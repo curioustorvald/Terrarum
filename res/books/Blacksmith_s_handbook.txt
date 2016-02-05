@@ -1,0 +1,26 @@
+
+§cBlacksmith’s handbook
+
+
+§cBy Anonymous
+§p
+To smith weapon, armour, or whatever you want, you need to build your own forge.
+Get 8 cobblestone, 3 iron ingots, and 4 coals. Then use a workbench to create your first forge.
+
+Almost every weapon and armour needs leather for the strips and bindings. So be sure to get some leathers before attempt to forge any items.
+
+Iron is easy to work. Just heat them up and make a shape. The heat of the forge is not that critical.
+
+Steel is made from iron and a bit of charcoal. It is still easy to work, although it is harder than iron.
+
+Cobalt is made from cobalt ore, melded with a bit of iron. Working with it requires a skill. Heat should be used sparingly, lest it become brittle.
+
+Titanium can only be worked when heated. It will develop small cracks and eventually shattered. Titanium will not alloy with iron. It must be used pure.
+
+For some blacksmiths who want to forge elven weapons and armour, here is some details.
+
+Typical elven weapons and armours use a large amount of orichalcum. The technique of smelting it from it’s ore is not known, only elven blacksmiths shares the secret.
+
+Advanced elven stuffs involve using of elven glass. This glass is not a one that composes your house window. The technique of smelting it is also the elven secret. 
+
+I can only tell you tales of adamantine. It is a legendary metal which is known for its superb quality. It is the best material for forging weapons and armours. The story says only dwarves know how it can be found, or forged. And some say that even dwarves lost their knowledge of forging stuffs with it.

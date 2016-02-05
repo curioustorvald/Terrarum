@@ -1,0 +1,25 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="http://slick.ninjacave.com/javadoc/" />
+      <root url="jar://$PROJECT_DIR$/lib/gson-2.5-javadoc.jar!/" />
+      <root url="file://$PROJECT_DIR$/lib/javadoc" />
+      <root url="file://$PROJECT_DIR$/lib/apidocs" />
+    </JAVADOC>
+    <NATIVE>
+      <root url="file://$PROJECT_DIR$/lib/native" />
+      <root url="jar://$PROJECT_DIR$/lib/natives-linux.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/natives-mac.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/natives-windows.jar!/" />
+    </NATIVE>
+    <SOURCES />
+    <excluded>
+      <root url="jar://$PROJECT_DIR$/lib/gson-2.5-javadoc.jar!/" />
+      <root url="file://$PROJECT_DIR$/lib/apidocs" />
+    </excluded>
+    <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
+  </library>
+</component>

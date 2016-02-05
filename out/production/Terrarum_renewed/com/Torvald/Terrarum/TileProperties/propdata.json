@@ -1,0 +1,22 @@
+{
+    "0": {
+        "name": "TILE_AIR",
+        "opacity": 0,
+        "strength": 0,
+        "isFluid": 0,
+        "fluidViscocity": 0,
+        "drop": "__null",
+        "isSolid": 0,
+        "isAlsoWall": 0
+    },
+    "1": {
+        "name": "TILE_STONE",
+        "opacity": 8,
+        "strength": 25,
+        "isFluid": 0,
+        "fluidViscocity": 0,
+        "drop": "item.stone",
+        "isSolid": 0,
+        "isAlsoWall": 0
+    }
+}

@@ -1,0 +1,139 @@
+== CHALLENGING, NOT PUNISHING       https://www.youtube.com/watch?v=ea6UuRTjkKs
+
+1. CONSISTENT RULES
+    - No arbitrary unstoppable death
+
+2. Player's skill involved
+    - Can play around, not restart
+
+3. Usability of in-game tools
+    - Players should be able to 'regret' their strategy and adjust.
+
+4. Comfortable control
+
+5. Make players overcome the challenge, not defeating them
+
+6. Let players have "aha" moment when they failed.
+    - Make them hungry to retry with new strategies.
+    - Some small things they've could done differently
+        - e.g. "One-big-hit didn't worked, may I should've picked up high DPS one"
+
+
+== MORE DEPTH, LESS COMPLEXITY      https://www.youtube.com/watch?v=jVL4st0blGU
+
+1. Memorise less!
+    - Less burden to, even starting the game
+    - Start with gentle learning curve, getting slowly steep
+    - Intuitive UX (UI, control, ...)
+    - Good tutorial = lessens complexity
+
+2. Intuitive!
+
+3. Calculations per second
+    - reduce!
+
+4. Players have to know everything to even begin the play == FAIL (irreducible complexity)
+    - Make them get familiar with rules of the game
+    - Dwarf Fortress failed this!
+
+
+== Lots of things players play with (aka don't make them bored)
+    - Combat, battle, building, mechanics, adventure, dungeon explore, spelunking
+    - Not scaled; easy combat, tough combat, tedious combat, etc.
+
+
+== Achieving perfect imbalance    https://www.youtube.com/watch?v=e31OSVZF77w
+    - Make sure no matter how you skilled, your playable character cannot be good at everything
+    - Give players __wide pool of options__ to solve problem
+        (kill the boss, defend their adobe, fast transportation, etc.)
+
+
+
+====================================
+
+
+* Friendlier version of Dwarf Fortress Adventure mode
+- Yet _lots of fun_
+- Add Fortress mode features by 'make your own settling'
+- Hard to actually die, but once you die, you're done.
+    + Config: imtooyoungtodie for easy mode
+
+
+
+* Side view
+
+* Interact menu w/ mouse right
+
+* Pixelated sprites
+  - Use 2x sprites if rotating does not work well
+
+
+
+###  User experience  ###
+
+* Indicative mouse cursor
+
+
+
+###  Game mechanics  ###
+
+* 24 pixels == 1 metre
+
+
+
+###  Purpose of the game  ###
+
+* Boss
+    - Will be mentioned/shown as absolute _evil_.
+    - But actually is not.
+
+* Theme
+    - Is an evil really really is what we think?
+    - Is there a thing as 'absolute evil'?
+
+* Boss character
+    - From debugger character
+    - Name key: "Sigriðr hinn Dróttningin" (can be changed)
+    * Little setting
+        - A ruler, hated by people
+
+* Mechanics
+    - Beating boss does not ends the game, but grants an ability to
+      create new character as it.
+
+
+
+###  Making sprite  ###
+
+* Layers
+    - (Optional) Hair foreground
+    - Right arm dress
+    - Right arm body
+    - Dress
+    - Boot right
+    - Boot left
+    - Body
+    - (Optional) Hair accessory
+    - Hair
+    - Head
+    - Left arm dress
+    - Left arm body
+    - (Optional) SFX
+
+* Size
+    - Regular sprite 'height': 40 px
+        - Apparent height may vary
+
+
+
+###  Chargen  ###
+
+* Select hair, colours, then compile them into single spritesheet
+
+* NO gender distinction, but have masculine/neutral/feminine designs (in clothing, hairstyles, etc.)
+
+* Colour: 4096 colours (12-bit 0x000 - 0xFFF)
+
+* Height variation option (.85 - .90 - .95 - 1 - 1.05 - 1.10 - 1.15)
+
+* Base mass: 60 kg

@@ -1,0 +1,16 @@
+Photoshop colourise settings
+
+Material	|Hue	|Sat	|Bri
+Copper		|35	|65	|0
+Cobalt		|225	|20	|0
+Titanium	|80	|7	|0
+Orichalcum	|45	|65	|0
+Glass		|127	|30	|0
+
+Curve settings
+
+Co/Ti	51->52	83->114
+Steel1	52->52	179->102  221->162
+Steel2	127->127  63->31  191->223
+
+Aetherium: #62FAFF

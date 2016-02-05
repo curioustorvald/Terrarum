@@ -1,0 +1,28 @@
+
+* Weapon tier
+
+Natural / Common  Stone > Copper > Iron > Silver      >        Titanium
+Forging                              ------------>  Steel  -------^
+Exotic ('elven')                Glass                  Aurichalcum
+Special (something 'adamant')                                            ??? (Use material spec of CNT, tensile strength 180 GPa)
+
+
+* Metal graphics
+
+Gold: Hue 43, low Saturation
+Aurichalcum: Hue 43, mid-high Saturation
+Copper: Hue 33,
+Copper rust: Hue 160
+Iron rust: Hue 15
+
+
+* Size variation
+
+Race base weapon/tool size <- 10 [kg]
+Size tolerance <- (50% * str/1000), or say, 20%
+
+If the size is bigger than tolerable, weapon speed severely slows down, tools become unusable
+    if use time >= 0.75 second, the weapon/tool cannot be equipped.
+Small weapons gains no (dis)advantage, tools become unusable
+
+Crafted tool/weapon size is dependent on the baseRaceMass.

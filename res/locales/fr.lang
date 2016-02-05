@@ -1,0 +1,166 @@
+MENU_LANGUAGE_THIS_EN=French
+MENU_LANGUAGE_THIS=Français
+
+COPYRIGHT_MSG=Tous les droits sont réservés.
+
+
+
+###########################
+##  Application messages  #
+###########################
+
+APP_CALIBRATE_YOUR_MONITOR=Meilleure expérience de joueur peut être réalisé avec écran correctement calibré. Si vous ne l'avez pas, s.v.p. le calibrez avant de jouer.
+
+
+
+###############
+##  Gameplay  #
+###############
+
+GAME_ACTION_ATTACK=Attaquer
+GAME_ACTION_BOOST=Booster
+GAME_ACTION_BUILD=Construire
+GAME_ACTION_CAST_FISHING=Lancer
+GAME_ACTION_CAST_SPELL=Lancer
+GAME_ACTION_CLAIM=Obtenir
+GAME_ACTION_CLIMB=Escalader
+GAME_ACTION_CLOSE=Fermer
+GAME_ACTION_COLLECT=Collecter
+GAME_ACTION_COOK=Cuisiner
+GAME_ACTION_CRAFT=Fabriquer
+GAME_ACTION_CROUCH=S'accroupir
+GAME_ACTION_DODGE=Esquiver
+GAME_ACTION_DRIVE=Conduire
+GAME_ACTION_FLY=Voler
+GAME_ACTION_FULL_SPEED=Vitesse Max
+GAME_ACTION_GO=Aller
+GAME_ACTION_GO_TO_PLACE=Aller à
+GAME_ACTION_HALF_SPEED=Mi-Vitesse
+GAME_ACTION_HEAL=Soigner
+GAME_ACTION_JUMP=Sauter
+GAME_ACTION_LAND=Atterrir
+GAME_ACTION_LOOK=Regarder
+GAME_ACTION_MIX=Mélanger
+GAME_ACTION_OPEN=Ouvrir
+GAME_ACTION_PICK_UP=Prendre
+GAME_ACTION_RACE=Faire la course
+GAME_ACTION_READ=Lire
+GAME_ACTION_REPLACE=Remplacer
+GAME_ACTION_RUN=Courir
+GAME_ACTION_RUN_AWAY=S'enfuir
+GAME_ACTION_SHOOT=Tirer
+GAME_ACTION_SNEAK=Se faufiler
+GAME_ACTION_SPIN=Tourner
+GAME_ACTION_SPRINT=Sprinter
+GAME_ACTION_STEER=Tourner
+GAME_ACTION_TAKE_OFF=Décoller
+GAME_ACTION_TALK=Parler
+GAME_ACTION_THROW=Jeter
+GAME_ACTION_WALK=Marcher
+
+GAME_CHARACTER_ENDURANCE=Endurance
+GAME_CHARACTER_EXP=Points d'expérience
+GAME_CHARACTER_HEALTH=Santé
+GAME_CHARACTER_HEART=Coeur
+GAME_CHARACTER_HEART_PLURAL=Coeurs
+GAME_CHARACTER_LEVEL=Niveau
+GAME_CHARACTER_LEVEL_UP=Niveau suivant !
+GAME_CHARACTER_RESPAWN=Réapparaître
+GAME_CHARACTER_RESPAWN_IN=Réapparition dans :
+GAME_CHARACTER_RESPAWN_QUESTION=Réapparaître ?
+GAME_CHARACTER_RESPAWNING=Réapparition
+GAME_CHARACTER_SKILL=Compétence
+GAME_CHARACTER_SPAWN_POINT=Point d'Apparition
+
+GAME_INVENTORY=Inventaire
+GAME_INVENTORY_AMMO=Munitions
+GAME_INVENTORY_AMMUNITION=Munitions
+GAME_INVENTORY_BULLET=Balle
+GAME_INVENTORY_BULLET_PLURAL=Balles
+GAME_INVENTORY_BUY=Acheter
+GAME_INVENTORY_CAPACITY=Capacité de l'inventaire
+GAME_INVENTORY_DROP=Jeter
+GAME_INVENTORY_ENCUMBRANCE=Encombrement
+GAME_INVENTORY_FULL=Inventaire plein
+GAME_INVENTORY_ITEM=Objet
+GAME_INVENTORY_KEY=Clé
+GAME_INVENTORY_POWERUP=Amélioration
+GAME_INVENTORY_SELL=Vendre
+GAME_INVENTORY_USE=Utiliser
+GAME_INVENTORY_WEAPON=Arme
+GAME_INVENTORY_WEAPONS=Armes
+GAME_INVENTORY_YOU_CANNOT_CARRY=Vous ne pouvez pas transporter plus
+
+
+
+############
+##  Tiles  #
+############
+
+TILE_AIR=Vous n'êtes pas censé voir ce
+TILE_STONE=Roche
+TILE_DIRT=Terre
+TILE_GRASS=Herbe
+TILE_PLANK_NORMAL=Planches
+TILE_PLANK_EBONY=Planches ébène
+TILE_PLANK_BIRCH=Planches bouleau
+TILE_PLANK_ROSEWOOD=Planches palissandre
+TILE_TRUNK_NORMAL=Bûche
+TILE_TRUNK_EBONY=Bûche ébène
+TILE_TRUNK_BIRCH=Bûche bouleau
+TILE_TRUNK_ROSEWOOD=Bûche rouge
+
+TILE_SNOW=Neige
+TILE_ICE_FRAGILE=Glace mance
+TILE_ICE_NATURAL=Glace
+TILE_ICE_CLEAR_MAGICAL=Glace claire
+
+
+
+####################
+##  Terminologies  #
+####################
+
+TERM_PHYS_MASS=masse
+
+
+
+##########
+##  Dev  #
+##########
+
+DEV_MEMORY_SHORT_CAP=MEM
+DEV_MEMORY_A_OF_B=%1$sM sur %2$sM
+
+DEV_COLOUR_LEGEND_GREEN= VERT
+DEV_COLOUR_LEGEND_BLUE= BLEU
+DEV_COLOUR_LEGEND_ORANGE=ORANGE
+DEV_COLOUR_LEGEND_RED= ROUGE
+
+DEV_MESSAGE_CONSOLE_CODEX=Tapez «codex» pour commandes disponibles.
+
+
+
+###############
+##  Debugger  #
+###############
+
+DBG_TOTAL_ACCEL_X=total X-accel
+
+
+
+##############
+##  Credits  #
+##############
+
+CREDITS_POLYGLOT=Traduit par le Polyglot Projet.
+
+
+
+################
+##  Languages  #
+################
+
+LANGUAGE_ENGLISH=Anglais
+LANGUAGE_FRENCH=Français
+LANGUAGE_KOREAN=Coréen

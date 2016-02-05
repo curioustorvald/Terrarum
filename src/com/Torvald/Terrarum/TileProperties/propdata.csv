@@ -1,0 +1,19 @@
+"type: excel";
+ "id";"name"                 ;"opacity";"strength";"isFluid";"viscosity";"isSolid";"isWall";"luminance";"drops"                ;
+  "0";"TILE_AIR"             ;      "0";       "0";      "0";        "0";      "0";     "0";        "0";"NULL"                 ;
+  "1";"TILE_STONE"           ;      "8";      "25";      "0";        "0";      "1";     "1";        "0";"TILE_STONE"           ;
+  "2";"TILE_DIRT"            ;      "8";       "6";      "0";        "0";      "1";     "1";        "0";"TILE_DIRT"            ;
+  "3";"TILE_GRASS"           ;      "8";       "6";      "0";        "0";      "1";     "1";        "0";"TILE_DIRT"            ;
+  "4";"TILE_PLANK_NORMAL"    ;      "8";      "12";      "0";        "0";      "1";     "1";        "0";"TILE_PLANK_NORMAL"    ;
+  "5";"TILE_PLANK_EBONY"     ;      "8";      "12";      "0";        "0";      "1";     "1";        "0";"TILE_PLANK_EBONY"     ;
+  "6";"TILE_PLANK_BIRCH"     ;      "8";      "12";      "0";        "0";      "1";     "1";        "0";"TILE_PLANK_BIRCH"     ;
+  "7";"TILE_PLANK_ROSEWOOD"  ;      "8";      "12";      "0";        "0";      "1";     "1";        "0";"TILE_PLANK_ROSEWOOD"  ;
+  "8";"TILE_TRUNK_NORMAL"    ;      "8";      "12";      "0";        "0";      "1";     "0";        "0";"TILE_PLANK_NORMAL"    ;
+  "9";"TILE_TRUNK_EBONY"     ;      "8";      "12";      "0";        "0";      "1";     "0";        "0";"TILE_PLANK_EBONY"     ;
+ "10";"TILE_TRUNK_BIRCH"     ;      "8";      "12";      "0";        "0";      "1";     "0";        "0";"TILE_PLANK_BIRCH"     ;
+ "11";"TILE_TRUNK_ROSEWOOD"  ;      "8";      "12";      "0";        "0";      "1";     "0";        "0";"TILE_PLANK_ROSEWOOD"  ;
+
+ "32";"TILE_SNOW"            ;      "8";       "6";      "0";        "0";      "1";     "1";        "0";"TILE_SNOW"            ;
+ "33";"TILE_ICE_FRAGILE"     ;      "1";       "1";      "0";        "0";      "1";     "0";        "0";"NULL"                 ;
+ "34";"TILE_ICE_NATURAL"     ;      "6";      "25";      "0";        "0";      "1";     "1";        "0";"TILE_ICE_NATURAL"     ;
+ "35";"TILE_ICE_CLEAR_MAGICAL";     "8";      "25";      "0";        "0";      "1";     "1";        "1";"TILE_ICE_CLEAR_MAGICAL";

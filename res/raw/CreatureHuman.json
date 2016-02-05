@@ -1,0 +1,23 @@
+{
+  "racename" : "CONTEXT_RACE_HUMAN",
+  "racenameplural" : "CONTEXT_RACE_HUMAN_PLURAL",
+  "baseheight" : 40,
+  "basemass" : 60.0,
+
+  "toolsize" : 15,
+
+  "strength" : 1000,
+  "strengthvariable" : [100,100,100,100,100,100,100],
+
+  "speed" : 3.0,
+  "speedvariable" : [100,100,100,100,100,100,100],
+
+  "jumppower" : 6.0,
+  "jumppowervariable" : [100,100,100,100,100,100,100],
+
+  "scale" : 1,
+  "scalevariable" : [100,100,100,100,100,100,100],
+
+  "encumbrance" : 1000,
+  "basedefence" : "work in progress"
+}

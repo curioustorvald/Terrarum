@@ -1,0 +1,20 @@
+§cBook writing guide
+
+
+§cBy Anonymous
+§p
+Writing a book is different from writing a simple text.
+The features that make difference are the usage of a ‘tokens’ for editing a book.
+
+Tokens have a fixed form. they are always consisted of section mark(§§) and one alphanumeric character.
+
+Available tokens are:
+§§p: Indicates page start or force turn to the next page.
+§§c: Align text to centre.
+§§b: Make text §bbold.
+§§i: Make text §iitalic.
+§§u: §uUnderline §xtext.
+§§x: Remove bold/italic/underline effect.
+§§: Write section mark(§§).
+
+Please note that effect of token will only affect single line.

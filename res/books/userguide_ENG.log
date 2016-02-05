@@ -1,0 +1,1409 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.3.31)  16 JUN 2015 18:28
+entering extended mode
+ restricted \write18 enabled.
+ file:line:error style messages enabled.
+ %&-line parsing enabled.
+**userguide_ENG.tex
+(./userguide_ENG.tex
+LaTeX2e <2014/05/01>
+Babel <3.9l> and hyphenation patterns for 79 languages loaded.
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/oblivoir.cls
+Document Class: oblivoir 
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/xoblivoir.cls
+Document Class: xoblivoir 2014/06/12
+(/usr/local/texlive/2014/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+Package: xkeyval 2014/12/03 v2.7a package option processing (HA)
+
+(/usr/local/texlive/2014/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/local/texlive/2014/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+\XKV@toks=\toks14
+\XKV@tempa@toks=\toks15
+
+(/usr/local/texlive/2014/texmf-dist/tex/generic/xkeyval/keyval.tex))
+\XKV@depth=\count79
+File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
+))
+(/usr/local/texlive/2014/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2013/04/04 v0.2 Provides if(tex) conditional for PDFTeX, XeTeX, 
+and LuaTeX
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/oblivoir-base.cls
+Document Class: oblivoir-base 2014/06/12 v0.6 article-like class to typeset UTF
+-8 korean using memoir.
+(/usr/local/texlive/2014/texmf-dist/tex/latex/etex-pkg/etex.sty
+Package: etex 2015/03/02 v2.1 eTeX basic definition package (PEB,DPC)
+\et@xins=\count80
+)
+\fa@setheight=\skip41
+\fa@setwidth=\skip42
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/memoir/memoir.cls
+Document Class: memoir 2015/03/05 v3.7c configurable book, report, article docu
+ment class
+\onelineskip=\skip43
+\lxvchars=\skip44
+\xlvchars=\skip45
+\@memcnta=\count81
+\c@@memmarkcntra=\count82
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
+Package ifpdf Info: pdfTeX in PDF mode is detected.
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/ifetex/ifetex.sty
+Package: ifetex 2011/12/15 v1.2 ifetex
+
+(/usr/local/texlive/2014/texmf-dist/tex/plain/ifetex/ifetex.tex))
+(/usr/local/texlive/2014/texmf-dist/tex/generic/ifxetex/ifxetex.sty
+Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
+)
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+)
+\stockheight=\skip46
+\stockwidth=\skip47
+\trimtop=\skip48
+\trimedge=\skip49
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/memoir/mem9.clo
+File: mem9.clo 2008/01/30 v0.4 memoir class 9pt size option
+)
+\binding=\skip50
+\spinemargin=\skip51
+\foremargin=\skip52
+\uppermargin=\skip53
+\lowermargin=\skip54
+\headdrop=\skip55
+\normalrulethickness=\skip56
+\mem@maxheadheight=\skip57
+\mem@maxfootheight=\skip58
+\headwidth=\skip59
+\c@storedpagenumber=\count83
+\memPD=\dimen102
+\m@mabparskip=\skip60
+\thanksmarkwidth=\skip61
+\thanksmarksep=\skip62
+\droptitle=\skip63
+\c@book=\count84
+\c@part=\count85
+\c@chapter=\count86
+\c@section=\count87
+\c@subsection=\count88
+\c@subsubsection=\count89
+\c@paragraph=\count90
+\c@subparagraph=\count91
+\beforechapskip=\skip64
+\midchapskip=\skip65
+\afterchapskip=\skip66
+\chapindent=\skip67
+\bottomsectionskip=\skip68
+\secindent=\skip69
+\beforesecskip=\skip70
+\aftersecskip=\skip71
+\subsecindent=\skip72
+\beforesubsecskip=\skip73
+\aftersubsecskip=\skip74
+\subsubsecindent=\skip75
+\beforesubsubsecskip=\skip76
+\aftersubsubsecskip=\skip77
+\paraindent=\skip78
+\beforeparaskip=\skip79
+\afterparaskip=\skip80
+\subparaindent=\skip81
+\beforesubparaskip=\skip82
+\aftersubparaskip=\skip83
+\pfbreakskip=\skip84
+\c@@ppsavesec=\count92
+\c@@ppsaveapp=\count93
+\ragrparindent=\dimen103
+\everylistparindent=\dimen104
+\parsepi=\skip85
+\topsepi=\skip86
+\itemsepi=\skip87
+\parsepii=\skip88
+\topsepii=\skip89
+\topsepiii=\skip90
+\itemsepii=\skip91
+\itemsepiii=\skip92
+\partopsepii=\skip93
+\partopsepiii=\skip94
+\m@msavetopsep=\skip95
+\m@msavepartopsep=\skip96
+\@enLab=\toks16
+\abstitleskip=\skip97
+\absleftindent=\skip98
+\abs@leftindent=\dimen105
+\absrightindent=\skip99
+\absparindent=\skip100
+\absparsep=\skip101
+\c@vslineno=\count94
+\c@poemline=\count95
+\c@modulo@vs=\count96
+\c@memfvsline=\count97
+\vleftskip=\skip102
+\vrightskip=\skip103
+\stanzaskip=\skip104
+\versewidth=\skip105
+\vgap=\skip106
+\vindent=\skip107
+\vleftmargin=\dimen106
+\c@verse=\count98
+\c@chrsinstr=\count99
+\beforepoemtitleskip=\skip108
+\afterpoemtitleskip=\skip109
+\c@poem=\count100
+\beforePoemTitleskip=\skip110
+\midPoemTitleskip=\skip111
+\afterPoemTitleskip=\skip112
+\col@sep=\dimen107
+\extrarowheight=\dimen108
+\NC@list=\toks17
+\extratabsurround=\skip113
+\backup@length=\skip114
+\TX@col@width=\dimen109
+\TX@old@table=\dimen110
+\TX@old@col=\dimen111
+\TX@target=\dimen112
+\TX@delta=\dimen113
+\TX@cols=\count101
+\TX@ftn=\toks18
+\heavyrulewidth=\dimen114
+\lightrulewidth=\dimen115
+\cmidrulewidth=\dimen116
+\belowrulesep=\dimen117
+\belowbottomsep=\dimen118
+\aboverulesep=\dimen119
+\abovetopsep=\dimen120
+\cmidrulesep=\dimen121
+\cmidrulekern=\dimen122
+\defaultaddspace=\dimen123
+\@cmidla=\count102
+\@cmidlb=\count103
+\@aboverulesep=\dimen124
+\@belowrulesep=\dimen125
+\@thisruleclass=\count104
+\@lastruleclass=\count105
+\@thisrulewidth=\dimen126
+\ctableftskip=\skip115
+\ctabrightskip=\skip116
+\abovecolumnspenalty=\count106
+\@linestogo=\count107
+\@cellstogo=\count108
+\@cellsincolumn=\count109
+\crtok=\toks19
+\@mincolumnwidth=\dimen127
+\c@newflo@tctr=\count110
+\mem@margin@floatbox=\box26
+\@contcwidth=\skip117
+\@contindw=\skip118
+\abovecaptionskip=\skip119
+\belowcaptionskip=\skip120
+\subfloattopskip=\skip121
+\subfloatcapskip=\skip122
+\subfloatcaptopadj=\skip123
+\subfloatbottomskip=\skip124
+\subfloatlabelskip=\skip125
+\subfloatcapmargin=\dimen128
+\c@@contsubnum=\count111
+\m@mscap@capbox=\box27
+\m@mscap@fbox=\box28
+\sidecapsep=\dimen129
+\sidecapwidth=\dimen130
+\m@m@tempdima=\dimen131
+\m@mscapraise=\dimen132
+\sidecapraise=\dimen133
+\m@mscapmainwidth=\dimen134
+\m@mscaplkern=\dimen135
+\beforeepigraphskip=\skip126
+\afterepigraphskip=\skip127
+\epigraphwidth=\skip128
+\epigraphrule=\skip129
+LaTeX Info: Redefining \em on input line 7514.
+LaTeX Info: Redefining \emph on input line 7522.
+\tocentryskip=\skip130
+\tocbaseline=\skip131
+\cftparskip=\skip132
+\cftbeforebookskip=\skip133
+\cftbookindent=\dimen136
+\cftbooknumwidth=\dimen137
+\cftbeforepartskip=\skip134
+\cftpartindent=\skip135
+\cftpartnumwidth=\skip136
+\cftbeforechapterskip=\skip137
+\cftchapterindent=\skip138
+\cftchapternumwidth=\skip139
+\cftbeforesectionskip=\skip140
+\cftsectionindent=\skip141
+\cftsectionnumwidth=\skip142
+\cftbeforesubsectionskip=\skip143
+\cftsubsectionindent=\skip144
+\cftsubsectionnumwidth=\skip145
+\cftbeforesubsubsectionskip=\skip146
+\cftsubsubsectionindent=\skip147
+\cftsubsubsectionnumwidth=\skip148
+\cftbeforeparagraphskip=\skip149
+\cftparagraphindent=\skip150
+\cftparagraphnumwidth=\skip151
+\cftbeforesubparagraphskip=\skip152
+\cftsubparagraphindent=\skip153
+\cftsubparagraphnumwidth=\skip154
+\prechapterprecisshift=\dimen138
+\c@maxsecnumdepth=\count112
+\bibindent=\dimen139
+\bibitemsep=\skip155
+\indexcolsep=\skip156
+\indexrule=\skip157
+\indexmarkstyle=\toks20
+\@indexbox=\insert233
+\glossarycolsep=\dimen140
+\glossaryrule=\dimen141
+\sideparvshift=\skip158
+\sideins=\insert232
+\sidebartopsep=\skip159
+\sidebarhsep=\skip160
+\sidebarvsep=\skip161
+\sidebarwidth=\skip162
+\footmarkwidth=\skip163
+\footmarksep=\skip164
+\footparindent=\skip165
+\footinsdim=\skip166
+\footinsv@r=\insert231
+\@mpfootinsv@r=\insert230
+\m@m@k=\count113
+\m@m@h=\dimen142
+\m@mipn@skip=\skip167
+\sidefootins=\insert229
+\sidefootadjust=\skip168
+\sidefootheight=\skip169
+\sidefoothsep=\skip170
+\sidefootvsep=\skip171
+\sidefootwidth=\skip172
+\m@mdownsf=\skip173
+\c@sidefootnote=\count114
+\sidefootmarkwidth=\skip174
+\sidefootmarksep=\skip175
+\sidefootparindent=\skip176
+\c@pagenote=\count115
+\c@pagenoteshadow=\count116
+\mem@pn@lastkern=\skip177
+\every@verbatim=\toks21
+\afterevery@verbatim=\toks22
+\verbatim@line=\toks23
+\tab@position=\count117
+\verbatim@in@stream=\read1
+\verbatimindent=\skip178
+\verbatim@out=\write3
+\bvboxsep=\skip179
+\c@memfbvline=\count118
+\c@bvlinectr=\count119
+\bvnumlength=\skip180
+\fb@frw=\dimen143
+\fb@frh=\dimen144
+\FrameRule=\dimen145
+\FrameSep=\dimen146
+\c@cp@cntr=\count120
+LaTeX Info: Redefining \: on input line 11980.
+LaTeX Info: Redefining \! on input line 11982.
+\c@ism@mctr=\count121
+\c@xsm@mctr=\count122
+\c@csm@mctr=\count123
+\c@ksm@mctr=\count124
+\c@xksm@mctr=\count125
+\c@cksm@mctr=\count126
+\c@msm@mctr=\count127
+\c@xmsm@mctr=\count128
+\c@cmsm@mctr=\count129
+\c@bsm@mctr=\count130
+\c@workm@mctr=\count131
+\c@sheetsequence=\count132
+\c@lastsheet=\count133
+\c@lastpage=\count134
+\c@figure=\count135
+\c@lofdepth=\count136
+\cftbeforefigureskip=\skip181
+\cftfigureindent=\skip182
+\cftfigurenumwidth=\skip183
+\c@table=\count137
+\c@lotdepth=\count138
+\cftbeforetableskip=\skip184
+\cfttableindent=\skip185
+\cfttablenumwidth=\skip186
+Package abstract [2008/07/23] emulated by memoir.
+Package appendix [2008/07/23] emulated by memoir.
+Package array [2008/09/09] emulated by memoir.
+Package booktabs [2008/07/23] emulated by memoir.
+Package ccaption [2008/07/23] emulated by memoir.
+Package changepage [2008/07/23] emulated by memoir.
+Package chngcntr [2008/07/23] emulated by memoir.
+Package chngpage [2008/07/23] emulated by memoir.
+Package crop emulated by memoir.
+Package dcolumn [2008/07/23] emulated by memoir.
+Package delarray [2008/07/23] emulated by memoir.
+Package enumerate [2008/07/23] emulated by memoir.
+Package epigraph [2008/07/23] emulated by memoir.
+Package ifmtarg [2008/07/23] emulated by memoir.
+Package index [2008/07/23] emulated by memoir.
+Package makeidx [2008/07/23] emulated by memoir.
+Package moreverb [2008/07/23] emulated by memoir.
+Package mparhack [2008/07/23] emulated by memoir.
+Package needspace [2008/07/23] emulated by memoir.
+Package newfile [2008/07/23] emulated by memoir.
+Package nextpage [2008/07/23] emulated by memoir.
+Package pagenote [2008/07/23] emulated by memoir.
+Package parskip [2008/07/23] emulated by memoir.
+Package patchcmd [2008/07/23] emulated by memoir.
+Package setspace [2008/07/23] emulated by memoir.
+Package shortvrb [2008/07/23] emulated by memoir.
+Package showidx [2008/07/23] emulated by memoir.
+Package tabularx [2008/07/23] emulated by memoir.
+Package titleref [2008/07/23] emulated by memoir.
+Package titling [2008/07/23] emulated by memoir.
+Package tocbibind [2008/07/23] emulated by memoir.
+Package tocloft [2008/07/23] emulated by memoir.
+Package tocvsec2 [2008/07/23] emulated by memoir.
+Package verbatim [2008/07/23] emulated by memoir.
+Package verse [2008/07/23] emulated by memoir.
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/memoir/mempatch.sty
+Package: mempatch 2009/07/24 v6.0f Patches for memoir class v1.6180339
+))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/memhangul-ucs/memh
+angul-ucs.sty
+Package: memhangul-ucs 2014/06/12UCS Hangul Package for memoir class
+
+memhangul-ucs v1.7.7 2014/06/12
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-utf/dhucs.sty
+Package: dhucs 2012/11/08 v5.3.2 typesetting UTF-8 Korean documents
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-utf/kotexutf.sty
+Package: kotexutf 2013/10/20 v1.5 typesetting UTF-8 Korean documents
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2014/04/30 v1.2b Input encoding file
+\inpenc@prehook=\toks24
+\inpenc@posthook=\toks25
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/utf8.def
+File: utf8.def 2014/09/29 v1.1m UTF-8 support for inputenc
+Now handling font encoding OML ...
+... no UTF-8 mapping file for font encoding OML
+Now handling font encoding T1 ...
+... processing UTF-8 mapping file for font encoding T1
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/t1enc.dfu
+File: t1enc.dfu 2014/09/29 v1.1m UTF-8 support for inputenc
+   defining Unicode char U+00A1 (decimal 161)
+   defining Unicode char U+00A3 (decimal 163)
+   defining Unicode char U+00AB (decimal 171)
+   defining Unicode char U+00BB (decimal 187)
+   defining Unicode char U+00BF (decimal 191)
+   defining Unicode char U+00C0 (decimal 192)
+   defining Unicode char U+00C1 (decimal 193)
+   defining Unicode char U+00C2 (decimal 194)
+   defining Unicode char U+00C3 (decimal 195)
+   defining Unicode char U+00C4 (decimal 196)
+   defining Unicode char U+00C5 (decimal 197)
+   defining Unicode char U+00C6 (decimal 198)
+   defining Unicode char U+00C7 (decimal 199)
+   defining Unicode char U+00C8 (decimal 200)
+   defining Unicode char U+00C9 (decimal 201)
+   defining Unicode char U+00CA (decimal 202)
+   defining Unicode char U+00CB (decimal 203)
+   defining Unicode char U+00CC (decimal 204)
+   defining Unicode char U+00CD (decimal 205)
+   defining Unicode char U+00CE (decimal 206)
+   defining Unicode char U+00CF (decimal 207)
+   defining Unicode char U+00D0 (decimal 208)
+   defining Unicode char U+00D1 (decimal 209)
+   defining Unicode char U+00D2 (decimal 210)
+   defining Unicode char U+00D3 (decimal 211)
+   defining Unicode char U+00D4 (decimal 212)
+   defining Unicode char U+00D5 (decimal 213)
+   defining Unicode char U+00D6 (decimal 214)
+   defining Unicode char U+00D8 (decimal 216)
+   defining Unicode char U+00D9 (decimal 217)
+   defining Unicode char U+00DA (decimal 218)
+   defining Unicode char U+00DB (decimal 219)
+   defining Unicode char U+00DC (decimal 220)
+   defining Unicode char U+00DD (decimal 221)
+   defining Unicode char U+00DE (decimal 222)
+   defining Unicode char U+00DF (decimal 223)
+   defining Unicode char U+00E0 (decimal 224)
+   defining Unicode char U+00E1 (decimal 225)
+   defining Unicode char U+00E2 (decimal 226)
+   defining Unicode char U+00E3 (decimal 227)
+   defining Unicode char U+00E4 (decimal 228)
+   defining Unicode char U+00E5 (decimal 229)
+   defining Unicode char U+00E6 (decimal 230)
+   defining Unicode char U+00E7 (decimal 231)
+   defining Unicode char U+00E8 (decimal 232)
+   defining Unicode char U+00E9 (decimal 233)
+   defining Unicode char U+00EA (decimal 234)
+   defining Unicode char U+00EB (decimal 235)
+   defining Unicode char U+00EC (decimal 236)
+   defining Unicode char U+00ED (decimal 237)
+   defining Unicode char U+00EE (decimal 238)
+   defining Unicode char U+00EF (decimal 239)
+   defining Unicode char U+00F0 (decimal 240)
+   defining Unicode char U+00F1 (decimal 241)
+   defining Unicode char U+00F2 (decimal 242)
+   defining Unicode char U+00F3 (decimal 243)
+   defining Unicode char U+00F4 (decimal 244)
+   defining Unicode char U+00F5 (decimal 245)
+   defining Unicode char U+00F6 (decimal 246)
+   defining Unicode char U+00F8 (decimal 248)
+   defining Unicode char U+00F9 (decimal 249)
+   defining Unicode char U+00FA (decimal 250)
+   defining Unicode char U+00FB (decimal 251)
+   defining Unicode char U+00FC (decimal 252)
+   defining Unicode char U+00FD (decimal 253)
+   defining Unicode char U+00FE (decimal 254)
+   defining Unicode char U+00FF (decimal 255)
+   defining Unicode char U+0102 (decimal 258)
+   defining Unicode char U+0103 (decimal 259)
+   defining Unicode char U+0104 (decimal 260)
+   defining Unicode char U+0105 (decimal 261)
+   defining Unicode char U+0106 (decimal 262)
+   defining Unicode char U+0107 (decimal 263)
+   defining Unicode char U+010C (decimal 268)
+   defining Unicode char U+010D (decimal 269)
+   defining Unicode char U+010E (decimal 270)
+   defining Unicode char U+010F (decimal 271)
+   defining Unicode char U+0110 (decimal 272)
+   defining Unicode char U+0111 (decimal 273)
+   defining Unicode char U+0118 (decimal 280)
+   defining Unicode char U+0119 (decimal 281)
+   defining Unicode char U+011A (decimal 282)
+   defining Unicode char U+011B (decimal 283)
+   defining Unicode char U+011E (decimal 286)
+   defining Unicode char U+011F (decimal 287)
+   defining Unicode char U+0130 (decimal 304)
+   defining Unicode char U+0131 (decimal 305)
+   defining Unicode char U+0132 (decimal 306)
+   defining Unicode char U+0133 (decimal 307)
+   defining Unicode char U+0139 (decimal 313)
+   defining Unicode char U+013A (decimal 314)
+   defining Unicode char U+013D (decimal 317)
+   defining Unicode char U+013E (decimal 318)
+   defining Unicode char U+0141 (decimal 321)
+   defining Unicode char U+0142 (decimal 322)
+   defining Unicode char U+0143 (decimal 323)
+   defining Unicode char U+0144 (decimal 324)
+   defining Unicode char U+0147 (decimal 327)
+   defining Unicode char U+0148 (decimal 328)
+   defining Unicode char U+014A (decimal 330)
+   defining Unicode char U+014B (decimal 331)
+   defining Unicode char U+0150 (decimal 336)
+   defining Unicode char U+0151 (decimal 337)
+   defining Unicode char U+0152 (decimal 338)
+   defining Unicode char U+0153 (decimal 339)
+   defining Unicode char U+0154 (decimal 340)
+   defining Unicode char U+0155 (decimal 341)
+   defining Unicode char U+0158 (decimal 344)
+   defining Unicode char U+0159 (decimal 345)
+   defining Unicode char U+015A (decimal 346)
+   defining Unicode char U+015B (decimal 347)
+   defining Unicode char U+015E (decimal 350)
+   defining Unicode char U+015F (decimal 351)
+   defining Unicode char U+0160 (decimal 352)
+   defining Unicode char U+0161 (decimal 353)
+   defining Unicode char U+0162 (decimal 354)
+   defining Unicode char U+0163 (decimal 355)
+   defining Unicode char U+0164 (decimal 356)
+   defining Unicode char U+0165 (decimal 357)
+   defining Unicode char U+016E (decimal 366)
+   defining Unicode char U+016F (decimal 367)
+   defining Unicode char U+0170 (decimal 368)
+   defining Unicode char U+0171 (decimal 369)
+   defining Unicode char U+0178 (decimal 376)
+   defining Unicode char U+0179 (decimal 377)
+   defining Unicode char U+017A (decimal 378)
+   defining Unicode char U+017B (decimal 379)
+   defining Unicode char U+017C (decimal 380)
+   defining Unicode char U+017D (decimal 381)
+   defining Unicode char U+017E (decimal 382)
+   defining Unicode char U+200C (decimal 8204)
+   defining Unicode char U+2013 (decimal 8211)
+   defining Unicode char U+2014 (decimal 8212)
+   defining Unicode char U+2018 (decimal 8216)
+   defining Unicode char U+2019 (decimal 8217)
+   defining Unicode char U+201A (decimal 8218)
+   defining Unicode char U+201C (decimal 8220)
+   defining Unicode char U+201D (decimal 8221)
+   defining Unicode char U+201E (decimal 8222)
+   defining Unicode char U+2030 (decimal 8240)
+   defining Unicode char U+2031 (decimal 8241)
+   defining Unicode char U+2039 (decimal 8249)
+   defining Unicode char U+203A (decimal 8250)
+   defining Unicode char U+2423 (decimal 9251)
+)
+Now handling font encoding OT1 ...
+... processing UTF-8 mapping file for font encoding OT1
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/ot1enc.dfu
+File: ot1enc.dfu 2014/09/29 v1.1m UTF-8 support for inputenc
+   defining Unicode char U+00A1 (decimal 161)
+   defining Unicode char U+00A3 (decimal 163)
+   defining Unicode char U+00B8 (decimal 184)
+   defining Unicode char U+00BF (decimal 191)
+   defining Unicode char U+00C5 (decimal 197)
+   defining Unicode char U+00C6 (decimal 198)
+   defining Unicode char U+00D8 (decimal 216)
+   defining Unicode char U+00DF (decimal 223)
+   defining Unicode char U+00E6 (decimal 230)
+   defining Unicode char U+00EC (decimal 236)
+   defining Unicode char U+00ED (decimal 237)
+   defining Unicode char U+00EE (decimal 238)
+   defining Unicode char U+00EF (decimal 239)
+   defining Unicode char U+00F8 (decimal 248)
+   defining Unicode char U+0131 (decimal 305)
+   defining Unicode char U+0141 (decimal 321)
+   defining Unicode char U+0142 (decimal 322)
+   defining Unicode char U+0152 (decimal 338)
+   defining Unicode char U+0153 (decimal 339)
+   defining Unicode char U+2013 (decimal 8211)
+   defining Unicode char U+2014 (decimal 8212)
+   defining Unicode char U+2018 (decimal 8216)
+   defining Unicode char U+2019 (decimal 8217)
+   defining Unicode char U+201C (decimal 8220)
+   defining Unicode char U+201D (decimal 8221)
+)
+Now handling font encoding OMS ...
+... processing UTF-8 mapping file for font encoding OMS
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/omsenc.dfu
+File: omsenc.dfu 2014/09/29 v1.1m UTF-8 support for inputenc
+   defining Unicode char U+00A7 (decimal 167)
+   defining Unicode char U+00B6 (decimal 182)
+   defining Unicode char U+00B7 (decimal 183)
+   defining Unicode char U+2020 (decimal 8224)
+   defining Unicode char U+2021 (decimal 8225)
+   defining Unicode char U+2022 (decimal 8226)
+)
+Now handling font encoding OMX ...
+... no UTF-8 mapping file for font encoding OMX
+Now handling font encoding U ...
+... no UTF-8 mapping file for font encoding U
+   defining Unicode char U+00A9 (decimal 169)
+   defining Unicode char U+00AA (decimal 170)
+   defining Unicode char U+00AE (decimal 174)
+   defining Unicode char U+00BA (decimal 186)
+   defining Unicode char U+02C6 (decimal 710)
+   defining Unicode char U+02DC (decimal 732)
+   defining Unicode char U+200C (decimal 8204)
+   defining Unicode char U+2026 (decimal 8230)
+   defining Unicode char U+2122 (decimal 8482)
+   defining Unicode char U+2423 (decimal 9251)
+))
+(/usr/local/texlive/2014/texmf-dist/tex/plain/kotex-plain/kotexutf-core.tex
+\unih@ngulpoint=\count139
+\dhucs@emph@raise=\dimen147
+)
+Now handling font encoding LUC ...
+... processing UTF-8 mapping file for font encoding LUC
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-utf/lucenc.dfu
+File: lucenc.dfu 2007/09/05 UTF-8 support for dhucs
+   defining Unicode char U+00B7 (decimal 183)
+   defining Unicode char U+2018 (decimal 8216)
+   defining Unicode char U+2019 (decimal 8217)
+   defining Unicode char U+201C (decimal 8220)
+   defining Unicode char U+201D (decimal 8221)
+   defining Unicode char U+3001 (decimal 12289)
+   defining Unicode char U+3002 (decimal 12290)
+   defining Unicode char U+3008 (decimal 12296)
+   defining Unicode char U+3009 (decimal 12297)
+   defining Unicode char U+300A (decimal 12298)
+   defining Unicode char U+300B (decimal 12299)
+   defining Unicode char U+300C (decimal 12300)
+   defining Unicode char U+300D (decimal 12301)
+   defining Unicode char U+300E (decimal 12302)
+   defining Unicode char U+300F (decimal 12303)
+   defining Unicode char U+3010 (decimal 12304)
+   defining Unicode char U+3011 (decimal 12305)
+   defining Unicode char U+3014 (decimal 12308)
+   defining Unicode char U+3015 (decimal 12309)
+   defining Unicode char U+3016 (decimal 12310)
+   defining Unicode char U+3017 (decimal 12311)
+   defining Unicode char U+3018 (decimal 12312)
+   defining Unicode char U+3019 (decimal 12313)
+   defining Unicode char U+301A (decimal 12314)
+   defining Unicode char U+301B (decimal 12315)
+   defining Unicode char U+FF01 (decimal 65281)
+   defining Unicode char U+FF08 (decimal 65288)
+   defining Unicode char U+FF09 (decimal 65289)
+   defining Unicode char U+FF0C (decimal 65292)
+   defining Unicode char U+FF0E (decimal 65294)
+   defining Unicode char U+FF1A (decimal 65306)
+   defining Unicode char U+FF1B (decimal 65307)
+   defining Unicode char U+FF1C (decimal 65308)
+   defining Unicode char U+FF1D (decimal 65309)
+   defining Unicode char U+FF1E (decimal 65310)
+   defining Unicode char U+FF1F (decimal 65311)
+   defining Unicode char U+FF3B (decimal 65339)
+   defining Unicode char U+FF3D (decimal 65341)
+   defining Unicode char U+FF5B (decimal 65371)
+   defining Unicode char U+FF5D (decimal 65373)
+   defining Unicode char U+FF61 (decimal 65377)
+   defining Unicode char U+FF62 (decimal 65378)
+   defining Unicode char U+FF63 (decimal 65379)
+   defining Unicode char U+FF64 (decimal 65380)
+   defining Unicode char U+FF65 (decimal 65381)
+)
+\@josa=\count140
+\josatoks=\toks26
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/cjk-ko/kolabels-utf.sty
+Package: kolabels-utf 2015/03/20 v1.5 UTF-8 Hangul item labels
+)))
+\memh@hu=\dimen148
+\t@nch@ars=\skip187
+\tmp@XXbox=\box29
+\tmp@XXdim=\dimen149
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/memhangul-ucs/memh
+angul-common.sty
+Package: memhangul-common 2014/06/12
+\pghgheadwidth=\dimen150
+\c@APPchapter=\count141
+\c@APPsection=\count142
+\c@APPsubsection=\count143
+\togetheightoffont=\box30
+\htoffnt=\skip188
+\divnoteskip=\skip189
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/memhangul-ucs/memh
+angul-patch.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
+(/usr/local/texlive/2014/texmf-dist/tex/latex/l3kernel/expl3.sty
+Package: expl3 2015/03/01 v5547 L3 programming layer (loader) 
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/l3kernel/expl3-code.tex
+Package: expl3 2015/03/01 v5547 L3 programming layer (code) 
+L3 Module: l3bootstrap 2015/02/28 v5542 L3 Bootstrap code
+L3 Module: l3names 2015/02/24 v5535 L3 Namespace for primitives
+L3 Module: l3basics 2015/01/27 v5500 L3 Basic definitions
+L3 Module: l3expan 2014/11/27 v5472 L3 Argument expansion
+L3 Module: l3tl 2015/01/27 v5500 L3 Token lists
+L3 Module: l3str 2015/03/01 v5545 L3 Strings
+L3 Module: l3seq 2014/08/23 v5354 L3 Sequences and stacks
+L3 Module: l3int 2015/02/21 v5529 L3 Integers
+\c_max_int=\count144
+\l_tmpa_int=\count145
+\l_tmpb_int=\count146
+\g_tmpa_int=\count147
+\g_tmpb_int=\count148
+L3 Module: l3quark 2014/08/23 v5354 L3 Quarks
+L3 Module: l3prg 2014/08/23 v5354 L3 Control structures
+\g__prg_map_int=\count149
+L3 Module: l3clist 2014/08/23 v5354 L3 Comma separated lists
+L3 Module: l3token 2014/09/15 v5422 L3 Experimental token manipulation
+L3 Module: l3prop 2014/08/23 v5354 L3 Property lists
+L3 Module: l3msg 2015/02/26 v5537 L3 Messages
+L3 Module: l3file 2014/08/24 v5369 L3 File and I/O operations
+\l_iow_line_count_int=\count150
+\l__iow_target_count_int=\count151
+\l__iow_current_line_int=\count152
+\l__iow_current_word_int=\count153
+\l__iow_current_indentation_int=\count154
+L3 Module: l3skip 2014/08/23 v5354 L3 Dimensions and skips
+\c_zero_dim=\dimen151
+\c_max_dim=\dimen152
+\l_tmpa_dim=\dimen153
+\l_tmpb_dim=\dimen154
+\g_tmpa_dim=\dimen155
+\g_tmpb_dim=\dimen156
+\c_zero_skip=\skip190
+\c_max_skip=\skip191
+\l_tmpa_skip=\skip192
+\l_tmpb_skip=\skip193
+\g_tmpa_skip=\skip194
+\g_tmpb_skip=\skip195
+\c_zero_muskip=\muskip10
+\c_max_muskip=\muskip11
+\l_tmpa_muskip=\muskip12
+\l_tmpb_muskip=\muskip13
+\g_tmpa_muskip=\muskip14
+\g_tmpb_muskip=\muskip15
+L3 Module: l3keys 2015/01/27 v5500 L3 Key-value interfaces
+\g__keyval_level_int=\count155
+\l_keys_choice_int=\count156
+L3 Module: l3fp 2014/08/22 v5336 L3 Floating points
+\c__fp_leading_shift_int=\count157
+\c__fp_middle_shift_int=\count158
+\c__fp_trailing_shift_int=\count159
+\c__fp_big_leading_shift_int=\count160
+\c__fp_big_middle_shift_int=\count161
+\c__fp_big_trailing_shift_int=\count162
+\c__fp_Bigg_leading_shift_int=\count163
+\c__fp_Bigg_middle_shift_int=\count164
+\c__fp_Bigg_trailing_shift_int=\count165
+L3 Module: l3box 2014/08/23 v5354 L3 Experimental boxes
+\c_empty_box=\box31
+\l_tmpa_box=\box32
+\l_tmpb_box=\box33
+\g_tmpa_box=\box34
+\g_tmpb_box=\box35
+L3 Module: l3coffins 2014/08/23 v5354 L3 Coffin code layer
+\l__coffin_internal_box=\box36
+\l__coffin_internal_dim=\dimen157
+\l__coffin_offset_x_dim=\dimen158
+\l__coffin_offset_y_dim=\dimen159
+\l__coffin_x_dim=\dimen160
+\l__coffin_y_dim=\dimen161
+\l__coffin_x_prime_dim=\dimen162
+\l__coffin_y_prime_dim=\dimen163
+\c_empty_coffin=\box37
+\l__coffin_aligned_coffin=\box38
+\l__coffin_aligned_internal_coffin=\box39
+\l_tmpa_coffin=\box40
+\l_tmpb_coffin=\box41
+\l__coffin_display_coffin=\box42
+\l__coffin_display_coord_coffin=\box43
+\l__coffin_display_pole_coffin=\box44
+\l__coffin_display_offset_dim=\dimen164
+\l__coffin_display_x_dim=\dimen165
+\l__coffin_display_y_dim=\dimen166
+L3 Module: l3color 2014/08/23 v5354 L3 Experimental color support
+L3 Module: l3candidates 2015/03/01 v5544 L3 Experimental additions to l3kernel
+\l__box_top_dim=\dimen167
+\l__box_bottom_dim=\dimen168
+\l__box_left_dim=\dimen169
+\l__box_right_dim=\dimen170
+\l__box_top_new_dim=\dimen171
+\l__box_bottom_new_dim=\dimen172
+\l__box_left_new_dim=\dimen173
+\l__box_right_new_dim=\dimen174
+\l__box_internal_box=\box45
+\l__coffin_bounding_shift_dim=\dimen175
+\l__coffin_left_corner_dim=\dimen176
+\l__coffin_right_corner_dim=\dimen177
+\l__coffin_bottom_corner_dim=\dimen178
+\l__coffin_top_corner_dim=\dimen179
+\l__coffin_scaled_total_height_dim=\dimen180
+\l__coffin_scaled_width_dim=\dimen181
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/l3kernel/l3unicode-data.def
+File: l3unicode-data.def 2015/03/01 v5544 L3 Unicode data
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/l3kernel/l3pdfmode.def
+File: l3pdfmode.def 2015/03/01 v5544 L3 Experimental driver: PDF mode
+\l__driver_color_stack_int=\count166
+))
+Package: xparse 2014/11/25 v5471 L3 Experimental document command parser
+\l__xparse_current_arg_int=\count167
+\l__xparse_m_args_int=\count168
+\l__xparse_mandatory_args_int=\count169
+\l__xparse_processor_int=\count170
+\l__xparse_v_nesting_int=\count171
+)
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/hologo.sty
+Package: hologo 2012/04/26 v1.10 A logo collection with bookmark support (HO)
+
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
+)
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
+)
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2012/04/25 v1.16 Key value parser (HO)
+
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2011/02/16 v1.5 Avoid name clashes with e-TeX commands (HO)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+))
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/kvdefinekeys.sty
+Package: kvdefinekeys 2011/04/07 v1.3 Define keys (HO)
+)
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/ifvtex.sty
+Package: ifvtex 2010/03/01 v1.5 Detect VTeX and its facilities (HO)
+Package ifvtex Info: VTeX not detected.
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
+)
+Package hologo Info: Using driver `pdftex'.
+)
+.................................................
+. LaTeX info: "xparse/define-command"
+. 
+. Defining command \XeTeX with sig. '' on line 1132.
+.................................................
+.................................................
+. LaTeX info: "xparse/define-command"
+. 
+. Defining command \XeLaTeX with sig. '' on line 1132.
+.................................................
+.................................................
+. LaTeX info: "xparse/define-command"
+. 
+. Defining command \LuaTeX with sig. '' on line 1138.
+.................................................
+.................................................
+. LaTeX info: "xparse/define-command"
+. 
+. Defining command \LuaLaTeX with sig. '' on line 1138.
+.................................................
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/memhangul-ucs/memu
+cs-interword.sty
+Package: memucs-interword 2007/09/22
+\BASE@FONTsize=\dimen182
+\ORIG@spaceskip=\skip196
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/memhangul-ucs/memu
+cs-setspace.sty
+Package: memucs-setspace 2007/09/21 6.7-memucs8 Contributed and Supported LaTeX
+2e package
+
+Package: `memucs-setspace', a modified version of `setspace', 6.7-memucs8 <2007
+/09/21>
+)
+   defining Unicode char U+00BC (decimal 188)
+   defining Unicode char U+00BD (decimal 189)
+   defining Unicode char U+00BE (decimal 190)
+   defining Unicode char U+02D0 (decimal 720)
+   defining Unicode char U+2025 (decimal 8229)
+   defining Unicode char U+2026 (decimal 8230)
+   defining Unicode char U+2015 (decimal 8213)
+   defining Unicode char U+2312 (decimal 8978)
+\raisedotdim=\dimen183
+\dhucs@emph@width=\dimen184
+\useremphraisedim=\dimen185
+\tmp_user_emph_dim=\dimen186
+.................................................
+. LaTeX info: "xparse/define-command"
+. 
+. Defining command \useremph with sig. 'oom' on line 541.
+.................................................
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/memhangul-ucs/nanu
+mfontsel.sty
+Package: nanumfontsel 
+)
+(/usr/local/texlive/2014/texmf-dist/tex/generic/pdftex/glyphtounicode.tex)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-utf/contrib/dhucs-cmap.sty
+Package: dhucs-cmap 2007/06/16 searchable PDF for dhucs upon pdftex
+)
+\ob@hu=\dimen187
+(/usr/local/texlive/2014/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2012/11/06 v6.83m Hypertext links for LaTeX
+
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+Package: hobsub-hyperref 2012/05/28 v1.13 Bundle oberdiek, subset hyperref (HO)
+
+
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty
+Package: hobsub-generic 2012/05/28 v1.13 Bundle oberdiek, subset generic (HO)
+Package: hobsub 2012/05/28 v1.13 Construct package bundles (HO)
+Package hobsub Info: Skipping package `infwarerr' (already loaded).
+Package hobsub Info: Skipping package `ltxcmds' (already loaded).
+Package hobsub Info: Skipping package `ifluatex' (already loaded).
+Package hobsub Info: Skipping package `ifvtex' (already loaded).
+Package: intcalc 2007/09/27 v1.1 Expandable calculations with integers (HO)
+Package hobsub Info: Skipping package `ifpdf' (already loaded).
+Package hobsub Info: Skipping package `etexcmds' (already loaded).
+Package hobsub Info: Skipping package `kvsetkeys' (already loaded).
+Package hobsub Info: Skipping package `kvdefinekeys' (already loaded).
+Package hobsub Info: Skipping package `pdftexcmds' (already loaded).
+Package: pdfescape 2011/11/25 v1.13 Implements pdfTeX's escape features (HO)
+Package: bigintcalc 2012/04/08 v1.3 Expandable calculations on big integers (HO
+)
+Package: bitset 2011/01/30 v1.1 Handle bit-vector datatype (HO)
+Package: uniquecounter 2011/01/30 v1.2 Provide unlimited unique counter (HO)
+)
+Package hobsub Info: Skipping package `hobsub' (already loaded).
+Package: letltxmacro 2010/09/02 v1.4 Let assignment for LaTeX macros (HO)
+Package: hopatch 2012/05/28 v1.2 Wrapper for package hooks (HO)
+Package: xcolor-patch 2011/01/30 xcolor patch
+Package: atveryend 2011/06/30 v1.8 Hooks at the very end of document (HO)
+Package atveryend Info: \enddocument detected (standard20110627).
+Package: atbegshi 2011/10/05 v1.16 At begin shipout hook (HO)
+Package: refcount 2011/10/16 v3.4 Data extraction from label references (HO)
+Package: hycolor 2011/01/30 v1.7 Color options for hyperref/bookmark (HO)
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/auxhook.sty
+Package: auxhook 2011/03/04 v1.3 Hooks for auxiliary files (HO)
+)
+\@linkdim=\dimen188
+\Hy@linkcounter=\count172
+\Hy@pagecounter=\count173
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2012/11/06 v6.83m Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+)
+\Hy@SavedSpaceFactor=\count174
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/latexconfig/hyperref.cfg
+File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
+)
+Package hyperref Info: Option `unicode' set `true' on input line 4319.
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2012/11/06 v6.83m Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
+)
+Package hyperref Info: Hyper figures OFF on input line 4443.
+Package hyperref Info: Link nesting OFF on input line 4448.
+Package hyperref Info: Hyper index ON on input line 4451.
+Package hyperref Info: Plain pages OFF on input line 4458.
+Package hyperref Info: Backreferencing OFF on input line 4463.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4688.
+\c@Hy@tempcnt=\count175
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip16
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 5041.
+\XeTeXLinkMargin=\dimen189
+\Fld@menulength=\count176
+\Field@Width=\dimen190
+\Fld@charsize=\dimen191
+Package hyperref Info: Hyper figures OFF on input line 6295.
+Package hyperref Info: Link nesting OFF on input line 6300.
+Package hyperref Info: Hyper index ON on input line 6303.
+Package hyperref Info: backreferencing OFF on input line 6310.
+Package hyperref Info: Link coloring OFF on input line 6315.
+Package hyperref Info: Link coloring with OCG OFF on input line 6320.
+Package hyperref Info: PDF/A mode OFF on input line 6325.
+LaTeX Info: Redefining \ref on input line 6365.
+LaTeX Info: Redefining \pageref on input line 6369.
+\Hy@abspage=\count177
+\c@Item=\count178
+\c@Hfootnote=\count179
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/memoir/memhfixc.sty
+Package: memhfixc 2013/05/30 v1.17 nameref/hyperref package fixes for memoir cl
+ass
+\c@memhycontfloat=\count180
+\c@Hpagenote=\count181
+)
+
+Package hyperref Message: Driver: hpdftex.
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2012/11/06 v6.83m Hyperref driver for pdfTeX
+\Fld@listcount=\count182
+\c@bookmark@seq@number=\count183
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty
+Package: rerunfilecheck 2011/04/15 v1.7 Rerun checks for auxiliary files (HO)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+82.
+)
+Normal \skip register pool exhausted, switching to extended pool.
+\Hy@SectionHShift=\skip256
+)
+\@ensp=\skip257
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/memhangul-ucs/ob-t
+oclof.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/memhangul-ucs/ob-k
+oreanappendix.sty))
+HANGUL DRIVER: kotex-utf
+))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/memhangul-ucs/fapa
+persize.sty
+Package: fapapersize 
+\fa@stockheight=\skip258
+\fa@stockwidth=\skip259
+\fa@paperheight=\skip260
+\fa@paperwidth=\skip261
+\fa@leftmargin=\skip262
+\fa@rightmargin=\skip263
+\fa@uppermargin=\skip264
+\fa@lowermargin=\skip265
+\fa@tmplenwd=\skip266
+\fa@tmplenht=\skip267
+\tmp@dim=\dimen192
+)
+
+******************************************************
+Stock height and width: 325.215pt by 216.81pt
+Top and edge trims: 0pt and 0pt
+Page height and width: 325.215pt by 216.81pt
+Text height and width: 275.59851pt by 168pt
+Spine and edge margins: 24.06537pt and 24.06537pt
+Upper and lower margins: 24.06537pt and 25.55112pt
+Headheight and headsep: 11.22011pt and 10pt
+Footskip: 11.22011pt
+Columnsep and columnseprule: 10pt and 0pt
+Marginparsep and marginparwidth: 7pt and 10.06537pt
+Sidecapsep and sidecapwidth: 7pt and 85pt
+Sidebarhsep and sidebarwidth: 7pt and 85pt
+Sidebarvsep and sidebartopsep: 10pt and 0pt
+Sidebarheight: 546.99997pt
+Sidefoothsep and sidefootwidth: 7pt and 85pt
+Sidefootvsep and sidefootheight: 10pt and 546.99997pt
+******************************************************
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/was/gensymb.sty
+Package: gensymb 2003/07/02 v1.0 (WaS)
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/microtype/microtype.sty
+Package: microtype 2013/05/23 v2.5a Micro-typographical refinements (RS)
+\MT@toks=\toks27
+\MT@count=\count184
+LaTeX Info: Redefining \textls on input line 766.
+\MT@outer@kern=\dimen193
+LaTeX Info: Redefining \textmicrotypecontext on input line 1285.
+\MT@listname@count=\count185
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/microtype/microtype-pdftex.def
+File: microtype-pdftex.def 2013/05/23 v2.5a Definitions specific to pdftex (RS)
+
+LaTeX Info: Redefining \lsstyle on input line 915.
+LaTeX Info: Redefining \lslig on input line 915.
+\MT@outer@space=\skip268
+)
+Package microtype Info: Loading configuration file microtype.cfg.
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/microtype/microtype.cfg
+File: microtype.cfg 2013/05/23 v2.5a microtype main configuration file (RS)
+))
+
+LaTeX Warning: Unused global option(s):
+    [nohan].
+
+(./userguide_ENG.aux)
+\openout1 = `userguide_ENG.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for LUC/nanummj/m/n on input line 39.
+LaTeX Font Info:    Try loading font information for LUC+nanummj on input line 
+39.
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/nanumtype1/lucnanummj.fd
+File: lucnanummj.fd 2013/02/12 v0.1 Nanum Myeongjo font definitions
+)
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+   defining Unicode char U+00B7 (decimal 183)
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/kotex-oblivoir/memhangul-ucs/memu
+cs-gremph.sty
+Package: memucs-gremph 
+LaTeX Info: Redefining \itshape on input line 74.
+LaTeX Info: Redefining \slshape on input line 78.
+)
+\AtBeginShipoutBox=\box46
+Package hyperref Info: Link coloring OFF on input line 39.
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
+
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
+Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
+)
+\c@section@level=\count186
+)
+Redoing nameref's sectioning
+Redoing nameref's label
+LaTeX Info: Redefining \nameref on input line 39.
+LaTeX Info: Redefining \ref on input line 39.
+LaTeX Info: Redefining \pageref on input line 39.
+LaTeX Info: Redefining \nameref on input line 39.
+(./userguide_ENG.out) (./userguide_ENG.out)
+\@outlinefile=\write4
+\openout4 = `userguide_ENG.out'.
+
+LaTeX Info: Redefining \celsius on input line 39.
+Package gensymb Info: Faking symbols for \degree and \celsius on input line 39.
+
+
+
+Package gensymb Warning: Not defining \perthousand.
+
+LaTeX Info: Redefining \ohm on input line 39.
+Package gensymb Info: Using \Omega for \ohm on input line 39.
+
+Package gensymb Warning: Not defining \micro.
+
+
+Package microtype Warning: Command \pickup@font is not defined as expected.
+(microtype)                Patching it anyway. Some things may break.
+(microtype)                Double-check whether micro-typography is indeed
+(microtype)                applied to the document.
+(microtype)                (Hint: Turn on `verbose' mode).
+
+LaTeX Info: Redefining \microtypecontext on input line 39.
+Package microtype Info: Generating PDF output.
+Package microtype Info: Character protrusion enabled (level 2).
+Package microtype Info: Using default protrusion set `alltext'.
+Package microtype Info: Automatic font expansion enabled (level 2),
+(microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
+Package microtype Info: Using default expansion set `basictext'.
+Package microtype Info: No adjustment of tracking.
+Package microtype Info: No adjustment of interword spacing.
+Package microtype Info: No adjustment of character kerning.
+Package microtype Info: ... Loading configuration file mt-cmr.cfg.
+(/usr/local/texlive/2014/texmf-dist/tex/latex/microtype/mt-cmr.cfg
+File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
+(RS)
+)
+Package microtype Info: Setting up font `OT1/cmr/m/n/9' on input line 39.
+Package microtype Info: ... Loading protrusion list `cmr-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-default'.
+Package microtype Info: ... Applying non-selected expansion (list `default').
+Package microtype Info: Setting up font `OT1/cmr/m/n/12' on input line 42.
+Package microtype Info: ... Loading protrusion list `cmr-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-default'.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OT1/cmr/m/n/8' on input line 42.
+Package microtype Info: ... Loading protrusion list `cmr-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-default'.
+Package microtype Info: ... Applying non-selected expansion (list `default').
+Package microtype Info: ... No configuration file mt-cmss.cfg.
+Package microtype Info: Setting up font `OT1/cmss/m/n/8' on input line 42.
+Package microtype Info: ... Loading protrusion list `OT1-default'.
+Package microtype Info: Loading generic settings for font family
+(microtype)             `cmss' (encoding: OT1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+Package microtype Info: ... : First loading protrusion list `default'.
+Package microtype Info: ... Applying non-selected expansion (list `default').
+Package microtype Info: Setting up font `OT1/cmr/m/n/10' on input line 42.
+Package microtype Info: ... Loading protrusion list `cmr-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-default'.
+Package microtype Info: ... Applying non-selected expansion (list `default').
+Package microtype Info: Setting up font `OT1/cmr/m/n/7' on input line 42.
+Package microtype Info: ... Loading protrusion list `cmr-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-default'.
+Package microtype Info: ... Applying non-selected expansion (list `default').
+Package microtype Info: Setting up font `OT1/cmr/m/n/5' on input line 42.
+Package microtype Info: ... Loading protrusion list `cmr-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-default'.
+Package microtype Info: ... No expansion.
+Package microtype Info: ... No configuration file mt-cmm.cfg.
+Package microtype Info: Setting up font `OML/cmm/m/it/10' on input line 42.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OML/cmm/m/it/7' on input line 42.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OML/cmm/m/it/5' on input line 42.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+Package microtype Info: ... No configuration file mt-cmsy.cfg.
+Package microtype Info: Setting up font `OMS/cmsy/m/n/10' on input line 42.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OMS/cmsy/m/n/7' on input line 42.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OMS/cmsy/m/n/5' on input line 42.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+Package microtype Info: ... No configuration file mt-cmex.cfg.
+Package microtype Info: Setting up font `OMX/cmex/m/n/10' on input line 42.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 42.
+Package microtype Info: Setting up font `OMX/cmex/m/n/7' on input line 42.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 42.
+Package microtype Info: Setting up font `OMX/cmex/m/n/5' on input line 42.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+ [1
+
+{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+Package microtype Info: Setting up font `OT1/cmr/m/n/6' on input line 47.
+Package microtype Info: ... Loading protrusion list `cmr-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-default'.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OML/cmm/m/it/8' on input line 47.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OML/cmm/m/it/6' on input line 47.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OMS/cmsy/m/n/8' on input line 47.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OMS/cmsy/m/n/6' on input line 47.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 47.
+Package microtype Info: Setting up font `OMX/cmex/m/n/8' on input line 47.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 47.
+Package microtype Info: Setting up font `OMX/cmex/m/n/6' on input line 47.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OT1/cmr/m/n/10.95' on input line 49.
+Package microtype Info: ... Loading protrusion list `cmr-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-default'.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OT1/cmr/bx/n/10.95' on input line 49.
+Package microtype Info: ... Loading protrusion list `cmr-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-default'.
+Package microtype Info: ... No expansion.
+
+(./userguide_ENG.toc
+Package microtype Info: Setting up font `OML/cmm/m/it/9' on input line 1.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OMS/cmsy/m/n/9' on input line 1.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 1.
+Package microtype Info: Setting up font `OMX/cmex/m/n/9' on input line 1.
+Package microtype Info: ... No protrusion.
+Package microtype Info: ... No expansion.
+ [2]) [3]
+Overfull \hbox (2.87178pt too wide) in paragraph at lines 56--57
+\OT1/cmr/m/n/9 (-20) Terrarum is a rogue-like world which things
+ []
+
+Package microtype Info: Setting up font `OT1/cmr/bx/n/10' on input line 58.
+Package microtype Info: ... Loading protrusion list `cmr-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-default'.
+Package microtype Info: ... No expansion.
+
+Overfull \hbox (8.91882pt too wide) in paragraph at lines 59--61
+\OT1/cmr/m/n/9 (-20) any proper wagon, which should be equipped
+ []
+
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 61.
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <9> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 61.
+Package microtype Info: Setting up font `OT1/cmr/m/it/9' on input line 68.
+Package microtype Info: ... Loading protrusion list `cmr-it-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-it'.
+Package microtype Info: ... Applying non-selected expansion (list `default').
+ [4]
+Package microtype Info: Setting up font `OT1/cmr/bx/n/9' on input line 71.
+Package microtype Info: ... Loading protrusion list `cmr-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-default'.
+Package microtype Info: ... No expansion.
+
+Overfull \hbox (0.13977pt too wide) in paragraph at lines 72--73
+\OT1/cmr/m/n/9 (-20) (qw-erty)/FRST (cole-mak)/.OEW (dvo-rak)
+ []
+
+
+Overfull \hbox (1.80681pt too wide) in paragraph at lines 72--73
+\OT1/cmr/m/n/9 (-20) you to pro-vide more mod-i-fier pedals---QAZ
+ []
+
+[5]
+Overfull \hbox (14.09688pt too wide) in paragraph at lines 78--79
+\OT1/cmr/m/n/9 (-20) The world is com-posed with \OT1/cmr/m/it/9 (-20) three-di
+mensional
+ []
+
+
+Overfull \hbox (2.53613pt too wide) in paragraph at lines 78--79
+\OT1/cmr/m/n/9 (-20) average-height man should oc-cupy two tiles
+ []
+
+Package microtype Info: Setting up font `OT1/cmr/m/it/6' on input line 82.
+Package microtype Info: ... Loading protrusion list `cmr-it-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-it'.
+Package microtype Info: ... No expansion.
+Package microtype Info: Setting up font `OT1/cmr/m/it/5' on input line 82.
+Package microtype Info: ... Loading protrusion list `cmr-it-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-it'.
+Package microtype Info: ... No expansion.
+
+Overfull \hbox (2.68578pt too wide) in paragraph at lines 85--86
+[]\OT1/cmr/m/n/9 (-20) i.e. The man men-tioned above can climb
+ []
+
+[6]
+Overfull \hbox (10.13351pt too wide) in paragraph at lines 90--91
+[]\OT1/cmr/m/n/9 (-20) There are sev-eral con-ti-nents on the planet,
+ []
+
+Package microtype Info: Setting up font `OT1/cmr/m/it/7' on input line 92.
+Package microtype Info: ... Loading protrusion list `cmr-it-OT1'.
+Package microtype Info: ... : First loading protrusion list `cmr-it'.
+Package microtype Info: ... Applying non-selected expansion (list `default').
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <7> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 92.
+[7] [8] [9]
+\tf@toc=\write5
+\openout5 = `userguide_ENG.toc'.
+
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 123.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 123.
+ (./userguide_ENG.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 123.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 123.
+Package rerunfilecheck Info: File `userguide_ENG.out' has not changed.
+(rerunfilecheck)             Checksum: 737E53831C5110811A9860057020378C;1629.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 123.
+ ) 
+Here is how much of TeX's memory you used:
+ 20113 strings out of 493109
+ 332895 string characters out of 6135004
+ 441006 words of memory out of 5000000
+ 23302 multiletter control sequences out of 15000+600000
+ 11903 words of font info for 70 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 76i,11n,51p,10423b,432s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
+></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb><
+/usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></u
+sr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr
+/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/l
+ocal/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/loca
+l/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/t
+exlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texl
+ive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive
+/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/20
+14/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texlive/2014
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2014/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2014/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2014/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmti7.pfb></usr/local/texlive/2014/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmti9.pfb>
+Output written on userguide_ENG.pdf (9 pages, 191250 bytes).
+PDF statistics:
+ 206 PDF objects out of 1000 (max. 8388607)
+ 161 compressed objects within 2 object streams
+ 28 named destinations out of 1000 (max. 500000)
+ 19049 words of extra memory for PDF output out of 20736 (max. 10000000)
+

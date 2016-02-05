@@ -1,0 +1,123 @@
+\documentclass[stock,9pt,nohan]{oblivoir}
+
+\usepackage{fapapersize}
+\usefapapersize{3in,4.5in,.333in,*,.333in,.333in}
+\usepackage{gensymb}
+
+\linespread{1.25}
+\frenchspacing
+
+\usepackage[verbose=true]{microtype}
+
+\renewcommand{\contentsname}{Table of Contents}
+
+\newcommand{\gamever}{Alpha 1}
+
+\newcommand{\titleEN}{A Pocket Guide to the Terrarum World \vskip1ex \small\textsf{English edition} \normalsize}
+\newcommand{\titleKO}{\textsf{Terrarum} 간편 여행 안내서 \vskip1ex \small\sffamily 한국어판}
+
+\newcommand{\authorEN}{\small By \sffamily{}Terrarum developers}
+\newcommand{\authorKO}{\small 개발진 일동}
+
+\newcommand{\dateEN}{\small\sffamily Corresponds to world version \gamever}
+\newcommand{\dateKO}{\small\sffamily \gamever{}판 기준}
+
+\newcommand{\tocEN}{Table of Contents}
+\newcommand{\tocKO}{목 \  차}
+
+\renewcommand{\contentsname}{\tocEN}
+
+\title{\titleEN}
+\author{\authorEN}
+\date{\dateEN}
+
+\epigraphposition{center}
+\setlength{\epigraphrule}{0pt}
+\setlength{\epigraphwidth}{2in}
+\setlength{\beforeepigraphskip}{72pt}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\epigraph{
+Welcome! You are most likely an explorer, or a brave and courageous traveller who seeks uncharted planet in the universe, or an aspiring ruler-to-be who want rule your own world. We hope this little book to be an useful guide for whatever ambitious work you are up to.
+}{Writers}
+
+\tableofcontents*
+
+\newpage
+
+\newpage
+
+\section{Introduction}
+Terrarum is a rogue-like world which things are happening on real-time basis as in real-time role-playing games.
+
+	\subsection{Luggage preparation}
+	Trip to Terrarum can be achieved with any proper wagon, which should be equipped with:
+	\begin{itemize}
+	\item 64-bit wagon engine
+	\item Java Roving Environs 8 or higher
+	\item A wagon engine with cylinder volume of 2 GB. 4 GB or more is recommended
+	\item Free luggage space of 4 GB or more
+	\end{itemize}
+
+\section{Moving around}
+The control is omnidirectional. In other words, \emph{not} cell-based.
+
+	\subsection{Your first toddling}
+	\subsubsection{ISO\slash ANSI\slash JIS pedalboards}
+	Your default moving around uses ESDF (qwerty)\slash FRST (colemak)\slash .OEW (dvorak) pedals for default `WASD', in order for you to provide more modifier pedals---QAZ (qwerty\slash colemak), /A; (dvorak)---that are pressed with your little finger and more comfort to some pedalboards with Topre actuators.\footnote{Writers of this book would recommend you to use pedalboard with Cherry MX Red actuators, though any decent pedalboard should be sufficient.}
+	
+	\subsubsection{Joypads}
+	Your moving around uses left stick, and direction of the movement is \emph{not} limited to 8 directions, hence the term, “omni\-direc\-tion\-al”.
+
+\section{World}
+The world is composed with \emph{three-dimensional} blocks, which is the feature you should keep in mind during your trip. Each block is a metre-size and a metre-high, so an average-height man should occupy two tiles vertically, thus he is two-tile-high in the world.
+
+Cliffs are treated as a stair, and you---as well as any living things in the world---can climb the tile as you would use a stair. Climbable cliff height is calculated as
+\begin{equation}
+floor( \frac{height_{you}}{height_{\mathit{cliff}}} )
+\end{equation}
+
+i.e. The man mentioned above can climb one-tile-high cliff as a stair.
+
+	\subsection{Geograghy}
+	The world---the continent you play on---features mountains, valleys, rivers, lakes, ocean, caves, etc.
+	
+	There are several continents on the planet, which are created by you. While there are multiple continents, however, your wagon cannot travel to others.
+	
+	Each time you create a continent, unless you specified a \emph{seed}\footnote{Refer to \S 4.}, will never be the same.
+	
+	\subsection{Day and night}
+	A day in Terrarum world---the planet---is 72 000 seconds. A second in Earth would be equivalent to 60 (depends on the operational speed of your wagon) planetary seconds, which consists a planetary minute.
+	
+	\subsection{Biome}
+	Average temperature in meadows\slash forests\slash mountains are kept to pleasant 298 K\slash 25 \degree{}C\slash 77 \degree{}F. However, some sovereign territories are will not be as pleasant. Some governor of such biomes, though will not hinder any access, will not be pleased with your ruling.
+	
+	\subsection{Vegetation}
+	
+	
+	\subsection{Races and their civilisations}
+	
+	
+	\subsection{Common animals}
+	
+	
+\section{World creation}
+	You can specify some parameters when you create a continent. Controllable parameters are:
+	\begin{itemize}
+	\item World size (affects distance between tribes)
+	\item Ore amount (affects civilisation)
+	\item Vegetation (more trees means more building materials)
+	\item Seed (each randomly-created continent has its own \emph{seed} for landform. Leave it blank to randomise)
+	\end{itemize}
+	
+	You can name your continent while in creation, so try to come up with a good name!
+	
+	\subsection{World Size}
+	There are two size options available. \emph{Normal} gives $2048\times2048$ metres in size, \emph{Huge} gives $4096\times4096$ metres. Depth of the world is limited to 128 metres for all options.
+	
+\end{document}

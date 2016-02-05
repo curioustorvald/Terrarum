@@ -1,0 +1,449 @@
+package com.Torvald.Terrarum.Actors;
+
+import com.Torvald.Terrarum.GameControl.EnumKeyFunc;
+import com.Torvald.Terrarum.GameControl.KeyMap;
+import com.Torvald.spriteAnimation.SpriteAnimation;
+import com.jme3.math.FastMath;
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+import org.newdawn.slick.*;
+
+/**
+ * Created by minjaesong on 15-12-31.
+ */
+public class Player extends ActorWithBody implements Controllable, Pocketed {
+
+    @Nullable public Controllable vehicleRiding;
+
+    ActorValue actorValue;
+
+    int jumpPowerCounter = 0;
+    int walkPowerCounter = 0;
+    private final int WALK_FRAMES_TO_MAX_ACCEL = 6;
+
+    public float readonly_totalX = 0;
+
+    boolean jumping = false;
+
+    @NotNull int walkHeading;
+
+    ActorInventory inventory;
+
+    private final int LEFT = 1;
+    private final int RIGHT = 2;
+
+    private int prevHMoveKey = -1;
+    private int prevVMoveKey = -1;
+    private final int KEY_NULL = -1;
+
+    final float ACCEL_MULT_IN_FLIGHT = 0.45f;
+    final float WALK_STOP_ACCEL = 0.2f;
+    final float WALK_ACCEL_BASE = 0.2f;
+
+    private boolean noClip = false;
+
+    /**
+     * Creates new Player instance with empty elements (sprites, actorvalue, etc.). <br />
+     *
+     * <strong>Use PlayerBuildFactory to build player!</strong>
+     *
+     * @throws SlickException
+     */
+    public Player() throws SlickException {
+        super();
+        actorValue = new ActorValue();
+    }
+
+    @Override
+    public void update(GameContainer gc, int delta_t) {
+        updatePhysicalInfos();
+        super.update(gc, delta_t);
+
+        updateSprite(delta_t);
+
+        updateMovementControl();
+
+        if (noClip) { super.setGrounded(true); }
+    }
+
+    private void updatePhysicalInfos() {
+        super.setScale((float) actorValue.get("scale"));
+        super.setMass((float) actorValue.get("basemass")
+                * FastMath.pow(super.getScale(), 3));
+    }
+
+    private void walkHorizontal(boolean left) {
+        readonly_totalX = super.getVeloX()
+                +
+                (float) actorValue.get("accel")
+                        * (float) actorValue.get("accelmult")
+                        * FastMath.sqrt(super.getScale())
+                        * applyAccelRealism(walkPowerCounter)
+                        * (left ? -1 : 1);
+
+        super.setVeloX(readonly_totalX);
+
+        if (walkPowerCounter < WALK_FRAMES_TO_MAX_ACCEL) {
+            walkPowerCounter += 1;
+        }
+
+        // Clamp veloX
+        super.setVeloX(
+                absClamp(super.getVeloX()
+                , (float) actorValue.get("speed")
+                        * (float) actorValue.get("speedmult")
+                        * FastMath.sqrt(super.getScale())
+        ));
+
+        // Heading flag
+        if (left)
+            walkHeading = LEFT;
+        else
+            walkHeading = RIGHT;
+    }
+
+    /**
+     * For realistic accelerating while walking.
+     *
+     * Naïve 'veloX += 3' is actually like:
+     *
+     *  a
+     *  |      ------------
+     *  |
+     *  |
+     * 0+------············  t
+     *
+     * which is unrealistic, so this method tries to introduce some realism by:
+     *
+     *  a
+     *  |           ------------
+     *  |        ---
+     *  |       -
+     *  |    ---
+     * 0+----··················· t
+     *
+     *
+     * @param x
+     */
+    private float applyAccelRealism(int x) {
+        return 0.5f + 0.5f * -FastMath.cos(10 * x / (WALK_FRAMES_TO_MAX_ACCEL * FastMath.PI));
+    }
+
+    private void walkVertical(boolean up) {
+        super.setVeloY(super.getVeloY()
+                +
+                (float) actorValue.get("accel")
+                * (float) actorValue.get("accelmult")
+                * FastMath.sqrt(super.getScale())
+                * applyAccelRealism(walkPowerCounter)
+                * (up ? -1 : 1)
+        );
+
+        if (walkPowerCounter < WALK_FRAMES_TO_MAX_ACCEL) {
+            walkPowerCounter += 1;
+        }
+
+        // Clamp veloX
+        super.setVeloY(
+                absClamp(super.getVeloY()
+                        , (float) actorValue.get("speed")
+                                * (float) actorValue.get("speedmult")
+                                * FastMath.sqrt(super.getScale())
+                )
+        );
+    }
+
+    private void walkHStop() {
+        if (super.getVeloX() > 0) {
+            super.setVeloX(super.getVeloX()
+                    -
+                    (float) actorValue.get("accel")
+                    * (float) actorValue.get("accelmult")
+                    * FastMath.sqrt(super.getScale())
+            );
+
+            // compensate overshoot
+            if (super.getVeloX() < 0)
+                super.setVeloX(0);
+        }
+        else if (super.getVeloX() < 0) {
+            super.setVeloX(super.getVeloX()
+                    +
+                    (float) actorValue.get("accel")
+                    * (float) actorValue.get("accelmult")
+                    * FastMath.sqrt(super.getScale())
+            );
+
+            // compensate overshoot
+            if (super.getVeloX() > 0)
+                super.setVeloX(0);
+        }
+        else {
+            super.setVeloX(0);
+        }
+
+        walkPowerCounter = 0;
+    }
+
+    private void walkVStop() {
+        if (super.getVeloY() > 0) {
+            super.setVeloY(super.getVeloY()
+                    -
+                    WALK_STOP_ACCEL
+                            * (float) actorValue.get("accelmult")
+                            * FastMath.sqrt(super.getScale())
+            );
+
+            // compensate overshoot
+            if (super.getVeloY() < 0)
+                super.setVeloY(0);
+        }
+        else if (super.getVeloY() < 0) {
+            super.setVeloY(super.getVeloY()
+                    +
+                    WALK_STOP_ACCEL
+                            * (float) actorValue.get("accelmult")
+                            * FastMath.sqrt(super.getScale())
+            );
+
+            // compensate overshoot
+            if (super.getVeloY() > 0)
+                super.setVeloY(0);
+        }
+        else {
+            super.setVeloY(0);
+        }
+
+        walkPowerCounter = 0;
+    }
+
+    private void updateMovementControl() {
+        if (!noClip) {
+            if (super.isGrounded()) {
+                actorValue.set("accelmult", 1f);
+            } else {
+                actorValue.set("accelmult", ACCEL_MULT_IN_FLIGHT);
+            }
+        }
+        else {
+            actorValue.set("accelmult", 1f);
+        }
+    }
+
+    public void processInput(Input input) {
+        /**
+         * L-R stop
+         */
+        // ↑F, ↑S
+        if (!isFuncDown(input, EnumKeyFunc.MOVE_LEFT)
+                && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+            walkHStop();
+            prevHMoveKey = KEY_NULL;
+        }
+        /**
+         * U-D stop
+         */
+        // ↑E
+        // ↑D
+        if (isNoClip()
+                &&!isFuncDown(input, EnumKeyFunc.MOVE_UP)
+                && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+            walkVStop();
+            prevVMoveKey = KEY_NULL;
+        }
+
+        /**
+         * Left/Right movement
+         */
+
+        // ↑F, ↓S
+        if (isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)
+                && !isFuncDown(input, EnumKeyFunc.MOVE_LEFT)) {
+            walkHorizontal(false);
+            prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT);
+        }
+        // ↓F, ↑S
+        else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT)
+                && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+            walkHorizontal(true);
+            prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT);
+        }
+        // ↓F, ↓S
+        else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT)
+                && isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+            if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
+                walkHorizontal(false);
+                prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT);
+            }
+            else if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)) {
+                walkHorizontal(true);
+                prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT);
+            }
+        }
+
+        /**
+         * Up/Down movement
+         */
+
+        if (noClip) {
+            // ↑E
+            // ↓D
+            if (isFuncDown(input, EnumKeyFunc.MOVE_DOWN)
+                    && !isFuncDown(input, EnumKeyFunc.MOVE_UP)) {
+                walkVertical(false);
+                prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN);
+            }
+            // ↓E
+            // ↑D
+            else if (isFuncDown(input, EnumKeyFunc.MOVE_UP)
+                    && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+                walkVertical(true);
+                prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP);
+            }
+            // ↓E
+            // ↓D
+            else if (isFuncDown(input, EnumKeyFunc.MOVE_UP)
+                    && isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+                if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
+                    walkVertical(false);
+                    prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN);
+                }
+                else if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)) {
+                    walkVertical(true);
+                    prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP);
+                }
+            }
+        }
+
+        /**
+         * Jump control
+         */
+        if (isFuncDown(input, EnumKeyFunc.JUMP)) {
+            if (!noClip) {
+                if (super.isGrounded()) {
+                    jumping = true;
+                    jump();
+                }
+            }
+            else {
+                walkVertical(true);
+            }
+        }
+        else {
+            jumping = false;
+            jumpPowerCounter = 0;
+        }
+
+    }
+
+    public void keyPressed(int key, char c) {
+
+    }
+
+    private void jump() {
+        float len = (float) actorValue.get("jumplength");
+        float pwr = (float) actorValue.get("jumppower");
+
+        //if (jumping) {
+        //    // Limit increment of jumpPowerCounter
+        //    if (jumpPowerCounter < len) {
+        //        jumpPowerCounter += 1;
+//
+        //        /**
+        //         * Limit jumping
+        //         */
+        //        //super.veloY = jumpFuncSqu(pwr, len);
+        //        super.veloY += jumpFuncLin(pwr, len);
+        //        //super.veloY = jumpFuncExp(pwr, len);
+//
+        //        System.out.println(jumpFuncLin(pwr, len));
+        //    }
+//
+        //    super.grounded = false;
+        //}
+
+        // At least this works, though. Useful if it were AI-controlled.
+        super.setVeloY(super.getVeloY()
+                -
+                pwr * FastMath.sqrt(super.getScale())
+        );
+    }
+
+    private float jumpFuncLin(float pwr, float len) {
+        return -(pwr / len) * jumpPowerCounter;
+    }
+
+    private float jumpFuncSqu(float pwr, float len) {
+        return (pwr / (len * len))
+                * (jumpPowerCounter - len)
+                * (jumpPowerCounter - len) // square
+                - pwr;
+    }
+
+    private float jumpFuncExp(float pwr, float len) {
+        float a = FastMath.pow(pwr + 1, 1 / len);
+        return -FastMath.pow(a, len) + 1;
+    }
+
+    private boolean isFuncDown(Input input, EnumKeyFunc fn) {
+        return input.isKeyDown(KeyMap.getKeyCode(fn));
+    }
+
+    private float absClamp(float i, float ceil) {
+        if (i > 0)
+            return (i > ceil) ? ceil : i;
+        else if (i < 0)
+            return (-i > ceil) ? -ceil : i;
+        else
+            return 0;
+    }
+
+    private void updateSprite(int delta_t) {
+        sprite.update(delta_t);
+        if (spriteGlow != null) {
+            spriteGlow.update(delta_t);
+        }
+
+        if (super.isGrounded()) {
+            if (walkHeading == LEFT) {
+                sprite.flip(true, false);
+                if (spriteGlow != null) {
+                    spriteGlow.flip(true, false);
+                }
+            }
+            else {
+                sprite.flip(false, false);
+                if (spriteGlow != null) {
+                    spriteGlow.flip(false, false);
+                }
+            }
+        }
+    }
+
+    @Override
+    public ActorInventory getInventory() {
+        return inventory;
+    }
+
+    @Override
+    public void overwriteInventory(ActorInventory inventory) {
+        this.inventory = inventory;
+    }
+
+    public boolean isNoClip() {
+        return noClip;
+    }
+
+    public void setNoClip(boolean b) {
+        noClip = b;
+    }
+
+    public ActorValue getActorValue() {
+        return actorValue;
+    }
+
+    public SpriteAnimation getSpriteGlow() {
+        return spriteGlow;
+    }
+
+}
