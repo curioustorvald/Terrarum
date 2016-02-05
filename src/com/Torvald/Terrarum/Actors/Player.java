@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum.Actors;
 
+import com.Torvald.Terrarum.Game;
 import com.Torvald.Terrarum.GameControl.EnumKeyFunc;
 import com.Torvald.Terrarum.GameControl.KeyMap;
 import com.Torvald.spriteAnimation.SpriteAnimation;
@@ -15,8 +16,6 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
 
     @Nullable public Controllable vehicleRiding;
 
-    ActorValue actorValue;
-
     int jumpPowerCounter = 0;
     int walkPowerCounter = 0;
     private final int WALK_FRAMES_TO_MAX_ACCEL = 6;
@@ -26,8 +25,6 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
     boolean jumping = false;
 
     @NotNull int walkHeading;
-
-    ActorInventory inventory;
 
     private final int LEFT = 1;
     private final int RIGHT = 2;
@@ -51,7 +48,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
      */
     public Player() throws SlickException {
         super();
-        actorValue = new ActorValue();
+        referenceID = Game.PLAYER_REF_ID;
+        setVisible(true);
     }
 
     @Override

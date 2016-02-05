@@ -21,27 +21,32 @@ public class ExportMap implements ConsoleCommand {
     private int mapDataPointer = 0;
 
     private static final byte AIR = 0;
-    private static final byte COAL = 16;
-    private static final byte COPPER = 17;
-    private static final byte IRON = 18;
-    private static final byte GOLD = 19;
 
-    private static final byte COBALTITE = 20;
-    private static final byte ILMENITE = 21;
-    private static final byte AURICHALCUM = 22;
-
-    private static final byte DIAMOND = 23;
-    private static final byte RUBY = 24;
-    private static final byte EMERALD = 25;
-    private static final byte SAPPHIRE = 26;
-    private static final byte TOPAZ = 27;
-    private static final byte AMETHYST = 28;
-
-    private static final byte DIRT = 2;
-    private static final byte GRAVEL = 15;
-    private static final byte SAND = 14;
     private static final byte STONE = 1;
+    private static final byte DIRT = 2;
     private static final byte GRASS = 3;
+
+    private static final byte SAND = 13;
+    private static final byte GRAVEL = 14;
+
+    private static final byte COPPER = 15;
+    private static final byte IRON = 16;
+    private static final byte GOLD = 17;
+    private static final byte SILVER = 18;
+    private static final byte ILMENITE = 19;
+    private static final byte AURICHALCUM = 20;
+
+    private static final byte DIAMOND = 21;
+    private static final byte RUBY = 22;
+    private static final byte EMERALD = 23;
+    private static final byte SAPPHIRE = 24;
+    private static final byte TOPAZ = 25;
+    private static final byte AMETHYST = 26;
+
+    private static final byte SNOW = 27;
+    private static final byte ICE_FRAGILE = 28;
+    private static final byte ICE_NATURAL = 29;
+    private static final byte ICE_MAGICAL = 30;
 
     private static final byte WATER = (byte) 239;
     private static final byte LAVA = (byte) 255;
@@ -121,11 +126,9 @@ public class ExportMap implements ConsoleCommand {
         colorTable.put(DIRT, new Col12(0x763));
         colorTable.put(GRASS, new Col12(0x251));
 
-        colorTable.put(COAL, new Col12(0x221));
         colorTable.put(COPPER, new Col12(0x6A8));
         colorTable.put(IRON, new Col12(0xC75));
         colorTable.put(GOLD, new Col12(0xCB6));
-        colorTable.put(COBALTITE, new Col12(0xDCD));
         colorTable.put(ILMENITE, new Col12(0x8AB));
         colorTable.put(AURICHALCUM, new Col12(0xD92));
 
@@ -141,6 +144,11 @@ public class ExportMap implements ConsoleCommand {
 
         colorTable.put(SAND, new Col12(0xDCA));
         colorTable.put(GRAVEL, new Col12(0x664));
+
+        colorTable.put(ICE_NATURAL, new Col12(0x9AB));
+        colorTable.put(ICE_MAGICAL, new Col12(0x7AC));
+        colorTable.put(ICE_FRAGILE, new Col12(0x6AF));
+        colorTable.put(SNOW, new Col12(0xCDE));
 
 
     }

@@ -12,10 +12,6 @@ public class PBFSigrid {
     public Player build() throws SlickException {
         Player p = new Player();
 
-        p.referenceID = Game.PLAYER_REF_ID;
-
-        p.setVisible(true);
-
         p.sprite = new SpriteAnimation();
         p.sprite.setDimension(28, 50);
         p.sprite.setSpriteImage("res/graphics/sprites/test_player.png");
@@ -35,12 +31,12 @@ public class PBFSigrid {
 
         p.actorValue = new ActorValue();
         p.actorValue.set("scale", 1.0f);
-        p.actorValue.set("speed", 3.0f);
+        p.actorValue.set("speed", 4.0f);
         p.actorValue.set("speedmult", 1.0f);
         p.actorValue.set("accel", p.WALK_ACCEL_BASE);
         p.actorValue.set("accelmult", 1.0f);
 
-        p.actorValue.set("jumppower", 6f);
+        p.actorValue.set("jumppower", 6.5f);
         // in frames
         p.actorValue.set("jumplength", 30f);
 
@@ -57,6 +53,8 @@ public class PBFSigrid {
         p.setHitboxDimension(20, 47, 7, 0);
 
         p.inventory = new ActorInventory((int) p.actorValue.get("encumbrance"), true);
+
+        p.setPosition(2048 * 16, 300 * 16);
 
         return p;
     }

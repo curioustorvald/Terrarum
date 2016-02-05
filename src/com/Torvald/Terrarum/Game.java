@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum;
 
+import com.Torvald.Rand.HighQualityRandom;
 import com.Torvald.Terrarum.Actors.*;
 import com.Torvald.Terrarum.ConsoleCommand.CommandDict;
 import com.Torvald.Terrarum.GameControl.GameController;
@@ -73,6 +74,7 @@ public class Game {
 
         MapGenerator.attachMap(map);
         MapGenerator.setSeed(0x51621D);
+        //MapGenerator.setSeed(new HighQualityRandom().nextLong());
         MapGenerator.generateMap();
 
         new CommandDict();
@@ -80,7 +82,6 @@ public class Game {
         // add new player and put it to actorContainer
         //player = new Player();
         player = new PBFSigrid().build();
-        player.setPosition(24, 24);
         //player.setNoClip(true);
         actorContainer.add(player);
 

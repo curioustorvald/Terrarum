@@ -17,52 +17,62 @@ public class MapGenerator {
     private static int[] heightMap;
 
     private static int dirtThickness;
-    private static int terrainHeightFromZeroPoint;
+    private static int TERRAIN_AVERAGE_HEIGHT;
     private static int minimumFloatingIsleHeight;
 
     private static final float noiseGradientStart = 0.67f;
     private static final float noiseGradientEnd = 0.56f;
     private static final float noiseGrdCaveEnd = 0.54f;
 
-    private static final float floatingIslandsProb = 0.63f;
-
     private static final int HILL_WIDTH = 256; // power of two!
+    private static final int MAX_HILL_HEIGHT = 100;
 
-    private static final int OCEAN_WIDTH = 200;
+    private static final int OCEAN_WIDTH = 400;
+    private static final int SHORE_WIDTH = 120;
+    private static final int MAX_OCEAN_DEPTH = 200;
+
     private static int GLACIER_MOUNTAIN_WIDTH;
     private static final int GLACIER_MOUNTAIN_HEIGHT = 300;
 
-    private static final int MAX_HILL_HEIGHT = 200;
-
     private static final byte AIR = 0;
 
-    private static final byte COPPER = 16;
-    private static final byte IRON = 17;
-    private static final byte GOLD = 18;
-    private static final byte SILVER = 19;
-
-    private static final byte ILMENITE = 20;
-    private static final byte AURICHALCUM = 21;
-
-    private static final byte DIAMOND = 22;
-    private static final byte RUBY = 23;
-    private static final byte EMERALD = 24;
-    private static final byte SAPPHIRE = 25;
-    private static final byte TOPAZ = 26;
-    private static final byte AMETHYST = 27;
-
-    private static final byte DIRT = 2;
-    private static final byte GRAVEL = 15;
-    private static final byte SAND = 14;
     private static final byte STONE = 1;
+    private static final byte DIRT = 2;
+    private static final byte GRASS = 3;
 
-    private static final byte SNOW = 28;
-    private static final byte ICE_FRAGILE = 29;
-    private static final byte ICE_NATURAL = 30;
+    private static final byte SAND = 13;
+    private static final byte GRAVEL = 14;
+
+    private static final byte COPPER = 15;
+    private static final byte IRON = 16;
+    private static final byte GOLD = 17;
+    private static final byte SILVER = 18;
+    private static final byte ILMENITE = 19;
+    private static final byte AURICHALCUM = 20;
+
+    private static final byte DIAMOND = 21;
+    private static final byte RUBY = 22;
+    private static final byte EMERALD = 23;
+    private static final byte SAPPHIRE = 24;
+    private static final byte TOPAZ = 25;
+    private static final byte AMETHYST = 26;
+
+    private static final byte SNOW = 27;
+    private static final byte ICE_FRAGILE = 28;
+    private static final byte ICE_NATURAL = 29;
+    private static final byte ICE_MAGICAL = 30;
+
+    private static final byte WATER = (byte) 239;
+    private static final byte LAVA = (byte) 255;
 
     @NotNull private static int worldOceanPosition;
     private static final int TYPE_OCEAN_LEFT = 0;
     private static final int TYPE_OCEAN_RIGHT = 1;
+
+    private static final int GRASSCUR_UP = 0;
+    private static final int GRASSCUR_RIGHT = 1;
+    private static final int GRASSCUR_DOWN = 2;
+    private static final int GRASSCUR_LEFT = 3;
 
     public static void attachMap(GameMap map) {
         MapGenerator.map = map;
@@ -71,7 +81,7 @@ public class MapGenerator {
 
         dirtThickness = (int) (100 * height / 1024f);
         minimumFloatingIsleHeight = (int) (25 * (height / 1024f));
-        terrainHeightFromZeroPoint = height / 4;
+        TERRAIN_AVERAGE_HEIGHT = height / 4;
         GLACIER_MOUNTAIN_WIDTH = Math.round(900 * (width / 8192f));
     }
 
@@ -86,7 +96,7 @@ public class MapGenerator {
         random = new HighQualityRandom(seed);
         System.out.println("[MapGenerator] Seed: " + seed);
 
-        worldOceanPosition = random.nextInt() & 0x1; // 0 or 1
+        worldOceanPosition = random.nextBoolean() ? TYPE_OCEAN_LEFT : TYPE_OCEAN_RIGHT;
 
         heightMap = raise2(MAX_HILL_HEIGHT / 2);
         generateOcean(heightMap);
@@ -174,15 +184,13 @@ public class MapGenerator {
                 , "Planting coals..."
         );*/
 
-        //flood
         floodBottomLava();
-
-        //plant
+        freeze();
+        fillOcean();
         plantGrass();
 
         //post-process
         generateFloatingIslands();
-        //fillOcean();
 
         //wire layer
         for (int i = 0; i < height; i++) {
@@ -268,16 +276,16 @@ public class MapGenerator {
             if (worldOceanPosition == TYPE_OCEAN_LEFT) {
                 noiseArrayLocal[i] = Math.round(
                         interpolateCosine(
-                                Math.round((float) (i) / OCEAN_WIDTH)
-                                , -MAX_HILL_HEIGHT, oceanLeftP1
+                                (float) (i) / OCEAN_WIDTH
+                                , -MAX_OCEAN_DEPTH, oceanLeftP1
                         )
                 );
             }
             else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
                 noiseArrayLocal[noiseArrayLocal.length - OCEAN_WIDTH + i] = Math.round(
                         interpolateCosine(
-                                Math.round((float) (i) / OCEAN_WIDTH)
-                                , oceanRightP1, -MAX_HILL_HEIGHT
+                                (float) (i) / OCEAN_WIDTH
+                                , oceanRightP1, -MAX_OCEAN_DEPTH
                         )
                 );
             }
@@ -437,8 +445,8 @@ public class MapGenerator {
 
         // iterate for heightmap
         for (int x = 0; x < width; x++) {
-            int medianPosition = terrainHeightFromZeroPoint;
-            int pillarOffset = medianPosition - fs[x] - 1;
+            int medianPosition = TERRAIN_AVERAGE_HEIGHT;
+            int pillarOffset = medianPosition - fs[x];
 
             // for pillar length
             for (int i = 0; i < height - pillarOffset; i++) {
@@ -589,13 +597,13 @@ public class MapGenerator {
      */
     private static float noiseMapGetGradientQuadPoly(int func_argX, float start, float end) {
         float graph_gradient =
-                FastMath.pow(FastMath.sqr(1 - terrainHeightFromZeroPoint), -1) // 1/4 -> 3/4 -> 9/16 -> 16/9
+                FastMath.pow(FastMath.sqr(1 - TERRAIN_AVERAGE_HEIGHT), -1) // 1/4 -> 3/4 -> 9/16 -> 16/9
                 * (start - end) / FastMath.sqr(height)
                 * FastMath.sqr(func_argX - height)
                 + end
                 ;
 
-        if (func_argX < terrainHeightFromZeroPoint) {
+        if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
             return start;
         }
         else if (func_argX >= height) {
@@ -631,13 +639,13 @@ public class MapGenerator {
      */
     private static float noiseMapGetGradientCubicPoly(int func_argX, float start, float end) {
         float graph_gradient =
-                -FastMath.pow(FastMath.pow(1 - terrainHeightFromZeroPoint, 3), -1) // 1/4 -> 3/4 -> 9/16 -> 16/9
+                -FastMath.pow(FastMath.pow(1 - TERRAIN_AVERAGE_HEIGHT, 3), -1) // 1/4 -> 3/4 -> 9/16 -> 16/9
                         * (start - end) / FastMath.pow(height, 3)
                         * FastMath.pow(func_argX - height, 3)
                         + end
                 ;
 
-        if (func_argX < terrainHeightFromZeroPoint) {
+        if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
             return start;
         }
         else if (func_argX >= height) {
@@ -673,13 +681,13 @@ public class MapGenerator {
      */
     private static float noiseMapGetGradientMinusQuadPoly(int func_argX, float start, float end) {
         float graph_gradient =
-                -FastMath.pow(FastMath.sqr(1 - terrainHeightFromZeroPoint), -1) // 1/4 -> 3/4 -> 9/16 -> 16/9
+                -FastMath.pow(FastMath.sqr(1 - TERRAIN_AVERAGE_HEIGHT), -1) // 1/4 -> 3/4 -> 9/16 -> 16/9
                         * (start - end) / FastMath.sqr(height)
-                        * FastMath.sqr(func_argX - terrainHeightFromZeroPoint)
+                        * FastMath.sqr(func_argX - TERRAIN_AVERAGE_HEIGHT)
                         + start
                 ;
 
-        if (func_argX < terrainHeightFromZeroPoint) {
+        if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
             return start;
         }
         else if (func_argX >= height) {
@@ -693,7 +701,9 @@ public class MapGenerator {
     private static void generateFloatingIslands() {
         System.out.println("[MapGenerator] Placing floating islands...");
 
-        int nIslands = map.width / 1024;
+        int nIslandsMax = Math.round(map.width * 6f / 8192f);
+        int nIslandsMin = Math.max(2, Math.round(map.width * 4f / 8192f));
+        int nIslands = random.nextInt(nIslandsMax - nIslandsMin) + nIslandsMin;
         int prevIndex = -1;
 
         for (int i = 0; i < nIslands; i++) {
@@ -703,13 +713,14 @@ public class MapGenerator {
             }
             int[][] island = FloatingIslandsPreset.generatePreset(currentIndex, random);
 
-            int startingPosX = 1024 * i + 256 + random.nextInt(256);
+            int startingPosX = random.nextInt(map.width - 2048) + 1024;
             int startingPosY = minimumFloatingIsleHeight + random.nextInt(minimumFloatingIsleHeight);
 
-            if (random.nextFloat() >= floatingIslandsProb) {
-                for (int j = 0; j < island.length; j++) {
-                    for (int k = 0; k < island[0].length; k++) {
-                        map.getTerrainArray()[j + startingPosY][k + startingPosX] = (byte) island[j][k];
+            for (int j = 0; j < island.length; j++) {
+                for (int k = 0; k < island[0].length; k++) {
+                    if (island[j][k] > 0) {
+                        map.getTerrainArray()[j + startingPosY][k + startingPosX]
+                                = (byte) island[j][k];
                     }
                 }
             }
@@ -723,7 +734,7 @@ public class MapGenerator {
         for (int i = height * 14 / 15; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (map.getTerrainArray()[i][j] == 0) {
-                    map.getTerrainArray()[i][j] = (byte) 0xFF;
+                    map.getTerrainArray()[i][j] = LAVA;
                 }
             }
         }
@@ -734,89 +745,157 @@ public class MapGenerator {
     private static void plantGrass() {
         System.out.println("[MapGenerator] Planting grass...");
 
-        int[] heightMap = new int[width]; //where topmost block sits
-
 		/* TODO composing dirt and stone
 		 * over certain level, use background dirt with stone 'peckles'
 		 * beetween levels, use background dirt with larger and denser stone peckles.
 		 * under another certain level, use background stone with dirt peckles.
 		 */
 
-        for (int i = 0; i < width; i++) {
-            //count down until hits block 2
-            int grassCounter = 0;
-            boolean hitDirt = false;
+        for (int y = TERRAIN_AVERAGE_HEIGHT - MAX_HILL_HEIGHT
+                ; y < TERRAIN_AVERAGE_HEIGHT + MAX_HILL_HEIGHT
+                ; y++) {
+            for (int x = 0; x < map.width; x++) {
 
-            while (grassCounter < height - 2 && map.getTerrainArray()[grassCounter][i] == 0) {
-                grassCounter++;
+                int thisTile = map.getTileFromTerrain(x, y);
+
+                for (int i = 0; i < 9; i++) {
+                    int nearbyTile = -1;
+                    try { nearbyTile = map.getTileFromTerrain(x + (i / 3) - 1, y + (i % 3) - 1); }
+                    catch (ArrayIndexOutOfBoundsException e) {}
+
+                    if (i != 4 && thisTile == DIRT && nearbyTile == AIR) {
+                        map.getTerrainArray()[y][x] = GRASS;
+                        break;
+                    }
+                }
             }
-
-            //actually hit grass or just counting halted?
-            if (map.getTerrainArray()[grassCounter][i] == 2) {
-                hitDirt = true;
-            }
-
-            //System.out.println(i+" ... "+grassCounter);
-
-            //plant grass
-            if (hitDirt) {
-                map.getTerrainArray()[grassCounter][i] = 3;
-            }
-
-            //compose heightMap
-            heightMap[i] = grassCounter;
         }
 
     }
-		
+
+    private static boolean isGrassOrDirt(int x, int y) {
+        return map.getTileFromTerrain(x, y) == GRASS || map.getTileFromTerrain(x, y) == DIRT;
+    }
+
+    private static void replaceIfTerrain(byte ifTile, int x, int y, byte replaceTile) {
+        if (map.getTileFromTerrain(x, y) == ifTile) {
+            map.getTerrainArray()[y][x] = replaceTile;
+        }
+    }
+
+    private static void replaceIfWall(byte ifTile, int x, int y, byte replaceTile) {
+        if (map.getTileFromWall(x, y) == ifTile) {
+            map.getWallArray()[y][x] = replaceTile;
+        }
+    }
+
 	/* Post-process */
 
     private static void fillOcean() {
-        int oceanLeftHeight = 0;
-        int oceanRightHeight = 0;
-
-        //get height
-        if (worldOceanPosition == TYPE_OCEAN_LEFT) {
-            while (map.getTerrainArray()[oceanLeftHeight][OCEAN_WIDTH] == 0) {
-                oceanLeftHeight++;
-            }
-        }
-        else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
-            while (map.getTerrainArray()[oceanRightHeight][map.width - 1 - OCEAN_WIDTH] == 0) {
-                oceanRightHeight++;
-            }
-        }
-
-        for (int i = 0; i < OCEAN_WIDTH * 1.5; i++) {
-            int oceanDepthCounterLeft = 0;
-            int oceanDepthCounterRight = 0;
+        for (int ix = 0; ix < OCEAN_WIDTH * 1.5; ix++) {
             //flooding
-            if (i < OCEAN_WIDTH) {
+            if (ix < OCEAN_WIDTH) {
                 if (worldOceanPosition == TYPE_OCEAN_LEFT) {
-                    while (map.getTerrainArray()[oceanLeftHeight + oceanDepthCounterLeft][i] == 0) {
-                        map.getTerrainArray()[oceanLeftHeight + oceanDepthCounterLeft][i] = (byte) 239;
-                        oceanDepthCounterLeft++;
+                    for (int y = getTerrainHeightFromHeightMap(OCEAN_WIDTH)
+                            ; y < getTerrainHeightFromHeightMap(ix)
+                            ; y++) {
+                        map.getTerrainArray()
+                                [y][ix] = WATER;
                     }
                 }
                 else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
-                    while (map.getTerrainArray()[oceanRightHeight + oceanDepthCounterRight][map.width - 1 - i] == 0) {
-                        map.getTerrainArray()[oceanRightHeight + oceanDepthCounterRight][map.width - 1 - i] = (byte) 239;
-                        oceanDepthCounterRight++;
+                    for (int y = getTerrainHeightFromHeightMap(map.width - 1 - OCEAN_WIDTH)
+                            ; y < getTerrainHeightFromHeightMap(map.width - 1 - ix)
+                            ; y++) {
+                        map.getTerrainArray()
+                                [y][map.width - 1 - ix] = WATER;
                     }
                 }
             }
             //sand
-            for (int j = 0; j < 40 - (i * 40 / (OCEAN_WIDTH + 20)); j++) { //20 => seashore size
+            // linearly increase thickness of the sand sheet
+            for (int iy = 0; iy < 40 - (ix * 40 / (OCEAN_WIDTH + SHORE_WIDTH)); iy++) {
                 if (worldOceanPosition == TYPE_OCEAN_LEFT) {
-                    map.getTerrainArray()[oceanLeftHeight + oceanDepthCounterLeft + j][i] = 14;
+                    int terrainPoint = getTerrainHeightFromHeightMap(ix);
+
+                    map.getTerrainArray()
+                            [terrainPoint + iy]
+                            [ix] = SAND;
+                    map.getTerrainArray()
+                            [terrainPoint + iy - 1] // clear grass and make the sheet thicker
+                            [ix] = SAND;
                 }
                 else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
-                    map.getTerrainArray()[oceanRightHeight + oceanDepthCounterRight + j][map.width - 1 - i] = SAND;
+                    int terrainPoint = getTerrainHeightFromHeightMap(map.width - 1 - ix);
+
+                    map.getTerrainArray()
+                            [terrainPoint + iy]
+                            [map.width - 1 - ix] = SAND;
+                    map.getTerrainArray()
+                            [terrainPoint + iy - 1] // clear grass and make the sheet thicker
+                            [map.width - 1 - ix] = SAND;
                 }
             }
         }
     }
-	
+
+    private static void freeze() {
+        for (int y = 0; y < map.height - 1; y++) {
+            for (int x = 0; x < getFrozenAreaWidth(y); x++) {
+                if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
+                    replaceIfTerrain(DIRT, x, y, SNOW);
+                    replaceIfTerrain(STONE, x, y, ICE_NATURAL);
+
+                    replaceIfWall(DIRT, x, y, SNOW);
+                    replaceIfWall(STONE, x, y, ICE_NATURAL);
+                }
+                else {
+                    replaceIfTerrain(DIRT, map.width - 1 - x, y, SNOW);
+                    replaceIfTerrain(STONE, map.width - 1 - x, y, ICE_NATURAL);
+
+                    replaceIfWall(DIRT, map.width - 1 - x, y, SNOW);
+                    replaceIfWall(STONE, map.width - 1 - x, y, ICE_NATURAL);
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * @return width of the frozen area for MapGenerator.freeze
+     */
+    private static int getFrozenAreaWidth(int y) {
+        int randDeviation = 7;
+        // narrower that the actual width
+        int width = Math.round(GLACIER_MOUNTAIN_WIDTH * 0.625f);
+        int height;
+        if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
+            height = getTerrainHeightFromHeightMap(width);
+        }
+        else {
+            height = getTerrainHeightFromHeightMap(map.width - 1 - width);
+        }
+        float k = (width) / FastMath.sqrt(height);
+
+        if (y < height) {
+            return width;
+        }
+        else {
+            return Math.round(
+                    k * FastMath.sqrt(y)
+            );
+        }
+    }
+
+    /**
+     *
+     * @param x position of heightmap
+     * @return
+     */
+    private static int getTerrainHeightFromHeightMap(int x) {
+        return TERRAIN_AVERAGE_HEIGHT - heightMap[x];
+    }
+
 	/* Utility */
 
     private static int clampN(int clampNumber, int num) {

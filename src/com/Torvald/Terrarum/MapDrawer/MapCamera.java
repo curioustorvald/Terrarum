@@ -8,6 +8,8 @@ import com.Torvald.Terrarum.GameMap.MapLayer;
 import com.jme3.math.FastMath;
 import org.newdawn.slick.*;
 
+import java.util.Arrays;
+
 /**
  * Created by minjaesong on 16-01-19.
  */
@@ -35,8 +37,6 @@ public class MapCamera {
     private static int renderWidth;
     private static int renderHeight;
 
-    private static final int TILE_AIR = 0;
-
     private static final int NEARBY_TILE_KEY_UP = 0;
     private static final int NEARBY_TILE_KEY_RIGHT = 1;
     private static final int NEARBY_TILE_KEY_DOWN = 2;
@@ -46,6 +46,47 @@ public class MapCamera {
     private static final int NEARBY_TILE_CODE_RIGHT = 0b0010;
     private static final int NEARBY_TILE_CODE_DOWN = 0b0100;
     private static final int NEARBY_TILE_CODE_LEFT = 0b1000;
+
+    private static final byte AIR = 0;
+
+    private static final byte STONE = 1;
+    private static final byte DIRT = 2;
+    private static final byte GRASS = 3;
+
+    private static final byte SAND = 13;
+    private static final byte GRAVEL = 14;
+
+    private static final byte COPPER = 15;
+    private static final byte IRON = 16;
+    private static final byte GOLD = 17;
+    private static final byte SILVER = 18;
+    private static final byte ILMENITE = 19;
+    private static final byte AURICHALCUM = 20;
+
+    private static final byte SNOW = 27;
+    private static final byte ICE_FRAGILE = 28;
+    private static final byte ICE_NATURAL = 29;
+    private static final byte ICE_MAGICAL = 30;
+
+    private static final Byte[] TILES_CONNECT_SELF = {
+            COPPER
+            , IRON
+            , GOLD
+            , SILVER
+            , ILMENITE
+            , AURICHALCUM
+            , ICE_MAGICAL
+    };
+
+    private static final Byte[] TILES_DARKEN_AIR = {
+            STONE
+            , DIRT
+            , GRASS
+            , SAND
+            , GRAVEL
+            , SNOW
+            , ICE_NATURAL
+    };
 
     /**
      * @param map
@@ -146,7 +187,24 @@ public class MapCamera {
                         ) {
 
                     if (mode == TERRAIN) {
-                        int nearbyTilesInfo = getNearbyTilesInfo(x, y, TILE_AIR);
+                        int nearbyTilesInfo;
+                        //if (thisTile == DIRT) {
+                        //    nearbyTilesInfo = getGrassInfo(x, y, GRASS);
+                        //}
+                        //else {
+                        //    nearbyTilesInfo = getNearbyTilesInfo(x, y, AIR);
+                        //}
+
+                        if (isDarkenAir((byte) thisTile)) {
+                            nearbyTilesInfo = getNearbyTilesInfo(x, y, AIR);
+                        }
+                        else if (isConnectSelf((byte) thisTile)) {
+                            nearbyTilesInfo = getNearbyTilesInfo(x, y, thisTile);
+                        }
+                        else {
+                            nearbyTilesInfo = 0;
+                        }
+
 
                         int thisTileX = nearbyTilesInfo;
                         int thisTileY = thisTile;
@@ -164,6 +222,10 @@ public class MapCamera {
         tilesetBook[mode].endUse();
     }
 
+    private static int getGrassInfo(int x, int y, int from, int to) {
+        return 0;
+    }
+
     /**
      *
      * @param x
@@ -172,22 +234,23 @@ public class MapCamera {
      */
     private static int getNearbyTilesInfo(int x, int y, int mark) {
         int[] nearbyTiles = new int[4];
-        if (x == 0) { nearbyTiles[NEARBY_TILE_KEY_LEFT] = 0; }
-        if (x == map.width - 1) { nearbyTiles[NEARBY_TILE_KEY_RIGHT] = 0; }
-        if (y == 0) { nearbyTiles[NEARBY_TILE_KEY_UP] = 0; }
-        if (y == map.height - 1) { nearbyTiles[NEARBY_TILE_KEY_DOWN] = 0; }
-        try {
-            nearbyTiles[NEARBY_TILE_KEY_UP] = map.getTileFromTerrain(x, y - 1);
-            nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFromTerrain(x, y + 1);
-            nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFromTerrain(x - 1, y);
-            nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFromTerrain(x + 1, y);
-        }
-        catch (ArrayIndexOutOfBoundsException e) { }
+        if (x == 0) { nearbyTiles[NEARBY_TILE_KEY_LEFT] = 0xFF; }
+        else { nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFromTerrain(x - 1, y); }
 
+        if (x == map.width - 1) { nearbyTiles[NEARBY_TILE_KEY_RIGHT] = 0xFF; }
+        else { nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFromTerrain(x + 1, y); }
+
+        if (y == 0) { nearbyTiles[NEARBY_TILE_KEY_UP] = 0; }
+        else { nearbyTiles[NEARBY_TILE_KEY_UP] = map.getTileFromTerrain(x, y - 1); }
+
+        if (y == map.height - 1) { nearbyTiles[NEARBY_TILE_KEY_DOWN] = 0xFF; }
+        else { nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFromTerrain(x, y + 1); }
+
+        // try for
         int ret = 0;
         for (int i = 0; i < 4; i++) {
             if (nearbyTiles[i] == mark) {
-                ret += (1 << i); // write 1, 2, 4, 8 for i = 0, 1, 2, 3
+                ret += (1 << i); // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
 
@@ -331,5 +394,13 @@ public class MapCamera {
 
     public static int getRenderEndY() {
         return clampHTile(getRenderStartY() + div16(renderHeight) + 2);
+    }
+
+    private static boolean isConnectSelf(byte b) {
+        return (Arrays.asList(TILES_CONNECT_SELF).contains(b));
+    }
+
+    private static boolean isDarkenAir(byte b) {
+        return (Arrays.asList(TILES_DARKEN_AIR).contains(b));
     }
 }

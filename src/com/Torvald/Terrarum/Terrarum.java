@@ -39,7 +39,7 @@ public class Terrarum extends BasicGame {
     public static String defaultDir;
     public static String defaultSaveDir;
 
-    public static String gameLocale = "fr";
+    public static String gameLocale = "ko";
 
     public static Font gameFontWhite;
 

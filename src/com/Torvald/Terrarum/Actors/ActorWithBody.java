@@ -16,6 +16,10 @@ import org.newdawn.slick.Graphics;
  */
 public class ActorWithBody implements Actor, Visible, Glowing {
 
+    ActorValue actorValue;
+
+    ActorInventory inventory;
+
     private @NotNull float hitboxTranslateX; // relative to spritePosX
     private @NotNull float hitboxTranslateY; // relative to spritePosY
     private @NotNull int baseHitboxW;
@@ -29,8 +33,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      *     veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
-    private @NotNull float veloX, veloY, veloMax;
-
+    private @NotNull float veloX, veloY;
+    private final float VELO_HARD_LIMIT = 10000;
 
     private boolean grounded = false;
 
@@ -75,6 +79,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     public ActorWithBody() {
         referenceID = new HighQualityRandom(0x7E22A211AAL).nextLong();
+        actorValue = new ActorValue();
     }
 
     public void setHitboxDimension(int w, int h, int tx, int ty) {
@@ -118,13 +123,21 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             baseSpriteWidth = sprite.getWidth();
             gravitation = Game.map.getGravitation();
 
-            applyGravitation();
+            if (!playerNoClip()) {
+                applyGravitation();
+            }
 
-            //Set 'next' positions to fiddle with
+            // hard limit velocity
+            if (veloX > VELO_HARD_LIMIT) veloX = VELO_HARD_LIMIT;
+            if (veloY > VELO_HARD_LIMIT) veloY = VELO_HARD_LIMIT;
+
+            // Set 'next' positions to fiddle with
             updateNextHitbox(delta_t);
 
-            updateVerticalPos();
-            updateHorizontalPos();
+            if (!playerNoClip()) {
+                updateVerticalPos();
+                updateHorizontalPos();
+            }
 
             // Apply previous fiddling
             updateHitbox();
@@ -204,26 +217,21 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         sprite.update(delta_t);
     }
 
-    boolean collideBottomAndAdjust() {
+    boolean collideBottomAndAdjusted() {
         // noclip off?
-        if (!(this instanceof Player && ((Player) this).isNoClip())) {
-            int feetTileX = clampWtile(Math.round((nextHitbox.getPointedX()) / TSIZE));
-            int feetTileY = clampHtile(FastMath.floor(nextHitbox.getPointedY() / TSIZE));
+        int feetTileX = clampWtile(Math.round((nextHitbox.getPointedX()) / TSIZE));
+        int feetTileY = clampHtile(FastMath.floor(nextHitbox.getPointedY() / TSIZE));
 
-            if (feetTileX < 0) feetTileX = 0;
-            if (feetTileY < 0) feetTileY = 0;
+        if (feetTileX < 0) feetTileX = 0;
+        if (feetTileY < 0) feetTileY = 0;
 
-            int feetTile = Game.map.getTileFromTerrain(feetTileX, feetTileY);
+        int feetTile = Game.map.getTileFromTerrain(feetTileX, feetTileY);
 
-            if (feetTile != 0) {
-                nextHitbox.setPositionYFromPoint(
-                        feetTileY * TSIZE
-                );
-                return true;
-            }
-            else {
-                return false;
-            }
+        if (feetTile != 0) {
+            nextHitbox.setPositionYFromPoint(
+                    feetTileY * TSIZE
+            );
+            return true;
         }
         else {
             return false;
@@ -236,6 +244,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      * Apply only if not grounded; normal force is not implemented (and redundant)
      * so we manually reset G to zero (not applying G. force) if grounded.
      */
+    // FIXME abnormal jump behaviour if mass == 1, same thing happens if mass == 0 but zero mass
+    // is invalid anyway.
     private void applyGravitation() {
         if (!isGrounded()) {
             /**
@@ -250,22 +260,19 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             float A = scale * scale;
             float D = DRAG_COEFF * 0.5f * 1.292f * veloY * veloY * A;
 
-            veloY += ((W - D) / mass) * SI_TO_GAME_ACC * G_MUL_PLAYABLE_CONST;
+            veloY += clampCeil(((W - D) / mass) * SI_TO_GAME_ACC * G_MUL_PLAYABLE_CONST
+                    , VELO_HARD_LIMIT
+            );
         }
     }
 
     private void updateVerticalPos() {
-        if (!playerNoClip()) {
-            if (collideBottomAndAdjust()) {
-                grounded = true;
-                veloY = 0;
-            }
-            else {
-                grounded = false;
-            }
+        if (collideBottomAndAdjusted()) {
+            grounded = true;
+            veloY = 0;
         }
         else {
-            grounded = true;
+            grounded = false;
         }
     }
 
@@ -363,6 +370,10 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         return x & 0b1111;
     }
 
+    private static float clampCeil(float x, float ceil) {
+        return (Math.abs(x) > ceil ? ceil : x);
+    }
+
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
@@ -381,10 +392,6 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     public void setVeloY(float veloY) {
         this.veloY = veloY;
-    }
-
-    public void setVeloMax(float veloMax) {
-        this.veloMax = veloMax;
     }
 
     public void setGrounded(boolean grounded) {
@@ -409,10 +416,6 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     public float getVeloY() {
         return veloY;
-    }
-
-    public float getVeloMax() {
-        return veloMax;
     }
 
     public boolean isGrounded() {
