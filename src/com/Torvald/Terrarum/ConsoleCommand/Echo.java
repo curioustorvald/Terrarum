@@ -1,6 +1,7 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
 import com.Torvald.Terrarum.Game;
+import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.Terrarum.UserInterface.ConsoleWindow;
 
 /**
@@ -9,12 +10,12 @@ import com.Torvald.Terrarum.UserInterface.ConsoleWindow;
 class Echo implements ConsoleCommand {
     @Override
     public void execute(String[] args) {
-        ((ConsoleWindow) Game.consoleHandler.getUI())
+        ((ConsoleWindow) Terrarum.game.consoleHandler.getUI())
                 .sendMessage(args.toString());
     }
 
     public void execute(String single_line) {
-        ((ConsoleWindow) Game.consoleHandler.getUI())
+        ((ConsoleWindow) Terrarum.game.consoleHandler.getUI())
                 .sendMessage(single_line);
     }
 

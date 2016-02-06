@@ -1,6 +1,7 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
 import com.Torvald.Terrarum.Game;
+import com.Torvald.Terrarum.Terrarum;
 
 /**
  * Created by minjaesong on 16-01-25.
@@ -19,14 +20,14 @@ public class Zoom implements ConsoleCommand {
                 return;
             }
 
-            if (zoom < Game.ZOOM_MIN) {
-                zoom = Game.ZOOM_MIN;
+            if (zoom < Terrarum.game.ZOOM_MIN) {
+                zoom = Terrarum.game.ZOOM_MIN;
             }
-            else if (zoom > Game.ZOOM_MAX) {
-                zoom = Game.ZOOM_MAX;
+            else if (zoom > Terrarum.game.ZOOM_MAX) {
+                zoom = Terrarum.game.ZOOM_MAX;
             }
 
-            Game.screenZoom = zoom;
+            Terrarum.game.screenZoom = zoom;
 
             System.gc();
 

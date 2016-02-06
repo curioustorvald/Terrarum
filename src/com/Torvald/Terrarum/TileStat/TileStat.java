@@ -3,6 +3,7 @@ package com.Torvald.Terrarum.TileStat;
 import com.Torvald.Terrarum.Game;
 import com.Torvald.Terrarum.GameMap.MapLayer;
 import com.Torvald.Terrarum.MapDrawer.MapCamera;
+import com.Torvald.Terrarum.Terrarum;
 
 import java.util.Arrays;
 
@@ -23,8 +24,8 @@ public class TileStat {
 
         for (int y = for_y_start; y < for_y_end; y++) {
             for (int x = for_x_start; x < for_x_end; x++) {
-                int tileWall = Game.map.getTileFromWall(x, y);
-                int tileTerrain = Game.map.getTileFromTerrain(x, y);
+                int tileWall = Terrarum.game.map.getTileFromWall(x, y);
+                int tileTerrain = Terrarum.game.map.getTileFromTerrain(x, y);
                 tilestat[tileWall] += 1;
                 tilestat[tileTerrain] += 1;
             }

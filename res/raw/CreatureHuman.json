@@ -1,6 +1,7 @@
 {
   "racename" : "CONTEXT_RACE_HUMAN",
   "racenameplural" : "CONTEXT_RACE_HUMAN_PLURAL",
+  "ethnicgroup" : "human",
   "baseheight" : 40,
   "basemass" : 60.0,
 

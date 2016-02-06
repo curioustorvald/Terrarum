@@ -3,6 +3,7 @@ package com.Torvald.Terrarum.Actors;
 import com.Torvald.Terrarum.Game;
 import com.Torvald.Terrarum.GameControl.EnumKeyFunc;
 import com.Torvald.Terrarum.GameControl.KeyMap;
+import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.spriteAnimation.SpriteAnimation;
 import com.jme3.math.FastMath;
 import com.sun.istack.internal.NotNull;
@@ -39,6 +40,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
 
     private boolean noClip = false;
 
+    public final long PLAYER_REF_ID = 0x51621D;
+
     /**
      * Creates new Player instance with empty elements (sprites, actorvalue, etc.). <br />
      *
@@ -48,7 +51,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
      */
     public Player() throws SlickException {
         super();
-        referenceID = Game.PLAYER_REF_ID;
+        referenceID = PLAYER_REF_ID;
         setVisible(true);
     }
 

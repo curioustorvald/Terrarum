@@ -1,9 +1,9 @@
 package com.Torvald.Terrarum.Actors;
 
 import com.Torvald.Rand.HighQualityRandom;
-import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.Terrarum.Game;
 import com.Torvald.Terrarum.MapDrawer.MapDrawer;
+import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.spriteAnimation.SpriteAnimation;
 import com.jme3.math.FastMath;
 import com.sun.istack.internal.NotNull;
@@ -65,8 +65,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      * meter to pixel : 24/FPS
      */
     private final float METER = 24f;
-    private final float SI_TO_GAME_ACC = METER / (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS);
-    private final float SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS;
+    private final float SI_TO_GAME_ACC = METER / (Terrarum.game.TARGET_FPS * Terrarum.game.TARGET_FPS);
+    private final float SI_TO_GAME_VEL = METER / Terrarum.game.TARGET_FPS;
     private float gravitation;
     private final float DRAG_COEFF = 1f;
 
@@ -121,7 +121,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
              */
             baseSpriteHeight = sprite.getHeight();
             baseSpriteWidth = sprite.getWidth();
-            gravitation = Game.map.getGravitation();
+            gravitation = Terrarum.game.map.getGravitation();
 
             if (!playerNoClip()) {
                 applyGravitation();
@@ -225,7 +225,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         if (feetTileX < 0) feetTileX = 0;
         if (feetTileY < 0) feetTileY = 0;
 
-        int feetTile = Game.map.getTileFromTerrain(feetTileX, feetTileY);
+        int feetTile = Terrarum.game.map.getTileFromTerrain(feetTileX, feetTileY);
 
         if (feetTile != 0) {
             nextHitbox.setPositionYFromPoint(
@@ -312,8 +312,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         if (x < 0) {
             return 0;
         }
-        else if (x >= Game.map.width * TSIZE) {
-            return Game.map.width * TSIZE - 1;
+        else if (x >= Terrarum.game.map.width * TSIZE) {
+            return Terrarum.game.map.width * TSIZE - 1;
         }
         else {
             return x;
@@ -324,8 +324,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         if (x < 0) {
             return 0;
         }
-        else if (x >= Game.map.height * TSIZE) {
-            return Game.map.height * TSIZE - 1;
+        else if (x >= Terrarum.game.map.height * TSIZE) {
+            return Terrarum.game.map.height * TSIZE - 1;
         }
         else {
             return x;
@@ -336,8 +336,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         if (x < 0) {
             return 0;
         }
-        else if (x >= Game.map.width) {
-            return Game.map.width - 1;
+        else if (x >= Terrarum.game.map.width) {
+            return Terrarum.game.map.width - 1;
         }
         else {
             return x;
@@ -348,8 +348,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         if (x < 0) {
             return 0;
         }
-        else if (x >= Game.map.height) {
-            return Game.map.height - 1;
+        else if (x >= Terrarum.game.map.height) {
+            return Terrarum.game.map.height - 1;
         }
         else {
             return x;

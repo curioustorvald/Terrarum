@@ -16,7 +16,6 @@ import java.util.Arrays;
 public class MapCamera {
 
     private static GameMap map;
-    private static Player player;
 
     private static int cameraX = 0;
     private static int cameraY = 0;
@@ -94,7 +93,6 @@ public class MapCamera {
      */
     public MapCamera(GameMap map, int tileSize) throws SlickException {
         this.map = map;
-        player = Game.getPlayer();
 
         tilesWall = new SpriteSheet("./res/graphics/terrain/wall.png"
                 , TSIZE
@@ -118,8 +116,10 @@ public class MapCamera {
     }
 
     public static void update(GameContainer gc, int delta_t) {
-        renderWidth = FastMath.ceil(Terrarum.WIDTH / Game.screenZoom);
-        renderHeight = FastMath.ceil(Terrarum.HEIGHT / Game.screenZoom);
+        Player player = Terrarum.game.getPlayer();
+
+        renderWidth = FastMath.ceil(Terrarum.WIDTH / Terrarum.game.screenZoom);
+        renderHeight = FastMath.ceil(Terrarum.HEIGHT / Terrarum.game.screenZoom);
 
         // position - (WH / 2)
         cameraX = clamp(
@@ -259,7 +259,7 @@ public class MapCamera {
     }
 
     private static void drawTile(int mode, int tilewisePosX, int tilewisePosY, int sheetX, int sheetY) {
-        if (Game.screenZoom == 1) {
+        if (Terrarum.game.screenZoom == 1) {
             tilesetBook[mode].renderInUse(
                     FastMath.floor(tilewisePosX * TSIZE)
                     , FastMath.floor(tilewisePosY * TSIZE)
@@ -272,10 +272,10 @@ public class MapCamera {
                     sheetX
                     , sheetY
             ).drawEmbedded(
-                    Math.round(tilewisePosX * TSIZE * Game.screenZoom)
-                    , Math.round(tilewisePosY * TSIZE * Game.screenZoom)
-                    , FastMath.ceil(TSIZE * Game.screenZoom)
-                    , FastMath.ceil(TSIZE * Game.screenZoom)
+                    Math.round(tilewisePosX * TSIZE * Terrarum.game.screenZoom)
+                    , Math.round(tilewisePosY * TSIZE * Terrarum.game.screenZoom)
+                    , FastMath.ceil(TSIZE * Terrarum.game.screenZoom)
+                    , FastMath.ceil(TSIZE * Terrarum.game.screenZoom)
             );
         }
     }

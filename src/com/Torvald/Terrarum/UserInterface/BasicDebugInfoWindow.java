@@ -31,18 +31,21 @@ public class BasicDebugInfoWindow implements UICanvas {
     public BasicDebugInfoWindow() {
         width = Terrarum.WIDTH;
         height = Terrarum.HEIGHT;
-
-        playerDbg = new PlayerDebugger(Game.getPlayer());
     }
 
     @Override
     public void render(GameContainer gc, Graphics g) {
+        if (playerDbg == null) {
+            playerDbg = new PlayerDebugger(Terrarum.game.getPlayer());
+        }
+
+
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb);
 
-        int mouseTileX = (int) ((MapCamera.getCameraX() + gc.getInput().getMouseX() / Game.screenZoom)
+        int mouseTileX = (int) ((MapCamera.getCameraX() + gc.getInput().getMouseX() / Terrarum.game.screenZoom)
                 / MapDrawer.TILE_SIZE);
-        int mouseTileY = (int) ((MapCamera.getCameraY() + gc.getInput().getMouseY() / Game.screenZoom)
+        int mouseTileY = (int) ((MapCamera.getCameraY() + gc.getInput().getMouseY() / Terrarum.game.screenZoom)
                 / MapDrawer.TILE_SIZE);
 
         g.setColor(Color.white);
@@ -89,7 +92,7 @@ public class BasicDebugInfoWindow implements UICanvas {
 
         String tileNo;
         try {
-            tileNo = String.valueOf(Game.map.getTileFromTerrain(mouseTileX, mouseTileY));
+            tileNo = String.valueOf(Terrarum.game.map.getTileFromTerrain(mouseTileX, mouseTileY));
         }
         catch (ArrayIndexOutOfBoundsException e) {
             tileNo = "out of bounds";
@@ -97,8 +100,8 @@ public class BasicDebugInfoWindow implements UICanvas {
         printLine(g, 10, "tile : " + tileNo);
 
         // Memory allocation
-        long memInUse = Terrarum.memInUse;
-        long totalVMMem = Terrarum.totalVMMem;
+        long memInUse = Terrarum.game.memInUse;
+        long totalVMMem = Terrarum.game.totalVMMem;
 
         g.setColor(new Color(0xFF7F00));
         g.drawString(

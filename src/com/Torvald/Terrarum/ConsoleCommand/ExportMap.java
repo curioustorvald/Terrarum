@@ -58,9 +58,9 @@ public class ExportMap implements ConsoleCommand {
         if (args.length == 2) {
             buildColorTable();
 
-            mapData = new byte[Game.map.width * Game.map.height * 3];
+            mapData = new byte[Terrarum.game.map.width * Terrarum.game.map.height * 3];
 
-            for (byte tile : Game.map.getLayerTerrain()) {
+            for (byte tile : Terrarum.game.map.getLayerTerrain()) {
                 byte[] colArray = colorTable.getOrDefault(tile, new Col12(0xFFF))
                         .toByteArray();
 
@@ -82,9 +82,9 @@ public class ExportMap implements ConsoleCommand {
                 DataBuffer buffer = new DataBufferByte(mapData, mapData.length);
                 WritableRaster raster = Raster.createInterleavedRaster(
                         buffer
-                        , Game.map.width
-                        , Game.map.height
-                        , 3 * Game.map.width
+                        , Terrarum.game.map.width
+                        , Terrarum.game.map.height
+                        , 3 * Terrarum.game.map.width
                         , 3
                         , bandOffsets
                         , null);

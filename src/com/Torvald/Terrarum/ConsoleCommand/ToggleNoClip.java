@@ -1,6 +1,7 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
 import com.Torvald.Terrarum.Game;
+import com.Torvald.Terrarum.Terrarum;
 
 /**
  * Created by minjaesong on 16-01-19.
@@ -8,9 +9,9 @@ import com.Torvald.Terrarum.Game;
 public class ToggleNoClip implements ConsoleCommand {
     @Override
     public void execute(String[] args) {
-        boolean status = Game.getPlayer().isNoClip();
+        boolean status = Terrarum.game.getPlayer().isNoClip();
 
-        Game.getPlayer().setNoClip(!status);
+        Terrarum.game.getPlayer().setNoClip(!status);
         new Echo().execute("Set no-clip status to " + String.valueOf(!status));
     }
 

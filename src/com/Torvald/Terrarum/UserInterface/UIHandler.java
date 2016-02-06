@@ -65,8 +65,8 @@ public class UIHandler {
             gameGraphicInstance.drawImage(UIDrawnCanvas
                     // compensate for screenZoom AND camera translation
                     // (see Game.render -> g.translate())
-                    , posX + MapCamera.getCameraX() * Game.screenZoom
-                    , posY + MapCamera.getCameraY() * Game.screenZoom
+                    , posX + MapCamera.getCameraX() * Terrarum.game.screenZoom
+                    , posY + MapCamera.getCameraY() * Terrarum.game.screenZoom
             );
         }
     }

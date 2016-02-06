@@ -6,32 +6,22 @@ import java.lang.management.ManagementFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.Torvald.ImageFont.GameFontBase;
-import com.Torvald.ImageFont.GameFontBlack;
 import com.Torvald.ImageFont.GameFontWhite;
-import com.Torvald.Terrarum.Actors.PlayerBuildFactory;
 import com.Torvald.Terrarum.GameControl.GameController;
 import com.Torvald.Terrarum.GameControl.KeyMap;
 import com.Torvald.Terrarum.LangPack.Lang;
 import org.newdawn.slick.*;
+import org.newdawn.slick.state.StateBasedGame;
 
 /**
  * Created by minjaesong on 15-12-30.
  */
-public class Terrarum extends BasicGame {
+public class Terrarum extends StateBasedGame {
 
     public static AppGameContainer appgc;
     public static final int WIDTH = 960;
     public static final int HEIGHT = 720;
-    private static Game game;
-    public static final int TARGET_FPS = 50;
-
-    /**
-     * To be used with render, to achieve smooth frame drawing
-     *
-     * TARGET_INTERNAL_FPS > TARGET_FPS for smooth frame drawing
-     */
-    public static final int TARGET_INTERNAL_FPS = 100;
+    public static Game game;
 
     public static String OSName;
     public static String OSVersion;
@@ -43,15 +33,12 @@ public class Terrarum extends BasicGame {
 
     public static Font gameFontWhite;
 
-    public static long memInUse;
-    public static long totalVMMem;
+    public static final int SCENE_ID_HOME = 1;
+    public static final int SCENE_ID_GAME = 3;
 
-    public Terrarum(String gamename) {
+    public Terrarum(String gamename) throws SlickException {
         super(gamename);
-    }
 
-    @Override
-    public void init(GameContainer gc) throws SlickException {
         getDefaultDirectory();
         createDirs();
         try {
@@ -61,75 +48,14 @@ public class Terrarum extends BasicGame {
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        game = new Game();
-
-        new GameController();
-        KeyMap.build();
-        GameController.setKeyMap(new KeyMap());
-
+    @Override
+    public void initStatesList(GameContainer gameContainer) throws SlickException {
         gameFontWhite = new GameFontWhite();
 
-
-    }
-
-    @Override
-    public void update(GameContainer gc, int delta_t) throws SlickException{
-        Runtime runtime = Runtime.getRuntime();
-        memInUse = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() >> 20;
-        totalVMMem = runtime.maxMemory() >> 20;
-
-        appgc.setTitle(
-                "Simple Slick Game — FPS: "
-                + appgc.getFPS() + " ("
-                + String.valueOf(TARGET_INTERNAL_FPS)
-                + ") — "
-                + String.valueOf(memInUse) + "M / "
-                + String.valueOf(totalVMMem) + "M"
-        );
-        Game.update(gc, delta_t);
-    }
-
-    @Override
-    public void render(GameContainer gc, Graphics g) throws SlickException
-    {
-        Game.render(gc, g);
-    }
-
-    public void keyPressed(int key, char c) {
-        GameController.keyPressed(key, c);
-    }
-
-    public void keyReleased(int key, char c) {
-        GameController.keyReleased(key, c);
-    }
-
-    public void mouseMoved(int oldx, int oldy, int newx, int newy) {
-        GameController.mouseMoved(oldx, oldy, newx, newy);
-    }
-
-    public void mouseDragged(int oldx, int oldy, int newx, int newy) {
-        GameController.mouseDragged(oldx, oldy, newx, newy);
-    }
-
-    public void mousePressed(int button, int x, int y) {
-        GameController.mousePressed(button, x, y);
-    }
-
-    public void mouseReleased(int button, int x, int y) {
-        GameController.mouseReleased(button, x, y);
-    }
-
-    public void mouseWheelMoved(int change) {
-        GameController.mouseWheelMoved(change);
-    }
-
-    public void controllerButtonPressed(int controller, int button) {
-        GameController.controllerButtonPressed(controller, button);
-    }
-
-    public void controllerButtonReleased(int controller, int button) {
-        GameController.controllerButtonReleased(controller, button);
+        game = new Game();
+        addState(game);
     }
 
     public static void main(String[] args)
@@ -138,11 +64,11 @@ public class Terrarum extends BasicGame {
         {
             appgc = new AppGameContainer(new Terrarum("Terrarum"));
             appgc.setDisplayMode(WIDTH, HEIGHT, false);
-            appgc.setTargetFrameRate(TARGET_INTERNAL_FPS);
+            appgc.setTargetFrameRate(Game.TARGET_INTERNAL_FPS);
             appgc.setVSync(true);
             appgc.setShowFPS(false);
             appgc.setUpdateOnlyWhenVisible(false);
-            appgc.setMaximumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS);
+            appgc.setMaximumLogicUpdateInterval(1000 / Game.TARGET_INTERNAL_FPS);
             appgc.start();
         }
         catch (SlickException ex)

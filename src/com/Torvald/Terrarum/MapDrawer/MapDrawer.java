@@ -27,13 +27,6 @@ public class MapDrawer {
 
         new MapCamera(map, TILE_SIZE);
 
-        Rectangle envOverlay = new Rectangle(
-                MapCamera.getCameraX() * Game.screenZoom
-                , MapCamera.getCameraY() * Game.screenZoom
-                , Terrarum.WIDTH
-                , Terrarum.HEIGHT
-        );
-
         System.gc();
     }
 
@@ -46,10 +39,10 @@ public class MapDrawer {
     }
 
     public static void drawEnvOverlay(Graphics g) {
-        envOverlay.setX(MapCamera.getCameraX() * Game.screenZoom);
-        envOverlay.setY(MapCamera.getCameraY() * Game.screenZoom);
-        envOverlay.setSize(Terrarum.WIDTH * Game.screenZoom
-                , Terrarum.HEIGHT * Game.screenZoom
+        envOverlay.setX(MapCamera.getCameraX() * Terrarum.game.screenZoom);
+        envOverlay.setY(MapCamera.getCameraY() * Terrarum.game.screenZoom);
+        envOverlay.setSize(Terrarum.WIDTH * Terrarum.game.screenZoom
+                , Terrarum.HEIGHT * Terrarum.game.screenZoom
         );
 
         // Color[] colourTable = getGradientColour(WorldTime.elapsedSeconds());

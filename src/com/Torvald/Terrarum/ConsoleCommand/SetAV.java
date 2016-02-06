@@ -1,6 +1,7 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
 import com.Torvald.Terrarum.Game;
+import com.Torvald.Terrarum.Terrarum;
 
 /**
  * Created by minjaesong on 16-01-15.
@@ -33,7 +34,7 @@ class SetAV implements ConsoleCommand {
                 return;
             }
 
-            Game.getPlayer().getActorValue().set(args[1], val);
+            Terrarum.game.getPlayer().getActorValue().set(args[1], val);
             echo.execute("Set " + args[1] + " to " + val);
         }
         else if (args.length == 4) {

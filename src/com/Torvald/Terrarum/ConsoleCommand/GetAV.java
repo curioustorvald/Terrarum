@@ -2,6 +2,7 @@ package com.Torvald.Terrarum.ConsoleCommand;
 
 import com.Torvald.Terrarum.Actors.ActorValue;
 import com.Torvald.Terrarum.Game;
+import com.Torvald.Terrarum.Terrarum;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -16,7 +17,7 @@ public class GetAV implements ConsoleCommand {
 
         if (args.length == 1) {
             // print all actorvalue of player
-            ActorValue av = Game.getPlayer().getActorValue();
+            ActorValue av = Terrarum.game.getPlayer().getActorValue();
             Set keyset = av.getKeySet();
 
             keyset.forEach(
@@ -29,7 +30,7 @@ public class GetAV implements ConsoleCommand {
         }
         else if (args.length == 2) {
             echo.execute("player." + args[1] + ": "
-                    + Game.getPlayer().getActorValue().get(args[1])
+                    + Terrarum.game.getPlayer().getActorValue().get(args[1])
             );
         }
         else if (args.length == 3) {

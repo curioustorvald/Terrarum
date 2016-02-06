@@ -1,9 +1,11 @@
 package com.Torvald.Terrarum;
 
+import com.Torvald.ImageFont.GameFontWhite;
 import com.Torvald.Rand.HighQualityRandom;
 import com.Torvald.Terrarum.Actors.*;
 import com.Torvald.Terrarum.ConsoleCommand.CommandDict;
 import com.Torvald.Terrarum.GameControl.GameController;
+import com.Torvald.Terrarum.GameControl.KeyMap;
 import com.Torvald.Terrarum.GameControl.KeyToggler;
 import com.Torvald.Terrarum.GameMap.GameMap;
 import com.Torvald.Terrarum.MapDrawer.LightmapRenderer;
@@ -18,45 +20,61 @@ import org.newdawn.slick.*;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.fills.GradientFill;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.state.BasicGameState;
+import org.newdawn.slick.state.StateBasedGame;
 import shader.Shader;
 
+import java.lang.management.ManagementFactory;
 import java.util.LinkedList;
 
 /**
  * Created by minjaesong on 15-12-30.
  */
-public class Game {
+public class Game extends BasicGameState {
 
-    static int game_mode = 0;
+    public static final int TARGET_FPS = 50;
+    /**
+     * To be used with render, to achieve smooth frame drawing
+     *
+     * TARGET_INTERNAL_FPS > TARGET_FPS for smooth frame drawing
+     */
+    public static final int TARGET_INTERNAL_FPS = 100;
+    public static long memInUse;
+    public static long totalVMMem;
+    int game_mode = 0;
 
-    public static GameConfig gameConfig;
+    public GameConfig gameConfig;
 
-    public static GameMap map;
+    public GameMap map;
 
-    public static LinkedList<Actor> actorContainer = new LinkedList<>();
-    public static LinkedList<UIHandler> uiContainer = new LinkedList<>();
+    public LinkedList<Actor> actorContainer = new LinkedList<>();
+    public LinkedList<UIHandler> uiContainer = new LinkedList<>();
 
-    public static UIHandler consoleHandler;
-    public static UIHandler debugWindow;
-    public static UIHandler bulletin;
+    public UIHandler consoleHandler;
+    public UIHandler debugWindow;
+    public UIHandler bulletin;
 
     @NotNull
-    static Player player;
+    Player player;
 
-    public static final long PLAYER_REF_ID = 0x51621D;
+    private Image GRADIENT_IMAGE;
+    private Rectangle skyBox;
 
-    private static Image GRADIENT_IMAGE;
-    private static Rectangle skyBox;
+    public float screenZoom = 1.0f;
+    public final float ZOOM_MAX = 2.0f;
+    public final float ZOOM_MIN = 0.25f;
 
-    public static float screenZoom = 1.0f;
-    public static final float ZOOM_MAX = 2.0f;
-    public static final float ZOOM_MIN = 0.25f;
-
-    private static Shader shader12BitCol;
-    private static Shader shaderBlurH;
-    private static Shader shaderBlurV;
+    private Shader shader12BitCol;
+    private Shader shaderBlurH;
+    private Shader shaderBlurV;
 
     public Game() throws SlickException {
+        new GameController();
+        KeyMap.build();
+        GameController.setKeyMap(new KeyMap());
+
+
+
         gameConfig = new GameConfig();
         gameConfig.addKey("smoothlighting", true);
 
@@ -113,11 +131,19 @@ public class Game {
         uiContainer.add(msgtest);
     }
 
-    public static Player getPlayer() {
+    @Override
+    public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws
+            SlickException {
+    }
+
+    public Player getPlayer() {
         return player;
     }
 
-    public static void update(GameContainer gc, int delta_t) {
+    @Override
+    public void update(GameContainer gc, StateBasedGame sbg, int delta_t) {
+        setAppTitle();
+
         MapDrawer.update(gc, delta_t);
 
         GameController.processInput(gc.getInput());
@@ -143,7 +169,23 @@ public class Game {
         TileStat.update();
     }
 
-    public static void render(GameContainer gc, Graphics g) {
+    private void setAppTitle() {
+        Runtime runtime = Runtime.getRuntime();
+        memInUse = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() >> 20;
+        totalVMMem = runtime.maxMemory() >> 20;
+
+        Terrarum.appgc.setTitle(
+                "Simple Slick Game — FPS: "
+                        + Terrarum.appgc.getFPS() + " ("
+                        + String.valueOf(TARGET_INTERNAL_FPS)
+                        + ") — "
+                        + String.valueOf(memInUse) + "M / "
+                        + String.valueOf(totalVMMem) + "M"
+        );
+    }
+
+    @Override
+    public void render(GameContainer gc, StateBasedGame sbg, Graphics g) {
         // shader12BitCol.setUniformIntVariable("pixelSize", 1);
         // shader12BitCol.startShader();
         // shaderBlurH.startShader();
@@ -191,7 +233,7 @@ public class Game {
         //bulletin.render(gc, g);
     }
 
-    private static Color[] getGradientColour(int timeSec) {
+    private Color[] getGradientColour(int timeSec) {
         Color[] colourTable = new Color[2];
 
         int gradMapWidth = GRADIENT_IMAGE.getWidth();
@@ -204,7 +246,48 @@ public class Game {
         return colourTable;
     }
 
-    private static void drawSkybox(Graphics g) {
+    public void keyPressed(int key, char c) {
+        GameController.keyPressed(key, c);
+    }
+
+    public void keyReleased(int key, char c) {
+        GameController.keyReleased(key, c);
+    }
+
+    public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+        GameController.mouseMoved(oldx, oldy, newx, newy);
+    }
+
+    public void mouseDragged(int oldx, int oldy, int newx, int newy) {
+        GameController.mouseDragged(oldx, oldy, newx, newy);
+    }
+
+    public void mousePressed(int button, int x, int y) {
+        GameController.mousePressed(button, x, y);
+    }
+
+    public void mouseReleased(int button, int x, int y) {
+        GameController.mouseReleased(button, x, y);
+    }
+
+    public void mouseWheelMoved(int change) {
+        GameController.mouseWheelMoved(change);
+    }
+
+    public void controllerButtonPressed(int controller, int button) {
+        GameController.controllerButtonPressed(controller, button);
+    }
+
+    public void controllerButtonReleased(int controller, int button) {
+        GameController.controllerButtonReleased(controller, button);
+    }
+
+    @Override
+    public int getID() {
+        return Terrarum.SCENE_ID_GAME;
+    }
+
+    private void drawSkybox(Graphics g) {
         Color[] colourTable = getGradientColour(WorldTime.elapsedSeconds());
         GradientFill skyColourFill = new GradientFill(0, 0, colourTable[0], 0, Terrarum.HEIGHT, colourTable[1]);
         g.fill(skyBox, skyColourFill);

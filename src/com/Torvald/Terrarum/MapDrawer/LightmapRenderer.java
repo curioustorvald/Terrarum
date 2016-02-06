@@ -1,6 +1,7 @@
 package com.Torvald.Terrarum.MapDrawer;
 
 import com.Torvald.Terrarum.Game;
+import com.Torvald.Terrarum.Terrarum;
 import com.jme3.math.FastMath;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -15,7 +16,8 @@ public class LightmapRenderer {
     /**
      * 8-Bit RGB values
      */
-    private static int[][] staticLightMap = new int[Game.map.height][Game.map.width];
+    private static int[][] staticLightMap;
+    private static boolean lightMapInitialised = false;
 
     /**
      * For entities that emits light (e.g. Player with shine potion)
@@ -55,6 +57,16 @@ public class LightmapRenderer {
     }
 
     public static void renderLightMap() {
+        if (staticLightMap == null) {
+            staticLightMap = new int[Terrarum.game.map.height][Terrarum.game.map.width];
+
+            if (lightMapInitialised) {
+                throw new RuntimeException("Attempting to re-initialise 'staticLightMap'");
+            }
+
+            lightMapInitialised = true;
+        }
+
 
         int for_y_start = div16(MapCamera.getCameraY());
         int for_x_start = div16(MapCamera.getCameraX());
@@ -117,7 +129,7 @@ public class LightmapRenderer {
         for (int y = for_y_start; y < for_y_end; y++) {
             for (int x = for_x_start; x < for_x_end; x++) {
                 // smooth
-                if (Game.screenZoom >= 1 && ((boolean) Game.gameConfig.get("smoothlighting"))) {
+                if (Terrarum.game.screenZoom >= 1 && ((boolean) Terrarum.game.gameConfig.get("smoothlighting"))) {
                     int thisLightLevel = staticLightMap[y][x];
                     if (y > 0 && x < for_x_end && thisLightLevel == 0 && staticLightMap[y - 1][x] == 0) {
                         // coalesce zero intensity blocks to one
@@ -131,10 +143,10 @@ public class LightmapRenderer {
 
                         g.setColor(new Color(0));
                         g.fillRect(
-                                Math.round(x * TSIZE * Game.screenZoom)
-                                , Math.round(y * TSIZE * Game.screenZoom)
-                                , FastMath.ceil(TSIZE * Game.screenZoom) * zeroLevelCounter
-                                , FastMath.ceil(TSIZE * Game.screenZoom)
+                                Math.round(x * TSIZE * Terrarum.game.screenZoom)
+                                , Math.round(y * TSIZE * Terrarum.game.screenZoom)
+                                , FastMath.ceil(TSIZE * Terrarum.game.screenZoom) * zeroLevelCounter
+                                , FastMath.ceil(TSIZE * Terrarum.game.screenZoom)
                         );
 
                         x += (zeroLevelCounter - 1);
@@ -149,19 +161,19 @@ public class LightmapRenderer {
                          *     d
                          */
                         int a = (y == 0) ? thisLightLevel
-                                         : (y == Game.map.height - 1) ? thisLightLevel
+                                         : (y == Terrarum.game.map.height - 1) ? thisLightLevel
                                                                       : Math.max(staticLightMap[y][x]
                                                                               , staticLightMap[y - 1][x]);
                         int d = (y == 0) ? thisLightLevel
-                                         : (y == Game.map.height - 1) ? thisLightLevel
+                                         : (y == Terrarum.game.map.height - 1) ? thisLightLevel
                                                                       : Math.max(staticLightMap[y][x]
                                                                               , staticLightMap[y + 1][x]);
                         int b = (x == 0) ? thisLightLevel
-                                         : (x == Game.map.width - 1) ? thisLightLevel
+                                         : (x == Terrarum.game.map.width - 1) ? thisLightLevel
                                                                      : Math.max(staticLightMap[y][x]
                                                                              , staticLightMap[y][x - 1]);
                         int c = (x == 0) ? thisLightLevel
-                                         : (x == Game.map.width - 1) ? thisLightLevel
+                                         : (x == Terrarum.game.map.width - 1) ? thisLightLevel
                                                                      : Math.max(staticLightMap[y][x]
                                                                              , staticLightMap[y][x + 1]);
                         int[] colourMapItoL = new int[4];
@@ -175,10 +187,10 @@ public class LightmapRenderer {
                                 g.setColor(new Color(colourMapItoL[iy * 2 + ix]));
 
                                 g.fillRect(
-                                        Math.round(x * TSIZE * Game.screenZoom) + (ix * TSIZE / 2 * Game.screenZoom)
-                                        , Math.round(y * TSIZE * Game.screenZoom) + (iy * TSIZE / 2 * Game.screenZoom)
-                                        , FastMath.ceil(TSIZE * Game.screenZoom / 2)
-                                        , FastMath.ceil(TSIZE * Game.screenZoom / 2)
+                                        Math.round(x * TSIZE * Terrarum.game.screenZoom) + (ix * TSIZE / 2 * Terrarum.game.screenZoom)
+                                        , Math.round(y * TSIZE * Terrarum.game.screenZoom) + (iy * TSIZE / 2 * Terrarum.game.screenZoom)
+                                        , FastMath.ceil(TSIZE * Terrarum.game.screenZoom / 2)
+                                        , FastMath.ceil(TSIZE * Terrarum.game.screenZoom / 2)
                                 );
                             }
                         }
@@ -198,10 +210,10 @@ public class LightmapRenderer {
 
                     g.setColor(new Color(staticLightMap[y][x]));
                     g.fillRect(
-                            Math.round(x * TSIZE * Game.screenZoom)
-                            , Math.round(y * TSIZE * Game.screenZoom)
-                            , FastMath.ceil(TSIZE * Game.screenZoom) * sameLevelCounter
-                            , FastMath.ceil(TSIZE * Game.screenZoom)
+                            Math.round(x * TSIZE * Terrarum.game.screenZoom)
+                            , Math.round(y * TSIZE * Terrarum.game.screenZoom)
+                            , FastMath.ceil(TSIZE * Terrarum.game.screenZoom) * sameLevelCounter
+                            , FastMath.ceil(TSIZE * Terrarum.game.screenZoom)
                     );
 
                     x += (sameLevelCounter - 1);
@@ -213,8 +225,8 @@ public class LightmapRenderer {
     private static void calculateAndSet(int x, int y){
         if (!outOfBounds(x, y)){
 
-            byte[][] layerTerrain = Game.map.getTerrainArray();
-            byte[][] layerWall = Game.map.getWallArray();
+            byte[][] layerTerrain = Terrarum.game.map.getTerrainArray();
+            byte[][] layerWall = Terrarum.game.map.getWallArray();
             int lightColor;
 
             int thisTerrain = layerTerrain[y][x];
@@ -387,7 +399,7 @@ public class LightmapRenderer {
     }
 
     private static boolean outOfBounds(int x, int y){
-        return ( x < 0 || y < 0 || x >= Game.map.width || y >= Game.map.height);
+        return ( x < 0 || y < 0 || x >= Terrarum.game.map.width || y >= Terrarum.game.map.height);
     }
 
     private static boolean outOfMapBounds(int x, int y){
@@ -421,8 +433,8 @@ public class LightmapRenderer {
         if (x < 0) {
             return 0;
         }
-        else if (x > Game.map.width) {
-            return Game.map.width;
+        else if (x > Terrarum.game.map.width) {
+            return Terrarum.game.map.width;
         }
         else {
             return x;
@@ -433,8 +445,8 @@ public class LightmapRenderer {
         if (x < 0) {
             return 0;
         }
-        else if (x > Game.map.height) {
-            return Game.map.height;
+        else if (x > Terrarum.game.map.height) {
+            return Terrarum.game.map.height;
         }
         else {
             return x;

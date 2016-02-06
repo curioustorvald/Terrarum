@@ -2,6 +2,7 @@ package com.Torvald.Terrarum.ConsoleCommand;
 
 import com.Torvald.Terrarum.Game;
 import com.Torvald.Terrarum.LangPack.Lang;
+import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.Terrarum.UserInterface.Bulletin;
 
 /**
@@ -29,6 +30,6 @@ public class SetBulletin implements ConsoleCommand {
      * @param message real message
      */
     public void send(String[] message) {
-        ((Bulletin) (Game.bulletin.getUI())).sendBulletin(message);
+        ((Bulletin) (Terrarum.game.bulletin.getUI())).sendBulletin(message);
     }
 }

@@ -2,7 +2,7 @@ package com.Torvald.Terrarum.GameControl;
 
 import com.Torvald.Terrarum.Actors.Controllable;
 import com.Torvald.Terrarum.Actors.Player;
-import com.Torvald.Terrarum.Game;
+import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.Terrarum.UserInterface.UIHandler;
 import org.newdawn.slick.Input;
 
@@ -13,11 +13,8 @@ public class GameController {
 
     private static KeyMap keyMap;
 
-    private static Player player;
-    private static Controllable playerVehicle;
-
     public GameController() {
-        player = Game.getPlayer();
+
     }
 
     public static void setKeyMap(KeyMap map) {
@@ -25,41 +22,41 @@ public class GameController {
     }
 
     public static void processInput(Input input) {
-        if (!Game.consoleHandler.isTakingControl()) {
-            if (playerVehicle != null) {
-                playerVehicle.processInput(input);
+        if (!Terrarum.game.consoleHandler.isTakingControl()) {
+            if (Terrarum.game.getPlayer().vehicleRiding != null) {
+                Terrarum.game.getPlayer().vehicleRiding.processInput(input);
             }
 
-            player.processInput(input);
+            Terrarum.game.getPlayer().processInput(input);
 
-            for (UIHandler ui : Game.uiContainer) {
+            for (UIHandler ui : Terrarum.game.uiContainer) {
                 ui.processInput(input);
             }
         }
         else {
-            Game.consoleHandler.processInput(input);
+            Terrarum.game.consoleHandler.processInput(input);
         }
     }
 
     public static void keyPressed(int key, char c) {
         if (keyPressedByCode(key, EnumKeyFunc.UI_CONSOLE)) {
-            Game.consoleHandler.toggleOpening();
+            Terrarum.game.consoleHandler.toggleOpening();
         }
         else if (keyPressedByCode(key, EnumKeyFunc.UI_BASIC_INFO)) {
-            Game.debugWindow.toggleOpening();
+            Terrarum.game.debugWindow.toggleOpening();
         }
 
 
 
-        if (!Game.consoleHandler.isTakingControl()) {
-            if (playerVehicle != null) {
-                playerVehicle.keyPressed(key, c);
+        if (!Terrarum.game.consoleHandler.isTakingControl()) {
+            if (Terrarum.game.getPlayer().vehicleRiding != null) {
+                Terrarum.game.getPlayer().vehicleRiding.keyPressed(key, c);
             }
 
-            player.keyPressed(key, c);
+            Terrarum.game.getPlayer().keyPressed(key, c);
         }
         else {
-            Game.consoleHandler.keyPressed(key, c);
+            Terrarum.game.consoleHandler.keyPressed(key, c);
         }
 
         //System.out.println(String.valueOf(key) + ", " + String.valueOf(c));
