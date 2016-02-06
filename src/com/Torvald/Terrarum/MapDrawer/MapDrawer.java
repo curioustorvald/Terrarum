@@ -25,7 +25,7 @@ public class MapDrawer {
         mapTileMap = new SpriteSheet("./res/graphics/terrain/terrain.png", TILE_SIZE, TILE_SIZE);
         wallTileMap = new SpriteSheet("./res/graphics/terrain/wall.png", TILE_SIZE, TILE_SIZE);
 
-        new MapCamera(map, TILE_SIZE);
+        new MapCamera(map);
 
         System.gc();
     }

@@ -1,11 +1,11 @@
 package com.Torvald.Terrarum.MapDrawer;
 
+import com.Torvald.Terrarum.*;
 import com.Torvald.Terrarum.Actors.Player;
-import com.Torvald.Terrarum.Terrarum;
-import com.Torvald.Terrarum.Game;
 import com.Torvald.Terrarum.GameMap.GameMap;
 import com.Torvald.Terrarum.GameMap.MapLayer;
 import com.jme3.math.FastMath;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.*;
 
 import java.util.Arrays;
@@ -67,7 +67,7 @@ public class MapCamera {
     private static final byte ICE_NATURAL = 29;
     private static final byte ICE_MAGICAL = 30;
 
-    private static final Byte[] TILES_CONNECT_SELF = {
+    private static Byte[] TILES_CONNECT_SELF = {
             COPPER
             , IRON
             , GOLD
@@ -77,7 +77,7 @@ public class MapCamera {
             , ICE_MAGICAL
     };
 
-    private static final Byte[] TILES_DARKEN_AIR = {
+    private static Byte[] TILES_DARKEN_AIR = {
             STONE
             , DIRT
             , GRASS
@@ -85,13 +85,26 @@ public class MapCamera {
             , GRAVEL
             , SNOW
             , ICE_NATURAL
+            , (byte)224, (byte)225, (byte)226, (byte)227, (byte)228, (byte)229, (byte)230, (byte)231
+            , (byte)232, (byte)233, (byte)234, (byte)235, (byte)236, (byte)237, (byte)238, (byte)239
+            , (byte)240, (byte)241, (byte)242, (byte)243, (byte)244, (byte)245, (byte)246, (byte)247
+            , (byte)248, (byte)249, (byte)250, (byte)251, (byte)252, (byte)253, (byte)254, (byte)255
+    };
+
+    /**
+     * Tiles that half-transparent and has hue
+     * will blend colour using colour multiplication
+     * i.e. red hues get lost if you dive into the water
+     */
+    private static Byte[] TILES_BLEND_MUL = {
+        (byte)224, (byte)225, (byte)226, (byte)227, (byte)228, (byte)229, (byte)230, (byte)231
+        , (byte)232, (byte)233, (byte)234, (byte)235, (byte)236, (byte)237, (byte)238, (byte)239
     };
 
     /**
      * @param map
-     * @param tileSize
      */
-    public MapCamera(GameMap map, int tileSize) throws SlickException {
+    public MapCamera(GameMap map) throws SlickException {
         this.map = map;
 
         tilesWall = new SpriteSheet("./res/graphics/terrain/wall.png"
@@ -209,6 +222,9 @@ public class MapCamera {
                         int thisTileX = nearbyTilesInfo;
                         int thisTileY = thisTile;
 
+
+                        if (isBlendMul((byte) thisTile)) setBlendModeMul();
+                        else setBlendModeNormal();
                         drawTile(TERRAIN, x, y, thisTileX, thisTileY);
                     }
                     else {
@@ -220,6 +236,7 @@ public class MapCamera {
         }
 
         tilesetBook[mode].endUse();
+        setBlendModeNormal();
     }
 
     private static int getGrassInfo(int x, int y, int from, int to) {
@@ -402,5 +419,19 @@ public class MapCamera {
 
     private static boolean isDarkenAir(byte b) {
         return (Arrays.asList(TILES_DARKEN_AIR).contains(b));
+    }
+
+    private static boolean isBlendMul(byte b) {
+        return (Arrays.asList(TILES_BLEND_MUL).contains(b));
+    }
+
+    private static void setBlendModeMul() {
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    private static void setBlendModeNormal() {
+        GL11.glDisable(GL11.GL_BLEND);
+        Terrarum.appgc.getGraphics().setDrawMode(Graphics.MODE_NORMAL);
     }
 }

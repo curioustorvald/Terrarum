@@ -46,7 +46,7 @@ public class Bulletin implements UICanvas {
 
     @Override
     public void render(GameContainer gc, Graphics g) {
-        /*if (isShowing) {
+        //if (isShowing) {
             int lineHeight = Terrarum.gameFontWhite.getLineHeight();
 
             g.setColor(uiColour);
@@ -65,7 +65,9 @@ public class Bulletin implements UICanvas {
                                 + (i * lineHeight)
                 );
             }
-        }*/
+        //}
+
+        System.out.println("arst");
     }
 
     @Override

@@ -54,7 +54,7 @@ public class PBFSigrid {
 
         p.inventory = new ActorInventory((int) p.actorValue.get("encumbrance"), true);
 
-        p.setPosition(2048 * 16, 300 * 16);
+        p.setPosition(4096 * 16, 300 * 16);
 
         return p;
     }

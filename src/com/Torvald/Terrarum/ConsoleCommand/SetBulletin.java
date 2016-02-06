@@ -31,5 +31,6 @@ public class SetBulletin implements ConsoleCommand {
      */
     public void send(String[] message) {
         ((Bulletin) (Terrarum.game.bulletin.getUI())).sendBulletin(message);
+        System.out.println("sent bulletin");
     }
 }

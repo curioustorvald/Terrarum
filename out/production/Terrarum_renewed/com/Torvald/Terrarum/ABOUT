@@ -49,6 +49,17 @@
 
 
 
+##*=-  What feeling do you want to convey to the player?
+
+
+== Always think WHY would you want to add _something_ on the game
+    - e.g. Why you are adding RPG leveling system?
+
+
+
+See also:
+HEARTS, CLUBS, DIAMONDS, SPADES: PLAYERS WHO SUIT MUDS
+
 ====================================
 
 
@@ -57,6 +68,21 @@
 - Add Fortress mode features by 'make your own settling'
 - Hard to actually die, but once you die, you're done.
     + Config: imtooyoungtodie for easy mode
+
+- Genre: Adventure, Open world (towns in RPG, building, town managing (conquer existing one or
+    you build one and persuade existing people to move in) -> See Dwarf Fortress and Animal Crossing)
+
+    * Adventure: adventure this vast—5,5 km wide—world, discover new (and good/horrible) things
+
+    * Open world:
+        - Building: building your own houses, structures, etc.
+        - Town managing:
+                1. Build your own little hamlet and manage it
+                or-
+                2. Conquer existing one and become a ruler
+                    The town is a special hamlet that can be tailored for your taste
+        - Survival:
+                mobs will trying to attack your assets (yourself, your hamlet, your people)
 
 
 

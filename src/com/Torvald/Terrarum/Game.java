@@ -113,14 +113,14 @@ public class Game extends BasicGameState {
         debugWindow = new UIHandler(new BasicDebugInfoWindow());
         debugWindow.setPosition(0, 0);
 
-        /*bulletin = new UIHandler(new Bulletin());
+        bulletin = new UIHandler(new Bulletin());
         bulletin.setPosition(
                 (Terrarum.WIDTH - bulletin.getUI().getWidth())
                         / 2
                 , 0
         );
         bulletin.setVisibility(true);
-        */
+
 
         UIHandler msgtest = new UIHandler(new Message(400, true));
         String[] msg = {"Hello, world!", "안녕, 세상아!"};
@@ -199,7 +199,6 @@ public class Game extends BasicGameState {
                 , -MapCamera.getCameraY() * screenZoom
         );
 
-        MapDrawer.render(gc, g);
         actorContainer.forEach(
                 actor -> {
                     if (actor instanceof Visible) {
@@ -207,6 +206,14 @@ public class Game extends BasicGameState {
                     }
                 }
         );
+        actorContainer.forEach(
+                actor -> {
+                    if (actor instanceof Glowing) {
+                        ((Glowing) actor).drawGlow(gc, g);
+                    }
+                }
+        );
+        MapDrawer.render(gc, g);
 
         // Slick's MODE_COLOR_MULTIPLY is clearly broken... using GL11
         LightmapRenderer.renderLightMap();
@@ -218,14 +225,6 @@ public class Game extends BasicGameState {
         // MapDrawer.drawEnvOverlay(g);
         GL11.glDisable(GL11.GL_BLEND);
         g.setDrawMode(Graphics.MODE_NORMAL);
-
-        actorContainer.forEach(
-                actor -> {
-                    if (actor instanceof Glowing) {
-                        ((Glowing) actor).drawGlow(gc, g);
-                    }
-                }
-        );
 
         uiContainer.forEach(ui -> ui.render(gc, g));
         debugWindow.render(gc, g);
