@@ -2,13 +2,10 @@ package com.Torvald.Terrarum;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.Torvald.ImageFont.GameFontWhite;
-import com.Torvald.Terrarum.GameControl.GameController;
-import com.Torvald.Terrarum.GameControl.KeyMap;
 import com.Torvald.Terrarum.LangPack.Lang;
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
@@ -17,6 +14,20 @@ import org.newdawn.slick.state.StateBasedGame;
  * Created by minjaesong on 15-12-30.
  */
 public class Terrarum extends StateBasedGame {
+
+    /**
+     * To be used with physics simulator
+     */
+    public static final int TARGET_FPS = 50;
+
+    /**
+     * To be used with render, to achieve smooth frame drawing
+     *
+     * TARGET_INTERNAL_FPS > TARGET_FPS for smooth frame drawing
+     *
+     * Must choose a value so that 1000 / VAL is still integer
+     */
+    public static final int TARGET_INTERNAL_FPS = 100;
 
     public static AppGameContainer appgc;
     public static final int WIDTH = 960;
@@ -64,11 +75,11 @@ public class Terrarum extends StateBasedGame {
         {
             appgc = new AppGameContainer(new Terrarum("Terrarum"));
             appgc.setDisplayMode(WIDTH, HEIGHT, false);
-            appgc.setTargetFrameRate(Game.TARGET_INTERNAL_FPS);
+            appgc.setTargetFrameRate(TARGET_INTERNAL_FPS);
             appgc.setVSync(true);
             appgc.setShowFPS(false);
             appgc.setUpdateOnlyWhenVisible(false);
-            appgc.setMaximumLogicUpdateInterval(1000 / Game.TARGET_INTERNAL_FPS);
+            appgc.setMaximumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS);
             appgc.start();
         }
         catch (SlickException ex)

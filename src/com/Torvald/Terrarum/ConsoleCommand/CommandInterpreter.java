@@ -1,7 +1,11 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
-import com.Torvald.Terrarum.Game;
-import com.Torvald.Terrarum.UserInterface.ConsoleWindow;
+import com.Torvald.Terrarum.LangPack.Lang;
+
+import java.util.ArrayList;
+import java.util.Formatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by minjaesong on 16-01-15.
@@ -17,41 +21,70 @@ public class CommandInterpreter {
                 commandObj.execute(single_command.toStringArray());
             }
             catch (NullPointerException e) {
-                new Echo().execute("Unknown command: " + single_command.getName());
+                StringBuilder sb = new StringBuilder();
+                Formatter formatter = new Formatter(sb);
+
+                new Echo().execute(
+                        formatter.format(Lang.get("DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN")
+                                , single_command.getName()
+                        ).toString()
+                );
             }
         }
     }
 
     private static CommandInput[] parse(String input) {
-        String[] commands = input.split(";[ ]?"); // split multiple commands (e.g. respawn player; setav player speed 5)
+        Pattern patternCommands = Pattern.compile("[^;]+");
+        Pattern patternTokensInCommand = Pattern.compile("[\"'][^;]+[\"']|[^ ]+");
 
-        CommandInput[] ret = new CommandInput[commands.length];
-        for (int i = 0; i < commands.length; i++) {
-            ret[i] = new CommandInput(commands[i].split(" "));
+        ArrayList<String> commands = new ArrayList<>();
+
+        // split multiple commands
+        Matcher m = patternCommands.matcher(input);
+        while (m.find()) commands.add(m.group());
+
+        // split command tokens from a command
+        CommandInput[] parsedCommands = new CommandInput[commands.size()];
+
+
+        for (int i = 0; i < parsedCommands.length; i++) {
+            ArrayList<String> tokens = new ArrayList<>();
+
+            m = patternTokensInCommand.matcher(commands.get(i));
+            while (m.find()) {
+                String regexGroup = m.group().replaceAll("[\"\']", "");
+                tokens.add(regexGroup);
+            }
+
+            // create new command
+            parsedCommands[i] = new CommandInput(tokens.toArray());
+
         }
 
-        return ret;
+        return parsedCommands;
     }
 
 }
 
 class CommandInput {
-    private String[] args;
-    private int argsCount = 0;
+    private String[] tokens;
 
-    CommandInput(String[] s) {
-        args = s;
+    CommandInput(Object[] o) {
+        tokens = new String[o.length];
+        for (int i = 0; i < o.length; i++) {
+            tokens[i] = (String) o[i];
+        }
     }
 
     String[] toStringArray() {
-        return args;
+        return tokens;
     }
 
     String getName() {
-        return args[0];
+        return tokens[0];
     }
 
     int getArgsCount() {
-        return argsCount;
+        return tokens.length;
     }
 }

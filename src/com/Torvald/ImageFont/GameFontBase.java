@@ -1,8 +1,5 @@
 package com.Torvald.ImageFont;
 
-import com.Torvald.Terrarum.MapDrawer.LightmapRenderer;
-import com.Torvald.Terrarum.Terrarum;
-import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.*;
 
 import java.util.Arrays;
@@ -16,28 +13,34 @@ public class GameFontBase implements Font {
     static SpriteSheet asciiSheet;
     static SpriteSheet asciiSheetEF;
     static SpriteSheet runicSheet;
+    static SpriteSheet extASheet;
+    static SpriteSheet extASheetEF;
 
     static final int JUNG_COUNT = 21;
     static final int JONG_COUNT = 28;
 
     static final int W_CJK = 10;
     static final int W_CJK_DRAW = 11;
-    static final int W_EM = 9; // width of regular letters, including m
-    static final int W_EF = 5; // width of letter f, t, i, l
+    static final int W_LATIN_WIDE = 9; // width of regular letters, including m
+    static final int W_LATIN_NARROW = 5; // width of letter f, t, i, l
     static final int H = 20;
     static final int H_CJK = 16;
 
-    static final int SHEET_EM = 0;
-    static final int SHEET_EF = 1;
-    static final int SHEET_HANGUL = 3;
-    static final int SHEET_CJKPUNCT = 4;
-    static final int SHEET_KANA = 5;
-    static final int SHEET_RUNIC = 6;
+    static final int SHEET_ASCII_EM = 0;
+    static final int SHEET_ASCII_EF = 1;
+    static final int SHEET_HANGUL = 2;
+    static final int SHEET_RUNIC = 3;
+    static final int SHEET_EXTA_EM = 4;
+    static final int SHEET_EXTA_EF = 5;
 
     static SpriteSheet[] sheetKey;
-    static final Character[] EFlist = {
-             ' ','!','"','\'',',','.','(',')',':',';','I','[',']','`','f','i'
-            ,'j','l','t','{','|','}'
+    static final Character[] asciiEFList = {
+             ' ','!','"','\'','(',')','I','[',']','`','f','i','j','l','t','{'
+            ,'|','}',0xA1,'Ì','Í','Î','Ï','ì','í','î','ï','·'
+    };
+
+    static final Character[] extAEFList = {
+            0x12E, 0x12F, 0x130, 0x131, 0x135, 0x13A, 0x13C, 0x142, 0x163, 0x167, 0x17F
     };
 
     /**
@@ -65,8 +68,12 @@ public class GameFontBase implements Font {
         return ret;
     }
 
-    private boolean isEF(char c) {
-        return (Arrays.asList(EFlist).contains(c));
+    private boolean isAsciiEF(char c) {
+        return (Arrays.asList(asciiEFList).contains(c));
+    }
+
+    private boolean isExtAEF(char c) {
+        return (Arrays.asList(extAEFList).contains(c));
     }
 
     private boolean isHangul(char c) {
@@ -79,12 +86,24 @@ public class GameFontBase implements Font {
         return (Arrays.asList(runicList).contains(c));
     }
 
-    private int EFindexX(char c) {
-        return (Arrays.asList(EFlist).indexOf(c) % 16);
+    private boolean isExtA(char c) {
+        return (c >= 0x100 && c < 0x180);
     }
 
-    private int EFindexY(char c) {
-        return (Arrays.asList(EFlist).indexOf(c) / 16);
+    private int asciiEFindexX(char c) {
+        return (Arrays.asList(asciiEFList).indexOf(c) % 16);
+    }
+
+    private int asciiEFindexY(char c) {
+        return (Arrays.asList(asciiEFList).indexOf(c) / 16);
+    }
+
+    private int extAEFindexX(char c) {
+        return (Arrays.asList(extAEFList).indexOf(c) % 16);
+    }
+
+    private int extAEFindexY(char c) {
+        return (Arrays.asList(extAEFList).indexOf(c) / 16);
     }
 
     private int runicIndexX(char c) {
@@ -101,12 +120,12 @@ public class GameFontBase implements Font {
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             switch (getSheetType(c)) {
-                case SHEET_EF:
-                    len += W_EF; break;
+                case SHEET_ASCII_EF:
+                    len += W_LATIN_NARROW; break;
                 case SHEET_HANGUL:
                     len += W_CJK_DRAW; break;
                 default:
-                    len += W_EM;
+                    len += W_LATIN_WIDE;
             }
         }
         return len;
@@ -153,7 +172,7 @@ public class GameFontBase implements Font {
         for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
 
-            if (isAscii(ch)) {
+            if (!isHangul(ch)) {
 
                 // if not init, enduse first
                 if (prevInstance != -1) {
@@ -165,11 +184,22 @@ public class GameFontBase implements Font {
                 int sheetX;
                 int sheetY;
                 switch (prevInstance) {
-                    case SHEET_EF:
-                        sheetX = EFindexX(ch);
-                        sheetY = EFindexY(ch);
+                    case SHEET_ASCII_EF:
+                        sheetX = asciiEFindexX(ch);
+                        sheetY = asciiEFindexY(ch);
                         break;
-                    case SHEET_EM:
+                    case SHEET_EXTA_EF:
+                        sheetX = extAEFindexX(ch);
+                        sheetY = extAEFindexY(ch);
+                        break;
+                    case SHEET_RUNIC:
+                        sheetX = runicIndexX(ch);
+                        sheetY = runicIndexY(ch);
+                        break;
+                    case SHEET_EXTA_EM:
+                        sheetX = (ch - 0x100) % 16;
+                        sheetY = (ch - 0x100) / 16;
+                        break;
                     default:
                         sheetX = ch % 16;
                         sheetY = ch / 16;
@@ -194,18 +224,12 @@ public class GameFontBase implements Font {
     }
 
     private int getSheetType(char c) {
-        if (isEF(c)) {
-            return SHEET_EF;
-        }
-        else if (isHangul(c)) {
-            return SHEET_HANGUL;
-        }
-        else if (isRunic(c)) {
-            return SHEET_RUNIC;
-        }
-        else {
-            return SHEET_EM;
-        }
+        if (isAsciiEF(c)) return SHEET_ASCII_EF;
+        else if (isHangul(c)) return SHEET_HANGUL;
+        else if (isRunic(c)) return SHEET_RUNIC;
+        else if (isExtA(c)) return SHEET_EXTA_EM;
+        else if (isExtAEF(c)) return SHEET_EXTA_EF;
+        else return SHEET_ASCII_EM;
     }
 
     @Override

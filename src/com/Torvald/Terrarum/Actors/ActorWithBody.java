@@ -1,7 +1,6 @@
 package com.Torvald.Terrarum.Actors;
 
 import com.Torvald.Rand.HighQualityRandom;
-import com.Torvald.Terrarum.Game;
 import com.Torvald.Terrarum.MapDrawer.MapDrawer;
 import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.spriteAnimation.SpriteAnimation;
@@ -65,8 +64,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      * meter to pixel : 24/FPS
      */
     private final float METER = 24f;
-    private final float SI_TO_GAME_ACC = METER / (Terrarum.game.TARGET_FPS * Terrarum.game.TARGET_FPS);
-    private final float SI_TO_GAME_VEL = METER / Terrarum.game.TARGET_FPS;
+    private final float SI_TO_GAME_ACC = METER / (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS);
+    private final float SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS;
     private float gravitation;
     private final float DRAG_COEFF = 1f;
 

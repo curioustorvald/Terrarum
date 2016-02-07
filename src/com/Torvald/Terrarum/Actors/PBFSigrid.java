@@ -50,6 +50,8 @@ public class PBFSigrid {
         p.actorValue.set("strength", 1250);
         p.actorValue.set("encumbrance", 1000);
 
+        p.actorValue.set("name", "Sigrid");
+
         p.setHitboxDimension(20, 47, 7, 0);
 
         p.inventory = new ActorInventory((int) p.actorValue.get("encumbrance"), true);

@@ -68,16 +68,16 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
     }
 
     private void updatePhysicalInfos() {
-        super.setScale((float) actorValue.get("scale"));
-        super.setMass((float) actorValue.get("basemass")
+        super.setScale(actorValue.getAsFloat("scale"));
+        super.setMass(actorValue.getAsFloat("basemass")
                 * FastMath.pow(super.getScale(), 3));
     }
 
     private void walkHorizontal(boolean left) {
         readonly_totalX = super.getVeloX()
                 +
-                (float) actorValue.get("accel")
-                        * (float) actorValue.get("accelmult")
+                actorValue.getAsFloat("accel")
+                        * actorValue.getAsFloat("accelmult")
                         * FastMath.sqrt(super.getScale())
                         * applyAccelRealism(walkPowerCounter)
                         * (left ? -1 : 1);
@@ -91,8 +91,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
         // Clamp veloX
         super.setVeloX(
                 absClamp(super.getVeloX()
-                , (float) actorValue.get("speed")
-                        * (float) actorValue.get("speedmult")
+                , actorValue.getAsFloat("speed")
+                        * actorValue.getAsFloat("speedmult")
                         * FastMath.sqrt(super.getScale())
         ));
 
@@ -133,8 +133,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
     private void walkVertical(boolean up) {
         super.setVeloY(super.getVeloY()
                 +
-                (float) actorValue.get("accel")
-                * (float) actorValue.get("accelmult")
+                actorValue.getAsFloat("accel")
+                * actorValue.getAsFloat("accelmult")
                 * FastMath.sqrt(super.getScale())
                 * applyAccelRealism(walkPowerCounter)
                 * (up ? -1 : 1)
@@ -147,8 +147,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
         // Clamp veloX
         super.setVeloY(
                 absClamp(super.getVeloY()
-                        , (float) actorValue.get("speed")
-                                * (float) actorValue.get("speedmult")
+                        , actorValue.getAsFloat("speed")
+                                * actorValue.getAsFloat("speedmult")
                                 * FastMath.sqrt(super.getScale())
                 )
         );
@@ -158,8 +158,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
         if (super.getVeloX() > 0) {
             super.setVeloX(super.getVeloX()
                     -
-                    (float) actorValue.get("accel")
-                    * (float) actorValue.get("accelmult")
+                    actorValue.getAsFloat("accel")
+                    * actorValue.getAsFloat("accelmult")
                     * FastMath.sqrt(super.getScale())
             );
 
@@ -170,8 +170,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
         else if (super.getVeloX() < 0) {
             super.setVeloX(super.getVeloX()
                     +
-                    (float) actorValue.get("accel")
-                    * (float) actorValue.get("accelmult")
+                    actorValue.getAsFloat("accel")
+                    * actorValue.getAsFloat("accelmult")
                     * FastMath.sqrt(super.getScale())
             );
 
@@ -191,7 +191,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
             super.setVeloY(super.getVeloY()
                     -
                     WALK_STOP_ACCEL
-                            * (float) actorValue.get("accelmult")
+                            * actorValue.getAsFloat("accelmult")
                             * FastMath.sqrt(super.getScale())
             );
 
@@ -203,7 +203,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
             super.setVeloY(super.getVeloY()
                     +
                     WALK_STOP_ACCEL
-                            * (float) actorValue.get("accelmult")
+                            * actorValue.getAsFloat("accelmult")
                             * FastMath.sqrt(super.getScale())
             );
 
@@ -342,8 +342,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
     }
 
     private void jump() {
-        float len = (float) actorValue.get("jumplength");
-        float pwr = (float) actorValue.get("jumppower");
+        float len = actorValue.getAsFloat("jumplength");
+        float pwr = actorValue.getAsFloat("jumppower");
 
         //if (jumping) {
         //    // Limit increment of jumpPowerCounter

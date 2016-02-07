@@ -1,7 +1,5 @@
 package com.Torvald.Terrarum;
 
-import com.Torvald.ImageFont.GameFontWhite;
-import com.Torvald.Rand.HighQualityRandom;
 import com.Torvald.Terrarum.Actors.*;
 import com.Torvald.Terrarum.ConsoleCommand.CommandDict;
 import com.Torvald.Terrarum.GameControl.GameController;
@@ -32,13 +30,6 @@ import java.util.LinkedList;
  */
 public class Game extends BasicGameState {
 
-    public static final int TARGET_FPS = 50;
-    /**
-     * To be used with render, to achieve smooth frame drawing
-     *
-     * TARGET_INTERNAL_FPS > TARGET_FPS for smooth frame drawing
-     */
-    public static final int TARGET_INTERNAL_FPS = 100;
     public static long memInUse;
     public static long totalVMMem;
     int game_mode = 0;
@@ -76,7 +67,7 @@ public class Game extends BasicGameState {
 
 
         gameConfig = new GameConfig();
-        gameConfig.addKey("smoothlighting", true);
+        gameConfig.set("smoothlighting", true);
 
         shader12BitCol = Shader.makeShader("./res/4096.vrt", "./res/4096.frg");
         shaderBlurH = Shader.makeShader("./res/blurH.vrt", "./res/blur.frg");
@@ -177,7 +168,7 @@ public class Game extends BasicGameState {
         Terrarum.appgc.setTitle(
                 "Simple Slick Game — FPS: "
                         + Terrarum.appgc.getFPS() + " ("
-                        + String.valueOf(TARGET_INTERNAL_FPS)
+                        + String.valueOf(Terrarum.TARGET_INTERNAL_FPS)
                         + ") — "
                         + String.valueOf(memInUse) + "M / "
                         + String.valueOf(totalVMMem) + "M"

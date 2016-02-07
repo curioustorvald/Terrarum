@@ -13,24 +13,36 @@ public class GameFontBlack extends GameFontBase {
 
         hangulSheet = new SpriteSheet(
                 "./res/graphics/fonts/han_atlas_black.png"
-                , W_CJK
-                , H_CJK
+                , W_CJK, H_CJK
         );
         asciiSheet = new SpriteSheet(
                 "./res/graphics/fonts/ascii_majuscule_black.png"
-                , W_EM
-                , H
+                , W_LATIN_WIDE, H
         );
         asciiSheetEF = new SpriteSheet(
                 "./res/graphics/fonts/ascii_special_ef_black.png"
-                , W_EF
-                , H
+                , W_LATIN_NARROW, H
+        );
+        runicSheet = new SpriteSheet(
+                "./res/graphics/fonts/futhark_black.png"
+                , W_LATIN_WIDE, H
+        );
+        extASheet = new SpriteSheet(
+                "./res/graphics/fonts/LatinExtA_majuscule_black.png"
+                , W_LATIN_WIDE, H
+        );
+        extASheetEF = new SpriteSheet(
+                "./res/graphics/fonts/LatinExtA_ef_black.png"
+                , W_LATIN_NARROW, H
         );
 
         SpriteSheet[] shk = {
                 asciiSheet
                 , asciiSheetEF
                 , hangulSheet
+                , runicSheet
+                , extASheet
+                , extASheetEF
         };
         sheetKey = shk;
     }

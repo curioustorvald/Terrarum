@@ -25,13 +25,11 @@ class SetAV implements ConsoleCommand {
             printUsage();
         }
         else if (args.length == 3) {
-            float val;
-            try {
-                val = new Float(args[2]);
-            }
+            Object val;
+
+            try { val = new Float(args[2]); } // try for number
             catch (NumberFormatException e) {
-                new Echo().execute("Wrong number input.");
-                return;
+                val = new String(args[2]); // string if not number
             }
 
             Terrarum.game.getPlayer().getActorValue().set(args[1], val);
