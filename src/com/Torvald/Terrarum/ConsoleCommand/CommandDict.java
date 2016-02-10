@@ -26,6 +26,7 @@ public class CommandDict {
         dict.put("zoom", new Zoom());
         dict.put("teleport", new TeleportPlayer());
         dict.put("cat", new CatStdout());
+        dict.put("exportav", new ExportAV());
     }
 
     public static ConsoleCommand getCommand(String commandName) {

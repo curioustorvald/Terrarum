@@ -27,11 +27,11 @@ public class MapGenerator {
     private static final int HILL_WIDTH = 256; // power of two!
     private static final int MAX_HILL_HEIGHT = 100;
 
-    private static final int OCEAN_WIDTH = 400;
-    private static final int SHORE_WIDTH = 120;
-    private static final int MAX_OCEAN_DEPTH = 200;
+    private static int OCEAN_WIDTH = 400;
+    private static int SHORE_WIDTH = 120;
+    private static int MAX_OCEAN_DEPTH = 200;
 
-    private static int GLACIER_MOUNTAIN_WIDTH;
+    private static int GLACIER_MOUNTAIN_WIDTH = 900;
     private static final int GLACIER_MOUNTAIN_HEIGHT = 300;
 
     private static final byte AIR = 0;
@@ -79,10 +79,15 @@ public class MapGenerator {
         width = map.width;
         height = map.height;
 
+        float widthMulFactor = (width / 8192f);
+
         dirtThickness = (int) (100 * height / 1024f);
         minimumFloatingIsleHeight = (int) (25 * (height / 1024f));
         TERRAIN_AVERAGE_HEIGHT = height / 4;
-        GLACIER_MOUNTAIN_WIDTH = Math.round(900 * (width / 8192f));
+
+        OCEAN_WIDTH = Math.round(OCEAN_WIDTH * widthMulFactor);
+        SHORE_WIDTH = Math.round(SHORE_WIDTH * widthMulFactor);
+        GLACIER_MOUNTAIN_WIDTH = Math.round(GLACIER_MOUNTAIN_WIDTH * widthMulFactor);
     }
 
     public static void setSeed(long seed) {
@@ -878,11 +883,13 @@ public class MapGenerator {
         float k = (width) / FastMath.sqrt(height);
 
         if (y < height) {
+            // ground
             return width;
         }
         else {
+            // underground
             return Math.round(
-                    k * FastMath.sqrt(y)
+                    k * FastMath.sqrt(y) + (random.nextInt(3) - 1)
             );
         }
     }

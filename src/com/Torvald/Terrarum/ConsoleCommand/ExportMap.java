@@ -93,8 +93,11 @@ public class ExportMap implements ConsoleCommand {
 
                 ImageIO.write(image, "PNG", new File(dir + args[1] + ".png"));
 
+                new Echo().execute("ExportMap: exported to " + args[1] + ".png");
+
             } catch (IOException e) {
                 new Echo().execute("ExportMap: IOException raised.");
+                e.printStackTrace();
             }
 
             mapData = null;
@@ -102,8 +105,6 @@ public class ExportMap implements ConsoleCommand {
 
             // Free up some memory
             System.gc();
-
-            new Echo().execute("ExportMap: exported to " + args[1] + ".png");
         }
         else{
             printUsage();

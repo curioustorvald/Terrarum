@@ -84,6 +84,9 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     long referenceID;
 
+    /**
+     * Give new random ReferenceID and initialise ActorValue
+     */
     public ActorWithBody() {
         referenceID = new HQRNG(0x7E22A211AAL).nextLong();
         actorValue = new ActorValue();
