@@ -12,7 +12,7 @@ public class GameFontWhite extends GameFontBase {
 
         hangulSheet = new SpriteSheet(
                 "./res/graphics/fonts/han_atlas.png"
-                , W_CJK, H_CJK
+                , W_CJK, H_HANGUL
         );
         asciiSheet = new SpriteSheet(
                 "./res/graphics/fonts/ascii_majuscule.png"
@@ -34,6 +34,14 @@ public class GameFontWhite extends GameFontBase {
                 "./res/graphics/fonts/LatinExtA_ef.png"
                 , W_LATIN_NARROW, H
         );
+        kanaSheet = new SpriteSheet(
+                "./res/graphics/fonts/kana.png"
+                , W_CJK, H_KANA
+        );
+        cjkPunct = new SpriteSheet(
+                "./res/graphics/fonts/cjkpunct.png"
+                , W_CJK, H_KANA
+        );
 
         SpriteSheet[] shk = {
                 asciiSheet
@@ -42,6 +50,8 @@ public class GameFontWhite extends GameFontBase {
                 , runicSheet
                 , extASheet
                 , extASheetEF
+                , kanaSheet
+                , cjkPunct
         };
         sheetKey = shk;
     }

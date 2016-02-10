@@ -1,6 +1,6 @@
 package com.Torvald.Terrarum.MapGenerator;
 
-import com.Torvald.Rand.HighQualityRandom;
+import com.Torvald.Rand.HQRNG;
 import com.jme3.math.FastMath;
 
 public class SimplexNoise {
@@ -30,7 +30,7 @@ public class SimplexNoise {
         frequencys = new float[numberOfOctaves];
         amplitudes = new float[numberOfOctaves];
 
-        HighQualityRandom rnd = new HighQualityRandom(seed);
+        HQRNG rnd = new HQRNG(seed);
 
         for (int i = 0; i < numberOfOctaves; i++) {
             octaves[i] = new SimplexNoise_octave(rnd.nextInt());

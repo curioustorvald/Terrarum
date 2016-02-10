@@ -1,6 +1,5 @@
 package com.Torvald.Terrarum.Actors;
 
-import com.Torvald.Terrarum.Game;
 import com.Torvald.Terrarum.GameControl.EnumKeyFunc;
 import com.Torvald.Terrarum.GameControl.KeyMap;
 import com.Torvald.Terrarum.Terrarum;
@@ -8,12 +7,16 @@ import com.Torvald.spriteAnimation.SpriteAnimation;
 import com.jme3.math.FastMath;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import org.lwjgl.input.Controller;
+import org.lwjgl.input.Controllers;
 import org.newdawn.slick.*;
+
+import java.io.Serializable;
 
 /**
  * Created by minjaesong on 15-12-31.
  */
-public class Player extends ActorWithBody implements Controllable, Pocketed {
+public class Player extends ActorWithBody implements Controllable, Pocketed, Serializable {
 
     @Nullable public Controllable vehicleRiding;
 
@@ -21,7 +24,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
     int walkPowerCounter = 0;
     private final int WALK_FRAMES_TO_MAX_ACCEL = 6;
 
-    public float readonly_totalX = 0;
+    public float readonly_totalX = 0, readonly_totalY = 0;
 
     boolean jumping = false;
 
@@ -41,6 +44,9 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
     private boolean noClip = false;
 
     public final long PLAYER_REF_ID = 0x51621D;
+
+    private final float AXIS_POSMAX = 1.0f;
+    private final int GAMEPAD_JUMP = 5;
 
     /**
      * Creates new Player instance with empty elements (sprites, actorvalue, etc.). <br />
@@ -73,34 +79,74 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
                 * FastMath.pow(super.getScale(), 3));
     }
 
-    private void walkHorizontal(boolean left) {
-        readonly_totalX = super.getVeloX()
+    /**
+     *
+     * @param left (even if the game is joypad controlled, you must give valid value)
+     * @param absAxisVal (set AXIS_POSMAX if keyboard controlled)
+     */
+    private void walkHorizontal(boolean left, float absAxisVal) {
+        if ((!super.isWalledLeft() && left) || (!super.isWalledRight() && !left)) {
+            readonly_totalX = super.getVeloX()
+                    +
+                    actorValue.getAsFloat("accel")
+                            * actorValue.getAsFloat("accelmult")
+                            * FastMath.sqrt(super.getScale())
+                            * applyAccelRealism(walkPowerCounter)
+                            * (left ? -1 : 1)
+                            * absAxisVal;
+
+            super.setVeloX(readonly_totalX);
+
+            if (walkPowerCounter < WALK_FRAMES_TO_MAX_ACCEL) {
+                walkPowerCounter += 1;
+            }
+
+            // Clamp veloX
+            super.setVeloX(
+                    absClamp(super.getVeloX()
+                            , actorValue.getAsFloat("speed")
+                                    * actorValue.getAsFloat("speedmult")
+                                    * FastMath.sqrt(super.getScale())
+                    )
+            );
+
+            // Heading flag
+            if (left)
+                walkHeading = LEFT;
+            else
+                walkHeading = RIGHT;
+        }
+    }
+
+    /**
+     *
+     * @param up (even if the game is joypad controlled, you must give valid value)
+     * @param absAxisVal (set AXIS_POSMAX if keyboard controlled)
+     */
+    private void walkVertical(boolean up, float absAxisVal) {
+        readonly_totalY = super.getVeloY()
                 +
                 actorValue.getAsFloat("accel")
                         * actorValue.getAsFloat("accelmult")
                         * FastMath.sqrt(super.getScale())
                         * applyAccelRealism(walkPowerCounter)
-                        * (left ? -1 : 1);
+                        * (up ? -1 : 1)
+                        * absAxisVal;
 
-        super.setVeloX(readonly_totalX);
+        super.setVeloY(readonly_totalY);
 
         if (walkPowerCounter < WALK_FRAMES_TO_MAX_ACCEL) {
             walkPowerCounter += 1;
         }
 
         // Clamp veloX
-        super.setVeloX(
-                absClamp(super.getVeloX()
-                , actorValue.getAsFloat("speed")
-                        * actorValue.getAsFloat("speedmult")
-                        * FastMath.sqrt(super.getScale())
-        ));
-
-        // Heading flag
-        if (left)
-            walkHeading = LEFT;
-        else
-            walkHeading = RIGHT;
+        super.setVeloY(
+                absClamp(super.getVeloY()
+                        , actorValue.getAsFloat("speed")
+                                * actorValue.getAsFloat("speedmult")
+                                * FastMath.sqrt(super.getScale())
+                )
+        );
     }
 
     /**
@@ -128,30 +174,6 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
      */
     private float applyAccelRealism(int x) {
         return 0.5f + 0.5f * -FastMath.cos(10 * x / (WALK_FRAMES_TO_MAX_ACCEL * FastMath.PI));
-    }
-
-    private void walkVertical(boolean up) {
-        super.setVeloY(super.getVeloY()
-                +
-                actorValue.getAsFloat("accel")
-                * actorValue.getAsFloat("accelmult")
-                * FastMath.sqrt(super.getScale())
-                * applyAccelRealism(walkPowerCounter)
-                * (up ? -1 : 1)
-        );
-
-        if (walkPowerCounter < WALK_FRAMES_TO_MAX_ACCEL) {
-            walkPowerCounter += 1;
-        }
-
-        // Clamp veloX
-        super.setVeloY(
-                absClamp(super.getVeloY()
-                        , actorValue.getAsFloat("speed")
-                                * actorValue.getAsFloat("speedmult")
-                                * FastMath.sqrt(super.getScale())
-                )
-        );
     }
 
     private void walkHStop() {
@@ -232,86 +254,128 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
     }
 
     public void processInput(Input input) {
+        Controller gamepad = null;
+        float axisX = 0, axisY = 0, axisRX = 0, axisRY = 0;
+        if (Terrarum.hasController) {
+            gamepad = Controllers.getController(0);
+            axisX = gamepad.getAxisValue(0);
+            axisY = gamepad.getAxisValue(1);
+            axisRX = gamepad.getAxisValue(2);
+            axisRY = gamepad.getAxisValue(3);
+
+            if (Math.abs(axisX) < Terrarum.CONTROLLER_DEADZONE) axisX = 0;
+            if (Math.abs(axisY) < Terrarum.CONTROLLER_DEADZONE) axisY = 0;
+            if (Math.abs(axisRX) < Terrarum.CONTROLLER_DEADZONE) axisRX = 0;
+            if (Math.abs(axisRY) < Terrarum.CONTROLLER_DEADZONE) axisRY = 0;
+        }
+
         /**
          * L-R stop
          */
-        // ↑F, ↑S
-        if (!isFuncDown(input, EnumKeyFunc.MOVE_LEFT)
-                && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
-            walkHStop();
-            prevHMoveKey = KEY_NULL;
+        if (Terrarum.hasController) {
+            if (axisX == 0) {
+                walkHStop();
+            }
+        }
+        else {
+            // ↑F, ↑S
+            if (!isFuncDown(input, EnumKeyFunc.MOVE_LEFT)
+                    && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+                walkHStop();
+                prevHMoveKey = KEY_NULL;
+            }
         }
         /**
          * U-D stop
          */
-        // ↑E
-        // ↑D
-        if (isNoClip()
-                &&!isFuncDown(input, EnumKeyFunc.MOVE_UP)
-                && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
-            walkVStop();
-            prevVMoveKey = KEY_NULL;
+        if (Terrarum.hasController) {
+            if (axisY == 0) {
+                walkVStop();
+            }
+        }
+        else {
+            // ↑E
+            // ↑D
+            if (isNoClip()
+                    && !isFuncDown(input, EnumKeyFunc.MOVE_UP)
+                    && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+                walkVStop();
+                prevVMoveKey = KEY_NULL;
+            }
         }
 
         /**
          * Left/Right movement
          */
 
-        // ↑F, ↓S
-        if (isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)
-                && !isFuncDown(input, EnumKeyFunc.MOVE_LEFT)) {
-            walkHorizontal(false);
-            prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT);
+        if (Terrarum.hasController) {
+            if (axisX != 0) {
+                walkHorizontal(axisX < 0, AXIS_POSMAX);
+            }
         }
-        // ↓F, ↑S
-        else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT)
-                && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
-            walkHorizontal(true);
-            prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT);
-        }
-        // ↓F, ↓S
-        else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT)
-                && isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
-            if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
-                walkHorizontal(false);
+        else {
+            // ↑F, ↓S
+            if (isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)
+                    && !isFuncDown(input, EnumKeyFunc.MOVE_LEFT)) {
+                walkHorizontal(false, AXIS_POSMAX);
                 prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT);
             }
-            else if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)) {
-                walkHorizontal(true);
+            // ↓F, ↑S
+            else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT)
+                    && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+                walkHorizontal(true, AXIS_POSMAX);
                 prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT);
+            }
+            // ↓F, ↓S
+            else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT)
+                    && isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+                if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
+                    walkHorizontal(false, AXIS_POSMAX);
+                    prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT);
+                }
+                else if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)) {
+                    walkHorizontal(true, AXIS_POSMAX);
+                    prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT);
+                }
             }
         }
 
         /**
          * Up/Down movement
          */
-
         if (noClip) {
-            // ↑E
-            // ↓D
-            if (isFuncDown(input, EnumKeyFunc.MOVE_DOWN)
-                    && !isFuncDown(input, EnumKeyFunc.MOVE_UP)) {
-                walkVertical(false);
-                prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN);
+            if (Terrarum.hasController) {
+                if (axisY != 0) {
+                    walkVertical(axisY > 0, AXIS_POSMAX);
+                }
             }
-            // ↓E
-            // ↑D
-            else if (isFuncDown(input, EnumKeyFunc.MOVE_UP)
-                    && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
-                walkVertical(true);
-                prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP);
-            }
-            // ↓E
-            // ↓D
-            else if (isFuncDown(input, EnumKeyFunc.MOVE_UP)
-                    && isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
-                if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
-                    walkVertical(false);
+            else {
+                // ↑E
+                // ↓D
+                if (isFuncDown(input, EnumKeyFunc.MOVE_DOWN)
+                        && !isFuncDown(input, EnumKeyFunc.MOVE_UP)) {
+                    walkVertical(false, AXIS_POSMAX);
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN);
                 }
-                else if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)) {
-                    walkVertical(true);
+                // ↓E
+                // ↑D
+                else if (isFuncDown(input, EnumKeyFunc.MOVE_UP)
+                        && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+                    walkVertical(true, AXIS_POSMAX);
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP);
+                }
+                // ↓E
+                // ↓D
+                else if (isFuncDown(input, EnumKeyFunc.MOVE_UP)
+                        && isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+                    if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
+                        walkVertical(false, AXIS_POSMAX);
+                        prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN);
+                    }
+                    else if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)) {
+                        walkVertical(true, AXIS_POSMAX);
+                        prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP);
+                    }
                 }
             }
         }
@@ -319,7 +383,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
         /**
          * Jump control
          */
-        if (isFuncDown(input, EnumKeyFunc.JUMP)) {
+        if (isFuncDown(input, EnumKeyFunc.JUMP)
+                || (Terrarum.hasController && gamepad.isButtonPressed(GAMEPAD_JUMP))) {
             if (!noClip) {
                 if (super.isGrounded()) {
                     jumping = true;
@@ -327,7 +392,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed {
                 }
             }
             else {
-                walkVertical(true);
+                walkVertical(true, AXIS_POSMAX);
             }
         }
         else {

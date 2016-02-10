@@ -13,17 +13,17 @@ import java.util.Random;
  * @author Numerical Recipes
  */
 
-public class HighQualityRandom extends Random {
+public class HQRNG extends Random {
 
     //private Lock l = new ReentrantLock();
     private long u;
     private long v = 4101842887655102017L;
     private long w = 1;
 
-    public HighQualityRandom() {
+    public HQRNG() {
         this(System.nanoTime());
     }
-    public HighQualityRandom(long seed) {
+    public HQRNG(long seed) {
         //l.lock();
         u = seed ^ v;
         nextLong();

@@ -136,24 +136,31 @@ public class MapCamera {
 
         // position - (WH / 2)
         cameraX = clamp(
-                Math.round(player.pointedPosX() - (renderWidth / 2))
+                Math.round(player.getNextHitbox().getPointedX() - (renderWidth / 2))
                 , map.width * TSIZE - renderWidth
         );
         cameraY = clamp(
-                Math.round(player.pointedPosY() - (renderHeight / 2))
+                Math.round(player.getNextHitbox().getPointedY() - (renderHeight / 2))
                 , map.height * TSIZE - renderHeight
         );
     }
 
-    public static void render(GameContainer gc, Graphics g) {
+    public static void renderBehind(GameContainer gc, Graphics g) {
         /**
          * render to camera
          */
-        drawTiles(WALL);
-        drawTiles(TERRAIN);
+        setBlendModeNormal();
+        drawTiles(WALL, false);
+        drawTiles(TERRAIN, false);
     }
 
-    private static void drawTiles(int mode) {
+    public static void renderFront(GameContainer gc, Graphics g) {
+        setBlendModeMul();
+        drawTiles(TERRAIN, true);
+        setBlendModeNormal();
+    }
+
+    private static void drawTiles(int mode, boolean drawModeTilesBlendMul) {
         int for_y_start = div16(cameraY);
         int for_x_start = div16(cameraX);
 
@@ -222,10 +229,16 @@ public class MapCamera {
                         int thisTileX = nearbyTilesInfo;
                         int thisTileY = thisTile;
 
-
-                        if (isBlendMul((byte) thisTile)) setBlendModeMul();
-                        else setBlendModeNormal();
-                        drawTile(TERRAIN, x, y, thisTileX, thisTileY);
+                        if (drawModeTilesBlendMul) {
+                            if (isBlendMul((byte) thisTile)) drawTile(TERRAIN, x, y, thisTileX, thisTileY);
+                        }
+                        else {
+                            // currently it draws all the transparent tile and colour mixes
+                            // on top of the previously drawn tile
+                            // TODO check wether it works as intended when skybox is dark
+                            // add instruction "if (!isBlendMul((byte) thisTile))"
+                            drawTile(TERRAIN, x, y, thisTileX, thisTileY);
+                        }
                     }
                     else {
                         drawTile(mode, x, y, mod16(thisTile), div16(thisTile));
@@ -236,7 +249,6 @@ public class MapCamera {
         }
 
         tilesetBook[mode].endUse();
-        setBlendModeNormal();
     }
 
     private static int getGrassInfo(int x, int y, int from, int to) {

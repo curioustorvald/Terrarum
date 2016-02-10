@@ -1,9 +1,7 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
-import com.Torvald.ColourUtil.Col12;
+import com.Torvald.ColourUtil.Col4096;
 import com.Torvald.Terrarum.Terrarum;
-import com.Torvald.Terrarum.Game;
-import org.newdawn.slick.Color;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -51,7 +49,7 @@ public class ExportMap implements ConsoleCommand {
     private static final byte WATER = (byte) 239;
     private static final byte LAVA = (byte) 255;
 
-    private Hashtable<Byte, Col12> colorTable = new Hashtable<>();
+    private Hashtable<Byte, Col4096> colorTable = new Hashtable<>();
 
     @Override
     public void execute(String[] args) {
@@ -61,7 +59,7 @@ public class ExportMap implements ConsoleCommand {
             mapData = new byte[Terrarum.game.map.width * Terrarum.game.map.height * 3];
 
             for (byte tile : Terrarum.game.map.getLayerTerrain()) {
-                byte[] colArray = colorTable.getOrDefault(tile, new Col12(0xFFF))
+                byte[] colArray = colorTable.getOrDefault(tile, new Col4096(0xFFF))
                         .toByteArray();
 
                 for (int i = 0; i < 3; i++) {
@@ -121,34 +119,34 @@ public class ExportMap implements ConsoleCommand {
     }
 
     private void buildColorTable() {
-        colorTable.put(AIR, new Col12(0xCEF));
-        colorTable.put(STONE, new Col12(0x887));
-        colorTable.put(DIRT, new Col12(0x763));
-        colorTable.put(GRASS, new Col12(0x251));
+        colorTable.put(AIR, new Col4096(0xCEF));
+        colorTable.put(STONE, new Col4096(0x887));
+        colorTable.put(DIRT, new Col4096(0x763));
+        colorTable.put(GRASS, new Col4096(0x251));
 
-        colorTable.put(COPPER, new Col12(0x6A8));
-        colorTable.put(IRON, new Col12(0xC75));
-        colorTable.put(GOLD, new Col12(0xCB6));
-        colorTable.put(ILMENITE, new Col12(0x8AB));
-        colorTable.put(AURICHALCUM, new Col12(0xD92));
+        colorTable.put(COPPER, new Col4096(0x6A8));
+        colorTable.put(IRON, new Col4096(0xC75));
+        colorTable.put(GOLD, new Col4096(0xCB6));
+        colorTable.put(ILMENITE, new Col4096(0x8AB));
+        colorTable.put(AURICHALCUM, new Col4096(0xD92));
 
-        colorTable.put(DIAMOND, new Col12(0x9CE));
-        colorTable.put(RUBY, new Col12(0xB10));
-        colorTable.put(EMERALD, new Col12(0x0B1));
-        colorTable.put(SAPPHIRE, new Col12(0x01B));
-        colorTable.put(TOPAZ, new Col12(0xC70));
-        colorTable.put(AMETHYST, new Col12(0x70C));
+        colorTable.put(DIAMOND, new Col4096(0x9CE));
+        colorTable.put(RUBY, new Col4096(0xB10));
+        colorTable.put(EMERALD, new Col4096(0x0B1));
+        colorTable.put(SAPPHIRE, new Col4096(0x01B));
+        colorTable.put(TOPAZ, new Col4096(0xC70));
+        colorTable.put(AMETHYST, new Col4096(0x70C));
 
-        colorTable.put(WATER, new Col12(0x038));
-        colorTable.put(LAVA, new Col12(0xF50));
+        colorTable.put(WATER, new Col4096(0x038));
+        colorTable.put(LAVA, new Col4096(0xF50));
 
-        colorTable.put(SAND, new Col12(0xDCA));
-        colorTable.put(GRAVEL, new Col12(0x664));
+        colorTable.put(SAND, new Col4096(0xDCA));
+        colorTable.put(GRAVEL, new Col4096(0x664));
 
-        colorTable.put(ICE_NATURAL, new Col12(0x9AB));
-        colorTable.put(ICE_MAGICAL, new Col12(0x7AC));
-        colorTable.put(ICE_FRAGILE, new Col12(0x6AF));
-        colorTable.put(SNOW, new Col12(0xCDE));
+        colorTable.put(ICE_NATURAL, new Col4096(0x9AB));
+        colorTable.put(ICE_MAGICAL, new Col4096(0x7AC));
+        colorTable.put(ICE_FRAGILE, new Col4096(0x6AF));
+        colorTable.put(SNOW, new Col4096(0xCDE));
 
 
     }

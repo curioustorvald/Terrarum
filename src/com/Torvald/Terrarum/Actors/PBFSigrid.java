@@ -52,7 +52,7 @@ public class PBFSigrid {
 
         p.actorValue.set("name", "Sigrid");
 
-        p.setHitboxDimension(20, 47, 7, 0);
+        p.setHitboxDimension(17, 47, 9, 0);
 
         p.inventory = new ActorInventory((int) p.actorValue.get("encumbrance"), true);
 

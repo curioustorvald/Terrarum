@@ -25,6 +25,7 @@ public class CommandDict {
         dict.put("setlocale", new SetLocale());
         dict.put("zoom", new Zoom());
         dict.put("teleport", new TeleportPlayer());
+        dict.put("cat", new CatStdout());
     }
 
     public static ConsoleCommand getCommand(String commandName) {

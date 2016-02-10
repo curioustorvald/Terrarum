@@ -1,7 +1,7 @@
 package com.Torvald.Terrarum.Actors;
 
 import com.Torvald.Rand.Fudge3;
-import com.Torvald.Rand.HighQualityRandom;
+import com.Torvald.Rand.HQRNG;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.newdawn.slick.SlickException;
@@ -67,7 +67,7 @@ public class CreatureBuildFactory {
         for (String s : elemSet) {
             float baseValue = jsonObject.get(s).getAsFloat();
             // roll fudge dice and get value [-3, 3] as [0, 6]
-            int varSelected = new Fudge3().create(new HighQualityRandom()).roll() + 3;
+            int varSelected = new Fudge3().create(new HQRNG()).roll() + 3;
             // get multiplier from json. Assuming percentile
             int multiplier = jsonObject.get(s + "variable").getAsJsonArray().get(varSelected).getAsInt();
             float realValue = baseValue * multiplier / 100f;

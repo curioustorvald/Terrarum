@@ -17,7 +17,7 @@ package com.Torvald.Terrarum.MapGenerator;
  *
  */
 
-import com.Torvald.Rand.HighQualityRandom;
+import com.Torvald.Rand.HQRNG;
 
 public class SimplexNoise_octave {  // Simplex noise in 2D, 3D and 4D
 
@@ -64,7 +64,7 @@ public class SimplexNoise_octave {  // Simplex noise in 2D, 3D and 4D
     }
 
     //the random for the swaps
-    HighQualityRandom rand=new HighQualityRandom(seed);
+    HQRNG rand=new HQRNG(seed);
 
     //the seed determines the swaps that occur between the default order and the order we're actually going to use
     for(int i=0;i<NUMBEROFSWAPS;i++){

@@ -31,11 +31,9 @@ public class MapDrawer {
     }
 
     public static void update(GameContainer gc, int delta_t) {
-        MapCamera.update(gc, delta_t);
     }
 
     public static void render(GameContainer gc, Graphics g) {
-        MapCamera.render(gc, g);
     }
 
     public static void drawEnvOverlay(Graphics g) {

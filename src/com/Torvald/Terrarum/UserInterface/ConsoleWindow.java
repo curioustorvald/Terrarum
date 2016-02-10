@@ -85,7 +85,7 @@ public class ConsoleWindow implements UICanvas {
         else if ((key >= 2 && key <= 13)
                 || (key >= 16 && key <= 27)
                 || (key >= 30 && key <= 40)
-                || (key >= 44 && key <= 52)
+                || (key >= 44 && key <= 53)
                 || (commandInputPool.length() > 0 && key == 57)){
             commandInputPool.append(c);
             inputCursorPos += 1;

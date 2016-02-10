@@ -7,6 +7,7 @@ package com.Torvald.spriteAnimation;
 
 import com.Torvald.Terrarum.Game;
 import com.Torvald.Terrarum.Terrarum;
+import com.jme3.math.FastMath;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -149,10 +150,10 @@ public class SpriteAnimation {
 
             flippedImage.startUse();
             flippedImage.drawEmbedded(
-                    Math.round(posX * Terrarum.game.screenZoom)
-					, Math.round(posY * Terrarum.game.screenZoom)
-                    , width * scale
-                    , height * scale
+                    FastMath.floor(posX * Terrarum.game.screenZoom)
+					, FastMath.floor(posY * Terrarum.game.screenZoom)
+                    , FastMath.floor(width * scale)
+                    , FastMath.floor(height * scale)
             );
             flippedImage.endUse();
         }

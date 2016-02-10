@@ -59,7 +59,11 @@ public class Game extends BasicGameState {
     private Shader shaderBlurH;
     private Shader shaderBlurV;
 
-    public Game() throws SlickException {
+    public Game() throws SlickException {  }
+
+    @Override
+    public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws
+            SlickException {
         new GameController();
         KeyMap.build();
         GameController.setKeyMap(new KeyMap());
@@ -83,7 +87,7 @@ public class Game extends BasicGameState {
 
         MapGenerator.attachMap(map);
         MapGenerator.setSeed(0x51621D);
-        //MapGenerator.setSeed(new HighQualityRandom().nextLong());
+        //MapGenerator.setSeed(new HQRNG().nextLong());
         MapGenerator.generateMap();
 
         new CommandDict();
@@ -122,11 +126,6 @@ public class Game extends BasicGameState {
         uiContainer.add(msgtest);
     }
 
-    @Override
-    public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws
-            SlickException {
-    }
-
     public Player getPlayer() {
         return player;
     }
@@ -136,6 +135,7 @@ public class Game extends BasicGameState {
         setAppTitle();
 
         MapDrawer.update(gc, delta_t);
+        MapCamera.update(gc, delta_t);
 
         GameController.processInput(gc.getInput());
 
@@ -177,10 +177,6 @@ public class Game extends BasicGameState {
 
     @Override
     public void render(GameContainer gc, StateBasedGame sbg, Graphics g) {
-        // shader12BitCol.setUniformIntVariable("pixelSize", 1);
-        // shader12BitCol.startShader();
-        // shaderBlurH.startShader();
-        // shaderBlurV.startShader();
 
         drawSkybox(g);
 
@@ -190,37 +186,30 @@ public class Game extends BasicGameState {
                 , -MapCamera.getCameraY() * screenZoom
         );
 
+        MapCamera.renderBehind(gc, g);
+
         actorContainer.forEach(
-                actor -> {
-                    if (actor instanceof Visible) {
-                        ((Visible) actor).drawBody(gc, g);
-                    }
-                }
+                actor -> { if (actor instanceof Visible) ((Visible) actor).drawBody(gc, g); }
         );
         actorContainer.forEach(
-                actor -> {
-                    if (actor instanceof Glowing) {
-                        ((Glowing) actor).drawGlow(gc, g);
-                    }
-                }
+                actor -> { if (actor instanceof Glowing) ((Glowing) actor).drawGlow(gc, g); }
         );
+
+        MapCamera.renderFront(gc, g);
         MapDrawer.render(gc, g);
 
-        // Slick's MODE_COLOR_MULTIPLY is clearly broken... using GL11
         LightmapRenderer.renderLightMap();
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        // draw lightmap
+        setBlendModeMul();
         LightmapRenderer.draw(g);
-        // draw environment colour overlay
         // MapDrawer.drawEnvOverlay(g);
-        GL11.glDisable(GL11.GL_BLEND);
-        g.setDrawMode(Graphics.MODE_NORMAL);
+        setBlendModeNormal();
 
         uiContainer.forEach(ui -> ui.render(gc, g));
         debugWindow.render(gc, g);
         consoleHandler.render(gc, g);
         //bulletin.render(gc, g);
+
+        GL11.glEnd();
     }
 
     private Color[] getGradientColour(int timeSec) {
@@ -281,5 +270,15 @@ public class Game extends BasicGameState {
         Color[] colourTable = getGradientColour(WorldTime.elapsedSeconds());
         GradientFill skyColourFill = new GradientFill(0, 0, colourTable[0], 0, Terrarum.HEIGHT, colourTable[1]);
         g.fill(skyBox, skyColourFill);
+    }
+
+    private void setBlendModeMul() {
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    private void setBlendModeNormal() {
+        GL11.glDisable(GL11.GL_BLEND);
+        Terrarum.appgc.getGraphics().setDrawMode(Graphics.MODE_NORMAL);
     }
 }

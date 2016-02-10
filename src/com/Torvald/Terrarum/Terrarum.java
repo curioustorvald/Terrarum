@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 
 import com.Torvald.ImageFont.GameFontWhite;
 import com.Torvald.Terrarum.LangPack.Lang;
+import org.lwjgl.input.Controllers;
+import org.lwjgl.opengl.DisplayMode;
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -47,6 +49,9 @@ public class Terrarum extends StateBasedGame {
     public static final int SCENE_ID_HOME = 1;
     public static final int SCENE_ID_GAME = 3;
 
+    public static boolean hasController = false;
+    public static final float CONTROLLER_DEADZONE = 0.1f;
+
     public Terrarum(String gamename) throws SlickException {
         super(gamename);
 
@@ -62,8 +67,15 @@ public class Terrarum extends StateBasedGame {
     }
 
     @Override
-    public void initStatesList(GameContainer gameContainer) throws SlickException {
+    public void initStatesList(GameContainer gc) throws SlickException {
         gameFontWhite = new GameFontWhite();
+
+        hasController = (gc.getInput().getControllerCount() > 0);
+        if (hasController) {
+            for (int c = 0; c < Controllers.getController(0).getAxisCount(); c++) {
+                Controllers.getController(0).setDeadZone(c, CONTROLLER_DEADZONE);
+            }
+        }
 
         game = new Game();
         addState(game);

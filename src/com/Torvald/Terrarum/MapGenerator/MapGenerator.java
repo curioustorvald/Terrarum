@@ -1,6 +1,6 @@
 package com.Torvald.Terrarum.MapGenerator;
 
-import com.Torvald.Rand.HighQualityRandom;
+import com.Torvald.Rand.HQRNG;
 import com.Torvald.Terrarum.GameMap.GameMap;
 import com.jme3.math.FastMath;
 import com.sun.istack.internal.NotNull;
@@ -8,7 +8,7 @@ import com.sun.istack.internal.NotNull;
 public class MapGenerator {
 
     @NotNull private static GameMap map;
-    private static HighQualityRandom random;
+    private static HQRNG random;
     //private static float[] noiseArray;
     @NotNull private static long seed;
     @NotNull private static int width;
@@ -93,7 +93,7 @@ public class MapGenerator {
      * Generate terrain and override attached map
      */
     public static void generateMap() {
-        random = new HighQualityRandom(seed);
+        random = new HQRNG(seed);
         System.out.println("[MapGenerator] Seed: " + seed);
 
         worldOceanPosition = random.nextBoolean() ? TYPE_OCEAN_LEFT : TYPE_OCEAN_RIGHT;

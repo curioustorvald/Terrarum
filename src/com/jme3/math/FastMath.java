@@ -70,8 +70,6 @@ final public class FastMath {
     public static final float DEG_TO_RAD = PI / 180.0f;
     /** A value to multiply a radian value by, to convert it to degrees. */
     public static final float RAD_TO_DEG = 180.0f / PI;
-    /** A precreated random object for random numbers. */
-    public static final Random rand = new Random(System.currentTimeMillis());
 
     /**
      * Returns true if the number is a power of 2 (2,4,8,16...)
@@ -653,30 +651,6 @@ final public class FastMath {
                 * (m10 * det23 - m12 * det03 + m13 * det02) + m02
                 * (m10 * det13 - m11 * det03 + m13 * det01) - m03
                 * (m10 * det12 - m11 * det02 + m12 * det01));
-    }
-
-    /**
-     * Returns a random float between 0 and 1.
-     *
-     * @return A random float between <tt>0.0f</tt> (inclusive) to
-     *         <tt>1.0f</tt> (exclusive).
-     */
-    public static float nextRandomFloat() {
-        return rand.nextFloat();
-    }
-
-    /**
-     * Returns a random float between min and max.
-     *
-     * @return A random int between <tt>min</tt> (inclusive) to
-     *         <tt>max</tt> (inclusive).
-     */
-    public static int nextRandomInt(int min, int max) {
-        return (int) (nextRandomFloat() * (max - min + 1)) + min;
-    }
-
-    public static int nextRandomInt() {
-        return rand.nextInt();
     }
 
     /**

@@ -22,43 +22,43 @@ import org.newdawn.slick.util.ResourceLoader;
 public class Shader {
   public static final int BRIEF = 128;
   public static final int MODERATE = 512;
-  public static final int VERBOSE = 1024;  
+  public static final int VERBOSE = 1024;
   private static final int NOT_LOADED = -1;
   private static final String ERR_LOCATION =
     "Warning: variable %s could not be found. " +
     "Ensure the name is spelled correctly\n";
   private static int logging = MODERATE;
-  
+
   private ShaderResourceManager srm;
   /**
-   * ID of the <tt>Shader</tt>.  A Shader may have programID of 
+   * ID of the <tt>Shader</tt>.  A Shader may have programID of
    * -1 only before construction is completed, or
    * after the <tt>Shader</tt> is deleted
    */
   private int programID = NOT_LOADED;
   private Map<String, ShaderVariable> vars = new HashMap<String, ShaderVariable>();
-  
-  
+
+
   private Shader(ShaderResourceManager srm,
                  Collection<String> vertex,
                  Collection<String> fragment)throws SlickException{
     this.srm = srm;
     StringBuilder errorMessage = new StringBuilder();
-    
+
     programID = GL20.glCreateProgram();
-    
+
     int[] shaderIds = new int[vertex.size() + fragment.size()];
     int index = 0;
-    
+
     //Load Vertex Shaders
-    for(String vertShader: vertex){      
+    for(String vertShader: vertex){
       int vsid = srm.getVertexShaderID(vertShader);
       srm.createProgramShaderDependancy(programID, vsid);
-      
+
       //Add to shader ids array
       shaderIds[index] = vsid;
       index++;
-      
+
       //Check for errors with shader
       if(!compiledSuccessfully(vsid)){
         errorMessage.append("Vertex Shader ");
@@ -67,20 +67,20 @@ public class Shader {
         errorMessage.append(getShaderInfoLog(vsid));
         errorMessage.append("\n\n");
       }
-      
+
       scanSource(vertShader);
     }
-    
-    
+
+
     //Load Fragment Shaders
-    for(String fragShader: fragment){      
+    for(String fragShader: fragment){
       int fsid = srm.getFragementShaderID(fragShader);
       srm.createProgramShaderDependancy(programID, fsid);
 
       //Add to shader ids array
       shaderIds[index] = fsid;
       index++;
-      
+
       //Check for errors with shader
       if(!compiledSuccessfully(fsid)){
         errorMessage.append("Fragment Shader ");
@@ -89,10 +89,10 @@ public class Shader {
         errorMessage.append(getShaderInfoLog(fsid));
         errorMessage.append("\n\n");
       }
-      
+
       scanSource(fragShader);
     }
-    
+
     //Attach shaders to program
     for(int i=0; i<index; i++){
       GL20.glAttachShader(programID, shaderIds[i]);
@@ -104,7 +104,7 @@ public class Shader {
       errorMessage.append(getProgramInfoLog());
       errorMessage.append("\n\n");
     }
-    
+
     if(errorMessage.length()!=0){
       errorMessage.insert(0, "Could not compile shader.\n");
       srm.removeProgram(programID);
@@ -112,12 +112,12 @@ public class Shader {
       errorMessage.append("Stack Trace:");
       throw new SlickException(errorMessage.toString());
     }
-    
-    
+
+
   }
-  
-  
-  
+
+
+
   /**
    * Factory method to create a new Shader.
    * @param vertexFileName
@@ -131,23 +131,23 @@ public class Shader {
     l1.add(vertexFileName);
     ArrayList<String> l2 = new ArrayList<String>();
     l2.add(fragmentFileName);
-    
+
     return new Shader(ShaderResourceManagerImpl.getSRM(),
                       l1,
                       l2);
   }
-  
-  
-  
+
+
+
   /**
    * Reverts GL context back to the fixed pixel pipeline.<br>
    */
   public static void forceFixedShader(){
     GL20.glUseProgram(0);
   }
-  
-  
-  
+
+
+
   /**
    * Sets the number of characters to be returned when printing
    * errors.</br>  Suggested values are the constants
@@ -159,8 +159,8 @@ public class Shader {
     logging = detailLevel;
   }
 
-  
-  
+
+
   /**
    * Deletes this shader and unloads all free resources.</br>
    * TODO should this be called from <tt>finalise()</tt>, or is
@@ -170,9 +170,9 @@ public class Shader {
     srm.removeProgram(programID);
     programID = NOT_LOADED;
   }
-  
-  
-  
+
+
+
   /**
    * Returns true if this <tt>Shader</tt> has been deleted.</br>
    * @return true if this <tt>Shader</tt> has been deleted.</br>
@@ -180,9 +180,9 @@ public class Shader {
   public boolean isDeleted(){
     return programID == NOT_LOADED;
   }
-  
-  
-  
+
+
+
   /**
    * Activates the shader.</br>
    */
@@ -194,10 +194,10 @@ public class Shader {
     forceFixedShader(); //Not sure why this is necessary but it is.
     GL20.glUseProgram(programID);
   }
-  
-  
-  
-//UNIFORM SETTERS  
+
+
+
+//UNIFORM SETTERS
   /**
    * Sets the value of the uniform integer Variable <tt>name</tt>.</br>
    * @param name the variable to set.
@@ -206,28 +206,28 @@ public class Shader {
   public Shader setUniformIntVariable(String name, int value){
   	return setUniformIntVariable(name, new int[]{value});
   }
-  
-  
-  
+
+
+
   public Shader setUniformIntVariable(String name, int v0, int v1){
   	return setUniformIntVariable(name, new int[]{v0, v1});
   }
-  
-  
-  
+
+
+
   public Shader setUniformIntVariable(String name,
                                       int v0, int v1, int v2){
   	return setUniformIntVariable(name, new int[]{v0, v1, v2});
   }
-  
-  
-  
+
+
+
   public Shader setUniformIntVariable(String name,
                                       int v0, int v1, int v2, int v3){
     return setUniformIntVariable(name, new int[]{v0, v1, v2, v3});
   }
-  
-  
+
+
   public Shader setUniformIntVariable(String name, int[] values){
 	  ShaderVariable var = vars.get(name);
 	  if(var==null){
@@ -238,8 +238,8 @@ public class Shader {
   	return this;
   }
 
-  
-  
+
+
   /**
    * Sets the value of the uniform integer Variable
    * <tt>name</tt>.</br>
@@ -249,31 +249,31 @@ public class Shader {
   public Shader setUniformFloatVariable(String name, float value){
   	return setUniformFloatVariable(name, new float[]{value});
   }
-  
-  
-  
+
+
+
   public Shader setUniformFloatVariable(String name,
                                         float v0, float v1){
   	return setUniformFloatVariable(name, new float[]{v0, v1});
   }
-  
-  
-  
+
+
+
   public Shader setUniformFloatVariable(String name,
                                         float v0, float v1, float v2){
   	return setUniformFloatVariable(name, new float[]{v0, v1, v2});
   }
-  
-  
-  
+
+
+
   public Shader setUniformFloatVariable(String name,
                                         float v0, float v1,
                                         float v2, float v3){
   	return setUniformFloatVariable(name, new float[]{v0, v1, v2, v3});
   }
-  
-  
-  
+
+
+
   public Shader setUniformFloatVariable(String name, float[] values){
 	  ShaderVariable var = vars.get(name);
 	  if(var==null){
@@ -283,9 +283,9 @@ public class Shader {
 	  }
   	return this;
   }
-  
-  
-  
+
+
+
   //TODO implement using ShaderVariable
   //TODO Test
   public Shader setUniformMatrix(String name,
@@ -293,7 +293,7 @@ public class Shader {
                                float[][] matrix){
     //Convert matrix format
     FloatBuffer matBuffer = matrixPrepare(matrix);
-    
+
     //Get uniform location
     int location = GL20.glGetUniformLocation(programID, name);
     printError(name);
@@ -307,12 +307,12 @@ public class Shader {
       case 4: GL20.glUniformMatrix4(location, transpose, matBuffer);
       break;
     }
-    
+
     return this;
   }
-  
-  
-   
+
+
+
   private FloatBuffer matrixPrepare(float[][] matrix){
     //Check argument validity
     if(matrix==null){
@@ -327,7 +327,7 @@ public class Shader {
       throw new IllegalArgumentException("The matrix must have an equal number of rows and columns.");
     }
     float[] unrolled = new float[row*col];
-    
+
     for(int i=0;i<row;i++){
       for(int j=0;j<col;j++){
         unrolled[i*col+j] = matrix[i][j];
@@ -337,15 +337,15 @@ public class Shader {
     //TODO FloatBuffer creation here is probably broken
     return FloatBuffer.wrap(unrolled);
   }
-  
-  
-  
+
+
+
   private void printError(String varName){
       System.err.printf(ERR_LOCATION, varName);
   }
-  
-  
-  
+
+
+
   /**
    * Returns true if the shader compiled successfully.</br>
    * @param shaderID
@@ -355,8 +355,8 @@ public class Shader {
     return GL20.glGetShader(shaderID, GL20.GL_COMPILE_STATUS)==GL11.GL_TRUE;
   }
 
-  
-  
+
+
   /**
    * Returns true if the shader program linked successfully.</br>
    * @return true if the shader program linked successfully.</br>
@@ -366,15 +366,15 @@ public class Shader {
 	  return true;
 //    return GL20.glGetShader(programID, GL20.GL_LINK_STATUS)==GL11.GL_TRUE;
   }
-  
-  
-  
+
+
+
   private String getShaderInfoLog(int shaderID){
     return GL20.glGetShaderInfoLog(shaderID, logging).trim();
   }
-  
-  
-  
+
+
+
   private String getProgramInfoLog(){
     return GL20.glGetProgramInfoLog(programID, logging).trim();
   }
