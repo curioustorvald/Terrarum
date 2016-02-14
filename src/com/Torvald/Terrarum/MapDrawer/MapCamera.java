@@ -68,7 +68,7 @@ public class MapCamera {
     private static final byte ICE_MAGICAL = 30;
 
     private static Byte[] TILES_CONNECT_SELF = {
-            COPPER
+              COPPER
             , IRON
             , GOLD
             , SILVER
@@ -78,7 +78,7 @@ public class MapCamera {
     };
 
     private static Byte[] TILES_DARKEN_AIR = {
-            STONE
+              STONE
             , DIRT
             , GRASS
             , SAND
@@ -97,8 +97,10 @@ public class MapCamera {
      * i.e. red hues get lost if you dive into the water
      */
     private static Byte[] TILES_BLEND_MUL = {
-        (byte)224, (byte)225, (byte)226, (byte)227, (byte)228, (byte)229, (byte)230, (byte)231
-        , (byte)232, (byte)233, (byte)234, (byte)235, (byte)236, (byte)237, (byte)238, (byte)239
+              (byte)224, (byte)225, (byte)226, (byte)227, (byte)228, (byte)229, (byte)230, (byte)231
+            , (byte)232, (byte)233, (byte)234, (byte)235, (byte)236, (byte)237, (byte)238, (byte)239
+            , (byte)240, (byte)241, (byte)242, (byte)243, (byte)244, (byte)245, (byte)246, (byte)247
+            , (byte)248, (byte)249, (byte)250, (byte)251, (byte)252, (byte)253, (byte)254, (byte)255
     };
 
     /**

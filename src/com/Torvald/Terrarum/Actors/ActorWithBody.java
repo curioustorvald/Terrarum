@@ -77,6 +77,10 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     private final int CONTACT_AREA_BOTTOM = 2;
     private final int CONTACT_AREA_LEFT = 3;
 
+    private final int UD_COMPENSATOR_MAX = 100;
+    private final int LR_COMPENSATOR_MAX = TSIZE;
+    private final int TILE_CLIMB_RATE = 4;
+
     /**
      * A constant to make falling faster so that the game is more playable
      */
@@ -261,6 +265,9 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         if (collidedRightAndAdjusted()) { // treat as 'event--collided right'
             veloX = 0;
             walledRight = true;
+
+            // TODO remove above two lines and implement tile climb (multi-frame calculation.)
+            // Use variable TILE_CLIMB_RATE
         }
         else if (collidedLeftAndAdjusted()) { // treat as 'event--collided left'
             veloX = 0;
@@ -351,7 +358,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     private void adjustHitBottom() {
         int tY = 0;
         int contactArea = getContactArea(CONTACT_AREA_BOTTOM, 0, 0);
-        for (int lim = 0; lim < TSIZE; lim++) {
+        for (int lim = 0; lim < UD_COMPENSATOR_MAX; lim++) {
             /**
              * get contact area and move up and get again.
              * keep track of this value, and some point they will be set as lowest
@@ -371,7 +378,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     private void adjustHitTop() {
         int tY = 0;
         int contactArea = getContactArea(CONTACT_AREA_TOP, 0, 0);
-        for (int lim = 0; lim < TSIZE; lim++) {
+        for (int lim = 0; lim < UD_COMPENSATOR_MAX; lim++) {
             /**
              * get contact area and move up and get again.
              * keep track of this value, and some point they will be set as lowest
@@ -391,7 +398,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     private void adjustHitRight() {
         int tX = 0;
         int contactArea = getContactArea(CONTACT_AREA_RIGHT, 0, 0);
-        for (int lim = 0; lim < TSIZE; lim++) {
+        for (int lim = 0; lim < LR_COMPENSATOR_MAX; lim++) {
             /**
              * get contact area and move up and get again.
              * keep track of this value, and some point they will be set as lowest
@@ -417,7 +424,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     private void adjustHitLeft() {
         int tX = 0;
         int contactArea = getContactArea(CONTACT_AREA_LEFT, 0, 0);
-        for (int lim = 0; lim < TSIZE; lim++) {
+        for (int lim = 0; lim < LR_COMPENSATOR_MAX; lim++) {
             /**
              * get contact area and move up and get again.
              * keep track of this value, and some point they will be set as lowest

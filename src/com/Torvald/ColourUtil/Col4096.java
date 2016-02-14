@@ -7,16 +7,26 @@ import org.newdawn.slick.Color;
  *
  * 12-bit RGB
  */
-public class Col4096 {
+public class Col4096 implements LimitedColours {
 
     private short data;
 
     /**
-     * Create new Col4096 format.
-     * @param data 0xARGB
+     *
+     * @param data
      */
     public Col4096(int data) {
-        this.data = (short) data;
+        create(data);
+    }
+
+    /**
+     *
+     * @param r 0-15
+     * @param g 0-15
+     * @param b 0-15
+     */
+    public Col4096(int r, int g, int b) {
+        create(r, g, b);
     }
 
     /**
@@ -24,12 +34,17 @@ public class Col4096 {
      * @param i
      * @return
      */
-    public Color create(int i) {
+    public Color createSlickColor(int i) {
+        assertRaw(i);
+
+        int a, r, g, b;
+
+        r = (i & 0xF00) >> 8;
+        g = (i & 0x0F0) >> 4;
+        b = i & 0x00F;
+
         if (i > 0xFFF) {
-            int a = (i & 0xF000) >> 12;
-            int r = (i & 0x0F00) >> 8;
-            int g = (i & 0x00F0) >> 4;
-            int b = i & 0x000F;
+            a = (i & 0xF000) >> 12;
 
             return new Color(
                     (r << 4) | r
@@ -39,16 +54,40 @@ public class Col4096 {
             );
         }
         else {
-            int r = (i & 0xF00) >> 8;
-            int g = (i & 0x0F0) >> 4;
-            int b = i & 0x00F;
-
             return new Color(
                     (r << 4) | r
                     , (g << 4) | g
                     , (b << 4) | b
             );
         }
+    }
+
+    @Override
+    public Color createSlickColor(int r, int g, int b) {
+        assertARGB(0, r, g, b);
+        return createSlickColor(r << 8 | g << 4 | b);
+    }
+
+    public Color createSlickColor(int a, int r, int g, int b) {
+        assertARGB(a, r, g, b);
+        return createSlickColor(a << 12 |r << 8 | g << 4 | b);
+    }
+
+    @Override
+    public void create(int raw) {
+        assertRaw(raw);
+        data = (short) (raw & 0xFFFF);
+    }
+
+    @Override
+    public void create(int r, int g, int b) {
+        assertARGB(0, r, g, b);
+        data = (short) (r << 8 | g << 4 | b);
+    }
+
+    public void create(int a, int r, int g, int b) {
+        assertARGB(a, r, g, b);
+        data = (short) (a << 12 | r << 8 | g << 4 | b);
     }
 
     /**
@@ -72,8 +111,25 @@ public class Col4096 {
      * Retrieve raw ARGB value
      * @return 0xARGB
      */
-    public short getShort() {
+    public short getRaw() {
         return data;
+    }
+
+    private void assertRaw(int i) {
+        if (i > 0xFFFF || i < 0) {
+            System.out.println("i: " + String.valueOf(i));
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private void assertARGB(int a, int r, int g, int b) {
+        if (a > 16 || r > 16 || g > 16 || b > 16 || r < 0 || g < 0 || b < 0 || a < 0) {
+            System.out.println("a: " + String.valueOf(a));
+            System.out.println("r: " + String.valueOf(r));
+            System.out.println("g: " + String.valueOf(g));
+            System.out.println("b: " + String.valueOf(b));
+            throw new IllegalArgumentException();
+        }
     }
 
 }

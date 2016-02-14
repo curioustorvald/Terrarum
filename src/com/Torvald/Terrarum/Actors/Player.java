@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum.Actors;
 
+import com.Torvald.Terrarum.Actors.Faction.Faction;
 import com.Torvald.Terrarum.GameControl.EnumKeyFunc;
 import com.Torvald.Terrarum.GameControl.KeyMap;
 import com.Torvald.Terrarum.Terrarum;
@@ -12,11 +13,12 @@ import org.lwjgl.input.Controllers;
 import org.newdawn.slick.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
 
 /**
  * Created by minjaesong on 15-12-31.
  */
-public class Player extends ActorWithBody implements Controllable, Pocketed, Serializable {
+public class Player extends ActorWithBody implements Controllable, Pocketed, Factionable {
 
     @Nullable public Controllable vehicleRiding;
 
@@ -47,6 +49,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Ser
 
     private final float AXIS_POSMAX = 1.0f;
     private final int GAMEPAD_JUMP = 5;
+
+    private HashSet<Faction> factionSet = new HashSet<>();
 
     /**
      * Creates new Player instance with empty elements (sprites, actorvalue, etc.). <br />
@@ -111,10 +115,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Ser
             );
 
             // Heading flag
-            if (left)
-                walkHeading = LEFT;
-            else
-                walkHeading = RIGHT;
+            if (left) walkHeading = LEFT;
+            else      walkHeading = RIGHT;
         }
     }
 
@@ -512,4 +514,23 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Ser
         return spriteGlow;
     }
 
+    @Override
+    public void assignFaction(Faction f) {
+        factionSet.add(f);
+    }
+
+    @Override
+    public void unassignFaction(Faction f) {
+        factionSet.remove(f);
+    }
+
+    @Override
+    public HashSet<Faction> getAssignedFactions() {
+        return factionSet;
+    }
+
+    @Override
+    public void clearFactionAssigning() {
+        factionSet.clear();
+    }
 }

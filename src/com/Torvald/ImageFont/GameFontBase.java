@@ -257,6 +257,9 @@ public class GameFontBase implements Font {
                                     + getWidth(s.substring(0, i))
                             )
                             , Math.round(y)
+                            - ((prevInstance == SHEET_KANA) ? 2
+                                                            : (prevInstance == SHEET_CJK_PUNCT) ?
+                                                             1 : 0)
                             , sheetX
                             , sheetY
                     );

@@ -1,0 +1,8 @@
+{
+  "factionname" : "sigrid",
+
+  "factionamicable" : ["follower"],
+  "factionneutral" : ["controlledvillager"],
+  "factionhostile" : ["wildlifehostile"],
+  "factionfearful" : ["peasant", "wildlifeflee"]
+}

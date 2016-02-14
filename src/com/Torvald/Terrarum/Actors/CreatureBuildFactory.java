@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum.Actors;
 
+import com.Torvald.JsonGetter;
 import com.Torvald.Rand.Fudge3;
 import com.Torvald.Rand.HQRNG;
 import com.google.gson.JsonObject;
@@ -16,10 +17,9 @@ import java.nio.file.Files;
 public class CreatureBuildFactory {
 
     private static final String JSONPATH = "./res/raw/";
-    private static String jsonString = new String();
 
     public ActorWithBody build(String jsonFileName) throws IOException, SlickException {
-        JsonObject jsonObj = readJson(jsonFileName);
+        JsonObject jsonObj = JsonGetter.readJson(JSONPATH + jsonFileName);
         ActorWithBody actor = new ActorWithBody();
 
 
@@ -99,24 +99,4 @@ public class CreatureBuildFactory {
             p.actorValue.set(s, jsonObject.get(s).getAsFloat());
         }
     }
-
-    private JsonObject readJson(String jsonFileName) throws IOException  {
-        readJsonFileAsString(jsonFileName);
-
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObj = jsonParser.parse(jsonString).getAsJsonObject();
-
-        return jsonObj;
-    }
-
-    private void readJsonFileAsString(String filename) throws IOException {
-        Files.lines(
-                FileSystems.getDefault().getPath(JSONPATH + filename)
-        ).forEach(this::strAppend);
-    }
-
-    private void strAppend( String s) {
-        jsonString += s;
-    }
-
 }
