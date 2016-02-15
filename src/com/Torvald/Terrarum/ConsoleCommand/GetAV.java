@@ -29,8 +29,12 @@ public class GetAV implements ConsoleCommand {
             printUsage();
         }
         else if (args.length == 2) {
-            echo.execute("player." + args[1] + ": "
+            echo.execute("player." + args[1] + " = "
                     + Terrarum.game.getPlayer().getActorValue().get(args[1])
+                    + " ("
+                    + Terrarum.game.getPlayer().getActorValue().get(args[1]).getClass()
+                                   .getSimpleName()
+                    + ")"
             );
         }
         else if (args.length == 3) {

@@ -29,9 +29,9 @@ public class MapCamera {
 
     private static SpriteSheet[] tilesetBook;
 
-    private static final int WALL = 0;
-    private static final int TERRAIN = 1;
-    private static final int WIRE = 2;
+    private static final int WALL = GameMap.WALL;
+    private static final int TERRAIN = GameMap.TERRAIN;
+    private static final int WIRE = GameMap.WIRE;
 
     private static int renderWidth;
     private static int renderHeight;
@@ -114,7 +114,7 @@ public class MapCamera {
                 , TSIZE
         );
 
-        tilesTerrain = new SpriteSheet("./res/graphics/terrain/terrainplusplus.png"
+        tilesTerrain = new SpriteSheet("./res/graphics/terrain/terrain.png"
                 , TSIZE
                 , TSIZE
         );
@@ -124,7 +124,7 @@ public class MapCamera {
                 , TSIZE
         );
 
-        tilesetBook = new SpriteSheet[9];
+        tilesetBook = new SpriteSheet[3];
         tilesetBook[WALL] = tilesWall;
         tilesetBook[TERRAIN] = tilesTerrain;
         tilesetBook[WIRE] = tilesWire;
@@ -188,7 +188,7 @@ public class MapCamera {
 
                         (
                                 (       // wall and not blocked
-                                        (mode == WALL) && (!isOpaque(thisTerrainTile))
+                                        (mode == WALL) && isWallThatBeDrawn(x, y)
                                 )
                                         ||
                                         (mode == TERRAIN)
@@ -205,48 +205,43 @@ public class MapCamera {
                                         // check if light level of this tile is zero, for y = 0
                                 ((y == 0)
                                         && (LightmapRenderer.getValueFromMap(x, y) > 0)
-                                        ))
-                        ) {
+                                        ))) {
 
-                    if (mode == TERRAIN) {
-                        int nearbyTilesInfo;
-                        //if (thisTile == DIRT) {
-                        //    nearbyTilesInfo = getGrassInfo(x, y, GRASS);
-                        //}
-                        //else {
-                        //    nearbyTilesInfo = getNearbyTilesInfo(x, y, AIR);
-                        //}
+                    int nearbyTilesInfo;
+                    //if (thisTile == DIRT) {
+                    //    nearbyTilesInfo = getGrassInfo(x, y, GRASS);
+                    //}
+                    //else {
+                    //    nearbyTilesInfo = getNearbyTilesInfo(x, y, AIR);
+                    //}
 
-                        if (isDarkenAir((byte) thisTile)) {
-                            nearbyTilesInfo = getNearbyTilesInfo(x, y, AIR);
-                        }
-                        else if (isConnectSelf((byte) thisTile)) {
-                            nearbyTilesInfo = getNearbyTilesInfo(x, y, thisTile);
-                        }
-                        else {
-                            nearbyTilesInfo = 0;
-                        }
+                    if (isDarkenAir((byte) thisTile)) {
+                        nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, AIR);
+                    }
+                    else if (isConnectSelf((byte) thisTile)) {
+                        nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile);
+                    }
+                    else {
+                        nearbyTilesInfo = 0;
+                    }
 
 
-                        int thisTileX = nearbyTilesInfo;
-                        int thisTileY = thisTile;
+                    int thisTileX = nearbyTilesInfo;
+                    int thisTileY = thisTile;
 
-                        if (drawModeTilesBlendMul) {
-                            if (isBlendMul((byte) thisTile)) drawTile(TERRAIN, x, y, thisTileX, thisTileY);
-                        }
-                        else {
-                            // currently it draws all the transparent tile and colour mixes
-                            // on top of the previously drawn tile
-                            // TODO check wether it works as intended when skybox is dark
-                            // add instruction "if (!isBlendMul((byte) thisTile))"
-                            drawTile(TERRAIN, x, y, thisTileX, thisTileY);
+                    if (drawModeTilesBlendMul) {
+                        if (isBlendMul((byte) thisTile)) {
+                            drawTile(mode, x, y, thisTileX, thisTileY);
                         }
                     }
                     else {
-                        drawTile(mode, x, y, mod16(thisTile), div16(thisTile));
+                        // currently it draws all the transparent tile and colour mixes
+                        // on top of the previously drawn tile
+                        // TODO check wether it works as intended when skybox is dark
+                        // add instruction "if (!isBlendMul((byte) thisTile))"
+                        drawTile(mode, x, y, thisTileX, thisTileY);
                     }
                 }
-
             }
         }
 
@@ -263,19 +258,19 @@ public class MapCamera {
      * @param y
      * @return [0-15] 1: up, 2: right, 4: down, 8: left
      */
-    private static int getNearbyTilesInfo(int x, int y, int mark) {
+    private static int getNearbyTilesInfo(int x, int y, int mode, int mark) {
         int[] nearbyTiles = new int[4];
         if (x == 0) { nearbyTiles[NEARBY_TILE_KEY_LEFT] = 0xFF; }
-        else { nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFromTerrain(x - 1, y); }
+        else { nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(mode, x - 1, y); }
 
         if (x == map.width - 1) { nearbyTiles[NEARBY_TILE_KEY_RIGHT] = 0xFF; }
-        else { nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFromTerrain(x + 1, y); }
+        else { nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFrom(mode, x + 1, y); }
 
         if (y == 0) { nearbyTiles[NEARBY_TILE_KEY_UP] = 0; }
-        else { nearbyTiles[NEARBY_TILE_KEY_UP] = map.getTileFromTerrain(x, y - 1); }
+        else { nearbyTiles[NEARBY_TILE_KEY_UP] = map.getTileFrom(mode, x, y - 1); }
 
         if (y == map.height - 1) { nearbyTiles[NEARBY_TILE_KEY_DOWN] = 0xFF; }
-        else { nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFromTerrain(x, y + 1); }
+        else { nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFrom(mode, x, y + 1); }
 
         // try for
         int ret = 0;
@@ -387,12 +382,25 @@ public class MapCamera {
         return s.getSprite(i % 16, i / 16);
     }
 
+    private static boolean isWallThatBeDrawn(int x, int y) {
+        for (int i = 0; i < 9; i++) {
+            int tx = x + (i % 3 - 1);
+            int ty = y + (i / 3 - 1);
+
+            if (tx < 0) tx = 0;
+            else if (tx >= map.width) tx = map.width;
+            if (ty < 0) ty = 0;
+            else if (ty >= map.width) ty = map.width;
+
+            if (!isOpaque(map.getTileFromTerrain(tx, ty))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean isOpaque(int x) {
-        return (x >= 1 && x <= 38)
-                || (x >= 41 && x <= 44)
-                || (x >= 46 && x <= 47)
-                || (x >= 64 && x <= 86)
-                || (x >= 88 && x <= 116);
+        return !(x == GRASS || x == AIR);
     }
 
     public static int getCameraX() {

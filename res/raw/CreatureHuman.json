@@ -4,15 +4,15 @@
   "baseheight" : 40,
   "basemass" : 60.0,
 
-  "toolsize" : 15,
-
   "strength" : 1000,
   "strengthvariable" : [100,100,100,100,100,100,100],
+
+  "accel" : 0.2,
 
   "speed" : 3.0,
   "speedvariable" : [100,100,100,100,100,100,100],
 
-  "jumppower" : 6.0,
+  "jumppower" : 5.5,
   "jumppowervariable" : [100,100,100,100,100,100,100],
 
   "scale" : 1,
@@ -21,10 +21,12 @@
   "speed" : 2.0,
   "speedvariable" : [100,100,100,100,100,100,100],
 
-  "jump" : 5.5,
-  "jumpvariable" : [100,100,100,100,100,100,100],
+  "physiquemult" : [100,100,100,100,100,100,100],
 
   "encumbrance" : 1000,
-  "basedefence" : "work in progress"
+  "basedefence" : "work in progress",
+
+  "toolsize" : 15,
+  "intelligent" : true
 
 }

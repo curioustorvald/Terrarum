@@ -33,7 +33,7 @@ public class PBFSigrid {
         p.actorValue.set("scale", 1.0f);
         p.actorValue.set("speed", 4.0f);
         p.actorValue.set("speedmult", 1.0f);
-        p.actorValue.set("accel", p.WALK_ACCEL_BASE);
+        p.actorValue.set("accel", Player.WALK_ACCEL_BASE);
         p.actorValue.set("accelmult", 1.0f);
 
         p.actorValue.set("jumppower", 6.5f);
@@ -52,9 +52,11 @@ public class PBFSigrid {
 
         p.actorValue.set("name", "Sigrid");
 
+        p.actorValue.set("intelligent", true);
+
         p.setHitboxDimension(17, 47, 9, 0);
 
-        p.inventory = new ActorInventory((int) p.actorValue.get("encumbrance"), true);
+        p.inventory = new ActorInventory(0x7FFFFFFF, true);
 
         p.setPosition(4096 * 16, 300 * 16);
 

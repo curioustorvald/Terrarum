@@ -3,6 +3,7 @@ package com.Torvald.Terrarum.Actors;
 import com.Torvald.JsonGetter;
 import com.Torvald.Rand.Fudge3;
 import com.Torvald.Rand.HQRNG;
+import com.Torvald.Terrarum.LangPack.Lang;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.newdawn.slick.SlickException;
@@ -24,32 +25,43 @@ public class CreatureBuildFactory {
 
 
         String[] elementsString = {
-                "racename"
+                  "racename"
                 , "racenameplural"
         };
 
         String[] elementsFloat = {
-                "baseheight"
+                  "baseheight"
                 , "basemass"
+                , "accel"
                 , "toolsize"
                 , "encumbrance"
         };
 
         String[] elementsFloatVariable = {
-                "baseheight"
-                , "strength"
+                  "strength"
                 , "speed"
                 , "jumppower"
                 , "scale"
                 , "speed"
-                , "jump"
+        };
+
+        String[] elementsBoolean = {
+                  "intelligent"
+        };
+
+        String[] elementsMultiplyFromOne = {
+                "physiquemult"
         };
 
 
         setAVStrings(actor, elementsString, jsonObj);
         setAVFloats(actor, elementsFloat, jsonObj);
         setAVFloatsVariable(actor, elementsFloatVariable, jsonObj);
+        setAVMultiplyFromOne(actor, elementsMultiplyFromOne, jsonObj);
+        setAVBooleans(actor, elementsBoolean, jsonObj);
 
+        actor.actorValue.set("accel", Player.WALK_ACCEL_BASE);
+        actor.actorValue.set("accelmult", 1f);
 
         actor.inventory = new ActorInventory((int) actor.actorValue.get("encumberance"), true);
 
@@ -84,7 +96,8 @@ public class CreatureBuildFactory {
      */
     private void setAVStrings(ActorWithBody p, String[] elemSet, JsonObject jsonObject) {
         for (String s : elemSet) {
-            p.actorValue.set(s, jsonObject.get(s).getAsString());
+            String key = jsonObject.get(s).getAsString();
+            p.actorValue.set(s, Lang.get(key));
         }
     }
 
@@ -97,6 +110,32 @@ public class CreatureBuildFactory {
     private void setAVFloats(ActorWithBody p, String[] elemSet, JsonObject jsonObject) {
         for (String s : elemSet) {
             p.actorValue.set(s, jsonObject.get(s).getAsFloat());
+        }
+    }
+
+    /**
+     * Fetch and set actor values that should multiplier be applied to the base value of 1.
+     * E.g. physiquemult
+     * @param p
+     * @param elemSet
+     * @param jsonObject
+     */
+    private void setAVMultiplyFromOne(ActorWithBody p, String[] elemSet, JsonObject jsonObject) {
+        for (String s : elemSet) {
+            float baseValue = 1f;
+            // roll fudge dice and get value [-3, 3] as [0, 6]
+            int varSelected = new Fudge3().create(new HQRNG()).roll() + 3;
+            // get multiplier from json. Assuming percentile
+            int multiplier = jsonObject.get(s).getAsJsonArray().get(varSelected).getAsInt();
+            float realValue = baseValue * multiplier / 100f;
+
+            p.actorValue.set(s, realValue);
+        }
+    }
+
+    private void setAVBooleans(ActorWithBody p, String[] elemSet, JsonObject jsonObject) {
+        for (String s : elemSet) {
+            p.actorValue.set(s, jsonObject.get(s).getAsBoolean());
         }
     }
 }

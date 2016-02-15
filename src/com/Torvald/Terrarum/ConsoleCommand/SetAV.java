@@ -29,7 +29,16 @@ class SetAV implements ConsoleCommand {
 
             try { val = new Float(args[2]); } // try for number
             catch (NumberFormatException e) {
-                val = new String(args[2]); // string if not number
+
+                if (args[2].toLowerCase() == "true") {
+                    val = new Boolean(true);
+                }
+                else if (args[2].toLowerCase() == "false") {
+                    val = new Boolean(false);
+                }
+                else {
+                    val = new String(args[2]); // string if not number
+                }
             }
 
             Terrarum.game.getPlayer().getActorValue().set(args[1], val);

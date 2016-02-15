@@ -33,6 +33,10 @@ public class GameMap {
 
     public LinkedList<MapPoint> houseDesignation;
 
+    public static final int WALL = 0;
+    public static final int TERRAIN = 1;
+    public static final int WIRE = 2;
+
     //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
     //physics
     @NotNull
@@ -112,6 +116,13 @@ public class GameMap {
 
     public int getTileFromWire(int x, int y) {
         return uint8ToInt32(layerWire.data[y][x]);
+    }
+
+    public int getTileFrom(int mode, int x, int y) {
+        if (mode == TERRAIN) { return getTileFromTerrain(x, y); }
+        else if (mode == WALL) { return getTileFromWall(x, y); }
+        else if (mode == WIRE) { return getTileFromWire(x, y); }
+        else throw new IllegalArgumentException("illegal mode input: " + String.valueOf(mode));
     }
 
     private int uint8ToInt32(byte x) {

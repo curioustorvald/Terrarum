@@ -2,7 +2,7 @@
   "factionname" : "sigrid",
 
   "factionamicable" : ["follower"],
-  "factionneutral" : ["controlledvillager"],
+  "factionneutral" : ["controlledvillager", "wildhamletcontroller"],
   "factionhostile" : ["wildlifehostile"],
-  "factionfearful" : ["peasant", "wildlifeflee"]
+  "factionfearful" : ["wildhamletvillager", "wildlifeflee"]
 }

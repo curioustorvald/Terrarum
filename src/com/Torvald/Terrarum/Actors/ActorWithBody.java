@@ -158,24 +158,16 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             if (!playerNoClip()) {
                 updateNextHitboxY();
                 updateVerticalPos();
+                clampNextHitbox();
                 updateHitboxY();
 
                 updateNextHitboxX();
                 updateHorizontalPos();
+                clampNextHitbox();
                 updateHitboxX();
             }
 
-            /**
-             *  clamp position
-             */
-            hitbox.setPositionFromPoint(
-                    clampW(hitbox.getPointedX())
-                    , clampH(hitbox.getPointedY())
-            );
-            nextHitbox.setPositionFromPoint(
-                    clampW(nextHitbox.getPointedX())
-                    , clampH(nextHitbox.getPointedY())
-            );
+            clampHitbox();
         }
     }
 
@@ -453,22 +445,30 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 ; i < Math.round((side % 2 == 0) ? nextHitbox.getWidth() : nextHitbox.getHeight())
                 ; i++) {
             // set tile positions
-            int tileX = 0, tileY = 0;
+            int tileX, tileY;
             if (side == CONTACT_AREA_BOTTOM) {
-                tileX = div16(Math.round(nextHitbox.getHitboxStart().getX()) + i + translateX);
-                tileY = div16(FastMath.floor(nextHitbox.getHitboxEnd().getY()) + translateY);
+                tileX = div16TruncateToMapWidth(Math.round(nextHitbox.getHitboxStart().getX())
+                        + i + translateX);
+                tileY = div16TruncateToMapHeight(FastMath.floor(nextHitbox.getHitboxEnd().getY())
+                        + translateY);
             }
             else if (side == CONTACT_AREA_TOP) {
-                tileX = div16(Math.round(nextHitbox.getHitboxStart().getX()) + i + translateX);
-                tileY = div16(FastMath.ceil(nextHitbox.getHitboxStart().getY()) + translateY);
+                tileX = div16TruncateToMapWidth(Math.round(nextHitbox.getHitboxStart().getX())
+                        + i + translateX);
+                tileY = div16TruncateToMapHeight(FastMath.ceil(nextHitbox.getHitboxStart().getY())
+                        + translateY);
             }
             else if (side == CONTACT_AREA_RIGHT) {
-                tileX = div16(FastMath.floor(nextHitbox.getHitboxEnd().getX()) + translateX);
-                tileY = div16(Math.round(nextHitbox.getHitboxStart().getY()) + i + translateY);
+                tileX = div16TruncateToMapWidth(FastMath.floor(nextHitbox.getHitboxEnd().getX())
+                        + translateX);
+                tileY = div16TruncateToMapHeight(Math.round(nextHitbox.getHitboxStart().getY())
+                        + i + translateY);
             }
             else if (side == CONTACT_AREA_LEFT) {
-                tileX = div16(FastMath.ceil(nextHitbox.getHitboxStart().getX()) + translateX);
-                tileY = div16(Math.round(nextHitbox.getHitboxStart().getY()) + i + translateY);
+                tileX = div16TruncateToMapWidth(FastMath.ceil(nextHitbox.getHitboxStart().getX())
+                        + translateX);
+                tileY = div16TruncateToMapHeight(Math.round(nextHitbox.getHitboxStart().getY())
+                        + i + translateY);
             }
             else {
                 throw new IllegalArgumentException(String.valueOf(side) + ": Wrong side input");
@@ -481,6 +481,20 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         }
 
         return contactAreaCounter;
+    }
+
+    private void clampHitbox() {
+        hitbox.setPositionFromPoint(
+                clampW(hitbox.getPointedX())
+                , clampH(hitbox.getPointedY())
+        );
+    }
+
+    private void clampNextHitbox() {
+        nextHitbox.setPositionFromPoint(
+                clampW(nextHitbox.getPointedX())
+                , clampH(nextHitbox.getPointedY())
+        );
     }
 
     @Override
@@ -553,31 +567,31 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     public float topLeftPosX() { return hitbox.getPosX(); }
     public float topLeftPosY() { return hitbox.getPosY(); }
 
-    private static float clampW(float x) {
-        if (x < 0) {
-            return 0;
+    private float clampW(float x) {
+        if (x < TSIZE + nextHitbox.getWidth() / 2) {
+            return TSIZE + nextHitbox.getWidth() / 2;
         }
-        else if (x >= Terrarum.game.map.width * TSIZE) {
-            return Terrarum.game.map.width * TSIZE - 1;
-        }
-        else {
-            return x;
-        }
-    }
-
-    private static float clampH(float x) {
-        if (x < 0) {
-            return 0;
-        }
-        else if (x >= Terrarum.game.map.height * TSIZE) {
-            return Terrarum.game.map.height * TSIZE - 1;
+        else if (x >= Terrarum.game.map.width * TSIZE - TSIZE - nextHitbox.getWidth() / 2) {
+            return Terrarum.game.map.width * TSIZE - 1 - TSIZE - nextHitbox.getWidth() / 2;
         }
         else {
             return x;
         }
     }
 
-    private static int clampWtile(int x) {
+    private float clampH(float y) {
+        if (y < TSIZE + nextHitbox.getHeight()) {
+            return TSIZE + nextHitbox.getHeight();
+        }
+        else if (y >= Terrarum.game.map.height * TSIZE - TSIZE - nextHitbox.getHeight()) {
+            return Terrarum.game.map.height * TSIZE - 1 - TSIZE - nextHitbox.getHeight();
+        }
+        else {
+            return y;
+        }
+    }
+
+    private int clampWtile(int x) {
         if (x < 0) {
             return 0;
         }
@@ -589,7 +603,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         }
     }
 
-    private static int clampHtile(int x) {
+    private int clampHtile(int x) {
         if (x < 0) {
             return 0;
         }
@@ -606,13 +620,25 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     }
 
     private static int div16(int x) {
-        if (x < 0) { throw new IllegalArgumentException("div16: Positive integer only:"
+        if (x < 0) { throw new IllegalArgumentException("div16: Positive integer only: "
                 + String.valueOf(x)); }
         return (x & 0x7FFF_FFFF) >> 4;
     }
 
+    private static int div16TruncateToMapWidth(int x) {
+        if (x < 0) return 0;
+        else if (x >= Terrarum.game.map.width << 4) return Terrarum.game.map.width - 1;
+        else return (x & 0x7FFF_FFFF) >> 4;
+    }
+
+    private static int div16TruncateToMapHeight(int y) {
+        if (y < 0) return 0;
+        else if (y >= Terrarum.game.map.height << 4) return Terrarum.game.map.height - 1;
+        else return (y & 0x7FFF_FFFF) >> 4;
+    }
+
     private static int mod16(int x) {
-        if (x < 0) { throw new IllegalArgumentException("mod16: Positive integer only:"
+        if (x < 0) { throw new IllegalArgumentException("mod16: Positive integer only: "
                 + String.valueOf(x)); }
         return x & 0b1111;
     }

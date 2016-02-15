@@ -39,13 +39,13 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
     private int prevVMoveKey = -1;
     private final int KEY_NULL = -1;
 
-    final float ACCEL_MULT_IN_FLIGHT = 0.45f;
-    final float WALK_STOP_ACCEL = 0.2f;
-    final float WALK_ACCEL_BASE = 0.2f;
+    static final float ACCEL_MULT_IN_FLIGHT = 0.45f;
+    static final float WALK_STOP_ACCEL = 0.2f;
+    static final float WALK_ACCEL_BASE = 0.2f;
 
     private boolean noClip = false;
 
-    public final long PLAYER_REF_ID = 0x51621D;
+    public static final long PLAYER_REF_ID = 0x51621D;
 
     private final float AXIS_POSMAX = 1.0f;
     private final int GAMEPAD_JUMP = 5;

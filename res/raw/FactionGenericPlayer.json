@@ -1,0 +1,8 @@
+{
+  "factionname" : "player",
+
+  "factionamicable" : ["follower"],
+  "factionneutral" : [],
+  "factionhostile" : ["wildlifehostile"],
+  "factionfearful" : ["wildlifeflee"]
+}

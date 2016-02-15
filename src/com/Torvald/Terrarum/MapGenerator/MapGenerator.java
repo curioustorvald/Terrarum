@@ -108,12 +108,12 @@ public class MapGenerator {
         placeGlacierMount(heightMap);
         heightMapToObjectMap(heightMap);
 
-        /*carveByMap(
+        carveByMap(
                 generate2DSimplexNoiseWorldSize(2.5f, 1.666f)
                 , 1
                 , AIR
                 , "Carving out cave..."
-        );*/
+        );
 
         /*fillByMapInverseGradFilter(
                 generate2DSimplexNoiseWorldSize(2.5f, 2.5f)
@@ -121,8 +121,8 @@ public class MapGenerator {
                 , DIRT
                 , STONE
                 , "Planting stones on dirt layers..."
-        );*/
-        /*fillByMapInverseGradFilter(
+        );
+        fillByMapInverseGradFilter(
                 generate2DSimplexNoiseWorldSize(2.5f, 2.5f)
                 , 0.98f
                 , STONE
