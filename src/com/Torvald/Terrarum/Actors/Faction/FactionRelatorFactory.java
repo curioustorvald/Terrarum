@@ -1,11 +1,9 @@
 package com.Torvald.Terrarum.Actors.Faction;
 
-import com.Torvald.JsonGetter;
-import com.google.gson.JsonElement;
+import com.Torvald.JsonFetcher;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
-import java.util.HashSet;
 
 /**
  * Created by minjaesong on 16-02-15.
@@ -15,7 +13,7 @@ public class FactionRelatorFactory {
     private static final String JSONPATH = "./res/raw/";
 
     public Faction build(String filename) throws IOException {
-        JsonObject jsonObj = JsonGetter.readJson(JSONPATH + filename);
+        JsonObject jsonObj = JsonFetcher.readJson(JSONPATH + filename);
         Faction factionObj = new Faction(jsonObj.get("factionname").getAsString());
 
 

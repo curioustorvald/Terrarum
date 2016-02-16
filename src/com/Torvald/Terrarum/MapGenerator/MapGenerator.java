@@ -50,11 +50,11 @@ public class MapGenerator {
     private static final byte ILMENITE = 19;
     private static final byte AURICHALCUM = 20;
 
-    private static final byte DIAMOND = 21;
-    private static final byte RUBY = 22;
-    private static final byte EMERALD = 23;
-    private static final byte SAPPHIRE = 24;
-    private static final byte TOPAZ = 25;
+    private static final byte DIAMOND = 25;
+    private static final byte RUBY = 21;
+    private static final byte EMERALD = 22;
+    private static final byte SAPPHIRE = 23;
+    private static final byte TOPAZ = 24;
     private static final byte AMETHYST = 26;
 
     private static final byte SNOW = 27;

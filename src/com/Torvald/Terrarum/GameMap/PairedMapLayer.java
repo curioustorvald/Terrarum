@@ -5,26 +5,34 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 
 /**
- * Created by minjaesong on 16-01-17.
+ * Created by minjaesong on 16-02-15.
  */
-public class MapLayer implements Iterable<Byte> {
+public class PairedMapLayer implements Iterable<Integer> {
 
-    byte[][] data;
+    /**
+     * 0b_xxxx_yyyy, x for lower index, y for higher index
+     *
+     * e.g.
+     *
+     *   0110 1101 is interpreted as
+     *   6 for tile 0, 13 for tile 1.
+     */
+    byte[][] dataPair;
 
     public int width;
     public int height;
 
-    public static final int TILES_SUPPORTED = 256;
+    public static final int MAX_VALUE = 16;
 
-    public MapLayer(int width, int height) {
-        this.width = width;
+    public PairedMapLayer(int width, int height) {
+        this.width = width / 2;
         this.height = height;
 
-        data = new byte[height][width];
+        dataPair = new byte[height][width / 2];
 
         for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                data[i][j] = 0;
+            for (int j = 0; j < width / 2; j++) {
+                dataPair[i][j] = 0;
             }
         }
     }
@@ -35,24 +43,24 @@ public class MapLayer implements Iterable<Byte> {
      * @return an Iterator.
      */
     @Override
-    public Iterator<Byte> iterator() {
-        Iterator<Byte> it = new Iterator<Byte>() {
+    public Iterator<Integer> iterator() {
+        Iterator<Integer> it = new Iterator<Integer>() {
 
             private int iteratorCount = 0;
 
             @Override
             public boolean hasNext() {
-                return iteratorCount < width * height;
+                return iteratorCount < width * height * 2;
             }
 
             @Override
-            public Byte next() {
-                int y = iteratorCount / width;
-                int x = iteratorCount % width;
+            public Integer next() {
+                int y = iteratorCount / (width * 2);
+                int x = iteratorCount % (width * 2);
                 // advance counter
                 iteratorCount += 1;
 
-                return data[y][x];
+                return getData(x, y);
             }
         };
 
@@ -77,14 +85,12 @@ public class MapLayer implements Iterable<Byte> {
      * @since 1.8
      */
     @Override
-    public void forEach(Consumer action) {
-        for (Byte b : this) {
-            action.accept(b);
-        }
+    public void forEach(Consumer<? super Integer> action) {
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * Creates a {@link java.util.Spliterator} over the elements described by this
+     * Creates a {@link Spliterator} over the elements described by this
      * {@code Iterable}.
      *
      * @return a {@code Spliterator} over the elements described by this
@@ -101,23 +107,16 @@ public class MapLayer implements Iterable<Byte> {
      * @since 1.8
      */
     @Override
-    public Spliterator spliterator() {
+    public Spliterator<Integer> spliterator() {
         throw new UnsupportedOperationException();
     }
 
-    public int getTile(int x, int y) {
-        return uint8ToInt32(data[y][x]);
-    }
-
-    private int uint8ToInt32(byte x) {
-        int ret;
-        if ((x & 0b1000_0000) != 0) {
-            ret = (x & 0b0111_1111) | (x & 0b1000_0000);
-        }
-        else {
-            ret = x;
-        }
-        return ret;
+    public int getData(int x, int y) {
+        if ((x & 0x1) == 0)
+            // higher four bits for i = 0, 2, 4, ...
+            return (dataPair[y][x / 2] & 0xF0) >>> 4;
+        else
+            // lower four bits for i = 1, 3, 5, ...
+            return dataPair[y][x / 2] & 0x0F;
     }
 }
-

@@ -1,27 +1,27 @@
-package com.Torvald.Terrarum;
+package com.Torvald.Terrarum.GameMap;
 
 /**
  * Created by minjaesong on 16-01-24.
  */
 public class WorldTime {
 
-    public static int seconds = 0;
-    public static int minutes = 0;
-    public static int hours = 0;
+    public int seconds = 0;
+    public int minutes = 0;
+    public int hours = 0;
 
-    public static int daysCount = 0; //NOT a calendar day
+    public int daysCount = 0; //NOT a calendar day
 
-    public static int days = 1;
-    public static int months = 1;
-    public static int years = 1;
+    public int days = 1;
+    public int months = 1;
+    public int years = 1;
 
-    public static int weeks = 1;
-    public static int dayOfWeek = 0; //0: Mondag-The first day of weekday
+    public int weeks = 1;
+    public int dayOfWeek = 0; //0: Mondag-The first day of weekday
 
     public static final int DAY_LENGTH = 79200; //must be the multiple of 3600
-    public static int timeDelta = 1;
+    public int timeDelta = 1;
 
-    public static final String[] DAYNAMES = { //daynames are taken from Nynorsk (å -> o)
+    public final String[] DAYNAMES = { //daynames are taken from Nynorsk (å -> o)
             "Mondag"
             ,"Tysdag"
             ,"Midtedag" //From Islenska Miðvikudagur
@@ -31,7 +31,7 @@ public class WorldTime {
             ,"Sundag"
             ,"Verdag" //From Norsk word 'verd'
     };
-    public static final String[] DAYNAMES_SHORT = {
+    public final String[] DAYNAMES_SHORT = {
             "Mon"
             ,"Tys"
             ,"Mid"
@@ -42,10 +42,13 @@ public class WorldTime {
             ,"Ver"
     };
 
+    public WorldTime() {
+    }
+
     /**
      * Note: Target FPS must be 60.
      */
-    public static void update(){
+    public void update(){
         //time
         seconds += timeDelta;
 
@@ -94,15 +97,15 @@ public class WorldTime {
         }
     }
 
-    public static int elapsedSeconds(){
+    public int elapsedSeconds(){
         return (3600 * hours + 60 * minutes + seconds) % DAY_LENGTH;
     }
 
-    public static long totalSeconds(){
+    public long totalSeconds(){
         return (long)(DAY_LENGTH) * daysCount + 3600 * hours + 60 * minutes + seconds;
     }
 
-    public static boolean isLeapYear(){
+    public boolean isLeapYear(){
         boolean ret = false;
 
         if (years % 4 == 0){
@@ -120,22 +123,22 @@ public class WorldTime {
         return ret;
     }
 
-    public static void setTime(int t){
+    public void setTime(int t){
         days += t / DAY_LENGTH;
         hours = t / 3600;
         minutes = (t - 3600 * hours) / 60;
         seconds = t - minutes * 60;
     }
 
-    public static void addTime(int t){
+    public void addTime(int t){
         setTime(elapsedSeconds() + t);
     }
 
-    public static void setTimeDelta(int d){
+    public void setTimeDelta(int d){
         timeDelta = (d == 0) ? 1 : d;
     }
 
-    public static String getDayName(){
+    public String getDayName(){
         return DAYNAMES[dayOfWeek];
     }
 }

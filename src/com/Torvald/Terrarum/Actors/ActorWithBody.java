@@ -32,7 +32,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      *     veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
-    private @NotNull float veloX, veloY;
+    private volatile @NotNull float veloX, veloY;
     private final float VELO_HARD_LIMIT = 10000;
 
     boolean grounded = false;
@@ -49,13 +49,13 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     /**
      * Positions: top-left point
      */
-    private @NotNull Hitbox hitbox, nextHitbox;
+    private volatile @NotNull Hitbox hitbox, nextHitbox;
 
     /**
      * Physical properties
      */
-    private float scale = 1;
-    private float mass = 1f;
+    private volatile float scale = 1;
+    private volatile float mass = 1f;
 
     private static final int TSIZE = MapDrawer.TILE_SIZE;
     private static final int AUTO_CLIMB_RATE = TSIZE / 4;

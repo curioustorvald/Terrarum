@@ -1,16 +1,13 @@
 package com.Torvald.Terrarum.Actors;
 
-import com.Torvald.JsonGetter;
+import com.Torvald.JsonFetcher;
 import com.Torvald.Rand.Fudge3;
 import com.Torvald.Rand.HQRNG;
 import com.Torvald.Terrarum.LangPack.Lang;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.newdawn.slick.SlickException;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 
 /**
  * Created by minjaesong on 16-02-05.
@@ -20,7 +17,7 @@ public class CreatureBuildFactory {
     private static final String JSONPATH = "./res/raw/";
 
     public ActorWithBody build(String jsonFileName) throws IOException, SlickException {
-        JsonObject jsonObj = JsonGetter.readJson(JSONPATH + jsonFileName);
+        JsonObject jsonObj = JsonFetcher.readJson(JSONPATH + jsonFileName);
         ActorWithBody actor = new ActorWithBody();
 
 

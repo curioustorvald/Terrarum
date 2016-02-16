@@ -34,11 +34,11 @@ public class ExportMap implements ConsoleCommand {
     private static final byte ILMENITE = 19;
     private static final byte AURICHALCUM = 20;
 
-    private static final byte DIAMOND = 21;
-    private static final byte RUBY = 22;
-    private static final byte EMERALD = 23;
-    private static final byte SAPPHIRE = 24;
-    private static final byte TOPAZ = 25;
+    private static final byte DIAMOND = 25;
+    private static final byte RUBY = 21;
+    private static final byte EMERALD = 22;
+    private static final byte SAPPHIRE = 23;
+    private static final byte TOPAZ = 24;
     private static final byte AMETHYST = 26;
 
     private static final byte SNOW = 27;
@@ -130,6 +130,7 @@ public class ExportMap implements ConsoleCommand {
         colorTable.put(GOLD, new Col4096(0xCB6));
         colorTable.put(ILMENITE, new Col4096(0x8AB));
         colorTable.put(AURICHALCUM, new Col4096(0xD92));
+        colorTable.put(SILVER, new Col4096(0xDDD));
 
         colorTable.put(DIAMOND, new Col4096(0x9CE));
         colorTable.put(RUBY, new Col4096(0xB10));

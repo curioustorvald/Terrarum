@@ -10,15 +10,15 @@ import java.nio.file.Files;
 /**
  * Created by minjaesong on 16-02-15.
  */
-public class JsonGetter {
+public class JsonFetcher {
 
-    private static String jsonString = new String();
+    private static StringBuffer jsonString = new StringBuffer();
 
-    public static JsonObject readJson(String jsonFileName) throws IOException {
-        readJsonFileAsString(jsonFileName);
+    public static JsonObject readJson(String jsonFilePath) throws IOException {
+        readJsonFileAsString(jsonFilePath);
 
         JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObj = jsonParser.parse(jsonString).getAsJsonObject();
+        JsonObject jsonObj = jsonParser.parse(jsonString.toString()).getAsJsonObject();
 
         return jsonObj;
     }
@@ -26,11 +26,6 @@ public class JsonGetter {
     private static void readJsonFileAsString(String path) throws IOException {
         Files.lines(
                 FileSystems.getDefault().getPath(path)
-        ).forEach(JsonGetter::strAppend);
+        ).forEach(jsonString::append); // JSON does not require line break
     }
-
-    private static void strAppend( String s) {
-        jsonString += s;
-    }
-
 }

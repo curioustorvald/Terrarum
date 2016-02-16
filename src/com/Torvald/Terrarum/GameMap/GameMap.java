@@ -20,18 +20,18 @@ import java.util.function.Consumer;
 public class GameMap {
 
     //layers
-    private MapLayer layerWall;
-    private MapLayer layerTerrain;
-    private MapLayer layerWire;
+    private volatile MapLayer layerWall;
+    private volatile MapLayer layerTerrain;
+    private volatile MapLayer layerWire;
+    private volatile PairedMapLayer terrainDamageCode;
 
     //properties
     public int width;
     public int height;
     public int spawnX;
     public int spawnY;
-    int offset;
 
-    public LinkedList<MapPoint> houseDesignation;
+    private LinkedList<MapPoint> houseDesignation;
 
     public static final int WALL = 0;
     public static final int TERRAIN = 1;
@@ -39,8 +39,9 @@ public class GameMap {
 
     //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
     //physics
-    @NotNull
     private float gravitation;
+    private int globalLight;
+    private WorldTime worldTime;
 
     /**
      * @param width
@@ -56,6 +57,10 @@ public class GameMap {
         layerTerrain = new MapLayer(width, height);
         layerWall = new MapLayer(width, height);
         layerWire = new MapLayer(width, height);
+        terrainDamageCode = new PairedMapLayer(width, height);
+
+        globalLight = 0xFFFFFF;
+        worldTime = new WorldTime();
     }
 
     public void setGravitation(float g) {
@@ -90,6 +95,15 @@ public class GameMap {
     }
 
     /**
+     * Get paired array data of damage codes.
+     * Format: 0baaaabbbb, aaaa for x = 0, 2, 4, ..., bbbb for x = 1, 3, 5, ...
+     * @return byte[][] damage code pair
+     */
+    public byte[][] getDamageDataArray() {
+        return terrainDamageCode.dataPair;
+    }
+
+    /**
      * Get MapLayer object of terrain
      *
      * @return MapLayer terrain layer
@@ -106,6 +120,10 @@ public class GameMap {
         return layerWire;
     }
 
+    public PairedMapLayer getTerrainDamageCode() {
+        return terrainDamageCode;
+    }
+
     public int getTileFromWall(int x, int y) {
         return uint8ToInt32(layerWall.data[y][x]);
     }
@@ -118,6 +136,10 @@ public class GameMap {
         return uint8ToInt32(layerWire.data[y][x]);
     }
 
+    public int getDamageData(int x, int y) {
+        return terrainDamageCode.getData(x, y);
+    }
+
     public int getTileFrom(int mode, int x, int y) {
         if (mode == TERRAIN) { return getTileFromTerrain(x, y); }
         else if (mode == WALL) { return getTileFromWall(x, y); }
@@ -128,7 +150,7 @@ public class GameMap {
     private int uint8ToInt32(byte x) {
         int ret;
         if ((x & 0b1000_0000) != 0) {
-            ret = (x & 0b0111_1111) | (x & 0b1000_0000);
+            ret = x & 0b1111_1111;
         } else {
             ret = x;
         }
@@ -137,5 +159,17 @@ public class GameMap {
 
     public float getGravitation() {
         return gravitation;
+    }
+
+    public int getGlobalLight() {
+        return globalLight;
+    }
+
+    public void setGlobalLight(int globalLight) {
+        this.globalLight = globalLight;
+    }
+
+    public WorldTime getWorldTime() {
+        return worldTime;
     }
 }

@@ -6,10 +6,12 @@ import com.Torvald.Terrarum.GameControl.GameController;
 import com.Torvald.Terrarum.GameControl.KeyMap;
 import com.Torvald.Terrarum.GameControl.KeyToggler;
 import com.Torvald.Terrarum.GameMap.GameMap;
+import com.Torvald.Terrarum.GameMap.WorldTime;
 import com.Torvald.Terrarum.MapDrawer.LightmapRenderer;
 import com.Torvald.Terrarum.MapDrawer.MapCamera;
 import com.Torvald.Terrarum.MapDrawer.MapDrawer;
 import com.Torvald.Terrarum.MapGenerator.MapGenerator;
+import com.Torvald.Terrarum.TileProperties.TilePropCodex;
 import com.Torvald.Terrarum.TileStat.TileStat;
 import com.Torvald.Terrarum.UserInterface.*;
 import com.sun.istack.internal.NotNull;
@@ -81,6 +83,7 @@ public class Game extends BasicGameState {
         skyBox = new Rectangle(0, 0, Terrarum.WIDTH, Terrarum.HEIGHT);
 
         new WorldTime();
+        new TilePropCodex();
 
         map = new GameMap(8192, 2048);
         map.setGravitation(9.8f);
@@ -267,7 +270,7 @@ public class Game extends BasicGameState {
     }
 
     private void drawSkybox(Graphics g) {
-        Color[] colourTable = getGradientColour(WorldTime.elapsedSeconds());
+        Color[] colourTable = getGradientColour(Terrarum.game.map.getWorldTime().elapsedSeconds());
         GradientFill skyColourFill = new GradientFill(0, 0, colourTable[0], 0, Terrarum.HEIGHT, colourTable[1]);
         g.fill(skyBox, skyColourFill);
     }

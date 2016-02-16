@@ -1,10 +1,10 @@
 
 * Weapon tier
 
-Natural / Common  Stone > Copper > Iron > Silver      >        Titanium
-Forging                              ------------>  Steel  -------^
-Exotic ('elven')                Glass                  Aurichalcum
-Special (something 'adamant')                                            ??? (Use material spec of CNT, tensile strength 180 GPa)
+Natural / Common  Stone -> Copper -> Iron -> Silver      ->        Titanium
+Forging                                -------------->  Steel  --------^
+Exotic ('elven')                 Glass                     Aurichalcum
+Special (something 'adamant')                                              ??? (Use material spec of CNT, tensile strength 180 GPa)
 
 
 * Metal graphics
@@ -26,3 +26,8 @@ If the size is bigger than tolerable, weapon speed severely slows down, tools be
 Small weapons gains no (dis)advantage, tools become unusable
 
 Crafted tool/weapon size is dependent on the baseRaceMass.
+
+
+* Gemstone tier
+
+Topaz -> R·G·B -> Diamond·Amethyst
