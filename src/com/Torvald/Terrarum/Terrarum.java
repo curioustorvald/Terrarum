@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import com.Torvald.ImageFont.GameFontWhite;
 import com.Torvald.Terrarum.LangPack.Lang;
 import org.lwjgl.input.Controllers;
-import org.lwjgl.opengl.DisplayMode;
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -42,7 +41,7 @@ public class Terrarum extends StateBasedGame {
     public static String defaultDir;
     public static String defaultSaveDir;
 
-    public static String gameLocale = "ko";
+    public static String gameLocale = "jp_kana";
 
     public static Font gameFontWhite;
 

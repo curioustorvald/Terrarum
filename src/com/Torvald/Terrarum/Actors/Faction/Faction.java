@@ -21,6 +21,14 @@ public class Faction {
         factionFearful = new HashSet<>();
     }
 
+    public String getFactionName() {
+        return factionName;
+    }
+
+    public void renewFactionName(String factionName) {
+        this.factionName = factionName;
+    }
+
     public HashSet<String> getFactionFearful() {
         return factionFearful;
     }

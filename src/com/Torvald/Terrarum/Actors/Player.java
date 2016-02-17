@@ -67,6 +67,9 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     @Override
     public void update(GameContainer gc, int delta_t) {
+        if (vehicleRiding instanceof Player) throw new RuntimeException("Attempted to 'ride' " +
+                "player object.");
+
         updatePhysicalInfos();
         super.update(gc, delta_t);
 

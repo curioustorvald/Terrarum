@@ -150,8 +150,8 @@ public class SpriteAnimation {
 
             flippedImage.startUse();
             flippedImage.drawEmbedded(
-                    FastMath.floor(posX * Terrarum.game.screenZoom)
-					, FastMath.floor(posY * Terrarum.game.screenZoom)
+                    Math.round(posX * Terrarum.game.screenZoom)
+					, Math.round(posY * Terrarum.game.screenZoom)
                     , FastMath.floor(width * scale)
                     , FastMath.floor(height * scale)
             );

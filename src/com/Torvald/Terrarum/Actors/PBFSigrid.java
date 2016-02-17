@@ -1,13 +1,21 @@
 package com.Torvald.Terrarum.Actors;
 
+import com.Torvald.JsonFetcher;
+import com.Torvald.Terrarum.Actors.Faction.Faction;
 import com.Torvald.Terrarum.Game;
 import com.Torvald.spriteAnimation.SpriteAnimation;
+import com.google.gson.JsonObject;
+import org.lwjgl.Sys;
 import org.newdawn.slick.SlickException;
+
+import java.io.IOException;
 
 /**
  * Created by minjaesong on 16-02-03.
  */
 public class PBFSigrid {
+
+    private static String FACTION_PATH = "./res/raw/";
 
     public Player build() throws SlickException {
         Player p = new Player();
@@ -60,7 +68,36 @@ public class PBFSigrid {
 
         p.setPosition(4096 * 16, 300 * 16);
 
+        p.assignFaction(loadFactioningData("FactionSigrid.json"));
+
         return p;
     }
 
+    private Faction loadFactioningData(String filename) {
+        JsonObject jsonObject = null;
+        try {
+            jsonObject = JsonFetcher.readJson(FACTION_PATH + filename);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+        Faction faction = new Faction(jsonObject.get("factionname").getAsString());
+
+        jsonObject.get("factionamicable").getAsJsonArray().forEach(
+                jobj -> faction.addFactionAmicable(jobj.getAsString())
+        );
+        jsonObject.get("factionneutral").getAsJsonArray().forEach(
+                jobj -> faction.addFactionNeutral(jobj.getAsString())
+        );
+        jsonObject.get("factionhostile").getAsJsonArray().forEach(
+                jobj -> faction.addFactionHostile(jobj.getAsString())
+        );
+        jsonObject.get("factionfearful").getAsJsonArray().forEach(
+                jobj -> faction.addFactionFearful(jobj.getAsString())
+        );
+
+        return faction;
+    }
 }

@@ -28,6 +28,8 @@ public class CommandDict {
         dict.put("cat", new CatStdout());
         dict.put("exportav", new ExportAV());
         dict.put("gsontest", new GsonTest());
+        dict.put("setgl", new SetGlobalLightLevel());
+        dict.put("getfaction", new GetFactioning());
     }
 
     public static ConsoleCommand getCommand(String commandName) {
