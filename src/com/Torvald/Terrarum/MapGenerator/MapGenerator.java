@@ -27,12 +27,23 @@ public class MapGenerator {
     private static final int HILL_WIDTH = 256; // power of two!
     private static final int MAX_HILL_HEIGHT = 100;
 
+    private static final int CAVE_LARGEST_FEATURE = 200;
+
     private static int OCEAN_WIDTH = 400;
     private static int SHORE_WIDTH = 120;
     private static int MAX_OCEAN_DEPTH = 200;
 
     private static int GLACIER_MOUNTAIN_WIDTH = 900;
     private static final int GLACIER_MOUNTAIN_HEIGHT = 300;
+
+    private static final float CAVEGEN_PERTURB_RATE = 0.37f;
+    private static final float CAVEGEN_PERTURB2_RATE = 0.25f;
+
+    private static final float CAVEGEN_THRE_START = 0.87f;
+    private static final float CAVEGEN_THRE_END = 0.67f;
+
+    private static final int CAVEGEN_LARGEST_FEATURE = 256;
+    private static final int CAVEGEN_LARGEST_FEATURE_PERTURB = 128;
 
     private static final byte AIR = 0;
 
@@ -108,9 +119,8 @@ public class MapGenerator {
         placeGlacierMount(heightMap);
         heightMapToObjectMap(heightMap);
 
-        carveByMap(
-                generate2DSimplexNoiseWorldSize(2.5f, 1.666f)
-                , 1
+        carveCave(
+                caveGen(1, 1.2f)
                 , AIR
                 , "Carving out cave..."
         );
@@ -181,14 +191,6 @@ public class MapGenerator {
 
         /** TODO Cobaltite, Ilmenite, Aurichalcum (and possibly pitchblende?) **/
 
-        /*fillByMap(
-                generate2DSimplexNoiseWorldSize(5, 5)
-                , 1.21f
-                , STONE
-                , COAL
-                , "Planting coals..."
-        );*/
-
         floodBottomLava();
         freeze();
         fillOcean();
@@ -210,20 +212,80 @@ public class MapGenerator {
 
 	/* 1. Raise */
 
-    private static float[][] generate2DSimplexNoiseWorldSize(float xDensity, float yDensity) {
-        return generate2DSimplexNoise(width, height, xDensity, yDensity);
+    /**
+     * Ridged 2D simplex noise with some perturbing
+     * @param xStretch
+     * @param yStretch
+     * @return
+     */
+    private static float[][] caveGen(float xStretch, float
+            yStretch) {
+        float[][] noiseMap = new float[height][width];
+
+        SimplexNoise simplexNoise = new SimplexNoise(CAVEGEN_LARGEST_FEATURE, CAVEGEN_PERTURB_RATE
+                , 0x51621D);
+        SimplexNoise simplexNoisePerturbMap = new SimplexNoise(CAVEGEN_LARGEST_FEATURE_PERTURB, 0.5f
+                , 0x51621D ^ random.nextLong());
+
+        float xEnd=width * yStretch;
+        float yEnd=height * xStretch;
+
+        float lowestNoiseVal = 10000f;
+        float highestNoiseVal = -10000f;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int ny=(int)(y * ((xEnd)/width));
+                int nx=(int)(x * ((yEnd)/height));
+
+                float noiseInit = simplexNoise.getNoise(nx,ny); // [-1 , 1]
+                float perturbInit = (simplexNoisePerturbMap.getNoise(nx, ny) * 0.5f) + 0.5f;  // [0 , 1]
+
+                /** Ridging part ! */
+                float noiseFin = 1f - Math.abs(noiseInit); // [0 , 1]
+
+                float perturb = 1 - (perturbInit * CAVEGEN_PERTURB2_RATE); // [1 , 1-0.25]
+                float noisePerturbed = (noiseFin * perturb); // [0 , 1]
+
+                if (noisePerturbed < lowestNoiseVal) lowestNoiseVal = noisePerturbed;
+                if (noisePerturbed > highestNoiseVal) highestNoiseVal = noisePerturbed;
+                noiseMap[y][x] = noisePerturbed;
+            }
+        }
+
+        // Auto-scaling noise
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                float noiseInit = noiseMap[y][x] - lowestNoiseVal;
+
+                float noiseFin = noiseInit * (1f / (highestNoiseVal - lowestNoiseVal));
+
+                float noiseThresholded = noiseFin > gradientSqrt(y, CAVEGEN_THRE_START,
+                        CAVEGEN_THRE_END
+                ) ? 1 : 0;
+
+                noiseMap[y][x] = noiseThresholded;
+            }
+        }
+
+        return noiseMap;
+    }
+
+    private static float[][] generate2DSimplexNoiseWorldSize(float xStretch, float yStretch) {
+        return generate2DSimplexNoise(width, height, xStretch, yStretch);
     }
 
     /**
      * Generate 2D array of simplex noise.
      * @param sizeX
      * @param sizeY
-     * @param xDensity higher == dense (smaller blob), lower == sparse (larger blob)
-     * @param yDensity higher == dense (smaller blob), lower == sparse (larger blob)
+     * @param xStretch
+     * @param yStretch
      * @return matrix in ![x][y]!
      */
-    private static float[][] generate2DSimplexNoise(int sizeX, int sizeY, float xDensity, float yDensity){
-        SimplexNoise simplexNoise = new SimplexNoise(HILL_WIDTH, 0.1f, seed ^ random.nextLong());
+    private static float[][] generate2DSimplexNoise(int sizeX, int sizeY, float xStretch, float yStretch){
+        SimplexNoise simplexNoise = new SimplexNoise(CAVE_LARGEST_FEATURE, 0.1f, seed ^ random.nextLong());
 
         float xStart=0;
         float yStart=0;
@@ -231,8 +293,8 @@ public class MapGenerator {
         /** higher = denser.
          * Recommended: (width or height) * 3
          */
-        float xEnd=height * xDensity;
-        float yEnd=width * yDensity;
+        float xEnd=height * yStretch;
+        float yEnd=width * xStretch;
 
         float[][] result=new float[sizeY][sizeX];
 
@@ -471,6 +533,18 @@ public class MapGenerator {
 
 	/* 2. Carve */
 
+    private static void carveCave(float[][] map, byte tile, String message) {
+        System.out.println("[MapGenerator] " + message);
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (map[i][j] > 0.9) {
+                    MapGenerator.map.getTerrainArray()[i][j] = tile;
+                }
+            }
+        }
+    }
+
     /**
      * Carve (place air block) by noisemap, inversed gradation filter applied.
      * @param map noisemap
@@ -483,7 +557,7 @@ public class MapGenerator {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                if (map[i][j] > noiseMapGetGradientQuadPoly(i, noiseGradientStart, noiseGrdCaveEnd) / scarcity) {
+                if (map[i][j] > gradientQuadratic(i, noiseGradientStart, noiseGrdCaveEnd) / scarcity) {
                     MapGenerator.map.getTerrainArray()[i][j] = tile;
                 }
             }
@@ -570,11 +644,28 @@ public class MapGenerator {
     }
 
     private static float getNoiseGradient(int x, float start, float end) {
-        return noiseMapGetGradientQuadPoly(x, start, end);
+        return gradientQuadratic(x, start, end);
     }
 
     private static float getNoiseGradientInversed(int x, float start, float end) {
-        return noiseMapGetGradientMinusQuadPoly(x, start, end);
+        return gradientMinusQuadratic(x, start, end);
+    }
+
+    private static float gradientSqrt(int func_argX, float start, float end) {
+        float graph_gradient =
+                ((end - start) / FastMath.sqrt(height - TERRAIN_AVERAGE_HEIGHT))
+                        * FastMath.sqrt(func_argX - TERRAIN_AVERAGE_HEIGHT)
+                        + start;
+
+        if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
+            return start;
+        }
+        else if (func_argX >= height) {
+            return end;
+        }
+        else {
+            return graph_gradient;
+        }
     }
 
     /**
@@ -600,7 +691,7 @@ public class MapGenerator {
      * @param end
      * @return
      */
-    private static float noiseMapGetGradientQuadPoly(int func_argX, float start, float end) {
+    private static float gradientQuadratic(int func_argX, float start, float end) {
         float graph_gradient =
                 FastMath.pow(FastMath.sqr(1 - TERRAIN_AVERAGE_HEIGHT), -1) // 1/4 -> 3/4 -> 9/16 -> 16/9
                 * (start - end) / FastMath.sqr(height)
@@ -642,7 +733,7 @@ public class MapGenerator {
      * @param end
      * @return
      */
-    private static float noiseMapGetGradientCubicPoly(int func_argX, float start, float end) {
+    private static float gradientCubic(int func_argX, float start, float end) {
         float graph_gradient =
                 -FastMath.pow(FastMath.pow(1 - TERRAIN_AVERAGE_HEIGHT, 3), -1) // 1/4 -> 3/4 -> 9/16 -> 16/9
                         * (start - end) / FastMath.pow(height, 3)
@@ -684,7 +775,7 @@ public class MapGenerator {
      * @param end
      * @return
      */
-    private static float noiseMapGetGradientMinusQuadPoly(int func_argX, float start, float end) {
+    private static float gradientMinusQuadratic(int func_argX, float start, float end) {
         float graph_gradient =
                 -FastMath.pow(FastMath.sqr(1 - TERRAIN_AVERAGE_HEIGHT), -1) // 1/4 -> 3/4 -> 9/16 -> 16/9
                         * (start - end) / FastMath.sqr(height)
