@@ -125,6 +125,14 @@ public class MapGenerator {
                 , "Carving out cave..."
         );
 
+        fillByMapNoFilterUnderground(
+                generate2DSimplexNoiseWorldSize(1f, 1f)
+                , 0.9f
+                , AIR
+                , STONE
+                , "Collapsing caves..."
+        );
+
         /*fillByMapInverseGradFilter(
                 generate2DSimplexNoiseWorldSize(2.5f, 2.5f)
                 , 1.02f
@@ -223,9 +231,9 @@ public class MapGenerator {
         float[][] noiseMap = new float[height][width];
 
         SimplexNoise simplexNoise = new SimplexNoise(CAVEGEN_LARGEST_FEATURE, CAVEGEN_PERTURB_RATE
-                , 0x51621D);
+                , seed);
         SimplexNoise simplexNoisePerturbMap = new SimplexNoise(CAVEGEN_LARGEST_FEATURE_PERTURB, 0.5f
-                , 0x51621D ^ random.nextLong());
+                , seed ^ random.nextLong());
 
         float xEnd=width * yStretch;
         float yEnd=height * xStretch;
@@ -293,8 +301,11 @@ public class MapGenerator {
         /** higher = denser.
          * Recommended: (width or height) * 3
          */
-        float xEnd=height * yStretch;
-        float yEnd=width * xStretch;
+        float xEnd=width * yStretch;
+        float yEnd=height * xStretch;
+
+        float lowestNoiseVal = 10000f;
+        float highestNoiseVal = -10000f;
 
         float[][] result=new float[sizeY][sizeX];
 
@@ -302,20 +313,29 @@ public class MapGenerator {
             for(int j=0;j<sizeX;j++){
                 int x=(int)(xStart+i*((xEnd-xStart)/sizeX));
                 int y=(int)(yStart+j*((yEnd-yStart)/sizeY));
-                result[i][j]=(float) (0.5*(1+simplexNoise.getNoise(x,y)));
+
+                float noiseValue = (float) (0.5*(1+simplexNoise.getNoise(x,y)));
+
+                if (noiseValue < lowestNoiseVal) lowestNoiseVal = noiseValue;
+                if (noiseValue > highestNoiseVal) highestNoiseVal = noiseValue;
+
+                result[i][j] = noiseValue;
+            }
+        }
+
+        // Auto-scaling noise
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                float noiseInit = result[y][x] - lowestNoiseVal;
+
+                float noiseFin = noiseInit * (1f / (highestNoiseVal - lowestNoiseVal));
+
+                result[y][x] = noiseFin;
             }
         }
 
         return result;
-    }
-
-    private static float[] generateWhiteNoiseArray(long seed) {
-        float[] noiseArray = new float[MapGenerator.width + 1];
-        for (int i = 0; i < noiseArray.length; i++) {
-            noiseArray[i] = random.nextFloat();
-        }
-
-        return noiseArray;
     }
 
     private static int[] generateOcean(int[] noiseArrayLocal) {
@@ -557,7 +577,8 @@ public class MapGenerator {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                if (map[i][j] > gradientQuadratic(i, noiseGradientStart, noiseGrdCaveEnd) / scarcity) {
+                if (map[i][j] > gradientQuadratic(i, noiseGradientStart, noiseGrdCaveEnd) *
+                        scarcity) {
                     MapGenerator.map.getTerrainArray()[i][j] = tile;
                 }
             }
@@ -577,7 +598,7 @@ public class MapGenerator {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                if (map[i][j] > getNoiseGradient(i, noiseGradientStart, noiseGradientEnd) / scarcity
+                if (map[i][j] > getNoiseGradient(i, noiseGradientStart, noiseGradientEnd) * scarcity
                         && MapGenerator.map.getTileFromTerrain(j, i) == replaceFrom) {
                     MapGenerator.map.getTerrainArray()[i][j] = tile;
                 }
@@ -598,7 +619,8 @@ public class MapGenerator {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                if (map[i][j] > getNoiseGradientInversed(i, noiseGradientEnd, noiseGradientStart) / scarcity
+                if (map[i][j] > getNoiseGradientInversed(i, noiseGradientEnd, noiseGradientStart)
+                        * scarcity
                         && MapGenerator.map.getTileFromTerrain(j, i) == replaceFrom) {
                     MapGenerator.map.getTerrainArray()[i][j] = tile;
                 }
@@ -621,8 +643,23 @@ public class MapGenerator {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                if (map[i][j] > noiseGradientStart / scarcity
+                if (map[i][j] > noiseGradientStart * scarcity
                         && MapGenerator.map.getTileFromTerrain(j, i) == replaceFrom) {
+                    MapGenerator.map.getTerrainArray()[i][j] = tile;
+                }
+            }
+        }
+    }
+
+    private static void fillByMapNoFilterUnderground(float[][] map, float scarcity, byte replaceFrom, byte
+            tile, String message) {
+        System.out.println("[MapGenerator] " + message);
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (map[i][j] > noiseGradientStart * scarcity
+                        && MapGenerator.map.getTileFromTerrain(j, i) == replaceFrom
+                        && MapGenerator.map.getTileFromWall(j, i) == STONE) {
                     MapGenerator.map.getTerrainArray()[i][j] = tile;
                 }
             }
@@ -634,7 +671,7 @@ public class MapGenerator {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                if (map[i][j] > getNoiseGradient(i, noiseGradientStart, noiseGradientEnd) / scarcity
+                if (map[i][j] > getNoiseGradient(i, noiseGradientStart, noiseGradientEnd) * scarcity
                         && MapGenerator.map.getTileFromTerrain(j, i) == replaceFrom) {
                     MapGenerator.map.getTerrainArray()[i][j]
                             = tile[random.nextInt(tile.length)];

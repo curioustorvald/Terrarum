@@ -77,7 +77,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     private final int CONTACT_AREA_BOTTOM = 2;
     private final int CONTACT_AREA_LEFT = 3;
 
-    private final int UD_COMPENSATOR_MAX = 100;
+    private final int UD_COMPENSATOR_MAX = TSIZE;
     private final int LR_COMPENSATOR_MAX = TSIZE;
     private final int TILE_CLIMB_RATE = 4;
 
@@ -155,17 +155,15 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             if (veloY > VELO_HARD_LIMIT) veloY = VELO_HARD_LIMIT;
 
             // Set 'next' positions to fiddle with
-            if (!playerNoClip()) {
-                updateNextHitboxY();
-                updateVerticalPos();
-                clampNextHitbox();
-                updateHitboxY();
+            updateNextHitboxY();
+            updateVerticalPos();
+            clampNextHitbox();
+            updateHitboxY();
 
-                updateNextHitboxX();
-                updateHorizontalPos();
-                clampNextHitbox();
-                updateHitboxX();
-            }
+            updateNextHitboxX();
+            updateHorizontalPos();
+            clampNextHitbox();
+            updateHitboxX();
 
             clampHitbox();
         }
@@ -200,16 +198,18 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     }
 
     private void updateVerticalPos() {
-        if (collidedBottomAndAdjusted()) {
-            grounded = true;
-            veloY = 0;
-        }
-        else {
-            grounded = false;
-        }
+        if (!playerNoClip()) {
+            if (collidedBottomAndAdjusted()) {
+                grounded = true;
+                veloY = 0;
+            }
+            else {
+                grounded = false;
+            }
 
-        if (collidedTopAndAdjusted()) {
-            veloY = 0;
+            if (collidedTopAndAdjusted()) {
+                veloY = 0;
+            }
         }
     }
 
@@ -254,20 +254,22 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     }
 
     private void updateHorizontalPos() {
-        if (collidedRightAndAdjusted()) { // treat as 'event--collided right'
-            veloX = 0;
-            walledRight = true;
+        if (!playerNoClip()) {
+            if (collidedRightAndAdjusted()) { // treat as 'event--collided right'
+                veloX = 0;
+                walledRight = true;
 
-            // TODO remove above two lines and implement tile climb (multi-frame calculation.)
-            // Use variable TILE_CLIMB_RATE
-        }
-        else if (collidedLeftAndAdjusted()) { // treat as 'event--collided left'
-            veloX = 0;
-            walledLeft = true;
-        }
-        else {
-            walledRight = false;
-            walledLeft = false;
+                // TODO remove above two lines and implement tile climb (multi-frame calculation.)
+                // Use variable TILE_CLIMB_RATE
+            }
+            else if (collidedLeftAndAdjusted()) { // treat as 'event--collided left'
+                veloX = 0;
+                walledLeft = true;
+            }
+            else {
+                walledRight = false;
+                walledLeft = false;
+            }
         }
     }
 

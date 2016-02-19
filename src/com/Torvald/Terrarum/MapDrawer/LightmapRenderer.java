@@ -45,9 +45,21 @@ public class LightmapRenderer {
 
     }
 
-    public static void addLantern(int x, int y, LightmapLantern lantern) {
-        // TODO check for duplicates
-        lanterns.add(lantern);
+    public static void addLantern(int x, int y, int intensity) {
+        LightmapLantern thisLantern = new LightmapLantern(x, y, intensity);
+
+        for (int i = lanterns.size() - 1; i >= 0; i--) {
+            LightmapLantern lanternInList = lanterns.get(i);
+            // found duplicates
+            if (lanternInList.getX() == x && lanternInList.getY() == y) {
+                // add colour
+                int addedL = addRaw(intensity, lanternInList.getIntensity());
+                lanternInList.intensity = addedL;
+                return;
+            }
+        }
+        //else
+        lanterns.add(thisLantern);
     }
 
     public static void removeLantern(int x, int y) {
@@ -260,6 +272,18 @@ public class LightmapRenderer {
                     }
                 }
 
+                // mix actor Luminous
+                // test player TODO for all actor.Luminous in the game
+                int tileX = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedX() / TSIZE);
+                int tileY = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedY() / TSIZE)
+                        - 1;
+                int lum = Terrarum.game.getPlayer().getLuminance();
+                if (x == tileX && y == tileY) {
+                    lightColorR = getR(lum);
+                    lightColorG = getG(lum);
+                    lightColorB = getB(lum);
+                }
+
                 float[] bgrVal = new float[3]; // {B, G, R}
 
                 // test for each R, G, B channel
@@ -375,7 +399,15 @@ public class LightmapRenderer {
         return getRawB(rgb) / 255f;
     }
 
-    private static int constructRGBFromFloat(int r, int g, int b) {
+    private static int addRaw(int rgb1, int rgb2) {
+        int newR = clampByte(getRawR(rgb1) + getRawB(rgb2));
+        int newG = clampByte(getRawG(rgb1) + getRawG(rgb2));
+        int newB = clampByte(getRawB(rgb1) + getRawB(rgb2));
+
+        return constructRGBFromInt(newR, newG, newB);
+    }
+
+    private static int constructRGBFromInt(int r, int g, int b) {
         if (r < 0 || r > 0xFF) { throw new IllegalArgumentException("Red: out of range"); }
         if (g < 0 || g > 0xFF) { throw new IllegalArgumentException("Green: out of range"); }
         if (b < 0 || b > 0xFF) { throw new IllegalArgumentException("Blue: out of range"); }
@@ -391,14 +423,14 @@ public class LightmapRenderer {
         int intG = Math.round(g * 0xFF);
         int intB = Math.round(b * 0xFF);
 
-        return constructRGBFromFloat(intR, intG, intB);
+        return constructRGBFromInt(intR, intG, intB);
     }
 
     private static int colourLinearMix(int colA, int colB) {
         int r = (getRawR(colA) + getRawR(colB)) >> 1;
         int g = (getRawG(colA) + getRawG(colB)) >> 1;
         int b = (getRawB(colA) + getRawB(colB)) >> 1;
-        return constructRGBFromFloat(r, g, b);
+        return constructRGBFromInt(r, g, b);
     }
 
     /**
@@ -417,7 +449,7 @@ public class LightmapRenderer {
         int bSide = max(getRawG(side1), getRawG(side2), getRawG(corner) / 2);
         int b = arithmeticAverage(bSide, getRawG(thisTile));
 
-        return constructRGBFromFloat(r, g, b);
+        return constructRGBFromInt(r, g, b);
     }
 
     private static int quantise16(int x) {
@@ -454,13 +486,15 @@ public class LightmapRenderer {
     }
 
     private static int clampZero(int i) {
-        if (i < 0) return 0;
-        else return i;
+        return (i < 0) ? 0 : i;
     }
 
     private static float clampZero(float i) {
-        if (i < 0) return 0;
-        else return i;
+        return (i < 0) ? 0 : i;
+    }
+
+    private static int clampByte(int i) {
+        return (i < 0) ? 0 : (i > 0xFF) ? 0xFF : i;
     }
 
     public static int[][] getStaticLightMap() {

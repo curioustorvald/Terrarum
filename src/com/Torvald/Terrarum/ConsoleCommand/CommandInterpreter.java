@@ -1,6 +1,7 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
 import com.Torvald.Terrarum.LangPack.Lang;
+import com.Torvald.Terrarum.Terrarum;
 
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -17,18 +18,28 @@ public class CommandInterpreter {
 
         for (CommandInput single_command : cmd) {
             try {
-                ConsoleCommand commandObj = CommandDict.getCommand(single_command.getName().toLowerCase());
-                commandObj.execute(single_command.toStringArray());
+                if (single_command.getName().equalsIgnoreCase("auth")) {
+                    Terrarum.game.auth.execute(single_command.toStringArray());
+                }
+                else if (single_command.getName().equalsIgnoreCase("qqq")) {
+                    new QuitApp().execute(single_command.toStringArray());
+                }
+                else if (single_command.getName().equalsIgnoreCase("zoom")) {
+                    new Zoom().execute(single_command.toStringArray());
+                }
+                else {
+                    if (Terrarum.game.auth.C()) {
+                        ConsoleCommand commandObj = CommandDict.getCommand(
+                                single_command.getName().toLowerCase());
+                        commandObj.execute(single_command.toStringArray());
+                    }
+                    else {
+                        throw new NullPointerException(); // if not authorised, say "Unknown command"
+                    }
+                }
             }
             catch (NullPointerException e) {
-                StringBuilder sb = new StringBuilder();
-                Formatter formatter = new Formatter(sb);
-
-                new Echo().execute(
-                        formatter.format(Lang.get("DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN")
-                                , single_command.getName()
-                        ).toString()
-                );
+                echoUnknownCmd(single_command.getName());
             }
         }
     }
@@ -62,6 +73,17 @@ public class CommandInterpreter {
         }
 
         return parsedCommands;
+    }
+
+    static void echoUnknownCmd(String cmdname) {
+        StringBuilder sb = new StringBuilder();
+        Formatter formatter = new Formatter(sb);
+
+        new Echo().execute(
+                formatter.format(Lang.get("DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN")
+                        , cmdname
+                ).toString()
+        );
     }
 
 }

@@ -62,7 +62,7 @@ public class PBFSigrid {
 
         p.actorValue.set("intelligent", true);
 
-        p.setHitboxDimension(17, 47, 9, 0);
+        p.setHitboxDimension(17, 46, 9, 0);
 
         p.inventory = new ActorInventory(0x7FFFFFFF, true);
 

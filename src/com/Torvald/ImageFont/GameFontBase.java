@@ -17,16 +17,21 @@ public class GameFontBase implements Font {
     static SpriteSheet extASheetEF;
     static SpriteSheet kanaSheet;
     static SpriteSheet cjkPunct;
+    static SpriteSheet uniHan;
+    static SpriteSheet cyrilic;
+    static SpriteSheet cyrilicEF;
 
     static final int JUNG_COUNT = 21;
     static final int JONG_COUNT = 28;
 
     static final int W_CJK = 10;
+    static final int W_UNIHAN = 16;
     static final int W_CJK_DRAW = 11;
     static final int W_LATIN_WIDE = 9; // width of regular letters, including m
     static final int W_LATIN_NARROW = 5; // width of letter f, t, i, l
     static final int H = 20;
     static final int H_HANGUL = 16;
+    static final int H_UNIHAN = 16;
     static final int H_KANA = 20;
 
     static final int SHEET_ASCII_EM = 0;
@@ -37,15 +42,22 @@ public class GameFontBase implements Font {
     static final int SHEET_EXTA_EF = 5;
     static final int SHEET_KANA = 6;
     static final int SHEET_CJK_PUNCT = 7;
+    static final int SHEET_UNIHAN = 8;
+    static final int SHEET_CYRILIC_EM = 9;
+    static final int SHEET_CYRILIC_EF = 10;
 
     static SpriteSheet[] sheetKey;
     static final Character[] asciiEFList = {
-             ' ','!','"','\'','(',')','I','[',']','`','f','i','j','l','t','{'
-            ,'|','}',0xA1,'Ì','Í','Î','Ï','ì','í','î','ï','·'
+             ' ','!','"','\'','(',')',',','.',':',';','I','[',']','`','f','i'
+            ,'j','l','t','{','|','}',0xA1,'Ì','Í','Î','Ï','ì','í','î','ï','·'
     };
 
     static final Character[] extAEFList = {
             0x12E, 0x12F, 0x130, 0x131, 0x135, 0x13A, 0x13C, 0x142, 0x163, 0x167, 0x17F
+    };
+
+    static final Character[] cyrilecEFList = {
+            0x406, 0x407, 0x456, 0x457, 0x458
     };
 
     /**
@@ -111,6 +123,18 @@ public class GameFontBase implements Font {
         return (c >= 0x3000 && c < 0x3040);
     }
 
+    private boolean isUniHan(char c) {
+        return (c >= 0x3400 && c < 0xA000);
+    }
+
+    private boolean isCyrilic(char c) {
+        return (c >= 0x400 && c < 0x460);
+    }
+
+    private boolean isCyrilicEF(char c) {
+        return (Arrays.asList(cyrilecEFList).contains(c));
+    }
+
     private int asciiEFindexX(char c) {
         return (Arrays.asList(asciiEFList).indexOf(c) % 16);
     }
@@ -151,18 +175,49 @@ public class GameFontBase implements Font {
         return (c - 0x3000) / 16;
     }
 
+    private int uniHanIndexX(char c) {
+        return (c - 0x3400) % 256;
+    }
+
+    private int uniHanIndexY(char c) {
+        return (c - 0x3400) / 256;
+    }
+
+    private int cyrilicIndexX(char c) {
+        return (c - 0x400) % 16;
+    }
+
+    private int cyrilicIndexY(char c) {
+        return (c - 0x400) / 16;
+    }
+
+    private int cyrilicEFindexX(char c) {
+        return (Arrays.asList(cyrilecEFList).indexOf(c) % 16);
+    }
+
+    private int cyrilicEFindexY(char c) {
+        return (Arrays.asList(cyrilecEFList).indexOf(c) / 16);
+    }
+
     @Override
     public int getWidth(String s) {
         int len = 0;
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
+
             switch (getSheetType(c)) {
                 case SHEET_ASCII_EF:
                     len += W_LATIN_NARROW; break;
-                case SHEET_HANGUL: case SHEET_KANA: case SHEET_CJK_PUNCT:
+                case SHEET_KANA: case SHEET_CJK_PUNCT:
                     len += W_CJK_DRAW; break;
+                case SHEET_HANGUL:
+                    len += W_CJK_DRAW;
+                    break;
+                case SHEET_UNIHAN:
+                    len += W_UNIHAN; break;
                 default:
                     len += W_LATIN_WIDE;
+
             }
         }
         return len;
@@ -204,12 +259,31 @@ public class GameFontBase implements Font {
         }
         hangulSheet.endUse();
 
+        // unihan fonts
+        uniHan.startUse();
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+
+            if (isUniHan(ch)) {
+                uniHan.renderInUse(
+                        Math.round(x
+                                + getWidth(s.substring(0, i))
+                        )
+                        , Math.round((H - H_HANGUL) / 2 + y)
+                        , uniHanIndexX(ch)
+                        , uniHanIndexY(ch)
+                );
+            }
+        }
+
+        uniHan.endUse();
+
         //ascii fonts
         int prevInstance = -1;
         for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
 
-            if (!isHangul(ch)) {
+            if (!isHangul(ch) && !isUniHan(ch)) {
 
                 // if not init, enduse first
                 if (prevInstance != -1) {
@@ -245,6 +319,14 @@ public class GameFontBase implements Font {
                         sheetX = cjkPunctIndexX(ch);
                         sheetY = cjkPunctIndexY(ch);
                         break;
+                    case SHEET_CYRILIC_EM:
+                        sheetX = cyrilicIndexX(ch);
+                        sheetY = cyrilicIndexY(ch);
+                        break;
+                    case SHEET_CYRILIC_EF:
+                        sheetX = cyrilicEFindexX(ch);
+                        sheetY = cyrilicEFindexY(ch);
+                        break;
                     default:
                         sheetX = ch % 16;
                         sheetY = ch / 16;
@@ -253,9 +335,9 @@ public class GameFontBase implements Font {
 
                 try {
                     sheetKey[prevInstance].renderInUse(
-                            Math.round(x
-                                    + getWidth(s.substring(0, i))
-                            )
+                            Math.round(x + getWidth(s.substring(0, i)))
+                                    // pull punct right next to hangul to the left
+                                    + ((i > 0 && isHangul(s.charAt(i - 1))) ? -2 : 0)
                             , Math.round(y)
                             - ((prevInstance == SHEET_CJK_PUNCT) ? 1 : 0)
                             , sheetX
@@ -263,11 +345,11 @@ public class GameFontBase implements Font {
                     );
                 }
                 catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("char: '" + ch + "' (" + String.valueOf((int) ch) + ")");
-                    System.out.println("sheet: " + prevInstance);
-                    System.out.println("sheetX: " + sheetX);
-                    System.out.println("sheetY: " + sheetY);
-                    e.printStackTrace();
+                    // System.out.println("ArrayIndexOutOfBoundsException")
+                    // System.out.println("char: '" + ch + "' (" + String.valueOf((int) ch) + ")");
+                    // System.out.println("sheet: " + prevInstance);
+                    // System.out.println("sheetX: " + sheetX);
+                    // System.out.println("sheetY: " + sheetY);
                 }
 
             }
@@ -279,14 +361,22 @@ public class GameFontBase implements Font {
     }
 
     private int getSheetType(char c) {
+        // EFs
         if (isAsciiEF(c)) return SHEET_ASCII_EF;
-        else if (isHangul(c)) return SHEET_HANGUL;
-        else if (isRunic(c)) return SHEET_RUNIC;
-        else if (isExtA(c)) return SHEET_EXTA_EM;
         else if (isExtAEF(c)) return SHEET_EXTA_EF;
+        else if (isCyrilicEF(c)) return SHEET_CYRILIC_EF;
+        // fixed width
+        else if (isRunic(c)) return SHEET_RUNIC;
+        else if (isHangul(c)) return SHEET_HANGUL;
         else if (isKana(c)) return SHEET_KANA;
+        else if (isUniHan(c)) return SHEET_UNIHAN;
+        else if (isAscii(c)) return SHEET_ASCII_EM;
+        else if (isExtA(c)) return SHEET_EXTA_EM;
+        else if (isCyrilic(c)) return SHEET_CYRILIC_EM;
+        // fixed width punctuations
         else if (isCJKPunct(c)) return SHEET_CJK_PUNCT;
-        else return SHEET_ASCII_EM;
+
+        else return SHEET_ASCII_EM; // fallback
     }
 
     @Override

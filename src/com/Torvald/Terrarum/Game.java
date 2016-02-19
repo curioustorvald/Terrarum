@@ -1,6 +1,7 @@
 package com.Torvald.Terrarum;
 
 import com.Torvald.Terrarum.Actors.*;
+import com.Torvald.Terrarum.ConsoleCommand.Authenticator;
 import com.Torvald.Terrarum.ConsoleCommand.CommandDict;
 import com.Torvald.Terrarum.GameControl.GameController;
 import com.Torvald.Terrarum.GameControl.KeyMap;
@@ -60,6 +61,8 @@ public class Game extends BasicGameState {
     private Shader shader12BitCol;
     private Shader shaderBlurH;
     private Shader shaderBlurV;
+
+    public static Authenticator auth = new Authenticator();
 
     public Game() throws SlickException {  }
 

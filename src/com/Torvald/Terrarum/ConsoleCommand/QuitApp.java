@@ -7,7 +7,7 @@ public class QuitApp implements ConsoleCommand {
 
     @Override
     public void execute(String[] args) {
-        System.exit(0);
+        System.exit(1);
     }
 
     @Override

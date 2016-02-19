@@ -8,6 +8,8 @@
       <root url="jar://$PROJECT_DIR$/lib/gson-2.5-javadoc.jar!/" />
       <root url="file://$PROJECT_DIR$/lib/javadoc" />
       <root url="file://$PROJECT_DIR$/lib/apidocs" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-codec-1.10-javadoc.jar!/" />
+      <root url="https://commons.apache.org/proper/commons-csv/archives/1.1/apidocs/index.html" />
     </JAVADOC>
     <NATIVE>
       <root url="file://$PROJECT_DIR$/lib/native" />

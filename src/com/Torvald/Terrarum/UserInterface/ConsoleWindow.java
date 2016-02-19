@@ -16,15 +16,15 @@ public class ConsoleWindow implements UICanvas {
 
     Color UIColour = new Color(0x90000000);
 
-    private StringBuffer commandInputPool = new StringBuffer();
-    private String prevCommand = "";
+    private StringBuffer commandInputPool;
+    private String prevCommand;
 
-    private int inputCursorPos = 0;
+    private int inputCursorPos;
 
     private final int MESSAGES_MAX = 5000;
-    private String[] messages = new String[MESSAGES_MAX];
-    private int messageDisplayPos = 0;
-    private int messagesCount = 0;
+    private String[] messages;
+    private int messageDisplayPos;
+    private int messagesCount;
 
     private final int LINE_HEIGHT = 20;
     private final int MESSAGES_DISPLAY_COUNT = 9;
@@ -34,11 +34,7 @@ public class ConsoleWindow implements UICanvas {
 
     public ConsoleWindow() {
         super();
-
-        width = Terrarum.WIDTH;
-        height = 200;
-
-        sendMessage(Lang.get("DEV_MESSAGE_CONSOLE_CODEX"));
+        reset();
     }
 
     @Override
@@ -180,6 +176,20 @@ public class ConsoleWindow implements UICanvas {
             messageDisplayPos = newVal;
         }
 
+    }
+
+    public void reset() {
+        width = Terrarum.WIDTH;
+        height = 200;
+
+        messages = new String[MESSAGES_MAX];
+        messageDisplayPos = 0;
+        messagesCount = 0;
+        inputCursorPos = 0;
+        prevCommand = "";
+        commandInputPool = new StringBuffer();
+
+        if (Terrarum.game.auth.C()) sendMessage(Lang.get("DEV_MESSAGE_CONSOLE_CODEX"));
     }
 
     @Override

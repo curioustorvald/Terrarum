@@ -42,9 +42,21 @@ public class GameFontWhite extends GameFontBase {
                 "./res/graphics/fonts/cjkpunct.png"
                 , W_CJK, H_KANA
         );
+        uniHan = new SpriteSheet(
+                "./res/graphics/fonts/unifont_unihan.png"
+                , W_UNIHAN, H_UNIHAN
+        );
+        cyrilic = new SpriteSheet(
+                "./res/graphics/fonts/cyrilic_majuscule.png"
+                , W_LATIN_WIDE, H
+        );
+        cyrilicEF = new SpriteSheet(
+                "./res/graphics/fonts/cyrilic_ef.png"
+                , W_LATIN_NARROW, H
+        );
 
         SpriteSheet[] shk = {
-                asciiSheet
+                  asciiSheet
                 , asciiSheetEF
                 , hangulSheet
                 , runicSheet
@@ -52,6 +64,9 @@ public class GameFontWhite extends GameFontBase {
                 , extASheetEF
                 , kanaSheet
                 , cjkPunct
+                , uniHan
+                , cyrilic
+                , cyrilicEF
         };
         sheetKey = shk;
     }

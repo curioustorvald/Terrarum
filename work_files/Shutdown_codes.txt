@@ -1,0 +1,11 @@
+
+== Shutdown codes
+
+bit   0  0  0  0  0  0  0  0
+index 8  7  6  5  4  3  2  1
+
+all zero: nominal
+
+1: exit by console command 'qqq'
+
+8: erratic, reserved by Java

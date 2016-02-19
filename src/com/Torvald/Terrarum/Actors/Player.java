@@ -3,6 +3,9 @@ package com.Torvald.Terrarum.Actors;
 import com.Torvald.Terrarum.Actors.Faction.Faction;
 import com.Torvald.Terrarum.GameControl.EnumKeyFunc;
 import com.Torvald.Terrarum.GameControl.KeyMap;
+import com.Torvald.Terrarum.MapDrawer.LightmapRenderer;
+import com.Torvald.Terrarum.MapDrawer.MapCamera;
+import com.Torvald.Terrarum.MapDrawer.MapDrawer;
 import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.spriteAnimation.SpriteAnimation;
 import com.jme3.math.FastMath;
@@ -18,7 +21,7 @@ import java.util.HashSet;
 /**
  * Created by minjaesong on 15-12-31.
  */
-public class Player extends ActorWithBody implements Controllable, Pocketed, Factionable {
+public class Player extends ActorWithBody implements Controllable, Pocketed, Factionable, Luminous {
 
     @Nullable public Controllable vehicleRiding;
 
@@ -50,6 +53,10 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
     private final float AXIS_POSMAX = 1.0f;
     private final int GAMEPAD_JUMP = 5;
 
+    private final int TSIZE = MapDrawer.TILE_SIZE;
+
+    private int LUMINANCE_RGB = 0xFFFFFF;
+
     private HashSet<Faction> factionSet = new HashSet<>();
 
     /**
@@ -78,6 +85,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
         updateMovementControl();
 
         if (noClip) { super.setGrounded(true); }
+
+
     }
 
     private void updatePhysicalInfos() {
@@ -535,5 +544,15 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
     @Override
     public void clearFactionAssigning() {
         factionSet.clear();
+    }
+
+    @Override
+    public void setLuminance(int RGB) {
+        LUMINANCE_RGB = RGB;
+    }
+
+    @Override
+    public int getLuminance() {
+        return LUMINANCE_RGB;
     }
 }
