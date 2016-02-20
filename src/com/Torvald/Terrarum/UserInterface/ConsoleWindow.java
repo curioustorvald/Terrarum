@@ -189,7 +189,7 @@ public class ConsoleWindow implements UICanvas {
         prevCommand = "";
         commandInputPool = new StringBuffer();
 
-        if (Terrarum.game.auth.C()) sendMessage(Lang.get("DEV_MESSAGE_CONSOLE_CODEX"));
+        if (Terrarum.game.auth.b()) sendMessage(Lang.get("DEV_MESSAGE_CONSOLE_CODEX"));
     }
 
     @Override

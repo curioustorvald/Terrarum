@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.Torvald.ImageFont.GameFontBase;
 import com.Torvald.ImageFont.GameFontWhite;
 import com.Torvald.Terrarum.ConsoleCommand.Authenticator;
 import com.Torvald.Terrarum.LangPack.Lang;
@@ -42,7 +43,7 @@ public class Terrarum extends StateBasedGame {
     public static String defaultDir;
     public static String defaultSaveDir;
 
-    public static String gameLocale = "ko";
+    public static String gameLocale = "jp";
 
     public static Font gameFontWhite;
 

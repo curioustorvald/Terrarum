@@ -55,7 +55,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     private final int TSIZE = MapDrawer.TILE_SIZE;
 
-    private int LUMINANCE_RGB = 0xFFFFFF;
+    private char LUMINANCE_RGB = 63999;
 
     private HashSet<Faction> factionSet = new HashSet<>();
 
@@ -174,7 +174,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
      *  |
      * 0+------············  t
      *
-     * which is unrealistic, so this method tries to introduce some realism by:
+     * which is unrealistic, so this method tries to introduce some realism by doing:
      *
      *  a
      *  |           ------------
@@ -547,12 +547,12 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
     }
 
     @Override
-    public void setLuminance(int RGB) {
+    public void setLuminance(char RGB) {
         LUMINANCE_RGB = RGB;
     }
 
     @Override
-    public int getLuminance() {
+    public char getLuminance() {
         return LUMINANCE_RGB;
     }
 }

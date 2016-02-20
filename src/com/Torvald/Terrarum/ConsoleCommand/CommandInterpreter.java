@@ -28,7 +28,7 @@ public class CommandInterpreter {
                     new Zoom().execute(single_command.toStringArray());
                 }
                 else {
-                    if (Terrarum.game.auth.C()) {
+                    if (Terrarum.game.auth.b()) {
                         ConsoleCommand commandObj = CommandDict.getCommand(
                                 single_command.getName().toLowerCase());
                         commandObj.execute(single_command.toStringArray());

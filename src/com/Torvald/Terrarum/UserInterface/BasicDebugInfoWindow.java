@@ -83,7 +83,14 @@ public class BasicDebugInfoWindow implements UICanvas {
 
         String lightVal;
         try {
-            lightVal = Integer.toHexString(LightmapRenderer.getValueFromMap(mouseTileX, mouseTileY)).toUpperCase();
+            char valRaw = LightmapRenderer.getValueFromMap(mouseTileX, mouseTileY);
+            int rawR = LightmapRenderer.getRawR(valRaw);
+            int rawG = LightmapRenderer.getRawG(valRaw);
+            int rawB = LightmapRenderer.getRawB(valRaw);
+            lightVal = String.valueOf((int)valRaw) + " ("
+                    + String.valueOf(rawR) + " "
+                    + String.valueOf(rawG) + " "
+                    + String.valueOf(rawB) + ")";
         }
         catch (ArrayIndexOutOfBoundsException e) {
             lightVal = "out of bounds";

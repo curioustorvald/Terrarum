@@ -31,8 +31,6 @@ public class GameMap {
     public int spawnX;
     public int spawnY;
 
-    private LinkedList<MapPoint> houseDesignation;
-
     public static final int WALL = 0;
     public static final int TERRAIN = 1;
     public static final int WIRE = 2;
@@ -40,7 +38,7 @@ public class GameMap {
     //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
     //physics
     private float gravitation;
-    private int globalLight;
+    private char globalLight;
     private WorldTime worldTime;
 
     /**
@@ -59,7 +57,7 @@ public class GameMap {
         layerWire = new MapLayer(width, height);
         terrainDamageCode = new PairedMapLayer(width, height);
 
-        globalLight = 0xFFFFFF;
+        globalLight = (char) 63999;
         worldTime = new WorldTime();
     }
 
@@ -140,6 +138,18 @@ public class GameMap {
         return terrainDamageCode.getData(x, y);
     }
 
+    public void setTileWall(int x, int y, byte tile) {
+        layerWall.data[y][x] = tile;
+    }
+
+    public void setTileTerrain(int x, int y, byte tile) {
+        layerTerrain.data[y][x] = tile;
+    }
+
+    public void setTileWire(int x, int y, byte tile) {
+        layerWire.data[y][x] = tile;
+    }
+
     public int getTileFrom(int mode, int x, int y) {
         if (mode == TERRAIN) { return getTileFromTerrain(x, y); }
         else if (mode == WALL) { return getTileFromWall(x, y); }
@@ -161,11 +171,11 @@ public class GameMap {
         return gravitation;
     }
 
-    public int getGlobalLight() {
+    public char getGlobalLight() {
         return globalLight;
     }
 
-    public void setGlobalLight(int globalLight) {
+    public void setGlobalLight(char globalLight) {
         this.globalLight = globalLight;
     }
 

@@ -5,7 +5,7 @@ package com.Torvald.Terrarum.Actors;
  */
 public interface Luminous {
 
-    void setLuminance(int RGB);
-    int getLuminance();
+    void setLuminance(char RGB);
+    char getLuminance();
 
 }

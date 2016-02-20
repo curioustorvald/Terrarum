@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum.MapDrawer;
 
+import com.Torvald.ColourUtil.Col40;
 import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.Terrarum.TileProperties.TilePropCodex;
 import com.jme3.math.FastMath;
@@ -17,7 +18,7 @@ public class LightmapRenderer {
     /**
      * 8-Bit RGB values
      */
-    private static volatile int[][] staticLightMap;
+    private static volatile char[][] staticLightMap;
     private static boolean lightMapInitialised = false;
 
     /**
@@ -26,6 +27,7 @@ public class LightmapRenderer {
     private static ArrayList<LightmapLantern> lanterns = new ArrayList<>();
 
     private static final int AIR = 0;
+    private static final int SUNSTONE = 41; // TODO add sunstone: emits same light as Map.GL. Goes dark at night
 
 
     private static final int OFFSET_R = 2;
@@ -34,18 +36,18 @@ public class LightmapRenderer {
 
     private static final int TSIZE = MapDrawer.TILE_SIZE;
 
-    /**
-     * Stores current light map as image.
-     * WILL BE PURGED in every single round of light calculation.
-     */
-    //private static Graphics lightMapGraphicsInstance;
-
+    // color model related vars
+    public static final int MUL = Col40.MUL;
+    public static final int MUL_2 = Col40.MUL_2;
+    public static final int CHANNEL_MAX = Col40.MAX_STEP;
+    public static final float CHANNEL_MAX_FLOAT = (float) CHANNEL_MAX;
+    public static final int COLOUR_DOMAIN_SIZE = Col40.COLOUR_DOMAIN_SIZE;
 
     public LightmapRenderer() {
 
     }
 
-    public static void addLantern(int x, int y, int intensity) {
+    public static void addLantern(int x, int y, char intensity) {
         LightmapLantern thisLantern = new LightmapLantern(x, y, intensity);
 
         for (int i = lanterns.size() - 1; i >= 0; i--) {
@@ -53,7 +55,7 @@ public class LightmapRenderer {
             // found duplicates
             if (lanternInList.getX() == x && lanternInList.getY() == y) {
                 // add colour
-                int addedL = addRaw(intensity, lanternInList.getIntensity());
+                char addedL = addRaw(intensity, lanternInList.getIntensity());
                 lanternInList.intensity = addedL;
                 return;
             }
@@ -73,7 +75,7 @@ public class LightmapRenderer {
 
     public static void renderLightMap() {
         if (staticLightMap == null) {
-            staticLightMap = new int[Terrarum.game.map.height][Terrarum.game.map.width];
+            staticLightMap = new char[Terrarum.game.map.height][Terrarum.game.map.width];
 
             if (lightMapInitialised) {
                 throw new RuntimeException("Attempting to re-initialise 'staticLightMap'");
@@ -145,7 +147,7 @@ public class LightmapRenderer {
             for (int x = for_x_start; x < for_x_end; x++) {
                 // smooth
                 if (Terrarum.game.screenZoom >= 1 && ((boolean) Terrarum.game.gameConfig.get("smoothlighting"))) {
-                    int thisLightLevel = staticLightMap[y][x];
+                    char thisLightLevel = staticLightMap[y][x];
                     if (y > 0 && x < for_x_end && thisLightLevel == 0 && staticLightMap[y - 1][x] == 0) {
                         // coalesce zero intensity blocks to one
                         int zeroLevelCounter = 1;
@@ -175,23 +177,25 @@ public class LightmapRenderer {
                          *   +-+-+
                          *     d
                          */
-                        int a = (y == 0) ? thisLightLevel
+                        char a = (y == 0) ? thisLightLevel
                                          : (y == Terrarum.game.map.height - 1) ? thisLightLevel
-                                                                      : Math.max(staticLightMap[y][x]
+                                                                      : max(staticLightMap[y][x]
                                                                               , staticLightMap[y - 1][x]);
-                        int d = (y == 0) ? thisLightLevel
+                        char d = (y == 0) ? thisLightLevel
                                          : (y == Terrarum.game.map.height - 1) ? thisLightLevel
-                                                                      : Math.max(staticLightMap[y][x]
+                                                                      : max(staticLightMap[y][x]
                                                                               , staticLightMap[y + 1][x]);
-                        int b = (x == 0) ? thisLightLevel
+                        char b = (x == 0) ? thisLightLevel
                                          : (x == Terrarum.game.map.width - 1) ? thisLightLevel
-                                                                     : Math.max(staticLightMap[y][x]
+                                                                     : max(staticLightMap[y][x]
                                                                              , staticLightMap[y][x - 1]);
-                        int c = (x == 0) ? thisLightLevel
+                        char c = (x == 0) ? thisLightLevel
                                          : (x == Terrarum.game.map.width - 1) ? thisLightLevel
-                                                                     : Math.max(staticLightMap[y][x]
+                                                                     : max(staticLightMap[y][x]
                                                                              , staticLightMap[y][x + 1]);
-                        int[] colourMapItoL = new int[4];
+                        char t = staticLightMap[y][x];
+
+                        char[] colourMapItoL = new char[4];
                         colourMapItoL[0] = colourLinearMix(a, b);
                         colourMapItoL[1] = colourLinearMix(a, c);
                         colourMapItoL[2] = colourLinearMix(b, d);
@@ -199,7 +203,7 @@ public class LightmapRenderer {
 
                         for (int iy = 0; iy < 2; iy++) {
                             for (int ix = 0; ix < 2; ix++) {
-                                g.setColor(new Color(colourMapItoL[iy * 2 + ix]));
+                                g.setColor(toTargetColour(colourMapItoL[iy * 2 + ix]));
 
                                 g.fillRect(
                                         Math.round(x * TSIZE * Terrarum.game.screenZoom) + (ix * TSIZE / 2 * Terrarum.game.screenZoom)
@@ -223,7 +227,7 @@ public class LightmapRenderer {
                         if (x + sameLevelCounter >= for_x_end) break;
                     }
 
-                    g.setColor(new Color(staticLightMap[y][x]));
+                    g.setColor(toTargetColour(staticLightMap[y][x]));
                     g.fillRect(
                             Math.round(x * TSIZE * Terrarum.game.screenZoom)
                             , Math.round(y * TSIZE * Terrarum.game.screenZoom)
@@ -237,13 +241,17 @@ public class LightmapRenderer {
         }
     }
 
-    private static int calculate(int x, int y){
+    private static Color toTargetColour(char raw) {
+        return new Col40().createSlickColor(raw);
+    }
+
+    private static char calculate(int x, int y){
         if (!outOfBounds(x, y)){
 
             float lightColorR = 1f;
             float lightColorG = 1f;
             float lightColorB = 1f;
-            int lightColorInt;
+            char lightColorInt;
 
             int thisTerrain = Terrarum.game.map.getTileFromTerrain(x, y);
             int thisWall = Terrarum.game.map.getTileFromWall(x, y);
@@ -255,7 +263,7 @@ public class LightmapRenderer {
             else {
                 // mix light emitter
                 if (TilePropCodex.getProp(thisTerrain).getLuminosity() != 0) {
-                    int lum = TilePropCodex.getProp(thisTerrain).getLuminosity();
+                    char lum = TilePropCodex.getProp(thisTerrain).getLuminosity();
                     lightColorR = getR(lum);
                     lightColorG = getG(lum);
                     lightColorB = getB(lum);
@@ -264,7 +272,7 @@ public class LightmapRenderer {
                 // mix lantern
                 for (LightmapLantern lantern : lanterns) {
                     if (lantern.getX() == x && lantern.getY() == y) {
-                        int lum = lantern.getIntensity();
+                        char lum = lantern.getIntensity();
                         lightColorR = getR(lum);
                         lightColorG = getG(lum);
                         lightColorB = getB(lum);
@@ -277,7 +285,7 @@ public class LightmapRenderer {
                 int tileX = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedX() / TSIZE);
                 int tileY = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedY() / TSIZE)
                         - 1;
-                int lum = Terrarum.game.getPlayer().getLuminance();
+                char lum = Terrarum.game.getPlayer().getLuminance();
                 if (x == tileX && y == tileY) {
                     lightColorR = getR(lum);
                     lightColorG = getG(lum);
@@ -286,49 +294,56 @@ public class LightmapRenderer {
 
                 float[] bgrVal = new float[3]; // {B, G, R}
 
-                // test for each R, G, B channel
+                // test for each B, G, R channel
                 for (int i = 0; i < 3; i++) {
                     int brightest = 0;
 
                     //get brightest of nearby 4 tiles
-                    int nearby = 0;
+                    int nearby = 0b0;
                     findNearbyBrightest:
                     for (int yoff = -1; yoff <= 1; yoff++) {
                         for (int xoff = -1; xoff <= 1; xoff++) {
                             /**
                              * filter for 'v's as:
                              * +-+-+-+
-                             * | |v| |
+                             * |a|v|a|
                              * +-+-+-+
                              * |v| |v|
                              * +-+-+-+
-                             * | |v| |
+                             * |a|v|a|
                              * +-+-+-+
                              */
-                            if (xoff != yoff && -xoff != yoff) {
-                                if (!outOfMapBounds(x + xoff, y + yoff)) {
-                                    nearby = getRaw(staticLightMap[y + yoff][x + xoff], i);
-                                }
-
-                                if (nearby > brightest) {
-                                    brightest = nearby;
-                                }
-
-                                if (brightest == 0xFF) break findNearbyBrightest;
+                            if (xoff != yoff && -xoff != yoff) { // 'v' tiles
+                              if (!outOfMapBounds(x + xoff, y + yoff)) {
+                                  nearby = getRaw(staticLightMap[y + yoff][x + xoff], i);
+                              }
                             }
+                            else if (xoff != 0 && yoff != 0) { // 'a' tiles
+                                if (!outOfMapBounds(x + xoff, y + yoff)) {
+                                    nearby = darken((char) getRaw(staticLightMap[y + yoff][x + xoff], i)
+                                    , 0x3); //mix some to have more 'spreading'
+                                    // so that light spreads in a shape of an octagon instead of a diamond
+                                }
+                            }
+
+                            if (nearby > brightest) {
+                                brightest = nearby;
+                            }
+
+                            if (brightest == CHANNEL_MAX) break findNearbyBrightest;
                         }
                     }
 
                     //return: brightest - opacity
                     bgrVal[i] = darkenFloat(
-                            brightest
+                            (char) (brightest)
                             , TilePropCodex.getProp(thisTerrain).getOpacity()
                     );
                 }
 
                 // construct lightColor from bgrVal
                 lightColorInt = constructRGBFromFloat(
-                        bgrVal[OFFSET_R] * lightColorR
+                          bgrVal[OFFSET_R] * lightColorR
                         , bgrVal[OFFSET_G] * lightColorG
                         , bgrVal[OFFSET_B] * lightColorB
                 );
@@ -344,36 +359,41 @@ public class LightmapRenderer {
 
     /**
      *
-     * @param data Raw channel value [0-255]
-     * @param darken [0-255]
-     * @return darkened data [0-1]
+     * @param data Raw channel value [0-39] per channel
+     * @param darken [0-39] per channel
+     * @return darkened data [0-9] per channel (darken-int divided by 39)
      */
-    private static float darkenFloat(int data, int darken) {
-        return (darken(data, darken) / 255f);
+    private static float darkenFloat(char data, int darken) {
+        return (darken(data, darken) / CHANNEL_MAX_FLOAT);
     }
 
     /**
      *
-     * @param data Raw channel value [0-255]
-     * @param darken [0-255]
-     * @return darkened data [0-255]
+     * @param data Raw channel value [0-39] per channel
+     * @param darken [0-39] per channel
+     * @return darkened data [0-39] per channel
      */
-    private static int darken(int data, int darken) {
-        if (darken < 0 || darken > 0xFF) { throw new IllegalArgumentException("darken: out of range"); }
+    private static char darken(char data, int darken) {
+        if (darken < 0 || darken > CHANNEL_MAX) { throw new IllegalArgumentException("darken: out of " +
+                "range"); }
 
-        return clampZero(data - darken);
+        int r = clampZero(getRawR(data) - darken);
+        int g = clampZero(getRawG(data) - darken);
+        int b = clampZero(getRawB(data) - darken);
+
+        return constructRGBFromInt(r, g, b);
     }
 
-    private static int getRawR(int RGB) {
-        return (RGB >> 16) & 0xFF;
+    public static int getRawR(char RGB) {
+        return RGB / MUL_2;
     }
 
-    private static int getRawG(int RGB) {
-        return (RGB >> 8) & 0xFF;
+    public static int getRawG(char RGB) {
+        return (RGB % MUL_2) / MUL;
     }
 
-    private static int getRawB(int RGB) {
-        return RGB & 0xFF;
+    public static int getRawB(char RGB) {
+        return RGB % MUL;
     }
 
     /**
@@ -382,24 +402,26 @@ public class LightmapRenderer {
      * @param offset 2 = R, 1 = G, 0 = B
      * @return
      */
-    private static int getRaw(int RGB, int offset) {
-        if (offset < 0 || offset > 2) throw new IllegalArgumentException("Offset out of range");
-        return (RGB >> (8 * offset)) & 0xFF;
+    public static int getRaw(char RGB, int offset) {
+        if (offset == OFFSET_R) return getRawR(RGB);
+        if (offset == OFFSET_G) return getRawG(RGB);
+        if (offset == OFFSET_B) return getRawB(RGB);
+        else throw new IllegalArgumentException("Channel offset out of range");
     }
 
-    private static float getR(int rgb) {
-        return getRawR(rgb) / 255f;
+    private static float getR(char rgb) {
+        return getRawR(rgb) / CHANNEL_MAX_FLOAT;
     }
 
-    private static float getG(int rgb) {
-        return getRawG(rgb) / 255f;
+    private static float getG(char rgb) {
+        return getRawG(rgb) / CHANNEL_MAX_FLOAT;
     }
 
-    private static float getB(int rgb) {
-        return getRawB(rgb) / 255f;
+    private static float getB(char rgb) {
+        return getRawB(rgb) / CHANNEL_MAX_FLOAT;
     }
 
-    private static int addRaw(int rgb1, int rgb2) {
+    private static char addRaw(char rgb1, char rgb2) {
         int newR = clampByte(getRawR(rgb1) + getRawB(rgb2));
         int newG = clampByte(getRawG(rgb1) + getRawG(rgb2));
         int newB = clampByte(getRawB(rgb1) + getRawB(rgb2));
@@ -407,48 +429,29 @@ public class LightmapRenderer {
         return constructRGBFromInt(newR, newG, newB);
     }
 
-    private static int constructRGBFromInt(int r, int g, int b) {
-        if (r < 0 || r > 0xFF) { throw new IllegalArgumentException("Red: out of range"); }
-        if (g < 0 || g > 0xFF) { throw new IllegalArgumentException("Green: out of range"); }
-        if (b < 0 || b > 0xFF) { throw new IllegalArgumentException("Blue: out of range"); }
-        return (r << 16) | (g << 8) | b;
+    public static char constructRGBFromInt(int r, int g, int b) {
+        if (r < 0 || r > CHANNEL_MAX) { throw new IllegalArgumentException("Red: out of range"); }
+        if (g < 0 || g > CHANNEL_MAX) { throw new IllegalArgumentException("Green: out of range"); }
+        if (b < 0 || b > CHANNEL_MAX) { throw new IllegalArgumentException("Blue: out of range"); }
+        return (char) (r * MUL_2 + g * MUL + b);
     }
 
-    private static int constructRGBFromFloat(float r, float g, float b) {
+    private static char constructRGBFromFloat(float r, float g, float b) {
         if (r < 0 || r > 1.0f) { throw new IllegalArgumentException("Red: out of range"); }
         if (g < 0 || g > 1.0f) { throw new IllegalArgumentException("Green: out of range"); }
         if (b < 0 || b > 1.0f) { throw new IllegalArgumentException("Blue: out of range"); }
 
-        int intR = Math.round(r * 0xFF);
-        int intG = Math.round(g * 0xFF);
-        int intB = Math.round(b * 0xFF);
+        int intR = Math.round(r * CHANNEL_MAX);
+        int intG = Math.round(g * CHANNEL_MAX);
+        int intB = Math.round(b * CHANNEL_MAX);
 
         return constructRGBFromInt(intR, intG, intB);
     }
 
-    private static int colourLinearMix(int colA, int colB) {
+    private static char colourLinearMix(char colA, char colB) {
         int r = (getRawR(colA) + getRawR(colB)) >> 1;
         int g = (getRawG(colA) + getRawG(colB)) >> 1;
         int b = (getRawB(colA) + getRawB(colB)) >> 1;
-        return constructRGBFromInt(r, g, b);
-    }
-
-    /**
-     *
-     * @param thisTile
-     * @param side1
-     * @param side2
-     * @param corner
-     * @return
-     */
-    private static int colourQuadraticMix(int thisTile, int side1, int side2, int corner) {
-        int rSide = max(getRawR(side1), getRawR(side2), getRawR(corner) / 2);
-        int r = arithmeticAverage(rSide, getRawR(thisTile));
-        int gSide = max(getRawG(side1), getRawG(side2), getRawG(corner) / 2);
-        int g = arithmeticAverage(gSide, getRawG(thisTile));
-        int bSide = max(getRawG(side1), getRawG(side2), getRawG(corner) / 2);
-        int b = arithmeticAverage(bSide, getRawG(thisTile));
-
         return constructRGBFromInt(r, g, b);
     }
 
@@ -467,12 +470,12 @@ public class LightmapRenderer {
         return (x << 4);
     }
 
-    private static int max(int... i) {
+    private static char max(char... i) {
         Arrays.sort(i);
         return i[i.length - 1];
     }
 
-    private static int min(int... i) {
+    private static char min(char... i) {
         Arrays.sort(i);
         return i[0];
     }
@@ -494,14 +497,14 @@ public class LightmapRenderer {
     }
 
     private static int clampByte(int i) {
-        return (i < 0) ? 0 : (i > 0xFF) ? 0xFF : i;
+        return (i < 0) ? 0 : (i > CHANNEL_MAX) ? CHANNEL_MAX : i;
     }
 
-    public static int[][] getStaticLightMap() {
+    public static char[][] getStaticLightMap() {
         return staticLightMap;
     }
 
-    public static int getValueFromMap(int x, int y) {
+    public static char getValueFromMap(int x, int y) {
         return staticLightMap[y][x];
     }
 
@@ -550,9 +553,9 @@ public class LightmapRenderer {
 
 class LightmapLantern {
     int x, y;
-    int intensity;
+    char intensity;
 
-    public LightmapLantern(int x, int y, int intensity) {
+    public LightmapLantern(int x, int y, char intensity) {
         this.x = x;
         this.y = y;
         this.intensity = intensity;
@@ -566,7 +569,7 @@ class LightmapLantern {
         return y;
     }
 
-    public int getIntensity() {
+    public char getIntensity() {
         return intensity;
     }
 }

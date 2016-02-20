@@ -49,14 +49,18 @@ public class TilePropCodex {
         return tileProps[index];
     }
 
-    private void setProp(TileProp prop, CSVRecord record) {
+    public static byte getTileID(String name) {
+        return 0;
+    }
+
+    private static void setProp(TileProp prop, CSVRecord record) {
         prop.setName(record.get("name"));
 
         prop.setId(intVal(record, "id"));
 
         prop.setOpacity(intVal(record, "opacity"));
         prop.setStrength(intVal(record, "strength"));
-        prop.setLuminosity(intVal(record, "lumcolor"));
+        prop.setLuminosity((char) intVal(record, "lumcolor"));
         prop.setDrop(intVal(record, "drop"));
         prop.setFriction(intVal(record, "friction"));
 
@@ -71,11 +75,11 @@ public class TilePropCodex {
         System.out.println("\t" + prop.getName());
     }
 
-    private int intVal(CSVRecord rec, String s) {
+    private static int intVal(CSVRecord rec, String s) {
         return Integer.decode(rec.get(s));
     }
 
-    private boolean boolVal(CSVRecord rec, String s) {
+    private static boolean boolVal(CSVRecord rec, String s) {
         return !(intVal(rec, s) == 0);
     }
 }

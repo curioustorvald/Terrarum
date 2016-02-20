@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
+import com.Torvald.Terrarum.MapDrawer.LightmapRenderer;
 import com.Torvald.Terrarum.Terrarum;
 
 /**
@@ -13,13 +14,32 @@ public class SetGlobalLightLevel implements ConsoleCommand {
                 int r = new Integer(args[1]);
                 int g = new Integer(args[2]);
                 int b = new Integer(args[3]);
-                int GL = (r << 16) | (g << 8) | b;
+                char GL = LightmapRenderer.constructRGBFromInt(r, g, b);
 
                 Terrarum.game.map.setGlobalLight(GL);
             }
             catch (NumberFormatException e) {
                 new Echo().execute("Wrong number input.");
             }
+            catch (IllegalArgumentException e1) {
+                new Echo().execute("Range: 0-" + LightmapRenderer.CHANNEL_MAX + " per channel");
+            }
+        }
+        else if (args.length == 2) {
+            try {
+                char GL = (char) (new Integer(args[1]).intValue());
+
+                if (GL < 0 || GL >= LightmapRenderer.COLOUR_DOMAIN_SIZE) {
+                    new Echo().execute("Range: 0-" + (LightmapRenderer.COLOUR_DOMAIN_SIZE - 1));
+                }
+                else {
+                    Terrarum.game.map.setGlobalLight(GL);
+                }
+            }
+            catch (NumberFormatException e) {
+                new Echo().execute("Wrong number input.");
+            }
+
         }
         else{
             printUsage();
@@ -28,6 +48,6 @@ public class SetGlobalLightLevel implements ConsoleCommand {
 
     @Override
     public void printUsage() {
-        new Echo().execute("Usage: setgl r g b");
+        new Echo().execute("Usage: setgl [raw_value|r g b]");
     }
 }

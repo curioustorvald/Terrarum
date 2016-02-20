@@ -1,7 +1,9 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
+import com.Torvald.ImageFont.GameFontBase;
 import com.Torvald.Terrarum.LangPack.Lang;
 import com.Torvald.Terrarum.Terrarum;
+import org.newdawn.slick.SlickException;
 
 import java.io.IOException;
 
@@ -17,6 +19,12 @@ public class SetLocale implements ConsoleCommand {
             try {
                 new Lang();
                 new Echo().execute("Set locale to '" + Terrarum.gameLocale + "'.");
+
+                if ((!prevLocale.contains("cn") && Terrarum.gameLocale.contains("cn"))
+                        || (prevLocale.contains("cn") && !Terrarum.gameLocale.contains("cn"))) {
+                    try { ((GameFontBase) Terrarum.gameFontWhite).reloadUnihan(); }
+                    catch (SlickException e) { e.printStackTrace(); }
+                }
             }
             catch (IOException e) {
                 new Echo().execute("Locale '"

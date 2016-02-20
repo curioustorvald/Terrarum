@@ -25,7 +25,7 @@
           <option name="FOR_STATEMENT_WRAP" value="5" />
           <option name="ARRAY_INITIALIZER_WRAP" value="5" />
           <option name="ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE" value="true" />
-          <option name="WRAP_ON_TYPING" value="1" />
+          <option name="WRAP_ON_TYPING" value="0" />
         </codeStyleSettings>
       </value>
     </option>

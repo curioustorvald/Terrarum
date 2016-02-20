@@ -26,7 +26,6 @@ public class GameFontBase implements Font {
 
     static final int W_CJK = 10;
     static final int W_UNIHAN = 16;
-    static final int W_CJK_DRAW = 11;
     static final int W_LATIN_WIDE = 9; // width of regular letters, including m
     static final int W_LATIN_NARROW = 5; // width of letter f, t, i, l
     static final int H = 20;
@@ -80,6 +79,8 @@ public class GameFontBase implements Font {
              'ᚠ','ᚢ','ᚦ','ᚬ','ᚱ','ᚴ','ᚼ','ᚾ','ᛁ','ᛅ','ᛋ','ᛏ','ᛒ','ᛘ','ᛚ','ᛦ'
             ,'ᛂ','᛬','᛫','᛭','ᛮ','ᛯ','ᛰ'
     };
+
+    static int interchar = 0;
 
 
     public GameFontBase() throws SlickException {
@@ -201,24 +202,44 @@ public class GameFontBase implements Font {
 
     @Override
     public int getWidth(String s) {
-        int len = 0;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
+        return getWidthSubstr(s, s.length());
+    }
 
-            switch (getSheetType(c)) {
-                case SHEET_ASCII_EF:
-                    len += W_LATIN_NARROW; break;
-                case SHEET_KANA: case SHEET_CJK_PUNCT:
-                    len += W_CJK_DRAW; break;
-                case SHEET_HANGUL:
-                    len += W_CJK_DRAW;
-                    break;
-                case SHEET_UNIHAN:
-                    len += W_UNIHAN; break;
-                default:
-                    len += W_LATIN_WIDE;
+    private int getWidthSubstr(String s, int endIndex) {
+        int len = 0;
+        for (int i = 0; i < endIndex; i++) {
+            int c = getSheetType(s.charAt(i));
+
+            if (i > 0 && s.charAt(i) > 0x20) { // Kerning
+                int cpre = getSheetType(s.charAt(i - 1));
+                if (
+                        ((cpre == SHEET_UNIHAN || cpre == SHEET_HANGUL)
+                                && !(c == SHEET_UNIHAN || c == SHEET_HANGUL))
+
+                        || ((c == SHEET_UNIHAN || c == SHEET_HANGUL)
+                                && !(cpre == SHEET_UNIHAN || cpre == SHEET_HANGUL))
+                        ) {
+                    // margin after/before hangul/unihan
+                    len += 2;
+                }
+                else if ((c == SHEET_HANGUL || c == SHEET_KANA)
+                        && (cpre == SHEET_HANGUL || cpre == SHEET_KANA)) {
+                    // margin between hangul/kana
+                    len += 1;
+                }
 
             }
+
+            if (c == SHEET_ASCII_EF || c == SHEET_EXTA_EF || c == SHEET_CYRILIC_EF)
+                len += W_LATIN_NARROW;
+            else if (c == SHEET_KANA || c == SHEET_HANGUL || c == SHEET_CJK_PUNCT)
+                len += W_CJK;
+            else if (c == SHEET_UNIHAN)
+                len += W_UNIHAN;
+            else
+                len += W_LATIN_WIDE;
+
+            if (i < endIndex - 1) len += interchar;
         }
         return len;
     }
@@ -247,9 +268,10 @@ public class GameFontBase implements Font {
 
             if (isHangul(ch)) {
                 int[] hanPos = getHan(ch - 0xAC00);
+                int glyphW = getWidth("" + ch);
                 hangulSheet.renderInUse(
                         Math.round(x
-                                + getWidth(s.substring(0, i))
+                                + getWidthSubstr(s, i + 1) - glyphW
                         )
                         , Math.round((H - H_HANGUL) / 2 + y + 1)
                         , hanPos[0]
@@ -265,9 +287,10 @@ public class GameFontBase implements Font {
             char ch = s.charAt(i);
 
             if (isUniHan(ch)) {
+                int glyphW = getWidth("" + ch);
                 uniHan.renderInUse(
                         Math.round(x
-                                + getWidth(s.substring(0, i))
+                                + getWidthSubstr(s, i + 1) - glyphW
                         )
                         , Math.round((H - H_HANGUL) / 2 + y)
                         , uniHanIndexX(ch)
@@ -334,10 +357,11 @@ public class GameFontBase implements Font {
                 }
 
                 try {
+                    int glyphW = getWidth("" + ch);
                     sheetKey[prevInstance].renderInUse(
-                            Math.round(x + getWidth(s.substring(0, i)))
-                                    // pull punct right next to hangul to the left
-                                    + ((i > 0 && isHangul(s.charAt(i - 1))) ? -2 : 0)
+                            Math.round(x + getWidthSubstr(s, i + 1) - glyphW)
+                            // Interchar: pull punct right next to hangul to the left
+                            + ((i > 0 && isHangul(s.charAt(i - 1))) ? -3 : 0)
                             , Math.round(y)
                             - ((prevInstance == SHEET_CJK_PUNCT) ? 1 : 0)
                             , sheetX
@@ -384,4 +408,15 @@ public class GameFontBase implements Font {
 
     }
 
+    public void reloadUnihan() throws SlickException {
+
+    }
+
+    /**
+     * Set margin between characters
+     * @param margin
+     */
+    public void setInterchar(int margin) {
+        interchar = margin;
+    }
 }

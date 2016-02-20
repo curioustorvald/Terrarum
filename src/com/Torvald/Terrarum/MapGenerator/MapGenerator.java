@@ -892,11 +892,11 @@ public class MapGenerator {
                 int thisTile = map.getTileFromTerrain(x, y);
 
                 for (int i = 0; i < 9; i++) {
-                    int nearbyTile = -1;
-                    try { nearbyTile = map.getTileFromTerrain(x + (i / 3) - 1, y + (i % 3) - 1); }
+                    int nearbyWallTile = -1;
+                    try { nearbyWallTile = map.getTileFromWall(x + (i % 3) - 1, y + (i / 3) - 1); }
                     catch (ArrayIndexOutOfBoundsException e) {}
 
-                    if (i != 4 && thisTile == DIRT && nearbyTile == AIR) {
+                    if (i != 4 && thisTile == DIRT && nearbyWallTile == AIR) {
                         map.getTerrainArray()[y][x] = GRASS;
                         break;
                     }

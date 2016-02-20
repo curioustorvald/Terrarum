@@ -147,7 +147,7 @@ HEARTS, CLUBS, DIAMONDS, SPADES: PLAYERS WHO SUIT MUDS
     - (Optional) SFX
 
 * Size
-    - Regular sprite 'height': 40 px
+    - Regular sprite 'height' (hitbox height) : 40 px
         - Apparent height may vary
 
 
@@ -159,7 +159,5 @@ HEARTS, CLUBS, DIAMONDS, SPADES: PLAYERS WHO SUIT MUDS
 * NO gender distinction, but have masculine/neutral/feminine designs (in clothing, hairstyles, etc.)
 
 * Colour: 4096 colours (12-bit 0x000 - 0xFFF)
-
-* Height variation option (.85 - .90 - .95 - 1 - 1.05 - 1.10 - 1.15)
 
 * Base mass: 60 kg

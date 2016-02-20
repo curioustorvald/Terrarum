@@ -1,5 +1,6 @@
 package com.Torvald.ImageFont;
 
+import com.Torvald.Terrarum.Terrarum;
 import org.newdawn.slick.*;
 
 /**
@@ -43,7 +44,10 @@ public class GameFontWhite extends GameFontBase {
                 , W_CJK, H_KANA
         );
         uniHan = new SpriteSheet(
-                "./res/graphics/fonts/unifont_unihan.png"
+                "./res/graphics/fonts/unifont_unihan"
+                        + (((Terrarum.gameLocale.contains("jp") || Terrarum.gameLocale.contains("ko")))
+                        ? "_jp" : "")
+                        +".png"
                 , W_UNIHAN, H_UNIHAN
         );
         cyrilic = new SpriteSheet(
@@ -71,4 +75,14 @@ public class GameFontWhite extends GameFontBase {
         sheetKey = shk;
     }
 
+    @Override
+    public void reloadUnihan() throws SlickException {
+        uniHan = new SpriteSheet(
+                "./res/graphics/fonts/unifont_unihan"
+                        + ((!Terrarum.gameLocale.contains("cn"))
+                           ? "_jp" : "")
+                        +".png"
+                , W_UNIHAN, H_UNIHAN
+        );
+    }
 }

@@ -3,35 +3,18 @@ package com.Torvald.ColourUtil;
 import org.newdawn.slick.Color;
 
 /**
- * Created by minjaesong on 16-02-11.
+ * Created by minjaesong on 16-02-20.
  */
-public class Col216 implements LimitedColours {
+public class Col40 implements LimitedColours {
 
-    private byte data;
-    private static int[] LOOKUP = {0x00, 0x33, 0x66, 0x99, 0xCC, 0xFF};
+    private char data;
+    private static int[] LOOKUP = {0,7,13,20,26,33,39,46,52,59,65,72,78,85,92,98,105,111,118,124
+            ,131,137,144,150,157,163,170,177,183,190,196,203,209,216,222,229,235,242,248,255};
 
-    public static final int MUL = 6;
+    public static final int MUL = 40;
     public static final int MUL_2 = MUL * MUL;
     public static final int MAX_STEP = MUL - 1;
     public static final int COLOUR_DOMAIN_SIZE = MUL_2 * MUL;
-
-    /**
-     *
-     * @param data
-     */
-    public Col216(byte data) {
-        create(data);
-    }
-
-    /**
-     *
-     * @param r 0-5
-     * @param g 0-5
-     * @param b 0-5
-     */
-    public Col216(int r, int g, int b) {
-        create(r, g, b);
-    }
 
     @Override
     public Color createSlickColor(int raw) {
@@ -46,22 +29,22 @@ public class Col216 implements LimitedColours {
     @Override
     public Color createSlickColor(int r, int g, int b) {
         assertRGB(r, g, b);
-        return new Color(LOOKUP[r], LOOKUP[g], LOOKUP[b]);
+        return new Color((LOOKUP[r] << 16) | (LOOKUP[g] << 8) | LOOKUP[b]);
     }
 
     @Override
     public void create(int raw) {
         assertRaw(raw);
-        data = (byte) raw;
+        data = (char) raw;
     }
 
     @Override
     public void create(int r, int g, int b) {
         assertRGB(r, g, b);
-        data = (byte) (MUL_2 * r + MUL * g + b);
+        data = (char) (MUL_2 * r + MUL * g + b);
     }
 
-    public byte getRaw() { return data; }
+    public char getRaw() { return data; }
 
     private void assertRaw(int i) {
         if (i >= COLOUR_DOMAIN_SIZE || i < 0) {

@@ -2,21 +2,25 @@ package com.Torvald.Terrarum.Actors;
 
 import com.Torvald.Terrarum.Actors.Faction.Faction;
 import com.Torvald.Terrarum.GameItem.InventoryItem;
+import com.Torvald.Terrarum.Terrarum;
 import org.newdawn.slick.GameContainer;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
  * Created by minjaesong on 16-01-31.
  */
-public class TestNPC extends ActorWithBody implements AIControlled, Pocketed, CanBeStoredAsItem,
-        Factionable {
+public class NPCIntelligentBase extends ActorWithBody implements AIControlled, Pocketed, CanBeStoredAsItem,
+        Factionable, Landholder {
 
     private InventoryItem itemData;
     // private ActorAI ai;
     private ActorInventory inventory;
 
     private HashSet<Faction> factionSet = new HashSet<>();
+
+    private ArrayList<Integer> houseTiles = new ArrayList<>();
 
     @Override
     public void attachAI() {
@@ -86,6 +90,31 @@ public class TestNPC extends ActorWithBody implements AIControlled, Pocketed, Ca
     @Override
     public float getItemWeight() {
         return super.getMass();
+    }
+
+    @Override
+    public ArrayList<Integer> getHouseDesignation() {
+        return houseTiles;
+    }
+
+    @Override
+    public void setHouseDesignation(ArrayList<Integer> list) {
+        houseTiles = list;
+    }
+
+    @Override
+    public void addHouseTile(int x, int y) {
+        houseTiles.add(Terrarum.game.map.width * y + x);
+    }
+
+    @Override
+    public void removeHouseTile(int x, int y) {
+        houseTiles.remove(new Integer(Terrarum.game.map.width * y + x));
+    }
+
+    @Override
+    public void clearHouseDesignation() {
+        houseTiles.clear();
     }
 
     @Override

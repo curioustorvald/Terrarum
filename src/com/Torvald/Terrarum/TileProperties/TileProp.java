@@ -19,7 +19,7 @@ public class TileProp {
 
     private boolean wallable;
 
-    private int luminosity;
+    private char luminosity;
     private int drop;
 
     private boolean fallable;
@@ -94,7 +94,7 @@ public class TileProp {
      * Raw RGB value, without alpha
      * @return
      */
-    public int getLuminosity() {
+    public char getLuminosity() {
         return luminosity;
     }
 
@@ -102,7 +102,7 @@ public class TileProp {
      *
      * @param luminosity Raw RGB value, without alpha
      */
-    void setLuminosity(int luminosity) {
+    void setLuminosity(char luminosity) {
         this.luminosity = luminosity;
     }
 
