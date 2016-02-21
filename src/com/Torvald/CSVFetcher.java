@@ -14,9 +14,10 @@ import java.util.List;
  */
 public class CSVFetcher {
 
-    private static StringBuffer csvString = new StringBuffer();
+    private static StringBuffer csvString;
 
     public static List<CSVRecord> readCSV(String csvFilePath) throws IOException {
+        csvString = new StringBuffer();
         readCsvFileAsString(csvFilePath);
 
         CSVParser csvParser = CSVParser.parse(csvString.toString()

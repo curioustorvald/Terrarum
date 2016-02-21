@@ -15,22 +15,13 @@ public class SetLocale implements ConsoleCommand {
     public void execute(String[] args) {
         if (args.length == 2) {
             String prevLocale = Terrarum.gameLocale;
-            Terrarum.gameLocale = args[1].toLowerCase();
+            Terrarum.gameLocale = args[1];
             try {
                 new Lang();
                 new Echo().execute("Set locale to '" + Terrarum.gameLocale + "'.");
-
-                if ((!prevLocale.contains("cn") && Terrarum.gameLocale.contains("cn"))
-                        || (prevLocale.contains("cn") && !Terrarum.gameLocale.contains("cn"))) {
-                    try { ((GameFontBase) Terrarum.gameFontWhite).reloadUnihan(); }
-                    catch (SlickException e) { e.printStackTrace(); }
-                }
             }
             catch (IOException e) {
-                new Echo().execute("Locale '"
-                        + args[1].toLowerCase()
-                        + "' does not exist or could not read file."
-                );
+                new Echo().execute("could not read lang file.");
                 Terrarum.gameLocale = prevLocale;
             }
         }

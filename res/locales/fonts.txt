@@ -1,7 +1,0 @@
-en_US=theleagueofmovabletype/Junction.otf
-en_UK=theleagueofmovabletype/Junction.otf
-ko_KR=NanumBarunGothic.otf
-
-en_US.serif=theleagueofmovabletype/OFLGoudyStM.otf
-en_UK.serif=theleagueofmovabletype/OFLGoudyStM.otf
-ko_KR.serif=NanumMyeongjoBold.otf

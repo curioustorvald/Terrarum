@@ -12,9 +12,10 @@ import java.nio.file.Files;
  */
 public class JsonFetcher {
 
-    private static StringBuffer jsonString = new StringBuffer();
+    private static StringBuffer jsonString;
 
     public static JsonObject readJson(String jsonFilePath) throws IOException {
+        jsonString = new StringBuffer();
         readJsonFileAsString(jsonFilePath);
 
         JsonParser jsonParser = new JsonParser();

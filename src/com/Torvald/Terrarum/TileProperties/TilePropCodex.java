@@ -5,6 +5,7 @@ import com.Torvald.Terrarum.GameMap.MapLayer;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -22,6 +23,7 @@ public class TilePropCodex {
         }
 
         try {
+            // todo verify CSV using pre-calculated SHA256 hash
             List<CSVRecord> records = CSVFetcher.readCSV("" +
                     "./src/com/Torvald/Terrarum/TileProperties/propdata" +
                     ".csv");

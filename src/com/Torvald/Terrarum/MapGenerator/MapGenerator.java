@@ -2,6 +2,7 @@ package com.Torvald.Terrarum.MapGenerator;
 
 import com.Torvald.Rand.HQRNG;
 import com.Torvald.Terrarum.GameMap.GameMap;
+import com.Torvald.Terrarum.TileProperties.TileNameCode;
 import com.jme3.math.FastMath;
 import com.sun.istack.internal.NotNull;
 
@@ -44,37 +45,6 @@ public class MapGenerator {
 
     private static final int CAVEGEN_LARGEST_FEATURE = 256;
     private static final int CAVEGEN_LARGEST_FEATURE_PERTURB = 128;
-
-    private static final byte AIR = 0;
-
-    private static final byte STONE = 1;
-    private static final byte DIRT = 2;
-    private static final byte GRASS = 3;
-
-    private static final byte SAND = 13;
-    private static final byte GRAVEL = 14;
-
-    private static final byte COPPER = 15;
-    private static final byte IRON = 16;
-    private static final byte GOLD = 17;
-    private static final byte SILVER = 18;
-    private static final byte ILMENITE = 19;
-    private static final byte AURICHALCUM = 20;
-
-    private static final byte DIAMOND = 25;
-    private static final byte RUBY = 21;
-    private static final byte EMERALD = 22;
-    private static final byte SAPPHIRE = 23;
-    private static final byte TOPAZ = 24;
-    private static final byte AMETHYST = 26;
-
-    private static final byte SNOW = 27;
-    private static final byte ICE_FRAGILE = 28;
-    private static final byte ICE_NATURAL = 29;
-    private static final byte ICE_MAGICAL = 30;
-
-    private static final byte WATER = (byte) 239;
-    private static final byte LAVA = (byte) 255;
 
     @NotNull private static int worldOceanPosition;
     private static final int TYPE_OCEAN_LEFT = 0;
@@ -121,36 +91,36 @@ public class MapGenerator {
 
         carveCave(
                 caveGen(1, 1.2f)
-                , AIR
+                , TileNameCode.AIR
                 , "Carving out cave..."
         );
 
         fillByMapNoFilterUnderground(
                 generate2DSimplexNoiseWorldSize(1f, 1f)
                 , 0.9f
-                , AIR
-                , STONE
+                , TileNameCode.AIR
+                , TileNameCode.STONE
                 , "Collapsing caves..."
         );
 
         /*fillByMapInverseGradFilter(
                 generate2DSimplexNoiseWorldSize(2.5f, 2.5f)
                 , 1.02f
-                , DIRT
-                , STONE
+                , TileNameCode.DIRT
+                , TileNameCode.STONE
                 , "Planting stones on dirt layers..."
         );
         fillByMapInverseGradFilter(
                 generate2DSimplexNoiseWorldSize(2.5f, 2.5f)
                 , 0.98f
-                , STONE
-                , DIRT
+                , TileNameCode.STONE
+                , TileNameCode.DIRT
                 , "Planting dirts..."
         );
         fillByMapInverseGradFilter(
                 generate2DSimplexNoiseWorldSize(2.5f, 2.5f)
                 , 0.92f
-                , STONE
+                , TileNameCode.STONE
                 , GRAVEL
                 , "Planting gravels..."
         );*/
@@ -161,7 +131,7 @@ public class MapGenerator {
         /*fillByMap(
                 generate2DSimplexNoiseWorldSize(5, 5)
                 , 0.78f
-                , STONE
+                , TileNameCode.STONE
                 , DIAMOND
                 , "Planting diamonds..."
         );
@@ -170,7 +140,7 @@ public class MapGenerator {
         fillByMap(
                 generate2DSimplexNoiseWorldSize(5, 5)
                 , 0.8f
-                , STONE
+                , TileNameCode.STONE
                 , berylsArray
                 , "Planting beryls..."
         );
@@ -178,21 +148,21 @@ public class MapGenerator {
         fillByMap(
                 generate2DSimplexNoiseWorldSize(5, 5)
                 , 0.80f
-                , STONE
+                , TileNameCode.STONE
                 , GOLD
                 , "Planting golds..."
         );
         fillByMap(
                 generate2DSimplexNoiseWorldSize(5, 5)
                 , 0.866f
-                , STONE
+                , TileNameCode.STONE
                 , IRON
                 , "Planting irons..."
         );
         fillByMap(
                 generate2DSimplexNoiseWorldSize(5, 5)
                 , 0.88f
-                , STONE
+                , TileNameCode.STONE
                 , COPPER
                 , "Planting coppers..."
         );*/
@@ -539,11 +509,11 @@ public class MapGenerator {
             for (int i = 0; i < height - pillarOffset; i++) {
 
                 if (i < dirtThickness) {
-                    map.getTerrainArray()[i + pillarOffset][x] = DIRT;
-                    map.getWallArray()[i + pillarOffset][x] = DIRT;
+                    map.getTerrainArray()[i + pillarOffset][x] = TileNameCode.DIRT;
+                    map.getWallArray()[i + pillarOffset][x] = TileNameCode.DIRT;
                 } else {
-                    map.getTerrainArray()[i + pillarOffset][x] = STONE;
-                    map.getWallArray()[i + pillarOffset][x] = STONE;
+                    map.getTerrainArray()[i + pillarOffset][x] = TileNameCode.STONE;
+                    map.getWallArray()[i + pillarOffset][x] = TileNameCode.STONE;
                 }
 
             }
@@ -659,7 +629,7 @@ public class MapGenerator {
             for (int j = 0; j < width; j++) {
                 if (map[i][j] > noiseGradientStart * scarcity
                         && MapGenerator.map.getTileFromTerrain(j, i) == replaceFrom
-                        && MapGenerator.map.getTileFromWall(j, i) == STONE) {
+                        && MapGenerator.map.getTileFromWall(j, i) == TileNameCode.STONE) {
                     MapGenerator.map.getTerrainArray()[i][j] = tile;
                 }
             }
@@ -867,7 +837,7 @@ public class MapGenerator {
         for (int i = height * 14 / 15; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (map.getTerrainArray()[i][j] == 0) {
-                    map.getTerrainArray()[i][j] = LAVA;
+                    map.getTerrainArray()[i][j] = TileNameCode.LAVA;
                 }
             }
         }
@@ -896,8 +866,8 @@ public class MapGenerator {
                     try { nearbyWallTile = map.getTileFromWall(x + (i % 3) - 1, y + (i / 3) - 1); }
                     catch (ArrayIndexOutOfBoundsException e) {}
 
-                    if (i != 4 && thisTile == DIRT && nearbyWallTile == AIR) {
-                        map.getTerrainArray()[y][x] = GRASS;
+                    if (i != 4 && thisTile == TileNameCode.DIRT && nearbyWallTile == TileNameCode.AIR) {
+                        map.getTerrainArray()[y][x] = TileNameCode.GRASS;
                         break;
                     }
                 }
@@ -907,7 +877,7 @@ public class MapGenerator {
     }
 
     private static boolean isGrassOrDirt(int x, int y) {
-        return map.getTileFromTerrain(x, y) == GRASS || map.getTileFromTerrain(x, y) == DIRT;
+        return map.getTileFromTerrain(x, y) == TileNameCode.GRASS || map.getTileFromTerrain(x, y) == TileNameCode.DIRT;
     }
 
     private static void replaceIfTerrain(byte ifTile, int x, int y, byte replaceTile) {
@@ -933,7 +903,7 @@ public class MapGenerator {
                             ; y < getTerrainHeightFromHeightMap(ix)
                             ; y++) {
                         map.getTerrainArray()
-                                [y][ix] = WATER;
+                                [y][ix] = TileNameCode.WATER;
                     }
                 }
                 else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
@@ -941,7 +911,7 @@ public class MapGenerator {
                             ; y < getTerrainHeightFromHeightMap(map.width - 1 - ix)
                             ; y++) {
                         map.getTerrainArray()
-                                [y][map.width - 1 - ix] = WATER;
+                                [y][map.width - 1 - ix] = TileNameCode.WATER;
                     }
                 }
             }
@@ -953,20 +923,20 @@ public class MapGenerator {
 
                     map.getTerrainArray()
                             [terrainPoint + iy]
-                            [ix] = SAND;
+                            [ix] = TileNameCode.SAND;
                     map.getTerrainArray()
                             [terrainPoint + iy - 1] // clear grass and make the sheet thicker
-                            [ix] = SAND;
+                            [ix] = TileNameCode.SAND;
                 }
                 else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
                     int terrainPoint = getTerrainHeightFromHeightMap(map.width - 1 - ix);
 
                     map.getTerrainArray()
                             [terrainPoint + iy]
-                            [map.width - 1 - ix] = SAND;
+                            [map.width - 1 - ix] = TileNameCode.SAND;
                     map.getTerrainArray()
                             [terrainPoint + iy - 1] // clear grass and make the sheet thicker
-                            [map.width - 1 - ix] = SAND;
+                            [map.width - 1 - ix] = TileNameCode.SAND;
                 }
             }
         }
@@ -976,18 +946,18 @@ public class MapGenerator {
         for (int y = 0; y < map.height - 1; y++) {
             for (int x = 0; x < getFrozenAreaWidth(y); x++) {
                 if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
-                    replaceIfTerrain(DIRT, x, y, SNOW);
-                    replaceIfTerrain(STONE, x, y, ICE_NATURAL);
+                    replaceIfTerrain(TileNameCode.DIRT, x, y, TileNameCode.SNOW);
+                    replaceIfTerrain(TileNameCode.STONE, x, y, TileNameCode.ICE_NATURAL);
 
-                    replaceIfWall(DIRT, x, y, SNOW);
-                    replaceIfWall(STONE, x, y, ICE_NATURAL);
+                    replaceIfWall(TileNameCode.DIRT, x, y, TileNameCode.SNOW);
+                    replaceIfWall(TileNameCode.STONE, x, y, TileNameCode.ICE_NATURAL);
                 }
                 else {
-                    replaceIfTerrain(DIRT, map.width - 1 - x, y, SNOW);
-                    replaceIfTerrain(STONE, map.width - 1 - x, y, ICE_NATURAL);
+                    replaceIfTerrain(TileNameCode.DIRT, map.width - 1 - x, y, TileNameCode.SNOW);
+                    replaceIfTerrain(TileNameCode.STONE, map.width - 1 - x, y, TileNameCode.ICE_NATURAL);
 
-                    replaceIfWall(DIRT, map.width - 1 - x, y, SNOW);
-                    replaceIfWall(STONE, map.width - 1 - x, y, ICE_NATURAL);
+                    replaceIfWall(TileNameCode.DIRT, map.width - 1 - x, y, TileNameCode.SNOW);
+                    replaceIfWall(TileNameCode.STONE, map.width - 1 - x, y, TileNameCode.ICE_NATURAL);
                 }
             }
         }

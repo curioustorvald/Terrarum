@@ -1,0 +1,15 @@
+"STRING_ID";"IETF language tag(s) without dash";"enUS";"frFR";"esES";"deDE";"itIT";"ptBR";"ptPT";"ruRU";"elGR";"trTR";"daDK";"noNB";"svSE";"nlNL";"plPL";"fiFI";"jaJP";"zhCN";"zhTW";"koKR";"csCZ";"huHU";"roRO";"thTH";"bgBG";"heIL";"jakanaJP"
+
+"TERM_PHYS_MASS";;"mass";"masse";;;;;;;;;;;;;;;"質量";;;"질량";;;;;;;"しつりょう"
+
+"DEV_MEMORY_SHORT_CAP";;"MEM";"MEM";;;;;;;;;;;;;;;"メモリー";;;"메모리";;;;;;;"メモリー"
+"DEV_MEMORY_A_OF_B";;"%1$sM out of %2$sM";"%1$sM sur %2$sM";;;;;;;;;;;;;;;"%2$sM中%1$sM";;;"%2$sM 중 %1$sM";;;;;;;"%2$sM　ちゅう　%1$sM"
+
+"DEV_COLOUR_LEGEND_GREEN";;" GREEN";" VERT";;;;;;;;;;;;;;;"緑";;;"녹";;;;;;;"　みどり"
+"DEV_COLOUR_LEGEND_BLUE";;"  BLUE";" BLEU";;;;;;;;;;;;;;;"青";;;"청";;;;;;;"　　あお"
+"DEV_COLOUR_LEGEND_ORANGE";;"ORANGE";"ORANGE";;;;;;;;;;;;;;;"黄";;;"황";;;;;;;"オレンジ"
+"DEV_COLOUR_LEGEND_RED";;"   RED";" ROUGE";;;;;;;;;;;;;;;"赤";;;"적";;;;;;;"　　あか"
+
+"DEV_MESSAGE_CONSOLE_CODEX";;"Type 'codex' for available commands.";"Tapez « codex » pour commandes disponibles.";;;;;;;;;;;;;;;"使用可能な命令語の目録は「codex」を入力して下さい。";;;"사용 가능한 명령어 목록을 보려면 'codex'를 입력해 주십시오.";;;;;;;"しよう　かのうな　めいれいご　の　もくろく　は　「codex」を　にゅうりょく　して　ください。"
+"DEV_MESSAGE_CONSOLE_AVAILABLE_COMMANDS";;"Available commends:";"Commandes disponibles :";;;;;;;;;;;;;;;"命令語の目録:";;;"명령어 목록:";;;;;;;"めいれいご　の　もくろく:"
+"DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN";;"'%1$s': Unknown command";"« %1$s » : Commande inconnue";;;;;;;;;;;;;;;"「%1$s」:　不明な命令語";;;"'%1$s': 알 수 없는 명령어";;;;;;;"「%1$s」:　ふめいな　めいれいご"

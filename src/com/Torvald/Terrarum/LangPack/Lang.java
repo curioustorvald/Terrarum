@@ -1,10 +1,16 @@
 package com.Torvald.Terrarum.LangPack;
 
+import com.Torvald.CSVFetcher;
+import com.Torvald.ImageFont.GameFontWhite;
 import com.Torvald.Terrarum.Terrarum;
+import org.apache.commons.csv.CSVRecord;
+import org.newdawn.slick.SlickException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -12,11 +18,17 @@ import java.util.Properties;
  */
 public class Lang {
 
-    private static Properties lang;
-    private static Properties langFallback;
-    private static final String FALLBACK_LANG_CODE = "en";
+    private static final String CSV_COLUMN_FIRST = "STRING_ID";
+    /**
+     * Get record by its STRING_ID
+     */
+    private static Hashtable<String, CSVRecord> lang;
+    private static final String FALLBACK_LANG_CODE = "enUS";
 
     private static final int HANGUL_SYL_START = 0xAC00;
+
+    private static final String PATH_TO_CSV = "./res/locales/";
+    private static final String CSV_MAIN = "polyglot.csv";
 
     private static final int[] HANGUL_POST_INDEX_ALPH = { // 0: 는, 가, ...  1: 은, 이, ...
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -37,22 +49,42 @@ public class Lang {
     };
 
     public Lang() throws IOException {
-        lang = new Properties();
-        lang.load(new BufferedReader(new InputStreamReader(new FileInputStream(
-                "res/locales/" + Terrarum.gameLocale + ".lang"), StandardCharsets.UTF_8)));
+        lang = new Hashtable<>();
 
-        langFallback = new Properties();
-        langFallback.load(new BufferedReader(new InputStreamReader(new FileInputStream(
-                "res/locales/" + FALLBACK_LANG_CODE + ".lang"), StandardCharsets.UTF_8)));
+        List<CSVRecord> langPackCSV = CSVFetcher.readCSV(PATH_TO_CSV + CSV_MAIN);
+
+        File file = new File(PATH_TO_CSV);
+        FilenameFilter filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.contains(".csv") && !name.contains(CSV_MAIN);
+            }
+        };
+        for (String csvfilename : file.list(filter)) {
+            List<CSVRecord> csv = CSVFetcher.readCSV(PATH_TO_CSV + csvfilename);
+            csv.forEach(langPackCSV::add);
+        }
+
+        // Fill lang table
+        langPackCSV.forEach(this::appendToLangByStringID);
+
 
         Arrays.sort(ENGLISH_WORD_NORMAL_PLURAL);
+        Arrays.sort(FRENCH_WORD_NORMAL_PLURAL);
+
+        try { ((GameFontWhite)Terrarum.gameFontWhite).reloadUnihan(); }
+        catch (SlickException e) {}
+    }
+
+    private void appendToLangByStringID(CSVRecord record) {
+        lang.put(record.get(CSV_COLUMN_FIRST), record);
     }
 
     public static String get(String key) {
-        return lang.getProperty(key
-                ,langFallback.getProperty(key
-                        , key)
-        );
+        String value = null;
+        try { value = lang.get(key).get(Terrarum.gameLocale); }
+        catch (IllegalArgumentException e) { value = key; }
+        return value;
     }
 
     public static String pluraliseLang(String key, int count) {

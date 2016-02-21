@@ -69,12 +69,7 @@ public class BasicDebugInfoWindow implements UICanvas {
         printLine(g, 4, "veloY : " + String.valueOf(playerDbg.veloY()));
         printLine(g, 5, "grounded : " + String.valueOf(playerDbg.grounded()));
         printLine(g, 6, "noClip : " + String.valueOf(playerDbg.noClip()));
-        printLine(g, 7, Lang.get("DBG_TOTAL_ACCEL_X") + " : " + String.valueOf(
-                (float) playerDbg.actorValue().get("accel")
-                        * (float) playerDbg.actorValue().get("accelmult")
-        )
-        + " (" + String.valueOf(playerDbg.getPlayer().readonly_totalX) + ")");
-        printLine(g, 8
+        printLine(g, 7
                 , Lang.get("TERM_PHYS_MASS")
                         + " : "
                         + String.valueOf(playerDbg.mass())
@@ -95,7 +90,7 @@ public class BasicDebugInfoWindow implements UICanvas {
         catch (ArrayIndexOutOfBoundsException e) {
             lightVal = "out of bounds";
         }
-        printLine(g, 9, "light at cursor : " + lightVal);
+        printLine(g, 8, "light at cursor : " + lightVal);
 
         String tileNo;
         try {
@@ -104,7 +99,7 @@ public class BasicDebugInfoWindow implements UICanvas {
         catch (ArrayIndexOutOfBoundsException e) {
             tileNo = "out of bounds";
         }
-        printLine(g, 10, "tile : " + tileNo);
+        printLine(g, 9, "tile : " + tileNo);
 
         // Memory allocation
         long memInUse = Terrarum.game.memInUse;

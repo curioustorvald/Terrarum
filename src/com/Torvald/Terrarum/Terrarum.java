@@ -43,7 +43,7 @@ public class Terrarum extends StateBasedGame {
     public static String defaultDir;
     public static String defaultSaveDir;
 
-    public static String gameLocale = "jp";
+    public static String gameLocale = "jaJP";
 
     public static Font gameFontWhite;
 
@@ -60,7 +60,6 @@ public class Terrarum extends StateBasedGame {
         createDirs();
         try {
             createFiles();
-            new Lang();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -70,6 +69,9 @@ public class Terrarum extends StateBasedGame {
     @Override
     public void initStatesList(GameContainer gc) throws SlickException {
         gameFontWhite = new GameFontWhite();
+
+        try { new Lang(); }
+        catch (IOException e) { e.printStackTrace(); }
 
         hasController = (gc.getInput().getControllerCount() > 0);
         if (hasController) {

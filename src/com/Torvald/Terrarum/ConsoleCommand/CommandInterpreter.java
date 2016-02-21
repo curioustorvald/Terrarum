@@ -27,6 +27,12 @@ public class CommandInterpreter {
                 else if (single_command.getName().equalsIgnoreCase("zoom")) {
                     new Zoom().execute(single_command.toStringArray());
                 }
+                else if (single_command.getName().equalsIgnoreCase("setlocale")) {
+                    new SetLocale().execute(single_command.toStringArray());
+                }
+                else if (single_command.getName().equalsIgnoreCase("getlocale")) {
+                    new GetLocale().execute(single_command.toStringArray());
+                }
                 else {
                     if (Terrarum.game.auth.b()) {
                         ConsoleCommand commandObj = CommandDict.getCommand(
