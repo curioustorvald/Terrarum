@@ -248,109 +248,80 @@ public class LightmapRenderer {
     private static char calculate(int x, int y){
         if (!outOfBounds(x, y)){
 
-            float lightColorR = 1f;
-            float lightColorG = 1f;
-            float lightColorB = 1f;
-            char lightColorInt;
-
+            char lightLevelThis = 0;
             int thisTerrain = Terrarum.game.map.getTileFromTerrain(x, y);
             int thisWall = Terrarum.game.map.getTileFromWall(x, y);
+            char thisTileLuminosity = TilePropCodex.getProp(thisTerrain).getLuminosity();
 
             // open air
             if (thisTerrain == AIR && thisWall == AIR) {
-                lightColorInt = Terrarum.game.map.getGlobalLight();
+                lightLevelThis = screenBlend(lightLevelThis, Terrarum.game.map.getGlobalLight());
             }
-            else {
-                // mix light emitter
-                if (TilePropCodex.getProp(thisTerrain).getLuminosity() != 0) {
-                    char lum = TilePropCodex.getProp(thisTerrain).getLuminosity();
-                    lightColorR = getR(lum);
-                    lightColorG = getG(lum);
-                    lightColorB = getB(lum);
+
+            // mix luminous tile
+            if (thisTileLuminosity > 0) {
+                lightLevelThis = screenBlend(lightLevelThis, thisTileLuminosity);
+            }
+
+            // mix lantern
+            for (LightmapLantern lantern : lanterns) {
+                if (lantern.getX() == x && lantern.getY() == y) {
+                    lightLevelThis = screenBlend(lightLevelThis, lantern.getIntensity());
+                    break;
                 }
+            }
 
-                // mix lantern
-                for (LightmapLantern lantern : lanterns) {
-                    if (lantern.getX() == x && lantern.getY() == y) {
-                        char lum = lantern.getIntensity();
-                        lightColorR = getR(lum);
-                        lightColorG = getG(lum);
-                        lightColorB = getB(lum);
-                        break;
-                    }
-                }
+            // mix luminous actor
+            // test player TODO for all actor.Luminous in the game
+            int tileX = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedX() / TSIZE);
+            int tileY = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedY() / TSIZE)
+                    - 1;
+            char actorLuminosity = Terrarum.game.getPlayer().getLuminance();
+            if (x == tileX && y == tileY) {
+                lightLevelThis = screenBlend(lightLevelThis, actorLuminosity);
+            }
 
-                // mix actor Luminous
-                // test player TODO for all actor.Luminous in the game
-                int tileX = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedX() / TSIZE);
-                int tileY = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedY() / TSIZE)
-                        - 1;
-                char lum = Terrarum.game.getPlayer().getLuminance();
-                if (x == tileX && y == tileY) {
-                    lightColorR = getR(lum);
-                    lightColorG = getG(lum);
-                    lightColorB = getB(lum);
-                }
 
-                float[] bgrVal = new float[3]; // {B, G, R}
-
-                // test for each B, G, R channel
-                for (int i = 0; i < 3; i++) {
-                    int brightest = 0;
-
-                    //get brightest of nearby 4 tiles
-                    int nearby = 0b0;
-                    findNearbyBrightest:
-                    for (int yoff = -1; yoff <= 1; yoff++) {
-                        for (int xoff = -1; xoff <= 1; xoff++) {
-                            /**
-                             * filter for 'v's as:
-                             * +-+-+-+
-                             * |a|v|a|
-                             * +-+-+-+
-                             * |v| |v|
-                             * +-+-+-+
-                             * |a|v|a|
-                             * +-+-+-+
-                             */
-                            if (xoff != yoff && -xoff != yoff) { // 'v' tiles
-                              if (!outOfMapBounds(x + xoff, y + yoff)) {
-                                  nearby = getRaw(staticLightMap[y + yoff][x + xoff], i);
-                              }
-                            }
-                            else if (xoff != 0 && yoff != 0) { // 'a' tiles
-                                if (!outOfMapBounds(x + xoff, y + yoff)) {
-                                    nearby = darken((char) getRaw(staticLightMap[y + yoff][x + xoff], i)
-                                    , 0x3); //mix some to have more 'spreading'
-                                    // so that light spreads in a shape of an octagon instead of a diamond
-                                }
-                            }
-
-                            if (nearby > brightest) {
-                                brightest = nearby;
-                            }
-
-                            if (brightest == CHANNEL_MAX) break findNearbyBrightest;
+            // calculate and mix ambient
+            char ambient = 0; char nearby = 0;
+            findNearbyBrightest:
+            for (int yoff = -1; yoff <= 1; yoff++) {
+                for (int xoff = -1; xoff <= 1; xoff++) {
+                    /**
+                     * filter for 'v's as:
+                     * +-+-+-+
+                     * |a|v|a|
+                     * +-+-+-+
+                     * |v| |v|
+                     * +-+-+-+
+                     * |a|v|a|
+                     * +-+-+-+
+                     */
+                    if (xoff != yoff && -xoff != yoff) { // 'v' tiles
+                        if (!outOfMapBounds(x + xoff, y + yoff)) {
+                            nearby = staticLightMap[y + yoff][x + xoff];
                         }
                     }
+                    else if (xoff != 0 && yoff != 0) { // 'a' tiles
+                        if (!outOfMapBounds(x + xoff, y + yoff)) {
+                            nearby = darkenUniformInt(staticLightMap[y + yoff][x + xoff]
+                                    , 2);
+                            // mix some to have more 'spreading'
+                            // so that light spreads in a shape of an octagon instead of a diamond
+                        }
+                    }
+                    else {
+                        nearby = 0; // exclude 'me' tile
+                    }
 
-                    //return: brightest - opacity
-                    bgrVal[i] = darkenFloat(
-                            (char) (brightest)
-                            , TilePropCodex.getProp(thisTerrain).getOpacity()
-                    );
+                    ambient = additiveBlend(ambient, nearby); // keep base value as brightest nearby
                 }
-
-                // construct lightColor from bgrVal
-                lightColorInt = constructRGBFromFloat(
-                          bgrVal[OFFSET_R] * lightColorR
-                        , bgrVal[OFFSET_G] * lightColorG
-                        , bgrVal[OFFSET_B] * lightColorB
-                );
-
             }
 
-            return lightColorInt;
+            char opacity = TilePropCodex.getProp(thisTerrain).getOpacity();
+            ambient = darkenColoured(ambient, opacity); // get real ambient by appling opacity value
+
+            return screenBlend(lightLevelThis, ambient);
         }
         else {
             throw new IllegalArgumentException("Out of bounds of lightMap");
@@ -361,19 +332,43 @@ public class LightmapRenderer {
      *
      * @param data Raw channel value [0-39] per channel
      * @param darken [0-39] per channel
-     * @return darkened data [0-9] per channel (darken-int divided by 39)
+     * @return darkened data [0-39] per channel
      */
-    private static float darkenFloat(char data, int darken) {
-        return (darken(data, darken) / CHANNEL_MAX_FLOAT);
+    private static char darkenColoured(char data, char darken) {
+        if (darken < 0 || darken >= COLOUR_DOMAIN_SIZE) { throw new IllegalArgumentException("darken: out of " +
+                "range"); }
+
+        float r = clampZero(getR(data) - getR(darken));
+        float g = clampZero(getG(data) - getG(darken));
+        float b = clampZero(getB(data) - getB(darken));
+
+        return constructRGBFromFloat(r, g, b);
     }
 
     /**
-     *
-     * @param data Raw channel value [0-39] per channel
-     * @param darken [0-39] per channel
-     * @return darkened data [0-39] per channel
+     * Darken each channel by 'darken' argument
+     * @param data [0-39] per channel
+     * @param darken [0-1]
+     * @return
      */
-    private static char darken(char data, int darken) {
+    private static char darkenUniformFloat(char data, float darken) {
+        if (darken < 0 || darken > 1f) { throw new IllegalArgumentException("darken: out of " +
+                "range"); }
+
+        float r = clampZero(getR(data) - darken);
+        float g = clampZero(getG(data) - darken);
+        float b = clampZero(getB(data) - darken);
+
+        return constructRGBFromFloat(r, g, b);
+    }
+
+    /**
+     * Darken each channel by 'darken' argument
+     * @param data [0-39] per channel
+     * @param darken [0-39]
+     * @return
+     */
+    private static char darkenUniformInt(char data, int darken) {
         if (darken < 0 || darken > CHANNEL_MAX) { throw new IllegalArgumentException("darken: out of " +
                 "range"); }
 
@@ -382,6 +377,46 @@ public class LightmapRenderer {
         int b = clampZero(getRawB(data) - darken);
 
         return constructRGBFromInt(r, g, b);
+    }
+
+
+    /**
+     *
+     * @param data Raw channel value [0-39] per channel
+     * @param brighten [0-39] per channel
+     * @return brightened data [0-39] per channel
+     */
+    private static char brightenColoured(char data, char brighten) {
+        if (brighten < 0 || brighten >= COLOUR_DOMAIN_SIZE) { throw new IllegalArgumentException("brighten: out of " +
+                "range"); }
+
+       float r = clampFloat(getR(data) + getR(brighten));
+       float g = clampFloat(getG(data) + getG(brighten));
+       float b = clampFloat(getB(data) + getB(brighten));
+
+        return constructRGBFromFloat(r, g, b);
+    }
+
+    /**
+     *
+     * @param rgb
+     * @param rgb2
+     * @return
+     */
+    private static char additiveBlend(char rgb, char rgb2) {
+        int r1 = getRawR(rgb); int r2 = getRawR(rgb2); int newR = (r1 > r2) ? r1 : r2;
+        int g1 = getRawG(rgb); int g2 = getRawG(rgb2); int newG = (g1 > g2) ? g1 : g2;
+        int b1 = getRawB(rgb); int b2 = getRawB(rgb2); int newB = (b1 > b2) ? b1 : b2;
+
+        return constructRGBFromInt(newR, newG, newB);
+    }
+
+    private static char screenBlend(char rgb, char rgb2) {
+        float r1 = getR(rgb); float r2 = getR(rgb2); float newR = 1 - (1 - r1) * (1 - r2);
+        float g1 = getG(rgb); float g2 = getG(rgb2); float newG = 1 - (1 - g1) * (1 - g2);
+        float b1 = getB(rgb); float b2 = getB(rgb2); float newB = 1 - (1 - b1) * (1 - b2);
+
+        return constructRGBFromFloat(newR, newG, newB);
     }
 
     public static int getRawR(char RGB) {
@@ -498,6 +533,10 @@ public class LightmapRenderer {
 
     private static int clampByte(int i) {
         return (i < 0) ? 0 : (i > CHANNEL_MAX) ? CHANNEL_MAX : i;
+    }
+
+    private static float clampFloat(float i) {
+        return (i < 0) ? 0 : (i > 1) ? 1 : i;
     }
 
     public static char[][] getStaticLightMap() {

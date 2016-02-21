@@ -5,7 +5,7 @@ package com.Torvald.Terrarum.ConsoleCommand;
  */
 interface ConsoleCommand {
 
-    void execute(String[] args);
+    void execute(String[] args) throws Exception;
 
     void printUsage();
 

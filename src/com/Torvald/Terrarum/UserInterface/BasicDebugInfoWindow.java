@@ -69,12 +69,7 @@ public class BasicDebugInfoWindow implements UICanvas {
         printLine(g, 4, "veloY : " + String.valueOf(playerDbg.veloY()));
         printLine(g, 5, "grounded : " + String.valueOf(playerDbg.grounded()));
         printLine(g, 6, "noClip : " + String.valueOf(playerDbg.noClip()));
-        printLine(g, 7
-                , Lang.get("TERM_PHYS_MASS")
-                        + " : "
-                        + String.valueOf(playerDbg.mass())
-                        + " [kg]"
-        );
+        printLine(g, 7, "mass : " + String.valueOf(playerDbg.mass()) + " [kg]");
 
         String lightVal;
         try {

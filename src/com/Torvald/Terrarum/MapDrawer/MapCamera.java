@@ -392,8 +392,13 @@ public class MapCamera {
             if (ty < 0) ty = 0;
             else if (ty >= map.width) ty = map.width;
 
-            if (!isOpaque(map.getTileFromTerrain(tx, ty))) {
-                return true;
+            try {
+                if (!isOpaque(map.getTileFromTerrain(tx, ty))) {
+                    return true;
+                }
+            }
+            catch (ArrayIndexOutOfBoundsException e) {
+                return false;
             }
         }
         return false;

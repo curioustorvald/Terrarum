@@ -17,6 +17,7 @@ public class CommandInterpreter {
         CommandInput[] cmd = parse(command);
 
         for (CommandInput single_command : cmd) {
+            ConsoleCommand commandObj = null;
             try {
                 if (single_command.getName().equalsIgnoreCase("auth")) {
                     Terrarum.game.auth.execute(single_command.toStringArray());
@@ -35,9 +36,9 @@ public class CommandInterpreter {
                 }
                 else {
                     if (Terrarum.game.auth.b()) {
-                        ConsoleCommand commandObj = CommandDict.getCommand(
-                                single_command.getName().toLowerCase());
-                        commandObj.execute(single_command.toStringArray());
+                        commandObj = CommandDict.getCommand(
+                                single_command.getName().toLowerCase()
+                        );
                     }
                     else {
                         throw new NullPointerException(); // if not authorised, say "Unknown command"
@@ -46,6 +47,17 @@ public class CommandInterpreter {
             }
             catch (NullPointerException e) {
                 echoUnknownCmd(single_command.getName());
+            }
+            finally {
+                try {
+                    if (commandObj != null)
+                        commandObj.execute(single_command.toStringArray());
+                }
+                catch (Exception e) {
+                    System.out.println("[CommandInterpreter] ");
+                    e.printStackTrace();
+                    new Echo().execute(Lang.get("ERROR_GENERIC_TEXT"));
+                }
             }
         }
     }

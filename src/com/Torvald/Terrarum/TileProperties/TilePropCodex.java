@@ -60,7 +60,7 @@ public class TilePropCodex {
 
         prop.setId(intVal(record, "id"));
 
-        prop.setOpacity(intVal(record, "opacity"));
+        prop.setOpacity((char) intVal(record, "opacity"));
         prop.setStrength(intVal(record, "strength"));
         prop.setLuminosity((char) intVal(record, "lumcolor"));
         prop.setDrop(intVal(record, "drop"));
@@ -71,7 +71,7 @@ public class TilePropCodex {
         prop.setWallable(boolVal(record, "wall"));
         prop.setFallable(boolVal(record, "fall"));
 
-        if (prop.isFluid()) prop.setOpacity(intVal(record, "opacity"));
+        if (prop.isFluid()) prop.setViscocity(intVal(record, "opacity"));
 
         System.out.print(prop.getId());
         System.out.println("\t" + prop.getName());

@@ -3,6 +3,7 @@ package com.Torvald.Terrarum.ConsoleCommand;
 import com.Torvald.ImageFont.GameFontBase;
 import com.Torvald.Terrarum.LangPack.Lang;
 import com.Torvald.Terrarum.Terrarum;
+import org.apache.commons.csv.CSVRecord;
 import org.newdawn.slick.SlickException;
 
 import java.io.IOException;
@@ -24,6 +25,13 @@ public class SetLocale implements ConsoleCommand {
                 new Echo().execute("could not read lang file.");
                 Terrarum.gameLocale = prevLocale;
             }
+        }
+        else if (args.length == 1) {
+            Echo echo = new Echo();
+            echo.execute("Locales:");
+
+            CSVRecord record = Lang.getRecord("LANGUAGE_ID");
+            record.forEach(field -> echo.execute("] " + field));
         }
         else {
             printUsage();

@@ -11,9 +11,9 @@ public class GetLocale implements ConsoleCommand {
     public void execute(String[] args) {
         new Echo().execute(
                 "Locale: "
-                + Lang.get("MENU_LANGUAGE_THIS")
+                + Lang.get("LANGUAGE_THIS")
                 + " ("
-                + Lang.get("MENU_LANGUAGE_THIS_EN")
+                + Lang.get("LANGUAGE_EN")
                 + ")"
         );
     }

@@ -45,8 +45,8 @@ public class GameFontWhite extends GameFontBase {
         );
         uniHan = new SpriteSheet(
                 "./res/graphics/fonts/unifont_unihan"
-                        + (((Terrarum.gameLocale.contains("jp") || Terrarum.gameLocale.contains("ko")))
-                        ? "_jp" : "")
+                        + ((!Terrarum.gameLocale.contains("zh"))
+                        ? "_ja" : "")
                         +".png"
                 , W_UNIHAN, H_UNIHAN
         );
@@ -79,8 +79,8 @@ public class GameFontWhite extends GameFontBase {
     public void reloadUnihan() throws SlickException {
         uniHan = new SpriteSheet(
                 "./res/graphics/fonts/unifont_unihan"
-                        + ((!Terrarum.gameLocale.contains("cn"))
-                           ? "_jp" : "")
+                        + ((!Terrarum.gameLocale.contains("zh"))
+                           ? "_ja" : "")
                         +".png"
                 , W_UNIHAN, H_UNIHAN
         );

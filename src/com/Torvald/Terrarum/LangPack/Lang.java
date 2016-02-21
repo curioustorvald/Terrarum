@@ -80,6 +80,15 @@ public class Lang {
         lang.put(record.get(CSV_COLUMN_FIRST), record);
     }
 
+    public static CSVRecord getRecord(String key) {
+        CSVRecord record = lang.get(key);
+        if (record == null) {
+            System.out.println("[Lang] No such record.");
+            throw new NullPointerException();
+        }
+        return record;
+    }
+
     public static String get(String key) {
         String value = null;
         try { value = lang.get(key).get(Terrarum.gameLocale); }

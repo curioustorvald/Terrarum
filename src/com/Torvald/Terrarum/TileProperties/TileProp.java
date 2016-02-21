@@ -8,7 +8,7 @@ public class TileProp {
     private int id;
     private String name;
 
-    private int opacity;
+    private char opacity;
 
     private int strength;
 
@@ -42,11 +42,11 @@ public class TileProp {
         this.name = name;
     }
 
-    public int getOpacity() {
+    public char getOpacity() {
         return opacity;
     }
 
-    void setOpacity(int opacity) {
+    void setOpacity(char opacity) {
         this.opacity = opacity;
     }
 
