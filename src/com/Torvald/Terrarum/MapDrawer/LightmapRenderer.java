@@ -114,9 +114,9 @@ public class LightmapRenderer {
             }
         }
 
-        // Round 2
-        for (int y = for_y_start; y < for_y_end; y++) {
-            for (int x = for_x_end - 1; x >= for_x_start; x--) {
+        // Round 4
+        for (int y = for_y_end - 1; y > for_y_start; y--) {
+            for (int x = for_x_start; x < for_x_end; x++) {
                 staticLightMap[y][x] = calculate(x, y);
             }
         }
@@ -128,12 +128,13 @@ public class LightmapRenderer {
             }
         }
 
-        // Round 4
-        for (int y = for_y_end - 1; y > for_y_start; y--) {
-            for (int x = for_x_start; x < for_x_end; x++) {
+        // Round 2
+        for (int y = for_y_start; y < for_y_end; y++) {
+            for (int x = for_x_end - 1; x >= for_x_start; x--) {
                 staticLightMap[y][x] = calculate(x, y);
             }
         }
+
     }
 
     public static void draw(Graphics g) {
@@ -178,23 +179,21 @@ public class LightmapRenderer {
                          *     d
                          */
                         char a = (y == 0) ? thisLightLevel
-                                         : (y == Terrarum.game.map.height - 1) ? thisLightLevel
-                                                                      : max(staticLightMap[y][x]
+                                          : (y == Terrarum.game.map.height - 1) ? thisLightLevel
+                                                                      : maximiseRGB(staticLightMap[y][x]
                                                                               , staticLightMap[y - 1][x]);
                         char d = (y == 0) ? thisLightLevel
-                                         : (y == Terrarum.game.map.height - 1) ? thisLightLevel
-                                                                      : max(staticLightMap[y][x]
+                                          : (y == Terrarum.game.map.height - 1) ? thisLightLevel
+                                                                      : maximiseRGB(staticLightMap[y][x]
                                                                               , staticLightMap[y + 1][x]);
                         char b = (x == 0) ? thisLightLevel
-                                         : (x == Terrarum.game.map.width - 1) ? thisLightLevel
-                                                                     : max(staticLightMap[y][x]
+                                          : (x == Terrarum.game.map.width - 1) ? thisLightLevel
+                                                                     : maximiseRGB(staticLightMap[y][x]
                                                                              , staticLightMap[y][x - 1]);
                         char c = (x == 0) ? thisLightLevel
-                                         : (x == Terrarum.game.map.width - 1) ? thisLightLevel
-                                                                     : max(staticLightMap[y][x]
+                                          : (x == Terrarum.game.map.width - 1) ? thisLightLevel
+                                                                     : maximiseRGB(staticLightMap[y][x]
                                                                              , staticLightMap[y][x + 1]);
-                        char t = staticLightMap[y][x];
-
                         char[] colourMapItoL = new char[4];
                         colourMapItoL[0] = colourLinearMix(a, b);
                         colourMapItoL[1] = colourLinearMix(a, c);
@@ -252,15 +251,21 @@ public class LightmapRenderer {
             int thisTerrain = Terrarum.game.map.getTileFromTerrain(x, y);
             int thisWall = Terrarum.game.map.getTileFromWall(x, y);
             char thisTileLuminosity = TilePropCodex.getProp(thisTerrain).getLuminosity();
+            char thisTileOpacity = TilePropCodex.getProp(thisTerrain).getOpacity();
+            char sunLight = Terrarum.game.map.getGlobalLight();
 
             // open air
             if (thisTerrain == AIR && thisWall == AIR) {
-                lightLevelThis = screenBlend(lightLevelThis, Terrarum.game.map.getGlobalLight());
+                lightLevelThis = sunLight;
             }
-
-            // mix luminous tile
-            if (thisTileLuminosity > 0) {
-                lightLevelThis = screenBlend(lightLevelThis, thisTileLuminosity);
+            // luminous tile transparent (allows sunlight to pass)
+            else if (thisWall == AIR && thisTileLuminosity < COLOUR_DOMAIN_SIZE) {
+                char darkenSunlight = darkenColoured(sunLight, thisTileOpacity);
+                lightLevelThis = screenBlend(darkenSunlight, thisTileLuminosity);
+            }
+            // luminous tile (opaque)
+            else {
+                lightLevelThis = thisTileLuminosity;
             }
 
             // mix lantern
@@ -282,7 +287,7 @@ public class LightmapRenderer {
             }
 
 
-            // calculate and mix ambient
+            // calculate ambient
             char ambient = 0; char nearby = 0;
             findNearbyBrightest:
             for (int yoff = -1; yoff <= 1; yoff++) {
@@ -305,7 +310,7 @@ public class LightmapRenderer {
                     else if (xoff != 0 && yoff != 0) { // 'a' tiles
                         if (!outOfMapBounds(x + xoff, y + yoff)) {
                             nearby = darkenUniformInt(staticLightMap[y + yoff][x + xoff]
-                                    , 2);
+                                    , 2); //2
                             // mix some to have more 'spreading'
                             // so that light spreads in a shape of an octagon instead of a diamond
                         }
@@ -314,14 +319,14 @@ public class LightmapRenderer {
                         nearby = 0; // exclude 'me' tile
                     }
 
-                    ambient = additiveBlend(ambient, nearby); // keep base value as brightest nearby
+                    ambient = maximiseRGB(ambient, nearby); // keep base value as brightest nearby
                 }
             }
 
-            char opacity = TilePropCodex.getProp(thisTerrain).getOpacity();
-            ambient = darkenColoured(ambient, opacity); // get real ambient by appling opacity value
+            ambient = darkenColoured(ambient, thisTileOpacity); // get real ambient by appling opacity value
 
-            return screenBlend(lightLevelThis, ambient);
+            // mix and return lightlevel and ambient
+            return maximiseRGB(lightLevelThis, ambient);
         }
         else {
             throw new IllegalArgumentException("Out of bounds of lightMap");
@@ -329,6 +334,9 @@ public class LightmapRenderer {
     }
 
     /**
+     * Subtract each channel's RGB value.
+     * It works like:
+     *     f(data, darken) = RGB(data.r - darken.r, data.g - darken.g, data.b - darken.b)
      *
      * @param data Raw channel value [0-39] per channel
      * @param darken [0-39] per channel
@@ -347,6 +355,8 @@ public class LightmapRenderer {
 
     /**
      * Darken each channel by 'darken' argument
+     * It works like:
+     *     f(data, darken) = RGB(data.r - darken, data.g - darken, data.b - darken)
      * @param data [0-39] per channel
      * @param darken [0-1]
      * @return
@@ -364,6 +374,8 @@ public class LightmapRenderer {
 
     /**
      * Darken each channel by 'darken' argument
+     * It works like:
+     *     f(data, darken) = RGB(data.r - darken, data.g - darken, data.b - darken)
      * @param data [0-39] per channel
      * @param darken [0-39]
      * @return
@@ -381,7 +393,9 @@ public class LightmapRenderer {
 
 
     /**
-     *
+     * Add each channel's RGB value.
+     * It works like:
+     *     f(data, brighten) = RGB(data.r + darken.r, data.g + darken.g, data.b + darken.b)
      * @param data Raw channel value [0-39] per channel
      * @param brighten [0-39] per channel
      * @return brightened data [0-39] per channel
@@ -397,13 +411,12 @@ public class LightmapRenderer {
         return constructRGBFromFloat(r, g, b);
     }
 
-    /**
-     *
+    /** Get each channel from two RGB values, return new RGB that has max value of each channel
      * @param rgb
      * @param rgb2
      * @return
      */
-    private static char additiveBlend(char rgb, char rgb2) {
+    private static char maximiseRGB(char rgb, char rgb2) {
         int r1 = getRawR(rgb); int r2 = getRawR(rgb2); int newR = (r1 > r2) ? r1 : r2;
         int g1 = getRawG(rgb); int g2 = getRawG(rgb2); int newG = (g1 > g2) ? g1 : g2;
         int b1 = getRawB(rgb); int b2 = getRawB(rgb2); int newB = (b1 > b2) ? b1 : b2;
@@ -505,12 +518,12 @@ public class LightmapRenderer {
         return (x << 4);
     }
 
-    private static char max(char... i) {
+    private static int max(int... i) {
         Arrays.sort(i);
         return i[i.length - 1];
     }
 
-    private static char min(char... i) {
+    private static int min(int... i) {
         Arrays.sort(i);
         return i[0];
     }

@@ -157,6 +157,14 @@ public class GameMap {
         else throw new IllegalArgumentException("illegal mode input: " + String.valueOf(mode));
     }
 
+    public void overwriteLayerWall(MapLayer layerData) {
+        layerWall = layerData;
+    }
+
+    public void overwriteLayerTerrain(MapLayer layerData) {
+        layerTerrain = layerData;
+    }
+
     private int uint8ToInt32(byte x) {
         int ret;
         if ((x & 0b1000_0000) != 0) {

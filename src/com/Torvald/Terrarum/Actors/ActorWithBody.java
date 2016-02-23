@@ -67,8 +67,15 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      * meter to pixel : 24/FPS
      */
     private final float METER = 24f;
-    private final float SI_TO_GAME_ACC = METER / (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS);
+    /**
+     * [m / s^2] * SI_TO_GAME_ACC -> [px / IFrame^2]
+     */
+    private final float SI_TO_GAME_ACC = METER / FastMath.sqr(Terrarum.TARGET_FPS);
+    /**
+     * [m / s] * SI_TO_GAME_VEL -> [px / IFrame]
+     */
     private final float SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS;
+
     private float gravitation;
     private final float DRAG_COEFF = 1f;
 

@@ -2,6 +2,7 @@ package com.Torvald.Terrarum.MapGenerator;
 
 import com.Torvald.Rand.HQRNG;
 import com.Torvald.Terrarum.GameMap.GameMap;
+import com.Torvald.Terrarum.GameMap.MapLayer;
 import com.Torvald.Terrarum.TileProperties.TileNameCode;
 import com.jme3.math.FastMath;
 import com.sun.istack.internal.NotNull;
@@ -33,6 +34,10 @@ public class MapGenerator {
     private static int OCEAN_WIDTH = 400;
     private static int SHORE_WIDTH = 120;
     private static int MAX_OCEAN_DEPTH = 200;
+
+    private static final int TERRAIN_PERTURB_OFFSETMAX = 32; // [-val , val]
+    private static final int TERRAIN_PERTURB_LARGESTFEATURE = 256;
+    private static final float TERRAIN_PERTURB_RATE = 0.5f;
 
     private static int GLACIER_MOUNTAIN_WIDTH = 900;
     private static final int GLACIER_MOUNTAIN_HEIGHT = 300;
@@ -89,8 +94,10 @@ public class MapGenerator {
         placeGlacierMount(heightMap);
         heightMapToObjectMap(heightMap);
 
+        perturbTerrain();
+
         carveCave(
-                caveGen(1, 1.2f)
+                caveGen(1.4f, 1.7f)
                 , TileNameCode.AIR
                 , "Carving out cave..."
         );
@@ -518,6 +525,70 @@ public class MapGenerator {
 
             }
         }
+    }
+
+    private static void perturbTerrain() {
+        SimplexNoise perturbGen = new SimplexNoise(TERRAIN_PERTURB_LARGESTFEATURE
+                , TERRAIN_PERTURB_RATE, seed ^ random.nextLong());
+
+        float[][] perturbMap = new float[height][width];
+
+        byte[][] layerWall = map.getWallArray();
+        byte[][] layerTerrain = map.getTerrainArray();
+        MapLayer newLayerWall = new MapLayer(width, height);
+        MapLayer newLayerTerrain = new MapLayer(width, height);
+
+        float lowestNoiseVal = 10000f;
+        float highestNoiseVal = -10000f;
+
+        for (int y = 0; y < map.height; y++) {
+            for (int x = 0; x < map.width; x++) {
+                float noise = perturbGen.getNoise(x, y); // [-1, 1]
+                perturbMap[y][x] = noise;
+                if (noise < lowestNoiseVal) lowestNoiseVal = noise;
+                if (noise > highestNoiseVal) highestNoiseVal = noise;
+            }
+        }
+
+        // Auto-scale noise [-1, 1]
+        /**
+         * See ./work_files/Linear_autoscale.gcx
+         */
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                float noiseInit = perturbMap[y][x];
+                float noiseFin = (noiseInit - ((highestNoiseVal + lowestNoiseVal) / 2f))
+                        * (2f / (highestNoiseVal - lowestNoiseVal));
+
+                perturbMap[y][x] = noiseFin;
+            }
+        }
+
+        // Perturb to x-axis, apply to newLayer
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                float offsetOrigin = perturbMap[y][x] * 0.5f + 0.5f; // [0 , 1]
+                int offset = Math.round(offsetOrigin * TERRAIN_PERTURB_OFFSETMAX);
+
+                byte tileWall = layerWall[y][x];
+                byte tileTerrain = layerTerrain[y][x];
+
+                try {
+                    //newLayerWall.setTile(x + offset, y, tileWall);
+                    //newLayerTerrain.setTile(x + offset, y, tileTerrain);
+                    //layerWall[y][x] = 0;
+                    //layerTerrain[y][x] = 0;
+                    layerWall[y - offset][x] = tileWall;
+                    layerTerrain[y - offset][x] = tileTerrain;
+                }
+                catch (ArrayIndexOutOfBoundsException e) {
+                }
+            }
+        }
+
+        // set reference (pointer) of original map layer to new layers
+        //map.overwriteLayerWall(newLayerWall);
+        //map.overwriteLayerTerrain(newLayerTerrain);
 
     }
 

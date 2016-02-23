@@ -31,3 +31,9 @@ Crafted tool/weapon size is dependent on the baseRaceMass.
 * Gemstone tier
 
 Topaz -> R·G·B -> Diamond·Amethyst
+
+
+* Colouring
+
+Natural: Use 4096
+Magical/Surreal: Use 24 Bits

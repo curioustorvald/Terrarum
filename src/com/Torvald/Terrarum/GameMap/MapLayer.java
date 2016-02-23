@@ -109,6 +109,10 @@ public class MapLayer implements Iterable<Byte> {
         return uint8ToInt32(data[y][x]);
     }
 
+    public void setTile(int x, int y, byte tile) {
+        data[y][x] = tile;
+    }
+
     private int uint8ToInt32(byte x) {
         int ret;
         if ((x & 0b1000_0000) != 0) {

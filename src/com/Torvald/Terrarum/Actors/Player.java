@@ -55,7 +55,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     private final int TSIZE = MapDrawer.TILE_SIZE;
 
-    private char LUMINANCE_RGB = 1560;
+    private char LUMINANCE_RGB = 31960;
 
     private HashSet<Faction> factionSet = new HashSet<>();
 
