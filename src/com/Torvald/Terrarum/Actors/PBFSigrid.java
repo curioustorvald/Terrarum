@@ -44,9 +44,7 @@ public class PBFSigrid {
         p.actorValue.set("accel", Player.WALK_ACCEL_BASE);
         p.actorValue.set("accelmult", 1.0f);
 
-        p.actorValue.set("jumppower", 6.5f);
-        // in frames
-        p.actorValue.set("jumplength", 30f);
+        p.actorValue.set("jumppower", 5f);
 
         p.actorValue.set("basemass", 80f);
 

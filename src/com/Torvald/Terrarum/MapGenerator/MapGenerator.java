@@ -35,7 +35,7 @@ public class MapGenerator {
     private static int SHORE_WIDTH = 120;
     private static int MAX_OCEAN_DEPTH = 200;
 
-    private static final int TERRAIN_PERTURB_OFFSETMAX = 32; // [-val , val]
+    private static final int TERRAIN_PERTURB_OFFSETMAX = 0; // [-val , val]
     private static final int TERRAIN_PERTURB_LARGESTFEATURE = 256;
     private static final float TERRAIN_PERTURB_RATE = 0.5f;
 

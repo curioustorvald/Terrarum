@@ -37,3 +37,9 @@ Topaz -> R·G·B -> Diamond·Amethyst
 
 Natural: Use 4096
 Magical/Surreal: Use 24 Bits
+
+    = Colouring of potion
+        - Randomised, roguelike fashion
+        - Choose Col(R40, G40, B40) from set of finite cards:
+            39, 39, 19, 19, 0, 0
+        - MULTIPLY blend chosen colour with white texture

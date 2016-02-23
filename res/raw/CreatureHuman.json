@@ -12,7 +12,7 @@
   "speed" : 3.0,
   "speedvariable" : [100,100,100,100,100,100,100],
 
-  "jumppower" : 5.5,
+  "jumppower" : 5,
   "jumppowervariable" : [100,100,100,100,100,100,100],
 
   "scale" : 1,

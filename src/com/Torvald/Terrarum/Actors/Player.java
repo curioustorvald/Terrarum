@@ -3,8 +3,6 @@ package com.Torvald.Terrarum.Actors;
 import com.Torvald.Terrarum.Actors.Faction.Faction;
 import com.Torvald.Terrarum.GameControl.EnumKeyFunc;
 import com.Torvald.Terrarum.GameControl.KeyMap;
-import com.Torvald.Terrarum.MapDrawer.LightmapRenderer;
-import com.Torvald.Terrarum.MapDrawer.MapCamera;
 import com.Torvald.Terrarum.MapDrawer.MapDrawer;
 import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.spriteAnimation.SpriteAnimation;
@@ -15,7 +13,6 @@ import org.lwjgl.input.Controller;
 import org.lwjgl.input.Controllers;
 import org.newdawn.slick.*;
 
-import java.io.Serializable;
 import java.util.HashSet;
 
 /**
@@ -25,8 +22,13 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     @Nullable public Controllable vehicleRiding;
 
-    int jumpPowerCounter = 0;
+    int jumpCounter = 0;
     int walkPowerCounter = 0;
+    private final int MAX_JUMP_LENGTH = 20;
+    /**
+     * experimental value.
+     */
+    private final float JUMP_ACCELERATION_MOD = 92f / 10000f;
     private final int WALK_FRAMES_TO_MAX_ACCEL = 6;
 
     public float readonly_totalX = 0, readonly_totalY = 0;
@@ -402,8 +404,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
             if (!noClip) {
                 if (super.isGrounded()) {
                     jumping = true;
-                    jump();
                 }
+                jump();
             }
             else {
                 walkVertical(true, AXIS_POSMAX);
@@ -411,7 +413,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
         }
         else {
             jumping = false;
-            jumpPowerCounter = 0;
+            jumpCounter = 0;
         }
 
     }
@@ -420,43 +422,43 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     }
 
+    /**
+     * See ./work_files/Jump\ power\ by\ pressing\ time.gcx
+     */
     private void jump() {
-        float len = actorValue.getAsFloat("jumplength");
-        float pwr = actorValue.getAsFloat("jumppower");
+        if (jumping) {
+            float len = MAX_JUMP_LENGTH;
+            float pwr = actorValue.getAsFloat("jumppower");
 
-        //if (jumping) {
-        //    // Limit increment of jumpPowerCounter
-        //    if (jumpPowerCounter < len) {
-        //        jumpPowerCounter += 1;
-//
-        //        /**
-        //         * Limit jumping
-        //         */
-        //        //super.veloY = jumpFuncSqu(pwr, len);
-        //        super.veloY += jumpFuncLin(pwr, len);
-        //        //super.veloY = jumpFuncExp(pwr, len);
-//
-        //        System.out.println(jumpFuncLin(pwr, len));
-        //    }
-//
-        //    super.grounded = false;
-        //}
+            // increment jump counter
+            if (jumpCounter < len) jumpCounter += 1;
 
-        // At least this works, though. Useful if it were AI-controlled.
-        super.setVeloY(super.getVeloY()
-                -
-                pwr * FastMath.sqrt(super.getScale())
-        );
+            float sumT = (jumpCounter * (jumpCounter + 1)) / 2f;
+            float timedJumpCharge = ((len + 1) / 2f) - (sumT / len);
+            if (timedJumpCharge < 0) timedJumpCharge = 0;
+
+            float jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD;
+
+            super.setVeloY(super.getVeloY()
+                    - jumpAcc
+            );
+        }
+
+        // for mob AI:
+        //super.setVeloY(super.getVeloY()
+        //        -
+        //        pwr * FastMath.sqrt(super.getScale())
+        //);
     }
 
     private float jumpFuncLin(float pwr, float len) {
-        return -(pwr / len) * jumpPowerCounter;
+        return -(pwr / len) * jumpCounter;
     }
 
     private float jumpFuncSqu(float pwr, float len) {
         return (pwr / (len * len))
-                * (jumpPowerCounter - len)
-                * (jumpPowerCounter - len) // square
+                * (jumpCounter - len)
+                * (jumpCounter - len) // square
                 - pwr;
     }
 
