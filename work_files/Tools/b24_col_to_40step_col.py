@@ -27,4 +27,5 @@ def intFromCol(r, g, b):
 def colFromNum(raw):
 	return getR40(raw), getG40(raw), getB40(raw)
 
-print(intFromCol(19,39,0))
+print(intFromCol(9,13,29))
+print(colFromNum(31399))

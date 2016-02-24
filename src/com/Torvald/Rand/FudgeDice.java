@@ -12,7 +12,7 @@ public class FudgeDice {
 
     /**
      * Define new set of fudge dice with given counts.
-     * @param randfunc
+     * @param randfunc java.util.Random or its extension
      * @param counts amount of die
      */
     public FudgeDice(Random randfunc, int counts) {
@@ -21,8 +21,8 @@ public class FudgeDice {
     }
 
     /**
-     * Roll dice and get result. Range: [-3, 3] for three dice
-     * @return
+     * Roll dice and get result.
+     * @return Normal distributed integer [-N , N] for diceCount of N. 0 is the most frequent return.
      */
     public int roll() {
         int diceResult = 0;
@@ -34,7 +34,7 @@ public class FudgeDice {
     }
 
     /**
-     * @return random [-1, 0, 1]
+     * @return integer randomly picked from {-1, 0, 1}
      */
     private int rollSingleDie() {
         return (randfunc.nextInt(3)) - 1;

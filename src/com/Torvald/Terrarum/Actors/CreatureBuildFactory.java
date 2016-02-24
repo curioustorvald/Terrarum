@@ -76,7 +76,7 @@ public class CreatureBuildFactory {
         for (String s : elemSet) {
             float baseValue = jsonObject.get(s).getAsFloat();
             // roll fudge dice and get value [-3, 3] as [0, 6]
-            int varSelected = new Fudge3().create(new HQRNG()).roll() + 3;
+            int varSelected = new Fudge3(new HQRNG()).roll() + 3;
             // get multiplier from json. Assuming percentile
             int multiplier = jsonObject.get(s + "variable").getAsJsonArray().get(varSelected).getAsInt();
             float realValue = baseValue * multiplier / 100f;
@@ -121,7 +121,7 @@ public class CreatureBuildFactory {
         for (String s : elemSet) {
             float baseValue = 1f;
             // roll fudge dice and get value [-3, 3] as [0, 6]
-            int varSelected = new Fudge3().create(new HQRNG()).roll() + 3;
+            int varSelected = new Fudge3(new HQRNG()).roll() + 3;
             // get multiplier from json. Assuming percentile
             int multiplier = jsonObject.get(s).getAsJsonArray().get(varSelected).getAsInt();
             float realValue = baseValue * multiplier / 100f;

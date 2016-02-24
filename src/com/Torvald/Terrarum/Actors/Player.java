@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum.Actors;
 
+import com.Torvald.Rand.Fudge3;
 import com.Torvald.Terrarum.Actors.Faction.Faction;
 import com.Torvald.Terrarum.GameControl.EnumKeyFunc;
 import com.Torvald.Terrarum.GameControl.KeyMap;
@@ -57,7 +58,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     private final int TSIZE = MapDrawer.TILE_SIZE;
 
-    private char LUMINANCE_RGB = 31960;
+    private char LUMINANCE_RGB = 31399;
 
     private HashSet<Faction> factionSet = new HashSet<>();
 

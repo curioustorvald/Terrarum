@@ -254,19 +254,21 @@ public class LightmapRenderer {
             char thisTileOpacity = TilePropCodex.getProp(thisTerrain).getOpacity();
             char sunLight = Terrarum.game.map.getGlobalLight();
 
+            // MIX TILE
             // open air
             if (thisTerrain == AIR && thisWall == AIR) {
                 lightLevelThis = sunLight;
             }
             // luminous tile transparent (allows sunlight to pass)
-            else if (thisWall == AIR && thisTileLuminosity < COLOUR_DOMAIN_SIZE) {
+            else if (thisWall == AIR && thisTileLuminosity > 0) {
                 char darkenSunlight = darkenColoured(sunLight, thisTileOpacity);
                 lightLevelThis = screenBlend(darkenSunlight, thisTileLuminosity);
             }
             // luminous tile (opaque)
-            else {
+            else if (thisWall != AIR && thisTileLuminosity > 0) {
                 lightLevelThis = thisTileLuminosity;
             }
+            // END MIX TILE
 
             // mix lantern
             for (LightmapLantern lantern : lanterns) {
