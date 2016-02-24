@@ -1,13 +1,16 @@
 package com.Torvald.Terrarum;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.Torvald.ImageFont.GameFontBase;
 import com.Torvald.ImageFont.GameFontWhite;
-import com.Torvald.Terrarum.ConsoleCommand.Authenticator;
+import com.Torvald.JsonFetcher;
 import com.Torvald.Terrarum.LangPack.Lang;
 import org.lwjgl.input.Controllers;
 import org.newdawn.slick.*;
@@ -146,14 +149,14 @@ public class Terrarum extends StateBasedGame {
     }
 
     private static void createFiles() throws IOException {
-        File[] files = {
-                new File(defaultDir + "/properties")
-        };
+        File configFile = new File(defaultDir + "/config.json");
 
-        for (File f : files){
-            if (!f.exists()){
-                f.createNewFile();
-            }
+        if (!configFile.exists() || configFile.length() == 0) {
+            configFile.createNewFile();
+            ArrayList<String> jsonLines = JsonFetcher.readJsonAsString("./res/config_default.json");
+            PrintWriter printWriter = new PrintWriter(configFile);
+            jsonLines.forEach(printWriter::println);
+            printWriter.close();
         }
     }
 }

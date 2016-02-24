@@ -184,63 +184,68 @@ public class MapCamera {
                 int thisTerrainTile = map.getTileFromTerrain(x, y);
 
                 // draw
-                if (
+                try {
+                    if (
 
-                        (
-                                (       // wall and not blocked
-                                        (mode == WALL) && isWallThatBeDrawn(x, y)
-                                )
-                                        ||
-                                        (mode == TERRAIN)
-                        )       // not an air tile
-                                && (thisTile > 0)
-                                &&
-                                // check if light level of upper tile is zero and
-                                // that of this tile is also zero
-                                (((y > 0)
-                                        && !((LightmapRenderer.getValueFromMap(x, y) == 0)
-                                                && (LightmapRenderer.getValueFromMap(x, y - 1) == 0))
-                                )
-                                ||
-                                        // check if light level of this tile is zero, for y = 0
-                                ((y == 0)
-                                        && (LightmapRenderer.getValueFromMap(x, y) > 0)
-                                        ))) {
+                            (
+                                    (       // wall and not blocked
+                                            (mode == WALL) && isWallThatBeDrawn(x, y)
+                                    )
+                                            ||
+                                            (mode == TERRAIN)
+                            )       // not an air tile
+                                    && (thisTile > 0)
+                                    &&
+                                    // check if light level of upper tile is zero and
+                                    // that of this tile is also zero
+                                    (((y > 0)
+                                            && !((LightmapRenderer.getValueFromMap(x, y) == 0)
+                                            && (LightmapRenderer.getValueFromMap(x, y - 1) == 0))
+                                    )
+                                            ||
+                                            // check if light level of this tile is zero, for y = 0
+                                            ((y == 0)
+                                                    && (LightmapRenderer.getValueFromMap(x, y) > 0)
+                                            ))) {
 
-                    int nearbyTilesInfo;
-                    //if (thisTile == DIRT) {
-                    //    nearbyTilesInfo = getGrassInfo(x, y, GRASS);
-                    //}
-                    //else {
-                    //    nearbyTilesInfo = getNearbyTilesInfo(x, y, AIR);
-                    //}
+                        int nearbyTilesInfo;
+                        //if (thisTile == DIRT) {
+                        //    nearbyTilesInfo = getGrassInfo(x, y, GRASS);
+                        //}
+                        //else {
+                        //    nearbyTilesInfo = getNearbyTilesInfo(x, y, AIR);
+                        //}
 
-                    if (isDarkenAir((byte) thisTile)) {
-                        nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, AIR);
-                    }
-                    else if (isConnectSelf((byte) thisTile)) {
-                        nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile);
-                    }
-                    else {
-                        nearbyTilesInfo = 0;
-                    }
+                        if (isDarkenAir((byte) thisTile)) {
+                            nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, AIR);
+                        }
+                        else if (isConnectSelf((byte) thisTile)) {
+                            nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile);
+                        }
+                        else {
+                            nearbyTilesInfo = 0;
+                        }
 
 
-                    int thisTileX = nearbyTilesInfo;
-                    int thisTileY = thisTile;
+                        int thisTileX = nearbyTilesInfo;
+                        int thisTileY = thisTile;
 
-                    if (drawModeTilesBlendMul) {
-                        if (isBlendMul((byte) thisTile)) {
+                        if (drawModeTilesBlendMul) {
+                            if (isBlendMul((byte) thisTile)) {
+                                drawTile(mode, x, y, thisTileX, thisTileY);
+                            }
+                        }
+                        else {
+                            // currently it draws all the transparent tile and colour mixes
+                            // on top of the previously drawn tile
+                            // TODO check wether it works as intended when skybox is dark
+                            // add instruction "if (!isBlendMul((byte) thisTile))"
                             drawTile(mode, x, y, thisTileX, thisTileY);
                         }
                     }
-                    else {
-                        // currently it draws all the transparent tile and colour mixes
-                        // on top of the previously drawn tile
-                        // TODO check wether it works as intended when skybox is dark
-                        // add instruction "if (!isBlendMul((byte) thisTile))"
-                        drawTile(mode, x, y, thisTileX, thisTileY);
-                    }
+                }
+                catch (NullPointerException e) {
+                    // do nothing. This exception handling may hide erratic behaviour completely.
                 }
             }
         }

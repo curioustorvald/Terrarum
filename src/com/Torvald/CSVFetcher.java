@@ -17,7 +17,7 @@ public class CSVFetcher {
     private static StringBuffer csvString;
 
     public static List<CSVRecord> readCSV(String csvFilePath) throws IOException {
-        csvString = new StringBuffer();
+        csvString = new StringBuffer(); // reset buffer every time it called
         readCsvFileAsString(csvFilePath);
 
         CSVParser csvParser = CSVParser.parse(csvString.toString()

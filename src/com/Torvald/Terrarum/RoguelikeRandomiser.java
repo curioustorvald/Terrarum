@@ -13,6 +13,8 @@ public class RoguelikeRandomiser {
     private static final int[] POTION_PRIMARY_COLSET = {15, 15, 8, 8, 0, 0};
 
     private static Hashtable<Integer, Col4096> potionColours;
+    private static Hashtable<Col4096, Boolean> coloursDiscovered;
+
     private static ArrayList<Col4096> coloursTaken;
 
 

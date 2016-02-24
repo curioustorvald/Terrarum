@@ -24,11 +24,11 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     int jumpCounter = 0;
     int walkPowerCounter = 0;
-    private final int MAX_JUMP_LENGTH = 20;
+    private final int MAX_JUMP_LENGTH = 15;
     /**
      * experimental value.
      */
-    private final float JUMP_ACCELERATION_MOD = 92f / 10000f;
+    private final float JUMP_ACCELERATION_MOD = 180f / 10000f;
     private final int WALK_FRAMES_TO_MAX_ACCEL = 6;
 
     public float readonly_totalX = 0, readonly_totalY = 0;
