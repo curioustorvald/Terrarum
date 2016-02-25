@@ -25,11 +25,12 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     int jumpCounter = 0;
     int walkPowerCounter = 0;
-    private final int MAX_JUMP_LENGTH = 15;
+    private final int MAX_JUMP_LENGTH = 17; // use 17; in internal frames
     /**
      * experimental value.
      */
-    private final float JUMP_ACCELERATION_MOD = 180f / 10000f;
+    // private final float JUMP_ACCELERATION_MOD = ???f / 10000f; //quadratic mode
+    private final float JUMP_ACCELERATION_MOD = 170f / 10000f; //linear mode
     private final int WALK_FRAMES_TO_MAX_ACCEL = 6;
 
     public float readonly_totalX = 0, readonly_totalY = 0;
@@ -45,9 +46,9 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
     private int prevVMoveKey = -1;
     private final int KEY_NULL = -1;
 
-    static final float ACCEL_MULT_IN_FLIGHT = 0.45f;
-    static final float WALK_STOP_ACCEL = 0.2f;
-    static final float WALK_ACCEL_BASE = 0.2f;
+    static final float ACCEL_MULT_IN_FLIGHT = 0.22f;
+    static final float WALK_STOP_ACCEL = 0.32f;
+    static final float WALK_ACCEL_BASE = 0.32f;
 
     private boolean noClip = false;
 
@@ -433,7 +434,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
             // increment jump counter
             if (jumpCounter < len) jumpCounter += 1;
-
+            // quadratic time (convex) mode
+            /*
             float sumT = (jumpCounter * (jumpCounter + 1)) / 2f;
             float timedJumpCharge = ((len + 1) / 2f) - (sumT / len);
             if (timedJumpCharge < 0) timedJumpCharge = 0;
@@ -443,6 +445,20 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
             super.setVeloY(super.getVeloY()
                     - jumpAcc
             );
+            */
+
+            // linear time mode
+            float init = (len + 1) / 2f;
+            float timedJumpCharge = init - (init / len) * jumpCounter;
+            if (timedJumpCharge < 0) timedJumpCharge = 0;
+
+            float jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD;
+
+            super.setVeloY(super.getVeloY()
+                    - jumpAcc
+            );
+
+            // concave mode?
         }
 
         // for mob AI:

@@ -20,6 +20,7 @@ public class GameFontBase implements Font {
     static SpriteSheet uniHan;
     static SpriteSheet cyrilic;
     static SpriteSheet cyrilicEF;
+    static SpriteSheet fullwidthForms;
 
     static final int JUNG_COUNT = 21;
     static final int JONG_COUNT = 28;
@@ -44,6 +45,7 @@ public class GameFontBase implements Font {
     static final int SHEET_UNIHAN = 8;
     static final int SHEET_CYRILIC_EM = 9;
     static final int SHEET_CYRILIC_EF = 10;
+    static final int SHEET_FW_UNI = 11;
 
     static SpriteSheet[] sheetKey;
     static final Character[] asciiEFList = {
@@ -136,6 +138,10 @@ public class GameFontBase implements Font {
         return (Arrays.asList(cyrilecEFList).contains(c));
     }
 
+    private boolean isFullwidthUni(char c) {
+        return (c >= 0xFF00 && c < 0xFF60);
+    }
+
     private int asciiEFindexX(char c) {
         return (Arrays.asList(asciiEFList).indexOf(c) % 16);
     }
@@ -200,6 +206,14 @@ public class GameFontBase implements Font {
         return (Arrays.asList(cyrilecEFList).indexOf(c) / 16);
     }
 
+    private int fullwidthUniIndexX(char c) {
+        return (c - 0xFF00) % 16;
+    }
+
+    private int fullwidthUniIndexY(char c) {
+        return (c - 0xFF00) / 16;
+    }
+
     @Override
     public int getWidth(String s) {
         return getWidthSubstr(s, s.length());
@@ -234,7 +248,7 @@ public class GameFontBase implements Font {
                 len += W_LATIN_NARROW;
             else if (c == SHEET_KANA || c == SHEET_HANGUL || c == SHEET_CJK_PUNCT)
                 len += W_CJK;
-            else if (c == SHEET_UNIHAN)
+            else if (c == SHEET_UNIHAN || c == SHEET_FW_UNI)
                 len += W_UNIHAN;
             else
                 len += W_LATIN_WIDE;
@@ -292,7 +306,7 @@ public class GameFontBase implements Font {
                         Math.round(x
                                 + getWidthSubstr(s, i + 1) - glyphW
                         )
-                        , Math.round((H - H_HANGUL) / 2 + y)
+                        , Math.round((H - H_UNIHAN) / 2 + y)
                         , uniHanIndexX(ch)
                         , uniHanIndexY(ch)
                 );
@@ -350,6 +364,10 @@ public class GameFontBase implements Font {
                         sheetX = cyrilicEFindexX(ch);
                         sheetY = cyrilicEFindexY(ch);
                         break;
+                    case SHEET_FW_UNI:
+                        sheetX = fullwidthUniIndexX(ch);
+                        sheetY = fullwidthUniIndexY(ch);
+                        break;
                     default:
                         sheetX = ch % 16;
                         sheetY = ch / 16;
@@ -363,7 +381,8 @@ public class GameFontBase implements Font {
                             // Interchar: pull punct right next to hangul to the left
                             + ((i > 0 && isHangul(s.charAt(i - 1))) ? -3 : 0)
                             , Math.round(y)
-                            - ((prevInstance == SHEET_CJK_PUNCT) ? 1 : 0)
+                            + ((prevInstance == SHEET_CJK_PUNCT) ? -1 :
+                               (prevInstance == SHEET_FW_UNI) ? (H - H_HANGUL) / 2 : 0)
                             , sheetX
                             , sheetY
                     );
@@ -399,6 +418,7 @@ public class GameFontBase implements Font {
         else if (isCyrilic(c)) return SHEET_CYRILIC_EM;
         // fixed width punctuations
         else if (isCJKPunct(c)) return SHEET_CJK_PUNCT;
+        else if (isFullwidthUni(c)) return SHEET_FW_UNI;
 
         else return SHEET_ASCII_EM; // fallback
     }
