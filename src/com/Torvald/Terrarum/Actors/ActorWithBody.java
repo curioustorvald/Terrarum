@@ -57,6 +57,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      */
     private volatile float scale = 1;
     private volatile float mass = 1f;
+    private final float MASS_LOWEST = Float.MIN_NORMAL;
 
     private static final int TSIZE = MapDrawer.TILE_SIZE;
     private static int AUTO_CLIMB_RATE = TSIZE / 8;
@@ -163,6 +164,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             /**
              * Update variables
              */
+            if (mass < MASS_LOWEST) mass = MASS_LOWEST; // clamp to minimum possible mass
             baseSpriteHeight = sprite.getHeight();
             baseSpriteWidth = sprite.getWidth();
             gravitation = Terrarum.game.map.getGravitation();
@@ -259,7 +261,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     }
 
     private void adjustHitBottom() {
-        float newX = nextHitbox.getPointedX();
+        float newX = nextHitbox.getPointedX(); // look carefully, getPos or getPointed
         // int-ify posY of nextHitbox
         nextHitbox.setPositionYFromPoint( FastMath.floor(nextHitbox.getPointedY()) );
 
@@ -275,10 +277,10 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         nextHitbox.setPositionFromPoint(newX, newY + 1);
     }
 
-    private void adjustHitTop() { // FIXME jump to teleport to ceiling
-        float newX = nextHitbox.getPointedX();
+    private void adjustHitTop() {
+        float newX = nextHitbox.getPosX();
         // int-ify posY of nextHitbox
-        nextHitbox.setPositionY( FastMath.floor(nextHitbox.getPosY()) );
+        nextHitbox.setPositionY( FastMath.ceil(nextHitbox.getPosY()) );
 
         int newYOff = 0; // always positive
 
@@ -289,7 +291,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         } while (colliding);
 
         float newY = nextHitbox.getPosY() + newYOff;
-        nextHitbox.setPositionFromPoint(newX, newY - 1);
+        nextHitbox.setPosition(newX, newY - 1);
     }
 
     private void updateHorizontalPos() {

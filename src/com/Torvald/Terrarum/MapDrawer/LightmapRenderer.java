@@ -150,24 +150,30 @@ public class LightmapRenderer {
                 if (Terrarum.game.screenZoom >= 1 && ((boolean) Terrarum.game.gameConfig.get("smoothlighting"))) {
                     char thisLightLevel = staticLightMap[y][x];
                     if (y > 0 && x < for_x_end && thisLightLevel == 0 && staticLightMap[y - 1][x] == 0) {
-                        // coalesce zero intensity blocks to one
-                        int zeroLevelCounter = 1;
-                        while (staticLightMap[y][x + zeroLevelCounter] == 0
-                                && staticLightMap[y - 1][x + zeroLevelCounter] == 0) {
-                            zeroLevelCounter += 1;
+                        try {
+                            // coalesce zero intensity blocks to one
+                            int zeroLevelCounter = 1;
+                            while (staticLightMap[y][x + zeroLevelCounter] == 0
+                                    && staticLightMap[y - 1][x + zeroLevelCounter] == 0) {
+                                zeroLevelCounter += 1;
 
-                            if (x + zeroLevelCounter >= for_x_end) break;
+                                if (x + zeroLevelCounter >= for_x_end) break;
+                            }
+
+                            g.setColor(new Color(0));
+                            g.fillRect(
+                                    Math.round(x * TSIZE * Terrarum.game.screenZoom)
+                                    , Math.round(y * TSIZE * Terrarum.game.screenZoom)
+                                    , FastMath.ceil(
+                                            TSIZE * Terrarum.game.screenZoom) * zeroLevelCounter
+                                    , FastMath.ceil(TSIZE * Terrarum.game.screenZoom)
+                            );
+
+                            x += (zeroLevelCounter - 1);
                         }
-
-                        g.setColor(new Color(0));
-                        g.fillRect(
-                                Math.round(x * TSIZE * Terrarum.game.screenZoom)
-                                , Math.round(y * TSIZE * Terrarum.game.screenZoom)
-                                , FastMath.ceil(TSIZE * Terrarum.game.screenZoom) * zeroLevelCounter
-                                , FastMath.ceil(TSIZE * Terrarum.game.screenZoom)
-                        );
-
-                        x += (zeroLevelCounter - 1);
+                        catch (ArrayIndexOutOfBoundsException e) {
+                            // do nothing
+                        }
                     }
                     else {
                         /**    a
@@ -216,25 +222,30 @@ public class LightmapRenderer {
                 }
                 // Retro
                 else {
-                    int thisLightLevel = staticLightMap[y][x];
+                    try {
+                        int thisLightLevel = staticLightMap[y][x];
 
-                    // coalesce identical intensity blocks to one
-                    int sameLevelCounter = 1;
-                    while (staticLightMap[y][x + sameLevelCounter] == thisLightLevel) {
-                        sameLevelCounter += 1;
+                        // coalesce identical intensity blocks to one
+                        int sameLevelCounter = 1;
+                        while (staticLightMap[y][x + sameLevelCounter] == thisLightLevel) {
+                            sameLevelCounter += 1;
 
-                        if (x + sameLevelCounter >= for_x_end) break;
+                            if (x + sameLevelCounter >= for_x_end) break;
+                        }
+
+                        g.setColor(toTargetColour(staticLightMap[y][x]));
+                        g.fillRect(
+                                Math.round(x * TSIZE * Terrarum.game.screenZoom)
+                                , Math.round(y * TSIZE * Terrarum.game.screenZoom)
+                                , FastMath.ceil(TSIZE * Terrarum.game.screenZoom) * sameLevelCounter
+                                , FastMath.ceil(TSIZE * Terrarum.game.screenZoom)
+                        );
+
+                        x += (sameLevelCounter - 1);
                     }
-
-                    g.setColor(toTargetColour(staticLightMap[y][x]));
-                    g.fillRect(
-                            Math.round(x * TSIZE * Terrarum.game.screenZoom)
-                            , Math.round(y * TSIZE * Terrarum.game.screenZoom)
-                            , FastMath.ceil(TSIZE * Terrarum.game.screenZoom) * sameLevelCounter
-                            , FastMath.ceil(TSIZE * Terrarum.game.screenZoom)
-                    );
-
-                    x += (sameLevelCounter - 1);
+                    catch (ArrayIndexOutOfBoundsException e) {
+                        // do nothing
+                    }
                 }
             }
         }
