@@ -72,6 +72,7 @@ public class BasicDebugInfoWindow implements UICanvas {
         printLine(g, 7, "mass : " + String.valueOf(playerDbg.mass()) + " [kg]");
 
         String lightVal;
+        String mtX = String.valueOf(mouseTileX), mtY = String.valueOf(mouseTileY);
         try {
             char valRaw = LightmapRenderer.getValueFromMap(mouseTileX, mouseTileY);
             int rawR = LightmapRenderer.getRawR(valRaw);
@@ -84,8 +85,11 @@ public class BasicDebugInfoWindow implements UICanvas {
         }
         catch (ArrayIndexOutOfBoundsException e) {
             lightVal = "out of bounds";
+            mtX = "---";
+            mtY = "---";
         }
-        printLine(g, 8, "light at cursor : " + lightVal);
+        printLine(g, 8, "light at cursor : " + lightVal
+        );
 
         String tileNo;
         try {
@@ -94,7 +98,21 @@ public class BasicDebugInfoWindow implements UICanvas {
         catch (ArrayIndexOutOfBoundsException e) {
             tileNo = "out of bounds";
         }
-        printLine(g, 9, "tile : " + tileNo);
+        printLine(g, 9, "tile : " + tileNo + " (" + mtX + ", " + mtY + ")");
+
+        /**
+         * Second column
+         */
+
+        String[] collisionFlagKey = {"top", "right", "bottom", "left"};
+        int collisonFlag = playerDbg.collisionEvent();
+        printLineColumn(g, 2, 1, "CollisionFlag : "
+                                         + ((collisonFlag == -1) ? "none" : collisionFlagKey[collisonFlag]));
+        printLineColumn(g, 2, 2, "Env colour temp : " + MapDrawer.getColTemp());
+
+        /**
+         * On screen
+         */
 
         // Memory allocation
         long memInUse = Terrarum.game.memInUse;
@@ -113,20 +131,21 @@ public class BasicDebugInfoWindow implements UICanvas {
         );
 
         // Hitbox
+        float zoom = Terrarum.game.screenZoom;
         g.setColor(new Color(0x007f00));
-        g.drawRect(hitbox.getHitboxStart().getX()
-                        - MapCamera.getCameraX()
-                , hitbox.getHitboxStart().getY()
-                        - MapCamera.getCameraY()
-                , hitbox.getWidth()
-                , hitbox.getHeight()
+        g.drawRect(hitbox.getHitboxStart().getX() * zoom
+                        - MapCamera.getCameraX() * zoom
+                , hitbox.getHitboxStart().getY() * zoom
+                        - MapCamera.getCameraY() * zoom
+                , hitbox.getWidth() * zoom
+                , hitbox.getHeight() * zoom
         );
         // ...and its point
         g.fillRect(
-                hitbox.getPointedX() - 1
-                        - MapCamera.getCameraX()
-                , hitbox.getPointedY() - 1
-                        - MapCamera.getCameraY()
+                (hitbox.getPointedX() - 1) * zoom
+                        - MapCamera.getCameraX() * zoom
+                , (hitbox.getPointedY() - 1) * zoom
+                        - MapCamera.getCameraY() * zoom
                 , 3
                 , 3
         );
@@ -138,19 +157,19 @@ public class BasicDebugInfoWindow implements UICanvas {
 
         // Next hitbox
         g.setColor(Color.blue);
-        g.drawRect(nextHitbox.getHitboxStart().getX()
-                        - MapCamera.getCameraX()
-                , nextHitbox.getHitboxStart().getY()
-                        - MapCamera.getCameraY()
-                , nextHitbox.getWidth()
-                , nextHitbox.getHeight()
+        g.drawRect(nextHitbox.getHitboxStart().getX() * zoom
+                        - MapCamera.getCameraX() * zoom
+                , nextHitbox.getHitboxStart().getY() * zoom
+                        - MapCamera.getCameraY() * zoom
+                , nextHitbox.getWidth() * zoom
+                , nextHitbox.getHeight() * zoom
         );
         // ...and its point
         g.fillRect(
-                nextHitbox.getPointedX() - 1
-                        - MapCamera.getCameraX()
-                , nextHitbox.getPointedY() - 1
-                        - MapCamera.getCameraY()
+                (nextHitbox.getPointedX() - 1) * zoom
+                        - MapCamera.getCameraX() * zoom
+                , (nextHitbox.getPointedY() - 1) * zoom
+                        - MapCamera.getCameraY() * zoom
                 , 3
                 , 3
         );
@@ -165,8 +184,16 @@ public class BasicDebugInfoWindow implements UICanvas {
         g.drawString(s, 20, line(l));
     }
 
+    private static void printLineColumn(Graphics g, int col, int row, String s) {
+        g.drawString(s, 20 + column(col), line(row));
+    }
+
     private static int line(int i) {
         return i * 20;
+    }
+
+    private static int column(int i) {
+        return (250 * (i - 1));
     }
 
     @Override

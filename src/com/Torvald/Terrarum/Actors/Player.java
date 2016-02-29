@@ -46,7 +46,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
     private int prevVMoveKey = -1;
     private final int KEY_NULL = -1;
 
-    static final float ACCEL_MULT_IN_FLIGHT = 0.22f;
+    static final float ACCEL_MULT_IN_FLIGHT = 0.48f;
     static final float WALK_STOP_ACCEL = 0.32f;
     static final float WALK_ACCEL_BASE = 0.32f;
 
@@ -59,9 +59,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     private final int TSIZE = MapDrawer.TILE_SIZE;
 
-    private char LUMINANCE_RGB = 31399;
-
     private HashSet<Faction> factionSet = new HashSet<>();
+
 
     /**
      * Creates new Player instance with empty elements (sprites, actorvalue, etc.). <br />
@@ -452,7 +451,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
             float timedJumpCharge = init - (init / len) * jumpCounter;
             if (timedJumpCharge < 0) timedJumpCharge = 0;
 
-            float jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD;
+            float jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD
+                    * FastMath.sqrt(getScale());
 
             super.setVeloY(super.getVeloY()
                     - jumpAcc
@@ -567,11 +567,12 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     @Override
     public void setLuminance(char RGB) {
-        LUMINANCE_RGB = RGB;
+        actorValue.set("luminosity", (int) RGB);
     }
 
     @Override
     public char getLuminance() {
-        return LUMINANCE_RGB;
+        return actorValue.hasKey("luminosity") ?
+               (char) actorValue.getAsInt("luminosity") : 0;
     }
 }

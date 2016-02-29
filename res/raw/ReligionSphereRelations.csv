@@ -1,17 +1,17 @@
 # An adjacency matrix of religion sphere relationship
-# 0: neutral, 1: amicable (welcoming), -1: hostile (will not barter == explicit neutrality)
+# 0: neutral, 1: amicable (welcoming), -1: hostile (will not barter, like 'unassigned' neutral)
 # -2: enemy (this is the holy war! WAAAGH!!)
 
 # war: WAAAGH!!
 # randomness: All hail the Random Number God!
 # strength: tranees; disciplinants
-# brute: mostly "brute" wild mobs, or spheres that fond of bruteness
+# brute: mostly "brute" wild mobs, or spheres that is fond of brute-ness
 
 "↓from  to→";"strength";"harmony";"war";"randomness";"wealth";"brute";"helix"
-"strength"  ;       "1";      "1"; "-1";         "0";     "0";   "-1"
-"harmony"   ;       "0";      "1"; "-1";        "-1";     "0";    "0"
-"war"       ;      "-2";     "-2";  "1";        "-2";    "-2";   "-2"
-"randomness";       "0";      "0";  "0";         "1";     "0";    "0"
+"strength"  ;       "1";      "1";  "0";         "0";     "0";    "0";    "0"
+"harmony"   ;       "0";      "1"; "-1";         "0";     "0";    "0";    "0"
+"war"       ;      "-2";     "-2";  "1";        "-2";    "-2";   "-2";    "0"
+"randomness";       "0";      "0";  "0";         "1";     "0";    "0";    "0"
 "wealth"    ;
-"brute"     ;
+"brute"     ;       "0";      "0"; "-1";         "0";     "0";   "-1";    "0"
 "helix"     ;

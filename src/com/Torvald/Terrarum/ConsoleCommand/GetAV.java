@@ -15,30 +15,43 @@ public class GetAV implements ConsoleCommand {
     public void execute(String[] args) {
         Echo echo = new Echo();
 
-        if (args.length == 1) {
-            // print all actorvalue of player
-            ActorValue av = Terrarum.game.getPlayer().getActorValue();
-            Set keyset = av.getKeySet();
+        try {
+            if (args.length == 1) {
+                // print all actorvalue of player
+                ActorValue av = Terrarum.game.getPlayer().getActorValue();
+                Set keyset = av.getKeySet();
 
-            keyset.forEach(
-                    elem -> echo.execute(elem + " = " + av.get((String)elem))
-            );
+                keyset.forEach(
+                        elem -> echo.execute(elem + " = " + av.get((String) elem))
+                );
 
-        }
-        else if (args.length != 3 && args.length != 2) {
-            printUsage();
-        }
-        else if (args.length == 2) {
-            echo.execute("player." + args[1] + " = "
-                    + Terrarum.game.getPlayer().getActorValue().get(args[1])
-                    + " ("
-                    + Terrarum.game.getPlayer().getActorValue().get(args[1]).getClass()
-                                   .getSimpleName()
-                    + ")"
-            );
-        }
-        else if (args.length == 3) {
+            }
+            else if (args.length != 3 && args.length != 2) {
+                printUsage();
+            }
+            else if (args.length == 2) {
+                echo.execute("player." + args[1] + " = "
+                        + Terrarum.game.getPlayer().getActorValue().get(args[1])
+                        + " ("
+                        + Terrarum.game.getPlayer().getActorValue().get(args[1]).getClass()
+                                       .getSimpleName()
+                        + ")"
+                );
+            }
+            else if (args.length == 3) {
 
+            }
+        }
+        catch (NullPointerException e) {
+            if (args.length == 2) {
+                echo.execute(args[1] + ": actor value does not exist.");
+            }
+            else if (args.length == 3) {
+                echo.execute(args[2] + ": actor value does not exist.");
+            }
+            else {
+                throw new NullPointerException();
+            }
         }
     }
 

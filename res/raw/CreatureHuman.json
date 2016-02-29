@@ -7,7 +7,7 @@
   "strength" : 1000,
   "strengthvariable" : [100,100,100,100,100,100,100],
 
-  "accel" : 0.2,
+  "accel" : 0.32,
 
   "speed" : 3.0,
   "speedvariable" : [100,100,100,100,100,100,100],
@@ -18,15 +18,13 @@
   "scale" : 1,
   "scalevariable" : [100,100,100,100,100,100,100],
 
-  "speed" : 2.0,
-  "speedvariable" : [100,100,100,100,100,100,100],
-
   "physiquemult" : [100,100,100,100,100,100,100],
 
   "encumbrance" : 1000,
   "basedefence" : "work in progress",
 
   "toolsize" : 15,
+  
   "intelligent" : true
 
 }

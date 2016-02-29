@@ -4,6 +4,7 @@ import com.Torvald.Terrarum.LangPack.Lang;
 import com.Torvald.Terrarum.Terrarum;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Formatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,26 +14,16 @@ import java.util.regex.Pattern;
  */
 public class CommandInterpreter {
 
+    private static String[] commandsAvailableWOAuth = {"auth", "qqq", "zoom", "setlocale", "getlocale"};
+
     public static void execute(String command) {
         CommandInput[] cmd = parse(command);
 
         for (CommandInput single_command : cmd) {
             ConsoleCommand commandObj = null;
             try {
-                if (single_command.getName().equalsIgnoreCase("auth")) {
-                    Terrarum.game.auth.execute(single_command.toStringArray());
-                }
-                else if (single_command.getName().equalsIgnoreCase("qqq")) {
-                    new QuitApp().execute(single_command.toStringArray());
-                }
-                else if (single_command.getName().equalsIgnoreCase("zoom")) {
-                    new Zoom().execute(single_command.toStringArray());
-                }
-                else if (single_command.getName().equalsIgnoreCase("setlocale")) {
-                    new SetLocale().execute(single_command.toStringArray());
-                }
-                else if (single_command.getName().equalsIgnoreCase("getlocale")) {
-                    new GetLocale().execute(single_command.toStringArray());
+                if (Arrays.asList(commandsAvailableWOAuth).contains(single_command.getName().toLowerCase())) {
+                    commandObj = CommandDict.getCommand(single_command.getName().toLowerCase());
                 }
                 else {
                     if (Terrarum.game.auth.b()) {
@@ -41,20 +32,26 @@ public class CommandInterpreter {
                         );
                     }
                     else {
+                        System.out.println("ee1");
                         throw new NullPointerException(); // if not authorised, say "Unknown command"
                     }
                 }
             }
             catch (NullPointerException e) {
-                echoUnknownCmd(single_command.getName());
+
             }
             finally {
                 try {
-                    if (commandObj != null)
+                    if (commandObj != null) {
                         commandObj.execute(single_command.toStringArray());
+                    }
+                    else {
+                        echoUnknownCmd(single_command.getName());
+                        System.out.println("ee3");
+                    }
                 }
                 catch (Exception e) {
-                    System.out.println("[CommandInterpreter] ");
+                    System.out.println("[CommandInterpreter] :");
                     e.printStackTrace();
                     new Echo().execute(Lang.get("ERROR_GENERIC_TEXT"));
                 }

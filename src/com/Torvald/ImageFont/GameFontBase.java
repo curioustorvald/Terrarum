@@ -21,6 +21,7 @@ public class GameFontBase implements Font {
     static SpriteSheet cyrilic;
     static SpriteSheet cyrilicEF;
     static SpriteSheet fullwidthForms;
+    static SpriteSheet uniPunct;
 
     static final int JUNG_COUNT = 21;
     static final int JONG_COUNT = 28;
@@ -46,6 +47,7 @@ public class GameFontBase implements Font {
     static final int SHEET_CYRILIC_EM = 9;
     static final int SHEET_CYRILIC_EF = 10;
     static final int SHEET_FW_UNI = 11;
+    static final int SHEET_UNI_PUNCT = 12;
 
     static SpriteSheet[] sheetKey;
     static final Character[] asciiEFList = {
@@ -139,8 +141,14 @@ public class GameFontBase implements Font {
     }
 
     private boolean isFullwidthUni(char c) {
-        return (c >= 0xFF00 && c < 0xFF60);
+        return (c >= 0xFF00 && c < 0xFF20);
     }
+
+    private boolean isUniPunct(char c) {
+        return (c >= 0x2000 && c < 0x2070);
+    }
+
+    /** */
 
     private int asciiEFindexX(char c) {
         return (Arrays.asList(asciiEFList).indexOf(c) % 16);
@@ -214,6 +222,14 @@ public class GameFontBase implements Font {
         return (c - 0xFF00) / 16;
     }
 
+    private int uniPunctIndexX(char c) {
+        return (c - 0x2000) % 16;
+    }
+
+    private int uniPunctIndexY(char c) {
+        return (c - 0x2000) / 16;
+    }
+
     @Override
     public int getWidth(String s) {
         return getWidthSubstr(s, s.length());
@@ -269,12 +285,7 @@ public class GameFontBase implements Font {
     }
 
     @Override
-    public void drawString(float v, float v1, String s) {
-
-    }
-
-    @Override
-    public void drawString(float x, float y, String s, Color color) {
+    public void drawString(float x, float y, String s) {
         // hangul fonts first
         hangulSheet.startUse();
         for (int i = 0; i < s.length(); i++) {
@@ -368,6 +379,10 @@ public class GameFontBase implements Font {
                         sheetX = fullwidthUniIndexX(ch);
                         sheetY = fullwidthUniIndexY(ch);
                         break;
+                    case SHEET_UNI_PUNCT:
+                        sheetX = uniPunctIndexX(ch);
+                        sheetY = uniPunctIndexY(ch);
+                        break;
                     default:
                         sheetX = ch % 16;
                         sheetY = ch / 16;
@@ -378,11 +393,11 @@ public class GameFontBase implements Font {
                     int glyphW = getWidth("" + ch);
                     sheetKey[prevInstance].renderInUse(
                             Math.round(x + getWidthSubstr(s, i + 1) - glyphW)
-                            // Interchar: pull punct right next to hangul to the left
-                            + ((i > 0 && isHangul(s.charAt(i - 1))) ? -3 : 0)
+                                    // Interchar: pull punct right next to hangul to the left
+                                    + ((i > 0 && isHangul(s.charAt(i - 1))) ? -3 : 0)
                             , Math.round(y)
-                            + ((prevInstance == SHEET_CJK_PUNCT) ? -1 :
-                               (prevInstance == SHEET_FW_UNI) ? (H - H_HANGUL) / 2 : 0)
+                                    + ((prevInstance == SHEET_CJK_PUNCT) ? -1 :
+                                       (prevInstance == SHEET_FW_UNI) ? (H - H_HANGUL) / 2 : 0)
                             , sheetX
                             , sheetY
                     );
@@ -403,6 +418,11 @@ public class GameFontBase implements Font {
         }
     }
 
+    @Override
+    public void drawString(float x, float y, String s, Color color) {
+        drawString(x, y, s);
+    }
+
     private int getSheetType(char c) {
         // EFs
         if (isAsciiEF(c)) return SHEET_ASCII_EF;
@@ -416,6 +436,7 @@ public class GameFontBase implements Font {
         else if (isAscii(c)) return SHEET_ASCII_EM;
         else if (isExtA(c)) return SHEET_EXTA_EM;
         else if (isCyrilic(c)) return SHEET_CYRILIC_EM;
+        else if (isUniPunct(c)) return SHEET_UNI_PUNCT;
         // fixed width punctuations
         else if (isCJKPunct(c)) return SHEET_CJK_PUNCT;
         else if (isFullwidthUni(c)) return SHEET_FW_UNI;
@@ -423,9 +444,22 @@ public class GameFontBase implements Font {
         else return SHEET_ASCII_EM; // fallback
     }
 
+    /**
+     * Draw part of a string to the screen. Note that this will still position the text as though
+     * it's part of the bigger string.
+     * @param x
+     * @param y
+     * @param s
+     * @param color
+     * @param startIndex
+     * @param endIndex
+     */
     @Override
-    public void drawString(float v, float v1, String s, Color color, int i, int i1) {
-
+    public void drawString(float x, float y, String s, Color color, int startIndex, int endIndex) {
+        String unprintedHead = s.substring(0, startIndex);
+        String printedBody = s.substring(startIndex, endIndex);
+        int xoff = getWidth(unprintedHead);
+        drawString(x + xoff, y, printedBody, color);
     }
 
     public void reloadUnihan() throws SlickException {

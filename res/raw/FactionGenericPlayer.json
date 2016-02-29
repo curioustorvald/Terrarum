@@ -2,7 +2,7 @@
   "factionname" : "player",
 
   "factionamicable" : ["follower"],
-  "factionneutral" : [],
+  "factionneutral" : ["controlledvillager"],
   "factionhostile" : ["wildlifehostile"],
   "factionfearful" : ["wildlifeflee"]
 }

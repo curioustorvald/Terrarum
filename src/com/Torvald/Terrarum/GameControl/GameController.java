@@ -5,6 +5,8 @@ import com.Torvald.Terrarum.Actors.Player;
 import com.Torvald.Terrarum.MapDrawer.MapCamera;
 import com.Torvald.Terrarum.MapDrawer.MapDrawer;
 import com.Torvald.Terrarum.Terrarum;
+import com.Torvald.Terrarum.TileProperties.TileNameCode;
+import com.Torvald.Terrarum.TileProperties.TilePropCodex;
 import com.Torvald.Terrarum.UserInterface.UIHandler;
 import org.newdawn.slick.Input;
 
@@ -37,6 +39,30 @@ public class GameController {
         }
         else {
             Terrarum.game.consoleHandler.processInput(input);
+        }
+
+
+        int mouseTileX = (int) ((MapCamera.getCameraX() + input.getMouseX() / Terrarum.game.screenZoom)
+                / MapDrawer.TILE_SIZE);
+        int mouseTileY = (int) ((MapCamera.getCameraY() + input.getMouseY() / Terrarum.game.screenZoom)
+                / MapDrawer.TILE_SIZE);
+
+        if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+            // test tile remove
+            try {
+                Terrarum.game.map.setTileTerrain(mouseTileX, mouseTileY, TileNameCode.AIR);
+                Terrarum.game.map.setTileWall(mouseTileX, mouseTileY, TileNameCode.AIR);
+            }
+            catch (ArrayIndexOutOfBoundsException e) {
+            }
+        }
+        else if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
+            // test tile place
+            try {
+                Terrarum.game.map.setTileTerrain(mouseTileX, mouseTileY, TileNameCode.ICE_MAGICAL);
+            }
+            catch (ArrayIndexOutOfBoundsException e) {
+            }
         }
     }
 
@@ -77,16 +103,7 @@ public class GameController {
     }
 
     public static void mousePressed(int button, int x, int y) {
-        int mouseTileX = (int) ((MapCamera.getCameraX() + x / Terrarum.game.screenZoom)
-                / MapDrawer.TILE_SIZE);
-        int mouseTileY = (int) ((MapCamera.getCameraY() + y / Terrarum.game.screenZoom)
-                / MapDrawer.TILE_SIZE);
 
-        try {
-            Terrarum.game.map.setTileTerrain(mouseTileX, mouseTileY, (byte) 0);
-            Terrarum.game.map.setTileWall(mouseTileX, mouseTileY, (byte) 0);
-        }
-        catch (ArrayIndexOutOfBoundsException e) {}
     }
 
     public static void mouseReleased(int button, int x, int y) {

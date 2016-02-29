@@ -140,10 +140,16 @@ public class Game extends BasicGameState {
     public void update(GameContainer gc, StateBasedGame sbg, int delta_t) {
         setAppTitle();
 
+        GameController.processInput(gc.getInput());
+        KeyToggler.update(gc);
+
+        TileStat.update();
+
+        /** Placed before actor update to give some dynamic view of player on screen,
+         *  or else player will always stay same spot, which is somewhat dull.
+         */
         MapDrawer.update(gc, delta_t);
         MapCamera.update(gc, delta_t);
-
-        GameController.processInput(gc.getInput());
 
         actorContainer.forEach(actor -> actor.update(gc, delta_t));
         actorContainer.forEach(
@@ -159,11 +165,7 @@ public class Game extends BasicGameState {
 
         uiContainer.forEach(ui -> ui.update(gc, delta_t));
 
-        KeyToggler.update(gc);
-
         //bulletin.update(gc, delta_t);
-
-        TileStat.update();
     }
 
     private void setAppTitle() {
@@ -205,9 +207,10 @@ public class Game extends BasicGameState {
         MapDrawer.render(gc, g);
 
         LightmapRenderer.renderLightMap();
+
         setBlendModeMul();
+        MapDrawer.drawEnvOverlay(g);
         LightmapRenderer.draw(g);
-        // MapDrawer.drawEnvOverlay(g);
         setBlendModeNormal();
 
         uiContainer.forEach(ui -> ui.render(gc, g));
@@ -224,7 +227,7 @@ public class Game extends BasicGameState {
         int gradMapWidth = GRADIENT_IMAGE.getWidth();
         int phase = Math.round((timeSec / WorldTime.DAY_LENGTH) * gradMapWidth);
 
-        //update in every 60 frames
+        //update in every INTERNAL_FRAME frames
         colourTable[0] = GRADIENT_IMAGE.getColor(phase, 0);
         colourTable[1] = GRADIENT_IMAGE.getColor(phase, 1);
 

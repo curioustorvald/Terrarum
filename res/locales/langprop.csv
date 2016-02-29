@@ -1,2 +1,3 @@
-"STRING_ID";"GLYPH_TAG";"alphabet";"hangul";"jpkana";"cyrillic";"zhsimp";"zhtrad"
-"nameset_suffix";;"alph";"hangul";"kana";"cyril";"zhsimp";"zhtrad"
+"STRING_ID";"IETF language tag(s) without dash";"enUS";"frFR";"esES";"deDE";"itIT";"ptBR";"ptPT";"ruRU";"elGR";"trTR";"daDK";"noNB";"svSE";"nlNL";"plPL";"fiFI";"jaJP";"zhCN";"zhTW";"koKR";"csCZ";"huHU";"roRO";"thTH";"bgBG";"heIL";"jakanaJP";"isIC"
+
+"NAMESET_CHARSET";;"LatinAlph";"LatinAlph";"LatinAlph";"LatinAlph";"LatinAlph";"LatinAlph";"LatinAlph";"CyrilRuRU";"AlphElGR";"LatinAlph";"LatinAlph";"LatinAlph";"LatinAlph";"LatinAlph";"LatinAlph";"LatinAlph";"KanaJaJP";"HanziZhCN";"HanziZhTW";"HangulKoKR";"LatinAlph";"LatinAlph";"LatinAlph";"AksonThTH";"LatinAlph";"AlefbetHeIL";"KanaJaJP";"LatinAlph"

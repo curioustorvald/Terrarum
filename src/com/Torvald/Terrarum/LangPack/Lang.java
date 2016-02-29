@@ -29,6 +29,7 @@ public class Lang {
 
     private static final String PATH_TO_CSV = "./res/locales/";
     private static final String CSV_MAIN = "polyglot.csv";
+    private static final String NAMESET_PREFIX = "nameset_";
 
     private static final int[] HANGUL_POST_INDEX_ALPH = { // 0: 는, 가, ...  1: 은, 이, ...
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -57,7 +58,7 @@ public class Lang {
         FilenameFilter filter = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                return name.contains(".csv") && !name.contains(CSV_MAIN);
+                return name.contains(".csv") && !name.contains(CSV_MAIN) && !name.contains(NAMESET_PREFIX);
             }
         };
         for (String csvfilename : file.list(filter)) {

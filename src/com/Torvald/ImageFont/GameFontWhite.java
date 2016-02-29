@@ -62,6 +62,10 @@ public class GameFontWhite extends GameFontBase {
                 "./res/graphics/fonts/fullwidth_forms.png"
                 , W_UNIHAN, H_UNIHAN
         );
+        uniPunct = new SpriteSheet(
+                "./res/graphics/fonts/unipunct.png"
+                , W_LATIN_WIDE, H
+        );
 
         SpriteSheet[] shk = {
                   asciiSheet
@@ -76,6 +80,7 @@ public class GameFontWhite extends GameFontBase {
                 , cyrilic
                 , cyrilicEF
                 , fullwidthForms
+                , uniPunct
         };
         sheetKey = shk;
     }

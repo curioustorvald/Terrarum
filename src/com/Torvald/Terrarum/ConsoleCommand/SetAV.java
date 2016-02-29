@@ -27,17 +27,24 @@ class SetAV implements ConsoleCommand {
         else if (args.length == 3) {
             Object val;
 
-            try { val = new Float(args[2]); } // try for number
+            try {
+                val = new Integer(args[2]); // try for integer
+            }
             catch (NumberFormatException e) {
 
-                if (args[2].toLowerCase() == "true") {
-                    val = new Boolean(true);
+                try {
+                    val = new Float(args[2]); // try for float
                 }
-                else if (args[2].toLowerCase() == "false") {
-                    val = new Boolean(false);
-                }
-                else {
-                    val = new String(args[2]); // string if not number
+                catch (NumberFormatException ee) {
+                    if (args[2].equalsIgnoreCase("true")) {
+                        val = new Boolean(true);
+                    }
+                    else if (args[2].equalsIgnoreCase("false")) {
+                        val = new Boolean(false);
+                    }
+                    else {
+                        val = new String(args[2]); // string if not number
+                    }
                 }
             }
 

@@ -51,10 +51,6 @@ public class TilePropCodex {
         return tileProps[index];
     }
 
-    public static byte getTileID(String name) {
-        return 0;
-    }
-
     private static void setProp(TileProp prop, CSVRecord record) {
         prop.setName(record.get("name"));
 

@@ -11,17 +11,12 @@ public class Hitbox {
     private Point2f hitboxEnd;
     private float width;
     private float height;
-    private float pointX;
-    private float pointY;
 
     public Hitbox(float x1, float y1, float width, float height) {
         hitboxStart = new Point2f(x1, y1);
         hitboxEnd = new Point2f(x1 + width, y1 + height);
         this.width = width;
         this.height = height;
-
-        pointX = x1 + (width / 2);
-        pointY = y1 + height;
     }
 
     public Point2f getHitboxStart() {
@@ -45,7 +40,7 @@ public class Hitbox {
      * @return pointX
      */
     public float getPointedX() {
-        return pointX;
+        return hitboxStart.getX() + (width / 2);
     }
 
     /**
@@ -53,7 +48,7 @@ public class Hitbox {
      * @return pointY
      */
     public float getPointedY() {
-        return pointY;
+        return hitboxEnd.getY();
     }
 
     /**
@@ -68,30 +63,45 @@ public class Hitbox {
         hitboxEnd = new Point2f(x1 + width, y1 + height);
         this.width = width;
         this.height = height;
+    }
 
-        pointX = x1 + (width / 2);
-        pointY = y1 + height;
+    public void setPosition(float x1, float y1) {
+        hitboxStart = new Point2f(x1, y1);
+        hitboxEnd = new Point2f(x1 + width, y1 + height);
+    }
+
+    public void setPositionX(float x) {
+        setPosition(x, getPosY());
+    }
+
+    public void setPositionY(float y) {
+        setPosition(getPosX(), y);
     }
 
     public void setPositionFromPoint(float x1, float y1) {
         hitboxStart = new Point2f(x1 - (width / 2), y1 - height);
         hitboxEnd = new Point2f(hitboxStart.getX() + width, hitboxStart.getY() + height);
-        pointX = x1;
-        pointY = y1;
     }
 
-    public void setPositionXFromPoint(float x1) {
-        float y1 = pointY;
-        hitboxStart = new Point2f(x1 - (width / 2), y1 - height);
-        hitboxEnd = new Point2f(hitboxStart.getX() + width, hitboxStart.getY() + height);
-        pointX = x1;
+    public void setPositionXFromPoint(float x) {
+        setPositionFromPoint(x, getPointedY());
     }
 
-    public void setPositionYFromPoint(float y1) {
-        float x1 = pointX;
-        hitboxStart = new Point2f(x1 - (width / 2), y1 - height);
-        hitboxEnd = new Point2f(hitboxStart.getX() + width, hitboxStart.getY() + height);
-        pointY = y1;
+    public void setPositionYFromPoint(float y) {
+        setPositionFromPoint(getPointedX(), y);
+    }
+
+    public void translatePosX(float d) {
+        setPositionX(getPosX() + d);
+    }
+
+    public void translatePosY(float d) {
+        setPositionY(getPosY() + d);
+    }
+
+    public void setDimension(float w, float h) {
+        width = w;
+        height = h;
     }
 
     /**
@@ -108,5 +118,13 @@ public class Hitbox {
      */
     public float getPosY() {
         return hitboxStart.getY();
+    }
+
+    public float getCenteredX() {
+        return (hitboxStart.getX() + hitboxEnd.getX()) * 0.5f;
+    }
+
+    public float getCenteredY() {
+        return (hitboxStart.getY() + hitboxEnd.getY()) * 0.5f;
     }
 }

@@ -133,16 +133,16 @@ public class MapCamera {
     public static void update(GameContainer gc, int delta_t) {
         Player player = Terrarum.game.getPlayer();
 
-        renderWidth = FastMath.ceil(Terrarum.WIDTH / Terrarum.game.screenZoom);
+        renderWidth = FastMath.ceil(Terrarum.WIDTH / Terrarum.game.screenZoom); // div, not mul
         renderHeight = FastMath.ceil(Terrarum.HEIGHT / Terrarum.game.screenZoom);
 
         // position - (WH / 2)
         cameraX = clamp(
-                Math.round(player.getNextHitbox().getPointedX() - (renderWidth / 2))
+                Math.round(player.getHitbox().getCenteredX() - (renderWidth / 2))
                 , map.width * TSIZE - renderWidth
         );
         cameraY = clamp(
-                Math.round(player.getNextHitbox().getPointedY() - (renderHeight / 2))
+                Math.round(player.getHitbox().getCenteredY() - (renderHeight / 2))
                 , map.height * TSIZE - renderHeight
         );
     }
@@ -311,19 +311,19 @@ public class MapCamera {
         }
     }
 
-    private static int div16(int x) {
+    public static int div16(int x) {
         return (x & 0x7FFF_FFFF) >> 4;
     }
 
-    private static int mod16(int x) {
+    public static int mod16(int x) {
         return x & 0b1111;
     }
 
-    private static int quantise16(int x) {
+    public static int quantise16(int x) {
         return (x & 0xFFFF_FFF0);
     }
 
-    private static int clampW(int x) {
+    public static int clampW(int x) {
         if (x < 0) {
             return 0;
         }
@@ -335,7 +335,7 @@ public class MapCamera {
         }
     }
 
-    private static int clampH(int x) {
+    public static int clampH(int x) {
         if (x < 0) {
             return 0;
         }
@@ -347,7 +347,7 @@ public class MapCamera {
         }
     }
 
-    private static int clampWTile(int x) {
+    public static int clampWTile(int x) {
         if (x < 0) {
             return 0;
         }
@@ -359,7 +359,7 @@ public class MapCamera {
         }
     }
 
-    private static int clampHTile(int x) {
+    public static int clampHTile(int x) {
         if (x < 0) {
             return 0;
         }
@@ -371,7 +371,7 @@ public class MapCamera {
         }
     }
 
-    private static int clamp(int x, int lim) {
+    public static int clamp(int x, int lim) {
         if (x < 0) {
             return 0;
         }

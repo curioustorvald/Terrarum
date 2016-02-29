@@ -1,0 +1,8 @@
+{
+  "factionname" : "wildhamlet_template",
+
+  "factionamicable" : [],
+  "factionneutral" : ["player", "thisvillager", "thiscontroller"],
+  "factionhostile" : [],
+  "factionfearful" : []
+}

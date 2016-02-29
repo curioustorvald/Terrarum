@@ -3,6 +3,7 @@ package com.Torvald.Terrarum.Actors;
 import com.Torvald.Rand.HQRNG;
 import com.Torvald.Terrarum.MapDrawer.MapDrawer;
 import com.Torvald.Terrarum.Terrarum;
+import com.Torvald.Terrarum.TileProperties.TilePropCodex;
 import com.Torvald.spriteAnimation.SpriteAnimation;
 import com.jme3.math.FastMath;
 import com.sun.istack.internal.NotNull;
@@ -58,7 +59,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     private volatile float mass = 1f;
 
     private static final int TSIZE = MapDrawer.TILE_SIZE;
-    private static final int AUTO_CLIMB_RATE = TSIZE / 4;
+    private static int AUTO_CLIMB_RATE = TSIZE / 8;
 
     /**
      * Gravitational Constant G. Load from GameMap.
@@ -86,7 +87,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     private final int UD_COMPENSATOR_MAX = TSIZE;
     private final int LR_COMPENSATOR_MAX = TSIZE;
-    private final int TILE_CLIMB_RATE = 4;
+    private final int TILE_AUTOCLIMB_RATE = 4;
 
     /**
      * A constant to make falling faster so that the game is more playable
@@ -95,11 +96,24 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     long referenceID;
 
+    private final int EVENT_COLLIDE_TOP = 0;
+    private final int EVENT_COLLIDE_RIGHT = 1;
+    private final int EVENT_COLLIDE_BOTTOM = 2;
+    private final int EVENT_COLLIDE_LEFT = 3;
+    private final int EVENT_COLLIDE_NONE = -1;
+
+    int collisionEvent = EVENT_COLLIDE_NONE; // cannot collide both X-axis and Y-axis, or else jump control breaks up.
+
+    /**
+     * in milliseconds
+     */
+    public final int COOLTIME = 500;
+
     /**
      * Give new random ReferenceID and initialise ActorValue
      */
     public ActorWithBody() {
-        referenceID = new HQRNG(0x7E22A211AAL).nextLong();
+        referenceID = new HQRNG().nextLong();
         actorValue = new ActorValue();
     }
 
@@ -152,8 +166,9 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             baseSpriteHeight = sprite.getHeight();
             baseSpriteWidth = sprite.getWidth();
             gravitation = Terrarum.game.map.getGravitation();
+            AUTO_CLIMB_RATE = (int) Math.min(TSIZE / 8 * FastMath.sqrt(scale), TSIZE);
 
-            if (!playerNoClip()) {
+            if (!isPlayerNoClip()) {
                 applyGravitation();
             }
 
@@ -162,16 +177,21 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             if (veloY > VELO_HARD_LIMIT) veloY = VELO_HARD_LIMIT;
 
             // Set 'next' positions to fiddle with
-            updateNextHitboxY();
-            updateVerticalPos();
-            clampNextHitbox();
-            updateHitboxY();
+            // updateNextHitboxYFromVelo();
+            // updateNextHitboxXFromVelo();
+            updateNextHitboxFromVelo();
 
-            updateNextHitboxX();
-            updateHorizontalPos();
-            clampNextHitbox();
+
+            // do horizontal collision detection first!
+            // updateHorizontalPos();
             updateHitboxX();
 
+
+            updateVerticalPos();
+            updateHitboxY();
+
+
+            clampNextHitbox();
             clampHitbox();
         }
     }
@@ -182,8 +202,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      * Apply only if not grounded; normal force is not implemented (and redundant)
      * so we manually reset G to zero (not applying G. force) if grounded.
      */
-    // FIXME abnormal jump behaviour if mass == 1, same thing happens if mass == 0 but zero mass
-    // is invalid anyway.
+    // FIXME abnormal jump behaviour if mass == 1, same thing happens if mass == 0 (but zero mass is invalid anyway).
     private void applyGravitation() {
         if (!isGrounded()) {
             /**
@@ -205,84 +224,101 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     }
 
     private void updateVerticalPos() {
-        if (!playerNoClip()) {
-            if (collidedBottomAndAdjusted()) {
-                grounded = true;
-                veloY = 0;
+        if (!isPlayerNoClip()) {
+            // check downward
+            if (veloY >= 0) { // use TERNARY for L/R!
+                // order of the if-elseif chain is IMPORTANT
+                if (isColliding(CONTACT_AREA_BOTTOM)) {
+                    adjustHitBottom();
+                    veloY = 0;
+                    grounded = true;
+                }
+                else if (isColliding(CONTACT_AREA_BOTTOM, 0, 1)) {
+                    veloY = 0;
+                    grounded = true;
+                }
+                else {
+                    grounded = false;
+                }
             }
-            else {
+            else if (veloY < 0) {
                 grounded = false;
-            }
 
-            if (collidedTopAndAdjusted()) {
-                veloY = 0;
+                // order of the if-elseif chain is IMPORTANT
+                if (isColliding(CONTACT_AREA_TOP)) {
+                    adjustHitTop();
+                    veloY = 0;
+                }
+                else if (isColliding(CONTACT_AREA_TOP, 0, -1)) {
+                    veloY = 0; // for reversed gravity
+                }
+                else {
+                }
             }
         }
     }
 
-    boolean collidedBottomAndAdjusted() {
-        if (getContactArea(CONTACT_AREA_BOTTOM, 0, 1) == 0) {
-            return false;
-        }
-        /**
-         * seemingly adjusted and one pixel below has ground
-         *
-         * seemingly adjusted: adjustHitBottom sets position one pixel above the ground
-         * (stepping on ground in-game look, as the sprite render is one pixel offseted to Y)
-         */
-        else if (getContactArea(CONTACT_AREA_BOTTOM, 0, 1) > 0
-                && getContactArea(CONTACT_AREA_BOTTOM, 0, 0) == 0) {
-            return true;
-        }
-        else {
-            adjustHitBottom();
-            return true;
-        }
+    private void adjustHitBottom() {
+        float newX = nextHitbox.getPointedX();
+        // int-ify posY of nextHitbox
+        nextHitbox.setPositionYFromPoint( FastMath.floor(nextHitbox.getPointedY()) );
+
+        int newYOff = 0; // always positive
+
+        boolean colliding;
+        do {
+            colliding = isColliding(CONTACT_AREA_BOTTOM, 0, -newYOff);
+            newYOff += 1;
+        } while (colliding);
+
+        float newY = nextHitbox.getPointedY() - newYOff;
+        nextHitbox.setPositionFromPoint(newX, newY + 1);
     }
 
-    boolean collidedTopAndAdjusted() {
-        if (getContactArea(CONTACT_AREA_TOP, 0, -1) == 0) {
-            return false;
-        }
-        /**
-         * seemingly adjusted and one pixel below has ground
-         *
-         * seemingly adjusted: adjustHitBottom sets position one pixel above the ground
-         * (stepping on ground in-game look, as the sprite render is one pixel offseted to Y)
-         */
-        else if (getContactArea(CONTACT_AREA_TOP, 0, -1) > 0
-                && getContactArea(CONTACT_AREA_TOP, 0, 0) == 0) {
-            return true;
-        }
-        else {
-            adjustHitTop();
-            return true;
-        }
+    private void adjustHitTop() { // FIXME jump to teleport to ceiling
+        float newX = nextHitbox.getPointedX();
+        // int-ify posY of nextHitbox
+        nextHitbox.setPositionY( FastMath.floor(nextHitbox.getPosY()) );
+
+        int newYOff = 0; // always positive
+
+        boolean colliding;
+        do {
+            colliding = isColliding(CONTACT_AREA_TOP, 0, newYOff);
+            newYOff += 1;
+        } while (colliding);
+
+        float newY = nextHitbox.getPosY() + newYOff;
+        nextHitbox.setPositionFromPoint(newX, newY - 1);
     }
 
     private void updateHorizontalPos() {
-        if (!playerNoClip()) {
-            if (collidedRightAndAdjusted()) { // treat as 'event--collided right'
+        if (!isPlayerNoClip()) {
+            resetCollisionEventFlag();
+            collidedRightAndAdjusted();
+
+            if (collisionEvent == EVENT_COLLIDE_RIGHT) {
                 veloX = 0;
                 walledRight = true;
-
-                // TODO remove above two lines and implement tile climb (multi-frame calculation.)
-                // Use variable TILE_CLIMB_RATE
             }
-            else if (collidedLeftAndAdjusted()) { // treat as 'event--collided left'
+
+            collidedLeftAndAdjusted();
+
+            if (collisionEvent == EVENT_COLLIDE_LEFT) {
                 veloX = 0;
                 walledLeft = true;
             }
-            else {
+
+            if (collisionEvent != EVENT_COLLIDE_LEFT && collisionEvent != EVENT_COLLIDE_RIGHT) {
                 walledRight = false;
                 walledLeft = false;
             }
         }
     }
 
-    boolean collidedRightAndAdjusted() {
-        if (getContactArea(CONTACT_AREA_RIGHT, 1, 0) == 0) {
-            return false;
+    void collidedRightAndAdjusted() {
+        if (getContactingArea(CONTACT_AREA_RIGHT, 1, 0) == 0) {
+            resetCollisionEventFlag();
         }
         /**
          * seemingly adjusted and one pixel below has ground
@@ -290,19 +326,19 @@ public class ActorWithBody implements Actor, Visible, Glowing {
          * seemingly adjusted: adjustHitBottom sets position one pixel above the ground
          * (stepping on ground in-game look, as the sprite render is one pixel offseted to Y)
          */
-        else if (getContactArea(CONTACT_AREA_RIGHT, 1, 0) > 0
-                && getContactArea(CONTACT_AREA_RIGHT, 0, 0) == 0) {
-            return true;
+        else if (getContactingArea(CONTACT_AREA_RIGHT, 1, 0) > 0
+                && getContactingArea(CONTACT_AREA_RIGHT, 0, 0) == 0) {
+            collisionEvent = EVENT_COLLIDE_RIGHT;
         }
         else {
             adjustHitRight();
-            return true;
+            collisionEvent = EVENT_COLLIDE_RIGHT;
         }
     }
 
-    boolean collidedLeftAndAdjusted() {
-        if (getContactArea(CONTACT_AREA_LEFT, -1, 0) == 0) {
-            return false;
+    void collidedLeftAndAdjusted() {
+        if (getContactingArea(CONTACT_AREA_LEFT, -1, 0) == 0) {
+            resetCollisionEventFlag();
         }
         /**
          * seemingly adjusted and one pixel below has ground
@@ -310,95 +346,19 @@ public class ActorWithBody implements Actor, Visible, Glowing {
          * seemingly adjusted: adjustHitBottom sets position one pixel above the ground
          * (stepping on ground in-game look, as the sprite render is one pixel offseted to Y)
          */
-        else if (getContactArea(CONTACT_AREA_LEFT, -1, 0) > 0
-                && getContactArea(CONTACT_AREA_LEFT, 0, 0) == 0) {
-            return true;
+        else if (getContactingArea(CONTACT_AREA_LEFT, -1, 0) > 0
+                && getContactingArea(CONTACT_AREA_LEFT, 0, 0) == 0) {
+            collisionEvent = EVENT_COLLIDE_LEFT;
         }
         else {
             adjustHitLeft();
-            return true;
+            collisionEvent = EVENT_COLLIDE_LEFT;
         }
-    }
-
-    private void updateNextHitboxX() {
-        nextHitbox.set(
-                hitbox.getPosX() + veloX
-                , hitbox.getPosY()
-                , baseHitboxW * scale
-                , baseHitboxH * scale
-        );
-    }
-
-    private void updateNextHitboxY() {
-        nextHitbox.set(
-                hitbox.getPosX()
-                , hitbox.getPosY() + veloY
-                , baseHitboxW * scale
-                , baseHitboxH * scale
-        );
-    }
-
-    private void updateHitboxX() {
-        hitbox.set(
-                nextHitbox.getPosX()
-                , hitbox.getPosY()
-                , baseHitboxW * scale
-                , baseHitboxH * scale
-        );
-    }
-
-    private void updateHitboxY() {
-        hitbox.set(
-                hitbox.getPosX()
-                , nextHitbox.getPosY()
-                , baseHitboxW * scale
-                , baseHitboxH * scale
-        );
-    }
-
-    private void adjustHitBottom() {
-        int tY = 0;
-        int contactArea = getContactArea(CONTACT_AREA_BOTTOM, 0, 0);
-        for (int lim = 0; lim < UD_COMPENSATOR_MAX; lim++) {
-            /**
-             * get contact area and move up and get again.
-             * keep track of this value, and some point they will be set as lowest
-             * and become static. The very point where the value first became lowest
-             * is the value what we want.
-             */
-            int newContactArea = getContactArea(CONTACT_AREA_BOTTOM, 0, -lim);
-
-            if (newContactArea < contactArea) {
-                tY = -lim;
-            }
-            contactArea = newContactArea;
-        }
-        nextHitbox.setPositionYFromPoint(FastMath.ceil(nextHitbox.getPointedY() + tY));
-    }
-
-    private void adjustHitTop() {
-        int tY = 0;
-        int contactArea = getContactArea(CONTACT_AREA_TOP, 0, 0);
-        for (int lim = 0; lim < UD_COMPENSATOR_MAX; lim++) {
-            /**
-             * get contact area and move up and get again.
-             * keep track of this value, and some point they will be set as lowest
-             * and become static. The very point where the value first became lowest
-             * is the value what we want.
-             */
-            int newContactArea = getContactArea(CONTACT_AREA_TOP, 0, lim);
-
-            if (newContactArea < contactArea) {
-                tY = lim;
-            }
-            contactArea = newContactArea;
-        }
-        nextHitbox.setPositionYFromPoint(FastMath.floor(nextHitbox.getPointedY() + tY));
     }
 
     private void adjustHitRight() {
         int tX = 0;
-        int contactArea = getContactArea(CONTACT_AREA_RIGHT, 0, 0);
+        int contactArea = getContactingArea(CONTACT_AREA_RIGHT, 0, 0);
         for (int lim = 0; lim < LR_COMPENSATOR_MAX; lim++) {
             /**
              * get contact area and move up and get again.
@@ -406,7 +366,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
              * and become static. The very point where the value first became lowest
              * is the value what we want.
              */
-            int newContactArea = getContactArea(CONTACT_AREA_RIGHT, -lim, 0);
+            int newContactArea = getContactingArea(CONTACT_AREA_RIGHT, -lim, 0);
 
             if (newContactArea < contactArea) {
                 tX = -lim;
@@ -424,7 +384,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     private void adjustHitLeft() {
         int tX = 0;
-        int contactArea = getContactArea(CONTACT_AREA_LEFT, 0, 0);
+        int contactArea = getContactingArea(CONTACT_AREA_LEFT, 0, 0);
         for (int lim = 0; lim < LR_COMPENSATOR_MAX; lim++) {
             /**
              * get contact area and move up and get again.
@@ -432,7 +392,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
              * and become static. The very point where the value first became lowest
              * is the value what we want.
              */
-            int newContactArea = getContactArea(CONTACT_AREA_LEFT, lim, 0);
+            int newContactArea = getContactingArea(CONTACT_AREA_LEFT, lim, 0);
 
             if (newContactArea < contactArea) {
                 tX = lim;
@@ -441,14 +401,26 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         }
         //nextHitbox.setPositionYFromPoint(nextHitbox.getPointedX() + tX);
         nextHitbox.set(
-                FastMath.floor(nextHitbox.getPosX() + tX)
+                FastMath.floor(nextHitbox.getPosX() + tX + 1)
                 , nextHitbox.getPosY()
                 , nextHitbox.getWidth()
                 , nextHitbox.getHeight()
         );
     }
 
-    private int getContactArea(int side, int translateX, int translateY) {
+    private boolean isColliding(int side) {
+        return getContactingArea(side) > 0;
+    }
+
+    private boolean isColliding(int side, int tx, int ty) {
+        return getContactingArea(side, tx, ty) > 0;
+    }
+
+    private int getContactingArea(int side) {
+        return getContactingArea(side, 0, 0);
+    }
+
+    private int getContactingArea(int side, int translateX, int translateY) {
         int contactAreaCounter = 0;
         for (int i = 0
                 ; i < Math.round((side % 2 == 0) ? nextHitbox.getWidth() : nextHitbox.getHeight())
@@ -484,12 +456,16 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             }
 
             // evaluate
-            if (Terrarum.game.map.getTileFromTerrain(tileX, tileY) > 0) {
+            if (TilePropCodex.getProp(Terrarum.game.map.getTileFromTerrain(tileX, tileY)).isSolid()) {
                 contactAreaCounter += 1;
             }
         }
 
         return contactAreaCounter;
+    }
+
+    private void resetCollisionEventFlag() {
+        collisionEvent = EVENT_COLLIDE_NONE;
     }
 
     private void clampHitbox() {
@@ -505,6 +481,50 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 , clampH(nextHitbox.getPointedY())
         );
     }
+
+    private void updateNextHitboxXFromVelo() {
+        nextHitbox.set(
+                hitbox.getPosX() + veloX
+                , hitbox.getPosY()
+                , baseHitboxW * scale
+                , baseHitboxH * scale
+        );
+    }
+
+    private void updateNextHitboxYFromVelo() {
+        nextHitbox.set(
+                hitbox.getPosX()
+                , hitbox.getPosY() + veloY
+                , baseHitboxW * scale
+                , baseHitboxH * scale
+        );
+    }
+
+    private void updateNextHitboxFromVelo() {
+        nextHitbox.set(
+                hitbox.getPosX() + veloX
+                , hitbox.getPosY() + veloY
+                , baseHitboxW * scale
+                , baseHitboxH * scale
+        );
+    }
+
+    private void updateHitboxX() {
+        hitbox.setDimension(
+                nextHitbox.getWidth()
+                , nextHitbox.getHeight()
+        );
+        hitbox.setPositionX(nextHitbox.getPosX());
+    }
+
+    private void updateHitboxY() {
+        hitbox.setDimension(
+                nextHitbox.getWidth()
+                , nextHitbox.getHeight()
+        );
+        hitbox.setPositionY(nextHitbox.getPosY());
+    }
+
 
     @Override
     public void drawGlow(GameContainer gc, Graphics g) {
@@ -624,7 +644,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         }
     }
 
-    private boolean playerNoClip() {
+    private boolean isPlayerNoClip() {
         return (this instanceof Player && ((Player) this).isNoClip());
     }
 
@@ -744,7 +764,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         this.update = update;
     }
 
-    private int clampMulOfTSize(float v) {
-        return (Math.round(v) / TSIZE) * TSIZE;
+    private int quantiseTSize(float v) {
+        return FastMath.floor(v / TSIZE) * TSIZE;
     }
 }

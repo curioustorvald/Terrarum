@@ -36,8 +36,14 @@ public class KVHashtable {
         return hashtable.get(key.toLowerCase());
     }
 
+    public int getAsInt(String key) {
+        return (int) get(key);
+    }
+
     public float getAsFloat(String key) {
-        return (float) get(key);
+        Object value = get(key);
+        if (value instanceof Integer) return ((Integer) value).floatValue();
+        else return (float) value;
     }
 
     public String getAsString(String key) {
@@ -46,6 +52,10 @@ public class KVHashtable {
 
     public boolean getAsBoolean(String key) {
         return (boolean) get(key);
+    }
+
+    public boolean hasKey(String key) {
+        return hashtable.containsKey(key);
     }
 
     public Set getKeySet() {

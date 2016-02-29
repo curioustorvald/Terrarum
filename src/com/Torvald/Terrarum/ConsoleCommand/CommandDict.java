@@ -1,5 +1,7 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
+import com.Torvald.Terrarum.Terrarum;
+
 import java.util.Hashtable;
 
 /**
@@ -30,6 +32,7 @@ public class CommandDict {
         dict.put("gsontest", new GsonTest());
         dict.put("setgl", new SetGlobalLightLevel());
         dict.put("getfaction", new GetFactioning());
+        dict.put("auth", Terrarum.game.auth);
     }
 
     public static ConsoleCommand getCommand(String commandName) {

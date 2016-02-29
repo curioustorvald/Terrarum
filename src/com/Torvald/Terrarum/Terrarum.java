@@ -46,7 +46,7 @@ public class Terrarum extends StateBasedGame {
     public static String defaultDir;
     public static String defaultSaveDir;
 
-    public static String gameLocale = "jaJP";
+    public static String gameLocale = "isIC";
 
     public static Font gameFontWhite;
 

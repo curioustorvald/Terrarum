@@ -1,3 +1,5 @@
+Faction documentation
+
 {
   "factionname" : "player",
 
@@ -10,12 +12,12 @@
 factionname     : Identifier of the faction data
 
 factionamicable : Amicable faction. Players can give/take items of actors of this faction, in plus
-                  to the ability of trading. Assigned actors (usually follower) will follow players
+                  to the ability of barter. Assigned actors (usually follower) will follow players
                   in game.
 
 factionneutral  : Explicit neutrality. If the assigned actor is intelligent (NPC AV), players can
-                  trade with them. Unassigned faction will be treated like neutral, but players can
-                  not make any trade with them.
+                  barter with them. Unassigned faction will be treated like neutral, but players
+                  cannot barter with them.
 
 factionhostile  : Assigned faction will attack players on the sight. e.g. 'wildlifehostile'
 

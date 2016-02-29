@@ -22,7 +22,7 @@ public class PlayerDebugger {
         }
     }
 
-    /*
+    /**
      * Delegates for Player instances
      */
 
@@ -42,4 +42,5 @@ public class PlayerDebugger {
     public ActorValue actorValue() { return getPlayer().getActorValue(); }
     public float mass() { return getPlayer().getMass(); }
     public boolean noClip() { return getPlayer().isNoClip(); }
+    public int collisionEvent() { return getPlayer().collisionEvent; }
 }

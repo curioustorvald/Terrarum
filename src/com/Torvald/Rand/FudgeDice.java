@@ -34,6 +34,22 @@ public class FudgeDice {
     }
 
     /**
+     * Roll dice and get result, for array index
+     * @return Normal distributed integer [0 , N] for N = 2 × DiceCounts + 1. 0 is the most frequent return.
+     */
+    public int rollForArray() {
+        return roll() + diceCounts;
+    }
+
+    public int getDiceCounts() {
+        return diceCounts;
+    }
+
+    public int getSizeOfProbabilityRange() {
+        return 2 * diceCounts + 1;
+    }
+
+    /**
      * @return integer randomly picked from {-1, 0, 1}
      */
     private int rollSingleDie() {
