@@ -42,5 +42,5 @@ public class PlayerDebugger {
     public ActorValue actorValue() { return getPlayer().getActorValue(); }
     public float mass() { return getPlayer().getMass(); }
     public boolean noClip() { return getPlayer().isNoClip(); }
-    public int collisionEvent() { return getPlayer().collisionEvent; }
+    public int eventMoving() { return getPlayer().eventMoving; }
 }

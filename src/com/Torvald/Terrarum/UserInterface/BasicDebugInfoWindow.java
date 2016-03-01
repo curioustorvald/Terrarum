@@ -6,7 +6,6 @@ import com.Torvald.Terrarum.LangPack.Lang;
 import com.Torvald.Terrarum.MapDrawer.LightmapRenderer;
 import com.Torvald.Terrarum.MapDrawer.MapDrawer;
 import com.Torvald.Terrarum.Terrarum;
-import com.Torvald.Terrarum.Game;
 import com.Torvald.Terrarum.MapDrawer.MapCamera;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -105,7 +104,7 @@ public class BasicDebugInfoWindow implements UICanvas {
          */
 
         String[] collisionFlagKey = {"top", "right", "bottom", "left"};
-        int collisonFlag = playerDbg.collisionEvent();
+        int collisonFlag = playerDbg.eventMoving();
         printLineColumn(g, 2, 1, "CollisionFlag : "
                                          + ((collisonFlag == -1) ? "none" : collisionFlagKey[collisonFlag]));
         printLineColumn(g, 2, 2, "Env colour temp : " + MapDrawer.getColTemp());

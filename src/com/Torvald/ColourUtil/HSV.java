@@ -67,7 +67,7 @@ public class HSV {
         }
 
         return new Color(
-                (int) ((R_prime + m) * 255)
+                  (int) ((R_prime + m) * 255)
                 , (int) ((G_prime + m) * 255)
                 , (int) ((B_prime + m) * 255)
         );

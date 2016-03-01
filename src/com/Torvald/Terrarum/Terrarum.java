@@ -36,8 +36,11 @@ public class Terrarum extends StateBasedGame {
     public static final int TARGET_INTERNAL_FPS = 100;
 
     public static AppGameContainer appgc;
-    public static final int WIDTH = 960;
-    public static final int HEIGHT = 720;
+
+    public static final int WIDTH = 1060;
+    public static final int HEIGHT = 742; // IMAX ratio
+    public static boolean VSYNC = true;
+
     public static Game game;
 
     public static String OSName;
@@ -93,11 +96,14 @@ public class Terrarum extends StateBasedGame {
         {
             appgc = new AppGameContainer(new Terrarum("Terrarum"));
             appgc.setDisplayMode(WIDTH, HEIGHT, false);
+
             appgc.setTargetFrameRate(TARGET_INTERNAL_FPS);
-            appgc.setVSync(true);
+            appgc.setVSync(VSYNC);
+            appgc.setMaximumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS);
+
             appgc.setShowFPS(false);
             appgc.setUpdateOnlyWhenVisible(false);
-            appgc.setMaximumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS);
+
             appgc.start();
         }
         catch (SlickException ex)

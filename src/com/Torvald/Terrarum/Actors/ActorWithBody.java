@@ -97,13 +97,13 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     long referenceID;
 
-    private final int EVENT_COLLIDE_TOP = 0;
-    private final int EVENT_COLLIDE_RIGHT = 1;
-    private final int EVENT_COLLIDE_BOTTOM = 2;
-    private final int EVENT_COLLIDE_LEFT = 3;
-    private final int EVENT_COLLIDE_NONE = -1;
+    private final int EVENT_MOVE_TOP = 0;
+    private final int EVENT_MOVE_RIGHT = 1;
+    private final int EVENT_MOVE_BOTTOM = 2;
+    private final int EVENT_MOVE_LEFT = 3;
+    private final int EVENT_MOVE_NONE = -1;
 
-    int collisionEvent = EVENT_COLLIDE_NONE; // cannot collide both X-axis and Y-axis, or else jump control breaks up.
+    int eventMoving = EVENT_MOVE_NONE; // cannot collide both X-axis and Y-axis, or else jump control breaks up.
 
     /**
      * in milliseconds
@@ -179,17 +179,12 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             if (veloY > VELO_HARD_LIMIT) veloY = VELO_HARD_LIMIT;
 
             // Set 'next' positions to fiddle with
-            // updateNextHitboxYFromVelo();
-            // updateNextHitboxXFromVelo();
             updateNextHitboxFromVelo();
 
 
-            // do horizontal collision detection first!
-            // updateHorizontalPos();
-            updateHitboxX();
-
-
+            updateHorizontalPos();
             updateVerticalPos();
+            updateHitboxX();
             updateHitboxY();
 
 
@@ -269,12 +264,12 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
         boolean colliding;
         do {
-            colliding = isColliding(CONTACT_AREA_BOTTOM, 0, -newYOff);
             newYOff += 1;
+            colliding = isColliding(CONTACT_AREA_BOTTOM, 0, -newYOff);
         } while (colliding);
 
         float newY = nextHitbox.getPointedY() - newYOff;
-        nextHitbox.setPositionFromPoint(newX, newY + 1);
+        nextHitbox.setPositionFromPoint(newX - 1, newY);
     }
 
     private void adjustHitTop() {
@@ -286,136 +281,92 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
         boolean colliding;
         do {
-            colliding = isColliding(CONTACT_AREA_TOP, 0, newYOff);
             newYOff += 1;
+            colliding = isColliding(CONTACT_AREA_TOP, 0, newYOff);
         } while (colliding);
 
         float newY = nextHitbox.getPosY() + newYOff;
-        nextHitbox.setPosition(newX, newY - 1);
+        nextHitbox.setPosition(newX + 1, newY);
     }
 
     private void updateHorizontalPos() {
         if (!isPlayerNoClip()) {
-            resetCollisionEventFlag();
-            collidedRightAndAdjusted();
-
-            if (collisionEvent == EVENT_COLLIDE_RIGHT) {
-                veloX = 0;
-                walledRight = true;
+            // check right
+            if (veloX > 0) { // use TERNARY for L/R!
+                // order of the if-elseif chain is IMPORTANT
+                if (isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT)) {
+                    adjustHitRight();
+                    veloX = 0;
+                }
+                else if (isColliding(CONTACT_AREA_RIGHT, 1, 0)
+                        && !isColliding(CONTACT_AREA_LEFT, -1, 0)) {
+                    veloX = 0;
+                }
+                else {
+                }
             }
+            else if (veloX < 0) {
 
-            collidedLeftAndAdjusted();
-
-            if (collisionEvent == EVENT_COLLIDE_LEFT) {
-                veloX = 0;
-                walledLeft = true;
+                // order of the if-elseif chain is IMPORTANT
+                if (isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT)) {
+                    adjustHitLeft();
+                    veloX = 0;
+                }
+                else if (isColliding(CONTACT_AREA_LEFT, -1, 0)
+                        && !isColliding(CONTACT_AREA_RIGHT, 1, 0)) {
+                    veloX = 0;
+                }
+                else {
+                }
             }
+            else {
 
-            if (collisionEvent != EVENT_COLLIDE_LEFT && collisionEvent != EVENT_COLLIDE_RIGHT) {
-                walledRight = false;
-                walledLeft = false;
             }
-        }
-    }
-
-    void collidedRightAndAdjusted() {
-        if (getContactingArea(CONTACT_AREA_RIGHT, 1, 0) == 0) {
-            resetCollisionEventFlag();
-        }
-        /**
-         * seemingly adjusted and one pixel below has ground
-         *
-         * seemingly adjusted: adjustHitBottom sets position one pixel above the ground
-         * (stepping on ground in-game look, as the sprite render is one pixel offseted to Y)
-         */
-        else if (getContactingArea(CONTACT_AREA_RIGHT, 1, 0) > 0
-                && getContactingArea(CONTACT_AREA_RIGHT, 0, 0) == 0) {
-            collisionEvent = EVENT_COLLIDE_RIGHT;
-        }
-        else {
-            adjustHitRight();
-            collisionEvent = EVENT_COLLIDE_RIGHT;
-        }
-    }
-
-    void collidedLeftAndAdjusted() {
-        if (getContactingArea(CONTACT_AREA_LEFT, -1, 0) == 0) {
-            resetCollisionEventFlag();
-        }
-        /**
-         * seemingly adjusted and one pixel below has ground
-         *
-         * seemingly adjusted: adjustHitBottom sets position one pixel above the ground
-         * (stepping on ground in-game look, as the sprite render is one pixel offseted to Y)
-         */
-        else if (getContactingArea(CONTACT_AREA_LEFT, -1, 0) > 0
-                && getContactingArea(CONTACT_AREA_LEFT, 0, 0) == 0) {
-            collisionEvent = EVENT_COLLIDE_LEFT;
-        }
-        else {
-            adjustHitLeft();
-            collisionEvent = EVENT_COLLIDE_LEFT;
         }
     }
 
     private void adjustHitRight() {
-        int tX = 0;
-        int contactArea = getContactingArea(CONTACT_AREA_RIGHT, 0, 0);
-        for (int lim = 0; lim < LR_COMPENSATOR_MAX; lim++) {
-            /**
-             * get contact area and move up and get again.
-             * keep track of this value, and some point they will be set as lowest
-             * and become static. The very point where the value first became lowest
-             * is the value what we want.
-             */
-            int newContactArea = getContactingArea(CONTACT_AREA_RIGHT, -lim, 0);
-
-            if (newContactArea < contactArea) {
-                tX = -lim;
-            }
-            contactArea = newContactArea;
-        }
-        //nextHitbox.setPositionYFromPoint(nextHitbox.getPointedX() + tX);
-        nextHitbox.set(
-                FastMath.ceil(nextHitbox.getPosX() + tX)
-                , nextHitbox.getPosY()
-                , nextHitbox.getWidth()
-                , nextHitbox.getHeight()
+        float newY = nextHitbox.getPosY(); // look carefully, getPos or getPointed
+        // int-ify posY of nextHitbox
+        nextHitbox.setPositionX( FastMath.floor(nextHitbox.getPosX() + nextHitbox.getWidth())
+                - nextHitbox.getWidth()
         );
+
+        int newXOff = 0; // always positive
+
+        boolean colliding;
+        do {
+            newXOff += 1;
+            colliding = isColliding(CONTACT_AREA_BOTTOM, -newXOff, 0);
+        } while (newXOff < TSIZE && colliding);
+
+        float newX = nextHitbox.getPosX() - newXOff;
+        nextHitbox.setPosition(newX, newY);
     }
 
     private void adjustHitLeft() {
-        int tX = 0;
-        int contactArea = getContactingArea(CONTACT_AREA_LEFT, 0, 0);
-        for (int lim = 0; lim < LR_COMPENSATOR_MAX; lim++) {
-            /**
-             * get contact area and move up and get again.
-             * keep track of this value, and some point they will be set as lowest
-             * and become static. The very point where the value first became lowest
-             * is the value what we want.
-             */
-            int newContactArea = getContactingArea(CONTACT_AREA_LEFT, lim, 0);
+        float newY = nextHitbox.getPosY();
+        // int-ify posY of nextHitbox
+        nextHitbox.setPositionX( FastMath.ceil(nextHitbox.getPosX()) );
 
-            if (newContactArea < contactArea) {
-                tX = lim;
-            }
-            contactArea = newContactArea;
-        }
-        //nextHitbox.setPositionYFromPoint(nextHitbox.getPointedX() + tX);
-        nextHitbox.set(
-                FastMath.floor(nextHitbox.getPosX() + tX + 1)
-                , nextHitbox.getPosY()
-                , nextHitbox.getWidth()
-                , nextHitbox.getHeight()
-        );
+        int newXOff = 0; // always positive
+
+        boolean colliding;
+        do {
+            newXOff += 1;
+            colliding = isColliding(CONTACT_AREA_TOP, newXOff, 0);
+        } while (newXOff < TSIZE && colliding);
+
+        float newX = nextHitbox.getPosX() + newXOff;
+        nextHitbox.setPosition(newX, newY);
     }
 
     private boolean isColliding(int side) {
-        return getContactingArea(side) > 0;
+        return isColliding(side, 0, 0);
     }
 
     private boolean isColliding(int side, int tx, int ty) {
-        return getContactingArea(side, tx, ty) > 0;
+        return getContactingArea(side, tx, ty) > 1;
     }
 
     private int getContactingArea(int side) {
@@ -429,7 +380,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 ; i++) {
             // set tile positions
             int tileX, tileY;
-            if (side == CONTACT_AREA_BOTTOM) {
+            /*if (side == CONTACT_AREA_BOTTOM) {
                 tileX = div16TruncateToMapWidth(Math.round(nextHitbox.getHitboxStart().getX())
                         + i + translateX);
                 tileY = div16TruncateToMapHeight(FastMath.floor(nextHitbox.getHitboxEnd().getY())
@@ -452,6 +403,30 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                         + translateX);
                 tileY = div16TruncateToMapHeight(Math.round(nextHitbox.getHitboxStart().getY())
                         + i + translateY);
+            }*/
+            if (side == CONTACT_AREA_BOTTOM) {
+                tileX = div16TruncateToMapWidth(Math.round(nextHitbox.getHitboxStart().getX())
+                        + i + translateX);
+                tileY = div16TruncateToMapHeight(Math.round(nextHitbox.getHitboxEnd().getY())
+                        + translateY);
+            }
+            else if (side == CONTACT_AREA_TOP) {
+                tileX = div16TruncateToMapWidth(Math.round(nextHitbox.getHitboxStart().getX())
+                        + i + translateX);
+                tileY = div16TruncateToMapHeight(Math.round(nextHitbox.getHitboxStart().getY())
+                        + translateY);
+            }
+            else if (side == CONTACT_AREA_RIGHT) {
+                tileX = div16TruncateToMapWidth(Math.round(nextHitbox.getHitboxEnd().getX())
+                        + translateX);
+                tileY = div16TruncateToMapHeight(Math.round(nextHitbox.getHitboxStart().getY())
+                        + i + translateY);
+            }
+            else if (side == CONTACT_AREA_LEFT) {
+                tileX = div16TruncateToMapWidth(Math.round(nextHitbox.getHitboxStart().getX())
+                        + translateX);
+                tileY = div16TruncateToMapHeight(Math.round(nextHitbox.getHitboxStart().getY())
+                        + i + translateY);
             }
             else {
                 throw new IllegalArgumentException(String.valueOf(side) + ": Wrong side input");
@@ -464,10 +439,6 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         }
 
         return contactAreaCounter;
-    }
-
-    private void resetCollisionEventFlag() {
-        collisionEvent = EVENT_COLLIDE_NONE;
     }
 
     private void clampHitbox() {
@@ -484,30 +455,14 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         );
     }
 
-    private void updateNextHitboxXFromVelo() {
-        nextHitbox.set(
-                hitbox.getPosX() + veloX
-                , hitbox.getPosY()
-                , baseHitboxW * scale
-                , baseHitboxH * scale
-        );
-    }
-
-    private void updateNextHitboxYFromVelo() {
-        nextHitbox.set(
-                hitbox.getPosX()
-                , hitbox.getPosY() + veloY
-                , baseHitboxW * scale
-                , baseHitboxH * scale
-        );
-    }
-
     private void updateNextHitboxFromVelo() {
         nextHitbox.set(
-                hitbox.getPosX() + veloX
-                , hitbox.getPosY() + veloY
-                , baseHitboxW * scale
-                , baseHitboxH * scale
+                  Math.round(hitbox.getPosX() + veloX)
+                , Math.round(hitbox.getPosY() + veloY)
+                , Math.round(baseHitboxW * scale)
+                , Math.round(baseHitboxH * scale)
+                /** Full quantisation; wonder what havoc these statements would wreak...
+                 */
         );
     }
 

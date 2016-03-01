@@ -23,9 +23,14 @@ def getB40(raw):
 
 
 def intFromCol(r, g, b):
-	return r * MUL_2 + g * MUL + b
+	return int(r * MUL_2 + g * MUL + b)
+def intFromRGB24(r24, g24, b24):
+	roundR = round(r24 / 255.0 * 39)
+	roundG = round(g24 / 255.0 * 39)
+	roundB = round(b24 / 255.0 * 39)
+	return intFromCol(roundR, roundG, roundB)
 def colFromNum(raw):
 	return getR40(raw), getG40(raw), getB40(raw)
 
 print(colFromNum(9979))
-print(intFromCol(3,5,9))
+print(intFromRGB24(255, 164, 78))

@@ -26,6 +26,12 @@ public class GameController {
     }
 
     public static void processInput(Input input) {
+        int mouseTileX = (int) ((MapCamera.getCameraX() + input.getMouseX() / Terrarum.game.screenZoom)
+                / MapDrawer.TILE_SIZE);
+        int mouseTileY = (int) ((MapCamera.getCameraY() + input.getMouseY() / Terrarum.game.screenZoom)
+                / MapDrawer.TILE_SIZE);
+
+
         if (!Terrarum.game.consoleHandler.isTakingControl()) {
             if (Terrarum.game.getPlayer().vehicleRiding != null) {
                 Terrarum.game.getPlayer().vehicleRiding.processInput(input);
@@ -42,16 +48,11 @@ public class GameController {
         }
 
 
-        int mouseTileX = (int) ((MapCamera.getCameraX() + input.getMouseX() / Terrarum.game.screenZoom)
-                / MapDrawer.TILE_SIZE);
-        int mouseTileY = (int) ((MapCamera.getCameraY() + input.getMouseY() / Terrarum.game.screenZoom)
-                / MapDrawer.TILE_SIZE);
-
         if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
             // test tile remove
             try {
                 Terrarum.game.map.setTileTerrain(mouseTileX, mouseTileY, TileNameCode.AIR);
-                Terrarum.game.map.setTileWall(mouseTileX, mouseTileY, TileNameCode.AIR);
+                // Terrarum.game.map.setTileWall(mouseTileX, mouseTileY, TileNameCode.AIR);
             }
             catch (ArrayIndexOutOfBoundsException e) {
             }
