@@ -145,8 +145,6 @@ public class Game extends BasicGameState {
 
         TileStat.update();
 
-
-
         actorContainer.forEach(actor -> actor.update(gc, delta_t));
         actorContainer.forEach(
                 actor -> {
@@ -158,10 +156,7 @@ public class Game extends BasicGameState {
                     }
                 }
         );
-
-        /** Placed before actor update to give some dynamic view of player on screen,
-         *  or else player will always stay same spot, which is somewhat dull.
-         */
+        
         MapDrawer.update(gc, delta_t);
         MapCamera.update(gc, delta_t);
 

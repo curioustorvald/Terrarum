@@ -35,14 +35,14 @@ public class TileStat {
         int renderWidth = FastMath.ceil(Terrarum.WIDTH);
         int renderHeight = FastMath.ceil(Terrarum.HEIGHT);
 
-        int noZoomCameraX = MapCamera.clamp(
-                Math.round(player.getHitbox().getPointedX() - (renderWidth / 2))
-                , map.width * TSIZE - renderWidth
-        );
-        int noZoomCameraY = MapCamera.clamp(
-                Math.round(player.getHitbox().getPointedY() - (renderHeight / 2))
-                , map.height * TSIZE - renderHeight
-        );
+        int noZoomCameraX = Math.round(FastMath.clamp(
+                player.getHitbox().getCenteredX() - (renderWidth / 2)
+                , TSIZE, map.width * TSIZE - renderWidth - TSIZE
+        ));
+        int noZoomCameraY = Math.round(FastMath.clamp(
+                player.getHitbox().getCenteredY() - (renderHeight / 2)
+                , TSIZE, map.height * TSIZE - renderHeight - TSIZE
+        ));
 
         int for_x_start = MapCamera.div16(noZoomCameraX);
         int for_y_start = MapCamera.div16(noZoomCameraY);

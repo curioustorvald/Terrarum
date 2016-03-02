@@ -85,11 +85,11 @@ public class LightmapRenderer {
         }
 
 
-        int for_y_start = div16(MapCamera.getCameraY());
-        int for_x_start = div16(MapCamera.getCameraX());
+        int for_y_start = div16(MapCamera.getCameraY()) - MUL;
+        int for_x_start = div16(MapCamera.getCameraX()) - MUL;
 
-        int for_y_end = clampHTile(for_y_start + div16(MapCamera.getRenderHeight()) + 2);
-        int for_x_end = clampWTile(for_x_start + div16(MapCamera.getRenderWidth()) + 2);
+        int for_y_end = clampHTile(for_y_start + div16(MapCamera.getRenderHeight()) + 2) + MUL;
+        int for_x_end = clampWTile(for_x_start + div16(MapCamera.getRenderWidth()) + 2) + MUL;
 
         /**
 		 * Updating order:

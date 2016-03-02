@@ -37,8 +37,6 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     private final float VELO_HARD_LIMIT = 10000;
 
     boolean grounded = false;
-    boolean walledLeft = false;
-    boolean walledRight = false;
 
     SpriteAnimation sprite;
     @Nullable SpriteAnimation spriteGlow;
@@ -57,7 +55,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      */
     private volatile float scale = 1;
     private volatile float mass = 1f;
-    private final float MASS_LOWEST = Float.MIN_NORMAL;
+    private final float MASS_LOWEST = 2f;
 
     private static final int TSIZE = MapDrawer.TILE_SIZE;
     private static int AUTO_CLIMB_RATE = TSIZE / 8;
@@ -685,14 +683,6 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     public boolean isGrounded() {
         return grounded;
-    }
-
-    public boolean isWalledLeft() {
-        return walledLeft;
-    }
-
-    public boolean isWalledRight() {
-        return walledRight;
     }
 
     public int getBaseHitboxW() {

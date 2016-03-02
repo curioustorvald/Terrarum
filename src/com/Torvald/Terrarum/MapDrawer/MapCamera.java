@@ -137,14 +137,14 @@ public class MapCamera {
         renderHeight = FastMath.ceil(Terrarum.HEIGHT / Terrarum.game.screenZoom);
 
         // position - (WH / 2)
-        cameraX = clamp(
-                Math.round(player.getHitbox().getCenteredX() - (renderWidth / 2))
-                , map.width * TSIZE - renderWidth
-        );
-        cameraY = clamp(
-                Math.round(player.getHitbox().getCenteredY() - (renderHeight / 2))
-                , map.height * TSIZE - renderHeight
-        );
+        cameraX = Math.round(FastMath.clamp(
+                player.getHitbox().getCenteredX() - (renderWidth / 2)
+                , TSIZE, map.width * TSIZE - renderWidth - TSIZE
+        ));
+        cameraY = Math.round(FastMath.clamp(
+                player.getHitbox().getCenteredY() - (renderHeight / 2)
+                , TSIZE, map.height * TSIZE - renderHeight - TSIZE
+        ));
     }
 
     public static void renderBehind(GameContainer gc, Graphics g) {
@@ -365,18 +365,6 @@ public class MapCamera {
         }
         else if (x > map.height) {
             return map.height;
-        }
-        else {
-            return x;
-        }
-    }
-
-    public static int clamp(int x, int lim) {
-        if (x < 0) {
-            return 0;
-        }
-        else if (x > lim) {
-            return lim;
         }
         else {
             return x;
