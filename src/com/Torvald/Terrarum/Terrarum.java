@@ -49,7 +49,7 @@ public class Terrarum extends StateBasedGame {
     public static String defaultDir;
     public static String defaultSaveDir;
 
-    public static String gameLocale = "isIC";
+    public static String gameLocale = ""; // locale override
 
     public static Font gameFontWhite;
 
@@ -70,6 +70,22 @@ public class Terrarum extends StateBasedGame {
         catch (IOException e) {
             e.printStackTrace();
         }
+
+        // TODO if config language is not defined
+        if (gameLocale.length() < 2) { // get system language if not overridden
+            String lan = System.getProperty("user.language");
+            String country = System.getProperty("user.country");
+
+            // exception handling
+            if      (lan.equals("en")) country = "US";
+            else if (lan.equals("fr")) country = "FR";
+            else if (lan.equals("de")) country = "DE";
+            else if (lan.equals("ko")) country = "KR";
+
+            gameLocale = lan + country;
+        }
+
+        System.out.println("[Terrarum] Locale: " + gameLocale);
     }
 
     @Override

@@ -182,8 +182,14 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             updateNextHitboxFromVelo();
 
 
-            updateHorizontalPos();
-            updateVerticalPos();
+            if (Math.abs(veloX) < 0.5) {
+                updateVerticalPos();
+                updateHorizontalPos();
+            }
+            else {
+                updateHorizontalPos();
+                updateVerticalPos();
+            }
             updateHitboxX();
             updateHitboxY();
 
@@ -358,7 +364,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         } while (newXOff < TSIZE && colliding);
 
         float newX = nextHitbox.getPosX() + newXOff;
-        nextHitbox.setPosition(newX, newY);
+        nextHitbox.setPosition(newX + 1, newY);
     }
 
     private boolean isColliding(int side) {

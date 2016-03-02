@@ -12,7 +12,7 @@ public class GameFontBlack extends GameFontBase {
         super();
 
         hangulSheet = new SpriteSheet(
-                "./res/graphics/fonts/han_atlas_black.png"
+                "./res/graphics/fonts/han_johab_black.png"
                 , W_CJK, H_HANGUL
         );
         asciiSheet = new SpriteSheet(

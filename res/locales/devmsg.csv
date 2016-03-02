@@ -1,7 +1,7 @@
 "STRING_ID";"IETF language tag(s) without dash";"enUS";"frFR";"esES";"deDE";"itIT";"ptBR";"ptPT";"ruRU";"elGR";"trTR";"daDK";"noNB";"svSE";"nlNL";"plPL";"fiFI";"jaJP";"zhCN";"zhTW";"koKR";"csCZ";"huHU";"roRO";"thTH";"bgBG";"heIL";"jakanaJP";"isIC"
 
 "DEV_MEMORY_SHORT_CAP";;"MEM";"MEM";;;;;;;;;;;;;;;"メモリー";;;"메모리";;;;;;;"メモリー";"MIN"
-"DEV_MEMORY_A_OF_B";;"%1$sM out of %2$sM";"%1$sM sur %2$sM";;;;;;;;;;;;;;;"%2$sM中%1$sM";;;"%2$sM 중 %1$sM";;;;;;;"%2$sM　ちゅう　%1$sM";"%1$sM af %2$s"
+"DEV_MEMORY_A_OF_B";;"%1$sM out of %2$sM";"%1$sM sur %2$sM";;;;;;;;;;;;;;;"%2$sM中%1$sM";;;"%2$sM 중 %1$sM";;;;;;;"%2$sM　ちゅう　%1$sM";"%1$sM af %2$sM"
 
 "DEV_COLOUR_LEGEND_GREEN";;" GREEN";" VERT";;;;;;;;;;;;;;;"緑";;;"녹";;;;;;;"　みどり";"grænn"
 "DEV_COLOUR_LEGEND_BLUE";;"  BLUE";" BLEU";;;;;;;;;;;;;;;"青";;;"청";;;;;;;"　　あお";"blár"

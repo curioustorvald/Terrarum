@@ -104,7 +104,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
      * @param absAxisVal (set AXIS_POSMAX if keyboard controlled)
      */
     private void walkHorizontal(boolean left, float absAxisVal) {
-        if ((!super.isWalledLeft() && left) || (!super.isWalledRight() && !left)) {
+        //if ((!super.isWalledLeft() && left) || (!super.isWalledRight() && !left)) {
             readonly_totalX = super.getVeloX()
                     +
                     actorValue.getAsFloat("accel")
@@ -132,7 +132,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
             // Heading flag
             if (left) walkHeading = LEFT;
             else      walkHeading = RIGHT;
-        }
+        //}
     }
 
     /**

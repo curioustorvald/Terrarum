@@ -98,6 +98,25 @@ public class GameFontBase implements Font {
         return ret;
     }
 
+    private int getHanChosung(int hanIndex) {
+        return hanIndex / (JUNG_COUNT * JONG_COUNT);
+    }
+
+    private int getHanJungseong(int hanIndex) {
+        return hanIndex / (JONG_COUNT) % JUNG_COUNT;
+    }
+
+    private int getHanJongseong(int hanIndex) {
+        return hanIndex % JONG_COUNT;
+    }
+
+    private int getHanChosungShift(int hanIndex) {
+        int jungseongIndex = getHanJungseong(hanIndex);
+        Integer[] jungseongWide = {8, 12, 13, 17, 18, 21};
+        return (Arrays.asList(jungseongWide).contains(jungseongIndex))
+                ? 1 : 0;
+    }
+
     private boolean isAsciiEF(char c) {
         return (Arrays.asList(asciiEFList).contains(c));
     }
@@ -288,7 +307,8 @@ public class GameFontBase implements Font {
     public void drawString(float x, float y, String s) {
         // hangul fonts first
         hangulSheet.startUse();
-        for (int i = 0; i < s.length(); i++) {
+        // WANSEONG
+        /*for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
 
             if (isHangul(ch)) {
@@ -301,6 +321,53 @@ public class GameFontBase implements Font {
                         , Math.round((H - H_HANGUL) / 2 + y + 1)
                         , hanPos[0]
                         , hanPos[1]
+                );
+            }
+        }*/
+
+        // JOHAB
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+
+            if (isHangul(ch)) {
+                int hIndex = ch - 0xAC00;
+
+                int indexCho =  getHanChosung(hIndex);
+                int indexJung = getHanJungseong(hIndex);
+                int indexJong = getHanJongseong(hIndex);
+
+                int choRow = getHanChosungShift(hIndex);
+                int jungRow = 2;
+                int jongRow = 3;
+
+                int glyphW = getWidth("" + ch);
+
+                // chosung
+                hangulSheet.renderInUse(
+                        Math.round(x
+                                + getWidthSubstr(s, i + 1) - glyphW
+                        )
+                        , Math.round((H - H_HANGUL) / 2 + y + 1)
+                        , indexCho
+                        , choRow
+                );
+                // jungseong
+                hangulSheet.renderInUse(
+                        Math.round(x
+                                + getWidthSubstr(s, i + 1) - glyphW
+                        )
+                        , Math.round((H - H_HANGUL) / 2 + y + 1)
+                        , indexJung
+                        , jungRow
+                );
+                // jongseong
+                hangulSheet.renderInUse(
+                        Math.round(x
+                                + getWidthSubstr(s, i + 1) - glyphW
+                        )
+                        , Math.round((H - H_HANGUL) / 2 + y + 1)
+                        , indexJong
+                        , jongRow
                 );
             }
         }
