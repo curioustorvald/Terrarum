@@ -4,6 +4,7 @@ import com.Torvald.Terrarum.*;
 import com.Torvald.Terrarum.Actors.Player;
 import com.Torvald.Terrarum.GameMap.GameMap;
 import com.Torvald.Terrarum.GameMap.MapLayer;
+import com.Torvald.Terrarum.TileProperties.TilePropCodex;
 import com.jme3.math.FastMath;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.*;
@@ -398,7 +399,7 @@ public class MapCamera {
     }
 
     private static boolean isOpaque(int x) {
-        return !(x == GRASS || x == AIR);
+        return TilePropCodex.getProp(x).isOpaque();
     }
 
     public static int getCameraX() {

@@ -108,33 +108,35 @@ public class LightmapRenderer {
         //System.out.println(for_x_start);
         //System.out.println(for_x_end);
 
-        for (int y = for_y_start; y < for_y_end; y++) {
-            for (int x = for_x_start; x < for_x_end; x++) {
-                staticLightMap[y][x] = calculate(x, y);
+        try {
+            for (int y = for_y_start; y < for_y_end; y++) {
+                for (int x = for_x_start; x < for_x_end; x++) {
+                    staticLightMap[y][x] = calculate(x, y);
+                }
+            }
+
+            // Round 4
+            for (int y = for_y_end - 1; y > for_y_start; y--) {
+                for (int x = for_x_start; x < for_x_end; x++) {
+                    staticLightMap[y][x] = calculate(x, y);
+                }
+            }
+
+            // Round 3
+            for (int y = for_y_end - 1; y > for_y_start; y--) {
+                for (int x = for_x_end - 1; x >= for_x_start; x--) {
+                    staticLightMap[y][x] = calculate(x, y);
+                }
+            }
+
+            // Round 2
+            for (int y = for_y_start; y < for_y_end; y++) {
+                for (int x = for_x_end - 1; x >= for_x_start; x--) {
+                    staticLightMap[y][x] = calculate(x, y);
+                }
             }
         }
-
-        // Round 4
-        for (int y = for_y_end - 1; y > for_y_start; y--) {
-            for (int x = for_x_start; x < for_x_end; x++) {
-                staticLightMap[y][x] = calculate(x, y);
-            }
-        }
-
-        // Round 3
-        for (int y = for_y_end - 1; y > for_y_start; y--) {
-            for (int x = for_x_end - 1; x >= for_x_start; x--) {
-                staticLightMap[y][x] = calculate(x, y);
-            }
-        }
-
-        // Round 2
-        for (int y = for_y_start; y < for_y_end; y++) {
-            for (int x = for_x_end - 1; x >= for_x_start; x--) {
-                staticLightMap[y][x] = calculate(x, y);
-            }
-        }
-
+        catch (ArrayIndexOutOfBoundsException e) {}
     }
 
     public static void draw(Graphics g) {
@@ -256,94 +258,88 @@ public class LightmapRenderer {
     }
 
     private static char calculate(int x, int y){
-        if (!outOfBounds(x, y)){
+        char lightLevelThis = 0;
+        int thisTerrain = Terrarum.game.map.getTileFromTerrain(x, y);
+        int thisWall = Terrarum.game.map.getTileFromWall(x, y);
+        char thisTileLuminosity = TilePropCodex.getProp(thisTerrain).getLuminosity();
+        char thisTileOpacity = TilePropCodex.getProp(thisTerrain).getOpacity();
+        char sunLight = Terrarum.game.map.getGlobalLight();
 
-            char lightLevelThis = 0;
-            int thisTerrain = Terrarum.game.map.getTileFromTerrain(x, y);
-            int thisWall = Terrarum.game.map.getTileFromWall(x, y);
-            char thisTileLuminosity = TilePropCodex.getProp(thisTerrain).getLuminosity();
-            char thisTileOpacity = TilePropCodex.getProp(thisTerrain).getOpacity();
-            char sunLight = Terrarum.game.map.getGlobalLight();
-
-            // MIX TILE
-            // open air
-            if (thisTerrain == AIR && thisWall == AIR) {
-                lightLevelThis = sunLight;
-            }
-            // luminous tile transparent (allows sunlight to pass)
-            else if (thisWall == AIR && thisTileLuminosity > 0) {
-                char darkenSunlight = darkenColoured(sunLight, thisTileOpacity);
-                lightLevelThis = screenBlend(darkenSunlight, thisTileLuminosity);
-            }
-            // luminous tile (opaque)
-            else if (thisWall != AIR && thisTileLuminosity > 0) {
-                lightLevelThis = thisTileLuminosity;
-            }
-            // END MIX TILE
-
-            // mix lantern
-            for (LightmapLantern lantern : lanterns) {
-                if (lantern.getX() == x && lantern.getY() == y) {
-                    lightLevelThis = screenBlend(lightLevelThis, lantern.getIntensity());
-                    break;
-                }
-            }
-
-            // mix luminous actor
-            // test player TODO for all actor.Luminous in the game
-            int tileX = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedX() / TSIZE);
-            int tileY = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedY() / TSIZE)
-                    - 1;
-            char actorLuminosity = Terrarum.game.getPlayer().getLuminance();
-            if (x == tileX && y == tileY) {
-                lightLevelThis = screenBlend(lightLevelThis, actorLuminosity);
-            }
-
-
-            // calculate ambient
-            char ambient = 0; char nearby = 0;
-            findNearbyBrightest:
-            for (int yoff = -1; yoff <= 1; yoff++) {
-                for (int xoff = -1; xoff <= 1; xoff++) {
-                    /**
-                     * filter for 'v's as:
-                     * +-+-+-+
-                     * |a|v|a|
-                     * +-+-+-+
-                     * |v| |v|
-                     * +-+-+-+
-                     * |a|v|a|
-                     * +-+-+-+
-                     */
-                    if (xoff != yoff && -xoff != yoff) { // 'v' tiles
-                        if (!outOfMapBounds(x + xoff, y + yoff)) {
-                            nearby = staticLightMap[y + yoff][x + xoff];
-                        }
-                    }
-                    else if (xoff != 0 && yoff != 0) { // 'a' tiles
-                        if (!outOfMapBounds(x + xoff, y + yoff)) {
-                            nearby = darkenUniformInt(staticLightMap[y + yoff][x + xoff]
-                                    , 2); //2
-                            // mix some to have more 'spreading'
-                            // so that light spreads in a shape of an octagon instead of a diamond
-                        }
-                    }
-                    else {
-                        nearby = 0; // exclude 'me' tile
-                    }
-
-                    ambient = maximiseRGB(ambient, nearby); // keep base value as brightest nearby
-                }
-            }
-
-            ambient = darkenColoured(ambient, thisTileOpacity); // get real ambient by appling opacity value
-
-            // mix and return lightlevel and ambient
-            return maximiseRGB(lightLevelThis, ambient);
+        // MIX TILE
+        // open air
+        if (thisTerrain == AIR && thisWall == AIR) {
+            lightLevelThis = sunLight;
         }
-        else {
-            throw new IllegalArgumentException("Out of bounds of lightMap");
+        // luminous tile transparent (allows sunlight to pass)
+        else if (thisWall == AIR && thisTileLuminosity > 0) {
+            char darkenSunlight = darkenColoured(sunLight, thisTileOpacity);
+            lightLevelThis = screenBlend(darkenSunlight, thisTileLuminosity);
         }
+        // luminous tile (opaque)
+        else if (thisWall != AIR && thisTileLuminosity > 0) {
+            lightLevelThis = thisTileLuminosity;
+        }
+        // END MIX TILE
+
+        // mix lantern
+        for (LightmapLantern lantern : lanterns) {
+            if (lantern.getX() == x && lantern.getY() == y) {
+                lightLevelThis = screenBlend(lightLevelThis, lantern.getIntensity());
+                break;
+            }
+        }
+
+        // mix luminous actor
+        // test player TODO for all actor.Luminous in the game
+        int tileX = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedX() / TSIZE);
+        int tileY = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedY() / TSIZE)
+                - 1;
+        char actorLuminosity = Terrarum.game.getPlayer().getLuminance();
+        if (x == tileX && y == tileY) {
+            lightLevelThis = screenBlend(lightLevelThis, actorLuminosity);
+        }
+
+
+        // calculate ambient
+        char ambient = 0; char nearby = 0;
+        findNearbyBrightest:
+        for (int yoff = -1; yoff <= 1; yoff++) {
+            for (int xoff = -1; xoff <= 1; xoff++) {
+                /**
+                 * filter for 'v's as:
+                 * +-+-+-+
+                 * |a|v|a|
+                 * +-+-+-+
+                 * |v| |v|
+                 * +-+-+-+
+                 * |a|v|a|
+                 * +-+-+-+
+                 */
+                if (xoff != yoff && -xoff != yoff) { // 'v' tiles
+                    if (!outOfMapBounds(x + xoff, y + yoff)) {
+                        nearby = staticLightMap[y + yoff][x + xoff];
+                    }
+                }
+                else if (xoff != 0 && yoff != 0) { // 'a' tiles
+                    if (!outOfMapBounds(x + xoff, y + yoff)) {
+                        nearby = darkenUniformInt(staticLightMap[y + yoff][x + xoff]
+                                , 2); //2
+                        // mix some to have more 'spreading'
+                        // so that light spreads in a shape of an octagon instead of a diamond
+                    }
+                }
+                else {
+                    nearby = 0; // exclude 'me' tile
+                }
+
+                ambient = maximiseRGB(ambient, nearby); // keep base value as brightest nearby
+            }
+        }
+
+        ambient = darkenColoured(ambient, thisTileOpacity); // get real ambient by appling opacity value
+
+        // mix and return lightlevel and ambient
+        return maximiseRGB(lightLevelThis, ambient);
     }
 
     /**

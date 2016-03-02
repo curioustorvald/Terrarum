@@ -156,7 +156,7 @@ public class Game extends BasicGameState {
                     }
                 }
         );
-        
+
         MapDrawer.update(gc, delta_t);
         MapCamera.update(gc, delta_t);
 

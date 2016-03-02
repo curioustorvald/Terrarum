@@ -8,7 +8,7 @@ public class TileProp {
     private int id;
     private String name;
 
-    private char opacity;
+    private char opacity; // colour attenuation
 
     private int strength;
 
@@ -18,6 +18,8 @@ public class TileProp {
     private boolean solid; // transparent or not
 
     private boolean wallable;
+
+    private boolean opaque; // hides wall or not
 
     private char luminosity;
     private int drop;
@@ -128,5 +130,13 @@ public class TileProp {
 
     void setFriction(int friction) {
         this.friction = friction;
+    }
+
+    public boolean isOpaque() {
+        return opaque;
+    }
+
+    public void setOpaque(boolean opaque) {
+        this.opaque = opaque;
     }
 }

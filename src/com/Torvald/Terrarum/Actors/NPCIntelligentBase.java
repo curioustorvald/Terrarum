@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum.Actors;
 
+import com.Torvald.Terrarum.Actors.AI.ActorAI;
 import com.Torvald.Terrarum.Actors.Faction.Faction;
 import com.Torvald.Terrarum.GameItem.InventoryItem;
 import com.Torvald.Terrarum.Terrarum;
@@ -14,18 +15,17 @@ import java.util.HashSet;
 public class NPCIntelligentBase extends ActorWithBody implements AIControlled, Pocketed, CanBeStoredAsItem,
         Factionable, Landholder {
 
-    private InventoryItem itemData;
-    // private ActorAI ai;
+    private InventoryItem itemData; // keep it for extendibility, like Carriers in SC1
+    private ActorAI ai;
     private ActorInventory inventory;
 
     private HashSet<Faction> factionSet = new HashSet<>();
 
+    /**
+     * Absolute tile index. index(x, y) = y * map.width + x <br />
+     * The arraylist will be saved in JSON format with GSON.
+     */
     private ArrayList<Integer> houseTiles = new ArrayList<>();
-
-    @Override
-    public void attachAI() {
-
-    }
 
     @Override
     public void assignFaction(Faction f) {
@@ -142,5 +142,10 @@ public class NPCIntelligentBase extends ActorWithBody implements AIControlled, P
     @Override
     public void overwriteInventory(ActorInventory inventory) {
         this.inventory = inventory;
+    }
+
+    @Override
+    public void attachAI(ActorAI ai) {
+        this.ai = ai;
     }
 }

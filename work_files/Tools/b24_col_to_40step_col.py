@@ -34,3 +34,4 @@ def colFromNum(raw):
 
 print(colFromNum(9979))
 print(intFromRGB24(255, 164, 78))
+print(intFromCol(6, 10, 18))
