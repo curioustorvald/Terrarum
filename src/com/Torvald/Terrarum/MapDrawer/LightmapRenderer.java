@@ -47,6 +47,7 @@ public class LightmapRenderer {
 
     }
 
+    @Deprecated
     public static void addLantern(int x, int y, char intensity) {
         LightmapLantern thisLantern = new LightmapLantern(x, y, intensity);
 
@@ -64,6 +65,7 @@ public class LightmapRenderer {
         lanterns.add(thisLantern);
     }
 
+    @Deprecated
     public static void removeLantern(int x, int y) {
         for (int i = lanterns.size() - 1; i >= 0; i--) {
             LightmapLantern lantern = lanterns.get(i);
@@ -85,11 +87,11 @@ public class LightmapRenderer {
         }
 
 
-        int for_y_start = div16(MapCamera.getCameraY()) - MUL;
-        int for_x_start = div16(MapCamera.getCameraX()) - MUL;
+        int for_y_start = div16(MapCamera.getCameraY()) - 1;
+        int for_x_start = div16(MapCamera.getCameraX()) - 1;
 
-        int for_y_end = clampHTile(for_y_start + div16(MapCamera.getRenderHeight()) + 2) + MUL;
-        int for_x_end = clampWTile(for_x_start + div16(MapCamera.getRenderWidth()) + 2) + MUL;
+        int for_y_end = clampHTile(for_y_start + div16(MapCamera.getRenderHeight()) + 2) + 1;
+        int for_x_end = clampWTile(for_x_start + div16(MapCamera.getRenderWidth()) + 2) + 1;
 
         /**
 		 * Updating order:
@@ -102,13 +104,12 @@ public class LightmapRenderer {
          * for all staticLightMap[y][x]
 		 */
 
-        // Round 1
-        purgePartOfLightmap(for_x_start, for_y_start, for_x_end, for_y_end);
-
-        //System.out.println(for_x_start);
-        //System.out.println(for_x_end);
+        purgePartOfLightmap(for_x_start - 1, for_y_start - 1, for_x_end + 1, for_y_end + 1);
+        // if wider purge were not applied, GL changing (sunset, sunrise) will behave incorrectly
+        // ("leakage" of non-updated sunlight)
 
         try {
+            // Round 1
             for (int y = for_y_start; y < for_y_end; y++) {
                 for (int x = for_x_start; x < for_x_end; x++) {
                     staticLightMap[y][x] = calculate(x, y);
@@ -140,117 +141,132 @@ public class LightmapRenderer {
     }
 
     public static void draw(Graphics g) {
-        int for_x_start = MapCamera.getRenderStartX();
-        int for_y_start = MapCamera.getRenderStartY();
+        int for_x_start = MapCamera.getRenderStartX() - 1;
+        int for_y_start = MapCamera.getRenderStartY() - 1;
         int for_x_end = MapCamera.getRenderEndX();
         int for_y_end = MapCamera.getRenderEndY();
 
         // draw
-        for (int y = for_y_start; y < for_y_end; y++) {
-            for (int x = for_x_start; x < for_x_end; x++) {
-                // smooth
-                if (Terrarum.game.screenZoom >= 1 && ((boolean) Terrarum.game.gameConfig.get("smoothlighting"))) {
-                    char thisLightLevel = staticLightMap[y][x];
-                    if (y > 0 && x < for_x_end && thisLightLevel == 0 && staticLightMap[y - 1][x] == 0) {
-                        try {
-                            // coalesce zero intensity blocks to one
-                            int zeroLevelCounter = 1;
-                            while (staticLightMap[y][x + zeroLevelCounter] == 0
-                                    && staticLightMap[y - 1][x + zeroLevelCounter] == 0) {
-                                zeroLevelCounter += 1;
+        try {
+            for (int y = for_y_start; y < for_y_end; y++) {
+                for (int x = for_x_start; x < for_x_end; x++) {
+                    // smooth
+                    if (Terrarum.game.screenZoom >= 1 && ((boolean) Terrarum.game.gameConfig.get(
+                            "smoothlighting"))) {
+                        char thisLightLevel = staticLightMap[y][x];
+                        if (y > 0 && x < for_x_end && thisLightLevel == 0 && staticLightMap[y - 1][x] == 0) {
+                            try {
+                                // coalesce zero intensity blocks to one
+                                int zeroLevelCounter = 1;
+                                while (staticLightMap[y][x + zeroLevelCounter] == 0
+                                        && staticLightMap[y - 1][x + zeroLevelCounter] == 0) {
+                                    zeroLevelCounter += 1;
 
-                                if (x + zeroLevelCounter >= for_x_end) break;
+                                    if (x + zeroLevelCounter >= for_x_end) break;
+                                }
+
+                                g.setColor(new Color(0));
+                                g.fillRect(
+                                        Math.round(x * TSIZE * Terrarum.game.screenZoom)
+                                        , Math.round(y * TSIZE * Terrarum.game.screenZoom)
+                                        , FastMath.ceil(
+                                                TSIZE * Terrarum.game.screenZoom) * zeroLevelCounter
+                                        , FastMath.ceil(TSIZE * Terrarum.game.screenZoom)
+                                );
+
+                                x += (zeroLevelCounter - 1);
+                            }
+                            catch (ArrayIndexOutOfBoundsException e) {
+                                // do nothing
+                            }
+                        }
+                        else {
+                            /**    a
+                             *   +-+-+
+                             *   |i|j|
+                             * b +-+-+ c
+                             *   |k|l|
+                             *   +-+-+
+                             *     d
+                             */
+                            char a = (y == 0) ? thisLightLevel
+                                              : (y == Terrarum.game.map.height - 1) ? thisLightLevel
+                                                                                    : maximiseRGB(
+                                                                                            staticLightMap[y][x]
+                                                                                            ,
+                                                                                            staticLightMap[y - 1][x]);
+                            char d = (y == 0) ? thisLightLevel
+                                              : (y == Terrarum.game.map.height - 1) ? thisLightLevel
+                                                                                    : maximiseRGB(
+                                                                                            staticLightMap[y][x]
+                                                                                            ,
+                                                                                            staticLightMap[y + 1][x]);
+                            char b = (x == 0) ? thisLightLevel
+                                              : (x == Terrarum.game.map.width - 1) ? thisLightLevel
+                                                                                   : maximiseRGB(
+                                                                                           staticLightMap[y][x]
+                                                                                           ,
+                                                                                           staticLightMap[y][x - 1]);
+                            char c = (x == 0) ? thisLightLevel
+                                              : (x == Terrarum.game.map.width - 1) ? thisLightLevel
+                                                                                   : maximiseRGB(
+                                                                                           staticLightMap[y][x]
+                                                                                           ,
+                                                                                           staticLightMap[y][x + 1]);
+                            char[] colourMapItoL = new char[4];
+                            colourMapItoL[0] = colourLinearMix(a, b);
+                            colourMapItoL[1] = colourLinearMix(a, c);
+                            colourMapItoL[2] = colourLinearMix(b, d);
+                            colourMapItoL[3] = colourLinearMix(c, d);
+
+                            for (int iy = 0; iy < 2; iy++) {
+                                for (int ix = 0; ix < 2; ix++) {
+                                    g.setColor(toTargetColour(colourMapItoL[iy * 2 + ix]));
+
+                                    g.fillRect(
+                                            Math.round(
+                                                    x * TSIZE * Terrarum.game.screenZoom) + (ix * TSIZE / 2 * Terrarum.game.screenZoom)
+                                            , Math.round(
+                                                    y * TSIZE * Terrarum.game.screenZoom) + (iy * TSIZE / 2 * Terrarum.game.screenZoom)
+                                            , FastMath.ceil(TSIZE * Terrarum.game.screenZoom / 2)
+                                            , FastMath.ceil(TSIZE * Terrarum.game.screenZoom / 2)
+                                    );
+                                }
+                            }
+                        }
+                    }
+                    // Retro
+                    else {
+                        try {
+                            int thisLightLevel = staticLightMap[y][x];
+
+                            // coalesce identical intensity blocks to one
+                            int sameLevelCounter = 1;
+                            while (staticLightMap[y][x + sameLevelCounter] == thisLightLevel) {
+                                sameLevelCounter += 1;
+
+                                if (x + sameLevelCounter >= for_x_end) break;
                             }
 
-                            g.setColor(new Color(0));
+                            g.setColor(toTargetColour(staticLightMap[y][x]));
                             g.fillRect(
                                     Math.round(x * TSIZE * Terrarum.game.screenZoom)
                                     , Math.round(y * TSIZE * Terrarum.game.screenZoom)
                                     , FastMath.ceil(
-                                            TSIZE * Terrarum.game.screenZoom) * zeroLevelCounter
+                                            TSIZE * Terrarum.game.screenZoom) * sameLevelCounter
                                     , FastMath.ceil(TSIZE * Terrarum.game.screenZoom)
                             );
 
-                            x += (zeroLevelCounter - 1);
+                            x += (sameLevelCounter - 1);
                         }
                         catch (ArrayIndexOutOfBoundsException e) {
                             // do nothing
                         }
                     }
-                    else {
-                        /**    a
-                         *   +-+-+
-                         *   |i|j|
-                         * b +-+-+ c
-                         *   |k|l|
-                         *   +-+-+
-                         *     d
-                         */
-                        char a = (y == 0) ? thisLightLevel
-                                          : (y == Terrarum.game.map.height - 1) ? thisLightLevel
-                                                                      : maximiseRGB(staticLightMap[y][x]
-                                                                              , staticLightMap[y - 1][x]);
-                        char d = (y == 0) ? thisLightLevel
-                                          : (y == Terrarum.game.map.height - 1) ? thisLightLevel
-                                                                      : maximiseRGB(staticLightMap[y][x]
-                                                                              , staticLightMap[y + 1][x]);
-                        char b = (x == 0) ? thisLightLevel
-                                          : (x == Terrarum.game.map.width - 1) ? thisLightLevel
-                                                                     : maximiseRGB(staticLightMap[y][x]
-                                                                             , staticLightMap[y][x - 1]);
-                        char c = (x == 0) ? thisLightLevel
-                                          : (x == Terrarum.game.map.width - 1) ? thisLightLevel
-                                                                     : maximiseRGB(staticLightMap[y][x]
-                                                                             , staticLightMap[y][x + 1]);
-                        char[] colourMapItoL = new char[4];
-                        colourMapItoL[0] = colourLinearMix(a, b);
-                        colourMapItoL[1] = colourLinearMix(a, c);
-                        colourMapItoL[2] = colourLinearMix(b, d);
-                        colourMapItoL[3] = colourLinearMix(c, d);
-
-                        for (int iy = 0; iy < 2; iy++) {
-                            for (int ix = 0; ix < 2; ix++) {
-                                g.setColor(toTargetColour(colourMapItoL[iy * 2 + ix]));
-
-                                g.fillRect(
-                                        Math.round(x * TSIZE * Terrarum.game.screenZoom) + (ix * TSIZE / 2 * Terrarum.game.screenZoom)
-                                        , Math.round(y * TSIZE * Terrarum.game.screenZoom) + (iy * TSIZE / 2 * Terrarum.game.screenZoom)
-                                        , FastMath.ceil(TSIZE * Terrarum.game.screenZoom / 2)
-                                        , FastMath.ceil(TSIZE * Terrarum.game.screenZoom / 2)
-                                );
-                            }
-                        }
-                    }
-                }
-                // Retro
-                else {
-                    try {
-                        int thisLightLevel = staticLightMap[y][x];
-
-                        // coalesce identical intensity blocks to one
-                        int sameLevelCounter = 1;
-                        while (staticLightMap[y][x + sameLevelCounter] == thisLightLevel) {
-                            sameLevelCounter += 1;
-
-                            if (x + sameLevelCounter >= for_x_end) break;
-                        }
-
-                        g.setColor(toTargetColour(staticLightMap[y][x]));
-                        g.fillRect(
-                                Math.round(x * TSIZE * Terrarum.game.screenZoom)
-                                , Math.round(y * TSIZE * Terrarum.game.screenZoom)
-                                , FastMath.ceil(TSIZE * Terrarum.game.screenZoom) * sameLevelCounter
-                                , FastMath.ceil(TSIZE * Terrarum.game.screenZoom)
-                        );
-
-                        x += (sameLevelCounter - 1);
-                    }
-                    catch (ArrayIndexOutOfBoundsException e) {
-                        // do nothing
-                    }
                 }
             }
         }
+        catch (ArrayIndexOutOfBoundsException e) {}
     }
 
     private static Color toTargetColour(char raw) {
@@ -559,10 +575,6 @@ public class LightmapRenderer {
 
     private static float clampFloat(float i) {
         return (i < 0) ? 0 : (i > 1) ? 1 : i;
-    }
-
-    public static char[][] getStaticLightMap() {
-        return staticLightMap;
     }
 
     public static char getValueFromMap(int x, int y) {
