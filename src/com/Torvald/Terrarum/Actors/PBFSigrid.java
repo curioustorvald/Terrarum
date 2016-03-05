@@ -53,7 +53,7 @@ public class PBFSigrid {
          * fixed value, or 'base value', from creature strength of Dwarf Fortress.
          * Human race uses 1000. (see CreatureHuman.json)
          */
-        p.actorValue.set("strength", 1250);
+        p.actorValue.set("strength", 1414);
         p.actorValue.set("encumbrance", 1000);
 
         p.actorValue.set("name", "Sigrid");

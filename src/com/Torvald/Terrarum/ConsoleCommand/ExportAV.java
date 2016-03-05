@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
+import com.Torvald.JsonWriter;
 import com.Torvald.Terrarum.Terrarum;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -16,14 +17,10 @@ public class ExportAV implements ConsoleCommand {
     @Override
     public void execute(String[] args) {
         if (args.length == 2) {
-            JsonElement avelem = new Gson().toJsonTree(Terrarum.game.getPlayer().getActorValue());
-            String jsonString = avelem.toString();
-
-            FileWriter writer;
             try {
-                writer = new FileWriter(Terrarum.defaultDir + "/Exports/" + args[1] + ".json");
-                writer.write(jsonString);
-                writer.close();
+                JsonWriter.writeFile(Terrarum.game.getPlayer().getActorValue()
+                        , Terrarum.defaultDir + "/Exports/" + args[1] + ".json"
+                );
 
                 new Echo().execute("ExportAV: exported to " + args[1] + ".json");
             }

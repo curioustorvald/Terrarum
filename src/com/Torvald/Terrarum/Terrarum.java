@@ -31,7 +31,7 @@ public class Terrarum extends StateBasedGame {
      *
      * TARGET_INTERNAL_FPS > TARGET_FPS for smooth frame drawing
      *
-     * Must choose a value so that 1000 / VAL is still integer
+     * Must choose a value so that (1000 / VAL) is still integer
      */
     public static final int TARGET_INTERNAL_FPS = 100;
 
@@ -116,6 +116,7 @@ public class Terrarum extends StateBasedGame {
             appgc.setTargetFrameRate(TARGET_INTERNAL_FPS);
             appgc.setVSync(VSYNC);
             appgc.setMaximumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS);
+            appgc.setMinimumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS - 1);
 
             appgc.setShowFPS(false);
             appgc.setUpdateOnlyWhenVisible(false);

@@ -1,6 +1,7 @@
 package com.Torvald.Terrarum.ConsoleCommand;
 
 import com.Torvald.ColourUtil.Col4096;
+import com.Torvald.RasterWriter;
 import com.Torvald.Terrarum.Terrarum;
 
 import javax.imageio.ImageIO;
@@ -76,23 +77,12 @@ public class ExportMap implements ConsoleCommand {
             }
 
             try {
-                int[] bandOffsets = {0, 1, 2}; // RGB
-                DataBuffer buffer = new DataBufferByte(mapData, mapData.length);
-                WritableRaster raster = Raster.createInterleavedRaster(
-                        buffer
-                        , Terrarum.game.map.width
+                RasterWriter.writePNG_RGB(
+                          Terrarum.game.map.width
                         , Terrarum.game.map.height
-                        , 3 * Terrarum.game.map.width
-                        , 3
-                        , bandOffsets
-                        , null);
-
-                ColorModel colorModel = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB), false, false, Transparency.TRANSLUCENT, DataBuffer.TYPE_BYTE);
-
-                BufferedImage image = new BufferedImage(colorModel, raster, colorModel.isAlphaPremultiplied(), null);
-
-                ImageIO.write(image, "PNG", new File(dir + args[1] + ".png"));
-
+                        , mapData
+                        , dir + args[1] + ".png"
+                );
                 new Echo().execute("ExportMap: exported to " + args[1] + ".png");
 
             } catch (IOException e) {

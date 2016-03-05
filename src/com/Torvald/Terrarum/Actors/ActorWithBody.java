@@ -106,7 +106,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     /**
      * in milliseconds
      */
-    public final int COOLTIME = 500;
+    public final int INVINCIBILITY_TIME = 500;
 
     /**
      * Give new random ReferenceID and initialise ActorValue
@@ -180,7 +180,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             updateNextHitboxFromVelo();
 
 
-            if (Math.abs(veloX) < 0.5) {
+            // if not horizontally moving then ...
+            if (Math.abs(veloX) < 0.5) { // fix for special situations (see fig. 1 at the bottom of the source)
                 updateVerticalPos();
                 updateHorizontalPos();
             }
@@ -227,7 +228,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     private void updateVerticalPos() {
         if (!isPlayerNoClip()) {
             // check downward
-            if (veloY >= 0) { // use TERNARY for L/R!
+            if (veloY >= 0) {
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_BOTTOM)) {
                     adjustHitBottom();
@@ -273,7 +274,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         } while (colliding);
 
         float newY = nextHitbox.getPointedY() - newYOff;
-        nextHitbox.setPositionFromPoint(newX - 1, newY);
+        nextHitbox.setPositionFromPoint(newX, newY);
     }
 
     private void adjustHitTop() {
@@ -290,13 +291,13 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         } while (colliding);
 
         float newY = nextHitbox.getPosY() + newYOff;
-        nextHitbox.setPosition(newX + 1, newY);
+        nextHitbox.setPosition(newX, newY);
     }
 
     private void updateHorizontalPos() {
         if (!isPlayerNoClip()) {
             // check right
-            if (veloX > 0) { // use TERNARY for L/R!
+            if (veloX > 0) {
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT)) {
                     adjustHitRight();
@@ -309,8 +310,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 else {
                 }
             }
-            else if (veloX < 0) {
-
+            else { // fix for float-point rounding; veloX of zero should be treated as moving left
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT)) {
                     adjustHitLeft();
@@ -323,9 +323,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 else {
                 }
             }
-            else {
 
-            }
         }
     }
 
@@ -362,7 +360,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         } while (newXOff < TSIZE && colliding);
 
         float newX = nextHitbox.getPosX() + newXOff;
-        nextHitbox.setPosition(newX + 1, newY);
+        nextHitbox.setPosition(newX, newY); // + 1; float-point rounding compensation (i think...)
     }
 
     private boolean isColliding(int side) {
@@ -721,3 +719,16 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         return FastMath.floor(v / TSIZE) * TSIZE;
     }
 }
+
+/**
+
+  =                  = ↑
+ ===                ===@!
+  =↑                 =↑
+  =↑                 =
+  =↑                 =
+  =@ (pressing R)    =
+==================  ==================
+
+ Fig. 1: the fix was not applied
+ */

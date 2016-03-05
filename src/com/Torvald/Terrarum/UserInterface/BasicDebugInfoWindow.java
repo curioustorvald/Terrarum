@@ -103,10 +103,8 @@ public class BasicDebugInfoWindow implements UICanvas {
          * Second column
          */
 
-        String[] collisionFlagKey = {"top", "right", "bottom", "left"};
         int collisonFlag = playerDbg.eventMoving();
-        printLineColumn(g, 2, 1, "CollisionFlag : "
-                                         + ((collisonFlag == -1) ? "none" : collisionFlagKey[collisonFlag]));
+        printLineColumn(g, 2, 1, "Vsync : " + Terrarum.appgc.isVSyncRequested());
         printLineColumn(g, 2, 2, "Env colour temp : " + MapDrawer.getColTemp());
 
         /**

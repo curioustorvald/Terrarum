@@ -145,6 +145,9 @@ public class Game extends BasicGameState {
 
         TileStat.update();
 
+        MapDrawer.update(gc, delta_t);
+        MapCamera.update(gc, delta_t);
+
         actorContainer.forEach(actor -> actor.update(gc, delta_t));
         actorContainer.forEach(
                 actor -> {
@@ -157,12 +160,11 @@ public class Game extends BasicGameState {
                 }
         );
 
-        MapDrawer.update(gc, delta_t);
-        MapCamera.update(gc, delta_t);
-
         uiContainer.forEach(ui -> ui.update(gc, delta_t));
 
         //bulletin.update(gc, delta_t);
+
+        Terrarum.appgc.setVSync(Terrarum.appgc.getFPS() >= 59);
     }
 
     private void setAppTitle() {
@@ -200,10 +202,10 @@ public class Game extends BasicGameState {
                 actor -> { if (actor instanceof Glowing) ((Glowing) actor).drawGlow(gc, g); }
         );
 
+        LightmapRenderer.renderLightMap();
+
         MapCamera.renderFront(gc, g);
         MapDrawer.render(gc, g);
-
-        LightmapRenderer.renderLightMap();
 
         setBlendModeMul();
         MapDrawer.drawEnvOverlay(g);

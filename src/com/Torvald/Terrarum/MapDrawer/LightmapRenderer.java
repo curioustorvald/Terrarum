@@ -87,11 +87,11 @@ public class LightmapRenderer {
         }
 
 
-        int for_y_start = div16(MapCamera.getCameraY()) - 1;
-        int for_x_start = div16(MapCamera.getCameraX()) - 1;
+        int for_y_start = div16(MapCamera.getCameraY()) - 1; // fix for premature lightmap rendering
+        int for_x_start = div16(MapCamera.getCameraX()) - 1; // on topmost/leftmost side
 
-        int for_y_end = clampHTile(for_y_start + div16(MapCamera.getRenderHeight()) + 2) + 1;
-        int for_x_end = clampWTile(for_x_start + div16(MapCamera.getRenderWidth()) + 2) + 1;
+        int for_y_end = clampHTile(for_y_start + div16(MapCamera.getRenderHeight()) + 2) + 1; // same fix as above
+        int for_x_end = clampWTile(for_x_start + div16(MapCamera.getRenderWidth()) + 2)  + 1;
 
         /**
 		 * Updating order:
@@ -104,7 +104,7 @@ public class LightmapRenderer {
          * for all staticLightMap[y][x]
 		 */
 
-        purgePartOfLightmap(for_x_start - 1, for_y_start - 1, for_x_end + 1, for_y_end + 1);
+        purgePartOfLightmap(for_x_start, for_y_start, for_x_end, for_y_end);
         // if wider purge were not applied, GL changing (sunset, sunrise) will behave incorrectly
         // ("leakage" of non-updated sunlight)
 
@@ -269,11 +269,11 @@ public class LightmapRenderer {
         catch (ArrayIndexOutOfBoundsException e) {}
     }
 
-    private static Color toTargetColour(char raw) {
-        return new Col40().createSlickColor(raw);
+    private static char calculate(int x, int y) {
+        return calculate(x, y, false);
     }
 
-    private static char calculate(int x, int y){
+    private static char calculate(int x, int y, boolean doNotCalculateAmbient){
         char lightLevelThis = 0;
         int thisTerrain = Terrarum.game.map.getTileFromTerrain(x, y);
         int thisWall = Terrarum.game.map.getTileFromWall(x, y);
@@ -316,46 +316,54 @@ public class LightmapRenderer {
         }
 
 
-        // calculate ambient
-        char ambient = 0; char nearby = 0;
-        findNearbyBrightest:
-        for (int yoff = -1; yoff <= 1; yoff++) {
-            for (int xoff = -1; xoff <= 1; xoff++) {
-                /**
-                 * filter for 'v's as:
-                 * +-+-+-+
-                 * |a|v|a|
-                 * +-+-+-+
-                 * |v| |v|
-                 * +-+-+-+
-                 * |a|v|a|
-                 * +-+-+-+
-                 */
-                if (xoff != yoff && -xoff != yoff) { // 'v' tiles
-                    if (!outOfMapBounds(x + xoff, y + yoff)) {
-                        nearby = staticLightMap[y + yoff][x + xoff];
+        if (!doNotCalculateAmbient) {
+            // calculate ambient
+            char ambient = 0;
+            char nearby = 0;
+            findNearbyBrightest:
+            for (int yoff = -1; yoff <= 1; yoff++) {
+                for (int xoff = -1; xoff <= 1; xoff++) {
+                    /**
+                     * filter for 'v's as:
+                     * +-+-+-+
+                     * |a|v|a|
+                     * +-+-+-+
+                     * |v| |v|
+                     * +-+-+-+
+                     * |a|v|a|
+                     * +-+-+-+
+                     */
+                    if (xoff != yoff && -xoff != yoff) { // 'v' tiles
+                        if (!outOfMapBounds(x + xoff, y + yoff)) {
+                            nearby = staticLightMap[y + yoff][x + xoff];
+                        }
                     }
-                }
-                else if (xoff != 0 && yoff != 0) { // 'a' tiles
-                    if (!outOfMapBounds(x + xoff, y + yoff)) {
-                        nearby = darkenUniformInt(staticLightMap[y + yoff][x + xoff]
-                                , 2); //2
-                        // mix some to have more 'spreading'
-                        // so that light spreads in a shape of an octagon instead of a diamond
+                    else if (xoff != 0 && yoff != 0) { // 'a' tiles
+                        if (!outOfMapBounds(x + xoff, y + yoff)) {
+                            nearby = darkenUniformInt(staticLightMap[y + yoff][x + xoff]
+                                    , 2); //2
+                            // mix some to have more 'spreading'
+                            // so that light spreads in a shape of an octagon instead of a diamond
+                        }
                     }
-                }
-                else {
-                    nearby = 0; // exclude 'me' tile
-                }
+                    else {
+                        nearby = 0; // exclude 'me' tile
+                    }
 
-                ambient = maximiseRGB(ambient, nearby); // keep base value as brightest nearby
+                    ambient = maximiseRGB(ambient, nearby); // keep base value as brightest nearby
+                }
             }
+
+            ambient = darkenColoured(ambient,
+                    thisTileOpacity
+            ); // get real ambient by appling opacity value
+
+            // mix and return lightlevel and ambient
+            return maximiseRGB(lightLevelThis, ambient);
         }
-
-        ambient = darkenColoured(ambient, thisTileOpacity); // get real ambient by appling opacity value
-
-        // mix and return lightlevel and ambient
-        return maximiseRGB(lightLevelThis, ambient);
+        else {
+            return lightLevelThis;
+        }
     }
 
     /**
@@ -582,13 +590,45 @@ public class LightmapRenderer {
     }
 
     private static void purgePartOfLightmap(int x1, int y1, int x2, int y2) {
-        for (int y = y1; y < y2; y++) {
-            for (int x = x1; x < x2; x++) {
-                if (!outOfMapBounds(x, y)) {
-                    staticLightMap[y][x] = 0;
+        try {
+            for (int y = y1 - 1; y < y2 + 1; y++) {
+                for (int x = x1 - 1; x < x2 + 1; x++) {
+                    if (y == y1 - 1 || y == y2 || x == x1 - 1 || x == x2) {
+                        // fill the rim with (pre) calculation
+                        staticLightMap[y][x] = preCalculateUpdateGLOnly(x, y);
+                    }
+                    else {
+                        staticLightMap[y][x] = 0;
+                    }
                 }
             }
         }
+        catch (ArrayIndexOutOfBoundsException e) {}
+    }
+
+    private static char preCalculateUpdateGLOnly(int x, int y) {
+        int thisWall = Terrarum.game.map.getTileFromWall(x, y);
+        int thisTerrain = Terrarum.game.map.getTileFromTerrain(x, y);
+        char thisTileLuminosity = TilePropCodex.getProp(thisTerrain).getLuminosity();
+        char thisTileOpacity = TilePropCodex.getProp(thisTerrain).getOpacity();
+        char sunLight = Terrarum.game.map.getGlobalLight();
+
+        char lightLevelThis;
+
+        // MIX TILE
+        // open air
+        if (thisTerrain == AIR && thisWall == AIR) {
+            lightLevelThis = sunLight;
+        }
+        // luminous tile transparent (allows sunlight to pass)
+        else if (thisWall == AIR && thisTileLuminosity > 0) {
+            char darkenSunlight = darkenColoured(sunLight, thisTileOpacity);
+            lightLevelThis = screenBlend(darkenSunlight, thisTileLuminosity);
+        }
+        else {
+            lightLevelThis = getValueFromMap(x, y);
+        }
+        return lightLevelThis;
     }
 
     private static int clampWTile(int x) {
@@ -621,6 +661,10 @@ public class LightmapRenderer {
             sum += i[k];
         }
         return Math.round(sum / (float) i.length);
+    }
+
+    private static Color toTargetColour(char raw) {
+        return new Col40().createSlickColor(raw);
     }
 }
 
