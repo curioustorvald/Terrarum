@@ -13,8 +13,10 @@ public class TileProp {
 
     private int strength;
 
+    private int density;
+
     private boolean fluid;
-    private int viscocity;
+    private int movementResistance;
 
     private boolean solid; // transparent or not
 
@@ -79,12 +81,12 @@ public class TileProp {
         this.fluid = fluid;
     }
 
-    public int getViscocity() {
-        return viscocity;
+    public int getMovementResistance() {
+        return movementResistance;
     }
 
-    void setViscocity(int viscocity) {
-        this.viscocity = viscocity;
+    void setMovementResistance(int movementResistance) {
+        this.movementResistance = movementResistance;
     }
 
     public boolean isSolid() {
@@ -157,5 +159,13 @@ public class TileProp {
 
     public void setOpaque(boolean opaque) {
         this.opaque = opaque;
+    }
+
+    public int getDensity() {
+        return density;
+    }
+
+    public void setDensity(int density) {
+        this.density = density;
     }
 }

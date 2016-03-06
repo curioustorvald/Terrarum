@@ -1,6 +1,5 @@
 package com.Torvald.Terrarum.Actors;
 
-import com.Torvald.Rand.Fudge3;
 import com.Torvald.Terrarum.Actors.Faction.Faction;
 import com.Torvald.Terrarum.GameControl.EnumKeyFunc;
 import com.Torvald.Terrarum.GameControl.KeyMap;
@@ -61,7 +60,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     private HashSet<Faction> factionSet = new HashSet<>();
 
-    private final float BASE_BUOYANCY = 0.98f;
+    private final int BASE_DENSITY = 1020;
 
 
     /**
@@ -75,7 +74,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
         super();
         referenceID = PLAYER_REF_ID;
         setVisible(true);
-        super.setBuoyancy(BASE_BUOYANCY);
+        super.setDensity(BASE_DENSITY);
     }
 
     @Override

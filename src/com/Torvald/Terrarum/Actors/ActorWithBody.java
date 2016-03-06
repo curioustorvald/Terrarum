@@ -2,6 +2,7 @@ package com.Torvald.Terrarum.Actors;
 
 import com.Torvald.Rand.HQRNG;
 import com.Torvald.Terrarum.*;
+import com.Torvald.Terrarum.GameMap.GameMap;
 import com.Torvald.Terrarum.MapDrawer.MapDrawer;
 import com.Torvald.Terrarum.TileProperties.TilePropCodex;
 import com.Torvald.spriteAnimation.SpriteAnimation;
@@ -47,6 +48,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     private boolean noSubjectToGrav = false;
     private boolean noCollideWorld = false;
+    private boolean noSubjectToFluidResistance = false;
 
     int baseSpriteWidth, baseSpriteHeight;
 
@@ -58,15 +60,13 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     /**
      * Physical properties
      */
-    @NonZero
-    private volatile float scale = 1;
+    @NonZero private volatile float scale = 1;
     @NonZero private volatile float mass = 2f;
     private final float MASS_LOWEST = 2f;
     /** Valid range: [0, 1] */
     private float elasticity = 0;
     private final float ELASTICITY_MAX = 0.993f;
-    @NoNegative
-    private float buoyancy = 0;
+    @NoNegative private float density = 1000;
 
     private static final int TSIZE = MapDrawer.TILE_SIZE;
     private static int AUTO_CLIMB_RATE = TSIZE / 8;
@@ -119,12 +119,15 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      */
     public final int INVINCIBILITY_TIME = 500;
 
+    private GameMap map;
+
     /**
      * Give new random ReferenceID and initialise ActorValue
      */
     public ActorWithBody() {
         referenceID = new HQRNG().nextLong();
         actorValue = new ActorValue();
+        map = Terrarum.game.map;
     }
 
     /**
@@ -176,6 +179,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             if (this instanceof Player) {
                 noSubjectToGrav = isPlayerNoClip();
                 noCollideWorld = isPlayerNoClip();
+                noSubjectToFluidResistance = isPlayerNoClip();
             }
 
             if (mass < MASS_LOWEST) mass = MASS_LOWEST; // clamp to minimum possible mass
@@ -183,16 +187,24 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 baseSpriteHeight = sprite.getHeight();
                 baseSpriteWidth = sprite.getWidth();
             }
-            gravitation = Terrarum.game.map.getGravitation();
+            gravitation = map.getGravitation();
             AUTO_CLIMB_RATE = (int) Math.min(TSIZE / 8 * FastMath.sqrt(scale), TSIZE);
 
             if (!isNoSubjectToGrav()) {
                 applyGravitation();
+                applyBuoyancy();
             }
 
             // hard limit velocity
             if (veloX > VELO_HARD_LIMIT) veloX = VELO_HARD_LIMIT;
             if (veloY > VELO_HARD_LIMIT) veloY = VELO_HARD_LIMIT;
+            // limit velocity by fluid resistance
+            //int tilePropResistance = getTileMvmtRstc();
+            //if (!noSubjectToFluidResistance) {
+            //    veloX *= mvmtRstcToMultiplier(tilePropResistance);
+            //    veloY *= mvmtRstcToMultiplier(tilePropResistance);
+            //}
+
 
             // Set 'next' positions to fiddle with
             updateNextHitboxFromVelo();
@@ -207,6 +219,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 updateHorizontalPos();
                 updateVerticalPos();
             }
+
+
             updateHitboxX();
             updateHitboxY();
 
@@ -237,7 +251,11 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             float A = scale * scale;
             float D = DRAG_COEFF * 0.5f * 1.292f * veloY * veloY * A;
 
-            veloY += clampCeil(((W - D) / mass) * SI_TO_GAME_ACC * G_MUL_PLAYABLE_CONST
+            int fluidResistance = getTileMvmtRstc();
+
+            veloY += clampCeil(
+                    ((W - D) / mass) * SI_TO_GAME_ACC * G_MUL_PLAYABLE_CONST
+                            * mvmtRstcToMultiplier(fluidResistance) // eliminate shoot-up from fluids
                     , VELO_HARD_LIMIT
             );
         }
@@ -453,12 +471,152 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             }
 
             // evaluate
-            if (TilePropCodex.getProp(Terrarum.game.map.getTileFromTerrain(tileX, tileY)).isSolid()) {
+            if (TilePropCodex.getProp(map.getTileFromTerrain(tileX, tileY)).isSolid()) {
                 contactAreaCounter += 1;
             }
         }
 
         return contactAreaCounter;
+    }
+
+    /**
+     * [N] = [kg * m / s^2]
+     * F(bo) = density * submerged_volume * gravitational_acceleration [N]
+     */
+    private void applyBuoyancy() {
+        int fluidDensity = getTileDensity();
+        int fluidResistance = getTileMvmtRstc();
+        float submergedVolume = getSubmergedVolume();
+
+        if (!isPlayerNoClip() && !grounded) {
+            // System.out.println("density: "+density);
+            veloY -= ((fluidDensity - this.density)
+                            * map.getGravitation() * submergedVolume
+                            * Math.pow(mass, -1)
+                            * mvmtRstcToMultiplier(fluidResistance) // eliminate shoot-up
+                    * SI_TO_GAME_ACC);
+        }
+    }
+
+    private float getSubmergedVolume(){
+        float GAME_TO_SI_VOL = FastMath.pow((1f/METER), 3);
+
+        if( density > 0 ){
+            return FastMath.clamp(
+                    (nextHitbox.getPointedY() - getFluidLevel()) // submerged height
+                            * nextHitbox.getWidth() * nextHitbox.getWidth()
+                            * GAME_TO_SI_VOL
+                    , 0
+                    , nextHitbox.getHeight()
+                            * nextHitbox.getWidth() * nextHitbox.getWidth()
+                            * GAME_TO_SI_VOL
+            );
+            //System.out.println("fluidHeight: "+fluidHeight+", submerged: "+submergedVolume);
+            //submergedHeight / TILE_SIZE * 1^2 (pixel to meter)
+        }
+        else{
+            return 0;
+        }
+    }
+
+    private int getFluidLevel(){
+        int tilePosXStart = Math.round(nextHitbox.getPosX() / TSIZE);
+        int tilePosXEnd = Math.round(nextHitbox.getHitboxEnd().getX() / TSIZE);
+        int tilePosY = Math.round(nextHitbox.getPosY() / TSIZE);
+
+        int fluidHeight = 2147483647;
+
+        for (int x = tilePosXStart; x <= tilePosXEnd; x++) {
+            int tile = map.getTileFromTerrain(x, tilePosY);
+            if ( TilePropCodex.getProp(tile).isFluid()
+                    && tilePosY * TSIZE < fluidHeight ){
+                fluidHeight = tilePosY * TSIZE;
+            }
+        }
+
+        return fluidHeight;
+    }
+
+    /**
+     * Get highest friction value from feet tiles.
+     * @return
+     */
+    private int getTileFriction(){
+        int friction = 0;
+
+        int tilePosXStart = Math.round(nextHitbox.getPosX() / TSIZE);
+        int tilePosXEnd = Math.round(nextHitbox.getHitboxEnd().getX() / TSIZE);
+        int tilePosY = Math.round(nextHitbox.getPointedY() / TSIZE);
+
+        //get density
+        for (int x = tilePosXStart; x <= tilePosXEnd; x++) {
+            int tile = map.getTileFromTerrain(x, tilePosY);
+            if (TilePropCodex.getProp(tile).isFluid()) {
+                int thisFluidDensity = TilePropCodex.getProp(tile).getFriction();
+
+                if (thisFluidDensity > friction) friction = thisFluidDensity;
+            }
+        }
+
+        return friction;
+    }
+
+    /**
+     * Get highest movement resistance value from tiles that the body occupies.
+     * @return
+     */
+    private int getTileMvmtRstc(){
+        int resistance = 0;
+
+        int tilePosXStart = Math.round(nextHitbox.getPosX() / TSIZE);
+        int tilePosYStart = Math.round(nextHitbox.getPosY() / TSIZE);
+        int tilePosXEnd = Math.round(nextHitbox.getHitboxEnd().getX() / TSIZE);
+        int tilePosYEnd = Math.round(nextHitbox.getHitboxEnd().getY() / TSIZE);
+
+        //get density
+        for (int y = tilePosYStart; y <= tilePosYEnd; y++) {
+            for (int x = tilePosXStart; x <= tilePosXEnd; x++) {
+                int tile = map.getTileFromTerrain(x, y);
+                if (TilePropCodex.getProp(tile).isFluid()) {
+                    int thisFluidDensity = TilePropCodex.getProp(tile).getMovementResistance();
+
+                    if (thisFluidDensity > resistance) resistance = thisFluidDensity;
+                }
+            }
+        }
+
+        return resistance;
+    }
+
+    /**
+     * Get highest density (specific gravity) value from tiles that the body occupies.
+     * @return
+     */
+    private int getTileDensity() {
+        int density = 0;
+
+        int tilePosXStart = Math.round(nextHitbox.getPosX() / TSIZE);
+        int tilePosYStart = Math.round(nextHitbox.getPosY() / TSIZE);
+        int tilePosXEnd = Math.round(nextHitbox.getHitboxEnd().getX() / TSIZE);
+        int tilePosYEnd = Math.round(nextHitbox.getHitboxEnd().getY() / TSIZE);
+
+        //get density
+        for (int y = tilePosYStart; y <= tilePosYEnd; y++) {
+            for (int x = tilePosXStart; x <= tilePosXEnd; x++) {
+                int tile = map.getTileFromTerrain(x, y);
+                if (TilePropCodex.getProp(tile).isFluid()) {
+                    int thisFluidDensity = TilePropCodex.getProp(tile).getDensity();
+
+                    if (thisFluidDensity > density) density = thisFluidDensity;
+                }
+            }
+        }
+
+        return density;
+    }
+
+    private float mvmtRstcToMultiplier(int viscosity) {
+        return 1f / (1 + (viscosity / 16f));
     }
 
     private void clampHitbox() {
@@ -575,8 +733,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         if (x < TSIZE + nextHitbox.getWidth() / 2) {
             return TSIZE + nextHitbox.getWidth() / 2;
         }
-        else if (x >= Terrarum.game.map.width * TSIZE - TSIZE - nextHitbox.getWidth() / 2) {
-            return Terrarum.game.map.width * TSIZE - 1 - TSIZE - nextHitbox.getWidth() / 2;
+        else if (x >= map.width * TSIZE - TSIZE - nextHitbox.getWidth() / 2) {
+            return map.width * TSIZE - 1 - TSIZE - nextHitbox.getWidth() / 2;
         }
         else {
             return x;
@@ -587,8 +745,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         if (y < TSIZE + nextHitbox.getHeight()) {
             return TSIZE + nextHitbox.getHeight();
         }
-        else if (y >= Terrarum.game.map.height * TSIZE - TSIZE - nextHitbox.getHeight()) {
-            return Terrarum.game.map.height * TSIZE - 1 - TSIZE - nextHitbox.getHeight();
+        else if (y >= map.height * TSIZE - TSIZE - nextHitbox.getHeight()) {
+            return map.height * TSIZE - 1 - TSIZE - nextHitbox.getHeight();
         }
         else {
             return y;
@@ -599,8 +757,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         if (x < 0) {
             return 0;
         }
-        else if (x >= Terrarum.game.map.width) {
-            return Terrarum.game.map.width - 1;
+        else if (x >= map.width) {
+            return map.width - 1;
         }
         else {
             return x;
@@ -611,8 +769,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         if (x < 0) {
             return 0;
         }
-        else if (x >= Terrarum.game.map.height) {
-            return Terrarum.game.map.height - 1;
+        else if (x >= map.height) {
+            return map.height - 1;
         }
         else {
             return x;
@@ -747,8 +905,16 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         return noCollideWorld;
     }
 
+    public boolean isNoSubjectToFluidResistance() {
+        return noSubjectToFluidResistance;
+    }
+
     public void setNoCollideWorld(boolean noCollideWorld) {
         this.noCollideWorld = noCollideWorld;
+    }
+
+    public void setNoSubjectToFluidResistance(boolean noSubjectToFluidResistance) {
+        this.noSubjectToFluidResistance = noSubjectToFluidResistance;
     }
 
     public void setElasticity(float elasticity) {
@@ -762,11 +928,11 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         else this.elasticity = elasticity * ELASTICITY_MAX;
     }
 
-    public void setBuoyancy(float buoyancy) {
-        if (buoyancy < 0)
-            throw new IllegalArgumentException("[ActorWithBody] " + buoyancy + ": buoyancy cannot be negative.");
+    public void setDensity(int density) {
+        if (density < 0)
+            throw new IllegalArgumentException("[ActorWithBody] " + density + ": density cannot be negative.");
 
-        this.buoyancy = buoyancy;
+        this.density = density;
     }
 }
 

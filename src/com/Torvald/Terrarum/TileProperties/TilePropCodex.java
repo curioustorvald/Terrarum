@@ -75,6 +75,7 @@ public class TilePropCodex {
 
         prop.setOpacity((char) intVal(record, "opacity"));
         prop.setStrength(intVal(record, "strength"));
+        prop.setDensity(intVal(record, "spcg"));
         prop.setLuminosity((char) intVal(record, "lumcolor"));
         prop.setDrop(intVal(record, "drop"));
         prop.setDropDamage(intVal(record, "ddmg"));
@@ -86,14 +87,17 @@ public class TilePropCodex {
         prop.setFallable(boolVal(record, "fall"));
         prop.setOpaque(boolVal(record, "opaque"));
 
-        if (prop.isFluid()) prop.setViscocity(intVal(record, "viscosity"));
+        if (prop.isFluid()) prop.setMovementResistance(intVal(record, "movr"));
 
-        System.out.print(prop.getId());
+        System.out.print(formatNum3(prop.getId()) + ":" + formatNum2(prop.getDamage()));
         System.out.println("\t" + prop.getName());
     }
 
     private static int intVal(CSVRecord rec, String s) {
-        return Integer.decode(rec.get(s));
+        int ret = -1;
+        try { ret = Integer.decode(rec.get(s)); }
+        catch (NullPointerException e) {}
+        return ret;
     }
 
     private static boolean boolVal(CSVRecord rec, String s) {
@@ -102,5 +106,16 @@ public class TilePropCodex {
 
     public static int indexDamageToArrayAddr(int index, int damage) {
         return (index * (PairedMapLayer.RANGE) + damage);
+    }
+
+    private static String formatNum3(int i) {
+        if (i < 10) return "00" + i;
+        else if (i < 100) return "0" + i;
+        else return String.valueOf(i);
+    }
+
+    private static String formatNum2(int i) {
+        if (i < 10) return "0" + i;
+        else return String.valueOf(i);
     }
 }
