@@ -64,7 +64,12 @@ public class MapCamera {
             , TileNameCode.DIRT
             , TileNameCode.GRASS
             , TileNameCode.SAND
+            , TileNameCode.SAND_BEACH
+            , TileNameCode.SAND_RED
+            , TileNameCode.SAND_DESERT
+            , TileNameCode.SAND_BLACK
             , TileNameCode.GRAVEL
+            , TileNameCode.GRAVEL_GREY
             , TileNameCode.SNOW
             , TileNameCode.ICE_NATURAL
             , TileNameCode.WATER
@@ -211,7 +216,7 @@ public class MapCamera {
                         int thisTileY = thisTile / PairedMapLayer.RANGE;
 
                         if (drawModeTilesBlendMul) {
-                            if (isBlendMul((byte) thisTile)) {
+                            if (isBlendMul(thisTile)) {
                                 drawTile(mode, x, y, thisTileX, thisTileY);
                             }
                         }
@@ -414,15 +419,15 @@ public class MapCamera {
     }
 
     private static boolean isConnectSelf(int b) {
-        return (Arrays.asList(TILES_CONNECT_SELF).contains((byte) b));
+        return Arrays.asList(TILES_CONNECT_SELF).contains(b);
     }
 
     private static boolean isDarkenAir(int b) {
-        return (Arrays.asList(TILES_DARKEN_AIR).contains((byte) b));
+        return Arrays.asList(TILES_DARKEN_AIR).contains(b);
     }
 
     private static boolean isBlendMul(int b) {
-        return (Arrays.asList(TILES_BLEND_MUL).contains((byte) b));
+        return Arrays.asList(TILES_BLEND_MUL).contains(b);
     }
 
     private static void setBlendModeMul() {

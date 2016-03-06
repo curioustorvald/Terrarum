@@ -42,6 +42,8 @@ public class GameMap {
     private char globalLight;
     private WorldTime worldTime;
 
+    public static final int TILES_SUPPORTED = MapLayer.RANGE * PairedMapLayer.RANGE;
+
     /**
      * @param width
      * @param height

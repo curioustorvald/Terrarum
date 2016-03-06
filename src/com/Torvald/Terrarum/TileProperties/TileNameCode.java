@@ -29,7 +29,9 @@ public class TileNameCode {
     public static final int SAND_RED = TilePropCodex.indexDamageToArrayAddr(5, 2);
     public static final int SAND_DESERT = TilePropCodex.indexDamageToArrayAddr(5, 3);
     public static final int SAND_BLACK = TilePropCodex.indexDamageToArrayAddr(5, 4);
+
     public static final int GRAVEL = TilePropCodex.indexDamageToArrayAddr(6, 0);
+    public static final int GRAVEL_GREY = TilePropCodex.indexDamageToArrayAddr(6, 1);
 
     public static final int ORE_COPPER = TilePropCodex.indexDamageToArrayAddr(7, 0);
     public static final int ORE_IRON = TilePropCodex.indexDamageToArrayAddr(7, 1);

@@ -14,7 +14,7 @@ public class MapLayer implements Iterable<Byte> {
     public int width;
     public int height;
 
-    public static final int TILES_SUPPORTED = 256;
+    public static final int RANGE = 256;
 
     public MapLayer(int width, int height) {
         this.width = width;

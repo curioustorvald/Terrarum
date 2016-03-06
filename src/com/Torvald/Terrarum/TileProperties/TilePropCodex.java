@@ -6,7 +6,6 @@ import com.Torvald.Terrarum.GameMap.PairedMapLayer;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -17,7 +16,7 @@ public class TilePropCodex {
     private static TileProp[] tileProps;
 
     public TilePropCodex() {
-        tileProps = new TileProp[MapLayer.TILES_SUPPORTED * (PairedMapLayer.RANGE)];
+        tileProps = new TileProp[MapLayer.RANGE * (PairedMapLayer.RANGE)];
 
         for (int i = 0; i < tileProps.length; i++) {
             tileProps[i] = new TileProp();

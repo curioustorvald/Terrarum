@@ -2,6 +2,7 @@ package com.Torvald.Terrarum.UserInterface;
 
 import com.Torvald.Terrarum.Actors.PlayerDebugger;
 import com.Torvald.Terrarum.Actors.Hitbox;
+import com.Torvald.Terrarum.GameMap.PairedMapLayer;
 import com.Torvald.Terrarum.LangPack.Lang;
 import com.Torvald.Terrarum.MapDrawer.LightmapRenderer;
 import com.Torvald.Terrarum.MapDrawer.MapDrawer;
@@ -92,10 +93,13 @@ public class BasicDebugInfoWindow implements UICanvas {
 
         String tileNo;
         try {
-            tileNo = String.valueOf(Terrarum.game.map.getTileFromTerrain(mouseTileX, mouseTileY));
+            int tileNumRaw = Terrarum.game.map.getTileFromTerrain(mouseTileX, mouseTileY);
+            int tilenum = tileNumRaw / PairedMapLayer.RANGE;
+            int tiledmg = tileNumRaw % PairedMapLayer.RANGE;
+            tileNo = tilenum + ":" + tiledmg;
         }
         catch (ArrayIndexOutOfBoundsException e) {
-            tileNo = "out of bounds";
+            tileNo = "-";
         }
         printLine(g, 9, "tile : " + tileNo + " (" + mtX + ", " + mtY + ")");
 

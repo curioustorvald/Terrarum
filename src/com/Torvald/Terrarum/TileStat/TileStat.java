@@ -15,7 +15,7 @@ import java.util.Arrays;
  */
 public class TileStat {
 
-    private static short[] tilestat = new short[MapLayer.TILES_SUPPORTED];
+    private static short[] tilestat = new short[GameMap.TILES_SUPPORTED];
 
     private static final int TSIZE = MapDrawer.TILE_SIZE;
 
@@ -29,8 +29,6 @@ public class TileStat {
         // no matter how the screen is zoomed.
         GameMap map = Terrarum.game.map;
         Player player = Terrarum.game.getPlayer();
-
-        float zoom = Terrarum.game.screenZoom;
 
         int renderWidth = FastMath.ceil(Terrarum.WIDTH);
         int renderHeight = FastMath.ceil(Terrarum.HEIGHT);
@@ -82,7 +80,7 @@ public class TileStat {
      * @return copy of the stat data
      */
     public static short[] getStatCopy() {
-        return Arrays.copyOf(tilestat, MapLayer.TILES_SUPPORTED);
+        return Arrays.copyOf(tilestat, MapLayer.RANGE);
     }
 
 }
