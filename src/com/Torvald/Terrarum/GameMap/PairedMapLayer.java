@@ -22,7 +22,7 @@ public class PairedMapLayer implements Iterable<Integer> {
     public int width;
     public int height;
 
-    public static final int MAX_VALUE = 16;
+    public static final int RANGE = 16;
 
     public PairedMapLayer(int width, int height) {
         this.width = width / 2;
@@ -44,7 +44,7 @@ public class PairedMapLayer implements Iterable<Integer> {
      */
     @Override
     public Iterator<Integer> iterator() {
-        Iterator<Integer> it = new Iterator<Integer>() {
+        return new Iterator<Integer>() {
 
             private int iteratorCount = 0;
 
@@ -63,8 +63,6 @@ public class PairedMapLayer implements Iterable<Integer> {
                 return getData(x, y);
             }
         };
-
-        return it;
     }
 
     /**
@@ -85,7 +83,7 @@ public class PairedMapLayer implements Iterable<Integer> {
      * @since 1.8
      */
     @Override
-    public void forEach(Consumer<? super Integer> action) {
+    public void forEach(Consumer action) {
         throw new UnsupportedOperationException();
     }
 
@@ -111,12 +109,22 @@ public class PairedMapLayer implements Iterable<Integer> {
         throw new UnsupportedOperationException();
     }
 
-    public int getData(int x, int y) {
+    int getData(int x, int y) {
         if ((x & 0x1) == 0)
             // higher four bits for i = 0, 2, 4, ...
             return (dataPair[y][x / 2] & 0xF0) >>> 4;
         else
             // lower four bits for i = 1, 3, 5, ...
             return dataPair[y][x / 2] & 0x0F;
+    }
+
+    void setData(int x, int y, int data) {
+        if (data < 0 || data >= 16) throw new IllegalArgumentException("[PairedMapLayer] " + data + ": invalid data value.");
+        if ((x & 0x1) == 0)
+            // higher four bits for i = 0, 2, 4, ...
+            dataPair[y][x / 2] = (byte) (dataPair[y][x / 2] & 0x0F | (data & 0xF) << 4);
+        else
+            // lower four bits for i = 1, 3, 5, ...
+            dataPair[y][x / 2] = (byte) (dataPair[y][x / 2] & 0xF0 | (data & 0xF));
     }
 }

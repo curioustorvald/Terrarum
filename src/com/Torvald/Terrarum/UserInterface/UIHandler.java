@@ -78,7 +78,7 @@ public class UIHandler {
 
     public  void setVisibility(boolean b){
         if (alwaysVisible) {
-            throw new RuntimeException("Tried to 'set visibility of' constant UI");
+            throw new RuntimeException("[UIHandler] Tried to 'set visibility of' constant UI");
         }
         visible = b;
     }
@@ -110,21 +110,21 @@ public class UIHandler {
 
     public void setAsOpening(){
         if (alwaysVisible) {
-            throw new RuntimeException("Tried to 'open' constant UI");
+            throw new RuntimeException("[UIHandler] Tried to 'open' constant UI");
         }
         visible = true;
     }
 
     public void setAsClosing(){
         if (alwaysVisible) {
-            throw new RuntimeException("Tried to 'close' constant UI");
+            throw new RuntimeException("[UIHandler] Tried to 'close' constant UI");
         }
         visible = false;
     }
 
     public void toggleOpening() {
         if (alwaysVisible) {
-            throw new RuntimeException("Tried to 'toggle opening of' constant UI");
+            throw new RuntimeException("[UIHandler] Tried to 'toggle opening of' constant UI");
         }
         if (visible) {
             if (!closing) {
@@ -143,39 +143,39 @@ public class UIHandler {
     }
 
     public void keyPressed(int key, char c) {
-        if (visible) { ui.keyPressed(key, c); }
+        if (visible && ui instanceof UITypable) { ((UITypable) (ui)).keyPressed(key, c); }
     }
 
     public void keyReleased(int key, char c) {
-        if (visible) { ui.keyReleased(key, c); }
+        if (visible && ui instanceof UITypable) { ((UITypable) (ui)).keyReleased(key, c); }
     }
 
     public void mouseMoved(int oldx, int oldy, int newx, int newy) {
-        if (visible) { ui.mouseMoved(oldx, oldy, newx, newy); }
+        if (visible && ui instanceof UIClickable) { ((UIClickable) (ui)).mouseMoved(oldx, oldy, newx, newy); }
     }
 
     public void mouseDragged(int oldx, int oldy, int newx, int newy) {
-        if (visible) { ui.mouseDragged(oldx, oldy, newx, newy); }
+        if (visible && ui instanceof UIClickable) { ((UIClickable) (ui)).mouseDragged(oldx, oldy, newx, newy); }
     }
 
     public void mousePressed(int button, int x, int y) {
-        if (visible) { ui.mousePressed(button, x, y); }
+        if (visible && ui instanceof UIClickable) { ((UIClickable) (ui)).mousePressed(button, x, y); }
     }
 
     public void mouseReleased(int button, int x, int y) {
-        if (visible) { ui.mouseReleased(button, x, y); }
+        if (visible && ui instanceof UIClickable) { ((UIClickable) (ui)).mouseReleased(button, x, y); }
     }
 
     public void mouseWheelMoved(int change) {
-        if (visible) { ui.mouseWheelMoved(change); }
+        if (visible && ui instanceof UIClickable) { ((UIClickable) (ui)).mouseWheelMoved(change); }
     }
 
     public void controllerButtonPressed(int controller, int button) {
-        if (visible) { ui.controllerButtonPressed(controller, button); }
+        if (visible && ui instanceof UIClickable) { ((UIClickable) (ui)).controllerButtonPressed(controller, button); }
     }
 
     public void controllerButtonReleased(int controller, int button) {
-        if (visible) { ui.controllerButtonReleased(controller, button); }
+        if (visible && ui instanceof UIClickable) { ((UIClickable) (ui)).controllerButtonReleased(controller, button); }
     }
 
     public boolean isTakingControl() {

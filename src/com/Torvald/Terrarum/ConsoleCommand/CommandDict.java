@@ -33,6 +33,7 @@ public class CommandDict {
         dict.put("setgl", new SetGlobalLightLevel());
         dict.put("getfaction", new GetFactioning());
         dict.put("auth", Terrarum.game.auth);
+        dict.put("spawnball", new SpawnPhysTestBall());
     }
 
     public static ConsoleCommand getCommand(String commandName) {

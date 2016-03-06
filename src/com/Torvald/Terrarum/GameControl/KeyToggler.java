@@ -13,10 +13,7 @@ public class KeyToggler {
         return currentState[key];
     }
 
-    public static void update(GameContainer gc){
-
-        Input input = gc.getInput();
-
+    public static void update(Input input){
         for (int i = 0; i < 256; i++) {
             if (input.isKeyDown(i)) {
                 isPressed[i] = true;

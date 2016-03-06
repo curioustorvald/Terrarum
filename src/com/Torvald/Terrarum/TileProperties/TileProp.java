@@ -6,6 +6,7 @@ package com.Torvald.Terrarum.TileProperties;
 public class TileProp {
 
     private int id;
+    private int damage;
     private String name;
 
     private char opacity; // colour attenuation
@@ -22,7 +23,9 @@ public class TileProp {
     private boolean opaque; // hides wall or not
 
     private char luminosity;
+
     private int drop;
+    private int dropDamage;
 
     private boolean fallable;
 
@@ -34,6 +37,14 @@ public class TileProp {
 
     void setId(int id) {
         this.id = id;
+    }
+
+    public int getDamage() {
+        return damage;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
     }
 
     public String getName() {
@@ -114,6 +125,14 @@ public class TileProp {
 
     void setDrop(int drop) {
         this.drop = drop;
+    }
+
+    public int getDropDamage() {
+        return dropDamage;
+    }
+
+    public void setDropDamage(int dropDamage) {
+        this.dropDamage = dropDamage;
     }
 
     public boolean isFallable() {

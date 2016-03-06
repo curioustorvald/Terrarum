@@ -23,6 +23,7 @@ public class GameMap {
     private volatile MapLayer layerWall;
     private volatile MapLayer layerTerrain;
     private volatile MapLayer layerWire;
+    private volatile PairedMapLayer wallDamageCode;
     private volatile PairedMapLayer terrainDamageCode;
 
     //properties
@@ -56,6 +57,7 @@ public class GameMap {
         layerWall = new MapLayer(width, height);
         layerWire = new MapLayer(width, height);
         terrainDamageCode = new PairedMapLayer(width, height);
+        wallDamageCode = new PairedMapLayer(width, height);
 
         globalLight = (char) 63999;
         worldTime = new WorldTime();
@@ -122,28 +124,62 @@ public class GameMap {
         return terrainDamageCode;
     }
 
+    public PairedMapLayer getWallDamageCode() {
+        return wallDamageCode;
+    }
+
     public int getTileFromWall(int x, int y) {
-        return uint8ToInt32(layerWall.data[y][x]);
+        return layerWall.getTile(x, y) * PairedMapLayer.RANGE + getWallDamage(x, y);
     }
 
     public int getTileFromTerrain(int x, int y) {
-        return uint8ToInt32(layerTerrain.data[y][x]);
+        return layerTerrain.getTile(x, y) * PairedMapLayer.RANGE + getTerrainDamage(x, y);
     }
 
     public int getTileFromWire(int x, int y) {
-        return uint8ToInt32(layerWire.data[y][x]);
+        return layerWire.getTile(x, y);
     }
 
-    public int getDamageData(int x, int y) {
+    public int getWallDamage(int x, int y) {
+        return wallDamageCode.getData(x, y);
+    }
+
+    public int getTerrainDamage(int x, int y) {
         return terrainDamageCode.getData(x, y);
     }
 
-    public void setTileWall(int x, int y, byte tile) {
-        layerWall.data[y][x] = tile;
+    /**
+     * Set the tile of wall as specified, with damage value of zero.
+     * @param x
+     * @param y
+     * @param combinedTilenum (tilenum * 16) + damage
+     */
+    public void setTileWall(int x, int y, int combinedTilenum) {
+        setTileWall(x, y
+                , (byte) (combinedTilenum / PairedMapLayer.RANGE)
+                , combinedTilenum % PairedMapLayer.RANGE);
     }
 
-    public void setTileTerrain(int x, int y, byte tile) {
-        layerTerrain.data[y][x] = tile;
+    /**
+     * Set the tile of wall as specified, with damage value of zero.
+     * @param x
+     * @param y
+     * @param combinedTilenum (tilenum * 16) + damage
+     */
+    public void setTileTerrain(int x, int y, int combinedTilenum) {
+        setTileTerrain(x, y
+                , (byte) (combinedTilenum / PairedMapLayer.RANGE)
+                , combinedTilenum % PairedMapLayer.RANGE);
+    }
+
+    public void setTileWall(int x, int y, byte tile, int damage) {
+        layerWall.setTile(x, y, tile);
+        wallDamageCode.setData(x, y, damage);
+    }
+
+    public void setTileTerrain(int x, int y, byte tile, int damage) {
+        layerTerrain.setTile(x, y, tile);
+        terrainDamageCode.setData(x, y, damage);
     }
 
     public void setTileWire(int x, int y, byte tile) {

@@ -12,7 +12,7 @@ import org.newdawn.slick.Input;
 /**
  * Created by minjaesong on 15-12-31.
  */
-public class ConsoleWindow implements UICanvas {
+public class ConsoleWindow implements UICanvas, UITypable {
 
     Color UIColour = new Color(0x90000000);
 
@@ -103,41 +103,6 @@ public class ConsoleWindow implements UICanvas {
 
     @Override
     public void keyReleased(int key, char c) {
-
-    }
-
-    @Override
-    public void mouseMoved(int oldx, int oldy, int newx, int newy) {
-
-    }
-
-    @Override
-    public void mouseDragged(int oldx, int oldy, int newx, int newy) {
-
-    }
-
-    @Override
-    public void mousePressed(int button, int x, int y) {
-
-    }
-
-    @Override
-    public void mouseReleased(int button, int x, int y) {
-
-    }
-
-    @Override
-    public void mouseWheelMoved(int change) {
-
-    }
-
-    @Override
-    public void controllerButtonPressed(int controller, int button) {
-
-    }
-
-    @Override
-    public void controllerButtonReleased(int controller, int button) {
 
     }
 

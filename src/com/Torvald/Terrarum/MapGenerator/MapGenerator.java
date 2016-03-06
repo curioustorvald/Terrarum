@@ -516,11 +516,11 @@ public class MapGenerator {
             for (int i = 0; i < height - pillarOffset; i++) {
 
                 if (i < dirtThickness) {
-                    map.getTerrainArray()[i + pillarOffset][x] = TileNameCode.DIRT;
-                    map.getWallArray()[i + pillarOffset][x] = TileNameCode.DIRT;
+                    MapGenerator.map.setTileTerrain(x, i + pillarOffset, TileNameCode.DIRT);
+                    MapGenerator.map.setTileWall(x, i + pillarOffset, TileNameCode.DIRT);
                 } else {
-                    map.getTerrainArray()[i + pillarOffset][x] = TileNameCode.STONE;
-                    map.getWallArray()[i + pillarOffset][x] = TileNameCode.STONE;
+                    MapGenerator.map.setTileTerrain(x, i + pillarOffset, TileNameCode.STONE);
+                    MapGenerator.map.setTileWall(x, i + pillarOffset, TileNameCode.STONE);
                 }
 
             }
@@ -594,13 +594,13 @@ public class MapGenerator {
 
 	/* 2. Carve */
 
-    private static void carveCave(float[][] map, byte tile, String message) {
+    private static void carveCave(float[][] map, int tile, String message) {
         System.out.println("[MapGenerator] " + message);
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (map[i][j] > 0.9) {
-                    MapGenerator.map.getTerrainArray()[i][j] = tile;
+                    MapGenerator.map.setTileTerrain(j, i, tile);
                 }
             }
         }
@@ -613,14 +613,14 @@ public class MapGenerator {
      * @param tile
      * @param message
      */
-    private static void carveByMap(float[][] map, float scarcity, byte tile, String message) {
+    private static void carveByMap(float[][] map, float scarcity, int tile, String message) {
         System.out.println("[MapGenerator] " + message);
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (map[i][j] > gradientQuadratic(i, noiseGradientStart, noiseGrdCaveEnd) *
                         scarcity) {
-                    MapGenerator.map.getTerrainArray()[i][j] = tile;
+                    MapGenerator.map.setTileTerrain(j, i, tile);
                 }
             }
         }
@@ -634,14 +634,14 @@ public class MapGenerator {
      * @param tile
      * @param message
      */
-    private static void fillByMap(float[][] map, float scarcity, byte replaceFrom, byte tile, String message) {
+    private static void fillByMap(float[][] map, float scarcity, int replaceFrom, int tile, String message) {
         System.out.println("[MapGenerator] " + message);
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (map[i][j] > getNoiseGradient(i, noiseGradientStart, noiseGradientEnd) * scarcity
                         && MapGenerator.map.getTileFromTerrain(j, i) == replaceFrom) {
-                    MapGenerator.map.getTerrainArray()[i][j] = tile;
+                    MapGenerator.map.setTileTerrain(j, i, tile);
                 }
             }
         }
@@ -655,7 +655,7 @@ public class MapGenerator {
      * @param tile
      * @param message
      */
-    private static void fillByMapInverseGradFilter(float[][] map, float scarcity, byte replaceFrom, byte tile, String message) {
+    private static void fillByMapInverseGradFilter(float[][] map, float scarcity, int replaceFrom, int tile, String message) {
         System.out.println("[MapGenerator] " + message);
 
         for (int i = 0; i < height; i++) {
@@ -663,7 +663,7 @@ public class MapGenerator {
                 if (map[i][j] > getNoiseGradientInversed(i, noiseGradientEnd, noiseGradientStart)
                         * scarcity
                         && MapGenerator.map.getTileFromTerrain(j, i) == replaceFrom) {
-                    MapGenerator.map.getTerrainArray()[i][j] = tile;
+                    MapGenerator.map.setTileTerrain(j, i, tile);
                 }
             }
         }
@@ -679,20 +679,20 @@ public class MapGenerator {
      * @param tile
      * @param message
      */
-    private static void fillByMapNoFilter(float[][] map, float scarcity, byte replaceFrom, byte tile, String message) {
+    private static void fillByMapNoFilter(float[][] map, float scarcity, int replaceFrom, int tile, String message) {
         System.out.println("[MapGenerator] " + message);
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (map[i][j] > noiseGradientStart * scarcity
                         && MapGenerator.map.getTileFromTerrain(j, i) == replaceFrom) {
-                    MapGenerator.map.getTerrainArray()[i][j] = tile;
+                    MapGenerator.map.setTileTerrain(j, i, tile);
                 }
             }
         }
     }
 
-    private static void fillByMapNoFilterUnderground(float[][] map, float scarcity, byte replaceFrom, byte
+    private static void fillByMapNoFilterUnderground(float[][] map, float scarcity, int replaceFrom, int
             tile, String message) {
         System.out.println("[MapGenerator] " + message);
 
@@ -701,21 +701,20 @@ public class MapGenerator {
                 if (map[i][j] > noiseGradientStart * scarcity
                         && MapGenerator.map.getTileFromTerrain(j, i) == replaceFrom
                         && MapGenerator.map.getTileFromWall(j, i) == TileNameCode.STONE) {
-                    MapGenerator.map.getTerrainArray()[i][j] = tile;
+                    MapGenerator.map.setTileTerrain(j, i, tile);
                 }
             }
         }
     }
 
-    private static void fillByMap(float[][] map, float scarcity, byte replaceFrom, byte[] tile, String message) {
+    private static void fillByMap(float[][] map, float scarcity, int replaceFrom, int[] tile, String message) {
         System.out.println("[MapGenerator] " + message);
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (map[i][j] > getNoiseGradient(i, noiseGradientStart, noiseGradientEnd) * scarcity
                         && MapGenerator.map.getTileFromTerrain(j, i) == replaceFrom) {
-                    MapGenerator.map.getTerrainArray()[i][j]
-                            = tile[random.nextInt(tile.length)];
+                    MapGenerator.map.setTileTerrain(j, i, tile[random.nextInt(tile.length)]);
                 }
             }
         }
@@ -908,7 +907,7 @@ public class MapGenerator {
         for (int i = height * 14 / 15; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (map.getTerrainArray()[i][j] == 0) {
-                    map.getTerrainArray()[i][j] = TileNameCode.LAVA;
+                    map.setTileTerrain(j, i, TileNameCode.LAVA);
                 }
             }
         }
@@ -938,7 +937,7 @@ public class MapGenerator {
                     catch (ArrayIndexOutOfBoundsException e) {}
 
                     if (i != 4 && thisTile == TileNameCode.DIRT && nearbyWallTile == TileNameCode.AIR) {
-                        map.getTerrainArray()[y][x] = TileNameCode.GRASS;
+                        map.setTileTerrain(x, y, TileNameCode.GRASS);
                         break;
                     }
                 }
@@ -951,15 +950,15 @@ public class MapGenerator {
         return map.getTileFromTerrain(x, y) == TileNameCode.GRASS || map.getTileFromTerrain(x, y) == TileNameCode.DIRT;
     }
 
-    private static void replaceIfTerrain(byte ifTile, int x, int y, byte replaceTile) {
-        if (map.getTileFromTerrain(x, y) == ifTile) {
-            map.getTerrainArray()[y][x] = replaceTile;
+    private static void replaceIfTerrain(int ifTileRaw, int x, int y, int replaceTileRaw) {
+        if (map.getTileFromTerrain(x, y) == ifTileRaw) {
+            map.setTileTerrain(x, y, replaceTileRaw);
         }
     }
 
-    private static void replaceIfWall(byte ifTile, int x, int y, byte replaceTile) {
-        if (map.getTileFromWall(x, y) == ifTile) {
-            map.getWallArray()[y][x] = replaceTile;
+    private static void replaceIfWall(int ifTileRaw, int x, int y, int replaceTileRaw) {
+        if (map.getTileFromWall(x, y) == ifTileRaw) {
+            map.setTileWall(x, y, replaceTileRaw);
         }
     }
 
@@ -973,16 +972,14 @@ public class MapGenerator {
                     for (int y = getTerrainHeightFromHeightMap(OCEAN_WIDTH)
                             ; y < getTerrainHeightFromHeightMap(ix)
                             ; y++) {
-                        map.getTerrainArray()
-                                [y][ix] = TileNameCode.WATER;
+                        map.setTileTerrain(ix, y, TileNameCode.WATER);
                     }
                 }
                 else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
                     for (int y = getTerrainHeightFromHeightMap(map.width - 1 - OCEAN_WIDTH)
                             ; y < getTerrainHeightFromHeightMap(map.width - 1 - ix)
                             ; y++) {
-                        map.getTerrainArray()
-                                [y][map.width - 1 - ix] = TileNameCode.WATER;
+                        map.setTileTerrain(map.width - 1 - ix, y, TileNameCode.WATER);
                     }
                 }
             }
@@ -992,22 +989,17 @@ public class MapGenerator {
                 if (worldOceanPosition == TYPE_OCEAN_LEFT) {
                     int terrainPoint = getTerrainHeightFromHeightMap(ix);
 
-                    map.getTerrainArray()
-                            [terrainPoint + iy]
-                            [ix] = TileNameCode.SAND;
-                    map.getTerrainArray()
-                            [terrainPoint + iy - 1] // clear grass and make the sheet thicker
-                            [ix] = TileNameCode.SAND;
+
+                    map.setTileTerrain(ix, terrainPoint + iy, TileNameCode.SAND_BEACH);
+                    // clear grass and make the sheet thicker
+                    map.setTileTerrain(ix, terrainPoint + iy - 1, TileNameCode.SAND_BEACH);
                 }
                 else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
                     int terrainPoint = getTerrainHeightFromHeightMap(map.width - 1 - ix);
 
-                    map.getTerrainArray()
-                            [terrainPoint + iy]
-                            [map.width - 1 - ix] = TileNameCode.SAND;
-                    map.getTerrainArray()
-                            [terrainPoint + iy - 1] // clear grass and make the sheet thicker
-                            [map.width - 1 - ix] = TileNameCode.SAND;
+                    map.setTileTerrain(map.width - 1 - ix, terrainPoint + iy, TileNameCode.SAND_BEACH);
+                    // clear grass and make the sheet thicker
+                    map.setTileTerrain(map.width - 1 - ix, terrainPoint + iy - 1, TileNameCode.SAND_BEACH);
                 }
             }
         }

@@ -61,6 +61,8 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     private HashSet<Faction> factionSet = new HashSet<>();
 
+    private final float BASE_BUOYANCY = 0.98f;
+
 
     /**
      * Creates new Player instance with empty elements (sprites, actorvalue, etc.). <br />
@@ -73,6 +75,7 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
         super();
         referenceID = PLAYER_REF_ID;
         setVisible(true);
+        super.setBuoyancy(BASE_BUOYANCY);
     }
 
     @Override

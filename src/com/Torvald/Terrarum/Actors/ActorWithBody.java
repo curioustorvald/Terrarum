@@ -1,13 +1,11 @@
 package com.Torvald.Terrarum.Actors;
 
 import com.Torvald.Rand.HQRNG;
+import com.Torvald.Terrarum.*;
 import com.Torvald.Terrarum.MapDrawer.MapDrawer;
-import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.Terrarum.TileProperties.TilePropCodex;
 import com.Torvald.spriteAnimation.SpriteAnimation;
 import com.jme3.math.FastMath;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
@@ -20,7 +18,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     ActorInventory inventory;
 
-    private @NotNull float hitboxTranslateX; // relative to spritePosX
+    private @NotNull
+    float hitboxTranslateX; // relative to spritePosX
     private @NotNull float hitboxTranslateY; // relative to spritePosY
     private @NotNull int baseHitboxW;
     private @NotNull int baseHitboxH;
@@ -38,12 +37,18 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     boolean grounded = false;
 
+    @Nullable
     SpriteAnimation sprite;
     @Nullable SpriteAnimation spriteGlow;
+    /** Default to 'false' */
     private boolean visible = false;
+    /** Default to 'true' */
     private boolean update = true;
 
-    @NotNull int baseSpriteWidth, baseSpriteHeight;
+    private boolean noSubjectToGrav = false;
+    private boolean noCollideWorld = false;
+
+    int baseSpriteWidth, baseSpriteHeight;
 
     /**
      * Positions: top-left point
@@ -53,9 +58,15 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     /**
      * Physical properties
      */
+    @NonZero
     private volatile float scale = 1;
-    private volatile float mass = 1f;
+    @NonZero private volatile float mass = 2f;
     private final float MASS_LOWEST = 2f;
+    /** Valid range: [0, 1] */
+    private float elasticity = 0;
+    private final float ELASTICITY_MAX = 0.993f;
+    @NoNegative
+    private float buoyancy = 0;
 
     private static final int TSIZE = MapDrawer.TILE_SIZE;
     private static int AUTO_CLIMB_RATE = TSIZE / 8;
@@ -162,13 +173,20 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             /**
              * Update variables
              */
+            if (this instanceof Player) {
+                noSubjectToGrav = isPlayerNoClip();
+                noCollideWorld = isPlayerNoClip();
+            }
+
             if (mass < MASS_LOWEST) mass = MASS_LOWEST; // clamp to minimum possible mass
-            baseSpriteHeight = sprite.getHeight();
-            baseSpriteWidth = sprite.getWidth();
+            if (sprite != null) {
+                baseSpriteHeight = sprite.getHeight();
+                baseSpriteWidth = sprite.getWidth();
+            }
             gravitation = Terrarum.game.map.getGravitation();
             AUTO_CLIMB_RATE = (int) Math.min(TSIZE / 8 * FastMath.sqrt(scale), TSIZE);
 
-            if (!isPlayerNoClip()) {
+            if (!isNoSubjectToGrav()) {
                 applyGravitation();
             }
 
@@ -226,17 +244,17 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     }
 
     private void updateVerticalPos() {
-        if (!isPlayerNoClip()) {
+        if (!isNoCollideWorld()) {
             // check downward
             if (veloY >= 0) {
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_BOTTOM)) {
                     adjustHitBottom();
-                    veloY = 0;
+                    if (veloY != 0) veloY = -veloY * elasticity;
                     grounded = true;
                 }
                 else if (isColliding(CONTACT_AREA_BOTTOM, 0, 1)) {
-                    veloY = 0;
+                    if (veloY != 0) veloY = -veloY * elasticity;
                     grounded = true;
                 }
                 else {
@@ -249,10 +267,10 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_TOP)) {
                     adjustHitTop();
-                    veloY = 0;
+                    if (veloY != 0) veloY = -veloY * elasticity;
                 }
                 else if (isColliding(CONTACT_AREA_TOP, 0, -1)) {
-                    veloY = 0; // for reversed gravity
+                    if (veloY != 0) veloY = -veloY * elasticity; // for reversed gravity
                 }
                 else {
                 }
@@ -295,17 +313,17 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     }
 
     private void updateHorizontalPos() {
-        if (!isPlayerNoClip()) {
+        if (!isNoCollideWorld()) {
             // check right
             if (veloX > 0) {
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT)) {
                     adjustHitRight();
-                    veloX = 0;
+                    if (veloX != 0) veloX = -veloX * elasticity;
                 }
                 else if (isColliding(CONTACT_AREA_RIGHT, 1, 0)
                         && !isColliding(CONTACT_AREA_LEFT, -1, 0)) {
-                    veloX = 0;
+                    if (veloX != 0) veloX = -veloX * elasticity;
                 }
                 else {
                 }
@@ -314,11 +332,11 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT)) {
                     adjustHitLeft();
-                    veloX = 0;
+                    if (veloX != 0) veloX = -veloX * elasticity;
                 }
                 else if (isColliding(CONTACT_AREA_LEFT, -1, 0)
                         && !isColliding(CONTACT_AREA_RIGHT, 1, 0)) {
-                    veloX = 0;
+                    if (veloX != 0) veloX = -veloX * elasticity;
                 }
                 else {
                 }
@@ -511,7 +529,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     @Override
     public void drawBody(GameContainer gc, Graphics g) {
-        if (visible) {
+        if (visible && sprite != null) {
             if (!sprite.flippedHorizontal()) {
                 sprite.render(g
                         , (hitbox.getPosX() - (hitboxTranslateX * scale))
@@ -535,14 +553,12 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     @Override
     public void updateGlowSprite(GameContainer gc, int delta_t) {
-        if (spriteGlow != null) {
-            spriteGlow.update(delta_t);
-        }
+        if (spriteGlow != null) spriteGlow.update(delta_t);
     }
 
     @Override
     public void updateBodySprite(GameContainer gc, int delta_t) {
-        sprite.update(delta_t);
+        if (sprite != null) sprite.update(delta_t);
     }
 
     @Override
@@ -717,6 +733,40 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     private int quantiseTSize(float v) {
         return FastMath.floor(v / TSIZE) * TSIZE;
+    }
+
+    public boolean isNoSubjectToGrav() {
+        return noSubjectToGrav;
+    }
+
+    public void setNoSubjectToGrav(boolean noSubjectToGrav) {
+        this.noSubjectToGrav = noSubjectToGrav;
+    }
+
+    public boolean isNoCollideWorld() {
+        return noCollideWorld;
+    }
+
+    public void setNoCollideWorld(boolean noCollideWorld) {
+        this.noCollideWorld = noCollideWorld;
+    }
+
+    public void setElasticity(float elasticity) {
+        if (elasticity < 0)
+            throw new IllegalArgumentException("[ActorWithBody] " + elasticity + ": valid elasticity value is [0, 1].");
+
+        if (elasticity > 1) {
+            System.out.println("[ActorWithBody] Elasticity were capped to 1.");
+            this.elasticity = ELASTICITY_MAX;
+        }
+        else this.elasticity = elasticity * ELASTICITY_MAX;
+    }
+
+    public void setBuoyancy(float buoyancy) {
+        if (buoyancy < 0)
+            throw new IllegalArgumentException("[ActorWithBody] " + buoyancy + ": buoyancy cannot be negative.");
+
+        this.buoyancy = buoyancy;
     }
 }
 

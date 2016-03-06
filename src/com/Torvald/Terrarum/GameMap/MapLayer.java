@@ -36,7 +36,7 @@ public class MapLayer implements Iterable<Byte> {
      */
     @Override
     public Iterator<Byte> iterator() {
-        Iterator<Byte> it = new Iterator<Byte>() {
+        return new Iterator<Byte>() {
 
             private int iteratorCount = 0;
 
@@ -55,8 +55,6 @@ public class MapLayer implements Iterable<Byte> {
                 return data[y][x];
             }
         };
-
-        return it;
     }
 
     /**
@@ -105,11 +103,11 @@ public class MapLayer implements Iterable<Byte> {
         throw new UnsupportedOperationException();
     }
 
-    public int getTile(int x, int y) {
+    int getTile(int x, int y) {
         return uint8ToInt32(data[y][x]);
     }
 
-    public void setTile(int x, int y, byte tile) {
+    void setTile(int x, int y, byte tile) {
         data[y][x] = tile;
     }
 

@@ -40,6 +40,7 @@ public class Terrarum extends StateBasedGame {
     public static final int WIDTH = 1060;
     public static final int HEIGHT = 742; // IMAX ratio
     public static boolean VSYNC = true;
+    public static final int VSYNC_TRIGGER_THRESHOLD = 56;
 
     public static Game game;
 
@@ -101,6 +102,8 @@ public class Terrarum extends StateBasedGame {
                 Controllers.getController(0).setDeadZone(c, CONTROLLER_DEADZONE);
             }
         }
+
+        appgc.getInput().enableKeyRepeat();
 
         game = new Game();
         addState(game);

@@ -32,6 +32,9 @@ public class GameController {
                 / MapDrawer.TILE_SIZE);
 
 
+        KeyToggler.update(input);
+
+
         if (!Terrarum.game.consoleHandler.isTakingControl()) {
             if (Terrarum.game.getPlayer().vehicleRiding != null) {
                 Terrarum.game.getPlayer().vehicleRiding.processInput(input);

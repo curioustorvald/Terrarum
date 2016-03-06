@@ -15,7 +15,6 @@ import com.Torvald.Terrarum.MapGenerator.MapGenerator;
 import com.Torvald.Terrarum.TileProperties.TilePropCodex;
 import com.Torvald.Terrarum.TileStat.TileStat;
 import com.Torvald.Terrarum.UserInterface.*;
-import com.sun.istack.internal.NotNull;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.*;
 import org.newdawn.slick.Graphics;
@@ -26,7 +25,7 @@ import org.newdawn.slick.state.StateBasedGame;
 import shader.Shader;
 
 import java.lang.management.ManagementFactory;
-import java.util.LinkedList;
+import java.util.HashSet;
 
 /**
  * Created by minjaesong on 15-12-30.
@@ -41,15 +40,14 @@ public class Game extends BasicGameState {
 
     public GameMap map;
 
-    public LinkedList<Actor> actorContainer = new LinkedList<>();
-    public LinkedList<UIHandler> uiContainer = new LinkedList<>();
+    public HashSet<Actor> actorContainer = new HashSet<>();
+    public HashSet<UIHandler> uiContainer = new HashSet<>();
 
     public UIHandler consoleHandler;
     public UIHandler debugWindow;
     public UIHandler bulletin;
 
-    @NotNull
-    Player player;
+    @NotNull Player player;
 
     private Image GRADIENT_IMAGE;
     private Rectangle skyBox;
@@ -141,7 +139,6 @@ public class Game extends BasicGameState {
         setAppTitle();
 
         GameController.processInput(gc.getInput());
-        KeyToggler.update(gc);
 
         TileStat.update();
 
@@ -164,7 +161,7 @@ public class Game extends BasicGameState {
 
         //bulletin.update(gc, delta_t);
 
-        Terrarum.appgc.setVSync(Terrarum.appgc.getFPS() >= 59);
+        Terrarum.appgc.setVSync(Terrarum.appgc.getFPS() >= Terrarum.VSYNC_TRIGGER_THRESHOLD);
     }
 
     private void setAppTitle() {
@@ -218,6 +215,14 @@ public class Game extends BasicGameState {
         //bulletin.render(gc, g);
 
         GL11.glEnd();
+    }
+
+    public boolean addActor(Actor e) {
+        return actorContainer.add(e);
+    }
+
+    public boolean removeActor(Actor e) {
+        return actorContainer.remove(e);
     }
 
     private Color[] getGradientColour(int timeSec) {
