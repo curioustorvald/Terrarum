@@ -668,7 +668,6 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         hitbox.setPositionY(nextHitbox.getPosY());
     }
 
-
     @Override
     public void drawGlow(GameContainer gc, Graphics g) {
         if (visible && spriteGlow != null) {

@@ -3,7 +3,6 @@ package com.Torvald.Terrarum.MapDrawer;
 import com.Torvald.Terrarum.*;
 import com.Torvald.Terrarum.Actors.Player;
 import com.Torvald.Terrarum.GameMap.GameMap;
-import com.Torvald.Terrarum.GameMap.MapLayer;
 import com.Torvald.Terrarum.GameMap.PairedMapLayer;
 import com.Torvald.Terrarum.TileProperties.TileNameCode;
 import com.Torvald.Terrarum.TileProperties.TilePropCodex;
@@ -49,20 +48,43 @@ public class MapCamera {
     private static final int NEARBY_TILE_CODE_DOWN = 0b0100;
     private static final int NEARBY_TILE_CODE_LEFT = 0b1000;
 
-    private static Integer[] TILES_CONNECT_SELF = {
-              TileNameCode.ORE_COPPER
-            , TileNameCode.ORE_IRON
-            , TileNameCode.ORE_GOLD
-            , TileNameCode.ORE_SILVER
-            , TileNameCode.ORE_ILMENITE
-            , TileNameCode.ORE_AURICHALCUM
-            , TileNameCode.ICE_MAGICAL
+    /**
+     * Connectivity group 01 : man-made tiles
+     * It holds different shading rule to discriminate with group 02, index 0 is single tile.
+     */
+    private static Integer[] TILES_CONNECTIVE_THE_TILE = {
+              TileNameCode.ICE_MAGICAL
+            , TileNameCode.ILLUMINATOR_BLACK
+            , TileNameCode.ILLUMINATOR_BLUE
+            , TileNameCode.ILLUMINATOR_BROWN
+            , TileNameCode.ILLUMINATOR_CYAN
+            , TileNameCode.ILLUMINATOR_FUCHSIA
+            , TileNameCode.ILLUMINATOR_GREEN
+            , TileNameCode.ILLUMINATOR_GREEN_DARK
+            , TileNameCode.ILLUMINATOR_GREY_DARK
+            , TileNameCode.ILLUMINATOR_GREY_LIGHT
+            , TileNameCode.ILLUMINATOR_GREY_MED
+            , TileNameCode.ILLUMINATOR_ORANGE
+            , TileNameCode.ILLUMINATOR_PURPLE
+            , TileNameCode.ILLUMINATOR_RED
+            , TileNameCode.ILLUMINATOR_TAN
+            , TileNameCode.ILLUMINATOR_WHITE
+            , TileNameCode.ILLUMINATOR_YELLOW
+
     };
 
-    private static Integer[] TILES_DARKEN_AIR = {
+    /**
+     * Connectivity group 02 : natural tiles
+     * It holds different shading rule to discriminate with group 01, index 0 is middle tile.
+     */
+    private static Integer[] TILES_CONNECTIVE = {
               TileNameCode.STONE
             , TileNameCode.DIRT
             , TileNameCode.GRASS
+            , TileNameCode.PLANK_BIRCH
+            , TileNameCode.PLANK_BLOODROSE
+            , TileNameCode.PLANK_EBONY
+            , TileNameCode.PLANK_NORMAL
             , TileNameCode.SAND
             , TileNameCode.SAND_BEACH
             , TileNameCode.SAND_RED
@@ -72,7 +94,44 @@ public class MapCamera {
             , TileNameCode.GRAVEL_GREY
             , TileNameCode.SNOW
             , TileNameCode.ICE_NATURAL
-            , TileNameCode.WATER
+            , TileNameCode.ORE_COPPER
+            , TileNameCode.ORE_IRON
+            , TileNameCode.ORE_GOLD
+            , TileNameCode.ORE_SILVER
+            , TileNameCode.ORE_ILMENITE
+            , TileNameCode.ORE_AURICHALCUM
+
+            , TileNameCode.WATER_1
+            , TileNameCode.WATER_2
+            , TileNameCode.WATER_3
+            , TileNameCode.WATER_4
+            , TileNameCode.WATER_5
+            , TileNameCode.WATER_6
+            , TileNameCode.WATER_7
+            , TileNameCode.WATER_8
+            , TileNameCode.WATER_9
+            , TileNameCode.WATER_10
+            , TileNameCode.WATER_11
+            , TileNameCode.WATER_12
+            , TileNameCode.WATER_13
+            , TileNameCode.WATER_14
+            , TileNameCode.WATER_15
+            , TileNameCode.LAVA
+            , TileNameCode.LAVA_1
+            , TileNameCode.LAVA_2
+            , TileNameCode.LAVA_3
+            , TileNameCode.LAVA_4
+            , TileNameCode.LAVA_5
+            , TileNameCode.LAVA_6
+            , TileNameCode.LAVA_7
+            , TileNameCode.LAVA_8
+            , TileNameCode.LAVA_9
+            , TileNameCode.LAVA_10
+            , TileNameCode.LAVA_11
+            , TileNameCode.LAVA_12
+            , TileNameCode.LAVA_13
+            , TileNameCode.LAVA_14
+            , TileNameCode.LAVA_15
             , TileNameCode.LAVA
     };
 
@@ -419,11 +478,11 @@ public class MapCamera {
     }
 
     private static boolean isConnectSelf(int b) {
-        return Arrays.asList(TILES_CONNECT_SELF).contains(b);
+        return Arrays.asList(TILES_CONNECTIVE_THE_TILE).contains(b);
     }
 
     private static boolean isDarkenAir(int b) {
-        return Arrays.asList(TILES_DARKEN_AIR).contains(b);
+        return Arrays.asList(TILES_CONNECTIVE).contains(b);
     }
 
     private static boolean isBlendMul(int b) {

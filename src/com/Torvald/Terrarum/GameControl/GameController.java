@@ -63,7 +63,8 @@ public class GameController {
         else if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
             // test tile place
             try {
-                Terrarum.game.map.setTileTerrain(mouseTileX, mouseTileY, TileNameCode.ICE_MAGICAL);
+                Terrarum.game.map.setTileTerrain(mouseTileX, mouseTileY
+                        , Terrarum.game.getPlayer().getActorValue().getAsInt("selectedtile"));
             }
             catch (ArrayIndexOutOfBoundsException e) {
             }

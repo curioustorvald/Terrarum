@@ -62,6 +62,8 @@ public class PBFSigrid {
 
         p.actorValue.set("luminosity", 22819);
 
+        p.actorValue.set("selectedtile", 16);
+
         p.setHitboxDimension(18, 46, 8, 0);
 
         p.inventory = new ActorInventory(0x7FFFFFFF, true);
