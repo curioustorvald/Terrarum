@@ -14,6 +14,7 @@ public class CommandDict {
     public CommandDict() {
         dict = new Hashtable<>();
 
+        dict.put("echo", new Echo());
         dict.put("setav", new SetAV());
         dict.put("qqq", new QuitApp());
         dict.put("codex", new CodexEdictis());
@@ -27,6 +28,7 @@ public class CommandDict {
         dict.put("setlocale", new SetLocale());
         dict.put("zoom", new Zoom());
         dict.put("teleport", new TeleportPlayer());
+        dict.put("tp", dict.get("teleport"));
         dict.put("cat", new CatStdout());
         dict.put("exportav", new ExportAV());
         dict.put("gsontest", new GsonTest());
@@ -34,6 +36,7 @@ public class CommandDict {
         dict.put("getfaction", new GetFactioning());
         dict.put("auth", Terrarum.game.auth);
         dict.put("spawnball", new SpawnPhysTestBall());
+        dict.put("batch", new Batch());
     }
 
     public static ConsoleCommand getCommand(String commandName) {

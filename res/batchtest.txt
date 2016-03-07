@@ -1,0 +1,4 @@
+echo "Hello, world!"
+echo "This is a batch test."
+setav batch true
+getav batch

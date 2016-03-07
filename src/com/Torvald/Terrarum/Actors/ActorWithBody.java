@@ -255,7 +255,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
             veloY += clampCeil(
                     ((W - D) / mass) * SI_TO_GAME_ACC * G_MUL_PLAYABLE_CONST
-                            * mvmtRstcToMultiplier(fluidResistance) // eliminate shoot-up from fluids
+                            // * mvmtRstcToMultiplier(fluidResistance) // eliminate shoot-up from fluids
                     , VELO_HARD_LIMIT
             );
         }
@@ -493,7 +493,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             veloY -= ((fluidDensity - this.density)
                             * map.getGravitation() * submergedVolume
                             * Math.pow(mass, -1)
-                            * mvmtRstcToMultiplier(fluidResistance) // eliminate shoot-up
+                            // * mvmtRstcToMultiplier(fluidResistance) // eliminate shoot-up
                     * SI_TO_GAME_ACC);
         }
     }
@@ -615,8 +615,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         return density;
     }
 
-    private float mvmtRstcToMultiplier(int viscosity) {
-        return 1f / (1 + (viscosity / 16f));
+    private float mvmtRstcToMultiplier(int movementResistanceValue) {
+        return 1f / (1 + (movementResistanceValue / 16f));
     }
 
     private void clampHitbox() {
@@ -634,9 +634,17 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     }
 
     private void updateNextHitboxFromVelo() {
+        float fluidResistance = mvmtRstcToMultiplier(getTileMvmtRstc());
+
         nextHitbox.set(
-                  Math.round(hitbox.getPosX() + veloX)
-                , Math.round(hitbox.getPosY() + veloY)
+                  Math.round(hitbox.getPosX()
+                          + (veloX
+                          * (isNoSubjectToFluidResistance() ? 1 : fluidResistance)
+                  ))
+                , Math.round(hitbox.getPosY()
+                          + (veloY
+                          * (isNoSubjectToFluidResistance() ? 1 : fluidResistance)
+                  ))
                 , Math.round(baseHitboxW * scale)
                 , Math.round(baseHitboxH * scale)
                 /** Full quantisation; wonder what havoc these statements would wreak...

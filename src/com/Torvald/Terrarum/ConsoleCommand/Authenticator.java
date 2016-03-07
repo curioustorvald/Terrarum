@@ -15,11 +15,10 @@ public class Authenticator implements ConsoleCommand {
     public void execute(String[] args) {
         if (args.length == 2) {
             String pwd = args[1];
-
             String hashedPwd = DigestUtils.sha256Hex(pwd);
 
-            if ("54c5b3dd459d5ef778bb2fa1e23a5fb0e1b62ae66970bcb436e8f81a1a1a8e41".equalsIgnoreCase(hashedPwd)) {
-                // alpine
+            if ("54c5b3dd459d5ef778bb2fa1e23a5fb0e1b62ae66970bcb436e8f81a1a1a8e41"
+                    .equalsIgnoreCase(hashedPwd)) { // alpine
                 String msg = (a) ? "Locked" : "Authenticated";
                 new Echo().execute(msg);
                 System.out.println("[Authenticator] " + msg);
