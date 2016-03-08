@@ -49,10 +49,11 @@ public class MapCamera {
     private static final int NEARBY_TILE_CODE_LEFT = 0b1000;
 
     /**
-     * Connectivity group 01 : man-made tiles
+     * Connectivity group 01 : artificial tiles
      * It holds different shading rule to discriminate with group 02, index 0 is single tile.
+     * These are the tiles that only connects to itself, will not connect to colour variants
      */
-    private static Integer[] TILES_CONNECTIVE_THE_TILE = {
+    private static Integer[] TILES_CONNECT_SELF = {
               TileNameCode.ICE_MAGICAL
             , TileNameCode.ILLUMINATOR_BLACK
             , TileNameCode.ILLUMINATOR_BLUE
@@ -77,7 +78,7 @@ public class MapCamera {
      * Connectivity group 02 : natural tiles
      * It holds different shading rule to discriminate with group 01, index 0 is middle tile.
      */
-    private static Integer[] TILES_CONNECTIVE = {
+    private static Integer[] TILES_CONNECT_MUTUAL = {
               TileNameCode.STONE
             , TileNameCode.DIRT
             , TileNameCode.GRASS
@@ -133,6 +134,23 @@ public class MapCamera {
             , TileNameCode.LAVA_14
             , TileNameCode.LAVA_15
             , TileNameCode.LAVA
+    };
+
+    /**
+     * Torches, levers, switches, ...
+     */
+    private static Integer[] TILES_WALL_STICKER = {
+              TileNameCode.TORCH
+            , TileNameCode.TORCH_FROST
+            , TileNameCode.TORCH_OFF
+            , TileNameCode.TORCH_FROST_OFF
+    };
+
+    /**
+     * platforms, ...
+     */
+    private static Integer[] TILES_WALL_STICKER_CONNECT_SELF = {
+
     };
 
     /**
@@ -252,8 +270,11 @@ public class MapCamera {
                                             ))) {
 
                         int nearbyTilesInfo;
-                        if (isDarkenAir(thisTile)) {
-                            nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, TileNameCode.AIR);
+                        if (isWallSticker(thisTile)) {
+                            nearbyTilesInfo = getNearbyTilesInfoWallSticker(x, y);
+                        }
+                        else if (isConnectMutual(thisTile)) {
+                            nearbyTilesInfo = getNearbyTilesInfoNonSolid(x, y, mode);
                         }
                         else if (isConnectSelf(thisTile)) {
                             nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile);
@@ -330,7 +351,69 @@ public class MapCamera {
         }
 
         return ret;
+    }
 
+    private static int getNearbyTilesInfoNonSolid(int x, int y, int mode) {
+        int[] nearbyTiles = new int[4];
+        if (x == 0) { nearbyTiles[NEARBY_TILE_KEY_LEFT] = 4096; }
+        else { nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(mode, x - 1, y); }
+
+        if (x == map.width - 1) { nearbyTiles[NEARBY_TILE_KEY_RIGHT] = 4096; }
+        else { nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFrom(mode, x + 1, y); }
+
+        if (y == 0) { nearbyTiles[NEARBY_TILE_KEY_UP] = 0; }
+        else { nearbyTiles[NEARBY_TILE_KEY_UP] = map.getTileFrom(mode, x, y - 1); }
+
+        if (y == map.height - 1) { nearbyTiles[NEARBY_TILE_KEY_DOWN] = 4096; }
+        else { nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFrom(mode, x, y + 1); }
+
+        // try for
+        int ret = 0;
+        for (int i = 0; i < 4; i++) {
+            if (!TilePropCodex.getProp(nearbyTiles[i]).isSolid()) {
+                ret += (1 << i); // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+            }
+        }
+
+        return ret;
+    }
+
+    private static int getNearbyTilesInfoWallSticker(int x, int y) {
+        int[] nearbyTiles = new int[4];
+        int NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP;
+        if (x == 0) { nearbyTiles[NEARBY_TILE_KEY_LEFT] = 4096; }
+        else { nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(TERRAIN, x - 1, y); }
+
+        if (x == map.width - 1) { nearbyTiles[NEARBY_TILE_KEY_RIGHT] = 4096; }
+        else { nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFrom(TERRAIN, x + 1, y); }
+
+        if (y == map.height - 1) { nearbyTiles[NEARBY_TILE_KEY_DOWN] = 4096; }
+        else { nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFrom(TERRAIN, x, y + 1); }
+
+        nearbyTiles[NEARBY_TILE_KEY_BACK] = map.getTileFrom(WALL, x, y);
+
+        try {
+            if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_RIGHT]).isSolid()
+                    && TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_LEFT]).isSolid()) {
+                if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_BACK]).isSolid())
+                     return 0;
+                else return 3;
+            }
+            else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_RIGHT]).isSolid()) {
+                return 2;
+            }
+            else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_LEFT]).isSolid()) {
+                return 1;
+            }
+            else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_BACK]).isSolid()) {
+                return 0;
+            }
+            else return 3;
+        }
+        catch (ArrayIndexOutOfBoundsException e) {
+            return TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_BACK]).isSolid()
+                   ? 0 : 3;
+        }
     }
 
     private static void drawTile(int mode, int tilewisePosX, int tilewisePosY, int sheetX, int sheetY) {
@@ -478,11 +561,19 @@ public class MapCamera {
     }
 
     private static boolean isConnectSelf(int b) {
-        return Arrays.asList(TILES_CONNECTIVE_THE_TILE).contains(b);
+        return Arrays.asList(TILES_CONNECT_SELF).contains(b);
     }
 
-    private static boolean isDarkenAir(int b) {
-        return Arrays.asList(TILES_CONNECTIVE).contains(b);
+    private static boolean isConnectMutual(int b) {
+        return Arrays.asList(TILES_CONNECT_MUTUAL).contains(b);
+    }
+
+    private static boolean isWallSticker(int b) {
+        return Arrays.asList(TILES_WALL_STICKER).contains(b);
+    }
+
+    private static boolean isPlatform(int b) {
+        return Arrays.asList(TILES_WALL_STICKER_CONNECT_SELF).contains(b);
     }
 
     private static boolean isBlendMul(int b) {

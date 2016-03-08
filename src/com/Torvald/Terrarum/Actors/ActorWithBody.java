@@ -676,7 +676,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                         , (hitbox.getPosX() - (hitboxTranslateX * scale))
                         , (hitbox.getPosY() + (hitboxTranslateY * scale))
                                 - (baseSpriteHeight - baseHitboxH) * scale
-                                + 1
+                                + 2
                         , scale
                 );
             }
@@ -685,7 +685,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                         , (hitbox.getPosX() - scale)
                         , (hitbox.getPosY() + (hitboxTranslateY * scale))
                                 - (baseSpriteHeight - baseHitboxH) * scale
-                                + 1
+                                + 2
                         , scale
                 );
             }
@@ -700,7 +700,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                         , (hitbox.getPosX() - (hitboxTranslateX * scale))
                         , (hitbox.getPosY() + (hitboxTranslateY * scale))
                                 - (baseSpriteHeight - baseHitboxH) * scale
-                                + 1
+                                + 2
                         , scale
                 );
             }
@@ -709,7 +709,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                         , (hitbox.getPosX() - scale)
                         , (hitbox.getPosY() + (hitboxTranslateY * scale))
                                 - (baseSpriteHeight - baseHitboxH) * scale
-                                + 1
+                                + 2
                         , scale
                 );
             }

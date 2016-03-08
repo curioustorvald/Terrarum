@@ -21,7 +21,7 @@ public class PBFSigrid {
         Player p = new Player();
 
         p.sprite = new SpriteAnimation();
-        p.sprite.setDimension(28, 50);
+        p.sprite.setDimension(28, 51);
         p.sprite.setSpriteImage("res/graphics/sprites/test_player.png");
         p.sprite.setDelay(200);
         p.sprite.setRowsAndFrames(1, 1);
@@ -29,7 +29,7 @@ public class PBFSigrid {
         p.sprite.composeSprite();
 
         p.spriteGlow = new SpriteAnimation();
-        p.spriteGlow.setDimension(28, 50);
+        p.spriteGlow.setDimension(28, 51);
         p.spriteGlow.setSpriteImage("res/graphics/sprites/test_player_glow.png");
         p.spriteGlow.setDelay(200);
         p.spriteGlow.setRowsAndFrames(1, 1);

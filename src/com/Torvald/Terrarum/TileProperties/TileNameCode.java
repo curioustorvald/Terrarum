@@ -59,24 +59,28 @@ public class TileNameCode {
     public static final int PLATFORM_BIRCH =     TilePropCodex.indexDamageToArrayAddr(10, 3);
     public static final int PLATFORM_BLOODROSE = TilePropCodex.indexDamageToArrayAddr(10, 4);
 
-    public static final int TORCH = TilePropCodex.indexDamageToArrayAddr(11, 0);
+    public static final int TORCH =        TilePropCodex.indexDamageToArrayAddr(11, 0);
+    public static final int TORCH_FROST =  TilePropCodex.indexDamageToArrayAddr(11, 1);
 
-    public static final int ILLUMINATOR_WHITE =      TilePropCodex.indexDamageToArrayAddr(12, 0);
-    public static final int ILLUMINATOR_YELLOW =     TilePropCodex.indexDamageToArrayAddr(12, 1);
-    public static final int ILLUMINATOR_ORANGE =     TilePropCodex.indexDamageToArrayAddr(12, 2);
-    public static final int ILLUMINATOR_RED =        TilePropCodex.indexDamageToArrayAddr(12, 3);
-    public static final int ILLUMINATOR_FUCHSIA =    TilePropCodex.indexDamageToArrayAddr(12, 4);
-    public static final int ILLUMINATOR_PURPLE =     TilePropCodex.indexDamageToArrayAddr(12, 5);
-    public static final int ILLUMINATOR_BLUE =       TilePropCodex.indexDamageToArrayAddr(12, 6);
-    public static final int ILLUMINATOR_CYAN =       TilePropCodex.indexDamageToArrayAddr(12, 7);
-    public static final int ILLUMINATOR_GREEN =      TilePropCodex.indexDamageToArrayAddr(12, 8);
-    public static final int ILLUMINATOR_GREEN_DARK = TilePropCodex.indexDamageToArrayAddr(12, 9);
-    public static final int ILLUMINATOR_BROWN =      TilePropCodex.indexDamageToArrayAddr(12, 10);
-    public static final int ILLUMINATOR_TAN =        TilePropCodex.indexDamageToArrayAddr(12, 11);
-    public static final int ILLUMINATOR_GREY_LIGHT = TilePropCodex.indexDamageToArrayAddr(12, 12);
-    public static final int ILLUMINATOR_GREY_MED =   TilePropCodex.indexDamageToArrayAddr(12, 13);
-    public static final int ILLUMINATOR_GREY_DARK =  TilePropCodex.indexDamageToArrayAddr(12, 14);
-    public static final int ILLUMINATOR_BLACK =      TilePropCodex.indexDamageToArrayAddr(12, 15);
+    public static final int TORCH_OFF =        TilePropCodex.indexDamageToArrayAddr(12, 0);
+    public static final int TORCH_FROST_OFF =  TilePropCodex.indexDamageToArrayAddr(12, 1);
+
+    public static final int ILLUMINATOR_WHITE =      TilePropCodex.indexDamageToArrayAddr(13, 0);
+    public static final int ILLUMINATOR_YELLOW =     TilePropCodex.indexDamageToArrayAddr(13, 1);
+    public static final int ILLUMINATOR_ORANGE =     TilePropCodex.indexDamageToArrayAddr(13, 2);
+    public static final int ILLUMINATOR_RED =        TilePropCodex.indexDamageToArrayAddr(13, 3);
+    public static final int ILLUMINATOR_FUCHSIA =    TilePropCodex.indexDamageToArrayAddr(13, 4);
+    public static final int ILLUMINATOR_PURPLE =     TilePropCodex.indexDamageToArrayAddr(13, 5);
+    public static final int ILLUMINATOR_BLUE =       TilePropCodex.indexDamageToArrayAddr(13, 6);
+    public static final int ILLUMINATOR_CYAN =       TilePropCodex.indexDamageToArrayAddr(13, 7);
+    public static final int ILLUMINATOR_GREEN =      TilePropCodex.indexDamageToArrayAddr(13, 8);
+    public static final int ILLUMINATOR_GREEN_DARK = TilePropCodex.indexDamageToArrayAddr(13, 9);
+    public static final int ILLUMINATOR_BROWN =      TilePropCodex.indexDamageToArrayAddr(13, 10);
+    public static final int ILLUMINATOR_TAN =        TilePropCodex.indexDamageToArrayAddr(13, 11);
+    public static final int ILLUMINATOR_GREY_LIGHT = TilePropCodex.indexDamageToArrayAddr(13, 12);
+    public static final int ILLUMINATOR_GREY_MED =   TilePropCodex.indexDamageToArrayAddr(13, 13);
+    public static final int ILLUMINATOR_GREY_DARK =  TilePropCodex.indexDamageToArrayAddr(13, 14);
+    public static final int ILLUMINATOR_BLACK =      TilePropCodex.indexDamageToArrayAddr(13, 15);
 
     public static final int WATER_1 =  TilePropCodex.indexDamageToArrayAddr(254, 0);
     public static final int WATER_2 =  TilePropCodex.indexDamageToArrayAddr(254, 1);

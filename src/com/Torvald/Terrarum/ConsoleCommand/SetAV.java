@@ -36,10 +36,10 @@ class SetAV implements ConsoleCommand {
                     val = new Float(args[2]); // try for float
                 }
                 catch (NumberFormatException ee) {
-                    if (args[2].equalsIgnoreCase("true")) {
+                    if (args[2].equalsIgnoreCase("__true")) {
                         val = new Boolean(true);
                     }
-                    else if (args[2].equalsIgnoreCase("false")) {
+                    else if (args[2].equalsIgnoreCase("__false")) {
                         val = new Boolean(false);
                     }
                     else {
