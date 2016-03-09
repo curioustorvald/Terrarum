@@ -71,7 +71,12 @@ public class MapCamera {
             , TileNameCode.ILLUMINATOR_TAN
             , TileNameCode.ILLUMINATOR_WHITE
             , TileNameCode.ILLUMINATOR_YELLOW
-
+            , TileNameCode.SANDSTONE
+            , TileNameCode.SANDSTONE_BLACK
+            , TileNameCode.SANDSTONE_DESERT
+            , TileNameCode.SANDSTONE_RED
+            , TileNameCode.SANDSTONE_WHITE
+            , TileNameCode.SANDSTONE_GREEN
     };
 
     /**
@@ -91,6 +96,7 @@ public class MapCamera {
             , TileNameCode.SAND_RED
             , TileNameCode.SAND_DESERT
             , TileNameCode.SAND_BLACK
+            , TileNameCode.SAND_GREEN
             , TileNameCode.GRAVEL
             , TileNameCode.GRAVEL_GREY
             , TileNameCode.SNOW
@@ -250,7 +256,7 @@ public class MapCamera {
 
                             (
                                     (       // wall and not blocked
-                                            (mode == WALL) && isWallThatBeDrawn(x, y)
+                                            (mode == WALL)
                                     )
                                             ||
                                             (mode == TERRAIN)
@@ -496,36 +502,6 @@ public class MapCamera {
         else {
             return x;
         }
-    }
-
-    private static Image getTileByIndex(SpriteSheet s, int i) {
-        return s.getSprite(i % 16, i / 16);
-    }
-
-    private static boolean isWallThatBeDrawn(int x, int y) {
-        for (int i = 0; i < 9; i++) {
-            int tx = x + (i % 3 - 1);
-            int ty = y + (i / 3 - 1);
-
-            if (tx < 0) tx = 0;
-            else if (tx >= map.width) tx = map.width;
-            if (ty < 0) ty = 0;
-            else if (ty >= map.width) ty = map.width;
-
-            try {
-                if (!isOpaque(map.getTileFromTerrain(tx, ty))) {
-                    return true;
-                }
-            }
-            catch (ArrayIndexOutOfBoundsException e) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isOpaque(int x) {
-        return TilePropCodex.getProp(x).isOpaque();
     }
 
     public static int getCameraX() {

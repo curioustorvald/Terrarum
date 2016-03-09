@@ -1,6 +1,10 @@
 package com.Torvald.Terrarum.MapDrawer;
 
 import com.Torvald.ColourUtil.Col40;
+import com.Torvald.Terrarum.Actors.Actor;
+import com.Torvald.Terrarum.Actors.ActorWithBody;
+import com.Torvald.Terrarum.Actors.Glowing;
+import com.Torvald.Terrarum.Actors.Luminous;
 import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.Terrarum.TileProperties.TilePropCodex;
 import com.jme3.math.FastMath;
@@ -306,13 +310,18 @@ public class LightmapRenderer {
         }
 
         // mix luminous actor
-        // test player TODO for all actor.Luminous in the game
-        int tileX = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedX() / TSIZE);
-        int tileY = Math.round(Terrarum.game.getPlayer().getHitbox().getPointedY() / TSIZE)
-                - 1;
-        char actorLuminosity = Terrarum.game.getPlayer().getLuminance();
-        if (x == tileX && y == tileY) {
-            lightLevelThis = screenBlend(lightLevelThis, actorLuminosity);
+        for (Actor actor : Terrarum.game.actorContainer) {
+            if (actor instanceof Luminous && actor instanceof ActorWithBody) {
+                Luminous actorLum = (Luminous) actor;
+                ActorWithBody actorBody = (ActorWithBody) actor;
+                int tileX = Math.round(actorBody.getHitbox().getPointedX() / TSIZE);
+                int tileY = Math.round(actorBody.getHitbox().getPointedY() / TSIZE)
+                        - 1;
+                char actorLuminosity = actorLum.getLuminance();
+                if (x == tileX && y == tileY) {
+                    lightLevelThis = screenBlend(lightLevelThis, actorLuminosity);
+                }
+            }
         }
 
 

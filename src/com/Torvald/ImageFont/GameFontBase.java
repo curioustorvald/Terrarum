@@ -1,5 +1,7 @@
 package com.Torvald.ImageFont;
 
+import com.Torvald.Terrarum.Terrarum;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.*;
 
 import java.util.Arrays;
@@ -318,6 +320,11 @@ public class GameFontBase implements Font {
 
     @Override
     public void drawString(float x, float y, String s) {
+        drawString(x, y, s, Color.white);
+    }
+
+    @Override
+    public void drawString(float x, float y, String s, Color color) {
         // hangul fonts first
         hangulSheet.startUse();
         // WANSEONG
@@ -498,11 +505,6 @@ public class GameFontBase implements Font {
         }
     }
 
-    @Override
-    public void drawString(float x, float y, String s, Color color) {
-        drawString(x, y, s);
-    }
-
     private int getSheetType(char c) {
         // EFs
         if (isAsciiEF(c)) return SHEET_ASCII_EF;
@@ -552,5 +554,15 @@ public class GameFontBase implements Font {
      */
     public void setInterchar(int margin) {
         interchar = margin;
+    }
+
+    private void setBlendModeMul() {
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    private void setBlendModeNormal() {
+        GL11.glDisable(GL11.GL_BLEND);
+        Terrarum.appgc.getGraphics().setDrawMode(Graphics.MODE_NORMAL);
     }
 }

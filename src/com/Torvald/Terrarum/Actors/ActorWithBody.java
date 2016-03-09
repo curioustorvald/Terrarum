@@ -211,14 +211,14 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
 
             // if not horizontally moving then ...
-            if (Math.abs(veloX) < 0.5) { // fix for special situations (see fig. 1 at the bottom of the source)
-                updateVerticalPos();
+            //if (Math.abs(veloX) < 0.5) { // fix for special situations (see fig. 1 at the bottom of the source)
+            //    updateVerticalPos();
+            //    updateHorizontalPos();
+            //}
+            //else {
                 updateHorizontalPos();
-            }
-            else {
-                updateHorizontalPos();
                 updateVerticalPos();
-            }
+            //}
 
 
             updateHitboxX();
@@ -236,7 +236,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      * Apply only if not grounded; normal force is not implemented (and redundant)
      * so we manually reset G to zero (not applying G. force) if grounded.
      */
-    // FIXME abnormal jump behaviour if mass == 1, same thing happens if mass == 0 (but zero mass is invalid anyway).
+    // FIXME abnormal jump behaviour if mass < 2, same thing happens if mass == 0 (but zero mass is invalid anyway).
     private void applyGravitation() {
         if (!isGrounded()) {
             /**

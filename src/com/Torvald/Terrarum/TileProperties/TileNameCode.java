@@ -30,6 +30,7 @@ public class TileNameCode {
     public static final int SAND_RED =    TilePropCodex.indexDamageToArrayAddr(5, 2);
     public static final int SAND_DESERT = TilePropCodex.indexDamageToArrayAddr(5, 3);
     public static final int SAND_BLACK =  TilePropCodex.indexDamageToArrayAddr(5, 4);
+    public static final int SAND_GREEN =  TilePropCodex.indexDamageToArrayAddr(5, 5);
 
     public static final int GRAVEL =          TilePropCodex.indexDamageToArrayAddr(6, 0);
     public static final int GRAVEL_GREY =     TilePropCodex.indexDamageToArrayAddr(6, 1);
@@ -81,6 +82,13 @@ public class TileNameCode {
     public static final int ILLUMINATOR_GREY_MED =   TilePropCodex.indexDamageToArrayAddr(13, 13);
     public static final int ILLUMINATOR_GREY_DARK =  TilePropCodex.indexDamageToArrayAddr(13, 14);
     public static final int ILLUMINATOR_BLACK =      TilePropCodex.indexDamageToArrayAddr(13, 15);
+
+    public static final int SANDSTONE        = TilePropCodex.indexDamageToArrayAddr(14, 0);
+    public static final int SANDSTONE_WHITE  = TilePropCodex.indexDamageToArrayAddr(14, 1);
+    public static final int SANDSTONE_RED    = TilePropCodex.indexDamageToArrayAddr(14, 2);
+    public static final int SANDSTONE_DESERT = TilePropCodex.indexDamageToArrayAddr(14, 3);
+    public static final int SANDSTONE_BLACK  = TilePropCodex.indexDamageToArrayAddr(14, 4);
+    public static final int SANDSTONE_GREEN  = TilePropCodex.indexDamageToArrayAddr(14, 5);
 
     public static final int WATER_1 =  TilePropCodex.indexDamageToArrayAddr(254, 0);
     public static final int WATER_2 =  TilePropCodex.indexDamageToArrayAddr(254, 1);

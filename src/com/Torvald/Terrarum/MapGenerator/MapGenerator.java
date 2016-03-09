@@ -96,6 +96,16 @@ public class MapGenerator {
 
         perturbTerrain();
 
+        /**
+         * Todo: more perturbed overworld (harder to supra-navigate)
+         * Todo: veined ore distribution (metals) -- use veined simplex noise
+         * Todo: clustered gem distribution (Groups: [Ruby, Sapphire], Amethyst, Yellow topaz, emerald, diamond) -- use regular simplex noise
+         * Todo: Lakes! Aquifers! Lava chamber!
+         * Todo: desert areas (variants: SAND_DESERT, SAND_RED
+         * Todo: volcano(es?)
+         * Todo: variants of beach (SAND_BEACH, SAND_BLACK, SAND_GREEN)
+         */
+
         carveCave(
                 caveGen(1.4f, 1.7f)
                 , TileNameCode.AIR

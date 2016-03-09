@@ -32,5 +32,5 @@ def intFromRGB24(r24, g24, b24):
 def colFromNum(raw):
 	return getR40(raw), getG40(raw), getB40(raw)
 
-print(intFromCol(28, 0, 36))
-print(colFromNum(57618))
+print(intFromCol(12, 19, 39))
+print(colFromNum(5009))

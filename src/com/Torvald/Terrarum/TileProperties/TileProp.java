@@ -22,8 +22,6 @@ public class TileProp {
 
     private boolean wallable;
 
-    private boolean opaque; // hides wall or not
-
     private char luminosity;
 
     private int drop;
@@ -151,14 +149,6 @@ public class TileProp {
 
     void setFriction(int friction) {
         this.friction = friction;
-    }
-
-    public boolean isOpaque() {
-        return opaque;
-    }
-
-    public void setOpaque(boolean opaque) {
-        this.opaque = opaque;
     }
 
     public int getDensity() {

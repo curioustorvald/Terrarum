@@ -85,7 +85,6 @@ public class TilePropCodex {
         prop.setSolid(boolVal(record, "solid"));
         prop.setWallable(boolVal(record, "wall"));
         prop.setFallable(boolVal(record, "fall"));
-        prop.setOpaque(boolVal(record, "opaque"));
 
         if (prop.isFluid()) prop.setMovementResistance(intVal(record, "movr"));
 

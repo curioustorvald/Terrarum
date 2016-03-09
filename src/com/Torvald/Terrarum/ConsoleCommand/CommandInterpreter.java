@@ -32,7 +32,7 @@ public class CommandInterpreter {
                         );
                     }
                     else {
-                        System.out.println("ee1");
+                        // System.out.println("ee1");
                         throw new NullPointerException(); // if not authorised, say "Unknown command"
                     }
                 }
@@ -47,7 +47,7 @@ public class CommandInterpreter {
                     }
                     else {
                         echoUnknownCmd(single_command.getName());
-                        System.out.println("ee3");
+                        // System.out.println("ee3");
                     }
                 }
                 catch (Exception e) {

@@ -21,7 +21,22 @@ public class MapDrawer {
     private static final int ENV_COLTEMP_LOWEST = 5500;
     private static final int ENV_COLTEMP_HIGHEST = 7500;
 
+    private static final int ENV_COLTEMP_GOLDEN_HOUR = 5000;
+    private static final int ENV_COLTEMP_NOON = 6500;
+
     private static int colTemp;
+
+    private static final int[] TILES_COLD = {
+              TileNameCode.ICE_MAGICAL
+            , TileNameCode.ICE_FRAGILE
+            , TileNameCode.ICE_NATURAL
+            , TileNameCode.SNOW
+    };
+
+    private static final int[] TILES_WARM = {
+              TileNameCode.SAND_DESERT
+            , TileNameCode.SAND_RED
+    };
 
     public MapDrawer(GameMap map) throws SlickException {
         new MapCamera(map);
@@ -41,14 +56,12 @@ public class MapDrawer {
         int onscreen_tiles_max = FastMath.ceil(Terrarum.HEIGHT * Terrarum.WIDTH / FastMath.sqr(TILE_SIZE))
                 * 2;
         float onscreen_tiles_cap = onscreen_tiles_max / 4f;
-        float onscreen_cold_tiles = TileStat.getCount(
-                  TileNameCode.ICE_MAGICAL
-                , TileNameCode.ICE_FRAGILE
-                , TileNameCode.ICE_NATURAL
-                , TileNameCode.SNOW
-        );
+        float onscreen_cold_tiles = TileStat.getCount(TILES_COLD);
+        float onscreen_warm_tiles = TileStat.getCount(TILES_WARM);
 
-        colTemp = colTempLinearFunc((onscreen_cold_tiles / onscreen_tiles_cap));
+        int colTemp_cold = colTempLinearFunc((onscreen_cold_tiles / onscreen_tiles_cap));
+        int colTemp_warm = colTempLinearFunc(-(onscreen_warm_tiles / onscreen_tiles_cap));
+        colTemp = colTemp_warm + colTemp_cold - ENV_COLTEMP_NOON;
         float zoom = Terrarum.game.screenZoom;
 
         g.setColor(getColourFromMap(colTemp));
@@ -58,7 +71,7 @@ public class MapDrawer {
                 , Terrarum.HEIGHT * ((zoom < 1) ? 1f / zoom : zoom)
         );
 
-        // Color[] colourTable = getGradientColour(WorldTime.elapsedSeconds());
+        // TODO colour overlay by sun position (5000-morning -> 6500-noon -> 5000-twilight)
     }
 
     /**

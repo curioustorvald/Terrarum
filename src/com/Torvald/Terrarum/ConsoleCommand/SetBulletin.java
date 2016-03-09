@@ -11,7 +11,9 @@ import com.Torvald.Terrarum.UserInterface.Bulletin;
 public class SetBulletin implements ConsoleCommand {
     @Override
     public void execute(String[] args) {
-        new Echo().execute(Lang.get("APP_CALIBRATE_YOUR_MONITOR"));
+        new Echo().execute(Lang.get("ERROR_SAVE_CORRUPTED")
+                + " "
+                + Lang.get("MENU_LABEL_CONTINUE_QUESTION"));
 
         String[] testMsg = {
                 "SetBulletin: this is a test!"
