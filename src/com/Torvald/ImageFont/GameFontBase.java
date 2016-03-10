@@ -112,24 +112,30 @@ public class GameFontBase implements Font {
         return hanIndex % JONG_COUNT;
     }
 
-    private int getHanChoseongShift(int hanIndex) {
+    private int getHanChoseongRow(int hanIndex) {
         int jungseongIndex = getHanJungseong(hanIndex);
         Integer[] jungseongWide = {8, 12, 13, 17, 18, 21};
+        Integer[] jungseongComplex = {9, 10, 11, 14, 15, 16, 22};
+        int ret;
 
-        if (getHanJongseong(hanIndex) != 0)
-            return (Arrays.asList(jungseongWide).contains(jungseongIndex))
-                   ? 1 : 0;
-        else
-            return (Arrays.asList(jungseongWide).contains(jungseongIndex))
-                   ? 1 : 0;
+        if (Arrays.asList(jungseongWide).contains(jungseongIndex)) {
+            ret = 2;
+        }
+        else if (Arrays.asList(jungseongComplex).contains(jungseongIndex)) {
+            ret = 4;
+        }
+        else {
+            ret = 0;
+        }
+        return (getHanJongseong(hanIndex) == 0) ? ret : ret + 1;
     }
 
-    private int getHanJungseongShift(int hanIndex) {
-        return (getHanJongseong(hanIndex) == 0) ? 4 : 5;
+    private int getHanJungseongRow(int hanIndex) {
+        return (getHanJongseong(hanIndex) == 0) ? 6 : 7;
     }
 
-    private int getHanJongseongShift() {
-        return 6;
+    private int getHanJongseongRow() {
+        return 8;
     }
 
     private boolean isAsciiEF(char c) {
@@ -356,9 +362,9 @@ public class GameFontBase implements Font {
                 int indexJung = getHanJungseong(hIndex);
                 int indexJong = getHanJongseong(hIndex);
 
-                int choRow = getHanChoseongShift(hIndex);
-                int jungRow = getHanJungseongShift(hIndex);
-                int jongRow = getHanJongseongShift();
+                int choRow = getHanChoseongRow(hIndex);
+                int jungRow = getHanJungseongRow(hIndex);
+                int jongRow = getHanJongseongRow();
 
                 int glyphW = getWidth("" + ch);
 

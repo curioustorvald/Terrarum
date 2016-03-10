@@ -34,6 +34,7 @@
 
 package com.jme3.math;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -636,10 +637,10 @@ final public class FastMath {
     /**
      * Returns the determinant of a 4x4 matrix.
      */
-    public static float determinant(double m00, double m01, double m02,
-                                    double m03, double m10, double m11, double m12, double m13,
-                                    double m20, double m21, double m22, double m23, double m30,
-                                    double m31, double m32, double m33) {
+    public static float determinant(double m00, double m01, double m02, double m03,
+                                    double m10, double m11, double m12, double m13,
+                                    double m20, double m21, double m22, double m23,
+                                    double m30, double m31, double m32, double m33) {
 
         double det01 = m20 * m31 - m21 * m30;
         double det02 = m20 * m32 - m22 * m30;
@@ -836,5 +837,17 @@ final public class FastMath {
         return (short) (((f >> 16) & 0x8000)
                 | ((((f & 0x7f800000) - 0x38000000) >> 13) & 0x7c00)
                 | ((f >> 13) & 0x03ff));
+    }
+
+    public static float min(float... f) {
+        float[] sorted = f.clone();
+        Arrays.sort(f.clone());
+        return sorted[0];
+    }
+
+    public static float max(float... f) {
+        float[] sorted = f.clone();
+        Arrays.sort(f.clone());
+        return sorted[sorted.length - 1];
     }
 }

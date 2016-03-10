@@ -7,6 +7,8 @@ import com.Torvald.Terrarum.TileProperties.TileNameCode;
 import com.jme3.math.FastMath;
 import com.sun.istack.internal.NotNull;
 
+import java.util.Random;
+
 public class MapGenerator {
 
     @NotNull private static GameMap map;
@@ -100,10 +102,10 @@ public class MapGenerator {
          * Todo: more perturbed overworld (harder to supra-navigate)
          * Todo: veined ore distribution (metals) -- use veined simplex noise
          * Todo: clustered gem distribution (Groups: [Ruby, Sapphire], Amethyst, Yellow topaz, emerald, diamond) -- use regular simplex noise
-         * Todo: Lakes! Aquifers! Lava chamber!
-         * Todo: desert areas (variants: SAND_DESERT, SAND_RED
+         * Todo: Lakes! Aquifers! Lava chambers!
+         * Todo: deserts (variants: SAND_DESERT, SAND_RED)
          * Todo: volcano(es?)
-         * Todo: variants of beach (SAND_BEACH, SAND_BLACK, SAND_GREEN)
+         * Done: variants of beach (SAND_BEACH, SAND_BLACK, SAND_GREEN)
          */
 
         carveCave(
@@ -889,10 +891,12 @@ public class MapGenerator {
         int nIslands = random.nextInt(nIslandsMax - nIslandsMin) + nIslandsMin;
         int prevIndex = -1;
 
+        int[] tiles = {TileNameCode.AIR, TileNameCode.STONE, TileNameCode.DIRT, TileNameCode.GRASS};
+
         for (int i = 0; i < nIslands; i++) {
-            int currentIndex = random.nextInt(FloatingIslandsPreset.presets);
+            int currentIndex = random.nextInt(FloatingIslandsPreset.PRESETS);
             while (currentIndex == prevIndex) {
-                currentIndex = random.nextInt(FloatingIslandsPreset.presets);
+                currentIndex = random.nextInt(FloatingIslandsPreset.PRESETS);
             }
             int[][] island = FloatingIslandsPreset.generatePreset(currentIndex, random);
 
@@ -902,8 +906,9 @@ public class MapGenerator {
             for (int j = 0; j < island.length; j++) {
                 for (int k = 0; k < island[0].length; k++) {
                     if (island[j][k] > 0) {
-                        map.getTerrainArray()[j + startingPosY][k + startingPosX]
-                                = (byte) island[j][k];
+                        map.setTileTerrain(k + startingPosX, j + startingPosY
+                                , tiles[island[j][k]]
+                        );
                     }
                 }
             }
@@ -975,6 +980,18 @@ public class MapGenerator {
 	/* Post-process */
 
     private static void fillOcean() {
+        int[] thisSandList = {TileNameCode.SAND_BEACH, TileNameCode.SAND_BLACK, TileNameCode.SAND_GREEN
+                            , TileNameCode.SAND_BEACH, TileNameCode.SAND_BEACH, TileNameCode.SAND_BLACK
+        };
+        Random thisRand = new HQRNG(seed ^ random.nextLong());
+        int thisSand = thisSandList[thisRand.nextInt(thisSandList.length)];
+
+        String thisSandStr = (thisSand == TileNameCode.SAND_BLACK) ? "black"
+                                                                   : (thisSand == TileNameCode.SAND_GREEN) ? "green"
+                                                                     : "white"
+                ;
+        System.out.println("[MapGenerator] Beach sand type: " + thisSandStr);
+
         for (int ix = 0; ix < OCEAN_WIDTH * 1.5; ix++) {
             //flooding
             if (ix < OCEAN_WIDTH) {
@@ -1000,16 +1017,16 @@ public class MapGenerator {
                     int terrainPoint = getTerrainHeightFromHeightMap(ix);
 
 
-                    map.setTileTerrain(ix, terrainPoint + iy, TileNameCode.SAND_BEACH);
+                    map.setTileTerrain(ix, terrainPoint + iy, thisSand);
                     // clear grass and make the sheet thicker
-                    map.setTileTerrain(ix, terrainPoint + iy - 1, TileNameCode.SAND_BEACH);
+                    map.setTileTerrain(ix, terrainPoint + iy - 1, thisSand);
                 }
                 else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
                     int terrainPoint = getTerrainHeightFromHeightMap(map.width - 1 - ix);
 
-                    map.setTileTerrain(map.width - 1 - ix, terrainPoint + iy, TileNameCode.SAND_BEACH);
+                    map.setTileTerrain(map.width - 1 - ix, terrainPoint + iy, thisSand);
                     // clear grass and make the sheet thicker
-                    map.setTileTerrain(map.width - 1 - ix, terrainPoint + iy - 1, TileNameCode.SAND_BEACH);
+                    map.setTileTerrain(map.width - 1 - ix, terrainPoint + iy - 1, thisSand);
                 }
             }
         }

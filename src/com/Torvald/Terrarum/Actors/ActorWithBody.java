@@ -119,6 +119,12 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      */
     public final int INVINCIBILITY_TIME = 500;
 
+    /**
+     * Will ignore fluid resistance if (submerged height / actor height) <= this var
+     */
+    private final float FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO = 0.2f;
+    private final float FLUID_RESISTANCE_APPLY_FULL_RATIO = 0.5f;
+
     private GameMap map;
 
     /**
@@ -268,11 +274,11 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_BOTTOM)) {
                     adjustHitBottom();
-                    if (veloY != 0) veloY = -veloY * elasticity;
+                    elasticReflectY();
                     grounded = true;
                 }
                 else if (isColliding(CONTACT_AREA_BOTTOM, 0, 1)) {
-                    if (veloY != 0) veloY = -veloY * elasticity;
+                    elasticReflectY();
                     grounded = true;
                 }
                 else {
@@ -285,10 +291,10 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_TOP)) {
                     adjustHitTop();
-                    if (veloY != 0) veloY = -veloY * elasticity;
+                    elasticReflectY();
                 }
                 else if (isColliding(CONTACT_AREA_TOP, 0, -1)) {
-                    if (veloY != 0) veloY = -veloY * elasticity; // for reversed gravity
+                    elasticReflectY(); // for reversed gravity
                 }
                 else {
                 }
@@ -333,33 +339,39 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     private void updateHorizontalPos() {
         if (!isNoCollideWorld()) {
             // check right
-            if (veloX > 0) {
+            if (veloX >= 0.5) {
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT)) {
                     adjustHitRight();
-                    if (veloX != 0) veloX = -veloX * elasticity;
+                    elasticReflectX();
                 }
                 else if (isColliding(CONTACT_AREA_RIGHT, 1, 0)
                         && !isColliding(CONTACT_AREA_LEFT, -1, 0)) {
-                    if (veloX != 0) veloX = -veloX * elasticity;
+                    elasticReflectX();
                 }
                 else {
                 }
             }
-            else { // fix for float-point rounding; veloX of zero should be treated as moving left
+            else if (veloX <= 0.5) {
+                System.out.println("collidingleft");
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT)) {
                     adjustHitLeft();
-                    if (veloX != 0) veloX = -veloX * elasticity;
+                    elasticReflectX();
                 }
                 else if (isColliding(CONTACT_AREA_LEFT, -1, 0)
                         && !isColliding(CONTACT_AREA_RIGHT, 1, 0)) {
-                    if (veloX != 0) veloX = -veloX * elasticity;
+                    elasticReflectX();
                 }
                 else {
                 }
             }
-
+            else {
+                System.out.println("updatehorizontal - |velo| < 0.5");
+                if (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)) {
+                    // elasticReflectX();
+                }
+            }
         }
     }
 
@@ -397,6 +409,14 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
         float newX = nextHitbox.getPosX() + newXOff;
         nextHitbox.setPosition(newX, newY); // + 1; float-point rounding compensation (i think...)
+    }
+
+    private void elasticReflectX() {
+        if (veloX != 0) veloX = -veloX * elasticity;
+    }
+
+    private void elasticReflectY() {
+        if (veloY != 0) veloY = -veloY * elasticity;
     }
 
     private boolean isColliding(int side) {
@@ -485,7 +505,6 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      */
     private void applyBuoyancy() {
         int fluidDensity = getTileDensity();
-        int fluidResistance = getTileMvmtRstc();
         float submergedVolume = getSubmergedVolume();
 
         if (!isPlayerNoClip() && !grounded) {
@@ -493,24 +512,18 @@ public class ActorWithBody implements Actor, Visible, Glowing {
             veloY -= ((fluidDensity - this.density)
                             * map.getGravitation() * submergedVolume
                             * Math.pow(mass, -1)
-                            // * mvmtRstcToMultiplier(fluidResistance) // eliminate shoot-up
                     * SI_TO_GAME_ACC);
         }
     }
 
-    private float getSubmergedVolume(){
+    private float getSubmergedVolume() {
         float GAME_TO_SI_VOL = FastMath.pow((1f/METER), 3);
 
         if( density > 0 ){
-            return FastMath.clamp(
-                    (nextHitbox.getPointedY() - getFluidLevel()) // submerged height
-                            * nextHitbox.getWidth() * nextHitbox.getWidth()
-                            * GAME_TO_SI_VOL
-                    , 0
-                    , nextHitbox.getHeight()
-                            * nextHitbox.getWidth() * nextHitbox.getWidth()
-                            * GAME_TO_SI_VOL
-            );
+            return getSubmergedHeight()
+                    * nextHitbox.getWidth() * nextHitbox.getWidth()
+                    * GAME_TO_SI_VOL
+            ;
             //System.out.println("fluidHeight: "+fluidHeight+", submerged: "+submergedVolume);
             //submergedHeight / TILE_SIZE * 1^2 (pixel to meter)
         }
@@ -519,7 +532,15 @@ public class ActorWithBody implements Actor, Visible, Glowing {
         }
     }
 
-    private int getFluidLevel(){
+    private float getSubmergedHeight() {
+        return FastMath.clamp(
+                nextHitbox.getPointedY() - getFluidLevel()
+                , 0
+                , nextHitbox.getHeight()
+        );
+    }
+
+    private int getFluidLevel() {
         int tilePosXStart = Math.round(nextHitbox.getPosX() / TSIZE);
         int tilePosXEnd = Math.round(nextHitbox.getHitboxEnd().getX() / TSIZE);
         int tilePosY = Math.round(nextHitbox.getPosY() / TSIZE);
@@ -635,15 +656,33 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     private void updateNextHitboxFromVelo() {
         float fluidResistance = mvmtRstcToMultiplier(getTileMvmtRstc());
+        float submergedRatio = FastMath.clamp(
+                getSubmergedHeight() / nextHitbox.getHeight()
+                , 0f, 1f
+        );
+
+        boolean applyResistance = (!isNoSubjectToFluidResistance()
+                && submergedRatio > FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO
+        );
+        float resistanceMulInterValueSize = FLUID_RESISTANCE_APPLY_FULL_RATIO - FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO;
+        float resistanceMultiplier = FastMath.interpolateLinear(
+                (submergedRatio - FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO)
+                * FastMath.pow(resistanceMulInterValueSize, -1)
+                , 0, 1
+        );
+        float adjustedResistance = FastMath.interpolateLinear(
+                resistanceMultiplier
+                , 1f, fluidResistance
+        );
 
         nextHitbox.set(
                   Math.round(hitbox.getPosX()
                           + (veloX
-                          * (isNoSubjectToFluidResistance() ? 1 : fluidResistance)
+                          * (!applyResistance ? 1 : adjustedResistance)
                   ))
                 , Math.round(hitbox.getPosY()
                           + (veloY
-                          * (isNoSubjectToFluidResistance() ? 1 : fluidResistance)
+                          * (!applyResistance ? 1 : adjustedResistance)
                   ))
                 , Math.round(baseHitboxW * scale)
                 , Math.round(baseHitboxH * scale)
@@ -730,11 +769,6 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     public long getRefID() {
         return referenceID;
     }
-
-    public float pointedPosX() { return hitbox.getPointedX(); }
-    public float pointedPosY() { return hitbox.getPointedY(); }
-    public float topLeftPosX() { return hitbox.getPosX(); }
-    public float topLeftPosY() { return hitbox.getPosY(); }
 
     private float clampW(float x) {
         if (x < TSIZE + nextHitbox.getWidth() / 2) {

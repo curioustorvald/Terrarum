@@ -4,10 +4,10 @@ import com.Torvald.Rand.HQRNG;
 
 public class FloatingIslandsPreset {
 	
-	public static int presets = 5;
+	public static final int PRESETS = 5;
 	
 	static int[][] generatePreset(HQRNG random) {
-		int index = random.nextInt(presets);
+		int index = random.nextInt(PRESETS);
 		return generatePreset(index, random);
 	}
 

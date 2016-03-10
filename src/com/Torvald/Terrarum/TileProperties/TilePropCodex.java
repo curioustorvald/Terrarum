@@ -75,7 +75,7 @@ public class TilePropCodex {
 
         prop.setOpacity((char) intVal(record, "opacity"));
         prop.setStrength(intVal(record, "strength"));
-        prop.setDensity(intVal(record, "spcg"));
+        prop.setDensity(intVal(record, "dsty"));
         prop.setLuminosity((char) intVal(record, "lumcolor"));
         prop.setDrop(intVal(record, "drop"));
         prop.setDropDamage(intVal(record, "ddmg"));
