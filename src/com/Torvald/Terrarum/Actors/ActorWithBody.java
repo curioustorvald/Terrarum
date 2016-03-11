@@ -35,12 +35,12 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
     private volatile @NotNull float veloX, veloY;
-    private final transient float VELO_HARD_LIMIT = 10000;
+    private transient final float VELO_HARD_LIMIT = 10000;
 
     boolean grounded = false;
 
-    @Nullable transient SpriteAnimation sprite;
-    @Nullable transient SpriteAnimation spriteGlow;
+    transient @Nullable SpriteAnimation sprite;
+    transient @Nullable SpriteAnimation spriteGlow;
     /** Default to 'false' */
     private boolean visible = false;
     /** Default to 'true' */
@@ -55,20 +55,21 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     /**
      * Positions: top-left point
      */
-    private volatile @NotNull Hitbox hitbox, nextHitbox;
+    private volatile @NotNull Hitbox hitbox;
+    private volatile transient @NotNull Hitbox nextHitbox;
 
     /**
      * Physical properties
      */
-    @NonZero private volatile transient float scale = 1;
-    @NonZero private volatile transient float mass = 2f;
-    private final transient float MASS_LOWEST = 2f;
+    private volatile transient @NonZero float scale = 1;
+    private volatile transient @NonZero float mass = 2f;
+    private transient final float MASS_LOWEST = 2f;
     /** Valid range: [0, 1] */
     private float elasticity = 0;
-    private final transient float ELASTICITY_MAX = 0.993f;
-    @NoNegative private float density = 1000;
+    private transient final float ELASTICITY_MAX = 0.993f;
+    private @NoNegative float density = 1000;
 
-    private static final transient int TSIZE = MapDrawer.TILE_SIZE;
+    private static transient final int TSIZE = MapDrawer.TILE_SIZE;
     private static int AUTO_CLIMB_RATE = TSIZE / 8;
 
     /**
@@ -77,55 +78,55 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      * s^2 = 1/FPS = 1/60 if FPS is targeted to 60
      * meter to pixel : 24/FPS
      */
-    private final transient float METER = 24f;
+    private transient final float METER = 24f;
     /**
      * [m / s^2] * SI_TO_GAME_ACC -> [px / IFrame^2]
      */
-    private final transient float SI_TO_GAME_ACC = METER / FastMath.sqr(Terrarum.TARGET_FPS);
+    private transient final float SI_TO_GAME_ACC = METER / FastMath.sqr(Terrarum.TARGET_FPS);
     /**
      * [m / s] * SI_TO_GAME_VEL -> [px / IFrame]
      */
-    private final transient float SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS;
+    private transient final float SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS;
 
-    private float gravitation;
-    private final transient float DRAG_COEFF = 1f;
+    private transient float gravitation;
+    private transient final float DRAG_COEFF = 1f;
 
-    private final transient int CONTACT_AREA_TOP = 0;
-    private final transient int CONTACT_AREA_RIGHT = 1;
-    private final transient int CONTACT_AREA_BOTTOM = 2;
-    private final transient int CONTACT_AREA_LEFT = 3;
+    private transient final int CONTACT_AREA_TOP = 0;
+    private transient final int CONTACT_AREA_RIGHT = 1;
+    private transient final int CONTACT_AREA_BOTTOM = 2;
+    private transient final int CONTACT_AREA_LEFT = 3;
 
-    private final transient int UD_COMPENSATOR_MAX = TSIZE;
-    private final transient int LR_COMPENSATOR_MAX = TSIZE;
-    private final transient int TILE_AUTOCLIMB_RATE = 4;
+    private transient final int UD_COMPENSATOR_MAX = TSIZE;
+    private transient final int LR_COMPENSATOR_MAX = TSIZE;
+    private transient final int TILE_AUTOCLIMB_RATE = 4;
 
     /**
      * A constant to make falling faster so that the game is more playable
      */
-    private final transient float G_MUL_PLAYABLE_CONST = 1.4142f;
+    private transient final float G_MUL_PLAYABLE_CONST = 1.4142f;
 
     long referenceID;
 
-    private final transient int EVENT_MOVE_TOP = 0;
-    private final transient int EVENT_MOVE_RIGHT = 1;
-    private final transient int EVENT_MOVE_BOTTOM = 2;
-    private final transient int EVENT_MOVE_LEFT = 3;
-    private final transient int EVENT_MOVE_NONE = -1;
+    private transient final int EVENT_MOVE_TOP = 0;
+    private transient final int EVENT_MOVE_RIGHT = 1;
+    private transient final int EVENT_MOVE_BOTTOM = 2;
+    private transient final int EVENT_MOVE_LEFT = 3;
+    private transient final int EVENT_MOVE_NONE = -1;
 
-    int eventMoving = EVENT_MOVE_NONE; // cannot collide both X-axis and Y-axis, or else jump control breaks up.
+    transient int eventMoving = EVENT_MOVE_NONE; // cannot collide both X-axis and Y-axis, or else jump control breaks up.
 
     /**
      * in milliseconds
      */
-    public final transient int INVINCIBILITY_TIME = 500;
+    public transient final int INVINCIBILITY_TIME = 500;
 
     /**
      * Will ignore fluid resistance if (submerged height / actor height) <= this var
      */
-    private final transient float FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO = 0.2f;
-    private final transient float FLUID_RESISTANCE_APPLY_FULL_RATIO = 0.5f;
+    private transient final float FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO = 0.2f;
+    private transient final float FLUID_RESISTANCE_APPLY_FULL_RATIO = 0.5f;
 
-    private GameMap map;
+    private transient GameMap map;
 
     /**
      * Give new random ReferenceID and initialise ActorValue
@@ -352,8 +353,8 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 else {
                 }
             }
-            else if (veloX <= 0.5) {
-                System.out.println("collidingleft");
+            else if (veloX <= -0.5) {
+                // System.out.println("collidingleft");
                 // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT)) {
                     adjustHitLeft();
@@ -367,9 +368,9 @@ public class ActorWithBody implements Actor, Visible, Glowing {
                 }
             }
             else {
-                System.out.println("updatehorizontal - |velo| < 0.5");
+                // System.out.println("updatehorizontal - |velo| < 0.5");
                 if (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)) {
-                    // elasticReflectX();
+                    elasticReflectX();
                 }
             }
         }

@@ -43,13 +43,13 @@ public class GameFontWhite extends GameFontBase {
                 "./res/graphics/fonts/cjkpunct.png"
                 , W_CJK, H_KANA
         );
-        uniHan = new SpriteSheet(
+        /*uniHan = new SpriteSheet(
                 "./res/graphics/fonts/unifont_unihan"
                         + ((!Terrarum.gameLocale.contains("zh"))
                         ? "_ja" : "")
                         +".png"
                 , W_UNIHAN, H_UNIHAN
-        );
+        );*/
         cyrilic = new SpriteSheet(
                 "./res/graphics/fonts/cyrilic_majuscule.png"
                 , W_LATIN_WIDE, H
@@ -66,6 +66,14 @@ public class GameFontWhite extends GameFontBase {
                 "./res/graphics/fonts/unipunct.png"
                 , W_LATIN_WIDE, H
         );
+        wenQuanYi_1 = new SpriteSheet(
+                "./res/graphics/fonts/wenquanyi_11pt_part1.png"
+                , 16, 18, 2
+        );
+        wenQuanYi_2 = new SpriteSheet(
+                "./res/graphics/fonts/wenquanyi_11pt_part2.png"
+                , 16, 18, 2
+        );
 
         SpriteSheet[] shk = {
                   asciiSheet
@@ -76,23 +84,26 @@ public class GameFontWhite extends GameFontBase {
                 , extASheetEF
                 , kanaSheet
                 , cjkPunct
-                , uniHan
+                //, uniHan
+                , null
                 , cyrilic
                 , cyrilicEF
                 , fullwidthForms
                 , uniPunct
+                , wenQuanYi_1
+                , wenQuanYi_2
         };
         sheetKey = shk;
     }
 
     @Override
     public void reloadUnihan() throws SlickException {
-        uniHan = new SpriteSheet(
+        /*uniHan = new SpriteSheet(
                 "./res/graphics/fonts/unifont_unihan"
                         + ((!Terrarum.gameLocale.contains("zh"))
                            ? "_ja" : "")
                         +".png"
                 , W_UNIHAN, H_UNIHAN
-        );
+        );*/
     }
 }

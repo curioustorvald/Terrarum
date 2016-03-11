@@ -104,8 +104,9 @@
 
 ==  (De)serialisation  ==
 
-   * Custom binary + GSON
+    see SAVE_FORMAT
 
-   * Custom binary: Game map
 
-   * GSON: Actors, game configurations
+==  Actor being universal  ==
+
+    * Utility tiles that have states (e.g. noteblock) are implemented using Actor.

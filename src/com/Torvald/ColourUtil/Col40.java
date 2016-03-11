@@ -8,7 +8,7 @@ import org.newdawn.slick.Color;
 public class Col40 implements LimitedColours {
 
     private char data;
-    private static int[] LOOKUP = {0,7,13,20,26,33,39,46,52,59,65,72,78,85,92,98,105,111,118,124
+    private static transient final int[] LOOKUP = {0,7,13,20,26,33,39,46,52,59,65,72,78,85,92,98,105,111,118,124
             ,131,137,144,150,157,163,170,177,183,190,196,203,209,216,222,229,235,242,248,255};
 
     public static final int MUL = 40;

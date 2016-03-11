@@ -19,11 +19,13 @@ public class GameFontBase implements Font {
     static SpriteSheet extASheetEF;
     static SpriteSheet kanaSheet;
     static SpriteSheet cjkPunct;
-    static SpriteSheet uniHan;
+    // static SpriteSheet uniHan;
     static SpriteSheet cyrilic;
     static SpriteSheet cyrilicEF;
     static SpriteSheet fullwidthForms;
     static SpriteSheet uniPunct;
+    static SpriteSheet wenQuanYi_1;
+    static SpriteSheet wenQuanYi_2;
 
     static final int JUNG_COUNT = 21;
     static final int JONG_COUNT = 28;
@@ -50,6 +52,8 @@ public class GameFontBase implements Font {
     static final int SHEET_CYRILIC_EF = 10;
     static final int SHEET_FW_UNI = 11;
     static final int SHEET_UNI_PUNCT = 12;
+    static final int SHEET_WENQUANYI_1 = 13;
+    static final int SHEET_WENQUANYI_2 = 14;
 
     static SpriteSheet[] sheetKey;
     static final Character[] asciiEFList = {
@@ -188,6 +192,14 @@ public class GameFontBase implements Font {
         return (c >= 0x2000 && c < 0x2070);
     }
 
+    private boolean isWenQuanYi1(char c) {
+        return (c >= 0x33F3 && c <= 0x69FC);
+    }
+
+    private boolean isWenQuanYi2(char c) {
+        return (c >= 0x69FD && c <= 0x9FDC);
+    }
+
     /** */
 
     private int asciiEFindexX(char c) {
@@ -270,6 +282,19 @@ public class GameFontBase implements Font {
         return (c - 0x2000) / 16;
     }
 
+    private int wenQuanYiIndexX(char c) {
+        //                         v Ext1            v Unihan
+        return (c - (c <= 0x4DB5 ? 0x33F3 : 0x33F3 + 0x4A)) % 32;
+    }
+
+    private int wenQuanYi1IndexY(char c) {
+        return (c - (c <= 0x4DB5 ? 0x33F3 : 0x33F3 + 0x4A)) / 32;
+    }
+
+    private int wenQuanYi2IndexY(char c) {
+        return (c - 0x69FD) / 32;
+    }
+
     @Override
     public int getWidth(String s) {
         return getWidthSubstr(s, s.length());
@@ -304,7 +329,7 @@ public class GameFontBase implements Font {
                 len += W_LATIN_NARROW;
             else if (c == SHEET_KANA || c == SHEET_HANGUL || c == SHEET_CJK_PUNCT)
                 len += W_CJK;
-            else if (c == SHEET_UNIHAN || c == SHEET_FW_UNI)
+            else if (c == SHEET_UNIHAN || c == SHEET_FW_UNI || c == SHEET_WENQUANYI_1 || c == SHEET_WENQUANYI_2)
                 len += W_UNIHAN;
             else
                 len += W_LATIN_WIDE;
@@ -400,7 +425,7 @@ public class GameFontBase implements Font {
         hangulSheet.endUse();
 
         // unihan fonts
-        uniHan.startUse();
+        /*uniHan.startUse();
         for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
 
@@ -417,7 +442,47 @@ public class GameFontBase implements Font {
             }
         }
 
-        uniHan.endUse();
+        uniHan.endUse();*/
+
+        // WenQuanYi 1
+        wenQuanYi_1.startUse();
+
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+
+            if (isWenQuanYi1(ch)) {
+                int glyphW = getWidth("" + ch);
+                wenQuanYi_1.renderInUse(
+                        Math.round(x
+                                + getWidthSubstr(s, i + 1) - glyphW
+                        )
+                        , Math.round((H - H_UNIHAN) / 2 + y)
+                        , wenQuanYiIndexX(ch)
+                        , wenQuanYi1IndexY(ch)
+                );
+            }
+        }
+
+        wenQuanYi_1.endUse();
+        wenQuanYi_2.startUse();
+
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+
+            if (isWenQuanYi2(ch)) {
+                int glyphW = getWidth("" + ch);
+                wenQuanYi_2.renderInUse(
+                        Math.round(x
+                                + getWidthSubstr(s, i + 1) - glyphW
+                        )
+                        , Math.round((H - H_UNIHAN) / 2 + y)
+                        , wenQuanYiIndexX(ch)
+                        , wenQuanYi2IndexY(ch)
+                );
+            }
+        }
+
+        wenQuanYi_2.endUse();
 
         //ascii fonts
         int prevInstance = -1;

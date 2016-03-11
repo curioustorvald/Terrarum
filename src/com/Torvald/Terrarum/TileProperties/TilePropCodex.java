@@ -25,8 +25,7 @@ public class TilePropCodex {
         try {
             // todo verify CSV using pre-calculated SHA256 hash
             List<CSVRecord> records = CSVFetcher.readCSV("" +
-                    "./src/com/Torvald/Terrarum/TileProperties/propdata" +
-                    ".csv");
+                    "./src/com/Torvald/Terrarum/TileProperties/tileprop.csv");
 
             System.out.println("[TilePropCodex] Building tile properties table");
 

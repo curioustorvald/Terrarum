@@ -2,20 +2,18 @@ package com.Torvald.Terrarum.Actors;
 
 import com.Torvald.Terrarum.GameItem.InventoryItem;
 import com.Torvald.Terrarum.GameItem.ItemCodex;
-import com.sun.istack.internal.Nullable;
+import com.Torvald.Terrarum.Nullable;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by minjaesong on 16-01-15.
  */
 public class ActorInventory {
 
-    @Nullable private int capacityByCount;
-    @Nullable private int capacityByWeight;
+    private @Nullable int capacityByCount;
+    private @Nullable int capacityByWeight;
     private int capacityMode;
 
     /**
@@ -23,13 +21,13 @@ public class ActorInventory {
      */
     private HashMap<Long, Integer> itemList;
 
-    public final transient int CAPACITY_MODE_COUNT = 1;
-    public final transient int CAPACITY_MODE_WEIGHT = 2;
+    public transient final int CAPACITY_MODE_COUNT = 1;
+    public transient final int CAPACITY_MODE_WEIGHT = 2;
 
     /**
      * Construct new inventory with specified capacity.
      * @param capacity if is_weight is true, killogramme value is required, counts of items otherwise.
-     * @param is_weight
+     * @param is_weight whether encumbrance should be calculated upon the weight of the inventory. False to use item counts.
      */
     public ActorInventory(int capacity, boolean is_weight) {
         if (is_weight) {
@@ -79,7 +77,6 @@ public class ActorInventory {
         float weight = 0;
 
         for (Map.Entry<Long, Integer> item : itemList.entrySet()) {
-            //weight += item.getWeight();
             weight += ItemCodex.getItem(item.getKey()).getWeight()
                     * item.getValue();
         }
@@ -87,23 +84,36 @@ public class ActorInventory {
         return weight;
     }
 
-    public float getTotalCount() {
+    public int getTotalCount() {
         int count = 0;
 
         for (Map.Entry<Long, Integer> item : itemList.entrySet()) {
-            //weight += item.getWeight();
             count += item.getValue();
         }
 
         return count;
     }
 
+    public int getTotalUniqueCount() {
+        return itemList.entrySet().size();
+    }
+
     public void appendToPocket(InventoryItem item) {
+        appendToPocket(item, 1);
+    }
+
+    public void appendToPocket(InventoryItem item, int count) {
         long key = item.getItemID();
+
+        // if (key == Player.PLAYER_REF_ID)
+        //     throw new IllegalArgumentException("Attempted to put player into the inventory.");
+
         if (itemList.containsKey(key))
-            itemList.put(key, itemList.get(key) + 1);
+            // increment amount if it already has specified item
+            itemList.put(key, itemList.get(key) + count);
         else
-            itemList.put(key, 1);
+            // add new entry if it does not have specified item
+            itemList.put(key, count);
     }
 
     /**
@@ -114,8 +124,11 @@ public class ActorInventory {
         if (getCapacityMode() == CAPACITY_MODE_WEIGHT) {
             return (capacityByWeight < getTotalWeight());
         }
-        else {
+        else if (getCapacityMode() == CAPACITY_MODE_COUNT) {
             return (capacityByCount < getTotalWeight());
+        }
+        else {
+            throw new UnsupportedOperationException("capacity mode not valid.");
         }
     }
 }

@@ -8,7 +8,7 @@ import org.newdawn.slick.Color;
 public class Col216 implements LimitedColours {
 
     private byte data;
-    private static int[] LOOKUP = {0x00, 0x33, 0x66, 0x99, 0xCC, 0xFF};
+    private static transient final int[] LOOKUP = {0x00, 0x33, 0x66, 0x99, 0xCC, 0xFF};
 
     public static final int MUL = 6;
     public static final int MUL_2 = MUL * MUL;
