@@ -2,6 +2,8 @@ package com.Torvald.Terrarum.GameMap;
 
 import com.Torvald.Point.Point2f;
 
+import java.io.Serializable;
+
 
 public class MapPoint {
 	private Point2f startPoint;

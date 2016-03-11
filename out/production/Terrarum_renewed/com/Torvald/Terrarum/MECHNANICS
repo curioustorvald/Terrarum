@@ -100,3 +100,12 @@
 
     Scale ^ 3 ^ (3/4)
     = (ThisWgt / TargetWgt) ^ (3/4)
+
+
+==  (De)serialisation  ==
+
+   * Custom binary + GSON
+
+   * Custom binary: Game map
+
+   * GSON: Actors, game configurations

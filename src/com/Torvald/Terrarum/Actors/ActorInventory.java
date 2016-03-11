@@ -1,9 +1,13 @@
 package com.Torvald.Terrarum.Actors;
 
 import com.Torvald.Terrarum.GameItem.InventoryItem;
+import com.Torvald.Terrarum.GameItem.ItemCodex;
 import com.sun.istack.internal.Nullable;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by minjaesong on 16-01-15.
@@ -14,10 +18,13 @@ public class ActorInventory {
     @Nullable private int capacityByWeight;
     private int capacityMode;
 
-    private LinkedList<InventoryItem> pocket;
+    /**
+     * &lt;ReferenceID, Amounts&gt;
+     */
+    private HashMap<Long, Integer> itemList;
 
-    public final int CAPACITY_MODE_COUNT = 1;
-    public final int CAPACITY_MODE_WEIGHT = 2;
+    public final transient int CAPACITY_MODE_COUNT = 1;
+    public final transient int CAPACITY_MODE_WEIGHT = 2;
 
     /**
      * Construct new inventory with specified capacity.
@@ -53,26 +60,28 @@ public class ActorInventory {
     }
 
     /**
-     * Get reference to the pocket
+     * Get reference to the itemList
      * @return
      */
-    public LinkedList<InventoryItem> getPocket() {
-        return pocket;
+    public Map<Long, Integer> getItemList() {
+        return itemList;
     }
 
     /**
-     * Get clone of the pocket
+     * Get clone of the itemList
      * @return
      */
-    public LinkedList<InventoryItem> getCopyOfPocket() {
-        return (LinkedList<InventoryItem>) (pocket.clone());
+    public Map getCopyOfItemList() {
+        return (Map) (itemList.clone());
     }
 
     public float getTotalWeight() {
         float weight = 0;
 
-        for (InventoryItem item : pocket) {
-            weight += item.getWeight();
+        for (Map.Entry<Long, Integer> item : itemList.entrySet()) {
+            //weight += item.getWeight();
+            weight += ItemCodex.getItem(item.getKey()).getWeight()
+                    * item.getValue();
         }
 
         return weight;
@@ -81,19 +90,24 @@ public class ActorInventory {
     public float getTotalCount() {
         int count = 0;
 
-        for (InventoryItem item : pocket) {
-            count += 1;
+        for (Map.Entry<Long, Integer> item : itemList.entrySet()) {
+            //weight += item.getWeight();
+            count += item.getValue();
         }
 
         return count;
     }
 
     public void appendToPocket(InventoryItem item) {
-        pocket.add(item);
+        long key = item.getItemID();
+        if (itemList.containsKey(key))
+            itemList.put(key, itemList.get(key) + 1);
+        else
+            itemList.put(key, 1);
     }
 
     /**
-     * Check whether the pocket contains too many items
+     * Check whether the itemList contains too many items
      * @return
      */
     public boolean isEncumbered() {

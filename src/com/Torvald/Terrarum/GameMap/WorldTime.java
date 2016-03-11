@@ -1,25 +1,29 @@
 package com.Torvald.Terrarum.GameMap;
 
+import java.io.Serializable;
+
 /**
  * Created by minjaesong on 16-01-24.
  */
 public class WorldTime {
 
-    public int seconds = 0;
-    public int minutes = 0;
-    public int hours = 0;
+    private int seconds = 0;
+    private int minutes = 0;
+    private int hours = 0;
 
-    public int daysCount = 0; //NOT a calendar day
+    private int daysCount = 0; //NOT a calendar day
 
-    public int days = 1;
-    public int months = 1;
-    public int years = 1;
+    private int days = 1;
+    private int months = 1;
+    private int years = 1;
 
-    public int weeks = 1;
-    public int dayOfWeek = 0; //0: Mondag-The first day of weekday
+    private int dayOfWeek = 0; //0: Mondag-The first day of weekday
 
-    public static final int DAY_LENGTH = 79200; //must be the multiple of 3600
-    public int timeDelta = 1;
+    public static transient final int DAY_LENGTH = 79200; //must be the multiple of 3600
+    private int timeDelta = 1;
+
+    private static transient final int HOUR_SEC = 3600;
+    private static transient final int MINUTE_SEC = 60;
 
     public final String[] DAYNAMES = { //daynames are taken from Nynorsk (å -> o)
             "Mondag"
@@ -52,22 +56,7 @@ public class WorldTime {
         //time
         seconds += timeDelta;
 
-        if (seconds >= 60){
-            seconds = 0;
-            minutes++;
-        }
-
-        if (minutes >= 60){
-            minutes = 0;
-            hours++;
-        }
-
-        if (hours >= DAY_LENGTH/3600){
-            hours = 0;
-            days++;
-            daysCount++;
-            dayOfWeek++;
-        }
+        kickVariables();
 
         //calendar (the world calendar)
         if (dayOfWeek == 7){
@@ -97,37 +86,31 @@ public class WorldTime {
         }
     }
 
+    /**
+     * How much time has passed today, in seconds.
+     * @return
+     */
     public int elapsedSeconds(){
-        return (3600 * hours + 60 * minutes + seconds) % DAY_LENGTH;
+        return (HOUR_SEC * hours + MINUTE_SEC * minutes + seconds) % DAY_LENGTH;
     }
 
+    /**
+     * How much time has passed since the beginning, in seconds.
+     * @return
+     */
     public long totalSeconds(){
-        return (long)(DAY_LENGTH) * daysCount + 3600 * hours + 60 * minutes + seconds;
+        return (long)(DAY_LENGTH) * daysCount + HOUR_SEC * hours + MINUTE_SEC * minutes + seconds;
     }
 
     public boolean isLeapYear(){
-        boolean ret = false;
-
-        if (years % 4 == 0){
-            ret = true;
-
-            if (years % 100 == 0){
-                ret = false;
-
-                if (years % 400 == 0){
-                    ret = true;
-                }
-            }
-        }
-
-        return ret;
+        return ((years % 4 == 0) && (years % 100 != 0)) || (years % 400 == 0);
     }
 
     public void setTime(int t){
         days += t / DAY_LENGTH;
-        hours = t / 3600;
-        minutes = (t - 3600 * hours) / 60;
-        seconds = t - minutes * 60;
+        hours = t / HOUR_SEC;
+        minutes = (t - HOUR_SEC * hours) / MINUTE_SEC;
+        seconds = t - minutes * MINUTE_SEC;
     }
 
     public void addTime(int t){
@@ -140,5 +123,24 @@ public class WorldTime {
 
     public String getDayName(){
         return DAYNAMES[dayOfWeek];
+    }
+
+    private void kickVariables() {
+        if (seconds >= 60){
+            seconds = 0;
+            minutes++;
+        }
+
+        if (minutes >= 60){
+            minutes = 0;
+            hours++;
+        }
+
+        if (hours >= DAY_LENGTH/3600){
+            hours = 0;
+            days++;
+            daysCount++;
+            dayOfWeek++;
+        }
     }
 }

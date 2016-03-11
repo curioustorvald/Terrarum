@@ -2,17 +2,17 @@ package com.Torvald.Terrarum.ConsoleCommand;
 
 import com.Torvald.Terrarum.Terrarum;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 /**
  * Created by minjaesong on 16-01-15.
  */
 public class CommandDict {
 
-    protected static Hashtable<String, ConsoleCommand> dict;
+    protected static HashMap<String, ConsoleCommand> dict;
 
     public CommandDict() {
-        dict = new Hashtable<>();
+        dict = new HashMap<>();
 
         dict.put("echo", new Echo());
         dict.put("setav", new SetAV());

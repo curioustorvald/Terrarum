@@ -13,6 +13,7 @@ import org.lwjgl.input.Controller;
 import org.lwjgl.input.Controllers;
 import org.newdawn.slick.*;
 
+import java.io.Serializable;
 import java.util.HashSet;
 
 /**
@@ -24,13 +25,13 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     int jumpCounter = 0;
     int walkPowerCounter = 0;
-    private final int MAX_JUMP_LENGTH = 17; // use 17; in internal frames
+    private final transient int MAX_JUMP_LENGTH = 17; // use 17; in internal frames
     /**
      * experimental value.
      */
-    // private final float JUMP_ACCELERATION_MOD = ???f / 10000f; //quadratic mode
-    private final float JUMP_ACCELERATION_MOD = 170f / 10000f; //linear mode
-    private final int WALK_FRAMES_TO_MAX_ACCEL = 6;
+    // private final transient float JUMP_ACCELERATION_MOD = ???f / 10000f; //quadratic mode
+    private final transient float JUMP_ACCELERATION_MOD = 170f / 10000f; //linear mode
+    private final transient int WALK_FRAMES_TO_MAX_ACCEL = 6;
 
     public float readonly_totalX = 0, readonly_totalY = 0;
 
@@ -38,29 +39,29 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
     @NotNull int walkHeading;
 
-    private final int LEFT = 1;
-    private final int RIGHT = 2;
+    private final transient int LEFT = 1;
+    private final transient int RIGHT = 2;
 
-    private int prevHMoveKey = -1;
-    private int prevVMoveKey = -1;
-    private final int KEY_NULL = -1;
+    private final transient int KEY_NULL = -1;
+    private int prevHMoveKey = KEY_NULL;
+    private int prevVMoveKey = KEY_NULL;
 
-    static final float ACCEL_MULT_IN_FLIGHT = 0.48f;
-    static final float WALK_STOP_ACCEL = 0.32f;
-    static final float WALK_ACCEL_BASE = 0.32f;
+    static final transient float ACCEL_MULT_IN_FLIGHT = 0.48f;
+    static final transient float WALK_STOP_ACCEL = 0.32f;
+    static final transient float WALK_ACCEL_BASE = 0.32f;
 
     private boolean noClip = false;
 
     public static final long PLAYER_REF_ID = 0x51621D;
 
-    private final float AXIS_POSMAX = 1.0f;
-    private final int GAMEPAD_JUMP = 5;
+    private final transient float AXIS_POSMAX = 1.0f;
+    private final transient int GAMEPAD_JUMP = 5;
 
-    private final int TSIZE = MapDrawer.TILE_SIZE;
+    private final transient int TSIZE = MapDrawer.TILE_SIZE;
 
     private HashSet<Faction> factionSet = new HashSet<>();
 
-    private final int BASE_DENSITY = 1020;
+    private final transient int BASE_DENSITY = 1020;
 
 
     /**
@@ -91,13 +92,13 @@ public class Player extends ActorWithBody implements Controllable, Pocketed, Fac
 
         if (noClip) { super.setGrounded(true); }
 
-
     }
 
     private void updatePhysicalInfos() {
         super.setScale(actorValue.getAsFloat("scale"));
         super.setMass(actorValue.getAsFloat("basemass")
                 * FastMath.pow(super.getScale(), 3));
+        if (super.getElasticity() != 0) super.setElasticity(0);
     }
 
     /**

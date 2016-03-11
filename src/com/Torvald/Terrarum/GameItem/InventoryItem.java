@@ -8,6 +8,15 @@ import org.newdawn.slick.GameContainer;
 public interface InventoryItem {
 
     /**
+     * Get internal ID of an Item.
+     *   0-4096: Tiles
+     *   4097-32767: Various items
+     *   >=32768: Actor RefID
+     * @return
+     */
+    long getItemID();
+
+    /**
      * Weight of the item
      * @return
      */

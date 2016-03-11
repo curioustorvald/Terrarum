@@ -12,6 +12,7 @@ package com.Torvald.Terrarum.GameMap;
 import com.sun.istack.internal.NotNull;
 import org.newdawn.slick.SlickException;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Spliterator;
@@ -32,9 +33,9 @@ public class GameMap {
     public int spawnX;
     public int spawnY;
 
-    public static final int WALL = 0;
-    public static final int TERRAIN = 1;
-    public static final int WIRE = 2;
+    public static transient final int WALL = 0;
+    public static transient final int TERRAIN = 1;
+    public static transient final int WIRE = 2;
 
     //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
     //physics
@@ -42,7 +43,7 @@ public class GameMap {
     private char globalLight;
     private WorldTime worldTime;
 
-    public static final int TILES_SUPPORTED = MapLayer.RANGE * PairedMapLayer.RANGE;
+    public static transient final int TILES_SUPPORTED = MapLayer.RANGE * PairedMapLayer.RANGE;
 
     /**
      * @param width

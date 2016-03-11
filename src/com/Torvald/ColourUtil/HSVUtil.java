@@ -61,9 +61,9 @@ public class HSVUtil {
         }
 
         return new Color(
-                  (int) ((R_prime + m) * 255)
-                , (int) ((G_prime + m) * 255)
-                , (int) ((B_prime + m) * 255)
+                  (R_prime + m)
+                , (G_prime + m)
+                , (B_prime + m)
         );
     }
 
@@ -72,9 +72,9 @@ public class HSVUtil {
     }
 
     public static HSV fromRGB(Color color) {
-        float r = color.getRed() / 255f;
-        float g = color.getGreen() / 255f;
-        float b = color.getBlue() / 255f;
+        float r = color.r;
+        float g = color.g;
+        float b = color.b;
 
         float rgbMin = FastMath.min(r, g, b);
         float rgbMax = FastMath.max(r, g, b);

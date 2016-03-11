@@ -10,6 +10,8 @@ import com.jme3.math.FastMath;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
+import java.io.Serializable;
+
 /**
  * Created by minjaesong on 16-01-13.
  */
@@ -19,8 +21,7 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     ActorInventory inventory;
 
-    private @NotNull
-    float hitboxTranslateX; // relative to spritePosX
+    private @NotNull float hitboxTranslateX; // relative to spritePosX
     private @NotNull float hitboxTranslateY; // relative to spritePosY
     private @NotNull int baseHitboxW;
     private @NotNull int baseHitboxH;
@@ -34,13 +35,12 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
     private volatile @NotNull float veloX, veloY;
-    private final float VELO_HARD_LIMIT = 10000;
+    private final transient float VELO_HARD_LIMIT = 10000;
 
     boolean grounded = false;
 
-    @Nullable
-    SpriteAnimation sprite;
-    @Nullable SpriteAnimation spriteGlow;
+    @Nullable transient SpriteAnimation sprite;
+    @Nullable transient SpriteAnimation spriteGlow;
     /** Default to 'false' */
     private boolean visible = false;
     /** Default to 'true' */
@@ -60,15 +60,15 @@ public class ActorWithBody implements Actor, Visible, Glowing {
     /**
      * Physical properties
      */
-    @NonZero private volatile float scale = 1;
-    @NonZero private volatile float mass = 2f;
-    private final float MASS_LOWEST = 2f;
+    @NonZero private volatile transient float scale = 1;
+    @NonZero private volatile transient float mass = 2f;
+    private final transient float MASS_LOWEST = 2f;
     /** Valid range: [0, 1] */
     private float elasticity = 0;
-    private final float ELASTICITY_MAX = 0.993f;
+    private final transient float ELASTICITY_MAX = 0.993f;
     @NoNegative private float density = 1000;
 
-    private static final int TSIZE = MapDrawer.TILE_SIZE;
+    private static final transient int TSIZE = MapDrawer.TILE_SIZE;
     private static int AUTO_CLIMB_RATE = TSIZE / 8;
 
     /**
@@ -77,53 +77,53 @@ public class ActorWithBody implements Actor, Visible, Glowing {
      * s^2 = 1/FPS = 1/60 if FPS is targeted to 60
      * meter to pixel : 24/FPS
      */
-    private final float METER = 24f;
+    private final transient float METER = 24f;
     /**
      * [m / s^2] * SI_TO_GAME_ACC -> [px / IFrame^2]
      */
-    private final float SI_TO_GAME_ACC = METER / FastMath.sqr(Terrarum.TARGET_FPS);
+    private final transient float SI_TO_GAME_ACC = METER / FastMath.sqr(Terrarum.TARGET_FPS);
     /**
      * [m / s] * SI_TO_GAME_VEL -> [px / IFrame]
      */
-    private final float SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS;
+    private final transient float SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS;
 
     private float gravitation;
-    private final float DRAG_COEFF = 1f;
+    private final transient float DRAG_COEFF = 1f;
 
-    private final int CONTACT_AREA_TOP = 0;
-    private final int CONTACT_AREA_RIGHT = 1;
-    private final int CONTACT_AREA_BOTTOM = 2;
-    private final int CONTACT_AREA_LEFT = 3;
+    private final transient int CONTACT_AREA_TOP = 0;
+    private final transient int CONTACT_AREA_RIGHT = 1;
+    private final transient int CONTACT_AREA_BOTTOM = 2;
+    private final transient int CONTACT_AREA_LEFT = 3;
 
-    private final int UD_COMPENSATOR_MAX = TSIZE;
-    private final int LR_COMPENSATOR_MAX = TSIZE;
-    private final int TILE_AUTOCLIMB_RATE = 4;
+    private final transient int UD_COMPENSATOR_MAX = TSIZE;
+    private final transient int LR_COMPENSATOR_MAX = TSIZE;
+    private final transient int TILE_AUTOCLIMB_RATE = 4;
 
     /**
      * A constant to make falling faster so that the game is more playable
      */
-    private final float G_MUL_PLAYABLE_CONST = 1.4142f;
+    private final transient float G_MUL_PLAYABLE_CONST = 1.4142f;
 
     long referenceID;
 
-    private final int EVENT_MOVE_TOP = 0;
-    private final int EVENT_MOVE_RIGHT = 1;
-    private final int EVENT_MOVE_BOTTOM = 2;
-    private final int EVENT_MOVE_LEFT = 3;
-    private final int EVENT_MOVE_NONE = -1;
+    private final transient int EVENT_MOVE_TOP = 0;
+    private final transient int EVENT_MOVE_RIGHT = 1;
+    private final transient int EVENT_MOVE_BOTTOM = 2;
+    private final transient int EVENT_MOVE_LEFT = 3;
+    private final transient int EVENT_MOVE_NONE = -1;
 
     int eventMoving = EVENT_MOVE_NONE; // cannot collide both X-axis and Y-axis, or else jump control breaks up.
 
     /**
      * in milliseconds
      */
-    public final int INVINCIBILITY_TIME = 500;
+    public final transient int INVINCIBILITY_TIME = 500;
 
     /**
      * Will ignore fluid resistance if (submerged height / actor height) <= this var
      */
-    private final float FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO = 0.2f;
-    private final float FLUID_RESISTANCE_APPLY_FULL_RATIO = 0.5f;
+    private final transient float FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO = 0.2f;
+    private final transient float FLUID_RESISTANCE_APPLY_FULL_RATIO = 0.5f;
 
     private GameMap map;
 
@@ -956,6 +956,10 @@ public class ActorWithBody implements Actor, Visible, Glowing {
 
     public void setNoSubjectToFluidResistance(boolean noSubjectToFluidResistance) {
         this.noSubjectToFluidResistance = noSubjectToFluidResistance;
+    }
+
+    public float getElasticity() {
+        return elasticity;
     }
 
     public void setElasticity(float elasticity) {

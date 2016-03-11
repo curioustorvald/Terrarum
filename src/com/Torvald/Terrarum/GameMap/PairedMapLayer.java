@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum.GameMap;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
@@ -22,7 +23,7 @@ public class PairedMapLayer implements Iterable<Integer> {
     public int width;
     public int height;
 
-    public static final int RANGE = 16;
+    public static transient final int RANGE = 16;
 
     public PairedMapLayer(int width, int height) {
         this.width = width / 2;

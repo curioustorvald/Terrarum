@@ -1,17 +1,18 @@
 package com.Torvald.Terrarum;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Set;
 
 /**
  * Created by minjaesong on 15-12-30.
  */
-public class KVHashtable {
+public class KVHashMap {
 
-    private Hashtable<String, Object> hashtable;
+    private HashMap<String, Object> hashMap;
 
-    public KVHashtable() {
-        hashtable = new Hashtable<>();
+    public KVHashMap() {
+        hashMap = new HashMap<>();
     }
 
     /**
@@ -23,7 +24,7 @@ public class KVHashtable {
      * @param value
      */
     public void set(String key, Object value){
-        hashtable.put(key.toLowerCase(), value);
+        hashMap.put(key.toLowerCase(), value);
     }
 
     /**
@@ -33,7 +34,7 @@ public class KVHashtable {
      * @return Object value
      */
     public Object get(String key){
-        return hashtable.get(key.toLowerCase());
+        return hashMap.get(key.toLowerCase());
     }
 
     public int getAsInt(String key) {
@@ -55,11 +56,11 @@ public class KVHashtable {
     }
 
     public boolean hasKey(String key) {
-        return hashtable.containsKey(key);
+        return hashMap.containsKey(key);
     }
 
     public Set getKeySet() {
-        return hashtable.keySet();
+        return hashMap.keySet();
     }
 
 }

@@ -6,6 +6,7 @@ import com.Torvald.Terrarum.GameItem.InventoryItem;
 import com.Torvald.Terrarum.Terrarum;
 import org.newdawn.slick.GameContainer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -16,7 +17,7 @@ public class NPCIntelligentBase extends ActorWithBody implements AIControlled, P
         Factionable, Landholder {
 
     private InventoryItem itemData; // keep it for extendibility, like Carriers in SC1
-    private ActorAI ai;
+    private transient ActorAI ai;
     private ActorInventory inventory;
 
     private HashSet<Faction> factionSet = new HashSet<>();
@@ -51,35 +52,35 @@ public class NPCIntelligentBase extends ActorWithBody implements AIControlled, P
     public void attachItemData() {
         itemData = new InventoryItem() {
             @Override
-            public float getWeight() {
-                return getMass();
+            public long getItemID() {
+                return 0;
             }
 
-            /** Set no effect */
+            @Override
+            public float getWeight() {
+                return 0;
+            }
+
             @Override
             public void effectWhileInPocket(GameContainer gc, int delta_t) {
 
             }
 
-            /** Set no effect */
             @Override
             public void effectWhenPickedUp(GameContainer gc, int delta_t) {
 
             }
 
-            /** Set no effect */
             @Override
             public void primaryUse(GameContainer gc, int delta_t) {
 
             }
 
-            /** Set no effect */
             @Override
             public void secondaryUse(GameContainer gc, int delta_t) {
 
             }
 
-            /** Set no effect */
             @Override
             public void effectWhenThrownAway(GameContainer gc, int delta_t) {
 
