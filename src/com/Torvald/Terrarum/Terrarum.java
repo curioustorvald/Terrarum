@@ -1,17 +1,15 @@
 package com.Torvald.Terrarum;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.Torvald.ImageFont.GameFontBase;
 import com.Torvald.ImageFont.GameFontWhite;
 import com.Torvald.JsonFetcher;
+import com.Torvald.JsonWriter;
 import com.Torvald.Terrarum.LangPack.Lang;
+import com.google.gson.JsonObject;
 import org.lwjgl.input.Controllers;
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
@@ -43,6 +41,7 @@ public class Terrarum extends StateBasedGame {
     public static final int VSYNC_TRIGGER_THRESHOLD = 56;
 
     public static Game game;
+    public static GameConfig gameConfig;
 
     public static String OSName;
     public static String OSVersion;
@@ -60,31 +59,25 @@ public class Terrarum extends StateBasedGame {
     public static boolean hasController = false;
     public static final float CONTROLLER_DEADZONE = 0.1f;
 
+    private static String configDir;
+
     public Terrarum(String gamename) throws SlickException {
         super(gamename);
 
+        gameConfig = new GameConfig();
+
         getDefaultDirectory();
         createDirs();
-        try {
-            createFiles();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        // TODO if config language is not defined
-        if (gameLocale.length() < 2) { // get system language if not overridden
-            String lan = System.getProperty("user.language");
-            String country = System.getProperty("user.country");
+        boolean readFromDisk = readConfigJson();
+        if (!readFromDisk) readConfigJson();
 
-            // exception handling
-            if      (lan.equals("en")) country = "US";
-            else if (lan.equals("fr")) country = "FR";
-            else if (lan.equals("de")) country = "DE";
-            else if (lan.equals("ko")) country = "KR";
+        // get locale from config
+        gameLocale = gameConfig.getAsString("language");
 
-            gameLocale = lan + country;
-        }
+        // if game locale were not set, use system locale
+        if (gameLocale.length() < 4)
+            gameLocale = getSysLang();
 
         System.out.println("[Terrarum] Locale: " + gameLocale);
     }
@@ -160,6 +153,7 @@ public class Terrarum extends StateBasedGame {
         }
 
         defaultSaveDir = defaultDir + "/Saves";
+        configDir = defaultDir + "/config.json";
     }
 
     private static void createDirs(){
@@ -174,15 +168,138 @@ public class Terrarum extends StateBasedGame {
         }
     }
 
-    private static void createFiles() throws IOException {
-        File configFile = new File(defaultDir + "/config.json");
+    private static void createConfigJson() throws IOException {
+        File configFile = new File(configDir);
 
         if (!configFile.exists() || configFile.length() == 0) {
-            configFile.createNewFile();
-            ArrayList<String> jsonLines = JsonFetcher.readJsonAsString("./res/config_default.json");
-            PrintWriter printWriter = new PrintWriter(configFile);
-            jsonLines.forEach(printWriter::println);
-            printWriter.close();
+            JsonWriter.writeToFile(DefaultConfig.fetch(), configDir);
         }
+    }
+
+    private static boolean readConfigJson() {
+        try {
+            // read from disk and build config from it
+            JsonObject jsonObject = JsonFetcher.readJson(configDir);
+
+            // make config
+            jsonObject.entrySet().forEach(
+                    entry -> gameConfig.set(entry.getKey(), entry.getValue())
+            );
+
+            return true;
+        }
+        catch (IOException e) {
+            // write default config to game dir. Call this method again to read config from it.
+            try {
+                createConfigJson();
+            }
+            catch (IOException e1) {
+                e.printStackTrace();
+            }
+
+            return false;
+        }
+    }
+
+    public static String getSysLang() {
+        String lan = System.getProperty("user.language");
+        String country = System.getProperty("user.country");
+
+        // exception handling
+        if      (lan.equals("en")) country = "US";
+        else if (lan.equals("fr")) country = "FR";
+        else if (lan.equals("de")) country = "DE";
+        else if (lan.equals("ko")) country = "KR";
+
+        return lan + country;
+    }
+
+
+    /**
+     * Return config from config set. If the config does not exist, default value will be returned.
+     * @param key
+     * @return Config from config set or default config if it does not exist.
+     * @throws NullPointerException if the specified config simply does not exist.
+     */
+    public static int getConfigInt(String key) {
+        int cfg = 0;
+        try {
+            cfg = gameConfig.getAsInt(key);
+        }
+        catch (NullPointerException e) {
+            try {
+                cfg = DefaultConfig.fetch().get(key).getAsInt();
+            }
+            catch (NullPointerException e1) {
+                e.printStackTrace();
+            }
+        }
+        return cfg;
+    }
+
+    /**
+     * Return config from config set. If the config does not exist, default value will be returned.
+     * @param key
+     * @return Config from config set or default config if it does not exist.
+     * @throws NullPointerException if the specified config simply does not exist.
+     */
+    public static float getConfigFloat(String key) {
+        float cfg = 0;
+        try {
+            cfg = gameConfig.getAsFloat(key);
+        }
+        catch (NullPointerException e) {
+            try {
+                cfg = DefaultConfig.fetch().get(key).getAsFloat();
+            }
+            catch (NullPointerException e1) {
+                e.printStackTrace();
+            }
+        }
+        return cfg;
+    }
+
+    /**
+     * Return config from config set. If the config does not exist, default value will be returned.
+     * @param key
+     * @return Config from config set or default config if it does not exist.
+     * @throws NullPointerException if the specified config simply does not exist.
+     */
+    public static String getConfigString(String key) {
+        String cfg = "";
+        try {
+            cfg = gameConfig.getAsString(key);
+        }
+        catch (NullPointerException e) {
+            try {
+                cfg = DefaultConfig.fetch().get(key).getAsString();
+            }
+            catch (NullPointerException e1) {
+                e.printStackTrace();
+            }
+        }
+        return cfg;
+    }
+
+    /**
+     * Return config from config set. If the config does not exist, default value will be returned.
+     * @param key
+     * @return Config from config set or default config if it does not exist.
+     * @throws NullPointerException if the specified config simply does not exist.
+     */
+    public static boolean getConfigBoolean(String key) {
+        boolean cfg = false;
+        try {
+            cfg = gameConfig.getAsBoolean(key);
+        }
+        catch (NullPointerException e) {
+            try {
+                cfg = DefaultConfig.fetch().get(key).getAsBoolean();
+            }
+            catch (NullPointerException e1) {
+                e.printStackTrace();
+            }
+        }
+        return cfg;
     }
 }

@@ -1,5 +1,7 @@
 package com.Torvald.Terrarum;
 
+import com.google.gson.JsonPrimitive;
+
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Set;
@@ -44,15 +46,20 @@ public class KVHashMap {
     public float getAsFloat(String key) {
         Object value = get(key);
         if (value instanceof Integer) return ((Integer) value).floatValue();
-        else return (float) value;
+        else if (value instanceof JsonPrimitive) return ((JsonPrimitive) value).getAsFloat();
+        return (float) value;
     }
 
     public String getAsString(String key) {
-        return (String) get(key);
+        Object value = get(key);
+        if (value instanceof JsonPrimitive) return ((JsonPrimitive) value).getAsString();
+        return (String) value;
     }
 
     public boolean getAsBoolean(String key) {
-        return (boolean) get(key);
+        Object value = get(key);
+        if (value instanceof JsonPrimitive) return ((JsonPrimitive) value).getAsBoolean();
+        return (boolean) value;
     }
 
     public boolean hasKey(String key) {

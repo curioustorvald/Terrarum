@@ -4,6 +4,7 @@ import com.Torvald.Terrarum.LangPack.Lang;
 import com.Torvald.Terrarum.Terrarum;
 import com.Torvald.Terrarum.ConsoleCommand.CommandInterpreter;
 import com.Torvald.Terrarum.GameControl.Key;
+import org.jetbrains.annotations.Nullable;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -144,8 +145,8 @@ public class ConsoleWindow implements UICanvas, UITypable {
     }
 
     public void reset() {
-        width = Terrarum.WIDTH;
-        height = 200;
+        setWidth(Terrarum.WIDTH);
+        setHeight(200);
 
         messages = new String[MESSAGES_MAX];
         messageDisplayPos = 0;
@@ -157,13 +158,25 @@ public class ConsoleWindow implements UICanvas, UITypable {
         if (Terrarum.game.auth.b()) sendMessage(Lang.get("DEV_MESSAGE_CONSOLE_CODEX"));
     }
 
+    @Nullable
     @Override
-    public int getWidth() {
+    public Integer getWidth() {
         return width;
     }
 
     @Override
-    public int getHeight() {
+    public void setWidth(@Nullable Integer integer) {
+        width = integer;
+    }
+
+    @Nullable
+    @Override
+    public Integer getHeight() {
         return height;
+    }
+
+    @Override
+    public void setHeight(@Nullable Integer integer) {
+        height = integer;
     }
 }

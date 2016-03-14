@@ -2,12 +2,7 @@ package com.Torvald.Terrarum.ConsoleCommand;
 
 import com.Torvald.JsonWriter;
 import com.Torvald.Terrarum.Terrarum;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 /**
@@ -18,7 +13,7 @@ public class ExportAV implements ConsoleCommand {
     public void execute(String[] args) {
         if (args.length == 2) {
             try {
-                JsonWriter.writeFile(Terrarum.game.getPlayer().getActorValue()
+                JsonWriter.writeToFile(Terrarum.game.getPlayer().getActorValue()
                         , Terrarum.defaultDir + "/Exports/" + args[1] + ".json"
                 );
 

@@ -5,7 +5,6 @@ import com.Torvald.Terrarum.ConsoleCommand.Authenticator;
 import com.Torvald.Terrarum.ConsoleCommand.CommandDict;
 import com.Torvald.Terrarum.GameControl.GameController;
 import com.Torvald.Terrarum.GameControl.KeyMap;
-import com.Torvald.Terrarum.GameControl.KeyToggler;
 import com.Torvald.Terrarum.GameMap.GameMap;
 import com.Torvald.Terrarum.GameMap.WorldTime;
 import com.Torvald.Terrarum.MapDrawer.LightmapRenderer;
@@ -15,6 +14,7 @@ import com.Torvald.Terrarum.MapGenerator.MapGenerator;
 import com.Torvald.Terrarum.TileProperties.TilePropCodex;
 import com.Torvald.Terrarum.TileStat.TileStat;
 import com.Torvald.Terrarum.UserInterface.*;
+import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.*;
 import org.newdawn.slick.Graphics;
@@ -24,6 +24,9 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import shader.Shader;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.util.HashSet;
 
@@ -36,8 +39,6 @@ public class Game extends BasicGameState {
     public static long totalVMMem;
     int game_mode = 0;
 
-    public GameConfig gameConfig;
-
     public GameMap map;
 
     public HashSet<Actor> actorContainer = new HashSet<>();
@@ -45,7 +46,7 @@ public class Game extends BasicGameState {
 
     public UIHandler consoleHandler;
     public UIHandler debugWindow;
-    public UIHandler bulletin;
+    public UIHandler notifinator;
 
     @NotNull Player player;
 
@@ -64,6 +65,11 @@ public class Game extends BasicGameState {
 
     public Game() throws SlickException {  }
 
+
+    private boolean useShader;
+    private int shaderProgram = 0;
+
+
     @Override
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws
             SlickException {
@@ -72,13 +78,10 @@ public class Game extends BasicGameState {
         GameController.setKeyMap(new KeyMap());
 
 
-
-        gameConfig = new GameConfig();
-        gameConfig.set("smoothlighting", true);
-
         shader12BitCol = Shader.makeShader("./res/4096.vrt", "./res/4096.frg");
         shaderBlurH = Shader.makeShader("./res/blurH.vrt", "./res/blur.frg");
         shaderBlurV = Shader.makeShader("./res/blurV.vrt", "./res/blur.frg");
+
 
         GRADIENT_IMAGE = new Image("res/graphics/backgroundGradientColour.png");
         skyBox = new Rectangle(0, 0, Terrarum.WIDTH, Terrarum.HEIGHT);
@@ -98,7 +101,7 @@ public class Game extends BasicGameState {
 
         // add new player and put it to actorContainer
         //player = new Player();
-        player = new PBFSigrid().build();
+        player = new PFSigrid().build();
         //player.setNoClip(true);
         actorContainer.add(player);
 
@@ -112,22 +115,13 @@ public class Game extends BasicGameState {
         debugWindow = new UIHandler(new BasicDebugInfoWindow());
         debugWindow.setPosition(0, 0);
 
-        bulletin = new UIHandler(new Bulletin());
-        bulletin.setPosition(
-                (Terrarum.WIDTH - bulletin.getUI().getWidth())
+        notifinator = new UIHandler(new Notification());
+        notifinator.setPosition(
+                (Terrarum.WIDTH - notifinator.getUI().getWidth())
                         / 2
-                , 0
+                , Terrarum.HEIGHT - notifinator.getUI().getHeight()
         );
-        bulletin.setVisibility(true);
-
-
-        UIHandler msgtest = new UIHandler(new Message(400, true));
-        String[] msg = {"Hello, world!", "안녕, 세상아!"};
-        ((Message) msgtest.getUI()).setMessage(msg);
-        msgtest.setPosition(32, 32);
-        // msgtest.setVisibility(true);
-
-        uiContainer.add(msgtest);
+        notifinator.setVisibility(true);
     }
 
     public Player getPlayer() {
@@ -159,7 +153,7 @@ public class Game extends BasicGameState {
 
         uiContainer.forEach(ui -> ui.update(gc, delta_t));
 
-        //bulletin.update(gc, delta_t);
+        notifinator.update(gc, delta_t);
 
         Terrarum.appgc.setVSync(Terrarum.appgc.getFPS() >= Terrarum.VSYNC_TRIGGER_THRESHOLD);
     }
@@ -212,9 +206,7 @@ public class Game extends BasicGameState {
         uiContainer.forEach(ui -> ui.render(gc, g));
         debugWindow.render(gc, g);
         consoleHandler.render(gc, g);
-        //bulletin.render(gc, g);
-
-        GL11.glEnd();
+        notifinator.render(gc, g);
     }
 
     public boolean addActor(Actor e) {
@@ -293,5 +285,99 @@ public class Game extends BasicGameState {
     private void setBlendModeNormal() {
         GL11.glDisable(GL11.GL_BLEND);
         Terrarum.appgc.getGraphics().setDrawMode(Graphics.MODE_NORMAL);
+    }
+
+    public void sendNotification(String[] msg) {
+        ((Notification) notifinator.getUI()).sendNotification(msg);
+    }
+
+    private int createShader(String filename, int shaderType) throws Exception {
+        int shader = 0;
+        try {
+            shader = ARBShaderObjects.glCreateShaderObjectARB(shaderType);
+
+            if(shader == 0)
+                return 0;
+
+            ARBShaderObjects.glShaderSourceARB(shader, readFileAsString(filename));
+            ARBShaderObjects.glCompileShaderARB(shader);
+
+            if (ARBShaderObjects.glGetObjectParameteriARB(shader, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB) == GL11.GL_FALSE)
+                throw new RuntimeException("Error creating shader: " + getLogInfo(shader));
+
+            return shader;
+        }
+        catch(Exception exc) {
+            ARBShaderObjects.glDeleteObjectARB(shader);
+            throw exc;
+        }
+    }
+
+    private static String getLogInfo(int obj) {
+        return ARBShaderObjects.glGetInfoLogARB(obj, ARBShaderObjects.glGetObjectParameteriARB(obj, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB));
+    }
+
+    private String readFileAsString(String filename) throws Exception {
+        StringBuilder source = new StringBuilder();
+
+        FileInputStream in = new FileInputStream(filename);
+
+        Exception exception = null;
+
+        BufferedReader reader;
+        try{
+            reader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
+
+            Exception innerExc= null;
+            try {
+                String line;
+                while((line = reader.readLine()) != null)
+                    source.append(line).append('\n');
+            }
+            catch(Exception exc) {
+                exception = exc;
+            }
+            finally {
+                try {
+                    reader.close();
+                }
+                catch(Exception exc) {
+                    if(innerExc == null)
+                        innerExc = exc;
+                    else
+                        exc.printStackTrace();
+                }
+            }
+
+            if(innerExc != null)
+                throw innerExc;
+        }
+        catch(Exception exc) {
+            exception = exc;
+        }
+        finally {
+            try {
+                in.close();
+            }
+            catch(Exception exc) {
+                if(exception == null)
+                    exception = exc;
+                else
+                    exc.printStackTrace();
+            }
+
+            if(exception != null)
+                throw exception;
+        }
+
+        return source.toString();
+    }
+
+    public long getMemInUse() {
+        return memInUse;
+    }
+
+    public long getTotalVMMem() {
+        return totalVMMem;
     }
 }

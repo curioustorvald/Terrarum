@@ -8,11 +8,10 @@
     Byte[n]     name        Savegame name, UTF-8
     Byte        null        String terminator
     Byte[8]     terraseed   Terrain seed
-    Byte[8]     <arb name>  possible other seeds
+    Byte[8]     rogueseed   Randomiser seed
     Byte[32]    hash1       SHA-256 hash of worldinfo1 being stored
     Byte[32]    hash2       SHA-256 hash of worldinfo2 being stored
-    Byte[32]    hash3       SHA-256 hash of worldinfo3 being stored
-    Byte[32]    hash4       SHA-256 hash of worldinfo4 beihg stored (TEMD data) [32, 214, 42, 3, 76, ...]
+    Byte[32]    hash4       SHA-256 hash of worldinfo3 beihg stored (TEMD data) [32, 214, 42, 3, 76, ...]
 
 
 *  Actor data
@@ -51,5 +50,4 @@
      --- world              save meta
      --- worldinfo1         tileprop
      --- worldinfo2         itemprop
-     --- worldinfo3         Roguelike randomiser
-     --- worldinfo4         TEMD binary
+     --- worldinfo3         TEMD binary

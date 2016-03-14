@@ -19,6 +19,7 @@
     </NATIVE>
     <SOURCES>
       <root url="file://$USER_HOME$/Downloads/slick/src" />
+      <root url="jar://$PROJECT_DIR$/lib/kotlin-runtime-sources.jar!/" />
     </SOURCES>
     <excluded>
       <root url="jar://$PROJECT_DIR$/lib/gson-2.5-javadoc.jar!/" />

@@ -288,7 +288,7 @@ public class GameFontBase implements Font {
     }
 
     private int wenQuanYi1IndexY(char c) {
-        return (c - (c <= 0x4DB5 ? 0x33F3 : 0x33F3 + 0x4A)) / 32;
+        return (c - (0x33F3 + 0x4A)) / 32;
     }
 
     private int wenQuanYi2IndexY(char c) {
@@ -358,24 +358,6 @@ public class GameFontBase implements Font {
     public void drawString(float x, float y, String s, Color color) {
         // hangul fonts first
         hangulSheet.startUse();
-        // WANSEONG
-        /*for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
-
-            if (isHangul(ch)) {
-                int[] hanPos = getHan(ch - 0xAC00);
-                int glyphW = getWidth("" + ch);
-                hangulSheet.renderInUse(
-                        Math.round(x
-                                + getWidthSubstr(s, i + 1) - glyphW
-                        )
-                        , Math.round((H - H_HANGUL) / 2 + y + 1)
-                        , hanPos[0]
-                        , hanPos[1]
-                );
-            }
-        }*/
-
         // JOHAB
         for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
@@ -456,7 +438,7 @@ public class GameFontBase implements Font {
                         Math.round(x
                                 + getWidthSubstr(s, i + 1) - glyphW
                         )
-                        , Math.round((H - H_UNIHAN) / 2 + y)
+                        , Math.round((H - H_UNIHAN) / 2 + y - 1)
                         , wenQuanYiIndexX(ch)
                         , wenQuanYi1IndexY(ch)
                 );
@@ -475,7 +457,7 @@ public class GameFontBase implements Font {
                         Math.round(x
                                 + getWidthSubstr(s, i + 1) - glyphW
                         )
-                        , Math.round((H - H_UNIHAN) / 2 + y)
+                        , Math.round((H - H_UNIHAN) / 2 + y - 1)
                         , wenQuanYiIndexX(ch)
                         , wenQuanYi2IndexY(ch)
                 );

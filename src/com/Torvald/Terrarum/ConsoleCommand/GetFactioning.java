@@ -18,7 +18,7 @@ public class GetFactioning implements ConsoleCommand {
         Echo echo = new Echo();
 
         if (args.length == 1) { // get all factioning data of player
-            HashSet<Faction> factionSet = Terrarum.game.getPlayer().getAssignedFactions();
+            HashSet<Faction> factionSet = Terrarum.game.getPlayer().getFaction();
 
             int count = factionSet.size();
             echo.execute(String.valueOf(count) + Lang.pluralise(" faction", count) + " assigned.");

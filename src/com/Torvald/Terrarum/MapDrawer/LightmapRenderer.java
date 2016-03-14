@@ -155,8 +155,8 @@ public class LightmapRenderer {
             for (int y = for_y_start; y < for_y_end; y++) {
                 for (int x = for_x_start; x < for_x_end; x++) {
                     // smooth
-                    if (Terrarum.game.screenZoom >= 1 && ((boolean) Terrarum.game.gameConfig.get(
-                            "smoothlighting"))) {
+                    if (Terrarum.game.screenZoom >= 1
+                            && Terrarum.gameConfig.getAsBoolean("smoothlighting")) {
                         char thisLightLevel = staticLightMap[y][x];
                         if (y > 0 && x < for_x_end && thisLightLevel == 0 && staticLightMap[y - 1][x] == 0) {
                             try {
@@ -317,7 +317,7 @@ public class LightmapRenderer {
                 int tileX = Math.round(actorBody.getHitbox().getPointedX() / TSIZE);
                 int tileY = Math.round(actorBody.getHitbox().getPointedY() / TSIZE)
                         - 1;
-                char actorLuminosity = actorLum.getLuminance();
+                char actorLuminosity = actorLum.getLuminosity();
                 if (x == tileX && y == tileY) {
                     lightLevelThis = screenBlend(lightLevelThis, actorLuminosity);
                 }

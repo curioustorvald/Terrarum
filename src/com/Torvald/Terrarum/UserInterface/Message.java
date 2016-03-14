@@ -1,7 +1,7 @@
 package com.Torvald.Terrarum.UserInterface;
 
-import com.Torvald.ImageFont.GameFontBlack;
 import com.Torvald.ImageFont.GameFontWhite;
+import org.jetbrains.annotations.Nullable;
 import org.newdawn.slick.*;
 
 /**
@@ -12,7 +12,8 @@ public class Message implements UICanvas {
     private Image segmentLeft, segmentRight, segmentBody;
 
     private String[] messagesList;
-    private int messagesShowingIndex = 0;
+    // private int messagesShowingIndex = 0;
+    private static final int MESSAGES_DISPLAY = 2;
 
     private int width;
     private int height;
@@ -23,10 +24,11 @@ public class Message implements UICanvas {
 
     public Message(int width, boolean isBlackVariant) throws SlickException {
         if (!isBlackVariant) {
-            segmentLeft = new Image("./res/graphics/gui/message_twoline_white_left.png");
-            segmentRight = new Image("./res/graphics/gui/message_twoline_white_right.png");
-            segmentBody = new Image("./res/graphics/gui/message_twoline_white_body.png");
-            uiFont = new GameFontBlack();
+            //segmentLeft = new Image("./res/graphics/gui/message_twoline_white_left.png");
+            //segmentRight = new Image("./res/graphics/gui/message_twoline_white_right.png");
+            //segmentBody = new Image("./res/graphics/gui/message_twoline_white_body.png");
+            //uiFont = new GameFontBlack();
+            throw new SlickException("Black font not supported for now");
         }
         else {
             segmentLeft = new Image("./res/graphics/gui/message_twoline_black_left.png");
@@ -60,14 +62,14 @@ public class Message implements UICanvas {
         g.drawImage(segmentRight, width - segmentRight.getWidth(), 0);
 
         g.setFont(uiFont);
-        g.setDrawMode(Graphics.MODE_NORMAL);
-        for (int i = messagesShowingIndex; i < messagesShowingIndex + 2; i++) {
+        //g.setDrawMode(Graphics.MODE_NORMAL);
+        for (int i = 0; i < Math.min(messagesList.length, MESSAGES_DISPLAY); i++) {
             g.drawString(messagesList[i]
                     , messageWindowRadius + 4
-                    , messageWindowRadius + (GLYPH_HEIGHT * (i - messagesShowingIndex))
+                    , messageWindowRadius + (GLYPH_HEIGHT * i)
             );
         }
-        g.setDrawMode(Graphics.MODE_NORMAL);
+        //g.setDrawMode(Graphics.MODE_NORMAL);
     }
 
     @Override
@@ -75,13 +77,25 @@ public class Message implements UICanvas {
 
     }
 
+    @Nullable
     @Override
-    public int getWidth() {
+    public Integer getWidth() {
         return width;
     }
 
     @Override
-    public int getHeight() {
+    public void setWidth(@Nullable Integer integer) {
+        width = integer;
+    }
+
+    @Nullable
+    @Override
+    public Integer getHeight() {
         return height;
+    }
+
+    @Override
+    public void setHeight(@Nullable Integer integer) {
+        height = integer;
     }
 }

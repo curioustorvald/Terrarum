@@ -71,6 +71,22 @@ public class MapCamera {
             , TileNameCode.ILLUMINATOR_TAN
             , TileNameCode.ILLUMINATOR_WHITE
             , TileNameCode.ILLUMINATOR_YELLOW
+            , TileNameCode.ILLUMINATOR_BLACK_OFF
+            , TileNameCode.ILLUMINATOR_BLUE_OFF
+            , TileNameCode.ILLUMINATOR_BROWN_OFF
+            , TileNameCode.ILLUMINATOR_CYAN_OFF
+            , TileNameCode.ILLUMINATOR_FUCHSIA_OFF
+            , TileNameCode.ILLUMINATOR_GREEN_OFF
+            , TileNameCode.ILLUMINATOR_GREEN_DARK_OFF
+            , TileNameCode.ILLUMINATOR_GREY_DARK_OFF
+            , TileNameCode.ILLUMINATOR_GREY_LIGHT_OFF
+            , TileNameCode.ILLUMINATOR_GREY_MED_OFF
+            , TileNameCode.ILLUMINATOR_ORANGE_OFF
+            , TileNameCode.ILLUMINATOR_PURPLE_OFF
+            , TileNameCode.ILLUMINATOR_RED_OFF
+            , TileNameCode.ILLUMINATOR_TAN_OFF
+            , TileNameCode.ILLUMINATOR_WHITE_OFF
+            , TileNameCode.ILLUMINATOR_YELLOW
             , TileNameCode.SANDSTONE
             , TileNameCode.SANDSTONE_BLACK
             , TileNameCode.SANDSTONE_DESERT
@@ -376,9 +392,12 @@ public class MapCamera {
         // try for
         int ret = 0;
         for (int i = 0; i < 4; i++) {
-            if (!TilePropCodex.getProp(nearbyTiles[i]).isSolid()) {
-                ret += (1 << i); // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+            try {
+                if (!TilePropCodex.getProp(nearbyTiles[i]).isSolid()) {
+                    ret += (1 << i); // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+                }
             }
+            catch (ArrayIndexOutOfBoundsException e) {}
         }
 
         return ret;

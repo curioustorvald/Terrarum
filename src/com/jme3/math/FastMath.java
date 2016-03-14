@@ -840,14 +840,14 @@ final public class FastMath {
     }
 
     public static float min(float... f) {
-        float[] sorted = f.clone();
-        Arrays.sort(f.clone());
-        return sorted[0];
+        float min = f[0];
+        for (int i = 1; i < f.length; i++) min = (f[i] < min) ? f[i] : min;
+        return min;
     }
 
     public static float max(float... f) {
-        float[] sorted = f.clone();
-        Arrays.sort(f.clone());
-        return sorted[sorted.length - 1];
+        float max = f[0];
+        for (int i = 1; i < f.length; i++) max = (f[i] > max) ? f[i] : max;
+        return max;
     }
 }

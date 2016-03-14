@@ -36,8 +36,8 @@ public class GameController {
 
 
         if (!Terrarum.game.consoleHandler.isTakingControl()) {
-            if (Terrarum.game.getPlayer().vehicleRiding != null) {
-                Terrarum.game.getPlayer().vehicleRiding.processInput(input);
+            if (Terrarum.game.getPlayer().getVehicleRiding() != null) {
+                Terrarum.game.getPlayer().getVehicleRiding().processInput(input);
             }
 
             Terrarum.game.getPlayer().processInput(input);
@@ -82,8 +82,8 @@ public class GameController {
 
 
         if (!Terrarum.game.consoleHandler.isTakingControl()) {
-            if (Terrarum.game.getPlayer().vehicleRiding != null) {
-                Terrarum.game.getPlayer().vehicleRiding.keyPressed(key, c);
+            if (Terrarum.game.getPlayer().getVehicleRiding() != null) {
+                Terrarum.game.getPlayer().getVehicleRiding().keyPressed(key, c);
             }
 
             Terrarum.game.getPlayer().keyPressed(key, c);
