@@ -2,6 +2,8 @@ package com.Torvald.Terrarum.MapGenerator;
 
 import com.Torvald.Rand.HQRNG;
 
+import java.util.Random;
+
 public class FloatingIslandsPreset {
 	
 	public static final int PRESETS = 5;
@@ -11,7 +13,7 @@ public class FloatingIslandsPreset {
 		return generatePreset(index, random);
 	}
 
-	static int[][] generatePreset(int index, HQRNG random){
+	static int[][] generatePreset(int index, Random random){
 		if (index == 0){			
 			return processPreset(random, FloatingIslePreset01.data, FloatingIslePreset01.w, FloatingIslePreset01.h);
 		}
@@ -30,7 +32,7 @@ public class FloatingIslandsPreset {
 		return null;
 	}
 
-	private static int[][] processPreset(HQRNG random, int[] preset, int w, int h){
+	private static int[][] processPreset(Random random, int[] preset, int w, int h){
 		int[][] temp = new int[h][w];
 		int counter = 0;
 		boolean mirrored = random.nextBoolean();

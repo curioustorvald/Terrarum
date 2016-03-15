@@ -34,8 +34,8 @@ class BasicDebugInfoWindow : UICanvas {
         val sb = StringBuilder()
         val formatter = Formatter(sb)
 
-        val mouseTileX = ((MapCamera.getCameraX() + gc.getInput().mouseX / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
-        val mouseTileY = ((MapCamera.getCameraY() + gc.getInput().mouseY / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
+        val mouseTileX = ((MapCamera.cameraX + gc.getInput().mouseX / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
+        val mouseTileY = ((MapCamera.cameraY + gc.getInput().mouseY / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
 
         g.setColor(Color.white)
 
@@ -115,21 +115,33 @@ class BasicDebugInfoWindow : UICanvas {
         // Hitbox
         val zoom = Terrarum.game.screenZoom
         g.setColor(Color(0x007f00))
-        g.drawRect(hitbox.getHitboxStart().getX() * zoom - MapCamera.getCameraX() * zoom, hitbox.getHitboxStart().getY() * zoom - MapCamera.getCameraY() * zoom, hitbox.getWidth() * zoom, hitbox.getHeight() * zoom)
+        g.drawRect(hitbox.getHitboxStart().getX() * zoom - MapCamera.cameraX * zoom
+                , hitbox.getHitboxStart().getY() * zoom - MapCamera.cameraY * zoom
+                , hitbox.getWidth() * zoom
+                , hitbox.getHeight() * zoom)
         // ...and its point
         g.fillRect(
-                (hitbox.getPointedX() - 1) * zoom - MapCamera.getCameraX() * zoom, (hitbox.getPointedY() - 1) * zoom - MapCamera.getCameraY() * zoom, 3f, 3f)
+                (hitbox.getPointedX() - 1) * zoom - MapCamera.cameraX * zoom
+                , (hitbox.getPointedY() - 1) * zoom - MapCamera.cameraY * zoom
+                , 3f, 3f)
         g.drawString(
-                Lang.get("DEV_COLOUR_LEGEND_GREEN") + " :  hitbox", (Terrarum.WIDTH - 200).toFloat(), line(2).toFloat())
+                Lang.get("DEV_COLOUR_LEGEND_GREEN") + " :  hitbox", (Terrarum.WIDTH - 200).toFloat()
+                , line(2).toFloat())
 
         // Next hitbox
         g.setColor(Color.blue)
-        g.drawRect(nextHitbox!!.getHitboxStart().getX() * zoom - MapCamera.getCameraX() * zoom, nextHitbox.getHitboxStart().getY() * zoom - MapCamera.getCameraY() * zoom, nextHitbox.getWidth() * zoom, nextHitbox.getHeight() * zoom)
+        g.drawRect(nextHitbox!!.getHitboxStart().getX() * zoom - MapCamera.cameraX * zoom
+                , nextHitbox.getHitboxStart().getY() * zoom - MapCamera.cameraY * zoom
+                , nextHitbox.getWidth() * zoom
+                , nextHitbox.getHeight() * zoom)
         // ...and its point
         g.fillRect(
-                (nextHitbox!!.getPointedX() - 1) * zoom - MapCamera.getCameraX() * zoom, (nextHitbox.getPointedY() - 1) * zoom - MapCamera.getCameraY() * zoom, 3f, 3f)
+                (nextHitbox!!.getPointedX() - 1) * zoom - MapCamera.cameraX * zoom
+                , (nextHitbox.getPointedY() - 1) * zoom - MapCamera.cameraY * zoom
+                , 3f, 3f)
         g.drawString(
-                Lang.get("DEV_COLOUR_LEGEND_BLUE") + " :  nextHitbox", (Terrarum.WIDTH - 200).toFloat(), line(3).toFloat())
+                Lang.get("DEV_COLOUR_LEGEND_BLUE") + " :  nextHitbox", (Terrarum.WIDTH - 200).toFloat()
+                , line(3).toFloat())
     }
 
     private fun printLine(g: Graphics, l: Int, s: String) {

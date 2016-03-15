@@ -59,8 +59,6 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
     @Transient private val BASE_DENSITY = 1020
 
-    override var referenceID: Long? = PLAYER_REF_ID
-
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory? = null
 
@@ -94,6 +92,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     @Throws(SlickException::class)
     constructor() : super() {
         isVisible = true
+        referenceID = PLAYER_REF_ID
         super.setDensity(BASE_DENSITY)
     }
 

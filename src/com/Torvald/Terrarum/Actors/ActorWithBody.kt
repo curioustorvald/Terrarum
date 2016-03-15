@@ -13,10 +13,9 @@ import org.newdawn.slick.Graphics
 /**
  * Created by minjaesong on 16-03-14.
  */
-open class ActorWithBody : Actor, Visible, Glowing, Pocketed {
+open class ActorWithBody constructor() : Actor, Visible, Glowing {
 
     internal var actorValue: ActorValue
-    override var inventory: ActorInventory? = null
 
     var hitboxTranslateX: Float = 0.toFloat()// relative to spritePosX
     var hitboxTranslateY: Float = 0.toFloat()// relative to spritePosY
@@ -66,15 +65,15 @@ open class ActorWithBody : Actor, Visible, Glowing, Pocketed {
     @Transient private val MASS_LOWEST = 2f
     /** Valid range: [0, 1]  */
     var elasticity = 0f
-        set(elasticity) {
-            if (elasticity < 0)
-                throw IllegalArgumentException("[ActorWithBody] $elasticity: valid elasticity value is [0, 1].")
-
-            if (elasticity > 1) {
+        set(value) {
+            if (value < 0)
+                throw IllegalArgumentException("[ActorWithBody] $value: valid elasticity value is [0, 1].")
+            else if (value > 1) {
                 println("[ActorWithBody] Elasticity were capped to 1.")
-                this.elasticity = ELASTICITY_MAX
-            } else
-                this.elasticity = elasticity * ELASTICITY_MAX
+                field = ELASTICITY_MAX
+            }
+            else
+                field = value * ELASTICITY_MAX
         }
     @Transient private val ELASTICITY_MAX = 0.993f
     private var density = 1000f

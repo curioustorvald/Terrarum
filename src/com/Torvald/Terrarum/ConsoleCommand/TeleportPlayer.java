@@ -18,8 +18,8 @@ public class TeleportPlayer implements ConsoleCommand {
 
             int x, y;
             try {
-                x = new Integer((args[1])) * MapDrawer.TILE_SIZE + (MapDrawer.TILE_SIZE / 2);
-                y = new Integer((args[2])) * MapDrawer.TILE_SIZE + (MapDrawer.TILE_SIZE / 2);
+                x = new Integer((args[1])) * MapDrawer.getTILE_SIZE() + (MapDrawer.getTILE_SIZE() / 2);
+                y = new Integer((args[2])) * MapDrawer.getTILE_SIZE() + (MapDrawer.getTILE_SIZE() / 2);
             }
             catch (NumberFormatException e) {
                 new Echo().execute("Wrong number input.");

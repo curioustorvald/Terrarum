@@ -14,8 +14,9 @@ import java.io.IOException
 
 private const val JSONPATH = "./res/raw/"
 
-class CreatureFactory {
+object CreatureFactory {
 
+    @JvmStatic
     @Throws(IOException::class, SlickException::class)
     fun build(jsonFileName: String): ActorWithBody {
         val jsonObj = JsonFetcher.readJson(JSONPATH + jsonFileName)
@@ -41,8 +42,6 @@ class CreatureFactory {
 
         actor.actorValue.set("accel", Player.WALK_ACCEL_BASE)
         actor.actorValue.set("accelmult", 1f)
-
-        actor.inventory = (ActorInventory(actor.actorValue.get("encumbrance") as Int, true))
 
         return actor
     }

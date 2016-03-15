@@ -101,13 +101,9 @@ public class Game extends BasicGameState {
 
         // add new player and put it to actorContainer
         //player = new Player();
-        player = new PFSigrid().build();
+        player = PFSigrid.build();
         //player.setNoClip(true);
         actorContainer.add(player);
-
-        new MapDrawer(map);
-
-        new LightmapRenderer();
 
         consoleHandler = new UIHandler(new ConsoleWindow());
         consoleHandler.setPosition(0, 0);
@@ -180,7 +176,7 @@ public class Game extends BasicGameState {
 
         // compensate for zoom. UIs have to be treated specially! (see UIHandler)
         g.translate(
-                -MapCamera.getCameraX() * screenZoom
+                  -MapCamera.getCameraX() * screenZoom
                 , -MapCamera.getCameraY() * screenZoom
         );
 

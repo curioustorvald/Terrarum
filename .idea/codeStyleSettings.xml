@@ -4,6 +4,9 @@
     <option name="PER_PROJECT_SETTINGS">
       <value>
         <option name="RIGHT_MARGIN" value="100" />
+        <JetCodeStyleSettings>
+          <option name="ALIGN_IN_COLUMNS_CASE_BRANCH" value="true" />
+        </JetCodeStyleSettings>
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
@@ -26,6 +29,12 @@
           <option name="ARRAY_INITIALIZER_WRAP" value="5" />
           <option name="ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE" value="true" />
           <option name="WRAP_ON_TYPING" value="0" />
+        </codeStyleSettings>
+        <codeStyleSettings language="kotlin">
+          <option name="ELSE_ON_NEW_LINE" value="true" />
+          <option name="CATCH_ON_NEW_LINE" value="true" />
+          <option name="FINALLY_ON_NEW_LINE" value="true" />
+          <option name="ALIGN_MULTILINE_BINARY_OPERATION" value="true" />
         </codeStyleSettings>
       </value>
     </option>

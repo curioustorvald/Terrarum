@@ -17,7 +17,7 @@ public class TileStat {
 
     private static short[] tilestat = new short[GameMap.TILES_SUPPORTED];
 
-    private static final int TSIZE = MapDrawer.TILE_SIZE;
+    private static final int TSIZE = MapDrawer.getTILE_SIZE();
 
     /**
      * Update tile stats from tiles on screen

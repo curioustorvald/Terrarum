@@ -27,9 +27,9 @@ public class GameController {
 
     public static void processInput(Input input) {
         int mouseTileX = (int) ((MapCamera.getCameraX() + input.getMouseX() / Terrarum.game.screenZoom)
-                / MapDrawer.TILE_SIZE);
+                / MapDrawer.getTILE_SIZE());
         int mouseTileY = (int) ((MapCamera.getCameraY() + input.getMouseY() / Terrarum.game.screenZoom)
-                / MapDrawer.TILE_SIZE);
+                / MapDrawer.getTILE_SIZE());
 
 
         KeyToggler.update(input);

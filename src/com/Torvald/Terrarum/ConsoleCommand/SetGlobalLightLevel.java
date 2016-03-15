@@ -22,15 +22,15 @@ public class SetGlobalLightLevel implements ConsoleCommand {
                 new Echo().execute("Wrong number input.");
             }
             catch (IllegalArgumentException e1) {
-                new Echo().execute("Range: 0-" + LightmapRenderer.CHANNEL_MAX + " per channel");
+                new Echo().execute("Range: 0-" + LightmapRenderer.getCHANNEL_MAX() + " per channel");
             }
         }
         else if (args.length == 2) {
             try {
                 char GL = (char) (new Integer(args[1]).intValue());
 
-                if (GL < 0 || GL >= LightmapRenderer.COLOUR_DOMAIN_SIZE) {
-                    new Echo().execute("Range: 0-" + (LightmapRenderer.COLOUR_DOMAIN_SIZE - 1));
+                if (GL < 0 || GL >= LightmapRenderer.getCOLOUR_DOMAIN_SIZE()) {
+                    new Echo().execute("Range: 0-" + (LightmapRenderer.getCOLOUR_DOMAIN_SIZE() - 1));
                 }
                 else {
                     Terrarum.game.map.setGlobalLight(GL);

@@ -10,8 +10,12 @@ import java.io.IOException
 /**
  * Created by minjaesong on 16-03-14.
  */
-class PFSigrid {
 
+object PFSigrid {
+
+    private val FACTION_PATH = "./res/raw/"
+
+    @JvmStatic
     @Throws(SlickException::class)
     fun build(): Player {
         val p = Player()
@@ -87,10 +91,5 @@ class PFSigrid {
         jsonObject.get("factionfearful").asJsonArray.forEach { jobj -> faction.addFactionFearful(jobj.asString) }
 
         return faction
-    }
-
-    companion object {
-
-        private val FACTION_PATH = "./res/raw/"
     }
 }

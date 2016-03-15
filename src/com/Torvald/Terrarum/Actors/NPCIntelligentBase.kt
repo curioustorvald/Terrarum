@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum.Actors
 
+import com.Torvald.Rand.HQRNG
 import com.Torvald.Terrarum.Actors.AI.ActorAI
 import com.Torvald.Terrarum.Actors.Faction.Faction
 import com.Torvald.Terrarum.GameItem.InventoryItem
@@ -40,14 +41,12 @@ open class NPCIntelligentBase : ActorWithBody()
     }
 
     override fun attachItemData() {
-        itemData = object : InventoryItem {
-            override fun getItemID(): Long {
-                return 0
-            }
+        val random: Random = HQRNG()
 
-            override fun getWeight(): Float {
-                return 0f
-            }
+        itemData = object : InventoryItem {
+            override var itemID = random.nextLong()
+
+            override var weight = 0f
 
             override fun effectWhileInPocket(gc: GameContainer, delta_t: Int) {
 
