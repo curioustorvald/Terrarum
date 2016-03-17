@@ -1,19 +1,20 @@
 package com.Torvald.Terrarum.Actors
 
 import com.Torvald.Terrarum.GameItem.InventoryItem
-import com.Torvald.Terrarum.GameItem.ItemCodex
+import com.Torvald.Terrarum.GameItem.ItemPropCodex
 import java.util.*
 
 /**
  * Created by minjaesong on 16-03-15.
  */
 
-@Transient const val CAPACITY_MAX = 0x7FFFFFFF
-@Transient const val CAPACITY_MODE_NO_ENCUMBER = 0
-@Transient const val CAPACITY_MODE_COUNT = 1
-@Transient const val CAPACITY_MODE_WEIGHT = 2
-
 class ActorInventory {
+
+    @Transient val CAPACITY_MAX = 0x7FFFFFFF
+    @Transient val CAPACITY_MODE_NO_ENCUMBER = 0
+    @Transient val CAPACITY_MODE_COUNT = 1
+    @Transient val CAPACITY_MODE_WEIGHT = 2
+
 
     private var capacityByCount: Int = 0
     private var capacityByWeight: Int = 0
@@ -80,7 +81,7 @@ class ActorInventory {
         var weight = 0f
 
         for (item in itemList.entries) {
-            weight += ItemCodex.getItem(item.key).weight * item.value
+            weight += ItemPropCodex.getItem(item.key).weight * item.value
         }
 
         return weight

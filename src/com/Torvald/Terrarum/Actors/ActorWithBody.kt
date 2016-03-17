@@ -50,7 +50,7 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
     internal var baseSpriteWidth: Int = 0
     internal var baseSpriteHeight: Int = 0
 
-    override var referenceID: Long? = null
+    override var referenceID: Long = HQRNG().nextLong()
     /**
      * Positions: top-left point
      */
@@ -133,7 +133,7 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
     @Transient private val map: GameMap
 
     init {
-        referenceID = HQRNG().nextLong()
+        // referenceID = HQRNG().nextLong() // renew ID just in case
         actorValue = ActorValue()
         map = Terrarum.game.map
     }

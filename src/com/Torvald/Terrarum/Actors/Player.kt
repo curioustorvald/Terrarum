@@ -18,19 +18,20 @@ import java.util.*
  * Created by minjaesong on 16-03-14.
  */
 
-/**
- * empirical value.
- */
-// private transient final float JUMP_ACCELERATION_MOD = ???f / 10000f; //quadratic mode
-@Transient private const val JUMP_ACCELERATION_MOD = 170f / 10000f //linear mode
-@Transient private const val WALK_FRAMES_TO_MAX_ACCEL = 6
-
-@Transient private const val LEFT = 1
-@Transient private const val RIGHT = 2
-
-@Transient private const val KEY_NULL = -1
-
 class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, LandHolder {
+
+    /**
+     * empirical value.
+     */
+    // private transient final float JUMP_ACCELERATION_MOD = ???f / 10000f; //quadratic mode
+    @Transient private val JUMP_ACCELERATION_MOD = 170f / 10000f //linear mode
+    @Transient private val WALK_FRAMES_TO_MAX_ACCEL = 6
+
+    @Transient private val LEFT = 1
+    @Transient private val RIGHT = 2
+
+    @Transient private val KEY_NULL = -1
+
 
     var vehicleRiding: Controllable? = null
 

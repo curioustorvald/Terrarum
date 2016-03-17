@@ -15,6 +15,8 @@ public class TilePropCodex {
 
     private static TileProp[] tileProps;
 
+    public static final String CSV_PATH = "./src/com/Torvald/Terrarum/TileProperties/tileprop.csv";
+
     public TilePropCodex() {
         tileProps = new TileProp[MapLayer.RANGE * (PairedMapLayer.RANGE)];
 
@@ -24,8 +26,7 @@ public class TilePropCodex {
 
         try {
             // todo verify CSV using pre-calculated SHA256 hash
-            List<CSVRecord> records = CSVFetcher.readCSV("" +
-                    "./src/com/Torvald/Terrarum/TileProperties/tileprop.csv");
+            List<CSVRecord> records = CSVFetcher.readCSV(CSV_PATH);
 
             System.out.println("[TilePropCodex] Building tile properties table");
 

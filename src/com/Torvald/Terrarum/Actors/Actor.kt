@@ -13,5 +13,5 @@ interface Actor {
      * Valid RefID is equal to or greater than 32768.
      * @return Reference ID. (32768-0x7FFF_FFFF_FFFF_FFFF)
      */
-    var referenceID: Long?
+    var referenceID: Long
 }

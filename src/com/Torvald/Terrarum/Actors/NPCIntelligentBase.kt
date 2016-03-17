@@ -14,14 +14,38 @@ import java.util.*
 open class NPCIntelligentBase : ActorWithBody()
         , AIControlled, Pocketed, CanBeStoredAsItem, Factionable, LandHolder {
 
-    override var itemData: InventoryItem? = null
+    override var itemData: InventoryItem = object : InventoryItem {
+        override var itemID = HQRNG().nextLong()
+
+        override var weight = 0f
+
+        override fun effectWhileInPocket(gc: GameContainer, delta_t: Int) {
+
+        }
+
+        override fun effectWhenPickedUp(gc: GameContainer, delta_t: Int) {
+
+        }
+
+        override fun primaryUse(gc: GameContainer, delta_t: Int) {
+
+        }
+
+        override fun secondaryUse(gc: GameContainer, delta_t: Int) {
+
+        }
+
+        override fun effectWhenThrownAway(gc: GameContainer, delta_t: Int) {
+
+        }
+    }
 
     @Transient private var ai: ActorAI? = null
     override var inventory: ActorInventory? = null
 
     private val factionSet = HashSet<Faction>()
 
-    override var referenceID: Long? = null
+    override var referenceID: Long = HQRNG().nextLong()
 
     override var faction: HashSet<Faction>? = null
 
@@ -41,33 +65,7 @@ open class NPCIntelligentBase : ActorWithBody()
     }
 
     override fun attachItemData() {
-        val random: Random = HQRNG()
 
-        itemData = object : InventoryItem {
-            override var itemID = random.nextLong()
-
-            override var weight = 0f
-
-            override fun effectWhileInPocket(gc: GameContainer, delta_t: Int) {
-
-            }
-
-            override fun effectWhenPickedUp(gc: GameContainer, delta_t: Int) {
-
-            }
-
-            override fun primaryUse(gc: GameContainer, delta_t: Int) {
-
-            }
-
-            override fun secondaryUse(gc: GameContainer, delta_t: Int) {
-
-            }
-
-            override fun effectWhenThrownAway(gc: GameContainer, delta_t: Int) {
-
-            }
-        }
     }
 
     override fun getItemWeight(): Float {

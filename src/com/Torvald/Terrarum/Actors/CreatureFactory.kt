@@ -12,9 +12,9 @@ import java.io.IOException
  * Created by minjaesong on 16-03-14.
  */
 
-private const val JSONPATH = "./res/raw/"
-
 object CreatureFactory {
+
+    private val JSONPATH = "./res/raw/"
 
     @JvmStatic
     @Throws(IOException::class, SlickException::class)

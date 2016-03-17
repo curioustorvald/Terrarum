@@ -15,6 +15,6 @@ interface CanBeStoredAsItem {
 
     fun resumeUpdateAndDraw()
 
-    var itemData: InventoryItem?
+    var itemData: InventoryItem
 
 }

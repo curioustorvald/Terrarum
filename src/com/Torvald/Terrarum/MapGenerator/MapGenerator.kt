@@ -15,7 +15,7 @@ object MapGenerator {
     private lateinit var map: GameMap
     private lateinit var random: Random
     //private static float[] noiseArray;
-    private var seed: Long = 0
+    private var seed: Long? = null
     private var width: Int = 0
     private var height: Int = 0
 
@@ -90,7 +90,7 @@ object MapGenerator {
      */
     @JvmStatic
     fun generateMap() {
-        random = HQRNG(seed)
+        random = HQRNG(seed!!)
         println("[MapGenerator] Seed: " + seed)
 
         worldOceanPosition = if (random.nextBoolean()) TYPE_OCEAN_LEFT else TYPE_OCEAN_RIGHT
@@ -216,8 +216,8 @@ object MapGenerator {
     private fun caveGen(xStretch: Float, yStretch: Float): Array<FloatArray> {
         val noiseMap = Array(height) { FloatArray(width) }
 
-        val simplexNoise = SimplexNoise(CAVEGEN_LARGEST_FEATURE, CAVEGEN_PERTURB_RATE, seed)
-        val simplexNoisePerturbMap = SimplexNoise(CAVEGEN_LARGEST_FEATURE_PERTURB, 0.5f, seed xor random.nextLong())
+        val simplexNoise = SimplexNoise(CAVEGEN_LARGEST_FEATURE, CAVEGEN_PERTURB_RATE, seed!!)
+        val simplexNoisePerturbMap = SimplexNoise(CAVEGEN_LARGEST_FEATURE_PERTURB, 0.5f, seed!! xor random.nextLong())
 
         val xEnd = width * yStretch
         val yEnd = height * xStretch
@@ -283,7 +283,7 @@ object MapGenerator {
      * @return matrix in ![x][y]!
      */
     private fun generate2DSimplexNoise(sizeX: Int, sizeY: Int, xStretch: Float, yStretch: Float): Array<FloatArray> {
-        val simplexNoise = SimplexNoise(CAVE_LARGEST_FEATURE, 0.1f, seed xor random.nextLong())
+        val simplexNoise = SimplexNoise(CAVE_LARGEST_FEATURE, 0.1f, seed!! xor random.nextLong())
 
         val xStart = 0f
         val yStart = 0f
@@ -524,7 +524,7 @@ object MapGenerator {
     }
 
     private fun perturbTerrain() {
-        val perturbGen = SimplexNoise(TERRAIN_PERTURB_LARGESTFEATURE, TERRAIN_PERTURB_RATE, seed xor random.nextLong())
+        val perturbGen = SimplexNoise(TERRAIN_PERTURB_LARGESTFEATURE, TERRAIN_PERTURB_RATE, seed!! xor random.nextLong())
 
         val perturbMap = Array(height) { FloatArray(width) }
 
@@ -960,7 +960,7 @@ object MapGenerator {
 
     private fun fillOcean() {
         val thisSandList = intArrayOf(TileNameCode.SAND_BEACH, TileNameCode.SAND_BLACK, TileNameCode.SAND_GREEN, TileNameCode.SAND_BEACH, TileNameCode.SAND_BEACH, TileNameCode.SAND_BLACK)
-        val thisRand = HQRNG(seed xor random.nextLong())
+        val thisRand = HQRNG(seed!! xor random.nextLong())
         val thisSand = thisSandList[thisRand.nextInt(thisSandList.size)]
 
         val thisSandStr = if (thisSand == TileNameCode.SAND_BLACK)
@@ -1061,6 +1061,11 @@ object MapGenerator {
      */
     private fun getTerrainHeightFromHeightMap(x: Int): Int {
         return TERRAIN_AVERAGE_HEIGHT - heightMap!![x]
+    }
+
+    @JvmStatic
+    fun getGeneratorSeed(): Long {
+        return seed!!
     }
 
     /* Utility */

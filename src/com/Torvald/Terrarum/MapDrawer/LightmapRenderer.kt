@@ -3,6 +3,7 @@ package com.Torvald.Terrarum.MapDrawer
 import com.Torvald.ColourUtil.Col40
 import com.Torvald.Terrarum.Actors.ActorWithBody
 import com.Torvald.Terrarum.Actors.Luminous
+import com.Torvald.Terrarum.GameMap.WorldTime
 import com.Torvald.Terrarum.Terrarum
 import com.Torvald.Terrarum.TileProperties.TilePropCodex
 import com.jme3.math.FastMath
@@ -714,5 +715,3 @@ object LightmapRenderer {
         return Col40().createSlickColor(raw.toInt())
     }
 }
-
-internal data class LightmapLantern(var x: Int, var y: Int, var intensity: Char)

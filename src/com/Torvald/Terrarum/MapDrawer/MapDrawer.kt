@@ -18,8 +18,7 @@ object MapDrawer {
     @JvmStatic private val ENV_COLTEMP_LOWEST = 5500
     @JvmStatic private val ENV_COLTEMP_HIGHEST = 7500
 
-    @JvmStatic private val ENV_COLTEMP_GOLDEN_HOUR = 5000
-    @JvmStatic private val ENV_COLTEMP_NOON = 6500
+    @JvmStatic val ENV_COLTEMP_NOON = 6500
 
     private var colTemp: Int = 0
 
@@ -54,9 +53,8 @@ object MapDrawer {
         val zoom = Terrarum.game.screenZoom
 
         g.color = getColourFromMap(colTemp)
+        //g.color = getColourFromMap(3022)
         g.fillRect(MapCamera.getCameraX() * zoom, MapCamera.getCameraY() * zoom, Terrarum.WIDTH * if (zoom < 1) 1f / zoom else zoom, Terrarum.HEIGHT * if (zoom < 1) 1f / zoom else zoom)
-
-        // TODO colour overlay by sun position (5000-morning -> 6500-noon -> 5000-twilight)
     }
 
     /**
@@ -71,7 +69,8 @@ object MapDrawer {
         return Math.round((ENV_COLTEMP_HIGHEST - ENV_COLTEMP_LOWEST) / 2 * FastMath.clamp(x, -1f, 1f) + colTempMedian)
     }
 
-    private fun getColourFromMap(K: Int): Color {
+    @JvmStatic
+    fun getColourFromMap(K: Int): Color {
         return envOverlayColourmap.getColor(colTempToImagePos(K), 0)
     }
 

@@ -6,13 +6,12 @@ This project mainly uses Kotlin and Java, Python/Lua/etc. for tools.
 
 Documentations and resources for work (such as .psd) are also included in the repo. You will need Mac computer to read and edit documentations in .gcx and .numbers. 
 
-Any contribution in this project is sorely in English, so be sure to use English in codes, comments, etc.
+Any contribution in this project must be made sorely in English, so be sure to use English in codes, comments, etc.
 
 ## Setup ##
 * Configuration  
-Just make sure you have Java version 8 or higher
-* Dependencies  
-JRE 1.8
+Just make sure you have JDK 8 or higher
+* Required libraries are included in the repository.
 
 
 ## Contribution guidelines ##

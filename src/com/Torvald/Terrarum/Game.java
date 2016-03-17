@@ -1,5 +1,6 @@
 package com.Torvald.Terrarum;
 
+import com.Torvald.Rand.HQRNG;
 import com.Torvald.Terrarum.Actors.*;
 import com.Torvald.Terrarum.ConsoleCommand.Authenticator;
 import com.Torvald.Terrarum.ConsoleCommand.CommandDict;
@@ -11,9 +12,11 @@ import com.Torvald.Terrarum.MapDrawer.LightmapRenderer;
 import com.Torvald.Terrarum.MapDrawer.MapCamera;
 import com.Torvald.Terrarum.MapDrawer.MapDrawer;
 import com.Torvald.Terrarum.MapGenerator.MapGenerator;
+import com.Torvald.Terrarum.MapGenerator.RoguelikeRandomiser;
 import com.Torvald.Terrarum.TileProperties.TilePropCodex;
 import com.Torvald.Terrarum.TileStat.TileStat;
 import com.Torvald.Terrarum.UserInterface.*;
+import com.jme3.math.FastMath;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.*;
@@ -70,6 +73,10 @@ public class Game extends BasicGameState {
     private int shaderProgram = 0;
 
 
+    private final int ENV_COLTEMP_SUNRISE = 2500;
+    private final int ENV_SUNLIGHT_DELTA = MapDrawer.getENV_COLTEMP_NOON() - ENV_COLTEMP_SUNRISE;
+
+
     @Override
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws
             SlickException {
@@ -83,11 +90,12 @@ public class Game extends BasicGameState {
         shaderBlurV = Shader.makeShader("./res/blurV.vrt", "./res/blur.frg");
 
 
-        GRADIENT_IMAGE = new Image("res/graphics/backgroundGradientColour.png");
+        GRADIENT_IMAGE = new Image("res/graphics/sky_colour.png");
         skyBox = new Rectangle(0, 0, Terrarum.WIDTH, Terrarum.HEIGHT);
 
         new WorldTime();
         new TilePropCodex();
+        // new ItemPropCodex() -- This is kotlin object and already initialised.
 
         map = new GameMap(8192, 2048);
         map.setGravitation(9.8f);
@@ -96,6 +104,10 @@ public class Game extends BasicGameState {
         MapGenerator.setSeed(0x51621D);
         //MapGenerator.setSeed(new HQRNG().nextLong());
         MapGenerator.generateMap();
+
+        RoguelikeRandomiser.setSeed(0x540198);
+        //RoguelikeRandomiser.setSeed(new HQRNG().nextLong());
+
 
         new CommandDict();
 
@@ -127,6 +139,9 @@ public class Game extends BasicGameState {
     @Override
     public void update(GameContainer gc, StateBasedGame sbg, int delta_t) {
         setAppTitle();
+
+        // GL at after_sunrise-noon_before_sunset
+        //map.setGlobalLight();
 
         GameController.processInput(gc.getInput());
 
@@ -375,5 +390,14 @@ public class Game extends BasicGameState {
 
     public long getTotalVMMem() {
         return totalVMMem;
+    }
+
+    private int getSunlightColtemp() {
+        int half_today = WorldTime.DAY_LENGTH / 2;
+        int timeToday = WorldTime.elapsedSeconds();
+        float sunAlt = (timeToday < half_today) ?
+                        timeToday / half_today * FastMath.PI
+                       : 0f;
+        return Math.round(ENV_COLTEMP_SUNRISE + (ENV_SUNLIGHT_DELTA * FastMath.sin(sunAlt)));
     }
 }

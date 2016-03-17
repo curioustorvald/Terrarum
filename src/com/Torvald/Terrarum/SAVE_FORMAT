@@ -6,12 +6,13 @@
 
     Byte[4]     TESV        Magic
     Byte[n]     name        Savegame name, UTF-8
-    Byte        null        String terminator
+    Byte        NULL        String terminator
     Byte[8]     terraseed   Terrain seed
     Byte[8]     rogueseed   Randomiser seed
     Byte[32]    hash1       SHA-256 hash of worldinfo1 being stored
     Byte[32]    hash2       SHA-256 hash of worldinfo2 being stored
-    Byte[32]    hash4       SHA-256 hash of worldinfo3 beihg stored (TEMD data) [32, 214, 42, 3, 76, ...]
+    Byte[32]    hash3       SHA-256 hash of worldinfo3 being stored
+    Byte[32]    hash4       SHA-256 hash of worldinfo4 being stored (TEMD data) [32, 214, 42, 3, 76, ...]
 
 
 *  Actor data
@@ -22,7 +23,9 @@
 *  Prop data
     - GZip'd CSV
     - Filename : worldinfo1 -- tileprop.csv
-                 worldinfo2 -- itemprop.csv (with no extension)
+                 worldinfo2 -- itemprop.csv
+                 worldinfo3 -- materialprop.csv
+                    (with no extension)
 
 
 *  Roguelike randomiser data
@@ -33,6 +36,7 @@
 *  Human-readable
     - Tiles_list.txt -- list of tiles in csv
     - Items_list.txt -- list of items in csv
+    - Materials_list.txt -- list of materials in csv
 
 
 
@@ -50,4 +54,5 @@
      --- world              save meta
      --- worldinfo1         tileprop
      --- worldinfo2         itemprop
-     --- worldinfo3         TEMD binary
+     --- worldinfo3         materialprop
+     --- worldinfo4         TEMD binary
