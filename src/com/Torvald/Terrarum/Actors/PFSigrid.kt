@@ -69,13 +69,13 @@ object PFSigrid {
 
         p.setPosition((4096 * 16).toFloat(), (300 * 16).toFloat())
 
-        p.assignFaction(loadFactioningData("FactionSigrid.json"))
+        p.faction.add(loadFactioningData("FactionSigrid.json"))
 
         return p
     }
 
     private fun loadFactioningData(filename: String): Faction {
-        var jsonObject: JsonObject? = null
+        var jsonObject: JsonObject = JsonObject()
         try {
             jsonObject = JsonFetcher.readJson(FACTION_PATH + filename)
         } catch (e: IOException) {
@@ -83,7 +83,7 @@ object PFSigrid {
             System.exit(-1)
         }
 
-        val faction = Faction(jsonObject!!.get("factionname").asString)
+        val faction = Faction(jsonObject.get("factionname").asString)
 
         jsonObject.get("factionamicable").asJsonArray.forEach { jobj -> faction.addFactionAmicable(jobj.asString) }
         jsonObject.get("factionneutral").asJsonArray.forEach { jobj -> faction.addFactionNeutral(jobj.asString) }

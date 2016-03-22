@@ -3,7 +3,7 @@ package com.Torvald.Terrarum.GameItem
 import org.newdawn.slick.GameContainer
 
 /**
- * Created by minjaesong on 16-03-15.
+ * Created by minjaesong on 16-01-16.
  */
 interface InventoryItem {
     /**
@@ -17,7 +17,12 @@ interface InventoryItem {
     /**
      * Weight of the item, Float
      */
-    var weight: Float
+    var mass: Float
+
+    /**
+     * Scale of the item. Real mass: mass * (scale^3)
+     */
+    var scale: Float
 
     /**
      * Effects applied while in pocket

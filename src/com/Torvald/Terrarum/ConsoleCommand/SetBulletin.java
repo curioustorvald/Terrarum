@@ -13,7 +13,8 @@ public class SetBulletin implements ConsoleCommand {
         String[] testMsg = {
                 //Lang.get("ERROR_SAVE_CORRUPTED")
                 //, Lang.get("MENU_LABEL_CONTINUE_QUESTION")
-                "갎갎갎갎갎갎갎갎갎갎갎갎갎갎"
+                "Bulletin test “Hello, world!”",
+                "世界一みんなの人気者  それは彼女のこと  アシュリー  달이 차오른다 가자"
         };
         send(testMsg);
     }

@@ -7,9 +7,6 @@ import com.Torvald.Terrarum.TileProperties.TileNameCode
 import com.jme3.math.FastMath
 import java.util.*
 
-/**
- * Created by minjaesong on 16-03-15.
- */
 object MapGenerator {
 
     private lateinit var map: GameMap
@@ -959,9 +956,13 @@ object MapGenerator {
     /* Post-process */
 
     private fun fillOcean() {
-        val thisSandList = intArrayOf(TileNameCode.SAND_BEACH, TileNameCode.SAND_BLACK, TileNameCode.SAND_GREEN, TileNameCode.SAND_BEACH, TileNameCode.SAND_BEACH, TileNameCode.SAND_BLACK)
+        val thisSandList = intArrayOf(
+                TileNameCode.SAND_BEACH, TileNameCode.SAND_BLACK, TileNameCode.SAND_GREEN,
+                TileNameCode.SAND_BEACH, TileNameCode.SAND_BEACH, TileNameCode.SAND_BLACK
+        )
         val thisRand = HQRNG(seed!! xor random.nextLong())
         val thisSand = thisSandList[thisRand.nextInt(thisSandList.size)]
+        // val thisSand = TileNameCode.SAND_GREEN
 
         val thisSandStr = if (thisSand == TileNameCode.SAND_BLACK)
             "black"
@@ -1060,7 +1061,7 @@ object MapGenerator {
      * @return
      */
     private fun getTerrainHeightFromHeightMap(x: Int): Int {
-        return TERRAIN_AVERAGE_HEIGHT - heightMap!![x]
+        return TERRAIN_AVERAGE_HEIGHT - heightMap[x]
     }
 
     @JvmStatic

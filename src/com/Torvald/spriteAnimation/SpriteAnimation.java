@@ -14,21 +14,21 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 
 public class SpriteAnimation {
-	
-	private SpriteSheet spriteImage;
-	private Image[][] sprites;
-	private int height;
-	private int width;
-	private int currentFrame = 1;
-	private int currentRow = 1;
-	private int nFrames;
-	private int nRows;
-	private int delay = 200;
-	private int delta = 0;
-	private boolean looping = true;
-	private boolean animationRunning = true;
-	private boolean flipHorizontal = false;
-	private boolean flipVertical = false;
+
+    private SpriteSheet spriteImage;
+    private Image[][] sprites;
+    private int height;
+    private int width;
+    private int currentFrame = 1;
+    private int currentRow = 1;
+    private int nFrames;
+    private int nRows;
+    private int delay = 200;
+    private int delta = 0;
+    private boolean looping = true;
+    private boolean animationRunning = true;
+    private boolean flipHorizontal = false;
+    private boolean flipVertical = false;
     private boolean visible = false;
 
     private int offsetX = 0;
@@ -37,9 +37,9 @@ public class SpriteAnimation {
     private float prevScale = 1f;
     private Image currentImage;
 
-	public SpriteAnimation() throws SlickException{
+    public SpriteAnimation() throws SlickException{
 
-	}
+    }
 
     /**
      * Sets spritesheet.
@@ -47,7 +47,7 @@ public class SpriteAnimation {
      * @param imagePath path to the sprite sheet image.
      * @throws SlickException
      */
-	public void setSpriteImage(String imagePath) throws SlickException {
+    public void setSpriteImage(String imagePath) throws SlickException {
         spriteImage = new SpriteSheet(imagePath, this.width, this.height);
     }
 
@@ -105,23 +105,23 @@ public class SpriteAnimation {
         visible = false;
     }
 
-	public void update(int delta){
-		if (animationRunning){//skip this if animation is stopped
-			this.delta += delta;
-			
-			//check if it's time to advance the frame
-			if ( this.delta >= ( this.delay ) ){
-				//if set to not loop, keep the frame at the last frame
-				if ( this.currentFrame == this.nFrames && !(this.looping) ){
-					this.currentFrame = this.nFrames - 1;
-				}
-				
-				//advance one frame, then reset delta counter
-				this.currentFrame = (this.currentFrame % this.nFrames) + 1;
-				this.delta = 0;
-			}
-		}
-	}
+    public void update(int delta){
+        if (animationRunning){//skip this if animation is stopped
+            this.delta += delta;
+
+            //check if it's time to advance the frame
+            if ( this.delta >= ( this.delay ) ){
+                //if set to not loop, keep the frame at the last frame
+                if ( this.currentFrame == this.nFrames && !(this.looping) ){
+                    this.currentFrame = this.nFrames - 1;
+                }
+
+                //advance one frame, then reset delta counter
+                this.currentFrame = (this.currentFrame % this.nFrames) + 1;
+                this.delta = 0;
+            }
+        }
+    }
 
     /**
      * Render to specific coordinates. Will assume bottom-center point as image position.
@@ -131,8 +131,8 @@ public class SpriteAnimation {
      * @param posY bottom-center point
      * @param scale
      */
-	public void render(Graphics g, float posX, float posY, float scale){
-        scale *= Terrarum.game.screenZoom;
+    public void render(Graphics g, float posX, float posY, float scale){
+        scale *= Terrarum.game.getScreenZoom();
 
         // Null checking
         if (currentImage == null) {
@@ -150,93 +150,93 @@ public class SpriteAnimation {
 
             flippedImage.startUse();
             flippedImage.drawEmbedded(
-                    Math.round(posX * Terrarum.game.screenZoom)
-					, Math.round(posY * Terrarum.game.screenZoom)
+                      Math.round(posX * Terrarum.game.getScreenZoom())
+                    , Math.round(posY * Terrarum.game.getScreenZoom())
                     , FastMath.floor(width * scale)
                     , FastMath.floor(height * scale)
             );
             flippedImage.endUse();
         }
-	}
-	
-	public void render(Graphics g, float posX, float posY){
-	    render(g, posX, posY, 1);
     }
-	
-	public void switchSprite(int newRow){
-		currentRow = newRow;
-		
-		//if beyond the frame index then reset
-		if (currentFrame > nFrames){
-			reset();
-		}
-	}
-	
-	public void switchSprite(int newRow, int newMax){
-		if (newMax > 0){
-			nFrames = newMax;
-		}
-		
-		currentRow = newRow;
-		
-		//if beyond the frame index then reset
-		if (currentFrame > nFrames){
-			reset();
-		}
-	}
-	
-	public void switchSpriteDelay(int newDelay){
-		if (newDelay > 0){
-			delay = newDelay;
-		}
-	}
-	
-	public void switchSprite(int newRow, int newMax, int newDelay){
-		if (newMax > 0){
-			nFrames = newMax;
-		}
-		
-		if (newDelay > 0){
-			delay = newDelay;
-		}
-		
-		currentRow = newRow;
-		
-		//if beyond the frame index then reset
-		if (currentFrame > nFrames){
-			reset();
-		}
-	}
-	
-	public void reset(){
-		currentFrame = 1;
-	}
-	
-	public void start(){ //starts the animation
-		animationRunning = true;
-	}
-	
-	public void start(int selectFrame){ //starts the animation
-		animationRunning = true;
-		
-		//optional: seleft the frame no which to start the animation
-		currentFrame = selectFrame;
-	}
-	
-	public void stop(){
-		animationRunning = false;
-	}
-	
-	public void stop(int selectFrame){
-		animationRunning = false;
-		
-		currentFrame = selectFrame;
-	}
-	
-	public void flip(boolean horizontal, boolean vertical){
-		flipHorizontal = horizontal;
-		flipVertical = vertical;
-	}
+
+    public void render(Graphics g, float posX, float posY){
+        render(g, posX, posY, 1);
+    }
+
+    public void switchSprite(int newRow){
+        currentRow = newRow;
+
+        //if beyond the frame index then reset
+        if (currentFrame > nFrames){
+            reset();
+        }
+    }
+
+    public void switchSprite(int newRow, int newMax){
+        if (newMax > 0){
+            nFrames = newMax;
+        }
+
+        currentRow = newRow;
+
+        //if beyond the frame index then reset
+        if (currentFrame > nFrames){
+            reset();
+        }
+    }
+
+    public void switchSpriteDelay(int newDelay){
+        if (newDelay > 0){
+            delay = newDelay;
+        }
+    }
+
+    public void switchSprite(int newRow, int newMax, int newDelay){
+        if (newMax > 0){
+            nFrames = newMax;
+        }
+
+        if (newDelay > 0){
+            delay = newDelay;
+        }
+
+        currentRow = newRow;
+
+        //if beyond the frame index then reset
+        if (currentFrame > nFrames){
+            reset();
+        }
+    }
+
+    public void reset(){
+        currentFrame = 1;
+    }
+
+    public void start(){ //starts the animation
+        animationRunning = true;
+    }
+
+    public void start(int selectFrame){ //starts the animation
+        animationRunning = true;
+
+        //optional: seleft the frame no which to start the animation
+        currentFrame = selectFrame;
+    }
+
+    public void stop(){
+        animationRunning = false;
+    }
+
+    public void stop(int selectFrame){
+        animationRunning = false;
+
+        currentFrame = selectFrame;
+    }
+
+    public void flip(boolean horizontal, boolean vertical){
+        flipHorizontal = horizontal;
+        flipVertical = vertical;
+    }
 
     public boolean flippedHorizontal() {
         return flipHorizontal;
@@ -246,13 +246,13 @@ public class SpriteAnimation {
         return flipVertical;
     }
 
-	public int getWidth(){
-		return width;
-	}
-	
-	public int getHeight(){
-		return height;
-	}
+    public int getWidth(){
+        return width;
+    }
+
+    public int getHeight(){
+        return height;
+    }
 
     private Image getScaledSprite(float scale) {
         Image selectedImage = sprites[currentRow - 1][currentFrame - 1];

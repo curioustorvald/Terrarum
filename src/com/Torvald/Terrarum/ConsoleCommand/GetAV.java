@@ -18,7 +18,7 @@ public class GetAV implements ConsoleCommand {
         try {
             if (args.length == 1) {
                 // print all actorvalue of player
-                ActorValue av = Terrarum.game.getPlayer().getActorValue();
+                ActorValue av = Terrarum.game.player.getActorValue();
                 Set keyset = av.getKeySet();
 
                 keyset.forEach(
@@ -31,9 +31,9 @@ public class GetAV implements ConsoleCommand {
             }
             else if (args.length == 2) {
                 echo.execute("player." + args[1] + " = "
-                        + Terrarum.game.getPlayer().getActorValue().get(args[1])
+                        + Terrarum.game.player.getActorValue().get(args[1])
                         + " ("
-                        + Terrarum.game.getPlayer().getActorValue().get(args[1]).getClass()
+                        + Terrarum.game.player.getActorValue().get(args[1]).getClass()
                                        .getSimpleName()
                         + ")"
                 );

@@ -57,7 +57,7 @@ public class ExportMap implements ConsoleCommand {
         if (args.length == 2) {
             buildColorTable();
 
-            mapData = new byte[Terrarum.game.map.width * Terrarum.game.map.height * 3];
+            mapData = new byte[Terrarum.game.map.getWidth() * Terrarum.game.map.getHeight() * 3];
 
             for (byte tile : Terrarum.game.map.getLayerTerrain()) {
                 byte[] colArray = colorTable.getOrDefault(tile, new Col4096(0xFFF))
@@ -77,9 +77,9 @@ public class ExportMap implements ConsoleCommand {
             }
 
             try {
-                RasterWriter.writePNG_RGB(
-                          Terrarum.game.map.width
-                        , Terrarum.game.map.height
+                RasterWriter.INSTANCE.writePNG_RGB(
+                          Terrarum.game.map.getWidth()
+                        , Terrarum.game.map.getHeight()
                         , mapData
                         , dir + args[1] + ".png"
                 );

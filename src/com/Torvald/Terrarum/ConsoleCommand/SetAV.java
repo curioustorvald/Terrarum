@@ -48,7 +48,7 @@ class SetAV implements ConsoleCommand {
                 }
             }
 
-            Terrarum.game.getPlayer().getActorValue().set(args[1], val);
+            Terrarum.game.player.getActorValue().set(args[1], val);
             echo.execute("Set " + args[1] + " to " + val);
         }
         else if (args.length == 4) {

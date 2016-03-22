@@ -252,10 +252,8 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
             val A = scale * scale
             val D = DRAG_COEFF * 0.5f * 1.292f * veloY * veloY * A
 
-            val fluidResistance = tileMvmtRstc
-
             veloY += clampCeil(
-                    (W - D) / mass * SI_TO_GAME_ACC * G_MUL_PLAYABLE_CONST, VELO_HARD_LIMIT)// * mvmtRstcToMultiplier(fluidResistance) // eliminate shoot-up from fluids
+                    (W - D) / mass * SI_TO_GAME_ACC * G_MUL_PLAYABLE_CONST, VELO_HARD_LIMIT)
         }
     }
 
@@ -406,30 +404,6 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
             // set tile positions
             val tileX: Int
             val tileY: Int
-            /*if (side == CONTACT_AREA_BOTTOM) {
-                tileX = div16TruncateToMapWidth(Math.round(nextHitbox.getHitboxStart().getX())
-                        + i + translateX);
-                tileY = div16TruncateToMapHeight(FastMath.floor(nextHitbox.getHitboxEnd().getY())
-                        + translateY);
-            }
-            else if (side == CONTACT_AREA_TOP) {
-                tileX = div16TruncateToMapWidth(Math.round(nextHitbox.getHitboxStart().getX())
-                        + i + translateX);
-                tileY = div16TruncateToMapHeight(FastMath.ceil(nextHitbox.getHitboxStart().getY())
-                        + translateY);
-            }
-            else if (side == CONTACT_AREA_RIGHT) {
-                tileX = div16TruncateToMapWidth(FastMath.floor(nextHitbox.getHitboxEnd().getX())
-                        + translateX);
-                tileY = div16TruncateToMapHeight(Math.round(nextHitbox.getHitboxStart().getY())
-                        + i + translateY);
-            }
-            else if (side == CONTACT_AREA_LEFT) {
-                tileX = div16TruncateToMapWidth(FastMath.ceil(nextHitbox.getHitboxStart().getX())
-                        + translateX);
-                tileY = div16TruncateToMapHeight(Math.round(nextHitbox.getHitboxStart().getY())
-                        + i + translateY);
-            }*/
             if (side == CONTACT_AREA_BOTTOM) {
                 tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxStart.x)
                         + i + translateX)
@@ -459,6 +433,41 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
         return contactAreaCounter
     }
 
+    private fun getContactingAreaFluid(side: Int, translateX: Int = 0, translateY: Int = 0): Int {
+        var contactAreaCounter = 0
+        for (i in 0..Math.round(if (side % 2 == 0) nextHitbox!!.width else nextHitbox!!.height) - 1) {
+            // set tile positions
+            val tileX: Int
+            val tileY: Int
+            if (side == CONTACT_AREA_BOTTOM) {
+                tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxStart.x)
+                                                + i + translateX)
+                tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxEnd.y) + translateY)
+            } else if (side == CONTACT_AREA_TOP) {
+                tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxStart.x)
+                                                + i + translateX)
+                tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxStart.y) + translateY)
+            } else if (side == CONTACT_AREA_RIGHT) {
+                tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxEnd.x) + translateX)
+                tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxStart.y)
+                                                 + i + translateY)
+            } else if (side == CONTACT_AREA_LEFT) {
+                tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxStart.x) + translateX)
+                tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxStart.y)
+                                                 + i + translateY)
+            } else {
+                throw IllegalArgumentException(side.toString() + ": Wrong side input")
+            }
+
+            // evaluate
+            if (TilePropCodex.getProp(map.getTileFromTerrain(tileX, tileY)).isFluid) {
+                contactAreaCounter += 1
+            }
+        }
+
+        return contactAreaCounter
+    }
+
     /**
      * [N] = [kg * m / s^2]
      * F(bo) = density * submerged_volume * gravitational_acceleration [N]
@@ -476,52 +485,25 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
         }
     }
 
-    private //System.out.println("fluidHeight: "+fluidHeight+", submerged: "+submergedVolume);
-            //submergedHeight / TILE_SIZE * 1^2 (pixel to meter)
-    val submergedVolume: Float
-        get() {
-            val GAME_TO_SI_VOL = FastMath.pow(1f / METER, 3f)
-
-            if (density > 0) {
-                return submergedHeight *
-                        nextHitbox!!.width * nextHitbox!!.width *
-                        GAME_TO_SI_VOL
-            } else {
-                return 0f
-            }
-        }
+    private val submergedVolume: Float
+        get() = submergedHeight * hitbox!!.width * hitbox!!.width
 
     private val submergedHeight: Float
-        get() = FastMath.clamp(
-                nextHitbox!!.pointedY - fluidLevel, 0f, nextHitbox!!.height)
+        get() = Math.max(
+                getContactingAreaFluid(CONTACT_AREA_LEFT),
+                getContactingAreaFluid(CONTACT_AREA_RIGHT)
+        ).toFloat()
 
-    private val fluidLevel: Int
-        get() {
-            val tilePosXStart = Math.round(nextHitbox!!.posX / TSIZE)
-            val tilePosXEnd = Math.round(nextHitbox!!.hitboxEnd.x / TSIZE)
-            val tilePosY = Math.round(nextHitbox!!.posY / TSIZE)
-
-            var fluidHeight = 2147483647
-
-            for (x in tilePosXStart..tilePosXEnd) {
-                val tile = map.getTileFromTerrain(x, tilePosY)
-                if (TilePropCodex.getProp(tile).isFluid && tilePosY * TSIZE < fluidHeight) {
-                    fluidHeight = tilePosY * TSIZE
-                }
-            }
-
-            return fluidHeight
-        }
 
     /**
      * Get highest friction value from feet tiles.
      * @return
      */
-    private //get density
-    val tileFriction: Int
+    private val tileFriction: Int
         get() {
             var friction = 0
 
+            //get highest fluid density
             val tilePosXStart = Math.round(nextHitbox!!.posX / TSIZE)
             val tilePosXEnd = Math.round(nextHitbox!!.hitboxEnd.x / TSIZE)
             val tilePosY = Math.round(nextHitbox!!.pointedY / TSIZE)
@@ -541,11 +523,11 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
      * Get highest movement resistance value from tiles that the body occupies.
      * @return
      */
-    private //get density
-    val tileMvmtRstc: Int
+    private val tileMvmtRstc: Int
         get() {
             var resistance = 0
 
+            //get highest fluid density
             val tilePosXStart = Math.round(nextHitbox!!.posX / TSIZE)
             val tilePosYStart = Math.round(nextHitbox!!.posY / TSIZE)
             val tilePosXEnd = Math.round(nextHitbox!!.hitboxEnd.x / TSIZE)
@@ -568,11 +550,11 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
      * Get highest density (specific gravity) value from tiles that the body occupies.
      * @return
      */
-    private //get density
-    val tileDensity: Int
+    private val tileDensity: Int
         get() {
             var density = 0
 
+            //get highest fluid density
             val tilePosXStart = Math.round(nextHitbox!!.posX / TSIZE)
             val tilePosYStart = Math.round(nextHitbox!!.posY / TSIZE)
             val tilePosXEnd = Math.round(nextHitbox!!.hitboxEnd.x / TSIZE)
@@ -608,18 +590,19 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
     private fun updateNextHitboxFromVelo() {
         val fluidResistance = mvmtRstcToMultiplier(tileMvmtRstc)
         val submergedRatio = FastMath.clamp(
-                submergedHeight / nextHitbox!!.height, 0f, 1f)
-
-        val applyResistance = !isNoSubjectToFluidResistance && submergedRatio > FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO
-        val resistanceMulInterValueSize = FLUID_RESISTANCE_APPLY_FULL_RATIO - FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO
-        val resistanceMultiplier = FastMath.interpolateLinear(
-                (submergedRatio - FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO) * FastMath.pow(resistanceMulInterValueSize, -1f), 0f, 1f)
-        val adjustedResistance = FastMath.interpolateLinear(
-                resistanceMultiplier, 1f, fluidResistance)
+                submergedHeight / nextHitbox!!.height,
+                0f, 1f
+        )
+        val applyResistance: Boolean = !isNoSubjectToFluidResistance
+                                       && submergedRatio > FLUID_RESISTANCE_IGNORE_THRESHOLD_RATIO
+        val resistance: Float = FastMath.interpolateLinear(
+                submergedRatio,
+                1f, fluidResistance
+        )
 
         nextHitbox!!.set(
-                  Math.round(hitbox!!.posX + veloX * (if (!applyResistance) 1f else adjustedResistance)).toFloat()
-                , Math.round(hitbox!!.posY + veloY * (if (!applyResistance) 1f else adjustedResistance)).toFloat()
+                  Math.round(hitbox!!.posX + veloX * (if (!applyResistance) 1f else resistance)).toFloat()
+                , Math.round(hitbox!!.posY + veloY * (if (!applyResistance) 1f else resistance)).toFloat()
                 , Math.round(baseHitboxW * scale).toFloat()
                 , Math.round(baseHitboxH * scale).toFloat())
         /** Full quantisation; wonder what havoc these statements would wreak...
@@ -658,12 +641,12 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
         }
     }
 
-    override fun updateGlowSprite(gc: GameContainer, delta_t: Int) {
-        if (spriteGlow != null) spriteGlow!!.update(delta_t)
+    override fun updateGlowSprite(gc: GameContainer, delta: Int) {
+        if (spriteGlow != null) spriteGlow!!.update(delta)
     }
 
-    override fun updateBodySprite(gc: GameContainer, delta_t: Int) {
-        if (sprite != null) sprite!!.update(delta_t)
+    override fun updateBodySprite(gc: GameContainer, delta: Int) {
+        if (sprite != null) sprite!!.update(delta)
     }
 
     private fun clampW(x: Float): Float {

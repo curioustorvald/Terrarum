@@ -9,14 +9,7 @@
 
 package com.Torvald.Terrarum.GameMap;
 
-import com.sun.istack.internal.NotNull;
 import org.newdawn.slick.SlickException;
-
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Spliterator;
-import java.util.function.Consumer;
 
 public class GameMap {
 
@@ -24,14 +17,14 @@ public class GameMap {
     private volatile MapLayer layerWall;
     private volatile MapLayer layerTerrain;
     private volatile MapLayer layerWire;
-    private volatile PairedMapLayer wallDamageCode;
-    private volatile PairedMapLayer terrainDamageCode;
+    private volatile PairedMapLayer wallDamage;
+    private volatile PairedMapLayer terrainDamage;
 
     //properties
-    public int width;
-    public int height;
-    public int spawnX;
-    public int spawnY;
+    private int width;
+    private int height;
+    private int spawnX;
+    private int spawnY;
 
     public static transient final int WALL = 0;
     public static transient final int TERRAIN = 1;
@@ -44,6 +37,8 @@ public class GameMap {
     private WorldTime worldTime;
 
     public static transient final int TILES_SUPPORTED = MapLayer.RANGE * PairedMapLayer.RANGE;
+    public static transient final byte BITS = 1; // 1 for Byte, 2 for Char, 4 for Int, 8 for Long
+    public static transient final byte LAYERS = 4; // terrain, wall (terrainDamage + wallDamage), wire
 
     /**
      * @param width
@@ -59,8 +54,8 @@ public class GameMap {
         layerTerrain = new MapLayer(width, height);
         layerWall = new MapLayer(width, height);
         layerWire = new MapLayer(width, height);
-        terrainDamageCode = new PairedMapLayer(width, height);
-        wallDamageCode = new PairedMapLayer(width, height);
+        terrainDamage = new PairedMapLayer(width, height);
+        wallDamage = new PairedMapLayer(width, height);
 
         globalLight = (char) 63999;
         worldTime = new WorldTime();
@@ -103,7 +98,7 @@ public class GameMap {
      * @return byte[][] damage code pair
      */
     public byte[][] getDamageDataArray() {
-        return terrainDamageCode.dataPair;
+        return terrainDamage.dataPair;
     }
 
     /**
@@ -123,12 +118,12 @@ public class GameMap {
         return layerWire;
     }
 
-    public PairedMapLayer getTerrainDamageCode() {
-        return terrainDamageCode;
+    public PairedMapLayer getTerrainDamage() {
+        return terrainDamage;
     }
 
-    public PairedMapLayer getWallDamageCode() {
-        return wallDamageCode;
+    public PairedMapLayer getWallDamage() {
+        return wallDamage;
     }
 
     public int getTileFromWall(int x, int y) {
@@ -144,11 +139,11 @@ public class GameMap {
     }
 
     public int getWallDamage(int x, int y) {
-        return wallDamageCode.getData(x, y);
+        return wallDamage.getData(x, y);
     }
 
     public int getTerrainDamage(int x, int y) {
-        return terrainDamageCode.getData(x, y);
+        return terrainDamage.getData(x, y);
     }
 
     /**
@@ -177,12 +172,12 @@ public class GameMap {
 
     public void setTileWall(int x, int y, byte tile, int damage) {
         layerWall.setTile(x, y, tile);
-        wallDamageCode.setData(x, y, damage);
+        wallDamage.setData(x, y, damage);
     }
 
     public void setTileTerrain(int x, int y, byte tile, int damage) {
         layerTerrain.setTile(x, y, tile);
-        terrainDamageCode.setData(x, y, damage);
+        terrainDamage.setData(x, y, damage);
     }
 
     public void setTileWire(int x, int y, byte tile) {
@@ -228,5 +223,25 @@ public class GameMap {
 
     public WorldTime getWorldTime() {
         return worldTime;
+    }
+
+    public void updateWorldTime(int delta) {
+        worldTime.update(delta);
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getSpawnX() {
+        return spawnX;
+    }
+
+    public int getSpawnY() {
+        return spawnY;
     }
 }

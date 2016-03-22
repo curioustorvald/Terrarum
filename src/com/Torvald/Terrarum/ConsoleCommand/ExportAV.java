@@ -13,7 +13,7 @@ public class ExportAV implements ConsoleCommand {
     public void execute(String[] args) {
         if (args.length == 2) {
             try {
-                JsonWriter.writeToFile(Terrarum.game.getPlayer().getActorValue()
+                JsonWriter.INSTANCE.writeToFile(Terrarum.game.player.getActorValue()
                         , Terrarum.defaultDir + "/Exports/" + args[1] + ".json"
                 );
 

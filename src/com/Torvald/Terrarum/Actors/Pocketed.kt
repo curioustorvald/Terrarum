@@ -5,6 +5,6 @@ package com.Torvald.Terrarum.Actors
  */
 interface Pocketed {
 
-    var inventory: ActorInventory?
+    var inventory: ActorInventory
 
 }

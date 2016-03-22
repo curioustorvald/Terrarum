@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 /**
  * Created by minjaesong on 16-02-15.
  */
-public class PairedMapLayer implements Iterable<Integer> {
+public class PairedMapLayer implements Iterable<Byte> {
 
     /**
      * 0b_xxxx_yyyy, x for lower index, y for higher index
@@ -40,28 +40,29 @@ public class PairedMapLayer implements Iterable<Integer> {
 
     /**
      * Returns an iterator over elements of type {@code T}.
+     * Note: this iterator will return combined damage, that is 0bxxxx_yyyy as whole.
      *
      * @return an Iterator.
      */
     @Override
-    public Iterator<Integer> iterator() {
-        return new Iterator<Integer>() {
+    public Iterator<Byte> iterator() {
+        return new Iterator<Byte>() {
 
             private int iteratorCount = 0;
 
             @Override
             public boolean hasNext() {
-                return iteratorCount < width * height * 2;
+                return iteratorCount < width * height;
             }
 
             @Override
-            public Integer next() {
-                int y = iteratorCount / (width * 2);
-                int x = iteratorCount % (width * 2);
+            public Byte next() {
+                int y = iteratorCount / width;
+                int x = iteratorCount % width;
                 // advance counter
                 iteratorCount += 1;
 
-                return getData(x, y);
+                return dataPair[y][x];
             }
         };
     }
@@ -74,6 +75,8 @@ public class PairedMapLayer implements Iterable<Integer> {
      * is specified).  Exceptions thrown by the action are relayed to the
      * caller.
      *
+     * Note: this iterator will return combined damage, that is 0bxxxx_yyyy as whole.
+     *
      * @param action The action to be performed for each element
      * @throws NullPointerException if the specified action is null
      * @implSpec <p>The default implementation behaves as if:
@@ -85,7 +88,9 @@ public class PairedMapLayer implements Iterable<Integer> {
      */
     @Override
     public void forEach(Consumer action) {
-        throw new UnsupportedOperationException();
+        for (Byte b : this) {
+            action.accept(b);
+        }
     }
 
     /**
@@ -106,7 +111,7 @@ public class PairedMapLayer implements Iterable<Integer> {
      * @since 1.8
      */
     @Override
-    public Spliterator<Integer> spliterator() {
+    public Spliterator<Byte> spliterator() {
         throw new UnsupportedOperationException();
     }
 

@@ -1,11 +1,23 @@
 <component name="libraryTable">
   <library name="lib">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/lib" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-codec-1.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-csv-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/gson-2.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ibxm.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jbox2d-library-2.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jinput.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jnlp.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jogg-0.0.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jorbis-0.0.15.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/kotlin-reflect.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/kotlin-runtime.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/lwjgl_util.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/slick.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="http://slick.ninjacave.com/javadoc/" />
-      <root url="jar://$PROJECT_DIR$/lib/gson-2.5-javadoc.jar!/" />
       <root url="file://$PROJECT_DIR$/lib/javadoc" />
       <root url="file://$PROJECT_DIR$/lib/apidocs" />
       <root url="jar://$PROJECT_DIR$/lib/commons-codec-1.10-javadoc.jar!/" />
@@ -21,10 +33,5 @@
       <root url="file://$USER_HOME$/Downloads/slick/src" />
       <root url="jar://$PROJECT_DIR$/lib/kotlin-runtime-sources.jar!/" />
     </SOURCES>
-    <excluded>
-      <root url="jar://$PROJECT_DIR$/lib/gson-2.5-javadoc.jar!/" />
-      <root url="file://$PROJECT_DIR$/lib/apidocs" />
-    </excluded>
-    <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
   </library>
 </component>

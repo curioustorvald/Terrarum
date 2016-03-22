@@ -61,16 +61,20 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     @Transient private val BASE_DENSITY = 1020
 
     /** Must be set by PlayerFactory */
-    override var inventory: ActorInventory? = null
+    override var inventory: ActorInventory = ActorInventory()
 
     /** Must be set by PlayerFactory */
-    override var faction: HashSet<Faction>? = null
+    override var faction: HashSet<Faction> = HashSet()
 
     override var houseDesignation: ArrayList<Int>? = null
 
     override var luminosity: Char
-        get() = if (actorValue.get("luminosity") != null) actorValue.getAsInt("luminosity").toChar()
-        else 0 as Char
+        get() {
+            if (actorValue.get("luminosity") != null)
+                return actorValue.getAsInt("luminosity")!!.toChar()
+            else
+                return 0.toChar()
+        }
         set(value) {
             actorValue.set("luminosity", value)
         }
@@ -115,8 +119,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     }
 
     private fun updatePhysicalInfos() {
-        scale = actorValue.getAsFloat("scale")
-        mass = actorValue.getAsFloat("basemass") * FastMath.pow(scale, 3f)
+        scale = actorValue.getAsFloat("scale")!!
+        mass = actorValue.getAsFloat("basemass")!! * FastMath.pow(scale, 3f)
         if (elasticity != 0f) elasticity = 0f
     }
 
@@ -129,8 +133,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
         //if ((!super.isWalledLeft() && left) || (!super.isWalledRight() && !left)) {
         readonly_totalX = veloX +
-                actorValue.getAsFloat("accel") *
-                        actorValue.getAsFloat("accelmult") *
+                actorValue.getAsFloat("accel")!! *
+                        actorValue.getAsFloat("accelmult")!! *
                         FastMath.sqrt(scale) *
                         applyAccelRealism(walkPowerCounter) *
                         (if (left) -1 else 1).toFloat() *
@@ -143,8 +147,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         }
 
         // Clamp veloX
-        veloX = absClamp(veloX, actorValue.getAsFloat("speed")
-                        * actorValue.getAsFloat("speedmult")
+        veloX = absClamp(veloX, actorValue.getAsFloat("speed")!!
+                        * actorValue.getAsFloat("speedmult")!!
                         * FastMath.sqrt(scale))
 
         // Heading flag
@@ -163,8 +167,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
      */
     private fun walkVertical(up: Boolean, absAxisVal: Float) {
         readonly_totalY = veloY +
-                actorValue.getAsFloat("accel") *
-                        actorValue.getAsFloat("accelmult") *
+                actorValue.getAsFloat("accel")!! *
+                        actorValue.getAsFloat("accelmult")!! *
                         FastMath.sqrt(scale) *
                         applyAccelRealism(walkPowerCounter) *
                         (if (up) -1 else 1).toFloat() *
@@ -177,8 +181,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         }
 
         // Clamp veloX
-        veloY = absClamp(veloY, actorValue.getAsFloat("speed")
-                        * actorValue.getAsFloat("speedmult")
+        veloY = absClamp(veloY, actorValue.getAsFloat("speed")!!
+                        * actorValue.getAsFloat("speedmult")!!
                         * FastMath.sqrt(scale))
     }
 
@@ -211,15 +215,15 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
     private fun walkHStop() {
         if (veloX > 0) {
-            veloX -= actorValue.getAsFloat("accel") *
-                    actorValue.getAsFloat("accelmult") *
+            veloX -= actorValue.getAsFloat("accel")!! *
+                    actorValue.getAsFloat("accelmult")!! *
                     FastMath.sqrt(scale)
 
             // compensate overshoot
             if (veloX < 0) veloX = 0f
         } else if (veloX < 0) {
-            veloX += actorValue.getAsFloat("accel") *
-                    actorValue.getAsFloat("accelmult") *
+            veloX += actorValue.getAsFloat("accel")!! *
+                    actorValue.getAsFloat("accelmult")!! *
                     FastMath.sqrt(scale)
 
             // compensate overshoot
@@ -234,7 +238,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     private fun walkVStop() {
         if (veloY > 0) {
             veloY -= WALK_STOP_ACCEL *
-                    actorValue.getAsFloat("accelmult") *
+                    actorValue.getAsFloat("accelmult")!! *
                     FastMath.sqrt(scale)
 
             // compensate overshoot
@@ -242,7 +246,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
                 veloY = 0f
         } else if (veloY < 0) {
             veloY += WALK_STOP_ACCEL *
-                    actorValue.getAsFloat("accelmult") *
+                    actorValue.getAsFloat("accelmult")!! *
                     FastMath.sqrt(scale)
 
             // compensate overshoot
@@ -406,22 +410,10 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     private fun jump() {
         if (jumping) {
             val len = MAX_JUMP_LENGTH.toFloat()
-            val pwr = actorValue.getAsFloat("jumppower")
+            val pwr = actorValue.getAsFloat("jumppower")!!
 
             // increment jump counter
             if (jumpCounter < len) jumpCounter += 1
-            // quadratic time (convex) mode
-            /*
-            float sumT = (jumpCounter * (jumpCounter + 1)) / 2f;
-            float timedJumpCharge = ((len + 1) / 2f) - (sumT / len);
-            if (timedJumpCharge < 0) timedJumpCharge = 0;
-
-            float jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD;
-
-            super.setVeloY(veloY
-                    - jumpAcc
-            );
-            */
 
             // linear time mode
             val init = (len + 1) / 2f
@@ -432,7 +424,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
             veloY -= jumpAcc
 
-            // concave mode?
+            // try concave mode?
         }
 
         // for mob AI:
@@ -499,14 +491,6 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
     fun getActorValue(): ActorValue {
         return actorValue
-    }
-
-    override fun assignFaction(f: Faction) {
-        factionSet.add(f)
-    }
-
-    override fun unassignFaction(f: Faction) {
-        factionSet.remove(f)
     }
 
     override fun addHouseTile(x: Int, y: Int) {

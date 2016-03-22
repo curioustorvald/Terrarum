@@ -17,7 +17,17 @@ open class NPCIntelligentBase : ActorWithBody()
     override var itemData: InventoryItem = object : InventoryItem {
         override var itemID = HQRNG().nextLong()
 
-        override var weight = 0f
+        override var mass: Float
+            get() = actorValue.get("mass") as Float
+            set(value) {
+                actorValue.set("mass", value)
+            }
+
+        override var scale: Float
+            get() = actorValue.get("scale") as Float
+            set(value) {
+                actorValue.set("scale", value)
+            }
 
         override fun effectWhileInPocket(gc: GameContainer, delta_t: Int) {
 
@@ -41,13 +51,13 @@ open class NPCIntelligentBase : ActorWithBody()
     }
 
     @Transient private var ai: ActorAI? = null
-    override var inventory: ActorInventory? = null
+    override var inventory: ActorInventory = ActorInventory()
 
     private val factionSet = HashSet<Faction>()
 
     override var referenceID: Long = HQRNG().nextLong()
 
-    override var faction: HashSet<Faction>? = null
+    override var faction: HashSet<Faction> = HashSet()
 
     override var houseDesignation: ArrayList<Int>? = null
     /**
@@ -55,14 +65,6 @@ open class NPCIntelligentBase : ActorWithBody()
      * The arraylist will be saved in JSON format with GSON.
      */
     private var houseTiles = ArrayList<Int>()
-
-    override fun assignFaction(f: Faction) {
-        factionSet.add(f)
-    }
-
-    override fun unassignFaction(f: Faction) {
-        factionSet.remove(f)
-    }
 
     override fun attachItemData() {
 

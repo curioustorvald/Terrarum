@@ -1,7 +1,7 @@
 package com.Torvald.Terrarum.UserInterface
 
 /**
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 16-03-06.
  */
 interface UIClickable {
     fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int)

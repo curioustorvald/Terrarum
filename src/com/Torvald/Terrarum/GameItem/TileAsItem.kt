@@ -9,11 +9,12 @@ import org.newdawn.slick.GameContainer
 class TileAsItem(tileNum: Int) : InventoryItem {
 
     override var itemID: Long = -1
-    override var weight: Float = 0f
+    override var mass: Float = 0f
+    override var scale: Float = 1f
 
     init {
-        itemID = tileNum as Long
-        weight = TilePropCodex.getProp(tileNum).density / 1000f
+        itemID = tileNum.toLong()
+        mass = TilePropCodex.getProp(tileNum).density / 1000f
     }
 
     override fun effectWhileInPocket(gc: GameContainer, delta_t: Int) {

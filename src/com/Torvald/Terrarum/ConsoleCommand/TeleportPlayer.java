@@ -26,7 +26,7 @@ public class TeleportPlayer implements ConsoleCommand {
                 return;
             }
 
-            Terrarum.game.getPlayer().setPosition(x, y);
+            Terrarum.game.player.setPosition(x, y);
         }
     }
 

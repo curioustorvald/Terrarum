@@ -52,7 +52,7 @@ public class Lang {
     public Lang() throws IOException {
         lang = new Hashtable<>();
 
-        List<CSVRecord> langPackCSV = CSVFetcher.readCSV(PATH_TO_CSV + CSV_MAIN);
+        List<CSVRecord> langPackCSV = CSVFetcher.INSTANCE.readCSV(PATH_TO_CSV + CSV_MAIN);
 
         File file = new File(PATH_TO_CSV);
         FilenameFilter filter = new FilenameFilter() {
@@ -62,7 +62,7 @@ public class Lang {
             }
         };
         for (String csvfilename : file.list(filter)) {
-            List<CSVRecord> csv = CSVFetcher.readCSV(PATH_TO_CSV + csvfilename);
+            List<CSVRecord> csv = CSVFetcher.INSTANCE.readCSV(PATH_TO_CSV + csvfilename);
             csv.forEach(langPackCSV::add);
         }
 
@@ -92,7 +92,7 @@ public class Lang {
 
     public static String get(String key) {
         String value = null;
-        try { value = lang.get(key).get(Terrarum.gameLocale); }
+        try { value = lang.get(key).get(Terrarum.Companion.getGameLocale()); }
         catch (IllegalArgumentException e) { value = key; }
         return value;
     }
@@ -104,7 +104,7 @@ public class Lang {
     public static String pluralise(String word, int count) {
         if (count < 2) return word;
 
-        switch (Terrarum.gameLocale) {
+        switch (Terrarum.Companion.getGameLocale()) {
             case ("fr"):
                 if (Arrays.binarySearch(FRENCH_WORD_NORMAL_PLURAL, word) >= 0) {
                     return word + "s";

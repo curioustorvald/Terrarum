@@ -12,7 +12,7 @@ import org.newdawn.slick.Graphics
 import java.util.*
 
 /**
- * Created by minjaesong on 16-03-15.
+ * Created by minjaesong on 16-01-25.
  */
 
 object LightmapRenderer {
@@ -38,14 +38,16 @@ object LightmapRenderer {
     private val TSIZE = MapDrawer.TILE_SIZE
 
     // color model related vars
-    @JvmStatic val MUL = Col40.MUL
-    @JvmStatic val MUL_2 = Col40.MUL_2
-    @JvmStatic val CHANNEL_MAX = Col40.MAX_STEP
-    @JvmStatic val CHANNEL_MAX_FLOAT = CHANNEL_MAX.toFloat()
-    @JvmStatic val COLOUR_DOMAIN_SIZE = Col40.COLOUR_DOMAIN_SIZE
+    const val MUL = Col40.MUL
+    const val MUL_2 = Col40.MUL_2
+    const val CHANNEL_MAX = Col40.MAX_STEP
+    const val CHANNEL_MAX_FLOAT = CHANNEL_MAX.toFloat()
+    const val COLOUR_DOMAIN_SIZE = Col40.COLOUR_DOMAIN_SIZE
 
-    @Deprecated("")
-    @JvmStatic
+
+    private const val deprecatedFeatureDebatable = "This feature is debatable. Do not use it yet."
+
+    @Deprecated(deprecatedFeatureDebatable)
     fun addLantern(x: Int, y: Int, intensity: Char) {
         val thisLantern = LightmapLantern(x, y, intensity)
 
@@ -63,8 +65,7 @@ object LightmapRenderer {
         lanterns.add(thisLantern)
     }
 
-    @Deprecated("")
-    @JvmStatic
+    @Deprecated(deprecatedFeatureDebatable)
     fun removeLantern(x: Int, y: Int) {
         for (i in lanterns.indices.reversed()) {
             val lantern = lanterns[i]
@@ -74,7 +75,6 @@ object LightmapRenderer {
         }
     }
 
-    @JvmStatic
     fun renderLightMap() {
         if (staticLightMap == null) {
             staticLightMap = Array(Terrarum.game.map.height) { CharArray(Terrarum.game.map.width) }
@@ -106,7 +106,7 @@ object LightmapRenderer {
 
         purgePartOfLightmap(for_x_start, for_y_start, for_x_end, for_y_end)
         // if wider purge were not applied, GL changing (sunset, sunrise) will behave incorrectly
-        // ("leakage" of non-updated sunlight)
+        // ("leakage" of not updated sunlight)
 
         try {
             // Round 1
@@ -142,7 +142,6 @@ object LightmapRenderer {
 
     }
 
-    @JvmStatic
     fun draw(g: Graphics) {
         val for_x_start = MapCamera.getRenderStartX() - 1
         val for_y_start = MapCamera.getRenderStartY() - 1
@@ -155,7 +154,7 @@ object LightmapRenderer {
                 var x = for_x_start
                 while (x < for_x_end) {
                     // smooth
-                    if (Terrarum.game.screenZoom >= 1 && Terrarum.gameConfig.getAsBoolean("smoothlighting")) {
+                    if (Terrarum.game.screenZoom >= 1 && Terrarum.gameConfig.getAsBoolean("smoothlighting") ?: false) {
                         val thisLightLevel = staticLightMap!![y][x]
                         if (y > 0 && x < for_x_end && thisLightLevel.toInt() == 0 && staticLightMap!![y - 1][x].toInt() == 0) {
                             try {
@@ -271,9 +270,7 @@ object LightmapRenderer {
 
     }
 
-    private fun calculate(x: Int, y: Int): Char {
-        return calculate(x, y, false)
-    }
+    private fun calculate(x: Int, y: Int): Char = calculate(x, y, false)
 
     private fun calculate(x: Int, y: Int, doNotCalculateAmbient: Boolean): Char {
         var lightLevelThis: Char = 0.toChar()
@@ -288,14 +285,15 @@ object LightmapRenderer {
         if (thisTerrain == AIR && thisWall == AIR) {
             lightLevelThis = sunLight
         }
+        // luminous tile on top of air
         else if (thisWall == AIR && thisTileLuminosity.toInt() > 0) {
             val darkenSunlight = darkenColoured(sunLight, thisTileOpacity)
-            lightLevelThis = screenBlend(darkenSunlight, thisTileLuminosity)
+            lightLevelThis = maximiseRGB(darkenSunlight, thisTileLuminosity)
         }
+        // opaque wall and luminous tile
         else if (thisWall != AIR && thisTileLuminosity.toInt() > 0) {
             lightLevelThis = thisTileLuminosity
-        }// luminous tile (opaque)
-        // luminous tile transparent (allows sunlight to pass)
+        }
         // END MIX TILE
 
         // mix lantern
@@ -370,16 +368,16 @@ object LightmapRenderer {
 
     /**
      * Subtract each channel's RGB value.
+     *
      * It works like:
+     *
      * f(data, darken) = RGB(data.r - darken.r, data.g - darken.g, data.b - darken.b)
-
-     * @param data Raw channel value [0-39] per channel
-     * *
-     * @param darken [0-39] per channel
-     * *
-     * @return darkened data [0-39] per channel
+     *
+     * @param data Raw channel value (0-39) per channel
+     * @param darken (0-39) per channel
+     * @return darkened data (0-39) per channel
      */
-    private fun darkenColoured(data: Char, darken: Char): Char {
+    fun darkenColoured(data: Char, darken: Char): Char {
         if (darken.toInt() < 0 || darken.toInt() >= COLOUR_DOMAIN_SIZE) {
             throw IllegalArgumentException("darken: out of " + "range")
         }
@@ -393,15 +391,16 @@ object LightmapRenderer {
 
     /**
      * Darken each channel by 'darken' argument
+     *
      * It works like:
+     *
      * f(data, darken) = RGB(data.r - darken, data.g - darken, data.b - darken)
-     * @param data [0-39] per channel
-     * *
-     * @param darken [0-1]
-     * *
+     *
+     * @param data (0-39) per channel
+     * @param darken (0-1)
      * @return
      */
-    private fun darkenUniformFloat(data: Char, darken: Float): Char {
+    fun darkenUniformFloat(data: Char, darken: Float): Char {
         if (darken < 0 || darken > 1f) {
             throw IllegalArgumentException("darken: out of " + "range")
         }
@@ -415,15 +414,15 @@ object LightmapRenderer {
 
     /**
      * Darken each channel by 'darken' argument
+     *
      * It works like:
+     *
      * f(data, darken) = RGB(data.r - darken, data.g - darken, data.b - darken)
-     * @param data [0-39] per channel
-     * *
-     * @param darken [0-39]
-     * *
+     * @param data (0-39) per channel
+     * @param darken (0-39)
      * @return
      */
-    private fun darkenUniformInt(data: Char, darken: Int): Char {
+    fun darkenUniformInt(data: Char, darken: Int): Char {
         if (darken < 0 || darken > CHANNEL_MAX) {
             throw IllegalArgumentException("darken: out of " + "range")
         }
@@ -438,8 +437,10 @@ object LightmapRenderer {
 
     /**
      * Add each channel's RGB value.
+     *
      * It works like:
-     * f(data, brighten) = RGB(data.r + darken.r, data.g + darken.g, data.b + darken.b)
+     *
+     * f(data, brighten) = RGB(data.r + brighten.r, data.g + brighten.g, data.b + brighten.b)
      * @param data Raw channel value [0-39] per channel
      * *
      * @param brighten [0-39] per channel
@@ -542,7 +543,6 @@ object LightmapRenderer {
         return constructRGBFromInt(newR, newG, newB)
     }
 
-    @JvmStatic
     fun constructRGBFromInt(r: Int, g: Int, b: Int): Char {
         if (r < 0 || r > CHANNEL_MAX) {
             throw IllegalArgumentException("Red: out of range")
@@ -556,7 +556,6 @@ object LightmapRenderer {
         return (r * MUL_2 + g * MUL + b).toChar()
     }
 
-    @JvmStatic
     fun constructRGBFromFloat(r: Float, g: Float, b: Float): Char {
         if (r < 0 || r > 1.0f) {
             throw IllegalArgumentException("Red: out of range")
@@ -607,40 +606,27 @@ object LightmapRenderer {
         return i[0]
     }
 
-    private fun outOfBounds(x: Int, y: Int): Boolean {
-        return x < 0 || y < 0 || x >= Terrarum.game.map.width || y >= Terrarum.game.map.height
-    }
+    private fun outOfBounds(x: Int, y: Int): Boolean =
+            x < 0 || y < 0 || x >= Terrarum.game.map.width || y >= Terrarum.game.map.height
 
-    private fun outOfMapBounds(x: Int, y: Int): Boolean {
-        return x < 0 || y < 0 || x >= staticLightMap!![0].size || y >= staticLightMap!!.size
-    }
+    private fun outOfMapBounds(x: Int, y: Int): Boolean =
+            x < 0 || y < 0 || x >= staticLightMap!![0].size || y >= staticLightMap!!.size
 
-    private fun clampZero(i: Int): Int {
-        return if (i < 0) 0 else i
-    }
+    private fun clampZero(i: Int): Int = if (i < 0) 0 else i
 
-    private fun clampZero(i: Float): Float {
-        return if (i < 0) 0f else i
-    }
+    private fun clampZero(i: Float): Float = if (i < 0) 0f else i
 
-    private fun clampByte(i: Int): Int {
-        return if (i < 0) 0 else if (i > CHANNEL_MAX) CHANNEL_MAX else i
-    }
+    private fun clampByte(i: Int): Int = if (i < 0) 0 else if (i > CHANNEL_MAX) CHANNEL_MAX else i
 
-    private fun clampFloat(i: Float): Float {
-        return if (i < 0) 0f else if (i > 1) 1f else i
-    }
+    private fun clampFloat(i: Float): Float = if (i < 0) 0f else if (i > 1) 1f else i
 
-    @JvmStatic
-    fun getValueFromMap(x: Int, y: Int): Char {
-        return staticLightMap!![y][x]
-    }
+    fun getValueFromMap(x: Int, y: Int): Char = staticLightMap!![y][x]
 
     private fun purgePartOfLightmap(x1: Int, y1: Int, x2: Int, y2: Int) {
         try {
-            for (y in y1 - 1..y2 + 1 - 1) {
-                for (x in x1 - 1..x2 + 1 - 1) {
-                    if (y == y1 - 1 || y == y2 || x == x1 - 1 || x == x2) {
+            for (y in y1 - 1..y2 + 1) {
+                for (x in x1 - 1..x2 + 1) {
+                    if (y == y1 - 1 || y == y2 + 1 || x == x1 - 1 || x == x2 + 1) {
                         // fill the rim with (pre) calculation
                         staticLightMap!![y][x] = preCalculateUpdateGLOnly(x, y)
                     }
@@ -656,26 +642,49 @@ object LightmapRenderer {
     }
 
     private fun preCalculateUpdateGLOnly(x: Int, y: Int): Char {
-        val thisWall = Terrarum.game.map.getTileFromWall(x, y)
+        var lightLevelThis: Char = 0.toChar()
         val thisTerrain = Terrarum.game.map.getTileFromTerrain(x, y)
+        val thisWall = Terrarum.game.map.getTileFromWall(x, y)
         val thisTileLuminosity = TilePropCodex.getProp(thisTerrain).luminosity
         val thisTileOpacity = TilePropCodex.getProp(thisTerrain).opacity
         val sunLight = Terrarum.game.map.globalLight
-
-        val lightLevelThis: Char
 
         // MIX TILE
         // open air
         if (thisTerrain == AIR && thisWall == AIR) {
             lightLevelThis = sunLight
         }
+        // luminous tile on top of air
         else if (thisWall == AIR && thisTileLuminosity.toInt() > 0) {
             val darkenSunlight = darkenColoured(sunLight, thisTileOpacity)
-            lightLevelThis = screenBlend(darkenSunlight, thisTileLuminosity)
+            lightLevelThis = maximiseRGB(darkenSunlight, thisTileLuminosity)
         }
-        else {
-            lightLevelThis = getValueFromMap(x, y)
-        }// luminous tile transparent (allows sunlight to pass)
+        // opaque wall and luminous tile
+        else if (thisWall != AIR && thisTileLuminosity.toInt() > 0) {
+            lightLevelThis = thisTileLuminosity
+        }
+        // END MIX TILE
+
+        // mix lantern
+        for (lantern in lanterns) {
+            if (lantern.x == x && lantern.y == y) {
+                lightLevelThis = screenBlend(lightLevelThis, lantern.intensity)
+                break
+            }
+        }
+
+        // mix luminous actor
+        for (actor in Terrarum.game.actorContainer) {
+            if (actor is Luminous && actor is ActorWithBody) {
+                val tileX = Math.round(actor.hitbox!!.pointedX / TSIZE)
+                val tileY = Math.round(actor.hitbox!!.pointedY / TSIZE) - 1
+                val actorLuminosity = actor.luminosity
+                if (x == tileX && y == tileY) {
+                    lightLevelThis = screenBlend(lightLevelThis, actorLuminosity)
+                }
+            }
+        }
+
         return lightLevelThis
     }
 
@@ -711,7 +720,5 @@ object LightmapRenderer {
         return Math.round(sum / i.size.toFloat())
     }
 
-    private fun toTargetColour(raw: Char): Color {
-        return Col40().createSlickColor(raw.toInt())
-    }
+    private fun toTargetColour(raw: Char): Color = Col40().createSlickColor(raw.toInt())
 }

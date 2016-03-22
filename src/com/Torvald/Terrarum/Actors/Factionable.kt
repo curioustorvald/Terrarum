@@ -8,8 +8,6 @@ import java.util.*
  */
 interface Factionable {
 
-    fun assignFaction(f: Faction)
-    fun unassignFaction(f: Faction)
-    var faction: HashSet<Faction>?
+    var faction: HashSet<Faction>
 
 }

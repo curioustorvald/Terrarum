@@ -15,15 +15,15 @@ public class SetLocale implements ConsoleCommand {
     @Override
     public void execute(String[] args) {
         if (args.length == 2) {
-            String prevLocale = Terrarum.gameLocale;
-            Terrarum.gameLocale = args[1];
+            String prevLocale = Terrarum.Companion.getGameLocale();
+            Terrarum.Companion.setGameLocale(args[1]);
             try {
                 new Lang();
-                new Echo().execute("Set locale to '" + Terrarum.gameLocale + "'.");
+                new Echo().execute("Set locale to '" + Terrarum.Companion.getGameLocale() + "'.");
             }
             catch (IOException e) {
                 new Echo().execute("could not read lang file.");
-                Terrarum.gameLocale = prevLocale;
+                Terrarum.Companion.setGameLocale(prevLocale);
             }
         }
         else if (args.length == 1) {

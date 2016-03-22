@@ -17,8 +17,10 @@ import java.util.*
  */
 class BasicDebugInfoWindow : UICanvas {
 
-    override var width: Int? = Terrarum.WIDTH
-    override var height: Int? = Terrarum.HEIGHT
+    override var width: Int = Terrarum.WIDTH
+    override var height: Int = Terrarum.HEIGHT
+
+    override var openCloseTime: Int = 0
 
     override fun processInput(input: Input) {
 
@@ -45,7 +47,7 @@ class BasicDebugInfoWindow : UICanvas {
         printLine(g, 1, "posX : "
                 + "${hitbox!!.pointedX.toString()}"
                 + " ("
-                + "${(hitbox!!.pointedX / MapDrawer.TILE_SIZE).toInt().toString()}"
+                + "${(hitbox.pointedX / MapDrawer.TILE_SIZE).toInt().toString()}"
                 + ")")
         printLine(g, 2, "posY : "
                 + hitbox.pointedY.toString()
@@ -56,7 +58,6 @@ class BasicDebugInfoWindow : UICanvas {
         printLine(g, 4, "veloY : ${player.veloY}")
         printLine(g, 5, "grounded : ${player.grounded}")
         printLine(g, 6, "noClip : ${player.noClip}")
-        printLine(g, 7, "mass : ${player.mass} [kg]")
 
         val lightVal: String
         var mtX = mouseTileX.toString()
@@ -76,7 +77,7 @@ class BasicDebugInfoWindow : UICanvas {
             mtY = "---"
         }
 
-        printLine(g, 8, "light at cursor : " + lightVal)
+        printLine(g, 7, "light at cursor : " + lightVal)
 
         val tileNo: String
         try {
@@ -88,7 +89,7 @@ class BasicDebugInfoWindow : UICanvas {
             tileNo = "-"
         }
 
-        printLine(g, 9, "tile : $tileNo ($mtX, $mtY)")
+        printLine(g, 8, "tile at cursor : $tileNo ($mtX, $mtY)")
 
         /**
          * Second column
@@ -96,6 +97,8 @@ class BasicDebugInfoWindow : UICanvas {
 
         printLineColumn(g, 2, 1, "Vsync : " + Terrarum.appgc.isVSyncRequested)
         printLineColumn(g, 2, 2, "Env colour temp : " + MapDrawer.getColTemp())
+        printLineColumn(g, 2, 3, "Time : ${Terrarum.game.map.worldTime.elapsedSeconds()}" +
+                                 " (${Terrarum.game.map.worldTime.getFormattedTime()})")
 
         /**
          * On screen
@@ -136,7 +139,7 @@ class BasicDebugInfoWindow : UICanvas {
                 , nextHitbox.getHeight() * zoom)
         // ...and its point
         g.fillRect(
-                (nextHitbox!!.getPointedX() - 1) * zoom - MapCamera.cameraX * zoom
+                (nextHitbox.getPointedX() - 1) * zoom - MapCamera.cameraX * zoom
                 , (nextHitbox.getPointedY() - 1) * zoom - MapCamera.cameraY * zoom
                 , 3f, 3f)
         g.drawString(
@@ -158,5 +161,21 @@ class BasicDebugInfoWindow : UICanvas {
 
     private fun column(i: Int): Int {
         return 250 * (i - 1)
+    }
+
+    override fun doOpening(gc: GameContainer, delta: Int) {
+
+    }
+
+    override fun doClosing(gc: GameContainer, delta: Int) {
+
+    }
+
+    override fun endOpening(gc: GameContainer, delta: Int) {
+
+    }
+
+    override fun endClosing(gc: GameContainer, delta: Int) {
+
     }
 }

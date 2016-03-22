@@ -15,7 +15,7 @@ public class GsonTest implements ConsoleCommand {
     @Override
     public void execute(String[] args) {
         if (args.length == 2) {
-            JsonElement avelem = new Gson().toJsonTree(Terrarum.game.getPlayer());
+            JsonElement avelem = new Gson().toJsonTree(Terrarum.game.player);
 
             String jsonString = avelem.toString();
 

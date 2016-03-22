@@ -8,7 +8,7 @@ import com.jme3.math.FastMath
 import org.newdawn.slick.*
 
 /**
- * Created by minjaesong on 16-03-15.
+ * Created by minjaesong on 15-12-31.
  */
 object MapDrawer {
     @JvmStatic val TILE_SIZE = 16
@@ -69,7 +69,6 @@ object MapDrawer {
         return Math.round((ENV_COLTEMP_HIGHEST - ENV_COLTEMP_LOWEST) / 2 * FastMath.clamp(x, -1f, 1f) + colTempMedian)
     }
 
-    @JvmStatic
     fun getColourFromMap(K: Int): Color {
         return envOverlayColourmap.getColor(colTempToImagePos(K), 0)
     }

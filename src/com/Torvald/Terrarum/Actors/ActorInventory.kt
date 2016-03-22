@@ -1,14 +1,14 @@
 package com.Torvald.Terrarum.Actors
 
 import com.Torvald.Terrarum.GameItem.InventoryItem
-import com.Torvald.Terrarum.GameItem.ItemPropCodex
+import com.Torvald.Terrarum.ItemProperties.ItemPropCodex
 import java.util.*
 
 /**
  * Created by minjaesong on 16-03-15.
  */
 
-class ActorInventory {
+class ActorInventory() {
 
     @Transient val CAPACITY_MAX = 0x7FFFFFFF
     @Transient val CAPACITY_MODE_NO_ENCUMBER = 0
@@ -16,9 +16,9 @@ class ActorInventory {
     @Transient val CAPACITY_MODE_WEIGHT = 2
 
 
-    private var capacityByCount: Int = 0
-    private var capacityByWeight: Int = 0
-    private var capacityMode: Int = 0
+    private var capacityByCount: Int
+    private var capacityByWeight: Int
+    private var capacityMode: Int
 
     /**
      * &lt;ReferenceID, Amounts&gt;
@@ -26,12 +26,21 @@ class ActorInventory {
     private val itemList: HashMap<Long, Int> = HashMap()
 
     /**
+     * Default constructor with no encumbrance.
+     */
+    init {
+        capacityMode = CAPACITY_MODE_NO_ENCUMBER
+        capacityByCount = 0
+        capacityByWeight = 0
+    }
+
+    /**
      * Construct new inventory with specified capacity.
      * @param capacity if is_weight is true, killogramme value is required, counts of items otherwise.
      * *
      * @param is_weight whether encumbrance should be calculated upon the weight of the inventory. False to use item counts.
      */
-    constructor(capacity: Int, is_weight: Boolean) {
+    constructor(capacity: Int, is_weight: Boolean) : this() {
         if (is_weight) {
             capacityByWeight = capacity
             capacityMode = CAPACITY_MODE_WEIGHT
@@ -81,7 +90,7 @@ class ActorInventory {
         var weight = 0f
 
         for (item in itemList.entries) {
-            weight += ItemPropCodex.getItem(item.key).weight * item.value
+            weight += ItemPropCodex.getItem(item.key).mass * item.value
         }
 
         return weight

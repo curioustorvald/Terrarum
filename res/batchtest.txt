@@ -1,4 +1,5 @@
-echo "Hello, world!"
-echo "This is a batch test."
+echo "Hello, world! This is a batch test."
+echo "Will add actorvalue 'batch = true' to player"
 setav batch true
+echo "Checking if command did something."
 getav batch
