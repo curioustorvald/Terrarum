@@ -8,9 +8,10 @@ import com.Torvald.Terrarum.Terrarum
 class GetTime : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val echo = Echo()
-        echo.execute("Day ${Terrarum.game.map.worldTime.days}, " +
-                     "${Terrarum.game.map.worldTime.getFormattedTime()} " +
-                     "(${Terrarum.game.map.worldTime.elapsedSeconds()} s)"
+        val worldTime = Terrarum.game.map.worldTime
+        echo.execute("Year ${worldTime.years}, Month ${worldTime.months}, " +
+                     "Day ${worldTime.days} (${worldTime.getDayNameShort()}), " +
+                     "${worldTime.getFormattedTime()}"
         )
     }
 

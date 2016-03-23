@@ -1,6 +1,5 @@
 package com.Torvald.Terrarum.MapDrawer
 
-import com.Torvald.ColourUtil.Col40
 import com.Torvald.Terrarum.Actors.ActorWithBody
 import com.Torvald.Terrarum.Actors.Luminous
 import com.Torvald.Terrarum.GameMap.WorldTime
@@ -19,7 +18,8 @@ object LightmapRenderer {
     /**
      * 8-Bit RGB values
      */
-    @Volatile private var staticLightMap: Array<CharArray>? = null
+    @Volatile private var lightMapMSB: Array<CharArray>? = null
+    @Volatile private var lightMapLSB: Array<ByteArray>? = null
     private var lightMapInitialised = false
 
     /**
@@ -38,17 +38,17 @@ object LightmapRenderer {
     private val TSIZE = MapDrawer.TILE_SIZE
 
     // color model related vars
-    const val MUL = Col40.MUL
-    const val MUL_2 = Col40.MUL_2
-    const val CHANNEL_MAX = Col40.MAX_STEP
-    const val CHANNEL_MAX_FLOAT = CHANNEL_MAX.toFloat()
-    const val COLOUR_DOMAIN_SIZE = Col40.COLOUR_DOMAIN_SIZE
+    const val MUL = 256
+    const val MUL_2 = 256 * 256
+    const val CHANNEL_MAX = 255
+    const val CHANNEL_MAX_FLOAT = 255f
+    const val COLOUR_DOMAIN_SIZE = 256 * 256 * 256
 
 
     private const val deprecatedFeatureDebatable = "This feature is debatable. Do not use it yet."
 
     @Deprecated(deprecatedFeatureDebatable)
-    fun addLantern(x: Int, y: Int, intensity: Char) {
+    fun addLantern(x: Int, y: Int, intensity: Int) {
         val thisLantern = LightmapLantern(x, y, intensity)
 
         for (i in lanterns.indices.reversed()) {
@@ -75,9 +75,18 @@ object LightmapRenderer {
         }
     }
 
+    fun getLight(x: Int, y: Int): Int =
+            java.lang.Byte.toUnsignedInt(lightMapLSB!![y][x]) or (lightMapMSB!![y][x].toInt() shl 8)
+
+    fun setLight(x: Int, y: Int, colour: Int) {
+        lightMapLSB!![y][x] = (colour and 0xFF).toByte()
+        lightMapMSB!![y][x] = (colour ushr 8).toChar()
+    }
+
     fun renderLightMap() {
-        if (staticLightMap == null) {
-            staticLightMap = Array(Terrarum.game.map.height) { CharArray(Terrarum.game.map.width) }
+        if (lightMapMSB == null && lightMapLSB == null) {
+            lightMapMSB = Array(Terrarum.game.map.height) { CharArray(Terrarum.game.map.width) }
+            lightMapLSB = Array(Terrarum.game.map.height) { ByteArray(Terrarum.game.map.width) }
 
             if (lightMapInitialised) {
                 throw RuntimeException("Attempting to re-initialise 'staticLightMap'")
@@ -112,28 +121,28 @@ object LightmapRenderer {
             // Round 1
             for (y in for_y_start..for_y_end - 1) {
                 for (x in for_x_start..for_x_end - 1) {
-                    staticLightMap!![y][x] = calculate(x, y)
+                    setLight(x, y, calculate(x, y))
                 }
             }
 
             // Round 4
             for (y in for_y_end - 1 downTo for_y_start + 1) {
                 for (x in for_x_start..for_x_end - 1) {
-                    staticLightMap!![y][x] = calculate(x, y)
+                    setLight(x, y, calculate(x, y))
                 }
             }
 
             // Round 3
             for (y in for_y_end - 1 downTo for_y_start + 1) {
                 for (x in for_x_end - 1 downTo for_x_start) {
-                    staticLightMap!![y][x] = calculate(x, y)
+                    setLight(x, y, calculate(x, y))
                 }
             }
 
             // Round 2
             for (y in for_y_start..for_y_end - 1) {
                 for (x in for_x_end - 1 downTo for_x_start) {
-                    staticLightMap!![y][x] = calculate(x, y)
+                    setLight(x, y, calculate(x, y))
                 }
             }
         }
@@ -155,12 +164,14 @@ object LightmapRenderer {
                 while (x < for_x_end) {
                     // smooth
                     if (Terrarum.game.screenZoom >= 1 && Terrarum.gameConfig.getAsBoolean("smoothlighting") ?: false) {
-                        val thisLightLevel = staticLightMap!![y][x]
-                        if (y > 0 && x < for_x_end && thisLightLevel.toInt() == 0 && staticLightMap!![y - 1][x].toInt() == 0) {
+                        val thisLightLevel = getLight(x, y)
+                        if (y > 0 && x < for_x_end && thisLightLevel == 0
+                            && getLight(x, y - 1) == 0) {
                             try {
                                 // coalesce zero intensity blocks to one
                                 var zeroLevelCounter = 1
-                                while (staticLightMap!![y][x + zeroLevelCounter].toInt() == 0 && staticLightMap!![y - 1][x + zeroLevelCounter].toInt() == 0) {
+                                while (getLight(x + zeroLevelCounter, y) == 0
+                                       && getLight(x + zeroLevelCounter, y - 1) == 0) {
                                     zeroLevelCounter += 1
 
                                     if (x + zeroLevelCounter >= for_x_end) break
@@ -193,33 +204,33 @@ object LightmapRenderer {
                                 thisLightLevel
                             else
                                 maximiseRGB(
-                                        staticLightMap!![y][x],
-                                        staticLightMap!![y - 1][x])
+                                        getLight(x, y),
+                                        getLight(x, y - 1))
                             val d = if (y == 0)
                                 thisLightLevel
                             else if (y == Terrarum.game.map.height - 1)
                                 thisLightLevel
                             else
                                 maximiseRGB(
-                                        staticLightMap!![y][x],
-                                        staticLightMap!![y + 1][x])
+                                        getLight(x, y),
+                                        getLight(x, y + 1))
                             val b = if (x == 0)
                                 thisLightLevel
                             else if (x == Terrarum.game.map.width - 1)
                                 thisLightLevel
                             else
                                 maximiseRGB(
-                                        staticLightMap!![y][x],
-                                        staticLightMap!![y][x - 1])
+                                        getLight(x, y),
+                                        getLight(x - 1, y))
                             val c = if (x == 0)
                                 thisLightLevel
                             else if (x == Terrarum.game.map.width - 1)
                                 thisLightLevel
                             else
                                 maximiseRGB(
-                                        staticLightMap!![y][x],
-                                        staticLightMap!![y][x + 1])
-                            val colourMapItoL = CharArray(4)
+                                        getLight(x, y),
+                                        getLight(x + 1, y))
+                            val colourMapItoL = IntArray(4)
                             colourMapItoL[0] = colourLinearMix(a, b)
                             colourMapItoL[1] = colourLinearMix(a, c)
                             colourMapItoL[2] = colourLinearMix(b, d)
@@ -227,7 +238,7 @@ object LightmapRenderer {
 
                             for (iy in 0..1) {
                                 for (ix in 0..1) {
-                                    g.color = toTargetColour(colourMapItoL[iy * 2 + ix])
+                                    g.color = Color(colourMapItoL[iy * 2 + ix])
 
                                     g.fillRect(
                                             Math.round(
@@ -239,17 +250,17 @@ object LightmapRenderer {
                     }
                     else {
                         try {
-                            val thisLightLevel = staticLightMap!![y][x].toInt()
+                            val thisLightLevel = getLight(x, y)
 
                             // coalesce identical intensity blocks to one
                             var sameLevelCounter = 1
-                            while (staticLightMap!![y][x + sameLevelCounter].toInt() == thisLightLevel) {
+                            while (getLight(x + sameLevelCounter, y) == thisLightLevel) {
                                 sameLevelCounter += 1
 
                                 if (x + sameLevelCounter >= for_x_end) break
                             }
 
-                            g.color = toTargetColour(staticLightMap!![y][x])
+                            g.color = Color(getLight(x, y))
                             g.fillRect(
                                     Math.round(x.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), Math.round(y.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), (FastMath.ceil(
                                     TSIZE * Terrarum.game.screenZoom) * sameLevelCounter).toFloat(), FastMath.ceil(TSIZE * Terrarum.game.screenZoom).toFloat())
@@ -270,10 +281,10 @@ object LightmapRenderer {
 
     }
 
-    private fun calculate(x: Int, y: Int): Char = calculate(x, y, false)
+    private fun calculate(x: Int, y: Int): Int = calculate(x, y, false)
 
-    private fun calculate(x: Int, y: Int, doNotCalculateAmbient: Boolean): Char {
-        var lightLevelThis: Char = 0.toChar()
+    private fun calculate(x: Int, y: Int, doNotCalculateAmbient: Boolean): Int {
+        var lightLevelThis: Int = 0
         val thisTerrain = Terrarum.game.map.getTileFromTerrain(x, y)
         val thisWall = Terrarum.game.map.getTileFromWall(x, y)
         val thisTileLuminosity = TilePropCodex.getProp(thisTerrain).luminosity
@@ -319,8 +330,8 @@ object LightmapRenderer {
 
         if (!doNotCalculateAmbient) {
             // calculate ambient
-            var ambient: Char = 0.toChar()
-            var nearby: Char = 0.toChar()
+            var ambient: Int = 0
+            var nearby: Int = 0
             findNearbyBrightest@ for (yoff in -1..1) {
                 for (xoff in -1..1) {
                     /**
@@ -336,19 +347,19 @@ object LightmapRenderer {
                     if (xoff != yoff && -xoff != yoff) {
                         // 'v' tiles
                         if (!outOfMapBounds(x + xoff, y + yoff)) {
-                            nearby = staticLightMap!![y + yoff][x + xoff]
+                            nearby = getLight(x + xoff, y + yoff)
                         }
                     }
                     else if (xoff != 0 && yoff != 0) {
                         // 'a' tiles
                         if (!outOfMapBounds(x + xoff, y + yoff)) {
-                            nearby = darkenUniformInt(staticLightMap!![y + yoff][x + xoff], 2) //2
+                            nearby = darkenUniformInt(getLight(x + xoff, y + yoff), 12) //2 for 40step
                             // mix some to have more 'spreading'
                             // so that light spreads in a shape of an octagon instead of a diamond
                         }
                     }
                     else {
-                        nearby = 0.toChar() // exclude 'me' tile
+                        nearby = 0 // exclude 'me' tile
                     }
 
                     ambient = maximiseRGB(ambient, nearby) // keep base value as brightest nearby
@@ -377,7 +388,7 @@ object LightmapRenderer {
      * @param darken (0-39) per channel
      * @return darkened data (0-39) per channel
      */
-    fun darkenColoured(data: Char, darken: Char): Char {
+    fun darkenColoured(data: Int, darken: Int): Int {
         if (darken.toInt() < 0 || darken.toInt() >= COLOUR_DOMAIN_SIZE) {
             throw IllegalArgumentException("darken: out of " + "range")
         }
@@ -400,7 +411,7 @@ object LightmapRenderer {
      * @param darken (0-1)
      * @return
      */
-    fun darkenUniformFloat(data: Char, darken: Float): Char {
+    fun darkenUniformFloat(data: Int, darken: Float): Int {
         if (darken < 0 || darken > 1f) {
             throw IllegalArgumentException("darken: out of " + "range")
         }
@@ -422,7 +433,7 @@ object LightmapRenderer {
      * @param darken (0-39)
      * @return
      */
-    fun darkenUniformInt(data: Char, darken: Int): Char {
+    fun darkenUniformInt(data: Int, darken: Int): Int {
         if (darken < 0 || darken > CHANNEL_MAX) {
             throw IllegalArgumentException("darken: out of " + "range")
         }
@@ -447,7 +458,7 @@ object LightmapRenderer {
      * *
      * @return brightened data [0-39] per channel
      */
-    private fun brightenColoured(data: Char, brighten: Char): Char {
+    private fun brightenColoured(data: Int, brighten: Int): Int {
         if (brighten.toInt() < 0 || brighten.toInt() >= COLOUR_DOMAIN_SIZE) {
             throw IllegalArgumentException("brighten: out of " + "range")
         }
@@ -466,7 +477,7 @@ object LightmapRenderer {
      * *
      * @return
      */
-    private fun maximiseRGB(rgb: Char, rgb2: Char): Char {
+    private fun maximiseRGB(rgb: Int, rgb2: Int): Int {
         val r1 = getRawR(rgb)
         val r2 = getRawR(rgb2)
         val newR = if (r1 > r2) r1 else r2
@@ -480,7 +491,7 @@ object LightmapRenderer {
         return constructRGBFromInt(newR, newG, newB)
     }
 
-    private fun screenBlend(rgb: Char, rgb2: Char): Char {
+    private fun screenBlend(rgb: Int, rgb2: Int): Int {
         val r1 = getR(rgb)
         val r2 = getR(rgb2)
         val newR = 1 - (1 - r1) * (1 - r2)
@@ -494,15 +505,15 @@ object LightmapRenderer {
         return constructRGBFromFloat(newR, newG, newB)
     }
 
-    fun getRawR(RGB: Char): Int {
+    fun getRawR(RGB: Int): Int {
         return RGB.toInt() / MUL_2
     }
 
-    fun getRawG(RGB: Char): Int {
+    fun getRawG(RGB: Int): Int {
         return RGB.toInt() % MUL_2 / MUL
     }
 
-    fun getRawB(RGB: Char): Int {
+    fun getRawB(RGB: Int): Int {
         return RGB.toInt() % MUL
     }
 
@@ -514,7 +525,7 @@ object LightmapRenderer {
      * *
      * @return
      */
-    fun getRaw(RGB: Char, offset: Int): Int {
+    fun getRaw(RGB: Int, offset: Int): Int {
         if (offset == OFFSET_R) return getRawR(RGB)
         if (offset == OFFSET_G) return getRawG(RGB)
         if (offset == OFFSET_B)
@@ -523,19 +534,19 @@ object LightmapRenderer {
             throw IllegalArgumentException("Channel offset out of range")
     }
 
-    private fun getR(rgb: Char): Float {
+    private fun getR(rgb: Int): Float {
         return getRawR(rgb) / CHANNEL_MAX_FLOAT
     }
 
-    private fun getG(rgb: Char): Float {
+    private fun getG(rgb: Int): Float {
         return getRawG(rgb) / CHANNEL_MAX_FLOAT
     }
 
-    private fun getB(rgb: Char): Float {
+    private fun getB(rgb: Int): Float {
         return getRawB(rgb) / CHANNEL_MAX_FLOAT
     }
 
-    private fun addRaw(rgb1: Char, rgb2: Char): Char {
+    private fun addRaw(rgb1: Int, rgb2: Int): Int {
         val newR = clampByte(getRawR(rgb1) + getRawB(rgb2))
         val newG = clampByte(getRawG(rgb1) + getRawG(rgb2))
         val newB = clampByte(getRawB(rgb1) + getRawB(rgb2))
@@ -543,7 +554,7 @@ object LightmapRenderer {
         return constructRGBFromInt(newR, newG, newB)
     }
 
-    fun constructRGBFromInt(r: Int, g: Int, b: Int): Char {
+    fun constructRGBFromInt(r: Int, g: Int, b: Int): Int {
         if (r < 0 || r > CHANNEL_MAX) {
             throw IllegalArgumentException("Red: out of range")
         }
@@ -553,10 +564,10 @@ object LightmapRenderer {
         if (b < 0 || b > CHANNEL_MAX) {
             throw IllegalArgumentException("Blue: out of range")
         }
-        return (r * MUL_2 + g * MUL + b).toChar()
+        return (r * MUL_2 + g * MUL + b)
     }
 
-    fun constructRGBFromFloat(r: Float, g: Float, b: Float): Char {
+    fun constructRGBFromFloat(r: Float, g: Float, b: Float): Int {
         if (r < 0 || r > 1.0f) {
             throw IllegalArgumentException("Red: out of range")
         }
@@ -574,7 +585,7 @@ object LightmapRenderer {
         return constructRGBFromInt(intR, intG, intB)
     }
 
-    private fun colourLinearMix(colA: Char, colB: Char): Char {
+    private fun colourLinearMix(colA: Int, colB: Int): Int {
         val r = getRawR(colA) + getRawR(colB) shr 1
         val g = getRawG(colA) + getRawG(colB) shr 1
         val b = getRawB(colA) + getRawB(colB) shr 1
@@ -610,7 +621,7 @@ object LightmapRenderer {
             x < 0 || y < 0 || x >= Terrarum.game.map.width || y >= Terrarum.game.map.height
 
     private fun outOfMapBounds(x: Int, y: Int): Boolean =
-            x < 0 || y < 0 || x >= staticLightMap!![0].size || y >= staticLightMap!!.size
+            x < 0 || y < 0 || x >= lightMapMSB!![0].size || y >= lightMapMSB!!.size
 
     private fun clampZero(i: Int): Int = if (i < 0) 0 else i
 
@@ -620,7 +631,7 @@ object LightmapRenderer {
 
     private fun clampFloat(i: Float): Float = if (i < 0) 0f else if (i > 1) 1f else i
 
-    fun getValueFromMap(x: Int, y: Int): Char = staticLightMap!![y][x]
+    fun getValueFromMap(x: Int, y: Int): Int = getLight(x, y)
 
     private fun purgePartOfLightmap(x1: Int, y1: Int, x2: Int, y2: Int) {
         try {
@@ -628,10 +639,10 @@ object LightmapRenderer {
                 for (x in x1 - 1..x2 + 1) {
                     if (y == y1 - 1 || y == y2 + 1 || x == x1 - 1 || x == x2 + 1) {
                         // fill the rim with (pre) calculation
-                        staticLightMap!![y][x] = preCalculateUpdateGLOnly(x, y)
+                        setLight(x, y, preCalculateUpdateGLOnly(x, y))
                     }
                     else {
-                        staticLightMap!![y][x] = 0.toChar()
+                        setLight(x, y, 0)
                     }
                 }
             }
@@ -641,8 +652,8 @@ object LightmapRenderer {
 
     }
 
-    private fun preCalculateUpdateGLOnly(x: Int, y: Int): Char {
-        var lightLevelThis: Char = 0.toChar()
+    private fun preCalculateUpdateGLOnly(x: Int, y: Int): Int {
+        var lightLevelThis: Int = 0
         val thisTerrain = Terrarum.game.map.getTileFromTerrain(x, y)
         val thisWall = Terrarum.game.map.getTileFromWall(x, y)
         val thisTileLuminosity = TilePropCodex.getProp(thisTerrain).luminosity
@@ -720,5 +731,9 @@ object LightmapRenderer {
         return Math.round(sum / i.size.toFloat())
     }
 
-    private fun toTargetColour(raw: Char): Color = Col40().createSlickColor(raw.toInt())
+    internal data class LightmapLantern(
+            var x: Int,
+            var y: Int,
+            var intensity: Int
+    )
 }

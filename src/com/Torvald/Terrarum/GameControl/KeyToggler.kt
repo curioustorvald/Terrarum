@@ -2,12 +2,13 @@ package com.Torvald.Terrarum.GameControl
 
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
+import java.util.*
 
 object KeyToggler {
 
-    private val currentState = BooleanArray(256)
-    private val isPressed = BooleanArray(256)
-    private val isToggled = BooleanArray(256)
+    private val currentState = BitSet(256)
+    private val isPressed = BitSet(256)
+    private val isToggled = BitSet(256)
 
     fun isOn(key: Int): Boolean {
         return currentState[key]

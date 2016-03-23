@@ -22,12 +22,26 @@ class BasicDebugInfoWindow : UICanvas {
 
     override var openCloseTime: Int = 0
 
+    private var prevPlayerX = 0f
+    private var prevPlayerY = 0f
+
+    private var xdelta = 0f
+    private var ydelta = 0f
+
     override fun processInput(input: Input) {
 
     }
 
     override fun update(gc: GameContainer, delta_t: Int) {
+        val player = Terrarum.game.player
+        val hitbox = player.hitbox!!
+        val nextHitbox = player.nextHitbox
 
+        xdelta = hitbox.pointedX - prevPlayerX
+        ydelta = hitbox.pointedY - prevPlayerY
+
+        prevPlayerX = hitbox.pointedX
+        prevPlayerY = hitbox.pointedY
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
@@ -44,18 +58,23 @@ class BasicDebugInfoWindow : UICanvas {
         val hitbox = player.hitbox
         val nextHitbox = player.nextHitbox
 
-        printLine(g, 1, "posX : "
+        printLine(g, 1, "posX: "
                 + "${hitbox!!.pointedX.toString()}"
                 + " ("
                 + "${(hitbox.pointedX / MapDrawer.TILE_SIZE).toInt().toString()}"
                 + ")")
-        printLine(g, 2, "posY : "
+        printLine(g, 2, "posY: "
                 + hitbox.pointedY.toString()
                 + " ("
                 + (hitbox.pointedY / MapDrawer.TILE_SIZE).toInt().toString()
                 + ")")
-        printLine(g, 3, "veloX : ${player.veloX}")
-        printLine(g, 4, "veloY : ${player.veloY}")
+
+        printLine(g, 3, "veloX reported: ${player.veloX}")
+        printLine(g, 4, "veloY reported: ${player.veloY}")
+
+        printLineColumn(g, 2, 3, "veloX measured: ${xdelta}")
+        printLineColumn(g, 2, 4, "veloY measured: ${ydelta}")
+
         printLine(g, 5, "grounded : ${player.grounded}")
         printLine(g, 6, "noClip : ${player.noClip}")
 
@@ -97,7 +116,7 @@ class BasicDebugInfoWindow : UICanvas {
 
         printLineColumn(g, 2, 1, "Vsync : " + Terrarum.appgc.isVSyncRequested)
         printLineColumn(g, 2, 2, "Env colour temp : " + MapDrawer.getColTemp())
-        printLineColumn(g, 2, 3, "Time : ${Terrarum.game.map.worldTime.elapsedSeconds()}" +
+        printLineColumn(g, 2, 5, "Time : ${Terrarum.game.map.worldTime.elapsedSeconds()}" +
                                  " (${Terrarum.game.map.worldTime.getFormattedTime()})")
 
         /**

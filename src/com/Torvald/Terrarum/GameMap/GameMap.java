@@ -33,7 +33,7 @@ public class GameMap {
     //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
     //physics
     private float gravitation;
-    private char globalLight;
+    private int globalLight;
     private WorldTime worldTime;
 
     public static transient final int TILES_SUPPORTED = MapLayer.RANGE * PairedMapLayer.RANGE;
@@ -57,7 +57,7 @@ public class GameMap {
         terrainDamage = new PairedMapLayer(width, height);
         wallDamage = new PairedMapLayer(width, height);
 
-        globalLight = (char) 63999;
+        globalLight = (char) 0;
         worldTime = new WorldTime();
     }
 
@@ -213,11 +213,11 @@ public class GameMap {
         return gravitation;
     }
 
-    public char getGlobalLight() {
+    public int getGlobalLight() {
         return globalLight;
     }
 
-    public void setGlobalLight(char globalLight) {
+    public void setGlobalLight(int globalLight) {
         this.globalLight = globalLight;
     }
 

@@ -72,10 +72,10 @@ class TilePropCodex {
             prop.id = intVal(record, "id")
             prop.damage = intVal(record, "dmg")
 
-            prop.opacity = intVal(record, "opacity").toChar()
+            prop.opacity = intVal(record, "opacity")
             prop.strength = intVal(record, "strength")
             prop.density = intVal(record, "dsty")
-            prop.luminosity = intVal(record, "lumcolor").toChar()
+            prop.luminosity = intVal(record, "lumcolor")
             prop.drop = intVal(record, "drop")
             prop.dropDamage = intVal(record, "ddmg")
             prop.friction = intVal(record, "friction")

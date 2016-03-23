@@ -8,7 +8,7 @@ class WorldTime {
     internal var minutes: Int
     internal var hours: Int
 
-    internal var daysCount: Int //NOT a calendar day
+    internal var yearlyDays: Int //NOT a calendar day
 
     internal var days: Int
     internal var months: Int
@@ -20,23 +20,23 @@ class WorldTime {
 
     @Transient private var realMillisec: Int
 
-    val DAYNAMES = arrayOf(//daynames are taken from Nynorsk (å -> o)
+    val DAY_NAMES = arrayOf(//daynames are taken from Nynorsk (å -> o)
             "Mondag", "Tysdag", "Midtedag" //From Islenska Miðvikudagur
             , "Torsdag", "Fredag", "Laurdag", "Sundag", "Verdag" //From Norsk word 'verd'
     )
-    val DAYNAMES_SHORT = arrayOf("Mon", "Tys", "Mid", "Tor", "Fre", "Lau", "Sun", "Ver")
+    val DAY_NAMES_SHORT = arrayOf("Mon", "Tys", "Mid", "Tor", "Fre", "Lau", "Sun", "Ver")
 
 
     @Transient val REAL_SEC_IN_MILLI = 1000
 
     init {
         seconds = 0
-        minutes = 0
-        hours = 0
-        daysCount = 0
-        days = 1
-        months = 1
-        years = 1
+        minutes = 30
+        hours = 8
+        yearlyDays = 1
+        days = 12
+        months = 3
+        years = 125
         dayOfWeek = 0
         realMillisec = 0
     }
@@ -80,7 +80,7 @@ class WorldTime {
     }
 
     val dayName: String
-        get() = DAYNAMES[dayOfWeek]
+        get() = DAY_NAMES[dayOfWeek]
 
     private fun kickVariables() {
         if (seconds >= MINUTE_SEC) {
@@ -96,7 +96,7 @@ class WorldTime {
         if (hours >= DAY_LENGTH / HOUR_SEC) {
             hours = 0
             days += 1
-            daysCount += 1
+            yearlyDays += 1
             dayOfWeek += 1
         }
 
@@ -114,11 +114,11 @@ class WorldTime {
             years++
         }
         else if ((months == 1 || months == 4 || months == 7 || months == 10) && days > 31) {
-            days = 0
+            days = 1
             months++
         }
         else if (days > 30) {
-            days = 0
+            days = 1
             months++
         }
 
@@ -135,6 +135,9 @@ class WorldTime {
 
         return "${hours}h${formatMin(minutes)}"
     }
+
+    fun getDayNameFull(): String = DAY_NAMES[dayOfWeek]
+    fun getDayNameShort(): String = DAY_NAMES_SHORT[dayOfWeek]
 
     companion object {
         /**

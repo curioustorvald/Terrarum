@@ -59,7 +59,7 @@ object PFSigrid {
 
         p.actorValue.set("intelligent", true)
 
-        p.actorValue.set("luminosity", 22819)
+        p.actorValue.set("luminosity", 5980540)
 
         p.actorValue.set("selectedtile", 16)
 

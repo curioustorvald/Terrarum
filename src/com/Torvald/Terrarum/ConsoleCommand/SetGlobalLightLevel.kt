@@ -27,7 +27,7 @@ class SetGlobalLightLevel : ConsoleCommand {
         }
         else if (args.size == 2) {
             try {
-                val GL = Integer(args[1]).toInt().toChar()
+                val GL = args[1].toInt()
 
                 if (GL.toInt() < 0 || GL.toInt() >= LightmapRenderer.COLOUR_DOMAIN_SIZE) {
                     Echo().execute("Range: 0-" + (LightmapRenderer.COLOUR_DOMAIN_SIZE - 1))

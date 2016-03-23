@@ -19,6 +19,6 @@ interface Luminous {
             actorValue.set("luminosity", value)
         }
      */
-    var luminosity: Char
+    var luminosity: Int
 
 }

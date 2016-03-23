@@ -1,9 +1,7 @@
 package com.Torvald.Terrarum
 
-import com.Torvald.ColourUtil.Col40
 import com.Torvald.Terrarum.Actors.*
 import com.Torvald.Terrarum.ConsoleCommand.Authenticator
-import com.Torvald.Terrarum.ConsoleCommand.CommandDict
 import com.Torvald.Terrarum.GameControl.GameController
 import com.Torvald.Terrarum.GameControl.Key
 import com.Torvald.Terrarum.GameControl.KeyMap
@@ -139,7 +137,7 @@ constructor() : BasicGameState() {
 
         // GL at after_sunrise-noon_before_sunset
         map.updateWorldTime(delta)
-        map.setGlobalLight(globalLightByTime);
+        map.globalLight = globalLightByTime
 
         GameController.processInput(gc.input)
 
@@ -194,6 +192,9 @@ constructor() : BasicGameState() {
         actorContainer.forEach { actor -> if (actor is Visible) actor.drawBody(gc, g) }
         actorContainer.forEach { actor -> if (actor is Glowing) actor.drawGlow(gc, g) }
 
+        player.drawBody(gc, g)
+        player.drawGlow(gc, g)
+
         LightmapRenderer.renderLightMap()
 
         MapCamera.renderFront(gc, g)
@@ -225,17 +226,14 @@ constructor() : BasicGameState() {
         return actorContainer.remove(e)
     }
 
-    private fun getGradientColour(): Array<Color> {
+    private fun getGradientColour(row: Int): Color {
         val gradMapWidth = GRADIENT_IMAGE!!.width
         val phase = Math.round(
                 map.worldTime.elapsedSeconds().toFloat() / WorldTime.DAY_LENGTH.toFloat() * gradMapWidth
         )
 
         //update in every INTERNAL_FRAME frames
-        return arrayOf(
-                GRADIENT_IMAGE!!.getColor(phase, 0),
-                GRADIENT_IMAGE!!.getColor(phase, GRADIENT_IMAGE!!.height - 1)
-        )
+        return GRADIENT_IMAGE!!.getColor(phase, row)
     }
 
     override fun keyPressed(key: Int, c: Char) {
@@ -279,10 +277,9 @@ constructor() : BasicGameState() {
     }
 
     private fun drawSkybox(g: Graphics) {
-        val colourTable = getGradientColour()
         val skyColourFill = GradientFill(
-                0f, 0f, colourTable[0],
-                0f, Terrarum.HEIGHT.toFloat(), colourTable[1]
+                0f, 0f, getGradientColour(0),
+                0f, Terrarum.HEIGHT.toFloat(), getGradientColour(1)
         )
         g.fill(skyBox, skyColourFill)
     }
@@ -302,56 +299,13 @@ constructor() : BasicGameState() {
         notifinator.setAsOpening()
     }
 
-    private val globalLightByTime: Char
-        get() {
-            /**
-             * y = -DELTA(x-1)^RAYLEIGH + MAX
-             * See documentation 'sky colour'
-             */
-            val INTENSITY_MIN = 9
-            val INTENSITY_MAX = 39
+    private val globalLightByTime: Int
+        get() = getGradientColour(2).getRGB24()
 
-            val COLTEMP_MIN = 2500
-            val COLTEMP_MAX = MapDrawer.ENV_COLTEMP_NOON
-            val COLTEMP_DELTA = COLTEMP_MAX - COLTEMP_MIN
-            val RAYLEIGH_INDEX = 3.3f
-
-            /**
-             * get colour temperature
-             */
-            val dusk_len_colouring = 0.5f
-            val daytime_len = 10
-            var secs_offset: Int = Math.round(WorldTime.HOUR_SEC * dusk_len_colouring) // 1h as Seconds
-            var time_domain_x_in_sec = (daytime_len + 2*dusk_len_colouring) * WorldTime.HOUR_SEC // 11h as Seconds
-
-            var today_secs: Float = map.worldTime.elapsedSeconds().toFloat() + secs_offset
-            if (today_secs > time_domain_x_in_sec - secs_offset) today_secs - WorldTime.DAY_LENGTH // 79000 -> -200
-
-            var func_x: Float = (today_secs / time_domain_x_in_sec) * 2f // 0-46800 -> 0-2.0
-            if (func_x < 1) func_x = 2f - func_x // mirror graph
-            if (func_x > 2) func_x = 2f // clamp
-
-            // println("x: $func_x")
-
-            val sunAltColouring: Int = FastMath.ceil(
-                    -COLTEMP_DELTA * FastMath.pow(func_x - 1, RAYLEIGH_INDEX) + COLTEMP_MAX
-            )
-            val sunColour: Col40 = Col40(MapDrawer.getColourFromMap(sunAltColouring))
-
-            /**
-             * get intensity
-             */
-            val dusk_len = 1.5f
-            val intensity: Int = 39
-            secs_offset = Math.round(WorldTime.HOUR_SEC * dusk_len) // 1h30 as Seconds
-            time_domain_x_in_sec = (daytime_len + 2*dusk_len) * WorldTime.HOUR_SEC // 13h as Seconds
-
-            today_secs = map.worldTime.elapsedSeconds().toFloat() + secs_offset
-            if (today_secs > time_domain_x_in_sec - secs_offset) today_secs - WorldTime.DAY_LENGTH // 79000 -> -200
-
-
-
-
-            return LightmapRenderer.darkenUniformInt(sunColour.raw, INTENSITY_MAX - intensity)
-        }
+    /**
+     * extension function for org.newdawn.slick.Color
+     */
+    fun Color.getRGB24(): Int = (this.redByte shl 16) or
+                                (this.greenByte shl 8) or
+                                (this.blueByte)
 }

@@ -13,7 +13,7 @@ class TileProp {
     /**
      * @param opacity Raw RGB value, without alpha
      */
-    var opacity: Char = ' ' // colour attenuation
+    var opacity: Int = 0 // colour attenuation
 
     var strength: Int = 0
 
@@ -30,7 +30,7 @@ class TileProp {
     /**
      * @param luminosity Raw RGB value, without alpha
      */
-    var luminosity: Char = ' '
+    var luminosity: Int = 0
 
     var drop: Int = 0
     var dropDamage: Int = 0

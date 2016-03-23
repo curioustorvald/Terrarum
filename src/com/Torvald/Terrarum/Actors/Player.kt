@@ -68,13 +68,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
     override var houseDesignation: ArrayList<Int>? = null
 
-    override var luminosity: Char
-        get() {
-            if (actorValue.get("luminosity") != null)
-                return actorValue.getAsInt("luminosity")!!.toChar()
-            else
-                return 0.toChar()
-        }
+    override var luminosity: Int
+        get() = actorValue.getAsInt("luminosity") ?: 0
         set(value) {
             actorValue.set("luminosity", value)
         }
