@@ -96,11 +96,11 @@ object LightmapRenderer {
         }
 
 
-        val for_y_start = div16(MapCamera.getCameraY()) - 1 // fix for premature lightmap rendering
-        val for_x_start = div16(MapCamera.getCameraX()) - 1 // on topmost/leftmost side
+        val for_x_start = div16(MapCamera.cameraX) - 1 // fix for premature lightmap rendering
+        val for_y_start = div16(MapCamera.cameraY) - 1 // on topmost/leftmost side
 
-        val for_y_end = clampHTile(for_y_start + div16(MapCamera.getRenderHeight()) + 2) + 1 // same fix as above
         val for_x_end = clampWTile(for_x_start + div16(MapCamera.getRenderWidth()) + 2) + 1
+        val for_y_end = clampHTile(for_y_start + div16(MapCamera.getRenderHeight()) + 2) + 1 // same fix as above
 
         /**
          * Updating order:

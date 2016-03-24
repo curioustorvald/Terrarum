@@ -26,7 +26,6 @@ object PFSigrid {
         p.sprite!!.setDelay(200)
         p.sprite!!.setRowsAndFrames(1, 1)
         p.sprite!!.setAsVisible()
-        p.sprite!!.composeSprite()
 
         p.spriteGlow = SpriteAnimation()
         p.spriteGlow!!.setDimension(28, 51)
@@ -34,7 +33,6 @@ object PFSigrid {
         p.spriteGlow!!.setDelay(200)
         p.spriteGlow!!.setRowsAndFrames(1, 1)
         p.spriteGlow!!.setAsVisible()
-        p.spriteGlow!!.composeSprite()
 
         p.actorValue = ActorValue()
         p.actorValue.set("scale", 1.0f)

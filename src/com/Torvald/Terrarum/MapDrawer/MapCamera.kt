@@ -19,8 +19,10 @@ import java.util.*
 object MapCamera {
     private val map: GameMap = Terrarum.game.map;
 
-    internal var cameraX = 0
-    internal var cameraY = 0
+    var cameraX = 0
+        private set
+    var cameraY = 0
+        private set
 
     private val TSIZE = MapDrawer.TILE_SIZE
 
@@ -122,6 +124,7 @@ object MapCamera {
             , TileNameCode.ORE_ILMENITE
             , TileNameCode.ORE_AURICHALCUM
 
+            , TileNameCode.WATER
             , TileNameCode.WATER_1
             , TileNameCode.WATER_2
             , TileNameCode.WATER_3
@@ -153,7 +156,6 @@ object MapCamera {
             , TileNameCode.LAVA_13
             , TileNameCode.LAVA_14
             , TileNameCode.LAVA_15
-            , TileNameCode.LAVA
     )
 
     /**
@@ -444,18 +446,9 @@ object MapCamera {
         }
     }
 
-    @JvmStatic
-    fun div16(x: Int): Int {
-        return x and 0x7FFFFFFF shr 4
-    }
-
-    fun mod16(x: Int): Int {
-        return x and 15
-    }
-
-    fun quantise16(x: Int): Int {
-        return x and 0xFFFFFFF0.toInt()
-    }
+    fun div16(x: Int): Int = x and 0x7FFFFFFF shr 4
+    fun mod16(x: Int): Int = x and 15
+    fun quantise16(x: Int): Int = x and 0xFFFFFFF0.toInt()
 
     fun clampW(x: Int): Int {
         if (x < 0) {
@@ -477,7 +470,6 @@ object MapCamera {
         }
     }
 
-    @JvmStatic
     fun clampWTile(x: Int): Int {
         if (x < 0) {
             return 0
@@ -488,7 +480,6 @@ object MapCamera {
         }
     }
 
-    @JvmStatic
     fun clampHTile(x: Int): Int {
         if (x < 0) {
             return 0
@@ -499,55 +490,21 @@ object MapCamera {
         }
     }
 
-    @JvmStatic
-    fun getRenderWidth(): Int {
-        return renderWidth
-    }
+    fun getRenderWidth(): Int = renderWidth
+    fun getRenderHeight(): Int = renderHeight
 
-    @JvmStatic
-    fun getRenderHeight(): Int {
-        return renderHeight
-    }
+    fun getRenderStartX(): Int = div16(cameraX)
+    fun getRenderStartY(): Int = div16(cameraY)
 
-    @JvmStatic
-    fun getRenderStartX(): Int {
-        return div16(cameraX)
-    }
+    fun getRenderEndX(): Int = clampWTile(getRenderStartX() + div16(renderWidth) + 2)
+    fun getRenderEndY(): Int = clampHTile(getRenderStartY() + div16(renderHeight) + 2)
 
-    @JvmStatic
-    fun getRenderStartY(): Int {
-        return div16(cameraY)
-    }
+    private fun isConnectSelf(b: Int): Boolean = TILES_CONNECT_SELF.contains(b)
+    private fun isConnectMutual(b: Int): Boolean = TILES_CONNECT_MUTUAL.contains(b)
+    private fun isWallSticker(b: Int): Boolean = TILES_WALL_STICKER.contains(b)
+    private fun isPlatform(b: Int): Boolean = TILES_WALL_STICKER_CONNECT_SELF.contains(b)
 
-    @JvmStatic
-    fun getRenderEndX(): Int {
-        return clampWTile(getRenderStartX() + div16(renderWidth) + 2)
-    }
-
-    @JvmStatic
-    fun getRenderEndY(): Int {
-        return clampHTile(getRenderStartY() + div16(renderHeight) + 2)
-    }
-
-    private fun isConnectSelf(b: Int): Boolean {
-        return Arrays.asList(*TILES_CONNECT_SELF).contains(b)
-    }
-
-    private fun isConnectMutual(b: Int): Boolean {
-        return Arrays.asList(*TILES_CONNECT_MUTUAL).contains(b)
-    }
-
-    private fun isWallSticker(b: Int): Boolean {
-        return Arrays.asList(*TILES_WALL_STICKER).contains(b)
-    }
-
-    private fun isPlatform(b: Int): Boolean {
-        return Arrays.asList(*TILES_WALL_STICKER_CONNECT_SELF).contains(b)
-    }
-
-    private fun isBlendMul(b: Int): Boolean {
-        return Arrays.asList(*TILES_BLEND_MUL).contains(b)
-    }
+    private fun isBlendMul(b: Int): Boolean = TILES_BLEND_MUL.contains(b)
 
     private fun setBlendModeMul() {
         GL11.glEnable(GL11.GL_BLEND)
@@ -557,15 +514,5 @@ object MapCamera {
     private fun setBlendModeNormal() {
         GL11.glDisable(GL11.GL_BLEND)
         Terrarum.appgc.graphics.setDrawMode(Graphics.MODE_NORMAL)
-    }
-
-    @JvmStatic
-    fun getCameraX(): Int {
-        return cameraX
-    }
-
-    @JvmStatic
-    fun getCameraY(): Int {
-        return cameraY
     }
 }

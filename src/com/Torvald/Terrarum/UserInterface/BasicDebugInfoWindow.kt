@@ -137,14 +137,14 @@ class BasicDebugInfoWindow : UICanvas {
         // Hitbox
         val zoom = Terrarum.game.screenZoom
         g.setColor(Color(0x007f00))
-        g.drawRect(hitbox.getHitboxStart().getX() * zoom - MapCamera.cameraX * zoom
-                , hitbox.getHitboxStart().getY() * zoom - MapCamera.cameraY * zoom
-                , hitbox.getWidth() * zoom
-                , hitbox.getHeight() * zoom)
+        g.drawRect(hitbox.hitboxStart.x * zoom - MapCamera.cameraX * zoom
+                , hitbox.hitboxStart.y * zoom - MapCamera.cameraY * zoom
+                , hitbox.width * zoom
+                , hitbox.height * zoom)
         // ...and its point
         g.fillRect(
-                (hitbox.getPointedX() - 1) * zoom - MapCamera.cameraX * zoom
-                , (hitbox.getPointedY() - 1) * zoom - MapCamera.cameraY * zoom
+                (hitbox.pointedX - 1) * zoom - MapCamera.cameraX * zoom
+                , (hitbox.pointedY - 1) * zoom - MapCamera.cameraY * zoom
                 , 3f, 3f)
         g.drawString(
                 Lang.get("DEV_COLOUR_LEGEND_GREEN") + " :  hitbox", (Terrarum.WIDTH - 200).toFloat()
@@ -152,14 +152,14 @@ class BasicDebugInfoWindow : UICanvas {
 
         // Next hitbox
         g.setColor(Color.blue)
-        g.drawRect(nextHitbox!!.getHitboxStart().getX() * zoom - MapCamera.cameraX * zoom
-                , nextHitbox.getHitboxStart().getY() * zoom - MapCamera.cameraY * zoom
-                , nextHitbox.getWidth() * zoom
-                , nextHitbox.getHeight() * zoom)
+        g.drawRect(nextHitbox!!.hitboxStart.x * zoom - MapCamera.cameraX * zoom
+                , nextHitbox.hitboxStart.y * zoom - MapCamera.cameraY * zoom
+                , nextHitbox.width * zoom
+                , nextHitbox.height * zoom)
         // ...and its point
         g.fillRect(
-                (nextHitbox.getPointedX() - 1) * zoom - MapCamera.cameraX * zoom
-                , (nextHitbox.getPointedY() - 1) * zoom - MapCamera.cameraY * zoom
+                (nextHitbox.pointedX - 1) * zoom - MapCamera.cameraX * zoom
+                , (nextHitbox.pointedY - 1) * zoom - MapCamera.cameraY * zoom
                 , 3f, 3f)
         g.drawString(
                 Lang.get("DEV_COLOUR_LEGEND_BLUE") + " :  nextHitbox", (Terrarum.WIDTH - 200).toFloat()

@@ -185,7 +185,7 @@ constructor() : BasicGameState() {
 
         // compensate for zoom. UIs have to be treated specially! (see UIHandler)
         g.translate(
-                -MapCamera.getCameraX() * screenZoom, -MapCamera.getCameraY() * screenZoom)
+                -MapCamera.cameraX * screenZoom, -MapCamera.cameraY * screenZoom)
 
         MapCamera.renderBehind(gc, g)
 
@@ -305,7 +305,5 @@ constructor() : BasicGameState() {
     /**
      * extension function for org.newdawn.slick.Color
      */
-    fun Color.getRGB24(): Int = (this.redByte shl 16) or
-                                (this.greenByte shl 8) or
-                                (this.blueByte)
+    fun Color.getRGB24(): Int = (this.redByte shl 16) or (this.greenByte shl 8) or (this.blueByte)
 }

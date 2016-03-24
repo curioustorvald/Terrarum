@@ -46,13 +46,6 @@ constructor(gamename: String) : StateBasedGame(gamename) {
     override fun initStatesList(gc: GameContainer) {
         gameFontWhite = GameFontWhite()
 
-        try {
-            Lang()
-        }
-        catch (e: IOException) {
-            e.printStackTrace()
-        }
-
         hasController = gc.input.controllerCount > 0
         if (hasController) {
             for (c in 0..Controllers.getController(0).axisCount - 1) {

@@ -12,6 +12,12 @@ import java.io.IOException
  */
 object JsonWriter {
 
+    /**
+     * Serialise a class to the file as JSON, using Google GSON.
+     *
+     * @param c: a class
+     * @param path: path to write a file
+     */
     @Throws(IOException::class)
     fun writeToFile(c: Any, path: String) {
         val classElem = Gson().toJsonTree(c)
@@ -21,6 +27,12 @@ object JsonWriter {
         writer.close()
     }
 
+    /**
+     * Serialise JsonObject to the file as JSON, using Google GSON.
+     *
+     * @param jsonObject
+     * @param path: path to write a file
+     */
     @Throws(IOException::class)
     fun writeToFile(jsonObject: JsonObject, path: String) {
         val writer = FileWriter(path)

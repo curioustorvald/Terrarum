@@ -96,7 +96,10 @@ constructor(val UI: UICanvas) {
             UIGraphicInstance.font = Terrarum.gameFontWhite
 
             UI.render(gc, UIGraphicInstance)
-            gameGraphicInstance.drawImage(UIDrawnCanvas, posX + MapCamera.getCameraX() * Terrarum.game.screenZoom, posY + MapCamera.getCameraY() * Terrarum.game.screenZoom)// compensate for screenZoom AND camera translation
+            gameGraphicInstance.drawImage(UIDrawnCanvas,
+                    posX + MapCamera.cameraX * Terrarum.game.screenZoom,
+                    posY + MapCamera.cameraY * Terrarum.game.screenZoom
+            )// compensate for screenZoom AND camera translation
             // (see Game.render -> g.translate())
         }
     }

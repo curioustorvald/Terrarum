@@ -15,6 +15,6 @@ class Help : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo().execute("Prints some utility functions assigned to runction row of the keyboard.")
+        Echo().execute("Prints some utility functions assigned to function row of the keyboard.")
     }
 }

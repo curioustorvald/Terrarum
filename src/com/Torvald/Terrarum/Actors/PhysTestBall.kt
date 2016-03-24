@@ -17,9 +17,9 @@ class PhysTestBall : ActorWithBody {
     override fun drawBody(gc: GameContainer, g: Graphics) {
         g.color = Color.orange
         g.fillOval(
-                hitbox!!.getPosX(),
-                hitbox!!.getPosY(),
-                hitbox!!.getWidth(),
-                hitbox!!.getHeight())
+                hitbox!!.posX,
+                hitbox!!.posY,
+                hitbox!!.width,
+                hitbox!!.height)
     }
 }

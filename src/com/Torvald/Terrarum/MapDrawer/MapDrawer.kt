@@ -54,7 +54,12 @@ object MapDrawer {
 
         g.color = getColourFromMap(colTemp)
         //g.color = getColourFromMap(3022)
-        g.fillRect(MapCamera.getCameraX() * zoom, MapCamera.getCameraY() * zoom, Terrarum.WIDTH * if (zoom < 1) 1f / zoom else zoom, Terrarum.HEIGHT * if (zoom < 1) 1f / zoom else zoom)
+        g.fillRect(
+                MapCamera.cameraX * zoom,
+                MapCamera.cameraY * zoom,
+                Terrarum.WIDTH * if (zoom < 1) 1f / zoom else zoom,
+                Terrarum.HEIGHT * if (zoom < 1) 1f / zoom else zoom
+        )
     }
 
     /**

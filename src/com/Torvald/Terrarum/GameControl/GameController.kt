@@ -16,8 +16,8 @@ import org.newdawn.slick.Input
 object GameController {
 
     fun processInput(input: Input) {
-        val mouseTileX = ((MapCamera.getCameraX() + input.mouseX / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
-        val mouseTileY = ((MapCamera.getCameraY() + input.mouseY / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
+        val mouseTileX = ((MapCamera.cameraX + input.mouseX / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
+        val mouseTileY = ((MapCamera.cameraY + input.mouseY / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
 
 
         KeyToggler.update(input)
