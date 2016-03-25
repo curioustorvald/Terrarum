@@ -1,7 +1,7 @@
-package com.Torvald.Serialise
+package com.torvald.serialise
 
-import com.Torvald.Terrarum.GameMap.GameMap
-import com.Torvald.Terrarum.Terrarum
+import com.torvald.terrarum.gamemap.GameMap
+import com.torvald.terrarum.Terrarum
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path

@@ -1,6 +1,6 @@
-package com.Torvald
+package com.torvald
 
-import com.Torvald.Terrarum.Terrarum
+import com.torvald.terrarum.Terrarum
 
 import javax.imageio.ImageIO
 import java.awt.*

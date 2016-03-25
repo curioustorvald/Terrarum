@@ -2,10 +2,10 @@
  * This code is based on the original author's code written in Lua.
  */
 
-package com.Torvald.spriteAnimation
+package com.torvald.spriteanimation
 
-import com.Torvald.Terrarum.Game
-import com.Torvald.Terrarum.Terrarum
+import com.torvald.terrarum.Game
+import com.torvald.terrarum.Terrarum
 import com.jme3.math.FastMath
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image

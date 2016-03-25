@@ -1,4 +1,4 @@
-package com.Torvald.ColourUtil
+package com.torvald.colourutil
 
 import org.newdawn.slick.Color
 

@@ -1,9 +1,9 @@
-package com.Torvald.Terrarum
+package com.torvald.terrarum
 
-import com.Torvald.ImageFont.GameFontWhite
-import com.Torvald.JsonFetcher
-import com.Torvald.JsonWriter
-import com.Torvald.Terrarum.LangPack.Lang
+import com.torvald.imagefont.GameFontWhite
+import com.torvald.JsonFetcher
+import com.torvald.JsonWriter
+import com.torvald.terrarum.langpack.Lang
 import org.lwjgl.input.Controllers
 import org.newdawn.slick.AppGameContainer
 import org.newdawn.slick.Font
@@ -39,7 +39,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         if (gameLocale.length < 4)
             gameLocale = sysLang
 
-        println("[Terrarum] Locale: " + gameLocale)
+        println("[terrarum] Locale: " + gameLocale)
     }
 
     @Throws(SlickException::class)
@@ -105,7 +105,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         @JvmStatic fun main(args: Array<String>) {
             try {
-                appgc = AppGameContainer(Terrarum("Terrarum"))
+                appgc = AppGameContainer(Terrarum("terrarum"))
                 appgc.setDisplayMode(WIDTH, HEIGHT, false)
 
                 appgc.setTargetFrameRate(TARGET_INTERNAL_FPS)
@@ -131,11 +131,11 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             val OS = System.getProperty("os.name").toUpperCase()
             if (OS.contains("WIN")) {
                 OperationSystem = "WINDOWS"
-                defaultDir = System.getenv("APPDATA") + "/Terrarum"
+                defaultDir = System.getenv("APPDATA") + "/terrarum"
             }
             else if (OS.contains("OS X")) {
                 OperationSystem = "OSX"
-                defaultDir = System.getProperty("user.home") + "/Library/Application Support/Terrarum"
+                defaultDir = System.getProperty("user.home") + "/Library/Application Support/terrarum"
             }
             else if (OS.contains("NUX") || OS.contains("NIX")) {
                 OperationSystem = "LINUX"

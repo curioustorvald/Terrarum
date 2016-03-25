@@ -15,9 +15,7 @@ speed : walk speed. [px / TARGET_FPS]
 jumppower : self-explanatory. [-px / TARGET_FPS^2]
 scale : creature body scale. Mass/strength/accel/etc. will be changed accordingly, hence the prefix “base” for some raw tokens.
 
--variable : variability factor. [array of percentiles]
-
-physiquemult : variable scale. Used for wild creatures ONLY.
+-mass : variability factor. [array of percentiles]
 
 encumbrance : capacity of carrying. [kg]
 basedefence : base defence value of body. Sterner body material == higher value

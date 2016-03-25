@@ -1,6 +1,6 @@
-package com.Torvald.Terrarum.MapGenerator
+package com.torvald.terrarum.mapgenerator
 
-import com.Torvald.Rand.HQRNG
+import com.torvald.random.HQRNG
 import com.sun.javaws.exceptions.InvalidArgumentException
 
 import java.util.Random

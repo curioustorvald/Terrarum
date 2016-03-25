@@ -1,6 +1,6 @@
-package com.Torvald.Terrarum.TileProperties
+package com.torvald.terrarum.tileproperties
 
-import com.Torvald.Terrarum.Terrarum
+import com.torvald.terrarum.Terrarum
 
 /**
  * Created by minjaesong on 16-02-21.

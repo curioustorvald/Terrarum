@@ -1,4 +1,4 @@
-package com.Torvald
+package com.torvald
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser

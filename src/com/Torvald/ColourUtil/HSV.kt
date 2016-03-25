@@ -1,4 +1,4 @@
-package com.Torvald.ColourUtil
+package com.torvald.colourutil
 
 /**
  * Created by minjaesong on 16-03-10.

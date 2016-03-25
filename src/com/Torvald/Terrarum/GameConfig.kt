@@ -1,4 +1,4 @@
-package com.Torvald.Terrarum
+package com.torvald.terrarum
 
 /**
  * Created by minjaesong on 16-03-19.

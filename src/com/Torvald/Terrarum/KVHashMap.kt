@@ -1,4 +1,4 @@
-package com.Torvald.Terrarum
+package com.torvald.terrarum
 
 import com.google.gson.JsonPrimitive
 import java.util.*
@@ -39,7 +39,7 @@ open class KVHashMap {
     }
 
     fun getAsInt(key: String): Int? {
-        return get(key) as Int
+        return get(key) as Int?
     }
 
     fun getAsFloat(key: String): Float? {
@@ -47,19 +47,19 @@ open class KVHashMap {
         if (value is Int)
             return value.toFloat()
         else if (value is JsonPrimitive) return value.asFloat
-        return value as Float
+        return value as Float?
     }
 
     fun getAsString(key: String): String? {
         val value = get(key)
         if (value is JsonPrimitive) return value.asString
-        return value as String
+        return value as String?
     }
 
     fun getAsBoolean(key: String): Boolean? {
         val value = get(key)
         if (value is JsonPrimitive) return value.asBoolean
-        return value as Boolean
+        return value as Boolean?
     }
 
     fun hasKey(key: String): Boolean {

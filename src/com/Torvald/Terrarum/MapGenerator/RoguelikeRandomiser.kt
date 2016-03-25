@@ -1,7 +1,7 @@
-package com.Torvald.Terrarum.MapGenerator
+package com.torvald.terrarum.mapgenerator
 
-import com.Torvald.ColourUtil.Col4096
-import com.Torvald.Rand.HQRNG
+import com.torvald.colourutil.Col4096
+import com.torvald.random.HQRNG
 import java.util.*
 
 /**

@@ -1,4 +1,4 @@
-package com.Torvald.Terrarum.GameMap
+package com.torvald.terrarum.gamemap
 
 import java.io.Serializable
 import java.util.Spliterator

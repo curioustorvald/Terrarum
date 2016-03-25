@@ -1,10 +1,10 @@
-package com.Torvald.Serialise
+package com.torvald.serialise
 
-import com.Torvald.CSVFetcher
-import com.Torvald.Terrarum.ItemProperties.ItemPropCodex
-import com.Torvald.Terrarum.ItemProperties.MaterialPropCodex
-import com.Torvald.Terrarum.Terrarum
-import com.Torvald.Terrarum.TileProperties.TilePropCodex
+import com.torvald.CSVFetcher
+import com.torvald.terrarum.itemproperties.ItemPropCodex
+import com.torvald.terrarum.itemproperties.MaterialPropCodex
+import com.torvald.terrarum.Terrarum
+import com.torvald.terrarum.tileproperties.TilePropCodex
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path

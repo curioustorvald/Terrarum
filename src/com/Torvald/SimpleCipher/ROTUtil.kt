@@ -1,4 +1,4 @@
-package com.Torvald.SimpleCipher
+package com.torvald.simplecipher
 
 /**
  * Created by minjaesong on 16-03-20.

@@ -1,6 +1,6 @@
-package com.Torvald.Terrarum.GameMap
+package com.torvald.terrarum.gamemap
 
-import com.Torvald.Point.Point2f
+import com.torvald.point.Point2f
 
 import java.io.Serializable
 

@@ -1,4 +1,4 @@
-package com.Torvald.Terrarum
+package com.torvald.terrarum
 
 import com.google.gson.JsonObject
 

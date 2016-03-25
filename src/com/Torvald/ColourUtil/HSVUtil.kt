@@ -1,4 +1,4 @@
-package com.Torvald.ColourUtil
+package com.torvald.colourutil
 
 import com.jme3.math.FastMath
 import org.newdawn.slick.Color

@@ -1,8 +1,8 @@
-package com.Torvald.Terrarum.LangPack
+package com.torvald.terrarum.langpack
 
-import com.Torvald.CSVFetcher
-import com.Torvald.ImageFont.GameFontWhite
-import com.Torvald.Terrarum.Terrarum
+import com.torvald.CSVFetcher
+import com.torvald.imagefont.GameFontWhite
+import com.torvald.terrarum.Terrarum
 import org.apache.commons.csv.CSVRecord
 import org.newdawn.slick.SlickException
 
@@ -78,12 +78,21 @@ object Lang {
     }
 
     operator fun get(key: String): String {
+        fun fallback(): String = lang[key]!!.get(FALLBACK_LANG_CODE)
+
         var value: String
         try {
             value = lang[key]!!.get(Terrarum.gameLocale)
+            // fallback if empty string
+            if (value.length == 0)
+                value = fallback()
+        }
+        catch (e1: kotlin.KotlinNullPointerException) {
+            value = "ERRNULL:$key"
         }
         catch (e: IllegalArgumentException) {
-            value = key
+            //value = key
+            value = fallback()
         }
 
         return value

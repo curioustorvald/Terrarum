@@ -1,6 +1,6 @@
-package com.Torvald.Terrarum.GameItem
+package com.torvald.terrarum.gameitem
 
-import com.Torvald.Terrarum.TileProperties.TilePropCodex
+import com.torvald.terrarum.tileproperties.TilePropCodex
 import org.newdawn.slick.GameContainer
 
 /**

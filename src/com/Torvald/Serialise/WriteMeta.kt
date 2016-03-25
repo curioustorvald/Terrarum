@@ -1,9 +1,9 @@
-package com.Torvald.Serialise
+package com.torvald.serialise
 
-import com.Torvald.Terrarum.MapGenerator.MapGenerator
-import com.Torvald.Terrarum.MapGenerator.RoguelikeRandomiser
-import com.Torvald.Terrarum.Terrarum
-import com.Torvald.Terrarum.TileProperties.TilePropCodex
+import com.torvald.terrarum.mapgenerator.MapGenerator
+import com.torvald.terrarum.mapgenerator.RoguelikeRandomiser
+import com.torvald.terrarum.Terrarum
+import com.torvald.terrarum.tileproperties.TilePropCodex
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.FileInputStream
 import java.io.File

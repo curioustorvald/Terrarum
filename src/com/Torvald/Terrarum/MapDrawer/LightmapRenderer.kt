@@ -1,10 +1,10 @@
-package com.Torvald.Terrarum.MapDrawer
+package com.torvald.terrarum.mapdrawer
 
-import com.Torvald.Terrarum.Actors.ActorWithBody
-import com.Torvald.Terrarum.Actors.Luminous
-import com.Torvald.Terrarum.GameMap.WorldTime
-import com.Torvald.Terrarum.Terrarum
-import com.Torvald.Terrarum.TileProperties.TilePropCodex
+import com.torvald.terrarum.gameactors.ActorWithBody
+import com.torvald.terrarum.gameactors.Luminous
+import com.torvald.terrarum.gamemap.WorldTime
+import com.torvald.terrarum.Terrarum
+import com.torvald.terrarum.tileproperties.TilePropCodex
 import com.jme3.math.FastMath
 import org.newdawn.slick.Color
 import org.newdawn.slick.Graphics

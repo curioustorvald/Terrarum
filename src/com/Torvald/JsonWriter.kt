@@ -1,4 +1,4 @@
-package com.Torvald
+package com.torvald
 
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -13,7 +13,7 @@ import java.io.IOException
 object JsonWriter {
 
     /**
-     * Serialise a class to the file as JSON, using Google GSON.
+     * serialise a class to the file as JSON, using Google GSON.
      *
      * @param c: a class
      * @param path: path to write a file
@@ -28,7 +28,7 @@ object JsonWriter {
     }
 
     /**
-     * Serialise JsonObject to the file as JSON, using Google GSON.
+     * serialise JsonObject to the file as JSON, using Google GSON.
      *
      * @param jsonObject
      * @param path: path to write a file

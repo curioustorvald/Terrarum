@@ -1,4 +1,4 @@
-package com.Torvald.Terrarum.MapGenerator
+package com.torvald.terrarum.mapgenerator
 
 /*
  * A speed-improved simplex noise algorithm for 2D, 3D and 4D in Java.
@@ -17,7 +17,7 @@ package com.Torvald.Terrarum.MapGenerator
  *
  */
 
-import com.Torvald.Rand.HQRNG
+import com.torvald.random.HQRNG
 
 class SimplexNoise_octave(seed: Int) {  // Simplex noise in 2D, 3D and 4D
 

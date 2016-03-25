@@ -1,9 +1,9 @@
-package com.Torvald.Terrarum.MapDrawer
+package com.torvald.terrarum.mapdrawer
 
-import com.Torvald.Terrarum.GameMap.GameMap
-import com.Torvald.Terrarum.Terrarum
-import com.Torvald.Terrarum.TileProperties.TileNameCode
-import com.Torvald.Terrarum.TileStat.TileStat
+import com.torvald.terrarum.gamemap.GameMap
+import com.torvald.terrarum.Terrarum
+import com.torvald.terrarum.tileproperties.TileNameCode
+import com.torvald.terrarum.tilestats.TileStat
 import com.jme3.math.FastMath
 import org.newdawn.slick.*
 

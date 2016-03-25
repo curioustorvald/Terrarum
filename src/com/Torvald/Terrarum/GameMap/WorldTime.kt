@@ -1,4 +1,4 @@
-package com.Torvald.Terrarum.GameMap
+package com.torvald.terrarum.gamemap
 
 /**
  * Created by minjaesong on 16-01-24.

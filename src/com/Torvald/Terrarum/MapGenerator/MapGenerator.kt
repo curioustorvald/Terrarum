@@ -1,9 +1,9 @@
-package com.Torvald.Terrarum.MapGenerator
+package com.torvald.terrarum.mapgenerator
 
-import com.Torvald.Rand.HQRNG
-import com.Torvald.Terrarum.GameMap.GameMap
-import com.Torvald.Terrarum.GameMap.MapLayer
-import com.Torvald.Terrarum.TileProperties.TileNameCode
+import com.torvald.random.HQRNG
+import com.torvald.terrarum.gamemap.GameMap
+import com.torvald.terrarum.gamemap.MapLayer
+import com.torvald.terrarum.tileproperties.TileNameCode
 import com.jme3.math.FastMath
 import java.util.*
 
@@ -12,7 +12,7 @@ object MapGenerator {
     private lateinit var map: GameMap
     private lateinit var random: Random
     //private static float[] noiseArray;
-    private var seed: Long? = null
+    private var seed: Long = 0
     private var width: Int = 0
     private var height: Int = 0
 
@@ -51,7 +51,7 @@ object MapGenerator {
     private val CAVEGEN_LARGEST_FEATURE = 256
     private val CAVEGEN_LARGEST_FEATURE_PERTURB = 128
 
-    private var worldOceanPosition: Int? = null
+    private var worldOceanPosition: Int = -1
     private val TYPE_OCEAN_LEFT = 0
     private val TYPE_OCEAN_RIGHT = 1
 
@@ -88,7 +88,7 @@ object MapGenerator {
     @JvmStatic
     fun generateMap() {
         random = HQRNG(seed!!)
-        println("[MapGenerator] Seed: " + seed)
+        println("[mapgenerator] Seed: " + seed)
 
         worldOceanPosition = if (random.nextBoolean()) TYPE_OCEAN_LEFT else TYPE_OCEAN_RIGHT
 
@@ -468,7 +468,7 @@ object MapGenerator {
     }
 
     private fun placeGlacierMount(heightMap: IntArray) {
-        println("[MapGenerator] Putting glacier...")
+        println("[mapgenerator] Putting glacier...")
 
         // raise
         for (i in heightMap.indices) {
@@ -498,7 +498,7 @@ object MapGenerator {
     }
 
     private fun heightMapToObjectMap(fs: IntArray) {
-        println("[MapGenerator] Shaping world as processed...")
+        println("[mapgenerator] Shaping world as processed...")
 
         // iterate for heightmap
         for (x in 0..width - 1) {
@@ -586,7 +586,7 @@ object MapGenerator {
     /* 2. Carve */
 
     private fun carveCave(noisemap: Array<FloatArray>, tile: Int, message: String) {
-        println("[MapGenerator] " + message)
+        println("[mapgenerator] " + message)
 
         for (i in 0..height - 1) {
             for (j in 0..width - 1) {
@@ -608,7 +608,7 @@ object MapGenerator {
      * @param message
      */
     private fun carveByMap(noisemap: Array<FloatArray>, scarcity: Float, tile: Int, message: String) {
-        println("[MapGenerator] " + message)
+        println("[mapgenerator] " + message)
 
         for (i in 0..height - 1) {
             for (j in 0..width - 1) {
@@ -632,7 +632,7 @@ object MapGenerator {
      * @param message
      */
     private fun fillByMap(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: Int, message: String) {
-        println("[MapGenerator] " + message)
+        println("[mapgenerator] " + message)
 
         for (i in 0..height - 1) {
             for (j in 0..width - 1) {
@@ -656,7 +656,7 @@ object MapGenerator {
      * @param message
      */
     private fun fillByMapInverseGradFilter(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: Int, message: String) {
-        println("[MapGenerator] " + message)
+        println("[mapgenerator] " + message)
 
         for (i in 0..height - 1) {
             for (j in 0..width - 1) {
@@ -684,7 +684,7 @@ object MapGenerator {
      * @param message
      */
     private fun fillByMapNoFilter(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: Int, message: String) {
-        println("[MapGenerator] " + message)
+        println("[mapgenerator] " + message)
 
         for (i in 0..height - 1) {
             for (j in 0..width - 1) {
@@ -696,7 +696,7 @@ object MapGenerator {
     }
 
     private fun fillByMapNoFilterUnderground(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: Int, message: String) {
-        println("[MapGenerator] " + message)
+        println("[mapgenerator] " + message)
 
         for (i in 0..height - 1) {
             for (j in 0..width - 1) {
@@ -710,7 +710,7 @@ object MapGenerator {
     }
 
     private fun fillByMap(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: IntArray, message: String) {
-        println("[MapGenerator] " + message)
+        println("[mapgenerator] " + message)
 
         for (i in 0..height - 1) {
             for (j in 0..width - 1) {
@@ -862,7 +862,7 @@ object MapGenerator {
     }
 
     private fun generateFloatingIslands() {
-        println("[MapGenerator] Placing floating islands...")
+        println("[mapgenerator] Placing floating islands...")
 
         val nIslandsMax = Math.round(map.width * 6f / 8192f)
         val nIslandsMin = Math.max(2, Math.round(map.width * 4f / 8192f))
@@ -894,7 +894,7 @@ object MapGenerator {
     /* Flood */
 
     private fun floodBottomLava() {
-        println("[MapGenerator] Flooding bottom lava...")
+        println("[mapgenerator] Flooding bottom lava...")
         for (i in height * 14 / 15..height - 1) {
             for (j in 0..width - 1) {
                 if (map.terrainArray[i][j].toInt() == 0) {
@@ -907,7 +907,7 @@ object MapGenerator {
     /* Plant */
 
     private fun plantGrass() {
-        println("[MapGenerator] Planting grass...")
+        println("[mapgenerator] Planting grass...")
 
         /* TODO composing dirt and stone
 		 * over certain level, use background dirt with stone 'peckles'
@@ -970,7 +970,7 @@ object MapGenerator {
             "green"
         else
             "white"
-        println("[MapGenerator] Beach sand type: " + thisSandStr)
+        println("[mapgenerator] Beach sand type: " + thisSandStr)
 
         var ix = 0
         while (ix < OCEAN_WIDTH * 1.5) {
@@ -1030,7 +1030,7 @@ object MapGenerator {
 
     /**
 
-     * @return width of the frozen area for MapGenerator.freeze
+     * @return width of the frozen area for mapgenerator.freeze
      */
     private fun getFrozenAreaWidth(y: Int): Int {
         val randDeviation = 7

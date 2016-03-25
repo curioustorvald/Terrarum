@@ -1,4 +1,4 @@
-package com.Torvald.Terrarum.MapGenerator
+package com.torvald.terrarum.mapgenerator
 
 internal object FloatingIslePreset05 {
     var w = 74

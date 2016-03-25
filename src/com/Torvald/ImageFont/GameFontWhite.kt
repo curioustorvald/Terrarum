@@ -1,6 +1,6 @@
-package com.Torvald.ImageFont
+package com.torvald.imagefont
 
-import com.Torvald.Terrarum.Terrarum
+import com.torvald.terrarum.Terrarum
 import org.newdawn.slick.*
 
 /**
@@ -29,7 +29,7 @@ constructor() : GameFontBase() {
                 "./res/graphics/fonts/cjkpunct.png", GameFontBase.W_CJK, GameFontBase.H_KANA)
         /*uniHan = new SpriteSheet(
                 "./res/graphics/fonts/unifont_unihan"
-                        + ((!Terrarum.gameLocale.contains("zh"))
+                        + ((!terrarum.gameLocale.contains("zh"))
                         ? "_ja" : "")
                         +".png"
                 , W_UNIHAN, H_UNIHAN
@@ -70,7 +70,7 @@ constructor() : GameFontBase() {
     override fun reloadUnihan() {
         /*uniHan = new SpriteSheet(
                 "./res/graphics/fonts/unifont_unihan"
-                        + ((!Terrarum.gameLocale.contains("zh"))
+                        + ((!terrarum.gameLocale.contains("zh"))
                            ? "_ja" : "")
                         +".png"
                 , W_UNIHAN, H_UNIHAN

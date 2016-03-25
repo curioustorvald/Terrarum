@@ -1,6 +1,6 @@
-package com.Torvald.Terrarum.MapGenerator
+package com.torvald.terrarum.mapgenerator
 
-import com.Torvald.Rand.HQRNG
+import com.torvald.random.HQRNG
 import com.jme3.math.FastMath
 
 class SimplexNoise

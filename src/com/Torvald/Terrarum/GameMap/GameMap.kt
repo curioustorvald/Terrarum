@@ -7,7 +7,7 @@
  * See http://www.gnu.org/licenses/gpl.html for information.
  */
 
-package com.Torvald.Terrarum.GameMap
+package com.torvald.terrarum.gamemap
 
 import org.newdawn.slick.SlickException
 

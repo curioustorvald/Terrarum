@@ -1,4 +1,4 @@
-package com.Torvald.Terrarum.GameItem
+package com.torvald.terrarum.gameitem
 
 import org.newdawn.slick.GameContainer
 

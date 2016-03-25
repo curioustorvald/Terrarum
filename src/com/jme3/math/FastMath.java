@@ -577,9 +577,9 @@ final public class FastMath {
     /**
      * Given 3 points in a 2d plane, this function computes if the points going from A-B-C
      * are moving counter clock wise.
-     * @param p0 Point 0.
-     * @param p1 Point 1.
-     * @param p2 Point 2.
+     * @param p0 point 0.
+     * @param p1 point 1.
+     * @param p2 point 2.
      * @return 1 If they are CCW, -1 if they are not CCW, 0 if p2 is between p0 and p1.
      */
     public static int counterClockwise(Vector2f p0, Vector2f p1, Vector2f p2) {

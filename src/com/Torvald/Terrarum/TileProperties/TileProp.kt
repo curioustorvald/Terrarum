@@ -1,4 +1,4 @@
-package com.Torvald.Terrarum.TileProperties
+package com.torvald.terrarum.tileproperties
 
 /**
  * Created by minjaesong on 16-02-16.

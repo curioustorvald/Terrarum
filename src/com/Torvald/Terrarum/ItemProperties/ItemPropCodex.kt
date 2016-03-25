@@ -1,8 +1,8 @@
-package com.Torvald.Terrarum.ItemProperties
+package com.torvald.terrarum.itemproperties
 
-import com.Torvald.Terrarum.Actors.CanBeStoredAsItem
-import com.Torvald.Terrarum.GameItem.InventoryItem
-import com.Torvald.Terrarum.Terrarum
+import com.torvald.terrarum.gameactors.CanBeStoredAsItem
+import com.torvald.terrarum.gameitem.InventoryItem
+import com.torvald.terrarum.Terrarum
 import org.newdawn.slick.GameContainer
 import java.util.*
 
@@ -11,7 +11,7 @@ import java.util.*
  */
 object ItemPropCodex {
 
-    val CSV_PATH = "./src/com/Torvald/Terrarum/ItemProperties/itemprop.csv"
+    val CSV_PATH = "./src/com/torvald/terrarum/itemproperties/itemprop.csv"
 
     /**
      * &lt;ItemID or RefID for Actor, TheItem&gt;

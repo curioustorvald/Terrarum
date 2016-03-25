@@ -1,24 +1,24 @@
-package com.Torvald.Terrarum
+package com.torvald.terrarum
 
-import com.Torvald.Terrarum.Actors.*
-import com.Torvald.Terrarum.ConsoleCommand.Authenticator
-import com.Torvald.Terrarum.GameControl.GameController
-import com.Torvald.Terrarum.GameControl.Key
-import com.Torvald.Terrarum.GameControl.KeyMap
-import com.Torvald.Terrarum.GameControl.KeyToggler
-import com.Torvald.Terrarum.GameMap.GameMap
-import com.Torvald.Terrarum.GameMap.WorldTime
-import com.Torvald.Terrarum.MapDrawer.LightmapRenderer
-import com.Torvald.Terrarum.MapDrawer.MapCamera
-import com.Torvald.Terrarum.MapDrawer.MapDrawer
-import com.Torvald.Terrarum.MapGenerator.MapGenerator
-import com.Torvald.Terrarum.MapGenerator.RoguelikeRandomiser
-import com.Torvald.Terrarum.TileProperties.TilePropCodex
-import com.Torvald.Terrarum.TileStat.TileStat
-import com.Torvald.Terrarum.UserInterface.BasicDebugInfoWindow
-import com.Torvald.Terrarum.UserInterface.ConsoleWindow
-import com.Torvald.Terrarum.UserInterface.Notification
-import com.Torvald.Terrarum.UserInterface.UIHandler
+import com.torvald.terrarum.gameactors.*
+import com.torvald.terrarum.console.Authenticator
+import com.torvald.terrarum.gamecontroller.GameController
+import com.torvald.terrarum.gamecontroller.Key
+import com.torvald.terrarum.gamecontroller.KeyMap
+import com.torvald.terrarum.gamecontroller.KeyToggler
+import com.torvald.terrarum.gamemap.GameMap
+import com.torvald.terrarum.gamemap.WorldTime
+import com.torvald.terrarum.mapdrawer.LightmapRenderer
+import com.torvald.terrarum.mapdrawer.MapCamera
+import com.torvald.terrarum.mapdrawer.MapDrawer
+import com.torvald.terrarum.mapgenerator.MapGenerator
+import com.torvald.terrarum.mapgenerator.RoguelikeRandomiser
+import com.torvald.terrarum.tileproperties.TilePropCodex
+import com.torvald.terrarum.tilestats.TileStat
+import com.torvald.terrarum.ui.BasicDebugInfoWindow
+import com.torvald.terrarum.ui.ConsoleWindow
+import com.torvald.terrarum.ui.Notification
+import com.torvald.terrarum.ui.UIHandler
 import com.jme3.math.FastMath
 import org.lwjgl.opengl.ARBShaderObjects
 import org.lwjgl.opengl.GL11
@@ -101,7 +101,7 @@ constructor() : BasicGameState() {
 
         MapGenerator.attachMap(map)
         MapGenerator.setSeed(0x51621D2)
-        //MapGenerator.setSeed(new HQRNG().nextLong());
+        //mapgenerator.setSeed(new HQRNG().nextLong());
         MapGenerator.generateMap()
 
         RoguelikeRandomiser.setSeed(0x540198)
@@ -109,8 +109,8 @@ constructor() : BasicGameState() {
 
 
         // add new player and put it to actorContainer
-        //player = new Player();
-        player = PFSigrid.build()
+        //player = PFSigrid.build()
+        player = PFCynthia.create()
         //player.setNoClip(true);
         actorContainer.add(player)
 

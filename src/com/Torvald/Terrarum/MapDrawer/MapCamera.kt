@@ -1,10 +1,10 @@
-package com.Torvald.Terrarum.MapDrawer
+package com.torvald.terrarum.mapdrawer
 
-import com.Torvald.Terrarum.GameMap.GameMap
-import com.Torvald.Terrarum.GameMap.PairedMapLayer
-import com.Torvald.Terrarum.Terrarum
-import com.Torvald.Terrarum.TileProperties.TileNameCode
-import com.Torvald.Terrarum.TileProperties.TilePropCodex
+import com.torvald.terrarum.gamemap.GameMap
+import com.torvald.terrarum.gamemap.PairedMapLayer
+import com.torvald.terrarum.Terrarum
+import com.torvald.terrarum.tileproperties.TileNameCode
+import com.torvald.terrarum.tileproperties.TilePropCodex
 import com.jme3.math.FastMath
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.GameContainer

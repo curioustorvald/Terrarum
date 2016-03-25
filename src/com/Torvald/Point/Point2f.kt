@@ -1,4 +1,4 @@
-package com.Torvald.Point
+package com.torvald.point
 
 /**
  * Created by minjaesong on 16-01-15.

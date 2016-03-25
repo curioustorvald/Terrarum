@@ -1,4 +1,4 @@
-package com.Torvald
+package com.torvald
 
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser

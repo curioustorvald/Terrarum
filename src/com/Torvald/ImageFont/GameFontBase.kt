@@ -1,6 +1,6 @@
-package com.Torvald.ImageFont
+package com.torvald.imagefont
 
-import com.Torvald.Terrarum.Terrarum
+import com.torvald.terrarum.Terrarum
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
 
