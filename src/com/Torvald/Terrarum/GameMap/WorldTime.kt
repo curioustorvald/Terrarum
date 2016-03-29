@@ -143,11 +143,11 @@ class WorldTime {
         /**
          * 22h
          */
-        @Transient val DAY_LENGTH = 79200 //must be the multiple of 3600
+        val DAY_LENGTH = 79200 //must be the multiple of 3600
 
-        @Transient val HOUR_SEC: Int = 3600
-        @Transient val MINUTE_SEC: Int = 60
-        @Transient val HOUR_MIN: Int = 60
-        @Transient val GAME_MIN_TO_REAL_SEC: Float = 60f
+        val HOUR_SEC: Int = 3600
+        val MINUTE_SEC: Int = 60
+        val HOUR_MIN: Int = 60
+        val GAME_MIN_TO_REAL_SEC: Float = 60f
     }
 }

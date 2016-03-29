@@ -3,7 +3,7 @@ package com.torvald.terrarum.mapdrawer
 import com.torvald.terrarum.gamemap.GameMap
 import com.torvald.terrarum.Terrarum
 import com.torvald.terrarum.tileproperties.TileNameCode
-import com.torvald.terrarum.tilestats.TileStat
+import com.torvald.terrarum.tilestats.TileStats
 import com.jme3.math.FastMath
 import org.newdawn.slick.*
 
@@ -44,8 +44,8 @@ object MapDrawer {
     fun drawEnvOverlay(g: Graphics) {
         val onscreen_tiles_max = FastMath.ceil(Terrarum.HEIGHT * Terrarum.WIDTH / FastMath.sqr(TILE_SIZE.toFloat())) * 2
         val onscreen_tiles_cap = onscreen_tiles_max / 4f
-        val onscreen_cold_tiles = TileStat.getCount(*TILES_COLD).toFloat()
-        val onscreen_warm_tiles = TileStat.getCount(*TILES_WARM).toFloat()
+        val onscreen_cold_tiles = TileStats.getCount(*TILES_COLD).toFloat()
+        val onscreen_warm_tiles = TileStats.getCount(*TILES_WARM).toFloat()
 
         val colTemp_cold = colTempLinearFunc(onscreen_cold_tiles / onscreen_tiles_cap)
         val colTemp_warm = colTempLinearFunc(-(onscreen_warm_tiles / onscreen_tiles_cap))

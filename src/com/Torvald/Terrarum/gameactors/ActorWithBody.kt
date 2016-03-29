@@ -7,6 +7,7 @@ import com.torvald.terrarum.mapdrawer.MapDrawer
 import com.torvald.terrarum.tileproperties.TilePropCodex
 import com.torvald.spriteanimation.SpriteAnimation
 import com.jme3.math.FastMath
+import com.torvald.terrarum.tileproperties.TileNameCode
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 
@@ -424,7 +425,7 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
             }
 
             // evaluate
-            if (TilePropCodex.getProp(map.getTileFromTerrain(tileX, tileY)).isSolid) {
+            if (TilePropCodex.getProp(map.getTileFromTerrain(tileX, tileY) ?: TileNameCode.STONE).isSolid) {
                 contactAreaCounter += 1
             }
         }

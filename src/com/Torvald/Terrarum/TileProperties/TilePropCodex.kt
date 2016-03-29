@@ -55,15 +55,15 @@ class TilePropCodex {
             return tileProps[indexDamageToArrayAddr(index, damage)]
         }
 
-        fun getProp(rawIndex: Int): TileProp {
+        fun getProp(rawIndex: Int?): TileProp {
             try {
-                tileProps[rawIndex].id
+                tileProps[rawIndex ?: TileNameCode.STONE].id
             }
             catch (e: NullPointerException) {
                 throw NullPointerException("Tile prop with raw id $rawIndex does not exist.")
             }
 
-            return tileProps[rawIndex]
+            return tileProps[rawIndex ?: TileNameCode.STONE]
         }
 
         private fun setProp(prop: TileProp, record: CSVRecord) {
@@ -88,7 +88,7 @@ class TilePropCodex {
             if (prop.isFluid) prop.movementResistance = intVal(record, "movr")
 
             print(formatNum3(prop.id) + ":" + formatNum2(prop.damage))
-            println("\t" + prop.name!!)
+            println("\t" + prop.name)
         }
 
         private fun intVal(rec: CSVRecord, s: String): Int {

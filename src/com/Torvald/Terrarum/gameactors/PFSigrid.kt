@@ -4,6 +4,7 @@ import com.torvald.JsonFetcher
 import com.torvald.terrarum.gameactors.faction.Faction
 import com.torvald.spriteanimation.SpriteAnimation
 import com.google.gson.JsonObject
+import com.torvald.terrarum.gameactors.faction.FactionFactory
 import org.newdawn.slick.SlickException
 import java.io.IOException
 
@@ -12,8 +13,6 @@ import java.io.IOException
  */
 
 object PFSigrid {
-
-    private val FACTION_PATH = "./res/raw/"
 
     fun create(): Player {
         val p = Player()
@@ -66,27 +65,8 @@ object PFSigrid {
 
         p.setPosition((4096 * 16).toFloat(), (300 * 16).toFloat())
 
-        p.faction.add(loadFactioningData("FactionSigrid.json"))
+        p.faction.add(FactionFactory.create("FactionSigrid.json"))
 
         return p
-    }
-
-    private fun loadFactioningData(filename: String): Faction {
-        var jsonObject: JsonObject = JsonObject()
-        try {
-            jsonObject = JsonFetcher.readJson(FACTION_PATH + filename)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            System.exit(-1)
-        }
-
-        val faction = Faction(jsonObject.get("factionname").asString)
-
-        jsonObject.get("factionamicable").asJsonArray.forEach { jobj -> faction.addFactionAmicable(jobj.asString) }
-        jsonObject.get("factionneutral").asJsonArray.forEach { jobj -> faction.addFactionNeutral(jobj.asString) }
-        jsonObject.get("factionhostile").asJsonArray.forEach { jobj -> faction.addFactionHostile(jobj.asString) }
-        jsonObject.get("factionfearful").asJsonArray.forEach { jobj -> faction.addFactionFearful(jobj.asString) }
-
-        return faction
     }
 }

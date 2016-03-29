@@ -4,12 +4,8 @@ import com.torvald.colourutil.Col4096
 import com.torvald.RasterWriter
 import com.torvald.terrarum.Terrarum
 
-import javax.imageio.ImageIO
-import java.awt.*
-import java.awt.color.ColorSpace
-import java.awt.image.*
 import java.io.*
-import java.util.Hashtable
+import java.util.HashMap
 
 /**
  * Created by minjaesong on 16-01-17.
@@ -19,7 +15,7 @@ class ExportMap : ConsoleCommand {
     //private var mapData: ByteArray? = null
     // private var mapDataPointer = 0
 
-    private val colorTable = Hashtable<Byte, Col4096>()
+    private val colorTable = HashMap<Byte, Col4096>()
 
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
@@ -29,8 +25,8 @@ class ExportMap : ConsoleCommand {
             var mapDataPointer = 0
 
             for (tile in Terrarum.game.map.layerTerrain) {
-                val colArray = (colorTable as java.util.Map<Byte, Col4096>)
-                        .getOrDefault(tile, Col4096(0xFFF)).toByteArray()
+                val colArray = (colorTable as Map<Byte, Col4096>)
+                        .getOrElse(tile, { Col4096(0xFFF) }).toByteArray()
 
                 for (i in 0..2) {
                     mapData[mapDataPointer + i] = colArray[i]

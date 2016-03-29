@@ -29,7 +29,8 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * This source is a custom modification of the original code.
+ * This source, used in the project 'Terrarum' is a derivative of the original code.
+ * I claim no ownership to this FastMath module. --Torvald
  */
 
 package com.jme3.math;

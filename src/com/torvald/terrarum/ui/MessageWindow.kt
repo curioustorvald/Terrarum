@@ -53,7 +53,7 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
         this.messagesList = messagesList
     }
 
-    override fun update(gc: GameContainer, delta_t: Int) {
+    override fun update(gc: GameContainer, delta: Int) {
 
     }
 

@@ -43,7 +43,7 @@ class ConsoleWindow : UICanvas, UITypable {
         reset()
     }
 
-    override fun update(gc: GameContainer, delta_t: Int) {
+    override fun update(gc: GameContainer, delta: Int) {
 
     }
 

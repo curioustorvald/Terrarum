@@ -1,11 +1,3 @@
-/* 
- * MapLoader version 1.2
- * Release date 2013-05-20
- * Copyright 2013 SKYHi14
- * 
- * The program is distributed in GNU GPL Licence version 3.
- * See http://www.gnu.org/licenses/gpl.html for information.
- */
 
 package com.torvald.terrarum.gamemap
 
@@ -89,23 +81,33 @@ constructor(//properties
     val damageDataArray: Array<ByteArray>
         get() = terrainDamage.dataPair
 
-    fun getTileFromWall(x: Int, y: Int): Int {
-        return layerWall.getTile(x, y) * PairedMapLayer.RANGE + getWallDamage(x, y)
+    fun getTileFromWall(x: Int, y: Int): Int? {
+        val wall: Int? = layerWall.getTile(x, y)
+        val wallDamage: Int? = getWallDamage(x, y)
+        return if (wall == null || wallDamage == null)
+            null
+        else
+            wall * PairedMapLayer.RANGE + wallDamage
     }
 
-    fun getTileFromTerrain(x: Int, y: Int): Int {
-        return layerTerrain.getTile(x, y) * PairedMapLayer.RANGE + getTerrainDamage(x, y)
+    fun getTileFromTerrain(x: Int, y: Int): Int? {
+        val terrain: Int? = layerTerrain.getTile(x, y)
+        val terrainDamage: Int? = getTerrainDamage(x, y)
+        return if (terrain == null || terrainDamage == null)
+            null
+        else
+            terrain * PairedMapLayer.RANGE + terrainDamage
     }
 
-    fun getTileFromWire(x: Int, y: Int): Int {
+    fun getTileFromWire(x: Int, y: Int): Int? {
         return layerWire.getTile(x, y)
     }
 
-    fun getWallDamage(x: Int, y: Int): Int {
+    fun getWallDamage(x: Int, y: Int): Int? {
         return wallDamage.getData(x, y)
     }
 
-    fun getTerrainDamage(x: Int, y: Int): Int {
+    fun getTerrainDamage(x: Int, y: Int): Int? {
         return terrainDamage.getData(x, y)
     }
 
@@ -147,7 +149,7 @@ constructor(//properties
         layerWire.data[y][x] = tile
     }
 
-    fun getTileFrom(mode: Int, x: Int, y: Int): Int {
+    fun getTileFrom(mode: Int, x: Int, y: Int): Int? {
         if (mode == TERRAIN) {
             return getTileFromTerrain(x, y)
         }

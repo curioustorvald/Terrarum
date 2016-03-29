@@ -32,7 +32,7 @@ class BasicDebugInfoWindow : UICanvas {
 
     }
 
-    override fun update(gc: GameContainer, delta_t: Int) {
+    override fun update(gc: GameContainer, delta: Int) {
         val player = Terrarum.game.player
         val hitbox = player.hitbox!!
 
@@ -80,32 +80,26 @@ class BasicDebugInfoWindow : UICanvas {
         val lightVal: String
         var mtX = mouseTileX.toString()
         var mtY = mouseTileY.toString()
-        try {
-            val valRaw = LightmapRenderer.getValueFromMap(mouseTileX, mouseTileY)
-            val rawR = LightmapRenderer.getRawR(valRaw)
-            val rawG = LightmapRenderer.getRawG(valRaw)
-            val rawB = LightmapRenderer.getRawB(valRaw)
-            lightVal = valRaw.toInt().toString() + " (" +
+        val valRaw = LightmapRenderer.getValueFromMap(mouseTileX, mouseTileY) ?: -1
+        val rawR = LightmapRenderer.getRawR(valRaw)
+        val rawG = LightmapRenderer.getRawG(valRaw)
+        val rawB = LightmapRenderer.getRawB(valRaw)
+        lightVal = if (valRaw == -1)
+            "—"
+        else
+            valRaw.toInt().toString() + " (" +
                     rawR.toString() + " " +
                     rawG.toString() + " " +
                     rawB.toString() + ")"
-        } catch (e: ArrayIndexOutOfBoundsException) {
-            lightVal = "out of bounds"
-            mtX = "---"
-            mtY = "---"
-        }
+
 
         printLine(g, 7, "light at cursor : " + lightVal)
 
         val tileNo: String
-        try {
-            val tileNumRaw = Terrarum.game.map.getTileFromTerrain(mouseTileX, mouseTileY)
-            val tilenum = tileNumRaw / PairedMapLayer.RANGE
-            val tiledmg = tileNumRaw % PairedMapLayer.RANGE
-            tileNo = "$tilenum:$tiledmg"
-        } catch (e: ArrayIndexOutOfBoundsException) {
-            tileNo = "-"
-        }
+        val tileNumRaw = Terrarum.game.map.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
+        val tilenum = tileNumRaw / PairedMapLayer.RANGE
+        val tiledmg = tileNumRaw % PairedMapLayer.RANGE
+        tileNo = if (tileNumRaw == -1) "—" else "$tilenum:$tiledmg"
 
         printLine(g, 8, "tile at cursor : $tileNo ($mtX, $mtY)")
 

@@ -1,5 +1,6 @@
 package com.torvald.terrarum.gameactors.faction
 
+import com.torvald.random.HQRNG
 import java.util.HashSet
 
 /**
@@ -12,6 +13,7 @@ class Faction(factionName: String) {
     lateinit var factionNeutral: HashSet<String>
     lateinit var factionHostile: HashSet<String>
     lateinit var factionFearful: HashSet<String>
+    var factionID: Long = HQRNG().nextLong()
 
     init {
         this.factionName = factionName

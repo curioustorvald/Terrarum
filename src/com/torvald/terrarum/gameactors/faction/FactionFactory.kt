@@ -8,10 +8,15 @@ import java.io.IOException
 /**
  * Created by minjaesong on 16-02-15.
  */
-class FactionRelatorFactory {
+object FactionFactory {
 
+    const val JSONPATH = "./res/raw/factions/"
+
+    /**
+     * @param filename with extension
+     */
     @Throws(IOException::class)
-    fun build(filename: String): Faction {
+    fun create(filename: String): Faction {
         val jsonObj = JsonFetcher.readJson(JSONPATH + filename)
         val factionObj = Faction(jsonObj.get("factionname").asString)
 
@@ -23,10 +28,4 @@ class FactionRelatorFactory {
 
         return factionObj
     }
-
-    companion object {
-
-        val JSONPATH = "./res/raw/"
-    }
-
 }

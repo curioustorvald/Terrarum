@@ -13,7 +13,7 @@ import java.util.Arrays
 /**
  * Created by minjaesong on 16-02-01.
  */
-object TileStat {
+object TileStats {
 
     private val tilestat = ShortArray(GameMap.TILES_SUPPORTED)
 
@@ -47,8 +47,8 @@ object TileStat {
             for (x in for_x_start..for_x_end - 1) {
                 val tileWall = map.getTileFromWall(x, y)
                 val tileTerrain = map.getTileFromTerrain(x, y)
-                ++tilestat[tileWall]
-                ++tilestat[tileTerrain]
+                ++tilestat[tileWall ?: 0]
+                ++tilestat[tileTerrain ?: 0]
             }
         }
     }

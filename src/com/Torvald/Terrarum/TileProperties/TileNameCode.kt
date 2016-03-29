@@ -26,7 +26,7 @@ object TileNameCode {
     val TRUNK_BLOODROSE = TilePropCodex.indexDamageToArrayAddr(4, 3)
 
     val SAND = TilePropCodex.indexDamageToArrayAddr(5, 0)
-    val SAND_BEACH = TilePropCodex.indexDamageToArrayAddr(5, 1)
+    val SAND_WHITE = TilePropCodex.indexDamageToArrayAddr(5, 1)
     val SAND_RED = TilePropCodex.indexDamageToArrayAddr(5, 2)
     val SAND_DESERT = TilePropCodex.indexDamageToArrayAddr(5, 3)
     val SAND_BLACK = TilePropCodex.indexDamageToArrayAddr(5, 4)

@@ -103,9 +103,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         private lateinit var configDir: String
 
-        @JvmStatic fun main(args: Array<String>) {
+        fun main(args: Array<String>) {
             try {
-                appgc = AppGameContainer(Terrarum("terrarum"))
+                appgc = AppGameContainer(Terrarum("Terrarum"))
                 appgc.setDisplayMode(WIDTH, HEIGHT, false)
 
                 appgc.setTargetFrameRate(TARGET_INTERNAL_FPS)
@@ -328,3 +328,5 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         }
     }
 }
+
+fun main(args: Array<String>) = Terrarum.main(args)

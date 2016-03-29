@@ -1,9 +1,5 @@
 package com.torvald.terrarum.gamemap
 
-import java.io.Serializable
-import java.util.Spliterator
-import java.util.function.Consumer
-
 /**
  * Created by minjaesong on 16-01-17.
  */
@@ -40,8 +36,11 @@ class MapLayer(var width: Int, var height: Int) : Iterable<Byte> {
         }
     }
 
-    internal fun getTile(x: Int, y: Int): Int {
-        return uint8ToInt32(data[y][x])
+    internal fun getTile(x: Int, y: Int): Int? {
+        return if (x !in 0..width - 1 || y !in 0..height - 1)
+            null
+        else
+            uint8ToInt32(data[y][x])
     }
 
     internal fun setTile(x: Int, y: Int, tile: Byte) {
@@ -51,8 +50,7 @@ class MapLayer(var width: Int, var height: Int) : Iterable<Byte> {
     private fun uint8ToInt32(x: Byte): Int = java.lang.Byte.toUnsignedInt(x)
 
     companion object {
-
-        @Transient @JvmStatic val RANGE = 256
+        @Transient val RANGE = 256
     }
 }
 

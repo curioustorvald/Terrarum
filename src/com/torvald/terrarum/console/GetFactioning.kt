@@ -20,8 +20,8 @@ class GetFactioning : ConsoleCommand {
             // get all factioning data of player
             val factionSet = Terrarum.game.player.faction
 
-            if (factionSet == null) {
-                echo.execute("The actor has null faction set.")
+            if (factionSet.isEmpty()) {
+                echo.execute("The actor has empty faction set.")
                 return
             }
 
@@ -29,7 +29,7 @@ class GetFactioning : ConsoleCommand {
             echo.execute(count.toString() + Lang.pluralise(" faction", count) + " assigned.")
 
             for (faction in factionSet) {
-                echo.execute("faction \"" + faction.factionName + "\"")
+                echo.execute("faction “${faction.factionName}”")
                 echo.execute("    Amicable")
                 faction.factionAmicable.forEach { s -> echo.execute(PRINT_INDENTATION + s) }
 

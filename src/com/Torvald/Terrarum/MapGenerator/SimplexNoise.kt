@@ -11,9 +11,7 @@ class SimplexNoise
  * *
  * @param seed
  */
-(internal var largestFeature:
-
- Int, internal var persistence: Float, internal var seed: Long) {
+(internal var largestFeature: Int, internal var persistence: Float, internal var seed: Long) {
 
     internal var octaves: Array<SimplexNoise_octave>
     internal var frequencys: FloatArray

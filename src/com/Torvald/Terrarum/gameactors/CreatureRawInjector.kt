@@ -13,13 +13,14 @@ import java.io.IOException
  */
 object CreatureRawInjector {
 
-    const val JSONPATH = "./res/raw/"
+    const val JSONPATH = "./res/raw/creatures/"
     private const val MULTIPLIER_RAW_ELEM_SUFFIX = "mult"
 
     /**
      * 'Injects' creature raw ActorValue to the ActorValue reference provided.
      *
      * @param actorValueRef ActorValue object to be injected.
+     * @param jsonFileName with extension
      */
     @Throws(IOException::class, SlickException::class)
     fun inject(actorValueRef: ActorValue, jsonFileName: String) {

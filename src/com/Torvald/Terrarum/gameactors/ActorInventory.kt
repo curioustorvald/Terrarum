@@ -82,6 +82,7 @@ class ActorInventory() {
      * Get clone of the itemList
      * @return
      */
+    @Suppress("UNCHECKED_CAST")
     fun getCopyOfItemList(): Map<Long, Int>? {
         return itemList.clone() as Map<Long, Int>
     }

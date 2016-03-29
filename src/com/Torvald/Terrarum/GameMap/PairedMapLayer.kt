@@ -53,13 +53,17 @@ class PairedMapLayer(width: Int, var height: Int) : Iterable<Byte> {
         }
     }
 
-    internal fun getData(x: Int, y: Int): Int {
-        if (x and 0x1 == 0)
-        // higher four bits for i = 0, 2, 4, ...
-            return (java.lang.Byte.toUnsignedInt(dataPair[y][x / 2]) and 0xF0) ushr 4
-        else
-        // lower four bits for i = 1, 3, 5, ...
-            return java.lang.Byte.toUnsignedInt(dataPair[y][x / 2]) and 0x0F
+    internal fun getData(x: Int, y: Int): Int? {
+        return if (x !in 0..width * 2 - 1 || y !in 0..height - 1)
+            null
+        else {
+            if (x and 0x1 == 0)
+            // higher four bits for i = 0, 2, 4, ...
+                (java.lang.Byte.toUnsignedInt(dataPair[y][x / 2]) and 0xF0) ushr 4
+            else
+            // lower four bits for i = 1, 3, 5, ...
+                java.lang.Byte.toUnsignedInt(dataPair[y][x / 2]) and 0x0F
+        }
     }
 
     internal fun setData(x: Int, y: Int, data: Int) {

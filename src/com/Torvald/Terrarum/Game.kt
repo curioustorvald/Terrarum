@@ -14,13 +14,11 @@ import com.torvald.terrarum.mapdrawer.MapDrawer
 import com.torvald.terrarum.mapgenerator.MapGenerator
 import com.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import com.torvald.terrarum.tileproperties.TilePropCodex
-import com.torvald.terrarum.tilestats.TileStat
+import com.torvald.terrarum.tilestats.TileStats
 import com.torvald.terrarum.ui.BasicDebugInfoWindow
 import com.torvald.terrarum.ui.ConsoleWindow
 import com.torvald.terrarum.ui.Notification
 import com.torvald.terrarum.ui.UIHandler
-import com.jme3.math.FastMath
-import org.lwjgl.opengl.ARBShaderObjects
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
 import org.newdawn.slick.fills.GradientFill
@@ -69,17 +67,17 @@ constructor() : BasicGameState() {
     private val ENV_SUNLIGHT_DELTA = MapDrawer.ENV_COLTEMP_NOON - ENV_COLTEMP_SUNRISE
 
 
-    var memInUse: Long = 0
+    val memInUse: Long
         get() = ManagementFactory.getMemoryMXBean().heapMemoryUsage.used shr 20
-    var totalVMMem: Long = 0
+    val totalVMMem: Long
         get() = Runtime.getRuntime().maxMemory() shr 20
 
-    var auth = Authenticator()
+    val auth = Authenticator()
 
     private var update_delta: Int = 0
 
-    private val KEY_LIGHTMAP_RENDER = Key.F7
-    private val KEY_LIGHTMAP_SMOOTH = Key.F8
+    val KEY_LIGHTMAP_RENDER = Key.F7
+    val KEY_LIGHTMAP_SMOOTH = Key.F8
 
     @Throws(SlickException::class)
     override fun init(gameContainer: GameContainer, stateBasedGame: StateBasedGame) {
@@ -109,8 +107,8 @@ constructor() : BasicGameState() {
 
 
         // add new player and put it to actorContainer
-        //player = PFSigrid.build()
-        player = PFCynthia.create()
+        player = PFSigrid.create()
+        //player = PFCynthia.create()
         //player.setNoClip(true);
         actorContainer.add(player)
 
@@ -141,7 +139,7 @@ constructor() : BasicGameState() {
 
         GameController.processInput(gc.input)
 
-        TileStat.update()
+        TileStats.update()
 
         MapDrawer.update(gc, delta)
         MapCamera.update(gc, delta)
@@ -189,8 +187,10 @@ constructor() : BasicGameState() {
 
         MapCamera.renderBehind(gc, g)
 
-        actorContainer.forEach { actor -> if (actor is Visible) actor.drawBody(gc, g) }
-        actorContainer.forEach { actor -> if (actor is Glowing) actor.drawGlow(gc, g) }
+        actorContainer.forEach { actor ->
+            if (actor is Visible) actor.drawBody(gc, g)
+            if (actor is Glowing) actor.drawGlow(gc, g)
+        }
 
         player.drawBody(gc, g)
         player.drawGlow(gc, g)

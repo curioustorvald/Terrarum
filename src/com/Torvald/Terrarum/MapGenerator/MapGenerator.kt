@@ -2,9 +2,10 @@ package com.torvald.terrarum.mapgenerator
 
 import com.torvald.random.HQRNG
 import com.torvald.terrarum.gamemap.GameMap
-import com.torvald.terrarum.gamemap.MapLayer
 import com.torvald.terrarum.tileproperties.TileNameCode
 import com.jme3.math.FastMath
+import com.sudoplay.joise.Joise
+import com.sudoplay.joise.module.*
 import java.util.*
 
 object MapGenerator {
@@ -12,13 +13,14 @@ object MapGenerator {
     private lateinit var map: GameMap
     private lateinit var random: Random
     //private static float[] noiseArray;
-    private var seed: Long = 0
-    private var width: Int = 0
-    private var height: Int = 0
+    private var SEED: Long = 0
+    private var WIDTH: Int = 0
+    private var HEIGHT: Int = 0
 
-    private lateinit var heightMap: IntArray
+    //private lateinit var heightMap: IntArray
+    private lateinit var terrainMap: Array<BitSet>
 
-    private var dirtThickness: Int = 0
+    private var DIRT_LAYER_DEPTH: Int = 0
     private var TERRAIN_AVERAGE_HEIGHT: Int = 0
     private var minimumFloatingIsleHeight: Int = 0
 
@@ -27,17 +29,14 @@ object MapGenerator {
     private val noiseGrdCaveEnd = 0.54f
 
     private val HILL_WIDTH = 256 // power of two!
-    private val MAX_HILL_HEIGHT = 100
+    //private val MAX_HILL_HEIGHT = 100
+    private val TERRAIN_UNDULATION = 250
 
     private val CAVE_LARGEST_FEATURE = 200
 
     private var OCEAN_WIDTH = 400
     private var SHORE_WIDTH = 120
     private val MAX_OCEAN_DEPTH = 200
-
-    private val TERRAIN_PERTURB_OFFSETMAX = 0 // [-val , val]
-    private val TERRAIN_PERTURB_LARGESTFEATURE = 256
-    private val TERRAIN_PERTURB_RATE = 0.5f
 
     private var GLACIER_MOUNTAIN_WIDTH = 900
     private val GLACIER_MOUNTAIN_HEIGHT = 300
@@ -59,54 +58,55 @@ object MapGenerator {
     private val GRASSCUR_RIGHT = 1
     private val GRASSCUR_DOWN = 2
     private val GRASSCUR_LEFT = 3
-
-    @JvmStatic
+    
     fun attachMap(map: GameMap) {
         this.map = map
-        width = map.width
-        height = map.height
+        WIDTH = map.width
+        HEIGHT = map.height
 
-        val widthMulFactor = width / 8192f
+        val widthMulFactor = WIDTH / 8192f
 
-        dirtThickness = (100 * height / 1024f).toInt()
-        minimumFloatingIsleHeight = (25 * (height / 1024f)).toInt()
-        TERRAIN_AVERAGE_HEIGHT = height / 4
+        DIRT_LAYER_DEPTH = (100 * HEIGHT / 1024f).toInt()
+        minimumFloatingIsleHeight = (25 * (HEIGHT / 1024f)).toInt()
+        TERRAIN_AVERAGE_HEIGHT = HEIGHT / 4
 
         OCEAN_WIDTH = Math.round(OCEAN_WIDTH * widthMulFactor)
         SHORE_WIDTH = Math.round(SHORE_WIDTH * widthMulFactor)
         GLACIER_MOUNTAIN_WIDTH = Math.round(GLACIER_MOUNTAIN_WIDTH * widthMulFactor)
     }
 
-    @JvmStatic
     fun setSeed(seed: Long) {
-        this.seed = seed
+        this.SEED = seed
     }
 
     /**
      * Generate terrain and override attached map
      */
-    @JvmStatic
     fun generateMap() {
-        random = HQRNG(seed!!)
-        println("[mapgenerator] Seed: " + seed)
+        random = HQRNG(SEED)
+        println("[mapgenerator] Seed: " + SEED)
 
         worldOceanPosition = if (random.nextBoolean()) TYPE_OCEAN_LEFT else TYPE_OCEAN_RIGHT
 
-        heightMap = raise2(MAX_HILL_HEIGHT / 2)
-        generateOcean(heightMap)
-        placeGlacierMount(heightMap)
-        heightMapToObjectMap(heightMap)
+        //heightMap = raise2(MAX_HILL_HEIGHT / 2)
+        //generateOcean(heightMap)
+        //placeGlacierMount(heightMap)
+        //heightMapToObjectMap(heightMap)
 
-        perturbTerrain()
+
+        terrainMap = raise3()
+
+
+        terrainMapToObjectMap()
 
         /**
-         * Todo: more perturbed overworld (harder to supra-navigate)
+         * Done: more perturbed overworld (harder to supra-navigate)
          * Todo: veined ore distribution (metals) -- use veined simplex noise
          * Todo: clustered gem distribution (Groups: [Ruby, Sapphire], Amethyst, Yellow topaz, emerald, diamond) -- use regular simplex noise
          * Todo: Lakes! Aquifers! Lava chambers!
          * Todo: deserts (variants: SAND_DESERT, SAND_RED)
          * Todo: volcano(es?)
-         * Done: variants of beach (SAND_BEACH, SAND_BLACK, SAND_GREEN)
+         * Done: variants of beach (SAND, SAND_BEACH, SAND_BLACK, SAND_GREEN)
          */
 
         carveCave(
@@ -182,16 +182,16 @@ object MapGenerator {
         /** TODO Cobaltite, Ilmenite, Aurichalcum (and possibly pitchblende?)  */
 
         floodBottomLava()
-        freeze()
-        fillOcean()
+        // freeze()
+        // fillOcean()
         plantGrass()
 
         //post-process
         generateFloatingIslands()
 
         //wire layer
-        for (i in 0..height - 1) {
-            for (j in 0..width - 1) {
+        for (i in 0..HEIGHT - 1) {
+            for (j in 0..WIDTH - 1) {
                 map.wireArray[i][j] = 0
             }
         }
@@ -211,21 +211,21 @@ object MapGenerator {
      * @return
      */
     private fun caveGen(xStretch: Float, yStretch: Float): Array<FloatArray> {
-        val noiseMap = Array(height) { FloatArray(width) }
+        val noiseMap = Array(HEIGHT) { FloatArray(WIDTH) }
 
-        val simplexNoise = SimplexNoise(CAVEGEN_LARGEST_FEATURE, CAVEGEN_PERTURB_RATE, seed!!)
-        val simplexNoisePerturbMap = SimplexNoise(CAVEGEN_LARGEST_FEATURE_PERTURB, 0.5f, seed!! xor random.nextLong())
+        val simplexNoise = SimplexNoise(CAVEGEN_LARGEST_FEATURE, CAVEGEN_PERTURB_RATE, SEED)
+        val simplexNoisePerturbMap = SimplexNoise(CAVEGEN_LARGEST_FEATURE_PERTURB, 0.5f, SEED xor random.nextLong())
 
-        val xEnd = width * yStretch
-        val yEnd = height * xStretch
+        val xEnd = WIDTH * yStretch
+        val yEnd = HEIGHT * xStretch
 
         var lowestNoiseVal = 10000f
         var highestNoiseVal = -10000f
 
-        for (y in 0..height - 1) {
-            for (x in 0..width - 1) {
-                val ny = (y * (xEnd / width)).toInt()
-                val nx = (x * (yEnd / height)).toInt()
+        for (y in 0..HEIGHT - 1) {
+            for (x in 0..WIDTH - 1) {
+                val ny = (y * (xEnd / WIDTH)).toInt()
+                val nx = (x * (yEnd / HEIGHT)).toInt()
 
                 val noiseInit = simplexNoise.getNoise(nx, ny) // [-1 , 1]
                 val perturbInit = simplexNoisePerturbMap.getNoise(nx, ny) * 0.5f + 0.5f  // [0 , 1]
@@ -244,8 +244,8 @@ object MapGenerator {
 
         // Auto-scaling noise
 
-        for (y in 0..height - 1) {
-            for (x in 0..width - 1) {
+        for (y in 0..HEIGHT - 1) {
+            for (x in 0..WIDTH - 1) {
                 val noiseInit = noiseMap[y][x] - lowestNoiseVal
 
                 val noiseFin = noiseInit * (1f / (highestNoiseVal - lowestNoiseVal))
@@ -264,7 +264,7 @@ object MapGenerator {
     }
 
     private fun generate2DSimplexNoiseWorldSize(xStretch: Float, yStretch: Float): Array<FloatArray> {
-        return generate2DSimplexNoise(width, height, xStretch, yStretch)
+        return generate2DSimplexNoise(WIDTH, HEIGHT, xStretch, yStretch)
     }
 
     /**
@@ -280,7 +280,7 @@ object MapGenerator {
      * @return matrix in ![x][y]!
      */
     private fun generate2DSimplexNoise(sizeX: Int, sizeY: Int, xStretch: Float, yStretch: Float): Array<FloatArray> {
-        val simplexNoise = SimplexNoise(CAVE_LARGEST_FEATURE, 0.1f, seed!! xor random.nextLong())
+        val simplexNoise = SimplexNoise(CAVE_LARGEST_FEATURE, 0.1f, SEED xor random.nextLong())
 
         val xStart = 0f
         val yStart = 0f
@@ -288,8 +288,8 @@ object MapGenerator {
         /** higher = denser.
          * Recommended: (width or height) * 3
          */
-        val xEnd = width * yStretch
-        val yEnd = height * xStretch
+        val xEnd = WIDTH * yStretch
+        val yEnd = HEIGHT * xStretch
 
         var lowestNoiseVal = 10000f
         var highestNoiseVal = -10000f
@@ -312,8 +312,8 @@ object MapGenerator {
 
         // Auto-scaling noise
 
-        for (y in 0..height - 1) {
-            for (x in 0..width - 1) {
+        for (y in 0..HEIGHT - 1) {
+            for (x in 0..WIDTH - 1) {
                 val noiseInit = result[y][x] - lowestNoiseVal
 
                 val noiseFin = noiseInit * (1f / (highestNoiseVal - lowestNoiseVal))
@@ -364,83 +364,169 @@ object MapGenerator {
     }
 
     /**
-     * [http://freespace.virgin.net/hugo.elias/models/m_perlin.htm](null)
-     * @param maxval_div_2 max height (deviation from zero) divided by two.
-     * *
-     * @return noise array with range of [-maxval, maxval]
+     * http://accidentalnoise.sourceforge.net/minecraftworlds.html
      */
-    private fun raise2(maxval_div_2: Int): IntArray {
+    private fun raise3(): Array<BitSet> {
+        val noiseMap = Array(HEIGHT, { BitSet(WIDTH) })
 
-        val finalPerlinAmp = maxval_div_2 // 1 + 1/2 + 1/4 + 1/8 + ... == 2
-        val perlinOctaves = FastMath.intLog2(maxval_div_2) + 1 - 1 // max: for every 2nd node
+        // Height = Terrain undulation times 2.
+        val SCALE_X: Double = (TERRAIN_UNDULATION * 0.5).toDouble()
+        val SCALE_Y: Double = (TERRAIN_UNDULATION * 0.25).toDouble()
 
-        val perlinMap = IntArray(width) // [-2 * finalPerlinAmp, finalPerlinAmp]
+        val ground_gradient = ModuleGradient()
+        ground_gradient.setGradient(0.0, 0.0, 0.0, 1.0)
 
-        // assert
-        if (HILL_WIDTH.ushr(perlinOctaves - 1) == 0) {
-            throw RuntimeException("sample width of zero detected.")
+        /* Lowlands */
+
+        val lowland_shape_fractal = ModuleFractal()
+        lowland_shape_fractal.setType(ModuleFractal.FractalType.FBM)
+        lowland_shape_fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+        lowland_shape_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        lowland_shape_fractal.setNumOctaves(4)
+        lowland_shape_fractal.setFrequency(0.6)
+        lowland_shape_fractal.seed = SEED xor random.nextLong()
+        //println(lowland_shape_fractal.seed)
+
+        val lowland_autocorrect = ModuleAutoCorrect()
+        lowland_autocorrect.setLow(0.0)
+        lowland_autocorrect.setHigh(1.0)
+        lowland_autocorrect.setSource(lowland_shape_fractal)
+
+        val lowland_scale = ModuleScaleOffset()
+        lowland_scale.setSource(lowland_autocorrect)
+        lowland_scale.setScale(0.8)
+        lowland_scale.setOffset(-2.75)
+
+        val lowland_y_scale = ModuleScaleDomain()
+        lowland_y_scale.setSource(lowland_scale)
+        lowland_y_scale.setScaleY(0.0)
+
+        val lowland_terrain = ModuleTranslateDomain()
+        lowland_terrain.setSource(ground_gradient)
+        lowland_terrain.setAxisYSource(lowland_y_scale)
+
+        /* highlands */
+
+        val highland_shape_fractal = ModuleFractal()
+        highland_shape_fractal.setType(ModuleFractal.FractalType.RIDGEMULTI)
+        highland_shape_fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+        highland_shape_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        highland_shape_fractal.setNumOctaves(4)
+        highland_shape_fractal.setFrequency(0.5) // horizontal size. Higher == narrower
+        highland_shape_fractal.seed = SEED xor random.nextLong()
+        //println(highland_shape_fractal.seed)
+
+        val highland_autocorrect = ModuleAutoCorrect()
+        highland_autocorrect.setSource(highland_shape_fractal)
+        highland_autocorrect.setLow(0.0)
+        highland_autocorrect.setHigh(1.0)
+
+        val highland_scale = ModuleScaleOffset()
+        highland_scale.setSource(highland_autocorrect)
+        highland_scale.setScale(1.4) // vertical size. Higher == taller
+        highland_scale.setOffset(-2.25)
+
+        val highland_y_scale = ModuleScaleDomain()
+        highland_y_scale.setSource(highland_scale)
+        highland_y_scale.setScaleY(0.0)
+
+        val highland_terrain = ModuleTranslateDomain()
+        highland_terrain.setSource(ground_gradient)
+        highland_terrain.setAxisYSource(highland_y_scale)
+
+        /* mountains */
+
+        val mountain_shape_fractal = ModuleFractal()
+        mountain_shape_fractal.setType(ModuleFractal.FractalType.BILLOW)
+        mountain_shape_fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+        mountain_shape_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        mountain_shape_fractal.setNumOctaves(6)
+        mountain_shape_fractal.setFrequency(0.55)
+        mountain_shape_fractal.seed = SEED xor random.nextLong()
+        //println(mountain_shape_fractal.seed)
+
+        val mountain_autocorrect = ModuleAutoCorrect()
+        mountain_autocorrect.setSource(mountain_shape_fractal)
+        mountain_autocorrect.setLow(0.0)
+        mountain_autocorrect.setHigh(1.0)
+
+        val mountain_scale = ModuleScaleOffset()
+        mountain_scale.setSource(mountain_autocorrect)
+        mountain_scale.setScale(1.66)
+        mountain_scale.setOffset(-1.25)
+
+        val mountain_y_scale = ModuleScaleDomain()
+        mountain_y_scale.setSource(mountain_scale)
+        mountain_y_scale.setScaleY(0.1)
+
+        val mountain_terrain = ModuleTranslateDomain()
+        mountain_terrain.setSource(ground_gradient)
+        mountain_terrain.setAxisYSource(mountain_y_scale)
+
+        /* selection */
+
+        val terrain_type_fractal = ModuleFractal()
+        terrain_type_fractal.setType(ModuleFractal.FractalType.MULTI)
+        terrain_type_fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+        terrain_type_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        terrain_type_fractal.setNumOctaves(5)
+        terrain_type_fractal.setFrequency(0.4) // <= 0.33
+        terrain_type_fractal.seed = SEED xor random.nextLong()
+        //println(terrain_type_fractal.seed)
+
+        val terrain_autocorrect = ModuleAutoCorrect()
+        terrain_autocorrect.setSource(terrain_type_fractal)
+        terrain_autocorrect.setLow(0.0)
+        terrain_autocorrect.setHigh(1.0)
+
+        val terrain_type_scale = ModuleScaleDomain()
+        terrain_type_scale.setScaleY(0.33)
+        terrain_type_scale.setSource(terrain_autocorrect)
+
+        val terrain_type_cache = ModuleCache()
+        terrain_type_cache.setSource(terrain_type_scale)
+
+        val highland_mountain_select = ModuleSelect()
+        highland_mountain_select.setLowSource(highland_terrain)
+        highland_mountain_select.setHighSource(mountain_terrain)
+        highland_mountain_select.setControlSource(terrain_type_cache)
+        highland_mountain_select.setThreshold(0.55)
+        highland_mountain_select.setFalloff(0.15)
+
+        val highland_lowland_select = ModuleSelect()
+        highland_lowland_select.setLowSource(lowland_terrain)
+        highland_lowland_select.setHighSource(highland_mountain_select)
+        highland_lowland_select.setControlSource(terrain_type_cache)
+        highland_lowland_select.setThreshold(0.25)
+        highland_lowland_select.setFalloff(0.15)
+
+
+        val ground_select = ModuleSelect()
+        ground_select.setLowSource(0.0)
+        ground_select.setHighSource(1.0)
+        ground_select.setThreshold(0.5)
+        ground_select.setControlSource(highland_lowland_select)
+
+        val joise = Joise(ground_select)
+        // fill the area as Joise map
+        for (y in 0..(TERRAIN_UNDULATION - 1)) {
+            for (x in 0..WIDTH) {
+                val map: Boolean = (
+                        joise.get(
+                                x / SCALE_X,
+                                y / SCALE_Y
+                        ) == 1.0)
+                noiseMap[y + TERRAIN_AVERAGE_HEIGHT - (TERRAIN_UNDULATION / 2)].set(x, map)
+            }
+        }
+        // fill the area bottom of the above map as 'filled'
+        for (y in TERRAIN_AVERAGE_HEIGHT + (TERRAIN_UNDULATION / 2)..HEIGHT - 1) {
+            for (x in 0..WIDTH) {
+                noiseMap[y].set(x, true)
+            }
         }
 
-        // sample noise and add
-        for (oct in 1..perlinOctaves) {
-            // perlinAmp: 16364 -> 8192 -> 4096 -> 2048 -> ...
-            // This applies persistence of 1/2
-            val perlinAmp = finalPerlinAmp.ushr(oct - 1)
-
-            val perlinSampleDist = HILL_WIDTH.ushr(oct - 1)
-
-            // sample first
-            val perlinSamples = IntArray(width / perlinSampleDist + 1)
-            for (sample in perlinSamples.indices) {
-                perlinSamples[sample] = random.nextInt(perlinAmp * 2) - perlinAmp
-            }
-
-            // add interpolated value to map
-            for (i in perlinMap.indices) {
-                val perlinPointLeft = perlinSamples[i / perlinSampleDist]
-                val perlinPointRight = perlinSamples[i / perlinSampleDist + 1]
-
-                perlinMap[i] += Math.round(
-                        interpolateCosine(
-                                (i % perlinSampleDist).toFloat() / perlinSampleDist, perlinPointLeft.toFloat(), perlinPointRight.toFloat()))// using cosine; making tops rounded
-            }
-        }
-
-        for (k in 0..0) {
-            for (i in perlinMap.indices) {
-                // averaging smoothing
-                if (i > 1 && i < perlinMap.size - 2) {
-                    perlinMap[i] = Math.round(
-                            ((perlinMap[i - 1] + perlinMap[i + 1]) / 2).toFloat())
-                }
-            }
-        }
-
-        // single bump removal
-        for (i in perlinMap.indices) {
-            if (i > 1 && i < perlinMap.size - 2) {
-                val p1 = perlinMap[i - 1]
-                val p2 = perlinMap[i]
-                val p3 = perlinMap[i + 1]
-                //  _-_ / -_- -> ___ / ---
-                if (p1 == p3 && p1 != p2) {
-                    perlinMap[i] = p1
-                } else if (p1 > p3 && p2 > p1) {
-                    perlinMap[i] = p1
-                } else if (p3 > p1 && p2 > p3) {
-                    perlinMap[i] = p3
-                } else if (p3 > p1 && p2 < p1) {
-                    perlinMap[i] = p1
-                } else if (p1 > p3 && p2 < p3) {
-                    perlinMap[i] = p1
-                }// ^_- -> ^--
-                // -_^ -> --^
-                // _^- -> _--
-                // -^_ -> --_
-            }
-        }
-
-        return perlinMap
+        return noiseMap
     }
 
     /**
@@ -501,14 +587,14 @@ object MapGenerator {
         println("[mapgenerator] Shaping world as processed...")
 
         // iterate for heightmap
-        for (x in 0..width - 1) {
+        for (x in 0..WIDTH - 1) {
             val medianPosition = TERRAIN_AVERAGE_HEIGHT
             val pillarOffset = medianPosition - fs[x]
 
             // for pillar length
-            for (i in 0..height - pillarOffset - 1) {
+            for (i in 0..HEIGHT - pillarOffset - 1) {
 
-                if (i < dirtThickness) {
+                if (i < DIRT_LAYER_DEPTH) {
                     map.setTileTerrain(x, i + pillarOffset, TileNameCode.DIRT)
                     map.setTileWall(x, i + pillarOffset, TileNameCode.DIRT)
                 } else {
@@ -520,67 +606,71 @@ object MapGenerator {
         }
     }
 
-    private fun perturbTerrain() {
-        val perturbGen = SimplexNoise(TERRAIN_PERTURB_LARGESTFEATURE, TERRAIN_PERTURB_RATE, seed!! xor random.nextLong())
+    private fun terrainMapToObjectMap() {
+        println("[mapgenerator] Shaping world as processed...")
+        // generate dirt-stone transition line
+        // use catmull spline
+        val dirtStoneLine = IntArray(WIDTH)
+        val POINTS_GAP = 64 // power of two!
+        val splineControlPoints = Array((WIDTH / POINTS_GAP) + 1, { Pair(0, 0) })
 
-        val perturbMap = Array(height) { FloatArray(width) }
+        // get spline points
+        for (x in 0..(WIDTH / POINTS_GAP)) {
+            for (y in 0..TERRAIN_AVERAGE_HEIGHT + TERRAIN_UNDULATION) {
+                splineControlPoints[x] = Pair(x * POINTS_GAP, y)
+                if (terrainMap[y].get(splineControlPoints[x].first)) break
+            }
+            println("Spline[$x] x: ${splineControlPoints[x].first}, " +
+                    "y: ${splineControlPoints[x].second}")
+        }
 
-        val layerWall = map.wallArray
-        val layerTerrain = map.terrainArray
-        val newLayerWall = MapLayer(width, height)
-        val newLayerTerrain = MapLayer(width, height)
+        // do interpolation
+        for (x in 0..dirtStoneLine.size) {
+            val x_1 = x / POINTS_GAP
 
-        var lowestNoiseVal = 10000f
-        var highestNoiseVal = -10000f
+            val splineX0 = splineControlPoints[ clamp(x_1 - 1, 0, dirtStoneLine.size / POINTS_GAP) ].first
+            val splineX1 = splineControlPoints[x_1].first
+            val splineX2 = splineControlPoints[ clamp(x_1 + 1, 0, dirtStoneLine.size / POINTS_GAP) ].first
+            val splineX3 = splineControlPoints[ clamp(x_1 + 2, 0, dirtStoneLine.size / POINTS_GAP) ].first
 
-        for (y in 0..map.height - 1) {
-            for (x in 0..map.width - 1) {
-                val noise = perturbGen.getNoise(x, y) // [-1, 1]
-                perturbMap[y][x] = noise
-                if (noise < lowestNoiseVal) lowestNoiseVal = noise
-                if (noise > highestNoiseVal) highestNoiseVal = noise
+            val splineP0 = splineControlPoints[ clamp(x_1 - 1, 0, dirtStoneLine.size / POINTS_GAP) ].second.toFloat()
+            val splineP1 = splineControlPoints[x_1].second.toFloat()
+            val splineP2 = splineControlPoints[ clamp(x_1 + 1, 0, dirtStoneLine.size / POINTS_GAP) ].second.toFloat()
+            val splineP3 = splineControlPoints[ clamp(x_1 + 2, 0, dirtStoneLine.size / POINTS_GAP) ].second.toFloat()
+
+            if (x in POINTS_GAP - 1..WIDTH - 2 * POINTS_GAP) {
+                dirtStoneLine[x] = Math.round(FastMath.interpolateCatmullRom(
+                        (x - splineX1) / POINTS_GAP.toFloat(),
+                        0.01f,
+                        splineP0,
+                        splineP1,
+                        splineP2,
+                        splineP3
+                ))
+            }
+            else {
+                interpolateCosine(
+                        (x - splineX1) / POINTS_GAP.toFloat(),
+                        splineP1,
+                        splineP2
+                )
             }
         }
 
-        // Auto-scale noise [-1, 1]
-        /**
-         * See ./work_files/Linear_autoscale.gcx
-         */
-        for (y in 0..height - 1) {
-            for (x in 0..width - 1) {
-                val noiseInit = perturbMap[y][x]
-                val noiseFin = (noiseInit - (highestNoiseVal + lowestNoiseVal) / 2f) * (2f / (highestNoiseVal - lowestNoiseVal))
-
-                perturbMap[y][x] = noiseFin
-            }
-        }
-
-        // Perturb to x-axis, apply to newLayer
-        for (y in 0..height - 1) {
-            for (x in 0..width - 1) {
-                val offsetOrigin = perturbMap[y][x] * 0.5f + 0.5f // [0 , 1]
-                val offset = Math.round(offsetOrigin * TERRAIN_PERTURB_OFFSETMAX)
-
-                val tileWall = layerWall[y][x]
-                val tileTerrain = layerTerrain[y][x]
-
-                try {
-                    //newLayerWall.setTile(x + offset, y, tileWall);
-                    //newLayerTerrain.setTile(x + offset, y, tileTerrain);
-                    //layerWall[y][x] = 0;
-                    //layerTerrain[y][x] = 0;
-                    layerWall[y - offset][x] = tileWall
-                    layerTerrain[y - offset][x] = tileTerrain
-                } catch (e: ArrayIndexOutOfBoundsException) {
+        // scan vertically
+        for (x in 0..WIDTH - 1) {
+            for (y in 0..HEIGHT - 1) {
+                if (terrainMap[clamp(y + DIRT_LAYER_DEPTH, 0, HEIGHT - 1)].get(x)) {
+                    // map.setTileTerrain(x, y, TileNameCode.DIRT)
+                    // map.setTileWall(x, y, TileNameCode.DIRT)
+                    val tile =
+                            if (y < dirtStoneLine[x]) TileNameCode.DIRT
+                            else                      TileNameCode.STONE
+                    map.setTileTerrain(x, y, tile)
+                    map.setTileWall(x, y, tile)
                 }
-
             }
         }
-
-        // set reference (pointer) of original map layer to new layers
-        //map.overwriteLayerWall(newLayerWall);
-        //map.overwriteLayerTerrain(newLayerTerrain);
-
     }
 
     /* 2. Carve */
@@ -588,8 +678,8 @@ object MapGenerator {
     private fun carveCave(noisemap: Array<FloatArray>, tile: Int, message: String) {
         println("[mapgenerator] " + message)
 
-        for (i in 0..height - 1) {
-            for (j in 0..width - 1) {
+        for (i in 0..HEIGHT - 1) {
+            for (j in 0..WIDTH - 1) {
                 if (noisemap[i][j] > 0.9) {
                     map.setTileTerrain(j, i, tile)
                 }
@@ -610,8 +700,8 @@ object MapGenerator {
     private fun carveByMap(noisemap: Array<FloatArray>, scarcity: Float, tile: Int, message: String) {
         println("[mapgenerator] " + message)
 
-        for (i in 0..height - 1) {
-            for (j in 0..width - 1) {
+        for (i in 0..HEIGHT - 1) {
+            for (j in 0..WIDTH - 1) {
                 if (noisemap[i][j] > gradientQuadratic(i, noiseGradientStart, noiseGrdCaveEnd) * scarcity) {
                     map.setTileTerrain(j, i, tile)
                 }
@@ -634,8 +724,8 @@ object MapGenerator {
     private fun fillByMap(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: Int, message: String) {
         println("[mapgenerator] " + message)
 
-        for (i in 0..height - 1) {
-            for (j in 0..width - 1) {
+        for (i in 0..HEIGHT - 1) {
+            for (j in 0..WIDTH - 1) {
                 if (noisemap[i][j] > getNoiseGradient(i, noiseGradientStart, noiseGradientEnd) * scarcity && map.getTileFromTerrain(j, i) == replaceFrom) {
                     map.setTileTerrain(j, i, tile)
                 }
@@ -658,8 +748,8 @@ object MapGenerator {
     private fun fillByMapInverseGradFilter(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: Int, message: String) {
         println("[mapgenerator] " + message)
 
-        for (i in 0..height - 1) {
-            for (j in 0..width - 1) {
+        for (i in 0..HEIGHT - 1) {
+            for (j in 0..WIDTH - 1) {
                 if (noisemap[i][j] > getNoiseGradientInversed(i, noiseGradientEnd, noiseGradientStart) * scarcity
                         && map.getTileFromTerrain(j, i) == replaceFrom) {
                     map.setTileTerrain(j, i, tile)
@@ -686,8 +776,8 @@ object MapGenerator {
     private fun fillByMapNoFilter(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: Int, message: String) {
         println("[mapgenerator] " + message)
 
-        for (i in 0..height - 1) {
-            for (j in 0..width - 1) {
+        for (i in 0..HEIGHT - 1) {
+            for (j in 0..WIDTH - 1) {
                 if (noisemap[i][j] > noiseGradientStart * scarcity && map.getTileFromTerrain(j, i) == replaceFrom) {
                     map.setTileTerrain(j, i, tile)
                 }
@@ -695,15 +785,16 @@ object MapGenerator {
         }
     }
 
-    private fun fillByMapNoFilterUnderground(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: Int, message: String) {
+    private fun fillByMapNoFilterUnderground(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, replaceTo: Int, message: String) {
         println("[mapgenerator] " + message)
 
-        for (i in 0..height - 1) {
-            for (j in 0..width - 1) {
+        for (i in 0..HEIGHT - 1) {
+            for (j in 0..WIDTH - 1) {
                 if (noisemap[i][j] > noiseGradientStart * scarcity
-                        && map.getTileFromTerrain(j, i) == replaceFrom
-                        && map.getTileFromWall(j, i) == TileNameCode.STONE) {
-                    map.setTileTerrain(j, i, tile)
+                        && map.getTileFromTerrain(j, i) ?: 0 == replaceFrom
+                        && map.getTileFromWall(j, i) ?: 0 == replaceTo
+                ) {
+                    map.setTileTerrain(j, i, replaceTo)
                 }
             }
         }
@@ -712,8 +803,8 @@ object MapGenerator {
     private fun fillByMap(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: IntArray, message: String) {
         println("[mapgenerator] " + message)
 
-        for (i in 0..height - 1) {
-            for (j in 0..width - 1) {
+        for (i in 0..HEIGHT - 1) {
+            for (j in 0..WIDTH - 1) {
                 if (noisemap[i][j] > getNoiseGradient(i, noiseGradientStart, noiseGradientEnd) * scarcity && map.getTileFromTerrain(j, i) == replaceFrom) {
                     map.setTileTerrain(j, i, tile[random.nextInt(tile.size)])
                 }
@@ -730,11 +821,11 @@ object MapGenerator {
     }
 
     private fun gradientSqrt(func_argX: Int, start: Float, end: Float): Float {
-        val graph_gradient = (end - start) / FastMath.sqrt((height - TERRAIN_AVERAGE_HEIGHT).toFloat()) * FastMath.sqrt((func_argX - TERRAIN_AVERAGE_HEIGHT).toFloat()) + start
+        val graph_gradient = (end - start) / FastMath.sqrt((HEIGHT - TERRAIN_AVERAGE_HEIGHT).toFloat()) * FastMath.sqrt((func_argX - TERRAIN_AVERAGE_HEIGHT).toFloat()) + start
 
         if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
             return start
-        } else if (func_argX >= height) {
+        } else if (func_argX >= HEIGHT) {
             return end
         } else {
             return graph_gradient
@@ -769,12 +860,12 @@ object MapGenerator {
      */
     private fun gradientQuadratic(func_argX: Int, start: Float, end: Float): Float {
         val graph_gradient = FastMath.pow(FastMath.sqr((1 - TERRAIN_AVERAGE_HEIGHT).toFloat()), -1f) * // 1/4 -> 3/4 -> 9/16 -> 16/9
-                (start - end) / FastMath.sqr(height.toFloat()) *
-                FastMath.sqr((func_argX - height).toFloat()) + end
+                (start - end) / FastMath.sqr(HEIGHT.toFloat()) *
+                             FastMath.sqr((func_argX - HEIGHT).toFloat()) + end
 
         if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
             return start
-        } else if (func_argX >= height) {
+        } else if (func_argX >= HEIGHT) {
             return end
         } else {
             return graph_gradient
@@ -809,12 +900,12 @@ object MapGenerator {
      */
     private fun gradientCubic(func_argX: Int, start: Float, end: Float): Float {
         val graph_gradient = -FastMath.pow(FastMath.pow((1 - TERRAIN_AVERAGE_HEIGHT).toFloat(), 3f), -1f) * // 1/4 -> 3/4 -> 9/16 -> 16/9
-                (start - end) / FastMath.pow(height.toFloat(), 3f) *
-                FastMath.pow((func_argX - height).toFloat(), 3f) + end
+                (start - end) / FastMath.pow(HEIGHT.toFloat(), 3f) *
+                             FastMath.pow((func_argX - HEIGHT).toFloat(), 3f) + end
 
         if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
             return start
-        } else if (func_argX >= height) {
+        } else if (func_argX >= HEIGHT) {
             return end
         } else {
             return graph_gradient
@@ -848,13 +939,13 @@ object MapGenerator {
      * @return
      */
     private fun gradientMinusQuadratic(func_argX: Int, start: Float, end: Float): Float {
-        val graph_gradient = -FastMath.pow(FastMath.sqr((1 - TERRAIN_AVERAGE_HEIGHT).toFloat()), -1f) *// 1/4 -> 3/4 -> 9/16 -> 16/9
-                (start - end) / FastMath.sqr(height.toFloat()) *
-                FastMath.sqr((func_argX - TERRAIN_AVERAGE_HEIGHT).toFloat()) + start
+        val graph_gradient = -FastMath.pow(FastMath.sqr((1 - TERRAIN_AVERAGE_HEIGHT).toFloat()), -1f) * // 1/4 -> 3/4 -> 9/16 -> 16/9
+                (start - end) / FastMath.sqr(HEIGHT.toFloat()) *
+                             FastMath.sqr((func_argX - TERRAIN_AVERAGE_HEIGHT).toFloat()) + start
 
         if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
             return start
-        } else if (func_argX >= height) {
+        } else if (func_argX >= HEIGHT) {
             return end
         } else {
             return graph_gradient
@@ -895,8 +986,8 @@ object MapGenerator {
 
     private fun floodBottomLava() {
         println("[mapgenerator] Flooding bottom lava...")
-        for (i in height * 14 / 15..height - 1) {
-            for (j in 0..width - 1) {
+        for (i in HEIGHT * 14 / 15..HEIGHT - 1) {
+            for (j in 0..WIDTH - 1) {
                 if (map.terrainArray[i][j].toInt() == 0) {
                     map.setTileTerrain(j, i, TileNameCode.LAVA)
                 }
@@ -915,17 +1006,16 @@ object MapGenerator {
 		 * under another certain level, use background stone with dirt peckles.
 		 */
 
-        for (y in TERRAIN_AVERAGE_HEIGHT - MAX_HILL_HEIGHT..TERRAIN_AVERAGE_HEIGHT + MAX_HILL_HEIGHT - 1) {
+        for (y in TERRAIN_AVERAGE_HEIGHT - TERRAIN_UNDULATION..TERRAIN_AVERAGE_HEIGHT + TERRAIN_UNDULATION - 1) {
             for (x in 0..map.width - 1) {
 
                 val thisTile = map.getTileFromTerrain(x, y)
 
                 for (i in 0..8) {
-                    var nearbyWallTile = -1
-                    try {
-                        nearbyWallTile = map.getTileFromWall(x + i % 3 - 1, y + i / 3 - 1)
-                    } catch (e: ArrayIndexOutOfBoundsException) {
-                    }
+                    var nearbyWallTile: Int?
+                    nearbyWallTile = map.getTileFromWall(x + i % 3 - 1, y + i / 3 - 1)
+
+                    if (nearbyWallTile == null) break;
 
                     if (i != 4 && thisTile == TileNameCode.DIRT && nearbyWallTile == TileNameCode.AIR) {
                         map.setTileTerrain(x, y, TileNameCode.GRASS)
@@ -957,10 +1047,11 @@ object MapGenerator {
 
     private fun fillOcean() {
         val thisSandList = intArrayOf(
-                TileNameCode.SAND_BEACH, TileNameCode.SAND_BLACK, TileNameCode.SAND_GREEN,
-                TileNameCode.SAND_BEACH, TileNameCode.SAND_BEACH, TileNameCode.SAND_BLACK
-        )
-        val thisRand = HQRNG(seed!! xor random.nextLong())
+                TileNameCode.SAND, TileNameCode.SAND, TileNameCode.SAND, TileNameCode.SAND,
+                TileNameCode.SAND_WHITE, TileNameCode.SAND_WHITE, TileNameCode.SAND_WHITE,
+                TileNameCode.SAND_BLACK, TileNameCode.SAND_BLACK, TileNameCode.SAND_GREEN
+                )
+        val thisRand = HQRNG(SEED xor random.nextLong())
         val thisSand = thisSandList[thisRand.nextInt(thisSandList.size)]
         // val thisSand = TileNameCode.SAND_GREEN
 
@@ -968,9 +1059,11 @@ object MapGenerator {
             "black"
         else if (thisSand == TileNameCode.SAND_GREEN)
             "green"
+        else if (thisSand == TileNameCode.SAND)
+            "yellow"
         else
             "white"
-        println("[mapgenerator] Beach sand type: " + thisSandStr)
+        println("[mapgenerator] Beach sand type: $thisSandStr")
 
         var ix = 0
         while (ix < OCEAN_WIDTH * 1.5) {
@@ -1061,12 +1154,12 @@ object MapGenerator {
      * @return
      */
     private fun getTerrainHeightFromHeightMap(x: Int): Int {
-        return TERRAIN_AVERAGE_HEIGHT - heightMap[x]
+        TODO()
     }
 
-    @JvmStatic
+
     fun getGeneratorSeed(): Long {
-        return seed!!
+        return SEED
     }
 
     /* Utility */
@@ -1090,9 +1183,9 @@ object MapGenerator {
             for (pointerX in 0..brushSize - 1) {
                 if (getDistance(j.toFloat(), i.toFloat(), j + pointerX - halfBrushSize, i + pointerY - halfBrushSize) <= FastMath.floor((brushSize / 2).toFloat()) - 1) {
                     if (Math.round(j + pointerX - halfBrushSize) > brushSize
-                            && Math.round(j + pointerX - halfBrushSize) < width - brushSize
-                            && Math.round(i + pointerY - halfBrushSize) > brushSize
-                            && Math.round(i + pointerY - halfBrushSize) < height - brushSize) {
+                        && Math.round(j + pointerX - halfBrushSize) < WIDTH - brushSize
+                        && Math.round(i + pointerY - halfBrushSize) > brushSize
+                        && Math.round(i + pointerY - halfBrushSize) < HEIGHT - brushSize) {
                         if (map.terrainArray[Math.round(i + pointerY - halfBrushSize)][Math.round(j + pointerX - halfBrushSize)] == fillFrom.toByte()) {
                             map.terrainArray[Math.round(i + pointerY - halfBrushSize)][Math.round(j + pointerX - halfBrushSize)] = fill.toByte()
                         }
@@ -1101,5 +1194,7 @@ object MapGenerator {
             }
         }
     }
+
+    private fun clamp(x: Int, min: Int, max: Int): Int = if (x < min) min else if (x > max) max else x
 
 }

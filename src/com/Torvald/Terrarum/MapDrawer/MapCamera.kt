@@ -108,7 +108,7 @@ object MapCamera {
             , TileNameCode.PLANK_EBONY
             , TileNameCode.PLANK_NORMAL
             , TileNameCode.SAND
-            , TileNameCode.SAND_BEACH
+            , TileNameCode.SAND_WHITE
             , TileNameCode.SAND_RED
             , TileNameCode.SAND_DESERT
             , TileNameCode.SAND_BLACK
@@ -230,7 +230,7 @@ object MapCamera {
         for (y in for_y_start..for_y_end - 1) {
             for (x in for_x_start..for_x_end - 1) {
 
-                val thisTile: Int
+                val thisTile: Int?
                 if (mode % 3 == WALL)
                     thisTile = map.getTileFromWall(x, y)
                 else if (mode % 3 == TERRAIN)
@@ -248,12 +248,14 @@ object MapCamera {
 
                     (mode == WALL || mode == TERRAIN)       // not an air tile
 
-                            && thisTile > 0
+                            && (thisTile ?: 0) > 0
                             &&
                             // check if light level of upper tile is zero and
                             // that of this tile is also zero
-                            (y > 0 && !(LightmapRenderer.getValueFromMap(x, y).toInt() == 0 && LightmapRenderer.getValueFromMap(x, y - 1).toInt() == 0) || // check if light level of this tile is zero, for y = 0
-                                    y == 0 && LightmapRenderer.getValueFromMap(x, y).toInt() > 0)) {
+                            (y > 0 && !(LightmapRenderer.getValueFromMap(x, y) ?: 0.toInt() == 0
+                                        && LightmapRenderer.getValueFromMap(x, y - 1) ?: 0.toInt() == 0)
+                                    // check if light level of this tile is zero, for y = 0
+                                    || y == 0 && LightmapRenderer.getValueFromMap(x, y) ?: 0.toInt() > 0)) {
 
                         val nearbyTilesInfo: Int
                         if (isWallSticker(thisTile)) {
@@ -269,11 +271,11 @@ object MapCamera {
 
                         val thisTileX: Int
                         if (!noDamageLayer)
-                            thisTileX = PairedMapLayer.RANGE * (thisTile % PairedMapLayer.RANGE) + nearbyTilesInfo
+                            thisTileX = PairedMapLayer.RANGE * ((thisTile ?: 0) % PairedMapLayer.RANGE) + nearbyTilesInfo
                         else
                             thisTileX = nearbyTilesInfo
 
-                        val thisTileY = thisTile / PairedMapLayer.RANGE
+                        val thisTileY = (thisTile ?: 0) / PairedMapLayer.RANGE
 
                         if (drawModeTilesBlendMul) {
                             if (isBlendMul(thisTile)) {
@@ -311,31 +313,12 @@ object MapCamera {
      * *
      * @return [0-15] 1: up, 2: right, 4: down, 8: left
      */
-    private fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int): Int {
+    private fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
         val nearbyTiles = IntArray(4)
-        if (x == 0) {
-            nearbyTiles[NEARBY_TILE_KEY_LEFT] = 4096
-        } else {
-            nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(mode, x - 1, y)
-        }
-
-        if (x == map.width - 1) {
-            nearbyTiles[NEARBY_TILE_KEY_RIGHT] = 4096
-        } else {
-            nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFrom(mode, x + 1, y)
-        }
-
-        if (y == 0) {
-            nearbyTiles[NEARBY_TILE_KEY_UP] = 0
-        } else {
-            nearbyTiles[NEARBY_TILE_KEY_UP] = map.getTileFrom(mode, x, y - 1)
-        }
-
-        if (y == map.height - 1) {
-            nearbyTiles[NEARBY_TILE_KEY_DOWN] = 4096
-        } else {
-            nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFrom(mode, x, y + 1)
-        }
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(mode, x - 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFrom(mode, x + 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_UP] = map.getTileFrom(mode, x, y - 1) ?: 4906
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFrom(mode, x, y + 1) ?: 4096
 
         // try for
         var ret = 0
@@ -350,29 +333,10 @@ object MapCamera {
 
     private fun getNearbyTilesInfoNonSolid(x: Int, y: Int, mode: Int): Int {
         val nearbyTiles = IntArray(4)
-        if (x == 0) {
-            nearbyTiles[NEARBY_TILE_KEY_LEFT] = 4096
-        } else {
-            nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(mode, x - 1, y)
-        }
-
-        if (x == map.width - 1) {
-            nearbyTiles[NEARBY_TILE_KEY_RIGHT] = 4096
-        } else {
-            nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFrom(mode, x + 1, y)
-        }
-
-        if (y == 0) {
-            nearbyTiles[NEARBY_TILE_KEY_UP] = 0
-        } else {
-            nearbyTiles[NEARBY_TILE_KEY_UP] = map.getTileFrom(mode, x, y - 1)
-        }
-
-        if (y == map.height - 1) {
-            nearbyTiles[NEARBY_TILE_KEY_DOWN] = 4096
-        } else {
-            nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFrom(mode, x, y + 1)
-        }
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(mode, x - 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFrom(mode, x + 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_UP] = map.getTileFrom(mode, x, y - 1) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFrom(mode, x, y + 1) ?: 4096
 
         // try for
         var ret = 0
@@ -392,25 +356,10 @@ object MapCamera {
     private fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
         val nearbyTiles = IntArray(4)
         val NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP
-        if (x == 0) {
-            nearbyTiles[NEARBY_TILE_KEY_LEFT] = 4096
-        } else {
-            nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(TERRAIN, x - 1, y)
-        }
-
-        if (x == map.width - 1) {
-            nearbyTiles[NEARBY_TILE_KEY_RIGHT] = 4096
-        } else {
-            nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFrom(TERRAIN, x + 1, y)
-        }
-
-        if (y == map.height - 1) {
-            nearbyTiles[NEARBY_TILE_KEY_DOWN] = 4096
-        } else {
-            nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFrom(TERRAIN, x, y + 1)
-        }
-
-        nearbyTiles[NEARBY_TILE_KEY_BACK] = map.getTileFrom(WALL, x, y)
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(TERRAIN, x - 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFrom(TERRAIN, x + 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] = map.getTileFrom(TERRAIN, x, y + 1) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_BACK] = map.getTileFrom(WALL, x, y) ?: 4096
 
         try {
             if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_RIGHT]).isSolid && TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_LEFT]).isSolid) {
@@ -499,12 +448,12 @@ object MapCamera {
     fun getRenderEndX(): Int = clampWTile(getRenderStartX() + div16(renderWidth) + 2)
     fun getRenderEndY(): Int = clampHTile(getRenderStartY() + div16(renderHeight) + 2)
 
-    private fun isConnectSelf(b: Int): Boolean = TILES_CONNECT_SELF.contains(b)
-    private fun isConnectMutual(b: Int): Boolean = TILES_CONNECT_MUTUAL.contains(b)
-    private fun isWallSticker(b: Int): Boolean = TILES_WALL_STICKER.contains(b)
-    private fun isPlatform(b: Int): Boolean = TILES_WALL_STICKER_CONNECT_SELF.contains(b)
+    private fun isConnectSelf(b: Int?): Boolean = TILES_CONNECT_SELF.contains(b)
+    private fun isConnectMutual(b: Int?): Boolean = TILES_CONNECT_MUTUAL.contains(b)
+    private fun isWallSticker(b: Int?): Boolean = TILES_WALL_STICKER.contains(b)
+    private fun isPlatform(b: Int?): Boolean = TILES_WALL_STICKER_CONNECT_SELF.contains(b)
 
-    private fun isBlendMul(b: Int): Boolean = TILES_BLEND_MUL.contains(b)
+    private fun isBlendMul(b: Int?): Boolean = TILES_BLEND_MUL.contains(b)
 
     private fun setBlendModeMul() {
         GL11.glEnable(GL11.GL_BLEND)

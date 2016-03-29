@@ -39,9 +39,6 @@ object Lang {
     init {
         lang = HashMap<String, CSVRecord>()
 
-        // read polyglot.csv first and use this list as a pivot
-        var langPackCSV: List<CSVRecord> = CSVFetcher.readCSV(PATH_TO_CSV + CSV_MAIN)
-
         // append CSV records to the main langpack
         val file = File(PATH_TO_CSV)
         val filter = FilenameFilter { dir, name -> name.contains(".csv") && !name.contains(NAMESET_PREFIX) }
@@ -51,15 +48,11 @@ object Lang {
             csv.forEach { it -> lang.put(it.get(CSV_COLUMN_FIRST), it) }
         }
 
-        //        lang.put(record.get(CSV_COLUMN_FIRST), record)
-
-        // Fill lang table
-        // langPackCSV.forEach({ this.appendToLangByStringID(it) })
-
-
+        // sort word lists
         Arrays.sort(ENGLISH_WORD_NORMAL_PLURAL)
         Arrays.sort(FRENCH_WORD_NORMAL_PLURAL)
 
+        // reload correct (C/J) unihan fonts if applicable
         try {
             (Terrarum.gameFontWhite as GameFontWhite).reloadUnihan()
         }
