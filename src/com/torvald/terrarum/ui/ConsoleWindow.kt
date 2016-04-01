@@ -60,7 +60,7 @@ class ConsoleWindow : UICanvas, UITypable {
         // text and cursor
         g.color = Color.white
         g.drawString(input, 1f + drawOffX, drawOffY)
-        g.fillRect(inputDrawWidth.toFloat() + drawOffX, drawOffY, 2f, inputDrawHeight.toFloat())
+        g.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 2f, inputDrawHeight.toFloat())
 
         // messages
         for (i in 0..MESSAGES_DISPLAY_COUNT - 1) {

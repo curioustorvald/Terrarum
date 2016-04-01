@@ -1,7 +1,7 @@
 ##  Format  ##
 
 *  Save meta
-    - Binary (for more security)
+    - GZip'd binary (for more security)
     - Filename : world (with no extension)
 
     |Type        |Mnemonic    |Description                            |
@@ -11,10 +11,10 @@
     |Byte        |NULL        |String terminator                      |
     |Byte[8]     |terraseed   |Terrain seed                           |
     |Byte[8]     |rogueseed   |Randomiser seed                        |
-    |Byte[32]    |hash1       |SHA-256 hash of worldinfo1 being stored|
-    |Byte[32]    |hash2       |SHA-256 hash of worldinfo2 being stored|
-    |Byte[32]    |hash3       |SHA-256 hash of worldinfo3 being stored|
-    |Byte[32]    |hash4       |SHA-256 hash of worldinfo4 being stored|
+    |Byte[32]    |hash1       |SHA-256 hash of worldinfo1 being stored (when not zipped)|
+    |Byte[32]    |hash2       |SHA-256 hash of worldinfo2 being stored (when not zipped)|
+    |Byte[32]    |hash3       |SHA-256 hash of worldinfo3 being stored (when not zipped)|
+    |Byte[32]    |hash4       |SHA-256 hash of worldinfo4 being stored (when not zipped)|
     
     Endianness: Big
 
@@ -25,10 +25,10 @@
 
 *  Prop data
     - GZip'd CSV
-    - Filename : worldinfo2 -- tileprop.csv
-                 worldinfo3 -- itemprop.csv
-                 worldinfo4 -- materialprop.csv
-                    (with no extension)
+    - Filename : (with no extension)
+    worldinfo2 -- tileprop
+    worldinfo3 -- itemprop
+    worldinfo4 -- materialprop
 
 
 *  Human-readable
@@ -39,8 +39,7 @@
 
 
 ##  How it works  ##
-* If hash discrepancy has detected, (hash of csv in save dir != stored hash || hash of TEMD != stored hash)
-  printout "Save file corrupted. Continue?" with prompt "Yes/No"
+* If hash discrepancy has detected, (hash of csv in save dir != stored hash || hash of TEMD != stored hash), printout "Save file corrupted. Continue?" with prompt "Yes/No"
 
 Directory:
 
@@ -48,10 +47,10 @@ Directory:
      --- 2a93bc5fd...f823   Actor/Faction/etc. data
      --- 423bdc838...93bd   Actor/Faction/etc. data
      --- Items_list.txt     Human-readable
-     --- Materials_list.txt Human-redable
+     --- Materials_list.txt Human-readable
      --- Tiles_list.txt     Human-readable
-     --- world              save meta (binary)
-     --- worldinfo1         TEMD (binary)
-     --- worldinfo2         tileprop
-     --- worldinfo3         itemprop
-     --- worldinfo4         materialprop
+     --- world              save meta (binary, GZip)
+     --- worldinfo1         TEMD (binary, GZip)
+     --- worldinfo2         tileprop (GZip)
+     --- worldinfo3         itemprop (GZip)
+     --- worldinfo4         materialprop (GZip)

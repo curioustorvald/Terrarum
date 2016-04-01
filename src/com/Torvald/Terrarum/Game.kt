@@ -175,6 +175,8 @@ constructor() : BasicGameState() {
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
+        setBlendModeNormal()
+
         Terrarum.gameConfig["smoothlighting"] = KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH)
 
         if (!g.isAntiAlias) g.isAntiAlias = true
@@ -282,16 +284,6 @@ constructor() : BasicGameState() {
                 0f, Terrarum.HEIGHT.toFloat(), getGradientColour(1)
         )
         g.fill(skyBox, skyColourFill)
-    }
-
-    private fun setBlendModeMul() {
-        GL11.glEnable(GL11.GL_BLEND)
-        GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)
-    }
-
-    private fun setBlendModeNormal() {
-        GL11.glDisable(GL11.GL_BLEND)
-        Terrarum.appgc.graphics.setDrawMode(Graphics.MODE_NORMAL)
     }
 
     fun sendNotification(msg: Array<String>) {

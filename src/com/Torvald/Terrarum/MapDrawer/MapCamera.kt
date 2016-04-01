@@ -6,6 +6,8 @@ import com.torvald.terrarum.Terrarum
 import com.torvald.terrarum.tileproperties.TileNameCode
 import com.torvald.terrarum.tileproperties.TilePropCodex
 import com.jme3.math.FastMath
+import com.torvald.terrarum.setBlendModeMul
+import com.torvald.terrarum.setBlendModeNormal
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -455,13 +457,4 @@ object MapCamera {
 
     private fun isBlendMul(b: Int?): Boolean = TILES_BLEND_MUL.contains(b)
 
-    private fun setBlendModeMul() {
-        GL11.glEnable(GL11.GL_BLEND)
-        GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)
-    }
-
-    private fun setBlendModeNormal() {
-        GL11.glDisable(GL11.GL_BLEND)
-        Terrarum.appgc.graphics.setDrawMode(Graphics.MODE_NORMAL)
-    }
 }

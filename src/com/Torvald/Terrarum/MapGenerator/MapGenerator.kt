@@ -14,25 +14,24 @@ object MapGenerator {
     private lateinit var random: Random
     //private static float[] noiseArray;
     private var SEED: Long = 0
-    private var WIDTH: Int = 0
-    private var HEIGHT: Int = 0
+    var WIDTH: Int = 0
+    var HEIGHT: Int = 0
 
     //private lateinit var heightMap: IntArray
     private lateinit var terrainMap: Array<BitSet>
 
-    private var DIRT_LAYER_DEPTH: Int = 0
-    private var TERRAIN_AVERAGE_HEIGHT: Int = 0
+    var DIRT_LAYER_DEPTH: Int = 0
+    var TERRAIN_AVERAGE_HEIGHT: Int = 0
     private var minimumFloatingIsleHeight: Int = 0
 
     private val noiseGradientStart = 0.67f
     private val noiseGradientEnd = 0.56f
-    private val noiseGrdCaveEnd = 0.54f
 
     private val HILL_WIDTH = 256 // power of two!
     //private val MAX_HILL_HEIGHT = 100
     private val TERRAIN_UNDULATION = 250
 
-    private val CAVE_LARGEST_FEATURE = 200
+    private val SIMPLEXGEN_LARGEST_FEATURE = 200
 
     private var OCEAN_WIDTH = 400
     private var SHORE_WIDTH = 120
@@ -41,14 +40,9 @@ object MapGenerator {
     private var GLACIER_MOUNTAIN_WIDTH = 900
     private val GLACIER_MOUNTAIN_HEIGHT = 300
 
-    private val CAVEGEN_PERTURB_RATE = 0.37f
-    private val CAVEGEN_PERTURB2_RATE = 0.25f
-
-    private val CAVEGEN_THRE_START = 0.87f
+    private val CAVEGEN_THRE_START = 0.95f
     private val CAVEGEN_THRE_END = 0.67f
 
-    private val CAVEGEN_LARGEST_FEATURE = 256
-    private val CAVEGEN_LARGEST_FEATURE_PERTURB = 128
 
     private var worldOceanPosition: Int = -1
     private val TYPE_OCEAN_LEFT = 0
@@ -58,7 +52,9 @@ object MapGenerator {
     private val GRASSCUR_RIGHT = 1
     private val GRASSCUR_DOWN = 2
     private val GRASSCUR_LEFT = 3
-    
+
+    private val TILE_MACRO_ALL = -1
+
     fun attachMap(map: GameMap) {
         this.map = map
         WIDTH = map.width
@@ -97,87 +93,62 @@ object MapGenerator {
         terrainMap = raise3()
 
 
-        terrainMapToObjectMap()
+        fillMapByNoiseMap()
 
         /**
          * Done: more perturbed overworld (harder to supra-navigate)
          * Todo: veined ore distribution (metals) -- use veined simplex noise
-         * Todo: clustered gem distribution (Groups: [Ruby, Sapphire], Amethyst, Yellow topaz, emerald, diamond) -- use regular simplex noise
+         * Todo: clustered gem distribution (clusters: [Ruby, Sapphire], Amethyst, Yellow topaz, emerald, diamond) -- use regular simplex noise
          * Todo: Lakes! Aquifers! Lava chambers!
          * Todo: deserts (variants: SAND_DESERT, SAND_RED)
          * Todo: volcano(es?)
          * Done: variants of beach (SAND, SAND_BEACH, SAND_BLACK, SAND_GREEN)
          */
 
-        carveCave(
-                caveGen(1.4f, 1.7f), TileNameCode.AIR, "Carving out cave...")
+        val noiseArray = arrayOf(
+                TaggedJoise("Carving caves", noiseRidged(1.7f, 1.4f), 1f, TILE_MACRO_ALL, TILE_MACRO_ALL, TileNameCode.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END),
+                TaggedJoise("Collapsing caves", noiseBlobs(0.5f, 0.5f), 0.3f, TileNameCode.AIR, TileNameCode.STONE, TileNameCode.STONE, NoiseFilterUniform)
 
-        fillByMapNoFilterUnderground(
-                generate2DSimplexNoiseWorldSize(1f, 1f), 0.9f, TileNameCode.AIR, TileNameCode.STONE, "Collapsing caves...")
+                // random stone patches on grounds
+                //TaggedJoise(noiseBlobs(0.25f, 0.25f), 1.02f, TileNameCode.DIRT, TileNameCode.STONE, NoiseFilterQuadratic, noiseGradientEnd, noiseGradientStart),
+                // random dirt spots in caves
+                //TaggedJoise(noiseBlobs(2.5f, 2.5f), 0.98f, TileNameCode.STONE, TileNameCode.DIRT, NoiseFilterQuadratic, noiseGradientEnd, noiseGradientStart),
+                // random gravels in caves
+                //TaggedJoise(noiseBlobs(2.5f, 2.5f), 0.98f, TileNameCode.STONE, TileNameCode.GRAVEL, NoiseFilterQuadratic, noiseGradientEnd, noiseGradientStart),
 
-        /*fillByMapInverseGradFilter(
-                generate2DSimplexNoiseWorldSize(2.5f, 2.5f)
-                , 1.02f
-                , TileNameCode.DIRT
-                , TileNameCode.STONE
-                , "Planting stones on dirt layers..."
-        );
-        fillByMapInverseGradFilter(
-                generate2DSimplexNoiseWorldSize(2.5f, 2.5f)
-                , 0.98f
-                , TileNameCode.STONE
-                , TileNameCode.DIRT
-                , "Planting dirts..."
-        );
-        fillByMapInverseGradFilter(
-                generate2DSimplexNoiseWorldSize(2.5f, 2.5f)
-                , 0.92f
-                , TileNameCode.STONE
-                , GRAVEL
-                , "Planting gravels..."
-        );*/
+                // copper veins
+                //TaggedJoise(noiseRidged(2.2f, 2.2f), 1.67f, TileNameCode.STONE, TileNameCode.ORE_COPPER),
+                // separate copper veins
+                //TaggedJoise(noiseBlobs(1.3f, 1.3f), 0.75f, TileNameCode.ORE_COPPER, TileNameCode.STONE),
 
-        /**
-         * Plant ores
-         */
-        /*fillByMap(
-                generate2DSimplexNoiseWorldSize(5, 5)
-                , 0.78f
-                , TileNameCode.STONE
-                , DIAMOND
-                , "Planting diamonds..."
-        );
+                // iron veins
+                //TaggedJoise(noiseRidged(2.2f, 2.2f), 1.69f, TileNameCode.STONE, TileNameCode.ORE_IRON),
+                // separate iron veins
+                //TaggedJoise(noiseBlobs(1.3f, 1.3f), 0.75f, TileNameCode.ORE_IRON, TileNameCode.STONE),
 
-        byte[] berylsArray = {RUBY, EMERALD, SAPPHIRE, TOPAZ, AMETHYST};
-        fillByMap(
-                generate2DSimplexNoiseWorldSize(5, 5)
-                , 0.8f
-                , TileNameCode.STONE
-                , berylsArray
-                , "Planting beryls..."
-        );
+                // silver veins
+                //TaggedJoise(noiseRidged(2.2f, 2.2f), 1.70f, TileNameCode.STONE, TileNameCode.ORE_SILVER),
+                // separate silver veins
+                //TaggedJoise(noiseBlobs(1.3f, 1.3f), 0.75f, TileNameCode.ORE_SILVER, TileNameCode.STONE),
 
-        fillByMap(
-                generate2DSimplexNoiseWorldSize(5, 5)
-                , 0.80f
-                , TileNameCode.STONE
-                , GOLD
-                , "Planting golds..."
-        );
-        fillByMap(
-                generate2DSimplexNoiseWorldSize(5, 5)
-                , 0.866f
-                , TileNameCode.STONE
-                , IRON
-                , "Planting irons..."
-        );
-        fillByMap(
-                generate2DSimplexNoiseWorldSize(5, 5)
-                , 0.88f
-                , TileNameCode.STONE
-                , COPPER
-                , "Planting coppers..."
-        );*/
+                // gold veins
+                //TaggedJoise(noiseRidged(2.2f, 2.2f), 1.71f, TileNameCode.STONE, TileNameCode.ORE_GOLD),
+                // separate gold veins
+                //TaggedJoise(noiseBlobs(1.3f, 1.3f), 0.75f, TileNameCode.ORE_GOLD, TileNameCode.STONE),
+
+                // topaz
+                //TaggedJoise(noiseBlobs(1.55f, 1.55f), 1.5f, TileNameCode.STONE, TileNameCode.RAW_TOPAZ),
+                // ruby/sapphire
+                //TaggedJoise(noiseBlobs(1.55f, 1.55f), 1.5f, TileNameCode.STONE, intArrayOf(TileNameCode.RAW_RUBY, TileNameCode.RAW_SAPPHIRE)),
+                // emerald
+                //TaggedJoise(noiseBlobs(1.55f, 1.55f), 1.5f, TileNameCode.STONE, TileNameCode.RAW_EMERALD),
+                // diamond
+                //TaggedJoise(noiseBlobs(1.45f, 1.45f), 1.5f, TileNameCode.STONE, TileNameCode.RAW_DIAMOND),
+                // amethyst
+                //TaggedJoise(noiseBlobs(1.45f, 1.45f), 1.5f, TileNameCode.STONE, TileNameCode.RAW_AMETHYST)
+        )
+
+        processNoiseLayers(noiseArray)
 
         /** TODO Cobaltite, Ilmenite, Aurichalcum (and possibly pitchblende?)  */
 
@@ -202,128 +173,40 @@ object MapGenerator {
 
     /* 1. Raise */
 
-    /**
-     * Ridged 2D simplex noise with some perturbing
-     * @param xStretch
-     * *
-     * @param yStretch
-     * *
-     * @return
-     */
-    private fun caveGen(xStretch: Float, yStretch: Float): Array<FloatArray> {
-        val noiseMap = Array(HEIGHT) { FloatArray(WIDTH) }
+    private fun noiseRidged(xStretch: Float, yStretch: Float): Joise {
+        val ridged = ModuleFractal()
+        ridged.setType(ModuleFractal.FractalType.RIDGEMULTI)
+        ridged.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        ridged.setNumOctaves(4)
+        ridged.setFrequency(1.0)
+        ridged.seed = SEED xor random.nextLong()
 
-        val simplexNoise = SimplexNoise(CAVEGEN_LARGEST_FEATURE, CAVEGEN_PERTURB_RATE, SEED)
-        val simplexNoisePerturbMap = SimplexNoise(CAVEGEN_LARGEST_FEATURE_PERTURB, 0.5f, SEED xor random.nextLong())
+        val ridged_autocorrect = ModuleAutoCorrect()
+        ridged_autocorrect.setRange(0.0, 1.0)
+        ridged_autocorrect.setSource(ridged)
 
-        val xEnd = WIDTH * yStretch
-        val yEnd = HEIGHT * xStretch
+        val ridged_scale = ModuleScaleDomain()
+        ridged_scale.setScaleX(xStretch.toDouble())
+        ridged_scale.setScaleY(yStretch.toDouble())
+        ridged_scale.setSource(ridged_autocorrect)
 
-        var lowestNoiseVal = 10000f
-        var highestNoiseVal = -10000f
-
-        for (y in 0..HEIGHT - 1) {
-            for (x in 0..WIDTH - 1) {
-                val ny = (y * (xEnd / WIDTH)).toInt()
-                val nx = (x * (yEnd / HEIGHT)).toInt()
-
-                val noiseInit = simplexNoise.getNoise(nx, ny) // [-1 , 1]
-                val perturbInit = simplexNoisePerturbMap.getNoise(nx, ny) * 0.5f + 0.5f  // [0 , 1]
-
-                /** Ridging part !  */
-                val noiseFin = 1f - Math.abs(noiseInit) // [0 , 1]
-
-                val perturb = 1 - perturbInit * CAVEGEN_PERTURB2_RATE // [1 , 1-0.25]
-                val noisePerturbed = noiseFin * perturb // [0 , 1]
-
-                if (noisePerturbed < lowestNoiseVal) lowestNoiseVal = noisePerturbed
-                if (noisePerturbed > highestNoiseVal) highestNoiseVal = noisePerturbed
-                noiseMap[y][x] = noisePerturbed
-            }
-        }
-
-        // Auto-scaling noise
-
-        for (y in 0..HEIGHT - 1) {
-            for (x in 0..WIDTH - 1) {
-                val noiseInit = noiseMap[y][x] - lowestNoiseVal
-
-                val noiseFin = noiseInit * (1f / (highestNoiseVal - lowestNoiseVal))
-
-                val noiseThresholded = (if (noiseFin > gradientSqrt(y, CAVEGEN_THRE_START,
-                        CAVEGEN_THRE_END))
-                    1
-                else
-                    0).toFloat()
-
-                noiseMap[y][x] = noiseThresholded
-            }
-        }
-
-        return noiseMap
+        return Joise(ridged_scale)
     }
 
-    private fun generate2DSimplexNoiseWorldSize(xStretch: Float, yStretch: Float): Array<FloatArray> {
-        return generate2DSimplexNoise(WIDTH, HEIGHT, xStretch, yStretch)
+    private fun noiseBlobs(xStretch: Float, yStretch: Float): Joise {
+        val gradval = ModuleBasisFunction()
+        gradval.seed = SEED
+        gradval.setType(ModuleBasisFunction.BasisType.GRADVAL)
+        gradval.setInterpolation(ModuleBasisFunction.InterpolationType.QUINTIC)
+
+        val gradval_scale = ModuleScaleDomain()
+        gradval_scale.setScaleX(1.0 / xStretch)
+        gradval_scale.setScaleY(1.0 / yStretch)
+        gradval_scale.setSource(gradval)
+
+        return Joise(gradval_scale)
     }
 
-    /**
-     * Generate 2D array of simplex noise.
-     * @param sizeX
-     * *
-     * @param sizeY
-     * *
-     * @param xStretch
-     * *
-     * @param yStretch
-     * *
-     * @return matrix in ![x][y]!
-     */
-    private fun generate2DSimplexNoise(sizeX: Int, sizeY: Int, xStretch: Float, yStretch: Float): Array<FloatArray> {
-        val simplexNoise = SimplexNoise(CAVE_LARGEST_FEATURE, 0.1f, SEED xor random.nextLong())
-
-        val xStart = 0f
-        val yStart = 0f
-
-        /** higher = denser.
-         * Recommended: (width or height) * 3
-         */
-        val xEnd = WIDTH * yStretch
-        val yEnd = HEIGHT * xStretch
-
-        var lowestNoiseVal = 10000f
-        var highestNoiseVal = -10000f
-
-        val result = Array(sizeY) { FloatArray(sizeX) }
-
-        for (i in 0..sizeY - 1) {
-            for (j in 0..sizeX - 1) {
-                val x = (xStart + i * ((xEnd - xStart) / sizeX)).toInt()
-                val y = (yStart + j * ((yEnd - yStart) / sizeY)).toInt()
-
-                val noiseValue = (0.5 * (1 + simplexNoise.getNoise(x, y))).toFloat()
-
-                if (noiseValue < lowestNoiseVal) lowestNoiseVal = noiseValue
-                if (noiseValue > highestNoiseVal) highestNoiseVal = noiseValue
-
-                result[i][j] = noiseValue
-            }
-        }
-
-        // Auto-scaling noise
-
-        for (y in 0..HEIGHT - 1) {
-            for (x in 0..WIDTH - 1) {
-                val noiseInit = result[y][x] - lowestNoiseVal
-
-                val noiseFin = noiseInit * (1f / (highestNoiseVal - lowestNoiseVal))
-
-                result[y][x] = noiseFin
-            }
-        }
-
-        return result
-    }
 
     private fun generateOcean(noiseArrayLocal: IntArray): IntArray {
         val oceanLeftP1 = noiseArrayLocal[OCEAN_WIDTH]
@@ -333,13 +216,13 @@ object MapGenerator {
          * Add ocean so that:
 
          * +1|       -   -
-         * 0|      -  --  ...
+         *  0|      -  --  ...
          * -1|______  -
 
          * interpolated to
 
          * +1|        -   -
-         * 0|   _---  --  ...
+         *  0|   _---  --  ...
          * -1|__-      -
 
          * ↑-- Rough, white noise
@@ -388,8 +271,7 @@ object MapGenerator {
         //println(lowland_shape_fractal.seed)
 
         val lowland_autocorrect = ModuleAutoCorrect()
-        lowland_autocorrect.setLow(0.0)
-        lowland_autocorrect.setHigh(1.0)
+        lowland_autocorrect.setRange(0.0, 1.0)
         lowland_autocorrect.setSource(lowland_shape_fractal)
 
         val lowland_scale = ModuleScaleOffset()
@@ -418,8 +300,7 @@ object MapGenerator {
 
         val highland_autocorrect = ModuleAutoCorrect()
         highland_autocorrect.setSource(highland_shape_fractal)
-        highland_autocorrect.setLow(0.0)
-        highland_autocorrect.setHigh(1.0)
+        highland_autocorrect.setRange(0.0, 1.0)
 
         val highland_scale = ModuleScaleOffset()
         highland_scale.setSource(highland_autocorrect)
@@ -447,8 +328,7 @@ object MapGenerator {
 
         val mountain_autocorrect = ModuleAutoCorrect()
         mountain_autocorrect.setSource(mountain_shape_fractal)
-        mountain_autocorrect.setLow(0.0)
-        mountain_autocorrect.setHigh(1.0)
+        mountain_autocorrect.setRange(0.0, 1.0)
 
         val mountain_scale = ModuleScaleOffset()
         mountain_scale.setSource(mountain_autocorrect)
@@ -476,8 +356,7 @@ object MapGenerator {
 
         val terrain_autocorrect = ModuleAutoCorrect()
         terrain_autocorrect.setSource(terrain_type_fractal)
-        terrain_autocorrect.setLow(0.0)
-        terrain_autocorrect.setHigh(1.0)
+        terrain_autocorrect.setRange(0.0, 1.0)
 
         val terrain_type_scale = ModuleScaleDomain()
         terrain_type_scale.setScaleY(0.33)
@@ -508,7 +387,9 @@ object MapGenerator {
         ground_select.setControlSource(highland_lowland_select)
 
         val joise = Joise(ground_select)
+
         // fill the area as Joise map
+        println("[mapgenerator] Raising and eroding terrain...")
         for (y in 0..(TERRAIN_UNDULATION - 1)) {
             for (x in 0..WIDTH) {
                 val map: Boolean = (
@@ -606,8 +487,8 @@ object MapGenerator {
         }
     }
 
-    private fun terrainMapToObjectMap() {
-        println("[mapgenerator] Shaping world as processed...")
+    private fun fillMapByNoiseMap() {
+        println("[mapgenerator] Shaping world...")
         // generate dirt-stone transition line
         // use catmull spline
         val dirtStoneLine = IntArray(WIDTH)
@@ -620,12 +501,12 @@ object MapGenerator {
                 splineControlPoints[x] = Pair(x * POINTS_GAP, y)
                 if (terrainMap[y].get(splineControlPoints[x].first)) break
             }
-            println("Spline[$x] x: ${splineControlPoints[x].first}, " +
-                    "y: ${splineControlPoints[x].second}")
+            // println("Spline[$x] x: ${splineControlPoints[x].first}, " +
+            //         "y: ${splineControlPoints[x].second}")
         }
 
         // do interpolation
-        for (x in 0..dirtStoneLine.size) {
+        for (x in 0..dirtStoneLine.size - 1) {
             val x_1 = x / POINTS_GAP
 
             val splineX0 = splineControlPoints[ clamp(x_1 - 1, 0, dirtStoneLine.size / POINTS_GAP) ].first
@@ -641,7 +522,7 @@ object MapGenerator {
             if (x in POINTS_GAP - 1..WIDTH - 2 * POINTS_GAP) {
                 dirtStoneLine[x] = Math.round(FastMath.interpolateCatmullRom(
                         (x - splineX1) / POINTS_GAP.toFloat(),
-                        0.01f,
+                        -0.3f,//0.01f,
                         splineP0,
                         splineP1,
                         splineP2,
@@ -649,11 +530,14 @@ object MapGenerator {
                 ))
             }
             else {
-                interpolateCosine(
+                dirtStoneLine[x] = Math.round(FastMath.interpolateCatmullRom(
                         (x - splineX1) / POINTS_GAP.toFloat(),
+                        -0.3f,//0.01f,
+                        splineP0,
                         splineP1,
-                        splineP2
-                )
+                        splineP2,
+                        splineP3
+                ))
             }
         }
 
@@ -675,280 +559,135 @@ object MapGenerator {
 
     /* 2. Carve */
 
-    private fun carveCave(noisemap: Array<FloatArray>, tile: Int, message: String) {
-        println("[mapgenerator] " + message)
-
-        for (i in 0..HEIGHT - 1) {
-            for (j in 0..WIDTH - 1) {
-                if (noisemap[i][j] > 0.9) {
-                    map.setTileTerrain(j, i, tile)
-                }
-            }
-        }
-    }
-
     /**
-     * Carve (place air block) by noisemap, inversed gradation filter applied.
+     * Carve (place specified block) by noisemap, inversed gradation filter applied.
      * @param map noisemap
      * *
-     * @param scarcity higher = larger blob
-     * *
+     * @param scarcity higher == rarer
+     * * 1.0 is a default value. This value works as a multiplier to the gradient filter.
      * @param tile
      * *
      * @param message
      */
-    private fun carveByMap(noisemap: Array<FloatArray>, scarcity: Float, tile: Int, message: String) {
+    private fun carveByMap(noisemap: Any, scarcity: Float, tile: Int, message: String,
+                           filter: NoiseFilter = NoiseFilterQuadratic,
+                           filterStart: Float = noiseGradientStart,
+                           filterEnd: Float = noiseGradientEnd) {
         println("[mapgenerator] " + message)
 
-        for (i in 0..HEIGHT - 1) {
-            for (j in 0..WIDTH - 1) {
-                if (noisemap[i][j] > gradientQuadratic(i, noiseGradientStart, noiseGrdCaveEnd) * scarcity) {
-                    map.setTileTerrain(j, i, tile)
+        for (y in 0..HEIGHT - 1) {
+            for (x in 0..WIDTH - 1) {
+                val noise: Float = when (noisemap) {
+                    is Joise ->
+                        noisemap.get(
+                                x.toDouble() / 48.0, // 48: Fixed value
+                                y.toDouble() / 48.0
+                        ).toFloat()
+
+                    is TaggedSimplexNoise -> noisemap.noiseModule.getNoise(
+                            Math.round(x / noisemap.xStretch),
+                            Math.round(y / noisemap.yStretch)
+                    )
+
+                    else -> throw(IllegalArgumentException("[mapgenerator] Unknown noise module type '${noisemap.javaClass.simpleName}': Only the 'Joise' or 'TaggedSimplexNoise' is valid."))
+                }
+
+                if (noise > filter.getGrad(y, filterStart, filterEnd) * scarcity) {
+                    map.setTileTerrain(x, y, tile)
                 }
             }
         }
     }
 
-    /**
-     * Fill by noisemap, gradation filter applied.
-     * @param map noisemap
-     * *
-     * @param scarcity higher = larger blob
-     * *
-     * @param replaceFrom
-     * *
-     * @param tile
-     * *
-     * @param message
-     */
-    private fun fillByMap(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: Int, message: String) {
+    private fun fillByMap(noisemap: Any, scarcity: Float, replaceFrom: Int, replaceTo: Int, message: String,
+                          filter: NoiseFilter = NoiseFilterQuadratic,
+                          filterStart: Float = noiseGradientStart,
+                          filterEnd: Float = noiseGradientEnd) {
         println("[mapgenerator] " + message)
 
-        for (i in 0..HEIGHT - 1) {
-            for (j in 0..WIDTH - 1) {
-                if (noisemap[i][j] > getNoiseGradient(i, noiseGradientStart, noiseGradientEnd) * scarcity && map.getTileFromTerrain(j, i) == replaceFrom) {
-                    map.setTileTerrain(j, i, tile)
+        for (y in 0..HEIGHT - 1) {
+            for (x in 0..WIDTH - 1) {
+                val noise: Float = when (noisemap) {
+                    is Joise ->
+                        noisemap.get(
+                                x.toDouble() / 48.0, // 48: Fixed value
+                                y.toDouble() / 48.0
+                        ).toFloat()
+
+                    is TaggedSimplexNoise -> noisemap.noiseModule.getNoise(
+                            Math.round(x / noisemap.xStretch),
+                            Math.round(y / noisemap.yStretch)
+                    )
+
+                    else -> throw(IllegalArgumentException("[mapgenerator] Unknown noise module type '${noisemap.javaClass.simpleName}': Only the 'Joise' or 'TaggedSimplexNoise' is valid."))
+                }
+
+                if (noise > filter.getGrad(y, filterStart, filterEnd) * scarcity
+                    && map.getTileFromTerrain(x, y) == replaceFrom) {
+                    map.setTileTerrain(x, y, replaceTo)
                 }
             }
         }
     }
 
-    /**
-     * Fill by noisemap, inversed gradation filter applied.
-     * @param map noisemap
-     * *
-     * @param scarcity higher = larger blob
-     * *
-     * @param replaceFrom
-     * *
-     * @param tile
-     * *
-     * @param message
-     */
-    private fun fillByMapInverseGradFilter(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: Int, message: String) {
+    private fun fillByMap(noisemap: Any, scarcity: Float, replaceFrom: Int, tile: IntArray, message: String,
+                          filter: NoiseFilter = NoiseFilterQuadratic,
+                          filterStart: Float = noiseGradientStart,
+                          filterEnd: Float = noiseGradientEnd) {
         println("[mapgenerator] " + message)
 
-        for (i in 0..HEIGHT - 1) {
-            for (j in 0..WIDTH - 1) {
-                if (noisemap[i][j] > getNoiseGradientInversed(i, noiseGradientEnd, noiseGradientStart) * scarcity
-                        && map.getTileFromTerrain(j, i) == replaceFrom) {
-                    map.setTileTerrain(j, i, tile)
+        for (y in 0..HEIGHT - 1) {
+            for (x in 0..WIDTH - 1) {
+                val noise: Float = when (noisemap) {
+                    is Joise ->
+                        noisemap.get(
+                                x.toDouble() / 48.0, // 48: Fixed value
+                                y.toDouble() / 48.0
+                        ).toFloat()
+
+                    is TaggedSimplexNoise -> noisemap.noiseModule.getNoise(
+                            Math.round(x / noisemap.xStretch),
+                            Math.round(y / noisemap.yStretch)
+                    )
+
+                    else -> throw(IllegalArgumentException("[mapgenerator] Unknown noise module type '${noisemap.javaClass.simpleName}': Only the 'Joise' or 'TaggedSimplexNoise' is valid."))
+                }
+
+                if (noise > filter.getGrad(y, filterStart, filterEnd) * scarcity && map.getTileFromTerrain(x, y) == replaceFrom) {
+                    map.setTileTerrain(x, y, tile[random.nextInt(tile.size)])
                 }
             }
         }
     }
 
-    /**
-     * Fill by noisemap, no filter applied. Takes
-     *
-     * noiseGradientStart / scarcity
-     * as carving threshold.
-     * @param map noisemap
-     * *
-     * @param scarcity higher = larger blob
-     * *
-     * @param replaceFrom
-     * *
-     * @param tile
-     * *
-     * @param message
-     */
-    private fun fillByMapNoFilter(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: Int, message: String) {
-        println("[mapgenerator] " + message)
+    private fun processNoiseLayers(noiseRecords: Array<TaggedJoise>) {
+        for (record in noiseRecords) {
+            println("[mapgenerator] ${record.message}...")
+            for (y in 0..HEIGHT - 1) {
+                for (x in 0..WIDTH - 1) {
+                    val noise: Float = record.noiseModule.get(
+                            x.toDouble() / 48.0, // 48: Fixed value
+                            y.toDouble() / 48.0
+                    ).toFloat()
 
-        for (i in 0..HEIGHT - 1) {
-            for (j in 0..WIDTH - 1) {
-                if (noisemap[i][j] > noiseGradientStart * scarcity && map.getTileFromTerrain(j, i) == replaceFrom) {
-                    map.setTileTerrain(j, i, tile)
+                    val fromTerr = record.replaceFromTerrain
+                    val fromWall = record.replaceFromWall
+                    val to: Int = when(record.replaceTo) {
+                        is Int -> record.replaceTo as Int
+                        is IntArray -> (record.replaceTo as IntArray)[random.nextInt((record.replaceTo as IntArray).size)]
+                        else -> throw IllegalArgumentException("[mapgenerator] Unknown replaceTo tile type '${record.replaceTo.javaClass.canonicalName}': Only 'kotlin.Int' and 'kotlin.IntArray' is valid.")
+                    }
+                    if (to == TILE_MACRO_ALL) throw IllegalArgumentException("[mapgenerator] Invalid replaceTo: TILE_MACRO_ALL")
+                    val threshold = record.filter.getGrad(y, record.filterArg1, record.filterArg2)
+
+                    if (noise > threshold * record.scarcity) {
+                        if ((map.getTileFromTerrain(x, y) == fromTerr || fromTerr == TILE_MACRO_ALL)
+                                && (map.getTileFromWall(x, y) == fromWall || fromWall == TILE_MACRO_ALL)) {
+                            map.setTileTerrain(x, y, to)
+                        }
+                    }
                 }
             }
-        }
-    }
-
-    private fun fillByMapNoFilterUnderground(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, replaceTo: Int, message: String) {
-        println("[mapgenerator] " + message)
-
-        for (i in 0..HEIGHT - 1) {
-            for (j in 0..WIDTH - 1) {
-                if (noisemap[i][j] > noiseGradientStart * scarcity
-                        && map.getTileFromTerrain(j, i) ?: 0 == replaceFrom
-                        && map.getTileFromWall(j, i) ?: 0 == replaceTo
-                ) {
-                    map.setTileTerrain(j, i, replaceTo)
-                }
-            }
-        }
-    }
-
-    private fun fillByMap(noisemap: Array<FloatArray>, scarcity: Float, replaceFrom: Int, tile: IntArray, message: String) {
-        println("[mapgenerator] " + message)
-
-        for (i in 0..HEIGHT - 1) {
-            for (j in 0..WIDTH - 1) {
-                if (noisemap[i][j] > getNoiseGradient(i, noiseGradientStart, noiseGradientEnd) * scarcity && map.getTileFromTerrain(j, i) == replaceFrom) {
-                    map.setTileTerrain(j, i, tile[random.nextInt(tile.size)])
-                }
-            }
-        }
-    }
-
-    private fun getNoiseGradient(x: Int, start: Float, end: Float): Float {
-        return gradientQuadratic(x, start, end)
-    }
-
-    private fun getNoiseGradientInversed(x: Int, start: Float, end: Float): Float {
-        return gradientMinusQuadratic(x, start, end)
-    }
-
-    private fun gradientSqrt(func_argX: Int, start: Float, end: Float): Float {
-        val graph_gradient = (end - start) / FastMath.sqrt((HEIGHT - TERRAIN_AVERAGE_HEIGHT).toFloat()) * FastMath.sqrt((func_argX - TERRAIN_AVERAGE_HEIGHT).toFloat()) + start
-
-        if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
-            return start
-        } else if (func_argX >= HEIGHT) {
-            return end
-        } else {
-            return graph_gradient
-        }
-    }
-
-    /**
-     * Quadratic polynomial
-     * (16/9) * (start-end)/height^2 * (x-height)^2 + end
-     * 16/9: terrain is formed from 1/4 of height.
-     * 1 - (1/4) = 3/4, reverse it and square it.
-     * That makes 16/9.
-
-     * Shape:
-
-     * cavity -
-     * small
-     * -
-     * -
-     * --
-     * ----
-     * cavity          --------
-     * large                  ----------------
-
-     * @param func_argX
-     * *
-     * @param start
-     * *
-     * @param end
-     * *
-     * @return
-     */
-    private fun gradientQuadratic(func_argX: Int, start: Float, end: Float): Float {
-        val graph_gradient = FastMath.pow(FastMath.sqr((1 - TERRAIN_AVERAGE_HEIGHT).toFloat()), -1f) * // 1/4 -> 3/4 -> 9/16 -> 16/9
-                (start - end) / FastMath.sqr(HEIGHT.toFloat()) *
-                             FastMath.sqr((func_argX - HEIGHT).toFloat()) + end
-
-        if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
-            return start
-        } else if (func_argX >= HEIGHT) {
-            return end
-        } else {
-            return graph_gradient
-        }
-    }
-
-    /**
-     * Double Quadratic polynomial
-     * (16/9) * (start-end)/height^2 * (x-height)^2 + end
-     * 16/9: terrain is formed from 1/4 of height.
-     * 1 - (1/4) = 3/4, reverse it and square it.
-     * That makes 16/9.
-
-     * Shape:
-
-     * cavity -
-     * small
-     * -
-     * -
-     * --
-     * ----
-     * cavity          --------
-     * large                  ----------------
-
-     * @param func_argX
-     * *
-     * @param start
-     * *
-     * @param end
-     * *
-     * @return
-     */
-    private fun gradientCubic(func_argX: Int, start: Float, end: Float): Float {
-        val graph_gradient = -FastMath.pow(FastMath.pow((1 - TERRAIN_AVERAGE_HEIGHT).toFloat(), 3f), -1f) * // 1/4 -> 3/4 -> 9/16 -> 16/9
-                (start - end) / FastMath.pow(HEIGHT.toFloat(), 3f) *
-                             FastMath.pow((func_argX - HEIGHT).toFloat(), 3f) + end
-
-        if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
-            return start
-        } else if (func_argX >= HEIGHT) {
-            return end
-        } else {
-            return graph_gradient
-        }
-    }
-
-    /**
-     * Quadratic polynomial
-     * -(16/9) * (start-end)/height^2 * (x - 0.25 * height)^2 + start
-     * 16/9: terrain is formed from 1/4 of height.
-     * 1 - (1/4) = 3/4, reverse it and square it.
-     * That makes 16/9.
-
-     * Shape:
-
-     * cavity                                 _
-     * small
-     * _
-     * _
-     * __
-     * ____
-     * cavity                 ________
-     * large ________________
-
-     * @param func_argX
-     * *
-     * @param start
-     * *
-     * @param end
-     * *
-     * @return
-     */
-    private fun gradientMinusQuadratic(func_argX: Int, start: Float, end: Float): Float {
-        val graph_gradient = -FastMath.pow(FastMath.sqr((1 - TERRAIN_AVERAGE_HEIGHT).toFloat()), -1f) * // 1/4 -> 3/4 -> 9/16 -> 16/9
-                (start - end) / FastMath.sqr(HEIGHT.toFloat()) *
-                             FastMath.sqr((func_argX - TERRAIN_AVERAGE_HEIGHT).toFloat()) + start
-
-        if (func_argX < TERRAIN_AVERAGE_HEIGHT) {
-            return start
-        } else if (func_argX >= HEIGHT) {
-            return end
-        } else {
-            return graph_gradient
         }
     }
 
@@ -1197,4 +936,13 @@ object MapGenerator {
 
     private fun clamp(x: Int, min: Int, max: Int): Int = if (x < min) min else if (x > max) max else x
 
+    data class TaggedSimplexNoise(var noiseModule: SimplexNoise, var xStretch: Float, var yStretch: Float)
+
+    data class TaggedJoise(var message: String,
+                           var noiseModule: Joise, var scarcity: Float,
+                           var replaceFromTerrain: Int, var replaceFromWall: Int,
+                           var replaceTo: Any,
+                           var filter: NoiseFilter = NoiseFilterQuadratic,
+                           var filterArg1: Float = noiseGradientStart,
+                           var filterArg2: Float = noiseGradientEnd)
 }

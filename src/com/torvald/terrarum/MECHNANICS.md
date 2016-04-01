@@ -90,12 +90,6 @@ Magical/Surreal: Use 24 Bits
 * Base mass: 60 kg
 
 
-##  Custom pattern making  ##
-
-- Players can create their own décors (hang on wall), dresses.
-- Two looms (216 colour mode, 4096 colour mode)
-
-
 ##  Food/Potion dose  ##
 
 Scale ^ 3 ^ (3/4) == (ThisWgt / TargetWgt) ^ (3/4)

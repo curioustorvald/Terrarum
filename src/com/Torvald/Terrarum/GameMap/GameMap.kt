@@ -167,6 +167,48 @@ constructor(//properties
         worldTime.update(delta)
     }
 
+    fun terrainIterator(): Iterator<Int> {
+        return object : Iterator<Int> {
+
+            private var iteratorCount = 0
+
+            override fun hasNext(): Boolean {
+                return iteratorCount < width * height
+            }
+
+            override fun next(): Int {
+                val y = iteratorCount / width
+                val x = iteratorCount % width
+                // advance counter
+                iteratorCount += 1
+
+                return getTileFromTerrain(x, y)!!
+            }
+
+        }
+    }
+
+    fun wallIterator(): Iterator<Int> {
+        return object : Iterator<Int> {
+
+            private var iteratorCount = 0
+
+            override fun hasNext(): Boolean {
+                return iteratorCount < width * height
+            }
+
+            override fun next(): Int {
+                val y = iteratorCount / width
+                val x = iteratorCount % width
+                // advance counter
+                iteratorCount += 1
+
+                return getTileFromWall(x, y)!!
+            }
+
+        }
+    }
+
     companion object {
 
         @Transient val WALL = 0

@@ -315,9 +315,13 @@ constructor() : Font {
                 val glyphW = getWidth("" + ch)
                 sheetKey[prevInstance].renderInUse(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW) // Interchar: pull punct right next to hangul to the left
-                        + if (i > 0 && isHangul(s[i - 1])) -3 else 0, Math.round(y) + if (prevInstance == SHEET_CJK_PUNCT)
-                    -1
-                else if (prevInstance == SHEET_FW_UNI) (H - H_HANGUL) / 2 else 0, sheetX, sheetY)
+                        + if (i > 0 && isHangul(s[i - 1])) -3 else 0, Math.round(y) +
+                                                                      if (prevInstance == SHEET_CJK_PUNCT)
+                                                                          -1
+                                                                      else if (prevInstance == SHEET_FW_UNI)
+                                                                          (H - H_HANGUL) / 2
+                                                                      else 0,
+                        sheetX, sheetY)
 
             }
 

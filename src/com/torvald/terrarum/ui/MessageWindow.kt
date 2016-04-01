@@ -116,6 +116,6 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
     companion object {
         // private int messagesShowingIndex = 0;
         val MESSAGES_DISPLAY = 2
-        val OPEN_CLOSE_TIME = 200
+        val OPEN_CLOSE_TIME = 160
     }
 }

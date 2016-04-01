@@ -5,6 +5,7 @@ import com.torvald.JsonFetcher
 import com.torvald.JsonWriter
 import com.torvald.terrarum.langpack.Lang
 import org.lwjgl.input.Controllers
+import org.lwjgl.opengl.GL11
 import org.newdawn.slick.AppGameContainer
 import org.newdawn.slick.Font
 import org.newdawn.slick.GameContainer
@@ -330,3 +331,13 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 }
 
 fun main(args: Array<String>) = Terrarum.main(args)
+
+fun setBlendModeMul() {
+    GL11.glEnable(GL11.GL_BLEND)
+    GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)
+}
+
+fun setBlendModeNormal() {
+    GL11.glEnable(GL11.GL_BLEND)
+    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+}
