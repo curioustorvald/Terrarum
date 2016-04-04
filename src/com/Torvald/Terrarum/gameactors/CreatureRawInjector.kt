@@ -2,11 +2,11 @@ package com.torvald.terrarum.gameactors
 
 import com.torvald.JsonFetcher
 import com.torvald.random.Fudge3
-import com.torvald.random.HQRNG
 import com.torvald.terrarum.langpack.Lang
 import com.google.gson.JsonObject
 import org.newdawn.slick.SlickException
 import java.io.IOException
+import java.security.SecureRandom
 
 /**
  * Created by minjaesong on 16-03-25.
@@ -14,7 +14,7 @@ import java.io.IOException
 object CreatureRawInjector {
 
     const val JSONPATH = "./res/raw/creatures/"
-    private const val MULTIPLIER_RAW_ELEM_SUFFIX = "mult"
+    private const val MULTIPLIER_RAW_ELEM_SUFFIX = AVKey.MULTIPLIER_SUFFIX
 
     /**
      * 'Injects' creature raw ActorValue to the ActorValue reference provided.
@@ -26,10 +26,10 @@ object CreatureRawInjector {
     fun inject(actorValueRef: ActorValue, jsonFileName: String) {
         val jsonObj = JsonFetcher.readJson(JSONPATH + jsonFileName)
 
-        val elementsString = arrayOf("racename", "racenameplural")
-        val elementsFloat = arrayOf("baseheight", "basemass", "accel", "toolsize", "encumbrance")
-        val elementsFloatVariable = arrayOf("strength", "speed", "jumppower", "scale", "speed")
-        val elementsBoolean = arrayOf("intelligent")
+        val elementsString = arrayOf(AVKey.RACENAME, AVKey.RACENAMEPLURAL)
+        val elementsFloat = arrayOf(AVKey.BASEHEIGHT, AVKey.BASEMASS, AVKey.ACCEL, AVKey.TOOLSIZE, AVKey.ENCUMBRANCE)
+        val elementsFloatVariable = arrayOf(AVKey.STRENGTH, AVKey.SPEED, AVKey.JUMPPOWER, AVKey.SCALE, AVKey.SPEED)
+        val elementsBoolean = arrayOf(AVKey.INTELLIGENT)
         // val elementsMultiplyFromOne = arrayOf()
 
         setAVStrings(actorValueRef, elementsString, jsonObj)
@@ -38,8 +38,8 @@ object CreatureRawInjector {
         // setAVMultiplyFromOne(actorValueRef, elementsMultiplyFromOne, jsonObj)
         setAVBooleans(actorValueRef, elementsBoolean, jsonObj)
 
-        actorValueRef["accel"] = Player.WALK_ACCEL_BASE
-        actorValueRef["accelmult"] = 1f
+        actorValueRef[AVKey.ACCEL] = Player.WALK_ACCEL_BASE
+        actorValueRef[AVKey.ACCELMULT] = 1f
     }
 
     /**
@@ -54,7 +54,7 @@ object CreatureRawInjector {
         for (s in elemSet) {
             val baseValue = jsonObject.get(s).asFloat
             // roll fudge dice and get value [-3, 3] as [0, 6]
-            val varSelected = Fudge3(HQRNG()).rollForArray()
+            val varSelected = Fudge3(SecureRandom()).rollForArray()
             // get multiplier from json. Assuming percentile
             val multiplier = jsonObject.get(s + MULTIPLIER_RAW_ELEM_SUFFIX).asJsonArray.get(varSelected).asInt
             val realValue = baseValue * multiplier / 100f
@@ -106,7 +106,7 @@ object CreatureRawInjector {
         for (s in elemSet) {
             val baseValue = 1f
             // roll fudge dice and get value [-3, 3] as [0, 6]
-            val varSelected = Fudge3(HQRNG()).rollForArray()
+            val varSelected = Fudge3(SecureRandom()).rollForArray()
             // get multiplier from json. Assuming percentile
             val multiplier = jsonObject.get(s).asJsonArray.get(varSelected).asInt
             val realValue = baseValue * multiplier / 100f

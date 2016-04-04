@@ -11,14 +11,14 @@ import org.newdawn.slick.*
  * Created by minjaesong on 15-12-31.
  */
 object MapDrawer {
-    @JvmStatic val TILE_SIZE = 16
+    const val TILE_SIZE = 16
 
     private var envOverlayColourmap: Image = Image("./res/graphics/black_body_col_1000_40000_K.png")
 
-    @JvmStatic private val ENV_COLTEMP_LOWEST = 5500
-    @JvmStatic private val ENV_COLTEMP_HIGHEST = 7500
+    private val ENV_COLTEMP_LOWEST = 5500
+    private val ENV_COLTEMP_HIGHEST = 7500
 
-    @JvmStatic val ENV_COLTEMP_NOON = 6500
+    val ENV_COLTEMP_NOON = 6500
 
     private var colTemp: Int = 0
 

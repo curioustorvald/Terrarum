@@ -29,8 +29,8 @@ class SetGlobalLightLevel : ConsoleCommand {
             try {
                 val GL = args[1].toInt()
 
-                if (GL.toInt() < 0 || GL.toInt() >= LightmapRenderer.COLOUR_DOMAIN_SIZE) {
-                    Echo().execute("Range: 0-" + (LightmapRenderer.COLOUR_DOMAIN_SIZE - 1))
+                if (GL.toInt() < 0 || GL.toInt() >= LightmapRenderer.COLOUR_RANGE_SIZE) {
+                    Echo().execute("Range: 0-" + (LightmapRenderer.COLOUR_RANGE_SIZE - 1))
                 }
                 else {
                     Terrarum.game.map.globalLight = GL

@@ -12,9 +12,14 @@ import org.newdawn.slick.GameContainer
 import org.newdawn.slick.SlickException
 import org.newdawn.slick.state.StateBasedGame
 import java.io.File
+import java.io.FileWriter
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.logging.FileHandler
 import java.util.logging.Level
 import java.util.logging.Logger
+import java.util.logging.SimpleFormatter
 
 /**
  * Created by minjaesong on 15-12-30.
@@ -120,7 +125,22 @@ constructor(gamename: String) : StateBasedGame(gamename) {
                 appgc.start()
             }
             catch (ex: SlickException) {
-                Logger.getLogger(Terrarum::class.java.name).log(Level.SEVERE, null, ex)
+                val logger = Logger.getLogger(Terrarum::class.java.name)
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+                val calendar = Calendar.getInstance()
+                val filepath = "$defaultDir/crashlog-${dateFormat.format(calendar.time)}.txt"
+                val fileHandler = FileHandler(filepath)
+                logger.addHandler(fileHandler)
+
+                val formatter = SimpleFormatter()
+                fileHandler.formatter = formatter
+
+                //logger.info()
+
+                println("The game has been crashed!")
+                println("Crash log were saved to $filepath.")
+                println("================================================================================")
+                logger.log(Level.SEVERE, null, ex)
             }
 
         }

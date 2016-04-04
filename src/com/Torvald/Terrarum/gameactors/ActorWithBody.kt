@@ -133,6 +133,8 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
 
     @Transient private val map: GameMap
 
+    @Transient private val MASS_DEFAULT = 60f
+
     init {
         // referenceID = HQRNG().nextLong() // renew ID just in case
         map = Terrarum.game.map
@@ -172,25 +174,41 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
                 x - (baseHitboxW / 2 - hitboxTranslateX) * scale, y - (baseHitboxH - hitboxTranslateY) * scale, baseHitboxW * scale, baseHitboxH * scale)
     }
 
+    private fun updatePhysicalInfos() {
+        scale = actorValue.getAsFloat(AVKey.SCALE) ?: 1f
+        mass = (actorValue.getAsFloat(AVKey.BASEMASS) ?: MASS_DEFAULT) * FastMath.pow(scale, 3f)
+        if (elasticity != 0f) elasticity = 0f
+    }
+
     override fun update(gc: GameContainer, delta_t: Int) {
         if (isUpdate) {
+            updatePhysicalInfos()
             /**
              * Update variables
              */
+            // make NoClip work for player
             if (this is Player) {
                 isNoSubjectToGrav = isPlayerNoClip
                 isNoCollideWorld = isPlayerNoClip
                 isNoSubjectToFluidResistance = isPlayerNoClip
             }
 
-            if (mass < MASS_LOWEST) mass = MASS_LOWEST // clamp to minimum possible mass
+            // clamp to the minimum possible mass
+            if (mass < MASS_LOWEST) mass = MASS_LOWEST
+
+            // set sprite dimension vars if there IS sprite for the actor
             if (sprite != null) {
                 baseSpriteHeight = sprite!!.height
                 baseSpriteWidth = sprite!!.width
             }
+
+            // copy gravitational constant from the map the actor is in
             gravitation = map.gravitation
+
+            // Auto climb rate. Clamp to TSIZE
             AUTO_CLIMB_RATE = Math.min(TSIZE / 8 * FastMath.sqrt(scale), TSIZE.toFloat()).toInt()
 
+            // Actors are subject to the gravity and the buoyancy if they are not levitating
             if (!isNoSubjectToGrav) {
                 applyGravitation()
                 applyBuoyancy()
@@ -207,7 +225,7 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
             //}
 
 
-            // Set 'next' positions to fiddle with
+            // Set 'next' position (hitbox) to fiddle with
             updateNextHitboxFromVelo()
 
 
@@ -217,15 +235,16 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
             //    updateHorizontalPos();
             //}
             //else {
+            // compensate for colliding
             updateHorizontalPos()
             updateVerticalPos()
             //}
 
-
+            // apply our compensation to actual hitbox
             updateHitboxX()
             updateHitboxY()
 
-
+            // make sure the actor does not go out of the map
             clampNextHitbox()
             clampHitbox()
         }
@@ -259,29 +278,30 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
 
     private fun updateVerticalPos() {
         if (!isNoCollideWorld) {
-            // check downward
-            if (veloY >= 0) {
-                // order of the if-elseif chain is IMPORTANT
-                if (isColliding(CONTACT_AREA_BOTTOM)) {
+            if (veloY >= 0) { // check downward
+                if (isColliding(CONTACT_AREA_BOTTOM)) { // the ground has dug into the body
                     adjustHitBottom()
                     elasticReflectY()
                     grounded = true
-                } else if (isColliding(CONTACT_AREA_BOTTOM, 0, 1)) {
+                }
+                else if (isColliding(CONTACT_AREA_BOTTOM, 0, 1)) { // the actor is standing ON the ground
                     elasticReflectY()
                     grounded = true
-                } else {
+                }
+                else { // the actor is not grounded at all
                     grounded = false
                 }
-            } else if (veloY < 0) {
+            }
+            else if (veloY < 0) { // check upward
                 grounded = false
-
-                // order of the if-elseif chain is IMPORTANT
-                if (isColliding(CONTACT_AREA_TOP)) {
+                if (isColliding(CONTACT_AREA_TOP)) { // the ceiling has dug into the body
                     adjustHitTop()
                     elasticReflectY()
-                } else if (isColliding(CONTACT_AREA_TOP, 0, -1)) {
-                    elasticReflectY() // for reversed gravity
-                } else {
+                }
+                else if (isColliding(CONTACT_AREA_TOP, 0, -1)) { // the actor is touching the ceiling
+                    elasticReflectY() // reflect on ceiling, for reversed gravity
+                }
+                else { // the actor is not grounded at all
                 }
             }
         }
@@ -294,6 +314,7 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
 
         var newYOff = 0 // always positive
 
+        // count up Y offset until the actor is not touching the ground
         var colliding: Boolean
         do {
             newYOff += 1
@@ -311,6 +332,7 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
 
         var newYOff = 0 // always positive
 
+        // count up Y offset until the actor is not touching the ceiling
         var colliding: Boolean
         do {
             newYOff += 1
@@ -323,49 +345,57 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
 
     private fun updateHorizontalPos() {
         if (!isNoCollideWorld) {
-            // check right
-            if (veloX >= 0.5) {
-                // order of the if-elseif chain is IMPORTANT
+            if (veloX >= 0.5) { // check right
                 if (isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT)) {
+                    // the actor is embedded to the wall
                     adjustHitRight()
                     elasticReflectX()
-                } else if (isColliding(CONTACT_AREA_RIGHT, 1, 0) && !isColliding(CONTACT_AREA_LEFT, -1, 0)) {
-                    elasticReflectX()
-                } else {
                 }
-            } else if (veloX <= -0.5) {
+                else if (isColliding(CONTACT_AREA_RIGHT, 1, 0) && !isColliding(CONTACT_AREA_LEFT, -1, 0)) {
+                    // the actor is touching the wall
+                    elasticReflectX()
+                }
+                else {
+                }
+            }
+            else if (veloX <= -0.5) { // check left
                 // System.out.println("collidingleft");
-                // order of the if-elseif chain is IMPORTANT
                 if (isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT)) {
+                    // the actor is embedded to the wall
                     adjustHitLeft()
                     elasticReflectX()
-                } else if (isColliding(CONTACT_AREA_LEFT, -1, 0) && !isColliding(CONTACT_AREA_RIGHT, 1, 0)) {
-                    elasticReflectX()
-                } else {
                 }
-            } else {
+                else if (isColliding(CONTACT_AREA_LEFT, -1, 0) && !isColliding(CONTACT_AREA_RIGHT, 1, 0)) {
+                    // the actor is touching the wall
+                    elasticReflectX()
+                }
+                else {
+                }
+            }
+            else { // check both sides?
                 // System.out.println("updatehorizontal - |velo| < 0.5");
-                if (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)) {
-                    elasticReflectX()
-                }
+                //if (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)) {
+                //    elasticReflectX()
+                //}
             }
         }
     }
 
     private fun adjustHitRight() {
-        val newY = nextHitbox!!.posY // look carefully, getPos or getPointed
+        val newY = nextHitbox!!.posY // look carefully, posY or pointedY
         // int-ify posY of nextHitbox
         nextHitbox!!.setPositionX(FastMath.floor(nextHitbox!!.posX + nextHitbox!!.width) - nextHitbox!!.width)
 
         var newXOff = 0 // always positive
 
+        // count up Y offset until the actor is not touching the wall
         var colliding: Boolean
         do {
             newXOff += 1
             colliding = isColliding(CONTACT_AREA_BOTTOM, -newXOff, 0)
         } while (newXOff < TSIZE && colliding)
 
-        val newX = nextHitbox!!.posX - newXOff
+        val newX = nextHitbox!!.posX - newXOff -1 // -1: Q&D way to prevent the actor sticking to the wall and won't detach
         nextHitbox!!.setPosition(newX, newY)
     }
 
@@ -376,14 +406,15 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
 
         var newXOff = 0 // always positive
 
+        // count up Y offset until the actor is not touching the wall
         var colliding: Boolean
         do {
             newXOff += 1
             colliding = isColliding(CONTACT_AREA_TOP, newXOff, 0)
         } while (newXOff < TSIZE && colliding)
 
-        val newX = nextHitbox!!.posX + newXOff
-        nextHitbox!!.setPosition(newX, newY) // + 1; float-point rounding compensation (i think...)
+        val newX = nextHitbox!!.posX + newXOff +1 // +1: Q&D way to prevent the actor sticking to the wall and won't detach
+        nextHitbox!!.setPosition(newX, newY)
     }
 
     private fun elasticReflectX() {
@@ -394,9 +425,7 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
         if (veloY != 0f) veloY = -veloY * elasticity
     }
 
-    private fun isColliding(side: Int, tx: Int = 0, ty: Int = 0): Boolean {
-        return getContactingArea(side, tx, ty) > 1
-    }
+    private fun isColliding(side: Int, tx: Int = 0, ty: Int = 0): Boolean = getContactingArea(side, tx, ty) > 1
 
     private fun getContactingArea(side: Int, translateX: Int = 0, translateY: Int = 0): Int {
         var contactAreaCounter = 0
@@ -408,19 +437,23 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
                 tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxStart.x)
                         + i + translateX)
                 tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxEnd.y) + translateY)
-            } else if (side == CONTACT_AREA_TOP) {
+            }
+            else if (side == CONTACT_AREA_TOP) {
                 tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxStart.x)
                         + i + translateX)
                 tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxStart.y) + translateY)
-            } else if (side == CONTACT_AREA_RIGHT) {
+            }
+            else if (side == CONTACT_AREA_RIGHT) {
                 tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxEnd.x) + translateX)
                 tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxStart.y)
                         + i + translateY)
-            } else if (side == CONTACT_AREA_LEFT) {
+            }
+            else if (side == CONTACT_AREA_LEFT) {
                 tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxStart.x) + translateX)
                 tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxStart.y)
                         + i + translateY)
-            } else {
+            }
+            else {
                 throw IllegalArgumentException(side.toString() + ": Wrong side input")
             }
 
@@ -443,19 +476,23 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
                 tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxStart.x)
                                                 + i + translateX)
                 tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxEnd.y) + translateY)
-            } else if (side == CONTACT_AREA_TOP) {
+            }
+            else if (side == CONTACT_AREA_TOP) {
                 tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxStart.x)
                                                 + i + translateX)
                 tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxStart.y) + translateY)
-            } else if (side == CONTACT_AREA_RIGHT) {
+            }
+            else if (side == CONTACT_AREA_RIGHT) {
                 tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxEnd.x) + translateX)
                 tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxStart.y)
                                                  + i + translateY)
-            } else if (side == CONTACT_AREA_LEFT) {
+            }
+            else if (side == CONTACT_AREA_LEFT) {
                 tileX = div16TruncateToMapWidth(Math.round(nextHitbox!!.hitboxStart.x) + translateX)
                 tileY = div16TruncateToMapHeight(Math.round(nextHitbox!!.hitboxStart.y)
                                                  + i + translateY)
-            } else {
+            }
+            else {
                 throw IllegalArgumentException(side.toString() + ": Wrong side input")
             }
 

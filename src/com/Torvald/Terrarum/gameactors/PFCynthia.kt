@@ -1,6 +1,7 @@
 package com.torvald.terrarum.gameactors
 
 import com.torvald.spriteanimation.SpriteAnimation
+import com.torvald.terrarum.mapdrawer.MapDrawer
 
 /**
  * Created by minjaesong on 16-03-25.
@@ -20,9 +21,9 @@ object PFCynthia {
         p.sprite!!.setRowsAndFrames(1, 1)
         p.sprite!!.setAsVisible()
 
-        p.setHitboxDimension(15, 40, 9, 0)
+        p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: Player.BASE_HEIGHT, 9, 0)
 
-        p.setPosition((4096 * 16).toFloat(), (300 * 16).toFloat())
+        p.setPosition((4096 * MapDrawer.TILE_SIZE).toFloat(), (300 * 16).toFloat())
 
         return p
     }

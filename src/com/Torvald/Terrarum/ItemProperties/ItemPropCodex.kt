@@ -1,6 +1,6 @@
 package com.torvald.terrarum.itemproperties
 
-import com.torvald.terrarum.gameactors.CanBeStoredAsItem
+import com.torvald.terrarum.gameactors.CanBeAnItem
 import com.torvald.terrarum.gameitem.InventoryItem
 import com.torvald.terrarum.Terrarum
 import org.newdawn.slick.GameContainer
@@ -34,7 +34,7 @@ object ItemPropCodex {
             return itemCodex[(code and 0xFFFFFFFF).toInt()]
         else {
             for (actor in Terrarum.game.actorContainer) {
-                if (actor is CanBeStoredAsItem && actor.referenceID.equals(code))
+                if (actor is CanBeAnItem && actor.referenceID.equals(code))
                     return actor.itemData
             }
 

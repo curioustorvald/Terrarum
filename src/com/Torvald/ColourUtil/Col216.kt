@@ -56,7 +56,7 @@ class Col216 : LimitedColours {
     }
 
     private fun assertRaw(i: Int) {
-        if (i >= COLOUR_DOMAIN_SIZE || i < 0) {
+        if (i >= COLOUR_RANGE_SIZE || i < 0) {
             println("i: " + i.toString())
             throw IllegalArgumentException()
         }
@@ -77,6 +77,6 @@ class Col216 : LimitedColours {
         const val MUL = 6
         const val MUL_2 = MUL * MUL
         const val MAX_STEP = MUL - 1
-        const val COLOUR_DOMAIN_SIZE = MUL_2 * MUL
+        const val COLOUR_RANGE_SIZE = MUL_2 * MUL
     }
 }

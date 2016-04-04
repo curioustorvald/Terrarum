@@ -35,17 +35,17 @@ object LightmapRenderer {
     private val OFFSET_G = 1
     private val OFFSET_B = 0
 
-    private val TSIZE = MapDrawer.TILE_SIZE
+    private const val TSIZE = MapDrawer.TILE_SIZE
 
-    // color model related vars
+    // color model related constants
     const val MUL = 256 // modify this to 1024 to implement 30-bit RGB
     const val MUL_2 = MUL * MUL
     const val CHANNEL_MAX = MUL - 1
     const val CHANNEL_MAX_FLOAT = CHANNEL_MAX.toFloat()
-    const val COLOUR_DOMAIN_SIZE = MUL * MUL_2
-
+    const val COLOUR_RANGE_SIZE = MUL * MUL_2
 
     private const val deprecatedFeatureDebatable = "The usage of this feature is debatable. Do not use it yet."
+
 
     @Deprecated(deprecatedFeatureDebatable)
     fun addLantern(x: Int, y: Int, intensity: Int) {
@@ -77,6 +77,7 @@ object LightmapRenderer {
 
     fun getLight(x: Int, y: Int): Int? =
             if (x !in 0..Terrarum.game.map.width - 1 || y !in 0..Terrarum.game.map.height - 1)
+                // if out of range then
                 null
             else
                 java.lang.Byte.toUnsignedInt(lightMapLSB!![y][x]) or (lightMapMSB!![y][x].toInt() shl 8)
@@ -336,7 +337,7 @@ object LightmapRenderer {
             // calculate ambient
             var ambient: Int = 0
             var nearby: Int = 0
-            findNearbyBrightest@ for (yoff in -1..1) {
+            for (yoff in -1..1) {
                 for (xoff in -1..1) {
                     /**
                      * filter for 'v's as:
@@ -393,9 +394,8 @@ object LightmapRenderer {
      * @return darkened data (0-39) per channel
      */
     fun darkenColoured(data: Int, darken: Int): Int {
-        if (darken.toInt() < 0 || darken.toInt() >= COLOUR_DOMAIN_SIZE) {
-            throw IllegalArgumentException("darken: out of " + "range")
-        }
+        if (darken.toInt() < 0 || darken.toInt() >= COLOUR_RANGE_SIZE)
+            throw IllegalArgumentException("darken: out of range ($darken)")
 
         val r = clampZero(getR(data) - getR(darken))
         val g = clampZero(getG(data) - getG(darken))
@@ -416,9 +416,8 @@ object LightmapRenderer {
      * @return
      */
     fun darkenUniformFloat(data: Int, darken: Float): Int {
-        if (darken < 0 || darken > 1f) {
-            throw IllegalArgumentException("darken: out of " + "range")
-        }
+        if (darken < 0 || darken > 1f)
+            throw IllegalArgumentException("darken: out of range ($darken)")
 
         val r = clampZero(getR(data) - darken)
         val g = clampZero(getG(data) - darken)
@@ -438,9 +437,8 @@ object LightmapRenderer {
      * @return
      */
     fun darkenUniformInt(data: Int, darken: Int): Int {
-        if (darken < 0 || darken > CHANNEL_MAX) {
-            throw IllegalArgumentException("darken: out of " + "range")
-        }
+        if (darken < 0 || darken > CHANNEL_MAX)
+            throw IllegalArgumentException("darken: out of range ($darken)")
 
         val r = clampZero(getRawR(data) - darken)
         val g = clampZero(getRawG(data) - darken)
@@ -463,9 +461,8 @@ object LightmapRenderer {
      * @return brightened data [0-39] per channel
      */
     private fun brightenColoured(data: Int, brighten: Int): Int {
-        if (brighten.toInt() < 0 || brighten.toInt() >= COLOUR_DOMAIN_SIZE) {
-            throw IllegalArgumentException("brighten: out of " + "range")
-        }
+        if (brighten.toInt() < 0 || brighten.toInt() >= COLOUR_RANGE_SIZE)
+            throw IllegalArgumentException("brighten: out of range ($brighten)")
 
         val r = clampFloat(getR(data) + getR(brighten))
         val g = clampFloat(getG(data) + getG(brighten))
@@ -530,12 +527,10 @@ object LightmapRenderer {
      * @return
      */
     fun getRaw(RGB: Int, offset: Int): Int {
-        if (offset == OFFSET_R) return getRawR(RGB)
-        if (offset == OFFSET_G) return getRawG(RGB)
-        if (offset == OFFSET_B)
-            return getRawB(RGB)
-        else
-            throw IllegalArgumentException("Channel offset out of range")
+        if      (offset == OFFSET_R) return getRawR(RGB)
+        else if (offset == OFFSET_G) return getRawG(RGB)
+        else if (offset == OFFSET_B) return getRawB(RGB)
+        else throw IllegalArgumentException("Channel offset out of range")
     }
 
     private fun getR(rgb: Int): Float {
@@ -559,28 +554,16 @@ object LightmapRenderer {
     }
 
     fun constructRGBFromInt(r: Int, g: Int, b: Int): Int {
-        if (r < 0 || r > CHANNEL_MAX) {
-            throw IllegalArgumentException("Red: out of range")
-        }
-        if (g < 0 || g > CHANNEL_MAX) {
-            throw IllegalArgumentException("Green: out of range")
-        }
-        if (b < 0 || b > CHANNEL_MAX) {
-            throw IllegalArgumentException("Blue: out of range")
-        }
+        if (r !in 0..CHANNEL_MAX) throw IllegalArgumentException("Red: out of range")
+        if (g !in 0..CHANNEL_MAX) throw IllegalArgumentException("Green: out of range")
+        if (b !in 0..CHANNEL_MAX) throw IllegalArgumentException("Blue: out of range")
         return (r * MUL_2 + g * MUL + b)
     }
 
     fun constructRGBFromFloat(r: Float, g: Float, b: Float): Int {
-        if (r < 0 || r > 1.0f) {
-            throw IllegalArgumentException("Red: out of range")
-        }
-        if (g < 0 || g > 1.0f) {
-            throw IllegalArgumentException("Green: out of range")
-        }
-        if (b < 0 || b > 1.0f) {
-            throw IllegalArgumentException("Blue: out of range")
-        }
+        if (r < 0 || r > 1.0f) throw IllegalArgumentException("Red: out of range")
+        if (g < 0 || g > 1.0f) throw IllegalArgumentException("Green: out of range")
+        if (b < 0 || b > 1.0f) throw IllegalArgumentException("Blue: out of range")
 
         val intR = Math.round(r * CHANNEL_MAX)
         val intG = Math.round(g * CHANNEL_MAX)
@@ -622,10 +605,10 @@ object LightmapRenderer {
     }
 
     private fun outOfBounds(x: Int, y: Int): Boolean =
-            x < 0 || y < 0 || x >= Terrarum.game.map.width || y >= Terrarum.game.map.height
+            x !in 0..Terrarum.game.map.width - 1 || y !in 0..Terrarum.game.map.height - 1
 
     private fun outOfMapBounds(x: Int, y: Int): Boolean =
-            x < 0 || y < 0 || x >= lightMapMSB!![0].size || y >= lightMapMSB!!.size
+            x !in 0..lightMapMSB!![0].size - 1 || y !in 0..lightMapMSB!!.size - 1
 
     private fun clampZero(i: Int): Int = if (i < 0) 0 else i
 

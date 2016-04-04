@@ -7,7 +7,6 @@ import org.newdawn.slick.Color
  */
 interface LimitedColours {
 
-
     fun createSlickColor(raw: Int): Color
     fun createSlickColor(r: Int, g: Int, b: Int): Color
 

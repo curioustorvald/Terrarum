@@ -12,7 +12,7 @@ import java.util.*
  * Created by minjaesong on 16-03-14.
  */
 open class NPCIntelligentBase : ActorWithBody()
-        , AIControlled, Pocketed, CanBeStoredAsItem, Factionable, LandHolder {
+        , AIControlled, Pocketed, CanBeAnItem, Factionable, LandHolder {
 
     override var itemData: InventoryItem = object : InventoryItem {
         override var itemID = HQRNG().nextLong()

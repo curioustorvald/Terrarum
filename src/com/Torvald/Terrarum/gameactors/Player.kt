@@ -69,9 +69,9 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     override var houseDesignation: ArrayList<Int>? = null
 
     override var luminosity: Int
-        get() = actorValue.getAsInt("luminosity") ?: 0
+        get() = actorValue.getAsInt(AVKey.LUMINOSITY) ?: 0
         set(value) {
-            actorValue["luminosity"] = value
+            actorValue[AVKey.LUMINOSITY] = value
         }
 
     companion object {
@@ -79,7 +79,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         @Transient internal const val WALK_STOP_ACCEL = 0.32f
         @Transient internal const val WALK_ACCEL_BASE = 0.32f
 
-        @Transient val PLAYER_REF_ID: Long = 0x51621D
+        @Transient const val PLAYER_REF_ID: Long = 0x51621D
+        @Transient const val BASE_HEIGHT = 40
     }
 
     /**
@@ -100,7 +101,6 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         if (vehicleRiding is Player)
             throw RuntimeException("Attempted to 'ride' " + "player object.")
 
-        updatePhysicalInfos()
         super.update(gc, delta_t)
 
         updateSprite(delta_t)
@@ -113,12 +113,6 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
     }
 
-    private fun updatePhysicalInfos() {
-        scale = actorValue.getAsFloat("scale")!!
-        mass = actorValue.getAsFloat("basemass")!! * FastMath.pow(scale, 3f)
-        if (elasticity != 0f) elasticity = 0f
-    }
-
     /**
 
      * @param left (even if the game is joypad controlled, you must give valid value)
@@ -128,8 +122,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
         //if ((!super.isWalledLeft() && left) || (!super.isWalledRight() && !left)) {
         readonly_totalX = veloX +
-                actorValue.getAsFloat("accel")!! *
-                        actorValue.getAsFloat("accelmult")!! *
+                actorValue.getAsFloat(AVKey.ACCEL)!! *
+                        actorValue.getAsFloat(AVKey.ACCELMULT)!! *
                         FastMath.sqrt(scale) *
                         applyAccelRealism(walkPowerCounter) *
                         (if (left) -1 else 1).toFloat() *
@@ -142,8 +136,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         }
 
         // Clamp veloX
-        veloX = absClamp(veloX, actorValue.getAsFloat("speed")!!
-                        * actorValue.getAsFloat("speedmult")!!
+        veloX = absClamp(veloX, actorValue.getAsFloat(AVKey.SPEED)!!
+                        * actorValue.getAsFloat(AVKey.SPEEDMULT)!!
                         * FastMath.sqrt(scale))
 
         // Heading flag
@@ -162,8 +156,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
      */
     private fun walkVertical(up: Boolean, absAxisVal: Float) {
         readonly_totalY = veloY +
-                actorValue.getAsFloat("accel")!! *
-                        actorValue.getAsFloat("accelmult")!! *
+                actorValue.getAsFloat(AVKey.ACCEL)!! *
+                        actorValue.getAsFloat(AVKey.ACCELMULT)!! *
                         FastMath.sqrt(scale) *
                         applyAccelRealism(walkPowerCounter) *
                         (if (up) -1 else 1).toFloat() *
@@ -176,8 +170,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         }
 
         // Clamp veloX
-        veloY = absClamp(veloY, actorValue.getAsFloat("speed")!!
-                        * actorValue.getAsFloat("speedmult")!!
+        veloY = absClamp(veloY, actorValue.getAsFloat(AVKey.SPEED)!!
+                        * actorValue.getAsFloat(AVKey.SPEEDMULT)!!
                         * FastMath.sqrt(scale))
     }
 
@@ -210,15 +204,15 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
     private fun walkHStop() {
         if (veloX > 0) {
-            veloX -= actorValue.getAsFloat("accel")!! *
-                    actorValue.getAsFloat("accelmult")!! *
+            veloX -= actorValue.getAsFloat(AVKey.ACCEL)!! *
+                    actorValue.getAsFloat(AVKey.ACCELMULT)!! *
                     FastMath.sqrt(scale)
 
             // compensate overshoot
             if (veloX < 0) veloX = 0f
         } else if (veloX < 0) {
-            veloX += actorValue.getAsFloat("accel")!! *
-                    actorValue.getAsFloat("accelmult")!! *
+            veloX += actorValue.getAsFloat(AVKey.ACCEL)!! *
+                    actorValue.getAsFloat(AVKey.ACCELMULT)!! *
                     FastMath.sqrt(scale)
 
             // compensate overshoot
@@ -233,7 +227,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     private fun walkVStop() {
         if (veloY > 0) {
             veloY -= WALK_STOP_ACCEL *
-                    actorValue.getAsFloat("accelmult")!! *
+                    actorValue.getAsFloat(AVKey.ACCELMULT)!! *
                     FastMath.sqrt(scale)
 
             // compensate overshoot
@@ -241,7 +235,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
                 veloY = 0f
         } else if (veloY < 0) {
             veloY += WALK_STOP_ACCEL *
-                    actorValue.getAsFloat("accelmult")!! *
+                    actorValue.getAsFloat(AVKey.ACCELMULT)!! *
                     FastMath.sqrt(scale)
 
             // compensate overshoot
@@ -256,12 +250,12 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     private fun updateMovementControl() {
         if (!noClip) {
             if (grounded) {
-                actorValue.set("accelmult", 1f)
+                actorValue.set(AVKey.ACCELMULT, 1f)
             } else {
-                actorValue.set("accelmult", ACCEL_MULT_IN_FLIGHT)
+                actorValue.set(AVKey.ACCELMULT, ACCEL_MULT_IN_FLIGHT)
             }
         } else {
-            actorValue.set("accelmult", 1f)
+            actorValue.set(AVKey.ACCELMULT, 1f)
         }
     }
 
@@ -405,7 +399,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     private fun jump() {
         if (jumping) {
             val len = MAX_JUMP_LENGTH.toFloat()
-            val pwr = actorValue.getAsFloat("jumppower")!!
+            val pwr = actorValue.getAsFloat(AVKey.JUMPPOWER)!! * (actorValue.getAsFloat(AVKey.JUMPPOWERMULT) ?: 1f)
 
             // increment jump counter
             if (jumpCounter < len) jumpCounter += 1

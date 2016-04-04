@@ -180,13 +180,13 @@ constructor() : Font {
 
                 val glyphW = getWidth("" + ch)
 
-                // chosung
+                // initials
                 hangulSheet.renderInUse(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW), Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f), indexCho, choRow)
-                // jungseong
+                // medials
                 hangulSheet.renderInUse(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW), Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f), indexJung, jungRow)
-                // jongseong
+                // finals
                 hangulSheet.renderInUse(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW), Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f), indexJong, jongRow)
             }
@@ -231,6 +231,7 @@ constructor() : Font {
         }
 
         wenQuanYi_1.endUse()
+        // WenQuanYi 2
         wenQuanYi_2.startUse()
 
         for (i in 0..s.length - 1) {
@@ -249,7 +250,7 @@ constructor() : Font {
 
         wenQuanYi_2.endUse()
 
-        //ascii fonts
+        // regular fonts
         var prevInstance = -1
         for (i in 0..s.length - 1) {
             val ch = s[i]
@@ -313,16 +314,20 @@ constructor() : Font {
                 }
 
                 val glyphW = getWidth("" + ch)
-                sheetKey[prevInstance].renderInUse(
-                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW) // Interchar: pull punct right next to hangul to the left
-                        + if (i > 0 && isHangul(s[i - 1])) -3 else 0, Math.round(y) +
-                                                                      if (prevInstance == SHEET_CJK_PUNCT)
-                                                                          -1
-                                                                      else if (prevInstance == SHEET_FW_UNI)
-                                                                          (H - H_HANGUL) / 2
-                                                                      else 0,
-                        sheetX, sheetY)
-
+                try {
+                    sheetKey[prevInstance].renderInUse(
+                            Math.round(x + getWidthSubstr(s, i + 1) - glyphW) // Interchar: pull punct right next to hangul to the left
+                            + if (i > 0 && isHangul(s[i - 1])) -3 else 0, Math.round(y) +
+                                                                          if (prevInstance == SHEET_CJK_PUNCT)
+                                                                              -1
+                                                                          else if (prevInstance == SHEET_FW_UNI)
+                                                                              (H - H_HANGUL) / 2
+                                                                          else 0,
+                            sheetX, sheetY)
+                }
+                catch (e: ArrayIndexOutOfBoundsException) {
+                    // character that does not exist in the sheet. No render, pass.
+                }
             }
 
         }
