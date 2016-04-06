@@ -54,7 +54,7 @@ object Lang {
 
         // reload correct (C/J) unihan fonts if applicable
         try {
-            (Terrarum.gameFontWhite as GameFontWhite).reloadUnihan()
+            (Terrarum.gameFont as GameFontWhite).reloadUnihan()
         }
         catch (e: SlickException) {
         }

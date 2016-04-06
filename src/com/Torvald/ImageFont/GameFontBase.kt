@@ -162,7 +162,7 @@ constructor() : Font {
 
     override fun drawString(x: Float, y: Float, s: String, color: Color) {
         // hangul fonts first
-        hangulSheet.startUse()
+        //hangulSheet.startUse() // disabling texture binding to make the font coloured
         // JOHAB
         for (i in 0..s.length - 1) {
             val ch = s[i]
@@ -180,18 +180,43 @@ constructor() : Font {
 
                 val glyphW = getWidth("" + ch)
 
-                // initials
+                /*// initials
                 hangulSheet.renderInUse(
-                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW), Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f), indexCho, choRow)
+                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW),
+                        Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f),
+                        indexCho, choRow
+                )
                 // medials
                 hangulSheet.renderInUse(
-                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW), Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f), indexJung, jungRow)
+                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW),
+                        Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f),
+                        indexJung, jungRow
+                )
                 // finals
                 hangulSheet.renderInUse(
-                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW), Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f), indexJong, jongRow)
+                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW),
+                        Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f),
+                        indexJong, jongRow
+                )*/
+
+                hangulSheet.getSubImage(indexCho, choRow).draw(
+                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
+                        Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
+                        color
+                )
+                hangulSheet.getSubImage(indexJung, jungRow).draw(
+                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
+                        Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
+                        color
+                )
+                hangulSheet.getSubImage(indexJong, jongRow).draw(
+                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
+                        Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
+                        color
+                )
             }
         }
-        hangulSheet.endUse()
+        //hangulSheet.endUse()
 
         // unihan fonts
         /*uniHan.startUse();
@@ -214,41 +239,51 @@ constructor() : Font {
         uniHan.endUse();*/
 
         // WenQuanYi 1
-        wenQuanYi_1.startUse()
+        //wenQuanYi_1.startUse()
 
         for (i in 0..s.length - 1) {
             val ch = s[i]
 
             if (isWenQuanYi1(ch)) {
                 val glyphW = getWidth("" + ch)
-                wenQuanYi_1.renderInUse(
+                /*wenQuanYi_1.renderInUse(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW),
                         Math.round((H - H_UNIHAN) / 2 + y),
                         wenQuanYiIndexX(ch),
                         wenQuanYi1IndexY(ch)
+                )*/
+                wenQuanYi_1.getSubImage(wenQuanYiIndexX(ch), wenQuanYi1IndexY(ch)).draw(
+                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
+                        Math.round((H - H_UNIHAN) / 2 + y).toFloat(),
+                        color
                 )
             }
         }
 
-        wenQuanYi_1.endUse()
+        //wenQuanYi_1.endUse()
         // WenQuanYi 2
-        wenQuanYi_2.startUse()
+        //wenQuanYi_2.startUse()
 
         for (i in 0..s.length - 1) {
             val ch = s[i]
 
             if (isWenQuanYi2(ch)) {
                 val glyphW = getWidth("" + ch)
-                wenQuanYi_2.renderInUse(
+                /*wenQuanYi_2.renderInUse(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW),
                         Math.round((H - H_UNIHAN) / 2 + y),
                         wenQuanYiIndexX(ch),
                         wenQuanYi2IndexY(ch)
+                )*/
+                wenQuanYi_2.getSubImage(wenQuanYiIndexX(ch), wenQuanYi2IndexY(ch)).draw(
+                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
+                        Math.round((H - H_UNIHAN) / 2 + y).toFloat(),
+                        color
                 )
             }
         }
 
-        wenQuanYi_2.endUse()
+        //wenQuanYi_2.endUse()
 
         // regular fonts
         var prevInstance = -1
@@ -259,9 +294,9 @@ constructor() : Font {
 
                 // if not init, endUse first
                 if (prevInstance != -1) {
-                    sheetKey[prevInstance].endUse()
+                    //sheetKey[prevInstance].endUse()
                 }
-                sheetKey[getSheetType(ch)].startUse()
+                //sheetKey[getSheetType(ch)].startUse()
                 prevInstance = getSheetType(ch)
 
                 val sheetX: Int
@@ -315,15 +350,22 @@ constructor() : Font {
 
                 val glyphW = getWidth("" + ch)
                 try {
-                    sheetKey[prevInstance].renderInUse(
+                    /*sheetKey[prevInstance].renderInUse(
                             Math.round(x + getWidthSubstr(s, i + 1) - glyphW) // Interchar: pull punct right next to hangul to the left
-                            + if (i > 0 && isHangul(s[i - 1])) -3 else 0, Math.round(y) +
-                                                                          if (prevInstance == SHEET_CJK_PUNCT)
-                                                                              -1
-                                                                          else if (prevInstance == SHEET_FW_UNI)
-                                                                              (H - H_HANGUL) / 2
-                                                                          else 0,
-                            sheetX, sheetY)
+                            + if (i > 0 && isHangul(s[i - 1])) -3 else 0,
+                            Math.round(y) + if (prevInstance == SHEET_CJK_PUNCT) -1
+                            else if (prevInstance == SHEET_FW_UNI) (H - H_HANGUL) / 2
+                            else 0,
+                            sheetX, sheetY
+                    )*/
+                    sheetKey[prevInstance].getSubImage(sheetX, sheetY).draw(
+                            Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat() // Interchar: pull punct right next to hangul to the left
+                            + if (i > 0 && isHangul(s[i - 1])) -3f else 0f,
+                            Math.round(y).toFloat() + (if (prevInstance == SHEET_CJK_PUNCT) -1
+                            else if (prevInstance == SHEET_FW_UNI) (H - H_HANGUL) / 2
+                            else 0).toFloat(),
+                            color
+                    )
                 }
                 catch (e: ArrayIndexOutOfBoundsException) {
                     // character that does not exist in the sheet. No render, pass.
@@ -332,7 +374,7 @@ constructor() : Font {
 
         }
         if (prevInstance != -1) {
-            sheetKey[prevInstance].endUse()
+            //sheetKey[prevInstance].endUse()
         }
     }
 

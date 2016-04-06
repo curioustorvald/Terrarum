@@ -2,6 +2,8 @@ package com.torvald.terrarum.ui
 
 import com.torvald.imagefont.GameFontWhite
 import com.jme3.math.FastMath
+import com.torvald.terrarum.disableBlend
+import com.torvald.terrarum.setBlendModeNormal
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
 
@@ -20,6 +22,7 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
     private val messageWindowRadius: Int
 
     private var uiFont: Font? = null
+    private var fontCol: Color = if (!isBlackVariant) Color.black else Color.white
     private val GLYPH_HEIGHT = 20
 
     override var openCloseTime: Int = OPEN_CLOSE_TIME
@@ -31,18 +34,16 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
 
     init {
         if (!isBlackVariant) {
-            //segmentLeft = new Image("./res/graphics/gui/message_twoline_white_left.png");
-            //segmentRight = new Image("./res/graphics/gui/message_twoline_white_right.png");
-            //segmentBody = new Image("./res/graphics/gui/message_twoline_white_body.png");
-            //uiFont = new GameFontBlack();
-            TODO("Black font not supported for now")
+            segmentLeft = Image("./res/graphics/gui/message_twoline_white_left.png");
+            segmentRight = Image("./res/graphics/gui/message_twoline_white_right.png");
+            segmentBody = Image("./res/graphics/gui/message_twoline_white_body.png");
         }
         else {
             segmentLeft = Image("./res/graphics/gui/message_twoline_black_left.png")
             segmentRight = Image("./res/graphics/gui/message_twoline_black_right.png")
             segmentBody = Image("./res/graphics/gui/message_twoline_black_body.png")
-            uiFont = GameFontWhite()
         }
+        uiFont = GameFontWhite()
         height = segmentLeft!!.height
         messageWindowRadius = segmentLeft!!.width
         messagesList = arrayOf("", "")
@@ -60,7 +61,7 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
     override fun render(gc: GameContainer, g: Graphics) {
         val canvasG = uidrawCanvas.graphics
 
-        canvasG.setDrawMode(Graphics.MODE_NORMAL)
+        disableBlend()
         drawSegments(canvasG)
         canvasG.setDrawMode(Graphics.MODE_ALPHA_MAP)
         drawSegments(canvasG)
@@ -69,9 +70,11 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
 
         canvasG.setDrawMode(Graphics.MODE_NORMAL)
         for (i in 0..Math.min(messagesList.size, MESSAGES_DISPLAY) - 1) {
+            canvasG.color = fontCol
             canvasG.drawString(messagesList[i], (messageWindowRadius + 4).toFloat(), (messageWindowRadius + GLYPH_HEIGHT * i).toFloat())
         }
 
+        setBlendModeNormal()
         g.drawImage(uidrawCanvas, 0f, 0f, Color(1f,1f,1f,opacity))
 
         canvasG.clear()

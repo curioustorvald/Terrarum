@@ -93,7 +93,7 @@ constructor(val UI: UICanvas) {
     fun render(gc: GameContainer, gameGraphicInstance: Graphics) {
         if (visible || alwaysVisible) {
             UIGraphicInstance.clear()
-            UIGraphicInstance.font = Terrarum.gameFontWhite
+            UIGraphicInstance.font = Terrarum.gameFont
 
             UI.render(gc, UIGraphicInstance)
             gameGraphicInstance.drawImage(UIDrawnCanvas,

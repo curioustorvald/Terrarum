@@ -3,7 +3,6 @@ package com.torvald.terrarum
 import com.torvald.imagefont.GameFontWhite
 import com.torvald.JsonFetcher
 import com.torvald.JsonWriter
-import com.torvald.terrarum.langpack.Lang
 import org.lwjgl.input.Controllers
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.AppGameContainer
@@ -12,7 +11,6 @@ import org.newdawn.slick.GameContainer
 import org.newdawn.slick.SlickException
 import org.newdawn.slick.state.StateBasedGame
 import java.io.File
-import java.io.FileWriter
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -50,7 +48,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
     @Throws(SlickException::class)
     override fun initStatesList(gc: GameContainer) {
-        gameFontWhite = GameFontWhite()
+        gameFont = GameFontWhite()
 
         hasController = gc.input.controllerCount > 0
         if (hasController) {
@@ -99,7 +97,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         var gameLocale = "" // locale override
 
-        lateinit var gameFontWhite: Font
+        lateinit var gameFont: Font
 
         val SCENE_ID_HOME = 1
         val SCENE_ID_GAME = 3
@@ -354,10 +352,21 @@ fun main(args: Array<String>) = Terrarum.main(args)
 
 fun setBlendModeMul() {
     GL11.glEnable(GL11.GL_BLEND)
+    GL11.glColorMask(true, true, true, true)
     GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)
 }
 
 fun setBlendModeNormal() {
     GL11.glEnable(GL11.GL_BLEND)
+    GL11.glColorMask(true, true, true, true)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+}
+
+fun setBlendModeAlphaMap() {
+    GL11.glDisable(GL11.GL_BLEND)
+    GL11.glColorMask(false, false, false, true)
+}
+
+fun disableBlend() {
+    GL11.glDisable(GL11.GL_BLEND)
 }

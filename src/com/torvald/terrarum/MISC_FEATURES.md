@@ -25,16 +25,9 @@ Connect two or more tracker head to play the array of trackers play simultaneous
 
         <actorid>.json
         {
-            0 = [long],
-            1 = [long],
-            ...
-            47 = [long],
+            notes = [arr<int>, fixed size of 48],
             speed = 120
         }
         
-        *long: array of bits that indicates the note is stricken (1) or not (0)
-               0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
-               ↑G5     ↑C5            ↑C4            ↑C3            ↑C2            ↑C1     E0↑
-               (Assuming C3 (32nd bit) as middle 'C')
-               
+        *int: (0-63) number of the note pitch that is struck. 32: Middle C (C3)
         *speed: in BPM
