@@ -14,7 +14,7 @@ import java.security.SecureRandom
 object CreatureRawInjector {
 
     const val JSONPATH = "./res/raw/creatures/"
-    private const val MULTIPLIER_RAW_ELEM_SUFFIX = AVKey.MULTIPLIER_SUFFIX
+    private const val MULTIPLIER_RAW_ELEM_SUFFIX = AVKey.MULT
 
     /**
      * 'Injects' creature raw ActorValue to the ActorValue reference provided.

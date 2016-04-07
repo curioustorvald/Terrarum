@@ -175,7 +175,7 @@ constructor() : BasicGameState() {
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
-        setBlendModeNormal()
+        setBlendNormal()
 
         Terrarum.gameConfig["smoothlighting"] = KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH)
 
@@ -203,16 +203,16 @@ constructor() : BasicGameState() {
         MapDrawer.render(gc, g)
 
 
-        setBlendModeMul()
+        setBlendMul()
 
         MapDrawer.drawEnvOverlay(g)
 
-        if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) setBlendModeMul()
-        else setBlendModeNormal()
+        if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) setBlendMul()
+        else setBlendNormal()
 
         LightmapRenderer.draw(g)
 
-        setBlendModeNormal()
+        setBlendNormal()
 
         uiContainer.forEach { ui -> ui.render(gc, g) }
         debugWindow.render(gc, g)

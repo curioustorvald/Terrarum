@@ -56,6 +56,8 @@ object PFSigrid {
 
         p.actorValue[AVKey.LUMINOSITY] = 5980540
 
+        p.actorValue[AVKey.BASEDEFENCE] = 141
+
         p.actorValue["selectedtile"] = 16
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 10, 0)

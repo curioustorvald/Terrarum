@@ -6,8 +6,8 @@ import com.torvald.terrarum.Terrarum
 import com.torvald.terrarum.tileproperties.TileNameCode
 import com.torvald.terrarum.tileproperties.TilePropCodex
 import com.jme3.math.FastMath
-import com.torvald.terrarum.setBlendModeMul
-import com.torvald.terrarum.setBlendModeNormal
+import com.torvald.terrarum.setBlendMul
+import com.torvald.terrarum.setBlendNormal
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -206,16 +206,16 @@ object MapCamera {
         /**
          * render to camera
          */
-        setBlendModeNormal()
+        setBlendNormal()
         drawTiles(WALL, false)
         drawTiles(TERRAIN, false)
     }
 
     @JvmStatic
     fun renderFront(gc: GameContainer, g: Graphics) {
-        setBlendModeMul()
+        setBlendMul()
         drawTiles(TERRAIN, true)
-        setBlendModeNormal()
+        setBlendNormal()
     }
 
     private fun drawTiles(mode: Int, drawModeTilesBlendMul: Boolean) {

@@ -350,23 +350,23 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
 fun main(args: Array<String>) = Terrarum.main(args)
 
-fun setBlendModeMul() {
+fun setBlendMul() {
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glColorMask(true, true, true, true)
     GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)
 }
 
-fun setBlendModeNormal() {
+fun setBlendNormal() {
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glColorMask(true, true, true, true)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
 }
 
-fun setBlendModeAlphaMap() {
+fun setBlendAlphaMap() {
     GL11.glDisable(GL11.GL_BLEND)
     GL11.glColorMask(false, false, false, true)
 }
 
-fun disableBlend() {
+fun setBlendDisable() {
     GL11.glDisable(GL11.GL_BLEND)
 }

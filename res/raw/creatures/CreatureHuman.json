@@ -1,6 +1,6 @@
 {
-  "racename" : "CONTEXT_RACE_HUMAN",
-  "racenameplural" : "CONTEXT_RACE_HUMAN_PLURAL",
+  "racename" : "RACE_HUMAN",
+  "racenameplural" : "RACE_HUMAN_PLURAL",
   "baseheight" : 40,
   "basemass" : 60.0,
 
@@ -19,7 +19,7 @@
   "scalemult" : [100,100,100,100,100,100,100],
 
   "encumbrance" : 1000,
-  "basedefence" : "work in progress",
+  "basedefence" : 100,
 
   "toolsize" : 15,
   

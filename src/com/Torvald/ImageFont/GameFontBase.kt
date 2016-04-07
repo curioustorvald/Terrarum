@@ -161,6 +161,10 @@ constructor() : Font {
     }
 
     override fun drawString(x: Float, y: Float, s: String, color: Color) {
+        GL11.glEnable(GL11.GL_BLEND)
+        GL11.glColorMask(true, true, true, true)
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+
         // hangul fonts first
         //hangulSheet.startUse() // disabling texture binding to make the font coloured
         // JOHAB
@@ -376,6 +380,8 @@ constructor() : Font {
         if (prevInstance != -1) {
             //sheetKey[prevInstance].endUse()
         }
+
+        GL11.glEnd()
     }
 
     private fun getSheetType(c: Char): Int {
