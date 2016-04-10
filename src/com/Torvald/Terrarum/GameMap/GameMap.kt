@@ -31,7 +31,9 @@ constructor(//properties
 
     //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
     //physics
-    var gravitation: Float = 0.toFloat()
+    /** \[m / s^2\] */
+    var gravitation: Float = 9.8.toFloat()
+    /** RGB in Integer */
     var globalLight: Int = 0
     val worldTime: WorldTime
 
@@ -193,9 +195,8 @@ constructor(//properties
 
             private var iteratorCount = 0
 
-            override fun hasNext(): Boolean {
-                return iteratorCount < width * height
-            }
+            override fun hasNext(): Boolean =
+                    iteratorCount < width * height
 
             override fun next(): Int {
                 val y = iteratorCount / width

@@ -90,10 +90,15 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         lateinit var gameConfig: GameConfig
 
         lateinit var OSName: String
+            private set
         lateinit var OSVersion: String
+            private set
         lateinit var OperationSystem: String
+            private set
         lateinit var defaultDir: String
+            private set
         lateinit var defaultSaveDir: String
+            private set
 
         var gameLocale = "" // locale override
 

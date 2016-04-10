@@ -6,6 +6,7 @@ import com.torvald.terrarum.gamemap.WorldTime
 import com.torvald.terrarum.Terrarum
 import com.torvald.terrarum.tileproperties.TilePropCodex
 import com.jme3.math.FastMath
+import com.torvald.terrarum.tileproperties.TileNameCode
 import org.newdawn.slick.Color
 import org.newdawn.slick.Graphics
 import java.util.*
@@ -22,10 +23,8 @@ object LightmapRenderer {
     @Volatile private var lightMapLSB: Array<ByteArray>? = null // modify this to CharArray to implement 30-bit RGB
     private var lightMapInitialised = false
 
-    /**
-     * For entities that emits light (e.g. Player with shine potion)
-     */
-    private val lanterns = ArrayList<LightmapLantern>()
+    // TODO dynamic lightmap with overscanning, HDR (use 30-bit to store 0-1023, 255 = 1.0, 1024 = 4.0)
+    // redefine ONLY IF camera zoom has been changed!
 
     private val AIR = 0
     private val SUNSTONE = 41 // TODO add sunstone: emits same light as Map.GL. Goes dark at night
@@ -43,37 +42,6 @@ object LightmapRenderer {
     const val CHANNEL_MAX = MUL - 1
     const val CHANNEL_MAX_FLOAT = CHANNEL_MAX.toFloat()
     const val COLOUR_RANGE_SIZE = MUL * MUL_2
-
-    private const val deprecatedFeatureDebatable = "The usage of this feature is debatable. Do not use it yet."
-
-
-    @Deprecated(deprecatedFeatureDebatable)
-    fun addLantern(x: Int, y: Int, intensity: Int) {
-        val thisLantern = LightmapLantern(x, y, intensity)
-
-        for (i in lanterns.indices.reversed()) {
-            val lanternInList = lanterns[i]
-            // found duplicates
-            if (lanternInList.x == x && lanternInList.y == y) {
-                // add colour
-                val addedL = addRaw(intensity, lanternInList.intensity)
-                lanternInList.intensity = addedL
-                return
-            }
-        }
-        //else
-        lanterns.add(thisLantern)
-    }
-
-    @Deprecated(deprecatedFeatureDebatable)
-    fun removeLantern(x: Int, y: Int) {
-        for (i in lanterns.indices.reversed()) {
-            val lantern = lanterns[i]
-            if (lantern.x == x && lantern.y == y) {
-                lanterns.removeAt(i)
-            }
-        }
-    }
 
     fun getLight(x: Int, y: Int): Int? =
             if (x !in 0..Terrarum.game.map.width - 1 || y !in 0..Terrarum.game.map.height - 1)
@@ -94,7 +62,7 @@ object LightmapRenderer {
             lightMapLSB = Array(Terrarum.game.map.height) { ByteArray(Terrarum.game.map.width) }
 
             if (lightMapInitialised) {
-                throw RuntimeException("Attempting to re-initialise 'staticLightMap'")
+                throw RuntimeException("Tried to re-initialise lightmap.")
             }
 
             lightMapInitialised = true
@@ -104,180 +72,56 @@ object LightmapRenderer {
         val for_x_start = div16(MapCamera.cameraX) - 1 // fix for premature lightmap rendering
         val for_y_start = div16(MapCamera.cameraY) - 1 // on topmost/leftmost side
 
-        val for_x_end = clampWTile(for_x_start + div16(MapCamera.getRenderWidth()) + 2) + 1
-        val for_y_end = clampHTile(for_y_start + div16(MapCamera.getRenderHeight()) + 2) + 1 // same fix as above
+        val for_x_end = for_x_start + div16(MapCamera.getRenderWidth()) + 3
+        val for_y_end = for_y_start + div16(MapCamera.getRenderHeight()) + 2 // same fix as above
+
+        val overscan: Int = FastMath.ceil(256f / (TilePropCodex.getProp(TileNameCode.AIR).opacity and 0xFF).toFloat())
+        val overscan_opaque: Int = FastMath.ceil(256f / (TilePropCodex.getProp(TileNameCode.STONE).opacity and 0xFF).toFloat())
+
+        val noop_mask = BitSet(2 * (for_x_end - for_x_start + 1) +
+                               2 * (for_y_end - for_y_start - 1))
 
         /**
          * Updating order:
-         * +-----+   +-----+   +-----+   +-----+
-         * |1    |   |    1|   |3    |   |    3|
-         * |  2  | > |  2  | > |  2  | > |  2  |
-         * |    3|   |3    |   |    1|   |1    |
-         * +-----+   +-----+   +-----+   +-----+
-         * round: 1         2         3         4
+         * +--------+   +--+-----+   +-----+--+   +--------+ -
+         * | ↘      |   |  |    3|   |3    |  |   |      ↙ | ↕︎ overscan
+         * |  +-----+   |  |  2  |   |  2  |  |   +-----+  | -
+         * |  |1    | → |  |1    | → |    1|  | → |    1|  |
+         * |  |  2  |   |  +-----+   +-----+  |   |  2  |  |
+         * |  |    3|   | ↗      |   |      ↖ |   |3    |  |
+         * +--+-----+   +--------+   +--------+   +-----+--+
+         * round:   1            2            3            4
          * for all staticLightMap[y][x]
          */
 
-        purgePartOfLightmap(for_x_start, for_y_start, for_x_end, for_y_end)
-        // if wider purge were not applied, GL changing (sunset, sunrise) will behave incorrectly
-        // ("leakage" of not updated sunlight)
+        purgePartOfLightmap(for_x_start - overscan, for_y_start - overscan, for_x_end + overscan, for_y_end + overscan)
 
         try {
             // Round 1
-            for (y in for_y_start..for_y_end - 1) {
-                for (x in for_x_start..for_x_end - 1) {
-                    setLight(x, y, calculate(x, y))
-                }
-            }
-
-            // Round 4
-            for (y in for_y_end - 1 downTo for_y_start + 1) {
-                for (x in for_x_start..for_x_end - 1) {
-                    setLight(x, y, calculate(x, y))
-                }
-            }
-
-            // Round 3
-            for (y in for_y_end - 1 downTo for_y_start + 1) {
-                for (x in for_x_end - 1 downTo for_x_start) {
+            for (y in for_y_start - overscan..for_y_end) {
+                for (x in for_x_start - overscan..for_x_end) {
                     setLight(x, y, calculate(x, y))
                 }
             }
 
             // Round 2
-            for (y in for_y_start..for_y_end - 1) {
-                for (x in for_x_end - 1 downTo for_x_start) {
+            for (y in for_y_end + overscan downTo for_y_start) {
+                for (x in for_x_start - overscan..for_x_end) {
                     setLight(x, y, calculate(x, y))
                 }
             }
-        }
-        catch (e: ArrayIndexOutOfBoundsException) {
-        }
 
-    }
+            // Round 3
+            for (y in for_y_end + overscan downTo for_y_start) {
+                for (x in for_x_end + overscan downTo for_x_start) {
+                    setLight(x, y, calculate(x, y))
+                }
+            }
 
-    fun draw(g: Graphics) {
-        val for_x_start = MapCamera.getRenderStartX() - 1
-        val for_y_start = MapCamera.getRenderStartY() - 1
-        val for_x_end = MapCamera.getRenderEndX()
-        val for_y_end = MapCamera.getRenderEndY()
-
-        // draw
-        try {
-            for (y in for_y_start..for_y_end - 1) {
-                var x = for_x_start
-                while (x < for_x_end) {
-                    // smooth
-                    if (Terrarum.game.screenZoom >= 1 && Terrarum.gameConfig.getAsBoolean("smoothlighting") ?: false) {
-                        val thisLightLevel = getLight(x, y) ?: 0
-                        if (y > 0 && x < for_x_end && thisLightLevel == 0
-                            && getLight(x, y - 1) == 0) {
-                            try {
-                                // coalesce zero intensity blocks to one
-                                var zeroLevelCounter = 1
-                                while (getLight(x + zeroLevelCounter, y) == 0
-                                       && getLight(x + zeroLevelCounter, y - 1) == 0) {
-                                    zeroLevelCounter += 1
-
-                                    if (x + zeroLevelCounter >= for_x_end) break
-                                }
-
-                                g.color = Color(0)
-                                g.fillRect(
-                                        Math.round(x.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), Math.round(y.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), (FastMath.ceil(
-                                        TSIZE * Terrarum.game.screenZoom) * zeroLevelCounter).toFloat(), FastMath.ceil(TSIZE * Terrarum.game.screenZoom).toFloat())
-
-                                x += zeroLevelCounter - 1
-                            }
-                            catch (e: ArrayIndexOutOfBoundsException) {
-                                // do nothing
-                            }
-
-                        }
-                        else {
-                            /**    a
-                             * +-+-+
-                             * |i|j|
-                             * b +-+-+ c
-                             * |k|l|
-                             * +-+-+
-                             * d
-                             */
-                            val a = if (y == 0)
-                                thisLightLevel
-                            else if (y == Terrarum.game.map.height - 1)
-                                thisLightLevel
-                            else
-                                maximiseRGB(
-                                        getLight(x, y) ?: 0,
-                                        getLight(x, y - 1) ?: 0)
-                            val d = if (y == 0)
-                                thisLightLevel
-                            else if (y == Terrarum.game.map.height - 1)
-                                thisLightLevel
-                            else
-                                maximiseRGB(
-                                        getLight(x, y) ?: 0,
-                                        getLight(x, y + 1) ?: 0)
-                            val b = if (x == 0)
-                                thisLightLevel
-                            else if (x == Terrarum.game.map.width - 1)
-                                thisLightLevel
-                            else
-                                maximiseRGB(
-                                        getLight(x, y) ?: 0,
-                                        getLight(x - 1, y) ?: 0)
-                            val c = if (x == 0)
-                                thisLightLevel
-                            else if (x == Terrarum.game.map.width - 1)
-                                thisLightLevel
-                            else
-                                maximiseRGB(
-                                        getLight(x, y) ?: 0,
-                                        getLight(x + 1, y) ?: 0)
-                            val colourMapItoL = IntArray(4)
-                            colourMapItoL[0] = colourLinearMix(a, b)
-                            colourMapItoL[1] = colourLinearMix(a, c)
-                            colourMapItoL[2] = colourLinearMix(b, d)
-                            colourMapItoL[3] = colourLinearMix(c, d)
-
-                            for (iy in 0..1) {
-                                for (ix in 0..1) {
-                                    g.color = Color(colourMapItoL[iy * 2 + ix])
-
-                                    g.fillRect(
-                                            Math.round(
-                                                    x.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom) + ix * TSIZE / 2 * Terrarum.game.screenZoom, Math.round(
-                                            y.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom) + iy * TSIZE / 2 * Terrarum.game.screenZoom, FastMath.ceil(TSIZE * Terrarum.game.screenZoom / 2).toFloat(), FastMath.ceil(TSIZE * Terrarum.game.screenZoom / 2).toFloat())
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        try {
-                            val thisLightLevel = getLight(x, y)
-
-                            // coalesce identical intensity blocks to one
-                            var sameLevelCounter = 1
-                            while (getLight(x + sameLevelCounter, y) == thisLightLevel) {
-                                sameLevelCounter += 1
-
-                                if (x + sameLevelCounter >= for_x_end) break
-                            }
-
-                            g.color = Color(getLight(x, y) ?: 0)
-                            g.fillRect(
-                                    Math.round(x.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), Math.round(y.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), (FastMath.ceil(
-                                    TSIZE * Terrarum.game.screenZoom) * sameLevelCounter).toFloat(), FastMath.ceil(TSIZE * Terrarum.game.screenZoom).toFloat())
-
-                            x += sameLevelCounter - 1
-                        }
-                        catch (e: ArrayIndexOutOfBoundsException) {
-                            // do nothing
-                        }
-
-                    }// Retro
-                    x++
+            // Round 4
+            for (y in for_y_start - overscan..for_y_end) {
+                for (x in for_x_end + overscan downTo for_x_start) {
+                    setLight(x, y, calculate(x, y))
                 }
             }
         }
@@ -304,21 +148,13 @@ object LightmapRenderer {
         // luminous tile on top of air
         else if (thisWall == AIR && thisTileLuminosity.toInt() > 0) {
             val darkenSunlight = darkenColoured(sunLight, thisTileOpacity)
-            lightLevelThis = maximiseRGB(darkenSunlight, thisTileLuminosity)
+            lightLevelThis = screenBlend(darkenSunlight, thisTileLuminosity)
         }
         // opaque wall and luminous tile
         else if (thisWall != AIR && thisTileLuminosity.toInt() > 0) {
             lightLevelThis = thisTileLuminosity
         }
         // END MIX TILE
-
-        // mix lantern
-        for (lantern in lanterns) {
-            if (lantern.x == x && lantern.y == y) {
-                lightLevelThis = screenBlend(lightLevelThis, lantern.intensity)
-                break
-            }
-        }
 
         // mix luminous actor
         for (actor in Terrarum.game.actorContainer) {
@@ -328,6 +164,7 @@ object LightmapRenderer {
                 val actorLuminosity = actor.luminosity
                 if (x == tileX && y == tileY) {
                     lightLevelThis = screenBlend(lightLevelThis, actorLuminosity)
+                    break
                 }
             }
         }
@@ -380,6 +217,122 @@ object LightmapRenderer {
         else {
             return lightLevelThis
         }
+    }
+
+    fun draw(g: Graphics) {
+        val for_x_start = div16(MapCamera.cameraX) - 1 // fix for premature lightmap rendering
+        val for_y_start = div16(MapCamera.cameraY) - 1 // on topmost/leftmost side
+
+        val for_x_end = for_x_start + div16(MapCamera.getRenderWidth()) + 3
+        val for_y_end = for_y_start + div16(MapCamera.getRenderHeight()) + 2 // same fix as above
+
+
+        // draw
+        try {
+            for (y in for_y_start..for_y_end) {
+                var x = for_x_start
+                while (x < for_x_end) {
+                    // smooth
+                    if (Terrarum.game.screenZoom >= 1 && Terrarum.gameConfig.getAsBoolean("smoothlighting") ?: false) {
+                        val thisLightLevel = getLight(x, y) ?: 0
+                        if (y > 0 && x < for_x_end && thisLightLevel == 0
+                            && getLight(x, y - 1) == 0) {
+                            try {
+                                // coalesce zero intensity blocks to one
+                                var zeroLevelCounter = 1
+                                while (getLight(x + zeroLevelCounter, y) == 0
+                                       && getLight(x + zeroLevelCounter, y - 1) == 0) {
+                                    zeroLevelCounter += 1
+
+                                    if (x + zeroLevelCounter >= for_x_end) break
+                                }
+
+                                g.color = Color(0)
+                                g.fillRect(
+                                        Math.round(x.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), Math.round(y.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), (FastMath.ceil(
+                                        TSIZE * Terrarum.game.screenZoom) * zeroLevelCounter).toFloat(), FastMath.ceil(TSIZE * Terrarum.game.screenZoom).toFloat())
+
+                                x += zeroLevelCounter - 1
+                            }
+                            catch (e: ArrayIndexOutOfBoundsException) {
+                                // do nothing
+                            }
+
+                        }
+                        else {
+                            /**    a
+                             *   +-+-+
+                             *   |i|j|
+                             * b +-+-+ c
+                             *   |k|l|
+                             *   +-+-+
+                             *     d
+                             */
+                            val a = maximiseRGB(
+                                    thisLightLevel,
+                                    getLight(x, y - 1) ?: thisLightLevel
+                            )
+                            val d = maximiseRGB(
+                                    thisLightLevel,
+                                    getLight(x, y + 1) ?: thisLightLevel
+                            )
+                            val b = maximiseRGB(
+                                    thisLightLevel,
+                                    getLight(x - 1, y) ?: thisLightLevel
+                            )
+                            val c = maximiseRGB(
+                                    thisLightLevel,
+                                    getLight(x + 1, y) ?: thisLightLevel
+                            )
+                            val colourMapItoL = IntArray(4)
+                            colourMapItoL[0] = colourLinearMix(a, b)
+                            colourMapItoL[1] = colourLinearMix(a, c)
+                            colourMapItoL[2] = colourLinearMix(b, d)
+                            colourMapItoL[3] = colourLinearMix(c, d)
+
+                            for (iy in 0..1) {
+                                for (ix in 0..1) {
+                                    g.color = Color(colourMapItoL[iy * 2 + ix])
+
+                                    g.fillRect(
+                                            Math.round(
+                                                    x.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom) + ix * TSIZE / 2 * Terrarum.game.screenZoom, Math.round(
+                                            y.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom) + iy * TSIZE / 2 * Terrarum.game.screenZoom, FastMath.ceil(TSIZE * Terrarum.game.screenZoom / 2).toFloat(), FastMath.ceil(TSIZE * Terrarum.game.screenZoom / 2).toFloat())
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        try {
+                            val thisLightLevel = getLight(x, y)
+
+                            // coalesce identical intensity blocks to one
+                            var sameLevelCounter = 1
+                            while (getLight(x + sameLevelCounter, y) == thisLightLevel) {
+                                sameLevelCounter += 1
+
+                                if (x + sameLevelCounter >= for_x_end) break
+                            }
+
+                            g.color = Color(getLight(x, y) ?: 0)
+                            g.fillRect(
+                                    Math.round(x.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), Math.round(y.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), (FastMath.ceil(
+                                    TSIZE * Terrarum.game.screenZoom) * sameLevelCounter).toFloat(), FastMath.ceil(TSIZE * Terrarum.game.screenZoom).toFloat())
+
+                            x += sameLevelCounter - 1
+                        }
+                        catch (e: ArrayIndexOutOfBoundsException) {
+                            // do nothing
+                        }
+
+                    }// Retro
+                    x++
+                }
+            }
+        }
+        catch (e: ArrayIndexOutOfBoundsException) {
+        }
+
     }
 
     /**
@@ -488,6 +441,20 @@ object LightmapRenderer {
         val b1 = getRawB(rgb)
         val b2 = getRawB(rgb2)
         val newB = if (b1 > b2) b1 else b2
+
+        return constructRGBFromInt(newR, newG, newB)
+    }
+
+    private fun minimiseRGB(rgb: Int, rgb2: Int): Int {
+        val r1 = getRawR(rgb)
+        val r2 = getRawR(rgb2)
+        val newR = if (r1 < r2) r1 else r2
+        val g1 = getRawG(rgb)
+        val g2 = getRawG(rgb2)
+        val newG = if (g1 < g2) g1 else g2
+        val b1 = getRawB(rgb)
+        val b2 = getRawB(rgb2)
+        val newB = if (b1 < b2) b1 else b2
 
         return constructRGBFromInt(newR, newG, newB)
     }
@@ -624,66 +591,19 @@ object LightmapRenderer {
         try {
             for (y in y1 - 1..y2 + 1) {
                 for (x in x1 - 1..x2 + 1) {
-                    if (y == y1 - 1 || y == y2 + 1 || x == x1 - 1 || x == x2 + 1) {
+                    //if (y == y1 - 1 || y == y2 + 1 || x == x1 - 1 || x == x2 + 1) {
                         // fill the rim with (pre) calculation
-                        setLight(x, y, preCalculateUpdateGLOnly(x, y))
-                    }
-                    else {
+                    //    setLight(x, y, preCalculateUpdateGLOnly(x, y))
+                    //}
+                    //else {
                         setLight(x, y, 0)
-                    }
+                    //}
                 }
             }
         }
         catch (e: ArrayIndexOutOfBoundsException) {
         }
 
-    }
-
-    private fun preCalculateUpdateGLOnly(x: Int, y: Int): Int {
-        var lightLevelThis: Int = 0
-        val thisTerrain = Terrarum.game.map.getTileFromTerrain(x, y)
-        val thisWall = Terrarum.game.map.getTileFromWall(x, y)
-        val thisTileLuminosity = TilePropCodex.getProp(thisTerrain).luminosity
-        val thisTileOpacity = TilePropCodex.getProp(thisTerrain).opacity
-        val sunLight = Terrarum.game.map.globalLight
-
-        // MIX TILE
-        // open air
-        if (thisTerrain == AIR && thisWall == AIR) {
-            lightLevelThis = sunLight
-        }
-        // luminous tile on top of air
-        else if (thisWall == AIR && thisTileLuminosity.toInt() > 0) {
-            val darkenSunlight = darkenColoured(sunLight, thisTileOpacity)
-            lightLevelThis = maximiseRGB(darkenSunlight, thisTileLuminosity)
-        }
-        // opaque wall and luminous tile
-        else if (thisWall != AIR && thisTileLuminosity.toInt() > 0) {
-            lightLevelThis = thisTileLuminosity
-        }
-        // END MIX TILE
-
-        // mix lantern
-        for (lantern in lanterns) {
-            if (lantern.x == x && lantern.y == y) {
-                lightLevelThis = screenBlend(lightLevelThis, lantern.intensity)
-                break
-            }
-        }
-
-        // mix luminous actor
-        for (actor in Terrarum.game.actorContainer) {
-            if (actor is Luminous && actor is ActorWithBody) {
-                val tileX = Math.round(actor.hitbox!!.pointedX / TSIZE)
-                val tileY = Math.round(actor.hitbox!!.pointedY / TSIZE) - 1
-                val actorLuminosity = actor.luminosity
-                if (x == tileX && y == tileY) {
-                    lightLevelThis = screenBlend(lightLevelThis, actorLuminosity)
-                }
-            }
-        }
-
-        return lightLevelThis
     }
 
     private fun clampWTile(x: Int): Int {

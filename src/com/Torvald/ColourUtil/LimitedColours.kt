@@ -13,4 +13,5 @@ interface LimitedColours {
     fun create(raw: Int)
     fun create(r: Int, g: Int, b: Int)
 
+    fun toSlickColour(): Color
 }

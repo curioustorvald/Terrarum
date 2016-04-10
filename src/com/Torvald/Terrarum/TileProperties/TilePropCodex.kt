@@ -13,7 +13,7 @@ import java.io.IOException
 class TilePropCodex {
 
     init {
-        tileProps = Array<TileProp>(MapLayer.RANGE * PairedMapLayer.RANGE,
+        tileProps = Array<TileProp>(MapLayer.RANGE * PairedMapLayer.RANGE + 1,
                 {i -> TileProp() }
         )
 
@@ -28,7 +28,7 @@ class TilePropCodex {
             println("[TilePropCodex] Building tile properties table")
 
             records.forEach { record -> setProp(
-                    tileProps[indexDamageToArrayAddr(intVal(record, "id"), intVal(record, "dmg"))]
+                    tileProps[idDamageToIndex(intVal(record, "id"), intVal(record, "dmg"))]
                     , record)
             }
         }
@@ -46,24 +46,24 @@ class TilePropCodex {
 
         fun getProp(index: Int, damage: Int): TileProp {
             try {
-                tileProps[indexDamageToArrayAddr(index, damage)].id
+                tileProps[idDamageToIndex(index, damage)].id
             }
             catch (e: NullPointerException) {
                 throw NullPointerException("Tile prop with id $index and damage $damage does not exist.")
             }
 
-            return tileProps[indexDamageToArrayAddr(index, damage)]
+            return tileProps[idDamageToIndex(index, damage)]
         }
 
         fun getProp(rawIndex: Int?): TileProp {
             try {
-                tileProps[rawIndex ?: TileNameCode.STONE].id
+                tileProps[rawIndex ?: TileNameCode.NULL].id
             }
             catch (e: NullPointerException) {
                 throw NullPointerException("Tile prop with raw id $rawIndex does not exist.")
             }
 
-            return tileProps[rawIndex ?: TileNameCode.STONE]
+            return tileProps[rawIndex ?: TileNameCode.NULL]
         }
 
         private fun setProp(prop: TileProp, record: CSVRecord) {
@@ -102,13 +102,9 @@ class TilePropCodex {
             return ret
         }
 
-        private fun boolVal(rec: CSVRecord, s: String): Boolean {
-            return intVal(rec, s) != 0
-        }
+        private fun boolVal(rec: CSVRecord, s: String) = intVal(rec, s) != 0
 
-        fun indexDamageToArrayAddr(index: Int, damage: Int): Int {
-            return index * PairedMapLayer.RANGE + damage
-        }
+        fun idDamageToIndex(index: Int, damage: Int) = index * PairedMapLayer.RANGE + damage
 
         private fun formatNum3(i: Int): String {
             if (i < 10)
@@ -119,11 +115,6 @@ class TilePropCodex {
                 return i.toString()
         }
 
-        private fun formatNum2(i: Int): String {
-            if (i < 10)
-                return "0" + i
-            else
-                return i.toString()
-        }
+        private fun formatNum2(i: Int) = if (i < 10) "0" + i else i.toString()
     }
 }

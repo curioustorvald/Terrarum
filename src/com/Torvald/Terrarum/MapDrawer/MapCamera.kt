@@ -184,10 +184,39 @@ object MapCamera {
      */
     private val TILES_BLEND_MUL = arrayOf(
               TileNameCode.WATER
+            , TileNameCode.WATER_1
+            , TileNameCode.WATER_2
+            , TileNameCode.WATER_3
+            , TileNameCode.WATER_4
+            , TileNameCode.WATER_5
+            , TileNameCode.WATER_6
+            , TileNameCode.WATER_7
+            , TileNameCode.WATER_8
+            , TileNameCode.WATER_9
+            , TileNameCode.WATER_10
+            , TileNameCode.WATER_11
+            , TileNameCode.WATER_12
+            , TileNameCode.WATER_13
+            , TileNameCode.WATER_14
+            , TileNameCode.WATER_15
             , TileNameCode.LAVA
+            , TileNameCode.LAVA_1
+            , TileNameCode.LAVA_2
+            , TileNameCode.LAVA_3
+            , TileNameCode.LAVA_4
+            , TileNameCode.LAVA_5
+            , TileNameCode.LAVA_6
+            , TileNameCode.LAVA_7
+            , TileNameCode.LAVA_8
+            , TileNameCode.LAVA_9
+            , TileNameCode.LAVA_10
+            , TileNameCode.LAVA_11
+            , TileNameCode.LAVA_12
+            , TileNameCode.LAVA_13
+            , TileNameCode.LAVA_14
+            , TileNameCode.LAVA_15
     )
 
-    @JvmStatic
     fun update(gc: GameContainer, delta_t: Int) {
         val player = Terrarum.game.player
 
@@ -201,7 +230,6 @@ object MapCamera {
                 player.hitbox!!.centeredY - renderHeight / 2, TSIZE.toFloat(), map.height * TSIZE - renderHeight - TSIZE.toFloat()))
     }
 
-    @JvmStatic
     fun renderBehind(gc: GameContainer, g: Graphics) {
         /**
          * render to camera
@@ -211,7 +239,6 @@ object MapCamera {
         drawTiles(TERRAIN, false)
     }
 
-    @JvmStatic
     fun renderFront(gc: GameContainer, g: Graphics) {
         setBlendMul()
         drawTiles(TERRAIN, true)
@@ -252,12 +279,17 @@ object MapCamera {
 
                             && (thisTile ?: 0) > 0
                             &&
-                            // check if light level of upper tile is zero and
-                            // that of this tile is also zero
-                            (y > 0 && !(LightmapRenderer.getValueFromMap(x, y) ?: 0.toInt() == 0
-                                        && LightmapRenderer.getValueFromMap(x, y - 1) ?: 0.toInt() == 0)
-                                    // check if light level of this tile is zero, for y = 0
-                                    || y == 0 && LightmapRenderer.getValueFromMap(x, y) ?: 0.toInt() > 0)) {
+                            // check if light level of nearby or this tile is illuminated
+                    (    LightmapRenderer.getValueFromMap(x, y) ?: 0 > 0
+                         || LightmapRenderer.getValueFromMap(x - 1, y) ?: 0 > 0
+                         || LightmapRenderer.getValueFromMap(x + 1, y) ?: 0 > 0
+                         || LightmapRenderer.getValueFromMap(x, y - 1) ?: 0 > 0
+                         || LightmapRenderer.getValueFromMap(x, y + 1) ?: 0 > 0
+                         || LightmapRenderer.getValueFromMap(x - 1, y - 1) ?: 0 > 0
+                         || LightmapRenderer.getValueFromMap(x + 1, y + 1) ?: 0 > 0
+                         || LightmapRenderer.getValueFromMap(x + 1, y - 1) ?: 0 > 0
+                         || LightmapRenderer.getValueFromMap(x - 1, y + 1) ?: 0 > 0)
+                    ) {
 
                         val nearbyTilesInfo: Int
                         if (isWallSticker(thisTile)) {
@@ -284,13 +316,9 @@ object MapCamera {
                                 drawTile(mode, x, y, thisTileX, thisTileY)
                             }
                         } else {
-                            // currently it draws all the transparent tile and colour mixes
-                            // on top of the previously drawn tile
-                            // TODO check wether it works as intended when skybox is dark
-                            // add instruction "if (!isBlendMul((byte) thisTile))"
-                            if (!isBlendMul(thisTile)) {
-                                drawTile(mode, x, y, thisTileX, thisTileY)
-                            }
+                            // do NOT add "if (!isBlendMul(thisTile))"!
+                            // or else they will not look like they should be when backed with wall
+                            drawTile(mode, x, y, thisTileX, thisTileY)
                         }
                     }
                 } catch (e: NullPointerException) {
@@ -345,7 +373,7 @@ object MapCamera {
         for (i in 0..3) {
             try {
                 if (!TilePropCodex.getProp(nearbyTiles[i]).isSolid) {
-                    ret += 1 shl i // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+                    ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
                 }
             } catch (e: ArrayIndexOutOfBoundsException) {
             }
@@ -364,7 +392,8 @@ object MapCamera {
         nearbyTiles[NEARBY_TILE_KEY_BACK] = map.getTileFrom(WALL, x, y) ?: 4096
 
         try {
-            if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_RIGHT]).isSolid && TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_LEFT]).isSolid) {
+            if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_RIGHT]).isSolid
+                    && TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_LEFT]).isSolid) {
                 if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_BACK]).isSolid)
                     return 0
                 else

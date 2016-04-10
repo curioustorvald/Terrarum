@@ -12,6 +12,8 @@ import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 
 /**
+ * Base class for every actor that has physical (or visible) body. This includes furnishings, paintings, gadgets, etc.
+ *
  * Created by minjaesong on 16-03-14.
  */
 open class ActorWithBody constructor() : Actor, Visible, Glowing {
@@ -51,7 +53,7 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
     internal var baseSpriteWidth: Int = 0
     internal var baseSpriteHeight: Int = 0
 
-    override var referenceID: Long = HQRNG().nextLong()
+    override var referenceID: Long = 0L
     /**
      * Positions: top-left point
      */
@@ -136,7 +138,10 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
     @Transient private val MASS_DEFAULT = 60f
 
     init {
-        // referenceID = HQRNG().nextLong() // renew ID just in case
+        do {
+            referenceID = HQRNG().nextLong() // set new ID
+        } while (Terrarum.game.hasActor(referenceID)) // check for collision
+
         map = Terrarum.game.map
     }
 

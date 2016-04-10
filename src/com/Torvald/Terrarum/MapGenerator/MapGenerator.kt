@@ -13,7 +13,7 @@ object MapGenerator {
     private lateinit var map: GameMap
     private lateinit var random: Random
     //private static float[] noiseArray;
-    private var SEED: Long = 0
+    var SEED: Long = 0
     var WIDTH: Int = 0
     var HEIGHT: Int = 0
 
@@ -72,10 +72,6 @@ object MapGenerator {
         OCEAN_WIDTH = Math.round(OCEAN_WIDTH * widthMulFactor)
         SHORE_WIDTH = Math.round(SHORE_WIDTH * widthMulFactor)
         GLACIER_MOUNTAIN_WIDTH = Math.round(GLACIER_MOUNTAIN_WIDTH * widthMulFactor)
-    }
-
-    fun setSeed(seed: Long) {
-        this.SEED = seed
     }
 
     /**
@@ -904,10 +900,6 @@ object MapGenerator {
         TODO()
     }
 
-
-    fun getGeneratorSeed(): Long {
-        return SEED
-    }
 
     /* Utility */
 

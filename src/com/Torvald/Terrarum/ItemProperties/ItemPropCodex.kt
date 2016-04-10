@@ -14,7 +14,7 @@ object ItemPropCodex {
     val CSV_PATH = "./src/com/torvald/terrarum/itemproperties/itemprop.csv"
 
     /**
-     * &lt;ItemID or RefID for Actor, TheItem&gt;
+     * <ItemID or RefID for Actor, TheItem>
      * Will return corresponding Actor if ID >= 32768
      */
     private lateinit var itemCodex: Array<InventoryItem>
@@ -34,7 +34,7 @@ object ItemPropCodex {
             return itemCodex[(code and 0xFFFFFFFF).toInt()]
         else {
             for (actor in Terrarum.game.actorContainer) {
-                if (actor is CanBeAnItem && actor.referenceID.equals(code))
+                if (actor is CanBeAnItem && actor.referenceID == code)
                     return actor.itemData
             }
 

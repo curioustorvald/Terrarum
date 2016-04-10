@@ -38,8 +38,8 @@ constructor() : BasicGameState() {
 
     lateinit var map: GameMap
 
-    var actorContainer = HashSet<Actor>()
-    var uiContainer = HashSet<UIHandler>()
+    val actorContainer = LinkedList<Actor>()
+    val uiContainer = LinkedList<UIHandler>()
 
     lateinit var consoleHandler: UIHandler
     lateinit var debugWindow: UIHandler
@@ -54,17 +54,12 @@ constructor() : BasicGameState() {
     val ZOOM_MAX = 2.0f
     val ZOOM_MIN = 0.25f
 
-    private var shader12BitCol: Shader? = null
-    private var shaderBlurH: Shader? = null
-    private var shaderBlurV: Shader? = null
-
+    private lateinit var shader12BitCol: Shader
+    private lateinit var shaderBlurH: Shader
+    private lateinit var shaderBlurV: Shader
 
     private val useShader: Boolean = false
     private val shaderProgram = 0
-
-
-    private val ENV_COLTEMP_SUNRISE = 2500
-    private val ENV_SUNLIGHT_DELTA = MapDrawer.ENV_COLTEMP_NOON - ENV_COLTEMP_SUNRISE
 
 
     val memInUse: Long
@@ -98,11 +93,11 @@ constructor() : BasicGameState() {
         map.gravitation = 9.8f
 
         MapGenerator.attachMap(map)
-        MapGenerator.setSeed(0x51621D2)
+        MapGenerator.SEED = 0x51621D2
         //mapgenerator.setSeed(new HQRNG().nextLong());
         MapGenerator.generateMap()
 
-        RoguelikeRandomiser.setSeed(0x540198)
+        RoguelikeRandomiser.seed = 0x540198
         //RoguelikeRandomiser.setSeed(new HQRNG().nextLong());
 
 
@@ -110,7 +105,7 @@ constructor() : BasicGameState() {
         player = PFSigrid.create()
         //player = PFCynthia.create()
         //player.setNoClip(true);
-        actorContainer.add(player)
+        addActor(player)
 
         consoleHandler = UIHandler(ConsoleWindow())
         consoleHandler.setPosition(0, 0)
@@ -189,43 +184,30 @@ constructor() : BasicGameState() {
 
         MapCamera.renderBehind(gc, g)
 
-        actorContainer.forEach { actor ->
-            if (actor is Visible) actor.drawBody(gc, g)
-            if (actor is Glowing) actor.drawGlow(gc, g)
-        }
-
+        actorContainer.forEach { actor -> if (actor is Visible) actor.drawBody(gc, g) }
         player.drawBody(gc, g)
-        player.drawGlow(gc, g)
 
         LightmapRenderer.renderLightMap()
 
         MapCamera.renderFront(gc, g)
         MapDrawer.render(gc, g)
 
-
         setBlendMul()
 
-        MapDrawer.drawEnvOverlay(g)
+            MapDrawer.drawEnvOverlay(g)
 
-        if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) setBlendMul()
-        else setBlendNormal()
-
-        LightmapRenderer.draw(g)
+            if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) setBlendMul() else setBlendNormal()
+            LightmapRenderer.draw(g)
 
         setBlendNormal()
+
+        actorContainer.forEach { actor -> if (actor is Glowing) actor.drawGlow(gc, g) }
+        player.drawGlow(gc, g)
 
         uiContainer.forEach { ui -> ui.render(gc, g) }
         debugWindow.render(gc, g)
         consoleHandler.render(gc, g)
         notifinator.render(gc, g)
-    }
-
-    fun addActor(e: Actor): Boolean {
-        return actorContainer.add(e)
-    }
-
-    fun removeActor(e: Actor): Boolean {
-        return actorContainer.remove(e)
     }
 
     private fun getGradientColour(row: Int): Color {
@@ -298,4 +280,41 @@ constructor() : BasicGameState() {
      * extension function for org.newdawn.slick.Color
      */
     fun Color.getRGB24(): Int = (this.redByte shl 16) or (this.greenByte shl 8) or (this.blueByte)
+
+    /**
+     * actorContainer extensions
+     */
+    fun hasActor(ID: Long): Boolean {
+        for (actor in actorContainer) {
+            if (actor.referenceID == ID) return true
+        }
+        return false
+    }
+
+    fun removeActor(ID: Long) {
+        for (actor in actorContainer) {
+            if (actor.referenceID == ID)
+                actorContainer.remove(actor)
+        }
+    }
+
+    fun addActor(other: Actor): Boolean {
+        if (hasActor(other.referenceID)) return false
+        actorContainer.add(other)
+        return true
+    }
+
+    fun getActor(ID: Long): Actor {
+        for (actor in actorContainer) {
+            if (actor.referenceID == ID)
+                return actor
+        }
+        throw NullPointerException("Actor with ID $ID does not exist.")
+    }
+
+    fun addUI(other: UIHandler): Boolean {
+        if (uiContainer.contains(other)) return false
+        uiContainer.add(other)
+        return true
+    }
 }

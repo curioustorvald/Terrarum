@@ -4,7 +4,6 @@ import com.torvald.terrarum.langpack.Lang
 import com.torvald.terrarum.Terrarum
 import com.torvald.terrarum.console.CommandInterpreter
 import com.torvald.terrarum.gamecontroller.Key
-import com.jme3.math.FastMath
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -17,7 +16,7 @@ class ConsoleWindow : UICanvas, UITypable {
 
     internal var UIColour = Color(0xCC000000.toInt())
 
-    private var commandInputPool: StringBuffer? = null
+    private var commandInputPool: StringBuilder? = null
     private var prevCommand: String? = null
 
     private var inputCursorPos: Int = 0
@@ -75,7 +74,7 @@ class ConsoleWindow : UICanvas, UITypable {
         if (key == Key.RET && commandInputPool!!.length > 0) {
             prevCommand = commandInputPool!!.toString()
             executeCommand()
-            commandInputPool = StringBuffer()
+            commandInputPool = StringBuilder()
         }
         else if (key == Key.BKSP && commandInputPool!!.length > 0) {
             commandInputPool!!.deleteCharAt(commandInputPool!!.length - 1)
@@ -89,7 +88,7 @@ class ConsoleWindow : UICanvas, UITypable {
             inputCursorPos += 1
         }
         else if (key == Key.UP) {
-            commandInputPool = StringBuffer()
+            commandInputPool = StringBuilder()
             commandInputPool!!.append(prevCommand)
         }
         else if (key == Key.PGUP) {
@@ -151,7 +150,7 @@ class ConsoleWindow : UICanvas, UITypable {
         messagesCount = 0
         inputCursorPos = 0
         prevCommand = ""
-        commandInputPool = StringBuffer()
+        commandInputPool = StringBuilder()
 
         if (Terrarum.game.auth.b()) sendMessage(Lang.get("DEV_MESSAGE_CONSOLE_CODEX"))
     }

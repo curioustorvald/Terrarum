@@ -57,22 +57,22 @@ class Col4096 : LimitedColours {
             a = raw and 0xF000 shr 12
 
             return Color(
-                    r shl 4 or r, g shl 4 or g, b shl 4 or b, a shl 4 or a)
+                    r.shl(4) or r, g.shl(4) or g, b.shl(4) or b, a.shl(4) or a)
         }
         else {
             return Color(
-                    r shl 4 or r, g shl 4 or g, b shl 4 or b)
+                    r.shl(4) or r, g.shl(4) or g, b.shl(4) or b)
         }
     }
 
     override fun createSlickColor(r: Int, g: Int, b: Int): Color {
         assertARGB(0, r, g, b)
-        return createSlickColor(r shl 8 or g shl 4 or b)
+        return createSlickColor(r.shl(8) or g.shl(4) or b)
     }
 
     fun createSlickColor(a: Int, r: Int, g: Int, b: Int): Color {
         assertARGB(a, r, g, b)
-        return createSlickColor(a shl 12 or r shl 8 or g shl 4 or b)
+        return createSlickColor(a.shl(12) or r.shl(8) or g.shl(4) or b)
     }
 
     override fun create(raw: Int) {
@@ -82,12 +82,12 @@ class Col4096 : LimitedColours {
 
     override fun create(r: Int, g: Int, b: Int) {
         assertARGB(0, r, g, b)
-        raw = (r shl 8 or g shl 4 or b).toShort()
+        raw = (r.shl(8) or g.shl(4) or b).toShort()
     }
 
     fun create(a: Int, r: Int, g: Int, b: Int) {
         assertARGB(a, r, g, b)
-        raw = (a shl 12 or r shl 8 or g shl 4 or b).toShort()
+        raw = (a.shl(12) or r.shl(8) or g.shl(4) or b).toShort()
     }
 
     /**
@@ -100,12 +100,14 @@ class Col4096 : LimitedColours {
         val g = (raw.toInt() and 0x0F0) shr 4
         val b = (raw.toInt() and 0x00F)
 
-        ret[0] = (r shl 4 or r).toByte()
-        ret[1] = (g shl 4 or g).toByte()
-        ret[2] = (b shl 4 or b).toByte()
+        ret[0] = (r.shl(4) or r).toByte()
+        ret[1] = (g.shl(4) or g).toByte()
+        ret[2] = (b.shl(4) or b).toByte()
 
         return ret
     }
+
+    override fun toSlickColour(): Color = createSlickColor(raw.toUint())
 
     private fun assertRaw(i: Int) {
         if (i > 0xFFFF || i < 0) {
@@ -124,4 +126,5 @@ class Col4096 : LimitedColours {
         }
     }
 
+    fun Short.toUint(): Int = this.toInt() and 0xFFFF
 }

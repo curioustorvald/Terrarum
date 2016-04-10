@@ -55,6 +55,8 @@ class Col216 : LimitedColours {
         raw = (MUL_2 * r + MUL * g + b).toByte()
     }
 
+    override fun toSlickColour(): Color = createSlickColor(raw.toUint())
+
     private fun assertRaw(i: Int) {
         if (i >= COLOUR_RANGE_SIZE || i < 0) {
             println("i: " + i.toString())
@@ -70,6 +72,8 @@ class Col216 : LimitedColours {
             throw IllegalArgumentException()
         }
     }
+
+    fun Byte.toUint() = this.toInt() and 0xFF
 
     companion object {
         @Transient private val LOOKUP = intArrayOf(0x00, 0x33, 0x66, 0x99, 0xCC, 0xFF)

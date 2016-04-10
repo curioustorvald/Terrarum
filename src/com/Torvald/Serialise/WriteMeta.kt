@@ -27,8 +27,8 @@ object WriteMeta {
 
     val BYTE_NULL: Byte = 0
 
-    val terraseed: Long = MapGenerator.getGeneratorSeed()
-    val rogueseed: Long = RoguelikeRandomiser.getGeneratorSeed()
+    val terraseed: Long = MapGenerator.SEED
+    val rogueseed: Long = RoguelikeRandomiser.seed
 
     /**
      * Write save meta to specified directory. Returns false if something went wrong.
@@ -88,14 +88,14 @@ object WriteMeta {
 
     fun toByteArray(long: Long): ByteArray {
         return byteArrayOf(
-                ((long ushr 0x38) and 0xFF).toByte(),
-                ((long ushr 0x30) and 0xFF).toByte(),
-                ((long ushr 0x28) and 0xFF).toByte(),
-                ((long ushr 0x20) and 0xFF).toByte(),
-                ((long ushr 0x18) and 0xFF).toByte(),
-                ((long ushr 0x10) and 0xFF).toByte(),
-                ((long ushr 0x08) and 0xFF).toByte(),
-                ((long          ) and 0xFF).toByte()
+                (long.ushr(0x38) and 0xFF).toByte(),
+                (long.ushr(0x30) and 0xFF).toByte(),
+                (long.ushr(0x28) and 0xFF).toByte(),
+                (long.ushr(0x20) and 0xFF).toByte(),
+                (long.ushr(0x18) and 0xFF).toByte(),
+                (long.ushr(0x10) and 0xFF).toByte(),
+                (long.ushr(0x08) and 0xFF).toByte(),
+                (long            and 0xFF).toByte()
         )
     }
 }
