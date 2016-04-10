@@ -274,12 +274,15 @@ constructor() : BasicGameState() {
     }
 
     private val globalLightByTime: Int
-        get() = getGradientColour(2).getRGB24()
+        get() = getGradientColour(2).getRGB24().rgb24ExpandToRgb30()
 
     /**
      * extension function for org.newdawn.slick.Color
      */
     fun Color.getRGB24(): Int = (this.redByte shl 16) or (this.greenByte shl 8) or (this.blueByte)
+    fun Int.rgb24ExpandToRgb30(): Int = (this and 0xff) or
+            (this and 0xff00).ushr(8).shl(10) or
+            (this and 0xff0000).ushr(16).shl(20)
 
     /**
      * actorContainer extensions

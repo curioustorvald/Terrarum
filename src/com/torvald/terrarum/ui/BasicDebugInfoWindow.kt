@@ -44,6 +44,10 @@ class BasicDebugInfoWindow : UICanvas {
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
+        fun Int.rawR() = this / LightmapRenderer.MUL_2
+        fun Int.rawG() = this % LightmapRenderer.MUL_2 / LightmapRenderer.MUL
+        fun Int.rawB() = this % LightmapRenderer.MUL
+
         val player = Terrarum.game.player
 
         val sb = StringBuilder()
@@ -81,9 +85,9 @@ class BasicDebugInfoWindow : UICanvas {
         var mtX = mouseTileX.toString()
         var mtY = mouseTileY.toString()
         val valRaw = LightmapRenderer.getValueFromMap(mouseTileX, mouseTileY) ?: -1
-        val rawR = LightmapRenderer.getRawR(valRaw)
-        val rawG = LightmapRenderer.getRawG(valRaw)
-        val rawB = LightmapRenderer.getRawB(valRaw)
+        val rawR = valRaw.rawR()
+        val rawG = valRaw.rawG()
+        val rawB = valRaw.rawB()
         lightVal = if (valRaw == -1)
             "—"
         else

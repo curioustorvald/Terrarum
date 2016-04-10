@@ -29,5 +29,6 @@ Connect two or more tracker head to play the array of trackers play simultaneous
             speed = 120
         }
         
-        *int: (0-63) number of the note pitch that is struck. 32: Middle C (C3)
+        *int: (0-63) number of the note pitch that is struck. 32: Middle C (C3). 
+        'A' just above of Middle C (A3) has base pitch of 440 Hz.
         *speed: in BPM
