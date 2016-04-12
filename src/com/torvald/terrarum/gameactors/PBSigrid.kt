@@ -13,7 +13,7 @@ import java.io.IOException
  * Created by minjaesong on 16-03-14.
  */
 
-object PFSigrid {
+object PBSigrid {
 
     fun create(): Player {
         val p = Player()

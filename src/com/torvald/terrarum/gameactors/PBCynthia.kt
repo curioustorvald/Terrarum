@@ -6,7 +6,7 @@ import com.torvald.terrarum.mapdrawer.MapDrawer
 /**
  * Created by minjaesong on 16-03-25.
  */
-object PFCynthia {
+object PBCynthia {
 
     fun create(): Player {
         val p: Player = Player()

@@ -6,7 +6,7 @@ import java.io.IOException
 /**
  * Created by minjaesong on 16-03-15.
  */
-object PlayerFactory {
+object PlayerBuilder {
     private val JSONPATH = "./res/raw/"
     private val jsonString = String()
 

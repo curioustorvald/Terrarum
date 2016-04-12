@@ -12,7 +12,7 @@ import java.io.IOException
  * Created by minjaesong on 16-03-14.
  */
 
-object CreatureFactory {
+object CreatureBuilder {
 
     /**
      * @Param jsonFileName with extension
