@@ -52,7 +52,7 @@ constructor() : BasicGameState() {
 
     var screenZoom = 1.0f
     val ZOOM_MAX = 2.0f
-    val ZOOM_MIN = 0.25f
+    val ZOOM_MIN = 0.5f
 
     private lateinit var shader12BitCol: Shader
     private lateinit var shaderBlurH: Shader

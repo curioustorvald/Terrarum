@@ -34,7 +34,7 @@ class BasicDebugInfoWindow : UICanvas {
 
     override fun update(gc: GameContainer, delta: Int) {
         val player = Terrarum.game.player
-        val hitbox = player.hitbox!!
+        val hitbox = player.hitbox
 
         xdelta = hitbox.pointedX - prevPlayerX
         ydelta = hitbox.pointedY - prevPlayerY
@@ -53,8 +53,8 @@ class BasicDebugInfoWindow : UICanvas {
         val sb = StringBuilder()
         val formatter = Formatter(sb)
 
-        val mouseTileX = ((MapCamera.cameraX + gc.getInput().mouseX / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
-        val mouseTileY = ((MapCamera.cameraY + gc.getInput().mouseY / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
+        val mouseTileX = ((MapCamera.cameraX + gc.input.mouseX / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
+        val mouseTileY = ((MapCamera.cameraY + gc.input.mouseY / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
 
         g.color = Color.white
 
@@ -62,7 +62,7 @@ class BasicDebugInfoWindow : UICanvas {
         val nextHitbox = player.nextHitbox
 
         printLine(g, 1, "posX: "
-                + "${hitbox!!.pointedX.toString()}"
+                + "${hitbox.pointedX.toString()}"
                 + " ("
                 + "${(hitbox.pointedX / MapDrawer.TILE_SIZE).toInt().toString()}"
                 + ")")

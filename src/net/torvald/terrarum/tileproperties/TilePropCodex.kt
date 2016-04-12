@@ -42,7 +42,7 @@ class TilePropCodex {
 
         private lateinit var tileProps: Array<TileProp>
 
-        val CSV_PATH = "./src/com/torvald/terrarum/tileproperties/tileprop.csv"
+        val CSV_PATH = "./src/net/torvald/terrarum/tileproperties/tileprop.csv"
 
         fun getProp(index: Int, damage: Int): TileProp {
             try {
