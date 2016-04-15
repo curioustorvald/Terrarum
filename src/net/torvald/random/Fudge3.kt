@@ -7,7 +7,7 @@ import java.util.Random
  */
 class Fudge3
 /**
- * Define new set of fudge dice with three dice.
+ * Define new set of Fudge dice with three dice (3dF).
  * @param randfunc java.util.Random or its extension
  */
 (randfunc: Random) : FudgeDice(randfunc, 3)

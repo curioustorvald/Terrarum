@@ -5,10 +5,7 @@ import net.torvald.JsonFetcher
 import net.torvald.JsonWriter
 import org.lwjgl.input.Controllers
 import org.lwjgl.opengl.GL11
-import org.newdawn.slick.AppGameContainer
-import org.newdawn.slick.Font
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.SlickException
+import org.newdawn.slick.*
 import org.newdawn.slick.state.StateBasedGame
 import java.io.File
 import java.io.IOException
@@ -81,7 +78,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         lateinit var appgc: AppGameContainer
 
-        val WIDTH = 1060
+        val WIDTH = 1072
         val HEIGHT = 742 // IMAX ratio
         var VSYNC = true
         val VSYNC_TRIGGER_THRESHOLD = 56
@@ -371,6 +368,11 @@ fun setBlendAlphaMap() {
     GL11.glDisable(GL11.GL_BLEND)
     GL11.glColorMask(false, false, false, true)
 }
+
+fun setBlendScreen() {
+    GL11.glEnable(GL11.GL_BLEND)
+    GL11.glColorMask(true, true, true, true)
+    GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_COLOR)}
 
 fun setBlendDisable() {
     GL11.glDisable(GL11.GL_BLEND)

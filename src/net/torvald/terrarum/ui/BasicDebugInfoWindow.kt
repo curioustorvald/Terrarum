@@ -1,11 +1,14 @@
 package net.torvald.terrarum.ui
 
+import com.jme3.math.FastMath
 import net.torvald.terrarum.gamemap.PairedMapLayer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.setBlendNormal
+import net.torvald.terrarum.setBlendScreen
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -162,6 +165,8 @@ class BasicDebugInfoWindow : UICanvas {
         g.drawString(
                 Lang["DEV_COLOUR_LEGEND_BLUE"] + " :  nextHitbox", (Terrarum.WIDTH - 200).toFloat()
                 , line(3).toFloat())
+
+        drawHistogram(g, LightmapRenderer.histogram, Terrarum.WIDTH - 256 - 30, Terrarum.HEIGHT - 100 - 30)
     }
 
     private fun printLine(g: Graphics, l: Int, s: String) {
@@ -172,13 +177,45 @@ class BasicDebugInfoWindow : UICanvas {
         g.drawString(s, (20 + column(col)).toFloat(), line(row).toFloat())
     }
 
-    private fun line(i: Int): Int {
-        return i * 20
+    private fun drawHistogram(g: Graphics, histogram: LightmapRenderer.Histogram, x: Int, y: Int) {
+        val uiColour = Color(0x99000000.toInt())
+        val barR = Color(0xFF0000.toInt())
+        val barG = Color(0x00FF00.toInt())
+        val barB = Color(0x0000FF.toInt())
+        val barColour = arrayOf(barR, barG, barB)
+        val w = 256.toFloat()
+        val h = 100.toFloat()
+        val range = histogram.range
+        val histogramMax = histogram.screen_tiles
+        //val histogramMax = histogram.histogramMax
+
+        g.color = uiColour
+        g.fillRect(x.toFloat(), y.toFloat(), w.plus(1).toFloat(), h.toFloat())
+
+        setBlendScreen()
+        for (c in 0..2) {
+            for (i in 0..255) {
+                var histogram_value = if (i == 255) 0 else histogram.get(c)[i]
+                if (i == 255) {
+                    for (k in 255..range - 1) {
+                        histogram_value += histogram.get(c)[k]
+                    }
+                }
+
+                val bar_x = x + (w / w.minus(1).toFloat()) * i.toFloat()
+                val bar_h = FastMath.ceil(h / histogramMax.toFloat()) * histogram_value.toFloat()
+                val bar_y = y + (h / histogramMax.toFloat()) - bar_h + h
+                val bar_w = 1f
+                g.color = barColour[c]
+                g.fillRect(bar_x, bar_y, bar_w, bar_h)
+            }
+        }
+        setBlendNormal()
     }
 
-    private fun column(i: Int): Int {
-        return 250 * (i - 1)
-    }
+    private fun line(i: Int): Int = i * 20
+
+    private fun column(i: Int): Int = 250 * (i - 1)
 
     override fun doOpening(gc: GameContainer, delta: Int) {
 

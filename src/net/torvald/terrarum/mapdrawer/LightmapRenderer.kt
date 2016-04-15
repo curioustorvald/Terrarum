@@ -16,8 +16,8 @@ import java.util.*
  */
 
 object LightmapRenderer {
-    val overscan_open: Int = (256f / (TilePropCodex.getProp(TileNameCode.AIR).opacity and 0xFF).toFloat()).ceil()
-    val overscan_opaque: Int = (256f / (TilePropCodex.getProp(TileNameCode.STONE).opacity and 0xFF).toFloat()).ceil()
+    val overscan_open: Int = Math.min(32, 256f.div(TilePropCodex.getProp(TileNameCode.AIR).opacity and 0xFF).toFloat().ceil())
+    val overscan_opaque: Int = Math.min(8, 256f.div(TilePropCodex.getProp(TileNameCode.STONE).opacity and 0xFF).toFloat().ceil())
 
     private val LIGHTMAP_WIDTH = Terrarum.game.ZOOM_MIN.inv().times(Terrarum.WIDTH)
             .div(MapDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
@@ -84,8 +84,73 @@ object LightmapRenderer {
          * * true: overscanning is limited to 8 tiles in width (overscan_opaque)
          * * false: overscanning will fully applied to 32 tiles in width (overscan_open)
          */
-        val noop_mask = BitSet(2 * (for_x_end - for_x_start + 1) +
-                               2 * (for_y_end - for_y_start - 1))
+        /*val rect_width = for_x_end - for_x_start
+        val rect_height_rem_hbars = for_y_end - for_y_start - 2
+        val noop_mask = BitSet(2 * (rect_width) +
+                               2 * (rect_height_rem_hbars))
+        val rect_size = noop_mask.size()
+
+        // get No-op mask
+        fun edgeToMaskNum(i: Int): Pair<Int, Int> {
+            if (i > rect_size) throw IllegalArgumentException()
+
+            if (i < rect_width) // top edge horizontal
+                return Pair(for_x_start + i, for_y_start)
+            else if (i >= rect_size - rect_width) // bottom edge horizontal
+                return Pair(
+                        for_x_start + i.minus(rect_size - rect_width),
+                        for_y_end
+                )
+            else { // vertical edges without horizontal edge pair
+                return Pair(
+                        if ((rect_width.even() && i.even()) || (rect_width.odd() && i.odd()))
+                            // if the index is on the left side of the box
+                             for_x_start
+                        else for_x_end ,
+                        (i - rect_width).div(2) + for_y_start + 1
+                )
+            }
+        }
+
+        fun posToMaskNum(x: Int, y: Int): Int? {
+            if (x in for_x_start + 1..for_x_end - 1 && y in for_y_start + 1..for_y_end - 1) {
+                return null // inside of this imaginary box
+            }
+            else if (y <= for_y_start) { // upper edge
+                if (x < for_x_start) return 0
+                else if (x > for_x_end) return rect_width - 1
+                else return x - for_x_start
+            }
+            else if (y >= for_y_end) { // lower edge
+                if (x < for_x_start) return rect_size - rect_width
+                else if (x > for_x_end) return rect_size - 1
+                else return x - for_x_start + (rect_size - rect_width)
+            }
+            else { // between two edges
+                if (x < for_x_start)    return (y - for_y_start - 1) * 2 + rect_width
+                else if (x > for_x_end) return (y - for_y_start - 1) * 2 + rect_width + 1
+                else return null
+            }
+        }
+
+        fun isNoop(x: Int, y: Int): Boolean =
+                if (posToMaskNum(x, y) == null)
+                    false
+                else if (!(x in for_x_start - overscan_opaque..for_x_end + overscan_opaque &&
+                             x in for_y_start - overscan_opaque..for_y_end + overscan_opaque))
+                     // point is within the range of overscan_open but not overscan_opaque
+                    noop_mask.get(posToMaskNum(x, y)!!)
+                else // point within the overscan_opaque must be rendered, so no no-op
+                    false
+
+        // build noop map
+        for (i in 0..rect_size) {
+            val point = edgeToMaskNum(i)
+            val tile = Terrarum.game.map.getTileFromTerrain(point.first, point.second) ?: TileNameCode.NULL
+            val isSolid = TilePropCodex.getProp(tile).isSolid
+
+            noop_mask.set(i, isSolid)
+        }*/
 
         /**
          * Updating order:
@@ -527,4 +592,81 @@ object LightmapRenderer {
     fun Float.floor() = FastMath.floor(this)
     fun Float.round(): Int = Math.round(this)
     fun Float.ceil() = FastMath.ceil(this)
+    fun Int.even(): Boolean = this and 1 == 0
+    fun Int.odd(): Boolean = this and 1 == 1
+
+    val histogram: Histogram
+        get() {
+            var reds = IntArray(MUL) // reds[intensity] ← counts
+            var greens = IntArray(MUL) // do.
+            var blues = IntArray(MUL) // do.
+            val render_width = for_x_end - for_x_start
+            val render_height = for_y_end - for_y_start
+            // excluiding overscans; only reckon visible lights
+            for (y in overscan_open..render_height + overscan_open + 1) {
+                for (x in overscan_open..render_width + overscan_open + 1) {
+                    reds[lightmap[y][x].rawR()] += 1
+                    greens[lightmap[y][x].rawG()] += 1
+                    blues[lightmap[y][x].rawB()] += 1
+                }
+            }
+            return Histogram(reds, greens, blues)
+        }
+
+    class Histogram(val reds: IntArray, val greens: IntArray, val blues: IntArray) {
+
+        val RED = 0
+        val GREEN = 1
+        val BLUE = 2
+
+        val screen_tiles: Int
+            get() = (for_x_end - for_x_start + 2) * (for_y_end - for_y_start + 2)
+
+        val brightest: Int
+            get() {
+                for (i in CHANNEL_MAX downTo 1) {
+                    if (reds[i] > 0 || greens[i] > 0 || blues[i] > 0)
+                        return i
+                }
+                return 0
+            }
+
+        val brightest8Bit: Int
+            get() { val b = brightest
+                return if (brightest > 255) 255 else b
+            }
+
+        val dimmest: Int
+            get() {
+                for (i in 0..CHANNEL_MAX) {
+                    if (reds[i] > 0 || greens[i] > 0 || blues[i] > 0)
+                        return i
+                }
+                return CHANNEL_MAX
+            }
+
+        val histogramMax: Int
+            get() {
+                var max = 0
+                for (c in 0..2) {
+                    for (i in 0..CHANNEL_MAX) {
+                        val value = get(c)[i]
+                        if (value > max) max = value
+                    }
+                }
+                return max
+            }
+
+        val range: Int
+            get() = reds.size
+
+        fun get(index: Int): IntArray {
+            return when (index) {
+                RED -> reds
+                GREEN -> greens
+                BLUE -> blues
+                else -> throw IllegalArgumentException()
+            }
+        }
+    }
 }
