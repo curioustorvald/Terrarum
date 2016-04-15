@@ -392,25 +392,28 @@ object MapCamera {
         nearbyTiles[NEARBY_TILE_KEY_BACK] = map.getTileFrom(WALL, x, y) ?: 4096
 
         try {
-            if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_RIGHT]).isSolid
-                    && TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_LEFT]).isSolid) {
-                if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_BACK]).isSolid)
-                    return 0
-                else
-                    return 3
-            } else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_RIGHT]).isSolid) {
-                return 2
-            } else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_LEFT]).isSolid) {
-                return 1
-            } else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_BACK]).isSolid) {
+            if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_DOWN]).isSolid)
+                // has tile on the bottom
+                return 3
+            else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_RIGHT]).isSolid
+                    && TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_LEFT]).isSolid)
+                // has tile on both sides
                 return 0
-            } else
+            else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_RIGHT]).isSolid)
+                // has tile on the right
+                return 2
+            else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_LEFT]).isSolid)
+                // has tile on the left
+                return 1
+            else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_BACK]).isSolid)
+                // has tile on the back
+                return 0
+            else
                 return 3
         } catch (e: ArrayIndexOutOfBoundsException) {
-            return if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_BACK]).isSolid)
-                0
-            else
-                3
+            return if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_DOWN]).isSolid)
+                // has tile on the bottom
+                3 else 0
         }
 
     }

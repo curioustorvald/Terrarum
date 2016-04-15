@@ -166,7 +166,10 @@ class BasicDebugInfoWindow : UICanvas {
                 Lang["DEV_COLOUR_LEGEND_BLUE"] + " :  nextHitbox", (Terrarum.WIDTH - 200).toFloat()
                 , line(3).toFloat())
 
-        drawHistogram(g, LightmapRenderer.histogram, Terrarum.WIDTH - 256 - 30, Terrarum.HEIGHT - 100 - 30)
+        drawHistogram(g, LightmapRenderer.histogram,
+                Terrarum.WIDTH - histogramW - 30,
+                Terrarum.HEIGHT - histogramH - 30
+        )
     }
 
     private fun printLine(g: Graphics, l: Int, s: String) {
@@ -177,17 +180,19 @@ class BasicDebugInfoWindow : UICanvas {
         g.drawString(s, (20 + column(col)).toFloat(), line(row).toFloat())
     }
 
+    val histogramW = 256
+    val histogramH = 200
+
     private fun drawHistogram(g: Graphics, histogram: LightmapRenderer.Histogram, x: Int, y: Int) {
-        val uiColour = Color(0x99000000.toInt())
-        val barR = Color(0xFF0000.toInt())
-        val barG = Color(0x00FF00.toInt())
-        val barB = Color(0x0000FF.toInt())
+        val uiColour = Color(0xAA000000.toInt())
+        val barR = Color(0xDD0000.toInt())
+        val barG = Color(0x00DD00.toInt())
+        val barB = Color(0x0000DD.toInt())
         val barColour = arrayOf(barR, barG, barB)
-        val w = 256.toFloat()
-        val h = 100.toFloat()
+        val w = histogramW.toFloat()
+        val h = histogramH.toFloat()
         val range = histogram.range
-        val histogramMax = histogram.screen_tiles
-        //val histogramMax = histogram.histogramMax
+        val histogramMax = histogram.screen_tiles.toFloat()
 
         g.color = uiColour
         g.fillRect(x.toFloat(), y.toFloat(), w.plus(1).toFloat(), h.toFloat())
@@ -203,9 +208,10 @@ class BasicDebugInfoWindow : UICanvas {
                 }
 
                 val bar_x = x + (w / w.minus(1).toFloat()) * i.toFloat()
-                val bar_h = FastMath.ceil(h / histogramMax.toFloat()) * histogram_value.toFloat()
-                val bar_y = y + (h / histogramMax.toFloat()) - bar_h + h
+                val bar_h = FastMath.ceil(h / histogramMax * histogram_value.toFloat()).toFloat()
+                val bar_y = y + (h / histogramMax) - bar_h + h
                 val bar_w = 1f
+
                 g.color = barColour[c]
                 g.fillRect(bar_x, bar_y, bar_w, bar_h)
             }

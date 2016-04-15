@@ -619,8 +619,7 @@ object LightmapRenderer {
         val GREEN = 1
         val BLUE = 2
 
-        val screen_tiles: Int
-            get() = (for_x_end - for_x_start + 2) * (for_y_end - for_y_start + 2)
+        val screen_tiles: Int = (for_x_end - for_x_start + 2) * (for_y_end - for_y_start + 2)
 
         val brightest: Int
             get() {
@@ -645,20 +644,7 @@ object LightmapRenderer {
                 return CHANNEL_MAX
             }
 
-        val histogramMax: Int
-            get() {
-                var max = 0
-                for (c in 0..2) {
-                    for (i in 0..CHANNEL_MAX) {
-                        val value = get(c)[i]
-                        if (value > max) max = value
-                    }
-                }
-                return max
-            }
-
-        val range: Int
-            get() = reds.size
+        val range: Int = CHANNEL_MAX
 
         fun get(index: Int): IntArray {
             return when (index) {
