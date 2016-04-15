@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import net.torvald.imagefont.GameFontWhite
 import net.torvald.JsonFetcher
 import net.torvald.JsonWriter
+import net.torvald.imagefont.SmallNumbers
 import org.lwjgl.input.Controllers
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
@@ -46,6 +47,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
     @Throws(SlickException::class)
     override fun initStatesList(gc: GameContainer) {
         gameFont = GameFontWhite()
+        smallNumbers = SmallNumbers()
 
         hasController = gc.input.controllerCount > 0
         if (hasController) {
@@ -100,6 +102,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         var gameLocale = "" // locale override
 
         lateinit var gameFont: Font
+            private set
+        lateinit var smallNumbers: Font
+            private set
 
         val SCENE_ID_HOME = 1
         val SCENE_ID_GAME = 3

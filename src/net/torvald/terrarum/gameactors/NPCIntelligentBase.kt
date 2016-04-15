@@ -15,7 +15,7 @@ open class NPCIntelligentBase : ActorWithBody()
         , AIControlled, Pocketed, CanBeAnItem, Factionable, LandHolder {
 
     override var itemData: InventoryItem = object : InventoryItem {
-        override var itemID = HQRNG().nextLong()
+        override var itemID = HQRNG().nextInt()
 
         override var mass: Float
             get() = actorValue.get("mass") as Float
@@ -55,7 +55,7 @@ open class NPCIntelligentBase : ActorWithBody()
 
     private val factionSet = HashSet<Faction>()
 
-    override var referenceID: Long = HQRNG().nextLong()
+    override var referenceID: Int = HQRNG().nextInt()
 
     override var faction: HashSet<Faction> = HashSet()
 

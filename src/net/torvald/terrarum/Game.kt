@@ -172,18 +172,20 @@ constructor() : BasicGameState() {
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
         setBlendNormal()
 
+        // determine if lightmap blending should be done
         Terrarum.gameConfig["smoothlighting"] = KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH)
 
+        // set antialias as on
         if (!g.isAntiAlias) g.isAntiAlias = true
 
         drawSkybox(g)
 
         // compensate for zoom. UIs have to be treated specially! (see UIHandler)
-        g.translate(
-                -MapCamera.cameraX * screenZoom, -MapCamera.cameraY * screenZoom)
+        g.translate(-MapCamera.cameraX * screenZoom, -MapCamera.cameraY * screenZoom)
 
         MapCamera.renderBehind(gc, g)
 
+        // draw actors
         actorContainer.forEach { actor -> if (actor is Visible) actor.drawBody(gc, g) }
         player.drawBody(gc, g)
 
@@ -201,9 +203,27 @@ constructor() : BasicGameState() {
 
         setBlendNormal()
 
+        // draw actor glows
         actorContainer.forEach { actor -> if (actor is Glowing) actor.drawGlow(gc, g) }
         player.drawGlow(gc, g)
 
+        // draw reference ID if debugWindow is open
+        if (debugWindow.isVisible) {
+            actorContainer.forEach { actor ->
+                if (actor is Visible) {
+                    g.color = Color.white
+                    g.font = Terrarum.smallNumbers
+                    g.drawString(
+                            actor.referenceID.toString(),
+                            actor.hitbox.posX,
+                            actor.hitbox.pointedY + 4
+                    )
+                    g.font = Terrarum.gameFont
+                }
+            }
+        }
+
+        // draw UIs
         uiContainer.forEach { ui -> ui.render(gc, g) }
         debugWindow.render(gc, g)
         consoleHandler.render(gc, g)
@@ -287,14 +307,14 @@ constructor() : BasicGameState() {
     /**
      * actorContainer extensions
      */
-    fun hasActor(ID: Long): Boolean {
+    fun hasActor(ID: Int): Boolean {
         for (actor in actorContainer) {
             if (actor.referenceID == ID) return true
         }
         return false
     }
 
-    fun removeActor(ID: Long) {
+    fun removeActor(ID: Int) {
         for (actor in actorContainer) {
             if (actor.referenceID == ID)
                 actorContainer.remove(actor)
@@ -307,7 +327,7 @@ constructor() : BasicGameState() {
         return true
     }
 
-    fun getActor(ID: Long): Actor {
+    fun getActor(ID: Int): Actor {
         for (actor in actorContainer) {
             if (actor.referenceID == ID)
                 return actor

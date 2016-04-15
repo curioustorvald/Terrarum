@@ -53,11 +53,11 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
     internal var baseSpriteWidth: Int = 0
     internal var baseSpriteHeight: Int = 0
 
-    override var referenceID: Long = 0L
+    override var referenceID: Int = 0
     /**
      * Positions: top-left point
      */
-    val hitbox = Hitbox(0f,0f,0f,0f)
+    override val hitbox = Hitbox(0f,0f,0f,0f)
     @Transient val nextHitbox = Hitbox(0f,0f,0f,0f)
 
     /**
@@ -137,7 +137,7 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
 
     init {
         do {
-            referenceID = HQRNG().nextLong() // set new ID
+            referenceID = HQRNG().nextInt() // set new ID
         } while (Terrarum.game.hasActor(referenceID)) // check for collision
 
         map = Terrarum.game.map

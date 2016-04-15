@@ -8,12 +8,12 @@ import org.newdawn.slick.GameContainer
  */
 class TileAsItem(tileNum: Int) : InventoryItem {
 
-    override var itemID: Long = -1
+    override var itemID: Int = 0
     override var mass: Float = 0f
     override var scale: Float = 1f
 
     init {
-        itemID = tileNum.toLong()
+        itemID = tileNum
         mass = TilePropCodex.getProp(tileNum).density / 1000f
     }
 

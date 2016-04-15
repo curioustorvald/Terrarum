@@ -29,9 +29,9 @@ object ItemPropCodex {
 
     }
 
-    fun getItem(code: Long): InventoryItem {
+    fun getItem(code: Int): InventoryItem {
         if (code < ITEM_UNIQUE_MAX)
-            return itemCodex[(code and 0xFFFFFFFF).toInt()]
+            return itemCodex[code]
         else {
             for (actor in Terrarum.game.actorContainer) {
                 if (actor is CanBeAnItem && actor.referenceID == code)

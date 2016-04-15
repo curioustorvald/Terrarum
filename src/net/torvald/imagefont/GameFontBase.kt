@@ -156,9 +156,7 @@ constructor() : Font {
 
     override fun getLineHeight() = H
 
-    override fun drawString(x: Float, y: Float, s: String) {
-        drawString(x, y, s, Color.white)
-    }
+    override fun drawString(x: Float, y: Float, s: String) = drawString(x, y, s, Color.white)
 
     override fun drawString(x: Float, y: Float, s: String, color: Color) {
         GL11.glEnable(GL11.GL_BLEND)
@@ -364,10 +362,13 @@ constructor() : Font {
                     )*/
                     sheetKey[prevInstance].getSubImage(sheetX, sheetY).draw(
                             Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat() // Interchar: pull punct right next to hangul to the left
-                            + if (i > 0 && isHangul(s[i - 1])) -3f else 0f,
+                            + if (i > 0 && isHangul(s[i - 1])) -3f
+                            else 0f,
+
                             Math.round(y).toFloat() + (if (prevInstance == SHEET_CJK_PUNCT) -1
                             else if (prevInstance == SHEET_FW_UNI) (H - H_HANGUL) / 2
                             else 0).toFloat(),
+
                             color
                     )
                 }

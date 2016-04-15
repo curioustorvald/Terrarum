@@ -12,7 +12,7 @@ interface InventoryItem {
      * 4097-32767: Various items
      * >=32768: Actor RefID
      */
-    var itemID: Long
+    var itemID: Int
 
     /**
      * Weight of the item, Float

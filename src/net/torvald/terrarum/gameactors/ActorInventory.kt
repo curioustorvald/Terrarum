@@ -23,7 +23,7 @@ class ActorInventory() {
     /**
      * &lt;ReferenceID, Amounts&gt;
      */
-    private val itemList: HashMap<Long, Int> = HashMap()
+    private val itemList: HashMap<Int, Int> = HashMap()
 
     /**
      * Default constructor with no encumbrance.
@@ -74,7 +74,7 @@ class ActorInventory() {
      * Get reference to the itemList
      * @return
      */
-    fun getItemList(): Map<Long, Int>? {
+    fun getItemList(): Map<Int, Int>? {
         return itemList
     }
 
@@ -83,8 +83,8 @@ class ActorInventory() {
      * @return
      */
     @Suppress("UNCHECKED_CAST")
-    fun getCopyOfItemList(): Map<Long, Int>? {
-        return itemList.clone() as Map<Long, Int>
+    fun getCopyOfItemList(): Map<Int, Int>? {
+        return itemList.clone() as Map<Int, Int>
     }
 
     fun getTotalWeight(): Float {

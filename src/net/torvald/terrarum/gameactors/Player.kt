@@ -79,7 +79,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         @Transient internal const val WALK_STOP_ACCEL = 0.32f
         @Transient internal const val WALK_ACCEL_BASE = 0.32f
 
-        @Transient const val PLAYER_REF_ID: Long = 0x51621D
+        @Transient const val PLAYER_REF_ID: Int = 0x51621D
         @Transient const val BASE_HEIGHT = 40
     }
 
