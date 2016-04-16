@@ -1,14 +1,14 @@
 "STRING_ID";"IETF language tag(s) without dash";"enUS";"frFR";"esES";"deDE";"itIT";"ptBR";"ptPT";"ruRU";"elGR";"trTR";"daDK";"noNB";"svSE";"nlNL";"plPL";"fiFI";"jaJP";"zhCN";"zhTW";"koKR";"csCZ";"huHU";"roRO";"thTH";"bgBG";"heIL";"jakanaJP";"isIC"
 
 "HELP_OTF_MAIN_1";;"Type “help slow” for the ways to make the game run faster.";"Tapez « help slow » si votre jeu fonctionne lentement.";;;;;;;;;;;;;;;"ゲームの実行がおそければ「help slow」を入力してください。";;;"게임이 느리게 돌아간다면 “help slow”를 입력해 보세요."
-"HELP_OTF_MAIN_2";;"Press PageUp/PageDown to scroll the messages.";"Appuyez sur PageUp/PageDown pour faire défiler les messages.";;;;;;;;;;;;;;;"PageUp/PageDownを使ってメッセージのスクロールができます。";;;"PageUp/PageDown 키를 사용해 메시지를 스크롤할 수 있습니다."
+"HELP_OTF_MAIN_2";;"Press PageUp/PageDown to scroll the messages.";"Appuyez sur PageUp/PageDown pour faire défiler les messages.";;;;;;;;;;;;;;;"PageUp/PageDownキーを使ってメッセージのスクロールができます。";;;"PageUp/PageDown 키를 사용해 메시지를 스크롤할 수 있습니다."
 "HELP_OTF_MAIN_3";;"Utility keys:";"Touches utilitaires:";;;;;;;;;;;;;;;"技能キー";;;"기능 키:"
-"HELP_OTF_MAIN_4";;"• F3: basic information";"• F3: informations de base";;;;;;;;;;;;;;;"• F3: 基本的な情報";;;"• F3: 기본 정보"
-"HELP_OTF_MAIN_5";;"• F7: (debug) toggle light blending";"• F7: (déboguer) basculer fusion de lumière";;;;;;;;;;;;;;;"• F7: (デバッグ)光源のブレンドON/OFF";;;"• F7: (디버그용) 광원 블렌딩 켜고 끄기"
-"HELP_OTF_MAIN_6";;"• F8: toggle smooth lighting";"• F8: basculer éclairage lisse";;;;;;;;;;;;;;;"• F8: すべすべの光源ON/OFF";;;"• F8: 부드러운 광원 켜고 끄기"
+"HELP_OTF_MAIN_4";;"• F3: (debug) basic information";"• F3: (déboguer) informations de base";;;;;;;;;;;;;;;"• F3: (デバッグ)基本的な情報";;;"• F3: (디버그) 기본 정보"
+"HELP_OTF_MAIN_5";;"• F7: (debug) toggle light blending";"• F7: (déboguer) basculer fusion de lumière";;;;;;;;;;;;;;;"• F7: (デバッグ)光源のブレンドON/OFF";;;"• F7: (디버그) 광원 블렌딩 켜고 끄기"
+"HELP_OTF_MAIN_6";;"• F8: toggle smooth lighting effect";"• F8: basculer effet éclairage lisse";;;;;;;;;;;;;;;"• F8: すべすべの光源効果ON/OFF";;;"• F8: 부드러운 광원 효과 켜고 끄기"
 
 "HELP_OTF_SLOW_1";;"If your game runs slowly:";"Si votre jeu tourne lentement :";;;;;;;;;;;;;;;"ゲームの実行がおそければ";;;"게임이 느리게 돌아간다면"
 "HELP_OTF_SLOW_2";;"• Reset screen zoom to 1.";"• Réinitialisez le zoom de l‘écran à 1.";;;;;;;;;;;;;;;"• スクリーンのズームを1倍にリセットしてください。";;;"• 화면 줌을 1로 돌려주세요. "
 "HELP_OTF_SLOW_3";;"• Close the basic information window.";"• Désactivez la fenêtre d‘informations.";;;;;;;;;;;;;;;"• 情報ウィンドウをとじてください。";;;"• 기본 정보 창을 꺼 주세요."
-"HELP_OTF_SLOW_4";;"• Turn off smooth lighting. You can do it now by pressing F8.";"• Désactivez éclairage lisse en utilisant F8.";;;;;;;;;;;;;;;"• F8で、すべすべの光源をオフしてください。";;;"• 부드러운 광원 효과를 꺼 주세요. F8을 사용할 수 있습니다."
+"HELP_OTF_SLOW_4";;"• Turn off smooth lighting effect. You can do it now by pressing F8.";"• Désactivez effet éclairage lisse en utilisant F8.";;;;;;;;;;;;;;;"• F8で、すべすべの光源効果をオフしてください。";;;"• 부드러운 광원 효과를 꺼 주세요. F8을 사용할 수 있습니다."
 
