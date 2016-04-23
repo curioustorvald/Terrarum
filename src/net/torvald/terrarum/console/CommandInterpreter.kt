@@ -48,9 +48,9 @@ object CommandInterpreter {
                     }
                 }
                 catch (e: Exception) {
-                    println("[CommandInterpreter] :")
+                    System.err.print("[CommandInterpreter] ")
                     e.printStackTrace()
-                    Echo().execute(Lang.get("ERROR_GENERIC_TEXT"))
+                    Echo().error(Lang["ERROR_GENERIC_TEXT"])
                 }
 
             }
@@ -92,8 +92,8 @@ object CommandInterpreter {
         val sb = StringBuilder()
         val formatter = Formatter(sb)
 
-        Echo().execute(
-                formatter.format(Lang.get("DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN"), cmdname).toString())
+        Echo().error(
+                formatter.format(Lang["DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN"], cmdname).toString())
     }
 
     private class CommandInput(o: Array<Any>) {

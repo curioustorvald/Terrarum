@@ -16,7 +16,7 @@ import org.newdawn.slick.Graphics
  *
  * Created by minjaesong on 16-03-14.
  */
-open class ActorWithBody constructor() : Actor, Visible, Glowing {
+open class ActorWithBody constructor() : Actor(), Visible {
 
     override var actorValue: ActorValue = ActorValue()
 
@@ -26,15 +26,13 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
     var baseHitboxH: Int = 0
 
     /**
-     * Velocity for newtonian sim.
-     * Fluctuation in, otherwise still, velocity is equal to acceleration.
-
+     * Velocity vector (broken down by axes) for newtonian sim.
      * Acceleration: used in code like:
      * veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
-    @Volatile var veloX: Float = 0.toFloat()
-    @Volatile var veloY: Float = 0.toFloat()
+    var veloX: Float = 0.toFloat()
+    var veloY: Float = 0.toFloat()
     @Transient private val VELO_HARD_LIMIT = 10000f
 
     var grounded = false
@@ -61,16 +59,17 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
     @Transient val nextHitbox = Hitbox(0f,0f,0f,0f)
 
     /**
-     * Physical properties
+     * Physical properties.
+     * Values derived from ActorValue must be @Transient.
      */
-    @Volatile @Transient var scale = 1f
-    @Volatile @Transient var mass = 2f
+    @Transient var scale = 1f
+    @Transient var mass = 2f
     @Transient private val MASS_LOWEST = 2f
     /** Valid range: [0, 1]  */
     var elasticity = 0f
         set(value) {
             if (value < 0)
-                throw IllegalArgumentException("[ActorWithBody] $value: valid elasticity value is [0, 1].")
+                throw IllegalArgumentException("[ActorWithBody] Invalid elasticity value: $value; valid elasticity value is [0, 1].")
             else if (value > 1) {
                 println("[ActorWithBody] Elasticity were capped to 1.")
                 field = ELASTICITY_MAX
@@ -89,11 +88,11 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
      */
     @Transient private val METER = 24f
     /**
-     * [m / s^2] * SI_TO_GAME_ACC -> [px / IFrame^2]
+     * [m / s^2] * SI_TO_GAME_ACC -> [px / InternalFrame^2]
      */
     @Transient private val SI_TO_GAME_ACC = METER / FastMath.sqr(Terrarum.TARGET_FPS.toFloat())
     /**
-     * [m / s] * SI_TO_GAME_VEL -> [px / IFrame]
+     * [m / s] * SI_TO_GAME_VEL -> [px / InternalFrame]
      */
     @Transient private val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
 
@@ -131,6 +130,8 @@ open class ActorWithBody constructor() : Actor, Visible, Glowing {
 
     @Transient private val MASS_DEFAULT = 60f
 
+    internal val physSleep: Boolean
+        get() = veloX.abs() < 0.5 && veloY.abs() < 0.5
 
     private var posAdjustX = 0
     private var posAdjustY = 0

@@ -12,4 +12,8 @@ interface Visible {
     fun drawBody(gc: GameContainer, g: Graphics)
 
     fun updateBodySprite(gc: GameContainer, delta: Int)
+
+    fun drawGlow(gc: GameContainer, g: Graphics)
+
+    fun updateGlowSprite(gc: GameContainer, delta: Int)
 }

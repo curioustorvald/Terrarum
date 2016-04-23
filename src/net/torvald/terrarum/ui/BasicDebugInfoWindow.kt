@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.jme3.math.FastMath
+import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.gamemap.PairedMapLayer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
@@ -18,7 +19,7 @@ import java.util.*
 /**
  * Created by minjaesong on 16-03-14.
  */
-class BasicDebugInfoWindow : UICanvas {
+class BasicDebugInfoWindow:UICanvas {
 
     override var width: Int = Terrarum.WIDTH
     override var height: Int = Terrarum.HEIGHT
@@ -59,30 +60,35 @@ class BasicDebugInfoWindow : UICanvas {
         val mouseTileX = ((MapCamera.cameraX + gc.input.mouseX / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
         val mouseTileY = ((MapCamera.cameraY + gc.input.mouseY / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
 
-        g.color = Color.white
+        g.font = Terrarum.smallNumbers
+        g.color = GameFontBase.codeToCol["y"]
 
         val hitbox = player.hitbox
         val nextHitbox = player.nextHitbox
 
-        printLine(g, 1, "posX: "
+        val ccG = "${GameFontBase.colToCode["g"]}"
+
+        printLine(g, 1, "posX "
+                + ccG
                 + "${hitbox.pointedX.toString()}"
                 + " ("
                 + "${(hitbox.pointedX / MapDrawer.TILE_SIZE).toInt().toString()}"
                 + ")")
-        printLine(g, 2, "posY: "
+        printLine(g, 2, "posY "
+                + ccG
                 + hitbox.pointedY.toString()
                 + " ("
                 + (hitbox.pointedY / MapDrawer.TILE_SIZE).toInt().toString()
                 + ")")
 
-        printLine(g, 3, "veloX reported: ${player.veloX}")
-        printLine(g, 4, "veloY reported: ${player.veloY}")
+        printLine(g, 3, "veloX reported $ccG${player.veloX}")
+        printLine(g, 4, "veloY reported $ccG${player.veloY}")
 
-        printLineColumn(g, 2, 3, "veloX measured: ${xdelta}")
-        printLineColumn(g, 2, 4, "veloY measured: ${ydelta}")
+        printLineColumn(g, 2, 3, "veloX measured $ccG${xdelta}")
+        printLineColumn(g, 2, 4, "veloY measured $ccG${ydelta}")
 
-        printLine(g, 5, "grounded : ${player.grounded}")
-        printLine(g, 6, "noClip : ${player.noClip}")
+        printLine(g, 5, "grounded $ccG${player.grounded}")
+        printLine(g, 6, "noClip $ccG${player.noClip}")
 
         val lightVal: String
         var mtX = mouseTileX.toString()
@@ -100,7 +106,7 @@ class BasicDebugInfoWindow : UICanvas {
                     rawB.toString() + ")"
 
 
-        printLine(g, 7, "light at cursor : " + lightVal)
+        printLine(g, 7, "light@cursor $ccG$lightVal")
 
         val tileNo: String
         val tileNumRaw = Terrarum.game.map.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
@@ -108,32 +114,21 @@ class BasicDebugInfoWindow : UICanvas {
         val tiledmg = tileNumRaw % PairedMapLayer.RANGE
         tileNo = if (tileNumRaw == -1) "—" else "$tilenum:$tiledmg"
 
-        printLine(g, 8, "tile at cursor : $tileNo ($mtX, $mtY)")
+        printLine(g, 8, "tile@cursor $ccG$tileNo ($mtX, $mtY)")
 
         /**
          * Second column
          */
 
-        printLineColumn(g, 2, 1, "${Lang["MENU_OPTIONS_VSYNC"]} : " + Terrarum.appgc.isVSyncRequested)
-        printLineColumn(g, 2, 2, "Env colour temp : " + MapDrawer.getColTemp())
-        printLineColumn(g, 2, 5, "Time : ${Terrarum.game.map.worldTime.elapsedSeconds()}" +
+        printLineColumn(g, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
+        printLineColumn(g, 2, 2, "Env colour temp $ccG" + MapDrawer.getColTemp())
+        printLineColumn(g, 2, 5, "Time $ccG${Terrarum.game.map.worldTime.elapsedSeconds()}" +
                                  " (${Terrarum.game.map.worldTime.getFormattedTime()})")
-        printLineColumn(g, 2, 6, "Mass : ${player.mass}")
+        printLineColumn(g, 2, 6, "Mass $ccG${player.mass}")
 
         /**
          * On screen
          */
-
-        // Memory allocation
-        val memInUse = Terrarum.game.memInUse
-        val totalVMMem = Terrarum.game.totalVMMem
-
-        g.color = Color(0xFF7F00)
-        g.drawString(
-                Lang["DEV_MEMORY_SHORT_CAP"]
-                        + " : "
-                        + formatter.format(
-                        Lang["DEV_MEMORY_A_OF_B"], memInUse, totalVMMem), (Terrarum.WIDTH - 200).toFloat(), line(1).toFloat())
 
         // Hitbox
         val zoom = Terrarum.game.screenZoom
@@ -148,12 +143,12 @@ class BasicDebugInfoWindow : UICanvas {
                 , (hitbox.pointedY - 1) * zoom - MapCamera.cameraY * zoom
                 , 3f, 3f)
         g.drawString(
-                Lang["DEV_COLOUR_LEGEND_GREEN"] + " :  hitbox", (Terrarum.WIDTH - 200).toFloat()
-                , line(2).toFloat())
+                "hitbox", (Terrarum.WIDTH - 15 * 8 - 2).toFloat().toFloat()
+                , line(1))
 
         // Next hitbox
         g.color = Color.blue
-        g.drawRect(nextHitbox!!.hitboxStart.x * zoom - MapCamera.cameraX * zoom
+        g.drawRect(nextHitbox.hitboxStart.x * zoom - MapCamera.cameraX * zoom
                 , nextHitbox.hitboxStart.y * zoom - MapCamera.cameraY * zoom
                 , nextHitbox.width * zoom
                 , nextHitbox.height * zoom)
@@ -163,21 +158,41 @@ class BasicDebugInfoWindow : UICanvas {
                 , (nextHitbox.pointedY - 1) * zoom - MapCamera.cameraY * zoom
                 , 3f, 3f)
         g.drawString(
-                Lang["DEV_COLOUR_LEGEND_BLUE"] + " :  nextHitbox", (Terrarum.WIDTH - 200).toFloat()
-                , line(3).toFloat())
+                "nextHitbox", (Terrarum.WIDTH - 15 * 8 - 2).toFloat().toFloat()
+                , line(2))
 
         drawHistogram(g, LightmapRenderer.histogram,
                 Terrarum.WIDTH - histogramW - 30,
                 Terrarum.HEIGHT - histogramH - 30
         )
+
+        g.color = GameFontBase.codeToCol["y"]
+        g.drawString("MEM ", (Terrarum.WIDTH - 15 * 8 - 2).toFloat(), 2f)
+        //g.drawString("FPS ", (Terrarum.WIDTH - 6 * 8 - 2).toFloat(), 10f)
+        g.drawString("Actors total ", 2f, Terrarum.HEIGHT - 10f)
+        g.drawString("Active ", (2 + 17*8).toFloat(), Terrarum.HEIGHT - 10f)
+
+        g.color = GameFontBase.codeToCol["g"]
+        g.drawString("${Terrarum.game.memInUse}M",
+                (Terrarum.WIDTH - 11 * 8 - 2).toFloat(), 2f)
+        g.drawString("/${Terrarum.game.totalVMMem}M",
+                (Terrarum.WIDTH - 6 * 8 - 2).toFloat(), 2f)
+        //g.drawString("${Terrarum.appgc.fps}",
+        //        (Terrarum.WIDTH - 2 * 8 - 2).toFloat(), 10f)
+        g.drawString("${Terrarum.game.actorContainer.size + Terrarum.game.actorcontainerInactive.size}",
+                (2 + 13*8).toFloat(), Terrarum.HEIGHT - 10f
+        )
+        g.drawString(Terrarum.game.actorContainer.size.toString(),
+                (2 + 24*8).toFloat(), Terrarum.HEIGHT - 10f
+        )
     }
 
     private fun printLine(g: Graphics, l: Int, s: String) {
-        g.drawString(s, 20f, line(l).toFloat())
+        g.drawString(s, 10f, line(l).toFloat())
     }
 
     private fun printLineColumn(g: Graphics, col: Int, row: Int, s: String) {
-        g.drawString(s, (20 + column(col)).toFloat(), line(row).toFloat())
+        g.drawString(s, (10 + column(col)).toFloat(), line(row).toFloat())
     }
 
     val histogramW = 256
@@ -196,6 +211,10 @@ class BasicDebugInfoWindow : UICanvas {
 
         g.color = uiColour
         g.fillRect(x.toFloat(), y.toFloat(), w.plus(1).toFloat(), h.toFloat())
+        g.color = Color.gray
+        g.drawString("0", x.toFloat(), y.toFloat() + h + 2)
+        g.drawString("255", x.toFloat() + w + 1 - 8*3, y.toFloat() + h + 2)
+        g.drawString("Histogramme", x + w / 2 - 5.5f * 8, y.toFloat() + h + 2)
 
         setBlendScreen()
         for (c in 0..2) {
@@ -219,9 +238,9 @@ class BasicDebugInfoWindow : UICanvas {
         setBlendNormal()
     }
 
-    private fun line(i: Int): Int = i * 20
+    private fun line(i: Int): Float = i * 10f
 
-    private fun column(i: Int): Int = 250 * (i - 1)
+    private fun column(i: Int): Float = 250f * (i - 1)
 
     override fun doOpening(gc: GameContainer, delta: Int) {
 

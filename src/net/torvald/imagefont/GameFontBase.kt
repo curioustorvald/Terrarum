@@ -53,7 +53,7 @@ constructor() : Font {
 
     private fun isHangul(c: Char) = c.toInt() >= 0xAC00 && c.toInt() < 0xD7A4
 
-    private fun isAscii(c: Char) = c.toInt() > 0 && c.toInt() <= 0xFF
+    private fun isAscii(c: Char) = c.toInt() > 0x20 && c.toInt() <= 0xFF
 
     private fun isRunic(c: Char) = runicList.contains(c)
 
@@ -138,7 +138,9 @@ constructor() : Font {
 
             }
 
-            if (c == SHEET_ASCII_EF || c == SHEET_EXTA_EF || c == SHEET_CYRILIC_EF)
+            if (c == SHEET_COLOURCODE)
+                len += 0
+            else if (c == SHEET_ASCII_EF || c == SHEET_EXTA_EF || c == SHEET_CYRILIC_EF)
                 len += W_LATIN_NARROW
             else if (c == SHEET_KANA || c == SHEET_HANGUL || c == SHEET_CJK_PUNCT)
                 len += W_CJK
@@ -163,11 +165,18 @@ constructor() : Font {
         GL11.glColorMask(true, true, true, true)
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
 
+        var thisCol = color
+
         // hangul fonts first
         //hangulSheet.startUse() // disabling texture binding to make the font coloured
         // JOHAB
         for (i in 0..s.length - 1) {
             val ch = s[i]
+
+            if (ch.isColourCode()) {
+                thisCol = colourKey[ch]!!
+                continue
+            }
 
             if (isHangul(ch)) {
                 val hIndex = ch.toInt() - 0xAC00
@@ -204,17 +213,17 @@ constructor() : Font {
                 hangulSheet.getSubImage(indexCho, choRow).draw(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
-                        color
+                        thisCol
                 )
                 hangulSheet.getSubImage(indexJung, jungRow).draw(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
-                        color
+                        thisCol
                 )
                 hangulSheet.getSubImage(indexJong, jongRow).draw(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
-                        color
+                        thisCol
                 )
             }
         }
@@ -246,6 +255,11 @@ constructor() : Font {
         for (i in 0..s.length - 1) {
             val ch = s[i]
 
+            if (ch.isColourCode()) {
+                thisCol = colourKey[ch]!!
+                continue
+            }
+
             if (isWenQuanYi1(ch)) {
                 val glyphW = getWidth("" + ch)
                 /*wenQuanYi_1.renderInUse(
@@ -257,7 +271,7 @@ constructor() : Font {
                 wenQuanYi_1.getSubImage(wenQuanYiIndexX(ch), wenQuanYi1IndexY(ch)).draw(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round((H - H_UNIHAN) / 2 + y).toFloat(),
-                        color
+                        thisCol
                 )
             }
         }
@@ -268,6 +282,11 @@ constructor() : Font {
 
         for (i in 0..s.length - 1) {
             val ch = s[i]
+
+            if (ch.isColourCode()) {
+                thisCol = colourKey[ch]!!
+                continue
+            }
 
             if (isWenQuanYi2(ch)) {
                 val glyphW = getWidth("" + ch)
@@ -280,7 +299,7 @@ constructor() : Font {
                 wenQuanYi_2.getSubImage(wenQuanYiIndexX(ch), wenQuanYi2IndexY(ch)).draw(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round((H - H_UNIHAN) / 2 + y).toFloat(),
-                        color
+                        thisCol
                 )
             }
         }
@@ -291,6 +310,11 @@ constructor() : Font {
         var prevInstance = -1
         for (i in 0..s.length - 1) {
             val ch = s[i]
+
+            if (ch.isColourCode()) {
+                thisCol = colourKey[ch]!!
+                continue
+            }
 
             if (!isHangul(ch) && !isUniHan(ch)) {
 
@@ -369,7 +393,7 @@ constructor() : Font {
                             else if (prevInstance == SHEET_FW_UNI) (H - H_HANGUL) / 2
                             else 0).toFloat(),
 
-                            color
+                            thisCol
                     )
                 }
                 catch (e: ArrayIndexOutOfBoundsException) {
@@ -413,6 +437,8 @@ constructor() : Font {
             return SHEET_CJK_PUNCT
         else if (isFullwidthUni(c))
             return SHEET_FW_UNI
+        else if (c.isColourCode())
+            return SHEET_COLOURCODE
         else
             return SHEET_ASCII_EM// fixed width punctuations
         // fixed width
@@ -464,6 +490,8 @@ constructor() : Font {
         Terrarum.appgc.graphics.setDrawMode(Graphics.MODE_NORMAL)
     }
 
+    fun Char.isColourCode() = colourKey.containsKey(this)
+
     companion object {
 
         lateinit internal var hangulSheet: SpriteSheet
@@ -510,6 +538,8 @@ constructor() : Font {
         internal val SHEET_WENQUANYI_1 = 13
         internal val SHEET_WENQUANYI_2 = 14
 
+        internal val SHEET_COLOURCODE = 255
+
         lateinit internal var sheetKey: Array<SpriteSheet>
         internal val asciiEFList = arrayOf(' ', '!', '"', '\'', '(', ')', ',', '.', ':', ';', 'I', '[', ']', '`', 'f', 'i', 'j', 'l', 't', '{', '|', '}', 0xA1.toChar(), 'Ì', 'Í', 'Î', 'Ï', 'ì', 'í', 'î', 'ï', '·')
 
@@ -554,5 +584,30 @@ constructor() : Font {
         internal val runicList = arrayOf('ᚠ', 'ᚢ', 'ᚦ', 'ᚬ', 'ᚱ', 'ᚴ', 'ᚼ', 'ᚾ', 'ᛁ', 'ᛅ', 'ᛋ', 'ᛏ', 'ᛒ', 'ᛘ', 'ᛚ', 'ᛦ', 'ᛂ', '᛬', '᛫', '᛭', 'ᛮ', 'ᛯ', 'ᛰ')
 
         internal var interchar = 0
+
+        val colourKey = hashMapOf(
+                Pair(0x11.toChar(), Color(0xFFFFFF)), //w
+                Pair(0x12.toChar(), Color(0xFF8080)), //r
+                Pair(0x13.toChar(), Color(0x80FF80)), //g
+                Pair(0x14.toChar(), Color(0x8080FF)), //b
+                Pair(0x15.toChar(), Color(0xFFE080)), //y
+                Pair(0x16.toChar(), Color(0x808080))  //k
+        )
+        val colToCode = hashMapOf(
+                Pair("w", 0x11.toChar()),
+                Pair("r", 0x12.toChar()),
+                Pair("g", 0x13.toChar()),
+                Pair("b", 0x14.toChar()),
+                Pair("y", 0x15.toChar()),
+                Pair("k", 0x16.toChar())
+        )
+        val codeToCol = hashMapOf(
+                Pair("w", colourKey[0x11.toChar()]),
+                Pair("r", colourKey[0x12.toChar()]),
+                Pair("g", colourKey[0x13.toChar()]),
+                Pair("b", colourKey[0x14.toChar()]),
+                Pair("y", colourKey[0x15.toChar()]),
+                Pair("k", colourKey[0x16.toChar()])
+        )
     }
 }

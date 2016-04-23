@@ -59,16 +59,16 @@ class Col216 : LimitedColours {
 
     private fun assertRaw(i: Int) {
         if (i >= COLOUR_RANGE_SIZE || i < 0) {
-            println("i: " + i.toString())
+            System.err.println("Illegal colour input: $i")
             throw IllegalArgumentException()
         }
     }
 
     private fun assertRGB(r: Int, g: Int, b: Int) {
         if (r !in 0..MAX_STEP || g !in 0..MAX_STEP || b !in 0..MAX_STEP) {
-            println("r: " + r.toString())
-            println("g: " + g.toString())
-            println("b: " + b.toString())
+            System.err.println("Illegal colour input for channel r: $r")
+            System.err.println("Illegal colour input for channel g: $g")
+            System.err.println("Illegal colour input for channel b: $b")
             throw IllegalArgumentException()
         }
     }

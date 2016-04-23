@@ -33,7 +33,10 @@ constructor(val UI: UICanvas) {
     private var opening = false
     private var closing = false
     private var opened = false // fully opened
-    private var visible = false
+    private var _visible = false
+    val visible: Boolean
+        get() = if (alwaysVisible) true
+                else               _visible
 
     var openCloseCounter = 0
 
@@ -48,12 +51,12 @@ constructor(val UI: UICanvas) {
 
 
     fun update(gc: GameContainer, delta: Int) {
-        if (visible || alwaysVisible) {
+        if (_visible || alwaysVisible) {
             UI.update(gc, delta)
         }
 
         if (opening) {
-            visible = true
+            _visible = true
             openCloseCounter += delta
 
             // println("UI ${UI.javaClass.simpleName} (open)")
@@ -84,14 +87,14 @@ constructor(val UI: UICanvas) {
                 UI.endClosing(gc, delta)
                 closing = false
                 opened = false
-                visible = false
+                _visible = false
                 openCloseCounter = 0
             }
         }
     }
 
     fun render(gc: GameContainer, gameGraphicInstance: Graphics) {
-        if (visible || alwaysVisible) {
+        if (_visible || alwaysVisible) {
             UIGraphicInstance.clear()
             UIGraphicInstance.font = Terrarum.gameFont
 
@@ -113,22 +116,12 @@ constructor(val UI: UICanvas) {
         if (alwaysVisible) {
             throw RuntimeException("[UIHandler] Tried to 'set visibility of' constant UI")
         }
-        visible = b
+        _visible = b
     }
-
-    val isVisible: Boolean
-        get() {
-            if (alwaysVisible) {
-                return true
-            }
-            else {
-                return visible
-            }
-        }
 
     fun setAsAlwaysVisible() {
         alwaysVisible = true
-        visible = true
+        _visible = true
         opened = true
         opening = false
         closing = false
@@ -155,7 +148,7 @@ constructor(val UI: UICanvas) {
         if (alwaysVisible) {
             throw RuntimeException("[UIHandler] Tried to 'toggle opening of' constant UI")
         }
-        if (visible) {
+        if (_visible) {
             if (!closing) {
                 setAsClosing()
             }
@@ -168,61 +161,61 @@ constructor(val UI: UICanvas) {
     }
 
     fun processInput(input: Input) {
-        if (visible) {
+        if (_visible) {
             UI.processInput(input)
         }
     }
 
     fun keyPressed(key: Int, c: Char) {
-        if (visible && UI is UITypable) {
+        if (_visible && UI is UITypable) {
             UI.keyPressed(key, c)
         }
     }
 
     fun keyReleased(key: Int, c: Char) {
-        if (visible && UI is UITypable) {
+        if (_visible && UI is UITypable) {
             UI.keyReleased(key, c)
         }
     }
 
     fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        if (visible && UI is UIClickable) {
+        if (_visible && UI is UIClickable) {
             UI.mouseMoved(oldx, oldy, newx, newy)
         }
     }
 
     fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        if (visible && UI is UIClickable) {
+        if (_visible && UI is UIClickable) {
             UI.mouseDragged(oldx, oldy, newx, newy)
         }
     }
 
     fun mousePressed(button: Int, x: Int, y: Int) {
-        if (visible && UI is UIClickable) {
+        if (_visible && UI is UIClickable) {
             UI.mousePressed(button, x, y)
         }
     }
 
     fun mouseReleased(button: Int, x: Int, y: Int) {
-        if (visible && UI is UIClickable) {
+        if (_visible && UI is UIClickable) {
             UI.mouseReleased(button, x, y)
         }
     }
 
     fun mouseWheelMoved(change: Int) {
-        if (visible && UI is UIClickable) {
+        if (_visible && UI is UIClickable) {
             UI.mouseWheelMoved(change)
         }
     }
 
     fun controllerButtonPressed(controller: Int, button: Int) {
-        if (visible && UI is UIClickable) {
+        if (_visible && UI is UIClickable) {
             UI.controllerButtonPressed(controller, button)
         }
     }
 
     fun controllerButtonReleased(controller: Int, button: Int) {
-        if (visible && UI is UIClickable) {
+        if (_visible && UI is UIClickable) {
             UI.controllerButtonReleased(controller, button)
         }
     }
@@ -233,6 +226,6 @@ constructor(val UI: UICanvas) {
             if (alwaysVisible) {
                 return false
             }
-            return visible && !opening
+            return _visible && !opening
         }
 }

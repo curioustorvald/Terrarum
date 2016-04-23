@@ -15,7 +15,7 @@ class PhysTestBall : ActorWithBody {
     constructor(): super() {
         setHitboxDimension(16, 16, 0, 0)
         isVisible = true
-        mass = 10f
+        actorValue[AVKey.BASEMASS] = 10f
 
         color = RoguelikeRandomiser.composeColourFrom(RoguelikeRandomiser.POTION_PRIMARY_COLSET)
     }
@@ -23,9 +23,9 @@ class PhysTestBall : ActorWithBody {
     override fun drawBody(gc: GameContainer, g: Graphics) {
         g.color = color
         g.fillOval(
-                hitbox!!.posX,
-                hitbox!!.posY,
-                hitbox!!.width,
-                hitbox!!.height)
+                hitbox.posX,
+                hitbox.posY,
+                hitbox.width,
+                hitbox.height)
     }
 }

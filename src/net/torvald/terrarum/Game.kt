@@ -34,11 +34,17 @@ import java.util.*
  */
 class Game @Throws(SlickException::class)
 constructor() : BasicGameState() {
+    private val ACTOR_UPDATE_RANGE = 4096
+
     internal var game_mode = 0
 
     lateinit var map: GameMap
 
-    val actorContainer = LinkedList<Actor>()
+    /**
+     * Linked list of Actors that is sorted by Actors' referenceID
+     */
+    val actorContainer = ArrayList<Actor>(128)
+    val actorcontainerInactive = ArrayList<Actor>(128)
     val uiContainer = LinkedList<UIHandler>()
 
     lateinit var consoleHandler: UIHandler
@@ -128,7 +134,6 @@ constructor() : BasicGameState() {
         update_delta = delta
         setAppTitle()
 
-        // GL at after_sunrise-noon_before_sunset
         map.updateWorldTime(delta)
         map.globalLight = globalLightByTime
 
@@ -139,12 +144,19 @@ constructor() : BasicGameState() {
         MapDrawer.update(gc, delta)
         MapCamera.update(gc, delta)
 
-        actorContainer.forEach { actor -> actor.update(gc, delta) }
-        actorContainer.forEach { actor ->
-            if (actor is Visible) {
+        actorContainer.forEach { actor -> // update actors
+            if (actor !is Visible
+                    || actor is Visible && distToActorSqr(actor, player) < ACTOR_UPDATE_RANGE.sqr())
+            // update if the does not have specific position. (visible)
+            // if the actor has position (visible), update only if it is within the range
+                actor.update(gc, delta)
+        }
+        actorContainer.forEach { actor -> // update sprite(s)
+            if (actor is Visible &&
+                    distToActorSqr(actor, player) <= (Terrarum.WIDTH.plus(actor.hitbox.width.div(2)).sqr() +
+                                                      Terrarum.HEIGHT.plus(actor.hitbox.height.div(2)).sqr())
+            ) { // if visible and within screen
                 actor.updateBodySprite(gc, delta)
-            }
-            if (actor is Glowing) {
                 actor.updateGlowSprite(gc, delta)
             }
         }
@@ -186,7 +198,14 @@ constructor() : BasicGameState() {
         MapCamera.renderBehind(gc, g)
 
         // draw actors
-        actorContainer.forEach { actor -> if (actor is Visible) actor.drawBody(gc, g) }
+        actorContainer.forEach { actor ->
+            if (actor is Visible &&
+                distToActorSqr(actor, player) <= (Terrarum.WIDTH.plus(actor.hitbox.width.div(2)).sqr() +
+                                                  Terrarum.HEIGHT.plus(actor.hitbox.height.div(2)).sqr())
+            ) { // if visible and within screen
+                actor.drawBody(gc, g)
+            }
+        }
         player.drawBody(gc, g)
 
         LightmapRenderer.renderLightMap()
@@ -204,12 +223,19 @@ constructor() : BasicGameState() {
         setBlendNormal()
 
         // draw actor glows
-        actorContainer.forEach { actor -> if (actor is Glowing) actor.drawGlow(gc, g) }
+        actorContainer.forEach { actor ->
+            if (actor is Visible &&
+                distToActorSqr(actor, player) <= (Terrarum.WIDTH.plus(actor.hitbox.width.div(2)).sqr() +
+                                                  Terrarum.HEIGHT.plus(actor.hitbox.height.div(2)).sqr())
+            ) {
+                actor.drawGlow(gc, g)
+            }
+        }
         player.drawGlow(gc, g)
 
         // draw reference ID if debugWindow is open
-        if (debugWindow.isVisible) {
-            actorContainer.forEach { actor ->
+        if (debugWindow.visible) {
+            actorContainer.forEachIndexed { i, actor ->
                 if (actor is Visible) {
                     g.color = Color.white
                     g.font = Terrarum.smallNumbers
@@ -217,6 +243,12 @@ constructor() : BasicGameState() {
                             actor.referenceID.toString(),
                             actor.hitbox.posX,
                             actor.hitbox.pointedY + 4
+                    )
+                    g.color = Color(0x80FF80)
+                    g.drawString(
+                            i.toString(),
+                            actor.hitbox.posX,
+                            actor.hitbox.pointedY + 12
                     )
                     g.font = Terrarum.gameFont
                 }
@@ -304,40 +336,67 @@ constructor() : BasicGameState() {
             (this and 0xff00).ushr(8).shl(10) or
             (this and 0xff0000).ushr(16).shl(20)
 
+    fun Float.sqr() = this * this
+    fun Int.sqr() = this * this
+    private fun distToActorSqr(a: Visible, p: Player) =
+            (a.hitbox.centeredX - p.hitbox.centeredX).sqr() + (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
     /**
      * actorContainer extensions
      */
-    fun hasActor(ID: Int): Boolean {
-        for (actor in actorContainer) {
-            if (actor.referenceID == ID) return true
-        }
-        return false
-    }
+    fun hasActor(ID: Int): Boolean =
+            if (actorContainer.size == 0)
+                false
+            else
+                actorContainer.binarySearch(ID) >= 0
 
+    /**
+     * Remove actor and sort the list
+     */
     fun removeActor(ID: Int) {
         for (actor in actorContainer) {
-            if (actor.referenceID == ID)
+            if (actor.referenceID == ID) {
                 actorContainer.remove(actor)
+                actorContainer.sort()
+                break
+            }
         }
     }
 
+    /**
+     * Add actor and sort the list
+     */
     fun addActor(other: Actor): Boolean {
         if (hasActor(other.referenceID)) return false
         actorContainer.add(other)
+        actorContainer.sort()
         return true
     }
 
     fun getActor(ID: Int): Actor {
-        for (actor in actorContainer) {
-            if (actor.referenceID == ID)
-                return actor
-        }
-        throw NullPointerException("Actor with ID $ID does not exist.")
+        if (actorContainer.size == 0) throw IllegalArgumentException("Actor with ID $ID does not exist.")
+
+        val index = actorContainer.binarySearch(ID)
+        if (index < 0)
+            throw IllegalArgumentException("Actor with ID $ID does not exist.")
+        else
+            return actorContainer[index]
     }
 
-    fun addUI(other: UIHandler): Boolean {
-        if (uiContainer.contains(other)) return false
-        uiContainer.add(other)
-        return true
+    private fun ArrayList<Actor>.binarySearch(ID: Int): Int {
+        var low = 0
+        var high = actorContainer.size - 1
+
+        while (low <= high) {
+            val mid = (low + high).ushr(1) // safe from overflows
+            val midVal = get(mid)
+
+            if (ID > midVal.referenceID)
+                low = mid + 1
+            else if (ID < midVal.referenceID)
+                high = mid - 1
+            else
+                return mid // key found
+        }
+        return -(low + 1)  // key not found
     }
 }

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.console
 
+import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ui.ConsoleWindow
 
@@ -18,6 +19,10 @@ internal class Echo : ConsoleCommand {
 
     fun execute(single_line: String) {
         (Terrarum.game.consoleHandler.UI as ConsoleWindow).sendMessage(single_line)
+    }
+
+    fun error(single_line: String) {
+        (Terrarum.game.consoleHandler.UI as ConsoleWindow).sendMessage("${GameFontBase.colToCode["r"]}$single_line")
     }
 
     override fun printUsage() {

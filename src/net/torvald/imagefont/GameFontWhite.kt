@@ -47,7 +47,7 @@ constructor() : GameFontBase() {
         GameFontBase.wenQuanYi_2 = SpriteSheet(
                 "./res/graphics/fonts/wenquanyi_11pt_part2.png", 16, 18, 2)
 
-        val shk = arrayOf<SpriteSheet>(
+        val shk = arrayOf(
                 GameFontBase.asciiSheet,
                 GameFontBase.asciiSheetEF,
                 GameFontBase.hangulSheet,

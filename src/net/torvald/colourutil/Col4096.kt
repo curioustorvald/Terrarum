@@ -111,17 +111,17 @@ class Col4096 : LimitedColours {
 
     private fun assertRaw(i: Int) {
         if (i > 0xFFFF || i < 0) {
-            println("i: " + i.toString())
+            System.err.println("Illegal colour input: $i")
             throw IllegalArgumentException()
         }
     }
 
     private fun assertARGB(a: Int, r: Int, g: Int, b: Int) {
         if (a !in 0..16 || r !in 0..16 || g !in 0..16 || b !in 0..16) {
-            println("a: " + a.toString())
-            println("r: " + r.toString())
-            println("g: " + g.toString())
-            println("b: " + b.toString())
+            System.err.println("Illegal colour input for channel a: $a")
+            System.err.println("Illegal colour input for channel r: $r")
+            System.err.println("Illegal colour input for channel g: $g")
+            System.err.println("Illegal colour input for channel b: $b")
             throw IllegalArgumentException()
         }
     }

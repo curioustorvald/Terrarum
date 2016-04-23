@@ -9,6 +9,8 @@ import org.apache.commons.codec.digest.DigestUtils
  */
 class Authenticator : ConsoleCommand {
 
+    private var a = false
+
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             val pwd = args[1]
@@ -37,10 +39,5 @@ class Authenticator : ConsoleCommand {
 
     override fun printUsage() {
         CommandInterpreter.echoUnknownCmd("auth")
-    }
-
-    companion object {
-
-        private var a = false
     }
 }

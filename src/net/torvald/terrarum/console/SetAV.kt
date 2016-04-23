@@ -19,43 +19,81 @@ internal class SetAV : ConsoleCommand {
     }
 
     override fun execute(args: Array<String>) {
-        val echo = Echo()
 
-        // setav <id or "player"> <av> <val>
-        if (args.size != 4 && args.size != 3) {
-            printUsage()
-        }
-        else if (args.size == 3) {
+        fun parseAVInput(arg: String): Any {
             val `val`: Any
 
             try {
-                `val` = Integer(args[2]) // try for integer
+                `val` = Integer(arg) // try for integer
             }
             catch (e: NumberFormatException) {
 
                 try {
-                    `val` = args[2].toFloat() // try for float
+                    `val` = arg.toFloat() // try for float
                 }
                 catch (ee: NumberFormatException) {
-                    if (args[2].equals("__true", ignoreCase = true)) {
+                    if (arg.equals("__true", ignoreCase = true)) {
                         `val` = true
                     }
-                    else if (args[2].equals("__false", ignoreCase = true)) {
+                    else if (arg.equals("__false", ignoreCase = true)) {
                         `val` = false
                     }
                     else {
-                        `val` = args[2] // string if not number
+                        `val` = arg // string if not number
                     }
                 }
+            }
 
+            return `val`
+        }
+
+        val echo = Echo()
+
+        // setav <id, or blank for player> <av> <val>
+        if (args.size != 4 && args.size != 3) {
+            printUsage()
+        }
+        else if (args.size == 3) {
+            val `val` = parseAVInput(args[2])
+
+            // check if av is number
+            if (args[1].isNum()) {
+                echo.error("Illegal ActorValue “${args[1]}”: ActorValue cannot be a number.")
+                return
             }
 
             Terrarum.game.player.actorValue[args[1]] = `val`
-            echo.execute("Set " + args[1] + " to " + `val`)
+            echo.execute("Set ${args[1]} to $`val`")
         }
         else if (args.size == 4) {
+            try {
+                val id = args[1].toInt()
+                val `val` = parseAVInput(args[3])
 
+                // check if av is number
+                if (args[2].isNum()) {
+                    echo.error("Illegal ActorValue “${args[2]}”: ActorValue cannot be a number.")
+                    return
+                }
+
+                Terrarum.game.getActor(id).actorValue[args[2]] = `val`
+                echo.execute("Set ${args[2]} of $id to $`val`")
+            }
+            catch (e: IllegalArgumentException) {
+                if (args.size == 4)
+                    echo.error(args[1] + ": no actor with this ID.")
+            }
         }
 
+    }
+
+    fun String.isNum(): Boolean {
+        try {
+            this.toInt()
+            return true
+        }
+        catch (e: NumberFormatException) {
+            return false
+        }
     }
 }
