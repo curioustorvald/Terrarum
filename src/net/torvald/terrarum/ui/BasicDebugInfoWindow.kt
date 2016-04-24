@@ -32,6 +32,12 @@ class BasicDebugInfoWindow:UICanvas {
     private var xdelta = 0f
     private var ydelta = 0f
 
+    val ccW = GameFontBase.colToCode["w"]
+    val ccG = GameFontBase.colToCode["g"]
+    val ccY = GameFontBase.colToCode["y"]
+    val ccR = GameFontBase.colToCode["r"]
+    val ccM = GameFontBase.colToCode["m"]
+
     override fun processInput(input: Input) {
 
     }
@@ -65,8 +71,6 @@ class BasicDebugInfoWindow:UICanvas {
 
         val hitbox = player.hitbox
         val nextHitbox = player.nextHitbox
-
-        val ccG = "${GameFontBase.colToCode["g"]}"
 
         printLine(g, 1, "posX "
                 + ccG
@@ -167,24 +171,20 @@ class BasicDebugInfoWindow:UICanvas {
         )
 
         g.color = GameFontBase.codeToCol["y"]
-        g.drawString("MEM ", (Terrarum.WIDTH - 15 * 8 - 2).toFloat(), 2f)
-        //g.drawString("FPS ", (Terrarum.WIDTH - 6 * 8 - 2).toFloat(), 10f)
-        g.drawString("Actors total ", 2f, Terrarum.HEIGHT - 10f)
-        g.drawString("Active ", (2 + 17*8).toFloat(), Terrarum.HEIGHT - 10f)
+        g.drawString("${ccY}MEM ", (Terrarum.WIDTH - 15 * 8 - 2).toFloat(), 2f)
+        //g.drawString("${ccY}FPS $ccG${Terrarum.appgc.fps}", (Terrarum.WIDTH - 6 * 8 - 2).toFloat(), 10f)
+        g.drawString("${ccY}Actors total $ccG${Terrarum.game.actorContainer.size + Terrarum.game.actorContainerInactive.size}",
+                2f, Terrarum.HEIGHT - 10f)
+        g.drawString("${ccY}Active $ccG${Terrarum.game.actorContainer.size}",
+                (2 + 17*8).toFloat(), Terrarum.HEIGHT - 10f)
+        g.drawString("${ccY}Dormant $ccG${Terrarum.game.actorContainerInactive.size}",
+                (2 + 28*8).toFloat(), Terrarum.HEIGHT - 10f)
 
         g.color = GameFontBase.codeToCol["g"]
         g.drawString("${Terrarum.game.memInUse}M",
                 (Terrarum.WIDTH - 11 * 8 - 2).toFloat(), 2f)
         g.drawString("/${Terrarum.game.totalVMMem}M",
                 (Terrarum.WIDTH - 6 * 8 - 2).toFloat(), 2f)
-        //g.drawString("${Terrarum.appgc.fps}",
-        //        (Terrarum.WIDTH - 2 * 8 - 2).toFloat(), 10f)
-        g.drawString("${Terrarum.game.actorContainer.size + Terrarum.game.actorcontainerInactive.size}",
-                (2 + 13*8).toFloat(), Terrarum.HEIGHT - 10f
-        )
-        g.drawString(Terrarum.game.actorContainer.size.toString(),
-                (2 + 24*8).toFloat(), Terrarum.HEIGHT - 10f
-        )
     }
 
     private fun printLine(g: Graphics, l: Int, s: String) {

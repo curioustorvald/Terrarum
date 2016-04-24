@@ -112,7 +112,6 @@ class ConsoleWindow : UICanvas, UITypable {
     }
 
     private fun executeCommand() {
-        sendMessage("> " + commandInputPool!!.toString())
         CommandInterpreter.execute(commandInputPool!!.toString())
     }
 
@@ -152,7 +151,7 @@ class ConsoleWindow : UICanvas, UITypable {
         prevCommand = ""
         commandInputPool = StringBuilder()
 
-        if (Terrarum.game.auth.b()) sendMessage(Lang.get("DEV_MESSAGE_CONSOLE_CODEX"))
+        if (Terrarum.game.auth.b()) sendMessage(Lang["DEV_MESSAGE_CONSOLE_CODEX"])
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {

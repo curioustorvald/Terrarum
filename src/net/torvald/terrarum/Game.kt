@@ -43,8 +43,9 @@ constructor() : BasicGameState() {
     /**
      * Linked list of Actors that is sorted by Actors' referenceID
      */
-    val actorContainer = ArrayList<Actor>(128)
-    val actorcontainerInactive = ArrayList<Actor>(128)
+    val ACTORCONTAINER_INITIAL_SIZE = 128
+    val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
+    val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val uiContainer = LinkedList<UIHandler>()
 
     lateinit var consoleHandler: UIHandler
@@ -144,22 +145,32 @@ constructor() : BasicGameState() {
         MapDrawer.update(gc, delta)
         MapCamera.update(gc, delta)
 
-        actorContainer.forEach { actor -> // update actors
-            if (actor !is Visible
-                    || actor is Visible && distToActorSqr(actor, player) < ACTOR_UPDATE_RANGE.sqr())
-            // update if the does not have specific position. (visible)
-            // if the actor has position (visible), update only if it is within the range
-                actor.update(gc, delta)
-        }
-        actorContainer.forEach { actor -> // update sprite(s)
-            if (actor is Visible &&
-                    distToActorSqr(actor, player) <= (Terrarum.WIDTH.plus(actor.hitbox.width.div(2)).sqr() +
-                                                      Terrarum.HEIGHT.plus(actor.hitbox.height.div(2)).sqr())
-            ) { // if visible and within screen
-                actor.updateBodySprite(gc, delta)
-                actor.updateGlowSprite(gc, delta)
+        // determine whether the inactive actor should be re-active
+        actorContainerInactive.forEach { actor ->
+            if (actor is Visible && distToActorSqr(actor, player) <= ACTOR_UPDATE_RANGE.sqr()) {
+                addActor(actor)
             }
         }
+        actorContainer.forEach { if (actorContainerInactive.contains(it))
+            actorContainerInactive.remove(it)
+        }
+
+        actorContainer.forEach { actor -> // update actors
+            // determine whether the actor should be active by their distance from the player
+            // will put inactive actors to list specifically for them
+            if (actor is Visible && distToActorSqr(actor, player) > ACTOR_UPDATE_RANGE.sqr()) {
+                actorContainerInactive.add(actor)
+            }
+            else {
+                // update our remaining active actors
+                actor.update(gc, delta)
+                if (actor is Visible) {
+                    actor.updateBodySprite(gc, delta)
+                    actor.updateGlowSprite(gc, delta)
+                }
+            }
+        }
+        actorContainerInactive.forEach { removeActor(it.referenceID) }
 
         uiContainer.forEach { ui -> ui.update(gc, delta) }
         consoleHandler.update(gc, delta)
@@ -244,13 +255,6 @@ constructor() : BasicGameState() {
                             actor.hitbox.posX,
                             actor.hitbox.pointedY + 4
                     )
-                    g.color = Color(0x80FF80)
-                    g.drawString(
-                            i.toString(),
-                            actor.hitbox.posX,
-                            actor.hitbox.pointedY + 12
-                    )
-                    g.font = Terrarum.gameFont
                 }
             }
         }

@@ -1,7 +1,10 @@
 package net.torvald.terrarum.console
 
+import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.Terrarum
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 import java.util.ArrayList
 import java.util.Formatter
@@ -14,8 +17,14 @@ object CommandInterpreter {
 
     private val commandsNoAuth = arrayOf("auth", "qqq", "zoom", "setlocale", "getlocale", "help")
 
+    private val ccW = GameFontBase.colToCode["w"]
+    private val ccG = GameFontBase.colToCode["g"]
+    private val ccY = GameFontBase.colToCode["y"]
+    private val ccR = GameFontBase.colToCode["r"]
+
     fun execute(command: String) {
-        val cmd = parse(command)
+        val cmd: Array<CommandInput?> = parse(command)
+        val echo = Echo()
 
         for (single_command in cmd) {
             var commandObj: ConsoleCommand? = null
@@ -38,6 +47,8 @@ object CommandInterpreter {
 
             }
             finally {
+                echo.execute("$ccW> $single_command") // prints out the input
+                println("${ZonedDateTime.now()} [CommandInterpreter] issuing command '$single_command'")
                 try {
                     if (commandObj != null) {
                         commandObj.execute(single_command!!.toStringArray())
@@ -50,7 +61,7 @@ object CommandInterpreter {
                 catch (e: Exception) {
                     System.err.print("[CommandInterpreter] ")
                     e.printStackTrace()
-                    Echo().error(Lang["ERROR_GENERIC_TEXT"])
+                    echo.error(Lang["ERROR_GENERIC_TEXT"])
                 }
 
             }
@@ -112,5 +123,16 @@ object CommandInterpreter {
 
         val argsCount: Int
             get() = tokens.size
+
+        override fun toString(): String {
+            val sb = StringBuilder()
+            tokens.forEachIndexed { i, s ->
+                if (i == 0)
+                    sb.append("${ccY}$s${ccG}")
+                else
+                    sb.append(" $s")
+            }
+            return sb.toString()
+        }
     }
 }

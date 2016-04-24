@@ -35,6 +35,7 @@ object CommandDict {
             Pair("gettime", GetTime()),
             Pair("settimedelta", SetTimeDelta()),
             Pair("help", Help()),
+            Pair("version", Version()),
 
             // Test codes
             Pair("bulletintest", SetBulletin()),

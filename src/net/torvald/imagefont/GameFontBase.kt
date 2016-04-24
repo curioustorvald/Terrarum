@@ -586,28 +586,47 @@ constructor() : Font {
         internal var interchar = 0
 
         val colourKey = hashMapOf(
-                Pair(0x11.toChar(), Color(0xFFFFFF)), //w
-                Pair(0x12.toChar(), Color(0xFF8080)), //r
-                Pair(0x13.toChar(), Color(0x80FF80)), //g
-                Pair(0x14.toChar(), Color(0x8080FF)), //b
-                Pair(0x15.toChar(), Color(0xFFE080)), //y
-                Pair(0x16.toChar(), Color(0x808080))  //k
+                Pair(0x10.toChar(), Color(0xFFFFFF)), //*w hite
+                Pair(0x11.toChar(), Color(0xFFE080)), //*y ellow
+                Pair(0x12.toChar(), Color(0xFFB020)), //o range
+                Pair(0x13.toChar(), Color(0xFF8080)), //*r ed
+                Pair(0x14.toChar(), Color(0xFFA0E0)), //f uchsia
+                Pair(0x15.toChar(), Color(0xE0A0FF)), //*m agenta (purple)
+                Pair(0x16.toChar(), Color(0x8080FF)), //*b lue
+                Pair(0x17.toChar(), Color(0xFF80FF)), //c yan
+                Pair(0x18.toChar(), Color(0x80FF80)), //*g reen
+                Pair(0x19.toChar(), Color(0x008000)), //v iridian
+                Pair(0x1A.toChar(), Color(0x805030)), //x (khaki)
+                Pair(0x1B.toChar(), Color(0x808080))  //*k
+                                                      //* marked: commonly used
         )
         val colToCode = hashMapOf(
-                Pair("w", 0x11.toChar()),
-                Pair("r", 0x12.toChar()),
-                Pair("g", 0x13.toChar()),
-                Pair("b", 0x14.toChar()),
-                Pair("y", 0x15.toChar()),
-                Pair("k", 0x16.toChar())
+                Pair("w", 0x10.toChar()),
+                Pair("y", 0x11.toChar()),
+                Pair("o", 0x12.toChar()),
+                Pair("r", 0x13.toChar()),
+                Pair("f", 0x14.toChar()),
+                Pair("m", 0x15.toChar()),
+                Pair("b", 0x16.toChar()),
+                Pair("c", 0x17.toChar()),
+                Pair("g", 0x18.toChar()),
+                Pair("v", 0x19.toChar()),
+                Pair("x", 0x1A.toChar()),
+                Pair("k", 0x1B.toChar())
         )
         val codeToCol = hashMapOf(
-                Pair("w", colourKey[0x11.toChar()]),
-                Pair("r", colourKey[0x12.toChar()]),
-                Pair("g", colourKey[0x13.toChar()]),
-                Pair("b", colourKey[0x14.toChar()]),
-                Pair("y", colourKey[0x15.toChar()]),
-                Pair("k", colourKey[0x16.toChar()])
+                Pair("w", colourKey[0x10.toChar()]),
+                Pair("y", colourKey[0x11.toChar()]),
+                Pair("o", colourKey[0x12.toChar()]),
+                Pair("r", colourKey[0x13.toChar()]),
+                Pair("f", colourKey[0x14.toChar()]),
+                Pair("m", colourKey[0x15.toChar()]),
+                Pair("b", colourKey[0x16.toChar()]),
+                Pair("c", colourKey[0x17.toChar()]),
+                Pair("g", colourKey[0x18.toChar()]),
+                Pair("v", colourKey[0x19.toChar()]),
+                Pair("x", colourKey[0x1A.toChar()]),
+                Pair("k", colourKey[0x1B.toChar()])
         )
     }
 }

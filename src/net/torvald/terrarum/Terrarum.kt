@@ -355,6 +355,18 @@ constructor(gamename: String) : StateBasedGame(gamename) {
     }
 }
 
+/**
+ * 0xAA_BB_XXXX
+ * AA: Major version
+ * BB: Minor version
+ * XXXX: Revision
+ *
+ * e.g. 0x02010034 can be translated as 2.1.52
+ */
+const val VERSION_RAW = 0x00024000
+const val VERSION_STRING: String =
+        "${VERSION_RAW.ushr(24)}.${VERSION_RAW.and(0xFF0000).ushr(16)}.${VERSION_RAW.and(0xFFFF)}"
+
 fun main(args: Array<String>) = Terrarum.main(args)
 
 fun setBlendMul() {

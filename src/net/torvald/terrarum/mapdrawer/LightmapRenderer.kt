@@ -2,10 +2,10 @@ package net.torvald.terrarum.mapdrawer
 
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Luminous
-import net.torvald.terrarum.gamemap.WorldTime
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import com.jme3.math.FastMath
+import net.torvald.terrarum.gameactors.Visible
 import net.torvald.terrarum.tileproperties.TileNameCode
 import org.newdawn.slick.Color
 import org.newdawn.slick.Graphics
@@ -27,8 +27,8 @@ object LightmapRenderer {
     /**
      * 8-Bit RGB values
      */
-    //private val lightmap: Array<IntArray> = Array(Terrarum.game.map.height) { IntArray(Terrarum.game.map.width) }
     private val lightmap: Array<IntArray> = Array(LIGHTMAP_HEIGHT) { IntArray(LIGHTMAP_WIDTH) }
+    private val lanternMap = ArrayList<Lantern>(Terrarum.game.ACTORCONTAINER_INITIAL_SIZE)
 
     private val AIR = TileNameCode.AIR
 
@@ -165,8 +165,18 @@ object LightmapRenderer {
          * for all staticLightMap[y][x]
          */
 
-        //purgePartOfLightmap(for_x_start - overscan_open, for_y_start - overscan_open, for_x_end + overscan_open, for_y_end + overscan_open)
         purgeLightmap()
+
+        // scan for luminous actors and store their lighting info to the lanterns
+        lanternMap.clear()
+        Terrarum.game.actorContainer.forEach { it ->
+            if (it is Luminous && it is Visible)
+                lanternMap.add(Lantern(
+                        it.hitbox.centeredX.div(TSIZE).round(),
+                        it.hitbox.centeredY.div(TSIZE).round(),
+                        it.luminosity
+                ))
+        }
 
         try {
             // Round 1
@@ -229,23 +239,16 @@ object LightmapRenderer {
         // END MIX TILE
 
         // mix luminous actor
-        for (actor in Terrarum.game.actorContainer) {
-            if (actor is Luminous && actor is ActorWithBody) {
-                val tileX = Math.round(actor.hitbox.pointedX / TSIZE)
-                val tileY = Math.round(actor.hitbox.pointedY / TSIZE) - 1
-                val actorLuminosity = actor.luminosity
-                if (x == tileX && y == tileY) {
-                    lightLevelThis = maximiseRGB(lightLevelThis, actorLuminosity) // maximise to not exceed 1.0 with normal (<= 1.0) light
-                    break
-                }
-            }
+        for ((posX, posY, luminosity) in lanternMap) {
+            if (posX == x && posY == y)
+                lightLevelThis = maximiseRGB(lightLevelThis, luminosity) // maximise to not exceed 1.0 with normal (<= 1.0) light
         }
 
 
         if (!doNotCalculateAmbient) {
             // calculate ambient
             var ambient: Int = 0
-            var nearby: Int = 0
+            var nearby: Int
             for (yoff in -1..1) {
                 for (xoff in -1..1) {
                     /**
@@ -594,6 +597,8 @@ object LightmapRenderer {
     fun Float.ceil() = FastMath.ceil(this)
     fun Int.even(): Boolean = this and 1 == 0
     fun Int.odd(): Boolean = this and 1 == 1
+
+    data class Lantern(val posX: Int, val posY: Int, val luminosity: Int)
 
     val histogram: Histogram
         get() {

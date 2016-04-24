@@ -19,6 +19,6 @@ abstract class Actor : Comparable<Actor> {
 
     override fun equals(other: Any?) = referenceID == (other as Actor).referenceID
     override fun hashCode() = referenceID
-    override fun toString() = "ActorID: ${hashCode()}"
+    override fun toString() = "ID: ${hashCode()}"
     override fun compareTo(other: Actor): Int = this.referenceID - other.referenceID
 }

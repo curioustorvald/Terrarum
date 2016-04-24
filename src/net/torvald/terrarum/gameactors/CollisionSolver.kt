@@ -35,7 +35,7 @@ object CollisionSolver {
             }
         }
 
-        // sort list x (will use Timsort with Java SE >= 8, Mergesort otherwise)
+        // sort list x
         collListX.sortBy { it.pos }
 
         // set candidateX

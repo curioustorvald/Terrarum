@@ -39,7 +39,7 @@ class CodexEdictis : ConsoleCommand {
     private fun printList() {
         val echo = Echo()
         echo.execute(Lang.get("DEV_MESSAGE_CONSOLE_AVAILABLE_COMMANDS"))
-        CommandDict.dict.keys.forEach { s -> echo.execute("] " + s) }
+        CommandDict.dict.keys.forEach { s -> echo.execute("• " + s) }
     }
 
 }
