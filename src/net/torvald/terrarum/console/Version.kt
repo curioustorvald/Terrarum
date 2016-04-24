@@ -1,13 +1,13 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.VERSION_STRING
+import net.torvald.terrarum.Terrarum
 
 /**
  * Created by minjaesong on 16-04-23.
  */
 class Version : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        Echo().execute(VERSION_STRING)
+        Echo().execute("${Terrarum.NAME} ${Terrarum.VERSION_STRING}")
     }
 
     override fun printUsage() {

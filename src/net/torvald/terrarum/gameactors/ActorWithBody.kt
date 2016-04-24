@@ -51,7 +51,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
     internal var baseSpriteWidth: Int = 0
     internal var baseSpriteHeight: Int = 0
 
-    override var referenceID: Int = 0
+    override var referenceID: Int = generateUniqueReferenceID()
     /**
      * Positions: top-left point
      */
@@ -137,10 +137,6 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private var posAdjustY = 0
 
     init {
-        do {
-            referenceID = HQRNG().nextInt() // set new ID
-        } while (Terrarum.game.hasActor(referenceID)) // check for collision
-
         map = Terrarum.game.map
     }
 
@@ -719,18 +715,12 @@ open class ActorWithBody constructor() : Actor(), Visible {
     fun Float.round() = Math.round(this).toFloat()
     fun Float.roundToInt(): Int = Math.round(this)
     fun Float.abs() = FastMath.abs(this)
+    fun Int.abs() = if (this < 0) -this else this
 
     companion object {
 
         @Transient private val TSIZE = MapDrawer.TILE_SIZE
         private var AUTO_CLIMB_RATE = TSIZE / 8
-
-        private fun div16(x: Int): Int {
-            if (x < 0) {
-                throw IllegalArgumentException("div16: Positive integer only: " + x.toString())
-            }
-            return x and 0x7FFFFFFF shr 4
-        }
 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
@@ -748,13 +738,6 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 return Terrarum.game.map.height - 1
             else
                 return y and 0x7FFFFFFF shr 4
-        }
-
-        private fun mod16(x: Int): Int {
-            if (x < 0) {
-                throw IllegalArgumentException("mod16: Positive integer only: " + x.toString())
-            }
-            return x and 15
         }
 
         private fun clampCeil(x: Float, ceil: Float): Float {

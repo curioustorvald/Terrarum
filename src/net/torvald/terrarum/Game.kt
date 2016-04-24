@@ -1,5 +1,6 @@
 package net.torvald.terrarum
 
+import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.gamecontroller.GameController
@@ -146,31 +147,11 @@ constructor() : BasicGameState() {
         MapCamera.update(gc, delta)
 
         // determine whether the inactive actor should be re-active
-        actorContainerInactive.forEach { actor ->
-            if (actor is Visible && distToActorSqr(actor, player) <= ACTOR_UPDATE_RANGE.sqr()) {
-                addActor(actor)
-            }
-        }
-        actorContainer.forEach { if (actorContainerInactive.contains(it))
-            actorContainerInactive.remove(it)
-        }
+        wakeDormantActors()
 
-        actorContainer.forEach { actor -> // update actors
-            // determine whether the actor should be active by their distance from the player
-            // will put inactive actors to list specifically for them
-            if (actor is Visible && distToActorSqr(actor, player) > ACTOR_UPDATE_RANGE.sqr()) {
-                actorContainerInactive.add(actor)
-            }
-            else {
-                // update our remaining active actors
-                actor.update(gc, delta)
-                if (actor is Visible) {
-                    actor.updateBodySprite(gc, delta)
-                    actor.updateGlowSprite(gc, delta)
-                }
-            }
-        }
-        actorContainerInactive.forEach { removeActor(it.referenceID) }
+        // determine whether the actor should be active or dormant
+        // also updates active actors
+        inactivateDistantActors(gc, delta)
 
         uiContainer.forEach { ui -> ui.update(gc, delta) }
         consoleHandler.update(gc, delta)
@@ -184,12 +165,9 @@ constructor() : BasicGameState() {
 
     private fun setAppTitle() {
         Terrarum.appgc.setTitle(
-                "Simple Slick Game — FPS: "
-                + Terrarum.appgc.fps + " ("
-                + Terrarum.TARGET_INTERNAL_FPS.toString()
-                + ") — "
-                + memInUse.toString() + "M / "
-                + totalVMMem.toString() + "M")
+                "Simple Slick Game" +
+                " — FPS: ${Terrarum.appgc.fps} (${Terrarum.TARGET_INTERNAL_FPS})" +
+                " — ${memInUse}M / ${totalVMMem}M")
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
@@ -210,10 +188,7 @@ constructor() : BasicGameState() {
 
         // draw actors
         actorContainer.forEach { actor ->
-            if (actor is Visible &&
-                distToActorSqr(actor, player) <= (Terrarum.WIDTH.plus(actor.hitbox.width.div(2)).sqr() +
-                                                  Terrarum.HEIGHT.plus(actor.hitbox.height.div(2)).sqr())
-            ) { // if visible and within screen
+            if (actor is Visible && actor.inScreen()) { // if visible and within screen
                 actor.drawBody(gc, g)
             }
         }
@@ -235,10 +210,7 @@ constructor() : BasicGameState() {
 
         // draw actor glows
         actorContainer.forEach { actor ->
-            if (actor is Visible &&
-                distToActorSqr(actor, player) <= (Terrarum.WIDTH.plus(actor.hitbox.width.div(2)).sqr() +
-                                                  Terrarum.HEIGHT.plus(actor.hitbox.height.div(2)).sqr())
-            ) {
+            if (actor is Visible && actor.inScreen()) { // if visible and within screen
                 actor.drawGlow(gc, g)
             }
         }
@@ -255,6 +227,15 @@ constructor() : BasicGameState() {
                             actor.hitbox.posX,
                             actor.hitbox.pointedY + 4
                     )
+
+                    if (DEBUG_ARRAY) {
+                        g.color = GameFontBase.codeToCol["g"]
+                        g.drawString(
+                                i.toString(),
+                                actor.hitbox.posX,
+                                actor.hitbox.pointedY + 4 + 10
+                        )
+                    }
                 }
             }
         }
@@ -329,6 +310,45 @@ constructor() : BasicGameState() {
         notifinator.setAsOpening()
     }
 
+    fun wakeDormantActors() {
+        // determine whether the inactive actor should be re-active
+        var actorContainerSize = actorContainerInactive.size
+        var i = 0
+        while (i < actorContainerSize) { // loop thru actorContainerInactive
+            val actor = actorContainerInactive[i]
+            val actorIndex = i
+            if (actor is Visible && actor.inUpdateRange()) {
+                addActor(actor)
+                actorContainerInactive.removeAt(actorIndex)
+                actorContainerSize -= 1
+                i-- // array removed 1 elem, so also decrement counter by 1
+            }
+            i++
+        }
+    }
+
+    fun inactivateDistantActors(gc: GameContainer, delta: Int) {
+        var actorContainerSize = actorContainer.size
+        var i = 0
+        // determine whether the actor should be active or dormant by its distance from the player
+        // will put dormant actors to list specifically for them
+        // if the actor is not to be dormant, update it
+        while (i < actorContainerSize) { // loop thru actorContainer
+            val actor = actorContainer[i]
+            val actorIndex = i
+            if (actor is Visible && !actor.inUpdateRange()) {
+                actorContainerInactive.add(actor)
+                actorContainer.removeAt(actorIndex)
+                actorContainerSize -= 1
+                i-- // array removed 1 elem, so also decrement counter by 1
+            }
+            else {
+                actorContainer[i].update(gc, delta)
+            }
+            i++
+        }
+    }
+
     private val globalLightByTime: Int
         get() = getGradientColour(2).getRGB24().rgb24ExpandToRgb30()
 
@@ -342,8 +362,11 @@ constructor() : BasicGameState() {
 
     fun Float.sqr() = this * this
     fun Int.sqr() = this * this
-    private fun distToActorSqr(a: Visible, p: Player) =
+    private fun distToActorSqr(a: Visible, p: Player): Float =
             (a.hitbox.centeredX - p.hitbox.centeredX).sqr() + (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
+    private fun Visible.inScreen() = distToActorSqr(this, player) <= (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.game.screenZoom).sqr() +
+                                            Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.game.screenZoom).sqr())
+    private fun Visible.inUpdateRange() = distToActorSqr(this, player) <= ACTOR_UPDATE_RANGE.sqr()
     /**
      * actorContainer extensions
      */
@@ -353,30 +376,33 @@ constructor() : BasicGameState() {
             else
                 actorContainer.binarySearch(ID) >= 0
 
-    /**
-     * Remove actor and sort the list
-     */
+    fun removeActor(actor: Actor) = removeActor(actor.referenceID)
+
     fun removeActor(ID: Int) {
-        for (actor in actorContainer) {
-            if (actor.referenceID == ID) {
-                actorContainer.remove(actor)
-                actorContainer.sort()
-                break
-            }
-        }
+        if (ID == player.referenceID) throw IllegalArgumentException("Attemped to remove player.")
+        // get index of the actor and delete by the index.
+        // we can do this as the list is guaranteed to be sorted
+        // and only contains unique values
+        val indexToDelete = actorContainer.binarySearch(ID)
+        if (indexToDelete >= 0) actorContainer.removeAt(indexToDelete)
     }
 
     /**
      * Add actor and sort the list
      */
-    fun addActor(other: Actor): Boolean {
-        if (hasActor(other.referenceID)) return false
-        actorContainer.add(other)
-        actorContainer.sort()
+    fun addActor(actor: Actor): Boolean {
+        if (hasActor(actor.referenceID)) throw IllegalArgumentException("Actor with ID ${actor.referenceID} already exists.")
+        actorContainer.add(actor)
+        insertionSortLastElem(actorContainer) // we can do this as we only add one actor
         return true
     }
 
-    fun getActor(ID: Int): Actor {
+    /**
+     * Whether the game should display actorContainer elem number when F3 is on
+     */
+    val DEBUG_ARRAY = false
+
+    fun getActorByID(ID: Int): Actor {
         if (actorContainer.size == 0) throw IllegalArgumentException("Actor with ID $ID does not exist.")
 
         val index = actorContainer.binarySearch(ID)
@@ -386,7 +412,25 @@ constructor() : BasicGameState() {
             return actorContainer[index]
     }
 
+    private fun insertionSortLastElem(arr: ArrayList<Actor>) {
+
+        // 'insertion sort' last element
+        var x: Actor
+        var j: Int
+        var index: Int = arr.size - 1
+        x = arr[index]
+        j = index - 1
+        while (j > 0 && arr[j].referenceID > x.referenceID) {
+            arr[j + 1] = arr[j]
+            j -= 1
+        }
+        arr[j + 1] = x
+    }
+
+    private fun ArrayList<Actor>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID)
+
     private fun ArrayList<Actor>.binarySearch(ID: Int): Int {
+        // code from collections/Collections.kt
         var low = 0
         var high = actorContainer.size - 1
 

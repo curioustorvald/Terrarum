@@ -24,7 +24,7 @@ class GetFactioning : ConsoleCommand {
         val echo = Echo()
 
         fun printOutFactioning(id: Int) {
-            val a = Terrarum.game.getActor(id)
+            val a = Terrarum.game.getActorByID(id)
             if (a is Factionable) {
                 echo.execute("$ccW== Faction assignment for $ccY${if (id == Player.PLAYER_REF_ID) "player" else id.toString()} $ccW==")
                 println("[GetFactioning] == Faction assignment for '${if (id == Player.PLAYER_REF_ID) "player" else id.toString()}' ==")

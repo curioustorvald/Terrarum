@@ -52,7 +52,7 @@ class GetAV : ConsoleCommand {
                 }
                 else {
                     // args[1] is actor ID
-                    val actor = Terrarum.game.getActor(args[1].toInt())
+                    val actor = Terrarum.game.getActorByID(args[1].toInt())
                     val av = actor.actorValue
                     val keyset = av.keySet
 
@@ -74,14 +74,14 @@ class GetAV : ConsoleCommand {
                 val id = args[1].toInt()
                 val av = args[2]
                 echo.execute("$ccW$id.$ccM$av $ccW= $ccG" +
-                             Terrarum.game.getActor(id).actorValue[av] +
+                             Terrarum.game.getActorByID(id).actorValue[av] +
                              " $ccO" +
-                             Terrarum.game.getActor(id).actorValue[av]!!.javaClass.simpleName
+                             Terrarum.game.getActorByID(id).actorValue[av]!!.javaClass.simpleName
                 )
                 println("id.av = " +
-                        Terrarum.game.getActor(id).actorValue[av] +
+                        Terrarum.game.getActorByID(id).actorValue[av] +
                         " " +
-                        Terrarum.game.getActor(id).actorValue[av]!!.javaClass.simpleName
+                        Terrarum.game.getActorByID(id).actorValue[av]!!.javaClass.simpleName
                 )
             }
         }

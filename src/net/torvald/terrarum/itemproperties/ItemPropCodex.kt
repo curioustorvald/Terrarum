@@ -33,7 +33,7 @@ object ItemPropCodex {
         if (code < ITEM_UNIQUE_MAX)
             return itemCodex[code]
         else {
-            val a = Terrarum.game.getActor(code)
+            val a = Terrarum.game.getActorByID(code)
             if (a is CanBeAnItem) return a.itemData
 
             throw NullPointerException()
