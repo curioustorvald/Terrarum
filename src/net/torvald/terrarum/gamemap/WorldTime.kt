@@ -149,5 +149,17 @@ class WorldTime {
         val MINUTE_SEC: Int = 60
         val HOUR_MIN: Int = 60
         val GAME_MIN_TO_REAL_SEC: Float = 60f
+
+        fun parseTime(s: String): Int =
+                if (s.length >= 4) {
+                    s.toLowerCase().substringBefore('h').toInt() * WorldTime.HOUR_SEC +
+                    s.toLowerCase().substringAfter('h').toInt() * WorldTime.MINUTE_SEC
+                }
+                else if (s.endsWith("h", true)) {
+                    s.toLowerCase().substring(0, s.length - 1).toInt() * WorldTime.HOUR_SEC
+                }
+                else {
+                    s.toInt()
+                }
     }
 }

@@ -9,18 +9,7 @@ import net.torvald.terrarum.Terrarum
 class SetTime : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
-            val lowercaseTime = args[1].toLowerCase()
-            val timeToSet =
-                    if (args[1].length >= 4) {
-                        lowercaseTime.substringBefore('h').toInt() * WorldTime.HOUR_SEC +
-                        lowercaseTime.substringAfter('h').toInt() * WorldTime.MINUTE_SEC
-                    }
-                    else if (args[1].endsWith("h", true)) {
-                        lowercaseTime.substring(0, args[1].length - 1).toInt() * WorldTime.HOUR_SEC
-                    }
-                    else {
-                        lowercaseTime.toInt()
-                    }
+            val timeToSet = WorldTime.parseTime(args[1])
 
             Terrarum.game.map.worldTime.setTime(timeToSet)
 

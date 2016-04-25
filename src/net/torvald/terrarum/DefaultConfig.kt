@@ -3,7 +3,7 @@ package net.torvald.terrarum
 import com.google.gson.JsonObject
 
 /**
- * Created by minjaesong on 16-03-19.
+ * Created by minjaesong on 16-03-12.
  */
 object DefaultConfig {
     fun fetch(): JsonObject {

@@ -22,6 +22,7 @@ class GetFactioning : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         val echo = Echo()
+        val error = Error()
 
         fun printOutFactioning(id: Int) {
             val a = Terrarum.game.getActorByID(id)
@@ -75,7 +76,7 @@ class GetFactioning : ConsoleCommand {
                 }
             }
             else {
-                echo.error("The actor is not factionable.")
+                error.execute("The actor is not factionable.")
                 System.err.println("[GetFactioning] The actor is not factionable.")
             }
         }
@@ -85,7 +86,7 @@ class GetFactioning : ConsoleCommand {
         }
         else {
             if (!args[1].isNum()) {
-                echo.error("Invalid actor ID input.")
+                error.execute("Invalid actor ID input.")
                 System.err.println("[GetFactioning] Invalid actor ID input.")
                 return
             }
@@ -94,7 +95,7 @@ class GetFactioning : ConsoleCommand {
                 printOutFactioning(actorID)
             }
             catch (e: IllegalArgumentException) {
-                echo.error("${args[1]}: no actor with this ID.")
+                error.execute("${args[1]}: no actor with this ID.")
                 System.err.println("[GetFactioning] ${args[1]}: no actor with this ID.")
             }
         }

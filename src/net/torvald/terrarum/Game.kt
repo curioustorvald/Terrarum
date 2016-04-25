@@ -31,7 +31,7 @@ import java.lang.management.ManagementFactory
 import java.util.*
 
 /**
- * Created by minjaesong on 16-03-19.
+ * Created by minjaesong on 15-12-30.
  */
 class Game @Throws(SlickException::class)
 constructor() : BasicGameState() {
@@ -42,7 +42,7 @@ constructor() : BasicGameState() {
     lateinit var map: GameMap
 
     /**
-     * Linked list of Actors that is sorted by Actors' referenceID
+     * list of Actors that is sorted by Actors' referenceID
      */
     val ACTORCONTAINER_INITIAL_SIZE = 128
     val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
@@ -337,7 +337,7 @@ constructor() : BasicGameState() {
             val actor = actorContainer[i]
             val actorIndex = i
             if (actor is Visible && !actor.inUpdateRange()) {
-                actorContainerInactive.add(actor)
+                actorContainerInactive.add(actor) // duplicates are checked when the actor is re-activated
                 actorContainer.removeAt(actorIndex)
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so also decrement counter by 1
@@ -352,9 +352,6 @@ constructor() : BasicGameState() {
     private val globalLightByTime: Int
         get() = getGradientColour(2).getRGB24().rgb24ExpandToRgb30()
 
-    /**
-     * extension function for org.newdawn.slick.Color
-     */
     fun Color.getRGB24(): Int = (this.redByte shl 16) or (this.greenByte shl 8) or (this.blueByte)
     fun Int.rgb24ExpandToRgb30(): Int = (this and 0xff) or
             (this and 0xff00).ushr(8).shl(10) or
@@ -364,12 +361,14 @@ constructor() : BasicGameState() {
     fun Int.sqr() = this * this
     private fun distToActorSqr(a: Visible, p: Player): Float =
             (a.hitbox.centeredX - p.hitbox.centeredX).sqr() + (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
-    private fun Visible.inScreen() = distToActorSqr(this, player) <= (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.game.screenZoom).sqr() +
-                                            Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.game.screenZoom).sqr())
+    private fun Visible.inScreen() = distToActorSqr(this, player) <=
+                                     (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.game.screenZoom).sqr() +
+                                      Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.game.screenZoom).sqr())
     private fun Visible.inUpdateRange() = distToActorSqr(this, player) <= ACTOR_UPDATE_RANGE.sqr()
     /**
      * actorContainer extensions
      */
+    fun hasActor(actor: Actor) = hasActor(actor.referenceID)
     fun hasActor(ID: Int): Boolean =
             if (actorContainer.size == 0)
                 false
@@ -377,9 +376,8 @@ constructor() : BasicGameState() {
                 actorContainer.binarySearch(ID) >= 0
 
     fun removeActor(actor: Actor) = removeActor(actor.referenceID)
-
     fun removeActor(ID: Int) {
-        if (ID == player.referenceID) throw IllegalArgumentException("Attemped to remove player.")
+        if (ID == player.referenceID) throw RuntimeException("Attempted to remove player.")
         // get index of the actor and delete by the index.
         // we can do this as the list is guaranteed to be sorted
         // and only contains unique values
@@ -388,12 +386,13 @@ constructor() : BasicGameState() {
     }
 
     /**
-     * Add actor and sort the list
+     * Check for duplicates, append actor and sort the list
      */
     fun addActor(actor: Actor): Boolean {
-        if (hasActor(actor.referenceID)) throw IllegalArgumentException("Actor with ID ${actor.referenceID} already exists.")
+        if (hasActor(actor.referenceID))
+            throw RuntimeException("Actor with ID ${actor.referenceID} already exists.")
         actorContainer.add(actor)
-        insertionSortLastElem(actorContainer) // we can do this as we only add one actor
+        insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
         return true
     }
 
@@ -413,7 +412,6 @@ constructor() : BasicGameState() {
     }
 
     private fun insertionSortLastElem(arr: ArrayList<Actor>) {
-
         // 'insertion sort' last element
         var x: Actor
         var j: Int

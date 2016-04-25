@@ -6,8 +6,14 @@ import net.torvald.terrarum.Terrarum
  * Created by minjaesong on 16-03-20.
  */
 class SetTimeDelta : ConsoleCommand {
+
+    val HARD_LIMIT = 60
+
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
+            if (args[1].toInt() > HARD_LIMIT)
+                Error().execute("Delta too large -- acceptable delta is 0-60.")
+
             Terrarum.game.map.worldTime.setTimeDelta(args[1].toInt())
             if (Terrarum.game.map.worldTime.timeDelta == 0)
                 Echo().execute("時間よ止まれ！ザ・ワルド！！")

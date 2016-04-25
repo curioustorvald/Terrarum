@@ -19,9 +19,8 @@ object ItemPropCodex {
      */
     private lateinit var itemCodex: Array<InventoryItem>
 
-    @JvmStatic val ITEM_UNIQUE_MAX = 32768
+    const val ITEM_UNIQUE_MAX = 32768
 
-    @JvmStatic
     fun buildItemProp() {
         itemCodex = arrayOf<InventoryItem>()
 
@@ -29,14 +28,14 @@ object ItemPropCodex {
 
     }
 
-    fun getItem(code: Int): InventoryItem {
-        if (code < ITEM_UNIQUE_MAX)
+    fun getProp(code: Int): InventoryItem {
+        if (code < ITEM_UNIQUE_MAX) // generic item
             return itemCodex[code]
         else {
-            val a = Terrarum.game.getActorByID(code)
+            val a = Terrarum.game.getActorByID(code) // actor item
             if (a is CanBeAnItem) return a.itemData
 
-            throw NullPointerException()
+            throw IllegalArgumentException("Attempted to get item data of actor that cannot be an item. ($a)")
         }
     }
 }

@@ -25,6 +25,7 @@ object CommandInterpreter {
     fun execute(command: String) {
         val cmd: Array<CommandInput?> = parse(command)
         val echo = Echo()
+        val error = Error()
 
         for (single_command in cmd) {
             var commandObj: ConsoleCommand? = null
@@ -61,7 +62,7 @@ object CommandInterpreter {
                 catch (e: Exception) {
                     System.err.print("[CommandInterpreter] ")
                     e.printStackTrace()
-                    echo.error(Lang["ERROR_GENERIC_TEXT"])
+                    error.execute(Lang["ERROR_GENERIC_TEXT"])
                 }
 
             }
@@ -103,7 +104,7 @@ object CommandInterpreter {
         val sb = StringBuilder()
         val formatter = Formatter(sb)
 
-        Echo().error(
+        Error().execute(
                 formatter.format(Lang["DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN"], cmdname).toString())
     }
 

@@ -19,7 +19,6 @@ import java.util.logging.SimpleFormatter
 
 /**
  * Created by minjaesong on 15-12-30.
- * Kotlin code: Created by minjaesong on 16-03-19.
  */
 class Terrarum @Throws(SlickException::class)
 constructor(gamename: String) : StateBasedGame(gamename) {

@@ -54,6 +54,7 @@ internal class SetAV : ConsoleCommand {
         }
 
         val echo = Echo()
+        val error = Error()
 
         // setav <id, or blank for player> <av> <val>
         if (args.size != 4 && args.size != 3) {
@@ -64,7 +65,7 @@ internal class SetAV : ConsoleCommand {
 
             // check if av is number
             if (args[1].isNum()) {
-                echo.error("Illegal ActorValue ${args[1]}: ActorValue cannot be a number.")
+                error.execute("Illegal ActorValue ${args[1]}: ActorValue cannot be a number.")
                 System.err.println("[SetAV] Illegal ActorValue ${args[1]}: ActorValue cannot be a number.")
                 return
             }
@@ -81,7 +82,7 @@ internal class SetAV : ConsoleCommand {
 
                 // check if av is number
                 if (args[2].isNum()) {
-                    echo.error("Illegal ActorValue ${args[2]}: ActorValue cannot be a number.")
+                    error.execute("Illegal ActorValue ${args[2]}: ActorValue cannot be a number.")
                     System.err.println("[SetAV] Illegal ActorValue ${args[2]}: ActorValue cannot be a number.")
                     return
                 }
@@ -92,7 +93,7 @@ internal class SetAV : ConsoleCommand {
             }
             catch (e: IllegalArgumentException) {
                 if (args.size == 4) {
-                    echo.error("${args[1]}: no actor with this ID.")
+                    error.execute("${args[1]}: no actor with this ID.")
                     System.err.println("[SetAV] ${args[1]}: no actor with this ID.")
                 }
             }

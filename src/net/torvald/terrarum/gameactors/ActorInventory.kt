@@ -91,7 +91,7 @@ class ActorInventory() {
         var weight = 0f
 
         for (item in itemList.entries) {
-            weight += ItemPropCodex.getItem(item.key).mass * item.value
+            weight += ItemPropCodex.getProp(item.key).mass * item.value
         }
 
         return weight

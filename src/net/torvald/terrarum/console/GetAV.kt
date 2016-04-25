@@ -18,6 +18,7 @@ class GetAV : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         val echo = Echo()
+        val error = Error()
 
         try {
             if (args.size == 1) {
@@ -87,11 +88,11 @@ class GetAV : ConsoleCommand {
         }
         catch (e: NullPointerException) {
             if (args.size == 2) {
-                echo.error(args[1] + ": actor value does not exist.")
+                error.execute(args[1] + ": actor value does not exist.")
                 System.err.println("[GetAV] ${args[1]}: actor value does not exist.")
             }
             else if (args.size == 3) {
-                echo.error(args[2] + ": actor value does not exist.")
+                error.execute(args[2] + ": actor value does not exist.")
                 System.err.println("[GetAV] ${args[2]}: actor value does not exist.")
             }
             else {
@@ -99,7 +100,7 @@ class GetAV : ConsoleCommand {
             }
         }
         catch (e1: IllegalArgumentException) {
-            echo.error("${args[1]}: no actor with this ID.")
+            error.execute("${args[1]}: no actor with this ID.")
             System.err.println("[GetAV] ${args[1]}: no actor with this ID.")
         }
 
