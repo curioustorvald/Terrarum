@@ -106,7 +106,6 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     @Transient private val UD_COMPENSATOR_MAX = TSIZE
     @Transient private val LR_COMPENSATOR_MAX = TSIZE
-    @Transient private val TILE_AUTOCLIMB_RATE = 4
 
     /**
      * A constant to make falling faster so that the game is more playable
@@ -135,6 +134,8 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     private var posAdjustX = 0
     private var posAdjustY = 0
+
+    private val BASE_FRICTION = 0.3f
 
     init {
         map = Terrarum.game.map
@@ -211,9 +212,6 @@ open class ActorWithBody constructor() : Actor(), Visible {
             // copy gravitational constant from the map the actor is in
             gravitation = map.gravitation
 
-            // Auto climb rate. Clamp to TSIZE
-            AUTO_CLIMB_RATE = Math.min(TSIZE / 8 * FastMath.sqrt(scale), TSIZE.toFloat()).toInt()
-
             // Actors are subject to the gravity and the buoyancy if they are not levitating
             if (!isNoSubjectToGrav) {
                 applyGravitation()
@@ -234,8 +232,10 @@ open class ActorWithBody constructor() : Actor(), Visible {
             //}
             //else {
             // compensate for colliding
-            updateHorizontalPos()
-            updateVerticalPos()
+            updateHorizontalCollision()
+            updateVerticalCollision()
+
+            setHorizontalFriction()
             //}
 
             // apply our compensation to actual hitbox
@@ -274,7 +274,19 @@ open class ActorWithBody constructor() : Actor(), Visible {
         }
     }
 
-    private fun updateVerticalPos() {
+    private fun setHorizontalFriction() {
+        val friction = BASE_FRICTION * (tileFriction / 16f) // ground frction * !@#$!@#$ // default val: 0.3
+        if (veloX < 0) {
+            veloX += friction
+            if (veloX > 0) veloX = 0f
+        }
+        else if (veloX > 0) {
+            veloX -= friction
+            if (veloX < 0) veloX = 0f
+        }
+    }
+
+    private fun updateVerticalCollision() {
         if (!isNoCollideWorld) {
             if (veloY >= 0) { // check downward
                 if (isColliding(CONTACT_AREA_BOTTOM)) { // the ground has dug into the body
@@ -347,7 +359,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
         nextHitbox.setPosition(newX, newY)
     }
 
-    private fun updateHorizontalPos() {
+    private fun updateHorizontalCollision() {
         if (!isNoCollideWorld) {
             if (veloX >= 0.5) { // check right
                 if (isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT)) {
@@ -555,17 +567,15 @@ open class ActorWithBody constructor() : Actor(), Visible {
         get() {
             var friction = 0
 
-            //get highest fluid density
-            val tilePosXStart = (nextHitbox.posX / TSIZE).roundToInt()
-            val tilePosXEnd = (nextHitbox.hitboxEnd.x / TSIZE).roundToInt()
-            val tilePosY = (nextHitbox.pointedY / TSIZE).roundToInt()
+            //get highest friction
+            val tilePosXStart = (hitbox.posX / TSIZE).roundToInt()
+            val tilePosXEnd = (hitbox.hitboxEnd.x / TSIZE).roundToInt()
+            val tilePosY = (hitbox.pointedY.plus(1) / TSIZE).roundToInt()
             for (x in tilePosXStart..tilePosXEnd) {
                 val tile = map.getTileFromTerrain(x, tilePosY)
-                if (TilePropCodex.getProp(tile).isFluid) {
-                    val thisFluidDensity = TilePropCodex.getProp(tile).friction
+                val thisFriction = TilePropCodex.getProp(tile).friction
 
-                    if (thisFluidDensity > friction) friction = thisFluidDensity
-                }
+                if (thisFriction > friction) friction = thisFriction
             }
 
             return friction
@@ -615,13 +625,11 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private fun updateNextHitboxFromVelo() {
 
         nextHitbox.set(
-                  (hitbox.posX + veloX).round()
-                , (hitbox.posY + veloY).round()
-                , (baseHitboxW * scale).round()
-                , (baseHitboxH * scale).round()
+                  (hitbox.posX + veloX)
+                , (hitbox.posY + veloY)
+                , (baseHitboxW * scale)
+                , (baseHitboxH * scale)
         )
-        /** Full quantisation; wonder what havoc these statements would wreak...
-         */
     }
 
     private fun updateHitboxX() {
@@ -712,6 +720,9 @@ open class ActorWithBody constructor() : Actor(), Visible {
         this.density = density.toFloat()
     }
 
+    private val AUTO_CLIMB_RATE: Int
+        get() = Math.min(TSIZE / 8 * FastMath.sqrt(scale), TSIZE.toFloat()).toInt()
+
     fun Float.round() = Math.round(this).toFloat()
     fun Float.roundToInt(): Int = Math.round(this)
     fun Float.abs() = FastMath.abs(this)
@@ -720,7 +731,6 @@ open class ActorWithBody constructor() : Actor(), Visible {
     companion object {
 
         @Transient private val TSIZE = MapDrawer.TILE_SIZE
-        private var AUTO_CLIMB_RATE = TSIZE / 8
 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)

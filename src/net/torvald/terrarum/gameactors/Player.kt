@@ -23,7 +23,6 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     /**
      * empirical value.
      */
-    // private transient final float JUMP_ACCELERATION_MOD = ???f / 10000f; //quadratic mode
     @Transient private val JUMP_ACCELERATION_MOD = 170f / 10000f //linear mode
     @Transient private val WALK_FRAMES_TO_MAX_ACCEL = 6
 
@@ -75,9 +74,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         }
 
     companion object {
-        @Transient internal const val ACCEL_MULT_IN_FLIGHT = 0.48f
-        @Transient internal const val WALK_STOP_ACCEL = 0.32f
-        @Transient internal const val WALK_ACCEL_BASE = 0.32f
+        @Transient internal const val ACCEL_MULT_IN_FLIGHT = 0.31f
+        @Transient internal const val WALK_ACCEL_BASE = 0.67f
 
         @Transient const val PLAYER_REF_ID: Int = 0x51621D
         @Transient const val BASE_HEIGHT = 40
@@ -202,8 +200,9 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         return 0.5f + 0.5f * -FastMath.cos(10 * x / (WALK_FRAMES_TO_MAX_ACCEL * FastMath.PI))
     }
 
+    // stops; let the friction kick in by doing nothing to the velocity here
     private fun walkHStop() {
-        if (veloX > 0) {
+        /*if (veloX > 0) {
             veloX -= actorValue.getAsFloat(AVKey.ACCEL)!! *
                     actorValue.getAsFloat(AVKey.ACCELMULT)!! *
                     FastMath.sqrt(scale)
@@ -219,13 +218,16 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
             if (veloX > 0) veloX = 0f
         } else {
             veloX = 0f
-        }
+        }*/
+
+        //veloX = 0f
 
         walkPowerCounter = 0
     }
 
+    // stops; let the friction kick in by doing nothing to the velocity here
     private fun walkVStop() {
-        if (veloY > 0) {
+        /*if (veloY > 0) {
             veloY -= WALK_STOP_ACCEL *
                     actorValue.getAsFloat(AVKey.ACCELMULT)!! *
                     FastMath.sqrt(scale)
@@ -242,7 +244,9 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
             if (veloY > 0) veloY = 0f
         } else {
             veloY = 0f
-        }
+        }*/
+
+        ///veloY = 0f
 
         walkPowerCounter = 0
     }
@@ -250,12 +254,12 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     private fun updateMovementControl() {
         if (!noClip) {
             if (grounded) {
-                actorValue.set(AVKey.ACCELMULT, 1f)
+                actorValue[AVKey.ACCELMULT] = 1f
             } else {
-                actorValue.set(AVKey.ACCELMULT, ACCEL_MULT_IN_FLIGHT)
+                actorValue[AVKey.ACCELMULT] = ACCEL_MULT_IN_FLIGHT
             }
         } else {
-            actorValue.set(AVKey.ACCELMULT, 1f)
+            actorValue[AVKey.ACCELMULT] = 1f
         }
     }
 
@@ -412,8 +416,6 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
             val jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * FastMath.sqrt(scale)
 
             veloY -= jumpAcc
-
-            // try concave mode?
         }
 
         // for mob ai:

@@ -151,7 +151,9 @@ constructor() : BasicGameState() {
 
         // determine whether the actor should be active or dormant
         // also updates active actors
-        inactivateDistantActors(gc, delta)
+        updateAndInactivateDistantActors(gc, delta)
+
+        CollisionSolver.process()
 
         uiContainer.forEach { ui -> ui.update(gc, delta) }
         consoleHandler.update(gc, delta)
@@ -327,7 +329,7 @@ constructor() : BasicGameState() {
         }
     }
 
-    fun inactivateDistantActors(gc: GameContainer, delta: Int) {
+    fun updateAndInactivateDistantActors(gc: GameContainer, delta: Int) {
         var actorContainerSize = actorContainer.size
         var i = 0
         // determine whether the actor should be active or dormant by its distance from the player

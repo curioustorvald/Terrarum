@@ -21,45 +21,93 @@ object CollisionSolver {
 
     private val collCandidateX = ArrayList<Pair<ActorWithBody, ActorWithBody>>(COLL_CANDIDATES_SIZE)
     private val collCandidateY = ArrayList<Pair<ActorWithBody, ActorWithBody>>(COLL_CANDIDATES_SIZE)
-    private val collCandidates = ArrayList<Pair<ActorWithBody, ActorWithBody>>(COLL_FINAL_CANDIDATES_SIZE)
+    private var collCandidates = ArrayList<Pair<ActorWithBody, ActorWithBody>>(COLL_FINAL_CANDIDATES_SIZE)
+
+    private val collCandidateStack = Stack<CollisionMarkings>()
 
     /**
      * @link https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects
      */
     fun process() {
+        // clean up before we go
+        collListX.clear()
+        collListY.clear()
+        collCandidateX.clear()
+        collCandidateY.clear()
+
         // mark list x
         Terrarum.game.actorContainer.forEach { it ->
             if (it is ActorWithBody) {
-                collListX.add(CollisionMarkings(it.hitbox.hitboxStart.x, STARTPOINT, it.referenceID))
-                collListX.add(CollisionMarkings(it.hitbox.hitboxEnd.x, ENDPOINT, it.referenceID))
+                collListX.add(CollisionMarkings(it.hitbox.hitboxStart.x, STARTPOINT, it))
+                collListX.add(CollisionMarkings(it.hitbox.hitboxEnd.x, ENDPOINT, it))
             }
         }
-
         // sort list x
         collListX.sortBy { it.pos }
 
         // set candidateX
+        for (it in collListX) {
+            if (it.kind == STARTPOINT) {
+                collCandidateStack.push(it)
+            }
+            else if (it.kind == ENDPOINT) {
+                val mark_this = it
+                val mark_other = collCandidateStack.pop()
+                val collCandidate: Pair<ActorWithBody, ActorWithBody>
+                if (mark_this < mark_other) // make sure actor with lower pos comes left
+                    collCandidate = Pair(mark_this.actor, mark_other.actor)
+                else
+                    collCandidate = Pair(mark_other.actor, mark_this.actor)
+
+                collCandidateX.add(collCandidate)
+            }
+        }
+        collCandidateStack.clear()
 
         // mark list y
         Terrarum.game.actorContainer.forEach { it ->
             if (it is ActorWithBody) {
-                collListY.add(CollisionMarkings(it.hitbox.hitboxStart.y, STARTPOINT, it.referenceID))
-                collListY.add(CollisionMarkings(it.hitbox.hitboxEnd.y, ENDPOINT, it.referenceID))
+                collListY.add(CollisionMarkings(it.hitbox.hitboxStart.y, STARTPOINT, it))
+                collListY.add(CollisionMarkings(it.hitbox.hitboxEnd.y, ENDPOINT, it))
             }
         }
-
         // sort list y
         collListY.sortBy { it.pos }
 
         // set candidateY
+        for (it in collListY) {
+            if (it.kind == STARTPOINT) {
+                collCandidateStack.push(it)
+            }
+            else if (it.kind == ENDPOINT) {
+                val mark_this = it
+                val mark_other = collCandidateStack.pop()
+                val collCandidate: Pair<ActorWithBody, ActorWithBody>
+                if (mark_this < mark_other) // make sure actor with lower pos comes left
+                    collCandidate = Pair(mark_this.actor, mark_other.actor)
+                else
+                    collCandidate = Pair(mark_other.actor, mark_this.actor)
 
+                collCandidateY.add(collCandidate)
+            }
+        }
         // look for overlaps in candidate X/Y and put them into collCandidates
+        // overlapping in X and Y means they are actually overlapping physically
+        collCandidateY.retainAll(collCandidateX) // list Y will have intersection of X and Y now
+        collCandidates = collCandidateY // renaming. X and Y won't be used anyway.
 
         // solve collision for actors in collCandidates
+        collCandidates.forEach { solveCollision(it.first, it.second) }
     }
 
     private fun solveCollision(a: ActorWithBody, b: ActorWithBody) {
+        // some of the Pair(a, b) are either duplicates or erroneously reported.
+        // e.g. (A, B), (B, C) and then (A, C);
+        //      in some situation (A, C) will not making any contact with each other
+        // we are going to filter them
+        if (a isCollidingWith b) {
 
+        }
     }
 
     private infix fun ActorWithBody.isCollidingWith(other: ActorWithBody): Boolean {
@@ -90,11 +138,16 @@ object CollisionSolver {
     fun Float.abs() = if (this < 0) -this else this
     fun Float.sqr() = this * this
 
-    data class CollisionMarkings(
+    class CollisionMarkings(
             val pos: Float,
             val kind: Int,
-            val actorID: Int
-    )
+            val actor: ActorWithBody
+    ) : Comparable<CollisionMarkings> {
+        override fun compareTo(other: CollisionMarkings): Int =
+                if (this.pos > other.pos) 1
+                else if (this.pos < other.pos) -1
+                else 0
+    }
 
     /**
      * === Some useful physics knowledge ===
