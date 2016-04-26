@@ -1,7 +1,8 @@
-package net.torvald.terrarum.gameactors
+package net.torvald.terrarum.gameactors.collisionsolver
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.ActorWithBody
 import java.util.*
 
 /**
@@ -26,7 +27,8 @@ object CollisionSolver {
     private val collCandidateStack = Stack<CollisionMarkings>()
 
     /**
-     * @link https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects
+     * to see what's going on here, visit
+     * [this link](https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects)
      */
     fun process() {
         // clean up before we go
@@ -112,15 +114,31 @@ object CollisionSolver {
 
             // if they actually makes collision (e.g. player vs ball), solve it
             if (a makesCollisionWith b) {
+                // assuming perfect elastic collision; ignoring 'var elasticity'
+                val ux_1 = a.veloX
+                val ux_2 = b.veloX
+                val uy_1 = a.veloY
+                val uy_2 = b.veloY
+                val m1 = a.mass
+                val m2 = b.mass
 
+                val vx_1 = (ux_2 * (m1 - m2) + 2 * m2 * ux_2) / (m1 + m2)
+                val vx_2 = (ux_2 * (m2 - m1) + 2 * m1 * ux_1) / (m1 + m2)
+                val vy_1 = (uy_2 * (m1 - m2) + 2 * m2 * uy_2) / (m1 + m2)
+                val vy_2 = (uy_2 * (m2 - m1) + 2 * m1 * uy_1) / (m1 + m2)
+
+                a.veloX = vx_1
+                a.veloY = vy_1
+                b.veloX = vx_2
+                b.veloY = vy_2
             }
         }
     }
 
     private infix fun ActorWithBody.makesCollisionWith(other: ActorWithBody): Boolean {
-        return false
+        return true
     }
-
+    
     private infix fun ActorWithBody.isCollidingWith(other: ActorWithBody): Boolean {
         val ax = this.hitbox.centeredX
         val ay = this.hitbox.centeredY

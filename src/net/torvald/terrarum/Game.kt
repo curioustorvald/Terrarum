@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.console.Authenticator
+import net.torvald.terrarum.gameactors.collisionsolver.CollisionSolver
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyMap
@@ -82,6 +83,8 @@ constructor() : BasicGameState() {
     val KEY_LIGHTMAP_RENDER = Key.F7
     val KEY_LIGHTMAP_SMOOTH = Key.F8
 
+    var DELTA_T: Int = 0
+
     @Throws(SlickException::class)
     override fun init(gameContainer: GameContainer, stateBasedGame: StateBasedGame) {
         KeyMap.build()
@@ -133,6 +136,8 @@ constructor() : BasicGameState() {
     }
 
     override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
+        DELTA_T = delta
+
         update_delta = delta
         setAppTitle()
 
@@ -345,7 +350,8 @@ constructor() : BasicGameState() {
                 i-- // array removed 1 elem, so also decrement counter by 1
             }
             else {
-                actorContainer[i].update(gc, delta)
+                //actorContainer[i].update(gc, delta)
+                actorContainer[i].start()
             }
             i++
         }

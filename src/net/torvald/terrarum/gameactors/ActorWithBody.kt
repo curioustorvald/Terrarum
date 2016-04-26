@@ -28,7 +28,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
     /**
      * Velocity vector (broken down by axes) for newtonian sim.
      * Acceleration: used in code like:
-     * veloY += 3.0
+     *     veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
     @Volatile var veloX: Float = 0.toFloat()
@@ -121,17 +121,20 @@ open class ActorWithBody constructor() : Actor(), Visible {
     @Transient internal var eventMoving = EVENT_MOVE_NONE // cannot collide both X-axis and Y-axis, or else jump control breaks up.
 
     /**
-     * in milliseconds
+     * Post-hit invincibility, in milliseconds
      */
-    @Transient val INVINCIBILITY_TIME = 500
+    @Transient val INVINCIBILITY_TIME: Int = 500
 
     @Transient private val map: GameMap
 
-    @Transient private val MASS_DEFAULT = 60f
+    @Transient private val MASS_DEFAULT: Float = 60f
 
     internal val physSleep: Boolean
         get() = veloX.abs() < 0.5 && veloY.abs() < 0.5
 
+    /**
+     * for collide-to-world compensation
+     */
     @Transient private var posAdjustX = 0
     @Transient private var posAdjustY = 0
 
@@ -186,6 +189,8 @@ open class ActorWithBody constructor() : Actor(), Visible {
         mass = (actorValue.getAsFloat(AVKey.BASEMASS) ?: MASS_DEFAULT) * FastMath.pow(scale, 3f)
         if (elasticity != 0f) elasticity = 0f
     }
+
+    override fun run() = update(Terrarum.appgc, Terrarum.game.DELTA_T)
 
     override fun update(gc: GameContainer, delta_t: Int) {
         if (isUpdate) {
