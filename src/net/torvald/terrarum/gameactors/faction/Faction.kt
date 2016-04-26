@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors.faction
 
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.Terrarum
 import java.util.HashSet
 
 /**
@@ -13,7 +14,7 @@ class Faction(factionName: String) {
     lateinit var factionNeutral: HashSet<String>
     lateinit var factionHostile: HashSet<String>
     lateinit var factionFearful: HashSet<String>
-    var factionID: Long = HQRNG().nextLong()
+    var factionID: Long = generateUniqueID()
 
     init {
         this.factionName = factionName
@@ -59,4 +60,8 @@ class Faction(factionName: String) {
         factionFearful.remove(faction)
     }
 
+    fun generateUniqueID(): Long {
+        fun Long.abs() = if (this < 0) -this else this
+        return HQRNG().nextLong().abs() // set new ID
+    }
 }

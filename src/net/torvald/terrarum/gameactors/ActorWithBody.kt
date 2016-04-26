@@ -31,8 +31,8 @@ open class ActorWithBody constructor() : Actor(), Visible {
      * veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
-    var veloX: Float = 0.toFloat()
-    var veloY: Float = 0.toFloat()
+    @Volatile var veloX: Float = 0.toFloat()
+    @Volatile var veloY: Float = 0.toFloat()
     @Transient private val VELO_HARD_LIMIT = 10000f
 
     var grounded = false
@@ -132,10 +132,10 @@ open class ActorWithBody constructor() : Actor(), Visible {
     internal val physSleep: Boolean
         get() = veloX.abs() < 0.5 && veloY.abs() < 0.5
 
-    private var posAdjustX = 0
-    private var posAdjustY = 0
+    @Transient private var posAdjustX = 0
+    @Transient private var posAdjustY = 0
 
-    private val BASE_FRICTION = 0.3f
+    @Transient private val BASE_FRICTION = 0.3f
 
     init {
         map = Terrarum.game.map
@@ -189,10 +189,11 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     override fun update(gc: GameContainer, delta_t: Int) {
         if (isUpdate) {
-            updatePhysicalInfos()
             /**
              * Update variables
              */
+            updatePhysicalInfos()
+
             // make NoClip work for player
             if (this is Player) {
                 isNoSubjectToGrav = isPlayerNoClip
@@ -212,6 +213,9 @@ open class ActorWithBody constructor() : Actor(), Visible {
             // copy gravitational constant from the map the actor is in
             gravitation = map.gravitation
 
+            /**
+             * Actual physics thing (altering velocity) starts from here
+             */
             // Actors are subject to the gravity and the buoyancy if they are not levitating
             if (!isNoSubjectToGrav) {
                 applyGravitation()
@@ -222,29 +226,31 @@ open class ActorWithBody constructor() : Actor(), Visible {
             if (veloX > VELO_HARD_LIMIT) veloX = VELO_HARD_LIMIT
             if (veloY > VELO_HARD_LIMIT) veloY = VELO_HARD_LIMIT
 
-            // Set 'next' position (hitbox) to fiddle with
-            updateNextHitboxFromVelo()
+            if (!physSleep) {
+                // Set 'next' position (hitbox) to fiddle with
+                updateNextHitboxFromVelo()
 
-            // if not horizontally moving then ...
-            //if (Math.abs(veloX) < 0.5) { // fix for special situations (see fig. 1 at the bottom of the source)
-            //    updateVerticalPos();
-            //    updateHorizontalPos();
-            //}
-            //else {
-            // compensate for colliding
-            updateHorizontalCollision()
-            updateVerticalCollision()
+                // if not horizontally moving then ...
+                //if (Math.abs(veloX) < 0.5) { // fix for special situations (see fig. 1 at the bottom of the source)
+                //    updateVerticalPos();
+                //    updateHorizontalPos();
+                //}
+                //else {
+                // compensate for colliding
+                updateHorizontalCollision()
+                updateVerticalCollision()
 
-            setHorizontalFriction()
-            //}
+                setHorizontalFriction()
+                //}
 
-            // apply our compensation to actual hitbox
-            updateHitboxX()
-            updateHitboxY()
+                // apply our compensation to actual hitbox
+                updateHitboxX()
+                updateHitboxY()
 
-            // make sure the actor does not go out of the map
-            clampNextHitbox()
-            clampHitbox()
+                // make sure the actor does not go out of the map
+                clampNextHitbox()
+                clampHitbox()
+            }
         }
     }
 
@@ -275,14 +281,14 @@ open class ActorWithBody constructor() : Actor(), Visible {
     }
 
     private fun setHorizontalFriction() {
-        val friction = BASE_FRICTION * (tileFriction / 16f) // ground frction * !@#$!@#$ // default val: 0.3
+        val friction = BASE_FRICTION * tileFriction.tileFrictionToMult()
         if (veloX < 0) {
             veloX += friction
-            if (veloX > 0) veloX = 0f
+            if (veloX > 0) veloX = 0f // compensate overshoot
         }
         else if (veloX > 0) {
             veloX -= friction
-            if (veloX < 0) veloX = 0f
+            if (veloX < 0) veloX = 0f // compensate overshoot
         }
     }
 
@@ -580,6 +586,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
             return friction
         }
+    fun Int.tileFrictionToMult() = this / 16f
 
     /**
      * Get highest density (specific gravity) value from tiles that the body occupies.
@@ -597,20 +604,43 @@ open class ActorWithBody constructor() : Actor(), Visible {
             for (y in tilePosYStart..tilePosYEnd) {
                 for (x in tilePosXStart..tilePosXEnd) {
                     val tile = map.getTileFromTerrain(x, y)
-                    if (TilePropCodex.getProp(tile).isFluid) {
-                        val thisFluidDensity = TilePropCodex.getProp(tile).density
+                    val thisFluidDensity = TilePropCodex.getProp(tile).density
 
-                        if (thisFluidDensity > density) density = thisFluidDensity
-                    }
+                    if (thisFluidDensity > density) density = thisFluidDensity
                 }
             }
 
             return density
         }
 
-    private fun mvmtRstcToMultiplier(movementResistanceValue: Int): Float {
-        return 1f / (1 + movementResistanceValue / 16f)
-    }
+    /**
+     * Get highest fluid resistance value from tiles that the body occupies.
+     * @return
+     */
+    private val fluidResistance: Int
+        get() {
+            var resistance = 0
+
+            //get highest fluid density
+            val tilePosXStart = (nextHitbox.posX / TSIZE).roundToInt()
+            val tilePosYStart = (nextHitbox.posY / TSIZE).roundToInt()
+            val tilePosXEnd = (nextHitbox.hitboxEnd.x / TSIZE).roundToInt()
+            val tilePosYEnd = (nextHitbox.hitboxEnd.y / TSIZE).roundToInt()
+            for (y in tilePosYStart..tilePosYEnd) {
+                for (x in tilePosXStart..tilePosXEnd) {
+                    val tile = map.getTileFromTerrain(x, y)
+
+                    if (TilePropCodex.getProp(tile).isFluid) {
+                        val thisResistance = TilePropCodex.getProp(tile).movementResistance
+
+                        if (thisResistance > resistance) resistance = thisResistance
+                    }
+                }
+            }
+
+            return resistance
+        }
+    fun Int.resistanceToMult(): Float = 1f / (1 + this / 16f)
 
     private fun clampHitbox() {
         hitbox.setPositionFromPoint(

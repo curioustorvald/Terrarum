@@ -7,9 +7,9 @@ import net.torvald.point.Point2f
  */
 class Hitbox(x1: Float, y1: Float, width: Float, height: Float) {
 
-    var hitboxStart: Point2f
+    @Volatile var hitboxStart: Point2f
         private set
-    var hitboxEnd: Point2f
+    @Volatile var hitboxEnd: Point2f
         private set
     var width: Float = 0.toFloat()
         private set

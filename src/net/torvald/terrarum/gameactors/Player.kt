@@ -55,8 +55,6 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
     @Transient private val TSIZE = MapDrawer.TILE_SIZE
 
-    private val factionSet = HashSet<Faction>()
-
     @Transient private val BASE_DENSITY = 1020
 
     /** Must be set by PlayerFactory */

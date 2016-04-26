@@ -106,8 +106,19 @@ object CollisionSolver {
         //      in some situation (A, C) will not making any contact with each other
         // we are going to filter them
         if (a isCollidingWith b) {
+            // notify collision, but not solve it yet
+            // (e.g. player vs mob, will pass by but still takes damage)
 
+
+            // if they actually makes collision (e.g. player vs ball), solve it
+            if (a makesCollisionWith b) {
+
+            }
         }
+    }
+
+    private infix fun ActorWithBody.makesCollisionWith(other: ActorWithBody): Boolean {
+        return false
     }
 
     private infix fun ActorWithBody.isCollidingWith(other: ActorWithBody): Boolean {
@@ -152,6 +163,10 @@ object CollisionSolver {
     /**
      * === Some useful physics knowledge ===
      *
-     * * Momentum = mass × Velocity
+     * * Momentum = mass × Velocity (p = mv, conserved)
+     *
+     * * Force = mass × acceleration (f = ma, conserved)
+     *
+     * * F_AB = -F_BA (Lex Tertia, does NOT apply to fictitious force like centrifugal)
      */
 }

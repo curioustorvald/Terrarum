@@ -331,17 +331,13 @@ object MapCamera {
         tilesetBook[mode].endUse()
     }
 
-    private fun getGrassInfo(x: Int, y: Int, from: Int, to: Int): Int {
-        return 0
-    }
-
     /**
 
      * @param x
      * *
      * @param y
      * *
-     * @return [0-15] 1: up, 2: right, 4: down, 8: left
+     * @return binary [0-15] 1: up, 2: right, 4: down, 8: left
      */
     private fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
         val nearbyTiles = IntArray(4)
@@ -415,7 +411,6 @@ object MapCamera {
                 // has tile on the bottom
                 3 else 0
         }
-
     }
 
     private fun drawTile(mode: Int, tilewisePosX: Int, tilewisePosY: Int, sheetX: Int, sheetY: Int) {
