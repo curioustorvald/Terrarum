@@ -1,4 +1,4 @@
-package net.torvald.terrarum.gameactors.collisionsolver
+package net.torvald.terrarum.gameactors.physicssolver
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum

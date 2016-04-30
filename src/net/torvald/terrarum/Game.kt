@@ -3,7 +3,7 @@ package net.torvald.terrarum
 import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.console.Authenticator
-import net.torvald.terrarum.gameactors.collisionsolver.CollisionSolver
+import net.torvald.terrarum.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyMap

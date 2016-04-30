@@ -1,4 +1,4 @@
-package net.torvald.terrarum.gameactors.collisionsolver
+package net.torvald.terrarum.gameactors.physicssolver
 
 /**
  * multithreaded version of CollisionSolver#solveCollision

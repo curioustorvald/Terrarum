@@ -47,7 +47,7 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
      * *
      * @param height
      */
-    operator fun set(x1: Double, y1: Double, width: Double, height: Double) {
+    fun set(x1: Double, y1: Double, width: Double, height: Double) {
         hitboxStart = Point2d(x1, y1)
         hitboxEnd = Point2d(x1 + width, y1 + height)
         this.width = width

@@ -8,6 +8,7 @@ import net.torvald.terrarum.tileproperties.TilePropCodex
 import net.torvald.spriteanimation.SpriteAnimation
 import com.jme3.math.FastMath
 import net.torvald.terrarum.tileproperties.TileNameCode
+import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 
@@ -31,8 +32,13 @@ open class ActorWithBody constructor() : Actor(), Visible {
      *     veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
-    @Volatile var veloX: Double = 0.0
-    @Volatile var veloY: Double = 0.0
+    val velocity = Vector2(0.0, 0.0)
+    var veloX: Double
+        get() = velocity.x
+        set(value) { velocity.set(value, veloY) }
+    var veloY: Double
+        get() = velocity.y
+        set(value) { velocity.set(veloX, value) }
     @Transient private val VELO_HARD_LIMIT = 10000.0
 
     var grounded = false
@@ -62,8 +68,11 @@ open class ActorWithBody constructor() : Actor(), Visible {
      * Physical properties.
      * Values derived from ActorValue must be @Transient.
      */
-    @Transient var scale = 1.0
-    @Transient var mass = 2.0
+    var scale: Double
+        get() = actorValue.getAsDouble(AVKey.SCALE) ?: 1.0
+        set(value) = actorValue.set(AVKey.SCALE, value)
+    val mass: Double
+        get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT * Math.pow(scale, 3.0)
     @Transient private val MASS_LOWEST = 2.0
     /** Valid range: [0, 1]  */
     var elasticity = 0.0
@@ -140,6 +149,10 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     @Transient private val BASE_FRICTION = 0.3
 
+    @Transient val KINEMATIC = 1
+    @Transient val DYNAMIC = 2
+    @Transient val STATIC = 3
+
     init {
         map = Terrarum.game.map
     }
@@ -184,20 +197,10 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 baseHitboxH * scale)
     }
 
-    private fun updatePhysicalInfos() {
-        scale = actorValue.getAsDouble(AVKey.SCALE) ?: 1.0
-        mass = (actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT) * Math.pow(scale, 3.0)
-        if (elasticity != 0.0) elasticity = 0.0
-    }
-
     override fun run() = update(Terrarum.appgc, Terrarum.game.DELTA_T)
 
     override fun update(gc: GameContainer, delta_t: Int) {
         if (isUpdate) {
-            /**
-             * Update variables
-             */
-            updatePhysicalInfos()
 
             // make NoClip work for player
             if (this is Player) {
@@ -205,9 +208,6 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 isNoCollideWorld = isPlayerNoClip
                 isNoSubjectToFluidResistance = isPlayerNoClip
             }
-
-            // clamp to the minimum possible mass
-            if (mass < MASS_LOWEST) mass = MASS_LOWEST
 
             // set sprite dimension vars if there IS sprite for the actor
             if (sprite != null) {
