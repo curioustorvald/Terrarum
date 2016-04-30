@@ -20,7 +20,7 @@ internal class SetAV : ConsoleCommand {
         echo.execute("${ccW}Set actor value of specific target to desired value.")
         echo.execute("${ccW}Usage: ${ccY}setav ${ccG}(id) <av> <val>")
         echo.execute("${ccW}blank ID for player")
-        echo.execute("${ccR}Contaminated (float -> string) ActorValue will crash the game,")
+        echo.execute("${ccR}Contaminated (double -> string) ActorValue will crash the game,")
         echo.execute("${ccR}so make sure it will not happen before you issue the command!")
         echo.execute("${ccW}Use ${ccG}__true ${ccW}and ${ccG}__false ${ccW}for boolean value.")
     }
@@ -35,7 +35,7 @@ internal class SetAV : ConsoleCommand {
             catch (e: NumberFormatException) {
 
                 try {
-                    `val` = arg.toFloat() // try for float
+                    `val` = arg.toDouble() // try for double
                 }
                 catch (ee: NumberFormatException) {
                     if (arg.equals("__true", ignoreCase = true)) {

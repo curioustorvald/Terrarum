@@ -33,14 +33,14 @@ object PBSigrid {
         p.spriteGlow!!.setAsVisible()
 
         p.actorValue = ActorValue()
-        p.actorValue[AVKey.SCALE] = 1.0f
-        p.actorValue[AVKey.SPEED] = 4.0f
-        p.actorValue[AVKey.SPEEDMULT] = 1.0f
+        p.actorValue[AVKey.SCALE] = 1.0
+        p.actorValue[AVKey.SPEED] = 4.0
+        p.actorValue[AVKey.SPEEDMULT] = 1.0
         p.actorValue[AVKey.ACCEL] = Player.WALK_ACCEL_BASE
-        p.actorValue[AVKey.ACCELMULT] = 1.0f
-        p.actorValue[AVKey.JUMPPOWER] = 5f
+        p.actorValue[AVKey.ACCELMULT] = 1.0
+        p.actorValue[AVKey.JUMPPOWER] = 5.0
 
-        p.actorValue[AVKey.BASEMASS] = 80f
+        p.actorValue[AVKey.BASEMASS] = 80.0
         p.actorValue[AVKey.PHYSIQUEMULT] = 1 // Constant 1.0 for player, meant to be used by random mobs
         /**
          * fixed value, or 'base value', from creature strength of Dwarf Fortress.
@@ -64,7 +64,7 @@ object PBSigrid {
 
         p.inventory = ActorInventory(0x7FFFFFFF, true)
 
-        p.setPosition((4096 * MapDrawer.TILE_SIZE).toFloat(), (300 * 16).toFloat())
+        p.setPosition((4096 * MapDrawer.TILE_SIZE).toDouble(), (300 * 16).toDouble())
 
         p.faction.add(FactionFactory.create("FactionSigrid.json"))
 

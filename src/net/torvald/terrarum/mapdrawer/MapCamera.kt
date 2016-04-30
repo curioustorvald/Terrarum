@@ -225,9 +225,9 @@ object MapCamera {
 
         // position - (WH / 2)
         cameraX = Math.round(FastMath.clamp(
-                player.hitbox!!.centeredX - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))
+                player.hitbox.centeredX.toFloat() - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))
         cameraY = Math.round(FastMath.clamp(
-                player.hitbox!!.centeredY - renderHeight / 2, TSIZE.toFloat(), map.height * TSIZE - renderHeight - TSIZE.toFloat()))
+                player.hitbox.centeredY.toFloat() - renderHeight / 2, TSIZE.toFloat(), map.height * TSIZE - renderHeight - TSIZE.toFloat()))
     }
 
     fun renderBehind(gc: GameContainer, g: Graphics) {

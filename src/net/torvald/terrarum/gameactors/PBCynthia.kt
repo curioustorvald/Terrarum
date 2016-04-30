@@ -23,7 +23,7 @@ object PBCynthia {
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: Player.BASE_HEIGHT, 9, 0)
 
-        p.setPosition((4096 * MapDrawer.TILE_SIZE).toFloat(), (300 * 16).toFloat())
+        p.setPosition((4096 * MapDrawer.TILE_SIZE).toDouble(), (300 * 16).toDouble())
 
         return p
     }

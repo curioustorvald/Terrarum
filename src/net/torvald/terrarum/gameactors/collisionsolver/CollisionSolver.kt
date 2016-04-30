@@ -151,7 +151,7 @@ object CollisionSolver {
         val dist_y = (ay - by).abs() // 'ty'
         val tangent = dist_y / dist_x
 
-        var t_ax: Float; var t_ay: Float
+        var t_ax: Double; var t_ay: Double
         if (dist_x > dist_y) {
             t_ax = this.hitbox.width / 2
             t_ay = t_ax * tangent
@@ -164,11 +164,11 @@ object CollisionSolver {
         return (t_ax.sqr() + t_ay.sqr()) < actor_dist_t_sqr
     }
 
-    fun Float.abs() = if (this < 0) -this else this
-    fun Float.sqr() = this * this
+    fun Double.abs() = if (this < 0) -this else this
+    fun Double.sqr() = this * this
 
     class CollisionMarkings(
-            val pos: Float,
+            val pos: Double,
             val kind: Int,
             val actor: ActorWithBody
     ) : Comparable<CollisionMarkings> {

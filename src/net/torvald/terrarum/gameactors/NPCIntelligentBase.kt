@@ -17,14 +17,14 @@ open class NPCIntelligentBase : ActorWithBody()
     override var itemData: InventoryItem = object : InventoryItem {
         override var itemID = HQRNG().nextInt()
 
-        override var mass: Float
-            get() = actorValue.get("mass") as Float
+        override var mass: Double
+            get() = actorValue.getAsDouble("mass")!!
             set(value) {
                 actorValue.set("mass", value)
             }
 
-        override var scale: Float
-            get() = actorValue.get("scale") as Float
+        override var scale: Double
+            get() = actorValue.getAsDouble("scale")!!
             set(value) {
                 actorValue.set("scale", value)
             }
@@ -70,7 +70,7 @@ open class NPCIntelligentBase : ActorWithBody()
 
     }
 
-    override fun getItemWeight(): Float {
+    override fun getItemWeight(): Double {
         return mass
     }
 

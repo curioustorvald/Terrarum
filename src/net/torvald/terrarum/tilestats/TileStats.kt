@@ -34,9 +34,9 @@ object TileStats {
         val renderHeight = FastMath.ceil(Terrarum.HEIGHT.toFloat())
 
         val noZoomCameraX = Math.round(FastMath.clamp(
-                player.hitbox!!.centeredX - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))
+                player.hitbox.centeredX.toFloat() - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))
         val noZoomCameraY = Math.round(FastMath.clamp(
-                player.hitbox!!.centeredY - renderHeight / 2, TSIZE.toFloat(), map.width * TSIZE - renderHeight - TSIZE.toFloat()))
+                player.hitbox.centeredY.toFloat() - renderHeight / 2, TSIZE.toFloat(), map.width * TSIZE - renderHeight - TSIZE.toFloat()))
 
         val for_x_start = MapCamera.div16(noZoomCameraX)
         val for_y_start = MapCamera.div16(noZoomCameraY)

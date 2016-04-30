@@ -16,12 +16,12 @@ class SpawnPhysTestBall : ConsoleCommand {
             val mouseX = Terrarum.appgc.input.mouseX
             val mouseY = Terrarum.appgc.input.mouseY
 
-            val elasticity = args[1].toFloat()
+            val elasticity = args[1].toDouble()
 
             val ball = PhysTestBall()
             ball.setPosition(
-                    (mouseX + MapCamera.cameraX).toFloat(),
-                    (mouseY + MapCamera.cameraY).toFloat()
+                    (mouseX + MapCamera.cameraX).toDouble(),
+                    (mouseY + MapCamera.cameraY).toDouble()
             )
             ball.elasticity = elasticity
 

@@ -87,8 +87,8 @@ class ActorInventory() {
         return itemList.clone() as Map<Int, Int>
     }
 
-    fun getTotalWeight(): Float {
-        var weight = 0f
+    fun getTotalWeight(): Double {
+        var weight = 0.0
 
         for (item in itemList.entries) {
             weight += ItemPropCodex.getProp(item.key).mass * item.value

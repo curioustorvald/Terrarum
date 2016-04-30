@@ -17,7 +17,7 @@ class DroppedItem constructor(itemID: Int) : ActorWithBody() {
         isVisible = true
 
         mass = if (itemID < 4096)
-            TilePropCodex.getProp(itemID).density / 1000f
+            TilePropCodex.getProp(itemID).density / 1000.0
         else
             ItemPropCodex.getProp(itemID).mass
     }

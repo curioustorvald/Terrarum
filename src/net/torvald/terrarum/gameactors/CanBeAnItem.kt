@@ -9,7 +9,7 @@ interface CanBeAnItem {
 
     fun attachItemData()
 
-    fun getItemWeight(): Float
+    fun getItemWeight(): Double
 
     fun stopUpdateAndDraw()
 

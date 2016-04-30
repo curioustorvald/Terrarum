@@ -47,17 +47,6 @@ open class KVHashMap {
         return get(key) as Int?
     }
 
-    fun getAsFloat(key: String): Float? {
-        val value = get(key)
-
-        if (value is Int)
-            return value.toFloat()
-        else if (value is JsonPrimitive)
-            return value.asFloat
-
-        return value as Float?
-    }
-
     fun getAsDouble(key: String): Double? {
         val value = get(key)
 
@@ -66,7 +55,14 @@ open class KVHashMap {
         else if (value is JsonPrimitive)
             return value.asDouble
 
-        return value as Double?
+        try {
+            return value as Double?
+        }
+        catch (e: ClassCastException) {
+            System.err.println("[KVHashMap] ClassCastException for key '$key'")
+            e.printStackTrace(System.err)
+        }
+        return null
     }
 
     fun getAsString(key: String): String? {

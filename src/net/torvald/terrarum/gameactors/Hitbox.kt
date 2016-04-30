@@ -1,24 +1,24 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.point.Point2f
+import net.torvald.point.Point2d
 
 /**
  * Created by minjaesong on 16-01-15.
  */
-class Hitbox(x1: Float, y1: Float, width: Float, height: Float) {
+class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
 
-    @Volatile var hitboxStart: Point2f
+    @Volatile var hitboxStart: Point2d
         private set
-    @Volatile var hitboxEnd: Point2f
+    @Volatile var hitboxEnd: Point2d
         private set
-    var width: Float = 0.toFloat()
+    var width: Double = 0.toDouble()
         private set
-    var height: Float = 0.toFloat()
+    var height: Double = 0.toDouble()
         private set
 
     init {
-        hitboxStart = Point2f(x1, y1)
-        hitboxEnd = Point2f(x1 + width, y1 + height)
+        hitboxStart = Point2d(x1, y1)
+        hitboxEnd = Point2d(x1 + width, y1 + height)
         this.width = width
         this.height = height
     }
@@ -27,14 +27,14 @@ class Hitbox(x1: Float, y1: Float, width: Float, height: Float) {
      * Returns bottom-centered point of hitbox.
      * @return pointX
      */
-    val pointedX: Float
+    val pointedX: Double
         get() = hitboxStart.x + width / 2
 
     /**
      * Returns bottom-centered point of hitbox.
      * @return pointY
      */
-    val pointedY: Float
+    val pointedY: Double
         get() = hitboxEnd.y
 
     /**
@@ -47,48 +47,48 @@ class Hitbox(x1: Float, y1: Float, width: Float, height: Float) {
      * *
      * @param height
      */
-    operator fun set(x1: Float, y1: Float, width: Float, height: Float) {
-        hitboxStart = Point2f(x1, y1)
-        hitboxEnd = Point2f(x1 + width, y1 + height)
+    operator fun set(x1: Double, y1: Double, width: Double, height: Double) {
+        hitboxStart = Point2d(x1, y1)
+        hitboxEnd = Point2d(x1 + width, y1 + height)
         this.width = width
         this.height = height
     }
 
-    fun setPosition(x1: Float, y1: Float) {
-        hitboxStart = Point2f(x1, y1)
-        hitboxEnd = Point2f(x1 + width, y1 + height)
+    fun setPosition(x1: Double, y1: Double) {
+        hitboxStart = Point2d(x1, y1)
+        hitboxEnd = Point2d(x1 + width, y1 + height)
     }
 
-    fun setPositionX(x: Float) {
+    fun setPositionX(x: Double) {
         setPosition(x, posY)
     }
 
-    fun setPositionY(y: Float) {
+    fun setPositionY(y: Double) {
         setPosition(posX, y)
     }
 
-    fun setPositionFromPoint(x1: Float, y1: Float) {
-        hitboxStart = Point2f(x1 - width / 2, y1 - height)
-        hitboxEnd = Point2f(hitboxStart.x + width, hitboxStart.y + height)
+    fun setPositionFromPoint(x1: Double, y1: Double) {
+        hitboxStart = Point2d(x1 - width / 2, y1 - height)
+        hitboxEnd = Point2d(hitboxStart.x + width, hitboxStart.y + height)
     }
 
-    fun setPositionXFromPoint(x: Float) {
+    fun setPositionXFromPoint(x: Double) {
         setPositionFromPoint(x, pointedY)
     }
 
-    fun setPositionYFromPoint(y: Float) {
+    fun setPositionYFromPoint(y: Double) {
         setPositionFromPoint(pointedX, y)
     }
 
-    fun translatePosX(d: Float) {
+    fun translatePosX(d: Double) {
         setPositionX(posX + d)
     }
 
-    fun translatePosY(d: Float) {
+    fun translatePosY(d: Double) {
         setPositionY(posY + d)
     }
 
-    fun setDimension(w: Float, h: Float) {
+    fun setDimension(w: Double, h: Double) {
         width = w
         height = h
     }
@@ -97,19 +97,19 @@ class Hitbox(x1: Float, y1: Float, width: Float, height: Float) {
      * Returns x value of start point
      * @return top-left point posX
      */
-    val posX: Float
+    val posX: Double
         get() = hitboxStart.x
 
     /**
      * Returns y value of start point
      * @return top-left point posY
      */
-    val posY: Float
+    val posY: Double
         get() = hitboxStart.y
 
-    val centeredX: Float
+    val centeredX: Double
         get() = (hitboxStart.x + hitboxEnd.x) * 0.5f
 
-    val centeredY: Float
+    val centeredY: Double
         get() = (hitboxStart.y + hitboxEnd.y) * 0.5f
 }

@@ -26,11 +26,11 @@ class BasicDebugInfoWindow:UICanvas {
 
     override var openCloseTime: Int = 0
 
-    private var prevPlayerX = 0f
-    private var prevPlayerY = 0f
+    private var prevPlayerX = 0.0
+    private var prevPlayerY = 0.0
 
-    private var xdelta = 0f
-    private var ydelta = 0f
+    private var xdelta = 0.0
+    private var ydelta = 0.0
 
     val ccW = GameFontBase.colToCode["w"]
     val ccG = GameFontBase.colToCode["g"]
@@ -129,41 +129,6 @@ class BasicDebugInfoWindow:UICanvas {
         printLineColumn(g, 2, 5, "Time $ccG${Terrarum.game.map.worldTime.elapsedSeconds()}" +
                                  " (${Terrarum.game.map.worldTime.getFormattedTime()})")
         printLineColumn(g, 2, 6, "Mass $ccG${player.mass}")
-
-        /**
-         * On screen
-         */
-
-        // Hitbox
-        val zoom = Terrarum.game.screenZoom
-        g.color = Color(0x007f00)
-        g.drawRect(hitbox.hitboxStart.x * zoom - MapCamera.cameraX * zoom
-                , hitbox.hitboxStart.y * zoom - MapCamera.cameraY * zoom
-                , hitbox.width * zoom
-                , hitbox.height * zoom)
-        // ...and its point
-        g.fillRect(
-                (hitbox.pointedX - 1) * zoom - MapCamera.cameraX * zoom
-                , (hitbox.pointedY - 1) * zoom - MapCamera.cameraY * zoom
-                , 3f, 3f)
-        g.drawString(
-                "hitbox", (Terrarum.WIDTH - 15 * 8 - 2).toFloat().toFloat()
-                , line(1))
-
-        // Next hitbox
-        g.color = Color.blue
-        g.drawRect(nextHitbox.hitboxStart.x * zoom - MapCamera.cameraX * zoom
-                , nextHitbox.hitboxStart.y * zoom - MapCamera.cameraY * zoom
-                , nextHitbox.width * zoom
-                , nextHitbox.height * zoom)
-        // ...and its point
-        g.fillRect(
-                (nextHitbox.pointedX - 1) * zoom - MapCamera.cameraX * zoom
-                , (nextHitbox.pointedY - 1) * zoom - MapCamera.cameraY * zoom
-                , 3f, 3f)
-        g.drawString(
-                "nextHitbox", (Terrarum.WIDTH - 15 * 8 - 2).toFloat().toFloat()
-                , line(2))
 
         drawHistogram(g, LightmapRenderer.histogram,
                 Terrarum.WIDTH - histogramW - 30,

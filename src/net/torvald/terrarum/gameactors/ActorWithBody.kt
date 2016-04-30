@@ -20,8 +20,8 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     override var actorValue: ActorValue = ActorValue()
 
-    var hitboxTranslateX: Float = 0.toFloat()// relative to spritePosX
-    var hitboxTranslateY: Float = 0.toFloat()// relative to spritePosY
+    var hitboxTranslateX: Double = 0.toDouble()// relative to spritePosX
+    var hitboxTranslateY: Double = 0.toDouble()// relative to spritePosY
     var baseHitboxW: Int = 0
     var baseHitboxH: Int = 0
 
@@ -31,9 +31,9 @@ open class ActorWithBody constructor() : Actor(), Visible {
      *     veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
-    @Volatile var veloX: Float = 0.toFloat()
-    @Volatile var veloY: Float = 0.toFloat()
-    @Transient private val VELO_HARD_LIMIT = 10000f
+    @Volatile var veloX: Double = 0.0
+    @Volatile var veloY: Double = 0.0
+    @Transient private val VELO_HARD_LIMIT = 10000.0
 
     var grounded = false
 
@@ -55,18 +55,18 @@ open class ActorWithBody constructor() : Actor(), Visible {
     /**
      * Positions: top-left point
      */
-    override val hitbox = Hitbox(0f,0f,0f,0f)
-    @Transient val nextHitbox = Hitbox(0f,0f,0f,0f)
+    override val hitbox = Hitbox(0.0,0.0,0.0,0.0)
+    @Transient val nextHitbox = Hitbox(0.0,0.0,0.0,0.0)
 
     /**
      * Physical properties.
      * Values derived from ActorValue must be @Transient.
      */
-    @Transient var scale = 1f
-    @Transient var mass = 2f
-    @Transient private val MASS_LOWEST = 2f
+    @Transient var scale = 1.0
+    @Transient var mass = 2.0
+    @Transient private val MASS_LOWEST = 2.0
     /** Valid range: [0, 1]  */
-    var elasticity = 0f
+    var elasticity = 0.0
         set(value) {
             if (value < 0)
                 throw IllegalArgumentException("[ActorWithBody] Invalid elasticity value: $value; valid elasticity value is [0, 1].")
@@ -77,8 +77,8 @@ open class ActorWithBody constructor() : Actor(), Visible {
             else
                 field = value * ELASTICITY_MAX
         }
-    @Transient private val ELASTICITY_MAX = 0.993f
-    private var density = 1000f
+    @Transient private val ELASTICITY_MAX = 0.993
+    private var density = 1000.0
 
     /**
      * Gravitational Constant G. Load from gamemap.
@@ -86,18 +86,18 @@ open class ActorWithBody constructor() : Actor(), Visible {
      * s^2 = 1/FPS = 1/60 if FPS is targeted to 60
      * meter to pixel : 24/FPS
      */
-    @Transient private val METER = 24f
+    @Transient private val METER = 24.0
     /**
      * [m / s^2] * SI_TO_GAME_ACC -> [px / InternalFrame^2]
      */
-    @Transient private val SI_TO_GAME_ACC = METER / FastMath.sqr(Terrarum.TARGET_FPS.toFloat())
+    @Transient private val SI_TO_GAME_ACC = METER / (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS).toDouble()
     /**
      * [m / s] * SI_TO_GAME_VEL -> [px / InternalFrame]
      */
     @Transient private val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
 
-    @Transient private var gravitation: Float = 0.toFloat()
-    @Transient private val DRAG_COEFF = 1f
+    @Transient private var gravitation: Double = 0.toDouble()
+    @Transient private val DRAG_COEFF = 1.0
 
     @Transient private val CONTACT_AREA_TOP = 0
     @Transient private val CONTACT_AREA_RIGHT = 1
@@ -110,7 +110,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
     /**
      * A constant to make falling faster so that the game is more playable
      */
-    @Transient private val G_MUL_PLAYABLE_CONST = 1.4142f
+    @Transient private val G_MUL_PLAYABLE_CONST = 1.4142
 
     @Transient private val EVENT_MOVE_TOP = 0
     @Transient private val EVENT_MOVE_RIGHT = 1
@@ -127,7 +127,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     @Transient private val map: GameMap
 
-    @Transient private val MASS_DEFAULT: Float = 60f
+    @Transient private val MASS_DEFAULT: Double = 60.0
 
     internal val physSleep: Boolean
         get() = veloX.abs() < 0.5 && veloY.abs() < 0.5
@@ -138,7 +138,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
     @Transient private var posAdjustX = 0
     @Transient private var posAdjustY = 0
 
-    @Transient private val BASE_FRICTION = 0.3f
+    @Transient private val BASE_FRICTION = 0.3
 
     init {
         map = Terrarum.game.map
@@ -160,8 +160,8 @@ open class ActorWithBody constructor() : Actor(), Visible {
     fun setHitboxDimension(w: Int, h: Int, tx: Int, ty: Int) {
         baseHitboxH = h
         baseHitboxW = w
-        hitboxTranslateX = tx.toFloat()
-        hitboxTranslateY = ty.toFloat()
+        hitboxTranslateX = tx.toDouble()
+        hitboxTranslateY = ty.toDouble()
     }
 
     /**
@@ -170,7 +170,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
      * *
      * @param y
      */
-    fun setPosition(x: Float, y: Float) {
+    fun setPosition(x: Double, y: Double) {
         hitbox.set(
                 x - (baseHitboxW / 2 - hitboxTranslateX) * scale,
                 y - (baseHitboxH - hitboxTranslateY) * scale,
@@ -185,9 +185,9 @@ open class ActorWithBody constructor() : Actor(), Visible {
     }
 
     private fun updatePhysicalInfos() {
-        scale = actorValue.getAsFloat(AVKey.SCALE) ?: 1f
-        mass = (actorValue.getAsFloat(AVKey.BASEMASS) ?: MASS_DEFAULT) * FastMath.pow(scale, 3f)
-        if (elasticity != 0f) elasticity = 0f
+        scale = actorValue.getAsDouble(AVKey.SCALE) ?: 1.0
+        mass = (actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT) * Math.pow(scale, 3.0)
+        if (elasticity != 0.0) elasticity = 0.0
     }
 
     override fun run() = update(Terrarum.appgc, Terrarum.game.DELTA_T)
@@ -278,7 +278,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
              * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity) * A (area)
              */
             val A = scale * scale
-            val D = DRAG_COEFF * 0.5f * 1.292f * veloY * veloY * A
+            val D = DRAG_COEFF * 0.5 * 1.292 * veloY * veloY * A
 
             veloY += clampCeil(
                     (W - D) / mass * SI_TO_GAME_ACC * G_MUL_PLAYABLE_CONST, VELO_HARD_LIMIT)
@@ -289,11 +289,11 @@ open class ActorWithBody constructor() : Actor(), Visible {
         val friction = BASE_FRICTION * tileFriction.tileFrictionToMult()
         if (veloX < 0) {
             veloX += friction
-            if (veloX > 0) veloX = 0f // compensate overshoot
+            if (veloX > 0) veloX = 0.0 // compensate overshoot
         }
         else if (veloX > 0) {
             veloX -= friction
-            if (veloX < 0) veloX = 0f // compensate overshoot
+            if (veloX < 0) veloX = 0.0 // compensate overshoot
         }
     }
 
@@ -302,12 +302,12 @@ open class ActorWithBody constructor() : Actor(), Visible {
             if (veloY >= 0) { // check downward
                 if (isColliding(CONTACT_AREA_BOTTOM)) { // the ground has dug into the body
                     adjustHitBottom()
-                    veloY = 0f // reset veloY, simulating normal force
+                    veloY = 0.0 // reset veloY, simulating normal force
                     elasticReflectY()
                     grounded = true
                 }
                 else if (isColliding(CONTACT_AREA_BOTTOM, 0, 1)) { // the actor is standing ON the ground
-                    veloY = 0f // reset veloY, simulating normal force
+                    veloY = 0.0 // reset veloY, simulating normal force
                     elasticReflectY()
                     grounded = true
                 }
@@ -319,11 +319,11 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 grounded = false
                 if (isColliding(CONTACT_AREA_TOP)) { // the ceiling has dug into the body
                     adjustHitTop()
-                    veloY = 0f // reset veloY, simulating normal force
+                    veloY = 0.0 // reset veloY, simulating normal force
                     elasticReflectY()
                 }
                 else if (isColliding(CONTACT_AREA_TOP, 0, -1)) { // the actor is touching the ceiling
-                    veloY = 0f // reset veloY, simulating normal force
+                    veloY = 0.0 // reset veloY, simulating normal force
                     elasticReflectY() // reflect on ceiling, for reversed gravity
                 }
                 else { // the actor is not grounded at all
@@ -335,7 +335,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private fun adjustHitBottom() {
         val newX = nextHitbox.pointedX // look carefully, getPos or getPointed
         // int-ify posY of nextHitbox
-        nextHitbox.setPositionYFromPoint(FastMath.floor(nextHitbox.pointedY).toFloat())
+        nextHitbox.setPositionYFromPoint(Math.floor(nextHitbox.pointedY).toDouble())
 
         var newYOff = 0 // always positive
 
@@ -354,7 +354,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private fun adjustHitTop() {
         val newX = nextHitbox.posX
         // int-ify posY of nextHitbox
-        nextHitbox.setPositionY(FastMath.ceil(nextHitbox.posY).toFloat())
+        nextHitbox.setPositionY(Math.ceil(nextHitbox.posY).toDouble())
 
         var newYOff = 0 // always positive
 
@@ -376,12 +376,12 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 if (isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT)) {
                     // the actor is embedded to the wall
                     adjustHitRight()
-                    veloX = 0f // reset veloX, simulating normal force
+                    veloX = 0.0 // reset veloX, simulating normal force
                     elasticReflectX()
                 }
                 else if (isColliding(CONTACT_AREA_RIGHT, 2, 0) && !isColliding(CONTACT_AREA_LEFT, 0, 0)) { // offset by +1, to fix directional quarks
                     // the actor is touching the wall
-                    veloX = 0f // reset veloX, simulating normal force
+                    veloX = 0.0 // reset veloX, simulating normal force
                     elasticReflectX()
                 }
                 else {
@@ -392,12 +392,12 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 if (isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT)) {
                     // the actor is embedded to the wall
                     adjustHitLeft()
-                    veloX = 0f // reset veloX, simulating normal force
+                    veloX = 0.0 // reset veloX, simulating normal force
                     elasticReflectX()
                 }
                 else if (isColliding(CONTACT_AREA_LEFT, -1, 0) && !isColliding(CONTACT_AREA_RIGHT, 1, 0)) {
                     // the actor is touching the wall
-                    veloX = 0f // reset veloX, simulating normal force
+                    veloX = 0.0 // reset veloX, simulating normal force
                     elasticReflectX()
                 }
                 else {
@@ -406,7 +406,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
             else { // check both sides?
                 // System.out.println("updatehorizontal - |velo| < 0.5");
                 //if (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)) {
-                //    veloX = 0f // reset veloX, simulating normal force
+                //    veloX = 0.0 // reset veloX, simulating normal force
                 //    elasticReflectX()
                 //}
             }
@@ -416,7 +416,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private fun adjustHitRight() {
         val newY = nextHitbox.posY // look carefully, posY or pointedY
         // int-ify posY of nextHitbox
-        nextHitbox.setPositionX(FastMath.floor(nextHitbox.posX + nextHitbox.width) - nextHitbox.width)
+        nextHitbox.setPositionX(Math.floor(nextHitbox.posX + nextHitbox.width) - nextHitbox.width)
 
         var newXOff = 0 // always positive
 
@@ -434,7 +434,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private fun adjustHitLeft() {
         val newY = nextHitbox.posY
         // int-ify posY of nextHitbox
-        nextHitbox.setPositionX(FastMath.ceil(nextHitbox.posX).toFloat())
+        nextHitbox.setPositionX(Math.ceil(nextHitbox.posX).toDouble())
 
         var newXOff = 0 // always positive
 
@@ -451,14 +451,14 @@ open class ActorWithBody constructor() : Actor(), Visible {
     }
 
     private fun elasticReflectX() {
-        if (veloX != 0f && (veloX * elasticity).abs() > 0.5) {
+        if (veloX != 0.0 && (veloX * elasticity).abs() > 0.5) {
             veloX = -veloX * elasticity
 
         }
     }
 
     private fun elasticReflectY() {
-        if (veloY != 0f && (veloY * elasticity).abs() > 0.5) {
+        if (veloY != 0.0 && (veloY * elasticity).abs() > 0.5) {
             veloY = -veloY * elasticity
         }
     }
@@ -556,18 +556,18 @@ open class ActorWithBody constructor() : Actor(), Visible {
             veloY -= ((fluidDensity - this.density).toDouble()
                     * map.gravitation.toDouble() * submergedVolume.toDouble()
                     * Math.pow(mass.toDouble(), -1.0)
-                    * SI_TO_GAME_ACC.toDouble()).toFloat()
+                    * SI_TO_GAME_ACC.toDouble()).toDouble()
         }
     }*/
 
-    /*private val submergedVolume: Float
+    /*private val submergedVolume: Double
         get() = submergedHeight * hitbox.width * hitbox.width
 
-    private val submergedHeight: Float
+    private val submergedHeight: Double
         get() = Math.max(
                 getContactingAreaFluid(CONTACT_AREA_LEFT),
                 getContactingAreaFluid(CONTACT_AREA_RIGHT)
-        ).toFloat()*/
+        ).toDouble()*/
 
 
     /**
@@ -591,7 +591,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
             return friction
         }
-    fun Int.tileFrictionToMult() = this / 16f
+    fun Int.tileFrictionToMult() = this / 16.0
 
     /**
      * Get highest density (specific gravity) value from tiles that the body occupies.
@@ -645,7 +645,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
             return resistance
         }
-    fun Int.resistanceToMult(): Float = 1f / (1 + this / 16f)
+    fun Int.resistanceToMult(): Double = 1.0 / (1 + this / 16.0)
 
     private fun clampHitbox() {
         hitbox.setPositionFromPoint(
@@ -682,9 +682,17 @@ open class ActorWithBody constructor() : Actor(), Visible {
     override fun drawGlow(gc: GameContainer, g: Graphics) {
         if (isVisible && spriteGlow != null) {
             if (!sprite!!.flippedHorizontal()) {
-                spriteGlow!!.render(g, hitbox.posX - hitboxTranslateX * scale, hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2, scale)
+                spriteGlow!!.render(g,
+                        (hitbox.posX - hitboxTranslateX * scale).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (scale).toFloat()
+                )
             } else {
-                spriteGlow!!.render(g, hitbox.posX - scale, hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2, scale)
+                spriteGlow!!.render(g,
+                        (hitbox.posX - scale).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (scale).toFloat()
+                )
             }
         }
     }
@@ -692,9 +700,17 @@ open class ActorWithBody constructor() : Actor(), Visible {
     override fun drawBody(gc: GameContainer, g: Graphics) {
         if (isVisible && sprite != null) {
             if (!sprite!!.flippedHorizontal()) {
-                sprite!!.render(g, hitbox.posX - hitboxTranslateX * scale, hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2, scale)
+                sprite!!.render(g,
+                        (hitbox.posX - hitboxTranslateX * scale).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (scale).toFloat()
+                )
             } else {
-                sprite!!.render(g, hitbox.posX - scale, hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2, scale)
+                sprite!!.render(g,
+                        (hitbox.posX - scale).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (scale).toFloat()
+                )
             }
         }
     }
@@ -707,20 +723,20 @@ open class ActorWithBody constructor() : Actor(), Visible {
         if (sprite != null) sprite!!.update(delta)
     }
 
-    private fun clampW(x: Float): Float =
+    private fun clampW(x: Double): Double =
         if (x < TSIZE + nextHitbox.width / 2) {
             TSIZE + nextHitbox.width / 2
-        } else if (x >= (map.width * TSIZE).toFloat() - TSIZE.toFloat() - nextHitbox.width / 2) {
-            (map.width * TSIZE).toFloat() - 1f - TSIZE.toFloat() - nextHitbox.width / 2
+        } else if (x >= (map.width * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.width / 2) {
+            (map.width * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.width / 2
         } else {
             x
         }
 
-    private fun clampH(y: Float): Float =
+    private fun clampH(y: Double): Double =
         if (y < TSIZE + nextHitbox.height) {
             TSIZE + nextHitbox.height
-        } else if (y >= (map.height * TSIZE).toFloat() - TSIZE.toFloat() - nextHitbox.height) {
-            (map.height * TSIZE).toFloat() - 1f - TSIZE.toFloat() - nextHitbox.height
+        } else if (y >= (map.height * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.height) {
+            (map.height * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.height
         } else {
             y
         }
@@ -746,21 +762,20 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private val isPlayerNoClip: Boolean
         get() = this is Player && this.isNoClip()
 
-    private fun quantiseTSize(v: Float): Int = FastMath.floor(v / TSIZE) * TSIZE
-
     fun setDensity(density: Int) {
         if (density < 0)
             throw IllegalArgumentException("[ActorWithBody] $density: density cannot be negative.")
 
-        this.density = density.toFloat()
+        this.density = density.toDouble()
     }
 
     private val AUTO_CLIMB_RATE: Int
-        get() = Math.min(TSIZE / 8 * FastMath.sqrt(scale), TSIZE.toFloat()).toInt()
+        get() = Math.min(TSIZE / 8 * Math.sqrt(scale), TSIZE.toDouble()).toInt()
 
-    fun Float.round() = Math.round(this).toFloat()
-    fun Float.roundToInt(): Int = Math.round(this)
-    fun Float.abs() = FastMath.abs(this)
+    fun Double.round() = Math.round(this).toDouble()
+    fun Double.roundToInt(): Int = Math.round(this).toInt()
+    fun Double.abs() = Math.abs(this)
+    fun Double.sqr() = this * this
     fun Int.abs() = if (this < 0) -this else this
 
     companion object {
@@ -785,7 +800,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 return y and 0x7FFFFFFF shr 4
         }
 
-        private fun clampCeil(x: Float, ceil: Float): Float {
+        private fun clampCeil(x: Double, ceil: Double): Double {
             return if (Math.abs(x) > ceil) ceil else x
         }
     }

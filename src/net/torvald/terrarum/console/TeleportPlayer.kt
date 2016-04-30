@@ -26,7 +26,7 @@ class TeleportPlayer : ConsoleCommand {
                 return
             }
 
-            Terrarum.game.player.setPosition(x.toFloat(), y.toFloat())
+            Terrarum.game.player.setPosition(x.toDouble(), y.toDouble())
         }
     }
 

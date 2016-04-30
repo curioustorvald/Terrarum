@@ -594,6 +594,7 @@ object LightmapRenderer {
     private fun Float.inv() = 1f / this
     fun Float.floor() = FastMath.floor(this)
     fun Float.round(): Int = Math.round(this)
+    fun Double.round(): Int = Math.round(this).toInt()
     fun Float.ceil() = FastMath.ceil(this)
     fun Int.even(): Boolean = this and 1 == 0
     fun Int.odd(): Boolean = this and 1 == 1

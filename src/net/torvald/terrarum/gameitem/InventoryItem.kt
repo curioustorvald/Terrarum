@@ -17,12 +17,12 @@ interface InventoryItem {
     /**
      * Weight of the item, Float
      */
-    var mass: Float
+    var mass: Double
 
     /**
      * Scale of the item. Real mass: mass * (scale^3)
      */
-    var scale: Float
+    var scale: Double
 
     /**
      * Effects applied while in pocket

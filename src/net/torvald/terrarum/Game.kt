@@ -101,7 +101,6 @@ constructor() : BasicGameState() {
         // new ItemPropCodex() -- This is kotlin object and already initialised.
 
         map = GameMap(8192, 2048)
-        map.gravitation = 9.8f
 
         MapGenerator.attachMap(map)
         MapGenerator.SEED = 0x51621D2
@@ -231,16 +230,16 @@ constructor() : BasicGameState() {
                     g.font = Terrarum.smallNumbers
                     g.drawString(
                             actor.referenceID.toString(),
-                            actor.hitbox.posX,
-                            actor.hitbox.pointedY + 4
+                            actor.hitbox.posX.toFloat(),
+                            actor.hitbox.pointedY.toFloat() + 4
                     )
 
                     if (DEBUG_ARRAY) {
                         g.color = GameFontBase.codeToCol["g"]
                         g.drawString(
                                 i.toString(),
-                                actor.hitbox.posX,
-                                actor.hitbox.pointedY + 4 + 10
+                                actor.hitbox.posX.toFloat(),
+                                actor.hitbox.pointedY.toFloat() + 4 + 10
                         )
                     }
                 }
@@ -365,10 +364,10 @@ constructor() : BasicGameState() {
             (this and 0xff00).ushr(8).shl(10) or
             (this and 0xff0000).ushr(16).shl(20)
 
-    fun Float.sqr() = this * this
+    fun Double.sqr() = this * this
     fun Int.sqr() = this * this
     private fun distToActorSqr(a: Visible, p: Player): Float =
-            (a.hitbox.centeredX - p.hitbox.centeredX).sqr() + (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
+            (a.hitbox.centeredX - p.hitbox.centeredX).sqr().toFloat() + (a.hitbox.centeredY - p.hitbox.centeredY).sqr().toFloat()
     private fun Visible.inScreen() = distToActorSqr(this, player) <=
                                      (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.game.screenZoom).sqr() +
                                       Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.game.screenZoom).sqr())

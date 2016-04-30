@@ -295,32 +295,6 @@ constructor(gamename: String) : StateBasedGame(gamename) {
          * *
          * @throws NullPointerException if the specified config simply does not exist.
          */
-        fun getConfigFloat(key: String): Float {
-            var cfg = 0f
-            try {
-                cfg = gameConfig.getAsFloat(key)!!
-            }
-            catch (e: NullPointerException) {
-                try {
-                    cfg = DefaultConfig.fetch().get(key).asFloat
-                }
-                catch (e1: NullPointerException) {
-                    e.printStackTrace()
-                }
-
-            }
-
-            return cfg
-        }
-
-        /**
-         * Return config from config set. If the config does not exist, default value will be returned.
-         * @param key
-         * *
-         * @return Config from config set or default config if it does not exist.
-         * *
-         * @throws NullPointerException if the specified config simply does not exist.
-         */
         fun getConfigString(key: String): String {
             var cfg = ""
             try {

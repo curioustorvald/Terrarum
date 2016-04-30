@@ -32,7 +32,7 @@ constructor(//properties
     //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
     //physics
     /** \[m / s^2\] */
-    var gravitation: Float = 9.8.toFloat()
+    var gravitation: Double = 9.8
     /** RGB in Integer */
     var globalLight: Int = 0
     val worldTime: WorldTime
