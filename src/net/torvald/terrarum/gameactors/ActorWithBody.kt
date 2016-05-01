@@ -71,8 +71,9 @@ open class ActorWithBody constructor() : Actor(), Visible {
     var scale: Double
         get() = actorValue.getAsDouble(AVKey.SCALE) ?: 1.0
         set(value) = actorValue.set(AVKey.SCALE, value)
-    val mass: Double
+    var mass: Double
         get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT * Math.pow(scale, 3.0)
+        set(value) = actorValue.set(AVKey.BASEMASS, value)
     @Transient private val MASS_LOWEST = 2.0
     /** Valid range: [0, 1]  */
     var elasticity = 0.0

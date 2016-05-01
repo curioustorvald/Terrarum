@@ -27,19 +27,19 @@ object CreatureRawInjector {
         val jsonObj = JsonFetcher.readJson(JSONPATH + jsonFileName)
 
         val elementsString = arrayOf(AVKey.RACENAME, AVKey.RACENAMEPLURAL)
-        val elementsFloat = arrayOf(AVKey.BASEHEIGHT, AVKey.BASEMASS, AVKey.ACCEL, AVKey.TOOLSIZE, AVKey.ENCUMBRANCE)
-        val elementsFloatVariable = arrayOf(AVKey.STRENGTH, AVKey.SPEED, AVKey.JUMPPOWER, AVKey.SCALE, AVKey.SPEED)
+        val elementsDouble = arrayOf(AVKey.BASEHEIGHT, AVKey.BASEMASS, AVKey.ACCEL, AVKey.TOOLSIZE, AVKey.ENCUMBRANCE)
+        val elementsDoubleVariable = arrayOf(AVKey.STRENGTH, AVKey.SPEED, AVKey.JUMPPOWER, AVKey.SCALE, AVKey.SPEED)
         val elementsBoolean = arrayOf(AVKey.INTELLIGENT)
         // val elementsMultiplyFromOne = arrayOf()
 
         setAVStrings(actorValueRef, elementsString, jsonObj)
-        setAVFloats(actorValueRef, elementsFloat, jsonObj)
-        setAVFloatsVariable(actorValueRef, elementsFloatVariable, jsonObj)
+        setAVDoubles(actorValueRef, elementsDouble, jsonObj)
+        setAVDoublesVariable(actorValueRef, elementsDoubleVariable, jsonObj)
         // setAVMultiplyFromOne(actorValueRef, elementsMultiplyFromOne, jsonObj)
         setAVBooleans(actorValueRef, elementsBoolean, jsonObj)
 
         actorValueRef[AVKey.ACCEL] = Player.WALK_ACCEL_BASE
-        actorValueRef[AVKey.ACCELMULT] = 1f
+        actorValueRef[AVKey.ACCELMULT] = 1.0
     }
 
     /**
@@ -50,17 +50,17 @@ object CreatureRawInjector {
      * *
      * @param jsonObject
      */
-    private fun setAVFloatsVariable(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
+    private fun setAVDoublesVariable(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
         for (s in elemSet) {
-            val baseValue = jsonObject.get(s).asFloat
+            val baseValue = jsonObject.get(s).asDouble
             // roll fudge dice and get value [-3, 3] as [0, 6]
             val varSelected = Fudge3(SecureRandom()).rollForArray()
             // get multiplier from json. Assuming percentile
             val multiplier = jsonObject.get(s + MULTIPLIER_RAW_ELEM_SUFFIX).asJsonArray.get(varSelected).asInt
-            val realValue = baseValue * multiplier / 100f
+            val realValue = baseValue * multiplier / 100.0
 
             avRef[s] = realValue
-            avRef[s + MULTIPLIER_RAW_ELEM_SUFFIX] = 1.0f // use multiplied value as 'base' for all sort of things
+            avRef[s + MULTIPLIER_RAW_ELEM_SUFFIX] = 1.0 // use multiplied value as 'base' for all sort of things
         }
     }
 
@@ -80,16 +80,16 @@ object CreatureRawInjector {
     }
 
     /**
-     * Fetch and set float actor values
+     * Fetch and set double actor values
      * @param avRef
      * *
      * @param elemSet
      * *
      * @param jsonObject
      */
-    private fun setAVFloats(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
+    private fun setAVDoubles(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
         for (s in elemSet) {
-            avRef[s] = jsonObject.get(s).asFloat
+            avRef[s] = jsonObject.get(s).asDouble
         }
     }
 
@@ -104,12 +104,12 @@ object CreatureRawInjector {
      */
     private fun setAVMultiplyFromOne(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
         for (s in elemSet) {
-            val baseValue = 1f
+            val baseValue = 1.0
             // roll fudge dice and get value [-3, 3] as [0, 6]
             val varSelected = Fudge3(SecureRandom()).rollForArray()
             // get multiplier from json. Assuming percentile
             val multiplier = jsonObject.get(s).asJsonArray.get(varSelected).asInt
-            val realValue = baseValue * multiplier / 100f
+            val realValue = baseValue * multiplier / 100.0
 
             avRef[s] = realValue
         }
