@@ -349,8 +349,7 @@ constructor() : BasicGameState() {
                 i-- // array removed 1 elem, so also decrement counter by 1
             }
             else {
-                //actorContainer[i].update(gc, delta)
-                actorContainer[i].start()
+                actorContainer[i].update(gc, delta)
             }
             i++
         }

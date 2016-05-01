@@ -9,14 +9,7 @@ import org.newdawn.slick.GameContainer
  */
 abstract class Actor : Comparable<Actor>, Runnable {
 
-    abstract protected fun update(gc: GameContainer, delta_t: Int) // use start() for multithreaded env
-
-    protected var thread: Thread? = null
-
-    fun start() {
-        thread = Thread(this, "ID: $referenceID")
-        thread!!.run()
-    }
+    abstract fun update(gc: GameContainer, delta_t: Int)
 
     /**
      * Valid RefID is equal to or greater than 32768.
