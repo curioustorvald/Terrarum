@@ -38,23 +38,24 @@ import org.dyn4j.Epsilon
  * to be non-zero in length.
  *
  *
- * Some methods also return the vector to facilitate chaining.  For example:
- *
- * Vector a = new Vector();
- * a.zero().plus(1, 2).times(2);
+ * Chaining is not available.
  *
  * In this Kotlin code, you can use regular operations like + - * /.
  *
- * |operator|function|
- * |--------|--------|
- * |a + b|a.plus(b)|
- * |a - b|a.minus(b)|
- * |a * b|a.times(b)|
- * |a / b|a.div(b)|
- * |a dot b|a.dot(b)|
- * |a cross b|a.cross(b)|
- * |!a|negate(a)|
- * |a rotate th|a.rotate(th)|
+ * |operator   |function    |
+ * |-----------|------------|
+ * |a + b      |Vector(a).plus(b)   |
+ * |a - b      |Vector(a).minus(b)  |
+ * |a * b      |Vector(a).times(b)  |
+ * |a / b      |Vector(a).div(b)    |
+ * |a += b     |Vector(a).plusAssign(b)|
+ * |a -= b     |Vector(a).minusAssign(b)|
+ * |a *= b     |Vector(a).timesAssign(b)|
+ * |a /= b     |Vector(a).divAssign(b)|
+ * |a dot b    |Vector(a).dot(b)    |
+ * |a cross b  |Vector(a).cross(b)  |
+ * |!a         |Vector(negate(a)    |
+ * |a rotate th|Vector(a).rotate(th)|
  *
  * @author William Bittle
  * *
@@ -370,47 +371,12 @@ class Vector2 {
      * @return [Vector2] this vector
      */
     operator fun plus(vector: Vector2): Vector2 {
-        this.x += vector.x
-        this.y += vector.y
-        return this
-    }
-
-    /**
-     * Adds the given [Vector2] to this [Vector2].
-     * @param x the x component of the [Vector2]
-     * *
-     * @param y the y component of the [Vector2]
-     * *
-     * @return [Vector2] this vector
-     */
-    fun plus(x: Double, y: Double): Vector2 {
-        this.x += x
-        this.y += y
-        return this
-    }
-
-    /**
-     * Adds this [Vector2] and the given [Vector2] returning
-     * a new [Vector2] containing the result.
-     * @param vector the [Vector2]
-     * *
-     * @return [Vector2]
-     */
-    fun sum(vector: Vector2): Vector2 {
         return Vector2(this.x + vector.x, this.y + vector.y)
     }
 
-    /**
-     * Adds this [Vector2] and the given [Vector2] returning
-     * a new [Vector2] containing the result.
-     * @param x the x component of the [Vector2]
-     * *
-     * @param y the y component of the [Vector2]
-     * *
-     * @return [Vector2]
-     */
-    fun sum(x: Double, y: Double): Vector2 {
-        return Vector2(this.x + x, this.y + y)
+    operator fun plusAssign(vector: Vector2) {
+        this.x += vector.x
+        this.y += vector.y
     }
 
     /**
@@ -420,47 +386,12 @@ class Vector2 {
      * @return [Vector2] this vector
      */
     operator fun minus(vector: Vector2): Vector2 {
-        this.x -= vector.x
-        this.y -= vector.y
-        return this
-    }
-
-    /**
-     * Subtracts the given [Vector2] from this [Vector2].
-     * @param x the x component of the [Vector2]
-     * *
-     * @param y the y component of the [Vector2]
-     * *
-     * @return [Vector2] this vector
-     */
-    fun minus(x: Double, y: Double): Vector2 {
-        this.x -= x
-        this.y -= y
-        return this
-    }
-
-    /**
-     * Subtracts the given [Vector2] from this [Vector2] returning
-     * a new [Vector2] containing the result.
-     * @param vector the [Vector2]
-     * *
-     * @return [Vector2]
-     */
-    fun difference(vector: Vector2): Vector2 {
         return Vector2(this.x - vector.x, this.y - vector.y)
     }
 
-    /**
-     * Subtracts the given [Vector2] from this [Vector2] returning
-     * a new [Vector2] containing the result.
-     * @param x the x component of the [Vector2]
-     * *
-     * @param y the y component of the [Vector2]
-     * *
-     * @return [Vector2]
-     */
-    fun difference(x: Double, y: Double): Vector2 {
-        return Vector2(this.x - x, this.y - y)
+    operator fun minusAssign(vector: Vector2) {
+        this.x -= vector.x
+        this.y -= vector.y
     }
 
     /**
@@ -474,27 +405,18 @@ class Vector2 {
     }
 
     /**
-     * Creates a [Vector2] from this [Vector2] to the given [Vector2].
-     * @param x the x component of the [Vector2]
-     * *
-     * @param y the y component of the [Vector2]
-     * *
-     * @return [Vector2]
-     */
-    fun to(x: Double, y: Double): Vector2 {
-        return Vector2(x - this.x, y - this.y)
-    }
-
-    /**
      * Multiplies this [Vector2] by the given scalar.
      * @param scalar the scalar
      * *
      * @return [Vector2] this vector
      */
     operator fun times(scalar: Double): Vector2 {
+        return Vector2(this.x * scalar, this.y * scalar)
+    }
+
+    operator fun timesAssign(scalar: Double) {
         this.x *= scalar
         this.y *= scalar
-        return this
     }
 
     /**
@@ -504,9 +426,12 @@ class Vector2 {
      * @return [Vector2] this vector
      */
     operator fun div(scalar: Double): Vector2 {
+        return Vector2(this.x / scalar, this.y / scalar)
+    }
+
+    operator fun divAssign(scalar: Double) {
         this.x /= scalar
         this.y /= scalar
-        return this
     }
 
     /**
@@ -626,9 +551,7 @@ class Vector2 {
      * @return [Vector2] this vector
      */
     fun negate(): Vector2 {
-        this.x *= -1.0
-        this.y *= -1.0
-        return this
+        return Vector2(x * -1.0, y * -1.0)
     }
 
     /**
@@ -659,40 +582,9 @@ class Vector2 {
         val sin = Math.sin(theta)
         val x = this.x
         val y = this.y
-        this.x = x * cos - y * sin
-        this.y = x * sin + y * cos
-        return this
-    }
-
-    /**
-     * Rotates the [Vector2] about the given coordinates.
-     * @param theta the rotation angle in radians
-     * *
-     * @param x the x coordinate to rotate about
-     * *
-     * @param y the y coordinate to rotate about
-     * *
-     * @return [Vector2] this vector
-     */
-    fun rotate(theta: Double, x: Double, y: Double): Vector2 {
-        this.x -= x
-        this.y -= y
-        this.rotate(theta)
-        this.x += x
-        this.y += y
-        return this
-    }
-
-    /**
-     * Rotates the [Vector2] about the given point.
-     * @param theta the rotation angle in radians
-     * *
-     * @param point the point to rotate about
-     * *
-     * @return [Vector2] this vector
-     */
-    fun rotate(theta: Double, point: Vector2): Vector2 {
-        return this.rotate(theta, point.x, point.y)
+        val newX = x * cos - y * sin
+        val newY = x * sin + y * cos
+        return Vector2(newX, newY)
     }
 
     /**

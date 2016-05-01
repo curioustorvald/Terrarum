@@ -1,6 +1,8 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.point.Point2d
+import org.dyn4j.geometry.ChainedVector2
+import org.dyn4j.geometry.Vector2
 
 /**
  * Created by minjaesong on 16-01-15.
@@ -52,6 +54,18 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
         hitboxEnd = Point2d(x1 + width, y1 + height)
         this.width = width
         this.height = height
+    }
+
+    fun translate(x: Double, y: Double) {
+        setPosition(posX + x, posY + y)
+    }
+
+    fun translate(vec: ChainedVector2) {
+        translate(vec.x, vec.y)
+    }
+
+    fun translate(vec: Vector2) {
+        translate(vec.x, vec.y)
     }
 
     fun setPosition(x1: Double, y1: Double) {
@@ -112,4 +126,8 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
 
     val centeredY: Double
         get() = (hitboxStart.y + hitboxEnd.y) * 0.5f
+
+    fun toVector(): Vector2 {
+        return Vector2(posX, posY)
+    }
 }

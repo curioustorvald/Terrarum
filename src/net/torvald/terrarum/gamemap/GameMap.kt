@@ -1,6 +1,7 @@
 
 package net.torvald.terrarum.gamemap
 
+import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.SlickException
 
 class GameMap
@@ -32,7 +33,7 @@ constructor(//properties
     //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
     //physics
     /** \[m / s^2\] */
-    var gravitation: Double = 9.8
+    var gravitation: Vector2 = Vector2(0.0, 9.8)
     /** RGB in Integer */
     var globalLight: Int = 0
     val worldTime: WorldTime

@@ -8,6 +8,7 @@ import net.torvald.terrarum.tileproperties.TilePropCodex
 import net.torvald.spriteanimation.SpriteAnimation
 import com.jme3.math.FastMath
 import net.torvald.terrarum.tileproperties.TileNameCode
+import org.dyn4j.geometry.ChainedVector2
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -26,19 +27,21 @@ open class ActorWithBody constructor() : Actor(), Visible {
     var baseHitboxW: Int = 0
     var baseHitboxH: Int = 0
 
+    @Transient private val map: GameMap = Terrarum.game.map
+
     /**
      * Velocity vector (broken down by axes) for newtonian sim.
      * Acceleration: used in code like:
      *     veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
-    val velocity = Vector2(0.0, 0.0)
+    val velocity = ChainedVector2(0.0, 0.0)
     var veloX: Double
         get() = velocity.x
-        set(value) { velocity.set(value, veloY) }
+        set(value) { velocity.x = value }
     var veloY: Double
         get() = velocity.y
-        set(value) { velocity.set(veloX, value) }
+        set(value) { velocity.y = value }
     @Transient private val VELO_HARD_LIMIT = 10000.0
 
     var grounded = false
@@ -106,7 +109,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
      */
     @Transient private val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
 
-    @Transient private var gravitation: Double = 0.toDouble()
+    @Transient private var gravitation: Vector2 = map.gravitation
     @Transient private val DRAG_COEFF = 1.0
 
     @Transient private val CONTACT_AREA_TOP = 0
@@ -135,8 +138,6 @@ open class ActorWithBody constructor() : Actor(), Visible {
      */
     @Transient val INVINCIBILITY_TIME: Int = 500
 
-    @Transient private val map: GameMap
-
     @Transient private val MASS_DEFAULT: Double = 60.0
 
     internal val physSleep: Boolean
@@ -154,8 +155,10 @@ open class ActorWithBody constructor() : Actor(), Visible {
     @Transient val DYNAMIC = 2
     @Transient val STATIC = 3
 
+    private val SLEEP_THRE = 0.05
+
     init {
-        map = Terrarum.game.map
+
     }
 
     /**
@@ -243,10 +246,13 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 //}
                 //else {
                 // compensate for colliding
-                updateHorizontalCollision()
-                updateVerticalCollision()
+                //updateHorizontalCollision()
+                //updateVerticalCollision()
+                adjustHit()
+                applyNormalForce()
 
                 setHorizontalFriction()
+                if (isPlayerNoClip) setVerticalFriction()
                 //}
 
                 // apply our compensation to actual hitbox
@@ -273,16 +279,19 @@ open class ActorWithBody constructor() : Actor(), Visible {
              * weight; gravitational force in action
              * W = mass * G (9.8 [m/s^2])
              */
-            val W = gravitation * mass
+            val W: Vector2 = gravitation * mass
             /**
              * Drag of atmosphere
              * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity) * A (area)
              */
-            val A = scale * scale
-            val D = DRAG_COEFF * 0.5 * 1.292 * veloY * veloY * A
+            // TODO replace 1.292 with fluid tile density
+            val A: Double = scale * scale
+            val D: Vector2 = velocity.copy().toVector() * DRAG_COEFF * 0.5 * 1.292 * A
 
-            veloY += clampCeil(
-                    (W - D) / mass * SI_TO_GAME_ACC * G_MUL_PLAYABLE_CONST, VELO_HARD_LIMIT)
+            //veloY += (W - D) / mass * SI_TO_GAME_ACC
+            val V: Vector2 = (W - D) / mass * SI_TO_GAME_ACC
+            veloX += V.x
+            veloY += V.y
         }
     }
 
@@ -295,6 +304,18 @@ open class ActorWithBody constructor() : Actor(), Visible {
         else if (veloX > 0) {
             veloX -= friction
             if (veloX < 0) veloX = 0.0 // compensate overshoot
+        }
+    }
+
+    private fun setVerticalFriction() {
+        val friction = BASE_FRICTION * tileFriction.tileFrictionToMult()
+        if (veloY < 0) {
+            veloY += friction
+            if (veloY > 0) veloY = 0.0 // compensate overshoot
+        }
+        else if (veloY > 0) {
+            veloY -= friction
+            if (veloY < 0) veloY = 0.0 // compensate overshoot
         }
     }
 
@@ -449,6 +470,67 @@ open class ActorWithBody constructor() : Actor(), Visible {
         posAdjustX = newXOff
         val newX = nextHitbox.posX + newXOff // +1: Q&D way to prevent the actor sticking to the wall and won't detach
         nextHitbox.setPosition(newX, newY)
+    }
+
+    /**
+     * nextHitbox must NOT altered before this method is called!
+     */
+    private fun adjustHit() {
+        val delta: Vector2 = Vector2(hitbox.toVector() - nextHitbox.toVector()) // we need to traverse back, so may as well negate at the first place
+        delta *= SLEEP_THRE // CCD delta
+
+        while (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
+                || isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_BOTTOM)
+        ) {
+            // CCD to the 'delta'
+            nextHitbox.translate(delta)
+        }
+    }
+
+    private fun applyNormalForce() {
+        if (!isNoCollideWorld) {
+            if (gravitation.y != 0.0) {
+                if (veloY > SLEEP_THRE && isColliding(CONTACT_AREA_BOTTOM, 0, 1)) {
+                    veloY = 0.0
+                    grounded = (gravitation.y > 0)
+                }
+                else if (veloY < -SLEEP_THRE && isColliding(CONTACT_AREA_TOP, 0, -1)) {
+                    veloY = 0.0
+                    grounded = (gravitation.y < 0)
+                }
+                else {
+                    grounded = false
+                }
+            }
+            else {
+                if ((veloY > SLEEP_THRE && isColliding(CONTACT_AREA_BOTTOM, 0, 1))
+                    || (veloY < -SLEEP_THRE && isColliding(CONTACT_AREA_TOP, 0, -1))
+                ) {
+                    veloY = 0.0
+                }
+            }
+
+            if (gravitation.x != 0.0) {
+                if (veloX > SLEEP_THRE && isColliding(CONTACT_AREA_BOTTOM, 1, 0)) {
+                    veloX = 0.0
+                    grounded = (gravitation.x > 0)
+                }
+                else if (veloX < -SLEEP_THRE && isColliding(CONTACT_AREA_TOP, -1, 0)) {
+                    veloY = 0.0
+                    grounded = (gravitation.x < 0)
+                }
+                else {
+                    grounded = false
+                }
+            }
+            else {
+                if ((veloX > SLEEP_THRE && isColliding(CONTACT_AREA_RIGHT, 1, 0))
+                    || (veloX < -SLEEP_THRE && isColliding(CONTACT_AREA_LEFT, -1, 0))
+                ) {
+                    veloX = 0.0
+                }
+            }
+        }
     }
 
     private fun elasticReflectX() {
@@ -618,35 +700,6 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
             return density
         }
-
-    /**
-     * Get highest fluid resistance value from tiles that the body occupies.
-     * @return
-     */
-    private val fluidResistance: Int
-        get() {
-            var resistance = 0
-
-            //get highest fluid density
-            val tilePosXStart = (nextHitbox.posX / TSIZE).roundToInt()
-            val tilePosYStart = (nextHitbox.posY / TSIZE).roundToInt()
-            val tilePosXEnd = (nextHitbox.hitboxEnd.x / TSIZE).roundToInt()
-            val tilePosYEnd = (nextHitbox.hitboxEnd.y / TSIZE).roundToInt()
-            for (y in tilePosYStart..tilePosYEnd) {
-                for (x in tilePosXStart..tilePosXEnd) {
-                    val tile = map.getTileFromTerrain(x, y)
-
-                    if (TilePropCodex.getProp(tile).isFluid) {
-                        val thisResistance = TilePropCodex.getProp(tile).movementResistance
-
-                        if (thisResistance > resistance) resistance = thisResistance
-                    }
-                }
-            }
-
-            return resistance
-        }
-    fun Int.resistanceToMult(): Double = 1.0 / (1 + this / 16.0)
 
     private fun clampHitbox() {
         hitbox.setPositionFromPoint(

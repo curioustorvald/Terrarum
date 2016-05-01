@@ -21,7 +21,6 @@ class TileProp {
     var density: Int = 0
 
     var isFluid: Boolean = false
-    var movementResistance: Int = 0
 
     var isSolid: Boolean = false
 

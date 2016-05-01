@@ -85,8 +85,6 @@ class TilePropCodex {
             prop.isWallable = boolVal(record, "wall")
             prop.isFallable = boolVal(record, "fall")
 
-            if (prop.isFluid) prop.movementResistance = intVal(record, "movr")
-
             print(formatNum3(prop.id) + ":" + formatNum2(prop.damage))
             println("\t" + prop.name)
         }

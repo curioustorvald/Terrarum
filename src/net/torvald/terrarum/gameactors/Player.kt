@@ -322,10 +322,12 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
             if (isFuncDown(input, EnumKeyFunc.MOVE_RIGHT) && !isFuncDown(input, EnumKeyFunc.MOVE_LEFT)) {
                 walkHorizontal(false, AXIS_POSMAX)
                 prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
-            } else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+            } // ↓F, ↑S
+            else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
                 walkHorizontal(true, AXIS_POSMAX)
                 prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
-            } else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+            } // ↓F, ↓S
+            else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
                 if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
                     walkHorizontal(false, AXIS_POSMAX)
                     prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
@@ -333,8 +335,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
                     walkHorizontal(true, AXIS_POSMAX)
                     prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
                 }
-            }// ↓F, ↓S
-            // ↓F, ↑S
+            }
         }
 
         /**
@@ -346,15 +347,16 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
                     walkVertical(axisY > 0, AXIS_POSMAX)
                 }
             } else {
-                // ↑E
-                // ↓D
+                // ↑E, ↓D
                 if (isFuncDown(input, EnumKeyFunc.MOVE_DOWN) && !isFuncDown(input, EnumKeyFunc.MOVE_UP)) {
                     walkVertical(false, AXIS_POSMAX)
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
-                } else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+                } // ↓E, ↑D
+                else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
                     walkVertical(true, AXIS_POSMAX)
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
-                } else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+                } // ↓E, ↓D
+                else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
                     if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
                         walkVertical(false, AXIS_POSMAX)
                         prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
@@ -362,10 +364,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
                         walkVertical(true, AXIS_POSMAX)
                         prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
                     }
-                }// ↓E
-                // ↓D
-                // ↓E
-                // ↑D
+                }
             }
         }
 
