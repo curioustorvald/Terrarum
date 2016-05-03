@@ -74,10 +74,19 @@ open class ActorWithBody constructor() : Actor(), Visible {
     var scale: Double
         get() = actorValue.getAsDouble(AVKey.SCALE) ?: 1.0
         set(value) = actorValue.set(AVKey.SCALE, value)
+    @Transient val MASS_LOWEST = 0.1 // Kilograms
     var mass: Double
         get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT * Math.pow(scale, 3.0)
-        set(value) = actorValue.set(AVKey.BASEMASS, value)
-    @Transient private val MASS_LOWEST = 2.0
+        set(value) {
+            if (value <= 0)
+                throw IllegalArgumentException("mass cannot be less than or equal to zero.")
+            else if (value < MASS_LOWEST) {
+                println("[ActorWithBody] input too low; assigning 0.1 instead.")
+                actorValue[AVKey.BASEMASS] = MASS_LOWEST
+            }
+
+            actorValue[AVKey.BASEMASS] = value
+        }
     /** Valid range: [0, 1]  */
     var elasticity = 0.0
         set(value) {
@@ -155,7 +164,9 @@ open class ActorWithBody constructor() : Actor(), Visible {
     @Transient val DYNAMIC = 2
     @Transient val STATIC = 3
 
-    private val SLEEP_THRE = 0.05
+    private val SLEEP_THRE = 0.125
+    private val CCD_THRE = 1.0
+    private val CCD_TICK = 0.125
 
     init {
 
@@ -237,7 +248,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
             if (!physSleep) {
                 // Set 'next' position (hitbox) to fiddle with
-                updateNextHitboxFromVelo()
+                setNewNextHitbox()
 
                 // if not horizontally moving then ...
                 //if (Math.abs(veloX) < 0.5) { // fix for special situations (see fig. 1 at the bottom of the source)
@@ -248,8 +259,8 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 // compensate for colliding
                 //updateHorizontalCollision()
                 //updateVerticalCollision()
-                adjustHit()
                 applyNormalForce()
+                adjustHit()
 
                 setHorizontalFriction()
                 if (isPlayerNoClip) setVerticalFriction()
@@ -268,11 +279,10 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     /**
      * Apply gravitation to the every falling body (unless not levitating)
-
+     *
      * Apply only if not grounded; normal force is not implemented (and redundant)
      * so we manually reset G to zero (not applying G. force) if grounded.
      */
-    // FIXME abnormal jump behaviour if mass < 2, same thing happens if mass == 0 (but zero mass is invalid anyway).
     private fun applyGravitation() {
         if (!grounded) {
             /**
@@ -476,59 +486,81 @@ open class ActorWithBody constructor() : Actor(), Visible {
      * nextHitbox must NOT altered before this method is called!
      */
     private fun adjustHit() {
-        val delta: Vector2 = Vector2(hitbox.toVector() - nextHitbox.toVector()) // we need to traverse back, so may as well negate at the first place
-        delta *= SLEEP_THRE // CCD delta
+        if (!isNoCollideWorld){
+            val delta: Vector2 = Vector2(hitbox.toVector() - nextHitbox.toVector()) // we need to traverse back, so may as well negate at the first place
+            val ccdDelta = delta.setMagnitude(CCD_TICK)
 
-        while (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
-                || isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_BOTTOM)
-        ) {
-            // CCD to the 'delta'
-            nextHitbox.translate(delta)
+            while (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
+                   || isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_BOTTOM)
+            ) {
+                // while still colliding, CCD to the 'delta'
+                nextHitbox.translate(ccdDelta)
+            }
         }
     }
 
     private fun applyNormalForce() {
         if (!isNoCollideWorld) {
-            if (gravitation.y != 0.0) {
-                if (veloY > SLEEP_THRE && isColliding(CONTACT_AREA_BOTTOM, 0, 1)) {
-                    veloY = 0.0
-                    grounded = (gravitation.y > 0)
+            // axis Y
+            if (veloY >= 0) { // check downward
+                if (isColliding(CONTACT_AREA_BOTTOM)) { // the ground has dug into the body
+                    veloY = 0.0 // reset veloY, simulating normal force
+                    elasticReflectY()
+                    grounded = true
                 }
-                else if (veloY < -SLEEP_THRE && isColliding(CONTACT_AREA_TOP, 0, -1)) {
-                    veloY = 0.0
-                    grounded = (gravitation.y < 0)
+                else if (isColliding(CONTACT_AREA_BOTTOM, 0, 1)) { // the actor is standing ON the ground
+                    veloY = 0.0 // reset veloY, simulating normal force
+                    elasticReflectY()
+                    grounded = true
                 }
-                else {
+                else { // the actor is not grounded at all
                     grounded = false
                 }
             }
-            else {
-                if ((veloY > SLEEP_THRE && isColliding(CONTACT_AREA_BOTTOM, 0, 1))
-                    || (veloY < -SLEEP_THRE && isColliding(CONTACT_AREA_TOP, 0, -1))
-                ) {
-                    veloY = 0.0
+            else if (veloY < 0) { // check upward
+                grounded = false
+                if (isColliding(CONTACT_AREA_TOP)) { // the ceiling has dug into the body
+                    veloY = 0.0 // reset veloY, simulating normal force
+                    elasticReflectY()
+                }
+                else if (isColliding(CONTACT_AREA_TOP, 0, -1)) { // the actor is touching the ceiling
+                    veloY = 0.0 // reset veloY, simulating normal force
+                    elasticReflectY() // reflect on ceiling, for reversed gravity
+                }
+                else { // the actor is not grounded at all
                 }
             }
-
-            if (gravitation.x != 0.0) {
-                if (veloX > SLEEP_THRE && isColliding(CONTACT_AREA_BOTTOM, 1, 0)) {
-                    veloX = 0.0
-                    grounded = (gravitation.x > 0)
+            // axis X
+            if (veloX >= 0.5) { // check right
+                if (isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT)) {
+                    // the actor is embedded to the wall
+                    veloX = 0.0 // reset veloX, simulating normal force
+                    elasticReflectX()
                 }
-                else if (veloX < -SLEEP_THRE && isColliding(CONTACT_AREA_TOP, -1, 0)) {
-                    veloY = 0.0
-                    grounded = (gravitation.x < 0)
+                else if (isColliding(CONTACT_AREA_RIGHT, 2, 0) && !isColliding(CONTACT_AREA_LEFT, 0, 0)) { // offset by +1, to fix directional quarks
+                    // the actor is touching the wall
+                    veloX = 0.0 // reset veloX, simulating normal force
+                    elasticReflectX()
                 }
                 else {
-                    grounded = false
+                }
+            }
+            else if (veloX <= -0.5) { // check left
+                // System.out.println("collidingleft");
+                if (isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT)) {
+                    // the actor is embedded to the wall
+                    veloX = 0.0 // reset veloX, simulating normal force
+                    elasticReflectX()
+                }
+                else if (isColliding(CONTACT_AREA_LEFT, -1, 0) && !isColliding(CONTACT_AREA_RIGHT, 1, 0)) {
+                    // the actor is touching the wall
+                    veloX = 0.0 // reset veloX, simulating normal force
+                    elasticReflectX()
+                }
+                else {
                 }
             }
             else {
-                if ((veloX > SLEEP_THRE && isColliding(CONTACT_AREA_RIGHT, 1, 0))
-                    || (veloX < -SLEEP_THRE && isColliding(CONTACT_AREA_LEFT, -1, 0))
-                ) {
-                    veloX = 0.0
-                }
             }
         }
     }
@@ -711,7 +743,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 clampW(nextHitbox.pointedX), clampH(nextHitbox.pointedY))
     }
 
-    private fun updateNextHitboxFromVelo() {
+    private fun setNewNextHitbox() {
 
         nextHitbox.set(
                   (hitbox.posX + veloX)
@@ -724,13 +756,15 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private fun updateHitboxX() {
         hitbox.setDimension(
                 nextHitbox.width, nextHitbox.height)
-        hitbox.setPositionX(nextHitbox.posX)
+        //if (nextHitbox.posX - hitbox.posX > SLEEP_THRE.abs())
+            hitbox.setPositionX(nextHitbox.posX)
     }
 
     private fun updateHitboxY() {
         hitbox.setDimension(
                 nextHitbox.width, nextHitbox.height)
-        hitbox.setPositionY(nextHitbox.posY)
+        //if (nextHitbox.posY - hitbox.posY > SLEEP_THRE.abs())
+            hitbox.setPositionY(nextHitbox.posY)
     }
 
     override fun drawGlow(gc: GameContainer, g: Graphics) {

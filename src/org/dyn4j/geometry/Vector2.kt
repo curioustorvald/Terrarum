@@ -267,10 +267,9 @@ class Vector2 {
      * *
      * @return [Vector2] this vector
      */
-    fun set(vector: Vector2): Vector2 {
+    fun set(vector: Vector2) {
         this.x = vector.x
         this.y = vector.y
-        return this
     }
 
     /**
@@ -281,10 +280,9 @@ class Vector2 {
      * *
      * @return [Vector2] this vector
      */
-    fun set(x: Double, y: Double): Vector2 {
+    fun set(x: Double, y: Double) {
         this.x = x
         this.y = y
-        return this
     }
 
     /**
@@ -325,21 +323,19 @@ class Vector2 {
     fun setMagnitude(magnitude: Double): Vector2 {
         // check the given magnitude
         if (Math.abs(magnitude) <= Epsilon.E) {
-            this.x = 0.0
-            this.y = 0.0
-            return this
+            return Vector2(0.0, 0.0)
         }
         // is this vector a zero vector?
         if (this.isZero) {
-            return this
+            return Vector2(0.0, 0.0)
         }
         // get the magnitude
         var mag = Math.sqrt(this.x * this.x + this.y * this.y)
         // normalize and multiply by the new magnitude
         mag = magnitude / mag
-        this.x *= mag
-        this.y *= mag
-        return this
+        val newX = this.x * mag
+        val newY = this.y * mag
+        return Vector2(newX, newY)
     }
 
     /**
@@ -359,9 +355,9 @@ class Vector2 {
     fun setDirection(angle: Double): Vector2 {
         //double magnitude = Math.hypot(this.x, this.y);
         val magnitude = Math.sqrt(this.x * this.x + this.y * this.y)
-        this.x = magnitude * Math.cos(angle)
-        this.y = magnitude * Math.sin(angle)
-        return this
+        val newX = magnitude * Math.cos(angle)
+        val newY = magnitude * Math.sin(angle)
+        return Vector2(newX, newY)
     }
 
     /**
@@ -565,10 +561,9 @@ class Vector2 {
      * Sets the [Vector2] to the zero [Vector2]
      * @return [Vector2] this vector
      */
-    fun zero(): Vector2 {
+    fun zero() {
         this.x = 0.0
         this.y = 0.0
-        return this
     }
 
     /**
@@ -616,9 +611,9 @@ class Vector2 {
      */
     fun right(): Vector2 {
         val temp = this.x
-        this.x = -this.y
-        this.y = temp
-        return this
+        val newX = -this.y
+        val newY = temp
+        return Vector2(newX, newY)
     }
 
     /**
@@ -636,9 +631,9 @@ class Vector2 {
      */
     fun left(): Vector2 {
         val temp = this.x
-        this.x = this.y
-        this.y = -temp
-        return this
+        val newX = this.y
+        val newY = -temp
+        return Vector2(newX, newY)
     }
 
     /**
