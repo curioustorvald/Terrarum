@@ -6,6 +6,8 @@ import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.spriteanimation.SpriteAnimation
+import org.dyn4j.geometry.ChainedVector2
+import org.dyn4j.geometry.Vector2
 import org.lwjgl.input.Controller
 import org.lwjgl.input.Controllers
 import org.newdawn.slick.GameContainer
@@ -33,8 +35,10 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
     var vehicleRiding: Controllable? = null
 
+    /** how long the jump button has down, in frames */
     internal var jumpCounter = 0
-    internal var walkPowerCounter = 0
+    /** how long the walk button has down, in frames */
+    internal var walkCounter = 0
     @Transient private val MAX_JUMP_LENGTH = 17 // use 17; in internal frames
 
     private var readonly_totalX = 0.0
@@ -115,30 +119,38 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
      * @param absAxisVal (set AXIS_POSMAX if keyboard controlled)
      */
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
-        readonly_totalX = veloX +
-                          actorValue.getAsDouble(AVKey.ACCEL)!! *
+        readonly_totalX = //veloX +
+                          /*actorValue.getAsDouble(AVKey.ACCEL)!! *
                           actorValue.getAsDouble(AVKey.ACCELMULT)!! *
                           Math.sqrt(scale) *
                           applyAccelRealism(walkPowerCounter) *
                           (if (left) -1 else 1).toFloat() *
-                          absAxisVal
+                          absAxisVal*/
+                actorValue.getAsDouble(AVKey.ACCEL)!! *
+                actorValue.getAsDouble(AVKey.ACCELMULT)!! *
+                Math.sqrt(scale) *
+                applyVelo(walkCounter) *
+                (if (left) -1 else 1).toFloat() *
+                absAxisVal
 
-        veloX = readonly_totalX
+        // veloX = readonly_totalX
+        movementDelta += Vector2(readonly_totalX, 0.0)
 
-        if (walkPowerCounter < WALK_FRAMES_TO_MAX_ACCEL) {
-            walkPowerCounter += 1
-        }
+        walkCounter += 1
 
         // Clamp veloX
-        veloX = absClamp(veloX, actorValue.getAsDouble(AVKey.SPEED)!!
-                        * actorValue.getAsDouble(AVKey.SPEEDMULT)!!
-                        * Math.sqrt(scale))
+        movementDelta.x = absClamp(movementDelta.x,
+                actorValue.getAsDouble(AVKey.SPEED)!!
+                * actorValue.getAsDouble(AVKey.SPEEDMULT)!!
+                * Math.sqrt(scale))
 
         // Heading flag
         if (left)
             walkHeading = LEFT
         else
             walkHeading = RIGHT
+
+        println("$walkCounter: ${movementDelta.x}")
     }
 
     /**
@@ -148,51 +160,35 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
      * @param absAxisVal (set AXIS_POSMAX if keyboard controlled)
      */
     private fun walkVertical(up: Boolean, absAxisVal: Float) {
-        readonly_totalY = veloY +
+        readonly_totalY =
                 actorValue.getAsDouble(AVKey.ACCEL)!! *
-                        actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                        Math.sqrt(scale) *
-                        applyAccelRealism(walkPowerCounter) *
-                        (if (up) -1 else 1).toFloat() *
-                        absAxisVal
+                actorValue.getAsDouble(AVKey.ACCELMULT)!! *
+                Math.sqrt(scale) *
+                applyVelo(walkCounter) *
+                (if (up) -1 else 1).toFloat() *
+                absAxisVal
 
-        veloY = readonly_totalY
+        movementDelta.set(Vector2(0.0, readonly_totalY))
 
-        if (walkPowerCounter < WALK_FRAMES_TO_MAX_ACCEL) {
-            walkPowerCounter += 1
-        }
+        if (walkCounter <= WALK_FRAMES_TO_MAX_ACCEL) walkCounter += 1
 
         // Clamp veloX
-        veloY = absClamp(veloY, actorValue.getAsDouble(AVKey.SPEED)!!
-                        * actorValue.getAsDouble(AVKey.SPEEDMULT)!!
-                        * Math.sqrt(scale))
+        movementDelta.y = absClamp(movementDelta.y,
+                actorValue.getAsDouble(AVKey.SPEED)!! *
+                actorValue.getAsDouble(AVKey.SPEEDMULT)!! *
+                Math.sqrt(scale))
     }
 
-    /**
-     * For realistic accelerating while walking.
+    private fun applyAccel(x: Int): Double {
+        return if (x < WALK_FRAMES_TO_MAX_ACCEL)
+            Math.sin(Math.PI * x / WALK_FRAMES_TO_MAX_ACCEL)
+        else 0.0
+    }
 
-     * Naïve 'veloX += 3' is actually like:
-
-     * a
-     * |      ------------
-     * |
-     * |
-     * 0+------············  t
-
-     * which is unrealistic, so this method tries to introduce some realism by doing:
-
-     * a
-     * |           ------------
-     * |        ---
-     * |       -
-     * |    ---
-     * 0+----··················· t
-
-
-     * @param x
-     */
-    private fun applyAccelRealism(x: Int): Double {
-        return 0.5 + 0.5 * -Math.cos(10 * x / (WALK_FRAMES_TO_MAX_ACCEL * Math.PI))
+    private fun applyVelo(x: Int): Double {
+        return if (x < WALK_FRAMES_TO_MAX_ACCEL)
+            0.5 - 0.5 * Math.cos(Math.PI * x / WALK_FRAMES_TO_MAX_ACCEL)
+        else 1.0
     }
 
     // stops; let the friction kick in by doing nothing to the velocity here
@@ -217,7 +213,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
         //veloX = 0f
 
-        walkPowerCounter = 0
+        walkCounter = 0
+        movementDelta.zero()
     }
 
     // stops; let the friction kick in by doing nothing to the velocity here
@@ -243,7 +240,36 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
         ///veloY = 0f
 
-        walkPowerCounter = 0
+        walkCounter = 0
+        movementDelta.zero()
+    }
+
+    /**
+     * See ./work_files/Jump\ power\ by\ pressing\ time.gcx
+     */
+    private fun jump() {
+        if (jumping) {
+            val len = MAX_JUMP_LENGTH.toFloat()
+            val pwr = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERMULT) ?: 1.0)
+
+            // increment jump counter
+            if (jumpCounter < len) jumpCounter += 1
+
+            // linear time mode
+            val init = (len + 1) / 2.0
+            var timedJumpCharge = init - init / len * jumpCounter
+            if (timedJumpCharge < 0) timedJumpCharge = 0.0
+
+            val jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale)
+
+            movementDelta.y -= jumpAcc
+        }
+
+        // for mob ai:
+        //super.setVeloY(veloY
+        //        -
+        //        pwr * Math.sqrt(scale)
+        //);
     }
 
     private fun updateMovementControl() {
@@ -389,34 +415,6 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
     override fun keyPressed(key: Int, c: Char) {
 
-    }
-
-    /**
-     * See ./work_files/Jump\ power\ by\ pressing\ time.gcx
-     */
-    private fun jump() {
-        if (jumping) {
-            val len = MAX_JUMP_LENGTH.toFloat()
-            val pwr = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERMULT) ?: 1.0)
-
-            // increment jump counter
-            if (jumpCounter < len) jumpCounter += 1
-
-            // linear time mode
-            val init = (len + 1) / 2.0
-            var timedJumpCharge = init - init / len * jumpCounter
-            if (timedJumpCharge < 0) timedJumpCharge = 0.0
-
-            val jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale)
-
-            veloY -= jumpAcc
-        }
-
-        // for mob ai:
-        //super.setVeloY(veloY
-        //        -
-        //        pwr * Math.sqrt(scale)
-        //);
     }
 
     private fun isFuncDown(input: Input, fn: EnumKeyFunc): Boolean {

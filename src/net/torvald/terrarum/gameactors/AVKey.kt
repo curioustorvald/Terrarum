@@ -20,6 +20,7 @@ object AVKey {
     const val ENCUMBRANCE = "encumbrance"
     const val LUMINOSITY = "luminosity"
     const val PHYSIQUEMULT = "physique$MULT"
+    const val DRAGCOEFF = "dragcoeff"
 
     const val NAME = "name"
 

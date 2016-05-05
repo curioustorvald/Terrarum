@@ -94,7 +94,7 @@ constructor() : BasicGameState() {
         shaderBlurV = Shader.makeShader("./res/blurV.vrt", "./res/blur.frg")
 
 
-        GRADIENT_IMAGE = Image("res/graphics/sky_colour.png")
+        GRADIENT_IMAGE = Image("res/graphics/colourmap/sky_colour.png")
         skyBox = Rectangle(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
         TilePropCodex()

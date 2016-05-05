@@ -35,13 +35,13 @@ open class ActorWithBody constructor() : Actor(), Visible {
      *     veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
-    val velocity = ChainedVector2(0.0, 0.0)
+    internal val positioningDelta = Vector2(0.0, 0.0)
     var veloX: Double
-        get() = velocity.x
-        set(value) { velocity.x = value }
+        get() = positioningDelta.x
+        private set(value) { positioningDelta.x = value }
     var veloY: Double
-        get() = velocity.y
-        set(value) { velocity.y = value }
+        get() = positioningDelta.y
+        private set(value) { positioningDelta.y = value }
     @Transient private val VELO_HARD_LIMIT = 10000.0
 
     var grounded = false
@@ -92,14 +92,14 @@ open class ActorWithBody constructor() : Actor(), Visible {
         set(value) {
             if (value < 0)
                 throw IllegalArgumentException("[ActorWithBody] Invalid elasticity value: $value; valid elasticity value is [0, 1].")
-            else if (value > 1) {
-                println("[ActorWithBody] Elasticity were capped to 1.")
+            else if (value >= ELASTICITY_MAX) {
+                println("[ActorWithBody] Elasticity were capped to $ELASTICITY_MAX.")
                 field = ELASTICITY_MAX
             }
             else
                 field = value * ELASTICITY_MAX
         }
-    @Transient private val ELASTICITY_MAX = 0.993
+    @Transient private val ELASTICITY_MAX = 0.993 // No perpetual motion!
     private var density = 1000.0
 
     /**
@@ -119,7 +119,15 @@ open class ActorWithBody constructor() : Actor(), Visible {
     @Transient private val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
 
     @Transient private var gravitation: Vector2 = map.gravitation
-    @Transient private val DRAG_COEFF = 1.0
+    @Transient val DRAG_COEFF_DEFAULT = 1.2
+    /** Drag coeffisient. Parachutes have much higher value than bare body (1.2) */
+    private var DRAG_COEFF: Double
+        get() = actorValue.getAsDouble(AVKey.DRAGCOEFF) ?: DRAG_COEFF_DEFAULT
+        set(value) {
+            if (value < 0)
+                throw IllegalArgumentException("[ActorWithBody] drag coefficient cannot be negative.")
+            actorValue[AVKey.DRAGCOEFF] = value
+        }
 
     @Transient private val CONTACT_AREA_TOP = 0
     @Transient private val CONTACT_AREA_RIGHT = 1
@@ -158,7 +166,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
     @Transient private var posAdjustX = 0
     @Transient private var posAdjustY = 0
 
-    @Transient private val BASE_FRICTION = 0.3
+    @Transient internal val BASE_FRICTION = 0.3
 
     @Transient val KINEMATIC = 1
     @Transient val DYNAMIC = 2
@@ -167,6 +175,10 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private val SLEEP_THRE = 0.125
     private val CCD_THRE = 1.0
     private val CCD_TICK = 0.125
+
+    val movementDelta = Vector2(0.0, 0.0)
+    val externalDelta = Vector2(0.0, 0.0)
+    private val gravityDelta = Vector2(0.0 , 0.0)
 
     init {
 
@@ -230,9 +242,6 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 baseSpriteWidth = sprite!!.width
             }
 
-            // copy gravitational constant from the map the actor is in
-            gravitation = map.gravitation
-
             /**
              * Actual physics thing (altering velocity) starts from here
              */
@@ -241,6 +250,8 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 applyGravitation()
                 //applyBuoyancy()
             }
+
+            positioningDelta.set(movementDelta + externalDelta + gravityDelta)
 
             // hard limit velocity
             if (veloX > VELO_HARD_LIMIT) veloX = VELO_HARD_LIMIT
@@ -291,17 +302,18 @@ open class ActorWithBody constructor() : Actor(), Visible {
              */
             val W: Vector2 = gravitation * mass
             /**
+             * Area
+             */
+            val A: Double = scale * scale
+            /**
              * Drag of atmosphere
              * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity) * A (area)
              */
-            // TODO replace 1.292 with fluid tile density
-            val A: Double = scale * scale
-            val D: Vector2 = velocity.copy().toVector() * DRAG_COEFF * 0.5 * 1.292 * A
+            val D: Vector2 = (gravityDelta + movementDelta) * DRAG_COEFF * 0.5 * A * tileDensityFluid.toDouble()
 
-            //veloY += (W - D) / mass * SI_TO_GAME_ACC
             val V: Vector2 = (W - D) / mass * SI_TO_GAME_ACC
-            veloX += V.x
-            veloY += V.y
+
+            gravityDelta += V
         }
     }
 
@@ -335,12 +347,14 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 if (isColliding(CONTACT_AREA_BOTTOM)) { // the ground has dug into the body
                     adjustHitBottom()
                     veloY = 0.0 // reset veloY, simulating normal force
-                    elasticReflectY()
+                    gravityDelta.zero()
+                    hitAndReflectY()
                     grounded = true
                 }
                 else if (isColliding(CONTACT_AREA_BOTTOM, 0, 1)) { // the actor is standing ON the ground
                     veloY = 0.0 // reset veloY, simulating normal force
-                    elasticReflectY()
+                    gravityDelta.zero()
+                    hitAndReflectY()
                     grounded = true
                 }
                 else { // the actor is not grounded at all
@@ -352,11 +366,11 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 if (isColliding(CONTACT_AREA_TOP)) { // the ceiling has dug into the body
                     adjustHitTop()
                     veloY = 0.0 // reset veloY, simulating normal force
-                    elasticReflectY()
+                    hitAndReflectY()
                 }
                 else if (isColliding(CONTACT_AREA_TOP, 0, -1)) { // the actor is touching the ceiling
                     veloY = 0.0 // reset veloY, simulating normal force
-                    elasticReflectY() // reflect on ceiling, for reversed gravity
+                    hitAndReflectY() // reflect on ceiling, for reversed gravity
                 }
                 else { // the actor is not grounded at all
                 }
@@ -409,12 +423,12 @@ open class ActorWithBody constructor() : Actor(), Visible {
                     // the actor is embedded to the wall
                     adjustHitRight()
                     veloX = 0.0 // reset veloX, simulating normal force
-                    elasticReflectX()
+                    hitAndReflectX()
                 }
                 else if (isColliding(CONTACT_AREA_RIGHT, 2, 0) && !isColliding(CONTACT_AREA_LEFT, 0, 0)) { // offset by +1, to fix directional quarks
                     // the actor is touching the wall
                     veloX = 0.0 // reset veloX, simulating normal force
-                    elasticReflectX()
+                    hitAndReflectX()
                 }
                 else {
                 }
@@ -425,12 +439,12 @@ open class ActorWithBody constructor() : Actor(), Visible {
                     // the actor is embedded to the wall
                     adjustHitLeft()
                     veloX = 0.0 // reset veloX, simulating normal force
-                    elasticReflectX()
+                    hitAndReflectX()
                 }
                 else if (isColliding(CONTACT_AREA_LEFT, -1, 0) && !isColliding(CONTACT_AREA_RIGHT, 1, 0)) {
                     // the actor is touching the wall
                     veloX = 0.0 // reset veloX, simulating normal force
-                    elasticReflectX()
+                    hitAndReflectX()
                 }
                 else {
                 }
@@ -503,14 +517,10 @@ open class ActorWithBody constructor() : Actor(), Visible {
         if (!isNoCollideWorld) {
             // axis Y
             if (veloY >= 0) { // check downward
-                if (isColliding(CONTACT_AREA_BOTTOM)) { // the ground has dug into the body
-                    veloY = 0.0 // reset veloY, simulating normal force
-                    elasticReflectY()
-                    grounded = true
-                }
-                else if (isColliding(CONTACT_AREA_BOTTOM, 0, 1)) { // the actor is standing ON the ground
-                    veloY = 0.0 // reset veloY, simulating normal force
-                    elasticReflectY()
+                if (isColliding(CONTACT_AREA_BOTTOM) || isColliding(CONTACT_AREA_BOTTOM, 0, 1)) {
+                    // the actor is hitting the ground
+                    //veloY = 0.0 // reset veloY, simulating normal force
+                    hitAndReflectY()
                     grounded = true
                 }
                 else { // the actor is not grounded at all
@@ -519,43 +529,32 @@ open class ActorWithBody constructor() : Actor(), Visible {
             }
             else if (veloY < 0) { // check upward
                 grounded = false
-                if (isColliding(CONTACT_AREA_TOP)) { // the ceiling has dug into the body
-                    veloY = 0.0 // reset veloY, simulating normal force
-                    elasticReflectY()
-                }
-                else if (isColliding(CONTACT_AREA_TOP, 0, -1)) { // the actor is touching the ceiling
-                    veloY = 0.0 // reset veloY, simulating normal force
-                    elasticReflectY() // reflect on ceiling, for reversed gravity
+                if (isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_TOP, 0, -1)) {
+                    // the actor is hitting the ceiling
+                    //veloY = 0.0 // reset veloY, simulating normal force
+                    hitAndReflectY()
                 }
                 else { // the actor is not grounded at all
                 }
             }
             // axis X
             if (veloX >= 0.5) { // check right
-                if (isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT)) {
-                    // the actor is embedded to the wall
-                    veloX = 0.0 // reset veloX, simulating normal force
-                    elasticReflectX()
-                }
-                else if (isColliding(CONTACT_AREA_RIGHT, 2, 0) && !isColliding(CONTACT_AREA_LEFT, 0, 0)) { // offset by +1, to fix directional quarks
-                    // the actor is touching the wall
-                    veloX = 0.0 // reset veloX, simulating normal force
-                    elasticReflectX()
+                if ((isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT))
+                || (isColliding(CONTACT_AREA_RIGHT, 1, 0) && !isColliding(CONTACT_AREA_LEFT, 0, -1))) {
+                    // the actor is hitting the right wall
+                    //veloX = 0.0 // reset veloX, simulating normal force
+                    hitAndReflectX()
                 }
                 else {
                 }
             }
             else if (veloX <= -0.5) { // check left
                 // System.out.println("collidingleft");
-                if (isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT)) {
-                    // the actor is embedded to the wall
-                    veloX = 0.0 // reset veloX, simulating normal force
-                    elasticReflectX()
-                }
-                else if (isColliding(CONTACT_AREA_LEFT, -1, 0) && !isColliding(CONTACT_AREA_RIGHT, 1, 0)) {
-                    // the actor is touching the wall
-                    veloX = 0.0 // reset veloX, simulating normal force
-                    elasticReflectX()
+                if ((isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT))
+                || (isColliding(CONTACT_AREA_LEFT, -1, 0) && !isColliding(CONTACT_AREA_RIGHT, 1, 0))) {
+                    // the actor is hitting the left wall
+                    //veloX = 0.0 // reset veloX, simulating normal force
+                    hitAndReflectX()
                 }
                 else {
                 }
@@ -565,16 +564,21 @@ open class ActorWithBody constructor() : Actor(), Visible {
         }
     }
 
-    private fun elasticReflectX() {
-        if (veloX != 0.0 && (veloX * elasticity).abs() > 0.5) {
+    private fun hitAndReflectX() {
+        if ((veloX * elasticity).abs() > SLEEP_THRE) {
             veloX = -veloX * elasticity
-
+        }
+        else {
+            veloX = 0.0
         }
     }
 
-    private fun elasticReflectY() {
-        if (veloY != 0.0 && (veloY * elasticity).abs() > 0.5) {
+    private fun hitAndReflectY() {
+        if ((veloY * elasticity).abs() > SLEEP_THRE) {
             veloY = -veloY * elasticity
+        }
+        else {
+            veloY = 0.0
         }
     }
 
@@ -689,11 +693,11 @@ open class ActorWithBody constructor() : Actor(), Visible {
      * Get highest friction value from feet tiles.
      * @return
      */
-    private val tileFriction: Int
+    internal val tileFriction: Int
         get() {
             var friction = 0
 
-            //get highest friction
+            // take highest value
             val tilePosXStart = (hitbox.posX / TSIZE).roundToInt()
             val tilePosXEnd = (hitbox.hitboxEnd.x / TSIZE).roundToInt()
             val tilePosY = (hitbox.pointedY.plus(1) / TSIZE).roundToInt()
@@ -707,6 +711,30 @@ open class ActorWithBody constructor() : Actor(), Visible {
             return friction
         }
     fun Int.tileFrictionToMult() = this / 16.0
+
+    /**
+     * Get highest tile density from occupying tiles, fluid only
+     */
+    private val tileDensityFluid: Int
+        get() {
+            var density = 0
+
+            // take highest value
+            val tilePosXStart = (hitbox.posX / TSIZE).roundToInt()
+            val tilePosXEnd = (hitbox.hitboxEnd.x / TSIZE).roundToInt()
+            val tilePosYStart = (hitbox.posY / TSIZE).roundToInt()
+            val tilePosYEnd = (hitbox.hitboxEnd.y / TSIZE).roundToInt()
+            for (y in tilePosXStart..tilePosYEnd) {
+                for (x in tilePosXStart..tilePosXEnd) {
+                    val tile = map.getTileFromTerrain(x, y)
+                    val prop = TilePropCodex.getProp(tile)
+
+                    if (prop.isFluid && prop.density > density)
+                        density = prop.density
+                }
+            }
+            return density
+        }
 
     /**
      * Get highest density (specific gravity) value from tiles that the body occupies.

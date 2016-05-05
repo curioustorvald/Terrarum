@@ -378,7 +378,7 @@ class ChainedVector2 {
      * *
      * @return [ChainedVector2] this vector
      */
-    operator fun plus(vector: ChainedVector2): ChainedVector2 {
+    fun plus(vector: ChainedVector2): ChainedVector2 {
         this.x += vector.x
         this.y += vector.y
         return this
@@ -428,7 +428,7 @@ class ChainedVector2 {
      * *
      * @return [ChainedVector2] this vector
      */
-    operator fun minus(vector: ChainedVector2): ChainedVector2 {
+    fun minus(vector: ChainedVector2): ChainedVector2 {
         this.x -= vector.x
         this.y -= vector.y
         return this
@@ -500,7 +500,7 @@ class ChainedVector2 {
      * *
      * @return [ChainedVector2] this vector
      */
-    operator fun times(scalar: Double): ChainedVector2 {
+    fun times(scalar: Double): ChainedVector2 {
         this.x *= scalar
         this.y *= scalar
         return this
@@ -512,7 +512,7 @@ class ChainedVector2 {
      * *
      * @return [ChainedVector2] this vector
      */
-    operator fun div(scalar: Double): ChainedVector2 {
+    fun div(scalar: Double): ChainedVector2 {
         this.x /= scalar
         this.y /= scalar
         return this
@@ -525,7 +525,7 @@ class ChainedVector2 {
      * *
      * @return [ChainedVector2]
      */
-    infix fun product(scalar: Double): ChainedVector2 {
+    fun product(scalar: Double): ChainedVector2 {
         return ChainedVector2(this.x * scalar, this.y * scalar)
     }
 
@@ -536,7 +536,7 @@ class ChainedVector2 {
      * *
      * @return double
      */
-    infix fun dot(vector: ChainedVector2): Double {
+    fun dot(vector: ChainedVector2): Double {
         return this.x * vector.x + this.y * vector.y
     }
 
@@ -559,7 +559,7 @@ class ChainedVector2 {
      * *
      * @return double
      */
-    infix fun cross(vector: ChainedVector2): Double {
+    fun cross(vector: ChainedVector2): Double {
         return this.x * vector.y - this.y * vector.x
     }
 
@@ -581,7 +581,7 @@ class ChainedVector2 {
      * *
      * @return [ChainedVector2]
      */
-    infix fun cross(z: Double): ChainedVector2 {
+    fun cross(z: Double): ChainedVector2 {
         return ChainedVector2(-1.0 * this.y * z, this.x * z)
     }
 
@@ -628,7 +628,7 @@ class ChainedVector2 {
      * Negates this [ChainedVector2].
      * @return [ChainedVector2] this vector
      */
-    operator fun not() = negate()
+    fun not() = negate()
 
     /**
      * Negates this [ChainedVector2].
@@ -663,7 +663,7 @@ class ChainedVector2 {
      * *
      * @return [ChainedVector2] this vector
      */
-    infix fun rotate(theta: Double): ChainedVector2 {
+    fun rotate(theta: Double): ChainedVector2 {
         val cos = Math.cos(theta)
         val sin = Math.sin(theta)
         val x = this.x

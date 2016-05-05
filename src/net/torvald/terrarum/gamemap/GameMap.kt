@@ -32,7 +32,7 @@ constructor(//properties
 
     //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
     //physics
-    /** \[m / s^2\] */
+    /** Meter per second squared. Currently only the downward gravity is supported. No reverse gravity :p */
     var gravitation: Vector2 = Vector2(0.0, 9.8)
     /** RGB in Integer */
     var globalLight: Int = 0

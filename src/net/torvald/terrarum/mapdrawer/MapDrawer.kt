@@ -13,12 +13,12 @@ import org.newdawn.slick.*
 object MapDrawer {
     const val TILE_SIZE = 16
 
-    private var envOverlayColourmap: Image = Image("./res/graphics/black_body_col_1000_40000_K.png")
+    private var envOverlayColourmap: Image = Image("./res/graphics/colourmap/black_body_col_1000_40000_K.png")
 
     private val ENV_COLTEMP_LOWEST = 5500
     private val ENV_COLTEMP_HIGHEST = 7500
 
-    val ENV_COLTEMP_NOON = 6500
+    val ENV_COLTEMP_NOON = 6500 // 6500 == sRGB White == untouched!
 
     private var colTemp: Int = 0
 

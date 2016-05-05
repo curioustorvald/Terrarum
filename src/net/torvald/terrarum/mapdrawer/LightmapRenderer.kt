@@ -229,8 +229,7 @@ object LightmapRenderer {
         }
         // luminous tile on top of air
         else if (thisWall == AIR && thisTileLuminosity.toInt() > 0) {
-            val darkenSunlight = darkenColoured(sunLight, thisTileOpacity)
-            lightLevelThis = maximiseRGB(darkenSunlight, thisTileLuminosity) // maximise to not exceed 1.0 with normal (<= 1.0) light
+            lightLevelThis = maximiseRGB(sunLight, thisTileLuminosity) // maximise to not exceed 1.0 with normal (<= 1.0) light
         }
         // opaque wall and luminous tile
         else if (thisWall != AIR && thisTileLuminosity.toInt() > 0) {

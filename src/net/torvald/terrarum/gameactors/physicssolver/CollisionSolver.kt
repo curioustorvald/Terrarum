@@ -127,10 +127,10 @@ object CollisionSolver {
                 val vy_1 = (uy_2 * (m1 - m2) + 2 * m2 * uy_2) / (m1 + m2)
                 val vy_2 = (uy_2 * (m2 - m1) + 2 * m1 * uy_1) / (m1 + m2)
 
-                a.veloX = vx_1
+                /*a.veloX = vx_1
                 a.veloY = vy_1
                 b.veloX = vx_2
-                b.veloY = vy_2
+                b.veloY = vy_2*/
             }
         }
     }
