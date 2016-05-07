@@ -35,13 +35,16 @@ open class ActorWithBody constructor() : Actor(), Visible {
      *     veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
-    internal val positioningDelta = Vector2(0.0, 0.0)
+    internal val velocity = Vector2(0.0, 0.0)
     var veloX: Double
-        get() = positioningDelta.x
-        private set(value) { positioningDelta.x = value }
+        get() = velocity.x
+        private set(value) { velocity.x = value }
     var veloY: Double
-        get() = positioningDelta.y
-        private set(value) { positioningDelta.y = value }
+        get() = velocity.y
+        private set(value) { velocity.y = value }
+    var walkX: Double = 0.0
+    var walkY: Double = 0.0
+    val moveDelta = Vector2(0.0, 0.0)
     @Transient private val VELO_HARD_LIMIT = 10000.0
 
     var grounded = false
@@ -118,7 +121,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
      */
     @Transient private val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
 
-    @Transient private var gravitation: Vector2 = map.gravitation
+    @Transient private val gravitation: Vector2 = map.gravitation
     @Transient val DRAG_COEFF_DEFAULT = 1.2
     /** Drag coeffisient. Parachutes have much higher value than bare body (1.2) */
     private var DRAG_COEFF: Double
@@ -157,8 +160,8 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     @Transient private val MASS_DEFAULT: Double = 60.0
 
-    internal val physSleep: Boolean
-        get() = veloX.abs() < 0.5 && veloY.abs() < 0.5
+    internal var physSleep: Boolean = false
+        private set
 
     /**
      * for collide-to-world compensation
@@ -175,10 +178,6 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private val SLEEP_THRE = 0.125
     private val CCD_THRE = 1.0
     private val CCD_TICK = 0.125
-
-    val movementDelta = Vector2(0.0, 0.0)
-    val externalDelta = Vector2(0.0, 0.0)
-    private val gravityDelta = Vector2(0.0 , 0.0)
 
     init {
 
@@ -226,6 +225,18 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     override fun run() = update(Terrarum.appgc, Terrarum.game.DELTA_T)
 
+    /**
+     * Add vector value to the velocity, in the time unit of single frame.
+     *
+     * Since we're adding some value every frame, the value is equivalent to the acceleration.
+     * Find about Newton's second law for the background knowledge.
+     * @param vec : Acceleration in Vector2
+     */
+    fun applyForce(vec: Vector2) {
+        velocity += vec
+        physSleep = false
+    }
+
     override fun update(gc: GameContainer, delta_t: Int) {
         if (isUpdate) {
 
@@ -251,11 +262,12 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 //applyBuoyancy()
             }
 
-            positioningDelta.set(movementDelta + externalDelta + gravityDelta)
-
             // hard limit velocity
             if (veloX > VELO_HARD_LIMIT) veloX = VELO_HARD_LIMIT
             if (veloY > VELO_HARD_LIMIT) veloY = VELO_HARD_LIMIT
+
+            moveDelta.x = veloX + walkX
+            moveDelta.y = veloY + walkY
 
             if (!physSleep) {
                 // Set 'next' position (hitbox) to fiddle with
@@ -309,16 +321,17 @@ open class ActorWithBody constructor() : Actor(), Visible {
              * Drag of atmosphere
              * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity) * A (area)
              */
-            val D: Vector2 = (gravityDelta + movementDelta) * DRAG_COEFF * 0.5 * A * tileDensityFluid.toDouble()
+            val D: Vector2 = velocity * DRAG_COEFF * 0.5 * A * tileDensityFluid.toDouble()
 
             val V: Vector2 = (W - D) / mass * SI_TO_GAME_ACC
 
-            gravityDelta += V
+            applyForce(V)
         }
     }
 
     private fun setHorizontalFriction() {
         val friction = BASE_FRICTION * tileFriction.tileFrictionToMult()
+
         if (veloX < 0) {
             veloX += friction
             if (veloX > 0) veloX = 0.0 // compensate overshoot
@@ -327,17 +340,36 @@ open class ActorWithBody constructor() : Actor(), Visible {
             veloX -= friction
             if (veloX < 0) veloX = 0.0 // compensate overshoot
         }
+
+        if (walkX < 0) {
+            walkX += friction
+            if (walkX > 0) walkX = 0.0
+        }
+        else if (walkX > 0) {
+            walkX -= friction
+            if (walkX < 0) walkX = 0.0
+        }
     }
 
     private fun setVerticalFriction() {
         val friction = BASE_FRICTION * tileFriction.tileFrictionToMult()
+
         if (veloY < 0) {
             veloY += friction
-            if (veloY > 0) veloY = 0.0 // compensate overshoot
+            if (veloY > 0) veloX = 0.0 // compensate overshoot
         }
         else if (veloY > 0) {
             veloY -= friction
             if (veloY < 0) veloY = 0.0 // compensate overshoot
+        }
+
+        if (walkY < 0) {
+            walkY += friction
+            if (walkY > 0) walkY = 0.0
+        }
+        else if (walkY > 0) {
+            walkY -= friction
+            if (walkY < 0) walkY = 0.0
         }
     }
 
@@ -347,13 +379,11 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 if (isColliding(CONTACT_AREA_BOTTOM)) { // the ground has dug into the body
                     adjustHitBottom()
                     veloY = 0.0 // reset veloY, simulating normal force
-                    gravityDelta.zero()
                     hitAndReflectY()
                     grounded = true
                 }
                 else if (isColliding(CONTACT_AREA_BOTTOM, 0, 1)) { // the actor is standing ON the ground
                     veloY = 0.0 // reset veloY, simulating normal force
-                    gravityDelta.zero()
                     hitAndReflectY()
                     grounded = true
                 }
@@ -566,7 +596,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     private fun hitAndReflectX() {
         if ((veloX * elasticity).abs() > SLEEP_THRE) {
-            veloX = -veloX * elasticity
+            veloX *= -elasticity
         }
         else {
             veloX = 0.0
@@ -575,7 +605,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     private fun hitAndReflectY() {
         if ((veloY * elasticity).abs() > SLEEP_THRE) {
-            veloY = -veloY * elasticity
+            veloY *= -elasticity
         }
         else {
             veloY = 0.0
@@ -774,8 +804,8 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private fun setNewNextHitbox() {
 
         nextHitbox.set(
-                  (hitbox.posX + veloX)
-                , (hitbox.posY + veloY)
+                (hitbox.posX + moveDelta.x)
+                , (hitbox.posY + moveDelta.y)
                 , (baseHitboxW * scale)
                 , (baseHitboxH * scale)
         )

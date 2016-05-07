@@ -52,7 +52,7 @@ constructor() : BasicGameState() {
 
     lateinit var consoleHandler: UIHandler
     lateinit var debugWindow: UIHandler
-    lateinit var notifinator: UIHandler
+    lateinit var notifier: UIHandler
 
     lateinit internal var player: Player
 
@@ -123,10 +123,10 @@ constructor() : BasicGameState() {
         debugWindow = UIHandler(BasicDebugInfoWindow())
         debugWindow.setPosition(0, 0)
 
-        notifinator = UIHandler(Notification())
-        notifinator.setPosition(
-                (Terrarum.WIDTH - notifinator.UI.width) / 2, Terrarum.HEIGHT - notifinator.UI.height)
-        notifinator.setVisibility(true)
+        notifier = UIHandler(Notification())
+        notifier.setPosition(
+                (Terrarum.WIDTH - notifier.UI.width) / 2, Terrarum.HEIGHT - notifier.UI.height)
+        notifier.setVisibility(true)
 
         if (Terrarum.gameConfig.getAsBoolean("smoothlighting") == true)
             KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, true)
@@ -164,7 +164,7 @@ constructor() : BasicGameState() {
         debugWindow.update(gc, delta)
 
 
-        notifinator.update(gc, delta)
+        notifier.update(gc, delta)
 
         Terrarum.appgc.setVSync(Terrarum.appgc.fps >= Terrarum.VSYNC_TRIGGER_THRESHOLD)
     }
@@ -250,7 +250,7 @@ constructor() : BasicGameState() {
         uiContainer.forEach { ui -> ui.render(gc, g) }
         debugWindow.render(gc, g)
         consoleHandler.render(gc, g)
-        notifinator.render(gc, g)
+        notifier.render(gc, g)
     }
 
     private fun getGradientColour(row: Int): Color {
@@ -311,20 +311,21 @@ constructor() : BasicGameState() {
         g.fill(skyBox, skyColourFill)
     }
 
+    /** Send message to notifier UI and toggle the UI as opened. */
     fun sendNotification(msg: Array<String>) {
-        (notifinator.UI as Notification).sendNotification(Terrarum.appgc, update_delta, msg)
-        notifinator.setAsOpening()
+        (notifier.UI as Notification).sendNotification(Terrarum.appgc, update_delta, msg)
+        notifier.setAsOpening()
     }
 
     fun wakeDormantActors() {
-        // determine whether the inactive actor should be re-active
+        // determine whether the dormant actor should be re-activated
         var actorContainerSize = actorContainerInactive.size
         var i = 0
         while (i < actorContainerSize) { // loop thru actorContainerInactive
             val actor = actorContainerInactive[i]
             val actorIndex = i
             if (actor is Visible && actor.inUpdateRange()) {
-                addActor(actor)
+                addActor(actor) // duplicates are checked here
                 actorContainerInactive.removeAt(actorIndex)
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so also decrement counter by 1
@@ -336,14 +337,14 @@ constructor() : BasicGameState() {
     fun updateAndInactivateDistantActors(gc: GameContainer, delta: Int) {
         var actorContainerSize = actorContainer.size
         var i = 0
-        // determine whether the actor should be active or dormant by its distance from the player
-        // will put dormant actors to list specifically for them
+        // determine whether the actor should be active or dormant by its distance from the player.
+        // If the actor must be dormant, the target actor will be put to the list specifically for them.
         // if the actor is not to be dormant, update it
-        while (i < actorContainerSize) { // loop thru actorContainer
+        while (i < actorContainerSize) { // loop through the actorContainer
             val actor = actorContainer[i]
             val actorIndex = i
             if (actor is Visible && !actor.inUpdateRange()) {
-                actorContainerInactive.add(actor) // duplicates are checked when the actor is re-activated
+                actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
                 actorContainer.removeAt(actorIndex)
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so also decrement counter by 1
@@ -359,6 +360,7 @@ constructor() : BasicGameState() {
         get() = getGradientColour(2).getRGB24().rgb24ExpandToRgb30()
 
     fun Color.getRGB24(): Int = (this.redByte shl 16) or (this.greenByte shl 8) or (this.blueByte)
+    /** Remap 8-bit value (0.0-1.0) to 10-bit value (0.0-4.0) by prepending two bits of zero for each R, G and B. */
     fun Int.rgb24ExpandToRgb30(): Int = (this and 0xff) or
             (this and 0xff00).ushr(8).shl(10) or
             (this and 0xff0000).ushr(16).shl(20)
@@ -382,11 +384,16 @@ constructor() : BasicGameState() {
                 actorContainer.binarySearch(ID) >= 0
 
     fun removeActor(actor: Actor) = removeActor(actor.referenceID)
+    /**
+     * get index of the actor and delete by the index.
+     * we can do this as the list is guaranteed to be sorted
+     * and only contains unique values.
+     *
+     * Any values behind the index will be automatically pushed to front.
+     * This is how remove function of [java.util.ArrayList] is defined.
+     */
     fun removeActor(ID: Int) {
         if (ID == player.referenceID) throw RuntimeException("Attempted to remove player.")
-        // get index of the actor and delete by the index.
-        // we can do this as the list is guaranteed to be sorted
-        // and only contains unique values
         val indexToDelete = actorContainer.binarySearch(ID)
         if (indexToDelete >= 0) actorContainer.removeAt(indexToDelete)
     }
@@ -418,7 +425,6 @@ constructor() : BasicGameState() {
     }
 
     private fun insertionSortLastElem(arr: ArrayList<Actor>) {
-        // 'insertion sort' last element
         var x: Actor
         var j: Int
         var index: Int = arr.size - 1

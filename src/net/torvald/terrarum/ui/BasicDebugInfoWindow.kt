@@ -85,8 +85,8 @@ class BasicDebugInfoWindow:UICanvas {
                 + (hitbox.pointedY / MapDrawer.TILE_SIZE).toInt().toString()
                 + ")")
 
-        printLine(g, 3, "veloX reported $ccG${if (player.physSleep) "(sleep)" else player.veloX}")
-        printLine(g, 4, "veloY reported $ccG${if (player.physSleep) "(sleep)" else player.veloY}")
+        printLine(g, 3, "veloX reported $ccG${if (player.physSleep) "(sleep)" else player.moveDelta.x}")
+        printLine(g, 4, "veloY reported $ccG${if (player.physSleep) "(sleep)" else player.moveDelta.y}")
 
         printLineColumn(g, 2, 3, "veloX measured $ccG${xdelta}")
         printLineColumn(g, 2, 4, "veloY measured $ccG${ydelta}")

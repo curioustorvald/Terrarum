@@ -546,8 +546,14 @@ class Vector2 {
      * Negates this [Vector2].
      * @return [Vector2] this vector
      */
+    operator fun unaryMinus() = negate()
+
+    /**
+     * Negates this [Vector2].
+     * @return [Vector2] this vector
+     */
     fun negate(): Vector2 {
-        return Vector2(x * -1.0, y * -1.0)
+        return Vector2(-x, -y)
     }
 
     /**

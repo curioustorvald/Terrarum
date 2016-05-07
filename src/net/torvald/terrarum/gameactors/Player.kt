@@ -133,16 +133,11 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
                 (if (left) -1 else 1).toFloat() *
                 absAxisVal
 
-        // veloX = readonly_totalX
-        movementDelta += Vector2(readonly_totalX, 0.0)
+        //applyForce(Vector2(readonly_totalX, 0.0))
+        walkX += readonly_totalX
+        walkX = absClamp(walkX, actorValue.getAsDouble(AVKey.SPEED)!! * actorValue.getAsDouble(AVKey.SPEEDMULT)!!)
 
         walkCounter += 1
-
-        // Clamp veloX
-        movementDelta.x = absClamp(movementDelta.x,
-                actorValue.getAsDouble(AVKey.SPEED)!!
-                * actorValue.getAsDouble(AVKey.SPEEDMULT)!!
-                * Math.sqrt(scale))
 
         // Heading flag
         if (left)
@@ -150,7 +145,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         else
             walkHeading = RIGHT
 
-        println("$walkCounter: ${movementDelta.x}")
+        println("$walkCounter: ${readonly_totalX}")
     }
 
     /**
@@ -168,15 +163,9 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
                 (if (up) -1 else 1).toFloat() *
                 absAxisVal
 
-        movementDelta.set(Vector2(0.0, readonly_totalY))
+        applyForce(Vector2(0.0, readonly_totalY))
 
         if (walkCounter <= WALK_FRAMES_TO_MAX_ACCEL) walkCounter += 1
-
-        // Clamp veloX
-        movementDelta.y = absClamp(movementDelta.y,
-                actorValue.getAsDouble(AVKey.SPEED)!! *
-                actorValue.getAsDouble(AVKey.SPEEDMULT)!! *
-                Math.sqrt(scale))
     }
 
     private fun applyAccel(x: Int): Double {
@@ -214,7 +203,6 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         //veloX = 0f
 
         walkCounter = 0
-        movementDelta.zero()
     }
 
     // stops; let the friction kick in by doing nothing to the velocity here
@@ -241,7 +229,6 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         ///veloY = 0f
 
         walkCounter = 0
-        movementDelta.zero()
     }
 
     /**
@@ -260,9 +247,9 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
             var timedJumpCharge = init - init / len * jumpCounter
             if (timedJumpCharge < 0) timedJumpCharge = 0.0
 
-            val jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale)
+            val jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
 
-            movementDelta.y -= jumpAcc
+            applyForce(Vector2(0.0, -jumpAcc))
         }
 
         // for mob ai:
