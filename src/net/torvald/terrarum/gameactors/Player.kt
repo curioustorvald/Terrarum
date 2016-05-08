@@ -5,8 +5,6 @@ import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum
-import net.torvald.spriteanimation.SpriteAnimation
-import org.dyn4j.geometry.ChainedVector2
 import org.dyn4j.geometry.Vector2
 import org.lwjgl.input.Controller
 import org.lwjgl.input.Controllers
@@ -113,10 +111,23 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     }
 
     /**
-
+     * This code directly controls VELOCITY for walking, called walkX and walkY.
+     *
+     * In theory, we must add ACCELERATION to the velocity, but unfortunately it's arduous task
+     * with this simulation code base.
+     *
+     * Reason: we have naïve friction code that is not adaptive at all and to add proper walking code to
+     * this code base, ACCELERATION must be changed (in other words, we must deal with JERK) accordingly
+     * to the FRICTION.
+     *
+     * So I'm adding walkX/Y and getting the ActorWithBody.setNewNextHitbox to use the velocity value of
+     * walkX/Y + velocity, which is stored in variable moveDelta.
+     *
+     * Be warned.
+     *
      * @param left (even if the game is joypad controlled, you must give valid value)
-     * *
      * @param absAxisVal (set AXIS_POSMAX if keyboard controlled)
+     * @author minjaesong
      */
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
         readonly_totalX = //veloX +

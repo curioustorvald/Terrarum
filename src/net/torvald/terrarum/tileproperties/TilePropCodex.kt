@@ -67,10 +67,9 @@ class TilePropCodex {
         }
 
         private fun setProp(prop: TileProp, record: CSVRecord) {
-            prop.name = record.get("name")
+            prop.nameKey = record.get("name")
 
-            prop.id = intVal(record, "id")
-            prop.damage = intVal(record, "dmg")
+            prop.id = idDamageToIndex(intVal(record, "id"), intVal(record, "dmg"))
 
             prop.opacity = intVal(record, "opacity")
             prop.strength = intVal(record, "strength")
@@ -85,8 +84,8 @@ class TilePropCodex {
             prop.isWallable = boolVal(record, "wall")
             prop.isFallable = boolVal(record, "fall")
 
-            print(formatNum3(prop.id) + ":" + formatNum2(prop.damage))
-            println("\t" + prop.name)
+            print(formatNum3(intVal(record, "id")) + ":" + formatNum2(intVal(record, "dmg")))
+            println("\t" + prop.nameKey)
         }
 
         private fun intVal(rec: CSVRecord, s: String): Int {

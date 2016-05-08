@@ -107,6 +107,10 @@ object TileNameCode {
     val SANDSTONE_BLACK = TilePropCodex.idDamageToIndex(15, 4)
     val SANDSTONE_GREEN = TilePropCodex.idDamageToIndex(15, 5)
 
+    val LANTERN = TilePropCodex.idDamageToIndex(16, 0)
+    val SUNSTONE = TilePropCodex.idDamageToIndex(16, 1)
+    val DAYLIGHT_CAPACITOR = TilePropCodex.idDamageToIndex(16, 2)
+
     val WATER_1 =  TilePropCodex.idDamageToIndex(255, 0)
     val WATER_2 =  TilePropCodex.idDamageToIndex(255, 1)
     val WATER_3 =  TilePropCodex.idDamageToIndex(255, 2)

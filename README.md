@@ -29,10 +29,10 @@ Any contribution in this project must be made sorely in English, so be sure to u
 
 ### Contributing translations ###
 
-* Writing text  
-You will need to fiddle with .csv files in ./res/locales
-* Languagus with apparent grammatical gender  
-Any gender discrimination should *not* exist in this game, so please choose vocabularies that is gender-neutral. If such behaviour is not possible in the target language, please use male gender, but try your best to avoid the situation.
+* Writing text
+  You will need to fiddle with .csv files in ./res/locales
+* Languagus with apparent grammatical gender
+  Any gender discrimination should *not* exist in this game, so please choose vocabularies that is gender-neutral. If such behaviour is not possible in the target language, please use male gender, but try your best to avoid the situation.
 
 Note: Right-to-left languages (arabic, hebrew, etc.) are not supported.
 

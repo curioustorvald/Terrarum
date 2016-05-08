@@ -1,5 +1,8 @@
 package net.torvald.terrarum.tileproperties
 
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gamemap.WorldTime
+
 /**
  * Created by minjaesong on 16-02-16.
  */
@@ -7,8 +10,7 @@ class TileProp {
 
     var id: Int = 0
 
-    var damage: Int = 0
-    var name: String = ""
+    var nameKey: String = ""
 
     /**
      * @param opacity Raw RGB value, without alpha
@@ -29,7 +31,17 @@ class TileProp {
     /**
      * @param luminosity Raw RGB value, without alpha
      */
-    var luminosity: Int = 0
+    private var realLum: Int = 0
+    var luminosity: Int
+        set(value) {
+            realLum = value
+        }
+        get() = if (id == TileNameCode.SUNSTONE)
+            Terrarum.game.map.globalLight
+        else if (id == TileNameCode.DAYLIGHT_CAPACITOR)
+            Terrarum.game.globalLightByTime(WorldTime.DAY_LENGTH / 2)
+        else
+            realLum
 
     var drop: Int = 0
     var dropDamage: Int = 0

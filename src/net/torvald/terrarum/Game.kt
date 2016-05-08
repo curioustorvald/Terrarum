@@ -253,6 +253,8 @@ constructor() : BasicGameState() {
         notifier.render(gc, g)
     }
 
+    private fun getGradientColour(row: Int, phase: Int) = GRADIENT_IMAGE!!.getColor(phase, row)
+
     private fun getGradientColour(row: Int): Color {
         val gradMapWidth = GRADIENT_IMAGE!!.width
         val phase = Math.round(
@@ -260,7 +262,19 @@ constructor() : BasicGameState() {
         )
 
         //update in every INTERNAL_FRAME frames
-        return GRADIENT_IMAGE!!.getColor(phase, row)
+        return getGradientColour(row, phase)
+    }
+
+    /**
+     * @param time in seconds
+     */
+    private fun getGradientColourByTime(row: Int, time: Int): Color {
+        val gradMapWidth = GRADIENT_IMAGE!!.width
+        val phase = Math.round(
+                time.toFloat() / WorldTime.DAY_LENGTH.toFloat() * gradMapWidth
+        )
+
+        return getGradientColour(row, phase)
     }
 
     override fun keyPressed(key: Int, c: Char) {
@@ -358,6 +372,7 @@ constructor() : BasicGameState() {
 
     private val globalLightByTime: Int
         get() = getGradientColour(2).getRGB24().rgb24ExpandToRgb30()
+    fun globalLightByTime(t: Int): Int = getGradientColourByTime(2, t).getRGB24().rgb24ExpandToRgb30()
 
     fun Color.getRGB24(): Int = (this.redByte shl 16) or (this.greenByte shl 8) or (this.blueByte)
     /** Remap 8-bit value (0.0-1.0) to 10-bit value (0.0-4.0) by prepending two bits of zero for each R, G and B. */
