@@ -416,12 +416,11 @@ constructor() : BasicGameState() {
     /**
      * Check for duplicates, append actor and sort the list
      */
-    fun addActor(actor: Actor): Boolean {
+    fun addActor(actor: Actor) {
         if (hasActor(actor.referenceID))
             throw RuntimeException("Actor with ID ${actor.referenceID} already exists.")
         actorContainer.add(actor)
         insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
-        return true
     }
 
     /**
@@ -445,7 +444,7 @@ constructor() : BasicGameState() {
         var index: Int = arr.size - 1
         x = arr[index]
         j = index - 1
-        while (j > 0 && arr[j].referenceID > x.referenceID) {
+        while (j > 0 && arr[j] > x) {
             arr[j + 1] = arr[j]
             j -= 1
         }

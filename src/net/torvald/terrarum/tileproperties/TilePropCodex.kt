@@ -13,7 +13,7 @@ import java.io.IOException
 class TilePropCodex {
 
     init {
-        tileProps = Array<TileProp>(MapLayer.RANGE * PairedMapLayer.RANGE + 1,
+        tileProps = Array<TileProp>(TILE_UNIQUE_MAX + 1,
                 {i -> TileProp() }
         )
 
@@ -43,6 +43,8 @@ class TilePropCodex {
         private lateinit var tileProps: Array<TileProp>
 
         val CSV_PATH = "./src/net/torvald/terrarum/tileproperties/tileprop.csv"
+
+        const val TILE_UNIQUE_MAX = MapLayer.RANGE * PairedMapLayer.RANGE
 
         fun getProp(index: Int, damage: Int): TileProp {
             try {

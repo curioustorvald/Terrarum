@@ -81,6 +81,6 @@ class PairedMapLayer(width: Int, var height: Int) : Iterable<Byte> {
 
     companion object {
 
-        @Transient val RANGE = 16
+        @Transient const val RANGE = 16
     }
 }

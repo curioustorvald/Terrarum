@@ -95,6 +95,7 @@ object MapCamera {
             , TileNameCode.SANDSTONE_RED
             , TileNameCode.SANDSTONE_WHITE
             , TileNameCode.SANDSTONE_GREEN
+            , TileNameCode.DAYLIGHT_CAPACITOR
     )
 
     /**

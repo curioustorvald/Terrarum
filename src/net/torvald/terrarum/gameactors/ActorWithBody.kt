@@ -91,7 +91,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
             actorValue[AVKey.BASEMASS] = value
         }
     /** Valid range: [0, 1]  */
-    var elasticity = 0.0
+    var elasticity: Double = 0.0
         set(value) {
             if (value < 0)
                 throw IllegalArgumentException("[ActorWithBody] Invalid elasticity value: $value; valid elasticity value is [0, 1].")
@@ -103,6 +103,18 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 field = value * ELASTICITY_MAX
         }
     @Transient private val ELASTICITY_MAX = 0.993 // No perpetual motion!
+
+    /**
+     * what pretty much every physics engine has, instead of my 'elasticity'
+     *
+     * This is just a simple macro for 'elasticity'.
+     *
+     * Formula: restitution = 1.0 - elasticity
+     */
+    var restitution: Double
+        set(value) { elasticity = 1.0 - value }
+        get() = 1.0 - elasticity
+
     private var density = 1000.0
 
     /**
@@ -175,9 +187,11 @@ open class ActorWithBody constructor() : Actor(), Visible {
     @Transient val DYNAMIC = 2
     @Transient val STATIC = 3
 
-    private val SLEEP_THRE = 0.125
-    private val CCD_THRE = 1.0
-    private val CCD_TICK = 0.125
+    private val SLEEP_THRE = 1.0 / 16.0
+    private val CCD_TICK = 1.0 / 16.0
+
+    internal var walledLeft = false
+    internal var walledRight = false
 
     init {
 
@@ -297,6 +311,9 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 clampNextHitbox()
                 clampHitbox()
             }
+
+            walledLeft = isColliding(CONTACT_AREA_LEFT, -1, 0)
+            walledRight = isColliding(CONTACT_AREA_RIGHT, 1, 0)
         }
     }
 
@@ -534,11 +551,34 @@ open class ActorWithBody constructor() : Actor(), Visible {
             val delta: Vector2 = Vector2(hitbox.toVector() - nextHitbox.toVector()) // we need to traverse back, so may as well negate at the first place
             val ccdDelta = delta.setMagnitude(CCD_TICK)
 
-            while (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
-                   || isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_BOTTOM)
-            ) {
-                // while still colliding, CCD to the 'delta'
-                nextHitbox.translate(ccdDelta)
+            if (ccdDelta.x.abs() >= SLEEP_THRE || ccdDelta.y.abs() >= SLEEP_THRE) { // regular situation
+                // CCD to delta while still colliding
+                while (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
+                       || isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_BOTTOM)
+                ) {
+                    nextHitbox.translate(ccdDelta)
+                }
+            }
+            else { // stuck while standing still
+                // CCD upward
+                var upwardDelta = 0.0
+                while (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
+                       || isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_BOTTOM)
+                ) {
+                    nextHitbox.translate(0.0, -CCD_TICK)
+                    upwardDelta += CCD_TICK
+
+                    if (upwardDelta >= TSIZE) break
+
+                    /* TODO CCD in order of:
+
+                    .. 10 11 12 13 14 ..
+                    .. 08 03 04 05 09 ..
+                    .. 06 01 [] 02 07 ..
+
+                    until the stucking is resolved
+                     */
+                }
             }
         }
     }
@@ -546,10 +586,9 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private fun applyNormalForce() {
         if (!isNoCollideWorld) {
             // axis Y
-            if (veloY >= 0) { // check downward
+            if (moveDelta.y >= 0) { // check downward
                 if (isColliding(CONTACT_AREA_BOTTOM) || isColliding(CONTACT_AREA_BOTTOM, 0, 1)) {
                     // the actor is hitting the ground
-                    //veloY = 0.0 // reset veloY, simulating normal force
                     hitAndReflectY()
                     grounded = true
                 }
@@ -557,33 +596,30 @@ open class ActorWithBody constructor() : Actor(), Visible {
                     grounded = false
                 }
             }
-            else if (veloY < 0) { // check upward
+            else if (moveDelta.y < 0) { // check upward
                 grounded = false
                 if (isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_TOP, 0, -1)) {
                     // the actor is hitting the ceiling
-                    //veloY = 0.0 // reset veloY, simulating normal force
                     hitAndReflectY()
                 }
                 else { // the actor is not grounded at all
                 }
             }
             // axis X
-            if (veloX >= 0.5) { // check right
+            if (moveDelta.x > 0) { // check right
                 if ((isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT))
                 || (isColliding(CONTACT_AREA_RIGHT, 1, 0) && !isColliding(CONTACT_AREA_LEFT, 0, -1))) {
                     // the actor is hitting the right wall
-                    //veloX = 0.0 // reset veloX, simulating normal force
                     hitAndReflectX()
                 }
                 else {
                 }
             }
-            else if (veloX <= -0.5) { // check left
+            else if (moveDelta.x < 0) { // check left
                 // System.out.println("collidingleft");
                 if ((isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT))
                 || (isColliding(CONTACT_AREA_LEFT, -1, 0) && !isColliding(CONTACT_AREA_RIGHT, 1, 0))) {
                     // the actor is hitting the left wall
-                    //veloX = 0.0 // reset veloX, simulating normal force
                     hitAndReflectX()
                 }
                 else {
@@ -597,18 +633,22 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private fun hitAndReflectX() {
         if ((veloX * elasticity).abs() > SLEEP_THRE) {
             veloX *= -elasticity
+            walkX *= -elasticity
         }
         else {
             veloX = 0.0
+            walkX = 0.0
         }
     }
 
     private fun hitAndReflectY() {
         if ((veloY * elasticity).abs() > SLEEP_THRE) {
             veloY *= -elasticity
+            walkY *= -elasticity
         }
         else {
             veloY = 0.0
+            walkY *= 0.0
         }
     }
 

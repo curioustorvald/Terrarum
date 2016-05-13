@@ -7,17 +7,16 @@ import java.util.HashSet
 /**
  * Created by minjaesong on 16-02-15.
  */
-class Faction(factionName: String) {
+class Faction(name: String) : Comparable<Faction> {
 
-    lateinit var factionName: String
+    var factionName: String = name
     lateinit var factionAmicable: HashSet<String>
     lateinit var factionNeutral: HashSet<String>
     lateinit var factionHostile: HashSet<String>
     lateinit var factionFearful: HashSet<String>
-    var factionID: Long = generateUniqueID()
+    var referenceID: Long = generateUniqueID()
 
     init {
-        this.factionName = factionName
         factionAmicable = HashSet<String>()
         factionNeutral = HashSet<String>()
         factionHostile = HashSet<String>()
@@ -60,8 +59,18 @@ class Faction(factionName: String) {
         factionFearful.remove(faction)
     }
 
-    fun generateUniqueID(): Long {
-        fun Long.abs() = if (this < 0) -this else this
-        return HQRNG().nextLong().abs() // set new ID
+    private fun generateUniqueID(): Long {
+        var ret: Long
+        do {
+            ret = HQRNG().nextLong().or(0x80000000L).and(0xFFFFFFFFL) // guaranteed to be 2147483648..4294967295
+        } while (FactionCodex.hasFaction(ret)) // check for collision
+        return ret
     }
+
+    override fun equals(other: Any?) = referenceID == (other as Faction).referenceID
+    override fun hashCode() = (referenceID - 0x80000000L).toInt()
+    override fun toString() = "Faction, ID: $referenceID ($factionName)"
+    override fun compareTo(other: Faction): Int = (this.referenceID - other.referenceID).toInt().sign()
+
+    fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else this
 }

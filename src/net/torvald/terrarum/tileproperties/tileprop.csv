@@ -45,7 +45,7 @@
  "11";  "1";"TILE_TORCH_FROST"         ;  "8396808";       "0"; "N/A";    "0";    "0";   "0";  "81916159";  "11";   "1";   "0";"16"
  "12";  "0";"TILE_TORCH"               ;  "8396808";       "0"; "N/A";    "0";    "0";   "0";         "0";  "11";   "0";   "0";"16"
  "12";  "1";"TILE_TORCH_FROST"         ;  "8396808";       "0"; "N/A";    "0";    "0";   "0";         "0";  "11";   "1";   "0";"16"
- "13";  "0";"TILE_ILLUMINATOR_WHITE"   ;  "8396808";       "0"; "N/A";    "0";    "1";   "1"; "246656235";  "13";   "0";   "0";"16"
+ "13";  "0";"TILE_ILLUMINATOR_WHITE"   ;  "8396808";       "0"; "N/A";    "0";    "1";   "1"; "248768744";  "13";   "0";   "0";"16"
  "13";  "1";"TILE_ILLUMINATOR_YELLOW"  ;  "8396808";       "0"; "N/A";    "0";    "1";   "1"; "246656000";  "13";   "1";   "0";"16"
  "13";  "2";"TILE_ILLUMINATOR_ORANGE"  ;  "8396808";       "0"; "N/A";    "0";    "1";   "1"; "246602752";  "13";   "2";   "0";"16"
  "13";  "3";"TILE_ILLUMINATOR_RED"     ;  "8396808";       "0"; "N/A";    "0";    "1";   "1"; "246415360";  "13";   "3";   "0";"16"
@@ -119,23 +119,30 @@
 "255"; "14";"TILE_WATER"               ; "27282445";     "100";"1000";    "1";    "0";   "0";         "0"; "N/A"; "N/A";   "0";"16"
 "255"; "15";"TILE_WATER"               ; "27282445";     "100";"1000";    "1";    "0";   "0";         "0"; "N/A"; "N/A";   "0";"16"
 "256";  "0";"TILE_NULL"                ;        "0";      "-1";"2600";    "0";    "0";   "0";         "0"; "N/A"; "N/A";   "0";"16"
+## Notes ##
+
 # Friction: 0: frictionless, <16: slippery, 16: regular, >16: sticky
 # Opacity/Lumcolor: 40-step RGB
 # Solid: whether the tile has full collision
 # movr: Movement resistance, (walkspeedmax) / (1 + (n/16)), 16 halves movement speed
 # dsty: density. As we are putting water an 1000, it is identical to specific gravity. [g/l]
 
-# Sunstone: Artificial sunlight, change colour over time in sync with sunlight
-# Sunlight capacitor: daylight at 11h of 22h day
 
+## Illuminants ##
+
+# Illuminant white: RGB(237,250,232), simulation of mercury-vapour lamp (If you want high CRI lamp, collect a daylight!)
 # Defalut torch : L 70 a 51 b 59; real candlelight colour taken from properly configured camera.
+# Sunstone: Artificial sunlight, change colour over time in sync with sunlight. Set by game's code.
+# Sunlight capacitor: daylight at 11h of 22h day. Set by game's code.
+
+
+## Tiles ##
 
 # 16 colour palette : Old Apple Macintosh 16-colour palette
-
 # Magical ice: theoretical __metallic__ ice that might form under super-high pressure (> 5 TPa). Its density is a wild guess.
 
-# Off illuminator: NO OPACITY! this is intended!
 
-#   References:
+## References ##
+
 #     * Density of various woods : http://www.engineeringtoolbox.com/wood-density-d_40.html
 #     * Density of various phases of ice : http://www1.lsbu.ac.uk/water/ice_phases.html

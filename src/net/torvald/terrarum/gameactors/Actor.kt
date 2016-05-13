@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.itemproperties.ItemPropCodex
 import org.newdawn.slick.GameContainer
 
 /**
@@ -21,11 +22,13 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
     override fun equals(other: Any?) = referenceID == (other as Actor).referenceID
     override fun hashCode() = referenceID
-    override fun toString() = if (actorValue.getAsString(AVKey.NAME).isNullOrEmpty())
+    override fun toString() = "Actor, " + if (actorValue.getAsString(AVKey.NAME).isNullOrEmpty())
         "ID: ${hashCode()}"
     else
         "ID: ${hashCode()} (${actorValue.getAsString(AVKey.NAME)})"
-    override fun compareTo(other: Actor): Int = this.referenceID - other.referenceID
+    override fun compareTo(other: Actor): Int = (this.referenceID - other.referenceID).sign()
+
+    fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else this
 
     /**
      * Usage:
@@ -33,11 +36,10 @@ abstract class Actor : Comparable<Actor>, Runnable {
      * override var referenceID: Int = generateUniqueReferenceID()
      */
     fun generateUniqueReferenceID(): Int {
-        fun Int.abs() = if (this < 0) -this else this
         var ret: Int
         do {
-            ret = HQRNG().nextInt().abs() // set new ID
-        } while (Terrarum.game.hasActor(ret)) // check for collision
+            ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
+        } while (Terrarum.game.hasActor(ret) || ret < ItemPropCodex.ITEM_UNIQUE_MAX) // check for collision
         return ret
     }
 }

@@ -73,7 +73,7 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         }
 
     companion object {
-        @Transient internal const val ACCEL_MULT_IN_FLIGHT: Double = 0.31
+        @Transient internal const val ACCEL_MULT_IN_FLIGHT: Double = 0.21 // TODO air control still too 'slippery' with 0.31, lower the value!
         @Transient internal const val WALK_ACCEL_BASE: Double = 0.67
 
         @Transient const val PLAYER_REF_ID: Int = 0x51621D
@@ -130,33 +130,35 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
      * @author minjaesong
      */
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
-        readonly_totalX = //veloX +
-                          /*actorValue.getAsDouble(AVKey.ACCEL)!! *
+        if ((!walledLeft && left) || (!walledRight && !left)) {
+            readonly_totalX = //veloX +
+                    /*actorValue.getAsDouble(AVKey.ACCEL)!! *
                           actorValue.getAsDouble(AVKey.ACCELMULT)!! *
                           Math.sqrt(scale) *
                           applyAccelRealism(walkPowerCounter) *
                           (if (left) -1 else 1).toFloat() *
                           absAxisVal*/
-                actorValue.getAsDouble(AVKey.ACCEL)!! *
-                actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                Math.sqrt(scale) *
-                applyVelo(walkCounter) *
-                (if (left) -1 else 1).toFloat() *
-                absAxisVal
+                    actorValue.getAsDouble(AVKey.ACCEL)!! *
+                    actorValue.getAsDouble(AVKey.ACCELMULT)!! *
+                    Math.sqrt(scale) *
+                    applyVelo(walkCounter) *
+                    (if (left) -1 else 1).toFloat() *
+                    absAxisVal
 
-        //applyForce(Vector2(readonly_totalX, 0.0))
-        walkX += readonly_totalX
-        walkX = absClamp(walkX, actorValue.getAsDouble(AVKey.SPEED)!! * actorValue.getAsDouble(AVKey.SPEEDMULT)!!)
+            //applyForce(Vector2(readonly_totalX, 0.0))
+            walkX += readonly_totalX
+            walkX = absClamp(walkX, actorValue.getAsDouble(AVKey.SPEED)!! * actorValue.getAsDouble(AVKey.SPEEDMULT)!!)
 
-        walkCounter += 1
+            walkCounter += 1
 
-        // Heading flag
-        if (left)
-            walkHeading = LEFT
-        else
-            walkHeading = RIGHT
+            // Heading flag
+            if (left)
+                walkHeading = LEFT
+            else
+                walkHeading = RIGHT
 
-        println("$walkCounter: ${readonly_totalX}")
+            // println("$walkCounter: ${readonly_totalX}")
+        }
     }
 
     /**
@@ -243,7 +245,9 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
     }
 
     /**
-     * See ./work_files/Jump\ power\ by\ pressing\ time.gcx
+     * See ./work_files/Jump power by pressing time.gcx
+     *
+     * TODO linear function (play Super Mario Bros. and you'll get what I'm talking about)
      */
     private fun jump() {
         if (jumping) {

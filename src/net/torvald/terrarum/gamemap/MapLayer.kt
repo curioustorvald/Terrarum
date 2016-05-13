@@ -50,7 +50,7 @@ class MapLayer(var width: Int, var height: Int) : Iterable<Byte> {
     private fun uint8ToInt32(x: Byte): Int = java.lang.Byte.toUnsignedInt(x)
 
     companion object {
-        @Transient val RANGE = 256
+        @Transient const val RANGE = 256
     }
 }
 
