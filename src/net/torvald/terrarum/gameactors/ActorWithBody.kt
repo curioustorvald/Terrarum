@@ -183,9 +183,9 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     @Transient internal val BASE_FRICTION = 0.3
 
-    @Transient val KINEMATIC = 1
+    @Transient val KINEMATIC = 1 // does not be budged by external forces
     @Transient val DYNAMIC = 2
-    @Transient val STATIC = 3
+    @Transient val STATIC = 3 // does not be budged by external forces, target of collision
 
     private val SLEEP_THRE = 1.0 / 16.0
     private val CCD_TICK = 1.0 / 16.0
@@ -287,15 +287,11 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 // Set 'next' position (hitbox) to fiddle with
                 setNewNextHitbox()
 
-                // if not horizontally moving then ...
-                //if (Math.abs(veloX) < 0.5) { // fix for special situations (see fig. 1 at the bottom of the source)
-                //    updateVerticalPos();
-                //    updateHorizontalPos();
-                //}
-                //else {
-                // compensate for colliding
-                //updateHorizontalCollision()
-                //updateVerticalCollision()
+                /**
+                 * Solve collision
+                 * If and only if:
+                 *     This body is NON-STATIC and the other body is STATIC
+                 */
                 applyNormalForce()
                 adjustHit()
 
@@ -551,15 +547,15 @@ open class ActorWithBody constructor() : Actor(), Visible {
             val delta: Vector2 = Vector2(hitbox.toVector() - nextHitbox.toVector()) // we need to traverse back, so may as well negate at the first place
             val ccdDelta = delta.setMagnitude(CCD_TICK)
 
-            if (ccdDelta.x.abs() >= SLEEP_THRE || ccdDelta.y.abs() >= SLEEP_THRE) { // regular situation
+            //if (ccdDelta.x.abs() >= SLEEP_THRE || ccdDelta.y.abs() >= SLEEP_THRE) { // regular situation
                 // CCD to delta while still colliding
                 while (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
                        || isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_BOTTOM)
                 ) {
                     nextHitbox.translate(ccdDelta)
                 }
-            }
-            else { // stuck while standing still
+            //}
+            /*else { // stuck while standing still
                 // CCD upward
                 var upwardDelta = 0.0
                 while (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
@@ -579,7 +575,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
                     until the stucking is resolved
                      */
                 }
-            }
+            }*/
         }
     }
 

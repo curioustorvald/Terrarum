@@ -6,6 +6,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.tileproperties.TileNameCode
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import com.jme3.math.FastMath
+import net.torvald.terrarum.concurrent.ThreadPool
 import net.torvald.terrarum.setBlendMul
 import net.torvald.terrarum.setBlendNormal
 import org.lwjgl.opengl.GL11
@@ -19,7 +20,7 @@ import java.util.*
  * Created by minjaesong on 16-01-19.
  */
 object MapCamera {
-    private val map: GameMap = Terrarum.game.map;
+    val map: GameMap = Terrarum.game.map;
 
     var cameraX = 0
         private set
@@ -28,17 +29,23 @@ object MapCamera {
 
     private val TSIZE = MapDrawer.TILE_SIZE
 
-    private var tilesWall: SpriteSheet = SpriteSheet("./res/graphics/terrain/wall.png", TSIZE, TSIZE)
-    private var tilesTerrain: SpriteSheet = SpriteSheet("./res/graphics/terrain/terrain.png", TSIZE, TSIZE)
-    private var tilesWire: SpriteSheet = SpriteSheet("./res/graphics/terrain/wire.png", TSIZE, TSIZE)
-    private var tilesetBook: Array<SpriteSheet> = arrayOf(tilesWall, tilesTerrain, tilesWire)
+    var tilesWall: SpriteSheet = SpriteSheet("./res/graphics/terrain/wall.png", TSIZE, TSIZE)
+        private set
+    var tilesTerrain: SpriteSheet = SpriteSheet("./res/graphics/terrain/terrain.png", TSIZE, TSIZE)
+        private set
+    var tilesWire: SpriteSheet = SpriteSheet("./res/graphics/terrain/wire.png", TSIZE, TSIZE)
+        private set
+    var tilesetBook: Array<SpriteSheet> = arrayOf(tilesWall, tilesTerrain, tilesWire)
+        private set
 
-    private val WALL = GameMap.WALL
-    private val TERRAIN = GameMap.TERRAIN
-    private val WIRE = GameMap.WIRE
+    val WALL = GameMap.WALL
+    val TERRAIN = GameMap.TERRAIN
+    val WIRE = GameMap.WIRE
 
-    private var renderWidth: Int = 0
-    private var renderHeight: Int = 0
+    var renderWidth: Int = 0
+        private set
+    var renderHeight: Int = 0
+        private set
 
     private val NEARBY_TILE_KEY_UP = 0
     private val NEARBY_TILE_KEY_RIGHT = 1
@@ -55,7 +62,7 @@ object MapCamera {
      * It holds different shading rule to discriminate with group 02, index 0 is single tile.
      * These are the tiles that only connects to itself, will not connect to colour variants
      */
-    private val TILES_CONNECT_SELF = arrayOf(
+    val TILES_CONNECT_SELF = arrayOf(
               TileNameCode.ICE_MAGICAL
             , TileNameCode.ILLUMINATOR_BLACK
             , TileNameCode.ILLUMINATOR_BLUE
@@ -102,7 +109,7 @@ object MapCamera {
      * Connectivity group 02 : natural tiles
      * It holds different shading rule to discriminate with group 01, index 0 is middle tile.
      */
-    private val TILES_CONNECT_MUTUAL = arrayOf(
+    val TILES_CONNECT_MUTUAL = arrayOf(
               TileNameCode.STONE
             , TileNameCode.DIRT
             , TileNameCode.GRASS
@@ -164,7 +171,7 @@ object MapCamera {
     /**
      * Torches, levers, switches, ...
      */
-    private val TILES_WALL_STICKER = arrayOf(
+    val TILES_WALL_STICKER = arrayOf(
               TileNameCode.TORCH
             , TileNameCode.TORCH_FROST
             , TileNameCode.TORCH_OFF
@@ -174,7 +181,7 @@ object MapCamera {
     /**
      * platforms, ...
      */
-    private val TILES_WALL_STICKER_CONNECT_SELF = arrayOf<Int>(
+    val TILES_WALL_STICKER_CONNECT_SELF = arrayOf<Int>(
 
     )
 
@@ -183,7 +190,7 @@ object MapCamera {
      * will blend colour using colour multiplication
      * i.e. red hues get lost if you dive into the water
      */
-    private val TILES_BLEND_MUL = arrayOf(
+    val TILES_BLEND_MUL = arrayOf(
               TileNameCode.WATER
             , TileNameCode.WATER_1
             , TileNameCode.WATER_2
@@ -247,40 +254,40 @@ object MapCamera {
     }
 
     private fun drawTiles(mode: Int, drawModeTilesBlendMul: Boolean) {
-        val for_y_start = div16(cameraY)
-        val for_x_start = div16(cameraX)
+        val for_y_start = MapCamera.div16(MapCamera.cameraY)
+        val for_y_end = MapCamera.clampHTile(for_y_start + MapCamera.div16(MapCamera.renderHeight) + 2)
 
-        val for_y_end = clampHTile(for_y_start + div16(renderHeight) + 2)
-        val for_x_end = clampWTile(for_x_start + div16(renderWidth) + 2)
+        val for_x_start = MapCamera.div16(MapCamera.cameraX)
+        val for_x_end = MapCamera.clampWTile(for_x_start + MapCamera.div16(MapCamera.renderWidth) + 2)
 
         // initialise
-        tilesetBook[mode].startUse()
+        MapCamera.tilesetBook[mode].startUse()
 
         // loop
-        for (y in for_y_start..for_y_end - 1) {
+        for (y in for_y_start..for_y_end) {
             for (x in for_x_start..for_x_end - 1) {
 
                 val thisTile: Int?
-                if (mode % 3 == WALL)
-                    thisTile = map.getTileFromWall(x, y)
-                else if (mode % 3 == TERRAIN)
-                    thisTile = map.getTileFromTerrain(x, y)
-                else if (mode % 3 == WIRE)
-                    thisTile = map.getTileFromWire(x, y)
+                if (mode % 3 == MapCamera.WALL)
+                    thisTile = MapCamera.map.getTileFromWall(x, y)
+                else if (mode % 3 == MapCamera.TERRAIN)
+                    thisTile = MapCamera.map.getTileFromTerrain(x, y)
+                else if (mode % 3 == MapCamera.WIRE)
+                    thisTile = MapCamera.map.getTileFromWire(x, y)
                 else
                     throw IllegalArgumentException()
 
-                val noDamageLayer = mode % 3 == WIRE
+                val noDamageLayer = mode % 3 == MapCamera.WIRE
 
                 // draw
                 try {
                     if (
 
-                    (mode == WALL || mode == TERRAIN)       // not an air tile
+                    (mode == MapCamera.WALL || mode == MapCamera.TERRAIN)       // not an air tile
 
-                            && (thisTile ?: 0) > 0
-                            &&
-                            // check if light level of nearby or this tile is illuminated
+                    && (thisTile ?: 0) > 0
+                    &&
+                    // check if light level of nearby or this tile is illuminated
                     (    LightmapRenderer.getValueFromMap(x, y) ?: 0 > 0
                          || LightmapRenderer.getValueFromMap(x - 1, y) ?: 0 > 0
                          || LightmapRenderer.getValueFromMap(x + 1, y) ?: 0 > 0
@@ -293,12 +300,12 @@ object MapCamera {
                     ) {
 
                         val nearbyTilesInfo: Int
-                        if (isWallSticker(thisTile)) {
-                            nearbyTilesInfo = getNearbyTilesInfoWallSticker(x, y)
-                        } else if (isConnectMutual(thisTile)) {
-                            nearbyTilesInfo = getNearbyTilesInfoNonSolid(x, y, mode)
-                        } else if (isConnectSelf(thisTile)) {
-                            nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile)
+                        if (MapCamera.isWallSticker(thisTile)) {
+                            nearbyTilesInfo = MapCamera.getNearbyTilesInfoWallSticker(x, y)
+                        } else if (MapCamera.isConnectMutual(thisTile)) {
+                            nearbyTilesInfo = MapCamera.getNearbyTilesInfoNonSolid(x, y, mode)
+                        } else if (MapCamera.isConnectSelf(thisTile)) {
+                            nearbyTilesInfo = MapCamera.getNearbyTilesInfo(x, y, mode, thisTile)
                         } else {
                             nearbyTilesInfo = 0
                         }
@@ -313,7 +320,7 @@ object MapCamera {
                         val thisTileY = (thisTile ?: 0) / PairedMapLayer.RANGE
 
                         if (drawModeTilesBlendMul) {
-                            if (isBlendMul(thisTile)) {
+                            if (MapCamera.isBlendMul(thisTile)) {
                                 drawTile(mode, x, y, thisTileX, thisTileY)
                             }
                         } else {
@@ -323,13 +330,13 @@ object MapCamera {
                         }
                     }
                 } catch (e: NullPointerException) {
-                    // do nothing. This exception handling may hide erratic behaviour completely.
+                    // do nothing. WARNING: This exception handling may hide erratic behaviour completely.
                 }
 
             }
         }
 
-        tilesetBook[mode].endUse()
+        MapCamera.tilesetBook[mode].endUse()
     }
 
     /**
@@ -340,7 +347,7 @@ object MapCamera {
      * *
      * @return binary [0-15] 1: up, 2: right, 4: down, 8: left
      */
-    private fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
+    fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
         val nearbyTiles = IntArray(4)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(mode, x - 1, y) ?: 4096
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFrom(mode, x + 1, y) ?: 4096
@@ -358,7 +365,7 @@ object MapCamera {
         return ret
     }
 
-    private fun getNearbyTilesInfoNonSolid(x: Int, y: Int, mode: Int): Int {
+    fun getNearbyTilesInfoNonSolid(x: Int, y: Int, mode: Int): Int {
         val nearbyTiles = IntArray(4)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(mode, x - 1, y) ?: 4096
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = map.getTileFrom(mode, x + 1, y) ?: 4096
@@ -380,7 +387,7 @@ object MapCamera {
         return ret
     }
 
-    private fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
+    fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
         val nearbyTiles = IntArray(4)
         val NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = map.getTileFrom(TERRAIN, x - 1, y) ?: 4096
@@ -469,20 +476,16 @@ object MapCamera {
         }
     }
 
-    fun getRenderWidth(): Int = renderWidth
-    fun getRenderHeight(): Int = renderHeight
-
     fun getRenderStartX(): Int = div16(cameraX)
     fun getRenderStartY(): Int = div16(cameraY)
 
     fun getRenderEndX(): Int = clampWTile(getRenderStartX() + div16(renderWidth) + 2)
     fun getRenderEndY(): Int = clampHTile(getRenderStartY() + div16(renderHeight) + 2)
 
-    private fun isConnectSelf(b: Int?): Boolean = TILES_CONNECT_SELF.contains(b)
-    private fun isConnectMutual(b: Int?): Boolean = TILES_CONNECT_MUTUAL.contains(b)
-    private fun isWallSticker(b: Int?): Boolean = TILES_WALL_STICKER.contains(b)
-    private fun isPlatform(b: Int?): Boolean = TILES_WALL_STICKER_CONNECT_SELF.contains(b)
-
-    private fun isBlendMul(b: Int?): Boolean = TILES_BLEND_MUL.contains(b)
+    fun isConnectSelf(b: Int?): Boolean = TILES_CONNECT_SELF.contains(b)
+    fun isConnectMutual(b: Int?): Boolean = TILES_CONNECT_MUTUAL.contains(b)
+    fun isWallSticker(b: Int?): Boolean = TILES_WALL_STICKER.contains(b)
+    fun isPlatform(b: Int?): Boolean = TILES_WALL_STICKER_CONNECT_SELF.contains(b)
+    fun isBlendMul(b: Int?): Boolean = TILES_BLEND_MUL.contains(b)
 
 }

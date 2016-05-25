@@ -13,6 +13,7 @@ object DefaultConfig {
         jsonObject.addProperty("imtooyoungtodie", false)
         jsonObject.addProperty("language", Terrarum.sysLang)
         jsonObject.addProperty("notificationshowuptime", 6500)
+        jsonObject.addProperty("multithread", false) // experimental!
 
         return jsonObject
     }

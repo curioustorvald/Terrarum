@@ -111,6 +111,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         var hasController = false
         val CONTROLLER_DEADZONE = 0.1f
 
+        /** Available CPU cores */
+        val CORES = Runtime.getRuntime().availableProcessors();
+
         private lateinit var configDir: String
 
         /**

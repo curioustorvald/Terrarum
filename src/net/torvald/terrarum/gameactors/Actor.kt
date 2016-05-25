@@ -10,7 +10,7 @@ import org.newdawn.slick.GameContainer
  */
 abstract class Actor : Comparable<Actor>, Runnable {
 
-    abstract fun update(gc: GameContainer, delta_t: Int)
+    abstract fun update(gc: GameContainer, delta: Int)
 
     /**
      * Valid RefID is equal to or greater than 32768.

@@ -31,6 +31,7 @@ object CollisionSolver {
      * [this link](https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects)
      */
     fun process() {
+        // TODO threading X and Y
         // clean up before we go
         collListX.clear()
         collListY.clear()

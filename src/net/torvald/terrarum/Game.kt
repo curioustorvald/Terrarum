@@ -1,6 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.imagefont.GameFontBase
+import net.torvald.terrarum.concurrent.ThreadPool
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.gameactors.physicssolver.CollisionSolver
@@ -70,6 +71,7 @@ constructor() : BasicGameState() {
     private val useShader: Boolean = false
     private val shaderProgram = 0
 
+    private val CORES = ThreadPool.POOL_SIZE
 
     val memInUse: Long
         get() = ManagementFactory.getMemoryMXBean().heapMemoryUsage.used shr 20
@@ -128,7 +130,7 @@ constructor() : BasicGameState() {
                 (Terrarum.WIDTH - notifier.UI.width) / 2, Terrarum.HEIGHT - notifier.UI.height)
         notifier.setVisibility(true)
 
-        if (Terrarum.gameConfig.getAsBoolean("smoothlighting") == true)
+        if (Terrarum.getConfigBoolean("smoothlighting") == true)
             KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, true)
         else
             KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, false)
@@ -154,11 +156,14 @@ constructor() : BasicGameState() {
         wakeDormantActors()
 
         // determine whether the actor should be active or dormant
-        // also updates active actors
-        updateAndInactivateDistantActors(gc, delta)
+        InactivateDistantActors()
 
+        updateActors(gc, delta)
+
+        // TODO thread pool
         CollisionSolver.process()
 
+        // TODO thread pool
         uiContainer.forEach { ui -> ui.update(gc, delta) }
         consoleHandler.update(gc, delta)
         debugWindow.update(gc, delta)
@@ -194,7 +199,7 @@ constructor() : BasicGameState() {
 
         // draw actors
         actorContainer.forEach { actor ->
-            if (actor is Visible && actor.inScreen()) { // if visible and within screen
+            if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
                 actor.drawBody(gc, g)
             }
         }
@@ -216,7 +221,7 @@ constructor() : BasicGameState() {
 
         // draw actor glows
         actorContainer.forEach { actor ->
-            if (actor is Visible && actor.inScreen()) { // if visible and within screen
+            if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
                 actor.drawGlow(gc, g)
             }
         }
@@ -348,7 +353,7 @@ constructor() : BasicGameState() {
         }
     }
 
-    fun updateAndInactivateDistantActors(gc: GameContainer, delta: Int) {
+    fun InactivateDistantActors() {
         var actorContainerSize = actorContainer.size
         var i = 0
         // determine whether the actor should be active or dormant by its distance from the player.
@@ -363,10 +368,30 @@ constructor() : BasicGameState() {
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so also decrement counter by 1
             }
-            else {
-                actorContainer[i].update(gc, delta)
-            }
             i++
+        }
+    }
+
+    fun updateActors(gc: GameContainer, delta: Int) {
+        if (CORES >= 2 && Terrarum.getConfigBoolean("multithread")) {
+            val actors = actorContainer.size.toFloat()
+            // set up indices
+            for (i in 0..ThreadPool.POOL_SIZE - 1) {
+                ThreadPool.map(
+                        i,
+                        ThreadActorUpdate(
+                                ((actors / CORES) * i).toInt(),
+                                ((actors / CORES) * i.plus(1)).toInt() - 1,
+                                gc, delta
+                        ),
+                        "ActorUpdate"
+                )
+            }
+
+            ThreadPool.startAll()
+        }
+        else {
+            actorContainer.forEach { it.update(gc, delta) }
         }
     }
 

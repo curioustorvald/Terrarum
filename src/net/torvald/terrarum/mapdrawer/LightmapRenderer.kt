@@ -77,8 +77,8 @@ object LightmapRenderer {
         for_x_start = MapCamera.cameraX / TSIZE - 1 // fix for premature lightmap rendering
         for_y_start = MapCamera.cameraY / TSIZE - 1 // on topmost/leftmost side
 
-        for_x_end = for_x_start + MapCamera.getRenderWidth() / TSIZE + 3
-        for_y_end = for_y_start + MapCamera.getRenderHeight() / TSIZE + 2 // same fix as above
+        for_x_end = for_x_start + MapCamera.renderWidth / TSIZE + 3
+        for_y_end = for_y_start + MapCamera.renderHeight / TSIZE + 2 // same fix as above
 
         /**
          * * true: overscanning is limited to 8 tiles in width (overscan_opaque)
