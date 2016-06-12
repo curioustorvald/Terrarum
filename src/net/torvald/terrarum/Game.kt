@@ -373,7 +373,7 @@ constructor() : BasicGameState() {
     }
 
     fun updateActors(gc: GameContainer, delta: Int) {
-        if (CORES >= 2 && Terrarum.getConfigBoolean("multithread")) {
+        if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD) {
             val actors = actorContainer.size.toFloat()
             // set up indices
             for (i in 0..ThreadPool.POOL_SIZE - 1) {

@@ -6,12 +6,15 @@ import net.torvald.terrarum.tileproperties.TileNameCode
 import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.concurrent.ThreadPool
+import net.torvald.terrarum.gameactors.ThreadActorUpdate
 import java.util.*
 
 object MapGenerator {
 
-    private lateinit var map: GameMap
-    private lateinit var random: Random
+    internal lateinit var map: GameMap
+    internal lateinit var random: Random
     //private static float[] noiseArray;
     var SEED: Long = 0
     var WIDTH: Int = 0
@@ -56,7 +59,7 @@ object MapGenerator {
     private val GRASSCUR_DOWN = 2
     private val GRASSCUR_LEFT = 3
 
-    private val TILE_MACRO_ALL = -1
+    internal val TILE_MACRO_ALL = -1
 
     fun attachMap(map: GameMap) {
         this.map = map
@@ -665,33 +668,50 @@ object MapGenerator {
     }
 
     private fun processNoiseLayers(noiseRecords: Array<TaggedJoise>) {
-        for (record in noiseRecords) {
-            println("[mapgenerator] ${record.message}...")
-            for (y in 0..HEIGHT - 1) {
-                for (x in 0..WIDTH - 1) {
-                    val noise: Float = record.noiseModule.get(
-                            x.toDouble() / 48.0, // 48: Fixed value
-                            y.toDouble() / 48.0
-                    ).toFloat()
-
-                    val fromTerr = record.replaceFromTerrain
-                    val fromWall = record.replaceFromWall
-                    val to: Int = when(record.replaceTo) {
-                        is Int -> record.replaceTo as Int
-                        is IntArray -> (record.replaceTo as IntArray)[random.nextInt((record.replaceTo as IntArray).size)]
-                        else -> throw IllegalArgumentException("[mapgenerator] Unknown replaceTo tile type '${record.replaceTo.javaClass.canonicalName}': Only 'kotlin.Int' and 'kotlin.IntArray' is valid.")
-                    }
-                    if (to == TILE_MACRO_ALL) throw IllegalArgumentException("[mapgenerator] Invalid replaceTo: TILE_MACRO_ALL")
-                    val threshold = record.filter.getGrad(y, record.filterArg1, record.filterArg2)
-
-                    if (noise > threshold * record.scarcity) {
-                        if ((map.getTileFromTerrain(x, y) == fromTerr || fromTerr == TILE_MACRO_ALL)
-                                && (map.getTileFromWall(x, y) == fromWall || fromWall == TILE_MACRO_ALL)) {
-                            map.setTileTerrain(x, y, to)
-                        }
-                    }
-                }
+        if (Terrarum.MULTITHREAD) {
+            // set up indices
+            for (i in 0..ThreadPool.POOL_SIZE - 1) {
+                ThreadPool.map(
+                        i,
+                        ThreadProcessNoiseLayers(
+                                ((HEIGHT / Terrarum.CORES) * i).toInt(),
+                                ((HEIGHT / Terrarum.CORES) * i.plus(1)).toInt() - 1,
+                                noiseRecords
+                        ),
+                        "SampleJoiseMap"
+                )
             }
+
+            ThreadPool.startAll()
+            // FIXME game starts prematurely
+            /* Console:
+            [mapgenerator] Seed: 85336530
+            [mapgenerator] Raising and eroding terrain...
+            [mapgenerator] Shaping world...
+            [mapgenerator] Carving caves...
+            [mapgenerator] Carving caves...
+            [mapgenerator] Carving caves...
+            [mapgenerator] Flooding bottom lava...
+            [mapgenerator] Carving caves...
+            [mapgenerator] Planting grass...
+            [mapgenerator] Placing floating islands...
+            [UIHandler] Creating UI 'ConsoleWindow'
+            Mon Jun 13 00:43:57 KST 2016 INFO:Offscreen Buffers FBO=true PBUFFER=true PBUFFERRT=false
+            Mon Jun 13 00:43:57 KST 2016 DEBUG:Creating FBO 2048x256
+            [UIHandler] Creating UI 'BasicDebugInfoWindow'
+            Mon Jun 13 00:43:57 KST 2016 INFO:Offscreen Buffers FBO=true PBUFFER=true PBUFFERRT=false
+            Mon Jun 13 00:43:57 KST 2016 DEBUG:Creating FBO 2048x1024
+            [UIHandler] Creating UI 'Notification'
+            Mon Jun 13 00:43:57 KST 2016 INFO:Offscreen Buffers FBO=true PBUFFER=true PBUFFERRT=false
+            Mon Jun 13 00:43:57 KST 2016 DEBUG:Creating FBO 512x64
+            [mapgenerator] Collapsing caves...
+            [mapgenerator] Collapsing caves...
+            [mapgenerator] Collapsing caves...
+            [mapgenerator] Collapsing caves...
+             */
+        }
+        else {
+            ThreadProcessNoiseLayers(0, HEIGHT - 1, noiseRecords).run()
         }
     }
 

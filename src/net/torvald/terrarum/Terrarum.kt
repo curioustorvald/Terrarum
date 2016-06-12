@@ -114,6 +114,15 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         /** Available CPU cores */
         val CORES = Runtime.getRuntime().availableProcessors();
 
+        /**
+         * If the game is multithreading.
+         * True if:
+         *
+         *     CORES >= 2 and config "multithread" is true
+         */
+        val MULTITHREAD: Boolean
+            get() = CORES >= 2 && getConfigBoolean("multithread")
+
         private lateinit var configDir: String
 
         /**

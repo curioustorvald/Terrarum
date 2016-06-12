@@ -1,6 +1,6 @@
-package net.torvald.terrarum
+package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.gameactors.Player
+import net.torvald.terrarum.Terrarum
 import org.newdawn.slick.GameContainer
 
 /**
