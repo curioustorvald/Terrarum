@@ -7,6 +7,7 @@ import net.torvald.terrarum.tileproperties.TilePropCodex
 import com.jme3.math.FastMath
 import net.torvald.terrarum.gameactors.Visible
 import net.torvald.terrarum.tileproperties.TileNameCode
+import net.torvald.terrarum.tileproperties.TilePropUtil
 import org.newdawn.slick.Color
 import org.newdawn.slick.Graphics
 import java.util.*
@@ -40,6 +41,7 @@ object LightmapRenderer {
 
     // color model related constants
     const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB
+    const val CHANNEL_MAX_DECIMAL = 4f
     const val MUL_2 = MUL * MUL
     const val CHANNEL_MAX = MUL - 1
     const val CHANNEL_MAX_FLOAT = CHANNEL_MAX.toFloat()
@@ -206,6 +208,8 @@ object LightmapRenderer {
                     setLight(x, y, calculate(x, y))
                 }
             }
+
+            TilePropUtil.torchFlickerTickClock()
         }
         catch (e: ArrayIndexOutOfBoundsException) {
         }
@@ -422,33 +426,44 @@ object LightmapRenderer {
     /**
      * Subtract each channel's RGB value.
      *
-     * It works like:
-     *
-     * f(data, darken) = RGB(data.r - darken.r, data.g - darken.g, data.b - darken.b)
-     *
-     * @param data Raw channel value (0-39) per channel
-     * @param darken (0-39) per channel
-     * @return darkened data (0-39) per channel
+     * @param data Raw channel value (0-255) per channel
+     * @param darken (0-255) per channel
+     * @return darkened data (0-255) per channel
      */
     fun darkenColoured(data: Int, darken: Int): Int {
         if (darken.toInt() < 0 || darken.toInt() >= COLOUR_RANGE_SIZE)
             throw IllegalArgumentException("darken: out of range ($darken)")
 
-        var r = data.r() * (1f - darken.r() * 6) // 6: Arbitrary value
-        var g = data.g() * (1f - darken.g() * 6) // TODO gamma correction?
-        var b = data.b() * (1f - darken.b() * 6)
+        val r = data.r() * (1f - darken.r() * 6) // 6: Arbitrary value
+        val g = data.g() * (1f - darken.g() * 6) // TODO gamma correction?
+        val b = data.b() * (1f - darken.b() * 6)
 
         return constructRGBFromFloat(r.clampZero(), g.clampZero(), b.clampZero())
     }
 
     /**
+     * Add each channel's RGB value.
+     *
+     * @param data Raw channel value (0-255) per channel
+     * @param brighten (0-255) per channel
+     * @return brightened data (0-255) per channel
+     */
+    fun brightenColoured(data: Int, brighten: Int): Int {
+        if (brighten.toInt() < 0 || brighten.toInt() >= COLOUR_RANGE_SIZE)
+            throw IllegalArgumentException("brighten: out of range ($brighten)")
+
+        val r = data.r() * (1f + brighten.r() * 6) // 6: Arbitrary value
+        val g = data.g() * (1f + brighten.g() * 6) // TODO gamma correction?
+        val b = data.b() * (1f + brighten.b() * 6)
+
+        return constructRGBFromFloat(r.clampChannel(), g.clampChannel(), b.clampChannel())
+    }
+
+    /**
      * Darken each channel by 'darken' argument
      *
-     * It works like:
-     *
-     * f(data, darken) = RGB(data.r - darken, data.g - darken, data.b - darken)
-     * @param data (0-39) per channel
-     * @param darken (0-39)
+     * @param data Raw channel value (0-255) per channel
+     * @param darken (0-255)
      * @return
      */
     fun darkenUniformInt(data: Int, darken: Int): Int {
@@ -459,11 +474,27 @@ object LightmapRenderer {
         return darkenColoured(data, darkenColoured)
     }
 
+    /**
+     * Darken or brighten colour by 'brighten' argument
+     *
+     * @param data Raw channel value (0-255) per channel
+     * @param brighten (-1.0 - 1.0) negative means darkening
+     * @return processed colour
+     */
+    fun brightenUniform(data: Int, brighten: Float): Int {
+        val modifier = if (brighten < 0)
+            constructRGBFromFloat(-brighten, -brighten, -brighten)
+        else
+            constructRGBFromFloat(brighten, brighten, brighten)
+        return if (brighten < 0)
+            darkenColoured(data, modifier)
+        else
+            brightenColoured(data, modifier)
+    }
+
     /** Get each channel from two RGB values, return new RGB that has max value of each channel
      * @param rgb
-     * *
      * @param rgb2
-     * *
      * @return
      */
     private fun maximiseRGB(rgb: Int, rgb2: Int): Int {
@@ -505,9 +536,7 @@ object LightmapRenderer {
     /**
 
      * @param RGB
-     * *
      * @param offset 2 = R, 1 = G, 0 = B
-     * *
      * @return
      */
     fun getRaw(RGB: Int, offset: Int): Int {
@@ -558,6 +587,8 @@ object LightmapRenderer {
     private fun Int.clampChannel() = if (this < 0) 0 else if (this > CHANNEL_MAX) CHANNEL_MAX else this
 
     private fun Float.clampOne() = if (this < 0) 0f else if (this > 1) 1f else this
+
+    private fun Float.clampChannel() = if (this > CHANNEL_MAX_DECIMAL) CHANNEL_MAX_DECIMAL else this
 
     fun getValueFromMap(x: Int, y: Int): Int? = getLight(x, y)
 

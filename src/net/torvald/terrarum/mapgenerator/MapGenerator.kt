@@ -17,6 +17,10 @@ object MapGenerator {
     internal lateinit var random: Random
     //private static float[] noiseArray;
     var SEED: Long = 0
+        set(value) {
+            field = value
+            map.generatorSeed = value
+        }
     var WIDTH: Int = 0
     var HEIGHT: Int = 0
 
@@ -107,36 +111,35 @@ object MapGenerator {
          * Done: variants of beach (SAND, SAND_BEACH, SAND_BLACK, SAND_GREEN)
          */
 
-        val noiseArray = arrayOf(
-                  TaggedJoise("Carving caves", noiseRidged(1.7f, 1.4f), 1f, TILE_MACRO_ALL, TILE_MACRO_ALL, TileNameCode.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END)
-                , TaggedJoise("Collapsing caves", noiseBlobs(0.5f, 0.5f), 0.3f, TileNameCode.AIR, TileNameCode.STONE, TileNameCode.STONE, NoiseFilterUniform)
-
-                //, TaggedJoise("Putting stone patches on the ground", noiseBlobs(0.8f, 0.8f), 1.02f, TileNameCode.DIRT, TileNameCode.DIRT, TileNameCode.STONE, NoiseFilterQuadratic, noiseGradientEnd, noiseGradientStart)
-                //, TaggedJoise("Placing dirt spots in the cave", noiseBlobs(0.5f, 0.5f), 0.98f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.DIRT, NoiseFilterQuadratic, noiseGradientEnd, noiseGradientStart)
-                //, TaggedJoise("Quarrying some stone into gravels", noiseBlobs(0.5f, 0.5f), 0.98f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.GRAVEL, NoiseFilterQuadratic, noiseGradientEnd, noiseGradientStart)
-
+        //val noiseArray = arrayOf(
+                //  TaggedJoise("Carving caves", noiseRidged(1.7f, 1.4f), 1f, TILE_MACRO_ALL, TILE_MACRO_ALL, TileNameCode.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END)
+                //, TaggedJoise("Collapsing caves", noiseBlobs(0.5f, 0.5f), 0.3f, TileNameCode.AIR, TileNameCode.STONE, TileNameCode.STONE, NoiseFilterUniform)
+//
+                //, TaggedJoise("Putting stone patches on the ground", noiseBlobs(0.8f, 0.8f), 1.02f, intArrayOf(TileNameCode.DIRT, TileNameCode.GRASS), TileNameCode.DIRT, TileNameCode.STONE, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
+                //, TaggedJoise("Placing dirt spots in the cave", noiseBlobs(0.5f, 0.5f), 0.98f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.DIRT, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
+                //, TaggedJoise("Quarrying some stone into gravels", noiseBlobs(0.5f, 0.5f), 0.98f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.GRAVEL, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
+//
                 //, TaggedJoise("Growing copper veins", noiseRidged(1.7f, 1.7f), 1.68f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.ORE_COPPER)
                 //, TaggedJoise("Cutting copper veins", noiseBlobs(0.4f, 0.4f), 0.26f, TileNameCode.ORE_COPPER, TileNameCode.STONE, TileNameCode.STONE)
-
+//
                 //, TaggedJoise("Growing iron veins", noiseRidged(1.7f, 1.7f), 1.68f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.ORE_IRON)
                 //, TaggedJoise("Cutting iron veins", noiseBlobs(0.7f, 0.7f), 0.26f, TileNameCode.ORE_IRON, TileNameCode.STONE, TileNameCode.STONE)
-
+//
                 //, TaggedJoise("Growing silver veins", noiseRidged(1.7f, 1.7f), 1.71f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.ORE_SILVER)
                 //, TaggedJoise("Cutting silver veins", noiseBlobs(0.7f, 0.7f), 0.26f, TileNameCode.ORE_SILVER, TileNameCode.STONE, TileNameCode.STONE)
-
+//
                 //, TaggedJoise("Growing gold veins", noiseRidged(1.7f, 1.7f), 1.73f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.ORE_GOLD)
                 //, TaggedJoise("Cutting gold veins", noiseBlobs(0.7f, 0.7f), 0.26f, TileNameCode.ORE_GOLD, TileNameCode.STONE, TileNameCode.STONE)
-
-                ////, TaggedJoise("Growing topaz clusters", noiseBlobs(0.9f, 0.9f), 2f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.RAW_TOPAZ)
+//              //  FIXME gem clusters are too large
+                //, TaggedJoise("Growing topaz clusters", noiseBlobs(0.9f, 0.9f), 2f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.RAW_TOPAZ)
                 //, TaggedJoise("Growing aluminium oxide clusters", noiseBlobs(0.9f, 0.9f), 1.7f, TileNameCode.STONE, TileNameCode.STONE, intArrayOf(TileNameCode.RAW_RUBY, TileNameCode.RAW_SAPPHIRE))
-                //, TaggedJoise("Growing emerald clusters", noiseBlobs(0.9f, 0.9f), 1,7f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.RAW_EMERALD)
+                //, TaggedJoise("Growing emerald clusters", noiseBlobs(0.9f, 0.9f), 1.7f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.RAW_EMERALD)
                 //, TaggedJoise("Growing hearts of white", noiseBlobs(0.9f, 0.9f), 1.83f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.RAW_DIAMOND)
-
                 //, TaggedJoise("Growing hearts of violet", noiseRidged(2.5f, 2.5f), 1.75f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.RAW_AMETHYST)
+//
                 //, TaggedJoise("Cutting over-grown hearts", noiseBlobs(0.7f, 0.7f), 0.17f, TileNameCode.RAW_AMETHYST, TileNameCode.STONE, TileNameCode.STONE)
-        )
-
-        processNoiseLayers(noiseArray)
+        //)
+        //processNoiseLayers(noiseArray)
 
         /** TODO Cobaltite, Ilmenite, Aurichalcum (and possibly pitchblende?)  */
 
@@ -670,7 +673,7 @@ object MapGenerator {
     private fun processNoiseLayers(noiseRecords: Array<TaggedJoise>) {
         if (Terrarum.MULTITHREAD) {
             // set up indices
-            for (i in 0..ThreadPool.POOL_SIZE - 1) {
+            for (i in 0..Terrarum.CORES - 1) {
                 ThreadPool.map(
                         i,
                         ThreadProcessNoiseLayers(
@@ -960,7 +963,7 @@ object MapGenerator {
 
     data class TaggedJoise(var message: String,
                            var noiseModule: Joise, var scarcity: Float,
-                           var replaceFromTerrain: Int, var replaceFromWall: Int,
+                           var replaceFromTerrain: Any, var replaceFromWall: Int,
                            var replaceTo: Any,
                            var filter: NoiseFilter = NoiseFilterQuadratic,
                            var filterArg1: Float = NOISE_GRAD_START,

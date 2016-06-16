@@ -38,6 +38,8 @@ constructor(//properties
     var globalLight: Int = 0
     val worldTime: WorldTime
 
+    var generatorSeed: Long = 0
+
     init {
         this.spawnX = width / 2
         this.spawnY = 200

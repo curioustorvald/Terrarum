@@ -99,9 +99,6 @@ constructor() : BasicGameState() {
         GRADIENT_IMAGE = Image("res/graphics/colourmap/sky_colour.png")
         skyBox = Rectangle(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
-        TilePropCodex()
-        // new ItemPropCodex() -- This is kotlin object and already initialised.
-
         map = GameMap(8192, 2048)
 
         MapGenerator.attachMap(map)

@@ -4,9 +4,9 @@
 "HELP_OTF_MAIN_2";;"Press PageUp/PageDown to scroll the messages.";"Appuyez sur PageUp/PageDown pour faire défiler les messages.";;;;;;;;;;;;;;;"PageUp/PageDownキーを使ってメッセージのスクロールができます。";;;"PageUp/PageDown 키를 사용해 메시지를 스크롤할 수 있습니다.";;;;;;"PageUp/PageDownキーをつかって　メッセージのスクロールができます。"
 "HELP_OTF_MAIN_3";;"Utility keys:";"Touches utilitaires:";;;;;;;;;;;;;;;"技能キー";;;"기능 키:"
 "HELP_OTF_MAIN_4";;"• F3: (debug) basic information";"• F3: (déboguer) informations de base";;;;;;;;;;;;;;;"• F3: (デバッグ)基本的な情報を見る";;;"• F3: (디버그) 기본 정보";;;;;;"• F3: (デバッグ)きほんてきな　じょうほうを　みる"
-"HELP_OTF_MAIN_5";;"• F7: (debug) toggle light blending";"• F7: (déboguer) basculer fusion de lumière";;;;;;;;;;;;;;;"• F7: (デバッグ)光源のブレンドをオン・オフする";;;"• F7: (디버그) 광원 블렌딩 켜고 끄기";;;;;;"• F7: (デバッグ)こうげんのブレンドを　オン・オフする"
-"HELP_OTF_MAIN_6";;"• F8: toggle smooth lighting effect";"• F8: basculer effet éclairage lisse";;;;;;;;;;;;;;;"• F8: すべすべの光源効果をオン・オフする";;;"• F8: 부드러운 광원 효과 켜고 끄기";;;;;;"• F8: すべすべのこうげん　こうかを　オン・オフする"
-"HELP_OTF_MAIN_JP_1";;"• F4: toggle Kana/Kanji mode";;;;;;;;;;;;;;;;"• F8: 【日本語】かな・漢字モードを変換する";;;"• F8: 부드러운 광원 효과 켜고 끄기";;;;;;"• F8: 【日本語】かな・かんじモードを"
+"HELP_OTF_MAIN_5";;"• F7: (debug) toggle light blending";"• F7: (déboguer) basculer fusion de lumière";;;;;;;;;;;;;;;"• F7: (デバッグ)光源のブレンド　オン・オフ";;;"• F7: (디버그) 광원 블렌딩 켜고 끄기";;;;;;"• F7: (デバッグ)こうげんのブレンド　オン・オフ"
+"HELP_OTF_MAIN_6";;"• F8: toggle smooth lighting effect";"• F8: basculer effet éclairage lisse";;;;;;;;;;;;;;;"• F8: すべすべの光源効果　オン・オフ";;;"• F8: 부드러운 광원 효과 켜고 끄기";;;;;;"• F8: すべすべのこうげん　こうか　オン・オフ"
+"HELP_OTF_MAIN_JP_1";;"• F4: toggle Kana/Kanji mode";;;;;;;;;;;;;;;;"• F8: 【日本語】かな・漢字モード変換";;;"• F8: 부드러운 광원 효과 켜고 끄기";;;;;;"• F8: 【日本語】かな・かんじモードを"
 
 "HELP_OTF_SLOW_1";;"If your game runs slowly:";"Si votre jeu tourne lentement :";;;;;;;;;;;;;;;"ゲームの実行がおそければ";;;"게임이 느리게 돌아간다면";;;;;;"ゲームのじっこうが　おそければ"
 "HELP_OTF_SLOW_2";;"• Reset screen zoom to 1.";"• Réinitialisez le zoom de l‘écran à 1.";;;;;;;;;;;;;;;"• スクリーンのズームを1倍にリセットしてください。";;;"• 화면 줌을 1로 돌려주세요. ";;;;;;"• スクリーンのズームを　1にリセットしてください。"

@@ -33,9 +33,9 @@ object FactionCodex {
     }
 
     private fun insertionSortLastElem(arr: ArrayList<Faction>) {
-        var x: Faction
+        val x: Faction
         var j: Int
-        var index: Int = arr.size - 1
+        val index: Int = arr.size - 1
         x = arr[index]
         j = index - 1
         while (j > 0 && arr[j] > x) {

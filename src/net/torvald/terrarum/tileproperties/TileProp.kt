@@ -36,10 +36,13 @@ class TileProp {
         set(value) {
             realLum = value
         }
-        get() = if (id == TileNameCode.SUNSTONE)
+        get() = // specify special tiles; else return real luminosity recorded in CSV
+        if (id == TileNameCode.SUNSTONE)
             Terrarum.game.map.globalLight
         else if (id == TileNameCode.DAYLIGHT_CAPACITOR)
             Terrarum.game.globalLightByTime(WorldTime.DAY_LENGTH / 2)
+        else if (id == TileNameCode.TORCH)
+            TilePropUtil.getTorchFlicker(realLum)
         else
             realLum
 

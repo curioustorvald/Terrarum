@@ -34,7 +34,17 @@ class ThreadProcessNoiseLayers(val startIndex: Int, val endIndex: Int,
                     val threshold = record.filter.getGrad(y, record.filterArg1, record.filterArg2)
 
                     if (noise > threshold * record.scarcity) {
-                        if ((MapGenerator.map.getTileFromTerrain(x, y) == fromTerr || fromTerr == MapGenerator.TILE_MACRO_ALL)
+                        if (fromTerr is IntArray) {
+                            for (i in 0..fromTerr.size - 1) {
+                                val fromTerrVariable = fromTerr[i]
+
+                                if ((MapGenerator.map.getTileFromTerrain(x, y) == fromTerrVariable || fromTerrVariable == MapGenerator.TILE_MACRO_ALL)
+                                    && (MapGenerator.map.getTileFromWall(x, y) == fromWall || fromWall == MapGenerator.TILE_MACRO_ALL)) {
+                                    MapGenerator.map.setTileTerrain(x, y, to)
+                                }
+                            }
+                        }
+                        else if ((MapGenerator.map.getTileFromTerrain(x, y) == fromTerr || fromTerr == MapGenerator.TILE_MACRO_ALL)
                             && (MapGenerator.map.getTileFromWall(x, y) == fromWall || fromWall == MapGenerator.TILE_MACRO_ALL)) {
                             MapGenerator.map.setTileTerrain(x, y, to)
                         }

@@ -546,13 +546,17 @@ open class ActorWithBody constructor() : Actor(), Visible {
         if (!isNoCollideWorld){
             val delta: Vector2 = Vector2(hitbox.toVector() - nextHitbox.toVector()) // we need to traverse back, so may as well negate at the first place
             val ccdDelta = delta.setMagnitude(CCD_TICK)
+            val ccdTryMax = 400
+            var ccdCount = 0
 
             //if (ccdDelta.x.abs() >= SLEEP_THRE || ccdDelta.y.abs() >= SLEEP_THRE) { // regular situation
                 // CCD to delta while still colliding
-                while (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
-                       || isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_BOTTOM)
+                while ((isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
+                       || isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_BOTTOM))
+                    && ccdCount < ccdTryMax
                 ) {
                     nextHitbox.translate(ccdDelta)
+                    ccdCount += 1
                 }
             //}
             /*else { // stuck while standing still

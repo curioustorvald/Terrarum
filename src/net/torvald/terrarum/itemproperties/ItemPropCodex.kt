@@ -21,7 +21,7 @@ object ItemPropCodex {
 
     const val ITEM_UNIQUE_MAX = 32768
 
-    fun buildItemProp() {
+    init {
         itemCodex = arrayOf<InventoryItem>()
 
         // read prop in csv

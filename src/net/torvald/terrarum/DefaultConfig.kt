@@ -10,10 +10,10 @@ object DefaultConfig {
         val jsonObject = JsonObject()
 
         jsonObject.addProperty("smoothlighting", true)
-        jsonObject.addProperty("imtooyoungtodie", false)
+        jsonObject.addProperty("imtooyoungtodie", false) // perma-death
         jsonObject.addProperty("language", Terrarum.sysLang)
         jsonObject.addProperty("notificationshowuptime", 6500)
-        jsonObject.addProperty("multithread", false) // experimental!
+        jsonObject.addProperty("multithread", true) // experimental!
 
         return jsonObject
     }
