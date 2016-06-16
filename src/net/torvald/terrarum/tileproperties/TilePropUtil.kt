@@ -10,7 +10,7 @@ import net.torvald.terrarum.mapdrawer.LightmapRenderer
  */
 object TilePropUtil {
     var flickerFuncX = 0 // in milliseconds; saves current status of func
-    val flickerFuncDomain = 50 // time between two noise sample, in milliseconds
+    val flickerFuncDomain = 100 // time between two noise sample, in milliseconds
     val flickerFuncRange = 0.012f // intensity [0, 1]
     //val torchIntensityOffset = -0.04f
 
@@ -33,7 +33,8 @@ object TilePropUtil {
     }
 
     fun torchFlickerTickClock() {
-        flickerFuncX += Terrarum.game.DELTA_T
+        if (Terrarum.appgc.fps > 0)
+            flickerFuncX += 1000 / Terrarum.appgc.fps
 
         if (flickerFuncX > flickerFuncDomain) {
             flickerFuncX -= flickerFuncDomain
