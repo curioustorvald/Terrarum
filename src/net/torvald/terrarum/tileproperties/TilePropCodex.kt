@@ -84,6 +84,8 @@ object TilePropCodex {
         prop.isWallable = boolVal(record, "wall")
         prop.isFallable = boolVal(record, "fall")
 
+        prop.dynamicLuminosityFunction = intVal(record, "dlfn")
+
         print(formatNum3(intVal(record, "id")) + ":" + formatNum2(intVal(record, "dmg")))
         println("\t" + prop.nameKey)
     }

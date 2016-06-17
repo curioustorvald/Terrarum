@@ -1,6 +1,5 @@
 package net.torvald.terrarum.mapdrawer
 
-import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.tileproperties.TilePropCodex
@@ -10,6 +9,7 @@ import net.torvald.terrarum.tileproperties.TileNameCode
 import net.torvald.terrarum.tileproperties.TilePropUtil
 import org.newdawn.slick.Color
 import org.newdawn.slick.Graphics
+import org.newdawn.slick.Image
 import java.util.*
 
 /**
@@ -209,7 +209,7 @@ object LightmapRenderer {
                 }
             }
 
-            TilePropUtil.torchFlickerTickClock()
+            TilePropUtil.dynamicLumFuncTickClock()
         }
         catch (e: ArrayIndexOutOfBoundsException) {
         }
