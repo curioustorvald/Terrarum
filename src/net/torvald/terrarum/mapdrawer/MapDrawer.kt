@@ -32,15 +32,12 @@ object MapDrawer {
               TileNameCode.SAND_DESERT
             , TileNameCode.SAND_RED)
 
-    @JvmStatic
     fun update(gc: GameContainer, delta_t: Int) {
     }
 
-    @JvmStatic
     fun render(gc: GameContainer, g: Graphics) {
     }
 
-    @JvmStatic
     fun drawEnvOverlay(g: Graphics) {
         val onscreen_tiles_max = FastMath.ceil(Terrarum.HEIGHT * Terrarum.WIDTH / FastMath.sqr(TILE_SIZE.toFloat())) * 2
         val onscreen_tiles_cap = onscreen_tiles_max / 4f

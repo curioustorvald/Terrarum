@@ -18,14 +18,10 @@ class TileProp {
     var opacity: Int = 0 // colour attenuation
 
     var strength: Int = 0
-
-
     var density: Int = 0
 
     var isFluid: Boolean = false
-
     var isSolid: Boolean = false
-
     var isWallable: Boolean = false
 
     /**
@@ -36,15 +32,7 @@ class TileProp {
         set(value) {
             realLum = value
         }
-        get() = // specify special tiles; else return real luminosity recorded in CSV
-        if (id == TileNameCode.SUNSTONE)
-            Terrarum.game.map.globalLight
-        else if (id == TileNameCode.DAYLIGHT_CAPACITOR)
-            Terrarum.game.globalLightByTime(WorldTime.DAY_LENGTH / 2)
-        else if (id == TileNameCode.TORCH)
-            TilePropUtil.getTorchFlicker(realLum)
-        else
-            realLum
+        get() = TilePropUtil.getDynamicLumFunc(realLum, dynamicLuminosityFunction)
 
     var drop: Int = 0
     var dropDamage: Int = 0
@@ -52,4 +40,6 @@ class TileProp {
     var isFallable: Boolean = false
 
     var friction: Int = 0
+
+    var dynamicLuminosityFunction: Int = 0
 }
