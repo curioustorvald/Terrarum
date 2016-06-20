@@ -8,17 +8,18 @@ interface Luminous {
     /**
      * Recommended implementation:
      *
-     override var luminosity: Char
-        get() = if (actorValue.get("luminosity") != null) {
-            actorValue.get("luminosity") as Char
-        }
-        else {
-            0 as Char
-        }
+     override var luminosity: Int
+        get() = actorValue.getAsInt(AVKey.LUMINOSITY) ?: 0
         set(value) {
-            actorValue.set("luminosity", value)
+            actorValue[AVKey.LUMINOSITY] = value
         }
      */
     var luminosity: Int
 
+    /**
+     * Arguments:
+     *
+     * Hitbox(x-offset, y-offset, width, height)
+     */
+    val lightBox: Hitbox
 }

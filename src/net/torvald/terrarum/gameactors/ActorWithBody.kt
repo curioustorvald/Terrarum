@@ -18,7 +18,7 @@ import org.newdawn.slick.Graphics
  *
  * Created by minjaesong on 16-03-14.
  */
-open class ActorWithBody constructor() : Actor(), Visible {
+open class ActorWithBody : Actor(), Visible {
 
     override var actorValue: ActorValue = ActorValue()
 
@@ -65,10 +65,11 @@ open class ActorWithBody constructor() : Actor(), Visible {
 
     override var referenceID: Int = generateUniqueReferenceID()
     /**
-     * Positions: top-left point
+     * * Position: top-left point
+     * * Unit: pixel
      */
-    override val hitbox = Hitbox(0.0,0.0,0.0,0.0)
-    @Transient val nextHitbox = Hitbox(0.0,0.0,0.0,0.0)
+    override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
+    @Transient val nextHitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
 
     /**
      * Physical properties.
@@ -194,7 +195,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
     internal var walledRight = false
 
     init {
-
+        // any initialiser goes here...
     }
 
     /**
@@ -251,7 +252,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
         physSleep = false
     }
 
-    override fun update(gc: GameContainer, delta_t: Int) {
+    override fun update(gc: GameContainer, delta: Int) {
         if (isUpdate) {
 
             // make NoClip work for player
@@ -549,15 +550,14 @@ open class ActorWithBody constructor() : Actor(), Visible {
             val ccdTryMax = 400
             var ccdCount = 0
 
-            //if (ccdDelta.x.abs() >= SLEEP_THRE || ccdDelta.y.abs() >= SLEEP_THRE) { // regular situation
-                // CCD to delta while still colliding
-                while ((isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
+            while (((ccdDelta.x.abs() >= SLEEP_THRE) || (ccdDelta.y.abs() >= SLEEP_THRE))
+                   && (isColliding(CONTACT_AREA_LEFT) || isColliding(CONTACT_AREA_RIGHT)
                        || isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_BOTTOM))
-                    && ccdCount < ccdTryMax
-                ) {
-                    nextHitbox.translate(ccdDelta)
-                    ccdCount += 1
-                }
+                   && ccdCount < ccdTryMax
+            ) {
+                nextHitbox.translate(ccdDelta)
+                ccdCount += 1
+            }
             //}
             /*else { // stuck while standing still
                 // CCD upward
@@ -586,7 +586,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
     private fun applyNormalForce() {
         if (!isNoCollideWorld) {
             // axis Y
-            if (moveDelta.y >= 0) { // check downward
+            if (moveDelta.y > SLEEP_THRE) { // check downward
                 if (isColliding(CONTACT_AREA_BOTTOM) || isColliding(CONTACT_AREA_BOTTOM, 0, 1)) {
                     // the actor is hitting the ground
                     hitAndReflectY()
@@ -596,7 +596,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
                     grounded = false
                 }
             }
-            else if (moveDelta.y < 0) { // check upward
+            else if (moveDelta.y < SLEEP_THRE) { // check upward
                 grounded = false
                 if (isColliding(CONTACT_AREA_TOP) || isColliding(CONTACT_AREA_TOP, 0, -1)) {
                     // the actor is hitting the ceiling
@@ -606,7 +606,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 }
             }
             // axis X
-            if (moveDelta.x > 0) { // check right
+            if (moveDelta.x > SLEEP_THRE) { // check right
                 if ((isColliding(CONTACT_AREA_RIGHT) && !isColliding(CONTACT_AREA_LEFT))
                 || (isColliding(CONTACT_AREA_RIGHT, 1, 0) && !isColliding(CONTACT_AREA_LEFT, 0, -1))) {
                     // the actor is hitting the right wall
@@ -615,7 +615,7 @@ open class ActorWithBody constructor() : Actor(), Visible {
                 else {
                 }
             }
-            else if (moveDelta.x < 0) { // check left
+            else if (moveDelta.x < SLEEP_THRE) { // check left
                 // System.out.println("collidingleft");
                 if ((isColliding(CONTACT_AREA_LEFT) && !isColliding(CONTACT_AREA_RIGHT))
                 || (isColliding(CONTACT_AREA_LEFT, -1, 0) && !isColliding(CONTACT_AREA_RIGHT, 1, 0))) {

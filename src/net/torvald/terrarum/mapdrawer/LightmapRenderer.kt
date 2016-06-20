@@ -29,7 +29,7 @@ object LightmapRenderer {
      * 8-Bit RGB values
      */
     private val lightmap: Array<IntArray> = Array(LIGHTMAP_HEIGHT) { IntArray(LIGHTMAP_WIDTH) }
-    private val lanternMap = ArrayList<Lantern>(Terrarum.game.ACTORCONTAINER_INITIAL_SIZE)
+    private val lanternMap = ArrayList<Lantern>(Terrarum.game.ACTORCONTAINER_INITIAL_SIZE * 4)
 
     private val AIR = TileNameCode.AIR
 
@@ -172,12 +172,19 @@ object LightmapRenderer {
         // scan for luminous actors and store their lighting info to the lanterns
         lanternMap.clear()
         Terrarum.game.actorContainer.forEach { it ->
-            if (it is Luminous && it is Visible)
-                lanternMap.add(Lantern(
-                        it.hitbox.centeredX.div(TSIZE).round(),
-                        it.hitbox.centeredY.div(TSIZE).round(),
-                        it.luminosity
-                ))
+            if (it is Luminous && it is Visible) {
+                // put lanterns to the area the luminantBox is occupying
+                val lightBox = it.lightBox
+                val lightBoxX = it.hitbox.posX + lightBox.posX
+                val lightBoxY = it.hitbox.posY + lightBox.posY
+                val lightBoxW = lightBox.width
+                val lightBoxH = lightBox.height
+                for (y in lightBoxY.div(TSIZE).floorInt()
+                        ..lightBoxY.plus(lightBoxH).div(TSIZE).floorInt())
+                    for (x in lightBoxX.div(TSIZE).floorInt()
+                            ..lightBoxX.plus(lightBoxW).div(TSIZE).floorInt())
+                        lanternMap.add(Lantern(x, y, it.luminosity))
+            }
         }
 
         try {
@@ -623,6 +630,7 @@ object LightmapRenderer {
     private fun Float.sqrt() = FastMath.sqrt(this)
     private fun Float.inv() = 1f / this
     fun Float.floor() = FastMath.floor(this)
+    fun Double.floorInt() = Math.floor(this).toInt()
     fun Float.round(): Int = Math.round(this)
     fun Double.round(): Int = Math.round(this).toInt()
     fun Float.ceil() = FastMath.ceil(this)

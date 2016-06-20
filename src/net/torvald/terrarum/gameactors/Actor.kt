@@ -14,7 +14,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
     /**
      * Valid RefID is equal to or greater than 32768.
-     * @return Reference ID. (32768-0xFFFF_FFFF)
+     * @return Reference ID. (32768-0x7FFF_FFFF)
      */
     abstract var referenceID: Int
 
@@ -22,10 +22,11 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
     override fun equals(other: Any?) = referenceID == (other as Actor).referenceID
     override fun hashCode() = referenceID
-    override fun toString() = "Actor, " + if (actorValue.getAsString(AVKey.NAME).isNullOrEmpty())
-        "ID: ${hashCode()}"
-    else
-        "ID: ${hashCode()} (${actorValue.getAsString(AVKey.NAME)})"
+    override fun toString() = "Actor, " +
+            if (actorValue.getAsString(AVKey.NAME).isNullOrEmpty())
+                "ID: ${hashCode()}"
+            else
+                "ID: ${hashCode()} (${actorValue.getAsString(AVKey.NAME)})"
     override fun compareTo(other: Actor): Int = (this.referenceID - other.referenceID).sign()
 
     fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else this

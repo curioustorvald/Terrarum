@@ -22,7 +22,7 @@ class DroppedItem constructor(itemID: Int) : ActorWithBody() {
             ItemPropCodex.getProp(itemID).mass
     }
 
-    override fun update(gc: GameContainer, delta_t: Int) {
+    override fun update(gc: GameContainer, delta: Int) {
 
     }
 

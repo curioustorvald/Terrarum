@@ -17,7 +17,7 @@ import java.util.*
  * Created by minjaesong on 16-03-14.
  */
 
-class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, LandHolder {
+class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, LandHolder {
 
     /**
      * empirical value.
@@ -71,6 +71,8 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
         set(value) {
             actorValue[AVKey.LUMINOSITY] = value
         }
+    override val lightBox: Hitbox
+        get() = Hitbox(0.0, 0.0, hitbox.width, hitbox.height) // use getter; dimension of the player may change by time.
 
     companion object {
         @Transient internal const val ACCEL_MULT_IN_FLIGHT: Double = 0.21 // TODO air control still too 'slippery' with 0.31, lower the value!
@@ -87,20 +89,19 @@ class Player : ActorWithBody, Controllable, Pocketed, Factionable, Luminous, Lan
 
      * @throws SlickException
      */
-    @Throws(SlickException::class)
-    constructor() : super() {
+    init {
         isVisible = true
-        referenceID = PLAYER_REF_ID
+        referenceID = PLAYER_REF_ID // forcibly set ID
         super.setDensity(BASE_DENSITY)
     }
 
-    override fun update(gc: GameContainer, delta_t: Int) {
+    override fun update(gc: GameContainer, delta: Int) {
         if (vehicleRiding is Player)
             throw RuntimeException("Attempted to 'ride' " + "player object.")
 
-        super.update(gc, delta_t)
+        super.update(gc, delta)
 
-        updateSprite(delta_t)
+        updateSprite(delta)
 
         updateMovementControl()
 

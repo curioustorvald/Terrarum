@@ -8,11 +8,11 @@ import org.newdawn.slick.Graphics
 /**
  * Created by minjaesong on 16-03-14.
  */
-class PhysTestBall : ActorWithBody {
+class PhysTestBall : ActorWithBody() {
 
     private var color = Color.orange
 
-    constructor(): super() {
+    init {
         setHitboxDimension(16, 16, 0, 0)
         isVisible = true
         actorValue[AVKey.BASEMASS] = 10.0
