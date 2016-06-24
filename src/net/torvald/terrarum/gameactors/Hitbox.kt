@@ -7,15 +7,15 @@ import org.dyn4j.geometry.Vector2
 /**
  * Created by minjaesong on 16-01-15.
  */
-class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
+class Hitbox(x1: Double, y1: Double, width: Double, height: Double) : Cloneable {
 
     @Volatile var hitboxStart: Point2d
         private set
     @Volatile var hitboxEnd: Point2d
         private set
-    var width: Double = 0.toDouble()
+    var width: Double = 0.0
         private set
-    var height: Double = 0.toDouble()
+    var height: Double = 0.0
         private set
 
     init {
@@ -39,14 +39,16 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
     val pointedY: Double
         get() = hitboxEnd.y
 
+    val endPointX: Double
+        get() = hitboxEnd.x
+    val endPointY: Double
+        get() = hitboxEnd.y
+
     /**
      * Set to the point top left
      * @param x1
-     * *
      * @param y1
-     * *
      * @param width
-     * *
      * @param height
      */
     fun set(x1: Double, y1: Double, width: Double, height: Double) {
@@ -54,6 +56,13 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
         hitboxEnd = Point2d(x1 + width, y1 + height)
         this.width = width
         this.height = height
+    }
+
+    /**
+     * Set this hitbox from other
+     */
+    fun set(other: Hitbox) {
+        set(other.posX, other.posY, other.width, other.height)
     }
 
     fun translate(x: Double, y: Double) {

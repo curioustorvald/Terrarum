@@ -66,10 +66,10 @@ import org.dyn4j.Epsilon
 class Vector2 {
 
     /** The magnitude of the x component of this [Vector2]  */
-    var x: Double = 0.toDouble()
+    var x: Double = 0.0
 
     /** The magnitude of the y component of this [Vector2]  */
-    var y: Double = 0.toDouble()
+    var y: Double = 0.0
 
     /** Default constructor.  */
     constructor() {

@@ -10,46 +10,68 @@ import net.torvald.terrarum.mapdrawer.LightmapRenderer
  * Created by minjaesong on 16-06-16.
  */
 object TilePropUtil {
-    var flickerFuncX = 0 // in milliseconds; saves current status of func
+    var flickerFuncX = 0 // in milliseconds; saves current status (time) of func
     val flickerFuncDomain = 100 // time between two noise sample, in milliseconds
     val flickerFuncRange = 0.012f // intensity [0, 1]
 
-    val random = HQRNG();
-    var funcY = 0f
+    var breathFuncX = 0
+    val breathRange = 0.02f
+    val breathCycleDuration = 2000 // in milliseconds
 
-    var patternThis = getNewRandom()
-    var patternNext = getNewRandom()
+    var pulsateFuncX = 0
+    val pulsateRange = 0.034f
+    val pulsateCycleDuration = 500 // in milliseconds
+
+    val random = HQRNG();
+
+    var flickerPatternThis = getNewRandom()
+    var flickerPatternNext = getNewRandom()
 
     init {
 
     }
 
     private fun getTorchFlicker(baseLum: Int): Int {
-        funcY = linearInterpolation1D(patternThis, patternNext,
+        val funcY = linearInterpolation1D(flickerPatternThis, flickerPatternNext,
                 flickerFuncX.toFloat() / flickerFuncDomain
         )
 
-        return LightmapRenderer.brightenUniform(baseLum, funcY)
+        return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
     }
 
     private fun getSlowBreath(baseLum: Int): Int {
-        return baseLum
+        val funcY = FastMath.sin(FastMath.PI * breathFuncX / breathCycleDuration) * breathRange
+
+        return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
     }
 
     private fun getPulsate(baseLum: Int): Int {
-        return baseLum
+        val funcY = FastMath.sin(FastMath.PI * pulsateFuncX / pulsateCycleDuration) * pulsateRange
+
+        return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
     }
 
     internal fun dynamicLumFuncTickClock() {
-        if (Terrarum.appgc.fps > 0)
+        // FPS-time compensation
+        if (Terrarum.appgc.fps > 0) {
             flickerFuncX += 1000 / Terrarum.appgc.fps
+            breathFuncX += 1000 / Terrarum.appgc.fps
+            pulsateFuncX += 1000 / Terrarum.appgc.fps
+        }
 
+        // flicker-related vars
         if (flickerFuncX > flickerFuncDomain) {
             flickerFuncX -= flickerFuncDomain
 
-            patternThis = patternNext
-            patternNext = getNewRandom()
+            flickerPatternThis = flickerPatternNext
+            flickerPatternNext = getNewRandom()
         }
+
+        // breath-related vars
+        if (breathFuncX > breathCycleDuration) breathFuncX -= breathCycleDuration
+
+        // pulsate-related vars
+        if (pulsateFuncX > pulsateCycleDuration) pulsateFuncX -= pulsateCycleDuration
     }
 
     private fun getNewRandom() = random.nextFloat().times(2).minus(1f) * flickerFuncRange

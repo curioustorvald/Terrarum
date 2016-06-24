@@ -30,6 +30,7 @@ class FixturesTikiTorch : FixturesBase(), Luminous {
         sprite!!.setAsVisible()
 
         actorValue[AVKey.BASEMASS] = 1.0
-        actorValue[AVKey.LUMINOSITY] = TilePropCodex.getProp(TileNameCode.TORCH).luminosity
+
+        luminosity = TilePropCodex.getProp(TileNameCode.TORCH).luminosity
     }
 }

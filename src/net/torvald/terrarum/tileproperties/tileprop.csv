@@ -123,7 +123,7 @@
 ## Notes ##
 
 # Friction: 0: frictionless, <16: slippery, 16: regular, >16: sticky
-# Opacity/Lumcolor: 30-bit RGB
+# Opacity/Lumcolor: 30-bit RGB. Light diffusers have a value of ZERO.
 # Solid: whether the tile has full collision
 # movr: Movement resistance, (walkspeedmax) / (1 + (n/16)), 16 halves movement speed
 # dsty: density. As we are putting water an 1000, it is identical to specific gravity. [g/l]

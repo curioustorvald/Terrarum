@@ -252,12 +252,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             get() {
                 val lan = System.getProperty("user.language")
                 var country = System.getProperty("user.country")
-                if (lan == "en")
-                    country = "US"
-                else if (lan == "fr")
-                    country = "FR"
-                else if (lan == "de")
-                    country = "DE"
+                if (lan == "en") country = "US"
+                else if (lan == "fr") country = "FR"
+                else if (lan == "de") country = "DE"
                 else if (lan == "ko") country = "KR"
 
                 return lan + country

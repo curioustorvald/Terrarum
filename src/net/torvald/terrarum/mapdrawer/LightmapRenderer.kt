@@ -488,7 +488,7 @@ object LightmapRenderer {
      * @param brighten (-1.0 - 1.0) negative means darkening
      * @return processed colour
      */
-    fun brightenUniform(data: Int, brighten: Float): Int {
+    fun alterBrightnessUniform(data: Int, brighten: Float): Int {
         val modifier = if (brighten < 0)
             constructRGBFromFloat(-brighten, -brighten, -brighten)
         else

@@ -75,7 +75,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         get() = Hitbox(0.0, 0.0, hitbox.width, hitbox.height) // use getter; dimension of the player may change by time.
 
     companion object {
-        @Transient internal const val ACCEL_MULT_IN_FLIGHT: Double = 0.21 // TODO air control still too 'slippery' with 0.31, lower the value!
+        @Transient internal const val ACCEL_MULT_IN_FLIGHT: Double = 0.21
         @Transient internal const val WALK_ACCEL_BASE: Double = 0.67
 
         @Transient const val PLAYER_REF_ID: Int = 0x51621D
@@ -93,6 +93,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         isVisible = true
         referenceID = PLAYER_REF_ID // forcibly set ID
         super.setDensity(BASE_DENSITY)
+        collisionType = KINEMATIC
     }
 
     override fun update(gc: GameContainer, delta: Int) {
