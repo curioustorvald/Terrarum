@@ -23,29 +23,36 @@ constructor() : Font {
 
     private fun getHanJongseong(hanIndex: Int) = hanIndex % JONG_COUNT
 
+    private val jungseongWide = arrayOf(8, 12, 13, 17, 18, 21)
+    private val jungseongComplex = arrayOf(9, 10, 11, 14, 15, 16, 22)
 
-    private fun getHanChoseongRow(hanIndex: Int): Int {
-        val jungseongIndex = getHanJungseong(hanIndex)
-        val jungseongWide = arrayOf(8, 12, 13, 17, 18, 21)
-        val jungseongComplex = arrayOf(9, 10, 11, 14, 15, 16, 22)
+    private fun isJungseongWide(hanIndex: Int) = jungseongWide.contains(getHanJungseong(hanIndex))
+    private fun isJungseongComplex(hanIndex: Int) = jungseongComplex.contains(getHanJungseong(hanIndex))
+
+    private fun getHanInitialRow(hanIndex: Int): Int {
         val ret: Int
 
-        if (jungseongWide.contains(jungseongIndex)) {
+        if (isJungseongWide(hanIndex))
             ret = 2
-        }
-        else if (jungseongComplex.contains(jungseongIndex)) {
+        else if (isJungseongComplex(hanIndex))
             ret = 4
-        }
-        else {
+        else
             ret = 0
-        }
+
         return if (getHanJongseong(hanIndex) == 0) ret else ret + 1
     }
 
-    private fun getHanJungseongRow(hanIndex: Int) = if (getHanJongseong(hanIndex) == 0) 6 else 7
+    private fun getHanMedialRow(hanIndex: Int) = if (getHanJongseong(hanIndex) == 0) 6 else 7
 
-    private val hanJongseongRow: Int
-        get() = 8
+    private fun getHanFinalRow(hanIndex: Int): Int {
+        val jungseongIndex = getHanJungseong(hanIndex)
+
+        return if (jungseongWide.contains(jungseongIndex))
+            8
+        else
+            9
+
+    }
 
     private fun isAsciiEF(c: Char) = asciiEFList.contains(c)
 
@@ -185,9 +192,9 @@ constructor() : Font {
                 val indexJung = getHanJungseong(hIndex)
                 val indexJong = getHanJongseong(hIndex)
 
-                val choRow = getHanChoseongRow(hIndex)
-                val jungRow = getHanJungseongRow(hIndex)
-                val jongRow = hanJongseongRow
+                val choRow = getHanInitialRow(hIndex)
+                val jungRow = getHanMedialRow(hIndex)
+                val jongRow = getHanFinalRow(hIndex)
 
                 val glyphW = getWidth("" + ch)
 
