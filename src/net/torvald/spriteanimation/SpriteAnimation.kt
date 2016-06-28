@@ -4,7 +4,7 @@
 
 package net.torvald.spriteanimation
 
-import net.torvald.terrarum.Game
+import net.torvald.terrarum.StateGame
 import net.torvald.terrarum.Terrarum
 import com.jme3.math.FastMath
 import org.newdawn.slick.Graphics

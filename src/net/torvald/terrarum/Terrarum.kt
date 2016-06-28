@@ -57,7 +57,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         appgc.input.enableKeyRepeat()
 
-        game = Game()
+        game = StateGame()
         addState(game)
     }
 
@@ -84,7 +84,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         var VSYNC = true
         val VSYNC_TRIGGER_THRESHOLD = 56
 
-        lateinit var game: Game
+        lateinit var game: StateGame
         lateinit var gameConfig: GameConfig
 
         lateinit var OSName: String

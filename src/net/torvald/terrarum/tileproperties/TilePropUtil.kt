@@ -24,16 +24,23 @@ object TilePropUtil {
 
     val random = HQRNG();
 
-    var flickerPatternThis = getNewRandom()
-    var flickerPatternNext = getNewRandom()
+    //var flickerPatternThis = getNewRandom()
+    //var flickerPatternNext = getNewRandom()
+    var flickerP0 = getNewRandom()
+    var flickerP1 = getNewRandom()
+    var flickerP2 = getNewRandom()
+    var flickerP3 = getNewRandom()
 
     init {
 
     }
 
     private fun getTorchFlicker(baseLum: Int): Int {
-        val funcY = linearInterpolation1D(flickerPatternThis, flickerPatternNext,
-                flickerFuncX.toFloat() / flickerFuncDomain
+        //val funcY = linearInterpolation1D(flickerPatternThis, flickerPatternNext,
+        //        flickerFuncX.toFloat() / flickerFuncDomain
+        //)
+        val funcY = FastMath.interpolateCatmullRom(0.0f, flickerFuncX.toFloat() / flickerFuncDomain,
+                flickerP0, flickerP1, flickerP2, flickerP3
         )
 
         return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
@@ -63,8 +70,12 @@ object TilePropUtil {
         if (flickerFuncX > flickerFuncDomain) {
             flickerFuncX -= flickerFuncDomain
 
-            flickerPatternThis = flickerPatternNext
-            flickerPatternNext = getNewRandom()
+            //flickerPatternThis = flickerPatternNext
+            //flickerPatternNext = getNewRandom()
+            flickerP0 = flickerP1
+            flickerP1 = flickerP2
+            flickerP2 = flickerP3
+            flickerP3 = getNewRandom()
         }
 
         // breath-related vars

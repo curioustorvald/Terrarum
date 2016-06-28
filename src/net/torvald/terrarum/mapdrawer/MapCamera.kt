@@ -111,6 +111,9 @@ object MapCamera {
      */
     val TILES_CONNECT_MUTUAL = arrayOf(
               TileNameCode.STONE
+            , TileNameCode.STONE_QUARRIED
+            , TileNameCode.STONE_TILE_WHITE
+            , TileNameCode.STONE_BRICKS
             , TileNameCode.DIRT
             , TileNameCode.GRASS
             , TileNameCode.PLANK_BIRCH

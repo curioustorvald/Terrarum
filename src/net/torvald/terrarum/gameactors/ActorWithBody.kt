@@ -1,15 +1,12 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gamemap.GameMap
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import net.torvald.spriteanimation.SpriteAnimation
-import com.jme3.math.FastMath
 import net.torvald.terrarum.tileproperties.TileNameCode
 import org.dyn4j.Epsilon
-import org.dyn4j.geometry.ChainedVector2
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -21,14 +18,26 @@ import org.newdawn.slick.Graphics
  */
 open class ActorWithBody : Actor(), Visible {
 
+    override var referenceID: Int = generateUniqueReferenceID()
     override var actorValue: ActorValue = ActorValue()
+
+    @Transient var sprite: SpriteAnimation? = null
+    @Transient var spriteGlow: SpriteAnimation? = null
+
+    @Transient private val map: GameMap = Terrarum.game.map
 
     var hitboxTranslateX: Double = 0.0// relative to spritePosX
     var hitboxTranslateY: Double = 0.0// relative to spritePosY
     var baseHitboxW: Int = 0
     var baseHitboxH: Int = 0
-
-    @Transient private val map: GameMap = Terrarum.game.map
+    internal var baseSpriteWidth: Int = 0
+    internal var baseSpriteHeight: Int = 0
+    /**
+     * * Position: top-left point
+     * * Unit: pixel
+     */
+    override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
+    @Transient val nextHitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
 
     /**
      * Velocity vector for newtonian sim.
@@ -46,31 +55,7 @@ open class ActorWithBody : Actor(), Visible {
     var walkX: Double = 0.0
     var walkY: Double = 0.0
     val moveDelta = Vector2(0.0, 0.0)
-    @Transient private val VELO_HARD_LIMIT = 10000.0
-
-    var grounded = false
-
-    @Transient var sprite: SpriteAnimation? = null
-    @Transient var spriteGlow: SpriteAnimation? = null
-    /** Default to 'false'  */
-    var isVisible = false
-    /** Default to 'true'  */
-    var isUpdate = true
-
-    var isNoSubjectToGrav = false
-    var isNoCollideWorld = false
-    var isNoSubjectToFluidResistance = false
-
-    internal var baseSpriteWidth: Int = 0
-    internal var baseSpriteHeight: Int = 0
-
-    override var referenceID: Int = generateUniqueReferenceID()
-    /**
-     * * Position: top-left point
-     * * Unit: pixel
-     */
-    override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
-    @Transient val nextHitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
+    @Transient private val VELO_HARD_LIMIT = 100.0
 
     /**
      * Physical properties.
@@ -92,6 +77,7 @@ open class ActorWithBody : Actor(), Visible {
 
             actorValue[AVKey.BASEMASS] = value
         }
+    @Transient private val MASS_DEFAULT: Double = 60.0
     /** Valid range: [0, 1]  */
     var elasticity: Double = 0.0
         set(value) {
@@ -118,6 +104,31 @@ open class ActorWithBody : Actor(), Visible {
         get() = 1.0 - elasticity
 
     private var density = 1000.0
+
+    /**
+     * Flags and Properties
+     */
+
+    var grounded = false
+    /** Default to 'false'  */
+    var isVisible = false
+    /** Default to 'true'  */
+    var isUpdate = true
+    var isNoSubjectToGrav = false
+    var isNoCollideWorld = false
+    var isNoSubjectToFluidResistance = false
+    /** Time-freezing. The actor won't even budge but the velocity will accumulate
+     * EXCEPT FOR friction, gravity and buoyancy SHOULD NOT.
+     *
+     * (this would give something to do to the player otherwise it would be dull to travel far,
+     * think of a grass cutting on the Zelda games. It would also make a great puzzle to solve.
+     * --minjaesong)
+     */
+    var isChronostasis = false
+
+    /**
+     * Constants
+     */
 
     @Transient private val METER = 24.0
     /**
@@ -149,43 +160,22 @@ open class ActorWithBody : Actor(), Visible {
     @Transient private val LR_COMPENSATOR_MAX = TSIZE
 
     /**
-     * A constant to make falling faster so that the game is more playable
-     */
-    @Transient private val G_MUL_PLAYABLE_CONST = 1.4142
-
-    /**
      * Post-hit invincibility, in milliseconds
      */
     @Transient val INVINCIBILITY_TIME: Int = 500
-
-    @Transient private val MASS_DEFAULT: Double = 60.0
-
-    internal var physSleep: Boolean = false
-        private set
-
-    /**
-     * for collide-to-world compensation
-     */
-    @Transient private var posAdjustX = 0
-    @Transient private var posAdjustY = 0
 
     @Transient internal val BASE_FRICTION = 0.3
 
     @Transient val KINEMATIC = 1 // does not be budged by external forces
     @Transient val DYNAMIC = 2
     @Transient val STATIC = 3 // does not be budged by external forces, target of collision
-
     var collisionType = DYNAMIC
 
-    @Transient private val CCD_TICK = 1.0 / 256.0
-    @Transient private val CCD_TRY_MAX = 25600
-
-    // to use with Controller (incl. player)
-    internal var walledLeft = false
-    internal var walledRight = false
+    @Transient private val CCD_TICK = 1.0 / 16.0
+    @Transient private val CCD_TRY_MAX = 12800
 
     // just some trivial magic numbers
-    @Transient private val A_PIXEL = 2.0
+    @Transient private val A_PIXEL = 1.4
     @Transient private val COLLIDING_TOP = 0
     @Transient private val COLLIDING_RIGHT = 1
     @Transient private val COLLIDING_BOTTOM = 2
@@ -194,7 +184,17 @@ open class ActorWithBody : Actor(), Visible {
     @Transient private val COLLIDING_LR = 5
     @Transient private val COLLIDING_ALLSIDE = 6
 
+    /**
+     * Temporary variables
+     */
+
     @Transient private var assertPrinted = false
+
+    // to use with Controller (incl. player)
+    internal var walledLeft = false
+    internal var walledRight = false
+
+    var ccdCollided = false
 
     init {
         // some initialiser goes here...
@@ -240,16 +240,21 @@ open class ActorWithBody : Actor(), Visible {
      * Add vector value to the velocity, in the time unit of single frame.
      *
      * Since we're adding some value every frame, the value is equivalent to the acceleration.
-     * Find about Newton's second law for the background knowledge.
+     * Look for Newton's second law for the background knowledge.
      * @param vec : Acceleration in Vector2
      */
     fun applyForce(vec: Vector2) {
         velocity += vec
-        physSleep = false
     }
 
     override fun update(gc: GameContainer, delta: Int) {
         if (isUpdate) {
+
+            /**
+             * Temporary variables to reset
+             */
+            ccdCollided = false
+            /******************************/
 
             if (!assertPrinted) assertInit()
 
@@ -276,22 +281,22 @@ open class ActorWithBody : Actor(), Visible {
             }
 
             // hard limit velocity
-            if (veloX > VELO_HARD_LIMIT) veloX = VELO_HARD_LIMIT
-            if (veloY > VELO_HARD_LIMIT) veloY = VELO_HARD_LIMIT
+            veloX = veloX.bipolarClamp(VELO_HARD_LIMIT)
+            veloY = veloY.bipolarClamp(VELO_HARD_LIMIT)
 
             moveDelta.set(velocity + Vector2(walkX, walkY))
 
-            if (!physSleep) {
+            if (!isChronostasis) {
                 // Set 'next' position (hitbox) from canonical and walking velocity
                 setNewNextHitbox()
 
-                applyNormalForce()
                 /**
                  * solveCollision()?
                  * If and only if:
                  *     This body is NON-STATIC and the other body is STATIC
                  */
                 displaceByCCD()
+                applyNormalForce()
 
                 setHorizontalFriction()
                 if (isPlayerNoClip) // or hanging on the rope, etc.
@@ -304,8 +309,8 @@ open class ActorWithBody : Actor(), Visible {
                 clampHitbox()
             }
 
-            walledLeft =  isColliding(COLLIDING_LEFT)
-            walledRight = isColliding(COLLIDING_RIGHT)
+            walledLeft =  isColliding(hitbox, COLLIDING_LEFT)
+            walledRight = isColliding(hitbox, COLLIDING_RIGHT)
         }
     }
 
@@ -340,10 +345,8 @@ open class ActorWithBody : Actor(), Visible {
     private fun applyNormalForce() {
         if (!isNoCollideWorld) {
             // axis Y
-            if (moveDelta.y >= 0.0) { // check downward
-                //FIXME "isColliding" (likely the newer one) is the perkeleen vittupää
-                if (isColliding(COLLIDING_UD)) {
-                    // the actor is hitting the ground
+            if (moveDelta.y >= 0.0) { // was moving downward?
+                if (ccdCollided) { // actor hit something on its bottom
                     hitAndReflectY()
                     grounded = true
                 }
@@ -351,17 +354,16 @@ open class ActorWithBody : Actor(), Visible {
                     grounded = false
                 }
             }
-            else if (moveDelta.y < 0.0) { // check upward
+            else if (moveDelta.y < 0.0) { // or was moving upward?
                 grounded = false
-                if (isColliding(COLLIDING_UD)) {
-                    // the actor is hitting the ceiling
+                if (ccdCollided) { // actor hit something on its top
                     hitAndReflectY()
                 }
                 else { // the actor is not grounded at all
                 }
             }
             // axis X
-            if (isColliding(COLLIDING_LR) && moveDelta.x != 0.0) { // check right and left
+            if (ccdCollided && moveDelta.x != 0.0) { // check right and left
                 // the actor is hitting the wall
                 hitAndReflectX()
             }
@@ -373,48 +375,27 @@ open class ActorWithBody : Actor(), Visible {
      */
     private fun displaceByCCD() {
         if (!isNoCollideWorld){
-            // vector, toward the previous position; implies linear interpolation
-            val deltaNegative = Vector2(hitbox.toVector() - nextHitbox.toVector()) // we need to traverse back, so may as well negate at the first place
-            val ccdDelta = if (deltaNegative.magnitudeSquared > CCD_TICK.sqr())
-                deltaNegative.setMagnitude(CCD_TICK)
-            else
-                deltaNegative
-            var ccdCount = 0
+            // do some CCD between hitbox and nextHitbox
+            val ccdBox = hitbox.clone()
+            val ccdDelta = hitbox.toVector() to nextHitbox.toVector()
+            val ccdStep = Math.max(ccdDelta.x, ccdDelta.y)
 
-            // Q&D fix: quantise hitbox by direction
-            /*if (deltaNegative.y < 0) {
-                if (deltaNegative.x > 0)
-                    nextHitbox.setPosition(
-                            nextHitbox.posX.floor(),
-                            nextHitbox.endPointY.ceil().minus(nextHitbox.height)
-                    )
-                else if (deltaNegative.x < 0)
-                    nextHitbox.setPosition(
-                            nextHitbox.endPointX.ceil().minus(nextHitbox.width),
-                            nextHitbox.endPointY.ceil().minus(nextHitbox.height)
-                    )
-            }
-            else if (deltaNegative.y > 0) {
-                if (deltaNegative.x > 0)
-                    nextHitbox.setPosition(
-                            nextHitbox.posX.floor(),
-                            nextHitbox.posY.floor()
-                    )
-                else if (deltaNegative.x < 0)
-                    nextHitbox.setPosition(
-                            nextHitbox.endPointX.ceil().minus(nextHitbox.width),
-                            nextHitbox.posY.floor()
-                    )
-            }*/
+            for (step in 0..ccdStep.floorInt()) {
+                ccdBox.translate(ccdDelta * (step.toDouble() / ccdStep))
 
-            while (isColliding(COLLIDING_ALLSIDE) && ccdCount < CCD_TRY_MAX) { // no thresholding?
-                nextHitbox.translate(ccdDelta)
-                ccdCount += 1
+                println(ccdDelta * (step.toDouble() / ccdStep))
+                println(ccdBox)
+
+                if (isColliding(ccdBox)) {
+                    ccdCollided = true
+                    break
+                }
             }
 
-            if (ccdCount > 0) {
-                println("Displacement: ${ccdDelta.magnitude * ccdCount} ($ccdCount times)")
-            }
+            nextHitbox.reassign(ccdBox)
+        }
+        else {
+            ccdCollided = false
         }
     }
 
@@ -440,9 +421,9 @@ open class ActorWithBody : Actor(), Visible {
         }
     }
 
-    private fun isColliding() = isColliding(0)
+    private fun isColliding(hitbox: Hitbox) = isColliding(hitbox, 0)
 
-    private fun isColliding(option: Int): Boolean {
+    private fun isColliding(hitbox: Hitbox, option: Int): Boolean {
         if (isNoCollideWorld) return false
 
         // offsets will stretch and shrink detection box according to the argument
@@ -451,41 +432,41 @@ open class ActorWithBody : Actor(), Visible {
             val offsetX = if (option == COLLIDING_LR) A_PIXEL else 0.0
             val offsetY = if (option == COLLIDING_UD) A_PIXEL else 0.0
 
-            x1 = nextHitbox.posX - offsetX + offsetY
-            x2 = nextHitbox.posX + offsetX - offsetY + nextHitbox.width
-            y1 = nextHitbox.posY + offsetX - offsetY
-            y2 = nextHitbox.posY - offsetX + offsetY + nextHitbox.height
+            x1 = hitbox.posX - offsetX + offsetY
+            x2 = hitbox.posX + offsetX - offsetY + hitbox.width
+            y1 = hitbox.posY + offsetX - offsetY
+            y2 = hitbox.posY - offsetX + offsetY + hitbox.height
         }
         else {
             if (option == COLLIDING_LEFT) {
-                x1 = nextHitbox.posX - A_PIXEL
-                x2 = nextHitbox.posX - A_PIXEL + nextHitbox.width
-                y1 = nextHitbox.posY + A_PIXEL
-                y2 = nextHitbox.posY - A_PIXEL + nextHitbox.height
+                x1 = hitbox.posX - A_PIXEL
+                x2 = hitbox.posX - A_PIXEL + hitbox.width
+                y1 = hitbox.posY + A_PIXEL
+                y2 = hitbox.posY - A_PIXEL + hitbox.height
             }
             else if (option == COLLIDING_RIGHT) {
-                x1 = nextHitbox.posX + A_PIXEL
-                x2 = nextHitbox.posX + A_PIXEL + nextHitbox.width
-                y1 = nextHitbox.posY + A_PIXEL
-                y2 = nextHitbox.posY - A_PIXEL + nextHitbox.height
+                x1 = hitbox.posX + A_PIXEL
+                x2 = hitbox.posX + A_PIXEL + hitbox.width
+                y1 = hitbox.posY + A_PIXEL
+                y2 = hitbox.posY - A_PIXEL + hitbox.height
             }
             else if (option == COLLIDING_TOP) {
-                x1 = nextHitbox.posX + A_PIXEL
-                x2 = nextHitbox.posX - A_PIXEL + nextHitbox.width
-                y1 = nextHitbox.posY - A_PIXEL
-                y2 = nextHitbox.posY - A_PIXEL + nextHitbox.height
+                x1 = hitbox.posX + A_PIXEL
+                x2 = hitbox.posX - A_PIXEL + hitbox.width
+                y1 = hitbox.posY - A_PIXEL
+                y2 = hitbox.posY - A_PIXEL + hitbox.height
             }
             else if (option == COLLIDING_BOTTOM) {
-                x1 = nextHitbox.posX + A_PIXEL
-                x2 = nextHitbox.posX - A_PIXEL + nextHitbox.width
-                y1 = nextHitbox.posY + A_PIXEL
-                y2 = nextHitbox.posY + A_PIXEL + nextHitbox.height
+                x1 = hitbox.posX + A_PIXEL
+                x2 = hitbox.posX - A_PIXEL + hitbox.width
+                y1 = hitbox.posY + A_PIXEL
+                y2 = hitbox.posY + A_PIXEL + hitbox.height
             }
             else {
-                x1 = nextHitbox.posX
-                x2 = nextHitbox.posX + nextHitbox.width
-                y1 = nextHitbox.posY
-                y2 = nextHitbox.posY + nextHitbox.height
+                x1 = hitbox.posX
+                x2 = hitbox.posX + hitbox.width
+                y1 = hitbox.posY
+                y2 = hitbox.posY + hitbox.height
             }
         }
 
@@ -707,7 +688,7 @@ open class ActorWithBody : Actor(), Visible {
         )
     }
 
-    private fun updateHitbox() = hitbox.set(nextHitbox)
+    private fun updateHitbox() = hitbox.reassign(nextHitbox)
 
     override fun drawGlow(gc: GameContainer, g: Graphics) {
         if (isVisible && spriteGlow != null) {
@@ -810,6 +791,10 @@ open class ActorWithBody : Actor(), Visible {
     fun Double.abs() = Math.abs(this)
     fun Double.sqr() = this * this
     fun Int.abs() = if (this < 0) -this else this
+    fun Double.bipolarClamp(limit: Double) =
+            if      (this > 0 && this > limit)  limit
+            else if (this < 0 && this < -limit) -limit
+            else this
 
     private fun assertInit() {
         // errors
@@ -851,19 +836,3 @@ open class ActorWithBody : Actor(), Visible {
         }
     }
 }
-/**
- * Give new random ReferenceID and initialise ActorValue
- */
-
-/**
-
-=                  = ↑
-===                ===@!
-=↑                 =↑
-=↑                 =
-=↑                 =
-=@ (pressing R)    =
-==================  ==================
-
-Fig. 1: the fix was not applied
- */

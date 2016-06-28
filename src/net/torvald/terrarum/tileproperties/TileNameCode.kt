@@ -11,6 +11,8 @@ object TileNameCode {
 
     val STONE = TilePropCodex.idDamageToIndex(1, 0)
     val STONE_QUARRIED = TilePropCodex.idDamageToIndex(1, 1)
+    val STONE_TILE_WHITE = TilePropCodex.idDamageToIndex(1, 2)
+    val STONE_BRICKS = TilePropCodex.idDamageToIndex(1, 3)
 
     val DIRT = TilePropCodex.idDamageToIndex(2, 0)
     val GRASS = TilePropCodex.idDamageToIndex(2, 1)

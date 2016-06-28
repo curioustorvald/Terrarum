@@ -1,13 +1,12 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.point.Point2d
-import org.dyn4j.geometry.ChainedVector2
 import org.dyn4j.geometry.Vector2
 
 /**
  * Created by minjaesong on 16-01-15.
  */
-class Hitbox(x1: Double, y1: Double, width: Double, height: Double) : Cloneable {
+class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
 
     @Volatile var hitboxStart: Point2d
         private set
@@ -23,6 +22,10 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) : Cloneable 
         hitboxEnd = Point2d(x1 + width, y1 + height)
         this.width = width
         this.height = height
+    }
+
+    override fun toString(): String {
+        return "[$hitboxStart - $hitboxEnd]"
     }
 
     /**
@@ -58,19 +61,12 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) : Cloneable 
         this.height = height
     }
 
-    /**
-     * Set this hitbox from other
-     */
-    fun set(other: Hitbox) {
+    fun reassign(other: Hitbox) {
         set(other.posX, other.posY, other.width, other.height)
     }
 
     fun translate(x: Double, y: Double) {
         setPosition(posX + x, posY + y)
-    }
-
-    fun translate(vec: ChainedVector2) {
-        translate(vec.x, vec.y)
     }
 
     fun translate(vec: Vector2) {
@@ -139,4 +135,6 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) : Cloneable 
     fun toVector(): Vector2 {
         return Vector2(posX, posY)
     }
+
+    fun clone(): Hitbox = Hitbox(posX, posY, width, height)
 }

@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.Game
+import net.torvald.terrarum.StateGame
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.ConsoleWindow
 

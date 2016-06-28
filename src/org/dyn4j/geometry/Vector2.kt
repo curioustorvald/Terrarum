@@ -40,22 +40,23 @@ import org.dyn4j.Epsilon
  *
  * Chaining is not available.
  *
- * In this Kotlin code, you can use regular operations like + - * /.
+ * In this Kotlin code, you can use regular operators like + - * /.
  *
- * |operator   |function    |
- * |-----------|------------|
- * |a + b      |Vector(a).plus(b)   |
- * |a - b      |Vector(a).minus(b)  |
- * |a * b      |Vector(a).times(b)  |
- * |a / b      |Vector(a).div(b)    |
- * |a += b     |Vector(a).plusAssign(b)|
- * |a -= b     |Vector(a).minusAssign(b)|
- * |a *= b     |Vector(a).timesAssign(b)|
- * |a /= b     |Vector(a).divAssign(b)|
- * |a dot b    |Vector(a).dot(b)    |
- * |a cross b  |Vector(a).cross(b)  |
- * |!a         |Vector(negate(a)    |
- * |a rotate th|Vector(a).rotate(th)|
+ * |operator   |function             |
+ * |-----------|---------------------|
+ * |a + b      |Vector2(a).plus(b)   |
+ * |a - b      |Vector2(a).minus(b)  |
+ * |a * b      |Vector2(a).times(b)  |
+ * |a / b      |Vector2(a).div(b)    |
+ * |a += b     |a.plusAssign(b)      |
+ * |a -= b     |a.minusAssign(b)     |
+ * |a *= b     |a.timesAssign(b)     |
+ * |a /= b     |a.divAssign(b)       |
+ * |a dot b    |Vector2(a).dot(b)    |
+ * |a cross b  |Vector2(a).cross(b)  |
+ * |!a         |this.negative        |
+ * |a rotate th|Vector2(a).rotate(th)|
+ * |a to b     |Vector2(a).to(b)     |
  *
  * @author William Bittle
  * *
@@ -392,22 +393,22 @@ class Vector2 {
 
     /**
      * Creates a [Vector2] from this [Vector2] to the given [Vector2].
-     * @param vector the [Vector2]
+     * @param other : the other [Vector2]
      * *
      * @return [Vector2]
      */
-    fun to(vector: Vector2): Vector2 {
-        return Vector2(vector.x - this.x, vector.y - this.y)
+    infix fun to(other: Vector2): Vector2 {
+        return Vector2(other.x - this.x, other.y - this.y)
     }
 
     /**
-     * Multiplies this [Vector2] by the given scalar.
+     * Get product of this vector.
      * @param scalar the scalar
      * *
      * @return [Vector2] this vector
      */
     operator fun times(scalar: Double): Vector2 {
-        return Vector2(this.x * scalar, this.y * scalar)
+        return product(scalar)
     }
 
     operator fun timesAssign(scalar: Double) {
@@ -540,21 +541,13 @@ class Vector2 {
      * Negates this [Vector2].
      * @return [Vector2] this vector
      */
-    operator fun not() = negate()
+    operator fun not() = this.negative
 
     /**
      * Negates this [Vector2].
      * @return [Vector2] this vector
      */
-    operator fun unaryMinus() = negate()
-
-    /**
-     * Negates this [Vector2].
-     * @return [Vector2] this vector
-     */
-    fun negate(): Vector2 {
-        return Vector2(-x, -y)
-    }
+    operator fun unaryMinus() = this.negative
 
     /**
      * Returns a [Vector2] which is the negative of this [Vector2].

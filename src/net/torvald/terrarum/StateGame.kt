@@ -35,7 +35,7 @@ import java.util.*
 /**
  * Created by minjaesong on 15-12-30.
  */
-class Game @Throws(SlickException::class)
+class StateGame @Throws(SlickException::class)
 constructor() : BasicGameState() {
     private val ACTOR_UPDATE_RANGE = 4096
 
@@ -315,9 +315,7 @@ constructor() : BasicGameState() {
         GameController.controllerButtonReleased(controller, button)
     }
 
-    override fun getID(): Int {
-        return Terrarum.SCENE_ID_GAME
-    }
+    override fun getID(): Int = Terrarum.SCENE_ID_GAME
 
     private fun drawSkybox(g: Graphics) {
         val skyColourFill = GradientFill(
