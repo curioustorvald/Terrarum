@@ -1,0 +1,5 @@
+{
+  "DEV_MESSAGE_CONSOLE_CODEX": "使用可能な命令語の目録は「codex」を入力してください。",
+  "DEV_MESSAGE_CONSOLE_AVAILABLE_COMMANDS": "命令語の目録:",
+  "DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN": "「%1$s」:　不明な命令語"
+}

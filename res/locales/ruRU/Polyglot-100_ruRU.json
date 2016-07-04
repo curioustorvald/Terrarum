@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Russian",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "Класс"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "Удалить персонажа"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "Новый персонаж"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "Искусственный интеллект"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "Пришелец"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "Клон"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "Киборг"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "Божество"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "Демон"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "Демонесса"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "Дракон"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "Драконы"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "Призрак"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "Бог"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "Боги"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "Богиня"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "Маг"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "Медик"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "Монстр"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "Ниндзя"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "Пират"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "Жрец"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "Принц"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "Принцесса"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "Робот"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "Скелет"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "Снайпер"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "Солдат"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "Вор"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "Воин"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "Колдун"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "Зомби"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "Зомби"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "Первое место"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "Место"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "Второе место"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "Третье место"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "Горящий"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "В критическом состоянии"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "Мёртвый"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "Заморожен"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "Отравлен"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "Замедлен"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "Оглушен"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "Без сознания"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "Невредимый"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "Мокрый"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "Раненый"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "Большой"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "Огромный"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "Маленький"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "Крошечный"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "Воздух"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "Земля"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "Огонь"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "Металл"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "Вода"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "Сбросить"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "Отклонить"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "Джекпот"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "Макс"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "Мин"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "Броня"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "Стрела"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "Стрелы"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "Доска"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "Бомба"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "Книга"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "Ботинки"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "Лук"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "Карта"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "Карты"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "Сундук"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "Магический"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "Ржавый"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "Кинжал"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "Кубик"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "Кубика"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "Дверь"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "Рукавицы"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "Самоцвет"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "Подарок"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "Подарки"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "Перчатки"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "Огнестрельное оуржие"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "Молот"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "Шлем"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "Ключ"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "Нож"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "Замок"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "Любовь"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "Пулемёт"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "Магия"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "Пистолет"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "Задание"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "Ранг"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "Винтовка"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "Ракетница"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "РПГ"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "Свиток"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "Щит"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "Щиты"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "Энергетический щит"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "Энергетичкеские щиты"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "Дробовик"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "Снайперская винтовка"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "Заклинание"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "Посох"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "Меч"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "Сокровище"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "Эпичный"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "Мусорный"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "Жезл"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "Дерево"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "Высота"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "Тормоза"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "Шасси"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "Глубина"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "Топливо"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "Передача"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "Манёвренность"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "Скорость"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "Отзывчивость руля"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "Подвеска"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "Колёса"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "Крылья"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "Медаль"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "Бронзовая медаль"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "Золотая медаль"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "Серебряная медаль"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "Бронза"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "Монета"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "Золото"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "Слиток"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "Платина"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "Серебро"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "Замок"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "Пещера"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "Подземелье"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "Постоялый двор"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "Планета"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "Земля"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "Космос"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "Космический корабль"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "История"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "Приключение"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "Глава"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "Страница"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "3D моделирование"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "Анимация"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "Режиссёр анимации"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "Аниматор"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "Графика"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "Арт-директор"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "Художник"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "Художники"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "Заместитель"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "Партнёр"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "Аудио-директор"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "Дизайнер персонажей"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "Главный технический директор"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "Кинематографический художник"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "Кинематографический директор"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "Код"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "Композитор"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "Концепт-художник"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "Креативный директор"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "Администратор базы данных"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "Дизайн-директор"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "Разработано"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "Режиссёр"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "Шумовик"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "Шрифт"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "Шрифты"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "Игра"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "Гейм-дизайн"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "Гейм-дизайнер"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "Игровой разработчик"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "Разработка игры"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "Графический дизайнер"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "Изображение"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "Изображения"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "Художник интерфейса"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "Младший"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "Руководитель"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "Ведущий программист"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "Дизайн уровней"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "Дизайнер уровней"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "Локализация"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "Рукопись"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "Модели"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "Музыкант"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "Перевод от проекта Polygon"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "Продюсер"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "Производство"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "Руководитель программы"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "Программисты"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "Программисты"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "Программирование"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "Руководитель проекта"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "Издатель"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "Звукооператор"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "Сценарист"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "Старший"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "Звуковые эффекты"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "Саунд-дизайнер"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "Звукорежиссёр"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "Саундтрек"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "Особая благодарность"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "Особая благодарность"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "Технический художник"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "Технический директор"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "Руководитель тестирования"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "Тест-менеджер"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "Тестер"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "Перевод"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "Визуальные эффекты"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "Озвучивание"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "Актёр озвучивания"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "Автор"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "{0} не обнаружен"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "За пределами зоны отслеживания"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "VR-шлем не обнаружен"
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "Используются читы!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "Код ошибки:"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "Неверный цифровой ключ."
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "Недопустимое название!"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "Произошла ошибка."
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "Соединение потеряно."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "Ваш соперник отключился."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "Другой игрок отключился."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "Ваш союзник отключился."
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "Не удалось подключиться к серверу."
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "Файл сохранения повреждён."
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "Сохранения не найдены."
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "Нет свободных игр."
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "Атаковать"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "Ускориться"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "Построить"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "Закинуть"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "Заколдовать"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "Взять"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "Лезть"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "Закрыть"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "Собирать"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "Приготовить"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "Создать"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "Присесть"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "Уклониться"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "Ехать"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "Летать"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "Макс. скорость"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "Отправиться"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "Отправиться к"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "Половинная скорость"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "Залечить"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "Прыгать"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "Приземлиться"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "Смотреть"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "Смешать"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "Открыть"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "Взять"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "Гнать"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "Читать"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "Заменить"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "Бежать"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "Сбежать"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "Стрелять"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "Красться"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "Крутить"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "Пробежать"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "Вращать"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "Взлететь"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "Говорить"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "Бросить"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "Идти"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "Выносливость"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "Очки опыта"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "Женщина"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "Здоровье"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "Сердце"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "Сердца"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "Уровень"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "След. уровень!"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "Жизни"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "Мужчина"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "Мужчина"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "Мужчины"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "Возрождение"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "Возрождение через:"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "Возродиться?"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "Возрождение"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "Навык"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "Точка возрождения"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "Трансгендер"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "Женщина"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "Женщины"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "Повреждение"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "Критический удар"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "Критический промах"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "Удар"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "Очки здоровья"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "Промах"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "Урон"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "Урон"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "Враг"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "Враг"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "Враги"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "Враги"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "Экшен"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "Приключенческая игра"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "Карточная игра"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "Казуальная игра"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "Фэнтези"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "Хардкорная игра"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "Инди"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "Средневековье"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "Разное"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "Многопользовательская игра"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "Жанр"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "Платформер"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "Головоломка"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "Викторина"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "Гонки"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "Ретро-игра"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "Ролевая игра (RPG)"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "Стратегия в реальном времени"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "Научно-фантастическая игра"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "Шутер"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "Симулятор"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "Одиночная игра"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "Спортивный симулятор"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "Стратегия"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "Пошаговая стратегия"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "Башенная защита (TD)"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "Инвентарь"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "Б/П"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "Боеприпасы"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "Пуля"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "Пули"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "Купить"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "Вместимость инвентаря"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "Бросить"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "Макс. вес"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "Инвентарь полон"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "Предмет"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "Ключ"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "Усиление"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "Продать"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "Использовать"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "Оружие"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "Оружие"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "Вы не можете нести больше."
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "Будьте осторожны!"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "Просим быть осторожным!"
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "Тактика"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "Цель"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "Содействие"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "Содействия"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "Атаковать"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "Бонус"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "Захватить"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "Завершено"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "Смерть"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "Смерти"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "Защищать"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "Уничтожить"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "Спастись"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "Конец"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "Конец игры!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "КОНЕЦ ИГРЫ!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "Рекорд"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "Не завершено"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "Убить"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "Помощь в убийстве"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "Убийство"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "Убийства"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "Закрыто"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "Поражения"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "Матч"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "Миссия"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "Цель миссии"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "Цели миссии"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "Множитель"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "Цели"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "Позиция"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "Круг"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "Кругов"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "Раунд"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "Счёт"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "Время"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "Оставшееся время"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "Турнир"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "Турниры"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "Победы"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "Поражение"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "Вы потерпели поражение."
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "Проигравший"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "Ваша команда проиграла!"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "Ваша команда победила!"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "Победа"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "Победитель"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "Вы мертвы."
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "Вы умерли."
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "Вы проиграли"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "Вы проиграли!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "Вы выиграли!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "Вы выиграли!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "Камера"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "Перевёрнутая"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "Обычная"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "Камера по оси X"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "Камера по оси Y"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "Кнопка"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "Нажать"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "Мёртвая зона"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "Двойное нажатие"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "Перетащить"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "Перенести"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "Палец"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "Геймпад"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "Гироскоп"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "Клавиша"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "Клавиатура"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "Мышь"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "Чувствительность мыши"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "Свести пальцы"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "Повернуть"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "Прокрутить"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "Встряхнуть"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "Раздвинуть пальцы"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "Провести пальцем"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "Коснуться пальцем"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "Кнопка"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "Клавиша"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "Наклонить"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "Рука"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "Руки"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "Грудь"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "Подбородок"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "Цвет"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "Ухо"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "Уши"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "Глаз"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "Глаза"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "Стопы"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "Стопа"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "Волосы"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "Борода"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "Мех"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "Прическа"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "Кисть"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "Кисти"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "Голова"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "Бедра"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "Нога"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "Ноги"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "Рот"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "Шея"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "Нос"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "Кожа"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "Грудная клетка"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "Сложность"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "Просто"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "Сложно"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "Невозможно"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "Безумно"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "Средне"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "Очень просто"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "Очень сложно"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "Вниз"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "Влево"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "Вправо"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "Вверх"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "Загрузить"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "Загрузить игру"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "Загрузка…"
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "Подождите немного..."
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "Сбросить сохранение?"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "Сохранить"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "Сохранения"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "Сохранить игру"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "Сохранение…"
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "Возраст"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "Все"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "Вы точно уверены?"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "Вы уверены?"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "Назад"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "Музыка"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "Отмена"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "Закрыть"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "Принять"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "Продолжить игру"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "Продолжить игру?"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "Авторы"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "Выйти на рабочий стол"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "Выйти на рабочий стол?"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "Дополнения"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "Загрузить"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "Загружаемый контент"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "Покинуть"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "Выйти?"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "Дополнительно"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "Кадровая частота"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "Галерея"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "До свидания!"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "Графика"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "Внутриигровая покупка"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "Язык"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "Уровень"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "Почта"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "Главное меню"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "Ещё"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "Музыка"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "Музыкальный плеер"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "Новая игра"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "След."
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "След. трек"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "Нет"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "НЕТ"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "Неа"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "ОК"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "Пауза"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "Приостановлено"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "Играть"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "Играть заново"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "Нажмите любую клавишу"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "Нажмите любую клавишу для продолжения"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "Нажмите Start"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "Нажмите Start для продолжения"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "Пред."
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "Пред. трек"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "Цена"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "Бесплатно"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "Купить"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "Выход"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "Вы точно хотите выйти?"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "Выйти из игры?"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "Переиграть"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "Назад"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "Вернуться в главное меню"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "Вернуться в главное меню?"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "Поделиться"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "Пропустить"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "Звук"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "Спасибо!"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "Открыть"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "Видео"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "Голоса"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "Внимание!"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "Добро пожаловать"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "Мир"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "Ага"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "Да"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "ДА"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "Pусский"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Russian"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "Вход"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "E-Mail"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "Забыл пароль"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "Пароль"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "Регистрация"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "Запомнить?"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "Испытание"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "Режим испытаний"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "Co-op"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "Совместная игра"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "Бой насмерть"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "Помощь"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "Инструкции"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "Мультиплеер"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "Игра по локальной сети"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "Сетевая игра (онлайн)"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "Играть по сети"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "Одиночная игра"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "Тренировка"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "Обучение"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "Поединок"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "Имя"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "Имя"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "Фамилия"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "Имя пользователя"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "Настройки"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "Расширенные настройки графики"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "Сглаживание"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "Свечение"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "Управление"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "Настройки сложности"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "Экран"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "Детализация эффектов"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "Анизотропная"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "Билинейная"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "Фильтрация"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "Трилинейная"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "Вид от 1-го лица"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "Поле зрения"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "Во весь экран"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "Настройки игры"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "Настройки графики"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "Интерфейс"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "Детализация моделей"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "Многоядерная обработка"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "Громкость музыки"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "Настройки сети"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "Качество"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "Разрешение экрана"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "Громкость эффектов"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "Детализация шейдеров"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "Тень"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "Тени"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "Размер"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "Настройки звука"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "Громкость"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "Игра с разделением экрана"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "Детализация текстур"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "Вид от 3-го лица"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "Настройки видео"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "Качество"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "Громкость голосов"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "Вертикальная синхронизация"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "Широкий экран"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "Оконный режим"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "Высокий"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "Низкий"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "Средний"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "Ультра"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "Очень высокое"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "Версия"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "Демо"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "Бесплатная"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "Полная"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "Урезанная"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "Премиум"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "Условно-бесплатная"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "Пробная"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "Комфортный режим VR"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "Сброс ориентации VR-шлема"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "Виртуальная реальность"
+            }
+        ]
+    }
+}

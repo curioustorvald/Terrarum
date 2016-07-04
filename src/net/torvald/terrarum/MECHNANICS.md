@@ -117,3 +117,9 @@ see SAVE_FORMAT.md
 
 * Codex of Real Estate → assign owner to the tiles → copy the information to the NPC instance
  
+ 
+## Health and magic point ##
+
+* Works like Ampere in electronics.
+    - Health: Regen per time
+    - Magic: Out power per time

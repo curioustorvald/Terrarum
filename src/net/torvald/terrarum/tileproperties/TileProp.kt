@@ -27,12 +27,11 @@ class TileProp {
     /**
      * @param luminosity Raw RGB value, without alpha
      */
-    private var realLum: Int = 0
-    var luminosity: Int
+    var luminosity: Int = 0
         set(value) {
-            realLum = value
+            field = value
         }
-        get() = TilePropUtil.getDynamicLumFunc(realLum, dynamicLuminosityFunction)
+        get() = TilePropUtil.getDynamicLumFunc(field, dynamicLuminosityFunction)
 
     var drop: Int = 0
     var dropDamage: Int = 0

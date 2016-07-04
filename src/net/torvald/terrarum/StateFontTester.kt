@@ -9,7 +9,7 @@ import org.newdawn.slick.state.StateBasedGame
 /**
  * Created by minjaesong on 16-06-28.
  */
-class StateFontPrinter : BasicGameState() {
+class StateFontTester : BasicGameState() {
     val textToPrint = "Font printer 서체 인쇄기"
 
     lateinit var canvas: Graphics

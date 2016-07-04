@@ -1,0 +1,5 @@
+{
+  "DEV_MESSAGE_CONSOLE_CODEX": "Tapez « codex » pour commandes disponibles.",
+  "DEV_MESSAGE_CONSOLE_AVAILABLE_COMMANDS": "Commandes disponibles :",
+  "DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN": "« %1$s » : Commande inconnue"
+}

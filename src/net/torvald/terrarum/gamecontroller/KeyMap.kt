@@ -9,8 +9,7 @@ object KeyMap {
 
     var map_code = Hashtable<EnumKeyFunc, Int>()
 
-    fun build() {
-
+    init {
         map_code.put(EnumKeyFunc.MOVE_UP, Key.E)
         map_code.put(EnumKeyFunc.MOVE_LEFT, Key.S)
         map_code.put(EnumKeyFunc.MOVE_DOWN, Key.D)

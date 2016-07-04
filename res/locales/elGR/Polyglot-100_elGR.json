@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Greek",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "Κλάση"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "Διαγραφή Χαρακτήρα"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "Δημιουργία Χαρακτήρα"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "Τεχνιτή Νοημοσύνη"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "Εξωγήινος"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "Κλόνος"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "Cyborg"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "Θεότητα"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "Δαίμονας"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "Δαιμόνισσα"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "Δράκος"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "Δράκοι"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "Φάντασμα"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "Θεός"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "Θεοί"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "Θεά"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "Μάγος"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "Ιατρός"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "Τέρας"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "Νίντζα"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "Πειρατής"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "Παπάς"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "Πρίγκηπας"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "Πριγκήπισσα"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "Ρομπότ"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "Σκελετός"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "Σκοπευτής"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "Στρατιώτης"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "Κλέφτης"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "Πολεμιστής"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "Μάγος"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "Ζόμπι"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "Ζόμπι"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "Πρώτη θέση"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "Θέση"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "Δεύτερη θέση"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "Τρίτη θέση"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "Φλεγόμενο"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "Σε κρίσιμη κατάσταση"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "Νεκρός"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "Παγωμένος"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "Δηλητηρισμένος"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "Επιβραδυνμένος"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "Παραλυμένος"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "Αναίσθητος"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "Αβλαβής"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "Βρεγμένος"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "Πληγωμένος"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "Μεγάλο"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "Τεράστιο"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "Μικρό"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "Μικροσκοπικό"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "Αέρας"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "Γή"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "Φωτιά"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "Μέταλο"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "Νερό"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "Στοίχημα"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "Απέρριψε"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "Jackpot"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "Max"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "Min"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "Πανοπλία"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "Βέλος"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "Βέλη"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "Ταμπλό"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "Βόμβα"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "Βιβλίο"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "Μπότες"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "Τόξο"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "Κάρτα"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "Κάρτες"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "Σεντούκι"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "Μαγικ*"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "Σκουριασμέν*"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "Στιλέτο"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "ζάρι"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "ζάρια"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "Πόρτα"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "Γάντια"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "Πετράδι"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "Δώρο"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "Δώρα"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "Γάντια"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "Οπλο"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "Σφυρί"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "Κράνος"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "Κλειδί"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "Μαχαίρι"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "Κλειδαριά"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "Αγάπη"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "Πολυβόλο"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "Μαγία"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "Πιστόλι"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "Αποστολή"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "Βαθμός"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "Τουφέκι"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "Εκτοξευτής Ρουκετών"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "RPG"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "Περγαμηνή"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "Ασπίδα"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "Ασπίδες"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "Ασπίδα"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "Ασπίδες"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "Καραμπίνα"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "Τουφέκι ελεύθερου σκοπευτή"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "Ξόρκι"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "Ραβδί"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "Σπαθί"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "Θησαυτός"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "Επικ*"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "Άχρηστο αντικείμενο"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "Ραβδί"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "Ξύλο"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "Υψόμετρο"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "Φρένα"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "Αμάξωμα"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "Βάθος"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "Κάυσιμο"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "Ταχύτητα"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "Κράτημα"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "Ταχύτητα"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "Στρίψημο"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "Ανάρτηση"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "Ρόδες"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "Φτερά"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "Μετάλλιο"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "Χάλκινο μετάλλιο"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "Χρυσό μετάλλιο"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "Αργυρό μετάλλιο"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "Χαλκός"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "Κέρμα"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "Χρυσός"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "Πλίνθωμα"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "Πλατίνα"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "Ασήμι"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "Κάστρο"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "Σπηλιά"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "Μπουντρούμι"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "Ταβέρνα"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "Πλανήτης"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "Γη"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "Διάστημα"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "Διαστημόπλοιο"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "Ιστορία"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "Περιπέτεια"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "Κεφάλαιο"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "Σελίδα"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "3D Modeling"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "Animation"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "Υπεύθυνος Κινουμένων Σχεδίων"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "Animator"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "Εικαστικά"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "Καλλιτεχνική Διεύθυνση"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "Artist"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "Artists"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "Βοηθός"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "Associate"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "Ηχητική Διεύθυνση"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "Character Designer"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "Διευθύνων Τεχνικός Σύμβουλος"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "Cinematic Animator"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "Cinematics Director"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "Μυστικός κωδικός"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "Συνθέτης"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "Concept artist"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "Δημιουργικό:"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "Database Admin"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "Διεύθυνση Design"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "Φτιάχτηκε από:"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "Διεύθυνση"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "Foley artist"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "Γραμματοσειρά"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "Γραμματοσειρές"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "Παιχνίδι"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "Game design"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "Game designer"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "Δημιουργός παιχνιδιού"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "Δημιουργία παιχνιδιού"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "Graphic designer"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "Image"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "Images"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "Interface Artist"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "Junior"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "Lead"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "Lead programmer"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "Level design"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "Level designer"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "Επιλογή τοποθεσιών"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "Χειρόγραφα"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "Μοντέλα"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "Μουσικός"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "Μεταφράστηκε από το Polyglot Project"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "Παραγωγός:"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "Παραγωγή:"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "Program Manager"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "Προγραμματιστ*ς"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "Προγραμματιστ*ς"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "Προγραμματισμός"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "Διεύθυνση Έργου"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "Εκδότ*ς"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "Recordist"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "Script writer"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "Senior"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "Sound Effects"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "Sound designer"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "Sound engineer"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "Soundtrack"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "Ευχαριστούμε"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "Ευχαριστούμε τ*"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "Technical artist"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "Τεχνικός Διευθυντής"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "Test Lead"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "Test Manager"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "Tester"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "Μετάφραση"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "Visual Effects"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "Voice acting"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "Voice actor"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "Κείμενα"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "Δεν εντοπίστηκε {0}"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "Απομάκρυνση από την περιοχή καταγραφής"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "Δεν εντοπίστηκε HMD"
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "Ανιχνεύτηκε κλεψιά!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "Κωδικός σφάλματος:"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "Μη έγκυρο κλειδί CD."
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "Μη έγκυρο όνομα!"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "Γενικό σφάλμα."
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "Χάθηκε η σύνδεση."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "Ο/η αντίπαλός σου αποσυνδέθηκε."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "Ο/η άλλος παίχτης αποσυνδέθηκε."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "Ο/η συμπαίχτης σου αποσυνθέθηκε."
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "Δεν μπορώ να συνδεθώ στον διακομιστή."
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "Το αποθηκευμένο αρχείο είναι κατεστραμμένο."
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "Δεν βρέθηκαν παιχνίδια."
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "Κανένα ανοιχτό παιχνίδι"
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "Επίθεση"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "Ώθησε"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "Χτίσε"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "Ρίξε"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "Κάνε"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "Διεκδίκησε"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "Σκαρφάλωσε"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "Κλείσε"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "Συνέλεξε"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "Μαγείρεψε"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "Φτιάξε"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "Σκύψε"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "Απόφυγε"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "Οδήγησε"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "Πέτα"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "Πλήρης ταχύτητα"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "Πήγαινε"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "Πήγαινε στ*"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "Μισή ταχύτητα"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "Γιάτρεψε"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "Πήδα"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "Προσγείωσε"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "Κοίτα"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "Ανακάτεψε"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "Άνοιξε"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "Μάζεψε"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "Αγωνίσου"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "Διάβασε"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "Αντικατέστησε"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "Τρέξε"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "Ξέφυγε"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "Πυροβόλα"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "Νυχοπερπάτα"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "Περιέστρεψε"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "Τρέξε"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "Στρίψε"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "Απογειώσου"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "Μίλα"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "Πέτα"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "Περπάτα"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "Αντοχή"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "Πόντοι Εμπειρίας"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "Θηλυκό"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "Υγεία"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "Καρδιά"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "Καρδιές"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "Επίπεδο"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "Ανέβηκες επίπεδο!"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "Ζωές"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "Αρσενικό"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "Άντρας"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "Άντρες"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "Αναγέννηση"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "Αναγέννηση σε:"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "Αναγέννηση;"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "Αναγέννηση"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "Ικανότητα"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "Σημείο αναγέννησης"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "Τρανς"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "Γυναίκα"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "Γυναίκες"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "Ζημιά"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "Κρίσιμο χτύπημα"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "Απόλυτη Αστοχία"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "Χτυπημέν*"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "Πόντοι"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "Αστοχία"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "Πόντος χτυπήματος"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "Πόντοι χτυπήματος"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "Εχθρός"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "Εχθρός"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "Εχθροί"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "Εχθροί"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "Action παιχνίδι"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "Adventure παιχνίδι"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "Card"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "Casual παιχνίδι"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "Παιχνίδι Φαντασίας"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "Hardcore παιχνίδι"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "Indie"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "Μεσαιωνικό παιχνίδι"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "Αλλα"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "Multiplayer"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "Είδος"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "Platform παιχνίδι"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "Puzzle παιχνίδι"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "Κουίζ"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "Racing"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "Retro παιχνίδι"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "Παιχνίδι ρόλων"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "Real-Time Strategy"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "Επιστημονικής φαντασίας παιχνίδι"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "Shooter παιχνίδι"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "Παιχνίδι προσομοίωσης"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "Singleplayer"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "Αθλητικό παιχνίδι"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "Παιχνίδι στρατηγικής"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "Turn-Based Strategy"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "Tower defence παιχνίδι "
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "Αντικείμενα"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "Πυρομαχικά"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "Πυρομαχικά"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "Σφαίρα"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "Σφαίρες"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "Αγόρασε"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "Χωρητικότητα αποθέματος"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "Ρίξε"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "Επιβάρυνση"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "Το απόθεμα είναι γεμάτο"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "Αντικείμενο"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "Κλειδί"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "Φόρτιση"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "Πούλα"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "Χρησιμοποίησε"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "Όπλο"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "Όπλα"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "Δεν μπορείς να κουβαλήσεις άλλα"
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "Πρόσεχε!"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "Πρόσεχε αν θες."
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "Τακτική"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "Στόχος"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "Βοήθεια"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "Βοήθειες"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "Επίθεση"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "Μπόνους"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "Κατάκτηση"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "Ολοκληρωμέν*"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "Θάνατος"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "Θάνατοι"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "Προστάτεψε"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "Κατέστρεψε"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "Ξέφυγε"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "Τελος"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "Τέλος παιχνιδιού"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "ΤΕΛΟΣ ΠΑΙΧΝΙΔΙΟΥ!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "High Score"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "Ανολοκήρωτ*"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "Σκότωσε"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "Ασίστ στο σκότωμα"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "Φόνος"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "Φόνοι"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "Κλειδωμένο"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "Ήττες"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "Αγώνας"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "Αποστολή"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "Στόχος αποστολής"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "Στόχοι αποστολής"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "Πολλαπλασιαστής"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "Στόχοι"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "Κατάταξη"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "Γύρος"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "Γύροι"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "Γύρος"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "Βαθμολογία"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "Χρόνος"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "Εναπομείναν χρόνος"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "Τουρνουά"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "Τουρνουά"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "Νίκες"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "Ήττα"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "Νικήθηκες."
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "Χαμένος"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "Η ομάδα σου έχασε!"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "Η ομάδα σου κέρδισε!"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "Νίκη"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "Νικιτής"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "Έχεις πεθάνει"
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "Πέθανες."
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "Έχασες!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "Έχασες!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "Κέρδισες!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "Κέρδισες!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "Κάμερα"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "Ανεστραμμένη"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "Κανονική"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "Άξονας Χ της κάμερας"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "Άξονας Ψ της κάμερας"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "Κουμπί"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "Κλικ"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "Νεκρή ζώνη χειριστηρίου"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "Διπλό κλικ"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "Drag"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "Drag and drop"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "Δάχτυλα"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "Gamepad"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "Γυροσκόπιο"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "Πλήκτρο"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "Πληκτρολόγιο"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "Ποντίκι"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "Ευαισθησία ποντικιού"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "Pinch"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "Περιστροφή"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "Κύλιση"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "Ανακίνηση"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "Spread"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "Swipe"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "Ελαφρό χτύπημα"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "Το κουμπί"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "Το πλήκτρο"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "Κλίση"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "Μπράτσο"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "Μπράτσα"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "Στήθος"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "Πηγούνι"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "Χρώμα"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "Αυτί"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "Αυτιά"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "Μάτι"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "Μάτια"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "Πατούσες"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "Πατούσα"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "Μαλλιά"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "Μούσια"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "Γούνα"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "Μαλλιά"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "Χέρι"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "Χέρια"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "Κεφάλι"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "Γλουτοί"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "Πόδι"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "Πόδια"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "Στόμα"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "Λαιμός"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "Μύτη"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "Δέρμα"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "Θώρακας"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "Δυσκολία"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "Εύκολο"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "Δύσκολο"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "Ακατόρθωτα δύσκολο"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "Απαράδεκτα δύσκολο"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "Μέτριο"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "Πολύ εύκολο"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "Πολύ δύσκολο"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "Κάτω"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "Αριστερά"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "Δεξί"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "Πάνω"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "Άνοιγμα"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "Άνοιγμα παιχνιδιού"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "Φορτώνει"
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "Περίμενε παρακαλώ"
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "Να διαγραφούν τα αποθηκευμένα δεδομένα;"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "Αποθήκευσε"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "Αποθήκευση δεδομένων"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "Αποθήκευσε παιχνίδι"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "Γίνεται αποθήκευση..."
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "Ηλικία"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "Όλα"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "Απολύτως σίγουρα;"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "Σίγουρα;"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "Επιστροφή"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "Μουσική"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "Ακύρωση"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "Κλείσιμο"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "Επιβεβαίωση"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "Συνέχεια"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "Συνέχεια;"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "Συντελεστές"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "Επιστροφή στο περιβάλλον εργασίας"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "Να επιστρέψω στο περιβάλλον εργασίας;"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "DLC"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "Λήψη"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "Περιεχόμενο προς λήψη"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "Έξοδος"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "Έξοδος;"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "Επιπρόσθετα"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "FPS"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "Γκαλερί"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "Αντίο!"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "Γραφικά"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "Αγορές εντός εφαρμογής"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "Γλώσσα"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "Επίπεδο"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "Ταχυδρομικές υπηρεσίες"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "Κεντρικό Μενού"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "Περισσότερα"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "Μουσική"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "Music Player"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "Νέο παιχνίδι"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "Επόμενο"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "Επόμενο κομμάτι"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "Όχι"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "ΟΧΙ"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "Μπα"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "ΟΚ"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "Παύση"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "Σε παύση"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "Παίξε"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "Ξαναπαίξε"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "Πάτα ένα πλήκτρο"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "Πάτα ένα πλήκτρο για να συνεχίσεις"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "Πάτα Έναρξη"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "Πάτα Έναρξη για να συνεχίσεις"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "Προηγούμενο"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "Προηγούμενο κομμάτι"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "Τιμή"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "Ελεύθερο"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "Αγόρασε"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "Έξοδος"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "Σίγουρα θέλετε να εγκαταλείψετε;"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "Έξοδος;"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "Επανάληψη"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "Επιστροφή"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "Επιστροφή στο Κεντρικό Μενού"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "Επιστροφή στο Κεντρικό Μενού;"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "Μοιραστείτε"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "Παράλειψη"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "Ήχος"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "Ευχαριστώ!"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "Ξεκλείδωσε"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "Εικόνα"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "Ομιλία"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "Προειδοποίηση"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "Καλωσήρθατε"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "Κόσμος"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "Ναι"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "Ναι"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "ΝΑΙ"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "Ελληνικά"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Greek"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "Είσοδος"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "Ηλεκτρονικό ταχυδρομείο"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "Ξέχασα τον κωδικό μου"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "Κωδικός"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "Εγγραφή"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "Θυμήσου με"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "Πρόκληση"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "Δοκιμασία"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "Co-op"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "Co-op"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "Deathmatch"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "Βοήθεια"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "Οδηγίες"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "Πολλαπλοί παίχτες"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "Πολλαπλοί παίχτες τοπικά"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "Πολλαπλοί παίχτες δικτυακά"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "Διαδικτυακό παιχνίδι"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "Μονός παίκτης"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "Εκπαίδευση"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "Εκμάθηση"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "Έναντι"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "Ονοματεπώνυμο"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "Ονομα"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "Επώνυμο"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "Όνομα χρήστη"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "Επιλογές"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "Προχωρημένες επιλογές γραφικών"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "Anti-Aliasing"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "Διάχυση φωτός"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "Χειρισμός"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "Επιλογές δυσκολίας"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "Οθόνη"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "Λεπτομέρεια εφέ"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "Anisotropic"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "Bilinear"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "Τύπος φίλτρου"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "Trilinear"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "Οπτική 1ου προσώπου"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "Βάθος πεδίου"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "Πλήρης οθόνη"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "Επιλογές gameplay"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "Επιλογές γραφικών"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "Λεπτομέρεια μοντέλων"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "Multicore Rendering"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "Ένταση μουσικής"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "Επιλογές δικτύου"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "Ποιότητα"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "Ανάλυση"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "Ένταση ηχητικών εφέ"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "Ποιότητα σκίασης"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "Σκιά"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "Σκιές"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "Μέγεθος"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "Επιλογές ήχου"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "Ένταση"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "Splitscreen"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "Λεπτομέρεια δομών"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "Οπτική 3ου προσώπου"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "Επιλογές εικόνας"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "Ποιότητα"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "Ένταση ομιλίας"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "Vsync"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "Ευρεία"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "Σε παράθυρο"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "Υψηλό"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "Χαμηλό"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "Μέτριο"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "Πολύ υψηλή"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "Πολύ υψηλή"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "Έκδοση"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "Έκδοση επίδειξης"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "Δωρεάν"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "Πλήρης"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "Ελαφρυά"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "Premium"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "Shareware"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "Δοκιμαστική"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "VR λειτουργία άνεσης"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "HMD προσανατολισμό επαναφορά"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "Εικονική πραγματικότητα"
+            }
+        ]
+    }
+}

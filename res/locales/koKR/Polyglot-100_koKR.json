@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Korean",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "직업"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "캐릭터 지우기"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "캐릭터 만들기"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "인공지능"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "외계인"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "복제 인간"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "사이보그"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "신"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "악마"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "악마"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "드래곤"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "드래곤"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "유령"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "신"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "신"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "여신"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "마법사"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "의무관"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "괴물"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "닌자"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "해적"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "사제"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "왕자"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "공주"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "로봇"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "스켈레톤"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "저격수"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "군인"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "도둑"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "전사"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "마법사"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "좀비"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "좀비"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "일등"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "등수"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "이등"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "삼등"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "화상"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "치명상"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "사망"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "동결"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "중독"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "감속"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "스턴"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "기절"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "정상"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "젖음"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "부상"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "대"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "특대"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "소"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "특소"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "공기"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "땅"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "불"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "쇠"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "물"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "베팅하기"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "포기하기"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "잭팟"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "최대"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "최소"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "갑옷"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "화살"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "화살"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "판"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "폭탄"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "책"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "신발"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "활"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "카드"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "카드"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "상자"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "마법"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "녹슨"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "단검"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "주사위"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "주사위"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "문"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "건틀릿"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "보석"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "선물"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "선물"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "장갑"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "총"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "철퇴"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "투구"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "열쇠"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "칼"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "자물쇠"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "사랑"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "기관총"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "마법"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "권총"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "퀘스트"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "계급"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "소총"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "로켓 런처"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "RPG"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "두루마리"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "방패"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "방패"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "에너지 방어막"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "에너지 방어막"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "산탄총"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "저격총"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "주문"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "봉"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "검"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "보물"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "뛰어난"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "저질"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "마법 지팡이"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "목재"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "고도"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "브레이크"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "섀시"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "깊이"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "연료"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "변속기"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "핸들링"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "속도"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "핸들 반응"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "현가장치"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "바퀴"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "날개"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "메달"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "동메달"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "금메달"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "은메달"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "동"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "동전"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "금"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "주괴"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "백금"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "은"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "성"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "동굴"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "던전"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "여관"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "행성"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "지구"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "우주"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "우주선"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "이야기"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "모험"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "챕터"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "페이지"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "3D 모델링"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "애니메이션"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "애니메이션 감독"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "애니메이터"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "아트"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "아트 감독"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "아티스트"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "아티스트"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "보조"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "협력"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "오디오 감독"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "캐릭터 디자이너"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "최고 기술 책임자"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "영상 애니메이터"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "영상 감독"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "코드"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "작곡"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "컨셉트 아티스트"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "크리에이티브 감독"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "데이터베이스 관리자"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "디자인 감독"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "개발자"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "감독"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "효과음 아티스트"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "글꼴"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "글꼴"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "게임"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "게임 디자인"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "게임 디자이너"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "게임 개발자"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "게임 개발"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "그래픽 디자이너"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "이미지"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "이미지"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "인터페이스 아티스트"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "주니어"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "총책임자"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "리드 프로그래머"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "레벨 디자인"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "레벨 디자이너"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "지역화"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "대본"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "모델"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "연주"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "번역 제공: Polyglot Project"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "제작자"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "제작"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "프로그램 관리자"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "프로그래머"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "프로그래머"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "프로그래밍"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "프로젝트 관리자"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "배급"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "녹음"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "대본가"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "시니어"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "음향 효과"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "음향 디자이너"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "음향 엔지니어"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "사운드트랙"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "특별 감사"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "특별 감사:"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "테크니컬 아티스트"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "기술 감독"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "테스트 관리 총지휘"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "테스트 관리자"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "테스터"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "번역"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "시각 효과"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "성우"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "성우"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "대본가"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "{0}을(를) 찾을 수 없습니다."
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "인식 범위 밖입니다."
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "HMD를 찾을 수 없습니다."
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "치트 발견!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "오류 코드:"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "잘못된 CD키입니다."
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "이름이 잘못되었습니다."
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "오류가 발생했습니다."
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "연결이 끊어졌습니다."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "상대가 연결을 끊었습니다."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "다른 플레이어가 연결을 끊었습니다."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "팀원이 연결을 끊었습니다."
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "서버에 연결할 수 없습니다."
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "저장된 게임에 오류가 있습니다."
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "저장된 게임이 없습니다."
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "현재 열린 방이 없습니다."
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "공격"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "가속하기"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "짓기"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "던지기"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "사용하기"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "갖기"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "오르기"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "닫기"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "모으기"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "요리하기"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "만들기"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "조용히 걷기"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "피하기"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "운전하기"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "비행하기"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "최고 속도"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "가기"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "(으)로 가기"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "중간 속도"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "치료"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "점프"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "착륙"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "보기"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "섞기"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "열기"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "줍기"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "경주하기"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "읽기"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "바꾸어 놓기"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "달리기"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "도망치기"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "쏘기"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "몰래 가기"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "회전시키기"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "달리기"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "조종하기"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "이륙하기"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "대화하기"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "던지기"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "걷기"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "지구력"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "경험치"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "여성"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "체력"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "하트"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "하트"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "레벨"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "레벨 업!"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "라이프"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "남성"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "남자"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "남자"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "부활"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "부활 장소:"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "부활하시겠습니까?"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "부활하는 중"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "기술"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "스폰 지점"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "성전환자"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "여자"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "여자"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "손상"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "일격"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "일격 빗나감"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "타격"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "체력"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "빗나감"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "대미지"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "대미지"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "적"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "적"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "적들"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "적들"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "액션 게임"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "어드벤처 게임"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "카드"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "캐주얼 게임"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "판타지 게임"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "하드코어 게임"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "인디"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "중세 게임"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "기타"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "멀티플레이어"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "장르"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "플랫폼 게임"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "퍼즐 게임"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "퀴즈 게임"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "레이싱"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "레트로 게임"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "롤플레잉 게임"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "실시간 전략"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "SF 게임"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "슈팅 게임"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "시뮬레이션 게임"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "싱글플레이어"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "스포츠 게임"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "전략 게임"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "턴제 전략"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "타워 디펜스 게임"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "인벤토리"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "탄환"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "탄환"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "탄"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "탄"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "사기"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "인벤토리 용량"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "버리기"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "인벤토리 무게"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "인벤토리 꽉 참"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "아이템"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "열쇠"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "파워 업"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "팔기"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "사용하기"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "무기"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "무기"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "더 지닐 수 없습니다."
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "주의하십시오."
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "주의하여 주십시오."
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "작전"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "목표"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "보조"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "보조"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "공격"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "보너스"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "확보"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "완성"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "사망"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "사망"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "방어하기"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "파괴하기"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "탈출하기"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "끝"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "게임 오버!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "게임 오버"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "최고 점수"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "미완료"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "킬"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "킬 보조"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "킬"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "킬"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "잠김"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "패배"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "대전"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "임무"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "임무의 목표"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "임무의 목표"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "배수"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "목표"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "순위"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "랩"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "랩"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "횟수"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "점수"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "시간"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "남은 시간"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "토너먼트"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "토너먼트"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "승리"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "패배"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "패배하였습니다."
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "패자"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "팀 패배"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "팀 승리"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "우승"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "승자"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "사망하였습니다."
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "사망하였습니다."
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "패배하였습니다!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "패배하였습니다!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "승리하였습니다!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "승리하였습니다!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "카메라"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "반전"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "보통"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "카메라 가로축"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "카메라 세로축"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "버튼"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "클릭"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "데드존"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "이중 클릭"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "끌기"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "끌어다 놓기"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "터치 조작"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "게임 패드"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "자이로스코프"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "글쇠"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "자판"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "마우스"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "마우스 감도"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "손가락 모으기"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "돌리기"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "스크롤"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "흔들기"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "손가락 펼치기"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "밀기"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "터치하기"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "버튼"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "글쇠"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "기울이기"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "팔"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "팔"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "가슴"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "턱"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "색"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "귀"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "귀"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "눈"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "눈"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "발"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "발"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "털"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "수염"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "털"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "머리카락"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "손"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "손"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "머리"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "엉덩이"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "다리"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "다리"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "입"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "목"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "코"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "피부"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "상반신"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "난이도"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "쉬움"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "어려움"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "불가능"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "매니악"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "보통"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "매우 쉬움"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "매우 어려움"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "아래"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "왼쪽"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "오른쪽"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "위"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "불러오기"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "게임 불러오기"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "불러오는 중"
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "잠시만 기다려 주세요"
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "저장된 데이터를 초기화할까요?"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "저장"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "저장된 데이터"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "게임 저장"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "저장하는 중"
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "나이"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "모두"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "정말로 확실합니까?"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "확실합니까?"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "뒤로"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "배경 음악"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "취소"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "닫기"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "확인"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "계속"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "계속할까요?"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "제작진"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "바탕화면으로 나가기"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "바탕화면으로 나가겠습니까?"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "DLC"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "내려받기"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "다운로드 콘텐츠"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "나가기"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "나가겠습니까?"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "추가 컨텐츠"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "FPS"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "아트 갤러리"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "안녕히 가세요!"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "그래픽"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "앱 내 구매"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "언어"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "레벨"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "메일"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "메뉴"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "다른"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "음악"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "음악 재생기"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "새 게임"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "다음"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "다음 곡"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "아니요"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "아니요"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "아니"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "확인"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "일시 정지"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "일시 정지됨"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "플레이"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "다시 하기"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "아무 키나 누르세요"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "계속하려면 아무 키나 누르세요"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "‘시작’을 누르세요"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "계속하려면 ‘시작’을 누르세요"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "이전"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "이전 곡"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "가격"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "무료"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "구매하기"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "종료"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "정말로 종료할까요?"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "종료할까요?"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "리플레이"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "돌아가기"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "메인 메뉴로 돌아가기"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "메인 메뉴로 돌아갈까요?"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "공유하기"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "건너뛰기"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "음향"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "감사합니다!"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "잠김 해제"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "영상"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "음성"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "경고"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "환영합니다"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "세계"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "응"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "예"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "예"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "한국어"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Korean"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "로그인"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "이메일"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "비밀번호를 잊으셨나요?"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "비밀번호"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "회원 가입"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "계정 정보 저장"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "도전"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "도전 모드"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "협동"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "협동 플레이"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "데스매치"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "도움말"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "설명"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "멀티플레이"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "로컬 멀티플레이"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "온라인 멀티플레이"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "온라인으로 플레이"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "싱글플레이"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "트레이닝"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "튜토리얼"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "대전 모드"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "이름"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "이름"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "성"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "아이디"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "설정"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "고급 그래픽 설정"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "안티에일리어싱"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "블룸 효과"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "조작 방식"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "난이도 설정"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "화면 설정"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "효과 세부 묘사"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "비등방성"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "쌍선형"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "필터링 모드"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "삼선형"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "1인칭 시점"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "시야각"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "전체화면"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "게임플레이 설정"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "그래픽 설정"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "모델 세부 사항"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "다중 코어 렌더링"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "음악 음량"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "네트워크 설정"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "품질"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "해상도"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "효과음 음량"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "셰이더 세부 사항"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "그림자"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "그림자"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "크기"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "소리 설정"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "음량"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "분할 화면"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "텍스처 세부 사항"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "3인칭 시점"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "영상 설정"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "영상 화질"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "음성 음량"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "수직 동기"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "와이드스크린"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "창 모드"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "높음"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "낮음"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "중간"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "매우 높음"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "매우 높음"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "버전"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "체험판"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "무료 버전 (부분 유료)"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "풀 버전"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "라이트 버전"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "프리미엄 버전"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "셰어웨어"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "기간 한정 시험판"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "VR 효과 줄이기"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "HMD 방향 재설정"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "가상현실"
+            }
+        ]
+    }
+}

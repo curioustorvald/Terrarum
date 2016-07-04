@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Dutch",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "Klasse"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "Verwijder Personage"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "Nieuw Personage"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "Kunstmatige intelligentie"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "Buitenaards wezen"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "Kloon"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "Cyborg"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "Godheid"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "Demoon"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "Demone"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "Draak"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "Draken"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "Geest"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "God"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "Goden"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "Godin"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "Magiër"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "Doctor"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "Monster"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "Ninja"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "Piraat"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "Priester"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "Prins"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "Prinses"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "Robot"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "Skelet"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "Sluipschutter"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "Soldaat"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "Dief"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "Krijger"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "Tovenaar"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "Zombie"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "Zombies"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "Eerste plaats"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "Plaats"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "Tweede plaats"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "Derde plaats"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "Brandend"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "Kritisch"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "Dood"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "Bevroren"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "Vergiftigd"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "Vertraagd"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "Bedwelmd"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "Bewusteloos"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "Ongedeerd"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "Nat"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "Gewond"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "Groot"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "Enorm"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "Klein"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "Minuscuul"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "Lucht"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "Aarde"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "Vuur"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "Metaal"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "Water"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "Wedden"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "Afleggen"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "Hoofdprijs"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "Max"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "Min"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "Pantser"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "Pijl"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "Pijlen"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "Spelbord"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "Bom"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "Boek"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "Schoenen"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "Boog"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "Kaart"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "Kaarten"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "Kist"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "Magie"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "Roestig"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "Dolk"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "Dobbelsteen"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "Dobbelstenen"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "Deur"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "Pantser handschoenen"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "Edelsteen"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "Cadeau"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "Cadeaus"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "Handschoenen"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "Geweer"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "Hamer"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "Helm"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "Sleutel"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "Mes"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "Slot"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "Liefde"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "Machinegeweer"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "Magie"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "Pistool"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "Queeste"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "Rang"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "Karabijn"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "Scherpschuttersgeweer"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "Raketwerper"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "Boekrol"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "Schild"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "Schilden"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "Energieschild"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "Energieschilden"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "Shotgun"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "Sniper"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "Spreuk"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "Staf"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "Zwaard"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "Schat"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "Episch"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "Troep"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "Staf"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "Hout"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "Hoogte"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "Remmen"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "Chassis"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "Diepte"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "Brandstof"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "Versnelling"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "Handeling"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "Snelheid"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "Sturing"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "Koppeling"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "Wielen"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "Vleugels"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "Medaille"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "Bronzen medaille"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "Gouden medaille"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "Zilveren medaille"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "Brons"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "Munt"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "Goud"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "Staaf"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "Platinum"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "Zilver"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "Kasteel"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "Grot"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "Kerker"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "Herberg"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "Planeet"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "Aarde"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "Ruimte"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "Ruimteschip"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "Verhaal"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "Avondtuur"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "Hoofdstuk"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "Pagina"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "3D modelering"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "Animatie"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "Animation director"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "Animator"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "Art"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "Art director"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "Artist"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "Artists"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "Assistent"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "Associate"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "Audio director"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "Character Designer"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "Chief Technical Officer"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "Cinematic Animator"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "Cinematics Director"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "Code"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "Componist"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "Concept artist"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "Creative director"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "Database admin"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "Design director"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "Ontwikkeld door"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "Director"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "Foley artiest"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "Lettertype"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "Lettertypen"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "Spel"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "Game design"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "Game designer"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "Spelontwikkelaar"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "Spelontwikkeling"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "Grafisch designer"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "Afbeelding"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "Afbeeldingen"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "Interface Artist"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "Junior"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "Lead"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "Lead programmeur"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "Level design"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "Level designer"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "Lokalisatie"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "Manuscript"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "Modellen"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "Muzikant"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "Vertaald door het Polyglot project"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "Producer"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "Productie"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "Program manager"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "Programmeur"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "Programmeurs"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "Programmering"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "Project manager"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "Uitgever"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "Opnameleider"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "Scriptschrijver"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "Senior"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "Geluidseffecten"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "Geluidsdesigner"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "Geluidsingenieur"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "Soundtrack"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "Bijzonder dank"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "Bijzonder dank aan"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "Technical artist"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "Technical director"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "Test lead"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "Test manager"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "Tester"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "Vertaling"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "Visuele effecten"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "Stemacteerwerk"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "Stemacteur"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "Schrijver"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "Geen {apparaat} gevonden."
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "Het zoekgebied wordt verlaten"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "Geen HMD gedetecteerd."
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "Cheats gebruikt!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "Foutcode:"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "Ongeldige cd-code."
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "Ongeldige naam!"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "Er is een fout opgetreden."
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "Verbinding verloren."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "Je tegenstander heeft het spel verlaten."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "De andere speler heeft het spel verlaten."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "Je teamgenoot heeft het spel verlaten."
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "Kan geen verbinding maken met server."
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "Opgeslagen spel is beschadigd."
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "Geen spellen gevonden."
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "Geen open spellen gevonden."
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "Aanvallen"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "Boosten"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "Bouw"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "Uitgooien"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "Uitroepen"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "Claimen"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "Klimmen"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "Sluiten"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "Verzamelen"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "Kook"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "Maak"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "Kruipen"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "Ontwijken"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "Rijden"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "Vliegen"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "Volledige snelheid"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "Ga"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "Ga naar"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "Halve snelheid"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "Herstellen"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "Springen"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "Landen"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "Kijken"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "Meng"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "Openen"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "Oppakken"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "Racen"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "Lezen"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "Vervangen"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "Rennen"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "Wegrennen"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "Schieten"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "Sluipen"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "Draaien"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "Sprinten"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "Sturen"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "Opstijgen"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "Spreken"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "Gooien"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "Lopen"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "Uithoudingsvermogen"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "Ervaringspunten"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "Vrouw"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "Gezondheid"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "Hart"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "Harten"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "Level"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "Level up!"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "Levens"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "Man"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "Man"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "Mannen"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "Herspawn"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "Herspawn in:"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "Herspawnen?"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "Herspawnend"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "Vaardigheid"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "Spawnpunt"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "Transgender"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "Vrouw"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "Vrouwen"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "Schade"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "Kritieke treffer"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "Kritiek mis"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "Treffer"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "Levenspunten"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "Mis"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "Schade"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "Schade"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "Vijand"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "Vijand"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "Vijanden"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "Vijanden"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "Actiespel"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "Avonturenspel"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "Kaart"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "Casual spel"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "Fantasiespel"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "Hardcore spel"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "Indie"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "Middeleeuws spel"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "Overig"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "Multiplayer"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "Genre"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "Platformspel"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "Puzzelspel"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "Quizspel"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "Race"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "Retro-spel"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "Rollenspel"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "Realtimestrategie"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "Science fiction spel"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "Schietspel"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "Simulatiespel"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "Singeplayer"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "Sportspel"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "Strategiespel"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "Op beurt gebaseerde strategie"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "Tower defense spel"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "Inventaris"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "Munitie"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "Munitie"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "Kogel"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "Kogels"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "Kopen"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "Inventaris capaciteit"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "Weggooien"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "Belading"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "Inventaris vol"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "Voorwerp"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "Sleutel"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "Powerup"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "Verkopen"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "Gebruik"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "Wapen"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "Wapens"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "Je kan niet meer dragen."
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "Wees voorzichtig!"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "Wees alsjeblieft voorzichtig."
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "Tactiek"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "Doel"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "Assist"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "Assists"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "Aanvallen"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "Bonus"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "Bezetten"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "Voltooid"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "Dood"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "Doden"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "Verdedigen"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "Vernietigen"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "Ontsnappen"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "Einde"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "Game over!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "GAME OVER!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "Topscore"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "Onvoltooid"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "Doden"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "Kill assist"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "Kill"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "Kills"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "Op slot"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "Verloren"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "Match"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "Missie"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "Missie doel"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "Missie doelen"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "Vermenigvuldiger"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "Doelen"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "Positie"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "Ronde"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "Rondes"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "Ronde"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "Punten"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "Tijd"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "Tijd over"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "Toernooi"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "Toernooien"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "Gewonnen"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "Nederlaag"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "Je bent verslagen."
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "Verliezer"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "Je team heeft verloren!"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "Je team heeft gewonnen!"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "Overwinning"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "Winnaar"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "Je bent dood."
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "Je bent dood gegaan."
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "Je verliest!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "Je hebt verloren!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "Je wint!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "Je hebt gewonnen!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "Camera"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "Omgekeerd"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "Normaal"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "Camera X-as"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "Camera Y-as"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "Knop"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "Klik"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "Dood gebied"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "Dubbelklik"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "Sleep"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "Sleep en zet neer"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "Vinger"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "Controller"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "Gyroscoop"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "Knop"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "Toetsenbord"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "Muis"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "Muis gevoeligheid"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "Knijp"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "Draai"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "Scroll"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "Schud"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "Spreid"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "Veeg"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "Tik"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "De knop"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "De knop"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "Kantel"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "Arm"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "Armen"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "Borst"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "Kin"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "Kleur"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "Oor"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "Oren"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "Oog"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "Ogen"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "Voeten"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "Voet"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "Haar"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "Baard"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "Vacht"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "Haar"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "Hand"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "Handen"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "Hoofd"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "Heupen"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "Been"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "Benen"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "Mond"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "Nek"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "Neus"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "Huid"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "Borstkas"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "Moeilijkheid"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "Makkelijk"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "Moeilijk"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "Onmogelijk"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "Krankzinnig"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "Normaal"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "Zeer makkelijk"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "Zeer moeilijk"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "Omlaag"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "Links"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "Rechts"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "Omhoog"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "Laden"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "Spel laden"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "Laden..."
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "Even geduld..."
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "Waarden opnieuw instellen?"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "Opslaan"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "Waarden opslaan"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "Spel opslaan"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "Opslaan..."
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "Leeftijd"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "Iedereen"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "Weet je het heel zeker?"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "Weet je het zeker?"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "Terug"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "Achtergrondmuziek"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "Annuleren"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "Sluiten"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "Bevestigen"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "Doorgaan"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "Doorgaan?"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "Credits"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "Sluiten naar bureaublad"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "Sluiten naar bureaublad?"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "DLC"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "Downloaden"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "Downloadbare inhoud"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "Aflsuiten"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "Afsluiten?"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "Extra's"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "FPS"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "Kunstgallerij"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "Vaarwel!"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "Beeld"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "In-app aankoop"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "Taal"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "Level"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "Postvak"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "Hoofdmenu"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "Meer"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "Muziek"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "Muziekspeler"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "Nieuw spel"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "Volgende"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "Volgend nummer"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "Nee"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "NEE"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "Nope"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "OK"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "Pauzeren"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "Gepauzeerd"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "Spelen"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "Speel opnieuw"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "Druk op een knop"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "Drup op een knop om door te gaan"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "Druk op Start"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "Druk op Start om door te gaan"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "Vorige"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "Vorig nummer"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "Prijs"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "Gratis"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "Kopen"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "Stoppen"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "Weet je zeker dat je wilt stoppen?"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "Stoppen?"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "Speel opnieuw"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "Terug"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "Terug naar hoofdmenu"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "Terug naar hoofdmenu?"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "Delen"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "Overslaan"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "Geluid"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "Bedankt!"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "Ontgrendelen"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "Video"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "Stemmen"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "Waarschuwing"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "Welkom"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "Wereld"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "Jup"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "Ja"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "JA"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "Nederlands"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Dutch"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "Login"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "E-mail"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "Wachtwoord vergeten"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "Wachtwoord"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "Registreer"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "Onthouden"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "Uitdaging"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "Uitdagingsmodus"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "Co-op"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "Coöperatieve"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "Deathmatch"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "Help"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "Instructies"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "Meerdere spelers"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "Lokale Multiplayer"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "Online Multiplayer"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "Speel online"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "Een speler"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "Training"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "Introductie"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "Versus"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "Naam"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "Voornaam"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "Achternaam"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "Gebruikersnaam"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "Instellingen"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "Uitgebreide grafische instellingen"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "Anti-kartelvorming"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "Gloed"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "Besturing"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "Moeilijkheidsinstellingen"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "Scherm"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "Effectdetails"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "Anisotropisch"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "Tweelijnig"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "Filter"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "Drielijnig"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "Eerste persoonsperspectief"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "Gezichtsveld"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "Volledig scherm"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "Spelinstellingen"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "Beeldinstellingen"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "Modeldetails"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "Multicore-rendering"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "Muziekvolume"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "Netwerkinstellingen"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "Kwaliteit"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "Resolutie"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "Volume geluidseffecten"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "Verduisteringsdetails"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "Schaduw"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "Schaduwen"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "Grootte"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "Geluidsinstellingen"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "Volume"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "Gesplitst scherm"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "Texturekwaliteit"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "Derde persoonsperspectief"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "Videoinstellingen"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "Videokwaliteit"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "Stemvolume"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "Vsync"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "Breedbeeld"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "Venster"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "Hoog"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "Laag"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "Gemiddeld"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "Zeer hoog"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "Zeer hoog"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "Versie"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "Demo"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "Gratis"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "Volledige"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "Lite"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "Premium"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "Shareware"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "Proef"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "VR comfortmodus"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "Reset HMD orientatie"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "Virtuele Realiteit"
+            }
+        ]
+    }
+}

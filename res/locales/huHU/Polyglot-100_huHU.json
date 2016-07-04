@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Hungarian",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "Osztály"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "Karakter törlése"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "Új karakter"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "Mesterséges Intelligencia"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "Idegen"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "Klón"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "Kiborg"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "Istenség"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "Démon"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "Démon"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "Sárkány"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "Sárkányok"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "Szellem"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "Isten"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "Istenek"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "Istennő"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "Mágus"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "Felcser"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "Szörny"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "Nindzsa"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "Kalóz"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "Pap"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "Herceg"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "Hercegnő"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "Robot"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "Csontváz"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "Mesterlövész"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "Katona"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "Tolvaj"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "Harcos"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "Varázsló"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "Zombi"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "Zombik"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "Első hely"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "Helyezés"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "Második hely"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "Harmadik hely"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "Égés"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "Kritikus"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "Halott"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "Fagyott"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "Mérgezett"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "Lassított"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "Kábult"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "Eszméletlen"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "Sértetlen"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "Nedves"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "Sebesült"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "Nagy"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "Hatalmas"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "Kicsi"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "Apró"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "Levegő"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "Föld"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "Tűz"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "Fém"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "Víz"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "Fogadás"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "Eldob"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "Jackpot"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "Max"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "Min"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "Páncél"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "Nyílvessző"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "Nyílvesszők"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "Tábla"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "Bomba"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "Könyv"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "Csizma"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "Íj"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "Kártya"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "Kártyák"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "Láda"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "Varázslat"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "Rozsdás"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "Tőr"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "Kocka"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "Dobókocka"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "Ajtó"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "Kesztyű"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "Drágakő"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "Ajándék"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "Ajándékok"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "Kesztyűk"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "Lőfegyver"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "Kalapács"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "Sisak"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "Kulcs"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "Kés"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "Zár"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "Szerelem"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "Géppuska"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "Varázslat"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "Pisztoly"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "Küldetés"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "Rang"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "Puska"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "Rakétavető"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "RPG"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "Tekercs"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "Pajzs"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "Pajzsok"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "Energiapajzs"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "Energiapajzsok"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "Sörétes puska"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "Mesterlövész puska"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "Varázslat"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "Bot"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "Kard"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "Kincs"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "Epikus"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "Szemét"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "Pálca"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "Fa"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "Magasság"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "Fék"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "Karosszéria"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "Mélység"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "Üzemanyag"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "Váltó"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "Kezelhetőség"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "Sebesség"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "Kormányzás"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "Felfüggesztés"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "Kerék"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "Szárnyak"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "Érem"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "Bronzérem"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "Ezüstérem"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "Aranyérem"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "Bronz"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "Érme"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "Arany"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "Tömb"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "Platina"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "Ezüst"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "Kastély"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "Barlang"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "Tömlöc"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "Fogadó"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "Bolygó"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "Föld"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "Űr"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "Űrhajó"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "Történet"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "Kaland"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "Fejezet"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "Oldal"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "3D Modellezés"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "Animáció"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "Animációs rendező"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "Animátor"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "Művészet"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "Művészeti rendező"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "Művész"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "Művészek"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "Segéd"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "Segéd"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "Hangmérnök"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "Karakter Tervező"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "Vezető műszaki igazgató"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "A filmbetétel animátora"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "A filmbetétek rendezője"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "Kód"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "Zeneszerző"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "Koncepciós művész"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "Kreatív igazgató"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "Adatbázis adminisztrátor"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "Vezető designer"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "Készítette"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "Rendező"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "Hangeffekt mérnök"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "Betűtípus"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "Betűtípusok"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "Játék"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "Játéktervezés"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "Játéktervező"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "Játékfejlesztő"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "Játékfejlesztés"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "Grafikus mérnök"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "Kép"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "Képek"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "Felület művész"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "Junior"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "Vezető"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "Vezető programozó"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "Pályatervezés"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "Pályatervező"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "Lokalizáció"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "Kézirat"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "Modellek"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "Zenész"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "Fordította a Polgylot Project"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "Producer"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "Produckció"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "Programmenedzser"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "Programozó"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "Programozók"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "Programozás"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "Projektvezető"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "Kiadó"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "Hangmérnök"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "Forgatókönyv-író"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "Senior"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "Hanghatások"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "Hangtervező"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "Hangmérnök"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "Zene"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "Külön köszönet"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "Külön köszönet"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "Műszaki művész"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "Műszaki igazgató"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "Főtesztelő"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "Vezető tesztelő"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "Tesztelő"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "Fordítás"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "Képhatások"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "Szinkronizálás"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "Szinkronszínész"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "Író"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "{0} nem található"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "Elhagyod az érzékelési területet."
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "HMD nem található"
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "Csalást észleltünk!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "Hibakód:"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "Érvénytelen CD-kulcs."
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "Érvénytelen név!"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "Hiba történt."
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "A kapcsolat megszakadt."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "Megszakadt a kapcsolat az ellenfeleddel."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "Megszakadt a kapcsolat a másik játékossal."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "Megszakadt a kapcsolat a csapattársaddal."
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "Nem lehet a kiszolgálóhoz csatlakozni."
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "A játékmentés megsérült."
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "Nem található elmentett játékállás."
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "Nem található nyitott játék."
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "Támadni"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "Megnövelni"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "Építeni"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "Csalit bedobni"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "Varázsolni"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "Birtokba venni"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "Megmászni"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "Bezárni"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "Gyűjteni"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "Főzni"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "Elkészíteni"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "Leguggolni"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "Kitérni"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "Vezetni"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "Repülni"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "Teljes sebesség"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "Menni"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "Odamenni"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "Félsebesség"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "Gyógyítani"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "Ugrani"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "Leszállni"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "Nézni"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "Keverni"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "Kinyitni"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "Felvenni"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "Versenyezni"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "Olvasni"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "Kicserélni"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "Futni"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "Elmenekülni"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "Lőni"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "Lopakodni"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "Forogni"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "Sprintelni"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "Kormányozni"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "Felszállni"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "Beszélni"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "Dobni"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "Sétálni"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "Állóképesség"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "Tapasztalati pontok"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "Nő / Nőstény"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "Egészség"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "Szív"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "Szívek"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "Szint"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "Szintlépés"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "Életek"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "Férfi / Hím"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "Férfi"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "Férfiak"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "Újraéledés"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "Újraéledésig:"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "Újraéledsz?"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "Újraéledés"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "Képesség"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "Kezdőhely"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "Transznemű"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "Nő"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "Nők"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "Sebzés"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "Kritikus sebzés"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "Kritikus mellé"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "Találat"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "Életerő pont"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "Mellé"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "Sebzés"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "Sebzés"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "Ellenség"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "Ellenség"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "Ellenség"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "Ellenségek"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "Akciójáték"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "Kalandjáték"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "Kártya"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "Könnyed játék"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "Fantasy játék"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "Hardcore játék"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "Indie"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "Középkori játék"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "Egyéb"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "Többjátékos mód"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "Műfaj"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "Mászkálós Játék"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "Puzzle"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "Vetélkedő"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "Verseny"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "Retro játék"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "Szerepjáték"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "Valós idejű stratégia (RTS)"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "Tudományos Fantasztikus Játék"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "Lövöldözős játék"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "Szimulátor"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "Egyjátékos mód"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "Sportjáték"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "Stratégiai játék"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "Körökre osztott stratégia (TBS)"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "Toronyvédő Játék"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "Tárgylista"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "Lőszer"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "Lőszer"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "Töltény"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "Töltények"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "Vásárlás"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "Tárgylista kapacitása"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "Eldob"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "Teher"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "A tárgylista megtelt"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "Tárgy"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "Kulcs"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "Növelő"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "Elad"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "Használni"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "Fegyver"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "Fegyverek"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "Nem vihetsz többet"
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "Légy óvatos!"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "Kérlek légy óvatos!"
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "Taktika"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "Feladat"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "Segítség"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "Segítségek"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "Támadni"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "Jutalom"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "Elfoglalni"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "Kész"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "Halál"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "Halál"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "Védekezni"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "Pusztítani"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "Elszökni"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "Vége"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "Vége a játéknak!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "VÉGE A JÁTÉKNAK!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "Legjobb pontszámok"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "Hiányos"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "Megölni"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "Ölés-segítség"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "Ölés"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "Ölések"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "Zárt"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "Veszteségek"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "Meccs"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "Küldetés"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "A küldetés célja"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "A küldetés céljai"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "Szorzó"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "Célok"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "Helyezés"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "Kör"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "Körök"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "Kör"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "Pont"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "Idő"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "Hátralévő idő"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "Bajnokság"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "Bajnokságok"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "Győzelmek"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "Vereség"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "Legyőztek"
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "Vesztes"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "Vesztett a csapatod!"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "Győzött a csapatod!"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "Győzelem"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "Győztes"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "Meghaltál"
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "Meghaltál"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "Vesztettél!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "Vesztettél!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "Nyertél!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "Nyertél!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "Kamera"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "Fordított"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "Szokásos"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "A kamera X tengelye"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "A kamera Y tengelye"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "Gomb"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "Klikk"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "Holt zóna"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "Duplaklikk"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "Húzd"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "Húzd és engedd"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "Ujj"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "Kontroller"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "Giroszkóp"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "Billentyű"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "Billentyűzet"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "Egér"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "Egérérzékenység"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "Csípés"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "Forgatás"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "Görgetés"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "Rázás"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "Kend"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "Húzd"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "Érintés"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "A gomb"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "Billentyű"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "Döntés"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "Kar"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "Karok"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "Mell"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "Áll"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "Szín"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "Fül"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "Fülek"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "Szem"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "Szemek"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "Lábfejek"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "Lábfej"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "Szőr"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "Szakáll"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "Szőr"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "Haj"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "Kéz"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "Kezek"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "Fej"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "Csípő"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "Láb"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "Lábak"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "Száj"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "Nyak"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "Orr"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "Bőr"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "Mellkas"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "Nehézség"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "Könnyű"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "Nehéz"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "Lehetetlen"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "Őrült nehéz"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "Közepes"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "Nagyon könnyű"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "Nagyon nehéz"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "Le"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "Bal"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "Jobb"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "Fel"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "Betöltés"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "Játék betöltése"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "Töltés folyamatban"
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "Kis türelmet..."
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "Adatok visszaállítása"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "Mentés"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "Adatok mentése"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "Játék mentése"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "Mentés folyamatban"
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "Kor"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "Mind"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "Egészen biztos vagy benne?"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "Biztos vagy benne?"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "Vissza"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "Háttérzene"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "Mégse"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "Bezárás"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "Rendben"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "Folytatás"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "Folytatod?"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "Készítők"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "Kilépés a munkaasztalra"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "Kilépsz az asztalra?"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "DLC"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "Letöltés"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "Letölthető tartalom"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "Kilépés"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "Kilépsz?"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "Extra"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "FPS"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "Képtár"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "Viszont látásra!"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "Grafika"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "Alkalmazásbeli vásárlás"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "Nyelv"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "Szint"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "Posta"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "Főmenü"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "Több"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "Zene"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "Zene lejátszó"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "Új játék"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "Következő"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "Következő dal"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "Nem"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "NEM"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "Nem"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "OK"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "Szünet"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "Szünetelve"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "Játszás"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "Újrajátszás"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "Nyomj egy gombot"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "Nyomj egy gombot a folytatáshoz"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "Nyomd meg a startot"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "Nyomd meg a startot a folytatáshoz"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "Elöző"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "Elöző dal"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "Ár"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "Ingyenes"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "Vásárlás"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "Bezárás"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "Biztos ki akarsz lépni?"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "Kilépsz?"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "Újra játszás"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "Visszalépés"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "Vissza a főmenüre"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "Visszalépsz a főmenüre?"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "Megosztás"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "Kihagyás"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "Hang"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "Köszönöm"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "Feloldás"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "Video"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "Párbeszédek"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "Figyelem!"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "Üdvözölünk"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "Világ"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "Ja"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "Igen"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "IGEN"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "Magyar"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Hungarian"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "Csatlakozás"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "E-mail"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "Elfelejtettem a jelszót"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "Jelszó"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "Felirakozás"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "Megjegyzés?"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "Kihívás"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "Kihívásos mód"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "Co-op"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "Együttműködő"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "Deathmatch"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "Súgó"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "Használati utasítás"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "Többjátékos mód"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "Helyi többjátékos"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "Online többjátékos"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "Online játék"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "Egyjátékos mód"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "Tréning"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "Gyakorlás"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "Egymás elleni"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "Név"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "Keresztnév"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "Vezetéknév"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "Felhasználó név"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "Beállítások"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "Részletes grafikai bellítások"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "Élsimítás"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "Bloom"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "Irányítás"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "Nehézség"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "Képernyő"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "Effektek részletessége"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "Anizotropikus"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "Bilineáris"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "Szűrési mód"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "Trilineáris"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "Belső nézet"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "Látótér"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "Teljes képernyő"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "Játékbeállítások"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "Grafikai beállítások"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "Modell-részletesség"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "Többmagos képalkotás"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "Zene hangereje"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "Hálózati beállítások"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "Minőség"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "Felbontás"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "Hanghatások hangereje"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "Shader részletesség"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "Árnyék"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "Árnyékok"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "Méret"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "Hangbeállítások"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "Hangerő"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "Osztott képernyő"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "Textúra-részletesség"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "Külső nézet"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "Videobeállítások"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "Minőség"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "Párbeszédek hangereje"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "V-sync"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "Panoráma"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "Ablakban"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "Magas"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "Alacsony"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "Közepes"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "Nagyon magas"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "Nagyon magas"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "Verzió"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "Demó"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "Ingyenes"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "Teljes"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "Csökkentett"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "Prémium"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "Shareware"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "Próba"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "VR komfort mód"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "HMD Orientáció beálítás"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "Virtuális valóság"
+            }
+        ]
+    }
+}

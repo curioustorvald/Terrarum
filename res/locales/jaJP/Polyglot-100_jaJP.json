@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Japanese",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "クラス"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "キャラクター削除"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "新規キャラクター"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "人工知能"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "エイリアン"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "クローン"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "サイボーグ"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "神"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "悪魔"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "女悪魔"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "ドラゴン"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "ドラゴン"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "幽霊"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "神"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "神々"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "女神"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "魔法使い"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "メディック"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "モンスター"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "忍者"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "海賊"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "僧侶"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "王子"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "姫"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "ロボット"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "スケルトン"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "狙撃手"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "ソルジャー"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "盗賊"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "戦士"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "魔術師"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "ゾンビ"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "ゾンビ"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "一位"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "順位"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "二位"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "三位"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "炎上"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "瀕死"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "死亡"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "凍結"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "毒"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "減速"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "スタン"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "気絶"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "無傷"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "濡れている"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "負傷"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "大"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "巨大"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "小"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "極小"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "風"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "地"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "火"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "金"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "水"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "ベット"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "捨てる"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "ジャックポット"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "最大"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "最低"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "鎧"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "矢"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "矢"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "盤"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "爆弾"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "本"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "靴"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "弓"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "カード"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "カード"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "箱"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "魔法の"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "錆びた"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "短刀"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "サイコロ"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "サイコロ"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "扉"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "籠手"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "ジェム"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "ギフト"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "ギフト"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "手袋"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "銃"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "戦鎚"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "兜"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "鍵"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "ナイフ"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "鍵"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "愛"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "マシンガン"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "魔法"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "ピストル"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "クエスト"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "ランク"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "ライフル"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "ロケットランチャー"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "RPG"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "巻物"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "盾"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "盾"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "エネルギーシールド"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "エネルギーシールド"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "ショットガン"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "スナイパーライフル"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "呪文"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "杖"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "剣"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "財宝"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "壮麗な"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "がらくたの"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "魔法の杖"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "木"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "高度"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "ブレーキ"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "シャシ"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "深度"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "燃料"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "ギア"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "ハンドリング"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "速度"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "ステアリング"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "サスペンション"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "乗り物"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "ウィング"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "メダル"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "ブロンズメダル"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "ゴールドメダル"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "シルバーメダル"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "銅"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "硬貨"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "金"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "延べ棒"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "白金"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "銀"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "城"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "洞窟"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "ダンジョン"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "宿"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "惑星"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "地球"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "宇宙"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "宇宙船"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "ストーリー"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "アドベンチャー"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "チャプター"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "ページ"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "3Dモデリング"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "アニメーション"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "アニメーション監督"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "アニメーター"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "アート"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "美術監督"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "アーティスト"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "アーティスト"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "アシスタント"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "協力"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "音響監督"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "キャラクターデザイナー"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "最高技術責任者"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "シネマティックアニメーター"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "シネマティックディレクター"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "コード"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "編曲"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "コンセプトアーティスト"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "クリエイティブディレクター"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "データベースアドミン"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "デザイン監督"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "開発"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "監督"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "フォーリーアーティスト"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "フォント"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "フォント"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "ゲーム"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "ゲームデザイン"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "ゲームデザイナー"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "ゲーム開発者"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "ゲーム開発"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "グラフィックデザイナー"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "画像"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "画像"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "インターフェイスアーティスト"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "ジュニア"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "リード"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "リードプログラマー"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "レベルデザイン"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "レベルデザイナー"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "ローカリゼーション"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "脚本"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "モデル"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "演奏"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "翻訳提供：Polyglotプロジェクト"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "プロデューサー"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "製作"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "番組担当"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "プログラマー"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "プログラマー"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "プログラミング"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "企画担当"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "著作"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "録音"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "脚本家"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "シニア"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "SE"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "サウンドデザイナー"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "サウンドエンジニア"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "サウンドトラック"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "謝辞"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "謝辞"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "テクニカルアーティスト"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "技術監督"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "テスト管理総指揮"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "テスト管理者"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "テスター"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "翻訳"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "特殊効果"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "声優"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "声優"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "脚本家"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "{0} が接続されていません"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "通信圏外です"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "HMDが接続されていません"
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "チート検出！"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "エラーコード："
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "無効なCDキーです。"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "無効な名前です！"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "エラーが発生しました。"
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "接続が切断されました。"
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "相手プレイヤーが接続を切断しました。"
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "他のプレイヤーが接続を切断しました。"
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "味方プレイヤーが接続を切断しました。"
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "サーバーに接続できません。"
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "セーブデータが破損しています。"
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "セーブデータが見つかりません。"
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "参加可能なゲームがありません。"
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "攻める"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "ブーストする"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "建築"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "釣り糸を投げる"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "詠唱する"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "入手する"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "登る"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "閉じる"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "集める"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "調理"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "作る"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "しゃがむ"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "避ける"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "運転する"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "飛ぶ"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "全速力"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "移動する"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "へ移動する"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "半速力"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "回復する"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "ジャンプする"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "着陸する"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "見る"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "調合"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "開く"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "拾う"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "競争する"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "読む"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "入れ替え"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "走る"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "逃げる"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "撃つ"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "忍ぶ"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "回転させる"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "走る"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "操舵する"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "離陸する"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "話す"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "投げる"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "歩く"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "生命力"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "経験値"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "女"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "ヘルス"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "ハート"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "ハート"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "レベル"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "レベルアップ！"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "ライフ"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "男"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "男"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "男"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "復活"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "復活まで："
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "復活しますか？"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "復活中"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "スキル"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "復活ポイント"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "トランスジェンダー"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "女"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "女"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "ダメージ"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "クリティカルヒット"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "クリティカルミス"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "ヒット"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "ヒットポイント"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "ミス"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "ダメージ"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "ダメージ"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "敵"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "敵"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "敵"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "敵"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "アクションゲーム"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "アドベンチャーゲーム"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "カード"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "カジュアルゲーム"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "ファンタジーゲーム"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "ハードコアゲーム"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "独立系開発会社"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "中世風ゲーム"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "その他"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "マルチプレイヤー"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "ジャンル"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "プラットフォームゲーム"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "パズルゲーム"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "クイズゲーム"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "レース"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "レトロゲーム"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "ロールプレイングゲーム"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "リアルタイムシミュレーション"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "SFゲーム"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "シューティングゲーム"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "シミュレーションゲーム"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "シングルプレイヤー"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "スポーツゲーム"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "ストラテジーゲーム"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "ターン制シミュレーション"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "タワーディフェンスゲーム"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "インベントリ"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "弾薬"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "弾薬"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "弾"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "弾"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "買う"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "インベントリ容量"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "捨てる"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "持ち運べる量"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "インベントリがいっぱいです"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "アイテム"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "鍵"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "パワーアップ"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "売る"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "使用する"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "武器"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "武器"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "これ以上持てません。"
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "気をつけて！"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "気をつけてください。"
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "作戦"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "目標"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "アシスト"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "アシスト"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "攻める"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "ボーナス"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "確保する"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "完了済"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "デス"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "デス"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "守る"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "破壊する"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "逃走する"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "終わり"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "ゲームオーバー！"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "ゲームオーバー！"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "ハイスコア"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "未完了"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "キル"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "キルアシスト"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "キル"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "キル"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "ロック中"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "敗北"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "マッチ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "ミッション"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "ミッション目標"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "ミッション目標"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "倍"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "目標"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "ポジション"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "ラップ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "ラップ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "ラウンド"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "スコア"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "タイム"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "残り時間"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "トーナメント"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "トーナメント"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "勝利"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "敗北"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "敗北しました。"
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "敗者"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "チームの敗北！"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "チームの勝利！"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "勝利"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "勝者"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "死にました。"
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "死にました。"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "敗北！"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "敗北！"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "勝利！"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "勝利！"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "カメラ"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "反転"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "通常"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "カメラ操作：左右"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "カメラ操作：上下"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "ボタン"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "クリック"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "デッドゾーン"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "ダブルクリック"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "ドラッグ"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "ドラッグ・アンド・ドロップ"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "フィンガー"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "ゲームパッド"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "ジャイロ"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "キー"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "キーボード"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "マウス"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "マウス感度"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "ピンチ"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "回転"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "スクロール"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "シェイク"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "スプレッド"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "スワイプ"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "タップ"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "ボタン"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "キー"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "ティルト"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "腕"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "腕"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "胸"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "顎"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "色"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "耳"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "耳"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "目"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "目"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "足"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "足"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "毛"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "髭"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "毛皮"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "髪"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "手"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "手"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "頭"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "腰"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "脚"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "脚"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "口"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "首"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "鼻"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "肌"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "胸郭"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "難易度"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "易しい"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "難しい"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "クリア不可能"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "マニアック"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "普通"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "とても易しい"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "とても難しい"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "下"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "左"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "右"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "上"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "ロード"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "ゲームデータをロード"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "ローディング中…"
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "お待ちください…"
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "セーブデータを消去しますか？"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "セーブ"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "セーブデータ"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "ゲームデータをセーブ"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "セーブ中…"
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "年齢"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "すべて"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "本当によろしいですか？"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "よろしいですか？"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "戻る"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "BGM"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "キャンセル"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "閉じる"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "決定"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "続ける"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "続けますか？"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "クレジット"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "終了してデスクトップへ戻る"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "終了してデスクトップへ戻りますか？"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "DLC"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "ダウンロード"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "ダウンロードコンテンツ"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "終了する"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "終了しますか？"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "エキストラ"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "FPS"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "アートギャラリー"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "さようなら！"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "グラフィック"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "アプリ内購入"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "言語"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "ステージ"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "メール"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "メインメニュー"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "詳細"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "音楽"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "音楽プレーヤー"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "新しいゲーム"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "次へ"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "次の曲"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "いいえ"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "いいえ"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "だめ"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "OK"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "ポーズ"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "ポーズ中"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "プレイ"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "再プレイ"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "いずれかのキーを押す"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "続けるにはいずれかのキーを押す"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "STARTボタンを押す"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "続けるにはSTARTボタンを押す"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "前へ"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "先の曲"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "価格"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "無料"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "購入"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "終了する"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "本当に終了しますか？"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "終了しますか？"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "リプレイ"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "戻る"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "メインメニューに戻る"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "メインメニューに戻りますか？"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "共有"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "スキップ"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "サウンド"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "ありがとう！"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "アンロック"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "ビデオクオリティ"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "ボイス"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "警告"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "ようこそ"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "世界"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "いいよ"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "はい"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "はい"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "日本語"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Japanese"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "ログイン"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "Eメール"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "パスワードを忘れた"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "パスワード"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "登録"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "保存しますか？"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "チャレンジ"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "チャレンジモード"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "協力"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "協力モード"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "デスマッチ"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "ヘルプ"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "説明"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "マルチプレイ"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "ローカルマルチプレイ"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "オンラインマルチプレイ"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "オンラインでプレイ"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "シングルプレイ"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "トレーニング"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "チュートリアル"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "対戦"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "名前"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "名前"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "苗字"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "ユーザーネーム"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "設定"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "グラフィック詳細設定"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "アンチエイリアス"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "ブルーム効果"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "操作方法"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "難易度設定"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "ディスプレイ"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "エフェクト詳細設定"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "異方性"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "バイリニア"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "フィルタリング モード"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "トライリニア"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "一人称視点"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "視野角"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "フルスクリーン"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "ゲームプレイ設定"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "グラフィック設定"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "モデルの詳細"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "マルチコアレンダリング"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "BGM音量 "
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "ネットワーク設定"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "クオリティ"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "解像度"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "SE音量 "
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "シェーダーの詳細"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "シャドウ"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "シャドウ"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "サイズ"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "サウンド設定"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "ボリューム"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "画面分割"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "テクスチャの詳細"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "三人称視点"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "ビデオ設定"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "ビデオクオリティ"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "ボイス音量 "
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "垂直同期"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "ワイドスクリーン"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "ウィンドウモード"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "高"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "低"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "中"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "ウルトラ"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "最高"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "バージョン"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "デモ"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "無料版"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "完全版"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "Lite版"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "プレミアム"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "シェアウェア"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "体験版"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "VR向けモード"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "HMDの画面位置設定をリセット"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "バーチャルリアリティ"
+            }
+        ]
+    }
+}

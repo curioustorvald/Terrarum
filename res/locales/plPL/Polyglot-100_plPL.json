@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Polish",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "Klasa"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "Usuń postać"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "Nowa postać"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "Sztuczna Inteligencja"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "Kosmita"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "Klon"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "Cyborg"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "Bóstwo"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "Demon"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "Demon"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "Smok"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "Smoki"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "Duch"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "Bóg"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "Bogowie"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "Bogini"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "Mag"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "Medyk"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "Potwór"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "Ninja"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "Pirat"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "Kapłan"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "Książę"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "Księżniczka"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "Robot"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "Szkielet"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "Snajper"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "Żołnierz"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "Złodziej"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "Wojownik"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "Czarnoksiężnik"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "Zombie"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "Zombie"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "Pierwsze miejsce"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "Miejsce"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "Drugie miejsce"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "Trzecie miejsce"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "Popażony"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "Krytyczny"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "Martwy"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "Zamrożony"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "Otruty"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "Spowolniony"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "Ogłuszony"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "Nieprzytomny"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "Zdrowy"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "Przemoczony"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "Ranny"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "Duży"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "Ogromny"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "Mały"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "Malutki"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "Powietrze"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "Ziemia"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "Ogień"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "Metal"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "Woda"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "Zakład"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "Odrzuć"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "Jackpot"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "Maksymum"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "Minimum"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "Zbroja"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "Strzała"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "Strzały"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "Plansza"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "Bomba"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "Książka"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "Buty"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "Łuk"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "Karta"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "Karty"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "Skrzynia"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "Magiczny"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "Zardzewiały"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "Sztylet"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "Kość"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "Kości"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "Drzwi"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "Rękawica"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "Klejnot"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "Prezent"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "Prezenty"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "Rękawiczki"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "Broń"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "Młot"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "Hełm"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "Klucz"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "Nóż"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "Zamek"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "Miłość"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "Karabin Maszynowy"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "Magia"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "Pistolet"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "Wyprawa"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "Ranga"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "Karabin"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "Wyrzutnia Rakiet"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "RPG"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "Zwój"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "Tarcza"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "Tarcze"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "Pole siłowe"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "Pola siłowe"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "Strzelba"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "Karabin Snajperski"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "Zaklęcie"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "Laska"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "Miecz"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "Skarb"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "Epicki"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "Śmieć"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "Różdżka"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "Drewno"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "Wysokość"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "Hamulce"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "Podwozie"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "Głębokość"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "Paliwo"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "Zębatka"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "Zwrotność"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "Prędkość"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "Sterowanie"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "Zawieszenie"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "Koła"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "Skrzydła"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "Medal"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "Brązowy medal"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "Złoty medal"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "Srebrny medal"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "Brąz"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "Moneta"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "Złoto"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "Sztabka"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "Platyna"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "Srebro"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "Zamek"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "Jaskinia"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "Loch"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "Zajazd"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "Planeta"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "Ziemia"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "Kosmos"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "Statek kosmiczny"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "Historia"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "Przygoda"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "Rozdział"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "Strona"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "Modelowanie 3D"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "Animacja"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "Dyrektor animacji"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "Animator"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "Oprawa graficzna"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "Dyrektor artystyczny"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "Artysta"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "Artyści"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "Asystent"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "Współpracownik"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "Dyrektor udźwiękowienia"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "Projektant postaci"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "Dyrektor działu technicznego"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "Animator filmowy"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "Dyrektor filmowy"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "Kod"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "Kompozytor"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "Artysta koncepcyjny"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "Dyrektor kreatywny"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "Administracja bazy danych"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "Dyrektor projektu"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "Stworzono przez"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "Kierownik projektu"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "Imitator dźwięku"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "Font"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "Fonty"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "Gra"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "Mechanika gry"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "Projektant"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "Twórca gry"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "Tworzenie gry"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "Projektant graficzny"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "Zdjęcie"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "Zdjęcia"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "Grafik interfejsu"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "Młodszy"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "Główny"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "Główny programista"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "Projekt poziomów"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "Projektant poziomów"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "Lokalizacja"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "Manuskrypt"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "Modele"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "Muzyk"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "Przetłumaczono za pomocą Polyglot Project"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "Producent"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "Produkcja"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "Kierownik programowania"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "Programista"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "Programiści"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "Programowanie"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "Kierownik projektu"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "Wydawca"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "Operator dźwięku"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "Scenarzysta"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "Starszy"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "Efekty dźwiękowe"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "Dźwięk"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "Inżynier dźwięku"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "Ścieżka dźwiękowa"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "Szczególne podziękowania"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "Szczególne podziękowania dla"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "Artysta techniczny"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "Dyrektor techniczny"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "Główny tester"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "Menadżer testów"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "Tester"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "Tłumaczenia"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "Efekty wizualne"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "Aktorstwo głosowe"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "Aktor głosowy"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "Pisarz"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "Nie wykryto {0}"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "Opuszczanie strefy śledzenia"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "Nie wykryto HMD"
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "Wykryto użycie kodów!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "Kod błędu:"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "Nieprawidłowy numer seryjny."
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "Błędna nazwa!"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "Wystąpił jakiś błąd."
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "Stracono połączenie."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "Twój przeciwnik się rozłączył."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "Gracz się rozłączył."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "Członek Twojej drużyny się rozłączył."
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "Nie można połączyć się z serwerem."
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "Uszkodzony plik zapisu gry."
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "Nie znaleziono zapisanych gier."
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "Brak gier"
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "Atakuj"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "Szybciej"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "Budować"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "Zarzuć"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "Rzuć"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "Weź"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "Wspinaj się"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "Zamknij"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "Zbierz"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "Gotować"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "Tworzyć"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "Kucnij"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "Unik"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "Prowadź"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "Leć"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "Pełna Prędkość"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "Idź"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "Idź do"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "Pół Prędkości"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "Ulecz"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "Skacz"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "Wyląduj"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "Patrz"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "Mieszać"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "Otwórz"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "Podnieś"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "Wyścig"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "Czytaj"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "Zamień"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "Biegnij"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "Uciekaj"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "Strzelaj"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "Skradaj się"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "Obróć"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "Truchtem"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "Steruj"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "Wystartuj"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "Rozmawiaj"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "Rzuć"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "Idź"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "Wytrzymałość"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "Punkty doświadczenia"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "Żeński"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "Życie"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "Serce"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "Serca"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "Poziom"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "Następny poziom!"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "Życia"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "Męski"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "Mężczyzna"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "Mężczyźni"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "Odródź"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "Odrodzenie za:"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "Odrodzić?"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "Odradzanie"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "Umiejętność"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "Punkt Odrodzenia"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "Transpłciowy"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "Kobieta"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "Kobiety"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "Obrażenia"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "Cios krytyczny"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "Pudło krytyczne"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "Cios"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "Punkty życia"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "Pudło"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "Obrażenia"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "Obrażenia"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "Przeciwnik"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "Przeciwniczka"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "Przeciwniczki"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "Przeciwnicy"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "Gra akcji"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "Gra przygodowa"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "Karciane"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "Gra zwyczajna"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "Gra fantasy"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "Gra hardkorowa"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "Indie"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "Gra w średniowieczu"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "Różne"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "Gra wieloosobowa"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "Gatunek"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "Gra platformowa"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "Gra logiczna"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "Teleturniej"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "Wyścigi"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "Gra retro"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "RPG"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "Strategie czasu rzeczywistego"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "Gra science-fiction"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "Strzelanka"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "Symulator"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "Gra jednoosobowa"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "Gra sportowa"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "Gra strategiczna"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "Strategia turowe"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "Tower defence"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "Ekwipunek"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "Amunicja"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "Amunicja"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "Posik"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "Pociski"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "Kup"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "Pojemność Ekwipunku"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "Upuść"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "Obciążenie"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "Pełen Ekwipunek"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "Przedmiot"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "Klucz"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "Powerup"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "Sprzedaj"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "Użyj"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "Broń"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "Bronie"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "Nie możesz nieść więcej."
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "Uważaj!"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "Proszę uważaj."
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "Taktyka"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "Cel"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "Asysta"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "Asyst"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "Atakuj"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "Bonus"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "Przechwyć"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "Ukończona"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "Śmierć"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "Śmierci"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "Broń"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "Zniszcz"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "Uciekaj"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "Koniec"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "Koniec gry"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "KONIEC GRY"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "Rekord"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "Nieukończona"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "Zabij"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "Asysta Zabicia"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "Zabity"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "Zabitych"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "Zamknięte"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "Przegranych"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "Pojedynek"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "Misja"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "Cel Misji"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "Cele Misji"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "Multiplayer"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "Cele"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "Pozycja"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "Okrążenie"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "Okrążenia"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "Runda"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "Punkty"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "Czas"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "Pozostało czasu"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "Turniej"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "Turnieje"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "Wygranych"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "Przegrana"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "Pokonano Cię."
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "Przegrywasz"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "Twoja drużyna przegrała!"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "Twoja drużyna wygrała!"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "Zwycięstwo"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "Wygrywasz"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "Nie żyjesz."
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "Nie żyjesz."
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "Przegrana!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "Przegrana!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "Wygrana!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "Wygrana!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "Kamera"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "Odwrócona"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "Normalna"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "Oś X Kamery"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "Oś Y Kamery"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "Przycisk"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "Kliknij"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "Martwa strefa"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "Kliknij dwa razy"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "Przeciągnij"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "Przeciągnij i upuść"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "Palec"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "Kontroler"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "Żyroskop"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "Klawisz"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "Klawiatura"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "Mysz"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "Czułość myszy"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "Zwęź"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "Obróć"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "Przewiń"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "Potrząśnij"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "Rozciągnij"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "Przejedź"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "Dotknij"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "Przycisk"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "Klawisz"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "Przechyl"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "Ramię"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "Ramiona"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "Pierś"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "Broda"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "Kolor"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "Ucho"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "Uszy"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "Oko"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "Oczy"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "Stopy"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "Stopa"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "Włosy"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "Zarost"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "Owłosienie"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "Fryzura"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "Ręka"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "Ręce"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "Głowa"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "Biodra"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "Noga"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "Nogi"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "Usta"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "Szyja"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "Nos"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "Skóra"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "Klatka piersiowa"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "Poziom trudności"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "Łatwy"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "Trudny"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "Niemożliwy"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "Szalony"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "Średni"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "Bardzo łatwy"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "Bardzo trudny"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "Dół"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "Lewo"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "Prawo"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "Góra"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "Wczytaj"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "Wczytaj Grę"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "Wczytywanie..."
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "Proszę czekać..."
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "Zresetować zapisane dane ?"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "Zapisz"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "Zapisz dane"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "Zapisz Grę"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "Zapisywanie..."
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "Wiek"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "Wszystkie"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "Naprawdę?"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "Na pewno?"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "Wstecz"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "Podkład muzyczny"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "Anuluj"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "Zamknij"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "Zatwierdź"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "Kontynuuj"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "Kontynuować?"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "Twórcy"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "Wyjdź do Pulpitu"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "Wyjść do Pulpitu?"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "DLC"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "Pobierz"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "Zawartość do pobrania"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "Wyjdź"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "Wyjść?"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "Dodatki"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "FPS"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "Galeria"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "Do zobaczenia!"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "Grafika"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "Zakup wewnątrz aplikacji"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "Jezyk"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "Poziom"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "Poczta"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "Menu Główne"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "Więcej"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "Muzyka"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "Odtwarzacz Muzyki"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "Nowa Gra"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "Dalej"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "Nastepny utwór"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "Nie"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "NIE"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "Nie"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "OK"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "Pauza"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "Pauza"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "Zagraj"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "Zagraj jeszcze raz"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "Naciśnij dowolny klawisz"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "Aby kontynuować naciśnij dowolny klawisz"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "Naciśnij Start"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "Aby kontynuować naciśnij Start"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "Wstecz"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "Poprzedni utwór"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "Cena"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "Darmowy"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "Kup"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "Wyjdź"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "Czy na pewno chcesz wyjść?"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "Wyjść?"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "Replay"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "Powrót"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "Powrót do Menu Głównego"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "Wrócić do Menu Głównego?"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "Pochwal się"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "Pomiń"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "Dźwiek"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "Dziekuję!"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "Odblokuj"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "Jakość Wideo"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "Mowa"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "Uwaga"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "Witaj"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "Świat"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "Tak"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "Tak"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "TAK"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "Polski"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Polish"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "Logowanie"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "E-mail"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "Nie pamiętam hasła"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "Hasło"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "Rejestracja"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "Nie wylogowuj mnie"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "Wyzwanie"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "Wyzwania"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "Kooperacja"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "Kooperacja"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "Deathmatch"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "Pomoc"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "Instrukcje"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "Gra Wieloosobowa"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "Lokalna Gra Wieloosobowa"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "Gra Online"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "Graj Online"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "Jeden gracz"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "Trening"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "Wprowadzenie"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "Pojedynek"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "Imię"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "Imię"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "Nazwisko"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "Nazwa użytkownika"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "Ustawienia"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "Zaawansowane Ustawienia Grafiki"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "Antyaliasing"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "Światło (bloom)"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "Sterowanie"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "Ustawienia Trudności"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "Obraz"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "Szczegóły efektów"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "Anizotropowe"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "Dwuliniowe"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "Tryb filtrowania"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "Trójliniowe"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "Widok Pierwszej Osoby"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "Pole Widzenia"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "Pełny ekran"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "Ustawienia Gry"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "Ustawienia Grafiki"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "Detale modeli"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "Renderowanie wielordzeniowe"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "Głośność muzyki"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "Ustawienia Sieciowe"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "Jakość"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "Rozdzielczość"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "Głośność efektów"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "Detale shadera"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "Cień"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "Cienie"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "Rozmiar"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "Ustawienia Dźwieku"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "Głośność"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "Podzielony ekran"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "Detale tekstur"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "Widok Trzeciej Osoby"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "Ustawienia Wideo"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "Jakość"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "Głośność mowy"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "Vsync"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "Panoramiczny"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "Okno"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "Wysokie"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "Niskie"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "Srednie"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "Poziom b. wysoki"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "Bardzo wysoka"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "Wersja"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "Demo"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "Darmowa"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "Pełna wersja"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "Lite"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "Premium"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "Shareware"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "Trial"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "Tryb komfortu WR"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "Resetuj orientację HMD"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "Wirtualna Rzeczywistość"
+            }
+        ]
+    }
+}

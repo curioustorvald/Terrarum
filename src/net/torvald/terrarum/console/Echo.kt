@@ -16,7 +16,16 @@ internal class Echo : ConsoleCommand {
     }
 
     fun execute(single_line: String) {
-        (Terrarum.game.consoleHandler.UI as ConsoleWindow).sendMessage(single_line)
+        val sb = StringBuilder()
+        for (ch in single_line) {
+            if (ch == '\n') {
+                (Terrarum.game.consoleHandler.UI as ConsoleWindow).sendMessage(sb.toString())
+                sb.delete(0, sb.length - 1)
+            }
+            else
+                sb.append(ch)
+        }
+        (Terrarum.game.consoleHandler.UI as ConsoleWindow).sendMessage(sb.toString())
     }
 
     override fun printUsage() {

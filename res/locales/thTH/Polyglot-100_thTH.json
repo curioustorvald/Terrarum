@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Thai",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "คลาส"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "ลบตัวละคร"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "ตัวละครใหม่"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "ปัญญาประดิษฐ์"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "เอเลี่ยน"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "โคลน"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "ไซบอร์ก"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "เทพ"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "ปีศาจ"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "เหล่าปีศาจ"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "มังกร"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "มังกร"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "ผี"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "พระเจ้า"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "พระเจ้า"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "เทพเจ้า"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "นักเวทย์"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "แพทย์"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "สัตว์ประหลาด"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "นินจา"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "โจรสลัด"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "นักบวช"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "เจ้าชาย"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "เจ้าหญิง"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "หุ่นยนต์"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "โครงกระดูก"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "นักแม่นปืน"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "ทหาร"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "โจร"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "นักรบ"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "ผู้วิเศษ"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "ซอมบี้"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "ซอมบี้"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "อันดับที่หนึ่ง"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "อันดับ"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "อันดับที่สอง"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "อันดับที่สาม"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "ไหม้"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "คริติคอล"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "ตาย"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "หนาวเย็น"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "ติดพิษ"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "ช้า"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "มึน"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "สลบ"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "ไม่บาดเจ็บ"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "เปียก"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "บาดเจ็บ"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "ใหญ่"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "ใหญ่มาก"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "เล็ก"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "เล็กจิ๋ว"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "ลม"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "ดิน"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "ไฟ"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "โลหะ"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "น้ำ"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "พนัน"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "เอาออก"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "แจ๊คพ็อต"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "มากสุด"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "น้อยสุด"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "ชุดเกราะ"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "ลูกธนู"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "ลูกธนู"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "บอร์ด"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "ระเบิด"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "หนังสือ"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "รองเท้าบูท"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "ธนู"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "การ์ด"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "การ์ด"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "หีบสมบัติ"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "เวทย์มนต์"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "เก่า"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "มีด"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "ตาย"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "ลูกเต๋า"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "ประตู"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "ถุงมือเกราะ"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "เพชร"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "ของขวัญ"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "ของขวัญ"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "ถุงมือ"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "ปืน"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "ค้อน"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "หมวกเกราะ"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "กุญแจ"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "ดาบ"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "ล๊อค"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "ความรัก"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "ปืนกลหนัก"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "เวทมนต์"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "ปืนพก"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "เควส"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "อันดับ"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "ปืนไรเฟิล"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "ปืนยิงจรวด"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "ปืนอาร์พีจี"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "คัมภีร์"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "โล่"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "โล่"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "ม่านพลัง"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "ม่านพลัง"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "ปืนลูกซอง"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "ปืนซุ่มยิง"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "คาถา"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "ไม้เท้า"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "ดาบ"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "ขุมทรัพย์"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "มหากาพย์"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "ขยะ"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "ไม้เท้า"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "ไม้"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "ระดับความสูง"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "เบรก"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "เพลา"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "ความลึก"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "เชื้อเพลิง"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "เกียร์"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "ควบคุม"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "ความเร็ว"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "พวงมาลัย"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "ห้ามใช้งาน"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "ล้อ"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "ปีก"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "เหรียญรางวัล"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "เหรียญทองแดง"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "เหรียญทอง"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "เหรียญเงิน"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "ทองแดง"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "เหรียญ"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "ทอง"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "ก้อนโลหะ"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "แพลททินัม"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "เงิน"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "ปราสาท"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "ถ้ำ"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "ดันเจียน"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "โรงเตี๊ยม"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "ดาวเคราะห์"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "โลก"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "อวกาศ"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "ยานอวกาศ"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "เนื้อเรื่อง"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "การผจญภัย"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "บทที่"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "หน้า"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "โมเดลสามมิติ"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "อนิเมชัน"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "ผู้กำกับฝ่ายอนิเมชั่น"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "อนิเมเตอร์"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "ศิลป์"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "หัวหน้าฝ่ายศิลป์"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "อาร์ทติส"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "อาร์ทติส"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "ผู้ช่วย"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "ร่วมสรัาง"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "หัวหน้าฝ่ายเสียง"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "นักออกแบบตัวละคร"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "หัวหน้าฝ่ายเทคนิก"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "อนิเมเตอร์ฉากภาพยนตร์"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "ผู้กำกับฉากภาพยนตร์"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "โค้ด"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "นักแต่งเพลง"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "นักวาดคอนเซปต์"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "หัวหน้าฝ่ายครีเอทีฟ"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "ผู้ดูแลฐานข้อมูล"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "ผู้กำกับฝ่ายการออกแบบ"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "พัฒนาโดย"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "ผู้กำกับ"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "เจ้าหน้าที่บันทึกเสียง"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "ฟ้อนต์"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "ฟ้อนต์"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "เกม"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "ออกแบบเกม"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "นักออกแบบเกม"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "นักพัฒนาเกม"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "การพัฒนาเกม"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "ผู้ออกแบบกราฟฟิค"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "ภาพ"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "ภาพ"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "อินเตอร์เฟสอาร์ทติส"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "จูเนียร์"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "หัวหน้า"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "หัวหน้าโปรแกรมเมอร์"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "ออกแบบด่าน"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "ผู้ออกแบบด่าน"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "โลคัลไลเซชัน"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "บท"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "โมเดล"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "นักดนตรี"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "คำแปลโดย Polyglot Project"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "โปรดิวเซอร์"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "ฝ่ายการผลิต"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "ผู้จัดการโปรแกรม"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "โปรแกรมเมอร์"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "โปรแกรมเมอร์"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "เขียนโปรแกรม"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "ผู้จัดการโปรเจค"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "ฝ่ายขาย"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "เจ้าหน้าที่บันทึกเสียง"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "ผู้เขียนบท"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "ซีเนียร์"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "เสียงประกอบ"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "ออกแบบเสียงประกอบ"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "วิศวกรเสียง"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "เพลงบรรเลง"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "ขอบคุณ"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "ขอขอบคุณเป็นพิเศษกับ"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "ฝ่ายเทคนิกศิลป์"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "ผู้กำกับฝ่ายเทคนิก"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "หัวหน้าฝ่ายตรวจสอบ"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "ผู้จัดการตรวจสอบ"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "ผู้ทดสอบ"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "แปลภาษา"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "วิชวลเอฟเฟค"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "นักพากษ์ชาย"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "นักพากษ์หญิง"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "ผู้เขียน"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "ตรวจไม่พบอุปกรณ์ {0}"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "ออกจากพื้นที่ติดตาม"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "ตรวจไม่พบหน่วยแสดงผลสวมศีรษะ"
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "Cheats ตรวจสอบพบ!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "รหัสข้อผิดพลาด"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "CD Key ไม่ถูกต้อง"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "ชื่อไม่ถูกต้อง!"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "เกิดความผิดพลาดบางประการ"
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "การเชื่อมต่อผิดพลาด"
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "คู่ต่อสู้หลุดการเชื่อมต่อ"
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "ผู้เล่นอื่นหลุดการเชื่อมต่อ"
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "เพื่อนร่วมทีมหลุดการเชื่อมต่อ"
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "ไม่สามารถเชื่อมต่อระบบ"
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "Save เกิดความเสียหาย"
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "ไม่เจอเกมที่สร้าง"
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "ไม่เจอเกม"
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "โจมตี"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "บูสต์"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "สร้าง"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "โยน"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "ร่ายเวทย์"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "เคลม"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "ปีน"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "ปิด"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "เก็บ"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "ทำอาหาร"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "สร้าง"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "คลาน"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "หลบ"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "ขับ"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "บิน"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "ความเร็วเต็ม"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "ไป"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "ไปที่"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "ความเร็วครึ่งนึง"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "รักษา"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "กระโดด"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "ลงจอด"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "ดู"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "ผสม"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "เปิด"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "หยิบ"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "แข่ง"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "อ่าน"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "แทนที่"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "วิ่ง"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "หนี"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "ยิง"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "ย่อง"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "หมุน"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "วิ่ง"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "เลี้ยว"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "บินขึ้น"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "พูด"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "โยน"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "เดิน"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "ความทนทาน"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "ค่าประสบการณ์"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "หญิง"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "พลังชีวิต"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "หัวใจ"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "หัวใจ"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "เลเวล"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "เลเวลขึ้น"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "ชีวิต"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "ชาย"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "ผู้ชาย"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "ผู้ชาย"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "เกิดใหม่"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "เกิดใหม่ใน"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "ต้องการเกิดใหม่?"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "กำลังเกิดใหม่"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "สกิล"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "จุดเกิด"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "กระเทย"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "ผู้หญิง"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "ผู้หญิง"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "ความเสียหาย"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "คริติคัล"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "พลาด"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "โจมตี"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "พลังชีวิต"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "พลาด"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "ความเสียหาย"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "ความเสียหาย"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "ศัตรู"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "ศัตรู"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "ศัตรู"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "ศัตรู"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "เกมแอคชั่น"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "เกมผจญภัย"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "การ์ด"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "เกมแคชชวล"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "เกมแฟนตาซี"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "เกมฮาร์ดคอร์"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "อินดี้"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "เกมแนวยุคกลาง"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "เบ็ดเตล็ด"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "เล่นหลายคน"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "ประเภท"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "เกมแพลทฟอร์มเมอร์"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "เกมปริศนา"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "เกมตอบคำถาม"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "แข่งขันความเร็ว"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "เกมเรโทร"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "เกมสวมบทบาท"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "กลยุทธ์แบบเรียลไทม์"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "เกมแนวนิยายวิทยาศาสตร์"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "เกมยิง"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "เกมจำลองสถานการณ์"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "ผู้เล่นเดียว"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "เกมกีฬา"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "เกมวางแผน"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "กลยุทธ์แบบผลัดตาเดิน"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "เกมป้องกันฐาน"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "ช่องเก็บของ"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "กระสุน"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "กระสุน"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "กระสุน"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "กระสุน"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "ซื้อ"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "ขนาดช่องเก็บของ"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "ทิ้ง"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "ความจุสัมภาระ"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "ช่องเก็บของเต็ม"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "ของ"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "กุญแจ"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "ของเพิ่มพลัง"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "ขาย"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "ใช้"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "อาวุธ"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "อาวุธ"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "คุณเก็บไม่ได้อีกแล้ว"
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "ระวัง!"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "โปรดระวัง"
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "กลยุทธ์"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "เป้าหมาย"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "ช่วยเหลือ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "ช่วยเหลือ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "โจมตี"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "โบนัส"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "จับ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "สำเร็จ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "ตาย"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "ตาย"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "ป้องกัน"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "ทำลาย"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "หนี"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "จบเกม"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "เกมโอเวอร์"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "เกมโอเวอร์"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "คะแนนสูงสุด"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "ไม่สำเร็จ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "ฆ่า"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "ช่วยเหลือในการฆ่า"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "ศพ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "ศพ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "ล๊อค"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "แพ้"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "แมทช์"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "ภารกิจ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "เป้าหมายภารกิจ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "เป้าหมายภารกิจ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "ทวีคูณ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "เป้าหมาย"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "ลำดับ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "รอบ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "รอบ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "รอบ"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "คะแนน"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "เวลา"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "เหลือเวลา"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "ทัวร์นาเมนต์"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "ทัวร์นาเมนต์"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "ชนะ"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "แพ้"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "แพ้"
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "ผู้แพ้"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "ทีมคุณแพ้"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "ทีมคุณชนะ!"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "ชนะ"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "ผู้ชนะ"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "คุณตาย"
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "คุณตาย"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "คุณแพ้!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "คุณแพ้!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "คุณชนะ!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "คุณชนะ!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "กล้อง"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "กล้บด้าน"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "ปรกติ"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "แกน X"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "แกน Y"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "ปุ่ม"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "คลิ๊ก"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "Dead zone"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "คลิ๊กสองที"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "ลาก"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "ลากไปวาง"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "นื้ว"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "จอยสติ๊ก"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "Gyroscope"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "คีย์"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "คีย์บอร์ด"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "เมาส์"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "ความไวการรับค่าเมาส์"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "รวบนิ้ว"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "หมุน"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "ไหล"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "เขย่า"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "แยกนิ้ว"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "ตวัดนิ้ว"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "แตะ"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "ปุ่ม"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "คีย์"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "เอียง"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "แขน"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "แขน"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "หน้าอก"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "คาง"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "สี"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "หู"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "หู"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "ตา"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "ตา"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "เท้า"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "เท้า"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "ขน"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "หนวดเครา"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "ขน"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "ผม"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "มือ"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "มือ"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "หัว"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "สะโพก"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "ขา"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "ขา"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "ปาก"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "คอ"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "จมูก"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "ผิว"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "ช่วงอก"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "ระดับความยาก"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "ง่าย"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "ยาก"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "เป็นไปไม่ได้"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "ยากสุดๆ"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "ปานกลาง"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "ง่ายมาก"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "ยากมาก"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "ล่าง"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "ซ้าย"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "ขวา"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "บน"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "โหลด"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "โหลดเกม"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "กำลังโหลด"
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "กรุณารอซักครู่"
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "ล้างข้อมูลที่บันทึก"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "บันทึก"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "บันทึกข้อมูล"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "บันทึกเกม"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "กำลัังบันทึก"
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "อายุ"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "ทั้งหมด"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "คุณมั่นใจแล้วจริงๆนะ?"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "มั่นใจแล้วนะ?"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "กลับ"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "คนตรีประกอบ"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "ยกเลิก"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "ปิด"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "ยืนยัน"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "เล่นต่อ"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "เล่นต่อ?"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "เครดิต"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "ออกสู่ desktop"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "ต้องการออกสู่ desktop?"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "DLC"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "ดาวน์โหลด"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "เนื้อหาที่ดาวน์โหลดได้"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "ออก"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "ต้องการออก?"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "เพิ่มเติม"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "เฟรมต่อวินาที"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "แกลเลอรี่"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "ลาก่อน"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "กราฟฟิค"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "เสนอขายภายในเกม"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "ภาษา"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "ระดับขั้น"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "จดหมาย"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "เมนูหลัก"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "แสดงมากขึ้น"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "เพลง"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "เครื่องมือเล่นเพลง"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "เริ่มเกมใหม่"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "ต่อไป"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "เพลงต่อไป"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "ไม่ใช่่"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "ไม่ใช่"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "ไม่ใช่"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "ตกลง"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "หยุด"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "หยุด"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "เล่น"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "เล่นใหม่"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "กดปุ่มใดๆ"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "กดปุ่มใดๆ เพื่อไปต่อ"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "กดปุ่ม start"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "กดปุุ่ม start เพื่อเริ่ม"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "ก่อนหน้า"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "เพลงก่อนหน้า"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "ราคา"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "ฟรี"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "ซื้อ"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "ออก"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "มั่นใจหรือไม่ว่าต้องการออก?"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "ต้องการออก?"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "เล่นอีกรอบ"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "กลับ"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "กลับไปเมนูหลัก"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "กลับไปเมนูหลัก?"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "แชร์"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "ข้าม"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "เสียง"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "ขอบคุณ"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "ปลดล๊อค"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "คุณภาพวีดิโอ"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "เสียงพูด"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "คำเตือน"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "ยินดีต้อนรับ"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "โลก"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "ใช่"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "ใช่"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "ใช่"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "ภาษาไทย"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Thai"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "ล๊อกอิน"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "อีเมล"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "ลืมรหัสผ่าน"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "รหัสลับ"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "ลงทะเบียน"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "จดจำ"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "Challenge"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "Challenge mode"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "ร่วมมือ"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "ความร่วมมือ"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "เดธแมตช์"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "ช่วยเหลือ"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "คำแนะนำ"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "ผู้เล่นหลายคน"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "เล่นหลายคนผ่าน LAN"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "เล่นหลายคนแบบออนไลน์"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "เล่นออนไลน์"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "ผู้เล่นเดี่ยว"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "ฝึกฝน"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "บทเรียน"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "Versus"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "ชื่อ"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "ชื่อจริง"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "นามสกุล"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "ชื่อผู้ใช้"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "ตัวเลือก"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "กราฟฟิคขั้นสูง"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "Antialiasing"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "Bloom"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "การบังคับ"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "ตั้งค่าความยาก"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "หน้าจอ"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "รายละเอียดเอฟเฟกต์"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "Anisotropic"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "Bilinear"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "โหมดตัวกรอง"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "Trilinear"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "มุมมองบุคคลที่หนึ่ง"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "ระยะการมองเห็น"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "เต็มหน้าจอ"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "ตั้งค่าเกม"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "ปรับค่ากราฟฟิค"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "รายละเอียดโมเดล"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "การเรนเดอร์แบบ Multicore"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "ความดังดนตรี"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "ตั้งค่าการเชื่อมต่อ"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "คุณภาพ"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "ความละเอียดจอ"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "ความดังเอฟเฟค"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "รายละเอียด Shader"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "เงา"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "เงา"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "ขนาด"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "ปรับเสียง"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "ความดัง"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "แบ่งจอ"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "รายละเอียดเท็กซ์เจอร์"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "มุุมมองบุคคลที่สาม"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "ปรับค่าวีดิโอ"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "คุณภาพ"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "ความดังเสียงพูด"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "V-sync"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "จอกว้าง"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "หน้าต่าง"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "สูง"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "ต่ำ"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "ปานกลาง"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "สูงมาก"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "สูงมาก"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "เวอร์ชั่น"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "ตัวทดลอง"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "ฟรี"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "ตัวเต็ม"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "เวอร์ชั่นย่อมเยา"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "พิเศษ"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "Shareware"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "ตัวทดลอง"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "โหมดถนอมสายตา"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "หน่วยแสดงผลสวมศีรษะ"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "ภาพเสมือน"
+            }
+        ]
+    }
+}

@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Traditional Chinese",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "角色類"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "刪除角色"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "創新角色"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "人工智能"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "外星人"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "複製人"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "機器人"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "神靈"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "魔鬼"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "女魔"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "龍"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "龍"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "鬼"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "神"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "神"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "女神"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "魔法師"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "軍醫"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "怪獸"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "忍者"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "海賊"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "祭士"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "王子"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "公主"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "機器人"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "屍骨"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "狙擊手"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "戰士"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "盜賊"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "武士"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "巫師"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "僵尸"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "僵尸"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "第一名"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "名次"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "第二名"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "第三名"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "燃燒中"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "瀕死"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "死亡"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "凍結"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "中毒"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "減速"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "愕然"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "失去知覺"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "未受傷"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": ".濕"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "受傷"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "大"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "極大"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "小"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "極小"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "風"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "地"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "火"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "金"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "水"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "賭"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "拋棄"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "頭獎"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "最高限度"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "最低限度"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "護甲"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "箭"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "箭"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "遊戲盤"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "炸彈"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "書"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "靴"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "弓"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "卡片"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "卡片"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "箱"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "魔法的"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "生銹的"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "短劍"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "骰子"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "骰子"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "門"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "鐵手套"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "寶石"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "贈品"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "贈品"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "手套"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "槍"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "鐵錘"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "鋼盔"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "鑰匙"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "小刀"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "鎖"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "愛"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "機關槍"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "魔法"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "手槍"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "追尋"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "軍階"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "步槍"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "火箭炮"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "RPG"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "卷"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "盾"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "盾"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "能量罩"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "能量罩"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "散彈槍"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "狙擊步槍"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "咒語"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "杖"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "劍"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "財寶"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "特級的"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "沒用的"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "魔杖"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "木"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "高度"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "煞車閘"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "馬車"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "深度"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "燃料"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "檔"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "操縱"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "速度"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "轉向"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "懸挂"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "輪"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "翼"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "徽章"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "銅徽章"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "金徽章"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "銀徽章"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "青铜"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "硬幣"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "金"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "金屬塊"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "白金"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "銀"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "城堡"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "洞穴"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "地下城"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "客棧"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "行星"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "地球"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "太空"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "太空船"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "故事"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "冒險"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "章"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "頁"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "三維建模"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "動畫"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "動畫總監"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "動畫師"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "美術"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "美術總監"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "美術師"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "美術師"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "助理"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "副"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "音樂總監"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "角色設計"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "首席技術官"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "影片動畫"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "影片導演"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "程序"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "作曲家"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "觀念美術"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "創意總監"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "數據庫管理員"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "設計總監"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "游戲開發由"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "導演"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "擬音藝術家"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "字型"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "字型"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "游戲"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "遊戲設計"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "遊戲設計師"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "遊戲開發者"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "游戲開發"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "圖像設計"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "圖像"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "圖像"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "影片美術"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "初級"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "領頭"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "程序組長"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "關卡設計"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "關卡設計師"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "本土化"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "原稿"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "模型"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "音樂家"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "翻譯由Polyglot Project 提供"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "監制"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "制作"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "規劃經理"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "程序員"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "程序員"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "編程"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "項目經理"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "出版商"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "錄音師"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "劇本寫作人"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "高級"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "音響效果"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "音響設計師"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "錄音師"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "原聲音樂"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "特別感謝"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "特別感謝"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "技術設計"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "技術主任"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "測試領導"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "測試經理"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "測試儀"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "翻譯"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "視覺效果"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "配音員"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "配音演員"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "寫作人"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "未檢測到{0}"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "無信號"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "未檢測到HMD"
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "已偵測到作弊！"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "錯誤代碼："
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "無效的遊戲序號。"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "名稱無效！"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "發生了錯誤。"
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "網絡連接失敗。"
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "你的對手斷線"
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "另一個玩家斷線"
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "你的隊友斷線"
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "不能連接至服務器。"
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "存檔文件已被破壞。"
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "找不到游戲。"
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "沒有招募中的游戲"
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "攻擊"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "提升"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "建設"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "投"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "施咒語"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "索取"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "爬上"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "關閉"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "收取"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "煮"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "技術"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "蹲"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "閃避"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "駕駛"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "飛"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "急速"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "前往"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "去"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "半速"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "愈合"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "跳"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "降落"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "看"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "混合"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "開"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "拾起"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "競賽"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "讀"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "更換"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "奔跑"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "逃跑"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "射擊"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "潛行"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "旋轉"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "沖刺"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "左右"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "起飞 起飛"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "談話"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "扔"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "步行"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "耐力"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "經驗值"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "女性"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "健康值"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "心"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "心"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "等級"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "升級"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "生命"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "男性"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "男人"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "男人"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "重生"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "於此之后重生："
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "重生？"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "重生中"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "技能"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "重生點"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "跨性別"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "女人"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "女人"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "破損"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "嚴重傷害"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "嚴重失誤"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "擊中 击中"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "生命值"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "失誤"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "破壞值"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "破壞率"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "敵人"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "敵人"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "敵人"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "敵人"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "動作游戲"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "冒險游戲"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "卡牌遊戲"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "休閑游戲"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "魔幻遊戲"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "硬核游戲"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "獨立製作"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "中世紀式游戲"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "其他"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "多人游戲"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "類型"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "平台游戲"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "智力遊戲"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "問答游戲"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "競速遊戲"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "復古游戲"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "角色扮演游戲"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "即時戰略遊戲"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "科幻游戲"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "射擊游戲"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "模擬游戲"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "單式游戲"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "體育游戲"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "戰略游戲"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "回合戰略遊戲"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "塔防游戲"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "裝備"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "彈藥"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "彈藥值"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "子彈"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "子彈"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "購買"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "裝備容量"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "放下"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "負擔"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "裝備已滿"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "物品"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "鑰匙"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "提升功率"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "銷售"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "使用"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "武器"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "武器"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "你拿不起了。"
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "注意"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "請注意！"
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "戰術"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "目標"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "協助"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "協助"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "攻擊"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "獎金"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "捉取"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "完成"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "死亡"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "死亡"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "防守"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "消滅"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "逃生"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "結束"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "游戲結束！"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "游戲結束！"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "最高分"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "未完成"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "殺"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "助殺"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "擊殺"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "擊殺"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "鎖定"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "失敗"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "比賽"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "任務"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "任務目標"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "任務目標"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "倍"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "目標"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "地位"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "全程"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "圈數"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "回合"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "評分"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "時間"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "剩余時間"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "比賽"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "比賽"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "獲勝"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "失敗"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "你被擊敗了。"
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "輸家"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "你的團隊失敗"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "你的團隊勝利"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "勝利"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "贏家"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "你死了。"
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "你死了。"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "你輸了！"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "你輸了！"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "你贏了！"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "你贏了！"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "攝影機"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "反轉"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "標准"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "攝影機X坐標軸"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "攝影機Y坐標軸"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "按鍵"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "點擊"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "危險地區"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "雙擊"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "拖"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "拖放"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "手指"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "游戲手柄"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "回轉儀"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "關鍵"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "鍵盤"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "鼠標"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "鼠標靈敏度"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "捏"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "環繞"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "滾動"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "震動"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "擴"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "滑動"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "觸摸"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "按鍵"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "關鍵"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "傾斜"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "臂"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "臂"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "胸"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "下巴"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "顏色"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "耳"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "耳朵"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "眼"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "眼睛"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "雙腳"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "腳"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "毛"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "胡子"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "毛皮"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "頭發"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "手"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "手"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "頭"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "臀部"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "腿"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "雙腿"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "嘴巴"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "頸"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "鼻子"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "皮膚"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "胸部"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "難度"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "簡單"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "困難"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "不可能"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "瘋狂"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "中等"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "非常簡單"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "非常困難"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "下"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "左"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "右"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "上"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "載入"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "載入游戲"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "正在登錄中..."
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "請消侯等待..."
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "重設已保存數據"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "保存"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "保存數據"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "保存歐系"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "保存中…"
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "年齡"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "全部"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "你是否確認？"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "你確定嗎？"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "返回"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "背景音樂"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "取消"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "關閉"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "確認"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "繼續"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "繼續？"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "製作群"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "退出至桌面"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "退出至桌面？"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "DLC"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "下載"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "下載內容"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "退出"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "退出？"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "演員"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "FPS"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "藝術館"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "再見！"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "圖形設置"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "在應用程序內購買"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "語言"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "級別"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "郵件"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "主界面"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "更多"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "音樂"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "音樂播放器"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "新游戲"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "下一個"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "下一個曲目"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "否"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "否"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "不行"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "OK"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "暫停"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "暫停中"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "開始"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "再玩一次"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "按下任意鍵"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "按下任意鍵以繼續"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "按下開始"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "按下開始以繼續"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "返回"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "上一曲目"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "價錢"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "免費"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "購買"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "退出"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "你確定你需要退出嗎？"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "退出？"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "重播"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "返回"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "返回至主界面"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "返回至主界面？"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "分享"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "跳過"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "聲音"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "謝謝！"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "開鎖"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "視頻設置"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "聲音"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "注意"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "歡迎"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "世界"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "好的"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "是"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "是"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "繁體中文"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Traditional Chinese"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "登錄"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "電子郵件"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "忘記密碼"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "密碼"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "注冊"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "記住"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "挑戰"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "挑戰模式"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "團隊合作"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "合作模式"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "死亡競賽"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "幫助"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "說明"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "聯機模式"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "本地聯機"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "在線聯機"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "在線游戲"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "單人模式"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "訓練"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "教程"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "對抗模式"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "名稱"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "名字"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "姓"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "用戶名"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "設置"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "先進的圖形"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "抗折疊"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "盛開"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "操作模式"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "難度設置"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "顯示"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "效果細節"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "異向"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "雙線性"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "過濾模式"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "三線性"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "第一人稱視角"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "視場角"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "全屏"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "游戲設置"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "圖形設置"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "模型細節"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "多核心渲染"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "音樂音量"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "網絡設置"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "質量"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "解析度"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "音效音量"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "Shader 細節"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "影子"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "陰影效果"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "大小"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "聲音設置"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "音量"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "分屏"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "材質細節"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "第三人稱視角"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "視頻設置"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "視頻質量"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "聲音音量"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "垂直同步"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "寬螢幕"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "窗口模式"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "高"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "低"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "中"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "最高"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "最高"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "版本"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "試玩版"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "免費版"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "完整版"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "位版本"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "超值版"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "共享軟件"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "試用版"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "虛擬現實舒適模式"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "HMD方向重置"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "虛擬現實"
+            }
+        ]
+    }
+}

@@ -80,31 +80,31 @@ constructor() : BasicGameState() {
 
     val auth = Authenticator()
 
-    private var update_delta: Int = 0
-
     val KEY_LIGHTMAP_RENDER = Key.F7
     val KEY_LIGHTMAP_SMOOTH = Key.F8
 
-    var DELTA_T: Int = 0
+    var UPDATE_DELTA: Int = 0
 
     @Throws(SlickException::class)
     override fun init(gameContainer: GameContainer, stateBasedGame: StateBasedGame) {
-        KeyMap.build()
-
+        // load necessary shaders
         shader12BitCol = Shader.makeShader("./res/4096.vrt", "./res/4096.frg")
         shaderBlurH = Shader.makeShader("./res/blurH.vrt", "./res/blur.frg")
         shaderBlurV = Shader.makeShader("./res/blurV.vrt", "./res/blur.frg")
 
-
+        // init skybox
         GRADIENT_IMAGE = Image("res/graphics/colourmap/sky_colour.png")
         skyBox = Rectangle(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
+        // init map as chosen size
         map = GameMap(8192, 2048)
 
+        // generate terrain for the map
         MapGenerator.attachMap(map)
         MapGenerator.SEED = 0x51621D2
         //mapgenerator.setSeed(new HQRNG().nextLong());
         MapGenerator.generateMap()
+
 
         RoguelikeRandomiser.seed = 0x540198
         //RoguelikeRandomiser.setSeed(new HQRNG().nextLong());
@@ -116,27 +116,27 @@ constructor() : BasicGameState() {
         //player.setNoClip(true);
         addActor(player)
 
+        // init console window
         consoleHandler = UIHandler(ConsoleWindow())
         consoleHandler.setPosition(0, 0)
 
+        // init debug window
         debugWindow = UIHandler(BasicDebugInfoWindow())
         debugWindow.setPosition(0, 0)
 
+        // init notifier
         notifier = UIHandler(Notification())
         notifier.setPosition(
                 (Terrarum.WIDTH - notifier.UI.width) / 2, Terrarum.HEIGHT - notifier.UI.height)
         notifier.setVisibility(true)
 
-        if (Terrarum.getConfigBoolean("smoothlighting") == true)
-            KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, true)
-        else
-            KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, false)
+        // set smooth lighting as in config
+        KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, Terrarum.getConfigBoolean("smoothlighting"))
     }
 
     override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
-        DELTA_T = delta
+        UPDATE_DELTA = delta
 
-        update_delta = delta
         setAppTitle()
 
         map.updateWorldTime(delta)
@@ -157,10 +157,9 @@ constructor() : BasicGameState() {
 
         updateActors(gc, delta)
 
-        // TODO thread pool
+        // TODO thread pool(?)
         CollisionSolver.process()
 
-        // TODO thread pool
         uiContainer.forEach { ui -> ui.update(gc, delta) }
         consoleHandler.update(gc, delta)
         debugWindow.update(gc, delta)
@@ -195,12 +194,14 @@ constructor() : BasicGameState() {
         MapCamera.renderBehind(gc, g)
 
         // draw actors
-        actorContainer.forEach { actor ->
-            if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
-                actor.drawBody(gc, g)
+        run {
+            actorContainer.forEach { actor ->
+                if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
+                    actor.drawBody(gc, g)
+                }
             }
+            player.drawBody(gc, g)
         }
-        player.drawBody(gc, g)
 
         LightmapRenderer.renderLightMap()
 
@@ -208,21 +209,21 @@ constructor() : BasicGameState() {
         MapDrawer.render(gc, g)
 
         setBlendMul()
-
             MapDrawer.drawEnvOverlay(g)
 
             if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) setBlendMul() else setBlendNormal()
             LightmapRenderer.draw(g)
-
         setBlendNormal()
 
         // draw actor glows
-        actorContainer.forEach { actor ->
-            if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
-                actor.drawGlow(gc, g)
+        run {
+            actorContainer.forEach { actor ->
+                if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
+                    actor.drawGlow(gc, g)
+                }
             }
+            player.drawGlow(gc, g)
         }
-        player.drawGlow(gc, g)
 
         // draw reference ID if debugWindow is open
         if (debugWindow.visible) {
@@ -249,10 +250,12 @@ constructor() : BasicGameState() {
         }
 
         // draw UIs
-        uiContainer.forEach { ui -> ui.render(gc, g) }
-        debugWindow.render(gc, g)
-        consoleHandler.render(gc, g)
-        notifier.render(gc, g)
+        run {
+            uiContainer.forEach { ui -> ui.render(gc, g) }
+            debugWindow.render(gc, g)
+            consoleHandler.render(gc, g)
+            notifier.render(gc, g)
+        }
     }
 
     private fun getGradientColour(row: Int, phase: Int) = GRADIENT_IMAGE!!.getColor(phase, row)
@@ -327,46 +330,52 @@ constructor() : BasicGameState() {
 
     /** Send message to notifier UI and toggle the UI as opened. */
     fun sendNotification(msg: Array<String>) {
-        (notifier.UI as Notification).sendNotification(Terrarum.appgc, update_delta, msg)
+        (notifier.UI as Notification).sendNotification(Terrarum.appgc, UPDATE_DELTA, msg)
         notifier.setAsOpening()
     }
 
     fun wakeDormantActors() {
-        // determine whether the dormant actor should be re-activated
         var actorContainerSize = actorContainerInactive.size
         var i = 0
-        while (i < actorContainerSize) { // loop thru actorContainerInactive
+        while (i < actorContainerSize) { // loop through actorContainerInactive
             val actor = actorContainerInactive[i]
             val actorIndex = i
             if (actor is Visible && actor.inUpdateRange()) {
                 addActor(actor) // duplicates are checked here
                 actorContainerInactive.removeAt(actorIndex)
                 actorContainerSize -= 1
-                i-- // array removed 1 elem, so also decrement counter by 1
+                i-- // array removed 1 elem, so we also decrement counter by 1
             }
             i++
         }
     }
 
+    /**
+     * determine whether the actor should be active or dormant by its distance from the player.
+     * If the actor must be dormant, the target actor will be put to the list specifically for them.
+     * if the actor is not to be dormant, it will be just ignored.
+     */
     fun InactivateDistantActors() {
         var actorContainerSize = actorContainer.size
         var i = 0
-        // determine whether the actor should be active or dormant by its distance from the player.
-        // If the actor must be dormant, the target actor will be put to the list specifically for them.
-        // if the actor is not to be dormant, update it
-        while (i < actorContainerSize) { // loop through the actorContainer
+        while (i < actorContainerSize) { // loop through actorContainer
             val actor = actorContainer[i]
             val actorIndex = i
             if (actor is Visible && !actor.inUpdateRange()) {
                 actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
                 actorContainer.removeAt(actorIndex)
                 actorContainerSize -= 1
-                i-- // array removed 1 elem, so also decrement counter by 1
+                i-- // array removed 1 elem, so we also decrement counter by 1
             }
             i++
         }
     }
 
+    /**
+     * Update actors concurrently.
+     *
+     * NOTE: concurrency for actor updating is currently disabled because of it's poor performance
+     */
     fun updateActors(gc: GameContainer, delta: Int) {
         if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD) {
             val actors = actorContainer.size.toFloat()
@@ -394,7 +403,7 @@ constructor() : BasicGameState() {
         get() = getGradientColour(2).getRGB24().rgb24ExpandToRgb30()
     fun globalLightByTime(t: Int): Int = getGradientColourByTime(2, t).getRGB24().rgb24ExpandToRgb30()
 
-    fun Color.getRGB24(): Int = (this.redByte shl 16) or (this.greenByte shl 8) or (this.blueByte)
+    fun Color.getRGB24(): Int = this.redByte.shl(16) or this.greenByte.shl(8) or this.blueByte
     /** Remap 8-bit value (0.0-1.0) to 10-bit value (0.0-4.0) by prepending two bits of zero for each R, G and B. */
     fun Int.rgb24ExpandToRgb30(): Int = (this and 0xff) or
             (this and 0xff00).ushr(8).shl(10) or
@@ -402,11 +411,13 @@ constructor() : BasicGameState() {
 
     fun Double.sqr() = this * this
     fun Int.sqr() = this * this
-    private fun distToActorSqr(a: Visible, p: Player): Float =
-            (a.hitbox.centeredX - p.hitbox.centeredX).sqr().toFloat() + (a.hitbox.centeredY - p.hitbox.centeredY).sqr().toFloat()
+    private fun distToActorSqr(a: Visible, p: Player): Double =
+            (a.hitbox.centeredX - p.hitbox.centeredX).sqr() + (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
+    /** whether the actor is within screen */
     private fun Visible.inScreen() = distToActorSqr(this, player) <=
                                      (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.game.screenZoom).sqr() +
                                       Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.game.screenZoom).sqr())
+    /** whether the actor is within update range */
     private fun Visible.inUpdateRange() = distToActorSqr(this, player) <= ACTOR_UPDATE_RANGE.sqr()
     /**
      * actorContainer extensions
@@ -459,10 +470,9 @@ constructor() : BasicGameState() {
     }
 
     private fun insertionSortLastElem(arr: ArrayList<Actor>) {
-        var x: Actor
         var j: Int
-        var index: Int = arr.size - 1
-        x = arr[index]
+        val index: Int = arr.size - 1
+        val x = arr[index]
         j = index - 1
         while (j > 0 && arr[j] > x) {
             arr[j + 1] = arr[j]

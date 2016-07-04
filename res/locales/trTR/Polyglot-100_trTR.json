@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Turkish",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "Sınıf"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "Karakteri Sil"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "Yeni Karakter"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "Yapay Zeka"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "Uzaylı"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "Klon"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "Siber"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "Tanrısal Varlık"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "Şeytan"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "Şeytaniçe"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "Ejderha"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "Ejderhalar"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "Hayalet"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "Tanrı"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "Tanrılar"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "Tanrıça"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "Büyücü"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "Doktor"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "Canavar"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "Ninja"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "Korsan"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "Rahip"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "Prens"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "Prenses"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "Robot"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "İskelet"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "Keskin Nişancı"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "Asker"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "Hırsız"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "Savaşçı"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "Sihirbaz"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "Zombi"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "Zombiler"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "Birinci"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "Sıra"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "İkinci"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "Üçüncü"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "Yanıyor"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "Kritik"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "Ölü"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "Donmuş"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "Zehirlenmiş"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "Yavaşlamış"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "Sersemlemiş"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "Şuursuz"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "Yaralanmamış"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "Islak"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "Yaralı"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "Büyük"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "Devasa"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "Küçük"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "Minik"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "Hava"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "Toprak"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "Ateş"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "Metal"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "Su"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "Bahis"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "Elden Çıkar"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "Bingo"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "Maks."
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "Min."
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "Zırh"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "Ok"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "Oklar"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "Tahta"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "Bomba"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "Kitap"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "Bot"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "Yay"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "Kart"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "Kartlar"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "Sandık"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "Büyülü"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "Paslı"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "Hançer"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "Zar"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "Zar"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "Kapı"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "Zırh Eldiveni"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "Mücevher"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "Hediye"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "Hediyeler"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "Eldiven"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "Siah"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "Çekiç"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "Kafalık"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "Anahtar"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "Bıçak"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "Kilit"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "Aşk"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "Makineli Tüfek"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "Büyü"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "Tabanca"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "Görev"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "Sıra"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "Tüfek"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "Roketatar"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "Roketatar"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "Parşömen"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "Kalkan"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "Kalkanlar"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "Enerji Kalkanı"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "Enerji Kalkanları"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "Av Tüfeği"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "Dürbünlü Tüfek"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "Büyü"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "Baston"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "Kılıç"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "Hazine"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "Epik"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "Çöp"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "Asa"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "Tahta"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "Yükseklik"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "Fren"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "Şasi"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "Derinlik"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "Yakıt"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "Dişli"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "Yol Tutuşu"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "Hız"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "Direksiyon Hakimiyeti"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "Süspansiyon"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "Tekerler"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "Kanatlar"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "Madalya"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "Bronz madalya"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "Altın madalya"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "Hümüş madalya"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "Bronz"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "Para"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "Altın"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "Külçe"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "Platin"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "Gümüş"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "Kale"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "Mağara"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "Zindan"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "Han"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "Gezegen"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "Dünya"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "Uzay"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "Uzay Gemisi"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "Hikaye"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "Macera"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "Bölüm"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "Sayfa"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "3D Tasarım"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "Animasyon"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "Animasyon Yönetmeni"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "Animatör"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "Sanat"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "Sanat Yönetmeni"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "Sanatçı"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "Sanatçılar"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "Asistan"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "Yardımcı"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "Ses Yönetmeni"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "Karakter Tasarımcı"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "Teknoloji Yöneticisi"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "Sinematik Animasyoncusu"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "Sinematik Yönetmeni"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "Kod"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "Bestekar"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "Konsept Tasarımcı"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "Yaratıcı Yönetmen"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "Veritabanı Yöneticisi"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "Dizayn Yönetmeni"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "Geliştiren"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "Yönetmen"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "Foley Sanatçısı"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "Font"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "Fontlar"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "Oyun"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "Oyun Tasarımı"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "Oyun Tasarımcısı"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "Oyun Geliştirici"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "Oyun Geliştirme"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "Grafik Tasarımcı"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "Resim"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "Resimler"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "Arayüz Tasarımcısı"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "Kıdemsiz"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "Baş"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "Programlama Lideri"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "Seviye Tasarımı"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "Seviye Tasarımcısı"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "Lokalizasyon"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "Taslak"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "Modeller"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "Müzisyen"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "Polyglot Projesi ile çevrilmiştir"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "Yapımcı"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "Prodüksiyon"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "Program Yöneticisi"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "Programcı"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "Programcılar"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "Programlama"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "Proje Yöneticisi"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "Yayıncı"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "Ses Kayıtçısı"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "Senaryo Yazarı"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "Kıdemli"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "Ses Efektleri"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "Ses Tasarımcısı"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "Ses Mühendisi"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "Oyun Müziği"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "Teşekkürler"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "Teşekkürler"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "Teknik Tasarımcı"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "Teknik Yönetici"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "Test Yöneticisi"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "Test Yöneticisi"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "Testçi"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "Çeviri"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "Görsel Efektler"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "Seslendirme"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "Ses Sanatçısı"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "Yazar"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "{0} aygıt algılanamadı."
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "Takip alanı terkediliyor."
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "Görüş Ünitesi algılanamadı."
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "Hile Algılandı!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "Hata kodu:"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "Geçersiz CD Anahtarı."
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "Geçersiz İsim!"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "Bir hata oluştu."
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "Bağlantı kesildi."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "Rakibinizin bağlantısı kesildi."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "Diğer oyuncunun bağlantısı kesildi."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "Takım arkadaşınızın bağlantısı kesildi."
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "Sunucuya bağlanılamıyor."
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "Kayıt dosyası bozuk."
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "Oyun bulunamadı."
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "Açık oyun yok."
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "Saldır"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "Yükselt"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "İnşa Et"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "At"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "Yap"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "Al"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "Tırman"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "Kapat"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "Topla"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "Pişir"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "Yap"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "Eğil"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "Atlat"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "Sür"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "Uç"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "Tam Hız"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "Git"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "Git"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "Yarım Hız"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "İyileştir"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "Zıpla"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "Yere İn"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "Bak"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "Karıştır"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "Aç"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "Al"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "Yarış"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "Oku"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "Değiştir"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "Koş"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "Uzaklaş"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "Ateş Et"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "Gizlice Sokul"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "Dön"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "Depar At"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "Yönlen"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "Havalan"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "Konuş"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "Fırlat"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "Yürü"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "Dayanıklılık"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "Tecrübe puanı"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "Kadın"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "Can"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "Kalp"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "Kalp"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "Seviye"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "Seviye Atladın!"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "Hayat"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "Erkek"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "Erkek"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "Erkek"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "Canlanma"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "Canlanma: "
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "Canlan?"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "Canlanıyor"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "Yetenek"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "Canlanma Noktası"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "Travesti"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "Kadın"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "Kadın"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "Hasar"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "Kritik Vuruş"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "Kritik Iska"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "Vur"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "Can puanı"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "Iska"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "Hasar"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "Hasar"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "Düşman"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "Düşman"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "Düşmanlar"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "Düşmanlar"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "Aksiyon oyunu"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "Macera oyunu"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "Kart"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "Çerezlik oyun"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "Fantastik oyun"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "Hardcore oyun"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "Bağımsız Yapımcı"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "Orta çağ oyunu"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "Çeşitli"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "Çok oyunculu oyun"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "Tür"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "Platform oyunu"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "Puzzle"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "Bilgi yarışı"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "Yarış"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "Retro oyun"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "Rol yapma oyunu"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "Gerçek Zamanlı Strateji"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "Bilim kurgu oyunu"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "Atış oyunu"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "Simulasyon"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "Tek oyunculu oyun"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "Spor oyunu"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "Strateji oyunu"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "Sıra Tabanlı Strateji"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "Kule savunma oyunu"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "Depo"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "Cephane"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "Cephane"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "Mermi"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "Mermiler"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "Satın Al"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "Depo Kapasitesi"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "Yere At"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "Yük"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "Depo Dolu"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "Eşya"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "Anahtar"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "Güçlendirme"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "Sat"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "Kullan"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "Silah"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "Silahlar"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "Daha fazla taşıyamazsın."
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "Dikkatli Ol!"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "Lütfen dikkatli ol!"
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "Taktik"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "Hedef"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "Asist"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "Asistler"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "Saldır"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "Bonus"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "Ele Geçir"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "Tamamlanmış"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "Ölüm"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "Ölümler"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "Savun"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "Yoket"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "Kaç"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "Son"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "Oyun bitti!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "OYUN BİTTİ!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "Yüksek Skor"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "Tamamlanmamış"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "Öldür"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "Öldürme Asisti"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "Leş"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "Leş"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "Kilitli"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "Mağlubiyet"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "Maç"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "Hedef"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "Görev Hedefi"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "Görev Hedefleri"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "Çarpan"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "Hedefler"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "Pozisyon"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "Tur"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "Tur"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "Raund"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "Skor"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "Süre"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "Kalan Süre"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "Turnuva"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "Turnuvalar"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "Galibiyet"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "Mağlubiyet"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "Mağlup oldun."
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "Kaybeden"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "Takımın kaybetti!"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "Takımın kazandı!"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "Galibiyet"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "Kazanan"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "Ölüsün."
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "Öldün."
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "Kaybettin!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "Kaybettin!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "Kazandın!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "Kazandın!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "Kamera"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "Ters"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "Normal"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "Kamera X Ekseni"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "Kamera Y Ekseni"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "Buton"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "Tıkla"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "Ölü Bölge"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "Çift Tıkla"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "Sürükle"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "Sürükle ve bırak"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "Parmak"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "Oyun Kumandası"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "Jiroskop"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "Tuş"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "Klavye"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "Fare"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "Fare hassasiyeti"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "Sıkıştır"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "Döndür"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "Kaydır"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "Salla"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "Ayır"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "Kaydır"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "Tıkla"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "Buton"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "Tuş"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "Eğ"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "Kol"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "Kollar"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "Gövde"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "Çene"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "Renk"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "Kulak"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "Kulaklar"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "Göz"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "Gözler"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "Ayaklar"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "Ayak"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "Saç"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "Sakal"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "Post"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "Saç"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "El"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "Eller"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "Kafa"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "Kalça"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "Bacak"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "Bacaklar"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "Ağız"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "Boyun"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "Burun"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "Deri"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "Göğüs"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "Zorluk"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "Kolay"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "Zor"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "İmkansız"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "Akıllara Zarar"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "Orta"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "Çok Kolay"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "Çok Zor"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "Aşağı"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "Sol"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "Sağ"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "Yukarı"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "Yükle"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "Oyunu Yükle"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "Yükleniyor..."
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "Lütfen bekleyiniz..."
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "Verileri Sıfırla"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "Kaydet"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "Kaydet"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "Oyunu Kaydet"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "Kaydediliyor..."
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "Yaş"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "Tümü"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "Gerçekten emin misiniz?"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "Emin misiniz?"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "Geri"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "Arkafon Müziği"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "İptal"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "Kapat"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "Onayla"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "Devam Et"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "Devam edilsin mi?"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "Künye"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "Masaüstüne Çıkış"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "Masaüstüne çıkılsın mı?"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "DLC"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "İndir"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "İndirilebilir İçerik"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "Çıkış"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "Oyundan çıkılsın mı?"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "Ekstra"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "FPS"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "Sanat Galerisi"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "Güle güle!"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "Grafikler"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "Oyun içi satın alım"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "Dil"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "Seviye"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "Posta Kutusu"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "Ana Menü"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "Daha Fazla"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "Müzik"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "Müzik Oynatıcı"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "Yeni Oyun"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "Sonraki"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "Sonraki parça"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "Hayır"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "HAYIR"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "Yoo"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "TAMAM"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "Durdur"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "Durduruldu"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "Oyna"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "Tekrar Oyna"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "Herhangi bir tuşa bas"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "Devam etmek için herhangi bir tuşa bas"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "Başla'ya bas"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "Devam etmek için Başla'ya bas"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "Önceki"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "Önceki parça"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "Fiyat"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "Bedava"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "Satın Al"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "Oyunu Kapat"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "Çıkmak istediğinize emin misiniz?"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "Oyun kapatılsın mı?"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "Tekrarını İzle"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "Geri Dön"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "Ana Menü'ye geri dön"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "Ana Menü'ye geri dönülsün mü?"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "Paylaş"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "Atla"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "Ses"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "Teşekkürler!"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "Kilidini Aç"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "Video"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "Konuşmalar"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "Uyarı"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "Hoşgeldiniz"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "Dünya"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "Hee"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "Evet"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "EVET"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "Türkçe"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Turkish"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "Giriş"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "E-Mail"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "Şifremi Unuttum"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "Şifre"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "Kayıt Ol"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "Beni Hatırla"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "Meydan Okuma"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "Zorlu Mod"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "Eşli Oyun"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "Eşli Oyun"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "Ölüm Maçı"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "Yardım"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "Yönergeler"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "Çok oyuncu"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "Lokal Ağ"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "Çevrimiçi"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "Çevrimiçi Oyna"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "Tek oyuncu"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "Eğitim"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "Eğitim"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "Vs."
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "İsim"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "Ad"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "Soyad"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "Kullanıcı Adı"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "Ayarlar"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "Gelişmiş Grafikler"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "Kenar Yumuşatma"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "Işık Kütlesi"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "Kontroller"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "Zorluk Ayarları"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "Ekran"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "Efekt Detayı"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "Eşyönsüz Süzme"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "İki Doğrusal Süzme"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "Filtre modu"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "Üç Doğrusal Süzme"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "Birinci Kişi Görüşü"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "Görüş Mesafesi"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "Tam ekran"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "Oyun Ayarları"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "Grafik Ayarları"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "Gösterge"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "Model detayı"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "Çoklu CPU Kullanımı"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "Müzik Şiddeti"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "Bağlantı Ayarları"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "Kalite"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "Çözünürlük"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "Ses Şiddeti"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "Shader Detayı"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "Gölge"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "Gölgeler"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "Boyut"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "Ses Ayarları"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "Ses Şiddeti"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "Bölünmüş Ekran"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "Doku detayı"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "Üçüncü Kişi Görüşü"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "Video Ayarları"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "Video Kalitesi"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "Konuşma Şiddeti"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "Dikey Senkronizasyon (Vsync)"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "Geniş ekran"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "Pencere"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "Yüksek"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "Alçak"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "Orta"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "Çok Yüksek"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "Çok Yüksek"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "Versiyon"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "Demo"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "Bedava"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "Tam Sürüm"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "Deneme"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "Kaliteli"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "Paylaşımlı Yazılım"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "Deneme"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "VR konfor modu"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "Görüş Ünitesi yön sıfırla."
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "Sanal Gerçeklik"
+            }
+        ]
+    }
+}

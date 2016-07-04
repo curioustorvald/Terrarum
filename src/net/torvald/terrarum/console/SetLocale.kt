@@ -29,8 +29,7 @@ class SetLocale : ConsoleCommand {
             val echo = Echo()
             echo.execute("Locales:")
 
-            val record = Lang.getRecord("LANGUAGE_ID")
-            record.forEach { field -> echo.execute("] " + field) }
+            Lang.languageList.forEach { echo.execute("--> $it") }
         }
         else {
             printUsage()

@@ -118,7 +118,7 @@ open class ActorWithBody : Actor(), Visible {
     var isNoCollideWorld = false
     var isNoSubjectToFluidResistance = false
     /** Time-freezing. The actor won't even budge but the velocity will accumulate
-     * EXCEPT FOR friction, gravity and buoyancy SHOULD NOT.
+     * EXCEPT FOR friction, gravity and buoyancy.
      *
      * (this would give something to do to the player otherwise it would be dull to travel far,
      * think of a grass cutting on the Zelda games. It would also make a great puzzle to solve.
@@ -175,7 +175,7 @@ open class ActorWithBody : Actor(), Visible {
     @Transient private val CCD_TRY_MAX = 12800
 
     // just some trivial magic numbers
-    @Transient private val A_PIXEL = 1.4
+    @Transient private val A_PIXEL = 1.0
     @Transient private val COLLIDING_TOP = 0
     @Transient private val COLLIDING_RIGHT = 1
     @Transient private val COLLIDING_BOTTOM = 2
@@ -234,7 +234,7 @@ open class ActorWithBody : Actor(), Visible {
                 baseHitboxH * scale)
     }
 
-    override fun run() = update(Terrarum.appgc, Terrarum.game.DELTA_T)
+    override fun run() = update(Terrarum.appgc, Terrarum.game.UPDATE_DELTA)
 
     /**
      * Add vector value to the velocity, in the time unit of single frame.
@@ -274,19 +274,21 @@ open class ActorWithBody : Actor(), Visible {
             /**
              * Actual physics thing (altering velocity) starts from here
              */
-            // Actors are subject to the gravity and the buoyancy if they are not levitating
-            if (!isNoSubjectToGrav) {
-                applyGravitation()
-                //applyBuoyancy()
-            }
 
-            // hard limit velocity
-            veloX = veloX.bipolarClamp(VELO_HARD_LIMIT)
-            veloY = veloY.bipolarClamp(VELO_HARD_LIMIT)
+            applyControllerMovement()
 
-            moveDelta.set(velocity + Vector2(walkX, walkY))
+            // applyBuoyancy()
 
             if (!isChronostasis) {
+                // Actors are subject to the gravity and the buoyancy if they are not levitating
+                if (!isNoSubjectToGrav) {
+                    applyGravitation()
+                }
+
+                // hard limit velocity
+                veloX = veloX.bipolarClamp(VELO_HARD_LIMIT)
+                veloY = veloY.bipolarClamp(VELO_HARD_LIMIT)
+
                 // Set 'next' position (hitbox) from canonical and walking velocity
                 setNewNextHitbox()
 
@@ -309,8 +311,25 @@ open class ActorWithBody : Actor(), Visible {
                 clampHitbox()
             }
 
-            walledLeft =  isColliding(hitbox, COLLIDING_LEFT)
-            walledRight = isColliding(hitbox, COLLIDING_RIGHT)
+            // useless
+            walledLeft =  false//isColliding(hitbox, COLLIDING_LEFT)
+            walledRight = false//isColliding(hitbox, COLLIDING_RIGHT)
+        }
+    }
+
+    private fun applyControllerMovement() {
+        // decide whether ignore walkX
+        if (!(isCollidingSide(hitbox, COLLIDING_LEFT) && walkX < 0)
+            || !(isCollidingSide(hitbox, COLLIDING_RIGHT) && walkX > 0)
+        ) {
+            moveDelta.x = veloX + walkX
+        }
+
+        // decide whether ignore walkY
+        if (!(isCollidingSide(hitbox, COLLIDING_TOP) && walkY < 0)
+            || !(isCollidingSide(hitbox, COLLIDING_BOTTOM) && walkY > 0)
+        ) {
+            moveDelta.y = veloY + walkY
         }
     }
 
@@ -320,7 +339,7 @@ open class ActorWithBody : Actor(), Visible {
      * Apply only if not grounded; normal force is precessed separately.
      */
     private fun applyGravitation() {
-        if (!grounded) {//(!isColliding(COLLIDING_BOTTOM)) { // or !grounded
+        if (!isTouchingSide(hitbox, COLLIDING_BOTTOM)) {//(!isColliding(COLLIDING_BOTTOM)) { // or !grounded
             /**
              * weight; gravitational force in action
              * W = mass * G (9.8 [m/s^2])
@@ -346,7 +365,7 @@ open class ActorWithBody : Actor(), Visible {
         if (!isNoCollideWorld) {
             // axis Y
             if (moveDelta.y >= 0.0) { // was moving downward?
-                if (ccdCollided) { // actor hit something on its bottom
+                if (isTouchingSide(nextHitbox, COLLIDING_BOTTOM)) { // actor hit something on its bottom
                     hitAndReflectY()
                     grounded = true
                 }
@@ -356,14 +375,15 @@ open class ActorWithBody : Actor(), Visible {
             }
             else if (moveDelta.y < 0.0) { // or was moving upward?
                 grounded = false
-                if (ccdCollided) { // actor hit something on its top
+                if (isTouchingSide(nextHitbox, COLLIDING_TOP)) { // actor hit something on its top
                     hitAndReflectY()
                 }
                 else { // the actor is not grounded at all
                 }
             }
             // axis X
-            if (ccdCollided && moveDelta.x != 0.0) { // check right and left
+            if (isTouchingSide(nextHitbox, COLLIDING_LEFT) && isTouchingSide(nextHitbox, COLLIDING_RIGHT)
+                    && moveDelta.x != 0.0) { // check right and left
                 // the actor is hitting the wall
                 hitAndReflectX()
             }
@@ -376,23 +396,26 @@ open class ActorWithBody : Actor(), Visible {
     private fun displaceByCCD() {
         if (!isNoCollideWorld){
             // do some CCD between hitbox and nextHitbox
-            val ccdBox = hitbox.clone()
-            val ccdDelta = hitbox.toVector() to nextHitbox.toVector()
-            val ccdStep = Math.max(ccdDelta.x, ccdDelta.y)
+            val ccdBox = nextHitbox.clone().snapToPixel()
+            val ccdDelta = nextHitbox.toVector() to hitbox.toVector()
+            val deltaMax = Math.max(ccdDelta.x.abs(), ccdDelta.y.abs())
+            // set ccdDelta so that CCD move a pixel per round
+            if (deltaMax > 1.0)
+                ccdDelta *= (1.0 / deltaMax)
 
-            for (step in 0..ccdStep.floorInt()) {
-                ccdBox.translate(ccdDelta * (step.toDouble() / ccdStep))
+            //println("deltaMax: $deltaMax")
+            //println("ccdDelta: $ccdDelta")
 
-                println(ccdDelta * (step.toDouble() / ccdStep))
-                println(ccdBox)
+            while (!ccdDelta.isZero && isColliding(ccdBox)) {
+                nextHitbox.translate(ccdDelta)
+                ccdCollided = true
 
-                if (isColliding(ccdBox)) {
-                    ccdCollided = true
-                    break
-                }
+                ccdBox.reassign(nextHitbox).snapToPixel()
             }
 
-            nextHitbox.reassign(ccdBox)
+            nextHitbox.snapToPixel()
+
+            //println("ccdCollided: $ccdCollided")
         }
         else {
             ccdCollided = false
@@ -470,10 +493,99 @@ open class ActorWithBody : Actor(), Visible {
             }
         }
 
-        val txStart = x1.div(TSIZE).floorInt()
-        val txEnd = x2.div(TSIZE).floorInt()
-        val tyStart = y1.div(TSIZE).floorInt()
-        val tyEnd = y2.div(TSIZE).floorInt()
+        val txStart = x1.div(TSIZE).roundInt()
+        val txEnd = x2.div(TSIZE).roundInt()
+        val tyStart = y1.div(TSIZE).roundInt()
+        val tyEnd = y2.div(TSIZE).roundInt()
+
+        for (y in tyStart..tyEnd) {
+            for (x in txStart..txEnd) {
+                val tile = map.getTileFromTerrain(x, y)
+                if (TilePropCodex.getProp(tile).isSolid)
+                    return true
+            }
+        }
+
+        return false
+    }
+
+    private fun isTouchingSide(hitbox: Hitbox, option: Int): Boolean {
+        val x1: Double; val x2: Double; val y1: Double; val y2: Double
+        if (option == COLLIDING_TOP) {
+            x1 = hitbox.posX
+            x2 = hitbox.endPointX
+            y1 = hitbox.posY - A_PIXEL
+            y2 = y1
+        }
+        else if (option == COLLIDING_BOTTOM) {
+            x1 = hitbox.posX
+            x2 = hitbox.endPointX
+            y1 = hitbox.endPointY + A_PIXEL
+            y2 = y1
+        }
+        else if (option == COLLIDING_LEFT) {
+            x1 = hitbox.posX - A_PIXEL
+            x2 = x1
+            y1 = hitbox.posY
+            y2 = hitbox.endPointY
+        }
+        else if (option == COLLIDING_RIGHT) {
+            x1 = hitbox.endPointX + A_PIXEL
+            x2 = x1
+            y1 = hitbox.posY
+            y2 = hitbox.endPointY
+        }
+        else throw IllegalArgumentException()
+
+        val txStart = x1.div(TSIZE).roundInt()
+        val txEnd = x2.div(TSIZE).roundInt()
+        val tyStart = y1.div(TSIZE).roundInt()
+        val tyEnd = y2.div(TSIZE).roundInt()
+
+        for (y in tyStart..tyEnd) {
+            for (x in txStart..txEnd) {
+                val tile = map.getTileFromTerrain(x, y)
+                if (TilePropCodex.getProp(tile).isSolid)
+                    return true
+            }
+        }
+
+        return false
+    }
+
+
+    private fun isCollidingSide(hitbox: Hitbox, option: Int): Boolean {
+        val x1: Double; val x2: Double; val y1: Double; val y2: Double
+        if (option == COLLIDING_TOP) {
+            x1 = hitbox.posX
+            x2 = hitbox.endPointX
+            y1 = hitbox.posY
+            y2 = y1
+        }
+        else if (option == COLLIDING_BOTTOM) {
+            x1 = hitbox.posX
+            x2 = hitbox.endPointX
+            y1 = hitbox.endPointY
+            y2 = y1
+        }
+        else if (option == COLLIDING_LEFT) {
+            x1 = hitbox.posX
+            x2 = x1
+            y1 = hitbox.posY
+            y2 = hitbox.endPointY
+        }
+        else if (option == COLLIDING_RIGHT) {
+            x1 = hitbox.endPointX
+            x2 = x1
+            y1 = hitbox.posY
+            y2 = hitbox.endPointY
+        }
+        else throw IllegalArgumentException()
+
+        val txStart = x1.div(TSIZE).roundInt()
+        val txEnd = x2.div(TSIZE).roundInt()
+        val tyStart = y1.div(TSIZE).roundInt()
+        val tyEnd = y2.div(TSIZE).roundInt()
 
         for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
@@ -792,7 +904,7 @@ open class ActorWithBody : Actor(), Visible {
     fun Double.sqr() = this * this
     fun Int.abs() = if (this < 0) -this else this
     fun Double.bipolarClamp(limit: Double) =
-            if      (this > 0 && this > limit)  limit
+            if      (this > 0 && this > limit)   limit
             else if (this < 0 && this < -limit) -limit
             else this
 
@@ -800,11 +912,12 @@ open class ActorWithBody : Actor(), Visible {
         // errors
         if (baseHitboxW == 0 || baseHitboxH == 0)
             throw RuntimeException("Hitbox dimension was not set.")
-        if (sprite == null && isVisible)
-            throw RuntimeException("Actor ${this.javaClass.canonicalName} is visible but the sprite was not set.")
+
         // warnings
-        if (!isVisible && sprite != null)
-            println("[ActorWithBody] Caution: actor ${this.javaClass.canonicalName} is invisible but the sprite was given.")
+        if (sprite == null && isVisible)
+            println("[ActorWithBody] Caution: actor ${this.javaClass.simpleName} is visible but the sprite was not set.")
+        else if (sprite != null && !isVisible)
+            println("[ActorWithBody] Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
 
         assertPrinted = true
     }

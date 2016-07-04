@@ -10,9 +10,9 @@ class GetLocale : ConsoleCommand {
     override fun execute(args: Array<String>) {
         Echo().execute(
                 "Locale: "
-                + Lang.get("LANGUAGE_THIS")
+                + Lang["MENU_LANGUAGE_THIS"]
                 + " ("
-                + Lang.get("LANGUAGE_EN")
+                + Lang["MENU_LANGUAGE_THIS_EN"]
                 + ")")
     }
 

@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Finnish",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "Luokka"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "Poista hahmo"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "Uusi hahmo"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "Tekoäly"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "Avaruusolio"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "Klooni"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "Kyborgi"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "Jumalhahmo"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "Demoni"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "Demonitar"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "Lohikäärme"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "Lohikäärmeet"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "Haamu"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "Jumala"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "Jumalat"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "Jumalatar"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "Maagi"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "Lääkintämies"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "Hirviö"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "Ninja"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "Merirosvo"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "Pappi"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "Prinssi"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "Prinsessa"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "Robotti"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "Luuranko"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "Tarkka-ampuja"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "Sotilas"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "Varas"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "Soturi"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "Velho"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "Zombi"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "Zombit"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "Ensimmäinen sija"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "Sija"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "Toinen sija"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "Kolmas sija"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "Liekeissä"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "Kriittinen"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "Kuollut"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "Jäässä"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "Myrkytetty"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "Hidastettu"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "Pökerryksissä"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "Tajuton"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "Täydessä kunnossa"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "Märkä"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "Haavoittunut"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "Iso"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "Jättimäinen"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "Pieni"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "Pikkuriikkinen"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "Ilma"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "Maa"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "Tuli"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "Metalli"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "Vesi"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "Lyö vetoa"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "Hylkää"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "Päävoitto"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "Maksimi"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "Minimi"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "Panssari"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "Nuoli"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "Nuolia"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "Lauta"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "Pommi"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "Kirja"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "Saappaat"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "Jousi"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "Kortti"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "Kortit"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "Kirstu"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "Taika"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "Ruosteinen"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "Veitsi"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "Noppa"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "Nopat"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "Ovi"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "Taisteluhansikkaat"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "Jalokivi"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "Lahja"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "Lahjat"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "Hanskat"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "Ase"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "Vasara"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "Kypärä"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "Avain"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "Puukko"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "Lukko"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "Rakkaus"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "Konekivääri"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "Taikuus"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "Pistooli"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "Tehtävä"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "Arvo"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "Kivääri"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "Raketinheitin"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "Sinko"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "Käärö"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "Kilpi"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "Kilvet"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "Energiakilpi"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "Energiakilvet"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "Haulikko"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "Tarkkuuskivääri"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "Taika"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "Sauva"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "Miekka"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "Aarre"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "Eeppinen"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "Romu"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "Sauva"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "Puu"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "Korkeus"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "Jarrut"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "Runko"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "Syvyys"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "Polttoaine"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "Vaihde"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "Hallinta"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "Vauhti"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "Ohjaus"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "Jousitus"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "Pyörät"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "Siivet"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "Mitali"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "Pronssimitali"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "Kultamitali"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "Hopeamitali"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "Pronssi"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "Kolikko"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "Kulta"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "Harkko"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "Platina"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "Hopea"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "Linna"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "Luola"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "Vankityrmä"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "Majatalo"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "Planeetta"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "Maa"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "Avaruus"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "Avaruusalus"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "Tarina"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "Seikkailu"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "Luku"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "Sivu"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "3D-mallinnus"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "Animaatio"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "Animaatio-ohjaaja"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "Animaattori"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "Taide"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "Taideohjaaja"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "Taiteilija"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "Taiteilijat"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "Apulais"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "Kumppani"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "Ääniohjaaja"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "Hahmosuunnittelija"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "Teknologiavastaava"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "Elokuvallinen animaattori"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "Elokuvallinen ohjaaja"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "Koodi"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "Säveltäjä"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "Konseptitaiteilija"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "Luova ohjaaja"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "Tietokantaylläpitäjä"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "Suunnitteluohjaaja"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "Kehittäjä"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "Ohjaaja"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "Foleytaiteilija"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "Kirjasin"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "Kirjaisimet"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "Peli"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "Pelisuunnittelu"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "Pelisuunnittelija"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "Pelinkehittäjä"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "Pelinkehitys"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "Graafinen suunnittelija"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "Kuva"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "Kuvat"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "Käyttöliittymätaiteilija"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "Nuorempi"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "Johto"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "Pääohjelmoija"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "Tasosuunnittelu"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "Tasosuunnittelija"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "Lokalisaatio"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "Käsikirjoitus"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "Mallit"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "Muusikko"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "Käännökset: Polyglot Project"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "Tuottaja"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "Tuotanto"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "Ohjelmistopäällikkö"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "Ohjelmoija"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "Ohjelmoijat"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "Ohjelmointi"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "Projektipäällikkö"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "Julkaisija"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "Äänittäjä"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "Käsikirjoittaja"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "Vanhempi"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "Ääniefektit"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "Äänisuunnittelija"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "Ääniteknikko"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "Ääniraita"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "Erityinen kiitos"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "Erityiset kiitokset"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "Tekninen taiteilija"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "Tekninen ohjaaja"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "Testijohtaja"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "Testipäällikkö"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "Testaaja"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "Käännöstyö"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "Visuaaliset efektit"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "Ääninäyttely"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "Ääninäyttelijä"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "Kirjoittaja"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "{0} ei havaittu"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "Poistut seuranta-alueelta"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "HMD ei havaittu"
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "Huijauksia havaittu!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "Virhekoodi: "
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "Virheellinen tuotetunnus."
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "Virheellinen nimi!"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "On tapahtunut virhe."
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "Yhteys menetetty."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "Vastustajasi on menettänyt yhteyden."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "Toinen pelaaja on menettänyt yhteyden."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "Tiimikaverisi on menettänyt yhteyden."
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "Palvelimeen ei saada yhteyttä."
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "Tallennus on vioittunut."
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "Pelejä ei löytynyt."
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "Avoimia pelejä ei ole."
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "Hyökkää"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "Tehostus"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "Rakenna"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "Heitä"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "Loihdi"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "Lunasta"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "Kiipeä"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "Sulje"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "Kerää"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "Keitä"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "Luo"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "Kyyristy"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "Väistä"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "Aja"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "Lennä"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "Täysi vauhti"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "Mene"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "Mene"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "Puolivauhti"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "Paranna"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "Hyppää"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "Lasku"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "Katso"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "Sekoita"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "Avaa"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "Ota"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "Kilpaile"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "Lue"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "Vaihda"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "Juokse"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "Juokse pois"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "Ammu"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "Hiivi"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "Pyöritä"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "Pikajuokse"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "Ohjaa"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "Nousu"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "Puhu"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "Heitä"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "Kävele"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "Kestävyys"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "Kokemuspisteet"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "Nainen"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "Terveys"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "Sydän"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "Sydäntä"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "Taso"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "Uusi taso!"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "Elämät"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "Mies"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "Mies"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "Miehet"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "Synny uudestaan"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "Synnyt uudellen:"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "Synny uudestaan?"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "Synnytään uudestaan"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "Taito"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "Uudelleensyntymispaikka"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "Transsukupuolinen"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "Nainen"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "Naiset"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "Vaurio"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "Kriittinen osuma"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "Kriittinen epäonnistuminen"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "Osuma"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "Osumapisteet"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "Ohi"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "Osuma"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "Osumaa"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "Vastustaja"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "Vastustaja"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "Vastustajat"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "Vastustajat"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "Toimintapeli"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "Seikkailupeli"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "Kortti"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "Kasuaalipeli"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "Fantasiapeli"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "Hardcorepeli"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "Indie"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "Keskiaikapeli"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "Sekalaiset"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "Moninpeli"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "Lajityyppi"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "Tasohyppelypeli"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "Pulmapeli"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "Tietovisa"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "Kilpa-ajo"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "Retropeli"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "Roolipeli"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "Reaaliaikainen strategia"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "Tieteisfiktiopeli"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "Ammuntapeli"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "Simulaatiopeli"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "Yksinpeli"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "Urheilupeli"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "Strategiapeli"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "Vuoropohjainen strategia"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "Tornipuolustuspeli"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "Tavarat"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "Ammus"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "Ammukset"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "Luoti"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "Luodit"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "Osta"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "Kantoraja"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "Pudota"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "Taakka"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "Kantoraja täynnä"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "Esine"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "Avain"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "Lisävoima"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "Myy"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "Käytä"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "Ase"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "Aseet"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "Et voi kantaa enempää."
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "Ole varovainen!"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "Ole varovainen."
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "Taktiikat"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "Tavoite"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "Avustus"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "Avustukset"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "Hyökkää"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "Bonus"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "Valtaa"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "Suoritettu"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "Kuolema"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "Kuolemat"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "Puolusta"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "Tuhoa"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "Pakene"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "Loppu"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "Peli loppu!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "PELI LOPPU!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "Paras tulos"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "Keskeneräinen"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "Tapa"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "Avustettu tappo"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "Tappo"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "Tappoa"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "Lukittu"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "Häviöt"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "Ottelu"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "Tehtävä"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "Tehtävän tavoite"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "Tehtävän tavoitteet"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "Kerroin"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "Tavoitteet"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "Asema"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "Kierros"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "Kierrosta"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "Erä"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "Pisteet"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "Aika"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "Aikaa jäljellä"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "Turnaus"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "Turnaukset"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "Voitot"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "Häviö"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "Sinut on voitettu."
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "Häviäjä"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "Joukkueesi hävisi!"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "Joukkueesi voitti!"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "Voitto"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "Voittaja"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "Olet kuollut"
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "Kuolit."
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "Sinä hävisit!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "Sinä hävisit!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "Sinä voitit!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "Sinä voitit!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "Kamera"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "Käänteinen"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "Normaali"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "Kamera X-akseli"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "Kamera Y-akseli"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "Painike"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "Napsauta"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "Kuollut alue"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "Kaksoisnapsauta"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "Vedä"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "Raahaa ja pudota"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "Sormi"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "Peliohjain"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "Gyroskooppi"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "Näppäin"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "Näppäimistö"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "Hiiri"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "Hiiren herkkyys"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "Nipistä"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "Pyöritä"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "Vieritä"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "Ravista"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "Laajenna"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "Pyyhkäise"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "Paina"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "Painike"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "Näppäintä"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "Kallista"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "Käsivarsi"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "Käsivarret"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "Rinta"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "Leuka"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "Väri"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "Korva"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "Korvat"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "Silmä"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "Silmät"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "Jalat"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "Jalka"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "Karvoitus"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "Parta"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "Turkki"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "Hiukset"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "Käsi"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "Kädet"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "Pää"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "Lantio"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "Reisi"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "Reidet"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "Suu"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "Kaula"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "Nenä"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "Iho"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "Keskivartalo"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "Vaikeustaso"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "Helppo"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "Vaikea"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "Mahdoton"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "Älytön"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "Normaali"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "Erittäin helppo"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "Erittäin vaikea"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "Alas"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "Vasen"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "Oikea"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "Ylös"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "Lataa"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "Lataa peli"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "Ladataan..."
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "Odota hetki..."
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "Aseta alkutilaan"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "Tallenna"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "Tallenna tiedot"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "Tallenna peli"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "Tallennetaan..."
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "Ikä"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "Kaikki"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "Oletko aivan varma?"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "Oletko varma?"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "Takaisin"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "Taustamusiikki"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "Peruuta"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "Sulje"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "Valmis"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "Jatka"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "Jatka?"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "Lopputekstit"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "Poistu työpöydälle"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "Poistu työpöydälle?"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "Lisäsisältö"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "Lataa"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "Ladattava sisältö"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "Lopeta"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "Lopeta?"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "Ekstrat"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "FPS"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "Galleria"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "Näkemiin!"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "Grafiikka"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "Sovelluksen sisäinen ostos"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "Kieli"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "Taso"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "Viestit"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "Päävalikko"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "Lisää"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "Musiikki"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "Musiikinsoitin"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "Uusi peli"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "Seuraava"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "Seuraava kappale"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "Ei"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "EI"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "Ei"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "OK"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "Pysäytä"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "Pysäytetty"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "Pelaa"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "Pelaa uudestaan"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "Paina mitä tahansa näppäintä"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "Paina mitä tahansa näppäintä jatkaaksesi"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "Paina Start"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "Paina Start jatkaaksesi"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "Edellinen"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "Edellinen kappale"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "Hinta"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "Ilmainen"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "Osta"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "Lopeta"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "Haluatko varmasti lopettaa?"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "Lopeta?"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "Uusinta"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "Palaa"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "Palaa päävalikkoon"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "Palaa päävalikkoon?"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "Jaa"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "Ohita"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "Ääni"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "Kiitos!"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "Avaa"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "Video"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "Äänet"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "Varoitus"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "Tervetuloa"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "Maailma"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "Joo"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "Kyllä"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "KYLLÄ"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "Suomi"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Finnish"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "Kirjaudu"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "Sähköposti"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "Unohdin salasanan"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "Salasana"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "Rekisteröidy"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "Muista?"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "Haaste"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "Haastetila"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "Yhteistyöpeli"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "Yhteistyöpeli"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "Deathmatch"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "Ohje"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "Ohjeet"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "Moninpeli"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "Paikallinen moninpeli"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "Verkkomoninpeli"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "Pelaa verkossa"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "Yksinpeli"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "Harjoittelu"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "Opastus"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "Vastakkain"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "Nimi"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "Etunimi"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "Sukunimi"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "Käyttäjänimi"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "Asetukset"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "Grafiikka-lisäasetukset"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "Reunanpehmennys"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "Hohto"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "Ohjausasetukset"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "Vaikeustasoasetukset"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "Näyttö"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "Tehosteiden tarkkuus"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "Anisotrooppinen"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "Bilineaarinen"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "Suodatustila"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "Trilineaarinen"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "Ensimmäinen persoona"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "Näkökenttä"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "Kokoruutu"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "Peliasetukset"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "Grafiikka-asetukset"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "Mallien yksityiskohtaisuus"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "Moniydinrenderöinti"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "Musiikin voimakkuus"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "Verkkoasetukset"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "Laatu"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "Resoluutio"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "Ääniefektien voimakkuus"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "Pintojen yksityiskoht."
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "Varjo"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "Varjot"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "Koko"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "Ääniasetukset"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "Äänenvoimakkuus"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "Jaettu näyttö"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "Tekstuurien yksityiskohtaisuus"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "Kolmas persoona"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "Videoasetukset"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "Videon laatu"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "Puheäänen voimakkuus"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "Vsync"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "Laajakuva"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "Ikkunoitu"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "Korkea"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "Matala"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "Normaali"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "Erittäin korkea"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "Erittäin korkea"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "Versio"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "Demo"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "Ilmainen"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "Täysi"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "Lite"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "Premium"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "Shareware"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "Trial"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "VR mukavuustila"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "HMD suunta alkutilaan"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "Virtuaalitodellisuus"
+            }
+        ]
+    }
+}

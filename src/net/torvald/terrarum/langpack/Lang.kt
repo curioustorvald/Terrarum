@@ -1,6 +1,7 @@
 package net.torvald.terrarum.langpack
 
 import net.torvald.CSVFetcher
+import net.torvald.JsonFetcher
 import net.torvald.imagefont.GameFontWhite
 import net.torvald.terrarum.Terrarum
 import org.apache.commons.csv.CSVRecord
@@ -14,81 +15,106 @@ import java.util.*
  */
 object Lang {
 
-    private val CSV_COLUMN_FIRST = "STRING_ID"
     /**
      * Get record by its STRING_ID
+     *
+     * HashMap<"$key_$language", Value>
      */
-    private var lang: HashMap<String, CSVRecord>
-    private val FALLBACK_LANG_CODE = "enUS"
+    private var langpack: HashMap<String, String>
+    private val FALLBACK_LANG_CODE = "en"
 
     private val HANGUL_SYL_START = 0xAC00
 
-    private val PATH_TO_CSV = "./res/locales/"
-    private val CSV_MAIN = "polyglot.csv"
-    private val NAMESET_PREFIX = "nameset_"
+    val languageList: List<String>
+
+    private val PATH_TO_LANG = "./res/locales/"
+    val POLYGLOT_VERSION = "100"
+    private val PREFIX_POLYGLOT = "Polyglot-${POLYGLOT_VERSION}_"
+    private val PREFIX_NAMESET = "nameset_"
 
     private val HANGUL_POST_INDEX_ALPH = intArrayOf(// 0: 는, 가, ...  1: 은, 이, ...
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     private val HANGUL_POST_RO_INDEX_ALPH = intArrayOf(// 0: 로  1: 으로
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-    private val ENGLISH_WORD_NORMAL_PLURAL = arrayOf("photo")
+    private val ENGLISH_WORD_NORMAL_PLURAL = arrayOf("photo", "demo")
 
     private val FRENCH_WORD_NORMAL_PLURAL = arrayOf("bal", "banal", "fatal", "final")
 
+    var TIPS_COUNT = 0
+        private set
+
     init {
-        lang = HashMap<String, CSVRecord>()
+        langpack = HashMap<String, String>()
+        val localesDir = File(PATH_TO_LANG)
 
-        // append CSV records to the main langpack
-        val file = File(PATH_TO_CSV)
-        val filter = FilenameFilter { dir, name -> name.contains(".csv") && !name.contains(NAMESET_PREFIX) }
-        for (csvfilename in file.list(filter)) {
-            val csv = CSVFetcher.readCSV(PATH_TO_CSV + csvfilename)
-            //csv.forEach({ langPackCSV. })
-            csv.forEach { it -> lang.put(it.get(CSV_COLUMN_FIRST), it) }
+        // get all of the languages installed
+        languageList = localesDir.listFiles().filter { it.isDirectory }.map { it.name }
+
+        for (lang in languageList) {
+            // load polyglot first
+            val polyglotFile = File("$PATH_TO_LANG$lang/$PREFIX_POLYGLOT$lang.json")
+            val json = JsonFetcher.readJson(polyglotFile)
+            /*
+             * Polyglot JSON structure is:
+             *
+             * (root object)
+             *      "resources": object
+             *          "polyglot": object
+             *              (polyglot meta)
+             *          "data": array
+             *             [0]: object
+             *                  n = "CONTEXT_CHARACTER_CLASS"
+             *                  s = "Class"
+             *             [1]: object
+             *                  n = "CONTEXT_CHARACTER_DELETE"
+             *                  s = "Delecte Character"
+             *             (the array continues)
+             *
+             */
+            json.getAsJsonObject("resources").getAsJsonArray("data").forEach {
+                langpack.put(
+                        "${it.asJsonObject["n"].asString}_$lang",
+                        it.asJsonObject["s"].asString
+                )
+            }
+
+            // and then the rest of the lang file
+            val langFileList = ArrayList<File>()
+
+            // --> filter out files to retrieve a list of valid lang files
+            val langFileListFiles = File("$PATH_TO_LANG$lang/").listFiles()
+            langFileListFiles.forEach {
+                if (!it.name.startsWith("Polyglot") && it.name.endsWith(".json"))
+                    langFileList.add(it)
+            }
+
+            // --> put json entries in langpack
+            for (langFile in langFileList) {
+                val json = JsonFetcher.readJson(langFile)
+                /*
+                 * Terrarum langpack JSON structure is:
+                 *
+                 * (root object)
+                 *      "<<STRING ID>>" = "<<LOCALISED TEXT>>"
+                 */
+                //println(json.entrySet())
+                json.entrySet().forEach {
+                    langpack.put("${it.key}_$lang", it.value.asString)
+
+                    // count up TIPS_COUNT
+                    if (lang == "en" && it.key.startsWith("GAME_TIPS_")) TIPS_COUNT++
+                }
+            }
         }
-
-        // sort word lists
-        Arrays.sort(ENGLISH_WORD_NORMAL_PLURAL)
-        Arrays.sort(FRENCH_WORD_NORMAL_PLURAL)
-
-        // reload correct (C/J) unihan fonts if applicable
-        try {
-            (Terrarum.gameFont as GameFontWhite).reloadUnihan()
-        }
-        catch (e: SlickException) {
-        }
-
-    }
-
-    fun getRecord(key: String): CSVRecord {
-        val record = lang[key]
-        if (record == null) {
-            println("[Lang] No such record: $key")
-            throw NullPointerException()
-        }
-        return record
     }
 
     operator fun get(key: String): String {
-        fun fallback(): String = lang[key]!!.get(FALLBACK_LANG_CODE)
+        fun fallback(): String = langpack["${key}_$FALLBACK_LANG_CODE"] ?: "ERRNULL:$key"
 
-        var value: String
-        try {
-            value = lang[key]!!.get(Terrarum.gameLocale)
-            // fallback if empty string
-            if (value.length == 0)
-                value = fallback()
-        }
-        catch (e1: kotlin.KotlinNullPointerException) {
-            value = "ERRNULL:$key"
-        }
-        catch (e: IllegalArgumentException) {
-            //value = key
-            value = fallback()
-        }
+        val ret = langpack["${key}_${Terrarum.gameLocale}"]
 
-        return value
+        return if (ret.isNullOrEmpty()) fallback() else ret!!
     }
 
     fun pluraliseLang(key: String, count: Int): String {
@@ -184,9 +210,5 @@ object Lang {
 
     private fun getLastChar(s: String): Char {
         return s[s.length - 1]
-    }
-
-    private fun appendToLangByStringID(record: CSVRecord) {
-        lang.put(record.get(CSV_COLUMN_FIRST), record)
     }
 }

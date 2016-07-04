@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Danish",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "Klasse"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "Slet karakter"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "Ny karakter"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "Kunstig Intelligens"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "Rumvæsen"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "Klon"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "Cyborg"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "Guddom"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "Dæmon"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "Hundæmon"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "Drage"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "Drager"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "Spøgelse"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "Gud"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "Guder"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "Gudinde"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "Magiker"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "Læge"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "Monster"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "Ninja"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "Pirat"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "Præst"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "Prins "
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "Prinsesse"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "Robot"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "Skelet"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "Snigskytte"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "Soldat"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "Tyv"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "Kriger"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "Troldmand"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "Zombie"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "Zombier"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "Førsteplads"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "Plads"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "Andenplads"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "Tredjeplads"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "Brændende"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "Såret kritisk"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "Død"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "Frossen"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "Forgiftet"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "Langsommelig"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "Lamslået"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "Ubevist"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "Ubeskadiget"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "Våd"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "Såret"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "Stor"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "Enorm"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "Lille"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "Lillebitte"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "Luft"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "Jord"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "Ild"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "Metal"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "Vand"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "Sats"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "Kassér"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "Jackpot"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "Maks"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "Min"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "Rustning"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "Pil"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "Pile"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "Spilleplade"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "Bombe"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "Bog"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "Støvler"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "Bue"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "Kort"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "Kort"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "Kiste"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "Magisk"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "Rusten"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "Dagger"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "Terning"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "Terninger"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "Dør"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "Stridshandsker"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "Juvel"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "Gave"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "Gaver"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "Handsker"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "Skydevåben"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "Hammer"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "Hjelm"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "Nøgle"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "Kniv"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "Lås"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "Kærlighed"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "Maskinpistol"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "Magi"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "Pistol"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "Søgen"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "Rang"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "Riffel"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "Raketkaster"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "RPG"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "Skriftrulle"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "Skjold"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "Skjolde"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "Energiskjold"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "Energiskjolde"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "Haglgevær"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "Snigskytteriffel"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "Trylleformular"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "Stav"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "Sværd"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "Skat"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "Episk"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "Skrot"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "Tryllestav"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "Træ"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "Højde"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "Bremser"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "Chassis"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "Dybde"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "Brændstof"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "Gear"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "Manøvredygtighed"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "Fart"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "Styring"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "Affjedring"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "Hjul"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "Vinger"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "Medalje"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "Bronzemedalje"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "Guldmedalje"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "Sølvmedalje"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "Bronze"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "Mønt"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "Guld"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "Metalbarre"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "Platin"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "Sølv"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "Slot"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "Grotte"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "Fangekælder"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "Værtshus"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "Planet"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "Jorden"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "Rum"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "Rumskib"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "Historie"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "Eventyr"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "Kapitel"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "Side"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "3D Modellering"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "Animation"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "Animationsintruktør"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "Animator"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "Kunst"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "Kunstinstruktør"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "Kunstner"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "Kunstnere"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "Assistent"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "Associeret"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "Lydinstruktør"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "Karakter designer"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "Teknisk Chef"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "Filmisk Animator"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "Filmisk Instruktør"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "Kode"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "Komponist"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "Koncept kunster"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "Kreativ Instruktør"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "Database Administrator"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "Designinstruktør"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "Udviklet af"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "Spilinstruktør"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "Foley-kunstner"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "Skrifttype"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "Skrifttyper"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "Spil"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "Spildesign"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "Spildesigner"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "Spiludvikler"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "Spiludvikling"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "Grafisk designer"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "Billede"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "Billeder"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "Brugerflade Kunstner"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "Junior"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "Hovedansvarlig"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "Hovedansvarlig programmør"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "Level design"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "Leveldesigner"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "Lokalisering"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "Manuskript"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "Modeller"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "Musiker"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "Oversat af Polyglot Projektet"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "Producer"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "Produktion"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "Program Styrer"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "Programmør"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "Programmører"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "Programmering"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "Projektstyrer"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "Forlag"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "Lydindspiller"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "Manuskriptforfatter"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "Senior"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "Lydeffekter"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "Lyddesigner"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "Lydtekniker"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "Soundtrack"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "Særlig tak"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "Særligt tak til"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "Teknisk kunstner"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "Teknisk Instruktør"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "Hovedansvarlig Tester"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "Teststyrer"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "Tester"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "Oversættelse"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "Visuelle Effekter"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "Stemmeskuespil"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "Stemmeskuespiller"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "Forfatter"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "Ingen {0} detekteret."
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "Forlader sporingsområdet"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "Intet HMD detekteret."
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "Snydekoder opdaget!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "Fejlkode:"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "Ugyldig CD-nøgle."
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "Ugyldigt navn!"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "Der er sket en fejl."
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "Mistet forbindelse."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "Din modstander har afbrudt forbindelsen."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "Den anden spiller har afbrudt forbindelsen."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "Din medspiller har afbrudt forbindelsen."
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "Kan ikke få forbindelse til serveren."
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "Spildata er korrupt."
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "Ingen gemte spil fundet."
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "Ingen åbne spil."
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "Angrib"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "Boost"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "Byg"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "Kast"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "Kast"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "Kræv"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "Klatr"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "Luk"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "Saml"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "Tilbered"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "Skab"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "Duk"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "Undvig"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "Kør"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "Flyv"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "Fuld fart"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "Gå"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "Gå til"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "Halv fart"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "Helbrede"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "Hop"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "Land"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "Betragt"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "Bland"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "Åbn"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "Saml op"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "Ræs"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "Læs"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "Erstat"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "Løb"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "Løb væk"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "Skyd"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "Snig"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "Snur"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "Sprint"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "Styr"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "Afgang"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "Snak"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "Kast"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "Gå"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "Udholdenhed"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "Erfaringspoint"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "Kvindelig"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "Liv"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "Hjerte"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "Hjerter"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "Niveau"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "Næste niveau opnået!"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "Liv"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "Mandlig"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "Mand"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "Mænd"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "Genopstå"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "Genopstår om:"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "Genopstå?"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "Genopstår"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "Færdighed"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "Startpunkt"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "Transsexuel"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "Kvinde"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "Kvinder"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "Skade"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "Kritisk ramt"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "Kritisk miss"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "Ramt"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "Liv"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "Miss"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "Skade"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "Skade"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "Fjende"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "Fjende"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "Fjender"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "Fjender"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "Actionspil"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "Adventurespil"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "Kort"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "Casual spil"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "Fantasy spil"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "Hardcore spil"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "Indie"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "Middelalderspil"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "Diverse"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "Flerspiller"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "Genre"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "Platformspil"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "Puslespil"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "Quiz spil"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "Racer"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "Retrospil"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "Rollespil"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "Realtidsstrategi (RTS)"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "Science fiction spil"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "Skydespil"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "Simulationsspil"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "Enkeltspiller"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "Sportsspil"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "Strategispil"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "Turbaseret strategi"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "Tower defense spil"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "Inventar"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "Ammo"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "Ammunition"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "Patron"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "Patroner"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "Køb"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "Inventar kapacitet"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "Smid"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "Overbelastning"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "Inventar er fuldt"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "Genstand"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "Nøgle"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "Powerup"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "Sælg"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "Anvend"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "Våben"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "Våben"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "Du kan ikke bære mere."
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "Vær forsigtig!"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "Pas på dig selv."
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "Strategi"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "Mål"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "Assist"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "Assists"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "Angrib"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "Bonus"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "Fang"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "Færdig"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "Død"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "Dødsfald"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "Forsvar"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "Ødelæg"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "Flygt"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "Slut"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "Game over!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "GAME OVER!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "Højeste point"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "Ufærdig"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "Dræb"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "Assisterede drab"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "Drab"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "Drab"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "Låst"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "Nederlag"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "Kamp"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "Mission"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "Missionsmål"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "Missionsmål"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "Multiplikator"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "Mål"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "Position"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "Omgang"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "Omgange"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "Runde"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "Point"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "Tid"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "Tid tilbage"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "Turnering"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "Turneringer"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "Sejre"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "Nederlag"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "Du er blevet besejret."
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "Taber"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "Dit hold tabte!"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "Dit hold vandt!"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "Sejr"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "Vinder"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "Du er død."
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "Du døde."
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "Du taber!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "Du tabte!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "Du vinder!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "Du vandt!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "Kamera"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "Inverteret"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "Normal"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "Kamera X akse"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "Kamera Y akse"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "Knap"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "Klik"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "Dødzone"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "Dobbeltklik"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "Træk"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "Træk og slip"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "Finger"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "Gamepad"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "Gyroskop"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "Tast"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "Keyboard"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "Mus"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "Musefølsomhed"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "Knib"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "Rotér"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "Scroll"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "Ryst"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "Spred"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "Swipe"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "Tap"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "Knappen"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "Tasten"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "Tilt"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "Arm"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "Arme"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "Bryst"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "Hage"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "Farve"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "Øre"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "Ører"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "Øje"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "Øjne"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "Fødder"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "Fod"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "Hår"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "Skæg"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "Pels"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "Hår"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "Hånd"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "Hænder"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "Hoved"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "Hofter"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "Ben"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "Ben"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "Mund"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "Hals"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "Næse"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "Hud"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "Brystkasse"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "Sværhedsgrad"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "Let"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "Svært"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "Umulig"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "Sindsyg"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "Middel"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "Meget Let"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "Meget Svært"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "Ned"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "Venstre"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "Højre"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "Op"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "Indlæs"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "Indlæs Spil"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "Indlæser..."
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "Vent venligst..."
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "Nulstil spildata?"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "Gem"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "Spildata"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "Gem Spil"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "Gemmer..."
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "Alder"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "Alle"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "Er du helt sikker?"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "Er du sikker?"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "Tilbage"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "Baggrundsmusik"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "Annuler"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "Luk"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "Godkend"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "Fortsæt"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "Fortsæt?"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "Credits"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "Afslut til Skrivebord"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "Afslut til Skrivebord?"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "DLC"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "Download"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "Downloadbar indhold"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "Afslut"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "Afslut?"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "Ekstra indhold"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "FPS"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "Kunstgalleri"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "Farvel!"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "Grafik"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "In-app køb"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "Sprog"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "Bane"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "Postkasse"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "Hovedmenu"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "Mere"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "Musik"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "Musikafspiller"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "Nyt Spil"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "Næste"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "Næste nummer"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "Nej"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "NEJ"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "Næh"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "OK"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "Pause"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "Pauset"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "Spil"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "Spil igen"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "Tryk en vilkårlig tast"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "Tryk en vilkårlig tast for at fortsætte"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "Tryk Start"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "Tryk Start for at fortsætte"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "Forrige"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "Forrige nummer"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "Pris"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "Gratis"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "Køb"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "Afslut"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "Er du sikker på du vil afslutte?"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "Afslut?"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "Spil igen"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "Tilbage"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "Tilbage til hovedmenuen"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "Tilbage til hovedmenuen?"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "Del"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "Spring over"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "Lyd"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "Tak!"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "Lås op"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "Video"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "Stemmer"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "Advarsel"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "Velkommen"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "Verden"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "Jah"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "Ja"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "JA"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "Dansk"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Danish"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "Log ind"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "E-mail"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "Glemt kodeord"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "Adgangskode"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "Registrér"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "Husk?"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "Challenge"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "Challenge mode"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "Co-op"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "Kooperativ"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "Deathmatch"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "Hjælp"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "Instruktioner"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "Flere spillere"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "Lokal Multiplayer"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "Online Multiplayer"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "Spil online"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "Enkel spiller"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "Træning"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "Vejledning"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "Versus"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "Navn"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "Fornavn"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "Efternavn"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "Brugernavn"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "Indstillinger"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "Advancerede grafikindstillinger"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "Antialiasing"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "Bloom"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "Tastindstillinger"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "Sværhedsgradsinstillinger"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "Skærm"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "Detaljegrad for effekter"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "Anisotropisk"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "Bilineær"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "Filtreringstilstand"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "Trilineær"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "Førstepersons synsvinkel"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "Synsfelt"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "Fuld skærm"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "Spilindstillinger"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "Grafiske Indstillinger"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "Model detaljer"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "Multikerne-gengivelse"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "Musik volumen"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "Netværksindstillinger"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "Kvalitet"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "Opløsning"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "Lydeffekt volumen"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "Shaderdetaljer"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "Skygge"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "Skygger"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "Størrelse"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "Lydinstillinger"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "Volumen"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "Delt skærm"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "Teksturdetaljer"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "Tredjepersons synsvinkel"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "Video Indstillinger"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "Kvalitet"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "Stemme volumen"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "Vsync"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "Bredskærmsformat"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "Vindue"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "Høj"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "Lav"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "Mellem"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "Meget høj"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "Meget høj"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "Version"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "Demo"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "Gratis"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "Fuld"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "Let"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "Premium"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "Shareware"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "Prøve"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "VR komfort tilstand"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "Nulstil HMD orientering"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "Virtual Reality"
+            }
+        ]
+    }
+}

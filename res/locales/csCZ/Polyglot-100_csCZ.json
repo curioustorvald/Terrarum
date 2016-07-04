@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Czech",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "Třída"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "Smazat postavu"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "Nová postava"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "Umělá inteligence"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "Mimozemšťan"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "Klon "
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "Cyborg"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "Božstvo"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "Démon"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "Démon"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "Drak"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "Draci"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "Duch"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "Bůh"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "Bohové"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "Bohyně"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "Mág"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "Medik"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "Monstrum"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "Ninja"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "Pirát"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "Kněz"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "Princ "
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "Princezna"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "Robot"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "Kostlivec"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "Sniper"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "Voják"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "Zloděj"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "Válečník"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "Kouzelník"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "Zombie"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "Zombíci"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "První místo"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "Místo"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "Druhé místo"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "Třetí místo"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "Hořící"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "Kritický"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "Mrtvý"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "Zmražený"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "Otrávený"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "Zpomalený"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "Ohromený"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "V bezvědomí"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "Nezraněný"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "Vlhký"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "Zraněný"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "Velký"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "Obrovský"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "Malý"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "Maličký"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "Vzduch"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "Země"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "Oheň"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "Kov"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "Voda"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "Sázka"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "Vyřadit"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "Jackpot"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "Maximálně"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "Minimálně"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "Brnění"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "Šíp"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "Šípy"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "Deska"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "Bomba"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "Kniha"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "Boty"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "Luk"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "Karta"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "Karty"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "Truhla"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "Magický"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "Rezavý "
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "Dýka"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "Zemřít"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "Kostky"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "Dveře"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "Rukavice"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "Klenot"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "Dárek"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "Dárky"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "Rukavice"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "Pistol"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "Kladivo"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "Helma"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "Klíč"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "Nůž"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "Zámek"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "Láska"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "Kulomet"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "Magie"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "Pistol"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "Úkol"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "Hodnost"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "Puška"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "Raketomet"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "RPG"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "Svitek"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "Štít"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "Štíty"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "Energetický štít"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "Energetické štíty"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "Brokovnice"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "Odstřelovací puška"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "Kouzlo"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "Hůl"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "Meč"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "Poklad"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "Epický"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "Haraburdí"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "Hůlka"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "Dřevo"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "Nadmořská výška"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "Brzdy"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "Podvozek"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "Hloubka"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "Palivo"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "Ozubené kolo"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "Zacházení"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "Rychlost"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "Řízení"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "Zavěšení"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "Kola"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "Křídla"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "Medaile"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "Bronzová medaile"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "Zlatá medaile"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "Stříbrná medaile"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "Bronz"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "Mince"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "Zlato"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "Ingot"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "Platina"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "Stříbro"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "Hrad"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "Jeskyně"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "Dungeon"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "Hospoda"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "Planeta"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "Země"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "Vesmír"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "Vesmírná loď"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "Příběh"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "Dobrodružství"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "Kapitola"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "Stránka"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "3D modelování"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "Animace"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "Animátor"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "Animátor"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "Umění"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "Umělec"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "Umělec"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "Umělci"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "Asistant"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "Partner"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "Audio režisér"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "Designér Postav"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "Hlavní technický ředitel"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "Kinematický animátor"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "Kinematický ředitel"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "Kód"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "Skladatel"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "Konceptový umělec"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "Kreativní režisér"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "Databázový správce"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "Design"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "Vytvořeno "
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "Ražisér"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "Nahrávač zvuků"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "Písmo"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "Písma"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "Hra"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "Herní design"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "Herní designér"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "Vývojář"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "Vyvíjení hry"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "Grafický Designér"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "Obrázek"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "Obrázky"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "Umělec rozhraní"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "Junior"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "Vedení"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "Vedoucí programátor"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "Design prostředí"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "Designér prostředí"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "Lokalizace"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "Rukopis"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "Modely"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "Muzikant"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "Překlad: Polyglot Projektu"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "Producent"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "Produkce"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "Programový manažer"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "Programátor"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "Programátoři"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "Programování"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "Projektový manažer"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "Vydavatel"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "Nahrávač "
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "Skript spisovatel"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "Senior"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "Zvukové efekty"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "Zvukový designér"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "Zvukový inženýr"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "Soundtrack"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "Speciální poděkování"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "Speciální poděkování"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "Technický umělec"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "Technický ředitel"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "Vedoucí testování"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "Test manažer"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "Tester"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "Překlad"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "Vizuální efekty"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "Dabing"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "Dabing"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "Spisovatel"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "Zařízení {0} nenalezeno"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "Opouštíte trackovací zónu"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "HMD nenalezeno"
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "Detekovány cheaty!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "Kód chyby:"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "Neplatný CD klíč."
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "Neplatný název!"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "Vyskytla se chyba"
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "Spojení ztraceno."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "Tvůj protivník se odpojil"
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "Hráč se odpojil"
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "Tvůj spojenec se odpojil"
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "Nelze se připojit k serveru"
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "Uložený soubor je poškozen"
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "Nenalezeny žádné hry"
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "Žádné probíhající hry"
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "Útočit"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "Boost"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "Stavět"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "Nahodit"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "Seslat"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "Činit si nárok"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "Šplhat"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "Zavřít"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "Sbírat"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "Uvařit"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "Vytvořit"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "Skrčit se"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "Uhnout"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "Řídit"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "Letět"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "Plná rychlost"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "Jít"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "Jdi"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "Poloviční rychlost"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "Vyléčit"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "Skok"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "Přístát"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "Podívat se"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "Mixovat"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "Otevřít"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "Zvednout"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "Závod"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "Číst"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "Vyměnit"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "Bežet"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "Utéct"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "Střílet"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "plížit se"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "Točit"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "Sprintovat"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "ovládat"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "Sundat"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "Mluvit"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "Hodit"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "Jít"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "Vytrvalost"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "Body zkušeností"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "Žena"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "Zdraví"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "Srdce"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "Srdce"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "Úroveň"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "Vyšší úroveň"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "Životy"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "Muž"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "Muž"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "Muži"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "Oživení"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "Oživení za:"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "Oživit?"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "Oživování"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "Dovednost"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "Bod oživení"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "Transexuál"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "Žena"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "Ženy"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "Poškození"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "Kritický zásah"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "Vedle"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "Úder"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "Zásahové body"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "Vedle"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "Poškození"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "Poškození"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "Nepřítel"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "Nepřítel"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "Nepřítelé"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "Nepřátelé"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "Akční hra"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "Adventura"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "Karetní"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "Příležitostná hrá"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "Fantasy hra"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "Težká hra"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "Nezávislé"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "Středověká hra"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "Různé"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "Režim více hráčů"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "Žánr"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "Platformová hra"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "Puzzle"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "Kvíz"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "Závodní"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "Retro hra"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "Hra na role"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "Strategie v reálném čase"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "SCI-FI hra"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "Střílečka"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "Simulátor"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "Režim jednoho hráče"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "Sportovní hra"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "Strategická hra"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "Tahové strategické"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "Obranná hra"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "Inventář"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "Munice"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "Munice"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "Kulka"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "Kulky"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "Zakoupit"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "Kapacita inventáře"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "Upustit"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "Břemeno"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "Plný inventář"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "Předmět"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "Klíč"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "Posilňovač"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "Prodat"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "Použít"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "Zbraň"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "Zbraně"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "Nemůžeš nést nic víc."
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "Buď opatrný"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "Prosím buď opatrný"
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "Taktika"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "Objekt"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "Asistence  "
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "Asistence"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "Útočit"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "Bonus"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "Zabrat"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "Hotovo"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "Smrt"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "Smrti"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "Bránit"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "Zničit"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "Utéct"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "Konec "
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "Konec hry!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "KONEC HRY!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "Nejvyšší úroveň"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "Nedokončený"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "Zabití"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "Asistence zabití"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "Zabití"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "Zabití"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "Uzamčeno"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "Prohry"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "Zápas"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "Mise"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "Objekt mise"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "Objekty mise"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "Násobič"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "Objekty"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "Pozice"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "Kolo"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "Kola"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "Kolo"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "Skóre"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "Čas"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "Čas vypršel"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "Turnaj"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "Turnaje"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "Vítězství"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "Prohra"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "Byl jsi poražen"
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "Poražený"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "Tvůj tým prohrál!"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "Tvůj tým vyhrál!"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "Vítězství"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "Vítěz"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "Jsi mrtev"
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "Zemřel jsi"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "Prohrál jsi!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "Prohrál jsi!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "Vyhrál jsi!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "Vyhrál jsi!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "Kamera"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "Obrácený"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "Normální"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "Kamera osa X"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "Kamera osa Y"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "Tlačítko"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "Klik                                                                  "
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "Mrtvá zóna"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "Dvojklik"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "Táhnout"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "Táhni a pusť"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "Prst"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "Ovladač"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "Gyroskop"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "Klávesa"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "Klávesnice"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "Myš"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "Citlivost myši"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "Zúžení"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "Rotovat"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "Přetáčet"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "Třepat"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "Rozšířit"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "Výpad"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "Klepnout"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "Toto tlačítko"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "Tato klávesa"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "Naklonit"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "Paže"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "Paže"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "Hrudník"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "Brada"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "Barva"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "Ucho"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "Uši"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "Oko"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "Oči"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "Chodidla"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "Chodidlo"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "Vlasy"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "Vousy"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "Srst"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "Vlasy"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "Ruka"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "Ruce"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "Hlava"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "Boky"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "Noha"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "Nohy"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "Pusa"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "Krk"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "Nos"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "Pleť"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "Krunýř"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "Obtížnost"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "Snadná"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "Těžká"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "Nemožná"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "Šílená"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "Střední"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "Velmi snadná"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "Velmi težká"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "Dolů"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "vlevo"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "vpravo"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "Nahoru"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "Načíst"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "Načíst hru"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "Načítám..."
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "Prosím čekejte..."
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "Zrušit nastavení?"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "Uložit"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "Uložit nastavení"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "Uložit hru"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "Ukládám..."
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "Věk"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "Všechny"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "Jste si opravdu jist?"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "Jste si jist?"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "Zpět"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "Hudba v pozadí"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "Storno"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "Zavřít"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "Potvrdit"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "Pokračovat"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "Pokračovat?"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "Autoři"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "Odejít na plochu"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "Odejít na plochu?"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "Stáhnutelný obsah"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "Stáhnout"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "Obsah ke stažení"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "Odejít"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "Odejít?"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "Extra"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "FPS"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "Galerie umění"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "Nashledanou!"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "Grafika"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "Nákup v aplikaci"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "Jazyk"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "Úroveň"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "Mail"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "Hlavní menu"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "Více"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "Hudba"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "Hudební přehrávač"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "Nová hra"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "Další"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "Další skladba"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "Ne"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "NE"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "Nikoliv"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "OK"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "Pauza"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "Pozastaveno"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "Hrát"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "Hrát znova"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "Stiskněte libovolnou klávesu"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "Stiskněte libovolnou klávesu pro pokračování"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "Stiskněte start"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "Stiskněte start pro pokračování"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "Předchozí"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "Předchozí skladba"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "Cena"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "Zdarma"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "Zakoupit"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "Ukončit hru"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "Opravdu chcete hru ukončit?"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "Ukončít hru?"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "Přehrát"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "Zpět"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "Vrátit se na hlavní menu"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "Vrátit se na hlavní menu ?"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "Sdílet"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "Přeskočit"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "Zvuk"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "Děkuji!"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "Odemknout"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "Kvalita obrazu"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "Hlasy"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "Upozornění"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "Vítejte"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "Svět"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "Jistě"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "Ano"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "ANO"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "Čeština"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Czech"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "Přihlášení"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "E-mail"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "Zapomenuté heslo"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "Heslo"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "Registrace"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "Pamatujete ?"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "Výzva"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "Mód Výzvy"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "Ko-op"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "Kooperativní hra"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "Všichni proti všem"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "Nápověda"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "Instrukce"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "Více hráčů"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "Hrát po lokální síti"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "Hrát přes síť"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "Hrát online"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "Jeden hráč"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "Trénink"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "Návod"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "Versus"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "Jméno"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "Jméno"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "Přijmení"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "Přezdívka"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "Nastavení"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "Pokročilé grafické nastavení"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "Antialiasing"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "Bloom"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "Ovládání"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "Nastavení obtížnosti"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "Zobrazení"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "Kvalita efektů"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "Anizotropní"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "Bilineární"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "Filtrovací režim"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "Trilineární"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "Pohled z první osoby"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "Zorné pole"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "Celá obrazovka"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "Nastavení hratelnosti"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "Nastavení grafiky"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "Kvalita modelu"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "Vícejádrové vykreslování"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "Hlasitost hudby"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "Nastavení sítě"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "Kvalita"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "Rozlišení"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "Hlasitost efektů"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "Kvalita shaderu"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "Stín"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "Stíny"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "Velikost"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "Nastavení zvuku"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "Hlasitost"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "Rozdělená obrazovka"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "Kvalita textur"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "Pohled ze třetí osoby"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "Nastavení obrazu"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "Kvalita"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "Hlasitost hlasů"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "Vertikální synchronizace obrazu"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "Širokoúhlý"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "Režim v okně"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "Vysoká"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "Nízká"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "Střední"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "Velmi vysoká"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "Velmi vysoká"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "Verze"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "Demo"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "Zdarma"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "Plná verze"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "Lite"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "Premiová verze"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "Shareware"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "Zkušební verze"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "VR komfortní režim"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "Vyresetovat orientaci HMD"
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "Virtuální realita"
+            }
+        ]
+    }
+}

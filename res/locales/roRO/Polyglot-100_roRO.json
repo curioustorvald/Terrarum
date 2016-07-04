@@ -1,0 +1,2568 @@
+{
+    "resources": {
+        "polyglot": {
+            "LANG": "Romanian",
+            "DIRECTION": "ltr",
+            "VERSION": "100",
+            "DATE": "2015-11-16"
+        },
+        "data": [
+            {
+                "n": "CONTEXT_CHARACTER_CLASS",
+                "s": "Clasă"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_DELETE",
+                "s": "Șterge personaj"
+            },
+            {
+                "n": "CONTEXT_CHARACTER_NEW",
+                "s": "Personaj nou"
+            },
+            {
+                "n": "CONTEXT_CLASS_AI",
+                "s": "Inteligență Artificială"
+            },
+            {
+                "n": "CONTEXT_CLASS_ALIEN",
+                "s": "Extraterestru"
+            },
+            {
+                "n": "CONTEXT_CLASS_CLONE",
+                "s": "Clonă"
+            },
+            {
+                "n": "CONTEXT_CLASS_CYBORG",
+                "s": "Cyborg"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEITY",
+                "s": "Zeitate"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMON",
+                "s": "Demon"
+            },
+            {
+                "n": "CONTEXT_CLASS_DEMONNESS",
+                "s": "Demoniță"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON",
+                "s": "Dragon"
+            },
+            {
+                "n": "CONTEXT_CLASS_DRAGON_PLURAL",
+                "s": "Dragoni"
+            },
+            {
+                "n": "CONTEXT_CLASS_GHOST",
+                "s": "Fantomă"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD",
+                "s": "Zeu"
+            },
+            {
+                "n": "CONTEXT_CLASS_GOD_PLURAL",
+                "s": "Zei"
+            },
+            {
+                "n": "CONTEXT_CLASS_GODDESS",
+                "s": "Zeiță"
+            },
+            {
+                "n": "CONTEXT_CLASS_MAGE",
+                "s": "Mag"
+            },
+            {
+                "n": "CONTEXT_CLASS_MEDIC",
+                "s": "Medic"
+            },
+            {
+                "n": "CONTEXT_CLASS_MONSTER",
+                "s": "Monstru"
+            },
+            {
+                "n": "CONTEXT_CLASS_NINJA",
+                "s": "Ninja"
+            },
+            {
+                "n": "CONTEXT_CLASS_PIRATE",
+                "s": "Pirat"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRIEST",
+                "s": "Preot"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCE",
+                "s": "Prinț"
+            },
+            {
+                "n": "CONTEXT_CLASS_PRINCESS",
+                "s": "Prințesă"
+            },
+            {
+                "n": "CONTEXT_CLASS_ROBOT",
+                "s": "Robot"
+            },
+            {
+                "n": "CONTEXT_CLASS_SKELETON",
+                "s": "Schelet"
+            },
+            {
+                "n": "CONTEXT_CLASS_SNIPER",
+                "s": "Lunetist"
+            },
+            {
+                "n": "CONTEXT_CLASS_SOLDIER",
+                "s": "Soldat"
+            },
+            {
+                "n": "CONTEXT_CLASS_THIEF",
+                "s": "Pungaș"
+            },
+            {
+                "n": "CONTEXT_CLASS_WARRIOR",
+                "s": "Războinic"
+            },
+            {
+                "n": "CONTEXT_CLASS_WIZARD",
+                "s": "Vrăjitor"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE",
+                "s": "Zombie"
+            },
+            {
+                "n": "CONTEXT_CLASS_ZOMBIE_PLURAL",
+                "s": "Zombies"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_FIRST",
+                "s": "Primul loc"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_PLACE_NOUN",
+                "s": "Loc"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_SECOND",
+                "s": "Al doilea loc"
+            },
+            {
+                "n": "CONTEXT_COMPETITION_THIRD",
+                "s": "Al treilea loc"
+            },
+            {
+                "n": "CONTEXT_CONDITION_BURNING",
+                "s": "În flăcări"
+            },
+            {
+                "n": "CONTEXT_CONDITION_CRITICAL",
+                "s": "Critical"
+            },
+            {
+                "n": "CONTEXT_CONDITION_DEAD",
+                "s": "Mort"
+            },
+            {
+                "n": "CONTEXT_CONDITION_FROZEN",
+                "s": "Înghețat"
+            },
+            {
+                "n": "CONTEXT_CONDITION_POISONED",
+                "s": "Otrăvit"
+            },
+            {
+                "n": "CONTEXT_CONDITION_SLOWED",
+                "s": "Încetinit"
+            },
+            {
+                "n": "CONTEXT_CONDITION_STUNNED",
+                "s": "Împietrit"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNCONSCIOUS",
+                "s": "Inconștient"
+            },
+            {
+                "n": "CONTEXT_CONDITION_UNHURT",
+                "s": "Neatins"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WET",
+                "s": "Ud"
+            },
+            {
+                "n": "CONTEXT_CONDITION_WOUNDED",
+                "s": "Rănit"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_BIG",
+                "s": "Mare"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_HUGE",
+                "s": "Enorm"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_SMALL",
+                "s": "Mic"
+            },
+            {
+                "n": "CONTEXT_DESCRIPTION_TINY",
+                "s": "Minuscul"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_AIR",
+                "s": "Aer"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_EARTH",
+                "s": "Pământ"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_FIRE",
+                "s": "Foc"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_METAL",
+                "s": "Metal"
+            },
+            {
+                "n": "CONTEXT_ELEMENT_WATER",
+                "s": "Apă"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_BET",
+                "s": "Pariază"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_DISCARD",
+                "s": "Aruncă"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_JACKPOT",
+                "s": "Jackpot"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MAX",
+                "s": "Max"
+            },
+            {
+                "n": "CONTEXT_GAMBLING_MIN",
+                "s": "Min"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARMOR",
+                "s": "Armură"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROW",
+                "s": "Săgeată"
+            },
+            {
+                "n": "CONTEXT_ITEM_ARROWS",
+                "s": "Săgeți"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOARD",
+                "s": "Tablă de joc"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOMB",
+                "s": "Bombă"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOK",
+                "s": "Carte"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOOTS",
+                "s": "Bocanci"
+            },
+            {
+                "n": "CONTEXT_ITEM_BOW",
+                "s": "Arc"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD",
+                "s": "Carte"
+            },
+            {
+                "n": "CONTEXT_ITEM_CARD_PLURAL",
+                "s": "Carți"
+            },
+            {
+                "n": "CONTEXT_ITEM_CHEST",
+                "s": "Cufăr"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_MAGICAL",
+                "s": "Magic"
+            },
+            {
+                "n": "CONTEXT_ITEM_COND_RUSTY",
+                "s": "Ruginit"
+            },
+            {
+                "n": "CONTEXT_ITEM_DAGGER",
+                "s": "Pumnal"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_NOUN",
+                "s": "Zar"
+            },
+            {
+                "n": "CONTEXT_ITEM_DIE_PLURAL",
+                "s": "Zaruri"
+            },
+            {
+                "n": "CONTEXT_ITEM_DOOR",
+                "s": "Ușa"
+            },
+            {
+                "n": "CONTEXT_ITEM_GAUNTLETS",
+                "s": "Mănușă"
+            },
+            {
+                "n": "CONTEXT_ITEM_GEM",
+                "s": "Giuvaer"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_NOUN",
+                "s": "Cadou"
+            },
+            {
+                "n": "CONTEXT_ITEM_GIFT_PLURAL",
+                "s": "Cadouri"
+            },
+            {
+                "n": "CONTEXT_ITEM_GLOVE",
+                "s": "Mănușă"
+            },
+            {
+                "n": "CONTEXT_ITEM_GUN",
+                "s": "Armă"
+            },
+            {
+                "n": "CONTEXT_ITEM_HAMMER",
+                "s": "Baros"
+            },
+            {
+                "n": "CONTEXT_ITEM_HELMET",
+                "s": "Cască"
+            },
+            {
+                "n": "CONTEXT_ITEM_KEY",
+                "s": "Cheie"
+            },
+            {
+                "n": "CONTEXT_ITEM_KNIFE",
+                "s": "Cuțit"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOCK",
+                "s": "Broască"
+            },
+            {
+                "n": "CONTEXT_ITEM_LOVE",
+                "s": "Iubire"
+            },
+            {
+                "n": "CONTEXT_ITEM_MACHINE_ITEM_GUN",
+                "s": "Mitralieră"
+            },
+            {
+                "n": "CONTEXT_ITEM_MAGIC",
+                "s": "Magie"
+            },
+            {
+                "n": "CONTEXT_ITEM_PISTOL",
+                "s": "Pistol"
+            },
+            {
+                "n": "CONTEXT_ITEM_QUEST_NOUN",
+                "s": "Căutare"
+            },
+            {
+                "n": "CONTEXT_ITEM_RANK_NOUN",
+                "s": "Rang"
+            },
+            {
+                "n": "CONTEXT_ITEM_RIFLE",
+                "s": "Pușcă"
+            },
+            {
+                "n": "CONTEXT_ITEM_ROCKET_ITEM_LAUNCHER",
+                "s": "Lansator de rachete"
+            },
+            {
+                "n": "CONTEXT_ITEM_RPG",
+                "s": "AG"
+            },
+            {
+                "n": "CONTEXT_ITEM_SCROLL",
+                "s": "Pergament"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD",
+                "s": "Scut"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_PLURAL",
+                "s": "Scuturi"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI",
+                "s": "Scut de energie"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHIELD_SCIFI_PLURAL",
+                "s": "Scuturi de energie"
+            },
+            {
+                "n": "CONTEXT_ITEM_SHOTGUN",
+                "s": "Pușcă de apropiere"
+            },
+            {
+                "n": "CONTEXT_ITEM_SNIPER_ITEM_RIFLE",
+                "s": "Pușcă cu lunetă"
+            },
+            {
+                "n": "CONTEXT_ITEM_SPELL",
+                "s": "Vrajă"
+            },
+            {
+                "n": "CONTEXT_ITEM_STAFF",
+                "s": "Toiag"
+            },
+            {
+                "n": "CONTEXT_ITEM_SWORD",
+                "s": "Sabie"
+            },
+            {
+                "n": "CONTEXT_ITEM_TREASURE",
+                "s": "Comoară"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_EPIC",
+                "s": "Epic"
+            },
+            {
+                "n": "CONTEXT_ITEM_TYPE_JUNK",
+                "s": "Gunoi"
+            },
+            {
+                "n": "CONTEXT_ITEM_WAND",
+                "s": "Baghetă"
+            },
+            {
+                "n": "CONTEXT_ITEM_WOOD",
+                "s": "Lemn"
+            },
+            {
+                "n": "CONTEXT_MACHINE_ALTITUDE",
+                "s": "Altitudine"
+            },
+            {
+                "n": "CONTEXT_MACHINE_BRAKES",
+                "s": "Frâne"
+            },
+            {
+                "n": "CONTEXT_MACHINE_CHASSIS",
+                "s": "Șasiu"
+            },
+            {
+                "n": "CONTEXT_MACHINE_DEPTH",
+                "s": "Adâncime"
+            },
+            {
+                "n": "CONTEXT_MACHINE_FUEL",
+                "s": "Combustibil"
+            },
+            {
+                "n": "CONTEXT_MACHINE_GEAR",
+                "s": "Transmisie"
+            },
+            {
+                "n": "CONTEXT_MACHINE_HANDLING",
+                "s": "Control"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SPEED",
+                "s": "Viteză"
+            },
+            {
+                "n": "CONTEXT_MACHINE_STEERING",
+                "s": "Volan"
+            },
+            {
+                "n": "CONTEXT_MACHINE_SUSPENSION",
+                "s": "Suspensie"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WHEELS",
+                "s": "Roți"
+            },
+            {
+                "n": "CONTEXT_MACHINE_WINGS",
+                "s": "Aripi"
+            },
+            {
+                "n": "CONTEXT_MEDAL",
+                "s": "Medalie"
+            },
+            {
+                "n": "CONTEXT_MEDAL_BRONZE",
+                "s": "Medalie de bronz"
+            },
+            {
+                "n": "CONTEXT_MEDAL_GOLD",
+                "s": "Medalie de aur"
+            },
+            {
+                "n": "CONTEXT_MEDAL_SILVER",
+                "s": "Medalie de argint"
+            },
+            {
+                "n": "CONTEXT_METAL_BRONZE",
+                "s": "Bronz"
+            },
+            {
+                "n": "CONTEXT_METAL_COIN",
+                "s": "Monedă"
+            },
+            {
+                "n": "CONTEXT_METAL_GOLD",
+                "s": "Aur"
+            },
+            {
+                "n": "CONTEXT_METAL_INGOT",
+                "s": "Lingou"
+            },
+            {
+                "n": "CONTEXT_METAL_PLATINUM",
+                "s": "Platină"
+            },
+            {
+                "n": "CONTEXT_METAL_SILVER",
+                "s": "Argint"
+            },
+            {
+                "n": "CONTEXT_PLACE_CASTLE",
+                "s": "Castel"
+            },
+            {
+                "n": "CONTEXT_PLACE_CAVE",
+                "s": "Peșteră"
+            },
+            {
+                "n": "CONTEXT_PLACE_DUNGEON",
+                "s": "Temniță"
+            },
+            {
+                "n": "CONTEXT_PLACE_INN",
+                "s": "Han"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET",
+                "s": "Planetă"
+            },
+            {
+                "n": "CONTEXT_PLACE_PLANET_EARTH",
+                "s": "Pământ"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACE",
+                "s": "Spațiu"
+            },
+            {
+                "n": "CONTEXT_PLACE_SPACESHIP",
+                "s": "Navetă spațială"
+            },
+            {
+                "n": "CONTEXT_STORY",
+                "s": "Poveste"
+            },
+            {
+                "n": "CONTEXT_STORY_ADVENTURE",
+                "s": "Aventură"
+            },
+            {
+                "n": "CONTEXT_STORY_CHAPTER",
+                "s": "Capitol"
+            },
+            {
+                "n": "CONTEXT_STORY_PAGE",
+                "s": "Pagină"
+            },
+            {
+                "n": "CREDITS_3D_MODELING",
+                "s": "Modelare 3D"
+            },
+            {
+                "n": "CREDITS_ANIMATION",
+                "s": "Animație"
+            },
+            {
+                "n": "CREDITS_ANIMATION_DIRECTOR",
+                "s": "Director de animație"
+            },
+            {
+                "n": "CREDITS_ANIMATOR",
+                "s": "Animator cinematic"
+            },
+            {
+                "n": "CREDITS_ART",
+                "s": "Artă"
+            },
+            {
+                "n": "CREDITS_ART_DIRECTOR",
+                "s": "Director artistic"
+            },
+            {
+                "n": "CREDITS_ARTIST",
+                "s": "Artist"
+            },
+            {
+                "n": "CREDITS_ARTIST_PLURAL",
+                "s": "Artiști"
+            },
+            {
+                "n": "CREDITS_ASSISTANT",
+                "s": "Asistent"
+            },
+            {
+                "n": "CREDITS_ASSOCIATE",
+                "s": "Asociat"
+            },
+            {
+                "n": "CREDITS_AUDIO_DIRECTOR",
+                "s": "Director audio"
+            },
+            {
+                "n": "CREDITS_CHARACTER_DESIGNER",
+                "s": "Designer de caractere"
+            },
+            {
+                "n": "CREDITS_CHIEF_TECH_OFFICER",
+                "s": "Director tehnic șef"
+            },
+            {
+                "n": "CREDITS_CINEMATIC_ANIMATOR",
+                "s": "Animator cinematic"
+            },
+            {
+                "n": "CREDITS_CINEMATICS_DIRECTOR",
+                "s": "Director cinematic"
+            },
+            {
+                "n": "CREDITS_CODE",
+                "s": "Cod"
+            },
+            {
+                "n": "CREDITS_COMPOSER",
+                "s": "Compozitor"
+            },
+            {
+                "n": "CREDITS_CONCEPT_ARTIST",
+                "s": "Artist de concept"
+            },
+            {
+                "n": "CREDITS_CREATIVE_DIRECTOR",
+                "s": "Director creativ"
+            },
+            {
+                "n": "CREDITS_DATABASE_ADMIN",
+                "s": "Administrator baze de date"
+            },
+            {
+                "n": "CREDITS_DESIGN DIRECTOR",
+                "s": "Director de design"
+            },
+            {
+                "n": "CREDITS_DEVELOPED_BY",
+                "s": "Dezvoltat de către"
+            },
+            {
+                "n": "CREDITS_DIRECTOR",
+                "s": "Director"
+            },
+            {
+                "n": "CREDITS_FOLEY_ARTIST",
+                "s": "Foley artist"
+            },
+            {
+                "n": "CREDITS_FONT",
+                "s": "Font"
+            },
+            {
+                "n": "CREDITS_FONT_PLURAL",
+                "s": "Font-uri"
+            },
+            {
+                "n": "CREDITS_GAME",
+                "s": "Joc"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGN",
+                "s": "Design de joc"
+            },
+            {
+                "n": "CREDITS_GAME_DESIGNER",
+                "s": "Designer de joc"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPER",
+                "s": "Dezvoltatorul jocului"
+            },
+            {
+                "n": "CREDITS_GAME_DEVELOPMENT",
+                "s": "Dezvoltarea jocului"
+            },
+            {
+                "n": "CREDITS_GRAPHIC_DESIGNER",
+                "s": "Artist grafic"
+            },
+            {
+                "n": "CREDITS_IMAGE",
+                "s": "Imagine"
+            },
+            {
+                "n": "CREDITS_IMAGE_PLURAL",
+                "s": "Imagini"
+            },
+            {
+                "n": "CREDITS_INTERFACE_ARTIST",
+                "s": "Artist de interfață"
+            },
+            {
+                "n": "CREDITS_JUNIOR",
+                "s": "Junior"
+            },
+            {
+                "n": "CREDITS_LEAD",
+                "s": "Principal"
+            },
+            {
+                "n": "CREDITS_LEAD_PROGRAMMER",
+                "s": "Programator principal"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGN",
+                "s": "Design de nivel"
+            },
+            {
+                "n": "CREDITS_LEVEL_DESIGNER",
+                "s": "Designer de nivel"
+            },
+            {
+                "n": "CREDITS_LOCALIZATION",
+                "s": "Localizare"
+            },
+            {
+                "n": "CREDITS_MANUSCRIPT",
+                "s": "Manuscris"
+            },
+            {
+                "n": "CREDITS_MODELS",
+                "s": "Modele"
+            },
+            {
+                "n": "CREDITS_MUSICIAN",
+                "s": "Muzician"
+            },
+            {
+                "n": "CREDITS_POLYGLOT",
+                "s": "Tradus de către Polyglot Project"
+            },
+            {
+                "n": "CREDITS_PRODUCER",
+                "s": "Producător"
+            },
+            {
+                "n": "CREDITS_PRODUCTION",
+                "s": "Producție"
+            },
+            {
+                "n": "CREDITS_PROGRAM_MANAGER",
+                "s": "Manager de program"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER",
+                "s": "Programator"
+            },
+            {
+                "n": "CREDITS_PROGRAMMER_PLURAL",
+                "s": "Programatori"
+            },
+            {
+                "n": "CREDITS_PROGRAMMING",
+                "s": "Programarea"
+            },
+            {
+                "n": "CREDITS_PROJECT_MANAGER",
+                "s": "Manager de proiect"
+            },
+            {
+                "n": "CREDITS_PUBLISHER",
+                "s": "Distribuitor"
+            },
+            {
+                "n": "CREDITS_RECORDIST",
+                "s": "Înregistrator"
+            },
+            {
+                "n": "CREDITS_SCRIPT_WRITER",
+                "s": "Scriitor de scenariu"
+            },
+            {
+                "n": "CREDITS_SENIOR",
+                "s": "Senior"
+            },
+            {
+                "n": "CREDITS_SFX",
+                "s": "Efecte de sunet"
+            },
+            {
+                "n": "CREDITS_SOUND_DESIGNER",
+                "s": "Designer de sunet"
+            },
+            {
+                "n": "CREDITS_SOUND_ENGINEER",
+                "s": "Inginer de sunet"
+            },
+            {
+                "n": "CREDITS_SOUNDTRACK",
+                "s": "Coloană sonoră"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS",
+                "s": "Mulțumiri speciale"
+            },
+            {
+                "n": "CREDITS_SPECIAL_THANKS_TO",
+                "s": "Mulțumiri speciale către"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_ARTIST",
+                "s": "Artist tehnic"
+            },
+            {
+                "n": "CREDITS_TECHNICAL_DIRECTOR",
+                "s": "Director tehnic"
+            },
+            {
+                "n": "CREDITS_TEST_LEAD",
+                "s": "Conducere de test"
+            },
+            {
+                "n": "CREDITS_TEST_MANAGER",
+                "s": "Manager de test"
+            },
+            {
+                "n": "CREDITS_TESTER",
+                "s": "Tester"
+            },
+            {
+                "n": "CREDITS_TRANSLATION",
+                "s": "Traducere"
+            },
+            {
+                "n": "CREDITS_VFX",
+                "s": "Efecte vizuale"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTING",
+                "s": "Actorie de voce"
+            },
+            {
+                "n": "CREDITS_VOICE_ACTOR",
+                "s": "Actor de voce"
+            },
+            {
+                "n": "CREDITS_WRITER",
+                "s": "Scriitor"
+            },
+            {
+                "n": "ERROR_DEVICE_NOT_FOUND",
+                "s": "Nu s-a detectat niciun {0}"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_LEAVING_TRACKAREA",
+                "s": "Se părăsește zona de urmărire"
+            },
+            {
+                "n": "ERROR_DEVICE_VR_NO_HMD",
+                "s": "Nu s-a detectat niciun HMD"
+            },
+            {
+                "n": "ERROR_GENERIC_CHEATING",
+                "s": "Cheat-uri detectate!"
+            },
+            {
+                "n": "ERROR_GENERIC_ERRCODE",
+                "s": "Cod de eroare:"
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_KEY",
+                "s": "Cod de activare invalid."
+            },
+            {
+                "n": "ERROR_GENERIC_INVALID_NAME",
+                "s": "Nume Invalid!"
+            },
+            {
+                "n": "ERROR_GENERIC_TEXT",
+                "s": "A apărut o eroare."
+            },
+            {
+                "n": "ERROR_NETWORK_CONNECTION_LOST",
+                "s": "S-a întrerupt conexiunea."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
+                "s": "Inamicul tău s-a deconectat."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
+                "s": "Celalalt jucator s-a deconectat."
+            },
+            {
+                "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
+                "s": "Aliatul tău s-a deconectat."
+            },
+            {
+                "n": "ERROR_NETWORK_SERVER",
+                "s": "Nu se poate face conexiunea la server."
+            },
+            {
+                "n": "ERROR_SAVE_CORRUPTED",
+                "s": "Fișierul salvat este stricat."
+            },
+            {
+                "n": "ERROR_SAVE_NO_GAMES_FOUND",
+                "s": "Nu s-a găsit niciun joc."
+            },
+            {
+                "n": "ERROR_SAVE_NO_OPEN_GAMES",
+                "s": "Nu s-a găsit niciun joc."
+            },
+            {
+                "n": "GAME_ACTION_ATTACK",
+                "s": "Atacă"
+            },
+            {
+                "n": "GAME_ACTION_BOOST",
+                "s": "Mărire"
+            },
+            {
+                "n": "GAME_ACTION_BUILD",
+                "s": "Construiește"
+            },
+            {
+                "n": "GAME_ACTION_CAST_FISHING",
+                "s": "Aruncă"
+            },
+            {
+                "n": "GAME_ACTION_CAST_SPELL",
+                "s": "Castează"
+            },
+            {
+                "n": "GAME_ACTION_CLAIM",
+                "s": "A obtine"
+            },
+            {
+                "n": "GAME_ACTION_CLIMB",
+                "s": "Urcă"
+            },
+            {
+                "n": "GAME_ACTION_CLOSE",
+                "s": "Închide"
+            },
+            {
+                "n": "GAME_ACTION_COLLECT",
+                "s": "Colecționează"
+            },
+            {
+                "n": "GAME_ACTION_COOK",
+                "s": "Gătește"
+            },
+            {
+                "n": "GAME_ACTION_CRAFT",
+                "s": "Prepară"
+            },
+            {
+                "n": "GAME_ACTION_CROUCH",
+                "s": "Ghemuiește-te"
+            },
+            {
+                "n": "GAME_ACTION_DODGE",
+                "s": "Ferește-te"
+            },
+            {
+                "n": "GAME_ACTION_DRIVE",
+                "s": "Conduce"
+            },
+            {
+                "n": "GAME_ACTION_FLY",
+                "s": "Zboară"
+            },
+            {
+                "n": "GAME_ACTION_FULL_SPEED",
+                "s": "Viteză maxima"
+            },
+            {
+                "n": "GAME_ACTION_GO",
+                "s": "Du-te"
+            },
+            {
+                "n": "GAME_ACTION_GO_TO_PLACE",
+                "s": "Du-te către"
+            },
+            {
+                "n": "GAME_ACTION_HALF_SPEED",
+                "s": "Viteză la jumătate"
+            },
+            {
+                "n": "GAME_ACTION_HEAL",
+                "s": "Vindecă"
+            },
+            {
+                "n": "GAME_ACTION_JUMP",
+                "s": "Sari"
+            },
+            {
+                "n": "GAME_ACTION_LAND",
+                "s": "Aterizează"
+            },
+            {
+                "n": "GAME_ACTION_LOOK",
+                "s": "Uite-te"
+            },
+            {
+                "n": "GAME_ACTION_MIX",
+                "s": "Amestecă"
+            },
+            {
+                "n": "GAME_ACTION_OPEN",
+                "s": "Deschide"
+            },
+            {
+                "n": "GAME_ACTION_PICK_UP",
+                "s": "Ridică de jos"
+            },
+            {
+                "n": "GAME_ACTION_RACE",
+                "s": "Cursă"
+            },
+            {
+                "n": "GAME_ACTION_READ",
+                "s": "Citește"
+            },
+            {
+                "n": "GAME_ACTION_REPLACE",
+                "s": "Înlocuiește"
+            },
+            {
+                "n": "GAME_ACTION_RUN",
+                "s": "Fugi"
+            },
+            {
+                "n": "GAME_ACTION_RUN_AWAY",
+                "s": "Scapă fugind"
+            },
+            {
+                "n": "GAME_ACTION_SHOOT",
+                "s": "Trage"
+            },
+            {
+                "n": "GAME_ACTION_SNEAK",
+                "s": "Furișează-te"
+            },
+            {
+                "n": "GAME_ACTION_SPIN",
+                "s": "Invarte"
+            },
+            {
+                "n": "GAME_ACTION_SPRINT",
+                "s": "Sprintează"
+            },
+            {
+                "n": "GAME_ACTION_STEER",
+                "s": "Pilotează"
+            },
+            {
+                "n": "GAME_ACTION_TAKE_OFF",
+                "s": "Decolare"
+            },
+            {
+                "n": "GAME_ACTION_TALK",
+                "s": "Vorbeste"
+            },
+            {
+                "n": "GAME_ACTION_THROW",
+                "s": "Aruncă"
+            },
+            {
+                "n": "GAME_ACTION_WALK",
+                "s": "Mergi"
+            },
+            {
+                "n": "GAME_CHARACTER_ENDURANCE",
+                "s": "Rezistență"
+            },
+            {
+                "n": "GAME_CHARACTER_EXP",
+                "s": "Puncte de experiență"
+            },
+            {
+                "n": "GAME_CHARACTER_FEMALE",
+                "s": "Feminin"
+            },
+            {
+                "n": "GAME_CHARACTER_HEALTH",
+                "s": "Viată"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART",
+                "s": "Inimă"
+            },
+            {
+                "n": "GAME_CHARACTER_HEART_PLURAL",
+                "s": "Inimi"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL",
+                "s": "Nivel"
+            },
+            {
+                "n": "GAME_CHARACTER_LEVEL_UP",
+                "s": "Ți-a crescut nivelul!"
+            },
+            {
+                "n": "GAME_CHARACTER_LIVES",
+                "s": "Vieți"
+            },
+            {
+                "n": "GAME_CHARACTER_MALE",
+                "s": "Masculin"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN",
+                "s": "Bărbat"
+            },
+            {
+                "n": "GAME_CHARACTER_MAN_PLURAL",
+                "s": "Bărbați"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN",
+                "s": "Reîncarnare"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_IN",
+                "s": "Reîncarnare în:"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWN_QUESTION",
+                "s": "Reîncarnare?"
+            },
+            {
+                "n": "GAME_CHARACTER_RESPAWNING",
+                "s": "Reîncarnare"
+            },
+            {
+                "n": "GAME_CHARACTER_SKILL",
+                "s": "Îndemânare"
+            },
+            {
+                "n": "GAME_CHARACTER_SPAWN_POINT",
+                "s": "Loc de reîncarnare"
+            },
+            {
+                "n": "GAME_CHARACTER_TRANSGENDER",
+                "s": "Neutru"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN",
+                "s": "Femeie"
+            },
+            {
+                "n": "GAME_CHARACTER_WOMAN_PLURAL",
+                "s": "Femei"
+            },
+            {
+                "n": "GAME_DAMAGE",
+                "s": "Avarie"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_HIT",
+                "s": "Lovitură critică"
+            },
+            {
+                "n": "GAME_DAMAGE_CRITICAL_MISS",
+                "s": "Ratare critică"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_NOUN",
+                "s": "Lovitură"
+            },
+            {
+                "n": "GAME_DAMAGE_HIT_POINTS_PLURAL",
+                "s": "Puncte de viață"
+            },
+            {
+                "n": "GAME_DAMAGE_MISS_NOUN",
+                "s": "Ratare"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT",
+                "s": "Avarie"
+            },
+            {
+                "n": "GAME_DAMAGE_UNIT_PLURAL",
+                "s": "Avarie"
+            },
+            {
+                "n": "GAME_ENEMY",
+                "s": "Inamic"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE",
+                "s": "Inamici"
+            },
+            {
+                "n": "GAME_ENEMY_FEMALE_PLURAL",
+                "s": "Inamici"
+            },
+            {
+                "n": "GAME_ENEMY_PLURAL",
+                "s": "Inamici"
+            },
+            {
+                "n": "GAME_GENRE_ACTION",
+                "s": "Joc de acțiune"
+            },
+            {
+                "n": "GAME_GENRE_ADVENTURE",
+                "s": "Joc de aventură"
+            },
+            {
+                "n": "GAME_GENRE_CARD",
+                "s": "Cărţi"
+            },
+            {
+                "n": "GAME_GENRE_CASUAL",
+                "s": "Joc popular"
+            },
+            {
+                "n": "GAME_GENRE_FANTASY",
+                "s": "Fantezie"
+            },
+            {
+                "n": "GAME_GENRE_HARDCORE",
+                "s": "Joc hardcore"
+            },
+            {
+                "n": "GAME_GENRE_INDIE",
+                "s": "Independente"
+            },
+            {
+                "n": "GAME_GENRE_MEDIEVAL",
+                "s": "Joc medieval"
+            },
+            {
+                "n": "GAME_GENRE_MISC",
+                "s": "Altele"
+            },
+            {
+                "n": "GAME_GENRE_MULTIPLAYER",
+                "s": "Multiplayer"
+            },
+            {
+                "n": "GAME_GENRE_NAME",
+                "s": "Gen"
+            },
+            {
+                "n": "GAME_GENRE_PLATFORMER",
+                "s": "Platformer"
+            },
+            {
+                "n": "GAME_GENRE_PUZZLE",
+                "s": "Puzzle"
+            },
+            {
+                "n": "GAME_GENRE_QUIZ",
+                "s": "Joc de cultură generală"
+            },
+            {
+                "n": "GAME_GENRE_RACING",
+                "s": "Curse"
+            },
+            {
+                "n": "GAME_GENRE_RETRO",
+                "s": "Joc retro"
+            },
+            {
+                "n": "GAME_GENRE_RPG",
+                "s": "RPG"
+            },
+            {
+                "n": "GAME_GENRE_RTS",
+                "s": "Strategii în Timp Real"
+            },
+            {
+                "n": "GAME_GENRE_SCIFI",
+                "s": "Joc SF"
+            },
+            {
+                "n": "GAME_GENRE_SHOOTER",
+                "s": "Shooter"
+            },
+            {
+                "n": "GAME_GENRE_SIMULATION",
+                "s": "Joc de simulare"
+            },
+            {
+                "n": "GAME_GENRE_SINGLEPLAYER",
+                "s": "Individual"
+            },
+            {
+                "n": "GAME_GENRE_SPORTS",
+                "s": "Sport"
+            },
+            {
+                "n": "GAME_GENRE_STRATEGY",
+                "s": "Joc de strategie"
+            },
+            {
+                "n": "GAME_GENRE_TBS",
+                "s": "Strategii pe Ture"
+            },
+            {
+                "n": "GAME_GENRE_TOWER_DEFENSE",
+                "s": "TD"
+            },
+            {
+                "n": "GAME_INVENTORY",
+                "s": "Inventar"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMO",
+                "s": "Amuniție"
+            },
+            {
+                "n": "GAME_INVENTORY_AMMUNITION",
+                "s": "Amuniție"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET",
+                "s": "Glonț"
+            },
+            {
+                "n": "GAME_INVENTORY_BULLET_PLURAL",
+                "s": "Gloanțe"
+            },
+            {
+                "n": "GAME_INVENTORY_BUY",
+                "s": "Cumpără"
+            },
+            {
+                "n": "GAME_INVENTORY_CAPACITY",
+                "s": "Capacitate Inventar"
+            },
+            {
+                "n": "GAME_INVENTORY_DROP",
+                "s": "Aruncă"
+            },
+            {
+                "n": "GAME_INVENTORY_ENCUMBRANCE",
+                "s": "Povară"
+            },
+            {
+                "n": "GAME_INVENTORY_FULL",
+                "s": "Inventar plin"
+            },
+            {
+                "n": "GAME_INVENTORY_ITEM",
+                "s": "Obiect"
+            },
+            {
+                "n": "GAME_INVENTORY_KEY",
+                "s": "Cheie"
+            },
+            {
+                "n": "GAME_INVENTORY_POWERUP",
+                "s": "Mărire putere"
+            },
+            {
+                "n": "GAME_INVENTORY_SELL",
+                "s": "Vinde"
+            },
+            {
+                "n": "GAME_INVENTORY_USE",
+                "s": "Folosește"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPON",
+                "s": "Armă"
+            },
+            {
+                "n": "GAME_INVENTORY_WEAPONS",
+                "s": "Arme"
+            },
+            {
+                "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
+                "s": "Nu poți căra mai mult."
+            },
+            {
+                "n": "GAME_LABEL_BE_CAREFUL",
+                "s": "Fii atent!"
+            },
+            {
+                "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
+                "s": "Te rog sa fii atent."
+            },
+            {
+                "n": "GAME_LABEL_TACTICS",
+                "s": "Tactici"
+            },
+            {
+                "n": "GAME_OBJECTIVE",
+                "s": "Obiectiv"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST",
+                "s": "Asistare"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ASSIST_PLURAL",
+                "s": "Asistări"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ATTACK",
+                "s": "Atacă"
+            },
+            {
+                "n": "GAME_OBJECTIVE_BONUS",
+                "s": "Bonus"
+            },
+            {
+                "n": "GAME_OBJECTIVE_CAPTURE",
+                "s": "Capturează"
+            },
+            {
+                "n": "GAME_OBJECTIVE_COMPLETE",
+                "s": "Complet"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH",
+                "s": "Moarte"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEATH_PLURAL",
+                "s": "Morți"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DEFEND",
+                "s": "Apară"
+            },
+            {
+                "n": "GAME_OBJECTIVE_DESTROY",
+                "s": "Distruge"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ESCAPE",
+                "s": "Scapă"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAME_FINISHED",
+                "s": "Sfârșit"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER",
+                "s": "Joc terminat!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_GAMEOVER_CAPS",
+                "s": "JOC TERMINAT!"
+            },
+            {
+                "n": "GAME_OBJECTIVE_HIGH_SCORE",
+                "s": "Cel mai mare scor"
+            },
+            {
+                "n": "GAME_OBJECTIVE_INCOMPLETE",
+                "s": "Incomplet"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL",
+                "s": "Ucide"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_ASSIST",
+                "s": "Asistare in Ucidere"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_NOUN",
+                "s": "Ucidere"
+            },
+            {
+                "n": "GAME_OBJECTIVE_KILL_PLURAL",
+                "s": "Ucideri"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOCKED",
+                "s": "Blocat"
+            },
+            {
+                "n": "GAME_OBJECTIVE_LOSSES",
+                "s": "Înfrângeri"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MATCH",
+                "s": "Joc"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION",
+                "s": "Misiune"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE",
+                "s": "Obiectivul misiunii"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MISSION_OBJECTIVE_PLURAL",
+                "s": "Obiectivele misiunii"
+            },
+            {
+                "n": "GAME_OBJECTIVE_MULTIPLIER",
+                "s": "Multiplicator"
+            },
+            {
+                "n": "GAME_OBJECTIVE_PLURAL",
+                "s": "Obiective"
+            },
+            {
+                "n": "GAME_OBJECTIVE_POSITION",
+                "s": "Pozitie"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP",
+                "s": "Tur"
+            },
+            {
+                "n": "GAME_OBJECTIVE_RACE_LAP_PLURAL",
+                "s": "Tururi"
+            },
+            {
+                "n": "GAME_OBJECTIVE_ROUND",
+                "s": "Rundă"
+            },
+            {
+                "n": "GAME_OBJECTIVE_SCORE",
+                "s": "Scor"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME",
+                "s": "Timp"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TIME_LEFT",
+                "s": "Timp rămas"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT",
+                "s": "Turneu"
+            },
+            {
+                "n": "GAME_OBJECTIVE_TOURNAMENT_PLURAL",
+                "s": "Turnee"
+            },
+            {
+                "n": "GAME_OBJECTIVE_WINS",
+                "s": "Victorii"
+            },
+            {
+                "n": "GAME_STATUS_DEFEAT",
+                "s": "Înfrânt"
+            },
+            {
+                "n": "GAME_STATUS_DEFEATED",
+                "s": "Ai fost învins."
+            },
+            {
+                "n": "GAME_STATUS_LOSER",
+                "s": "Pierzător"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_LOST",
+                "s": "Echipa ta a pierdut!"
+            },
+            {
+                "n": "GAME_STATUS_TEAM_WON",
+                "s": "Echipa ta a câștigat!"
+            },
+            {
+                "n": "GAME_STATUS_VICTORY",
+                "s": "Victorie"
+            },
+            {
+                "n": "GAME_STATUS_WINNER",
+                "s": "Câștigător"
+            },
+            {
+                "n": "GAME_STATUS_YOU_ARE_DEAD",
+                "s": "Ești mort."
+            },
+            {
+                "n": "GAME_STATUS_YOU_DIED",
+                "s": "Ai murit."
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOSE",
+                "s": "Ai pierdut!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_LOST",
+                "s": "Ai pierdut!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WIN",
+                "s": "Ai câștigat!"
+            },
+            {
+                "n": "GAME_STATUS_YOU_WON",
+                "s": "Ai câștigat!"
+            },
+            {
+                "n": "MENU_CAMERA",
+                "s": "Camera"
+            },
+            {
+                "n": "MENU_CAMERA_INVERTED",
+                "s": "Inversată"
+            },
+            {
+                "n": "MENU_CAMERA_NORMAL",
+                "s": "Normal"
+            },
+            {
+                "n": "MENU_CAMERA_XAXIS",
+                "s": "Axa X a camerei"
+            },
+            {
+                "n": "MENU_CAMERA_YAXIS",
+                "s": "Axa Y a camerei"
+            },
+            {
+                "n": "MENU_CONTROLS_BUTTON",
+                "s": "Buton"
+            },
+            {
+                "n": "MENU_CONTROLS_CLICK",
+                "s": "Click"
+            },
+            {
+                "n": "MENU_CONTROLS_DEADZONE",
+                "s": "Zonă moartă"
+            },
+            {
+                "n": "MENU_CONTROLS_DOUBLE_CLICK",
+                "s": "Dublu click"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG",
+                "s": "Trage"
+            },
+            {
+                "n": "MENU_CONTROLS_DRAG_DROP",
+                "s": "Drag and drop"
+            },
+            {
+                "n": "MENU_CONTROLS_FINGER",
+                "s": "Deget"
+            },
+            {
+                "n": "MENU_CONTROLS_GAMEPAD",
+                "s": "Gamepad"
+            },
+            {
+                "n": "MENU_CONTROLS_GYROSCOPE",
+                "s": "Giroscop"
+            },
+            {
+                "n": "MENU_CONTROLS_KEY",
+                "s": "Tastă"
+            },
+            {
+                "n": "MENU_CONTROLS_KEYBOARD",
+                "s": "Tastatură"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE",
+                "s": "Mouse"
+            },
+            {
+                "n": "MENU_CONTROLS_MOUSE_SENSITIVITY",
+                "s": "Sensitivitate mouse"
+            },
+            {
+                "n": "MENU_CONTROLS_PINCH",
+                "s": "Ciupește"
+            },
+            {
+                "n": "MENU_CONTROLS_ROTATE",
+                "s": "Rotește"
+            },
+            {
+                "n": "MENU_CONTROLS_SCROLL",
+                "s": "Scroll"
+            },
+            {
+                "n": "MENU_CONTROLS_SHAKE",
+                "s": "Scutură"
+            },
+            {
+                "n": "MENU_CONTROLS_SPREAD",
+                "s": "Întinde"
+            },
+            {
+                "n": "MENU_CONTROLS_SWIPE",
+                "s": "Swipe"
+            },
+            {
+                "n": "MENU_CONTROLS_TAP",
+                "s": "Apasă"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_BUTTON",
+                "s": "Butonul"
+            },
+            {
+                "n": "MENU_CONTROLS_THE_KEY",
+                "s": "Tasta"
+            },
+            {
+                "n": "MENU_CONTROLS_TILT",
+                "s": "Înclină"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM",
+                "s": "Braț"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_ARM_PLURAL",
+                "s": "Brațe"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHEST",
+                "s": "Piept"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_CHIN",
+                "s": "Barbă"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_COLOR",
+                "s": "Culoare"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR",
+                "s": "Ureche"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EAR_PLURAL",
+                "s": "Urechi"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE",
+                "s": "Ochi"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_EYE_PLURAL",
+                "s": "Ochii"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FEET",
+                "s": "Labele picioarelor"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_FOOT",
+                "s": "Laba piciorului"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR",
+                "s": "Păr"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_BEARD",
+                "s": "Barbă"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_FUR",
+                "s": "Blană"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAIR_HEAD",
+                "s": "Păr din cap"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND",
+                "s": "Mână"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HAND_PLURAL",
+                "s": "Mâini"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HEAD",
+                "s": "Cap"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_HIPS",
+                "s": "Șold"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG",
+                "s": "Picior"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_LEG_PLURAL",
+                "s": "Picioare"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_MOUTH",
+                "s": "Gură"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NECK",
+                "s": "Gât"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_NOSE",
+                "s": "Nas"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_SKIN",
+                "s": "Piele"
+            },
+            {
+                "n": "MENU_CUSTOMIZE_THORAX",
+                "s": "Torace"
+            },
+            {
+                "n": "MENU_DIFFICULTY",
+                "s": "Dificultate"
+            },
+            {
+                "n": "MENU_DIFFICULTY_EASY",
+                "s": "Ușor"
+            },
+            {
+                "n": "MENU_DIFFICULTY_HARD",
+                "s": "Greu"
+            },
+            {
+                "n": "MENU_DIFFICULTY_IMPOSSIBLE",
+                "s": "Imposibil"
+            },
+            {
+                "n": "MENU_DIFFICULTY_INSANE",
+                "s": "Nebunesc"
+            },
+            {
+                "n": "MENU_DIFFICULTY_MEDIUM",
+                "s": "Mediu"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_EASY",
+                "s": "Foarte ușor"
+            },
+            {
+                "n": "MENU_DIFFICULTY_VERY_HARD",
+                "s": "Foarte greu"
+            },
+            {
+                "n": "MENU_DIR_DOWN",
+                "s": "Jos"
+            },
+            {
+                "n": "MENU_DIR_LEFT",
+                "s": "Stânga"
+            },
+            {
+                "n": "MENU_DIR_RIGHT",
+                "s": "Dreapta"
+            },
+            {
+                "n": "MENU_DIR_UP",
+                "s": "Sus"
+            },
+            {
+                "n": "MENU_IO_LOAD",
+                "s": "Încarcă"
+            },
+            {
+                "n": "MENU_IO_LOAD_GAME",
+                "s": "Încarcă Jocul"
+            },
+            {
+                "n": "MENU_IO_LOADING",
+                "s": "Se încărca..."
+            },
+            {
+                "n": "MENU_IO_PLEASE_WAIT",
+                "s": "Vă rugăm să așteptați..."
+            },
+            {
+                "n": "MENU_IO_RESET_SAVE_DATA",
+                "s": "Resetează datele?"
+            },
+            {
+                "n": "MENU_IO_SAVE",
+                "s": "Salvează"
+            },
+            {
+                "n": "MENU_IO_SAVE_DATA",
+                "s": "Salvează datele"
+            },
+            {
+                "n": "MENU_IO_SAVE_GAME",
+                "s": "Salvează Jocul"
+            },
+            {
+                "n": "MENU_IO_SAVING",
+                "s": "Se salvează..."
+            },
+            {
+                "n": "MENU_LABEL_AGE",
+                "s": "Vârstă"
+            },
+            {
+                "n": "MENU_LABEL_ALL",
+                "s": "Toate"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",
+                "s": "Ești foarte sigur?"
+            },
+            {
+                "n": "MENU_LABEL_ARE_YOU_SURE",
+                "s": "Ești sigur?"
+            },
+            {
+                "n": "MENU_LABEL_BACK",
+                "s": "Înapoi"
+            },
+            {
+                "n": "MENU_LABEL_BACKGROUND_MUSIC",
+                "s": "Volum muzică de fundal"
+            },
+            {
+                "n": "MENU_LABEL_CANCEL",
+                "s": "Anulare"
+            },
+            {
+                "n": "MENU_LABEL_CLOSE",
+                "s": "Închide"
+            },
+            {
+                "n": "MENU_LABEL_CONFIRM_BUTTON",
+                "s": "Confirmă"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE",
+                "s": "Continuă"
+            },
+            {
+                "n": "MENU_LABEL_CONTINUE_QUESTION",
+                "s": "Continui?"
+            },
+            {
+                "n": "MENU_LABEL_CREDITS",
+                "s": "Credite"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP",
+                "s": "Ieșire către Desktop"
+            },
+            {
+                "n": "MENU_LABEL_DESKTOP_QUESTION",
+                "s": "Ieși catre Desktop?"
+            },
+            {
+                "n": "MENU_LABEL_DLC",
+                "s": "DLC"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOAD",
+                "s": "Descarcă"
+            },
+            {
+                "n": "MENU_LABEL_DOWNLOADABLE",
+                "s": "Conţinut Suplimentar"
+            },
+            {
+                "n": "MENU_LABEL_EXIT",
+                "s": "Ieși"
+            },
+            {
+                "n": "MENU_LABEL_EXIT_QUESTION",
+                "s": "Ieșire?"
+            },
+            {
+                "n": "MENU_LABEL_EXTRAS",
+                "s": "Extra"
+            },
+            {
+                "n": "MENU_LABEL_FRAMESPERSEC",
+                "s": "Cadre pe secundă (FPS)"
+            },
+            {
+                "n": "MENU_LABEL_GALLERY",
+                "s": "Galerie de artă"
+            },
+            {
+                "n": "MENU_LABEL_GOODBYE",
+                "s": "La revedere!"
+            },
+            {
+                "n": "MENU_LABEL_GRAPHICS",
+                "s": "Grafică"
+            },
+            {
+                "n": "MENU_LABEL_IAP",
+                "s": "Achiziție in aplicație"
+            },
+            {
+                "n": "MENU_LABEL_LANGUAGE",
+                "s": "Limbă"
+            },
+            {
+                "n": "MENU_LABEL_LEVEL",
+                "s": "Nivel"
+            },
+            {
+                "n": "MENU_LABEL_MAIL",
+                "s": "Mail"
+            },
+            {
+                "n": "MENU_LABEL_MAINMENU",
+                "s": "Meniu Principal"
+            },
+            {
+                "n": "MENU_LABEL_MORE",
+                "s": "Mai multe"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC",
+                "s": "Muzică"
+            },
+            {
+                "n": "MENU_LABEL_MUSIC_PLAYER",
+                "s": "Player muzical"
+            },
+            {
+                "n": "MENU_LABEL_NEW_GAME",
+                "s": "Joc nou"
+            },
+            {
+                "n": "MENU_LABEL_NEXT",
+                "s": "Următorul"
+            },
+            {
+                "n": "MENU_LABEL_NEXT_TRACK",
+                "s": "Melodia următoare"
+            },
+            {
+                "n": "MENU_LABEL_NO",
+                "s": "Nu"
+            },
+            {
+                "n": "MENU_LABEL_NO_CAPS",
+                "s": "NU"
+            },
+            {
+                "n": "MENU_LABEL_NOPE",
+                "s": "Nah"
+            },
+            {
+                "n": "MENU_LABEL_OK",
+                "s": "OK"
+            },
+            {
+                "n": "MENU_LABEL_PAUSE",
+                "s": "Pauză"
+            },
+            {
+                "n": "MENU_LABEL_PAUSED",
+                "s": "Suspendat"
+            },
+            {
+                "n": "MENU_LABEL_PLAY",
+                "s": "Joacă"
+            },
+            {
+                "n": "MENU_LABEL_PLAY_AGAIN",
+                "s": "Joacă din nou"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY",
+                "s": "Apasă orice tasta"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
+                "s": "Apasă orice tasta pentru a continua"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START",
+                "s": "Apasă Start"
+            },
+            {
+                "n": "MENU_LABEL_PRESS_START_CONTINUE",
+                "s": "Apasă Start pentru a continua"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS",
+                "s": "Anteriorul"
+            },
+            {
+                "n": "MENU_LABEL_PREVIOUS_TRACK",
+                "s": "Melodia precedentă"
+            },
+            {
+                "n": "MENU_LABEL_PRICE",
+                "s": "Preț"
+            },
+            {
+                "n": "MENU_LABEL_PRICE_FREE",
+                "s": "Gratis"
+            },
+            {
+                "n": "MENU_LABEL_PURCHASE",
+                "s": "Cumpără"
+            },
+            {
+                "n": "MENU_LABEL_QUIT",
+                "s": "Închidere"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_CONFIRM",
+                "s": "Ești sigur că vrei să închizi?"
+            },
+            {
+                "n": "MENU_LABEL_QUIT_QUESTION",
+                "s": "Închizi?"
+            },
+            {
+                "n": "MENU_LABEL_REPLAY",
+                "s": "Joaca din nou"
+            },
+            {
+                "n": "MENU_LABEL_RETURN",
+                "s": "Întoarcere"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN",
+                "s": "Întoarcere către meniul principal"
+            },
+            {
+                "n": "MENU_LABEL_RETURN_MAIN_QUESTION",
+                "s": "Întoarcere către meniul principal?"
+            },
+            {
+                "n": "MENU_LABEL_SHARE",
+                "s": "Împărtășește"
+            },
+            {
+                "n": "MENU_LABEL_SKIP",
+                "s": "Treci peste"
+            },
+            {
+                "n": "MENU_LABEL_SOUND",
+                "s": "Sunet"
+            },
+            {
+                "n": "MENU_LABEL_THANK_YOU",
+                "s": "Mulțumesc!"
+            },
+            {
+                "n": "MENU_LABEL_UNLOCK",
+                "s": "Deblocare"
+            },
+            {
+                "n": "MENU_LABEL_VIDEO",
+                "s": "Video"
+            },
+            {
+                "n": "MENU_LABEL_VOICES",
+                "s": "Voce"
+            },
+            {
+                "n": "MENU_LABEL_WARNING",
+                "s": "Atenție!"
+            },
+            {
+                "n": "MENU_LABEL_WELCOME",
+                "s": "Bine ai venit"
+            },
+            {
+                "n": "MENU_LABEL_WORLD",
+                "s": "Lume"
+            },
+            {
+                "n": "MENU_LABEL_YEAH",
+                "s": "Dap"
+            },
+            {
+                "n": "MENU_LABEL_YES",
+                "s": "Da"
+            },
+            {
+                "n": "MENU_LABEL_YES_CAPS",
+                "s": "DA"
+            },
+            {
+                "n": "MENU_LANGUAGE_DIRECTION",
+                "s": "ltr"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS",
+                "s": "Română"
+            },
+            {
+                "n": "MENU_LANGUAGE_THIS_EN",
+                "s": "Romanian"
+            },
+            {
+                "n": "MENU_LOGIN",
+                "s": "Conectare"
+            },
+            {
+                "n": "MENU_LOGIN_EMAIL",
+                "s": "E-mail"
+            },
+            {
+                "n": "MENU_LOGIN_FORGOT",
+                "s": "Am uitat parola"
+            },
+            {
+                "n": "MENU_LOGIN_PASSWORD",
+                "s": "Parolă"
+            },
+            {
+                "n": "MENU_LOGIN_REGISTER",
+                "s": "Înregistrare"
+            },
+            {
+                "n": "MENU_LOGIN_REMEMBER",
+                "s": "Reține?"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE",
+                "s": "Provocare"
+            },
+            {
+                "n": "MENU_MODE_CHALLENGE_MODE",
+                "s": "Mod provocare"
+            },
+            {
+                "n": "MENU_MODE_COOP",
+                "s": "Co-op"
+            },
+            {
+                "n": "MENU_MODE_COOPERATIVE",
+                "s": "Cooperativ"
+            },
+            {
+                "n": "MENU_MODE_DEATHMATCH",
+                "s": "Deathmatch"
+            },
+            {
+                "n": "MENU_MODE_HELP",
+                "s": "Ajutor"
+            },
+            {
+                "n": "MENU_MODE_INSTRUCTIONS",
+                "s": "Instrucțiuni"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER",
+                "s": "Multiplayer"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_LOCAL",
+                "s": "Multiplayer Local"
+            },
+            {
+                "n": "MENU_MODE_MULTIPLAYER_ONLINE",
+                "s": "Multiplayer Online"
+            },
+            {
+                "n": "MENU_MODE_PLAY_ONLINE",
+                "s": "Joaca Online"
+            },
+            {
+                "n": "MENU_MODE_SINGLEPLAYER",
+                "s": "Individual"
+            },
+            {
+                "n": "MENU_MODE_TRAINING",
+                "s": "Antrenare"
+            },
+            {
+                "n": "MENU_MODE_TUTORIAL",
+                "s": "Tutorial"
+            },
+            {
+                "n": "MENU_MODE_VERSUS",
+                "s": "Contra"
+            },
+            {
+                "n": "MENU_NAME",
+                "s": "Nume"
+            },
+            {
+                "n": "MENU_NAME_FIRST",
+                "s": "Prenume"
+            },
+            {
+                "n": "MENU_NAME_LAST",
+                "s": "Nume"
+            },
+            {
+                "n": "MENU_NAME_USER",
+                "s": "Nume utilizator"
+            },
+            {
+                "n": "MENU_OPTIONS",
+                "s": "Preferințe"
+            },
+            {
+                "n": "MENU_OPTIONS_ADVANCEDGRAPHICS",
+                "s": "Preferițe avansate de grafică"
+            },
+            {
+                "n": "MENU_OPTIONS_ANTIALIASING",
+                "s": "Antialiasing"
+            },
+            {
+                "n": "MENU_OPTIONS_BLOOM",
+                "s": "Bloom"
+            },
+            {
+                "n": "MENU_OPTIONS_CONTROLS",
+                "s": "Controale"
+            },
+            {
+                "n": "MENU_OPTIONS_DIFFICULTY",
+                "s": "Opțiuni dificultate"
+            },
+            {
+                "n": "MENU_OPTIONS_DISPLAY",
+                "s": "Display"
+            },
+            {
+                "n": "MENU_OPTIONS_EFFECT_DETAIL",
+                "s": "Calitate efecte"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_ANISOTROPIC",
+                "s": "Anisotropic"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_BILINEAR",
+                "s": "Bilinear"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_MODE",
+                "s": "Mod Filtrare"
+            },
+            {
+                "n": "MENU_OPTIONS_FILTERING_TRILINEAR",
+                "s": "Trilinear"
+            },
+            {
+                "n": "MENU_OPTIONS_FIRST_PERSON_VIEW",
+                "s": "Vedere la persoana întâi"
+            },
+            {
+                "n": "MENU_OPTIONS_FOV",
+                "s": "Câmp de vedere"
+            },
+            {
+                "n": "MENU_OPTIONS_FULLSCREEN",
+                "s": "Ecran complet"
+            },
+            {
+                "n": "MENU_OPTIONS_GAMEPLAY",
+                "s": "Preferințe joc"
+            },
+            {
+                "n": "MENU_OPTIONS_GRAPHICS",
+                "s": "Opțiuni grafice"
+            },
+            {
+                "n": "MENU_OPTIONS_HUD",
+                "s": "HUD"
+            },
+            {
+                "n": "MENU_OPTIONS_MODEL_DETAIL",
+                "s": "Calitate Modele"
+            },
+            {
+                "n": "MENU_OPTIONS_MULTICORE_RENDERING",
+                "s": "Optimizare multi-nucleu"
+            },
+            {
+                "n": "MENU_OPTIONS_MUSIC_VOLUME",
+                "s": "Volum muzică"
+            },
+            {
+                "n": "MENU_OPTIONS_NETWORK",
+                "s": "Preferințe rețea"
+            },
+            {
+                "n": "MENU_OPTIONS_QUALITY",
+                "s": "Calitate"
+            },
+            {
+                "n": "MENU_OPTIONS_RESOLUTION",
+                "s": "Rezoluție"
+            },
+            {
+                "n": "MENU_OPTIONS_SFX_VOLUME",
+                "s": "Volum efecte sonore"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADER_DETAIL",
+                "s": "Calitate iluminare și umbrire"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW",
+                "s": "Umbră"
+            },
+            {
+                "n": "MENU_OPTIONS_SHADOW_PLURAL",
+                "s": "Umbre"
+            },
+            {
+                "n": "MENU_OPTIONS_SIZE",
+                "s": "Mărime"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND",
+                "s": "Preferințe sunet"
+            },
+            {
+                "n": "MENU_OPTIONS_SOUND_VOLUME",
+                "s": "Volum"
+            },
+            {
+                "n": "MENU_OPTIONS_SPLITSCREEN",
+                "s": "Ecran împărțit"
+            },
+            {
+                "n": "MENU_OPTIONS_TEXTURE_DETAIL",
+                "s": "Calitate Texturi"
+            },
+            {
+                "n": "MENU_OPTIONS_THIRD_PERSON_VIEW",
+                "s": "Vedere la persoana a treia"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO",
+                "s": "Preferințe video"
+            },
+            {
+                "n": "MENU_OPTIONS_VIDEO_QUALITY",
+                "s": "Calitate"
+            },
+            {
+                "n": "MENU_OPTIONS_VOICE_VOLUME",
+                "s": "Volum voce"
+            },
+            {
+                "n": "MENU_OPTIONS_VSYNC",
+                "s": "V-sync"
+            },
+            {
+                "n": "MENU_OPTIONS_WIDESCREEN",
+                "s": "Monitor Lat"
+            },
+            {
+                "n": "MENU_OPTIONS_WINDOWED",
+                "s": "Fereastră"
+            },
+            {
+                "n": "MENU_SETTING_HIGH",
+                "s": "Mare"
+            },
+            {
+                "n": "MENU_SETTING_LOW",
+                "s": "Mic"
+            },
+            {
+                "n": "MENU_SETTING_MEDIUM",
+                "s": "Mediu"
+            },
+            {
+                "n": "MENU_SETTING_ULTRA",
+                "s": "Foarte bună"
+            },
+            {
+                "n": "MENU_SETTING_VERY_HIGH",
+                "s": "Foarte bună"
+            },
+            {
+                "n": "MENU_VERSION",
+                "s": "Versiune"
+            },
+            {
+                "n": "MENU_VERSION_DEMO",
+                "s": "Demo"
+            },
+            {
+                "n": "MENU_VERSION_FREE",
+                "s": "Gratuită"
+            },
+            {
+                "n": "MENU_VERSION_FULL",
+                "s": "Completă"
+            },
+            {
+                "n": "MENU_VERSION_LITE",
+                "s": "Simplă"
+            },
+            {
+                "n": "MENU_VERSION_PREMIUM",
+                "s": "Premium"
+            },
+            {
+                "n": "MENU_VERSION_SHAREWARE",
+                "s": "Shareware"
+            },
+            {
+                "n": "MENU_VERSION_TRIAL",
+                "s": "Probă"
+            },
+            {
+                "n": "MENU_VR_COMFORT_MODE",
+                "s": "Mod de confort RV"
+            },
+            {
+                "n": "MENU_VR_HMD_ORIENT_RESET",
+                "s": "Resetare orientare HMD "
+            },
+            {
+                "n": "MENU_VR_VIRTUAL_REALITY",
+                "s": "Realitate Virtuala"
+            }
+        ]
+    }
+}

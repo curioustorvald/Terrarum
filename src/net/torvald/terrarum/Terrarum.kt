@@ -34,11 +34,13 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         if (!readFromDisk) readConfigJson()
 
         // get locale from config
-        gameLocale = gameConfig.getAsString("language") ?: sysLang
+        val gameLocaleFromConfig = gameConfig.getAsString("language") ?: sysLang
 
         // if bad game locale were set, use system locale
-        if (gameLocale.length < 4)
+        if (gameLocaleFromConfig.length < 2)
             gameLocale = sysLang
+        else
+            gameLocale = gameLocaleFromConfig
 
         println("[terrarum] Locale: " + gameLocale)
     }
@@ -98,7 +100,14 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         lateinit var defaultSaveDir: String
             private set
 
-        var gameLocale = "" // locale override
+        private val localeSimple = arrayOf("de", "en", "es", "it")
+        var gameLocale = "en" // locale override
+            set(value) {
+                if (localeSimple.contains(value.substring(0..1)))
+                    field = value.substring(0..1)
+                else
+                    field = value
+            }
 
         lateinit var gameFont: Font
             private set
@@ -145,11 +154,14 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
                 appgc.setTargetFrameRate(TARGET_INTERNAL_FPS)
                 appgc.setVSync(VSYNC)
-                appgc.setMaximumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS)
-                appgc.setMinimumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS - 1)
+                appgc.setMaximumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS) // 10 ms
+                appgc.setMinimumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS - 1) // 9 ms
 
                 appgc.setShowFPS(false)
+
+                // game will run normally even if it is not focused
                 appgc.setUpdateOnlyWhenVisible(false)
+                appgc.alwaysRender = true
 
                 appgc.start()
             }
@@ -165,7 +177,6 @@ constructor(gamename: String) : StateBasedGame(gamename) {
                 fileHandler.formatter = formatter
 
                 //logger.info()
-
                 println("The game has been crashed!")
                 println("Crash log were saved to $filepath.")
                 println("================================================================================")

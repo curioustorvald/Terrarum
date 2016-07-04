@@ -1,0 +1,10 @@
+{
+  "HELP_OTF_MAIN_1": "Type “help slow” for the ways to make the game run faster.",
+  "HELP_OTF_MAIN_2": "Press PageUp/PageDown to scroll the messages.",
+  "HELP_OTF_MAIN_3": "Utility keys:",
+  "HELP_OTF_MAIN_4": "• F3: (debug) basic information",
+  "HELP_OTF_MAIN_5": "• F7: (debug) toggle light blending",
+  "HELP_OTF_MAIN_6": "• F8: toggle smooth lighting effect",
+
+  "HELP_OTF_SLOW_1": ""
+}

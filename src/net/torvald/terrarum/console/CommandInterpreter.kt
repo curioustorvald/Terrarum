@@ -15,7 +15,16 @@ import java.util.regex.Pattern
  */
 object CommandInterpreter {
 
-    private val commandsNoAuth = arrayOf("auth", "qqq", "zoom", "setlocale", "getlocale", "help", "version")
+    private val commandsNoAuth = arrayOf(
+            "auth",
+            "qqq",
+            "zoom",
+            "setlocale",
+            "getlocale",
+            "help",
+            "version",
+            "tips"
+    )
 
     private val ccW = GameFontBase.colToCode["w"]
     private val ccG = GameFontBase.colToCode["g"]

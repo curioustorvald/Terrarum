@@ -2,6 +2,7 @@ package net.torvald
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import java.io.File
 
 import java.io.IOException
 import java.nio.file.FileSystems
@@ -20,6 +21,17 @@ object JsonFetcher {
     fun readJson(jsonFilePath: String): JsonObject {
         jsonString = StringBuffer() // reset buffer every time it called
         readJsonFileAsString(jsonFilePath)
+
+        val jsonParser = JsonParser()
+        val jsonObj = jsonParser.parse(jsonString!!.toString()).asJsonObject
+
+        return jsonObj
+    }
+
+    @Throws(IOException::class)
+    fun readJson(jsonFile: File): JsonObject {
+        jsonString = StringBuffer() // reset buffer every time it called
+        readJsonFileAsString(jsonFile.canonicalPath)
 
         val jsonParser = JsonParser()
         val jsonObj = jsonParser.parse(jsonString!!.toString()).asJsonObject
