@@ -1,5 +1,7 @@
 package net.torvald.terrarum.gameactors
 
+import java.util.*
+
 /**
  * Created by minjaesong on 16-03-14.
  */
@@ -20,6 +22,7 @@ interface Luminous {
      * Arguments:
      *
      * Hitbox(x-offset, y-offset, width, height)
+     * (Use ArrayList for normal circumstances)
      */
-    val lightBox: Hitbox
+    val lightBoxList: List<Hitbox>
 }

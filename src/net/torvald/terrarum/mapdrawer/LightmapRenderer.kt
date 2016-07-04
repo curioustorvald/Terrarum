@@ -174,16 +174,17 @@ object LightmapRenderer {
         Terrarum.game.actorContainer.forEach { it ->
             if (it is Luminous && it is Visible) {
                 // put lanterns to the area the luminantBox is occupying
-                val lightBox = it.lightBox
-                val lightBoxX = it.hitbox.posX + lightBox.posX
-                val lightBoxY = it.hitbox.posY + lightBox.posY
-                val lightBoxW = lightBox.width
-                val lightBoxH = lightBox.height
-                for (y in lightBoxY.div(TSIZE).floorInt()
-                        ..lightBoxY.plus(lightBoxH).div(TSIZE).floorInt())
-                    for (x in lightBoxX.div(TSIZE).floorInt()
-                            ..lightBoxX.plus(lightBoxW).div(TSIZE).floorInt())
-                        lanternMap.add(Lantern(x, y, it.luminosity))
+                for (lightBox in it.lightBoxList) {
+                    val lightBoxX = it.hitbox.posX + lightBox.posX
+                    val lightBoxY = it.hitbox.posY + lightBox.posY
+                    val lightBoxW = lightBox.width
+                    val lightBoxH = lightBox.height
+                    for (y in lightBoxY.div(TSIZE).floorInt()
+                            ..lightBoxY.plus(lightBoxH).div(TSIZE).floorInt())
+                        for (x in lightBoxX.div(TSIZE).floorInt()
+                                ..lightBoxX.plus(lightBoxW).div(TSIZE).floorInt())
+                            lanternMap.add(Lantern(x, y, it.luminosity))
+                }
             }
         }
 

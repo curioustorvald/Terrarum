@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.tileproperties.TileNameCode
 import net.torvald.terrarum.tileproperties.TilePropCodex
+import java.util.*
 
 /**
  * Created by minjaesong on 16-06-17.
@@ -14,13 +15,16 @@ class FixturesTikiTorch : FixturesBase(), Luminous {
         set(value) {
             throw UnsupportedOperationException()
         }
-    override val lightBox: Hitbox = Hitbox(3.0, 0.0, 4.0, 3.0)
+    override val lightBoxList: ArrayList<Hitbox>
 
     init {
         isVisible = true
         super.setDensity(1200)
 
         setHitboxDimension(10, 24, 0, 0)
+
+        lightBoxList = ArrayList(1)
+        lightBoxList.add(Hitbox(3.0, 0.0, 4.0, 3.0))
 
         sprite = SpriteAnimation()
         sprite!!.setDimension(10, 27)

@@ -71,8 +71,8 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         set(value) {
             actorValue[AVKey.LUMINOSITY] = value
         }
-    override val lightBox: Hitbox
-        get() = Hitbox(0.0, 0.0, hitbox.width, hitbox.height) // use getter; dimension of the player may change by time.
+    override val lightBoxList: List<Hitbox>
+        get() = arrayOf(Hitbox(0.0, 0.0, hitbox.width, hitbox.height)).toList() // use getter; dimension of the player may change by time.
 
     companion object {
         @Transient internal const val ACCEL_MULT_IN_FLIGHT: Double = 0.21
