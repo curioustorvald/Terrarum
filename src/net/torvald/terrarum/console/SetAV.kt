@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.imagefont.GameFontBase
-import net.torvald.terrarum.StateGame
+import net.torvald.terrarum.StateInGame
 import net.torvald.terrarum.Terrarum
 
 /**
@@ -70,7 +70,7 @@ internal class SetAV : ConsoleCommand {
                 return
             }
 
-            Terrarum.game.player.actorValue[args[1]] = `val`
+            Terrarum.ingame.player.actorValue[args[1]] = `val`
             echo.execute("${ccW}Set $ccM${args[1]} ${ccW}for ${ccY}player ${ccW}to $ccG$`val`")
             println("[SetAV] set ActorValue '${args[1]}' for player to '$`val`'.")
         }
@@ -78,7 +78,7 @@ internal class SetAV : ConsoleCommand {
             try {
                 val id = args[1].toInt()
                 val `val` = parseAVInput(args[3])
-                val actor = Terrarum.game.getActorByID(id)
+                val actor = Terrarum.ingame.getActorByID(id)
 
                 // check if av is number
                 if (args[2].isNum()) {

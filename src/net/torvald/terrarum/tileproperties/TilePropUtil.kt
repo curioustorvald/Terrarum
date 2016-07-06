@@ -92,8 +92,8 @@ object TilePropUtil {
     fun getDynamicLumFunc(baseLum: Int, type: Int): Int {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
-            2    -> Terrarum.game.map.globalLight // current global light
-            3    -> Terrarum.game.globalLightByTime(WorldTime.DAY_LENGTH / 2) // daylight at noon
+            2    -> Terrarum.ingame.map.globalLight // current global light
+            3    -> Terrarum.ingame.globalLightByTime(WorldTime.DAY_LENGTH / 2) // daylight at noon
             4    -> getSlowBreath(baseLum)
             5    -> getPulsate(baseLum)
             else -> baseLum

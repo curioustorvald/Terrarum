@@ -16,33 +16,33 @@ import org.newdawn.slick.Input
 object GameController {
 
     fun processInput(input: Input) {
-        val mouseTileX = ((MapCamera.cameraX + input.mouseX / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
-        val mouseTileY = ((MapCamera.cameraY + input.mouseY / Terrarum.game.screenZoom) / MapDrawer.TILE_SIZE).toInt()
+        val mouseTileX = ((MapCamera.cameraX + input.mouseX / Terrarum.ingame.screenZoom) / MapDrawer.TILE_SIZE).toInt()
+        val mouseTileY = ((MapCamera.cameraY + input.mouseY / Terrarum.ingame.screenZoom) / MapDrawer.TILE_SIZE).toInt()
 
 
         KeyToggler.update(input)
 
 
-        if (!Terrarum.game.consoleHandler.isTakingControl) {
-            if (Terrarum.game.player.vehicleRiding != null) {
-                Terrarum.game.player.vehicleRiding!!.processInput(input)
+        if (!Terrarum.ingame.consoleHandler.isTakingControl) {
+            if (Terrarum.ingame.player.vehicleRiding != null) {
+                Terrarum.ingame.player.vehicleRiding!!.processInput(input)
             }
 
-            Terrarum.game.player.processInput(input)
+            Terrarum.ingame.player.processInput(input)
 
-            for (ui in Terrarum.game.uiContainer) {
+            for (ui in Terrarum.ingame.uiContainer) {
                 ui.processInput(input)
             }
         }
         else {
-            Terrarum.game.consoleHandler.processInput(input)
+            Terrarum.ingame.consoleHandler.processInput(input)
         }
 
 
         if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
             // test tile remove
             try {
-                Terrarum.game.map.setTileTerrain(mouseTileX, mouseTileY, TileNameCode.AIR)
+                Terrarum.ingame.map.setTileTerrain(mouseTileX, mouseTileY, TileNameCode.AIR)
                 // terrarum.game.map.setTileWall(mouseTileX, mouseTileY, TileNameCode.AIR);
             }
             catch (e: ArrayIndexOutOfBoundsException) {
@@ -52,7 +52,7 @@ object GameController {
         else if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
             // test tile place
             try {
-                Terrarum.game.map.setTileTerrain(mouseTileX, mouseTileY, Terrarum.game.player.actorValue.getAsInt("selectedtile")!!)
+                Terrarum.ingame.map.setTileTerrain(mouseTileX, mouseTileY, Terrarum.ingame.player.actorValue.getAsInt("selectedtile")!!)
             }
             catch (e: ArrayIndexOutOfBoundsException) {
             }
@@ -62,23 +62,23 @@ object GameController {
 
     fun keyPressed(key: Int, c: Char) {
         if (keyPressedByCode(key, EnumKeyFunc.UI_CONSOLE)) {
-            Terrarum.game.consoleHandler.toggleOpening()
+            Terrarum.ingame.consoleHandler.toggleOpening()
         }
         else if (keyPressedByCode(key, EnumKeyFunc.UI_BASIC_INFO)) {
-            Terrarum.game.debugWindow.toggleOpening()
+            Terrarum.ingame.debugWindow.toggleOpening()
         }
 
 
 
-        if (!Terrarum.game.consoleHandler.isTakingControl) {
-            if (Terrarum.game.player.vehicleRiding != null) {
-                Terrarum.game.player.vehicleRiding!!.keyPressed(key, c)
+        if (!Terrarum.ingame.consoleHandler.isTakingControl) {
+            if (Terrarum.ingame.player.vehicleRiding != null) {
+                Terrarum.ingame.player.vehicleRiding!!.keyPressed(key, c)
             }
 
-            Terrarum.game.player.keyPressed(key, c)
+            Terrarum.ingame.player.keyPressed(key, c)
         }
         else {
-            Terrarum.game.consoleHandler.keyPressed(key, c)
+            Terrarum.ingame.consoleHandler.keyPressed(key, c)
         }
 
         //System.out.println(String.valueOf(key) + ", " + String.valueOf(c));

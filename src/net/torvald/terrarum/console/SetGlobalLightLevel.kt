@@ -15,7 +15,7 @@ class SetGlobalLightLevel : ConsoleCommand {
                 val b = args[3].toInt()
                 val GL = LightmapRenderer.constructRGBFromInt(r, g, b)
 
-                Terrarum.game.map.globalLight = GL
+                Terrarum.ingame.map.globalLight = GL
             }
             catch (e: NumberFormatException) {
                 Echo().execute("Wrong number input.")
@@ -33,7 +33,7 @@ class SetGlobalLightLevel : ConsoleCommand {
                     Echo().execute("Range: 0-" + (LightmapRenderer.COLOUR_RANGE_SIZE - 1))
                 }
                 else {
-                    Terrarum.game.map.globalLight = GL
+                    Terrarum.ingame.map.globalLight = GL
                 }
             }
             catch (e: NumberFormatException) {

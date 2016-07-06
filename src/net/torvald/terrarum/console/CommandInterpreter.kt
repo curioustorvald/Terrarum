@@ -43,7 +43,7 @@ object CommandInterpreter {
                     commandObj = CommandDict.getCommand(single_command.name.toLowerCase())
                 }
                 else {
-                    if (Terrarum.game.auth.b()) {
+                    if (Terrarum.ingame.auth.b()) {
                         commandObj = CommandDict.getCommand(
                                 single_command.name.toLowerCase())
                     }

@@ -47,6 +47,8 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
     @Throws(SlickException::class)
     override fun initStatesList(gc: GameContainer) {
+        gc.input.enableKeyRepeat()
+
         gameFont = GameFontWhite()
         smallNumbers = TinyAlphNum()
 
@@ -57,13 +59,19 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             }
         }
 
-        appgc.input.enableKeyRepeat()
-
-        game = StateGame()
-        addState(game)
+        //game = StateGame()
+        //addState(game)
+        addState(StateMonitorCheck())
     }
 
     companion object {
+
+        val sysLang: String
+            get() {
+                val lan = System.getProperty("user.language")
+                val country = System.getProperty("user.country")
+                return lan + country
+            }
 
         /**
          * To be used with physics simulator
@@ -86,7 +94,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         var VSYNC = true
         val VSYNC_TRIGGER_THRESHOLD = 56
 
-        lateinit var game: StateGame
+        lateinit var ingame: StateInGame
         lateinit var gameConfig: GameConfig
 
         lateinit var OSName: String
@@ -101,7 +109,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             private set
 
         private val localeSimple = arrayOf("de", "en", "es", "it")
-        var gameLocale = "en" // locale override
+        var gameLocale = "####" // locale override
             set(value) {
                 if (localeSimple.contains(value.substring(0..1)))
                     field = value.substring(0..1)
@@ -114,8 +122,14 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         lateinit var smallNumbers: Font
             private set
 
-        val SCENE_ID_HOME = 1
-        val SCENE_ID_GAME = 3
+        // 0x0 - 0xF: Game-related
+        // 0x10 - 0x1F: Config
+        // 0x100 and onward: unit tests for dev
+        val SCENE_ID_HOME = 0x1
+        val SCENE_ID_GAME = 0x3
+        val SCENE_ID_CONFIG_CALIBRATE = 0x11
+
+        val SCENE_ID_TEST_FONT = 0x100
 
         var hasController = false
         val CONTROLLER_DEADZONE = 0.1f
@@ -257,20 +271,6 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             }
 
         }
-
-        // exception handling
-        val sysLang: String
-            get() {
-                val lan = System.getProperty("user.language")
-                var country = System.getProperty("user.country")
-                if (lan == "en") country = "US"
-                else if (lan == "fr") country = "FR"
-                else if (lan == "de") country = "DE"
-                else if (lan == "ko") country = "KR"
-
-                return lan + country
-            }
-
 
         /**
          * Return config from config set. If the config does not exist, default value will be returned.

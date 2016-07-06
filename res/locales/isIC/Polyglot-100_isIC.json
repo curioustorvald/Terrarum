@@ -2107,19 +2107,19 @@
             },
             {
                 "n": "MENU_LABEL_PRESS_ANYKEY",
-                "s": "Press any key"
+                "s": "Ýttu á takka"
             },
             {
                 "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
-                "s": "Press any key to continue"
+                "s": "Ýttu á takka til að halda áfram"
             },
             {
                 "n": "MENU_LABEL_PRESS_START",
-                "s": "Press Start"
+                "s": "Ýttu „Start“"
             },
             {
                 "n": "MENU_LABEL_PRESS_START_CONTINUE",
-                "s": "Press Start to continue"
+                "s": "Ýttu „Start“ til að halda áfram"
             },
             {
                 "n": "MENU_LABEL_PREVIOUS",
@@ -2227,11 +2227,11 @@
             },
             {
                 "n": "MENU_LANGUAGE_THIS",
-                "s": "English"
+                "s": "Íslenska"
             },
             {
                 "n": "MENU_LANGUAGE_THIS_EN",
-                "s": "English"
+                "s": "Icelandic"
             },
             {
                 "n": "MENU_LOGIN",
@@ -2319,19 +2319,19 @@
             },
             {
                 "n": "MENU_NAME",
-                "s": "Name"
+                "s": "Nafn"
             },
             {
                 "n": "MENU_NAME_FIRST",
-                "s": "First Name"
+                "s": "Fornafn"
             },
             {
                 "n": "MENU_NAME_LAST",
-                "s": "Last Name"
+                "s": "Eftirnafn"
             },
             {
                 "n": "MENU_NAME_USER",
-                "s": "Username"
+                "s": "Notandanafn"
             },
             {
                 "n": "MENU_OPTIONS",
@@ -2351,7 +2351,7 @@
             },
             {
                 "n": "MENU_OPTIONS_CONTROLS",
-                "s": "Controls"
+                "s": "Stýringar"
             },
             {
                 "n": "MENU_OPTIONS_DIFFICULTY",
@@ -2359,7 +2359,7 @@
             },
             {
                 "n": "MENU_OPTIONS_DISPLAY",
-                "s": "Display"
+                "s": "Skjár"
             },
             {
                 "n": "MENU_OPTIONS_EFFECT_DETAIL",
@@ -2447,7 +2447,7 @@
             },
             {
                 "n": "MENU_OPTIONS_SIZE",
-                "s": "Size"
+                "s": "Stærð"
             },
             {
                 "n": "MENU_OPTIONS_SOUND",

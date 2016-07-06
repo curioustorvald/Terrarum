@@ -14,7 +14,7 @@ class Error : ConsoleCommand {
     }
 
     fun execute(single_line: String) {
-        (Terrarum.game.consoleHandler.UI as ConsoleWindow).sendMessage("${GameFontBase.colToCode["r"]}$single_line")
+        (Terrarum.ingame.consoleHandler.UI as ConsoleWindow).sendMessage("${GameFontBase.colToCode["r"]}$single_line")
     }
 
     override fun printUsage() {

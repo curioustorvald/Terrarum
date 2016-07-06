@@ -20,7 +20,7 @@ import java.util.*
  * Created by minjaesong on 16-01-19.
  */
 object MapCamera {
-    val map: GameMap = Terrarum.game.map;
+    val map: GameMap = Terrarum.ingame.map;
 
     var cameraX = 0
         private set
@@ -229,10 +229,10 @@ object MapCamera {
     )
 
     fun update(gc: GameContainer, delta_t: Int) {
-        val player = Terrarum.game.player
+        val player = Terrarum.ingame.player
 
-        renderWidth = FastMath.ceil(Terrarum.WIDTH / Terrarum.game.screenZoom) // div, not mul
-        renderHeight = FastMath.ceil(Terrarum.HEIGHT / Terrarum.game.screenZoom)
+        renderWidth = FastMath.ceil(Terrarum.WIDTH / Terrarum.ingame.screenZoom) // div, not mul
+        renderHeight = FastMath.ceil(Terrarum.HEIGHT / Terrarum.ingame.screenZoom)
 
         // position - (WH / 2)
         cameraX = Math.round(FastMath.clamp(
@@ -425,13 +425,13 @@ object MapCamera {
     }
 
     private fun drawTile(mode: Int, tilewisePosX: Int, tilewisePosY: Int, sheetX: Int, sheetY: Int) {
-        if (Terrarum.game.screenZoom == 1f) {
+        if (Terrarum.ingame.screenZoom == 1f) {
             tilesetBook[mode].renderInUse(
                     FastMath.floor((tilewisePosX * TSIZE).toFloat()), FastMath.floor((tilewisePosY * TSIZE).toFloat()), sheetX, sheetY)
         } else {
             tilesetBook[mode].getSprite(
                     sheetX, sheetY).drawEmbedded(
-                    Math.round(tilewisePosX.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), Math.round(tilewisePosY.toFloat() * TSIZE.toFloat() * Terrarum.game.screenZoom).toFloat(), FastMath.ceil(TSIZE * Terrarum.game.screenZoom).toFloat(), FastMath.ceil(TSIZE * Terrarum.game.screenZoom).toFloat())
+                    Math.round(tilewisePosX.toFloat() * TSIZE.toFloat() * Terrarum.ingame.screenZoom).toFloat(), Math.round(tilewisePosY.toFloat() * TSIZE.toFloat() * Terrarum.ingame.screenZoom).toFloat(), FastMath.ceil(TSIZE * Terrarum.ingame.screenZoom).toFloat(), FastMath.ceil(TSIZE * Terrarum.ingame.screenZoom).toFloat())
         }
     }
 

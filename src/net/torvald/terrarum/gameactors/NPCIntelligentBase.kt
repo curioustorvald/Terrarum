@@ -75,11 +75,11 @@ open class NPCIntelligentBase : ActorWithBody()
     }
 
     override fun addHouseTile(x: Int, y: Int) {
-        houseTiles.add(Terrarum.game.map.width * y + x)
+        houseTiles.add(Terrarum.ingame.map.width * y + x)
     }
 
     override fun removeHouseTile(x: Int, y: Int) {
-        houseTiles.remove(Terrarum.game.map.width * y + x)
+        houseTiles.remove(Terrarum.ingame.map.width * y + x)
     }
 
     override fun clearHouseDesignation() {

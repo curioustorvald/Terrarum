@@ -13,7 +13,7 @@ class Seed : ConsoleCommand {
     //                                tsalagi
 
     override fun execute(args: Array<String>) {
-        Echo().execute("${ccY}Map$ccW: $ccG${Terrarum.game.map.generatorSeed}")
+        Echo().execute("${ccY}Map$ccW: $ccG${Terrarum.ingame.map.generatorSeed}")
         // TODO display randomiser seed
     }
 

@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.StateGame
+import net.torvald.terrarum.StateInGame
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum
 
@@ -26,7 +26,7 @@ class TeleportPlayer : ConsoleCommand {
                 return
             }
 
-            Terrarum.game.player.setPosition(x.toDouble(), y.toDouble())
+            Terrarum.ingame.player.setPosition(x.toDouble(), y.toDouble())
         }
     }
 

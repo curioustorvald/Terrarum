@@ -24,7 +24,7 @@ open class ActorWithBody : Actor(), Visible {
     @Transient var sprite: SpriteAnimation? = null
     @Transient var spriteGlow: SpriteAnimation? = null
 
-    @Transient private val map: GameMap = Terrarum.game.map
+    @Transient private val map: GameMap = Terrarum.ingame.map
 
     var hitboxTranslateX: Double = 0.0// relative to spritePosX
     var hitboxTranslateY: Double = 0.0// relative to spritePosY
@@ -234,7 +234,7 @@ open class ActorWithBody : Actor(), Visible {
                 baseHitboxH * scale)
     }
 
-    override fun run() = update(Terrarum.appgc, Terrarum.game.UPDATE_DELTA)
+    override fun run() = update(Terrarum.appgc, Terrarum.ingame.UPDATE_DELTA)
 
     /**
      * Add vector value to the velocity, in the time unit of single frame.
@@ -929,8 +929,8 @@ open class ActorWithBody : Actor(), Visible {
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
                 return 0
-            else if (x >= Terrarum.game.map.width shl 4)
-                return Terrarum.game.map.width - 1
+            else if (x >= Terrarum.ingame.map.width shl 4)
+                return Terrarum.ingame.map.width - 1
             else
                 return x and 0x7FFFFFFF shr 4
         }
@@ -938,8 +938,8 @@ open class ActorWithBody : Actor(), Visible {
         private fun div16TruncateToMapHeight(y: Int): Int {
             if (y < 0)
                 return 0
-            else if (y >= Terrarum.game.map.height shl 4)
-                return Terrarum.game.map.height - 1
+            else if (y >= Terrarum.ingame.map.height shl 4)
+                return Terrarum.ingame.map.height - 1
             else
                 return y and 0x7FFFFFFF shr 4
         }

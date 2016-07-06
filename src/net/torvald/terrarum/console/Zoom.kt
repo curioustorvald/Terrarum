@@ -18,14 +18,14 @@ class Zoom : ConsoleCommand {
                 return
             }
 
-            if (zoom < Terrarum.game.ZOOM_MIN) {
-                zoom = Terrarum.game.ZOOM_MIN
+            if (zoom < Terrarum.ingame.ZOOM_MIN) {
+                zoom = Terrarum.ingame.ZOOM_MIN
             }
-            else if (zoom > Terrarum.game.ZOOM_MAX) {
-                zoom = Terrarum.game.ZOOM_MAX
+            else if (zoom > Terrarum.ingame.ZOOM_MAX) {
+                zoom = Terrarum.ingame.ZOOM_MAX
             }
 
-            Terrarum.game.screenZoom = zoom
+            Terrarum.ingame.screenZoom = zoom
 
             System.gc()
 

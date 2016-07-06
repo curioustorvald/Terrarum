@@ -4,7 +4,7 @@
 
 package net.torvald.spriteanimation
 
-import net.torvald.terrarum.StateGame
+import net.torvald.terrarum.StateInGame
 import net.torvald.terrarum.Terrarum
 import com.jme3.math.FastMath
 import org.newdawn.slick.Graphics
@@ -121,7 +121,7 @@ constructor() {
      */
     @JvmOverloads fun render(g: Graphics, posX: Float, posY: Float, scale: Float = 1f) {
         var scale = scale
-        scale *= Terrarum.game.screenZoom
+        scale *= Terrarum.ingame.screenZoom
 
         // Null checking
         if (currentImage == null) {
@@ -139,8 +139,8 @@ constructor() {
 
             flippedImage.startUse()
             flippedImage.drawEmbedded(
-                    Math.round(posX * Terrarum.game.screenZoom).toFloat(),
-                    Math.round(posY * Terrarum.game.screenZoom).toFloat(),
+                    Math.round(posX * Terrarum.ingame.screenZoom).toFloat(),
+                    Math.round(posY * Terrarum.ingame.screenZoom).toFloat(),
                     FastMath.floor(width * scale).toFloat(),
                     FastMath.floor(height * scale).toFloat()
             )

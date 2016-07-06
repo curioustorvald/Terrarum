@@ -29,7 +29,7 @@ object WriteGameMapData {
         val path = Paths.get("${Terrarum.defaultSaveDir}" +
                                        "/$saveDirectoryName/${WriteMeta.META_FILENAME}")
         val tempPath = Files.createTempFile(path.toString(), "_temp")
-        val map = Terrarum.game.map
+        val map = Terrarum.ingame.map
 
         // TODO gzip
 

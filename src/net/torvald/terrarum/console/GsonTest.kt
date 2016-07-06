@@ -14,7 +14,7 @@ import java.io.IOException
 class GsonTest : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
-            val avelem = Gson().toJsonTree(Terrarum.game.player)
+            val avelem = Gson().toJsonTree(Terrarum.ingame.player)
 
             val jsonString = avelem.toString()
 

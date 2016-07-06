@@ -22,7 +22,7 @@ class Authenticator : ConsoleCommand {
                 Echo().execute(msg)
                 println("[Authenticator] " + msg)
                 a = !a
-                (Terrarum.game.consoleHandler.UI as ConsoleWindow).reset()
+                (Terrarum.ingame.consoleHandler.UI as ConsoleWindow).reset()
             }
             else {
                 printUsage() // thou shalt not pass!

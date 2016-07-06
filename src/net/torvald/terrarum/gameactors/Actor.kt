@@ -40,7 +40,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
         var ret: Int
         do {
             ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
-        } while (Terrarum.game.hasActor(ret) || ret < ItemPropCodex.ITEM_UNIQUE_MAX) // check for collision
+        } while (Terrarum.ingame.hasActor(ret) || ret < ItemPropCodex.ITEM_UNIQUE_MAX) // check for collision
         return ret
     }
 }

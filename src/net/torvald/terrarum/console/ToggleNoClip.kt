@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.StateGame
+import net.torvald.terrarum.StateInGame
 import net.torvald.terrarum.Terrarum
 
 /**
@@ -8,9 +8,9 @@ import net.torvald.terrarum.Terrarum
  */
 class ToggleNoClip : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        val status = Terrarum.game.player.isNoClip()
+        val status = Terrarum.ingame.player.isNoClip()
 
-        Terrarum.game.player.setNoClip(!status)
+        Terrarum.ingame.player.setNoClip(!status)
         Echo().execute("Set no-clip status to " + (!status).toString())
     }
 

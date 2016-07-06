@@ -25,7 +25,7 @@ class SetBulletin : ConsoleCommand {
      * @param message real message
      */
     fun send(message: Array<String>) {
-        Terrarum.game.sendNotification(message)
+        Terrarum.ingame.sendNotification(message)
         println("sent notifinator")
     }
 }

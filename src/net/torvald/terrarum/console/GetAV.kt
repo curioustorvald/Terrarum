@@ -23,7 +23,7 @@ class GetAV : ConsoleCommand {
         try {
             if (args.size == 1) {
                 // print all actorvalue of player
-                val av = Terrarum.game.player.actorValue
+                val av = Terrarum.ingame.player.actorValue
                 val keyset = av.keySet
 
                 echo.execute("$ccW== ActorValue list for ${ccY}player $ccW==")
@@ -41,19 +41,19 @@ class GetAV : ConsoleCommand {
                 if (!args[1].isNum()) { // args[1] is ActorValue name
                     echo.execute("${ccW}player.$ccM${args[1]} $ccW= " +
                                  ccG +
-                                 Terrarum.game.player.actorValue[args[1]] +
+                                 Terrarum.ingame.player.actorValue[args[1]] +
                                  " $ccO" +
-                                 Terrarum.game.player.actorValue[args[1]]!!.javaClass.simpleName
+                                 Terrarum.ingame.player.actorValue[args[1]]!!.javaClass.simpleName
                     )
                     println("[GetAV] player.${args[1]} = " +
-                            Terrarum.game.player.actorValue[args[1]] +
+                            Terrarum.ingame.player.actorValue[args[1]] +
                             " " +
-                            Terrarum.game.player.actorValue[args[1]]!!.javaClass.simpleName
+                            Terrarum.ingame.player.actorValue[args[1]]!!.javaClass.simpleName
                     )
                 }
                 else {
                     // args[1] is actor ID
-                    val actor = Terrarum.game.getActorByID(args[1].toInt())
+                    val actor = Terrarum.ingame.getActorByID(args[1].toInt())
                     val av = actor.actorValue
                     val keyset = av.keySet
 
@@ -75,14 +75,14 @@ class GetAV : ConsoleCommand {
                 val id = args[1].toInt()
                 val av = args[2]
                 echo.execute("$ccW$id.$ccM$av $ccW= $ccG" +
-                             Terrarum.game.getActorByID(id).actorValue[av] +
+                             Terrarum.ingame.getActorByID(id).actorValue[av] +
                              " $ccO" +
-                             Terrarum.game.getActorByID(id).actorValue[av]!!.javaClass.simpleName
+                             Terrarum.ingame.getActorByID(id).actorValue[av]!!.javaClass.simpleName
                 )
                 println("id.av = " +
-                        Terrarum.game.getActorByID(id).actorValue[av] +
+                        Terrarum.ingame.getActorByID(id).actorValue[av] +
                         " " +
-                        Terrarum.game.getActorByID(id).actorValue[av]!!.javaClass.simpleName
+                        Terrarum.ingame.getActorByID(id).actorValue[av]!!.javaClass.simpleName
                 )
             }
         }

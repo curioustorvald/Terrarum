@@ -29,7 +29,7 @@ object CommandDict {
             Pair("exportav", ExportAV()),
             Pair("setgl", SetGlobalLightLevel()),
             Pair("getfaction", GetFactioning()),
-            Pair("auth", Terrarum.game.auth),
+            Pair("auth", Terrarum.ingame.auth),
             Pair("spawnball", SpawnPhysTestBall()),
             Pair("batch", Batch()),
             Pair("settime", SetTime()),

@@ -25,7 +25,7 @@ class SpawnPhysTestBall : ConsoleCommand {
             )
             ball.elasticity = elasticity
 
-            Terrarum.game.addActor(ball)
+            Terrarum.ingame.addActor(ball)
         }
         else {
             printUsage()

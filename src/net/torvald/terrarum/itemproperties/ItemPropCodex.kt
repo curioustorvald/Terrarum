@@ -32,7 +32,7 @@ object ItemPropCodex {
         if (code < ITEM_UNIQUE_MAX) // generic item
             return itemCodex[code]
         else {
-            val a = Terrarum.game.getActorByID(code) // actor item
+            val a = Terrarum.ingame.getActorByID(code) // actor item
             if (a is CanBeAnItem) return a.itemData
 
             throw IllegalArgumentException("Attempted to get item data of actor that cannot be an item. ($a)")

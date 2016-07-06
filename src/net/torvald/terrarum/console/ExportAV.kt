@@ -13,7 +13,7 @@ class ExportAV : ConsoleCommand {
         if (args.size == 2) {
             try {
                 JsonWriter.writeToFile(
-                        Terrarum.game.player.actorValue,
+                        Terrarum.ingame.player.actorValue,
                         Terrarum.defaultDir + "/Exports/" + args[1] + ".json")
 
                 Echo().execute("ExportAV: exported to " + args[1] + ".json")

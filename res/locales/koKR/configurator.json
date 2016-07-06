@@ -1,0 +1,13 @@
+{
+  "MENU_MONITOR_CALI_TITLE": "모니터 확인",
+  "MENU_MONITOR_CALI_LABEL_1":  "1번 막대가 배경에서 눈에 띄어야 하고",
+  "MENU_MONITOR_CALI_LABEL_2":  "30·31·32번 막대가 확실히 구분되어야 합니다",
+  "MENU_MONITOR_CALI_LABEL_3":  " ",
+  "MENU_MONITOR_CALI_LABEL_4":  "부적절한 모니터에서는 왼쪽 끝의 막대 몇 개가 보이지 않거나",
+  "MENU_MONITOR_CALI_LABEL_5":  "오른쪽 끝의 막대 몇 개가 똑같게 보이거나",
+  "MENU_MONITOR_CALI_LABEL_6":  "31번과 32번의 차이가 크게 보일 것입니다",
+  "MENU_MONITOR_CALI_LABEL_7":  " ",
+  "MENU_MONITOR_CALI_LABEL_8":  "적절한 모니터에서는 1번 막대에서 32번 막대까지 거의 일정하게 밝아지는 것으로 보입니다",
+  "MENU_MONITOR_CALI_LABEL_9":  " ",
+  "MENU_MONITOR_CALI_LABEL_10": "모니터의 대비와 밝기 설정을 조절해 모니터를 조정해 주십시오"
+}

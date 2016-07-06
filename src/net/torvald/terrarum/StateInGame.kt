@@ -35,7 +35,7 @@ import java.util.*
 /**
  * Created by minjaesong on 15-12-30.
  */
-class StateGame @Throws(SlickException::class)
+class StateInGame @Throws(SlickException::class)
 constructor() : BasicGameState() {
     private val ACTOR_UPDATE_RANGE = 4096
 
@@ -128,7 +128,7 @@ constructor() : BasicGameState() {
         notifier = UIHandler(Notification())
         notifier.setPosition(
                 (Terrarum.WIDTH - notifier.UI.width) / 2, Terrarum.HEIGHT - notifier.UI.height)
-        notifier.setVisibility(true)
+        notifier.visible = true
 
         // set smooth lighting as in config
         KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, Terrarum.getConfigBoolean("smoothlighting"))
@@ -251,10 +251,10 @@ constructor() : BasicGameState() {
 
         // draw UIs
         run {
-            uiContainer.forEach { ui -> ui.render(gc, g) }
-            debugWindow.render(gc, g)
-            consoleHandler.render(gc, g)
-            notifier.render(gc, g)
+            uiContainer.forEach { ui -> ui.render(gc, sbg, g) }
+            debugWindow.render(gc, sbg, g)
+            consoleHandler.render(gc, sbg, g)
+            notifier.render(gc, sbg, g)
         }
     }
 
@@ -415,8 +415,8 @@ constructor() : BasicGameState() {
             (a.hitbox.centeredX - p.hitbox.centeredX).sqr() + (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
     /** whether the actor is within screen */
     private fun Visible.inScreen() = distToActorSqr(this, player) <=
-                                     (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.game.screenZoom).sqr() +
-                                      Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.game.screenZoom).sqr())
+                                     (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr() +
+                                      Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr())
     /** whether the actor is within update range */
     private fun Visible.inUpdateRange() = distToActorSqr(this, player) <= ACTOR_UPDATE_RANGE.sqr()
     /**

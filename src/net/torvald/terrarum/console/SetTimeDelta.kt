@@ -14,11 +14,11 @@ class SetTimeDelta : ConsoleCommand {
             if (args[1].toInt() > HARD_LIMIT)
                 Error().execute("Delta too large -- acceptable delta is 0-60.")
 
-            Terrarum.game.map.worldTime.setTimeDelta(args[1].toInt())
-            if (Terrarum.game.map.worldTime.timeDelta == 0)
+            Terrarum.ingame.map.worldTime.setTimeDelta(args[1].toInt())
+            if (Terrarum.ingame.map.worldTime.timeDelta == 0)
                 Echo().execute("時間よ止まれ！ザ・ワルド！！")
             else
-                Echo().execute("Set time delta to ${Terrarum.game.map.worldTime.timeDelta}")
+                Echo().execute("Set time delta to ${Terrarum.ingame.map.worldTime.timeDelta}")
         }
         else {
             printUsage()
