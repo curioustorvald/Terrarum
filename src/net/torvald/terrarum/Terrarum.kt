@@ -59,9 +59,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             }
         }
 
-        //game = StateGame()
-        //addState(game)
-        addState(StateMonitorCheck())
+        ingame = StateInGame()
+        addState(ingame)
+        //addState(StateMonitorCheck())
     }
 
     companion object {

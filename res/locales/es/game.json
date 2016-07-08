@@ -1,6 +1,9 @@
 {
   "MENU_LABEL_NEW_WORLD": "Nuevo Mundo",
 
-  "COPYRIGHT_PROPRIETARY": "Todos los derechos reservados.",
-  "APP_CALIBRATE_YOUR_MONITOR": ""
+  "COPYRIGHT_ALL_RIGHTS_RESERVED": "Todos los derechos reservados.",
+  "APP_ADJUST_YOUR_MONITOR": "",
+
+  "APP_WARNING_HEALTH_AND_SAFETY": "ADVERTENCIA-SALUD Y SEGURIDAD"
+
 }

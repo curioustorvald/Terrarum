@@ -20,6 +20,8 @@ object CSVFetcher {
         csvString = StringBuffer() // reset buffer every time it called
         readCSVasString(csvFilePath)
 
+        println("Reading CSV $csvFilePath")
+
         val csvParser = CSVParser.parse(
                 csvString!!.toString(),
                 CSVFormat.DEFAULT.withIgnoreSurroundingSpaces()

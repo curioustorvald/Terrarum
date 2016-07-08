@@ -241,7 +241,7 @@ object LightmapRenderer {
         }
         // luminous tile on top of air
         else if (thisWall == AIR && thisTileLuminosity.toInt() > 0) {
-            lightLevelThis = maximiseRGB(sunLight, thisTileLuminosity) // maximise to not exceed 1.0 with normal (<= 1.0) light
+            lightLevelThis = sunLight maxBlend thisTileLuminosity // maximise to not exceed 1.0 with normal (<= 1.0) light
         }
         // opaque wall and luminous tile
         else if (thisWall != AIR && thisTileLuminosity.toInt() > 0) {
@@ -252,7 +252,7 @@ object LightmapRenderer {
         // mix luminous actor
         for ((posX, posY, luminosity) in lanternMap) {
             if (posX == x && posY == y)
-                lightLevelThis = maximiseRGB(lightLevelThis, luminosity) // maximise to not exceed 1.0 with normal (<= 1.0) light
+                lightLevelThis = lightLevelThis maxBlend luminosity // maximise to not exceed 1.0 with normal (<= 1.0) light
         }
 
 
@@ -286,7 +286,7 @@ object LightmapRenderer {
                         nearby = 0 // exclude 'me' tile
                     }
 
-                    ambient = maximiseRGB(ambient, nearby) // keep base value as brightest nearby
+                    ambient = ambient maxBlend nearby // keep base value as brightest nearby
                 }
             }
 
@@ -294,7 +294,7 @@ object LightmapRenderer {
                     thisTileOpacity) // get real ambient by appling opacity value
 
             // mix and return lightlevel and ambient
-            return maximiseRGB(lightLevelThis, ambient)
+            return lightLevelThis maxBlend ambient
         }
         else {
             return lightLevelThis
@@ -355,27 +355,19 @@ object LightmapRenderer {
                              *   +-+-+
                              *     d
                              */
-                            val a = maximiseRGB(
-                                    thisLightLevel,
-                                    getLight(x, y - 1) ?: thisLightLevel
-                            )
-                            val d = maximiseRGB(
-                                    thisLightLevel,
-                                    getLight(x, y + 1) ?: thisLightLevel
-                            )
-                            val b = maximiseRGB(
-                                    thisLightLevel,
-                                    getLight(x - 1, y) ?: thisLightLevel
-                            )
-                            val c = maximiseRGB(
-                                    thisLightLevel,
-                                    getLight(x + 1, y) ?: thisLightLevel
-                            )
+                            val a = thisLightLevel maxBlend (getLight(x, y - 1) ?: thisLightLevel)
+                            val d = thisLightLevel maxBlend (getLight(x, y + 1) ?: thisLightLevel)
+                            val b = thisLightLevel maxBlend (getLight(x - 1, y) ?: thisLightLevel)
+                            val c = thisLightLevel maxBlend (getLight(x + 1, y) ?: thisLightLevel)
+
                             val colourMapItoL = IntArray(4)
-                            colourMapItoL[0] = colourLinearMix(a, b)
-                            colourMapItoL[1] = colourLinearMix(a, c)
-                            colourMapItoL[2] = colourLinearMix(b, d)
-                            colourMapItoL[3] = colourLinearMix(c, d)
+                            val colMean = (a linMix d) linMix (b linMix c)
+                            val colDelta = thisLightLevel colSub colMean
+
+                            colourMapItoL[0] = a linMix b colAdd colDelta
+                            colourMapItoL[1] = a linMix c colAdd colDelta
+                            colourMapItoL[2] = b linMix d colAdd colDelta
+                            colourMapItoL[3] = c linMix d colAdd colDelta
 
                             for (iy in 0..1) {
                                 for (ix in 0..1) {
@@ -505,33 +497,45 @@ object LightmapRenderer {
      * @param rgb2
      * @return
      */
-    private fun maximiseRGB(rgb: Int, rgb2: Int): Int {
-        val r1 = rgb.rawR()
-        val r2 = rgb2.rawR()
+    private infix fun Int.maxBlend(other: Int): Int {
+        val r1 = this.rawR()
+        val r2 = other.rawR()
         val newR = if (r1 > r2) r1 else r2
-        val g1 = rgb.rawG()
-        val g2 = rgb2.rawG()
+        val g1 = this.rawG()
+        val g2 = other.rawG()
         val newG = if (g1 > g2) g1 else g2
-        val b1 = rgb.rawB()
-        val b2 = rgb2.rawB()
+        val b1 = this.rawB()
+        val b2 = other.rawB()
         val newB = if (b1 > b2) b1 else b2
 
         return constructRGBFromInt(newR, newG, newB)
     }
     
-    private fun screenBlend(rgb: Int, rgb2: Int): Int {
-        val r1 = rgb.r()
-        val r2 = rgb2.r()
+    private infix fun Int.screenBlend(other: Int): Int {
+        val r1 = this.r()
+        val r2 = other.r()
         val newR = 1 - (1 - r1) * (1 - r2)
-        val g1 = rgb.g()
-        val g2 = rgb2.g()
+        val g1 = this.g()
+        val g2 = other.g()
         val newG = 1 - (1 - g1) * (1 - g2)
-        val b1 = rgb.b()
-        val b2 = rgb2.b()
+        val b1 = this.b()
+        val b2 = other.b()
         val newB = 1 - (1 - b1) * (1 - b2)
 
         return constructRGBFromFloat(newR, newG, newB)
     }
+
+    private infix fun Int.colSub(other: Int) = constructRGBFromInt(
+            (this.rawR() - other.rawR()).clampChannel() ,
+            (this.rawG() - other.rawG()).clampChannel() ,
+            (this.rawB() - other.rawB()).clampChannel()
+    )
+
+    private infix fun Int.colAdd(other: Int) = constructRGBFromInt(
+            (this.rawR() + other.rawR()).clampChannel() ,
+            (this.rawG() + other.rawG()).clampChannel() ,
+            (this.rawB() + other.rawB()).clampChannel()
+    )
 
     fun Int.rawR() = this / MUL_2
     fun Int.rawG() = this % MUL_2 / MUL
@@ -581,10 +585,10 @@ object LightmapRenderer {
         return constructRGBFromInt(intR, intG, intB)
     }
 
-    private fun colourLinearMix(colA: Int, colB: Int): Int {
-        val r = (colA.rawR() + colB.rawR()) ushr 1
-        val g = (colA.rawG() + colB.rawG()) ushr 1
-        val b = (colA.rawB() + colB.rawB()) ushr 1
+    private infix fun Int.linMix(other: Int): Int {
+        val r = (this.rawR() + other.rawR()) ushr 1
+        val g = (this.rawG() + other.rawG()) ushr 1
+        val b = (this.rawB() + other.rawB()) ushr 1
         return constructRGBFromInt(r, g, b)
     }
 

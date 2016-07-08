@@ -22,6 +22,8 @@ object JsonFetcher {
         jsonString = StringBuffer() // reset buffer every time it called
         readJsonFileAsString(jsonFilePath)
 
+        println("Reading JSON $jsonFilePath")
+
         val jsonParser = JsonParser()
         val jsonObj = jsonParser.parse(jsonString!!.toString()).asJsonObject
 
@@ -32,6 +34,8 @@ object JsonFetcher {
     fun readJson(jsonFile: File): JsonObject {
         jsonString = StringBuffer() // reset buffer every time it called
         readJsonFileAsString(jsonFile.canonicalPath)
+
+        println("Reading JSON ${jsonFile.path}")
 
         val jsonParser = JsonParser()
         val jsonObj = jsonParser.parse(jsonString!!.toString()).asJsonObject

@@ -1,53 +1,66 @@
-* *Terrarum* by Torvald
-  Copyright 2015-2016 Torvald. All rights reserved.
-  mailto: skyhi14 *64* __115875741922660__ *46* __6516589__
+*Terrarum* by Torvald
+
+Copyright (C) 2015-2016 Torvald. All rights reserved.
+mailto: skyhi14 *64* __115875741922660__ *46* __6516589__
 
 ----
 
-* *Simplex Noise Generator*, version 2012-03-09 by Stefan Gustavson
-  Released as public domain
+*Simplex Noise Generator*, version 2012-03-09 by Stefan Gustavson
+
+Released as public domain
   
 ----
   
-* *Joise* modular noise library
-  Copyright (C) 2013 Jason Taylor.
-  
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-  
-  http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+*Joise* modular noise library
+
+Copyright (C) 2013 Jason Taylor.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    
+    http://www.apache.org/licenses/LICENSE-2.0
+    
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 
 ----
 
-* *Vector2* from Dyn4j
-  Copyright (c) 2010-2015 William Bittle  http://www.dyn4j.org/
-  All rights reserved.
+*Vector2* from Dyn4j
+
+Copyright (c) 2010-2015 William Bittle  http://www.dyn4j.org/
+All rights reserved.
   
-  Redistribution and use in source and binary forms, with or without modification, are permitted
-  provided that the following conditions are met:
+    Redistribution and use in source and binary forms, with or without modification, are permitted
+    provided that the following conditions are met:
+       
+    * Redistributions of source code must retain the above copyright notice, this list of conditions
+      and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+      and the following disclaimer in the documentation and/or other materials provided with the
+      distribution.
+    * Neither the name of dyn4j nor the names of its contributors may be used to endorse or
+      promote products derived from this software without specific prior written permission.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+    FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+    IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+    OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+      
+  Kotlin translated and modified code Copyright (C) 2016 Torvald aka skyhi14.
   
-  * Redistributions of source code must retain the above copyright notice, this list of conditions
-    and the following disclaimer.
-  * Redistributions in binary form must reproduce the above copyright notice, this list of conditions
-    and the following disclaimer in the documentation and/or other materials provided with the
-    distribution.
-  * Neither the name of dyn4j nor the names of its contributors may be used to endorse or
-    promote products derived from this software without specific prior written permission.
-  
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
-  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
-  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  
-  Kotlin translated and modified code Copyright (c) 2016 Torvald aka skyhi14.
+---
+
+Amazing ambient sound recordings in ```sound/ambient/klankbeeld-freesound```
+
+Samples used: 173111, 183181, 185290, 195287, 240108, 326914, 337691, 347753
+
+Copyright (C) 2012, 2013, 2015, 2016 Klankbeeld
+Sound from http://www.freesound.org/people/klankbeeld/

@@ -1,6 +1,8 @@
 {
   "MENU_LABEL_NEW_WORLD": "Uusi Maailma",
 
-  "COPYRIGHT_PROPRIETARY": "Kaikki oikeudet pidätetään",
-  "APP_CALIBRATE_YOUR_MONITOR": "Paras pelikokemus saavutetaan on oikealla säädetty näytöllä. Jos et ole ollut, säädä ennen pelaamista."
+  "COPYRIGHT_ALL_RIGHTS_RESERVED": "Kaikki oikeudet pidätetään",
+  "APP_ADJUST_YOUR_MONITOR": "Paras pelikokemus saavutetaan on oikealla säädetty näytöllä. Jos et ole ollut, säädä ennen pelaamista.",
+
+  "APP_WARNING_HEALTH_AND_SAFETY": "VAROITUS-TERVEYS JA TURVALLISUUS"
 }
