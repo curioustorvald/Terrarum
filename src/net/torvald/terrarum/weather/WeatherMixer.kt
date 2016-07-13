@@ -2,6 +2,7 @@ package net.torvald.terrarum.weather
 
 import com.jme3.math.FastMath
 import net.torvald.JsonFetcher
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamemap.WorldTime
 import net.torvald.terrarum.mapdrawer.Light10B
@@ -11,6 +12,7 @@ import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
 import org.newdawn.slick.fills.GradientFill
 import org.newdawn.slick.geom.Rectangle
+import java.io.File
 import java.util.*
 
 /**
@@ -19,7 +21,7 @@ import java.util.*
  * Created by minjaesong on 16-07-11.
  */
 object WeatherMixer {
-    lateinit var weatherList: ArrayList<BaseModularWeather>
+    lateinit var weatherList: HashMap<String, ArrayList<BaseModularWeather>>
 
     lateinit var currentWeather: BaseModularWeather
     lateinit var nextWeather: BaseModularWeather
@@ -29,25 +31,41 @@ object WeatherMixer {
     val globalLightNow = Light10B(0)
 
     // Weather indices
-    const val WEATHER_GENERIC = 0
-    // TODO add weather indices manually
+    const val WEATHER_GENERIC = "generic"
+    // TODO add weather classification indices manually
 
     const val RAW_DIR = "./res/raw/weathers"
 
     init {
-        weatherList = ArrayList()
+        weatherList = HashMap<String, ArrayList<BaseModularWeather>>()
 
-        // TODO read weather descriptions from res/weather (modular weather)
-        // test: read only one
-        weatherList.add(readFromJson("$RAW_DIR/WeatherGeneric.json"))
+        // read weather descriptions from res/weather (modular weather)
+        val weatherRawValidList = ArrayList<File>()
+        val weatherRaws = File(RAW_DIR).listFiles()
+        weatherRaws.forEach {
+            if (!it.isDirectory && it.name.endsWith(".json"))
+                weatherRawValidList.add(it)
+        }
+        // --> read from directory and store file that looks like RAW
+        for (raw in weatherRawValidList) {
+            val weather = readFromJson(raw)
+
+            // if List for the classification does not exist, make one
+            if (!weatherList.containsKey(weather.classification))
+                weatherList.put(weather.classification, ArrayList())
+
+            weatherList[weather.classification]!!.add(weather)
+        }
+
+
 
         // initialise
-        currentWeather = weatherList[WEATHER_GENERIC]
-        // nextWeather = %&)(@$*%&$(*%
+        currentWeather = weatherList[WEATHER_GENERIC]!![0]
+        nextWeather = getRandomWeather(WEATHER_GENERIC)
     }
 
     fun update(gc: GameContainer, delta: Int) {
-        currentWeather = weatherList[WEATHER_GENERIC]
+        currentWeather = weatherList[WEATHER_GENERIC]!![0]
 
     }
 
@@ -94,6 +112,12 @@ object WeatherMixer {
 
         return retColour
     }
+
+    fun getWeatherList(classification: String) = weatherList[classification]!!
+    fun getRandomWeather(classification: String) =
+            getWeatherList(classification)[HQRNG().nextInt(getWeatherList(classification).size)]
+
+    fun readFromJson(file: File): BaseModularWeather = readFromJson(file.path)
 
     fun readFromJson(path: String): BaseModularWeather {
         /* JSON structure:
