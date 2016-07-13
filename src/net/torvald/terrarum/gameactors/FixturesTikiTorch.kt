@@ -19,7 +19,7 @@ class FixturesTikiTorch : FixturesBase(), Luminous {
 
     init {
         isVisible = true
-        super.setDensity(1200)
+        density = 1200.0
 
         setHitboxDimension(10, 24, 0, 0)
 

@@ -114,7 +114,7 @@ class BasicDebugInfoWindow:UICanvas {
         printLine(g, 7, "light@cursor $ccG$lightVal")
 
         val tileNo: String
-        val tileNumRaw = Terrarum.ingame.map.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
+        val tileNumRaw = Terrarum.ingame.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
         val tilenum = tileNumRaw / PairedMapLayer.RANGE
         val tiledmg = tileNumRaw % PairedMapLayer.RANGE
         tileNo = if (tileNumRaw == -1) "—" else "$tilenum:$tiledmg"
@@ -127,8 +127,8 @@ class BasicDebugInfoWindow:UICanvas {
 
         printLineColumn(g, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
         printLineColumn(g, 2, 2, "Env colour temp $ccG" + MapDrawer.getColTemp())
-        printLineColumn(g, 2, 5, "Time $ccG${Terrarum.ingame.map.worldTime.elapsedSeconds()}" +
-                                 " (${Terrarum.ingame.map.worldTime.getFormattedTime()})")
+        printLineColumn(g, 2, 5, "Time $ccG${Terrarum.ingame.world.time.elapsedSeconds()}" +
+                                 " (${Terrarum.ingame.world.time.getFormattedTime()})")
         printLineColumn(g, 2, 6, "Mass $ccG${player.mass}")
 
         drawHistogram(g, LightmapRenderer.histogram,

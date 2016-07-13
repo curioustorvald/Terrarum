@@ -228,11 +228,11 @@ object LightmapRenderer {
 
     private fun calculate(x: Int, y: Int, doNotCalculateAmbient: Boolean): Int {
         var lightLevelThis: Int = 0
-        val thisTerrain = Terrarum.ingame.map.getTileFromTerrain(x, y)
-        val thisWall = Terrarum.ingame.map.getTileFromWall(x, y)
+        val thisTerrain = Terrarum.ingame.world.getTileFromTerrain(x, y)
+        val thisWall = Terrarum.ingame.world.getTileFromWall(x, y)
         val thisTileLuminosity = TilePropCodex.getProp(thisTerrain).luminosity
         val thisTileOpacity = TilePropCodex.getProp(thisTerrain).opacity
-        val sunLight = Terrarum.ingame.map.globalLight
+        val sunLight = Terrarum.ingame.world.globalLight
 
         // MIX TILE
         // open air

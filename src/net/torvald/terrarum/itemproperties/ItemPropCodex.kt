@@ -1,8 +1,10 @@
 package net.torvald.terrarum.itemproperties
 
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.gameactors.CanBeAnItem
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gamemap.GameWorld
 import org.newdawn.slick.GameContainer
 import java.util.*
 
@@ -20,6 +22,7 @@ object ItemPropCodex {
     private lateinit var itemCodex: Array<InventoryItem>
 
     const val ITEM_UNIQUE_MAX = 32768
+    val TILE_MAX = GameWorld.TILES_SUPPORTED
 
     init {
         itemCodex = arrayOf<InventoryItem>()

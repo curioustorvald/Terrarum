@@ -1,6 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.imagefont.GameFontBase
+import net.torvald.terrarum.audio.AudioResourceLibrary
 import net.torvald.terrarum.concurrent.ThreadPool
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.console.Authenticator
@@ -9,7 +10,7 @@ import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.gamemap.GameMap
+import net.torvald.terrarum.gamemap.GameWorld
 import net.torvald.terrarum.gamemap.WorldTime
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.mapdrawer.MapCamera
@@ -22,6 +23,7 @@ import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.terrarum.ui.Notification
 import net.torvald.terrarum.ui.UIHandler
+import net.torvald.terrarum.weather.WeatherMixer
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
 import org.newdawn.slick.fills.GradientFill
@@ -41,7 +43,7 @@ constructor() : BasicGameState() {
 
     internal var game_mode = 0
 
-    lateinit var map: GameMap
+    lateinit var world: GameWorld
 
     /**
      * list of Actors that is sorted by Actors' referenceID
@@ -57,8 +59,8 @@ constructor() : BasicGameState() {
 
     lateinit internal var player: Player
 
-    private var GRADIENT_IMAGE: Image? = null
-    private var skyBox: Rectangle? = null
+    //private var GRADIENT_IMAGE: Image? = null
+    //private var skyBox: Rectangle? = null
 
     var screenZoom = 1.0f
     val ZOOM_MAX = 2.0f
@@ -92,15 +94,11 @@ constructor() : BasicGameState() {
         shaderBlurH = Shader.makeShader("./res/blurH.vrt", "./res/blur.frg")
         shaderBlurV = Shader.makeShader("./res/blurV.vrt", "./res/blur.frg")
 
-        // init skybox
-        GRADIENT_IMAGE = Image("res/graphics/colourmap/sky_colour.png")
-        skyBox = Rectangle(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
-
         // init map as chosen size
-        map = GameMap(8192, 2048)
+        world = GameWorld(8192, 2048)
 
         // generate terrain for the map
-        MapGenerator.attachMap(map)
+        MapGenerator.attachMap(world)
         MapGenerator.SEED = 0x51621D2
         //mapgenerator.setSeed(new HQRNG().nextLong());
         MapGenerator.generateMap()
@@ -132,6 +130,11 @@ constructor() : BasicGameState() {
 
         // set smooth lighting as in config
         KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, Terrarum.getConfigBoolean("smoothlighting"))
+
+
+
+        // audio test
+        //AudioResourceLibrary.ambientsWoods[0].play()
     }
 
     override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
@@ -139,8 +142,11 @@ constructor() : BasicGameState() {
 
         setAppTitle()
 
-        map.updateWorldTime(delta)
-        map.globalLight = globalLightByTime
+        world.updateWorldTime(delta)
+
+        WeatherMixer.update(gc, delta)
+
+        world.globalLight = globalLightByTime.toInt()
 
         GameController.processInput(gc.input)
 
@@ -258,30 +264,6 @@ constructor() : BasicGameState() {
         }
     }
 
-    private fun getGradientColour(row: Int, phase: Int) = GRADIENT_IMAGE!!.getColor(phase, row)
-
-    private fun getGradientColour(row: Int): Color {
-        val gradMapWidth = GRADIENT_IMAGE!!.width
-        val phase = Math.round(
-                map.worldTime.elapsedSeconds().toFloat() / WorldTime.DAY_LENGTH.toFloat() * gradMapWidth
-        )
-
-        //update in every INTERNAL_FRAME frames
-        return getGradientColour(row, phase)
-    }
-
-    /**
-     * @param time in seconds
-     */
-    private fun getGradientColourByTime(row: Int, time: Int): Color {
-        val gradMapWidth = GRADIENT_IMAGE!!.width
-        val phase = Math.round(
-                time.toFloat() / WorldTime.DAY_LENGTH.toFloat() * gradMapWidth
-        )
-
-        return getGradientColour(row, phase)
-    }
-
     override fun keyPressed(key: Int, c: Char) {
         GameController.keyPressed(key, c)
     }
@@ -320,13 +302,7 @@ constructor() : BasicGameState() {
 
     override fun getID(): Int = Terrarum.SCENE_ID_GAME
 
-    private fun drawSkybox(g: Graphics) {
-        val skyColourFill = GradientFill(
-                0f, 0f, getGradientColour(0),
-                0f, Terrarum.HEIGHT.toFloat(), getGradientColour(1)
-        )
-        g.fill(skyBox, skyColourFill)
-    }
+    private fun drawSkybox(g: Graphics) = WeatherMixer.render(g)
 
     /** Send message to notifier UI and toggle the UI as opened. */
     fun sendNotification(msg: Array<String>) {
@@ -399,15 +375,7 @@ constructor() : BasicGameState() {
         }
     }
 
-    private val globalLightByTime: Int
-        get() = getGradientColour(2).getRGB24().rgb24ExpandToRgb30()
-    fun globalLightByTime(t: Int): Int = getGradientColourByTime(2, t).getRGB24().rgb24ExpandToRgb30()
-
-    fun Color.getRGB24(): Int = this.redByte.shl(16) or this.greenByte.shl(8) or this.blueByte
-    /** Remap 8-bit value (0.0-1.0) to 10-bit value (0.0-4.0) by prepending two bits of zero for each R, G and B. */
-    fun Int.rgb24ExpandToRgb30(): Int = (this and 0xff) or
-            (this and 0xff00).ushr(8).shl(10) or
-            (this and 0xff0000).ushr(16).shl(20)
+    private val globalLightByTime = WeatherMixer.globalLightNow
 
     fun Double.sqr() = this * this
     fun Int.sqr() = this * this

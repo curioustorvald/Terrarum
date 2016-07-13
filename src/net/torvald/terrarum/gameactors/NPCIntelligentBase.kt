@@ -1,10 +1,9 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.random.HQRNG
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameitem.InventoryItem
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.realestate.RealEstateUtility.getAbsoluteTileNumber
 import org.newdawn.slick.GameContainer
 import java.util.*
 
@@ -14,19 +13,27 @@ import java.util.*
 open class NPCIntelligentBase : ActorWithBody()
         , AIControlled, Pocketed, CanBeAnItem, Factionable, LandHolder {
 
+    override var actorAI: ActorAI = object : ActorAI {
+        // TODO fully establish ActorAI so that I can implement AI here
+    }
+    override var inventory: ActorInventory = ActorInventory()
+    override var faction: HashSet<Faction> = HashSet()
+    override var houseDesignation: ArrayList<Long>? = null
+
+    // we're having InventoryItem data so that this class could be somewhat universal
     override var itemData: InventoryItem = object : InventoryItem {
-        override var itemID = HQRNG().nextInt()
+        override var itemID = referenceID
 
         override var mass: Double
-            get() = actorValue.getAsDouble("mass")!!
+            get() = actorValue.getAsDouble(AVKey.BASEMASS)!!
             set(value) {
-                actorValue.set("mass", value)
+                actorValue[AVKey.BASEMASS] = value
             }
 
         override var scale: Double
-            get() = actorValue.getAsDouble("scale")!!
+            get() = actorValue.getAsDouble(AVKey.SCALE)!!
             set(value) {
-                actorValue.set("scale", value)
+                actorValue[AVKey.SCALE] = value
             }
 
         override fun effectWhileInPocket(gc: GameContainer, delta_t: Int) {
@@ -38,36 +45,16 @@ open class NPCIntelligentBase : ActorWithBody()
         }
 
         override fun primaryUse(gc: GameContainer, delta_t: Int) {
-
+            // TODO do not allow primary_use
         }
 
         override fun secondaryUse(gc: GameContainer, delta_t: Int) {
-
+            // TODO place this Actor to the world
         }
 
-        override fun effectWhenThrownAway(gc: GameContainer, delta_t: Int) {
+        override fun effectWhenThrown(gc: GameContainer, delta_t: Int) {
 
         }
-    }
-
-    @Transient private var ai: ActorAI? = null
-    override var inventory: ActorInventory = ActorInventory()
-
-    private val factionSet = HashSet<Faction>()
-
-    override var referenceID: Int = HQRNG().nextInt()
-
-    override var faction: HashSet<Faction> = HashSet()
-
-    override var houseDesignation: ArrayList<Int>? = null
-    /**
-     * Absolute tile index. index(x, y) = y * map.width + x
-     * The arraylist will be saved in JSON format with GSON.
-     */
-    private var houseTiles = ArrayList<Int>()
-
-    override fun attachItemData() {
-
     }
 
     override fun getItemWeight(): Double {
@@ -75,15 +62,15 @@ open class NPCIntelligentBase : ActorWithBody()
     }
 
     override fun addHouseTile(x: Int, y: Int) {
-        houseTiles.add(Terrarum.ingame.map.width * y + x)
+        if (houseDesignation != null) houseDesignation!!.add(getAbsoluteTileNumber(x, y))
     }
 
     override fun removeHouseTile(x: Int, y: Int) {
-        houseTiles.remove(Terrarum.ingame.map.width * y + x)
+        if (houseDesignation != null) houseDesignation!!.remove(getAbsoluteTileNumber(x, y))
     }
 
     override fun clearHouseDesignation() {
-        houseTiles.clear()
+        if (houseDesignation != null) houseDesignation!!.clear()
     }
 
     override fun stopUpdateAndDraw() {
@@ -96,7 +83,5 @@ open class NPCIntelligentBase : ActorWithBody()
         isVisible = true
     }
 
-    override fun attachAI(ai: ActorAI) {
-        this.ai = ai
-    }
+
 }

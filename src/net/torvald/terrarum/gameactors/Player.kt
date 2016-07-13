@@ -56,7 +56,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
 
     @Transient private val TSIZE = MapDrawer.TILE_SIZE
 
-    @Transient private val BASE_DENSITY = 1020
+    @Transient private val BASE_DENSITY = 980.0
 
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory = ActorInventory()
@@ -64,7 +64,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
     /** Must be set by PlayerFactory */
     override var faction: HashSet<Faction> = HashSet()
 
-    override var houseDesignation: ArrayList<Int>? = null
+    override var houseDesignation: ArrayList<Long>? = null
 
     override var luminosity: Int
         get() = actorValue.getAsInt(AVKey.LUMINOSITY) ?: 0
@@ -92,7 +92,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
     init {
         isVisible = true
         referenceID = PLAYER_REF_ID // forcibly set ID
-        super.setDensity(BASE_DENSITY)
+        density = BASE_DENSITY
         collisionType = KINEMATIC
     }
 

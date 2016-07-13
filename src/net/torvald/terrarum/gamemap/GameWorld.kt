@@ -4,7 +4,7 @@ package net.torvald.terrarum.gamemap
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.SlickException
 
-class GameMap
+class GameWorld
 /**
  * @param width
  * *
@@ -36,7 +36,7 @@ constructor(//properties
     var gravitation: Vector2 = Vector2(0.0, 9.8)
     /** RGB in Integer */
     var globalLight: Int = 0
-    val worldTime: WorldTime
+    val time: WorldTime
 
     var generatorSeed: Long = 0
 
@@ -50,8 +50,7 @@ constructor(//properties
         terrainDamage = PairedMapLayer(width, height)
         wallDamage = PairedMapLayer(width, height)
 
-        globalLight = 0.toChar().toInt()
-        worldTime = WorldTime()
+        time = WorldTime()
     }
 
     /**
@@ -169,7 +168,7 @@ constructor(//properties
     }
 
     fun updateWorldTime(delta: Int) {
-        worldTime.update(delta)
+        time.update(delta)
     }
 
     fun terrainIterator(): Iterator<Int> {

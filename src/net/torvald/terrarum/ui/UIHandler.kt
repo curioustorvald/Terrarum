@@ -54,7 +54,8 @@ constructor(val UI: UICanvas) {
         println("[UIHandler] Creating UI '${UI.javaClass.simpleName}'")
 
         UIDrawnCanvas = Image(
-                FastMath.nearestPowerOfTwo(UI.width), FastMath.nearestPowerOfTwo(UI.height))
+                //FastMath.nearestPowerOfTwo(UI.width), FastMath.nearestPowerOfTwo(UI.height))
+                UI.width, UI.height)
 
         UIGraphicInstance = UIDrawnCanvas.graphics
     }

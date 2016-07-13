@@ -8,10 +8,10 @@ import net.torvald.terrarum.gameactors.faction.FactionCodex
  */
 object RealEstateUtility {
     fun getAbsoluteTileNumber(x: Int, y: Int): Long =
-            (Terrarum.ingame.map.width * y).toLong() + x
+            (Terrarum.ingame.world.width * y).toLong() + x
 
     fun resolveAbsoluteTileNumber(t: Long): Pair<Int, Int> =
-            Pair((t % Terrarum.ingame.map.width).toInt(), (t / Terrarum.ingame.map.width).toInt())
+            Pair((t % Terrarum.ingame.world.width).toInt(), (t / Terrarum.ingame.world.width).toInt())
 
     /**
      * Get owner ID as an Actor/Faction

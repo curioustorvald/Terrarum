@@ -58,9 +58,14 @@ All rights reserved.
   
 ---
 
-Amazing ambient sound recordings in ```sound/ambient/klankbeeld-freesound```
+Amazing ambient sound recordings:
 
-Samples used: 173111, 183181, 185290, 195287, 240108, 326914, 337691, 347753
+    ambient_forest_01.ogg
+    ambient_meadow_01.ogg
+    ambient_windy_01.ogg
+    ambient_woods_01.ogg
+    crickets_01.ogg
+    crickets_02.ogg
 
 Copyright (C) 2012, 2013, 2015, 2016 Klankbeeld
 Sound from http://www.freesound.org/people/klankbeeld/

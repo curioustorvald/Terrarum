@@ -1,7 +1,7 @@
 package net.torvald.terrarum.mapgenerator
 
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.gamemap.GameMap
+import net.torvald.terrarum.gamemap.GameWorld
 import net.torvald.terrarum.tileproperties.TileNameCode
 import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise
@@ -13,13 +13,13 @@ import java.util.*
 
 object MapGenerator {
 
-    internal lateinit var map: GameMap
+    internal lateinit var world: GameWorld
     internal lateinit var random: Random
     //private static float[] noiseArray;
     var SEED: Long = 0
         set(value) {
             field = value
-            map.generatorSeed = value
+            world.generatorSeed = value
         }
     var WIDTH: Int = 0
     var HEIGHT: Int = 0
@@ -65,10 +65,10 @@ object MapGenerator {
 
     internal val TILE_MACRO_ALL = -1
 
-    fun attachMap(map: GameMap) {
-        this.map = map
-        WIDTH = map.width
-        HEIGHT = map.height
+    fun attachMap(world: GameWorld) {
+        this.world = world
+        WIDTH = world.width
+        HEIGHT = world.height
 
         val widthMulFactor = WIDTH / 8192f
 
@@ -154,7 +154,7 @@ object MapGenerator {
         //wire layer
         for (i in 0..HEIGHT - 1) {
             for (j in 0..WIDTH - 1) {
-                map.wireArray[i][j] = 0
+                world.wireArray[i][j] = 0
             }
         }
 
@@ -486,11 +486,11 @@ object MapGenerator {
             for (i in 0..HEIGHT - pillarOffset - 1) {
 
                 if (i < DIRT_LAYER_DEPTH) {
-                    map.setTileTerrain(x, i + pillarOffset, TileNameCode.DIRT)
-                    map.setTileWall(x, i + pillarOffset, TileNameCode.DIRT)
+                    world.setTileTerrain(x, i + pillarOffset, TileNameCode.DIRT)
+                    world.setTileWall(x, i + pillarOffset, TileNameCode.DIRT)
                 } else {
-                    map.setTileTerrain(x, i + pillarOffset, TileNameCode.STONE)
-                    map.setTileWall(x, i + pillarOffset, TileNameCode.STONE)
+                    world.setTileTerrain(x, i + pillarOffset, TileNameCode.STONE)
+                    world.setTileWall(x, i + pillarOffset, TileNameCode.STONE)
                 }
 
             }
@@ -560,8 +560,8 @@ object MapGenerator {
                     val tile =
                             if (y < dirtStoneLine[x]) TileNameCode.DIRT
                             else                      TileNameCode.STONE
-                    map.setTileTerrain(x, y, tile)
-                    map.setTileWall(x, y, tile)
+                    world.setTileTerrain(x, y, tile)
+                    world.setTileWall(x, y, tile)
                 }
             }
         }
@@ -603,7 +603,7 @@ object MapGenerator {
                 }
 
                 if (noise > filter.getGrad(y, filterStart, filterEnd) * scarcity) {
-                    map.setTileTerrain(x, y, tile)
+                    world.setTileTerrain(x, y, tile)
                 }
             }
         }
@@ -633,8 +633,8 @@ object MapGenerator {
                 }
 
                 if (noise > filter.getGrad(y, filterStart, filterEnd) * scarcity
-                    && map.getTileFromTerrain(x, y) == replaceFrom) {
-                    map.setTileTerrain(x, y, replaceTo)
+                    && world.getTileFromTerrain(x, y) == replaceFrom) {
+                    world.setTileTerrain(x, y, replaceTo)
                 }
             }
         }
@@ -663,8 +663,8 @@ object MapGenerator {
                     else -> throw(IllegalArgumentException("[mapgenerator] Unknown noise module type '${noisemap.javaClass.simpleName}': Only the 'Joise' or 'TaggedSimplexNoise' is valid."))
                 }
 
-                if (noise > filter.getGrad(y, filterStart, filterEnd) * scarcity && map.getTileFromTerrain(x, y) == replaceFrom) {
-                    map.setTileTerrain(x, y, tile[random.nextInt(tile.size)])
+                if (noise > filter.getGrad(y, filterStart, filterEnd) * scarcity && world.getTileFromTerrain(x, y) == replaceFrom) {
+                    world.setTileTerrain(x, y, tile[random.nextInt(tile.size)])
                 }
             }
         }
@@ -721,8 +721,8 @@ object MapGenerator {
     private fun generateFloatingIslands() {
         println("[mapgenerator] Placing floating islands...")
 
-        val nIslandsMax = Math.round(map.width * 6f / 8192f)
-        val nIslandsMin = Math.max(2, Math.round(map.width * 4f / 8192f))
+        val nIslandsMax = Math.round(world.width * 6f / 8192f)
+        val nIslandsMin = Math.max(2, Math.round(world.width * 4f / 8192f))
         val nIslands = random.nextInt(nIslandsMax - nIslandsMin) + nIslandsMin
         val prevIndex = -1
 
@@ -735,13 +735,13 @@ object MapGenerator {
             }
             val island = FloatingIslandsPreset.generatePreset(currentIndex, random)
 
-            val startingPosX = random.nextInt(map.width - 2048) + 1024
+            val startingPosX = random.nextInt(world.width - 2048) + 1024
             val startingPosY = minimumFloatingIsleHeight + random.nextInt(minimumFloatingIsleHeight)
 
             for (j in island.indices) {
                 for (k in 0..island[0].size - 1) {
                     if (island[j][k] > 0) {
-                        map.setTileTerrain(k + startingPosX, j + startingPosY, tiles[island[j][k]])
+                        world.setTileTerrain(k + startingPosX, j + startingPosY, tiles[island[j][k]])
                     }
                 }
             }
@@ -754,8 +754,8 @@ object MapGenerator {
         println("[mapgenerator] Flooding bottom lava...")
         for (i in HEIGHT * 14 / 15..HEIGHT - 1) {
             for (j in 0..WIDTH - 1) {
-                if (map.terrainArray[i][j].toInt() == 0) {
-                    map.setTileTerrain(j, i, TileNameCode.LAVA)
+                if (world.terrainArray[i][j].toInt() == 0) {
+                    world.setTileTerrain(j, i, TileNameCode.LAVA)
                 }
             }
         }
@@ -773,18 +773,18 @@ object MapGenerator {
 		 */
 
         for (y in TERRAIN_AVERAGE_HEIGHT - TERRAIN_UNDULATION..TERRAIN_AVERAGE_HEIGHT + TERRAIN_UNDULATION - 1) {
-            for (x in 0..map.width - 1) {
+            for (x in 0..world.width - 1) {
 
-                val thisTile = map.getTileFromTerrain(x, y)
+                val thisTile = world.getTileFromTerrain(x, y)
 
                 for (i in 0..8) {
                     var nearbyWallTile: Int?
-                    nearbyWallTile = map.getTileFromWall(x + i % 3 - 1, y + i / 3 - 1)
+                    nearbyWallTile = world.getTileFromWall(x + i % 3 - 1, y + i / 3 - 1)
 
                     if (nearbyWallTile == null) break;
 
                     if (i != 4 && thisTile == TileNameCode.DIRT && nearbyWallTile == TileNameCode.AIR) {
-                        map.setTileTerrain(x, y, TileNameCode.GRASS)
+                        world.setTileTerrain(x, y, TileNameCode.GRASS)
                         break
                     }
                 }
@@ -794,18 +794,18 @@ object MapGenerator {
     }
 
     private fun isGrassOrDirt(x: Int, y: Int): Boolean {
-        return map.getTileFromTerrain(x, y) == TileNameCode.GRASS || map.getTileFromTerrain(x, y) == TileNameCode.DIRT
+        return world.getTileFromTerrain(x, y) == TileNameCode.GRASS || world.getTileFromTerrain(x, y) == TileNameCode.DIRT
     }
 
     private fun replaceIfTerrain(ifTileRaw: Int, x: Int, y: Int, replaceTileRaw: Int) {
-        if (map.getTileFromTerrain(x, y) == ifTileRaw) {
-            map.setTileTerrain(x, y, replaceTileRaw)
+        if (world.getTileFromTerrain(x, y) == ifTileRaw) {
+            world.setTileTerrain(x, y, replaceTileRaw)
         }
     }
 
     private fun replaceIfWall(ifTileRaw: Int, x: Int, y: Int, replaceTileRaw: Int) {
-        if (map.getTileFromWall(x, y) == ifTileRaw) {
-            map.setTileWall(x, y, replaceTileRaw)
+        if (world.getTileFromWall(x, y) == ifTileRaw) {
+            world.setTileWall(x, y, replaceTileRaw)
         }
     }
 
@@ -837,11 +837,11 @@ object MapGenerator {
             if (ix < OCEAN_WIDTH) {
                 if (worldOceanPosition == TYPE_OCEAN_LEFT) {
                     for (y in getTerrainHeightFromHeightMap(OCEAN_WIDTH)..getTerrainHeightFromHeightMap(ix) - 1) {
-                        map.setTileTerrain(ix, y, TileNameCode.WATER)
+                        world.setTileTerrain(ix, y, TileNameCode.WATER)
                     }
                 } else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
-                    for (y in getTerrainHeightFromHeightMap(map.width - 1 - OCEAN_WIDTH)..getTerrainHeightFromHeightMap(map.width - 1 - ix) - 1) {
-                        map.setTileTerrain(map.width - 1 - ix, y, TileNameCode.WATER)
+                    for (y in getTerrainHeightFromHeightMap(world.width - 1 - OCEAN_WIDTH)..getTerrainHeightFromHeightMap(world.width - 1 - ix) - 1) {
+                        world.setTileTerrain(world.width - 1 - ix, y, TileNameCode.WATER)
                     }
                 }
             }
@@ -852,15 +852,15 @@ object MapGenerator {
                     val terrainPoint = getTerrainHeightFromHeightMap(ix)
 
 
-                    map.setTileTerrain(ix, terrainPoint + iy, thisSand)
+                    world.setTileTerrain(ix, terrainPoint + iy, thisSand)
                     // clear grass and make the sheet thicker
-                    map.setTileTerrain(ix, terrainPoint + iy - 1, thisSand)
+                    world.setTileTerrain(ix, terrainPoint + iy - 1, thisSand)
                 } else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
-                    val terrainPoint = getTerrainHeightFromHeightMap(map.width - 1 - ix)
+                    val terrainPoint = getTerrainHeightFromHeightMap(world.width - 1 - ix)
 
-                    map.setTileTerrain(map.width - 1 - ix, terrainPoint + iy, thisSand)
+                    world.setTileTerrain(world.width - 1 - ix, terrainPoint + iy, thisSand)
                     // clear grass and make the sheet thicker
-                    map.setTileTerrain(map.width - 1 - ix, terrainPoint + iy - 1, thisSand)
+                    world.setTileTerrain(world.width - 1 - ix, terrainPoint + iy - 1, thisSand)
                 }
             }
             ix++
@@ -868,7 +868,7 @@ object MapGenerator {
     }
 
     private fun freeze() {
-        for (y in 0..map.height - 1 - 1) {
+        for (y in 0..world.height - 1 - 1) {
             for (x in 0..getFrozenAreaWidth(y) - 1) {
                 if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
                     replaceIfTerrain(TileNameCode.DIRT, x, y, TileNameCode.SNOW)
@@ -877,11 +877,11 @@ object MapGenerator {
                     replaceIfWall(TileNameCode.DIRT, x, y, TileNameCode.SNOW)
                     replaceIfWall(TileNameCode.STONE, x, y, TileNameCode.ICE_NATURAL)
                 } else {
-                    replaceIfTerrain(TileNameCode.DIRT, map.width - 1 - x, y, TileNameCode.SNOW)
-                    replaceIfTerrain(TileNameCode.STONE, map.width - 1 - x, y, TileNameCode.ICE_NATURAL)
+                    replaceIfTerrain(TileNameCode.DIRT, world.width - 1 - x, y, TileNameCode.SNOW)
+                    replaceIfTerrain(TileNameCode.STONE, world.width - 1 - x, y, TileNameCode.ICE_NATURAL)
 
-                    replaceIfWall(TileNameCode.DIRT, map.width - 1 - x, y, TileNameCode.SNOW)
-                    replaceIfWall(TileNameCode.STONE, map.width - 1 - x, y, TileNameCode.ICE_NATURAL)
+                    replaceIfWall(TileNameCode.DIRT, world.width - 1 - x, y, TileNameCode.SNOW)
+                    replaceIfWall(TileNameCode.STONE, world.width - 1 - x, y, TileNameCode.ICE_NATURAL)
                 }
             }
         }
@@ -899,7 +899,7 @@ object MapGenerator {
         if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
             height = getTerrainHeightFromHeightMap(width)
         } else {
-            height = getTerrainHeightFromHeightMap(map.width - 1 - width)
+            height = getTerrainHeightFromHeightMap(world.width - 1 - width)
         }
         val k = width / FastMath.sqrt(height.toFloat())
 
@@ -948,8 +948,8 @@ object MapGenerator {
                         && Math.round(j + pointerX - halfBrushSize) < WIDTH - brushSize
                         && Math.round(i + pointerY - halfBrushSize) > brushSize
                         && Math.round(i + pointerY - halfBrushSize) < HEIGHT - brushSize) {
-                        if (map.terrainArray[Math.round(i + pointerY - halfBrushSize)][Math.round(j + pointerX - halfBrushSize)] == fillFrom.toByte()) {
-                            map.terrainArray[Math.round(i + pointerY - halfBrushSize)][Math.round(j + pointerX - halfBrushSize)] = fill.toByte()
+                        if (world.terrainArray[Math.round(i + pointerY - halfBrushSize)][Math.round(j + pointerX - halfBrushSize)] == fillFrom.toByte()) {
+                            world.terrainArray[Math.round(i + pointerY - halfBrushSize)][Math.round(j + pointerX - halfBrushSize)] = fill.toByte()
                         }
                     }
                 }

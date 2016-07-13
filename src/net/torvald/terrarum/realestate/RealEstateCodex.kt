@@ -12,9 +12,9 @@ object RealEstateCodex {
      *
      * Note that a tile can have only ONE owner (as an Actor or Faction ID)
      */
-    private var ownershipRegistry: HashMap<Long, Long> = HashMap()
+    private var ownershipRegistry: HashMap<Long, Int> = HashMap()
 
-    fun setOwner(tileX: Int, tileY: Int, refID: Long) {
+    fun setOwner(tileX: Int, tileY: Int, refID: Int) {
         ownershipRegistry[RealEstateUtility.getAbsoluteTileNumber(tileX, tileY)] = refID
     }
 
@@ -22,6 +22,6 @@ object RealEstateCodex {
         ownershipRegistry.remove(RealEstateUtility.getAbsoluteTileNumber(tileX, tileY))
     }
 
-    fun getOwner(tileX: Int, tileY: Int): Long? =
+    fun getOwner(tileX: Int, tileY: Int): Int? =
             ownershipRegistry[RealEstateUtility.getAbsoluteTileNumber(tileX, tileY)]
 }

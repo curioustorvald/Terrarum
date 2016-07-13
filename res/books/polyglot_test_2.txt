@@ -1,0 +1,29 @@
+"APP_WARNING_HEALTH_AND_SAFETY": ""
+
+bgBG    ВНИМАНИЕ-ЗДРАВЕ И БЕЗОПАСНОСТ
+csCZ    POZOR-ZDRAVÍ A BEZPEČNOST
+daDK    ADVARSEL-SUNDHED OG SIKKERHED
+de      WARNUNG-GESUNDHEIT UND SICHERHEIT
+elGR    ΠΡΟΣΟΧΗ-ΥΓΕΙΑ ΚΑΙ ΑΣΦΑΛΕΙΑ
+en      WARNING-HEALTH AND SAFETY
+es      ADVERTENCIA-SALUD Y SEGURIDAD
+fiFI    VAROITUS-TERVEYS JA TURVALLISUUS
+fr      ATTENTION-SANTÉ ET SÉCURITÉ
+huHU    VIGYÁZAT-EGÉSZSÉGÜGYI ÉS BIZTONSÁGI
+isIC    VIÐVÖRUN-HEILSA OG ÖRYGGI
+it      ATTENZIONE-SALUTE E SICUREZZA
+jaJP    警告ー健康と安全のために
+jakana  けいこくーけんこうと あんぜんの ために
+koKR    경고—건강과 안전을 위하여
+nlNL    WAARSCHUWING-GEZONDHEID EN VEILIGHEID
+noNB    ADVARSEL-HELSE OG SIKKERHET
+plPL    UWAGA-ZDROWIE I BEZPIECZEŃSTWO
+ptBR    ATENÇÃO-SAÚDE E SEGURANÇA
+ptPT    ATENÇÃO-SAÚDE E SEGURANÇA
+roRO    ATENȚIONARE-SĂNĂTATE ȘI SIGURANȚĂ
+ruRU    ПРЕДУПРЕЖДЕНИЕ-ЗДОРОВЬЕ И БЕЗОПАСНОСТЬ
+svSE    VARNING-HÄLSA OCH SÄKERHET
+thTH    คำเตือน-อนามัยและความปลอดภัย
+trTR    UYARI-SAĞLIK VE GÜVENLİK
+zhCN    警告ー健康和安全
+zhTW    警告ー健康和安全

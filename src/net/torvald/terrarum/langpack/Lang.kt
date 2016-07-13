@@ -20,7 +20,8 @@ object Lang {
      *
      * HashMap<"$key_$language", Value>
      */
-    private var langpack: HashMap<String, String>
+    var langpack: HashMap<String, String>
+        private set
     private val FALLBACK_LANG_CODE = "en"
 
     private val HANGUL_SYL_START = 0xAC00

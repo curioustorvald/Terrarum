@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import net.torvald.gadgets.HistoryArray
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.CommandInterpreter
@@ -16,15 +17,15 @@ class ConsoleWindow : UICanvas, UITypable {
 
     internal var UIColour = Color(0xCC000000.toInt())
 
-    private var commandInputPool: StringBuilder? = null
-    private var prevCommand: String? = null
-
     private var inputCursorPos: Int = 0
-
     private val MESSAGES_MAX = 5000
+    private val COMMAND_HISTORY_MAX = 100
     private var messages = Array(MESSAGES_MAX, {""})
     private var messageDisplayPos: Int = 0
     private var messagesCount: Int = 0
+
+    private var commandInputPool: StringBuilder? = null
+    private var commandHistory = HistoryArray<String>(COMMAND_HISTORY_MAX)
 
     private val LINE_HEIGHT = 20
     private val MESSAGES_DISPLAY_COUNT = 9
@@ -37,6 +38,9 @@ class ConsoleWindow : UICanvas, UITypable {
     private var drawOffX: Float = 0f
     private var drawOffY: Float = -height.toFloat()
     private var openingTimeCounter = 0
+
+
+    private var historyIndex = -1
 
     init {
         reset()
@@ -70,15 +74,25 @@ class ConsoleWindow : UICanvas, UITypable {
 
 
     override fun keyPressed(key: Int, c: Char) {
+        // history
+        if (key == Key.UP && historyIndex < commandHistory.history.size)
+            historyIndex++
+        else if (key == Key.DOWN && historyIndex >= 0)
+            historyIndex--
+        else if (key != Key.UP && key != Key.DOWN)
+            historyIndex = -1
+
         // execute
         if (key == Key.RET && commandInputPool!!.length > 0) {
-            prevCommand = commandInputPool!!.toString()
+            commandHistory.add(commandInputPool!!.toString())
             executeCommand()
             commandInputPool = StringBuilder()
         }
-        else if (key == Key.BKSP && commandInputPool!!.length > 0) {
+        // erase last letter
+        else if (key == Key.BACKSPACE && commandInputPool!!.length > 0) {
             commandInputPool!!.deleteCharAt(commandInputPool!!.length - 1)
         }
+        // append acceptable letter
         else if (key >= 2 && key <= 13
                  || key >= 16 && key <= 27
                  || key >= 30 && key <= 40
@@ -87,20 +101,25 @@ class ConsoleWindow : UICanvas, UITypable {
             commandInputPool!!.append(c)
             inputCursorPos += 1
         }
-        else if (key == Key.UP) {
+        // scroll
+        else if (key == Key.UP || key == Key.DOWN) {
+            // create new stringbuilder
             commandInputPool = StringBuilder()
-            commandInputPool!!.append(prevCommand)
+            if (historyIndex >= 0) // just leave blank if index is -1
+                commandInputPool!!.append(commandHistory[historyIndex] ?: "")
         }
+        // delete input
+        else if (key == Key.DELETE) {
+            commandInputPool = StringBuilder()
+        }
+        // message scroll up
         else if (key == Key.PGUP) {
             setDisplayPos(-MESSAGES_DISPLAY_COUNT + 1)
         }
+        // message scroll down
         else if (key == Key.PGDN) {
             setDisplayPos(MESSAGES_DISPLAY_COUNT - 1)
-        }// scroll down
-        // scroll up
-        // prev command
-        // get input
-        // backspace
+        }
     }
 
     override fun keyReleased(key: Int, c: Char) {
@@ -148,7 +167,7 @@ class ConsoleWindow : UICanvas, UITypable {
         messageDisplayPos = 0
         messagesCount = 0
         inputCursorPos = 0
-        prevCommand = ""
+        commandHistory = HistoryArray<String>(COMMAND_HISTORY_MAX)
         commandInputPool = StringBuilder()
 
         if (Terrarum.ingame.auth.b()) sendMessage(Lang["DEV_MESSAGE_CONSOLE_CODEX"])

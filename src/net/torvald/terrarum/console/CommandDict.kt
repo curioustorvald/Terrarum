@@ -42,7 +42,8 @@ object CommandDict {
             // Test codes
             Pair("bulletintest", SetBulletin()),
             Pair("gsontest", GsonTest()),
-            Pair("tips", PrintRandomTips())
+            Pair("tips", PrintRandomTips()),
+            Pair("langtest", LangTest())
     )
 
     fun getCommand(commandName: String): ConsoleCommand {

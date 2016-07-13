@@ -55,34 +55,22 @@ constructor() : Font {
     }
 
     private fun isAsciiEF(c: Char) = asciiEFList.contains(c)
-
     private fun isExtAEF(c: Char) = extAEFList.contains(c)
-
     private fun isHangul(c: Char) = c.toInt() >= 0xAC00 && c.toInt() < 0xD7A4
-
     private fun isAscii(c: Char) = c.toInt() > 0x20 && c.toInt() <= 0xFF
-
     private fun isRunic(c: Char) = runicList.contains(c)
-
     private fun isExtA(c: Char) = c.toInt() >= 0x100 && c.toInt() < 0x180
-
     private fun isKana(c: Char) = c.toInt() >= 0x3040 && c.toInt() < 0x3100
-
     private fun isCJKPunct(c: Char) = c.toInt() >= 0x3000 && c.toInt() < 0x3040
-
     private fun isUniHan(c: Char) = c.toInt() >= 0x3400 && c.toInt() < 0xA000
-
     private fun isCyrilic(c: Char) = c.toInt() >= 0x400 && c.toInt() < 0x460
-
     private fun isCyrilicEF(c: Char) = cyrilecEFList.contains(c)
-
     private fun isFullwidthUni(c: Char) = c.toInt() >= 0xFF00 && c.toInt() < 0xFF20
-
     private fun isUniPunct(c: Char) = c.toInt() >= 0x2000 && c.toInt() < 0x2070
-
     private fun isWenQuanYi1(c: Char) = c.toInt() >= 0x33F3 && c.toInt() <= 0x69FC
-
     private fun isWenQuanYi2(c: Char) = c.toInt() >= 0x69FD && c.toInt() <= 0x9FDC
+    private fun isGreek(c: Char) = c.toInt() >= 0x370 && c.toInt() <= 0x3CE
+    private fun isGreekEF(c: Char) = greekEFList.contains(c)
 
 
 
@@ -121,37 +109,65 @@ constructor() : Font {
     private fun wenQuanYi1IndexY(c: Char) = (c.toInt() - (0x33F3 + 0x4A)) / 32
     private fun wenQuanYi2IndexY(c: Char) = (c.toInt() - 0x69FD) / 32
 
-    override fun getWidth(s: String) = getWidthSubstr(s, s.length)
+    private fun greekIndexX(c: Char) = (c.toInt() - 0x370) % 16
+    private fun greekIndexY(c: Char) = (c.toInt() - 0x370) / 16
 
+    private fun greekEFIndexX(c: Char) = greekEFList.indexOf(c) % 16
+    private fun greekEFIndexY(c: Char) = greekEFList.indexOf(c) / 16
+
+
+    private val narrowWidthSheets = arrayOf(
+            SHEET_ASCII_EF,
+            SHEET_EXTA_EF,
+            SHEET_CYRILIC_EF,
+            SHEET_GREEK_EF
+    )
+    private val unihanWidthSheets = arrayOf(
+            SHEET_UNIHAN,
+            SHEET_FW_UNI,
+            SHEET_WENQUANYI_1,
+            SHEET_WENQUANYI_2
+    )
+    private val zeroWidthSheets = arrayOf(
+            SHEET_COLOURCODE
+    )
+    private val cjkWidthSheets = arrayOf(
+            SHEET_KANA,
+            SHEET_HANGUL,
+            SHEET_CJK_PUNCT
+    )
+
+
+    override fun getWidth(s: String) = getWidthSubstr(s, s.length)
 
     private fun getWidthSubstr(s: String, endIndex: Int): Int {
         var len = 0
         for (i in 0..endIndex - 1) {
-            val c = getSheetType(s[i])
+            val ctype = getSheetType(s[i])
 
             if (i > 0 && s[i].toInt() > 0x20) {
-                // Kerning
+                // Unihan-hangul Kerning
                 val cpre = getSheetType(s[i - 1])
-                if ((cpre == SHEET_UNIHAN || cpre == SHEET_HANGUL) && !(c == SHEET_UNIHAN || c == SHEET_HANGUL)
+                if ((unihanWidthSheets.contains(cpre) || cpre == SHEET_HANGUL) && !(unihanWidthSheets.contains(ctype) || ctype == SHEET_HANGUL)
 
-                    || (c == SHEET_UNIHAN || c == SHEET_HANGUL) && !(cpre == SHEET_UNIHAN || cpre == SHEET_HANGUL)) {
+                    || (unihanWidthSheets.contains(ctype) || ctype == SHEET_HANGUL) && !(unihanWidthSheets.contains(cpre) || cpre == SHEET_HANGUL)) {
                     // margin after/before hangul/unihan
                     len += 2
                 }
-                else if ((c == SHEET_HANGUL || c == SHEET_KANA) && (cpre == SHEET_HANGUL || cpre == SHEET_KANA)) {
+                else if ((ctype == SHEET_HANGUL || ctype == SHEET_KANA) && (cpre == SHEET_HANGUL || cpre == SHEET_KANA)) {
                     // margin between hangul/kana
                     len += 1
                 }
 
             }
 
-            if (c == SHEET_COLOURCODE)
+            if (zeroWidthSheets.contains(ctype))
                 len += 0
-            else if (c == SHEET_ASCII_EF || c == SHEET_EXTA_EF || c == SHEET_CYRILIC_EF)
+            else if (narrowWidthSheets.contains(ctype))
                 len += W_LATIN_NARROW
-            else if (c == SHEET_KANA || c == SHEET_HANGUL || c == SHEET_CJK_PUNCT)
+            else if (cjkWidthSheets.contains(ctype))
                 len += W_CJK
-            else if (c == SHEET_UNIHAN || c == SHEET_FW_UNI || c == SHEET_WENQUANYI_1 || c == SHEET_WENQUANYI_2)
+            else if (unihanWidthSheets.contains(ctype))
                 len += W_UNIHAN
             else
                 len += W_LATIN_WIDE
@@ -375,6 +391,14 @@ constructor() : Font {
                         sheetX = uniPunctIndexX(ch)
                         sheetY = uniPunctIndexY(ch)
                     }
+                    SHEET_GREEK_EM   -> {
+                        sheetX = greekIndexX(ch)
+                        sheetY = greekIndexY(ch)
+                    }
+                    SHEET_GREEK_EF   -> {
+                        sheetX = greekEFIndexX(ch)
+                        sheetY = greekEFIndexY(ch)
+                    }
                     else             -> {
                         sheetX = ch.toInt() % 16
                         sheetY = ch.toInt() / 16
@@ -406,6 +430,10 @@ constructor() : Font {
                 catch (e: ArrayIndexOutOfBoundsException) {
                     // character that does not exist in the sheet. No render, pass.
                 }
+                catch (e1: RuntimeException) {
+                    // System.err.println("[GameFontBase] RuntimeException raised while processing character '$ch' (U+${Integer.toHexString(ch.toInt()).toUpperCase()})")
+                    // e1.printStackTrack()
+                }
             }
 
         }
@@ -424,6 +452,8 @@ constructor() : Font {
             return SHEET_EXTA_EF
         else if (isCyrilicEF(c))
             return SHEET_CYRILIC_EF
+        else if (isGreekEF(c))
+            return SHEET_GREEK_EF
         else if (isRunic(c))
             return SHEET_RUNIC
         else if (isHangul(c))
@@ -444,6 +474,8 @@ constructor() : Font {
             return SHEET_CJK_PUNCT
         else if (isFullwidthUni(c))
             return SHEET_FW_UNI
+        else if (isGreek(c))
+            return SHEET_GREEK_EM
         else if (c.isColourCode())
             return SHEET_COLOURCODE
         else
@@ -516,6 +548,8 @@ constructor() : Font {
         lateinit internal var uniPunct: SpriteSheet
         lateinit internal var wenQuanYi_1: SpriteSheet
         lateinit internal var wenQuanYi_2: SpriteSheet
+        lateinit internal var greekSheet: SpriteSheet
+        lateinit internal var greekSheetEF: SpriteSheet
 
         internal val JUNG_COUNT = 21
         internal val JONG_COUNT = 28
@@ -544,12 +578,12 @@ constructor() : Font {
         internal val SHEET_UNI_PUNCT = 12
         internal val SHEET_WENQUANYI_1 = 13
         internal val SHEET_WENQUANYI_2 = 14
-
+        internal val SHEET_GREEK_EM = 15
+        internal val SHEET_GREEK_EF = 16
         internal val SHEET_COLOURCODE = 255
 
         lateinit internal var sheetKey: Array<SpriteSheet>
         internal val asciiEFList = arrayOf(' ', '!', '"', '\'', '(', ')', ',', '.', ':', ';', 'I', '[', ']', '`', 'f', 'i', 'j', 'l', 't', '{', '|', '}', 0xA1.toChar(), 'Ì', 'Í', 'Î', 'Ï', 'ì', 'í', 'î', 'ï', '·')
-
         internal val extAEFList = arrayOf(
                 0x12E.toChar(),
                 0x12F.toChar(),
@@ -563,13 +597,20 @@ constructor() : Font {
                 0x167.toChar(),
                 0x17F.toChar()
         )
-
         internal val cyrilecEFList = arrayOf(
                 0x406.toChar(),
                 0x407.toChar(),
                 0x456.toChar(),
                 0x457.toChar(),
                 0x458.toChar()
+        )
+        internal val greekEFList = arrayOf(
+                0x390.toChar(),
+                0x399.toChar(),
+                0x3AA.toChar(),
+                0x3AF.toChar(),
+                0x3B9.toChar(),
+                0x3CA.toChar()
         )
 
         /**

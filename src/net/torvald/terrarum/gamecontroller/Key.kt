@@ -6,11 +6,16 @@ package net.torvald.terrarum.gamecontroller
 object Key {
 
     val RET = 28
-    val BKSP = 14
+    val BACKSPACE = 14
     val GRAVE = 41
     val TAB = 15
     val ESCAPE = 1
     val SPACE = 57
+    val CAPS_LOCK = 58
+    val L_CONTROL = 29
+    val L_COMMAND = 219 // Mac
+
+    val DELETE = 211
 
     val L_SHIFT = 42
     val R_SHIFT = 54
@@ -46,12 +51,12 @@ object Key {
     val NUM_9 = 10
     val NUM_0 = 11
 
+    // JInput is QWERTY-based
     val Q = 16
     val W = 17
     val E = 18
     val R = 19
     val T = 20
-
     val Y = 21
     val U = 22
     val I = 23
@@ -63,7 +68,6 @@ object Key {
     val D = 32
     val F = 33
     val G = 34
-
     val H = 35
     val J = 36
     val K = 37
@@ -75,7 +79,6 @@ object Key {
     val C = 46
     val V = 47
     val B = 48
-
     val N = 49
     val M = 50
 

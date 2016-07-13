@@ -42,7 +42,7 @@ object GameController {
         if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
             // test tile remove
             try {
-                Terrarum.ingame.map.setTileTerrain(mouseTileX, mouseTileY, TileNameCode.AIR)
+                Terrarum.ingame.world.setTileTerrain(mouseTileX, mouseTileY, TileNameCode.AIR)
                 // terrarum.game.map.setTileWall(mouseTileX, mouseTileY, TileNameCode.AIR);
             }
             catch (e: ArrayIndexOutOfBoundsException) {
@@ -52,7 +52,7 @@ object GameController {
         else if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
             // test tile place
             try {
-                Terrarum.ingame.map.setTileTerrain(mouseTileX, mouseTileY, Terrarum.ingame.player.actorValue.getAsInt("selectedtile")!!)
+                Terrarum.ingame.world.setTileTerrain(mouseTileX, mouseTileY, Terrarum.ingame.player.actorValue.getAsInt("selectedtile")!!)
             }
             catch (e: ArrayIndexOutOfBoundsException) {
             }

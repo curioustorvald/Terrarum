@@ -11,9 +11,9 @@ interface LandHolder {
      * Absolute tile index. index(x, y) = y * map.width + x
      * The arraylist will be saved in JSON format with GSON.
      */
-    var houseDesignation: ArrayList<Int>?
-    fun addHouseTile(x: Int, y: Int);
-    fun removeHouseTile(x: Int, y: Int);
-    fun clearHouseDesignation();
+    var houseDesignation: ArrayList<Long>?
+    fun addHouseTile(x: Int, y: Int)
+    fun removeHouseTile(x: Int, y: Int)
+    fun clearHouseDesignation()
 
 }

@@ -1,7 +1,7 @@
 package net.torvald.terrarum.tilestats
 
 import net.torvald.terrarum.gameactors.Player
-import net.torvald.terrarum.gamemap.GameMap
+import net.torvald.terrarum.gamemap.GameWorld
 import net.torvald.terrarum.gamemap.MapLayer
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
@@ -15,7 +15,7 @@ import java.util.Arrays
  */
 object TileStats {
 
-    private val tilestat = ShortArray(GameMap.TILES_SUPPORTED)
+    private val tilestat = ShortArray(GameWorld.TILES_SUPPORTED)
 
     private val TSIZE = MapDrawer.TILE_SIZE
 
@@ -27,7 +27,7 @@ object TileStats {
 
         // Get stats on no-zoomed screen area. In other words, will behave as if screen zoom were 1.0
         // no matter how the screen is zoomed.
-        val map = Terrarum.ingame.map
+        val map = Terrarum.ingame.world
         val player = Terrarum.ingame.player
 
         val renderWidth = FastMath.ceil(Terrarum.WIDTH.toFloat())

@@ -33,7 +33,7 @@ class TileAsItem(tileNum: Int) : InventoryItem {
         throw UnsupportedOperationException()
     }
 
-    override fun effectWhenThrownAway(gc: GameContainer, delta_t: Int) {
+    override fun effectWhenThrown(gc: GameContainer, delta_t: Int) {
         throw UnsupportedOperationException()
     }
 }

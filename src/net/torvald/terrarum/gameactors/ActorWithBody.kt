@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gamemap.GameMap
+import net.torvald.terrarum.gamemap.GameWorld
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import net.torvald.spriteanimation.SpriteAnimation
@@ -24,7 +24,7 @@ open class ActorWithBody : Actor(), Visible {
     @Transient var sprite: SpriteAnimation? = null
     @Transient var spriteGlow: SpriteAnimation? = null
 
-    @Transient private val map: GameMap = Terrarum.ingame.map
+    @Transient private val world: GameWorld = Terrarum.ingame.world
 
     var hitboxTranslateX: Double = 0.0// relative to spritePosX
     var hitboxTranslateY: Double = 0.0// relative to spritePosY
@@ -103,7 +103,13 @@ open class ActorWithBody : Actor(), Visible {
         set(value) { elasticity = 1.0 - value }
         get() = 1.0 - elasticity
 
-    private var density = 1000.0
+    var density = 1000.0
+        set(value) {
+            if (value < 0)
+                throw IllegalArgumentException("[ActorWithBody] $value: density cannot be negative.")
+
+            field = value
+        }
 
     /**
      * Flags and Properties
@@ -145,7 +151,7 @@ open class ActorWithBody : Actor(), Visible {
      * s^2 = 1/FPS = 1/60 if FPS is targeted to 60
      * meter to pixel : 24/FPS
      */
-    @Transient private val gravitation: Vector2 = map.gravitation
+    @Transient private val gravitation: Vector2 = world.gravitation
     @Transient val DRAG_COEFF_DEFAULT = 1.2
     /** Drag coefficient. Parachutes have much higher value than bare body (1.2) */
     private var DRAG_COEFF: Double
@@ -361,9 +367,15 @@ open class ActorWithBody : Actor(), Visible {
         }
     }
 
+    /**
+     * FIXME the culprit!
+     * (5566 -> no colliiding but player does not "sink")
+     * (5567 -> colliding)
+     * How to fix:
+     */
     private fun applyNormalForce() {
         if (!isNoCollideWorld) {
-            // axis Y
+            // axis Y. Use operand >=
             if (moveDelta.y >= 0.0) { // was moving downward?
                 if (isTouchingSide(nextHitbox, COLLIDING_BOTTOM)) { // actor hit something on its bottom
                     hitAndReflectY()
@@ -493,14 +505,14 @@ open class ActorWithBody : Actor(), Visible {
             }
         }
 
-        val txStart = x1.div(TSIZE).roundInt()
-        val txEnd = x2.div(TSIZE).roundInt()
-        val tyStart = y1.div(TSIZE).roundInt()
-        val tyEnd = y2.div(TSIZE).roundInt()
+        val txStart = x1.div(TSIZE).floorInt()
+        val txEnd =   x2.div(TSIZE).floorInt()
+        val tyStart = y1.div(TSIZE).floorInt()
+        val tyEnd =   y2.div(TSIZE).floorInt()
 
         for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
-                val tile = map.getTileFromTerrain(x, y)
+                val tile = world.getTileFromTerrain(x, y)
                 if (TilePropCodex.getProp(tile).isSolid)
                     return true
             }
@@ -537,14 +549,14 @@ open class ActorWithBody : Actor(), Visible {
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.div(TSIZE).roundInt()
-        val txEnd = x2.div(TSIZE).roundInt()
-        val tyStart = y1.div(TSIZE).roundInt()
-        val tyEnd = y2.div(TSIZE).roundInt()
+        val txStart = x1.plus(1.0).div(TSIZE).floorInt()
+        val txEnd =   x2.plus(1.0).div(TSIZE).floorInt()
+        val tyStart = y1.plus(1.0).div(TSIZE).floorInt()
+        val tyEnd =   y2.plus(1.0).div(TSIZE).floorInt()
 
         for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
-                val tile = map.getTileFromTerrain(x, y)
+                val tile = world.getTileFromTerrain(x, y)
                 if (TilePropCodex.getProp(tile).isSolid)
                     return true
             }
@@ -589,7 +601,7 @@ open class ActorWithBody : Actor(), Visible {
 
         for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
-                val tile = map.getTileFromTerrain(x, y)
+                val tile = world.getTileFromTerrain(x, y)
                 if (TilePropCodex.getProp(tile).isSolid)
                     return true
             }
@@ -629,7 +641,7 @@ open class ActorWithBody : Actor(), Visible {
             }
 
             // evaluate
-            if (TilePropCodex.getProp(map.getTileFromTerrain(tileX, tileY)).isFluid) {
+            if (TilePropCodex.getProp(world.getTileFromTerrain(tileX, tileY)).isFluid) {
                 contactAreaCounter += 1
             }
         }
@@ -727,7 +739,7 @@ open class ActorWithBody : Actor(), Visible {
             val tilePosXEnd = (hitbox.hitboxEnd.x / TSIZE).roundInt()
             val tilePosY = (hitbox.pointedY.plus(1) / TSIZE).roundInt()
             for (x in tilePosXStart..tilePosXEnd) {
-                val tile = map.getTileFromTerrain(x, tilePosY)
+                val tile = world.getTileFromTerrain(x, tilePosY)
                 val thisFriction = TilePropCodex.getProp(tile).friction
 
                 if (thisFriction > friction) friction = thisFriction
@@ -751,7 +763,7 @@ open class ActorWithBody : Actor(), Visible {
             val tilePosYEnd = (hitbox.hitboxEnd.y / TSIZE).roundInt()
             for (y in tilePosXStart..tilePosYEnd) {
                 for (x in tilePosXStart..tilePosXEnd) {
-                    val tile = map.getTileFromTerrain(x, y)
+                    val tile = world.getTileFromTerrain(x, y)
                     val prop = TilePropCodex.getProp(tile)
 
                     if (prop.isFluid && prop.density > density)
@@ -776,7 +788,7 @@ open class ActorWithBody : Actor(), Visible {
             val tilePosYEnd = (nextHitbox.hitboxEnd.y / TSIZE).roundInt()
             for (y in tilePosYStart..tilePosYEnd) {
                 for (x in tilePosXStart..tilePosXEnd) {
-                    val tile = map.getTileFromTerrain(x, y)
+                    val tile = world.getTileFromTerrain(x, y)
                     val thisFluidDensity = TilePropCodex.getProp(tile).density
 
                     if (thisFluidDensity > density) density = thisFluidDensity
@@ -849,8 +861,8 @@ open class ActorWithBody : Actor(), Visible {
     private fun clampW(x: Double): Double =
         if (x < TSIZE + nextHitbox.width / 2) {
             TSIZE + nextHitbox.width / 2
-        } else if (x >= (map.width * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.width / 2) {
-            (map.width * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.width / 2
+        } else if (x >= (world.width * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.width / 2) {
+            (world.width * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.width / 2
         } else {
             x
         }
@@ -858,39 +870,21 @@ open class ActorWithBody : Actor(), Visible {
     private fun clampH(y: Double): Double =
         if (y < TSIZE + nextHitbox.height) {
             TSIZE + nextHitbox.height
-        } else if (y >= (map.height * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.height) {
-            (map.height * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.height
+        } else if (y >= (world.height * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.height) {
+            (world.height * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.height
         } else {
             y
         }
 
     private fun clampWtile(x: Int): Int =
-        if (x < 0) {
-            0
-        } else if (x >= map.width) {
-            map.width - 1
-        } else {
-            x
-        }
+            if (x < 0) 0 else if (x >= world.width) world.width - 1 else x
 
     private fun clampHtile(x: Int): Int =
-        if (x < 0) {
-            0
-        } else if (x >= map.height) {
-            map.height - 1
-        } else {
-            x
-        }
+            if (x < 0) 0 else if (x >= world.height) world.height - 1 else x
+
 
     private val isPlayerNoClip: Boolean
         get() = this is Player && this.isNoClip()
-
-    fun setDensity(density: Int) {
-        if (density < 0)
-            throw IllegalArgumentException("[ActorWithBody] $density: density cannot be negative.")
-
-        this.density = density.toDouble()
-    }
 
     private val AUTO_CLIMB_RATE: Int
         get() = Math.min(TSIZE / 8 * Math.sqrt(scale), TSIZE.toDouble()).toInt()
@@ -907,6 +901,17 @@ open class ActorWithBody : Actor(), Visible {
             if      (this > 0 && this > limit)   limit
             else if (this < 0 && this < -limit) -limit
             else this
+    fun Double.floorSpecial(): Int {
+        val threshold = 1.1 / TSIZE.toDouble()
+        // the idea is 321.0625 would rounded to 321, 320.9375 would rounded to 321,
+        // and regular flooring for otherwise.
+        if (this % TSIZE.toDouble() <= threshold) // case: 321.0625
+            return this.floorInt()
+        else if (1.0 - this.mod(TSIZE.toDouble()) <= threshold) // case: 320.9375
+            return this.floorInt() + 1
+        else
+            return this.floorInt()
+    }
 
     private fun assertInit() {
         // errors
@@ -929,8 +934,8 @@ open class ActorWithBody : Actor(), Visible {
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
                 return 0
-            else if (x >= Terrarum.ingame.map.width shl 4)
-                return Terrarum.ingame.map.width - 1
+            else if (x >= Terrarum.ingame.world.width shl 4)
+                return Terrarum.ingame.world.width - 1
             else
                 return x and 0x7FFFFFFF shr 4
         }
@@ -938,8 +943,8 @@ open class ActorWithBody : Actor(), Visible {
         private fun div16TruncateToMapHeight(y: Int): Int {
             if (y < 0)
                 return 0
-            else if (y >= Terrarum.ingame.map.height shl 4)
-                return Terrarum.ingame.map.height - 1
+            else if (y >= Terrarum.ingame.world.height shl 4)
+                return Terrarum.ingame.world.height - 1
             else
                 return y and 0x7FFFFFFF shr 4
         }

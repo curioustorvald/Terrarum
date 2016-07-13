@@ -1,6 +1,8 @@
 package net.torvald.terrarum.gameactors
 
 /**
+ * See [res/raw/Creature_raw_doc.md] for information about raw.
+ *
  * Created by minjaesong on 16-04-02.
  */
 object AVKey {

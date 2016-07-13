@@ -46,6 +46,10 @@ constructor() : GameFontBase() {
                 "./res/graphics/fonts/wenquanyi_11pt_part1.png", 16, 18, 2)
         GameFontBase.wenQuanYi_2 = SpriteSheet(
                 "./res/graphics/fonts/wenquanyi_11pt_part2.png", 16, 18, 2)
+        GameFontBase.greekSheet = SpriteSheet(
+                "./res/graphics/fonts/greek_majuscule.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
+        GameFontBase.greekSheetEF = SpriteSheet(
+                "./res/graphics/fonts/greek_ef.png", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
 
         val shk = arrayOf(
                 GameFontBase.asciiSheet,
@@ -62,7 +66,10 @@ constructor() : GameFontBase() {
                 GameFontBase.fullwidthForms,
                 GameFontBase.uniPunct,
                 GameFontBase.wenQuanYi_1,
-                GameFontBase.wenQuanYi_2)//, uniHan
+                GameFontBase.wenQuanYi_2, // uniHan
+                GameFontBase.greekSheet,
+                GameFontBase.greekSheetEF
+        )
         GameFontBase.sheetKey = shk
     }
 

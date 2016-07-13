@@ -5,6 +5,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamemap.WorldTime
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
+import net.torvald.terrarum.weather.WeatherMixer
 
 /**
  * Created by minjaesong on 16-06-16.
@@ -92,8 +93,8 @@ object TilePropUtil {
     fun getDynamicLumFunc(baseLum: Int, type: Int): Int {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
-            2    -> Terrarum.ingame.map.globalLight // current global light
-            3    -> Terrarum.ingame.globalLightByTime(WorldTime.DAY_LENGTH / 2) // daylight at noon
+            2    -> Terrarum.ingame.world.globalLight // current global light
+            3    -> WeatherMixer.getGlobalLightOfTime(WorldTime.DAY_LENGTH / 2).toInt() // daylight at noon
             4    -> getSlowBreath(baseLum)
             5    -> getPulsate(baseLum)
             else -> baseLum

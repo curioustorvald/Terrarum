@@ -1,0 +1,8 @@
+{
+  "globalLight": "generic_light.png",
+  "skyboxGradColourMap": "generic_skybox.png",
+  "classification": "generic",
+  "extraImages": [
+
+  ]
+}

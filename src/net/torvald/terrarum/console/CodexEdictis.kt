@@ -1,8 +1,7 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.StateInGame
+import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.ui.ConsoleWindow
 
 import java.util.Formatter
 
@@ -10,6 +9,9 @@ import java.util.Formatter
  * Created by minjaesong on 16-01-16.
  */
 class CodexEdictis : ConsoleCommand {
+
+    val ccW = GameFontBase.colToCode["o"]
+
     override fun execute(args: Array<String>) {
         if (args.size == 1) {
             printList()
@@ -23,7 +25,7 @@ class CodexEdictis : ConsoleCommand {
                 val sb = StringBuilder()
                 val formatter = Formatter(sb)
 
-                Echo().execute("Codex: " + formatter.format(Lang.get("DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN"), args[1]).toString())
+                Echo().execute("Codex: " + formatter.format(Lang["DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN"], args[1]).toString())
             }
 
         }
@@ -38,8 +40,11 @@ class CodexEdictis : ConsoleCommand {
 
     private fun printList() {
         val echo = Echo()
-        echo.execute(Lang.get("DEV_MESSAGE_CONSOLE_AVAILABLE_COMMANDS"))
-        CommandDict.dict.keys.forEach { s -> echo.execute("• " + s) }
+        echo.execute(Lang["DEV_MESSAGE_CONSOLE_AVAILABLE_COMMANDS"])
+        CommandDict.dict.forEach { name, cmd ->
+            echo.execute("$ccW• " + name)
+            cmd.printUsage()
+        }
     }
 
 }

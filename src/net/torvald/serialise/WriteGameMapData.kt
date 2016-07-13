@@ -1,6 +1,6 @@
 package net.torvald.serialise
 
-import net.torvald.terrarum.gamemap.GameMap
+import net.torvald.terrarum.gamemap.GameWorld
 import net.torvald.terrarum.Terrarum
 import java.io.IOException
 import java.nio.file.Files
@@ -29,14 +29,14 @@ object WriteGameMapData {
         val path = Paths.get("${Terrarum.defaultSaveDir}" +
                                        "/$saveDirectoryName/${WriteMeta.META_FILENAME}")
         val tempPath = Files.createTempFile(path.toString(), "_temp")
-        val map = Terrarum.ingame.map
+        val map = Terrarum.ingame.world
 
         // TODO gzip
 
         // write binary
         Files.write(tempPath, MAGIC)
-        Files.write(tempPath, byteArrayOf(GameMap.BITS))
-        Files.write(tempPath, byteArrayOf(GameMap.LAYERS))
+        Files.write(tempPath, byteArrayOf(GameWorld.BITS))
+        Files.write(tempPath, byteArrayOf(GameWorld.LAYERS))
         Files.write(tempPath, byteArrayOf(BYTE_NULL))
         Files.write(tempPath, byteArrayOf(BYTE_NULL))
         Files.write(tempPath, toByteArray(map.width))

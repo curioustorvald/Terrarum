@@ -7,8 +7,6 @@ import net.torvald.terrarum.gameitem.InventoryItem
  */
 interface CanBeAnItem {
 
-    fun attachItemData()
-
     fun getItemWeight(): Double
 
     fun stopUpdateAndDraw()

@@ -25,7 +25,7 @@ interface InventoryItem {
     var scale: Double
 
     /**
-     * Effects applied while in pocket
+     * Effects applied continuously while in pocket
      * @param gc
      * *
      * @param delta_t
@@ -41,7 +41,7 @@ interface InventoryItem {
     fun effectWhenPickedUp(gc: GameContainer, delta_t: Int)
 
     /**
-     * Effects applied while primary button (usually left mouse button) is down
+     * Effects applied (continuously or not) while primary button (usually left mouse button) is down
      * @param gc
      * *
      * @param delta_t
@@ -49,7 +49,7 @@ interface InventoryItem {
     fun primaryUse(gc: GameContainer, delta_t: Int)
 
     /**
-     * Effects applied while secondary button (usually right mouse button) is down
+     * Effects applied (continuously or not) while secondary button (usually right mouse button) is down
      * @param gc
      * *
      * @param delta_t
@@ -62,5 +62,5 @@ interface InventoryItem {
      * *
      * @param delta_t
      */
-    fun effectWhenThrownAway(gc: GameContainer, delta_t: Int)
+    fun effectWhenThrown(gc: GameContainer, delta_t: Int)
 }
