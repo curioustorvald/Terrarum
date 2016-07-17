@@ -100,13 +100,13 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
         return this
     }
 
-    fun snapToPixel(): Hitbox {
+    /*fun snapToPixel(): Hitbox {
         hitboxStart.x = Math.round(hitboxStart.x - HALF_PIXEL).toDouble()
         hitboxStart.y = Math.round(hitboxStart.y - HALF_PIXEL).toDouble()
         hitboxEnd.x = Math.round(hitboxEnd.x - HALF_PIXEL).toDouble()
         hitboxEnd.y = Math.round(hitboxEnd.y - HALF_PIXEL).toDouble()
         return this
-    }
+    }*/
 
     /**
      * Returns x value of start point

@@ -117,7 +117,7 @@ class StateMonitorCheck : BasicGameState() {
                     this, g
             )
 
-            (1..10).forEach {
+            (1..12).forEach {
                 Typesetter.printCentered(
                         Lang["MENU_MONITOR_CALI_LABEL_$it"],
                         instructionY + it.minus(2).times(g.font.lineHeight),

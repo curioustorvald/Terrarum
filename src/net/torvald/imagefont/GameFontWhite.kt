@@ -50,6 +50,12 @@ constructor() : GameFontBase() {
                 "./res/graphics/fonts/greek_majuscule.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.greekSheetEF = SpriteSheet(
                 "./res/graphics/fonts/greek_ef.png", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
+        GameFontBase.romanianSheet = SpriteSheet(
+                "./res/graphics/fonts/romana_majuscule.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
+        GameFontBase.romanianSheetEF = SpriteSheet(
+                "./res/graphics/fonts/romana_ef.png", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
+        GameFontBase.thaiSheet = SpriteSheet(
+                "./res/graphics/fonts/thai_fullwidth.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
 
         val shk = arrayOf(
                 GameFontBase.asciiSheet,
@@ -60,7 +66,7 @@ constructor() : GameFontBase() {
                 GameFontBase.extASheetEF,
                 GameFontBase.kanaSheet,
                 GameFontBase.cjkPunct,
-                GameFontBase.asciiSheet, // Filler
+                null, // Filler
                 GameFontBase.cyrilic,
                 GameFontBase.cyrilicEF,
                 GameFontBase.fullwidthForms,
@@ -68,19 +74,12 @@ constructor() : GameFontBase() {
                 GameFontBase.wenQuanYi_1,
                 GameFontBase.wenQuanYi_2, // uniHan
                 GameFontBase.greekSheet,
-                GameFontBase.greekSheetEF
+                GameFontBase.greekSheetEF,
+                GameFontBase.romanianSheet,
+                GameFontBase.romanianSheetEF,
+                GameFontBase.thaiSheet,
+                null // Filler
         )
         GameFontBase.sheetKey = shk
-    }
-
-    @Throws(SlickException::class)
-    override fun reloadUnihan() {
-        /*uniHan = new SpriteSheet(
-                "./res/graphics/fonts/unifont_unihan"
-                        + ((!terrarum.gameLocale.contains("zh"))
-                           ? "_ja" : "")
-                        +".png"
-                , W_UNIHAN, H_UNIHAN
-        );*/
     }
 }

@@ -9,5 +9,7 @@
   "MENU_MONITOR_CALI_LABEL_7":  "On a good monitor, you should see roughly equal steps in brightness",
   "MENU_MONITOR_CALI_LABEL_8":  "over the full 1 to 32 range",
   "MENU_MONITOR_CALI_LABEL_9":  " ",
-  "MENU_MONITOR_CALI_LABEL_10": "Adjust the contrast and brightness setting of the monitor to improve the image"
+  "MENU_MONITOR_CALI_LABEL_10": "Adjust the contrast and brightness setting of your monitor to improve the image",
+  "MENU_MONITOR_CALI_LABEL_11": " ",
+  "MENU_MONITOR_CALI_LABEL_12": " "
 }

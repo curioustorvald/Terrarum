@@ -71,14 +71,28 @@ constructor() : Font {
     private fun isWenQuanYi2(c: Char) = c.toInt() >= 0x69FD && c.toInt() <= 0x9FDC
     private fun isGreek(c: Char) = c.toInt() >= 0x370 && c.toInt() <= 0x3CE
     private fun isGreekEF(c: Char) = greekEFList.contains(c)
+    private fun isRomanian(c: Char) = c.toInt() >= 0x218 && c.toInt() <= 0x21A
+    private fun isRomanianEF(c: Char) = c.toInt() == 0x21B
+    private fun isThai(c: Char) = c.toInt() >= 0xE00 && c.toInt() <= 0xE7F
+    private fun isThaiDiacritics(c: Char) = (c.toInt() >= 0xE34 && c.toInt() <= 0xE3A)
+            || (c.toInt() >= 0xE47 && c.toInt() <= 0xE4E)
+            || (c.toInt() == 0xE31)
+    private fun isThaiEF(c: Char) = c.toInt() == 0xE40
 
 
 
     private fun asciiEFindexX(c: Char) = asciiEFList.indexOf(c) % 16
     private fun asciiEFindexY(c: Char) = asciiEFList.indexOf(c) / 16
 
-    private fun extAEFindexX(c: Char) = extAEFList.indexOf(c) % 16
-    private fun extAEFindexY(c: Char) = extAEFList.indexOf(c) / 16
+    private fun extAindexX(c: Char) = (c.toInt() - 0x100) % 16
+    private fun extAindexY(c: Char) = (c.toInt() - 0x100) / 16
+
+    private fun extAEFindexX(c: Char) =
+            if (isThaiEF(c)) 3  // thai เ
+            else extAEFList.indexOf(c) % 16
+    private fun extAEFindexY(c: Char) =
+            if (isThaiEF(c)) 0  // thai เ
+            else extAEFList.indexOf(c) / 16
 
     private fun runicIndexX(c: Char) = runicList.indexOf(c) % 16
     private fun runicIndexY(c: Char) = runicList.indexOf(c) / 16
@@ -115,12 +129,21 @@ constructor() : Font {
     private fun greekEFIndexX(c: Char) = greekEFList.indexOf(c) % 16
     private fun greekEFIndexY(c: Char) = greekEFList.indexOf(c) / 16
 
+    private fun romanianIndexX(c: Char) = c.toInt() - 0x218
+    private fun romanianIndexY(c: Char) = 0
+
+    private fun thaiIndexX(c: Char) = (c.toInt() - 0xE00) % 16
+    private fun thaiIndexY(c: Char) = (c.toInt() - 0xE00) / 16
+
+    private fun thaiEFIndexX(c: Char) = 3
+    private fun thaiEFIndexY(c: Char) = 0
 
     private val narrowWidthSheets = arrayOf(
             SHEET_ASCII_EF,
             SHEET_EXTA_EF,
             SHEET_CYRILIC_EF,
-            SHEET_GREEK_EF
+            SHEET_GREEK_EF,
+            SHEET_EXTB_ROMANIAN_EF
     )
     private val unihanWidthSheets = arrayOf(
             SHEET_UNIHAN,
@@ -169,17 +192,19 @@ constructor() : Font {
                 len += W_CJK
             else if (unihanWidthSheets.contains(ctype))
                 len += W_UNIHAN
+            else if (isThaiDiacritics(s[i]))
+                len = len // set width of the glyph as -W_LATIN_WIDE
             else
                 len += W_LATIN_WIDE
 
             if (i < endIndex - 1) len += interchar
         }
-        return len
+        return len * scale
     }
 
-    override fun getHeight(s: String) = H
+    override fun getHeight(s: String) = H * scale
 
-    override fun getLineHeight() = H
+    override fun getLineHeight() = H * scale
 
     override fun drawString(x: Float, y: Float, s: String) = drawString(x, y, s, Color.white)
 
@@ -236,17 +261,17 @@ constructor() : Font {
                 hangulSheet.getSubImage(indexCho, choRow).draw(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
-                        thisCol
+                        scale.toFloat(), thisCol
                 )
                 hangulSheet.getSubImage(indexJung, jungRow).draw(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
-                        thisCol
+                        scale.toFloat(), thisCol
                 )
                 hangulSheet.getSubImage(indexJong, jongRow).draw(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
-                        thisCol
+                        scale.toFloat(), thisCol
                 )
             }
         }
@@ -294,7 +319,7 @@ constructor() : Font {
                 wenQuanYi_1.getSubImage(wenQuanYiIndexX(ch), wenQuanYi1IndexY(ch)).draw(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round((H - H_UNIHAN) / 2 + y).toFloat(),
-                        thisCol
+                        scale.toFloat(), thisCol
                 )
             }
         }
@@ -322,7 +347,7 @@ constructor() : Font {
                 wenQuanYi_2.getSubImage(wenQuanYiIndexX(ch), wenQuanYi2IndexY(ch)).draw(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round((H - H_UNIHAN) / 2 + y).toFloat(),
-                        thisCol
+                        scale.toFloat(), thisCol
                 )
             }
         }
@@ -364,8 +389,8 @@ constructor() : Font {
                         sheetY = runicIndexY(ch)
                     }
                     SHEET_EXTA_EM    -> {
-                        sheetX = (ch.toInt() - 0x100) % 16
-                        sheetY = (ch.toInt() - 0x100) / 16
+                        sheetX = extAindexX(ch)
+                        sheetY = extAindexY(ch)
                     }
                     SHEET_KANA       -> {
                         sheetX = kanaIndexX(ch)
@@ -399,6 +424,18 @@ constructor() : Font {
                         sheetX = greekEFIndexX(ch)
                         sheetY = greekEFIndexY(ch)
                     }
+                    SHEET_EXTB_ROMANIAN_EM -> {
+                        sheetX = romanianIndexX(ch)
+                        sheetY = romanianIndexY(ch)
+                    }
+                    SHEET_EXTB_ROMANIAN_EF -> {
+                        sheetX = 0
+                        sheetY = 0
+                    }
+                    SHEET_THAI_EM    -> {
+                        sheetX = thaiIndexX(ch)
+                        sheetY = thaiIndexY(ch)
+                    }
                     else             -> {
                         sheetX = ch.toInt() % 16
                         sheetY = ch.toInt() / 16
@@ -415,7 +452,7 @@ constructor() : Font {
                             else 0,
                             sheetX, sheetY
                     )*/
-                    sheetKey[prevInstance].getSubImage(sheetX, sheetY).draw(
+                    sheetKey[prevInstance]!!.getSubImage(sheetX, sheetY).draw(
                             Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat() // Interchar: pull punct right next to hangul to the left
                             + if (i > 0 && isHangul(s[i - 1])) -3f
                             else 0f,
@@ -424,7 +461,7 @@ constructor() : Font {
                             else if (prevInstance == SHEET_FW_UNI) (H - H_HANGUL) / 2
                             else 0).toFloat(),
 
-                            thisCol
+                            scale.toFloat(), thisCol
                     )
                 }
                 catch (e: ArrayIndexOutOfBoundsException) {
@@ -454,6 +491,10 @@ constructor() : Font {
             return SHEET_CYRILIC_EF
         else if (isGreekEF(c))
             return SHEET_GREEK_EF
+        else if (isRomanianEF(c))
+            return SHEET_EXTB_ROMANIAN_EF
+        else if (isThaiEF(c))
+            return SHEET_EXTA_EF // will use fourth glyph in EXTA_EF
         else if (isRunic(c))
             return SHEET_RUNIC
         else if (isHangul(c))
@@ -476,6 +517,10 @@ constructor() : Font {
             return SHEET_FW_UNI
         else if (isGreek(c))
             return SHEET_GREEK_EM
+        else if (isRomanian(c))
+            return SHEET_EXTB_ROMANIAN_EM
+        else if (isThai(c))
+            return SHEET_THAI_EM
         else if (c.isColourCode())
             return SHEET_COLOURCODE
         else
@@ -504,19 +549,6 @@ constructor() : Font {
         val printedBody = s.substring(startIndex, endIndex)
         val xoff = getWidth(unprintedHead)
         drawString(x + xoff, y, printedBody, color)
-    }
-
-    @Throws(SlickException::class)
-    open fun reloadUnihan() {
-
-    }
-
-    /**
-     * Set margin between characters
-     * @param margin
-     */
-    fun setInterchar(margin: Int) {
-        interchar = margin
     }
 
     private fun setBlendModeMul() {
@@ -550,6 +582,9 @@ constructor() : Font {
         lateinit internal var wenQuanYi_2: SpriteSheet
         lateinit internal var greekSheet: SpriteSheet
         lateinit internal var greekSheetEF: SpriteSheet
+        lateinit internal var romanianSheet: SpriteSheet
+        lateinit internal var romanianSheetEF: SpriteSheet
+        lateinit internal var thaiSheet: SpriteSheet
 
         internal val JUNG_COUNT = 21
         internal val JONG_COUNT = 28
@@ -580,9 +615,13 @@ constructor() : Font {
         internal val SHEET_WENQUANYI_2 = 14
         internal val SHEET_GREEK_EM = 15
         internal val SHEET_GREEK_EF = 16
+        internal val SHEET_EXTB_ROMANIAN_EM = 17
+        internal val SHEET_EXTB_ROMANIAN_EF = 18
+        internal val SHEET_THAI_EM = 19
+        internal val SHEET_THAI_EF = 20
         internal val SHEET_COLOURCODE = 255
 
-        lateinit internal var sheetKey: Array<SpriteSheet>
+        lateinit internal var sheetKey: Array<SpriteSheet?>
         internal val asciiEFList = arrayOf(' ', '!', '"', '\'', '(', ')', ',', '.', ':', ';', 'I', '[', ']', '`', 'f', 'i', 'j', 'l', 't', '{', '|', '}', 0xA1.toChar(), 'Ì', 'Í', 'Î', 'Ï', 'ì', 'í', 'î', 'ï', '·')
         internal val extAEFList = arrayOf(
                 0x12E.toChar(),
@@ -632,6 +671,11 @@ constructor() : Font {
         internal val runicList = arrayOf('ᚠ', 'ᚢ', 'ᚦ', 'ᚬ', 'ᚱ', 'ᚴ', 'ᚼ', 'ᚾ', 'ᛁ', 'ᛅ', 'ᛋ', 'ᛏ', 'ᛒ', 'ᛘ', 'ᛚ', 'ᛦ', 'ᛂ', '᛬', '᛫', '᛭', 'ᛮ', 'ᛯ', 'ᛰ')
 
         internal var interchar = 0
+        internal var scale = 1
+            set(value) {
+                if (value > 0) field = value
+                else throw IllegalArgumentException("Font scale cannot be zero or negative (input: $value)")
+            }
 
         val colourKey = hashMapOf(
                 Pair(0x10.toChar(), Color(0xFFFFFF)), //*w hite

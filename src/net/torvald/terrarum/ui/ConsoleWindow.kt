@@ -28,10 +28,10 @@ class ConsoleWindow : UICanvas, UITypable {
     private var commandHistory = HistoryArray<String>(COMMAND_HISTORY_MAX)
 
     private val LINE_HEIGHT = 20
-    private val MESSAGES_DISPLAY_COUNT = 9
+    private val MESSAGES_DISPLAY_COUNT = 11
 
     override var width: Int = Terrarum.WIDTH
-    override var height: Int = 200
+    override var height: Int = LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT + 1)
 
     override var openCloseTime: Int = 0
 
