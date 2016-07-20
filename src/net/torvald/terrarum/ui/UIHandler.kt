@@ -35,10 +35,10 @@ constructor(val UI: UICanvas) {
     private val UIGraphicInstance: Graphics
     private val UIDrawnCanvas: Image
 
-    private var opening = false
-    private var closing = false
-    private var opened = false // fully opened
-    var visible: Boolean = false
+    var isOpening = false
+    var isClosing = false
+    var isOpened = false // fully opened
+    var isVisible: Boolean = false
         get() = if (alwaysVisible) true
                 else field
         set(value) {
@@ -48,6 +48,9 @@ constructor(val UI: UICanvas) {
             field = value
         }
 
+    var opacity = 1f
+    var scale = 1f
+
     var openCloseCounter = 0
 
     init {
@@ -56,18 +59,19 @@ constructor(val UI: UICanvas) {
         UIDrawnCanvas = Image(
                 //FastMath.nearestPowerOfTwo(UI.width), FastMath.nearestPowerOfTwo(UI.height))
                 UI.width, UI.height)
+        UIDrawnCanvas.filter = Image.FILTER_LINEAR
 
         UIGraphicInstance = UIDrawnCanvas.graphics
     }
 
 
     fun update(gc: GameContainer, delta: Int) {
-        if (visible || alwaysVisible) {
+        if (isVisible || alwaysVisible) {
             UI.update(gc, delta)
         }
 
-        if (opening) {
-            visible = true
+        if (isOpening) {
+            isVisible = true
             openCloseCounter += delta
 
             // println("UI ${UI.javaClass.simpleName} (open)")
@@ -79,12 +83,12 @@ constructor(val UI: UICanvas) {
             }
             else {
                 UI.endOpening(gc, delta)
-                opening = false
-                opened = true
+                isOpening = false
+                isOpened = true
                 openCloseCounter = 0
             }
         }
-        else if (closing) {
+        else if (isClosing) {
             openCloseCounter += delta
 
             // println("UI ${UI.javaClass.simpleName} (close)")
@@ -96,32 +100,37 @@ constructor(val UI: UICanvas) {
             }
             else {
                 UI.endClosing(gc, delta)
-                closing = false
-                opened = false
-                visible = false
+                isClosing = false
+                isOpened = false
+                isVisible = false
                 openCloseCounter = 0
             }
         }
     }
 
-    fun render(gc: GameContainer, sbg: StateBasedGame, gameGraphicInstance: Graphics) {
-        if (visible || alwaysVisible) {
+    fun render(gc: GameContainer, sbg: StateBasedGame, ingameGraphics: Graphics) {
+        if (isVisible || alwaysVisible) {
             UIGraphicInstance.clear()
             UIGraphicInstance.font = Terrarum.gameFont
 
+            UIGraphicInstance.setAntiAlias(true)
+
             UI.render(gc, UIGraphicInstance)
             if (sbg.currentStateID == Terrarum.SCENE_ID_GAME) {
-                gameGraphicInstance.drawImage(UIDrawnCanvas,
-                        posX + MapCamera.cameraX * Terrarum.ingame.screenZoom,
-                        posY + MapCamera.cameraY * Terrarum.ingame.screenZoom
+                ingameGraphics.drawImage(UIDrawnCanvas.getScaledCopy(scale),
+                        posX + MapCamera.cameraX * Terrarum.ingame.screenZoom - (UI.width / 2f * scale.minus(1)),
+                        posY + MapCamera.cameraY * Terrarum.ingame.screenZoom - (UI.height / 2f * scale.minus(1)),
+                        Color(1f, 1f, 1f, opacity)
                 )// compensate for screenZoom AND camera translation
                 // (see Game.render -> g.translate())
             }
             else {
-                gameGraphicInstance.drawImage(UIDrawnCanvas,
-                        posX.toFloat(),
-                        posY.toFloat()
+                ingameGraphics.drawImage(UIDrawnCanvas.getScaledCopy(scale),
+                        posX.toFloat() - (UI.width / 2f * scale.minus(1)),
+                        posY.toFloat() - (UI.height / 2f * scale.minus(1)),
+                        Color(1f, 1f, 1f, opacity)
                 )
+
             }
         }
     }
@@ -133,10 +142,10 @@ constructor(val UI: UICanvas) {
 
     fun setAsAlwaysVisible() {
         alwaysVisible = true
-        visible = true
-        opened = true
-        opening = false
-        closing = false
+        isVisible = true
+        isOpened = true
+        isOpening = false
+        isClosing = false
     }
 
     /**
@@ -146,8 +155,10 @@ constructor(val UI: UICanvas) {
         if (alwaysVisible) {
             throw RuntimeException("[UIHandler] Tried to 'open' constant UI")
         }
-        opened = false
-        opening = true
+        if (!isOpened && !isVisible) {
+            isOpened = false
+            isOpening = true
+        }
     }
 
     /**
@@ -157,82 +168,82 @@ constructor(val UI: UICanvas) {
         if (alwaysVisible) {
             throw RuntimeException("[UIHandler] Tried to 'close' constant UI")
         }
-        opened = false
-        closing = true
+        isOpened = false
+        isClosing = true
     }
 
     fun toggleOpening() {
         if (alwaysVisible) {
             throw RuntimeException("[UIHandler] Tried to 'toggle opening of' constant UI")
         }
-        if (visible) {
-            if (!closing) {
+        if (isVisible) {
+            if (!isClosing) {
                 setAsClosing()
             }
         }
         else {
-            if (!opening) {
+            if (!isOpening) {
                 setAsOpening()
             }
         }
     }
 
     fun processInput(input: Input) {
-        if (visible) {
+        if (isVisible) {
             UI.processInput(input)
         }
     }
 
     fun keyPressed(key: Int, c: Char) {
-        if (visible && UI is UITypable) {
+        if (isVisible && UI is UITypable) {
             UI.keyPressed(key, c)
         }
     }
 
     fun keyReleased(key: Int, c: Char) {
-        if (visible && UI is UITypable) {
+        if (isVisible && UI is UITypable) {
             UI.keyReleased(key, c)
         }
     }
 
     fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        if (visible && UI is UIClickable) {
+        if (isVisible && UI is UIClickable) {
             UI.mouseMoved(oldx, oldy, newx, newy)
         }
     }
 
     fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        if (visible && UI is UIClickable) {
+        if (isVisible && UI is UIClickable) {
             UI.mouseDragged(oldx, oldy, newx, newy)
         }
     }
 
     fun mousePressed(button: Int, x: Int, y: Int) {
-        if (visible && UI is UIClickable) {
+        if (isVisible && UI is UIClickable) {
             UI.mousePressed(button, x, y)
         }
     }
 
     fun mouseReleased(button: Int, x: Int, y: Int) {
-        if (visible && UI is UIClickable) {
+        if (isVisible && UI is UIClickable) {
             UI.mouseReleased(button, x, y)
         }
     }
 
     fun mouseWheelMoved(change: Int) {
-        if (visible && UI is UIClickable) {
+        if (isVisible && UI is UIClickable) {
             UI.mouseWheelMoved(change)
         }
     }
 
     fun controllerButtonPressed(controller: Int, button: Int) {
-        if (visible && UI is UIClickable) {
+        if (isVisible && UI is UIClickable) {
             UI.controllerButtonPressed(controller, button)
         }
     }
 
     fun controllerButtonReleased(controller: Int, button: Int) {
-        if (visible && UI is UIClickable) {
+        if (isVisible && UI is UIClickable) {
             UI.controllerButtonReleased(controller, button)
         }
     }
@@ -243,6 +254,6 @@ constructor(val UI: UICanvas) {
             if (alwaysVisible) {
                 return false
             }
-            return visible && !opening
+            return isVisible && !isOpening
         }
 }

@@ -52,10 +52,20 @@ open class ActorWithBody : Actor(), Visible {
     var veloY: Double
         get() = velocity.y
         private set(value) { velocity.y = value }
-    var walkX: Double = 0.0
-    var walkY: Double = 0.0
+
     val moveDelta = Vector2(0.0, 0.0)
     @Transient private val VELO_HARD_LIMIT = 100.0
+
+    /**
+     * for "Controllable" actors
+     */
+    var controllerVel: Vector2? = if (this is Controllable) Vector2() else null
+    var walkX: Double
+        get() = controllerVel!!.x
+        internal set(value) { controllerVel!!.x = value }
+    var walkY: Double
+        get() = controllerVel!!.x
+        internal set(value) { controllerVel!!.x = value }
 
     /**
      * Physical properties.
@@ -281,7 +291,7 @@ open class ActorWithBody : Actor(), Visible {
              * Actual physics thing (altering velocity) starts from here
              */
 
-            applyControllerMovement()
+            applyMovementVelocity()
 
             // applyBuoyancy()
 
@@ -298,13 +308,14 @@ open class ActorWithBody : Actor(), Visible {
                 // Set 'next' position (hitbox) from canonical and walking velocity
                 setNewNextHitbox()
 
+                applyNormalForce()
                 /**
                  * solveCollision()?
                  * If and only if:
                  *     This body is NON-STATIC and the other body is STATIC
                  */
+                setNewNextHitbox()
                 displaceByCCD()
-                applyNormalForce()
 
                 setHorizontalFriction()
                 if (isPlayerNoClip) // or hanging on the rope, etc.
@@ -317,25 +328,41 @@ open class ActorWithBody : Actor(), Visible {
                 clampHitbox()
             }
 
-            // useless
-            walledLeft =  false//isColliding(hitbox, COLLIDING_LEFT)
-            walledRight = false//isColliding(hitbox, COLLIDING_RIGHT)
+            // cheap solution for sticking into the wall while Left or Right is held
+            walledLeft =  false//isTouchingSide(hitbox, COLLIDING_LEFT)
+            walledRight = false//isTouchingSide(hitbox, COLLIDING_RIGHT)
         }
     }
 
-    private fun applyControllerMovement() {
-        // decide whether ignore walkX
-        if (!(isCollidingSide(hitbox, COLLIDING_LEFT) && walkX < 0)
-            || !(isCollidingSide(hitbox, COLLIDING_RIGHT) && walkX > 0)
-        ) {
-            moveDelta.x = veloX + walkX
-        }
+    private fun applyMovementVelocity() {
+        if (this is Controllable) {
+            // decide whether to ignore walkX
+            if (!(isCollidingSide(hitbox, COLLIDING_LEFT) && walkX < 0)
+                || !(isCollidingSide(hitbox, COLLIDING_RIGHT) && walkX > 0)
+            ) {
+                moveDelta.x = veloX + walkX
+            }
 
-        // decide whether ignore walkY
-        if (!(isCollidingSide(hitbox, COLLIDING_TOP) && walkY < 0)
-            || !(isCollidingSide(hitbox, COLLIDING_BOTTOM) && walkY > 0)
-        ) {
-            moveDelta.y = veloY + walkY
+            // decide whether to ignore walkY
+            if (!(isCollidingSide(hitbox, COLLIDING_TOP) && walkY < 0)
+                || !(isCollidingSide(hitbox, COLLIDING_BOTTOM) && walkY > 0)
+            ) {
+                moveDelta.y = veloY + walkY
+            }
+        }
+        else {
+            if (!isCollidingSide(hitbox, COLLIDING_LEFT)
+                || !isCollidingSide(hitbox, COLLIDING_RIGHT)
+            ) {
+                moveDelta.x = veloX
+            }
+
+            // decide whether to ignore walkY
+            if (!isCollidingSide(hitbox, COLLIDING_TOP)
+                || !isCollidingSide(hitbox, COLLIDING_BOTTOM)
+            ) {
+                moveDelta.y = veloY
+            }
         }
     }
 
@@ -369,16 +396,19 @@ open class ActorWithBody : Actor(), Visible {
 
     /**
      * FIXME the culprit!
-     * (5566 -> no colliiding but player does not "sink")
-     * (5567 -> colliding)
+     * (5566 -> no collision but player does not "sink")
+     * (5567 -> collision)
      * How to fix:
      */
     private fun applyNormalForce() {
         if (!isNoCollideWorld) {
             // axis Y. Use operand >=
             if (moveDelta.y >= 0.0) { // was moving downward?
-                if (isTouchingSide(nextHitbox, COLLIDING_BOTTOM)) { // actor hit something on its bottom
+                if (isColliding(nextHitbox)) {
                     hitAndReflectY()
+                    grounded = true
+                }
+                else if (isTouchingSide(nextHitbox, COLLIDING_BOTTOM)) { // actor hit something on its bottom
                     grounded = true
                 }
                 else { // the actor is not grounded at all
@@ -408,7 +438,7 @@ open class ActorWithBody : Actor(), Visible {
     private fun displaceByCCD() {
         if (!isNoCollideWorld){
             // do some CCD between hitbox and nextHitbox
-            val ccdBox = nextHitbox.clone().snapToPixel()
+            val ccdBox = nextHitbox.clone()//.snapToPixel()
             val ccdDelta = nextHitbox.toVector() to hitbox.toVector()
             val deltaMax = Math.max(ccdDelta.x.abs(), ccdDelta.y.abs())
             // set ccdDelta so that CCD move a pixel per round
@@ -418,14 +448,13 @@ open class ActorWithBody : Actor(), Visible {
             //println("deltaMax: $deltaMax")
             //println("ccdDelta: $ccdDelta")
 
-            while (!ccdDelta.isZero && isColliding(ccdBox)) {
+            while (!ccdDelta.isZero && isColliding(ccdBox, COLLIDING_ALLSIDE)) {
                 nextHitbox.translate(ccdDelta)
                 ccdCollided = true
 
-                ccdBox.reassign(nextHitbox).snapToPixel()
+                //ccdBox.reassign(nextHitbox).snapToPixel()
+                ccdBox.reassign(nextHitbox)
             }
-
-            nextHitbox.snapToPixel()
 
             //println("ccdCollided: $ccdCollided")
         }
@@ -437,22 +466,22 @@ open class ActorWithBody : Actor(), Visible {
     private fun hitAndReflectX() {
         if ((veloX * elasticity).abs() > Epsilon.E) {
             veloX *= -elasticity
-            walkX *= -elasticity
+            if (this is Controllable) walkX *= -elasticity
         }
         else {
             veloX = 0.0
-            walkX = 0.0
+            if (this is Controllable) walkX = 0.0
         }
     }
 
     private fun hitAndReflectY() {
         if ((veloY * elasticity).abs() > Epsilon.E) {
-          veloY *= -elasticity
-          walkY *= -elasticity
+            veloY *= -elasticity
+            if (this is Controllable) walkY *= -elasticity
         }
         else {
             veloY = 0.0
-            walkY *= 0.0
+            if (this is Controllable) walkY *= 0.0
         }
     }
 
@@ -510,15 +539,7 @@ open class ActorWithBody : Actor(), Visible {
         val tyStart = y1.div(TSIZE).floorInt()
         val tyEnd =   y2.div(TSIZE).floorInt()
 
-        for (y in tyStart..tyEnd) {
-            for (x in txStart..txEnd) {
-                val tile = world.getTileFromTerrain(x, y)
-                if (TilePropCodex.getProp(tile).isSolid)
-                    return true
-            }
-        }
-
-        return false
+        return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
 
     private fun isTouchingSide(hitbox: Hitbox, option: Int): Boolean {
@@ -549,20 +570,12 @@ open class ActorWithBody : Actor(), Visible {
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.plus(1.0).div(TSIZE).floorInt()
-        val txEnd =   x2.plus(1.0).div(TSIZE).floorInt()
-        val tyStart = y1.plus(1.0).div(TSIZE).floorInt()
-        val tyEnd =   y2.plus(1.0).div(TSIZE).floorInt()
+        val txStart = x1.div(TSIZE).floorInt()
+        val txEnd =   x2.div(TSIZE).floorInt()
+        val tyStart = y1.div(TSIZE).floorInt()
+        val tyEnd =   y2.div(TSIZE).floorInt()
 
-        for (y in tyStart..tyEnd) {
-            for (x in txStart..txEnd) {
-                val tile = world.getTileFromTerrain(x, y)
-                if (TilePropCodex.getProp(tile).isSolid)
-                    return true
-            }
-        }
-
-        return false
+        return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
 
 
@@ -599,7 +612,11 @@ open class ActorWithBody : Actor(), Visible {
         val tyStart = y1.div(TSIZE).roundInt()
         val tyEnd = y2.div(TSIZE).roundInt()
 
-        for (y in tyStart..tyEnd) {
+        return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
+    }
+
+    private fun isCollidingInternal(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int): Boolean {
+        /*for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
                 val tile = world.getTileFromTerrain(x, y)
                 if (TilePropCodex.getProp(tile).isSolid)
@@ -607,7 +624,8 @@ open class ActorWithBody : Actor(), Visible {
             }
         }
 
-        return false
+        return false*/
+        return if (tyEnd <= 347) false else true
     }
 
     private fun getContactingAreaFluid(side: Int, translateX: Int = 0, translateY: Int = 0): Int {
@@ -653,7 +671,7 @@ open class ActorWithBody : Actor(), Visible {
         val friction = if (isPlayerNoClip)
             BASE_FRICTION * TilePropCodex.getProp(TileNameCode.STONE).friction.tileFrictionToMult()
         else
-            BASE_FRICTION * tileFriction.tileFrictionToMult()
+            BASE_FRICTION * bodyFriction.tileFrictionToMult()
 
         if (veloX < 0) {
             veloX += friction
@@ -664,13 +682,15 @@ open class ActorWithBody : Actor(), Visible {
             if (veloX < 0) veloX = 0.0 // compensate overshoot
         }
 
-        if (walkX < 0) {
-            walkX += friction
-            if (walkX > 0) walkX = 0.0
-        }
-        else if (walkX > 0) {
-            walkX -= friction
-            if (walkX < 0) walkX = 0.0
+        if (this is Controllable) {
+            if (walkX < 0) {
+                walkX += friction
+                if (walkX > 0) walkX = 0.0
+            }
+            else if (walkX > 0) {
+                walkX -= friction
+                if (walkX < 0) walkX = 0.0
+            }
         }
     }
 
@@ -678,7 +698,7 @@ open class ActorWithBody : Actor(), Visible {
         val friction = if (isPlayerNoClip)
             BASE_FRICTION * TilePropCodex.getProp(TileNameCode.STONE).friction.tileFrictionToMult()
         else
-            BASE_FRICTION * tileFriction.tileFrictionToMult()
+            BASE_FRICTION * bodyFriction.tileFrictionToMult()
 
         if (veloY < 0) {
             veloY += friction
@@ -689,13 +709,15 @@ open class ActorWithBody : Actor(), Visible {
             if (veloY < 0) veloY = 0.0 // compensate overshoot
         }
 
-        if (walkY < 0) {
-            walkY += friction
-            if (walkY > 0) walkY = 0.0
-        }
-        else if (walkY > 0) {
-            walkY -= friction
-            if (walkY < 0) walkY = 0.0
+        if (this is Controllable) {
+            if (walkY < 0) {
+                walkY += friction
+                if (walkY > 0) walkY = 0.0
+            }
+            else if (walkY > 0) {
+                walkY -= friction
+                if (walkY < 0) walkY = 0.0
+            }
         }
     }
 
@@ -730,9 +752,9 @@ open class ActorWithBody : Actor(), Visible {
      * Get highest friction value from feet tiles.
      * @return
      */
-    internal val tileFriction: Int
+    internal val bodyFriction: Int
         get() {
-            var friction = 0
+            /*var friction = 0
 
             // take highest value
             val tilePosXStart = (hitbox.posX / TSIZE).roundInt()
@@ -745,9 +767,15 @@ open class ActorWithBody : Actor(), Visible {
                 if (thisFriction > friction) friction = thisFriction
             }
 
-            return friction
+            return friction*/
+            return 1
         }
-    fun Int.tileFrictionToMult() = this / 16.0
+    fun Int.tileFrictionToMult(): Double = this / 16.0
+
+    internal val feetFriction: Int
+        get() {
+            return 16
+        }
 
     /**
      * Get highest tile density from occupying tiles, fluid only

@@ -34,11 +34,13 @@ class ConsoleWindow : UICanvas, UITypable {
     override var height: Int = LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT + 1)
 
     override var openCloseTime: Int = 0
+    override var openCloseTimer: Int = 0
 
     private var drawOffX: Float = 0f
     private var drawOffY: Float = -height.toFloat()
     private var openingTimeCounter = 0
 
+    override var handler: UIHandler? = null
 
     private var historyIndex = -1
 
@@ -170,7 +172,10 @@ class ConsoleWindow : UICanvas, UITypable {
         commandHistory = HistoryArray<String>(COMMAND_HISTORY_MAX)
         commandInputPool = StringBuilder()
 
-        if (Terrarum.ingame.auth.b()) sendMessage(Lang["DEV_MESSAGE_CONSOLE_CODEX"])
+        if (Terrarum.ingame.auth.b()) {
+            sendMessage("${Terrarum.NAME} ${Terrarum.VERSION_STRING}")
+            sendMessage(Lang["DEV_MESSAGE_CONSOLE_CODEX"])
+        }
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {

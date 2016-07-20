@@ -21,7 +21,7 @@ class ActorInventory() {
     private var capacityMode: Int
 
     /**
-     * &lt;ReferenceID, Amounts&gt;
+     * HashMap&lt;ReferenceID, Amounts&gt;
      */
     private val itemList: HashMap<Int, Int> = HashMap()
 

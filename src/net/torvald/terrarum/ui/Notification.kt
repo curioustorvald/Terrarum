@@ -15,7 +15,7 @@ constructor() : UICanvas {
     override var width: Int = 0
     override var height: Int = 0
     internal var visibleTime: Int
-    internal var showupTimeConuter = 0
+    override var openCloseTimer = 0
 
     internal var isShowing = false
     internal var message: Array<String> = Array(MessageWindow.MESSAGES_DISPLAY, { i -> ""})
@@ -23,6 +23,8 @@ constructor() : UICanvas {
     internal var msgUI: MessageWindow
 
     override var openCloseTime: Int = MessageWindow.OPEN_CLOSE_TIME
+
+    override var handler: UIHandler? = null
 
     private val SHOWUP_MAX = 15000
 
@@ -37,7 +39,7 @@ constructor() : UICanvas {
     }
 
     override fun update(gc: GameContainer, delta: Int) {
-        if (showupTimeConuter >= visibleTime && isShowing) {
+        if (openCloseTimer >= visibleTime && isShowing) {
             // invoke closing mode
             doClosing(gc, delta)
             // check if msgUI is fully fade out
@@ -48,7 +50,7 @@ constructor() : UICanvas {
         }
 
         if (isShowing) {
-            showupTimeConuter += delta
+            openCloseTimer += delta
         }
     }
 
@@ -82,6 +84,6 @@ constructor() : UICanvas {
         isShowing = true
         this.message = message
         msgUI.setMessage(this.message)
-        showupTimeConuter = 0
+        openCloseTimer = 0
     }
 }

@@ -5,6 +5,7 @@ import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.ui.UIQuickBar
 import org.dyn4j.geometry.Vector2
 import org.lwjgl.input.Controller
 import org.lwjgl.input.Controllers
@@ -60,6 +61,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
 
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory = ActorInventory()
+    internal val quickBarRegistration = IntArray(UIQuickBar.SLOT_COUNT, { -1 })
 
     /** Must be set by PlayerFactory */
     override var faction: HashSet<Faction> = HashSet()

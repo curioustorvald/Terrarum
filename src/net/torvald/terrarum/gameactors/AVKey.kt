@@ -73,4 +73,8 @@ object AVKey {
      */
     const val ARMOURDEFENCE = "armourdefence"
     const val ARMOURDEFENCEMULT = "armourdefence$MULT"
+
+
+
+    const val _PLAYER_QUICKBARSEL = "__quickbarselection"
 }

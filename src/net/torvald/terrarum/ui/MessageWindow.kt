@@ -28,7 +28,9 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
     override var openCloseTime: Int = OPEN_CLOSE_TIME
 
     internal var opacity = 0f
-    internal var openCloseCounter = 0
+    override var openCloseTimer = 0
+
+    override var handler: UIHandler? = null
 
     private lateinit var uidrawCanvas: Image // render all the images and fonts here; will be faded
 
@@ -85,27 +87,27 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {
-        openCloseCounter += delta
-        opacity = FastMath.interpolateLinear(openCloseCounter.toFloat() / openCloseTime.toFloat(),
+        openCloseTimer += delta
+        opacity = FastMath.interpolateLinear(openCloseTimer.toFloat() / openCloseTime.toFloat(),
                 0f, 1f
         )
     }
 
     override fun doClosing(gc: GameContainer, delta: Int) {
-        openCloseCounter += delta
-        opacity = FastMath.interpolateLinear(openCloseCounter.toFloat() / openCloseTime.toFloat(),
+        openCloseTimer += delta
+        opacity = FastMath.interpolateLinear(openCloseTimer.toFloat() / openCloseTime.toFloat(),
                 1f, 0f
         )
     }
 
     override fun endOpening(gc: GameContainer, delta: Int) {
         opacity = 1f
-        openCloseCounter = 0
+        openCloseTimer = 0
     }
 
     override fun endClosing(gc: GameContainer, delta: Int) {
         opacity = 0f
-        openCloseCounter = 0
+        openCloseTimer = 0
     }
 
     private fun drawSegments(g: Graphics) {

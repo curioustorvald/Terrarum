@@ -1,5 +1,8 @@
 package net.torvald.terrarum
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import net.torvald.imagefont.GameFontWhite
 import net.torvald.JsonFetcher
 import net.torvald.JsonWriter
@@ -156,7 +159,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
          *
          * e.g. 0x02010034 can be translated as 2.1.52
          */
-        const val VERSION_RAW = 0x00020041
+        const val VERSION_RAW = 0x0002006D
         const val VERSION_STRING: String =
                 "${VERSION_RAW.ushr(24)}.${VERSION_RAW.and(0xFF0000).ushr(16)}.${VERSION_RAW.and(0xFFFF)}"
         const val NAME = "Terrarum"
@@ -281,30 +284,11 @@ constructor(gamename: String) : StateBasedGame(gamename) {
          * @throws NullPointerException if the specified config simply does not exist.
          */
         fun getConfigInt(key: String): Int {
-            var cfg: Int = 0
-            try {
-                cfg = gameConfig.getAsInt(key)!!
-            }
-            catch (e: NullPointerException) {
-                // if the config set does not have the key, try for the default config
-                try {
-                    cfg = DefaultConfig.fetch().get(key).asInt
-                }
-                catch (e1: NullPointerException) {
-                    e.printStackTrace()
-                }
-            }
-            catch (e: TypeCastException) {
-                // if the config set does not have the key, try for the default config
-                try {
-                    cfg = DefaultConfig.fetch().get(key).asInt
-                }
-                catch (e1: kotlin.TypeCastException) {
-                    e.printStackTrace()
-                }
-            }
-
-            return cfg
+            val cfg = getConfigMaster(key)
+            if (cfg is JsonPrimitive)
+                return cfg.asInt
+            else
+                return cfg as Int
         }
 
         /**
@@ -316,21 +300,11 @@ constructor(gamename: String) : StateBasedGame(gamename) {
          * @throws NullPointerException if the specified config simply does not exist.
          */
         fun getConfigString(key: String): String {
-            var cfg = ""
-            try {
-                cfg = gameConfig.getAsString(key)!!
-            }
-            catch (e: NullPointerException) {
-                try {
-                    cfg = DefaultConfig.fetch().get(key).asString
-                }
-                catch (e1: NullPointerException) {
-                    e.printStackTrace()
-                }
-
-            }
-
-            return cfg
+            val cfg = getConfigMaster(key)
+            if (cfg is JsonPrimitive)
+                return cfg.asString
+            else
+                return cfg as String
         }
 
         /**
@@ -342,21 +316,31 @@ constructor(gamename: String) : StateBasedGame(gamename) {
          * @throws NullPointerException if the specified config simply does not exist.
          */
         fun getConfigBoolean(key: String): Boolean {
-            var cfg = false
-            try {
-                cfg = gameConfig.getAsBoolean(key)!!
+            val cfg = getConfigMaster(key)
+            if (cfg is JsonPrimitive)
+                return cfg.asBoolean
+            else
+                return cfg as Boolean
+        }
+
+        fun getConfigIntArray(key: String): IntArray {
+            val cfg = getConfigMaster(key)
+            if (cfg is JsonArray) {
+                val jsonArray = cfg.asJsonArray
+                return IntArray(jsonArray.size(), { i -> jsonArray[i].asInt })
             }
+            else
+                return cfg as IntArray
+        }
+
+        private fun getConfigMaster(key: String): Any {
+            var cfg: Any? = null
+            try { cfg = gameConfig[key]!! }
             catch (e: NullPointerException) {
-                try {
-                    cfg = DefaultConfig.fetch().get(key).asBoolean
-                }
-                catch (e1: NullPointerException) {
-                    e.printStackTrace()
-                }
-
+                try { cfg = DefaultConfig.fetch()[key] }
+                catch (e1: NullPointerException) { e.printStackTrace() }
             }
-
-            return cfg
+            return cfg!!
         }
     }
 }

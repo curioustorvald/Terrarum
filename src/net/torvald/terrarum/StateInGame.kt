@@ -19,10 +19,7 @@ import net.torvald.terrarum.mapgenerator.MapGenerator
 import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import net.torvald.terrarum.tilestats.TileStats
-import net.torvald.terrarum.ui.BasicDebugInfoWindow
-import net.torvald.terrarum.ui.ConsoleWindow
-import net.torvald.terrarum.ui.Notification
-import net.torvald.terrarum.ui.UIHandler
+import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.weather.WeatherMixer
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
@@ -87,6 +84,13 @@ constructor() : BasicGameState() {
 
     var UPDATE_DELTA: Int = 0
 
+    // UI aliases
+    val uiAliases = HashMap<String, UIHandler>()
+    private val UI_PIE_MENU = "uiPieMenu"
+    private val UI_QUICK_BAR = "uiQuickBar"
+    private val UI_INVENTORY_PLAYER = "uiInventoryPlayer"
+    private val UI_INVENTORY_ANON = "uiInventoryAnon"
+
     @Throws(SlickException::class)
     override fun init(gameContainer: GameContainer, stateBasedGame: StateBasedGame) {
         // load necessary shaders
@@ -126,12 +130,20 @@ constructor() : BasicGameState() {
         notifier = UIHandler(Notification())
         notifier.setPosition(
                 (Terrarum.WIDTH - notifier.UI.width) / 2, Terrarum.HEIGHT - notifier.UI.height)
-        notifier.visible = true
+        notifier.isVisible = true
 
         // set smooth lighting as in config
         KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, Terrarum.getConfigBoolean("smoothlighting"))
 
-
+        // queue up game UIs
+        //  lesser UIs
+        uiAliases[UI_PIE_MENU] = UIHandler(UIPieMenu())
+        uiAliases[UI_PIE_MENU]!!.setPosition(
+                (Terrarum.WIDTH - uiAliases[UI_PIE_MENU]!!.UI.width) / 2,
+                (Terrarum.HEIGHT - uiAliases[UI_PIE_MENU]!!.UI.height) / 2
+        )
+        uiAliases[UI_PIE_MENU]!!.UI.handler = uiAliases[UI_PIE_MENU]
+        uiContainer.add(uiAliases[UI_PIE_MENU]!!)
 
         // audio test
         //AudioResourceLibrary.ambientsWoods[0].play()
@@ -149,6 +161,7 @@ constructor() : BasicGameState() {
         world.globalLight = globalLightByTime.toInt()
 
         GameController.processInput(gc.input)
+        uiContainer.forEach { it.processInput(gc.input) }
 
         TileStats.update()
 
@@ -184,6 +197,8 @@ constructor() : BasicGameState() {
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
+        g.setAntiAlias(true)
+
         setBlendNormal()
 
         // determine if lightmap blending should be done
@@ -232,7 +247,7 @@ constructor() : BasicGameState() {
         }
 
         // draw reference ID if debugWindow is open
-        if (debugWindow.visible) {
+        if (debugWindow.isVisible) {
             actorContainer.forEachIndexed { i, actor ->
                 if (actor is Visible) {
                     g.color = Color.white
@@ -266,38 +281,68 @@ constructor() : BasicGameState() {
 
     override fun keyPressed(key: Int, c: Char) {
         GameController.keyPressed(key, c)
+
+        if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
+                || key == Terrarum.getConfigInt("keyquicksel")) {
+            uiAliases[UI_PIE_MENU]!!.setAsOpening()
+            // TODO hide quick bar
+        }
+
+        uiContainer.forEach { it.keyPressed(key, c) }
     }
 
     override fun keyReleased(key: Int, c: Char) {
         GameController.keyReleased(key, c)
+
+        if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
+            || key == Terrarum.getConfigInt("keyquicksel")) {
+            uiAliases[UI_PIE_MENU]!!.setAsClosing()
+            // TODO show quick bar
+        }
+
+        uiContainer.forEach { it.keyReleased(key, c) }
     }
 
     override fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
         GameController.mouseMoved(oldx, oldy, newx, newy)
+
+        uiContainer.forEach { it.mouseMoved(oldx, oldy, newx, newy) }
     }
 
     override fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
         GameController.mouseDragged(oldx, oldy, newx, newy)
+
+        uiContainer.forEach { it.mouseDragged(oldx, oldy, newx, newy) }
     }
 
     override fun mousePressed(button: Int, x: Int, y: Int) {
         GameController.mousePressed(button, x, y)
+
+        uiContainer.forEach { it.mousePressed(button, x, y) }
     }
 
     override fun mouseReleased(button: Int, x: Int, y: Int) {
         GameController.mouseReleased(button, x, y)
+
+        uiContainer.forEach { it.mouseReleased(button, x, y) }
     }
 
     override fun mouseWheelMoved(change: Int) {
         GameController.mouseWheelMoved(change)
+
+        uiContainer.forEach { it.mouseWheelMoved(change) }
     }
 
     override fun controllerButtonPressed(controller: Int, button: Int) {
         GameController.controllerButtonPressed(controller, button)
+
+        uiContainer.forEach { it.controllerButtonPressed(controller, button) }
     }
 
     override fun controllerButtonReleased(controller: Int, button: Int) {
         GameController.controllerButtonReleased(controller, button)
+
+        uiContainer.forEach { it.controllerButtonReleased(controller, button) }
     }
 
     override fun getID(): Int = Terrarum.SCENE_ID_GAME

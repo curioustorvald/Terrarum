@@ -18,6 +18,7 @@ object PlayerBuilder {
         // attach sprite
 
         // do etc.
+        p.actorValue[AVKey._PLAYER_QUICKBARSEL] = 0
 
         return p
     }

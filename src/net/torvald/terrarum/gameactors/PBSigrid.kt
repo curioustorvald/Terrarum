@@ -59,6 +59,7 @@ object PBSigrid {
         p.actorValue[AVKey.BASEDEFENCE] = 141
 
         p.actorValue["selectedtile"] = 16
+        p.actorValue[AVKey._PLAYER_QUICKBARSEL] = 0
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 10, 0)
 

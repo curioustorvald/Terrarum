@@ -20,7 +20,7 @@ class StateMonitorCheck : BasicGameState() {
 
     override fun init(gc: GameContainer, g: StateBasedGame) {
         uiMonitorCheck = UIHandler(MonitorCheckUI())
-        uiMonitorCheck.visible = true
+        uiMonitorCheck.isVisible = true
     }
 
     override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
@@ -41,6 +41,9 @@ class StateMonitorCheck : BasicGameState() {
         override var width = Terrarum.WIDTH
         override var height = Terrarum.HEIGHT
         override var openCloseTime = 150
+        override var openCloseTimer: Int = 0
+
+        override var handler: UIHandler? = null
 
         private val colourLUT = arrayOf(
                 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x40,
