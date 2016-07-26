@@ -13,29 +13,31 @@ import org.newdawn.slick.Input
  * Created by minjaesong on 16-07-20.
  */
 class UIPieMenu : UICanvas {
-    private val cellSize = 32
+    private val cellSize = UIQuickBar.CELL_SIZE
 
     private val slotCount = UIQuickBar.SLOT_COUNT
-    private val roundRectRadius = 6
 
+    private val slotDistanceFromCentre = cellSize * 2.7
     override var width: Int = cellSize * 7
     override var height: Int = width
+
+    override var handler: UIHandler? = null
+
     /**
      * In milliseconds
      */
     override var openCloseTime: Int = 160
     override var openCloseTimer: Int = 0
-
-    override var handler: UIHandler? = null
+        get() = handler!!.openCloseCounter
 
     private val smallenSize = 0.93f
 
-    var menuSelection: Int = -1
+    var selection: Int = -1
 
     override fun update(gc: GameContainer, delta: Int) {
-        if (menuSelection >= 0)
+        if (selection >= 0)
             Terrarum.ingame.player.actorValue[AVKey._PLAYER_QUICKBARSEL] =
-                    menuSelection % quickbarSlots
+                    selection % slotCount
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
@@ -45,17 +47,19 @@ class UIPieMenu : UICanvas {
         for (i in 0..slotCount - 1) {
             // set position
             val angle = Math.PI * 2.0 * (i.toDouble() / slotCount) + Math.PI // 180 deg monitor-wise
-            val slotCentrePoint = Vector2(0.0, cellSize * 3.0).setDirection(angle) + centrePoint
+            val slotCentrePoint = Vector2(0.0, slotDistanceFromCentre.toDouble()).setDirection(angle) + centrePoint
 
             // draw cells
-            g.color = if (menuSelection == i) Color(0xC0C0C0) else Color(0x404040)
-            g.drawImage(ItemSlotImageBuilder.produce(
-                    if (menuSelection == i)
-                        ItemSlotImageBuilder.COLOR_WHITE
+            val color = if (i == selection)
+                ItemSlotImageBuilder.COLOR_WHITE
+            else
+                ItemSlotImageBuilder.COLOR_BLACK
+
+            g.drawImage(
+                    if (i == selection)
+                        ItemSlotImageBuilder.produceLarge(color, i + 1)
                     else
-                        ItemSlotImageBuilder.COLOR_BLACK,
-                    i + 1
-            ),
+                        ItemSlotImageBuilder.produce(color, i + 1),
                     slotCentrePoint.x.toFloat() - (cellSize / 2f),
                     slotCentrePoint.y.toFloat() - (cellSize / 2f)
             )
@@ -70,38 +74,29 @@ class UIPieMenu : UICanvas {
             val centre = Vector2(Terrarum.WIDTH / 2.0, Terrarum.HEIGHT / 2.0)
             val deg = (centre - cursorPos).direction.toFloat()
 
-            menuSelection = Math.round(deg * slotCount / FastMath.TWO_PI)
-            if (menuSelection < 0) menuSelection += 10
+            selection = Math.round(deg * slotCount / FastMath.TWO_PI)
+            if (selection < 0) selection += 10
+
+            // TODO add gamepad support
         }
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {
-        if (openCloseTimer < openCloseTime) {
-            openCloseTimer += delta
-
-            handler!!.opacity = openCloseTimer.toFloat() / openCloseTime
-            handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
-        }
+        handler!!.opacity = openCloseTimer.toFloat() / openCloseTime
+        handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
     }
 
     override fun doClosing(gc: GameContainer, delta: Int) {
-        if (openCloseTimer < openCloseTime) {
-            openCloseTimer += delta
-            handler!!.isOpened = false
-
-            handler!!.opacity = (openCloseTime - openCloseTimer.toFloat()) / openCloseTime
-            handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
-        }
+        handler!!.opacity = (openCloseTime - openCloseTimer.toFloat()) / openCloseTime
+        handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
     }
 
     override fun endOpening(gc: GameContainer, delta: Int) {
-        openCloseTimer = 0
         handler!!.opacity = 1f
         handler!!.scale = 1f
     }
 
     override fun endClosing(gc: GameContainer, delta: Int) {
-        openCloseTimer = 0
         handler!!.opacity = 0f
         handler!!.scale = 1f
     }

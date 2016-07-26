@@ -5,6 +5,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.tileproperties.TileNameCode
 import net.torvald.terrarum.tilestats.TileStats
 import com.jme3.math.FastMath
+import net.torvald.colourutil.ColourTemp
 import org.newdawn.slick.*
 
 /**
@@ -13,14 +14,13 @@ import org.newdawn.slick.*
 object MapDrawer {
     const val TILE_SIZE = 16
 
-    private var envOverlayColourmap: Image = Image("./res/graphics/colourmap/black_body_col_1000_40000_K.png")
-
     private val ENV_COLTEMP_LOWEST = 5500
     private val ENV_COLTEMP_HIGHEST = 7500
 
     val ENV_COLTEMP_NOON = 6500 // 6500 == sRGB White == untouched!
 
-    private var colTemp: Int = 0
+    var colTemp: Int = 0
+        private set
 
     private val TILES_COLD = intArrayOf(
               TileNameCode.ICE_MAGICAL
@@ -49,7 +49,7 @@ object MapDrawer {
         colTemp = colTemp_warm + colTemp_cold - ENV_COLTEMP_NOON
         val zoom = Terrarum.ingame.screenZoom
 
-        g.color = getColourFromMap(colTemp)
+        g.color = ColourTemp(colTemp)
         //g.color = getColourFromMap(3022)
         g.fillRect(
                 MapCamera.cameraX * zoom,
@@ -69,19 +69,5 @@ object MapDrawer {
         val colTempMedian = (ENV_COLTEMP_HIGHEST + ENV_COLTEMP_LOWEST) / 2
 
         return Math.round((ENV_COLTEMP_HIGHEST - ENV_COLTEMP_LOWEST) / 2 * FastMath.clamp(x, -1f, 1f) + colTempMedian)
-    }
-
-    fun getColourFromMap(K: Int): Color {
-        return envOverlayColourmap.getColor(colTempToImagePos(K), 0)
-    }
-
-    private fun colTempToImagePos(K: Int): Int {
-        if (K < 1000 || K >= 40000) throw IllegalArgumentException("K: out of range. ($K)")
-        return (K - 1000) / 10
-    }
-
-    @JvmStatic
-    fun getColTemp(): Int {
-        return colTemp
     }
 }

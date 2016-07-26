@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.Terrarum
 import com.jme3.math.FastMath
+import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
 import org.newdawn.slick.state.StateBasedGame
 
@@ -44,22 +45,25 @@ constructor(val UI: UICanvas) {
         set(value) {
             if (alwaysVisible)
                 throw RuntimeException("[UIHandler] Tried to 'set visibility of' constant UI")
-
-            field = value
+            if (value == true) {
+                isOpened = true
+                field = value
+            }
+            else {
+                isOpened = false
+                field = value
+            }
         }
 
     var opacity = 1f
     var scale = 1f
 
-    var openCloseCounter = 0
+    var openCloseCounter: Int = 0
 
     init {
         println("[UIHandler] Creating UI '${UI.javaClass.simpleName}'")
 
-        UIDrawnCanvas = Image(
-                //FastMath.nearestPowerOfTwo(UI.width), FastMath.nearestPowerOfTwo(UI.height))
-                UI.width, UI.height)
-        UIDrawnCanvas.filter = Image.FILTER_LINEAR
+        UIDrawnCanvas = Image(UI.width, UI.height)
 
         UIGraphicInstance = UIDrawnCanvas.graphics
     }
@@ -84,6 +88,7 @@ constructor(val UI: UICanvas) {
             else {
                 UI.endOpening(gc, delta)
                 isOpening = false
+                isClosing = false
                 isOpened = true
                 openCloseCounter = 0
             }
@@ -101,6 +106,7 @@ constructor(val UI: UICanvas) {
             else {
                 UI.endClosing(gc, delta)
                 isClosing = false
+                isOpening = false
                 isOpened = false
                 isVisible = false
                 openCloseCounter = 0
@@ -112,8 +118,6 @@ constructor(val UI: UICanvas) {
         if (isVisible || alwaysVisible) {
             UIGraphicInstance.clear()
             UIGraphicInstance.font = Terrarum.gameFont
-
-            UIGraphicInstance.setAntiAlias(true)
 
             UI.render(gc, UIGraphicInstance)
             if (sbg.currentStateID == Terrarum.SCENE_ID_GAME) {
@@ -151,26 +155,34 @@ constructor(val UI: UICanvas) {
     /**
      * Send OPEN signal to the attached UI.
      */
-    fun setAsOpening() {
+    fun setAsOpen() {
         if (alwaysVisible) {
             throw RuntimeException("[UIHandler] Tried to 'open' constant UI")
         }
-        if (!isOpened && !isVisible) {
+        if (!isOpened && !isOpening) {
             isOpened = false
             isOpening = true
+            isClosing = false
+            isVisible = true
         }
     }
 
     /**
      * Send CLOSE signal to the attached UI.
      */
-    fun setAsClosing() {
+    fun setAsClose() {
         if (alwaysVisible) {
             throw RuntimeException("[UIHandler] Tried to 'close' constant UI")
         }
-        isOpened = false
-        isClosing = true
+        if ((isOpening || isOpened) && !isClosing && isVisible) {
+            isOpened = false
+            isClosing = true
+            isOpening = false
+        }
     }
+
+    val isClosed: Boolean
+        get() = !isOpened && !isClosing && !isOpening
 
     fun toggleOpening() {
         if (alwaysVisible) {
@@ -178,12 +190,12 @@ constructor(val UI: UICanvas) {
         }
         if (isVisible) {
             if (!isClosing) {
-                setAsClosing()
+                setAsClose()
             }
         }
         else {
             if (!isOpening) {
-                setAsOpening()
+                setAsOpen()
             }
         }
     }
@@ -195,55 +207,55 @@ constructor(val UI: UICanvas) {
     }
 
     fun keyPressed(key: Int, c: Char) {
-        if (isVisible && UI is UITypable) {
+        if (isVisible && UI is KeyboardControlled) {
             UI.keyPressed(key, c)
         }
     }
 
     fun keyReleased(key: Int, c: Char) {
-        if (isVisible && UI is UITypable) {
+        if (isVisible && UI is KeyboardControlled) {
             UI.keyReleased(key, c)
         }
     }
 
     fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        if (isVisible && UI is UIClickable) {
+        if (isVisible && UI is MouseControlled) {
             UI.mouseMoved(oldx, oldy, newx, newy)
         }
     }
 
     fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        if (isVisible && UI is UIClickable) {
+        if (isVisible && UI is MouseControlled) {
             UI.mouseDragged(oldx, oldy, newx, newy)
         }
     }
 
     fun mousePressed(button: Int, x: Int, y: Int) {
-        if (isVisible && UI is UIClickable) {
+        if (isVisible && UI is MouseControlled) {
             UI.mousePressed(button, x, y)
         }
     }
 
     fun mouseReleased(button: Int, x: Int, y: Int) {
-        if (isVisible && UI is UIClickable) {
+        if (isVisible && UI is MouseControlled) {
             UI.mouseReleased(button, x, y)
         }
     }
 
     fun mouseWheelMoved(change: Int) {
-        if (isVisible && UI is UIClickable) {
+        if (isVisible && UI is MouseControlled) {
             UI.mouseWheelMoved(change)
         }
     }
 
     fun controllerButtonPressed(controller: Int, button: Int) {
-        if (isVisible && UI is UIClickable) {
+        if (isVisible && UI is GamepadControlled) {
             UI.controllerButtonPressed(controller, button)
         }
     }
 
     fun controllerButtonReleased(controller: Int, button: Int) {
-        if (isVisible && UI is UIClickable) {
+        if (isVisible && UI is GamepadControlled) {
             UI.controllerButtonReleased(controller, button)
         }
     }

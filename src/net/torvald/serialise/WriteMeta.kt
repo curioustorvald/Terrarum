@@ -3,6 +3,8 @@ package net.torvald.serialise
 import net.torvald.terrarum.mapgenerator.MapGenerator
 import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.itemproperties.ItemPropCodex
+import net.torvald.terrarum.itemproperties.MaterialPropCodex
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.FileInputStream
@@ -43,8 +45,8 @@ object WriteMeta {
         // define files to get hash
         val fileArray: Array<File> = arrayOf(
                 File(TilePropCodex.CSV_PATH)
-                //, File(ItemPropCodex.CSV_PATH)
-                //, File(MaterialPropCodex.CSV_PATH)
+                , File(ItemPropCodex.CSV_PATH)
+                , File(MaterialPropCodex.CSV_PATH)
                 //,
         )
 

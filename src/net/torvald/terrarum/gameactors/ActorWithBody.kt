@@ -64,12 +64,11 @@ open class ActorWithBody : Actor(), Visible {
         get() = controllerVel!!.x
         internal set(value) { controllerVel!!.x = value }
     var walkY: Double
-        get() = controllerVel!!.x
-        internal set(value) { controllerVel!!.x = value }
+        get() = controllerVel!!.y
+        internal set(value) { controllerVel!!.y = value }
 
     /**
      * Physical properties.
-     * Values derived from ActorValue must be @Transient.
      */
     var scale: Double
         get() = actorValue.getAsDouble(AVKey.SCALE) ?: 1.0
@@ -212,6 +211,8 @@ open class ActorWithBody : Actor(), Visible {
 
     var ccdCollided = false
 
+    var isWalking = false
+
     init {
         // some initialiser goes here...
     }
@@ -291,6 +292,7 @@ open class ActorWithBody : Actor(), Visible {
              * Actual physics thing (altering velocity) starts from here
              */
 
+            // Combine velo and walk
             applyMovementVelocity()
 
             // applyBuoyancy()
@@ -308,14 +310,13 @@ open class ActorWithBody : Actor(), Visible {
                 // Set 'next' position (hitbox) from canonical and walking velocity
                 setNewNextHitbox()
 
-                applyNormalForce()
                 /**
                  * solveCollision()?
                  * If and only if:
                  *     This body is NON-STATIC and the other body is STATIC
                  */
-                setNewNextHitbox()
                 displaceByCCD()
+                applyNormalForce()
 
                 setHorizontalFriction()
                 if (isPlayerNoClip) // or hanging on the rope, etc.
@@ -394,21 +395,15 @@ open class ActorWithBody : Actor(), Visible {
         }
     }
 
-    /**
-     * FIXME the culprit!
-     * (5566 -> no collision but player does not "sink")
-     * (5567 -> collision)
-     * How to fix:
-     */
     private fun applyNormalForce() {
         if (!isNoCollideWorld) {
             // axis Y. Use operand >=
             if (moveDelta.y >= 0.0) { // was moving downward?
-                if (isColliding(nextHitbox)) {
+                if (isColliding(nextHitbox)) { // FIXME if standing: standard box, if walking: top-squished box
                     hitAndReflectY()
                     grounded = true
                 }
-                else if (isTouchingSide(nextHitbox, COLLIDING_BOTTOM)) { // actor hit something on its bottom
+                else if (isTouchingSide(nextHitbox, COLLIDING_BOTTOM) && !isColliding(nextHitbox)) { // actor hit something on its bottom
                     grounded = true
                 }
                 else { // the actor is not grounded at all
@@ -427,7 +422,7 @@ open class ActorWithBody : Actor(), Visible {
             if (isTouchingSide(nextHitbox, COLLIDING_LEFT) && isTouchingSide(nextHitbox, COLLIDING_RIGHT)
                     && moveDelta.x != 0.0) { // check right and left
                 // the actor is hitting the wall
-                hitAndReflectX()
+                //hitAndReflectX()
             }
         }
     }
@@ -436,30 +431,31 @@ open class ActorWithBody : Actor(), Visible {
      * nextHitbox must NOT be altered before this method is called!
      */
     private fun displaceByCCD() {
+        ccdCollided = false
+
         if (!isNoCollideWorld){
+            if (!isColliding(nextHitbox, COLLIDING_ALLSIDE))
+                return
+
             // do some CCD between hitbox and nextHitbox
-            val ccdBox = nextHitbox.clone()//.snapToPixel()
-            val ccdDelta = nextHitbox.toVector() to hitbox.toVector()
-            val deltaMax = Math.max(ccdDelta.x.abs(), ccdDelta.y.abs())
-            // set ccdDelta so that CCD move a pixel per round
-            if (deltaMax > 1.0)
-                ccdDelta *= (1.0 / deltaMax)
+            val ccdDelta = (nextHitbox.toVector() - hitbox.toVector())
+            if (ccdDelta.x != 0.0 || ccdDelta.y != 0.0)
+                ccdDelta.set(ccdDelta.setMagnitude(CCD_TICK))
+
+            //////TEST//////
+            ccdDelta.x = 0.0
+            //////TEST//////
+            // Result: player CAN WALK with ccdDelta.x of zero, which means previous method is a shit.
 
             //println("deltaMax: $deltaMax")
             //println("ccdDelta: $ccdDelta")
 
-            while (!ccdDelta.isZero && isColliding(ccdBox, COLLIDING_ALLSIDE)) {
-                nextHitbox.translate(ccdDelta)
+            while (!ccdDelta.isZero && isColliding(nextHitbox, COLLIDING_ALLSIDE)) {
+                nextHitbox.translate(-ccdDelta)
                 ccdCollided = true
-
-                //ccdBox.reassign(nextHitbox).snapToPixel()
-                ccdBox.reassign(nextHitbox)
             }
 
             //println("ccdCollided: $ccdCollided")
-        }
-        else {
-            ccdCollided = false
         }
     }
 
@@ -625,7 +621,7 @@ open class ActorWithBody : Actor(), Visible {
         }
 
         return false*/
-        return if (tyEnd <= 347) false else true
+        return if (tyEnd < 348) false else true
     }
 
     private fun getContactingAreaFluid(side: Int, translateX: Int = 0, translateY: Int = 0): Int {
@@ -749,17 +745,23 @@ open class ActorWithBody : Actor(), Visible {
 
 
     /**
-     * Get highest friction value from feet tiles.
+     * Get highest friction value from surrounding tiles
      * @return
      */
     internal val bodyFriction: Int
         get() {
-            /*var friction = 0
+            var friction = 0
+            val frictionCalcHitbox = if (isWalking)
+                Hitbox(nextHitbox.posX + 1.0, nextHitbox.posY + 1.0,
+                        nextHitbox.width - 2.0, nextHitbox.height - 2.0)
+            else
+                nextHitbox.clone()
 
             // take highest value
-            val tilePosXStart = (hitbox.posX / TSIZE).roundInt()
-            val tilePosXEnd = (hitbox.hitboxEnd.x / TSIZE).roundInt()
-            val tilePosY = (hitbox.pointedY.plus(1) / TSIZE).roundInt()
+            val tilePosXStart = (frictionCalcHitbox.posX / TSIZE).floorInt()
+            val tilePosXEnd = (frictionCalcHitbox.hitboxEnd.x / TSIZE).floorInt()
+            val tilePosY = (frictionCalcHitbox.pointedY / TSIZE).floorInt()
+
             for (x in tilePosXStart..tilePosXEnd) {
                 val tile = world.getTileFromTerrain(x, tilePosY)
                 val thisFriction = TilePropCodex.getProp(tile).friction
@@ -767,15 +769,9 @@ open class ActorWithBody : Actor(), Visible {
                 if (thisFriction > friction) friction = thisFriction
             }
 
-            return friction*/
-            return 1
+            return friction
         }
     fun Int.tileFrictionToMult(): Double = this / 16.0
-
-    internal val feetFriction: Int
-        get() {
-            return 16
-        }
 
     /**
      * Get highest tile density from occupying tiles, fluid only

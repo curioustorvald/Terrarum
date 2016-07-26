@@ -219,7 +219,7 @@ constructor(//properties
         @Transient val WIRE = 2
 
         @Transient val TILES_SUPPORTED = MapLayer.RANGE * PairedMapLayer.RANGE
-        @Transient val BITS: Byte = 1 // 1 for Byte, 2 for Char, 4 for Int, 8 for Long
+        @Transient val SIZEOF: Byte = MapLayer.SIZEOF
         @Transient val LAYERS: Byte = 4 // terrain, wall (terrainDamage + wallDamage), wire
     }
 }

@@ -2,6 +2,7 @@ package net.torvald.terrarum.weather
 
 import com.jme3.math.FastMath
 import net.torvald.JsonFetcher
+import net.torvald.colourutil.ColourUtil
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamemap.WorldTime
@@ -93,24 +94,47 @@ object WeatherMixer {
             Light10B(getGradientColour(currentWeather.globalLightColourMap, 0, timeInSec))
 
     fun getGradientColour(image: Image, row: Int, timeInSec: Int): Color {
-        val gradMapWidth = image.width
-        val phaseThis = Math.round(
-                timeInSec.toFloat() / WorldTime.DAY_LENGTH.toFloat() * gradMapWidth
-        )
-        val phaseNext = (phaseThis + 1) % WorldTime.DAY_LENGTH
         val dataPointDistance = WorldTime.DAY_LENGTH / image.width
+
+        val phaseThis: Int = timeInSec / dataPointDistance // x-coord in gradmap
+        val phaseNext: Int = (phaseThis + 1) % image.width
 
         val colourThis = image.getColor(phaseThis, row)
         val colourNext = image.getColor(phaseNext, row)
 
         // interpolate R, G and B
-        val scale = (timeInSec % dataPointDistance).toFloat() / dataPointDistance
-        val retColour = Color(0)
-        retColour.r = FastMath.interpolateLinear(scale, colourThis.r, colourNext.r)
-        retColour.g = FastMath.interpolateLinear(scale, colourThis.g, colourNext.g)
-        retColour.b = FastMath.interpolateLinear(scale, colourThis.b, colourNext.b)
+        val scale = (timeInSec % dataPointDistance).toFloat() / dataPointDistance // [0.0, 1.0]
 
-        return retColour
+        val r = interpolateLinear(scale, colourThis.red, colourNext.red)
+        val g = interpolateLinear(scale, colourThis.green, colourNext.green)
+        val b = interpolateLinear(scale, colourThis.blue, colourNext.blue)
+
+        val newCol = ColourUtil.toSlickColor(r, g, b)
+
+        /* // very nice monitor code
+        // 65 -> 66 | 300 | 19623 | RGB8(255, 0, 255) -[41%]-> RGB8(193, 97, 23) | * `230`40`160`
+        // ^ step   |width| time  | colour from        scale   colour to         | output
+        if (dataPointDistance == 300)
+            println("$phaseThis -> $phaseNext | $dataPointDistance | $timeInSec" +
+                    " | ${colourThis.toStringRGB()} -[${scale.times(100).toInt()}%]-> ${colourNext.toStringRGB()}" +
+                    " | * `$r`$g`$b`")*/
+
+        return newCol
+    }
+
+    fun Color.toStringRGB() = "RGB8(${this.red}, ${this.green}, ${this.blue})"
+
+    fun interpolateLinear(scale: Float, startValue: Int, endValue: Int): Int {
+        if (startValue == endValue) {
+            return startValue
+        }
+        if (scale <= 0f) {
+            return startValue
+        }
+        if (scale >= 1f) {
+            return endValue
+        }
+        return Math.round((1f - scale) * startValue + scale * endValue)
     }
 
     fun getWeatherList(classification: String) = weatherList[classification]!!

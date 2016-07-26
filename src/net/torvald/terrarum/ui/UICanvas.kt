@@ -11,13 +11,17 @@ interface UICanvas {
 
     var width: Int
     var height: Int
+
+    var handler: UIHandler?
+
     /**
      * In milliseconds
      */
     var openCloseTime: Int
+    /**
+     * Usage: get() = handler!!.openCloseCounter
+     */
     var openCloseTimer: Int
-
-    var handler: UIHandler?
 
     fun update(gc: GameContainer, delta: Int)
 

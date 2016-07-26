@@ -4,7 +4,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.Typesetter
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIHandler
-import net.torvald.terrarum.ui.UITypable
+import net.torvald.terrarum.ui.KeyboardControlled
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -32,7 +32,7 @@ class StateMonitorCheck : BasicGameState() {
     }
 
     override fun keyPressed(key: Int, c: Char) {
-        //uiMonitorCheck.setAsClosing()
+        //uiMonitorCheck.setAsClose()
     }
 
     override fun getID(): Int = Terrarum.SCENE_ID_CONFIG_CALIBRATE

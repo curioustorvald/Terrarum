@@ -35,7 +35,7 @@ object WriteGameMapData {
 
         // write binary
         Files.write(tempPath, MAGIC)
-        Files.write(tempPath, byteArrayOf(GameWorld.BITS))
+        Files.write(tempPath, byteArrayOf(GameWorld.SIZEOF))
         Files.write(tempPath, byteArrayOf(GameWorld.LAYERS))
         Files.write(tempPath, byteArrayOf(BYTE_NULL))
         Files.write(tempPath, byteArrayOf(BYTE_NULL))
@@ -44,15 +44,15 @@ object WriteGameMapData {
         Files.write(tempPath, toByteArray(map.spawnX))
         Files.write(tempPath, toByteArray(map.spawnY))
         map.layerTerrain.forEach(
-                {b -> Files.write(tempPath, byteArrayOf(b))})
+                { b -> Files.write(tempPath, byteArrayOf(b)) })
         map.layerWall.forEach(
-                {b -> Files.write(tempPath, byteArrayOf(b))})
+                { b -> Files.write(tempPath, byteArrayOf(b)) })
         map.terrainDamage.forEach(
-                {b -> Files.write(tempPath, byteArrayOf(b))})
+                { b -> Files.write(tempPath, byteArrayOf(b)) })
         map.wallDamage.forEach(
-                {b -> Files.write(tempPath, byteArrayOf(b))})
+                { b -> Files.write(tempPath, byteArrayOf(b)) })
         map.layerWire.forEach(
-                {b -> Files.write(tempPath, byteArrayOf(b))})
+                { b -> Files.write(tempPath, byteArrayOf(b)) })
 
         // replace savemeta with tempfile
         try {

@@ -34,7 +34,7 @@ object DefaultConfig {
         jsonObject.addProperty("joypadrstickx", 2)
         jsonObject.addProperty("joypadrsticky", 3) // logitech indices
 
-        // control-keyboard (Java key index. This is what Minecraft also uses)
+        // control-keyboard (Java key codes. This is what Minecraft also uses)
         jsonObject.addProperty("keyup", Key.E)
         jsonObject.addProperty("keyleft", Key.S)
         jsonObject.addProperty("keydown", Key.D)

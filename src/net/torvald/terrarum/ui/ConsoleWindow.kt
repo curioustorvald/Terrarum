@@ -13,7 +13,7 @@ import org.newdawn.slick.Input
 /**
  * Created by minjaesong on 15-12-31.
  */
-class ConsoleWindow : UICanvas, UITypable {
+class ConsoleWindow : UICanvas, KeyboardControlled {
 
     internal var UIColour = Color(0xCC000000.toInt())
 

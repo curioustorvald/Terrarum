@@ -19,7 +19,7 @@ import java.util.*
 /**
  * Created by minjaesong on 16-03-14.
  */
-class BasicDebugInfoWindow:UICanvas {
+class BasicDebugInfoWindow : UICanvas {
 
     override var width: Int = Terrarum.WIDTH
     override var height: Int = Terrarum.HEIGHT
@@ -101,6 +101,8 @@ class BasicDebugInfoWindow:UICanvas {
         printLine(g, 5, "grounded $ccG${player.grounded}")
         printLine(g, 6, "noClip $ccG${player.noClip}")
 
+        printLine(g, 7, "jump $ccG${player.jumpAcc}")
+
         val lightVal: String
         val mtX = mouseTileX.toString()
         val mtY = mouseTileY.toString()
@@ -114,7 +116,7 @@ class BasicDebugInfoWindow:UICanvas {
                     rawR.toString() + " " +
                     rawG.toString() + " " +
                     rawB.toString() + ")"
-        printLine(g, 7, "light@cursor $ccG$lightVal")
+        printLine(g, 8, "light@cursor $ccG$lightVal")
 
         val tileNo: String
         val tileNumRaw = Terrarum.ingame.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
@@ -122,17 +124,21 @@ class BasicDebugInfoWindow:UICanvas {
         val tiledmg = tileNumRaw % PairedMapLayer.RANGE
         tileNo = if (tileNumRaw == -1) "—" else "$tilenum:$tiledmg"
 
-        printLine(g, 8, "tile@cursor $ccG$tileNo ($mtX, $mtY)")
+        printLine(g, 9, "tile@cursor $ccG$tileNo ($mtX, $mtY)")
 
         /**
          * Second column
          */
 
         printLineColumn(g, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
-        printLineColumn(g, 2, 2, "Env colour temp $ccG" + MapDrawer.getColTemp())
+        printLineColumn(g, 2, 2, "Env colour temp $ccG" + MapDrawer.colTemp)
         printLineColumn(g, 2, 5, "Time $ccG${Terrarum.ingame.world.time.elapsedSeconds()}" +
                                  " (${Terrarum.ingame.world.time.getFormattedTime()})")
         printLineColumn(g, 2, 6, "Mass $ccG${player.mass}")
+
+        printLineColumn(g, 2, 7, "p_WalkX $ccG${player.walkX}")
+        printLineColumn(g, 2, 8, "p_WalkY $ccG${player.walkY}")
+
 
         drawHistogram(g, LightmapRenderer.histogram,
                 Terrarum.WIDTH - histogramW - 30,
@@ -220,7 +226,7 @@ class BasicDebugInfoWindow:UICanvas {
 
     private fun line(i: Int): Float = i * 10f
 
-    private fun column(i: Int): Float = 250f * (i - 1)
+    private fun column(i: Int): Float = 300f * (i - 1)
 
     override fun doOpening(gc: GameContainer, delta: Int) {
 

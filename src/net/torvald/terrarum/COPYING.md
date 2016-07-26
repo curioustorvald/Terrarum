@@ -1,7 +1,9 @@
 *Terrarum* by Torvald
 
-Copyright (C) 2015-2016 Torvald. All rights reserved.
-mailto: skyhi14 *64* __115875741922660__ *46* __6516589__
+Copyright (C) 2013-2016 Torvald. All rights reserved.
+mailto: alswo9628 *at* __gmail__ *dot* __com__
+
+You can use any assets (sprites, fonts and tiles) for your own goods (e.g. texture pack for Minecraft), provided that you gave necessary credit to this game and me.
 
 ----
 

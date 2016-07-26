@@ -54,7 +54,7 @@ object PBSigrid {
 
         p.actorValue[AVKey.INTELLIGENT] = true
 
-        p.actorValue[AVKey.LUMINOSITY] = 95487100
+        p.actorValue[AVKey.LUMINOSITY] = 0//95487100
 
         p.actorValue[AVKey.BASEDEFENCE] = 141
 

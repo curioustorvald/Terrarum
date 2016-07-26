@@ -51,6 +51,7 @@ class MapLayer(var width: Int, var height: Int) : Iterable<Byte> {
 
     companion object {
         @Transient const val RANGE = 256
+        @Transient const val SIZEOF: Byte = 1 // 1 for 8-bit, 2 for 16-bit, ...
     }
 }
 

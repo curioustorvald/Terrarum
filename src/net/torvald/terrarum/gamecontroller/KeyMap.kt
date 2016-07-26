@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gamecontroller
 
+import net.torvald.terrarum.Terrarum
 import java.util.Hashtable
 
 /**
@@ -10,11 +11,11 @@ object KeyMap {
     var map_code = Hashtable<EnumKeyFunc, Int>()
 
     init {
-        map_code.put(EnumKeyFunc.MOVE_UP, Key.E)
-        map_code.put(EnumKeyFunc.MOVE_LEFT, Key.S)
-        map_code.put(EnumKeyFunc.MOVE_DOWN, Key.D)
-        map_code.put(EnumKeyFunc.MOVE_RIGHT, Key.F)
-        map_code.put(EnumKeyFunc.JUMP, Key.SPACE)
+        map_code.put(EnumKeyFunc.MOVE_UP, Terrarum.getConfigInt("keyup"))
+        map_code.put(EnumKeyFunc.MOVE_LEFT, Terrarum.getConfigInt("keyleft"))
+        map_code.put(EnumKeyFunc.MOVE_DOWN, Terrarum.getConfigInt("keydown"))
+        map_code.put(EnumKeyFunc.MOVE_RIGHT, Terrarum.getConfigInt("keyright"))
+        map_code.put(EnumKeyFunc.JUMP, Terrarum.getConfigInt("keyjump"))
         map_code.put(EnumKeyFunc.UI_CONSOLE, Key.GRAVE)
         map_code.put(EnumKeyFunc.UI_BASIC_INFO, Key.F3)
     }
@@ -23,7 +24,7 @@ object KeyMap {
         return map_code[fn]!!
     }
 
-    operator fun set(func: EnumKeyFunc, key: Int) {
+    fun set(func: EnumKeyFunc, key: Int) {
         map_code.put(func, key)
     }
 

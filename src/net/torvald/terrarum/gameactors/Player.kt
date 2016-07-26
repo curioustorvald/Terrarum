@@ -36,8 +36,10 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
 
     /** how long the jump button has down, in frames */
     internal var jumpCounter = 0
+    internal var jumpAcc = 0.0
     /** how long the walk button has down, in frames */
-    internal var walkCounter = 0
+    internal var walkCounterX = 0
+    internal var walkCounterY = 0
     @Transient private val MAX_JUMP_LENGTH = 17 // use 17; in internal frames
 
     private var readonly_totalX = 0.0
@@ -134,7 +136,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
      * @author minjaesong
      */
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
-        if ((!walledLeft && left) || (!walledRight && !left)) {
+        if (true) {//(!walledLeft && left) || (!walledRight && !left)) {
             readonly_totalX = //veloX +
                     /*actorValue.getAsDouble(AVKey.ACCEL)!! *
                           actorValue.getAsDouble(AVKey.ACCELMULT)!! *
@@ -145,7 +147,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
                     actorValue.getAsDouble(AVKey.ACCEL)!! *
                     actorValue.getAsDouble(AVKey.ACCELMULT)!! *
                     Math.sqrt(scale) *
-                    applyVelo(walkCounter) *
+                    applyVelo(walkCounterX) *
                     (if (left) -1 else 1).toFloat() *
                     absAxisVal
 
@@ -153,7 +155,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
             walkX += readonly_totalX
             walkX = absClamp(walkX, actorValue.getAsDouble(AVKey.SPEED)!! * actorValue.getAsDouble(AVKey.SPEEDMULT)!!)
 
-            walkCounter += 1
+            walkCounterX += 1
 
             // Heading flag
             if (left)
@@ -162,6 +164,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
                 walkHeading = RIGHT
 
             // println("$walkCounter: ${readonly_totalX}")
+            isWalking = true
         }
     }
 
@@ -176,13 +179,16 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
                 actorValue.getAsDouble(AVKey.ACCEL)!! *
                 actorValue.getAsDouble(AVKey.ACCELMULT)!! *
                 Math.sqrt(scale) *
-                applyVelo(walkCounter) *
+                applyVelo(walkCounterY) *
                 (if (up) -1 else 1).toFloat() *
                 absAxisVal
 
-        applyForce(Vector2(0.0, readonly_totalY))
+        walkY += readonly_totalY
+        walkY = absClamp(walkY, actorValue.getAsDouble(AVKey.SPEED)!! * actorValue.getAsDouble(AVKey.SPEEDMULT)!!)
 
-        if (walkCounter <= WALK_FRAMES_TO_MAX_ACCEL) walkCounter += 1
+        //if (walkCounterY <= WALK_FRAMES_TO_MAX_ACCEL) walkCounterY += 1
+
+        isWalking = true
     }
 
     private fun applyAccel(x: Int): Double {
@@ -219,7 +225,8 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
 
         //veloX = 0f
 
-        walkCounter = 0
+        walkCounterX = 0
+        isWalking = false
     }
 
     // stops; let the friction kick in by doing nothing to the velocity here
@@ -245,7 +252,8 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
 
         ///veloY = 0f
 
-        walkCounter = 0
+        walkCounterY = 0
+        isWalking = false
     }
 
     /**
@@ -266,9 +274,11 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
             var timedJumpCharge = init - init / len * jumpCounter
             if (timedJumpCharge < 0) timedJumpCharge = 0.0
 
-            val jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
+            jumpAcc = -pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
 
-            applyForce(Vector2(0.0, -jumpAcc))
+            applyForce(Vector2(0.0, jumpAcc))
+
+            if (jumpAcc != 0.0) println(jumpAcc)
         }
 
         // for mob ai:
@@ -359,7 +369,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
                 walkHorizontal(true, AXIS_POSMAX)
                 prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
             } // ↓F, ↓S
-            else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+            /*else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
                 if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
                     walkHorizontal(false, AXIS_POSMAX)
                     prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
@@ -367,7 +377,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
                     walkHorizontal(true, AXIS_POSMAX)
                     prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
                 }
-            }
+            }*/
         }
 
         /**
@@ -388,7 +398,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
                     walkVertical(true, AXIS_POSMAX)
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
                 } // ↓E, ↓D
-                else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+                /*else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
                     if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
                         walkVertical(false, AXIS_POSMAX)
                         prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
@@ -396,7 +406,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
                         walkVertical(true, AXIS_POSMAX)
                         prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
                     }
-                }
+                }*/
             }
         }
 

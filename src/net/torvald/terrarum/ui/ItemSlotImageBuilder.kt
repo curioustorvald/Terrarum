@@ -23,10 +23,16 @@ object ItemSlotImageBuilder {
             SpriteSheet("./res/graphics/fonts/numeric_small.png", 5, 8),
             '0'
     )
-    private val slotImage = Image("./res/graphics/gui/quickbar/item_slot.png")
+    val slotImage = Image("./res/graphics/gui/quickbar/item_slot.png") // must have same w/h as slotLarge
+    val slotLarge = Image("./res/graphics/gui/quickbar/item_slot_large.png")
     private val canvas = Image(slotImage.width, slotImage.height)
+    private val canvasLarge = Image(slotLarge.width, slotLarge.height)
+
+    val slotImageSize = slotImage.width
 
     fun produce(color: Int, number: Int = -1): Image {
+        canvas.graphics.clear()
+
         if (color == COLOR_BLACK)
             canvas.graphics.drawImage(slotImage, 0f, 0f, colourBlack)
         else if (color == COLOR_WHITE)
@@ -41,12 +47,38 @@ object ItemSlotImageBuilder {
                 canvas.graphics.color = colourBlack
 
             canvas.graphics.drawString(number.mod(UIQuickBar.SLOT_COUNT).toString(),
-                    slotImage.width - 6f,
-                    slotImage.height - 10f
+                    slotImage.width - 10f,
+                    slotImage.height - 13f
             )
         }
 
+
         return canvas
+    }
+
+    fun produceLarge(color: Int, number: Int = -1): Image {
+        canvasLarge.graphics.clear()
+
+        if (color == COLOR_BLACK)
+            canvasLarge.graphics.drawImage(slotLarge, 0f, 0f, colourBlack)
+        else if (color == COLOR_WHITE)
+            canvasLarge.graphics.drawImage(slotLarge, 0f, 0f, colourWhite)
+
+        if (number >= 0) {
+            canvasLarge.graphics.font = numberFont
+
+            if (color == COLOR_BLACK)
+                canvasLarge.graphics.color = colourWhite
+            else if (color == COLOR_WHITE)
+                canvasLarge.graphics.color = colourBlack
+
+            canvasLarge.graphics.drawString(number.mod(UIQuickBar.SLOT_COUNT).toString(),
+                    slotLarge.width - 10f,
+                    slotLarge.height - 13f
+            )
+        }
+
+        return canvasLarge
     }
 
 }

@@ -137,6 +137,13 @@ constructor() : BasicGameState() {
 
         // queue up game UIs
         //  lesser UIs
+        // quick bar
+        uiAliases[UI_QUICK_BAR] = UIHandler(UIQuickBar())
+        uiAliases[UI_QUICK_BAR]!!.isVisible = true
+        uiAliases[UI_QUICK_BAR]!!.setPosition(0, 0)
+        uiAliases[UI_QUICK_BAR]!!.UI.handler = uiAliases[UI_QUICK_BAR]
+        uiContainer.add(uiAliases[UI_QUICK_BAR]!!)
+        // pie menu
         uiAliases[UI_PIE_MENU] = UIHandler(UIPieMenu())
         uiAliases[UI_PIE_MENU]!!.setPosition(
                 (Terrarum.WIDTH - uiAliases[UI_PIE_MENU]!!.UI.width) / 2,
@@ -284,65 +291,65 @@ constructor() : BasicGameState() {
 
         if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
                 || key == Terrarum.getConfigInt("keyquicksel")) {
-            uiAliases[UI_PIE_MENU]!!.setAsOpening()
-            // TODO hide quick bar
+            uiAliases[UI_PIE_MENU]!!.setAsOpen()
+            uiAliases[UI_QUICK_BAR]!!.setAsClose()
         }
 
-        uiContainer.forEach { it.keyPressed(key, c) }
+        uiContainer.forEach { it.keyPressed(key, c) } // for KeyboardControlled UIcanvases
     }
 
     override fun keyReleased(key: Int, c: Char) {
         GameController.keyReleased(key, c)
 
         if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
-            || key == Terrarum.getConfigInt("keyquicksel")) {
-            uiAliases[UI_PIE_MENU]!!.setAsClosing()
-            // TODO show quick bar
+                || key == Terrarum.getConfigInt("keyquicksel")) {
+            uiAliases[UI_PIE_MENU]!!.setAsClose()
+            uiAliases[UI_QUICK_BAR]!!.setAsOpen()
         }
 
-        uiContainer.forEach { it.keyReleased(key, c) }
+        uiContainer.forEach { it.keyReleased(key, c) } // for KeyboardControlled UIcanvases
     }
 
     override fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
         GameController.mouseMoved(oldx, oldy, newx, newy)
 
-        uiContainer.forEach { it.mouseMoved(oldx, oldy, newx, newy) }
+        uiContainer.forEach { it.mouseMoved(oldx, oldy, newx, newy) } // for MouseControlled UIcanvases
     }
 
     override fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
         GameController.mouseDragged(oldx, oldy, newx, newy)
 
-        uiContainer.forEach { it.mouseDragged(oldx, oldy, newx, newy) }
+        uiContainer.forEach { it.mouseDragged(oldx, oldy, newx, newy) } // for MouseControlled UIcanvases
     }
 
     override fun mousePressed(button: Int, x: Int, y: Int) {
         GameController.mousePressed(button, x, y)
 
-        uiContainer.forEach { it.mousePressed(button, x, y) }
+        uiContainer.forEach { it.mousePressed(button, x, y) } // for MouseControlled UIcanvases
     }
 
     override fun mouseReleased(button: Int, x: Int, y: Int) {
         GameController.mouseReleased(button, x, y)
 
-        uiContainer.forEach { it.mouseReleased(button, x, y) }
+        uiContainer.forEach { it.mouseReleased(button, x, y) } // for MouseControlled UIcanvases
     }
 
     override fun mouseWheelMoved(change: Int) {
         GameController.mouseWheelMoved(change)
 
-        uiContainer.forEach { it.mouseWheelMoved(change) }
+        uiContainer.forEach { it.mouseWheelMoved(change) } // for MouseControlled UIcanvases
     }
 
     override fun controllerButtonPressed(controller: Int, button: Int) {
         GameController.controllerButtonPressed(controller, button)
 
-        uiContainer.forEach { it.controllerButtonPressed(controller, button) }
+        uiContainer.forEach { it.controllerButtonPressed(controller, button) } // for GamepadControlled UIcanvases
     }
 
     override fun controllerButtonReleased(controller: Int, button: Int) {
         GameController.controllerButtonReleased(controller, button)
 
-        uiContainer.forEach { it.controllerButtonReleased(controller, button) }
+        uiContainer.forEach { it.controllerButtonReleased(controller, button) } // for GamepadControlled UIcanvases
     }
 
     override fun getID(): Int = Terrarum.SCENE_ID_GAME
@@ -352,7 +359,7 @@ constructor() : BasicGameState() {
     /** Send message to notifier UI and toggle the UI as opened. */
     fun sendNotification(msg: Array<String>) {
         (notifier.UI as Notification).sendNotification(Terrarum.appgc, UPDATE_DELTA, msg)
-        notifier.setAsOpening()
+        notifier.setAsOpen()
     }
 
     fun wakeDormantActors() {
