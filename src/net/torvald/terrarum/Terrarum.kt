@@ -254,7 +254,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         private fun readConfigJson(): Boolean {
             try {
                 // read from disk and build config from it
-                val jsonObject = JsonFetcher.readJson(configDir)
+                val jsonObject = JsonFetcher(configDir)
 
                 // make config
                 jsonObject.entrySet().forEach { entry -> gameConfig[entry.key] = entry.value }

@@ -55,7 +55,7 @@ object Lang {
         for (lang in languageList) {
             // load polyglot first
             val polyglotFile = File("$PATH_TO_LANG$lang/$PREFIX_POLYGLOT$lang.json")
-            val json = JsonFetcher.readJson(polyglotFile)
+            val json = JsonFetcher(polyglotFile)
             /*
              * Polyglot JSON structure is:
              *
@@ -92,7 +92,7 @@ object Lang {
 
             // --> put json entries in langpack
             for (langFile in langFileList) {
-                val json = JsonFetcher.readJson(langFile)
+                val json = JsonFetcher(langFile)
                 /*
                  * Terrarum langpack JSON structure is:
                  *

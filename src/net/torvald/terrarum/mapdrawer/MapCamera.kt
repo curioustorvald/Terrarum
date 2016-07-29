@@ -64,6 +64,8 @@ object MapCamera {
      */
     val TILES_CONNECT_SELF = arrayOf(
               TileNameCode.ICE_MAGICAL
+            , TileNameCode.GLASS_CRUDE
+            , TileNameCode.GLASS_CLEAN
             , TileNameCode.ILLUMINATOR_BLACK
             , TileNameCode.ILLUMINATOR_BLUE
             , TileNameCode.ILLUMINATOR_BROWN

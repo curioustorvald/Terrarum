@@ -16,7 +16,7 @@ object CSVFetcher {
     private var csvString: StringBuffer? = null
 
     @Throws(IOException::class)
-    fun readCSV(csvFilePath: String): List<CSVRecord> {
+    operator fun invoke(csvFilePath: String): List<CSVRecord> {
         csvString = StringBuffer() // reset buffer every time it called
         readCSVasString(csvFilePath)
 

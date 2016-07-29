@@ -24,7 +24,7 @@ object CreatureRawInjector {
      */
     @Throws(IOException::class, SlickException::class)
     fun inject(actorValueRef: ActorValue, jsonFileName: String) {
-        val jsonObj = JsonFetcher.readJson(JSONPATH + jsonFileName)
+        val jsonObj = JsonFetcher(JSONPATH + jsonFileName)
 
         val elementsString = arrayOf(AVKey.RACENAME, AVKey.RACENAMEPLURAL)
         val elementsDouble = arrayOf(AVKey.BASEHEIGHT, AVKey.BASEMASS, AVKey.ACCEL, AVKey.TOOLSIZE, AVKey.ENCUMBRANCE)

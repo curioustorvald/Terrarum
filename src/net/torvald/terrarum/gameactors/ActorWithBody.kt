@@ -404,6 +404,7 @@ open class ActorWithBody : Actor(), Visible {
                     grounded = true
                 }
                 else if (isTouchingSide(nextHitbox, COLLIDING_BOTTOM) && !isColliding(nextHitbox)) { // actor hit something on its bottom
+                    hitAndReflectY()
                     grounded = true
                 }
                 else { // the actor is not grounded at all
@@ -751,11 +752,14 @@ open class ActorWithBody : Actor(), Visible {
     internal val bodyFriction: Int
         get() {
             var friction = 0
-            val frictionCalcHitbox = if (isWalking)
-                Hitbox(nextHitbox.posX + 1.0, nextHitbox.posY + 1.0,
-                        nextHitbox.width - 2.0, nextHitbox.height - 2.0)
-            else
-                nextHitbox.clone()
+            val frictionCalcHitbox =
+                    if (!isWalking)
+                        Hitbox(nextHitbox.posX, nextHitbox.posY,
+                                nextHitbox.width + 2.0, nextHitbox.height + 2.0)
+                        // when not walking, enlarge the hitbox for calculation so that
+                        // feet tiles are to be taken into calculation
+                    else
+                        nextHitbox.clone()
 
             // take highest value
             val tilePosXStart = (frictionCalcHitbox.posX / TSIZE).floorInt()

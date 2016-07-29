@@ -5,18 +5,19 @@ import java.util.function.Consumer
 
 /**
  * Simple ArrayList wrapper that acts as history keeper. You can append any data but cannot delete.
+ *
  * Created by minjaesong on 16-07-13.
  */
 class HistoryArray<T>(val historyMax: Int) {
 
-    val history = ArrayList<T?>(Math.min(historyMax, 256)) // 256: arbitrary-set upper bound
+    val history = ArrayList<T?>(Math.min(historyMax, 256)) // 256: arbitrary set upper bound
 
     fun add(value: T) {
         if (history.size == 0) {
             history.add(value)
             return
         }
-        // push existing values to back 1 index
+        // push existing values to an index
         else {
             for (i in history.size - 1 downTo 0) {
                 // if history.size is smaller than historyMax, make room by appending

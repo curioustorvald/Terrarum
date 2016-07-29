@@ -48,7 +48,7 @@ object DefaultConfig {
         jsonObject.addProperty("keygamemenu", Key.TAB)
         jsonObject.addProperty("keyquicksel", Key.CAPS_LOCK) // pie menu
         val keyquickselalt = JsonArray(); keyquickselalt.add(Key.BACKSPACE); keyquickselalt.add(Key.L_COMMAND); keyquickselalt.add(Key.L_CONTROL)
-        // some pro typers assign CapsLock to Backspace, LControl, or LCommand (Mac). Honestly, Control (Command for mac) and CapsLock must swap their places!
+        // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command
         jsonObject.add("keyquickselalt", keyquickselalt)
 
         jsonObject.addProperty("keyjump", Key.SPACE)

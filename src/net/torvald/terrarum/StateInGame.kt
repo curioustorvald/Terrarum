@@ -128,9 +128,9 @@ constructor() : BasicGameState() {
 
         // init notifier
         notifier = UIHandler(Notification())
+        notifier.UI.handler = notifier
         notifier.setPosition(
                 (Terrarum.WIDTH - notifier.UI.width) / 2, Terrarum.HEIGHT - notifier.UI.height)
-        notifier.isVisible = true
 
         // set smooth lighting as in config
         KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, Terrarum.getConfigBoolean("smoothlighting"))
@@ -358,8 +358,7 @@ constructor() : BasicGameState() {
 
     /** Send message to notifier UI and toggle the UI as opened. */
     fun sendNotification(msg: Array<String>) {
-        (notifier.UI as Notification).sendNotification(Terrarum.appgc, UPDATE_DELTA, msg)
-        notifier.setAsOpen()
+        (notifier.UI as Notification).sendNotification(msg)
     }
 
     fun wakeDormantActors() {

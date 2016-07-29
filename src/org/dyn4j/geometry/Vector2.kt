@@ -37,8 +37,7 @@ import org.dyn4j.Epsilon
  * [Vector2.project], and [Vector2.normalize] require the [Vector2]
  * to be non-zero in length.
  *
- *
- * Chaining is not available.
+ * ===============================================================================
  *
  * In this Kotlin code, you can use regular operators like + - * /.
  *

@@ -34,7 +34,6 @@ class ConsoleWindow : UICanvas, KeyboardControlled {
     override var height: Int = LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT + 1)
 
     override var openCloseTime: Int = 0
-    override var openCloseTimer: Int = 0
 
     private var drawOffX: Float = 0f
     private var drawOffY: Float = -height.toFloat()

@@ -41,7 +41,6 @@ class StateMonitorCheck : BasicGameState() {
         override var width = Terrarum.WIDTH
         override var height = Terrarum.HEIGHT
         override var openCloseTime = 150
-        override var openCloseTimer: Int = 0
 
         override var handler: UIHandler? = null
 

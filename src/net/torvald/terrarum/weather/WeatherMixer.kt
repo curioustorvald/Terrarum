@@ -159,7 +159,7 @@ object WeatherMixer {
          */
         val pathToImage = "./res/graphics/weathers"
 
-        val JSON = JsonFetcher.readJson(path)
+        val JSON = JsonFetcher(path)
 
         val globalLightInJson = JSON.get("globalLight").asJsonPrimitive
         val skyboxInJson = JSON.get("skyboxGradColourMap").asJsonPrimitive

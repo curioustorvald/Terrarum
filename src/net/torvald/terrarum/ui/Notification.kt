@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -12,78 +13,68 @@ import org.newdawn.slick.SlickException
 class Notification @Throws(SlickException::class)
 constructor() : UICanvas {
 
-    override var width: Int = 0
-    override var height: Int = 0
-    internal var visibleTime: Int
-    override var openCloseTimer = 0
+    private val SHOWUP_MAX = 15000
 
-    internal var isShowing = false
+    override var width: Int = 500
+
+    internal var msgUI = MessageWindow(width, true)
+
+    override var height: Int = msgUI.height
+    private val visibleTime = Math.min(
+            Terrarum.getConfigInt("notificationshowuptime"),
+            SHOWUP_MAX
+    )
+    private var displayTimer = 0
+
     internal var message: Array<String> = Array(MessageWindow.MESSAGES_DISPLAY, { i -> ""})
-
-    internal var msgUI: MessageWindow
 
     override var openCloseTime: Int = MessageWindow.OPEN_CLOSE_TIME
 
     override var handler: UIHandler? = null
 
-    private val SHOWUP_MAX = 15000
-
     init {
-        width = 500
-        msgUI = MessageWindow(width, true)
-        height = msgUI.height
-        visibleTime = Math.min(
-                Terrarum.getConfigInt("notificationshowuptime"),
-                SHOWUP_MAX
-        )
     }
 
     override fun update(gc: GameContainer, delta: Int) {
-        if (openCloseTimer >= visibleTime && isShowing) {
-            // invoke closing mode
-            doClosing(gc, delta)
-            // check if msgUI is fully fade out
-            if (msgUI.opacity <= 0.001f) {
-                endClosing(gc, delta)
-                isShowing = false
-            }
-        }
+        if (handler!!.isOpened)
+            displayTimer += delta
 
-        if (isShowing) {
-            openCloseTimer += delta
-        }
+        if (displayTimer >= visibleTime)
+            handler!!.setAsClose()
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        if (isShowing) {
-            msgUI.render(gc, g)
-        }
+        msgUI.render(gc, g)
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {
-        msgUI.doOpening(gc, delta)
+        handler!!.opacity = FastMath.interpolateLinear(handler!!.openCloseCounter.toFloat() / openCloseTime.toFloat(),
+                0f, 1f
+        )
     }
 
     override fun doClosing(gc: GameContainer, delta: Int) {
-        msgUI.doClosing(gc, delta)
+        handler!!.opacity = FastMath.interpolateLinear(handler!!.openCloseCounter.toFloat() / openCloseTime.toFloat(),
+                1f, 0f
+        )
     }
 
     override fun endOpening(gc: GameContainer, delta: Int) {
-        msgUI.endOpening(gc, delta)
+        handler!!.opacity = 1f
     }
 
     override fun endClosing(gc: GameContainer, delta: Int) {
-        msgUI.endClosing(gc, delta)
+        handler!!.opacity = 0f
     }
 
     override fun processInput(input: Input) {
-
     }
 
-    fun sendNotification(gc: GameContainer, delta: Int, message: Array<String>) {
-        isShowing = true
+    fun sendNotification(message: Array<String>) {
         this.message = message
         msgUI.setMessage(this.message)
-        openCloseTimer = 0
+        handler!!.openCloseCounter = 0
+        handler!!.opacity = 0f
+        handler!!.setAsOpen()
     }
 }

@@ -140,7 +140,7 @@ constructor() {
             flippedImage.startUse()
             flippedImage.drawEmbedded(
                     Math.round(posX * Terrarum.ingame.screenZoom).toFloat(),
-                    Math.round(posY * Terrarum.ingame.screenZoom).toFloat(),
+                    FastMath.floor(posY * Terrarum.ingame.screenZoom).toFloat(),
                     FastMath.floor(width * scale).toFloat(),
                     FastMath.floor(height * scale).toFloat()
             )

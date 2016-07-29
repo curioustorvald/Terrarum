@@ -27,12 +27,7 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
 
     override var openCloseTime: Int = OPEN_CLOSE_TIME
 
-    internal var opacity = 0f
-    override var openCloseTimer = 0
-
     override var handler: UIHandler? = null
-
-    private lateinit var uidrawCanvas: Image // render all the images and fonts here; will be faded
 
     init {
         if (!isBlackVariant) {
@@ -49,7 +44,6 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
         height = segmentLeft!!.height
         messageWindowRadius = segmentLeft!!.width
         messagesList = arrayOf("", "")
-        uidrawCanvas = Image(FastMath.nearestPowerOfTwo(width), FastMath.nearestPowerOfTwo(height))
     }
 
     fun setMessage(messagesList: Array<String>) {
@@ -61,25 +55,21 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        val canvasG = uidrawCanvas.graphics
-
         setBlendDisable()
-        drawSegments(canvasG)
-        canvasG.setDrawMode(Graphics.MODE_ALPHA_MAP)
-        drawSegments(canvasG)
 
-        canvasG.font = uiFont
+        drawSegments(g)
+        g.setDrawMode(Graphics.MODE_ALPHA_MAP)
+        drawSegments(g)
 
-        canvasG.setDrawMode(Graphics.MODE_NORMAL)
+        g.font = uiFont
+
+        g.setDrawMode(Graphics.MODE_NORMAL)
         for (i in 0..Math.min(messagesList.size, MESSAGES_DISPLAY) - 1) {
-            canvasG.color = fontCol
-            canvasG.drawString(messagesList[i], (messageWindowRadius + 4).toFloat(), (messageWindowRadius + GLYPH_HEIGHT * i).toFloat())
+            g.color = fontCol
+            g.drawString(messagesList[i], (messageWindowRadius + 4).toFloat(), (messageWindowRadius + GLYPH_HEIGHT * i).toFloat())
         }
 
         setBlendNormal()
-        g.drawImage(uidrawCanvas, 0f, 0f, Color(1f,1f,1f,opacity))
-
-        canvasG.clear()
     }
 
     override fun processInput(input: Input) {
@@ -87,27 +77,15 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {
-        openCloseTimer += delta
-        opacity = FastMath.interpolateLinear(openCloseTimer.toFloat() / openCloseTime.toFloat(),
-                0f, 1f
-        )
     }
 
     override fun doClosing(gc: GameContainer, delta: Int) {
-        openCloseTimer += delta
-        opacity = FastMath.interpolateLinear(openCloseTimer.toFloat() / openCloseTime.toFloat(),
-                1f, 0f
-        )
     }
 
     override fun endOpening(gc: GameContainer, delta: Int) {
-        opacity = 1f
-        openCloseTimer = 0
     }
 
     override fun endClosing(gc: GameContainer, delta: Int) {
-        opacity = 0f
-        openCloseTimer = 0
     }
 
     private fun drawSegments(g: Graphics) {

@@ -56,6 +56,9 @@ object TileNameCode {
     val ICE_NATURAL = TilePropCodex.idDamageToIndex(9, 2)
     val ICE_MAGICAL = TilePropCodex.idDamageToIndex(9, 3)
 
+    val GLASS_CRUDE = TilePropCodex.idDamageToIndex(9, 4)
+    val GLASS_CLEAN = TilePropCodex.idDamageToIndex(9, 5)
+
     val PLATFORM_STONE = TilePropCodex.idDamageToIndex(10, 0)
     val PLATFORM_WOODEN = TilePropCodex.idDamageToIndex(10, 1)
     val PLATFORM_EBONY = TilePropCodex.idDamageToIndex(10, 2)

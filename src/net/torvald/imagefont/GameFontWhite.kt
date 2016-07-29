@@ -14,13 +14,13 @@ constructor() : GameFontBase() {
         GameFontBase.hangulSheet = SpriteSheet(
                 "./res/graphics/fonts/han_johab.png", GameFontBase.W_CJK, GameFontBase.H_HANGUL)
         GameFontBase.asciiSheet = SpriteSheet(
-                "./res/graphics/fonts/ascii_majuscule.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
+                "./res/graphics/fonts/ascii_fullwidth.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.asciiSheetEF = SpriteSheet(
                 "./res/graphics/fonts/ascii_special_ef.png", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
         GameFontBase.runicSheet = SpriteSheet(
                 "./res/graphics/fonts/futhark.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.extASheet = SpriteSheet(
-                "./res/graphics/fonts/LatinExtA_majuscule.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
+                "./res/graphics/fonts/LatinExtA_fullwidth.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.extASheetEF = SpriteSheet(
                 "./res/graphics/fonts/LatinExtA_ef.png", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
         GameFontBase.kanaSheet = SpriteSheet(
@@ -35,7 +35,7 @@ constructor() : GameFontBase() {
                 , W_UNIHAN, H_UNIHAN
         );*/
         GameFontBase.cyrilic = SpriteSheet(
-                "./res/graphics/fonts/cyrilic_majuscule.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
+                "./res/graphics/fonts/cyrilic_fullwidth.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.cyrilicEF = SpriteSheet(
                 "./res/graphics/fonts/cyrilic_ef.png", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
         GameFontBase.fullwidthForms = SpriteSheet(
@@ -47,11 +47,11 @@ constructor() : GameFontBase() {
         GameFontBase.wenQuanYi_2 = SpriteSheet(
                 "./res/graphics/fonts/wenquanyi_11pt_part2.png", 16, 18, 2)
         GameFontBase.greekSheet = SpriteSheet(
-                "./res/graphics/fonts/greek_majuscule.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
+                "./res/graphics/fonts/greek_fullwidth.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.greekSheetEF = SpriteSheet(
                 "./res/graphics/fonts/greek_ef.png", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
         GameFontBase.romanianSheet = SpriteSheet(
-                "./res/graphics/fonts/romana_majuscule.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
+                "./res/graphics/fonts/romana_fullwidth.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.romanianSheetEF = SpriteSheet(
                 "./res/graphics/fonts/romana_ef.png", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
         GameFontBase.thaiSheet = SpriteSheet(

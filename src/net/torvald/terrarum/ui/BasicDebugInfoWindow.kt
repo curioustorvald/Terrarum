@@ -25,7 +25,6 @@ class BasicDebugInfoWindow : UICanvas {
     override var height: Int = Terrarum.HEIGHT
 
     override var openCloseTime: Int = 0
-    override var openCloseTimer: Int = 0
 
     override var handler: UIHandler? = null
 

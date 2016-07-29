@@ -18,7 +18,7 @@ object JsonFetcher {
     private var jsonString: StringBuffer? = null
 
     @Throws(IOException::class)
-    fun readJson(jsonFilePath: String): JsonObject {
+    operator fun invoke(jsonFilePath: String): JsonObject {
         jsonString = StringBuffer() // reset buffer every time it called
         readJsonFileAsString(jsonFilePath)
 
@@ -31,7 +31,7 @@ object JsonFetcher {
     }
 
     @Throws(IOException::class)
-    fun readJson(jsonFile: File): JsonObject {
+    operator fun invoke(jsonFile: File): JsonObject {
         jsonString = StringBuffer() // reset buffer every time it called
         readJsonFileAsString(jsonFile.canonicalPath)
 

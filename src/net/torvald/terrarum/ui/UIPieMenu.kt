@@ -27,8 +27,6 @@ class UIPieMenu : UICanvas {
      * In milliseconds
      */
     override var openCloseTime: Int = 160
-    override var openCloseTimer: Int = 0
-        get() = handler!!.openCloseCounter
 
     private val smallenSize = 0.93f
 
@@ -82,12 +80,12 @@ class UIPieMenu : UICanvas {
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {
-        handler!!.opacity = openCloseTimer.toFloat() / openCloseTime
+        handler!!.opacity = handler!!.openCloseCounter.toFloat() / openCloseTime
         handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
     }
 
     override fun doClosing(gc: GameContainer, delta: Int) {
-        handler!!.opacity = (openCloseTime - openCloseTimer.toFloat()) / openCloseTime
+        handler!!.opacity = (openCloseTime - handler!!.openCloseCounter.toFloat()) / openCloseTime
         handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
     }
 

@@ -277,8 +277,6 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
             jumpAcc = -pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
 
             applyForce(Vector2(0.0, jumpAcc))
-
-            if (jumpAcc != 0.0) println(jumpAcc)
         }
 
         // for mob ai:

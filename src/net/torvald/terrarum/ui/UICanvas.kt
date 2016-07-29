@@ -12,16 +12,17 @@ interface UICanvas {
     var width: Int
     var height: Int
 
+    /**
+     * Usage: (in StateInGame:) uiHandlerField.ui.handler = uiHandlerField
+     */
     var handler: UIHandler?
 
     /**
      * In milliseconds
+     *
+     * Timer itself is implemented in the handler.
      */
     var openCloseTime: Int
-    /**
-     * Usage: get() = handler!!.openCloseCounter
-     */
-    var openCloseTimer: Int
 
     fun update(gc: GameContainer, delta: Int)
 
@@ -29,11 +30,23 @@ interface UICanvas {
 
     fun processInput(input: Input)
 
+    /**
+     * Do not modify handler!!.openCloseCounter here.
+     */
     fun doOpening(gc: GameContainer, delta: Int)
 
+    /**
+     * Do not modify handler!!.openCloseCounter here.
+     */
     fun doClosing(gc: GameContainer, delta: Int)
 
+    /**
+     * Do not modify handler!!.openCloseCounter here.
+     */
     fun endOpening(gc: GameContainer, delta: Int)
 
+    /**
+     * Do not modify handler!!.openCloseCounter here.
+     */
     fun endClosing(gc: GameContainer, delta: Int)
 }

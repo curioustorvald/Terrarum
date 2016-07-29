@@ -17,7 +17,6 @@ class UIQuickBar : UICanvas, MouseControlled {
      * In milliseconds
      */
     override var openCloseTime: Int = 160
-    override var openCloseTimer: Int = 0
 
     private val startPointX = ItemSlotImageBuilder.slotLarge.width / 2
     private val startPointY = ItemSlotImageBuilder.slotLarge.height / 2
@@ -56,11 +55,11 @@ class UIQuickBar : UICanvas, MouseControlled {
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {
-        handler!!.opacity = openCloseTimer.toFloat() / openCloseTime
+        handler!!.opacity = handler!!.openCloseCounter.toFloat() / openCloseTime
     }
 
     override fun doClosing(gc: GameContainer, delta: Int) {
-        handler!!.opacity = (openCloseTime - openCloseTimer.toFloat()) / openCloseTime
+        handler!!.opacity = (openCloseTime - handler!!.openCloseCounter.toFloat()) / openCloseTime
     }
 
     override fun endOpening(gc: GameContainer, delta: Int) {
