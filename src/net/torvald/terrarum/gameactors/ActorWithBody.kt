@@ -211,7 +211,8 @@ open class ActorWithBody : Actor(), Visible {
 
     var ccdCollided = false
 
-    var isWalking = false
+    var isWalkingH = false
+    var isWalkingV = false
 
     init {
         // some initialiser goes here...
@@ -613,7 +614,7 @@ open class ActorWithBody : Actor(), Visible {
     }
 
     private fun isCollidingInternal(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int): Boolean {
-        /*for (y in tyStart..tyEnd) {
+        for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
                 val tile = world.getTileFromTerrain(x, y)
                 if (TilePropCodex.getProp(tile).isSolid)
@@ -621,8 +622,10 @@ open class ActorWithBody : Actor(), Visible {
             }
         }
 
-        return false*/
-        return if (tyEnd < 348) false else true
+        return false
+
+        // test code
+        //return if (tyEnd < 348) false else true
     }
 
     private fun getContactingAreaFluid(side: Int, translateX: Int = 0, translateY: Int = 0): Int {
@@ -753,7 +756,7 @@ open class ActorWithBody : Actor(), Visible {
         get() {
             var friction = 0
             val frictionCalcHitbox =
-                    if (!isWalking)
+                    if (!isWalkingH)
                         Hitbox(nextHitbox.posX, nextHitbox.posY,
                                 nextHitbox.width + 2.0, nextHitbox.height + 2.0)
                         // when not walking, enlarge the hitbox for calculation so that
@@ -929,16 +932,19 @@ open class ActorWithBody : Actor(), Visible {
             if      (this > 0 && this > limit)   limit
             else if (this < 0 && this < -limit) -limit
             else this
-    fun Double.floorSpecial(): Int {
-        val threshold = 1.1 / TSIZE.toDouble()
-        // the idea is 321.0625 would rounded to 321, 320.9375 would rounded to 321,
-        // and regular flooring for otherwise.
-        if (this % TSIZE.toDouble() <= threshold) // case: 321.0625
-            return this.floorInt()
-        else if (1.0 - this.mod(TSIZE.toDouble()) <= threshold) // case: 320.9375
-            return this.floorInt() + 1
-        else
-            return this.floorInt()
+    fun absMax(left: Double, right: Double): Double {
+        if (left > 0 && right > 0)
+            if (left > right) return left
+            else              return right
+        else if (left < 0 && right < 0)
+            if (left < right) return left
+            else              return right
+        else {
+            val absL = left.abs()
+            val absR = right.abs()
+            if (absL > absR) return left
+            else             return right
+        }
     }
 
     private fun assertInit() {

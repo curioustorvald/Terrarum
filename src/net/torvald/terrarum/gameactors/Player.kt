@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameactors
 
+import com.jme3.math.FastMath
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
@@ -55,7 +56,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
     internal var noClip = false
 
     @Transient private val AXIS_POSMAX = 1.0f
-    @Transient private val GAMEPAD_JUMP = 5
+    @Transient private val GAMEPAD_JUMP = 7
 
     @Transient private val TSIZE = MapDrawer.TILE_SIZE
 
@@ -77,6 +78,12 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         }
     override val lightBoxList: List<Hitbox>
         get() = arrayOf(Hitbox(0.0, 0.0, hitbox.width, hitbox.height)).toList() // use getter; dimension of the player may change by time.
+
+    var gamepad: Controller? = Controllers.getController(0)
+    var axisX = 0f
+    var axisY = 0f
+    var axisRX = 0f
+    var axisRY = 0f
 
     companion object {
         @Transient internal const val ACCEL_MULT_IN_FLIGHT: Double = 0.21
@@ -137,19 +144,19 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
      */
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
         if (true) {//(!walledLeft && left) || (!walledRight && !left)) {
-            readonly_totalX = //veloX +
-                    /*actorValue.getAsDouble(AVKey.ACCEL)!! *
-                          actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                          Math.sqrt(scale) *
-                          applyAccelRealism(walkPowerCounter) *
-                          (if (left) -1 else 1).toFloat() *
-                          absAxisVal*/
-                    actorValue.getAsDouble(AVKey.ACCEL)!! *
-                    actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                    Math.sqrt(scale) *
-                    applyVelo(walkCounterX) *
-                    (if (left) -1 else 1).toFloat() *
-                    absAxisVal
+            readonly_totalX =
+                    absMax( // keyboard
+                            actorValue.getAsDouble(AVKey.ACCEL)!! *
+                            actorValue.getAsDouble(AVKey.ACCELMULT)!! *
+                            Math.sqrt(scale) *
+                            applyVelo(walkCounterX) *
+                            (if (left) -1f else 1f)
+                            , // gamepad
+                            actorValue.getAsDouble(AVKey.ACCEL)!! *
+                            actorValue.getAsDouble(AVKey.ACCELMULT)!! *
+                            Math.sqrt(scale) *
+                            (if (left) -1f else 1f) * absAxisVal
+                    )
 
             //applyForce(Vector2(readonly_totalX, 0.0))
             walkX += readonly_totalX
@@ -163,8 +170,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
             else
                 walkHeading = RIGHT
 
-            // println("$walkCounter: ${readonly_totalX}")
-            isWalking = true
+            isWalkingH = true
         }
     }
 
@@ -176,19 +182,26 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
      */
     private fun walkVertical(up: Boolean, absAxisVal: Float) {
         readonly_totalY =
-                actorValue.getAsDouble(AVKey.ACCEL)!! *
-                actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                Math.sqrt(scale) *
-                applyVelo(walkCounterY) *
-                (if (up) -1 else 1).toFloat() *
-                absAxisVal
+                absMax( // keyboard
+                        actorValue.getAsDouble(AVKey.ACCEL)!! *
+                        actorValue.getAsDouble(AVKey.ACCELMULT)!! *
+                        Math.sqrt(scale) *
+                        applyVelo(walkCounterY) *
+                        (if (up) -1f else 1f)
+                        , // gamepad
+                        actorValue.getAsDouble(AVKey.ACCEL)!! *
+                        actorValue.getAsDouble(AVKey.ACCELMULT)!! *
+                        Math.sqrt(scale) *
+                        applyVelo(walkCounterY) *
+                        (if (up) -1f else 1f) * absAxisVal
+                )
 
         walkY += readonly_totalY
         walkY = absClamp(walkY, actorValue.getAsDouble(AVKey.SPEED)!! * actorValue.getAsDouble(AVKey.SPEEDMULT)!!)
 
-        //if (walkCounterY <= WALK_FRAMES_TO_MAX_ACCEL) walkCounterY += 1
+        walkCounterY += 1
 
-        isWalking = true
+        isWalkingV = true
     }
 
     private fun applyAccel(x: Int): Double {
@@ -226,7 +239,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         //veloX = 0f
 
         walkCounterX = 0
-        isWalking = false
+        isWalkingH = false
     }
 
     // stops; let the friction kick in by doing nothing to the velocity here
@@ -253,7 +266,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         ///veloY = 0f
 
         walkCounterY = 0
-        isWalking = false
+        isWalkingV = false
     }
 
     /**
@@ -299,18 +312,14 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
     }
 
     override fun processInput(input: Input) {
-        var gamepad: Controller? = null
-        var axisX = 0f
-        var axisY = 0f
-        var axisRX = 0f
-        var axisRY = 0f
         if (Terrarum.hasController) {
             gamepad = Controllers.getController(0)
             axisX = gamepad!!.getAxisValue(0)
-            axisY = gamepad.getAxisValue(1)
-            axisRX = gamepad.getAxisValue(2)
-            axisRY = gamepad.getAxisValue(3)
+            axisY = gamepad!!.getAxisValue(1)
+            axisRX = gamepad!!.getAxisValue(2)
+            axisRY = gamepad!!.getAxisValue(3)
 
+            // deadzonning
             if (Math.abs(axisX) < Terrarum.CONTROLLER_DEADZONE) axisX = 0f
             if (Math.abs(axisY) < Terrarum.CONTROLLER_DEADZONE) axisY = 0f
             if (Math.abs(axisRX) < Terrarum.CONTROLLER_DEADZONE) axisRX = 0f
@@ -320,16 +329,15 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         /**
          * L-R stop
          */
-        if (Terrarum.hasController) {
+        if (Terrarum.hasController && !isWalkingH) {
             if (axisX == 0f) {
                 walkHStop()
             }
-        } else {
-            // ↑F, ↑S
-            if (!isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
-                walkHStop()
-                prevHMoveKey = KEY_NULL
-            }
+        }
+        // ↑F, ↑S
+        if (isWalkingH && !isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+            walkHStop()
+            prevHMoveKey = KEY_NULL
         }
         /**
          * U-D stop
@@ -338,15 +346,14 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
             if (axisY == 0f) {
                 walkVStop()
             }
-        } else {
-            // ↑E
-            // ↑D
-            if (isNoClip()
-                    && !isFuncDown(input, EnumKeyFunc.MOVE_UP)
-                    && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
-                walkVStop()
-                prevVMoveKey = KEY_NULL
-            }
+        }
+        // ↑E
+        // ↑D
+        if (isNoClip()
+                && !isFuncDown(input, EnumKeyFunc.MOVE_UP)
+                && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+            walkVStop()
+            prevVMoveKey = KEY_NULL
         }
 
         /**
@@ -355,28 +362,27 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
 
         if (Terrarum.hasController) {
             if (axisX != 0f) {
-                walkHorizontal(axisX < 0, AXIS_POSMAX)
+                walkHorizontal(axisX < 0f, axisX.abs())
             }
-        } else {
-            // ↑F, ↓S
-            if (isFuncDown(input, EnumKeyFunc.MOVE_RIGHT) && !isFuncDown(input, EnumKeyFunc.MOVE_LEFT)) {
-                walkHorizontal(false, AXIS_POSMAX)
-                prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
-            } // ↓F, ↑S
-            else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
-                walkHorizontal(true, AXIS_POSMAX)
-                prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
-            } // ↓F, ↓S
-            /*else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
-                if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
-                    walkHorizontal(false, AXIS_POSMAX)
-                    prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
-                } else if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)) {
-                    walkHorizontal(true, AXIS_POSMAX)
-                    prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
-                }
-            }*/
         }
+        // ↑F, ↓S
+        if (isFuncDown(input, EnumKeyFunc.MOVE_RIGHT) && !isFuncDown(input, EnumKeyFunc.MOVE_LEFT)) {
+            walkHorizontal(false, AXIS_POSMAX)
+            prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
+        } // ↓F, ↑S
+        else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+            walkHorizontal(true, AXIS_POSMAX)
+            prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
+        } // ↓F, ↓S
+        /*else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+               if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
+                   walkHorizontal(false, AXIS_POSMAX)
+                   prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
+               } else if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)) {
+                   walkHorizontal(true, AXIS_POSMAX)
+                   prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
+               }
+           }*/
 
         /**
          * Up/Down movement
@@ -384,28 +390,27 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         if (noClip) {
             if (Terrarum.hasController) {
                 if (axisY != 0f) {
-                    walkVertical(axisY > 0, AXIS_POSMAX)
+                    walkVertical(axisY > 0, axisY.abs())
                 }
-            } else {
-                // ↑E, ↓D
-                if (isFuncDown(input, EnumKeyFunc.MOVE_DOWN) && !isFuncDown(input, EnumKeyFunc.MOVE_UP)) {
+            }
+            // ↑E, ↓D
+            if (isFuncDown(input, EnumKeyFunc.MOVE_DOWN) && !isFuncDown(input, EnumKeyFunc.MOVE_UP)) {
+                walkVertical(false, AXIS_POSMAX)
+                prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
+            } // ↓E, ↑D
+            else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+                walkVertical(true, AXIS_POSMAX)
+                prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
+            } // ↓E, ↓D
+            /*else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+                if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
                     walkVertical(false, AXIS_POSMAX)
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
-                } // ↓E, ↑D
-                else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+                } else if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)) {
                     walkVertical(true, AXIS_POSMAX)
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
-                } // ↓E, ↓D
-                /*else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
-                    if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
-                        walkVertical(false, AXIS_POSMAX)
-                        prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
-                    } else if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)) {
-                        walkVertical(true, AXIS_POSMAX)
-                        prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
-                    }
-                }*/
-            }
+                }
+            }*/
         }
 
         /**
@@ -423,6 +428,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         } else {
             jumping = false
             jumpCounter = 0
+            jumpAcc = 0.0
         }
 
     }
@@ -485,4 +491,5 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         throw UnsupportedOperationException()
     }
 
+    fun Float.abs() = FastMath.abs(this)
 }
