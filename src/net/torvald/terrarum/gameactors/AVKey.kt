@@ -12,12 +12,12 @@ object AVKey {
      * walking/running speed
      */
     const val SPEED = "speed"
-    const val SPEEDMULT = "speed$MULT"
+    const val SPEEDMULT = "$SPEED$MULT"
     /** pixels per frame squared
      * acceleration of the movement (e.g. running, flying, driving, etc.)
      */
     const val ACCEL = "accel"
-    const val ACCELMULT = "accel$MULT"
+    const val ACCELMULT = "$ACCEL$MULT"
     const val SCALE = "scale"
     /** pixels */
     const val BASEHEIGHT = "baseheight"
@@ -25,7 +25,7 @@ object AVKey {
     const val BASEMASS = "basemass"
     /** pixels per frame */
     const val JUMPPOWER = "jumppower"
-    const val JUMPPOWERMULT = "jumppower$MULT"
+    const val JUMPPOWERMULT = "$JUMPPOWER$MULT"
 
     /** Int
      * "Default" value of 1 000
@@ -72,7 +72,10 @@ object AVKey {
      * current defence point of worn armour(s)
      */
     const val ARMOURDEFENCE = "armourdefence"
-    const val ARMOURDEFENCEMULT = "armourdefence$MULT"
+    const val ARMOURDEFENCEMULT = "$ARMOURDEFENCE$MULT"
+
+    const val MAGICREGENRATE = "magicregenrate"
+    const val MAGICREGENRATEMULT = "$MAGICREGENRATE$MULT"
 
 
 

@@ -46,7 +46,7 @@ object CommandDict {
             Pair("langtest", LangTest())
     )
 
-    fun getCommand(commandName: String): ConsoleCommand {
+    operator fun get(commandName: String): ConsoleCommand {
         return dict[commandName]!!
     }
 }

@@ -39,13 +39,15 @@ object CommandInterpreter {
         for (single_command in cmd) {
             var commandObj: ConsoleCommand? = null
             try {
-                if (commandsNoAuth.contains(single_command!!.name.toLowerCase())) {
-                    commandObj = CommandDict.getCommand(single_command.name.toLowerCase())
+                if (single_command!!.name.toLowerCase().startsWith("qqq")) {
+                    commandObj = CommandDict["qqq"]
+                }
+                else if (commandsNoAuth.contains(single_command.name.toLowerCase())) {
+                    commandObj = CommandDict[single_command.name.toLowerCase()]
                 }
                 else {
                     if (Terrarum.ingame.auth.b()) {
-                        commandObj = CommandDict.getCommand(
-                                single_command.name.toLowerCase())
+                        commandObj = CommandDict[single_command.name.toLowerCase()]
                     }
                     else {
                         // System.out.println("ee1");

@@ -331,8 +331,8 @@ open class ActorWithBody : Actor(), Visible {
             }
 
             // cheap solution for sticking into the wall while Left or Right is held
-            walledLeft =  false//isTouchingSide(hitbox, COLLIDING_LEFT)
-            walledRight = false//isTouchingSide(hitbox, COLLIDING_RIGHT)
+            walledLeft =  isTouchingSide(nextHitbox, COLLIDING_LEFT)
+            walledRight = isTouchingSide(nextHitbox, COLLIDING_RIGHT)
         }
     }
 
@@ -421,10 +421,10 @@ open class ActorWithBody : Actor(), Visible {
                 }
             }
             // axis X
-            if (isTouchingSide(nextHitbox, COLLIDING_LEFT) && isTouchingSide(nextHitbox, COLLIDING_RIGHT)
+            if (isTouchingSide(nextHitbox, COLLIDING_LEFT) || isTouchingSide(nextHitbox, COLLIDING_RIGHT)
                     && moveDelta.x != 0.0) { // check right and left
                 // the actor is hitting the wall
-                //hitAndReflectX()
+                hitAndReflectX()
             }
         }
     }
@@ -443,11 +443,6 @@ open class ActorWithBody : Actor(), Visible {
             val ccdDelta = (nextHitbox.toVector() - hitbox.toVector())
             if (ccdDelta.x != 0.0 || ccdDelta.y != 0.0)
                 ccdDelta.set(ccdDelta.setMagnitude(CCD_TICK))
-
-            //////TEST//////
-            ccdDelta.x = 0.0
-            //////TEST//////
-            // Result: player CAN WALK with ccdDelta.x of zero, which means previous method is a shit.
 
             //println("deltaMax: $deltaMax")
             //println("ccdDelta: $ccdDelta")

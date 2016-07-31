@@ -143,7 +143,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
      * @author minjaesong
      */
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
-        if (true) {//(!walledLeft && left) || (!walledRight && !left)) {
+        if ((!walledLeft && left) || (!walledRight && !left)) {
             readonly_totalX =
                     absMax( // keyboard
                             actorValue.getAsDouble(AVKey.ACCEL)!! *
@@ -156,6 +156,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
                             actorValue.getAsDouble(AVKey.ACCELMULT)!! *
                             Math.sqrt(scale) *
                             (if (left) -1f else 1f) * absAxisVal
+                            // do not add applyVelo(walkCounterY) here, as it prevents player from moving with gamepad
                     )
 
             //applyForce(Vector2(readonly_totalX, 0.0))
@@ -192,7 +193,6 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
                         actorValue.getAsDouble(AVKey.ACCEL)!! *
                         actorValue.getAsDouble(AVKey.ACCELMULT)!! *
                         Math.sqrt(scale) *
-                        applyVelo(walkCounterY) *
                         (if (up) -1f else 1f) * absAxisVal
                 )
 
@@ -275,10 +275,20 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
      * TODO linear function (play Super Mario Bros. and you'll get what I'm talking about)
      */
     private fun jump() {
-        if (jumping) {
-            val len = MAX_JUMP_LENGTH.toFloat()
-            val pwr = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERMULT) ?: 1.0)
 
+        val len = MAX_JUMP_LENGTH.toFloat()
+        val pwr = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERMULT) ?: 1.0)
+        val jumpLinearThre = 0.08
+
+        fun jumpFunc(x: Int): Double {
+            if (x >= len) return 0.0
+            val ret = pwr - 0.02 * x
+
+            if (ret < jumpLinearThre) return jumpLinearThre
+            else return ret
+        }
+
+        if (jumping) {
             // increment jump counter
             if (jumpCounter < len) jumpCounter += 1
 
@@ -286,6 +296,9 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
             val init = (len + 1) / 2.0
             var timedJumpCharge = init - init / len * jumpCounter
             if (timedJumpCharge < 0) timedJumpCharge = 0.0
+
+            // one that uses jumpFunc(x)
+            //val timedJumpCharge = jumpFunc(jumpCounter)
 
             jumpAcc = -pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
 
@@ -390,7 +403,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         if (noClip) {
             if (Terrarum.hasController) {
                 if (axisY != 0f) {
-                    walkVertical(axisY > 0, axisY.abs())
+                    walkVertical(axisY < 0, axisY.abs())
                 }
             }
             // ↑E, ↓D
