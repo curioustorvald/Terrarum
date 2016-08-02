@@ -94,9 +94,9 @@ constructor() : BasicGameState() {
     @Throws(SlickException::class)
     override fun init(gameContainer: GameContainer, stateBasedGame: StateBasedGame) {
         // load necessary shaders
-        shader12BitCol = Shader.makeShader("./res/4096.vrt", "./res/4096.frg")
-        shaderBlurH = Shader.makeShader("./res/blurH.vrt", "./res/blur.frg")
-        shaderBlurV = Shader.makeShader("./res/blurV.vrt", "./res/blur.frg")
+        shader12BitCol = Shader.makeShader("./assets/4096.vrt", "./assets/4096.frg")
+        shaderBlurH = Shader.makeShader("./assets/blurH.vrt", "./assets/blur.frg")
+        shaderBlurV = Shader.makeShader("./assets/blurV.vrt", "./assets/blur.frg")
 
         // init map as chosen size
         world = GameWorld(8192, 2048)

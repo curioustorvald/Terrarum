@@ -1129,11 +1129,11 @@
             },
             {
                 "n": "GAME_CHARACTER_HEART",
-                "s": "Coeur"
+                "s": "Cœur"
             },
             {
                 "n": "GAME_CHARACTER_HEART_PLURAL",
-                "s": "Coeurs"
+                "s": "Cœurs"
             },
             {
                 "n": "GAME_CHARACTER_LEVEL",

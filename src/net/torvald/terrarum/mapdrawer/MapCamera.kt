@@ -29,11 +29,11 @@ object MapCamera {
 
     private val TSIZE = MapDrawer.TILE_SIZE
 
-    var tilesWall: SpriteSheet = SpriteSheet("./res/graphics/terrain/wall.png", TSIZE, TSIZE)
+    var tilesWall: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wall.png", TSIZE, TSIZE)
         private set
-    var tilesTerrain: SpriteSheet = SpriteSheet("./res/graphics/terrain/terrain.png", TSIZE, TSIZE)
+    var tilesTerrain: SpriteSheet = SpriteSheet("./assets/graphics/terrain/terrain.png", TSIZE, TSIZE)
         private set
-    var tilesWire: SpriteSheet = SpriteSheet("./res/graphics/terrain/wire.png", TSIZE, TSIZE)
+    var tilesWire: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wire.png", TSIZE, TSIZE)
         private set
     var tilesetBook: Array<SpriteSheet> = arrayOf(tilesWall, tilesTerrain, tilesWire)
         private set

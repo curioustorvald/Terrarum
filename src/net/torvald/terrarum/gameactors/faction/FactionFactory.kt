@@ -10,7 +10,7 @@ import java.io.IOException
  */
 object FactionFactory {
 
-    const val JSONPATH = "./res/raw/factions/"
+    const val JSONPATH = "./assets/raw/factions/"
 
     /**
      * @param filename with extension

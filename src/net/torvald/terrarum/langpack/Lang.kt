@@ -28,7 +28,7 @@ object Lang {
 
     val languageList: List<String>
 
-    private val PATH_TO_LANG = "./res/locales/"
+    private val PATH_TO_LANG = "./assets/locales/"
     val POLYGLOT_VERSION = "100"
     private val PREFIX_POLYGLOT = "Polyglot-${POLYGLOT_VERSION}_"
     private val PREFIX_NAMESET = "nameset_"

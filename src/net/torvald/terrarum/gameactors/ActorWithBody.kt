@@ -112,6 +112,8 @@ open class ActorWithBody : Actor(), Visible {
         set(value) { elasticity = 1.0 - value }
         get() = 1.0 - elasticity
 
+    @Transient private val CEILING_HIT_ELASTICITY = 0.3
+
     var density = 1000.0
         set(value) {
             if (value < 0)
@@ -374,7 +376,7 @@ open class ActorWithBody : Actor(), Visible {
      * Apply only if not grounded; normal force is precessed separately.
      */
     private fun applyGravitation() {
-        if (!isTouchingSide(hitbox, COLLIDING_BOTTOM)) {//(!isColliding(COLLIDING_BOTTOM)) { // or !grounded
+        if (!isTouchingSide(hitbox, COLLIDING_BOTTOM)) {
             /**
              * weight; gravitational force in action
              * W = mass * G (9.8 [m/s^2])
@@ -388,7 +390,7 @@ open class ActorWithBody : Actor(), Visible {
              * Drag of atmosphere
              * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity sqr) * A (area)
              */
-            val D: Vector2 = velocity * DRAG_COEFF * 0.5 * A// * tileDensityFluid.toDouble()
+            val D: Vector2 = Vector2(veloX.magnSqr(), veloY.magnSqr()) * DRAG_COEFF * 0.5 * A// * tileDensityFluid.toDouble()
 
             val V: Vector2 = (W - D) / mass * SI_TO_GAME_ACC
 
@@ -398,9 +400,13 @@ open class ActorWithBody : Actor(), Visible {
 
     private fun applyNormalForce() {
         if (!isNoCollideWorld) {
-            // axis Y. Use operand >=
-            if (moveDelta.y >= 0.0) { // was moving downward?
-                if (isColliding(nextHitbox)) { // FIXME if standing: standard box, if walking: top-squished box
+            // axis Y. Using operand >= and hitting the ceiling will lock the player to the position
+            if (moveDelta.y > 0.0) { // was moving downward?
+                if (isColliding(nextHitbox, COLLIDING_TOP)) { // hit the ceiling
+                    hitAndForciblyReflectY()
+                    grounded = false
+                }
+                else if (isColliding(nextHitbox)) { // FIXME if standing: standard box, if walking: top-squished box
                     hitAndReflectY()
                     grounded = true
                 }
@@ -415,7 +421,7 @@ open class ActorWithBody : Actor(), Visible {
             else if (moveDelta.y < 0.0) { // or was moving upward?
                 grounded = false
                 if (isTouchingSide(nextHitbox, COLLIDING_TOP)) { // actor hit something on its top
-                    hitAndReflectY()
+                    hitAndForciblyReflectY()
                 }
                 else { // the actor is not grounded at all
                 }
@@ -476,6 +482,13 @@ open class ActorWithBody : Actor(), Visible {
             veloY = 0.0
             if (this is Controllable) walkY *= 0.0
         }
+    }
+
+    private fun hitAndForciblyReflectY() {
+        if (veloY.abs() * CEILING_HIT_ELASTICITY > A_PIXEL)
+            veloY = -veloY * CEILING_HIT_ELASTICITY
+        else
+            veloY = veloY.sign() * -A_PIXEL
     }
 
     private fun isColliding(hitbox: Hitbox) = isColliding(hitbox, 0)
@@ -915,33 +928,6 @@ open class ActorWithBody : Actor(), Visible {
     private val AUTO_CLIMB_RATE: Int
         get() = Math.min(TSIZE / 8 * Math.sqrt(scale), TSIZE.toDouble()).toInt()
 
-    fun Double.floorInt() = Math.floor(this).toInt()
-    fun Double.round() = Math.round(this).toDouble()
-    fun Double.floor() = Math.floor(this)
-    fun Double.ceil() = this.floor() + 1.0
-    fun Double.roundInt(): Int = Math.round(this).toInt()
-    fun Double.abs() = Math.abs(this)
-    fun Double.sqr() = this * this
-    fun Int.abs() = if (this < 0) -this else this
-    fun Double.bipolarClamp(limit: Double) =
-            if      (this > 0 && this > limit)   limit
-            else if (this < 0 && this < -limit) -limit
-            else this
-    fun absMax(left: Double, right: Double): Double {
-        if (left > 0 && right > 0)
-            if (left > right) return left
-            else              return right
-        else if (left < 0 && right < 0)
-            if (left < right) return left
-            else              return right
-        else {
-            val absL = left.abs()
-            val absR = right.abs()
-            if (absL > absR) return left
-            else             return right
-        }
-    }
-
     private fun assertInit() {
         // errors
         if (baseHitboxW == 0 || baseHitboxH == 0)
@@ -983,3 +969,32 @@ open class ActorWithBody : Actor(), Visible {
         }
     }
 }
+
+fun Double.floorInt() = Math.floor(this).toInt()
+fun Double.round() = Math.round(this).toDouble()
+fun Double.floor() = Math.floor(this)
+fun Double.ceil() = this.floor() + 1.0
+fun Double.roundInt(): Int = Math.round(this).toInt()
+fun Double.abs() = Math.abs(this)
+fun Double.sqr() = this * this
+fun Int.abs() = if (this < 0) -this else this
+fun Double.bipolarClamp(limit: Double) =
+        if      (this > 0 && this > limit)   limit
+        else if (this < 0 && this < -limit) -limit
+        else this
+fun absMax(left: Double, right: Double): Double {
+    if (left > 0 && right > 0)
+        if (left > right) return left
+        else              return right
+    else if (left < 0 && right < 0)
+        if (left < right) return left
+        else              return right
+    else {
+        val absL = left.abs()
+        val absR = right.abs()
+        if (absL > absR) return left
+        else             return right
+    }
+}
+fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
+fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0

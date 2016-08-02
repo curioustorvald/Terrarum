@@ -56,7 +56,7 @@ object DefaultConfig {
         val keyquickbars = JsonArray(); for (i in 2..11) keyquickbars.add(i) // NUM_1 to NUM_0
         jsonObject.add("keyquickbars", keyquickbars)
 
-
+        jsonObject.addProperty("pcgamepadenv", "console")
 
 
         return jsonObject

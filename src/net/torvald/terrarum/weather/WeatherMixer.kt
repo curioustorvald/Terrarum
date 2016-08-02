@@ -35,12 +35,12 @@ object WeatherMixer {
     const val WEATHER_GENERIC = "generic"
     // TODO add weather classification indices manually
 
-    const val RAW_DIR = "./res/raw/weathers"
+    const val RAW_DIR = "./assets/raw/weathers"
 
     init {
         weatherList = HashMap<String, ArrayList<BaseModularWeather>>()
 
-        // read weather descriptions from res/weather (modular weather)
+        // read weather descriptions from assets/weather (modular weather)
         val weatherRawValidList = ArrayList<File>()
         val weatherRaws = File(RAW_DIR).listFiles()
         weatherRaws.forEach {
@@ -157,7 +157,7 @@ object WeatherMixer {
   ]
 }
          */
-        val pathToImage = "./res/graphics/weathers"
+        val pathToImage = "./assets/graphics/weathers"
 
         val JSON = JsonFetcher(path)
 

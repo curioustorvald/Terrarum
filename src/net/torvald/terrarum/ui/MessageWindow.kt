@@ -31,14 +31,14 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
 
     init {
         if (!isBlackVariant) {
-            segmentLeft = Image("./res/graphics/gui/message_twoline_white_left.png");
-            segmentRight = Image("./res/graphics/gui/message_twoline_white_right.png");
-            segmentBody = Image("./res/graphics/gui/message_twoline_white_body.png");
+            segmentLeft = Image("./assets/graphics/gui/message_twoline_white_left.png");
+            segmentRight = Image("./assets/graphics/gui/message_twoline_white_right.png");
+            segmentBody = Image("./assets/graphics/gui/message_twoline_white_body.png");
         }
         else {
-            segmentLeft = Image("./res/graphics/gui/message_twoline_black_left.png")
-            segmentRight = Image("./res/graphics/gui/message_twoline_black_right.png")
-            segmentBody = Image("./res/graphics/gui/message_twoline_black_body.png")
+            segmentLeft = Image("./assets/graphics/gui/message_twoline_black_left.png")
+            segmentRight = Image("./assets/graphics/gui/message_twoline_black_right.png")
+            segmentBody = Image("./assets/graphics/gui/message_twoline_black_body.png")
         }
         uiFont = GameFontWhite()
         height = segmentLeft!!.height

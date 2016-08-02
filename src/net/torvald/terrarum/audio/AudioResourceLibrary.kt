@@ -2,6 +2,7 @@ package net.torvald.terrarum.audio
 
 import org.newdawn.slick.openal.Audio
 import org.newdawn.slick.openal.AudioLoader
+import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
@@ -10,22 +11,25 @@ import java.util.*
  */
 object AudioResourceLibrary {
 
+    // will play as music
     val ambientsForest = ArrayList<Audio>()
     val ambientsMeadow = ArrayList<Audio>()
     val ambientsWindy = ArrayList<Audio>()
     val ambientsWoods = ArrayList<Audio>()
+
+    // will play as sound effect
     val crickets = ArrayList<Audio>()
 
     init {
-        ambientsForest.add(AudioLoader.getAudio("ogg", FileInputStream("./res/sounds/ambient/ambient_forest_01.ogg")))
+        ambientsForest.add(AudioLoader.getStreamingAudio("OGG", File("./assets/sounds/ambient/ambient_forest_01.ogg").toURI().toURL()))
 
-        ambientsMeadow.add(AudioLoader.getAudio("ogg", FileInputStream("./res/sounds/ambient/ambient_meadow_01.ogg")))
+        ambientsMeadow.add(AudioLoader.getStreamingAudio("OGG", File("./assets/sounds/ambient/ambient_meadow_01.ogg").toURI().toURL()))
 
-        ambientsWindy.add(AudioLoader.getAudio("ogg", FileInputStream("./res/sounds/ambient/ambient_windy_01.ogg")))
+        ambientsWindy.add(AudioLoader.getStreamingAudio("OGG", File("./assets/sounds/ambient/ambient_windy_01.ogg").toURI().toURL()))
 
-        ambientsWoods.add(AudioLoader.getAudio("ogg", FileInputStream("./res/sounds/ambient/ambient_woods_01.ogg")))
+        ambientsWoods.add(AudioLoader.getStreamingAudio("OGG", File("./assets/sounds/ambient/ambient_woods_01.ogg").toURI().toURL()))
 
-        crickets.add(AudioLoader.getAudio("ogg", FileInputStream("./res/sounds/ambient/crickets_01.ogg")))
-        crickets.add(AudioLoader.getAudio("ogg", FileInputStream("./res/sounds/ambient/crickets_02.ogg")))
+        crickets.add(AudioLoader.getAudio("OGG", FileInputStream("./assets/sounds/ambient/crickets_01.ogg")))
+        crickets.add(AudioLoader.getAudio("OGG", FileInputStream("./assets/sounds/ambient/crickets_02.ogg")))
     }
 }

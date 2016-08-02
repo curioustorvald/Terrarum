@@ -7,7 +7,7 @@ import java.io.IOException
  * Created by minjaesong on 16-03-15.
  */
 object PlayerBuilder {
-    private val JSONPATH = "./res/raw/"
+    private val JSONPATH = "./assets/raw/"
     private val jsonString = String()
 
     @Throws(IOException::class, SlickException::class)

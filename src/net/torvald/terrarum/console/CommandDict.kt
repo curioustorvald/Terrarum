@@ -43,7 +43,8 @@ object CommandDict {
             Pair("bulletintest", SetBulletin()),
             Pair("gsontest", GsonTest()),
             Pair("tips", PrintRandomTips()),
-            Pair("langtest", LangTest())
+            Pair("langtest", LangTest()),
+            Pair("musictest", MusicTest())
     )
 
     operator fun get(commandName: String): ConsoleCommand {

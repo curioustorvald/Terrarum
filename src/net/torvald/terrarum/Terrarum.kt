@@ -46,6 +46,17 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             gameLocale = gameLocaleFromConfig
 
         println("[terrarum] Locale: " + gameLocale)
+
+        try {
+            Controllers.getController(0)
+            environment = if (getConfigString("pcgamepadenv") == "console")
+                RunningEnvironment.CONSOLE
+            else
+                RunningEnvironment.PC
+        }
+        catch (e: IndexOutOfBoundsException) {
+            environment = RunningEnvironment.PC
+        }
     }
 
     @Throws(SlickException::class)
@@ -63,8 +74,8 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         }
 
         ingame = StateInGame()
-        addState(ingame)
-        //addState(StateMonitorCheck())
+        //addState(ingame)
+        addState(StateMonitorCheck())
     }
 
     companion object {
@@ -110,6 +121,8 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             private set
         lateinit var defaultSaveDir: String
             private set
+
+        lateinit var environment: RunningEnvironment
 
         private val localeSimple = arrayOf("de", "en", "es", "it")
         var gameLocale = "####" // locale override
@@ -335,9 +348,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         private fun getConfigMaster(key: String): Any {
             var cfg: Any? = null
-            try { cfg = gameConfig[key]!! }
+            try { cfg = gameConfig[key.toLowerCase()]!! }
             catch (e: NullPointerException) {
-                try { cfg = DefaultConfig.fetch()[key] }
+                try { cfg = DefaultConfig.fetch()[key.toLowerCase()] }
                 catch (e1: NullPointerException) { e.printStackTrace() }
             }
             return cfg!!
@@ -371,4 +384,8 @@ fun setBlendScreen() {
 
 fun setBlendDisable() {
     GL11.glDisable(GL11.GL_BLEND)
+}
+
+enum class RunningEnvironment {
+    PC, CONSOLE, MOBILE
 }

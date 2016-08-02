@@ -79,7 +79,7 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
     override val lightBoxList: List<Hitbox>
         get() = arrayOf(Hitbox(0.0, 0.0, hitbox.width, hitbox.height)).toList() // use getter; dimension of the player may change by time.
 
-    var gamepad: Controller? = Controllers.getController(0)
+    var gamepad: Controller? = null
     var axisX = 0f
     var axisY = 0f
     var axisRX = 0f
@@ -105,6 +105,13 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
         referenceID = PLAYER_REF_ID // forcibly set ID
         density = BASE_DENSITY
         collisionType = KINEMATIC
+
+        try {
+            gamepad = Controllers.getController(0)
+        }
+        catch (e: IndexOutOfBoundsException) {
+            println("[Player] gamepad not detected.")
+        }
     }
 
     override fun update(gc: GameContainer, delta: Int) {
