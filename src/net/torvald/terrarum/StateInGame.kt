@@ -11,6 +11,7 @@ import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gamemap.GameWorld
+import net.torvald.terrarum.gamemap.WorldSimulator
 import net.torvald.terrarum.gamemap.WorldTime
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.mapdrawer.MapCamera
@@ -161,38 +162,56 @@ constructor() : BasicGameState() {
 
         setAppTitle()
 
+        ///////////////////////////
+        // world-related updates //
+        ///////////////////////////
         world.updateWorldTime(delta)
-
+        WorldSimulator(world, player, delta)
         WeatherMixer.update(gc, delta)
-
         world.globalLight = globalLightByTime.toInt()
 
+
+        ///////////////////////////
+        // input-related updates //
+        ///////////////////////////
         GameController.processInput(gc.input)
         uiContainer.forEach { it.processInput(gc.input) }
 
+
         TileStats.update()
 
+
+        ////////////////////////////
+        // camera-related updates //
+        ////////////////////////////
         MapDrawer.update(gc, delta)
         MapCamera.update(gc, delta)
 
+
+        ///////////////////////////
+        // actor-related updates //
+        ///////////////////////////
         // determine whether the inactive actor should be re-active
         wakeDormantActors()
-
         // determine whether the actor should be active or dormant
         InactivateDistantActors()
-
         updateActors(gc, delta)
-
         // TODO thread pool(?)
         CollisionSolver.process()
 
+
+        ////////////////////////
+        // ui-related updates //
+        ////////////////////////
         uiContainer.forEach { ui -> ui.update(gc, delta) }
         consoleHandler.update(gc, delta)
         debugWindow.update(gc, delta)
-
-
         notifier.update(gc, delta)
 
+
+        /////////////////////////
+        // app-related updates //
+        /////////////////////////
         Terrarum.appgc.setVSync(Terrarum.appgc.fps >= Terrarum.VSYNC_TRIGGER_THRESHOLD)
     }
 
@@ -204,8 +223,6 @@ constructor() : BasicGameState() {
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
-        g.setAntiAlias(true)
-
         setBlendNormal()
 
         // determine if lightmap blending should be done

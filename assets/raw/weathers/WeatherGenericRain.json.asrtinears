@@ -1,0 +1,10 @@
+{
+  "globalLight": "generic_light.png",
+  "skyboxGradColourMap": "generic_skybox.png",
+  "classification": "genericrain",
+  "extraImages": [
+    "raindrop.png"
+  ],
+  "mixFrom": "__CURRENTWEATHER",
+  "mixPercentage": 80.0
+}

@@ -381,7 +381,8 @@ object MapCamera {
         var ret = 0
         for (i in 0..3) {
             try {
-                if (!TilePropCodex.getProp(nearbyTiles[i]).isSolid) {
+                if (!TilePropCodex.getProp(nearbyTiles[i]).isSolid &&
+                        !TilePropCodex.getProp(nearbyTiles[i]).isFluid) {
                     ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
                 }
             } catch (e: ArrayIndexOutOfBoundsException) {

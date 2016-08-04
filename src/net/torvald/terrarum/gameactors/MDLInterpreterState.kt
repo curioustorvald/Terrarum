@@ -46,27 +46,6 @@ class MDLInterpreterState {
         // push, pop, +,    -,      *,       /,          %,   dup,       swap,  drop
     }
 
-    class MagicOrInt() {
-        private var magic: MagicWords? = null
-        private var number: Int? = null
-
-        constructor(kynngi: MagicWords): this() {
-            magic = kynngi
-        }
-
-        constructor(integer: Int) : this() {
-            number = integer
-        }
-
-        fun toMagic() = if (magic != null) magic!! else throw TypeCastException("$this: cannot be cast to MagicWord")
-        fun toInt() = if (number != null) number!! else throw TypeCastException("$this: cannot be cast to MagicWord")
-
-        fun isMagic() = (magic != null)
-        fun isInt() = (number != null)
-
-        override fun toString(): String = if (magic != null && number == null) "$magic" else if (magic == null && number != null) "$number" else "INVALID"
-    }
-
     class MagicArrayStack {
         /**
          * Number of elements in the stack
@@ -81,28 +60,28 @@ class MDLInterpreterState {
                 else                 deflate(data.size - newSize)
             }
 
-        private lateinit var data: Array<MagicOrInt?>
+        private lateinit var data: Array<Int?>
 
         constructor(stackSize: Int) {
             data = Array(stackSize, { null })
         }
 
-        constructor(arr: Array<MagicOrInt?>) {
+        constructor(arr: Array<Int?>) {
             data = arr.copyOf()
             depth = size
         }
 
-        fun push(v: MagicOrInt) {
+        fun push(v: Int) {
             if (depth >= data.size) throw StackOverflowError()
             data[depth++] = v
         }
 
-        fun pop(): MagicOrInt {
+        fun pop(): Int {
             if (depth == 0) throw EmptyStackException()
             return data[--depth]!!
         }
 
-        fun peek(): MagicOrInt? {
+        fun peek(): Int? {
             if (depth == 0) return null
             return data[depth - 1]
         }
@@ -126,7 +105,7 @@ class MDLInterpreterState {
             --depth
         }
 
-        fun defineFromArray(arr: Array<MagicOrInt?>) { data = arr.copyOf() }
+        fun defineFromArray(arr: Array<Int?>) { data = arr.copyOf() }
 
         /**
          * Increase the stack size by a factor.
@@ -157,10 +136,10 @@ class MDLInterpreterState {
 
         fun equalTo(other: MagicArrayStack) = (this.asArray() == other.asArray())
 
-        fun plus()  { if (data[depth - 2]!!.isInt() && peek()!!.isInt()) data[depth - 2] = MagicOrInt(data[depth - 2]!!.toInt() + (pop().toInt())) else throw RuntimeException("${data[depth - 2]}: Cannot do arithmetic operation on non-numeric type.") }
-        fun minus() { if (data[depth - 2]!!.isInt() && peek()!!.isInt()) data[depth - 2] = MagicOrInt(data[depth - 2]!!.toInt() - (pop().toInt())) else throw RuntimeException("${data[depth - 2]}: Cannot do arithmetic operation on non-numeric type.") }
-        fun times() { if (data[depth - 2]!!.isInt() && peek()!!.isInt()) data[depth - 2] = MagicOrInt(data[depth - 2]!!.toInt() * (pop().toInt())) else throw RuntimeException("${data[depth - 2]}: Cannot do arithmetic operation on non-numeric type.") }
-        fun div()   { if (data[depth - 2]!!.isInt() && peek()!!.isInt()) data[depth - 2] = MagicOrInt(data[depth - 2]!!.toInt() / (pop().toInt())) else throw RuntimeException("${data[depth - 2]}: Cannot do arithmetic operation on non-numeric type.") }
-        fun mod()   { if (data[depth - 2]!!.isInt() && peek()!!.isInt()) data[depth - 2] = MagicOrInt(data[depth - 2]!!.toInt() % (pop().toInt())) else throw RuntimeException("${data[depth - 2]}: Cannot do arithmetic operation on non-numeric type.") }
+        fun plus()  { data[depth - 2] = data[depth - 2]!! + (pop().toInt()) }
+        fun minus() { data[depth - 2] = data[depth - 2]!! - (pop().toInt()) }
+        fun times() { data[depth - 2] = data[depth - 2]!! * (pop().toInt()) }
+        fun div()   { data[depth - 2] = data[depth - 2]!! / (pop().toInt()) }
+        fun mod()   { data[depth - 2] = data[depth - 2]!! % (pop().toInt()) }
     }
 }

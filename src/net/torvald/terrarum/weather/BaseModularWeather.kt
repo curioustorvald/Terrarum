@@ -14,5 +14,7 @@ data class BaseModularWeather(
         val globalLightColourMap: Image,
         var skyboxGradColourMap: Image,
         val classification: String,
-        var extraImages: ArrayList<Image>
+        var extraImages: ArrayList<Image>,
+        val mixFrom: String? = null,
+        val mixPercentage: Double? = null
 )

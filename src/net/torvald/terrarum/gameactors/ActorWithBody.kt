@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameactors
 
+import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gamemap.GameWorld
 import net.torvald.terrarum.mapdrawer.MapDrawer
@@ -971,10 +972,12 @@ open class ActorWithBody : Actor(), Visible {
 }
 
 fun Double.floorInt() = Math.floor(this).toInt()
+fun Float.floorInt() = FastMath.floor(this).toInt()
 fun Double.round() = Math.round(this).toDouble()
 fun Double.floor() = Math.floor(this)
 fun Double.ceil() = this.floor() + 1.0
 fun Double.roundInt(): Int = Math.round(this).toInt()
+fun Float.roundInt(): Int = Math.round(this).toInt()
 fun Double.abs() = Math.abs(this)
 fun Double.sqr() = this * this
 fun Int.abs() = if (this < 0) -this else this

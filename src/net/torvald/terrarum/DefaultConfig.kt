@@ -58,6 +58,8 @@ object DefaultConfig {
 
         jsonObject.addProperty("pcgamepadenv", "console")
 
+        jsonObject.addProperty("safetywarning", true)
+
 
         return jsonObject
     }

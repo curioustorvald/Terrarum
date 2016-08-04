@@ -1,14 +1,15 @@
 package net.torvald.terrarum.ui
 
+import net.torvald.terrarum.Terrarum
 import org.newdawn.slick.Graphics
 
 /**
  * Created by minjaesong on 16-07-06.
  */
-object Typesetter {
-    fun printCentered(string: String, screenPosY: Int, ui: UICanvas, g: Graphics) {
+object Typography {
+    fun printCentered(g: Graphics, string: String, screenPosY: Int, ui: UICanvas? = null) {
         val stringW = g.font.getWidth(string)
-        val targetW = ui.width
+        val targetW = if (ui == null) Terrarum.WIDTH else ui.width
 
         g.drawString(string, targetW.minus(stringW).ushr(1).toFloat(), screenPosY.toFloat())
     }

@@ -154,11 +154,6 @@ constructor() : Font {
     private val zeroWidthSheets = arrayOf(
             SHEET_COLOURCODE
     )
-    private val cjkWidthSheets = arrayOf(
-            SHEET_KANA,
-            SHEET_HANGUL,
-            SHEET_CJK_PUNCT
-    )
 
 
     override fun getWidth(s: String) = getWidthSubstr(s, s.length)
@@ -168,8 +163,8 @@ constructor() : Font {
         for (i in 0..endIndex - 1) {
             val ctype = getSheetType(s[i])
 
-            if (i > 0 && s[i].toInt() > 0x20) {
-                // Unihan-hangul Kerning
+            /*if (i > 0 && s[i].toInt() > 0x20) {
+                // inter-Unihan-hangul Kerning
                 val cpre = getSheetType(s[i - 1])
                 if ((unihanWidthSheets.contains(cpre) || cpre == SHEET_HANGUL) && !(unihanWidthSheets.contains(ctype) || ctype == SHEET_HANGUL)
 
@@ -182,18 +177,22 @@ constructor() : Font {
                     len += 1
                 }
 
-            }
+            }*/
 
             if (zeroWidthSheets.contains(ctype))
                 len += 0
             else if (narrowWidthSheets.contains(ctype))
                 len += W_LATIN_NARROW
-            else if (cjkWidthSheets.contains(ctype))
-                len += W_CJK
+            else if (ctype == SHEET_CJK_PUNCT)
+                len += W_ASIAN_PUNCT
+            else if (ctype == SHEET_HANGUL)
+                len += W_HANGUL
+            else if (ctype == SHEET_KANA)
+                len += W_KANA
             else if (unihanWidthSheets.contains(ctype))
                 len += W_UNIHAN
             else if (isThaiDiacritics(s[i]))
-                len = len // set width of the glyph as -W_LATIN_WIDE
+                len += 0 // set width of the glyph as -W_LATIN_WIDE
             else
                 len += W_LATIN_WIDE
 
@@ -237,7 +236,7 @@ constructor() : Font {
                 val jungRow = getHanMedialRow(hIndex)
                 val jongRow = getHanFinalRow(hIndex)
 
-                val glyphW = getWidth("" + ch)
+                val glyphW = getWidth(ch.toString())
 
                 /*// initials
                 hangulSheet.renderInUse(
@@ -453,11 +452,11 @@ constructor() : Font {
                             sheetX, sheetY
                     )*/
                     sheetKey[prevInstance]!!.getSubImage(sheetX, sheetY).draw(
-                            Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat() // Interchar: pull punct right next to hangul to the left
-                            + if (i > 0 && isHangul(s[i - 1])) -3f
-                            else 0f,
+                            Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
 
+                            // to deal with the height difference of the sheets
                             Math.round(y).toFloat() + (if (prevInstance == SHEET_CJK_PUNCT) -1
+
                             else if (prevInstance == SHEET_FW_UNI) (H - H_HANGUL) / 2
                             else 0).toFloat(),
 
@@ -589,10 +588,13 @@ constructor() : Font {
         internal val JUNG_COUNT = 21
         internal val JONG_COUNT = 28
 
-        internal val W_CJK = 10
+        internal val W_ASIAN_PUNCT = 10
+        internal val W_HANGUL = 11
+        internal val W_KANA = 12
         internal val W_UNIHAN = 16
         internal val W_LATIN_WIDE = 9 // width of regular letters, including m
         internal val W_LATIN_NARROW = 5 // width of letter f, t, i, l
+
         internal val H = 20
         internal val H_HANGUL = 16
         internal val H_UNIHAN = 16

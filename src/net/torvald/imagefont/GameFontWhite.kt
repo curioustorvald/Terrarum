@@ -12,7 +12,7 @@ constructor() : GameFontBase() {
     init {
 
         GameFontBase.hangulSheet = SpriteSheet(
-                "./assets/graphics/fonts/han_johab.png", GameFontBase.W_CJK, GameFontBase.H_HANGUL)
+                "./assets/graphics/fonts/han_johab.png", GameFontBase.W_HANGUL, GameFontBase.H_HANGUL)
         GameFontBase.asciiSheet = SpriteSheet(
                 "./assets/graphics/fonts/ascii_fullwidth.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.asciiSheetEF = SpriteSheet(
@@ -24,9 +24,9 @@ constructor() : GameFontBase() {
         GameFontBase.extASheetEF = SpriteSheet(
                 "./assets/graphics/fonts/LatinExtA_ef.png", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
         GameFontBase.kanaSheet = SpriteSheet(
-                "./assets/graphics/fonts/kana.png", GameFontBase.W_CJK, GameFontBase.H_KANA)
+                "./assets/graphics/fonts/kana.png", GameFontBase.W_KANA, GameFontBase.H_KANA)
         GameFontBase.cjkPunct = SpriteSheet(
-                "./assets/graphics/fonts/cjkpunct.png", GameFontBase.W_CJK, GameFontBase.H_KANA)
+                "./assets/graphics/fonts/cjkpunct.png", GameFontBase.W_ASIAN_PUNCT, GameFontBase.H_KANA)
         /*uniHan = new SpriteSheet(
                 "./assets/graphics/fonts/unifont_unihan"
                         + ((!terrarum.gameLocale.contains("zh"))

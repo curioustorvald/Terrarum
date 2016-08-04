@@ -1,6 +1,9 @@
 
 package net.torvald.terrarum.gamemap
 
+import net.torvald.terrarum.gameactors.Player
+import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.mapdrawer.MapDrawer
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.SlickException
 

@@ -47,6 +47,8 @@ class MapLayer(var width: Int, var height: Int) : Iterable<Byte> {
         data[y][x] = tile
     }
 
+    fun isInBound(x: Int, y: Int) = (x >= 0 && y >= 0 && x < width && y < height)
+
     private fun uint8ToInt32(x: Byte): Int = java.lang.Byte.toUnsignedInt(x)
 
     companion object {

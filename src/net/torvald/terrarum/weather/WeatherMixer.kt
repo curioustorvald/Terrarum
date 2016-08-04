@@ -27,12 +27,15 @@ object WeatherMixer {
     lateinit var currentWeather: BaseModularWeather
     lateinit var nextWeather: BaseModularWeather
 
+    lateinit var mixedWeather: BaseModularWeather
+
     private var skyBoxCurrent = Rectangle(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
     private var skyBoxNext = Rectangle(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
     val globalLightNow = Light10B(0)
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
+    const val WEATHER_GENERIC_RAIN = "genericrain"
     // TODO add weather classification indices manually
 
     const val RAW_DIR = "./assets/raw/weathers"
@@ -169,6 +172,12 @@ object WeatherMixer {
         val skybox: Image
         val extraImages = ArrayList<Image>()
         val classification = JSON.get("classification").asJsonPrimitive.asString
+        val mixFrom: String?
+        try { mixFrom = JSON.get("mixFrom").asJsonPrimitive.asString }
+        catch (e: NullPointerException) { mixFrom = null }
+        val mixPercentage: Double?
+        try { mixPercentage = JSON.get("mixPercentage").asJsonPrimitive.asDouble }
+        catch (e: NullPointerException) { mixPercentage = null }
 
         // parse globalLight
         if (globalLightInJson.isString)
@@ -196,7 +205,10 @@ object WeatherMixer {
 
         // get extra images
         for (i in extraImagesPath)
-            extraImages.add(Image("$pathToImage/$i"))
+            extraImages.add(Image("$pathToImage/${i.asString}"))
+
+        // get mix from
+
 
         return BaseModularWeather(globalLight, skybox, classification, extraImages)
     }

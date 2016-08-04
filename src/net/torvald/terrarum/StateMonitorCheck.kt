@@ -1,7 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.ui.Typesetter
+import net.torvald.terrarum.ui.Typography
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIHandler
 import net.torvald.terrarum.ui.KeyboardControlled
@@ -113,24 +113,24 @@ class StateMonitorCheck : BasicGameState() {
 
             // labels
             g.color = Color.white
-            Typesetter.printCentered(
-                    Lang["MENU_MONITOR_CALI_TITLE"],
+            Typography.printCentered(
+                    g, Lang["MENU_MONITOR_CALI_TITLE"],
                     titleY,
-                    this, g
+                    this
             )
 
             (1..12).forEach {
-                Typesetter.printCentered(
-                        Lang["MENU_MONITOR_CALI_LABEL_$it"],
+                Typography.printCentered(
+                        g, Lang["MENU_MONITOR_CALI_LABEL_$it"],
                         instructionY + it.minus(2).times(g.font.lineHeight),
-                        this, g
+                        this
                 )
             }
 
-            Typesetter.printCentered(
-                    Lang["MENU_LABEL_PRESS_ANYKEY_CONTINUE"],
+            Typography.printCentered(
+                    g, Lang["MENU_LABEL_PRESS_ANYKEY_CONTINUE"],
                     anykeyY,
-                    this, g
+                    this
             )
 
         }
