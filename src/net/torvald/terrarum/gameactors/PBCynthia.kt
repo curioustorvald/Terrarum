@@ -12,7 +12,9 @@ object PBCynthia {
         val p: Player = Player()
         CreatureRawInjector.inject(p.actorValue, "CreatureHuman.json")
 
+        p.actorValue[AVKey._PLAYER_QUICKBARSEL] = 0
         p.actorValue["selectedtile"] = 16
+
 
         p.sprite = SpriteAnimation()
         p.sprite!!.setDimension(26, 42)

@@ -40,7 +40,7 @@ class MapLayer(var width: Int, var height: Int) : Iterable<Byte> {
         return if (x !in 0..width - 1 || y !in 0..height - 1)
             null
         else
-            uint8ToInt32(data[y][x])
+            data[y][x].toUint()
     }
 
     internal fun setTile(x: Int, y: Int, tile: Byte) {
@@ -49,11 +49,10 @@ class MapLayer(var width: Int, var height: Int) : Iterable<Byte> {
 
     fun isInBound(x: Int, y: Int) = (x >= 0 && y >= 0 && x < width && y < height)
 
-    private fun uint8ToInt32(x: Byte): Int = java.lang.Byte.toUnsignedInt(x)
-
     companion object {
         @Transient const val RANGE = 256
         @Transient const val SIZEOF: Byte = 1 // 1 for 8-bit, 2 for 16-bit, ...
     }
 }
 
+fun Byte.toUint() = java.lang.Byte.toUnsignedInt(this)

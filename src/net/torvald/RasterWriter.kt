@@ -1,7 +1,5 @@
 package net.torvald
 
-import net.torvald.terrarum.Terrarum
-
 import javax.imageio.ImageIO
 import java.awt.*
 import java.awt.color.ColorSpace

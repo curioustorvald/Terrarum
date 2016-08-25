@@ -172,14 +172,14 @@ class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, L
 
             walkCounterX += 1
 
-            // Heading flag
-            if (left)
-                walkHeading = LEFT
-            else
-                walkHeading = RIGHT
-
             isWalkingH = true
         }
+
+        // Heading flag
+        if (left)
+            walkHeading = LEFT
+        else
+            walkHeading = RIGHT
     }
 
     /**

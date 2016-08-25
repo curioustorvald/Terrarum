@@ -117,10 +117,10 @@ constructor(val UI: UICanvas) {
     fun render(gc: GameContainer, sbg: StateBasedGame, ingameGraphics: Graphics) {
         if (isVisible || alwaysVisible) {
             UIGraphicInstance.clear()
-            UIGraphicInstance.font = Terrarum.gameFont
+            UIGraphicInstance.font = Terrarum.fontGame
 
             UI.render(gc, UIGraphicInstance)
-            if (sbg.currentStateID == Terrarum.SCENE_ID_GAME) {
+            if (sbg.currentStateID == Terrarum.STATE_ID_GAME) {
                 ingameGraphics.drawImage(UIDrawnCanvas.getScaledCopy(scale),
                         posX + MapCamera.cameraX * Terrarum.ingame.screenZoom - (UI.width / 2f * scale.minus(1)),
                         posY + MapCamera.cameraY * Terrarum.ingame.screenZoom - (UI.height / 2f * scale.minus(1)),

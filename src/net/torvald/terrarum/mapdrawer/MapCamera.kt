@@ -31,8 +31,8 @@ object MapCamera {
 
     var tilesWall: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wall.png", TSIZE, TSIZE)
         private set
-    var tilesTerrain: SpriteSheet = SpriteSheet("./assets/graphics/terrain/terrain.png", TSIZE, TSIZE)
-        private set
+    var tilesTerrain: SpriteSheet = SpriteSheet("./assets/graphics/terrain/terrain.tga", TSIZE, TSIZE)
+        private set // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
     var tilesWire: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wire.png", TSIZE, TSIZE)
         private set
     var tilesetBook: Array<SpriteSheet> = arrayOf(tilesWall, tilesTerrain, tilesWire)
@@ -494,4 +494,7 @@ object MapCamera {
     fun isPlatform(b: Int?): Boolean = TILES_WALL_STICKER_CONNECT_SELF.contains(b)
     fun isBlendMul(b: Int?): Boolean = TILES_BLEND_MUL.contains(b)
 
+    fun tileInCamera(x: Int, y: Int) =
+            x >= cameraX.div(TSIZE) && y >= cameraY.div(TSIZE) &&
+            x <= cameraX.plus(renderWidth).div(TSIZE) && y <= cameraY.plus(renderWidth).div(TSIZE)
 }

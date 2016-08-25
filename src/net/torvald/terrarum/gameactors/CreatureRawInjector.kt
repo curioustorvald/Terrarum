@@ -13,7 +13,7 @@ import java.security.SecureRandom
  */
 object CreatureRawInjector {
 
-    const val JSONPATH = "./res/raw/creatures/"
+    const val JSONPATH = "./assets/raw/creatures/"
     private const val MULTIPLIER_RAW_ELEM_SUFFIX = AVKey.MULT
 
     /**
@@ -26,12 +26,14 @@ object CreatureRawInjector {
     fun inject(actorValueRef: ActorValue, jsonFileName: String) {
         val jsonObj = JsonFetcher(JSONPATH + jsonFileName)
 
+        val elementsInt = arrayOf(AVKey.BASEHEIGHT, AVKey.TOOLSIZE, AVKey.ENCUMBRANCE)
         val elementsString = arrayOf(AVKey.RACENAME, AVKey.RACENAMEPLURAL)
-        val elementsDouble = arrayOf(AVKey.BASEHEIGHT, AVKey.BASEMASS, AVKey.ACCEL, AVKey.TOOLSIZE, AVKey.ENCUMBRANCE)
-        val elementsDoubleVariable = arrayOf(AVKey.STRENGTH, AVKey.SPEED, AVKey.JUMPPOWER, AVKey.SCALE, AVKey.SPEED)
+        val elementsDouble = arrayOf(AVKey.BASEMASS, AVKey.ACCEL)
+        val elementsDoubleVariable = arrayOf(AVKey.STRENGTH, AVKey.SPEED, AVKey.JUMPPOWER, AVKey.SCALE)
         val elementsBoolean = arrayOf(AVKey.INTELLIGENT)
         // val elementsMultiplyFromOne = arrayOf()
 
+        setAVInts(actorValueRef, elementsInt, jsonObj)
         setAVStrings(actorValueRef, elementsString, jsonObj)
         setAVDoubles(actorValueRef, elementsDouble, jsonObj)
         setAVDoublesVariable(actorValueRef, elementsDoubleVariable, jsonObj)
@@ -90,6 +92,20 @@ object CreatureRawInjector {
     private fun setAVDoubles(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
         for (s in elemSet) {
             avRef[s] = jsonObject.get(s).asDouble
+        }
+    }
+
+    /**
+     * Fetch and set int actor values
+     * @param avRef
+     * *
+     * @param elemSet
+     * *
+     * @param jsonObject
+     */
+    private fun setAVInts(avRef: ActorValue, elemSet: Array<String>, jsonObject: JsonObject) {
+        for (s in elemSet) {
+            avRef[s] = jsonObject.get(s).asInt
         }
     }
 

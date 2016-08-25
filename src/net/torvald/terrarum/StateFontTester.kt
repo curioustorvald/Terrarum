@@ -48,5 +48,5 @@ class StateFontTester : BasicGameState() {
         }
     }
 
-    override fun getID(): Int = Terrarum.SCENE_ID_TEST_FONT
+    override fun getID(): Int = Terrarum.STATE_ID_TEST_FONT
 }

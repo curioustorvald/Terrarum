@@ -4,14 +4,14 @@ package net.torvald.terrarum.mapgenerator
  * Created by minjaesong on 16-06-13.
  */
 class ThreadProcessNoiseLayers(val startIndex: Int, val endIndex: Int,
-                               val noiseRecords: Array<MapGenerator.TaggedJoise>) : Runnable {
+                               val noiseRecords: Array<WorldGenerator.TaggedJoise>) : Runnable {
 
 
     override fun run() {
         for (record in noiseRecords) {
             println("[mapgenerator] ${record.message}...")
             for (y in startIndex..endIndex) {
-                for (x in 0..MapGenerator.WIDTH - 1) {
+                for (x in 0..WorldGenerator.WIDTH - 1) {
                     val noise: Float = record.noiseModule.get(
                             x.toDouble() / 48.0, // 48: Fixed value
                             y.toDouble() / 48.0
@@ -24,11 +24,11 @@ class ThreadProcessNoiseLayers(val startIndex: Int, val endIndex: Int,
                     // replace to designated tile
                         is Int      -> record.replaceTo as Int
                     // replace to randomly selected tile from given array of tile IDs
-                        is IntArray -> (record.replaceTo as IntArray)[MapGenerator.random.nextInt((record.replaceTo as IntArray).size)]
+                        is IntArray -> (record.replaceTo as IntArray)[WorldGenerator.random.nextInt((record.replaceTo as IntArray).size)]
                         else        -> throw IllegalArgumentException("[mapgenerator] Unknown replaceTo tile type '${record.replaceTo.javaClass.canonicalName}': Only 'kotlin.Int' and 'kotlin.IntArray' is valid.")
                     }
                     // replace to ALL? this is bullshit
-                    if (to == MapGenerator.TILE_MACRO_ALL) throw IllegalArgumentException("[mapgenerator] Invalid replaceTo: TILE_MACRO_ALL")
+                    if (to == WorldGenerator.TILE_MACRO_ALL) throw IllegalArgumentException("[mapgenerator] Invalid replaceTo: TILE_MACRO_ALL")
 
                     // filtered threshold
                     val threshold = record.filter.getGrad(y, record.filterArg1, record.filterArg2)
@@ -38,15 +38,15 @@ class ThreadProcessNoiseLayers(val startIndex: Int, val endIndex: Int,
                             for (i in 0..fromTerr.size - 1) {
                                 val fromTerrVariable = fromTerr[i]
 
-                                if ((MapGenerator.world.getTileFromTerrain(x, y) == fromTerrVariable || fromTerrVariable == MapGenerator.TILE_MACRO_ALL)
-                                    && (MapGenerator.world.getTileFromWall(x, y) == fromWall || fromWall == MapGenerator.TILE_MACRO_ALL)) {
-                                    MapGenerator.world.setTileTerrain(x, y, to)
+                                if ((WorldGenerator.world.getTileFromTerrain(x, y) == fromTerrVariable || fromTerrVariable == WorldGenerator.TILE_MACRO_ALL)
+                                    && (WorldGenerator.world.getTileFromWall(x, y) == fromWall || fromWall == WorldGenerator.TILE_MACRO_ALL)) {
+                                    WorldGenerator.world.setTileTerrain(x, y, to)
                                 }
                             }
                         }
-                        else if ((MapGenerator.world.getTileFromTerrain(x, y) == fromTerr || fromTerr == MapGenerator.TILE_MACRO_ALL)
-                            && (MapGenerator.world.getTileFromWall(x, y) == fromWall || fromWall == MapGenerator.TILE_MACRO_ALL)) {
-                            MapGenerator.world.setTileTerrain(x, y, to)
+                        else if ((WorldGenerator.world.getTileFromTerrain(x, y) == fromTerr || fromTerr == WorldGenerator.TILE_MACRO_ALL)
+                            && (WorldGenerator.world.getTileFromWall(x, y) == fromWall || fromWall == WorldGenerator.TILE_MACRO_ALL)) {
+                            WorldGenerator.world.setTileTerrain(x, y, to)
                         }
                     }
                 }

@@ -5,6 +5,7 @@ import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.DrawUtil
+import net.torvald.terrarum.ui.ItemImageGallery
 import net.torvald.terrarum.ui.Typography
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -37,12 +38,15 @@ class StateSplash : BasicGameState() {
 
     val backgroundColour = Color(0x303030)
 
-    var delta = 0
     val deltathre = 500
 
-    val auto_dismiss = 5000
+    val auto_dismiss = 6500
 
     var opened = false
+
+    var init = false
+
+    lateinit var imageGallery: ItemImageGallery
 
     override fun init(container: GameContainer?, game: StateBasedGame?) {
         // pre-load lang
@@ -53,19 +57,24 @@ class StateSplash : BasicGameState() {
 
         fadeSheet = Image(Terrarum.WIDTH, Terrarum.HEIGHT)
         thisG = fadeSheet.graphics
-        thisG.font = Terrarum.gameFont
+        thisG.font = Terrarum.fontGame
+
+        imageBoardHeight = Terrarum.HEIGHT - thisG.font.lineHeight.times(6)
+        imageBoardOffset = thisG.font.lineHeight.times(3)
+
+        imageGallery = ItemImageGallery(0, imageBoardOffset, Terrarum.WIDTH, imageBoardHeight, pictogramCollection)
     }
 
     override fun update(container: GameContainer, game: StateBasedGame, delta: Int) {
-        this.delta = delta
-
         // next splash or load next scene
-        if (anykey_hit && opacity == 0f) {
-            System.exit(0)
+        if (anykey_hit && opened) {
+            game.enterState(Terrarum.STATE_ID_GAME)
         }
 
         // fade-in
         if (delta < deltathre) {
+            init = true
+
             if (opacity < 1f && !anykey_hit) {
                 opacity = FastMath.interpolateLinear(
                         fadeTimer.toFloat() / fadeTime, 0f, 1f
@@ -85,18 +94,15 @@ class StateSplash : BasicGameState() {
 
         // auto dismiss
         if (opened && fadeTimer >= auto_dismiss)
-            doAnykeyThingy()
+            //doAnykeyThingy()
 
         fadeTimer += delta
+        println(fadeTimer)
     }
 
-    override fun getID(): Int = Terrarum.SCENE_ID_SPLASH
+    override fun getID(): Int = Terrarum.STATE_ID_SPLASH
 
-    override fun render(container: GameContainer?, game: StateBasedGame?, g: Graphics) {
-
-        imageBoardHeight = Terrarum.HEIGHT - thisG.font.lineHeight.times(6)
-        imageBoardOffset = thisG.font.lineHeight.times(3)
-
+    override fun render(container: GameContainer, game: StateBasedGame, g: Graphics) {
         thisG.color = backgroundColour
         thisG.fillRect(0f, 0f, fadeSheet.width.toFloat(), fadeSheet.height.toFloat())
 
@@ -108,9 +114,7 @@ class StateSplash : BasicGameState() {
         Typography.printCentered(thisG, Lang["MENU_LABEL_PRESS_ANYKEY_CONTINUE"],
                 Terrarum.HEIGHT - thisG.font.lineHeight.times(3))
 
-        pictogramCollection.forEachIndexed { i, image ->
-            DrawUtil.drawCentered(thisG, image, knowYourPlace(i) + imageBoardOffset)
-        }
+        imageGallery.render(container, thisG)
 
         g.drawImage(fadeSheet, 0f, 0f, Color(1f, 1f, 1f, opacity))
     }
@@ -131,7 +135,7 @@ class StateSplash : BasicGameState() {
     }
 
     private fun doAnykeyThingy() {
-        if (delta < deltathre && !anykey_hit) {
+        if (!anykey_hit) {
             anykey_hit = true
             fadeTimer = 0
         }

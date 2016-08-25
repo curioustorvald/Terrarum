@@ -68,7 +68,7 @@ class BasicDebugInfoWindow : UICanvas {
         val mouseTileX = ((MapCamera.cameraX + gc.input.mouseX / Terrarum.ingame.screenZoom) / MapDrawer.TILE_SIZE).toInt()
         val mouseTileY = ((MapCamera.cameraY + gc.input.mouseY / Terrarum.ingame.screenZoom) / MapDrawer.TILE_SIZE).toInt()
 
-        g.font = Terrarum.smallNumbers
+        g.font = Terrarum.fontSmallNumbers
         g.color = GameFontBase.codeToCol["y"]
 
         val hitbox = player.hitbox

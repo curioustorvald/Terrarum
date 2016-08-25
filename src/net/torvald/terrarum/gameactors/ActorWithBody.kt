@@ -769,7 +769,7 @@ open class ActorWithBody : Actor(), Visible {
                         Hitbox(nextHitbox.posX, nextHitbox.posY,
                                 nextHitbox.width + 2.0, nextHitbox.height + 2.0)
                         // when not walking, enlarge the hitbox for calculation so that
-                        // feet tiles are to be taken into calculation
+                        // feet tiles are also counted
                     else
                         nextHitbox.clone()
 

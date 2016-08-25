@@ -26,6 +26,10 @@ import java.util.logging.SimpleFormatter
 class Terrarum @Throws(SlickException::class)
 constructor(gamename: String) : StateBasedGame(gamename) {
 
+    // these properties goes into the GameContainer
+
+    var previousState: Int? = null // to be used with temporary states like StateMonitorCheck
+
     init {
 
         gameConfig = GameConfig()
@@ -63,8 +67,8 @@ constructor(gamename: String) : StateBasedGame(gamename) {
     override fun initStatesList(gc: GameContainer) {
         gc.input.enableKeyRepeat()
 
-        gameFont = GameFontWhite()
-        smallNumbers = TinyAlphNum()
+        fontGame = GameFontWhite()
+        fontSmallNumbers = TinyAlphNum()
 
         hasController = gc.input.controllerCount > 0
         if (hasController) {
@@ -75,11 +79,11 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
-        ingame = StateInGame()
-        //addState(ingame)
-        //addState(StateMonitorCheck())
+        //addState(StateSplash())
+        addState(StateMonitorCheck())
         //addState(StateFontTester())
-        addState(StateSplash())
+        ingame = StateInGame()
+        addState(ingame)
     }
 
     companion object {
@@ -137,20 +141,20 @@ constructor(gamename: String) : StateBasedGame(gamename) {
                     field = value
             }
 
-        lateinit var gameFont: Font
+        lateinit var fontGame: Font
             private set
-        lateinit var smallNumbers: Font
+        lateinit var fontSmallNumbers: Font
             private set
 
         // 0x0 - 0xF: Game-related
         // 0x10 - 0x1F: Config
         // 0x100 and onward: unit tests for dev
-        val SCENE_ID_SPLASH = 0x0
-        val SCENE_ID_HOME = 0x1
-        val SCENE_ID_GAME = 0x3
-        val SCENE_ID_CONFIG_CALIBRATE = 0x11
+        val STATE_ID_SPLASH = 0x0
+        val STATE_ID_HOME = 0x1
+        val STATE_ID_GAME = 0x3
+        val STATE_ID_CONFIG_CALIBRATE = 0x11
 
-        val SCENE_ID_TEST_FONT = 0x100
+        val STATE_ID_TEST_FONT = 0x100
 
         var hasController = false
         val CONTROLLER_DEADZONE = 0.1f
@@ -367,7 +371,7 @@ fun main(args: Array<String>) = Terrarum.main(args)
 
 fun setBlendMul() {
     GL11.glEnable(GL11.GL_BLEND)
-    GL11.glColorMask(true, true, true, false)
+    GL11.glColorMask(true, true, true, true)
     GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)
 }
 

@@ -11,7 +11,7 @@ import net.torvald.terrarum.concurrent.ThreadPool
 import net.torvald.terrarum.gameactors.ThreadActorUpdate
 import java.util.*
 
-object MapGenerator {
+object WorldGenerator {
 
     internal lateinit var world: GameWorld
     internal lateinit var random: Random
@@ -74,7 +74,7 @@ object MapGenerator {
 
         DIRT_LAYER_DEPTH = (100 * HEIGHT / 1024f).toInt()
         minimumFloatingIsleHeight = (25 * (HEIGHT / 1024f)).toInt()
-        TERRAIN_AVERAGE_HEIGHT = HEIGHT / 4
+        TERRAIN_AVERAGE_HEIGHT = HEIGHT / 3
 
         OCEAN_WIDTH = Math.round(OCEAN_WIDTH * widthMulFactor)
         SHORE_WIDTH = Math.round(SHORE_WIDTH * widthMulFactor)

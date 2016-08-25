@@ -29,7 +29,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
                 "ID: ${hashCode()} (${actorValue.getAsString(AVKey.NAME)})"
     override fun compareTo(other: Actor): Int = (this.referenceID - other.referenceID).sign()
 
-    fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else this
+    fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else 0
 
     /**
      * Usage:

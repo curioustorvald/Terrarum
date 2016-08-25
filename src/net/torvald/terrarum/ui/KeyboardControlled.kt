@@ -5,6 +5,5 @@ package net.torvald.terrarum.ui
  */
 interface KeyboardControlled {
     fun keyPressed(key: Int, c: Char)
-
     fun keyReleased(key: Int, c: Char)
 }

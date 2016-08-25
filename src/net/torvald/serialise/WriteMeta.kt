@@ -1,6 +1,6 @@
 package net.torvald.serialise
 
-import net.torvald.terrarum.mapgenerator.MapGenerator
+import net.torvald.terrarum.mapgenerator.WorldGenerator
 import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.itemproperties.ItemPropCodex
@@ -29,7 +29,7 @@ object WriteMeta {
 
     val BYTE_NULL: Byte = 0
 
-    val terraseed: Long = MapGenerator.SEED
+    val terraseed: Long = WorldGenerator.SEED
     val rogueseed: Long = RoguelikeRandomiser.seed
 
     /**

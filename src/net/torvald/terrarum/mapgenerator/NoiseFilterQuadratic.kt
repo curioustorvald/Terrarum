@@ -32,13 +32,13 @@ import com.jme3.math.FastMath
  */
 object NoiseFilterQuadratic : NoiseFilter {
     override fun getGrad(func_argX: Int, start: Float, end: Float): Float {
-        val graph_gradient = FastMath.pow(FastMath.sqr((1 - MapGenerator.TERRAIN_AVERAGE_HEIGHT).toFloat()), -1f) * // 1/4 -> 3/4 -> 9/16 -> 16/9
-                             (start - end) / FastMath.sqr(MapGenerator.HEIGHT.toFloat()) *
-                             FastMath.sqr((func_argX - MapGenerator.HEIGHT).toFloat()) + end
+        val graph_gradient = FastMath.pow(FastMath.sqr((1 - WorldGenerator.TERRAIN_AVERAGE_HEIGHT).toFloat()), -1f) * // 1/4 -> 3/4 -> 9/16 -> 16/9
+                             (start - end) / FastMath.sqr(WorldGenerator.HEIGHT.toFloat()) *
+                             FastMath.sqr((func_argX - WorldGenerator.HEIGHT).toFloat()) + end
 
-        if (func_argX < MapGenerator.TERRAIN_AVERAGE_HEIGHT) {
+        if (func_argX < WorldGenerator.TERRAIN_AVERAGE_HEIGHT) {
             return start
-        } else if (func_argX >= MapGenerator.HEIGHT) {
+        } else if (func_argX >= WorldGenerator.HEIGHT) {
             return end
         } else {
             return graph_gradient

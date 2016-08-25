@@ -5,6 +5,8 @@ import net.torvald.terrarum.audio.AudioResourceLibrary
 import net.torvald.terrarum.concurrent.ThreadPool
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.console.Authenticator
+import net.torvald.terrarum.console.CommandDict
+import net.torvald.terrarum.console.SetGlobalLightOverride
 import net.torvald.terrarum.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.gamecontroller.Key
@@ -16,7 +18,7 @@ import net.torvald.terrarum.gamemap.WorldTime
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
-import net.torvald.terrarum.mapgenerator.MapGenerator
+import net.torvald.terrarum.mapgenerator.WorldGenerator
 import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import net.torvald.terrarum.tilestats.TileStats
@@ -94,6 +96,11 @@ constructor() : BasicGameState() {
 
     @Throws(SlickException::class)
     override fun init(gameContainer: GameContainer, stateBasedGame: StateBasedGame) {
+        // state init code. Executed before the game goes into any "state" in states in StateBasedGame.java
+    }
+
+    override fun enter(gc: GameContainer, sbg: StateBasedGame) {
+        // load things when the game entered this "state"
         // load necessary shaders
         shader12BitCol = Shader.makeShader("./assets/4096.vrt", "./assets/4096.frg")
         shaderBlurH = Shader.makeShader("./assets/blurH.vrt", "./assets/blur.frg")
@@ -103,10 +110,10 @@ constructor() : BasicGameState() {
         world = GameWorld(8192, 2048)
 
         // generate terrain for the map
-        MapGenerator.attachMap(world)
-        MapGenerator.SEED = 0x51621D2
+        WorldGenerator.attachMap(world)
+        WorldGenerator.SEED = 0x51621D2
         //mapgenerator.setSeed(new HQRNG().nextLong());
-        MapGenerator.generateMap()
+        WorldGenerator.generateMap()
 
 
         RoguelikeRandomiser.seed = 0x540198
@@ -114,8 +121,8 @@ constructor() : BasicGameState() {
 
 
         // add new player and put it to actorContainer
-        player = PBSigrid.create()
-        //player = PFCynthia.create()
+        //player = PBSigrid.create()
+        player = PBCynthia.create()
         //player.setNoClip(true);
         addActor(player)
 
@@ -159,8 +166,8 @@ constructor() : BasicGameState() {
 
     override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
         UPDATE_DELTA = delta
-
         setAppTitle()
+
 
         ///////////////////////////
         // world-related updates //
@@ -168,7 +175,9 @@ constructor() : BasicGameState() {
         world.updateWorldTime(delta)
         WorldSimulator(world, player, delta)
         WeatherMixer.update(gc, delta)
-        world.globalLight = globalLightByTime.toInt()
+        TileStats.update()
+        if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
+            world.globalLight = globalLightByTime.toInt()
 
 
         ///////////////////////////
@@ -176,9 +185,6 @@ constructor() : BasicGameState() {
         ///////////////////////////
         GameController.processInput(gc.input)
         uiContainer.forEach { it.processInput(gc.input) }
-
-
-        TileStats.update()
 
 
         ////////////////////////////
@@ -213,6 +219,9 @@ constructor() : BasicGameState() {
         // app-related updates //
         /////////////////////////
         Terrarum.appgc.setVSync(Terrarum.appgc.fps >= Terrarum.VSYNC_TRIGGER_THRESHOLD)
+
+        // determine if lightmap blending should be done
+        Terrarum.gameConfig["smoothlighting"] = KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH)
     }
 
     private fun setAppTitle() {
@@ -225,33 +234,40 @@ constructor() : BasicGameState() {
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
         setBlendNormal()
 
-        // determine if lightmap blending should be done
-        Terrarum.gameConfig["smoothlighting"] = KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH)
-
-        // set antialias as on
-        if (!g.isAntiAlias) g.isAntiAlias = true
 
         drawSkybox(g)
 
+
+        // make camara work //
         // compensate for zoom. UIs have to be treated specially! (see UIHandler)
         g.translate(-MapCamera.cameraX * screenZoom, -MapCamera.cameraY * screenZoom)
 
+
+        /////////////////////////////
+        // draw map related stuffs //
+        /////////////////////////////
         MapCamera.renderBehind(gc, g)
 
-        // draw actors
-        run {
-            actorContainer.forEach { actor ->
-                if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
-                    actor.drawBody(gc, g)
-                }
-            }
-            player.drawBody(gc, g)
-        }
 
+        /////////////////
+        // draw actors //
+        /////////////////
+        actorContainer.forEach { actor ->
+            if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
+                actor.drawBody(gc, g)
+            }
+        }
+        player.drawBody(gc, g)
+
+
+        /////////////////////////////
+        // draw map related stuffs //
+        /////////////////////////////
         LightmapRenderer.renderLightMap()
 
         MapCamera.renderFront(gc, g)
         MapDrawer.render(gc, g)
+
 
         setBlendMul()
             MapDrawer.drawEnvOverlay(g)
@@ -260,22 +276,27 @@ constructor() : BasicGameState() {
             LightmapRenderer.draw(g)
         setBlendNormal()
 
-        // draw actor glows
-        run {
-            actorContainer.forEach { actor ->
-                if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
-                    actor.drawGlow(gc, g)
-                }
-            }
-            player.drawGlow(gc, g)
-        }
 
+        //////////////////////
+        // draw actor glows //
+        //////////////////////
+        actorContainer.forEach { actor ->
+            if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
+                actor.drawGlow(gc, g)
+            }
+        }
+        player.drawGlow(gc, g)
+
+
+        ////////////////////////
+        // debug informations //
+        ////////////////////////
         // draw reference ID if debugWindow is open
         if (debugWindow.isVisible) {
             actorContainer.forEachIndexed { i, actor ->
                 if (actor is Visible) {
                     g.color = Color.white
-                    g.font = Terrarum.smallNumbers
+                    g.font = Terrarum.fontSmallNumbers
                     g.drawString(
                             actor.referenceID.toString(),
                             actor.hitbox.posX.toFloat(),
@@ -293,14 +314,18 @@ constructor() : BasicGameState() {
                 }
             }
         }
+        // fluidmap debug
+        if (KeyToggler.isOn(Key.F4))
+            WorldSimulator.drawFluidMapDebug(player, g)
 
-        // draw UIs
-        run {
-            uiContainer.forEach { ui -> ui.render(gc, sbg, g) }
-            debugWindow.render(gc, sbg, g)
-            consoleHandler.render(gc, sbg, g)
-            notifier.render(gc, sbg, g)
-        }
+
+        //////////////
+        // draw UIs //
+        //////////////
+        uiContainer.forEach { ui -> ui.render(gc, sbg, g) }
+        debugWindow.render(gc, sbg, g)
+        consoleHandler.render(gc, sbg, g)
+        notifier.render(gc, sbg, g)
     }
 
     override fun keyPressed(key: Int, c: Char) {
@@ -369,7 +394,7 @@ constructor() : BasicGameState() {
         uiContainer.forEach { it.controllerButtonReleased(controller, button) } // for GamepadControlled UIcanvases
     }
 
-    override fun getID(): Int = Terrarum.SCENE_ID_GAME
+    override fun getID(): Int = Terrarum.STATE_ID_GAME
 
     private fun drawSkybox(g: Graphics) = WeatherMixer.render(g)
 

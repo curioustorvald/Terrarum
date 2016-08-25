@@ -27,7 +27,7 @@ object CommandDict {
             Pair("tp", TeleportPlayer()),
             Pair("cat", CatStdout()),
             Pair("exportav", ExportAV()),
-            Pair("setgl", SetGlobalLightLevel()),
+            Pair("setgl", SetGlobalLightOverride()),
             Pair("getfaction", GetFactioning()),
             Pair("auth", Terrarum.ingame.auth),
             Pair("spawnball", SpawnPhysTestBall()),

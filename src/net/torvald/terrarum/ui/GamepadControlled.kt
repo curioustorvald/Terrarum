@@ -7,6 +7,5 @@ package net.torvald.terrarum.ui
  */
 interface GamepadControlled {
     fun controllerButtonPressed(controller: Int, button: Int)
-
     fun controllerButtonReleased(controller: Int, button: Int)
 }

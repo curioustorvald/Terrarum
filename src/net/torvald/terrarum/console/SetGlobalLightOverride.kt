@@ -6,7 +6,11 @@ import net.torvald.terrarum.Terrarum
 /**
  * Created by minjaesong on 16-02-17.
  */
-class SetGlobalLightLevel : ConsoleCommand {
+class SetGlobalLightOverride : ConsoleCommand {
+
+    var lightOverride = false
+        private set
+
     override fun execute(args: Array<String>) {
         if (args.size == 4) {
             try {
@@ -15,6 +19,7 @@ class SetGlobalLightLevel : ConsoleCommand {
                 val b = args[3].toInt()
                 val GL = LightmapRenderer.constructRGBFromInt(r, g, b)
 
+                lightOverride = true
                 Terrarum.ingame.world.globalLight = GL
             }
             catch (e: NumberFormatException) {
@@ -37,7 +42,10 @@ class SetGlobalLightLevel : ConsoleCommand {
                 }
             }
             catch (e: NumberFormatException) {
-                Echo().execute("Wrong number input.")
+                if (args[1].toLowerCase() == "none")
+                    lightOverride = false
+                else
+                    Echo().execute("Wrong number input.")
             }
 
         }
@@ -47,6 +55,6 @@ class SetGlobalLightLevel : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo().execute("Usage: setgl [raw_value|r g b]")
+        Echo().execute("Usage: setgl [raw_value|r g b|“none”]")
     }
 }

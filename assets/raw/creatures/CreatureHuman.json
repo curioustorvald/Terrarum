@@ -16,7 +16,7 @@
   "jumppowermult": [100,100,100,100,100,100,100],
 
   "scale": 1.0,
-  "physiquemult": [100,100,100,100,100,100,100],
+  "scalemult": [100,100,100,100,100,100,100],
 
   "encumbrance": 1000,
   "basedefence": 100,

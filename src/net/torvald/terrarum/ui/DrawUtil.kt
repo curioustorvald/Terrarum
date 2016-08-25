@@ -14,4 +14,9 @@ object DrawUtil {
 
         g.drawImage(image, targetW.minus(imageW).ushr(1).toFloat(), screenPosY.toFloat())
     }
+
+    fun drawCentered(g: Graphics, image: Image, screenPosY: Int, targetW: Int, offsetX: Int = 0, offsetY: Int = 0) {
+        val imageW = image.width
+        g.drawImage(image, targetW.minus(imageW).ushr(1).toFloat() + offsetX, screenPosY.toFloat() + offsetY)
+    }
 }

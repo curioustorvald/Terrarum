@@ -1,16 +1,11 @@
 package net.torvald.terrarum
 
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.ui.Typography
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIHandler
-import net.torvald.terrarum.ui.KeyboardControlled
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Input
+import net.torvald.terrarum.ui.*
+import org.newdawn.slick.*
 import org.newdawn.slick.state.BasicGameState
 import org.newdawn.slick.state.StateBasedGame
+import java.util.*
 
 /**
  * Created by minjaesong on 16-07-06.
@@ -35,7 +30,7 @@ class StateMonitorCheck : BasicGameState() {
         //uiMonitorCheck.setAsClose()
     }
 
-    override fun getID(): Int = Terrarum.SCENE_ID_CONFIG_CALIBRATE
+    override fun getID(): Int = Terrarum.STATE_ID_CONFIG_CALIBRATE
 
     class MonitorCheckUI : UICanvas {
         override var width = Terrarum.WIDTH
@@ -44,6 +39,8 @@ class StateMonitorCheck : BasicGameState() {
 
         override var handler: UIHandler? = null
 
+        private val backgroundCol = Color(0x404040)
+
         private val colourLUT = arrayOf(
                 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x40,
                 0x48, 0x50, 0x58, 0x60, 0x68, 0x70, 0x78, 0x80,
@@ -51,13 +48,29 @@ class StateMonitorCheck : BasicGameState() {
                 0xC8, 0xD0, 0xD8, 0xE0, 0xE8, 0xF0, 0xF8, 0xFF
         )
 
+        val pictograms = ArrayList<Image>()
+        lateinit var imageGallery: ItemImageGallery
+
+        val instructionY = Terrarum.HEIGHT / 2//Terrarum.HEIGHT * 9 / 16
+        val anykeyY = Terrarum.HEIGHT * 15 / 16
+
+        val maru_alt = Regex("CN|JP|K[RP]|TW")
+
+        init {
+            if (Terrarum.gameLocale.length >= 4 && Terrarum.gameLocale.contains(maru_alt))
+                pictograms.add(Image("./assets/graphics/gui/monitor_good_alt_maru.png"))
+            else
+                pictograms.add(Image("./assets/graphics/gui/monitor_good.png"))
+            pictograms.add(Image("./assets/graphics/gui/monitor_bad.png"))
+
+            imageGallery = ItemImageGallery(0, instructionY, Terrarum.WIDTH, anykeyY - instructionY, pictograms)
+        }
+
         override fun update(gc: GameContainer, delta: Int) {
         }
 
         override fun render(gc: GameContainer, g: Graphics) {
             val titleY = Terrarum.HEIGHT * 7 / 16
-            val instructionY = Terrarum.HEIGHT * 9 / 16
-            val anykeyY = Terrarum.HEIGHT * 15 / 16
 
             val barWidthAll = Terrarum.WIDTH.div(100).times(100) * 9 / 10
             val barWidth: Int = barWidthAll / 32 + 1
@@ -77,7 +90,7 @@ class StateMonitorCheck : BasicGameState() {
 
                 // bar start point indicator
                 if (i == 0) {
-                    g.color = Color(0x404040)
+                    g.color = backgroundCol
                     g.drawLine(
                             barXstart.toFloat(), barYstart - barNumberGap - labelH.toFloat(),
                             barXstart.toFloat(), barYstart - barNumberGap.toFloat()
@@ -105,7 +118,7 @@ class StateMonitorCheck : BasicGameState() {
             }
 
             // messages background
-            g.color = Color(0x404040)
+            g.color = backgroundCol
             g.fillRect(
                     0f, Terrarum.HEIGHT.shr(1).toFloat(),
                     Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.shr(1).plus(1).toFloat()
@@ -119,14 +132,20 @@ class StateMonitorCheck : BasicGameState() {
                     this
             )
 
-            (1..12).forEach {
+            // message text
+            /*(1..12).forEach {
                 Typography.printCentered(
                         g, Lang["MENU_MONITOR_CALI_LABEL_$it"],
                         instructionY + it.minus(2).times(g.font.lineHeight),
                         this
                 )
-            }
+            }*/
 
+            // message pictogram
+            imageGallery.render(gc, g)
+
+
+            // anykey
             Typography.printCentered(
                     g, Lang["MENU_LABEL_PRESS_ANYKEY_CONTINUE"],
                     anykeyY,

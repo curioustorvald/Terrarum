@@ -3,7 +3,7 @@ Creature raw documentation
 ## Physical properties ##
 
 * 1 m = 24 px
-* mult: Multiplier. e.g. 1.0, 0.85, 1.25, ...
+* mult: Multiplier in pencentage. e.g. 100, 85, 125, ...
 
 |name|unit|description|
 |----|----|-----------|
@@ -15,7 +15,7 @@ Creature raw documentation
 |scale|unit|Creature body scale. Mass/strength/accel/etc. will be changed accordingly, hence the prefix “base” for some raw tokens|
 |dragcoeff|unit|Drag coefficient|
 |speedmult, accelmult, jumppowermult|array of percentiles (Int)|Variability factor|
-|physiquemult|mult|Breadth variation for mobs|
+|scalemult|mult|Breadth variation for mobs|
 
 ## Creature properties ##
 

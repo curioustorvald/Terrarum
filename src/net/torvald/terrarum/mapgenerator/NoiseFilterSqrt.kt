@@ -7,11 +7,11 @@ import com.jme3.math.FastMath
  */
 object NoiseFilterSqrt : NoiseFilter {
     override fun getGrad(func_argX: Int, start: Float, end: Float): Float {
-        val graph_gradient = (end - start) / FastMath.sqrt((MapGenerator.HEIGHT - MapGenerator.TERRAIN_AVERAGE_HEIGHT).toFloat()) * FastMath.sqrt((func_argX - MapGenerator.TERRAIN_AVERAGE_HEIGHT).toFloat()) + start
+        val graph_gradient = (end - start) / FastMath.sqrt((WorldGenerator.HEIGHT - WorldGenerator.TERRAIN_AVERAGE_HEIGHT).toFloat()) * FastMath.sqrt((func_argX - WorldGenerator.TERRAIN_AVERAGE_HEIGHT).toFloat()) + start
 
-        if (func_argX < MapGenerator.TERRAIN_AVERAGE_HEIGHT) {
+        if (func_argX < WorldGenerator.TERRAIN_AVERAGE_HEIGHT) {
             return start
-        } else if (func_argX >= MapGenerator.HEIGHT) {
+        } else if (func_argX >= WorldGenerator.HEIGHT) {
             return end
         } else {
             return graph_gradient
