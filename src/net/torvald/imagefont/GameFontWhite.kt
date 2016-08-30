@@ -56,6 +56,8 @@ constructor() : GameFontBase() {
                 "./assets/graphics/fonts/romana_ef.png", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
         GameFontBase.thaiSheet = SpriteSheet(
                 "./assets/graphics/fonts/thai_fullwidth.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
+        GameFontBase.keycapSheet = SpriteSheet(
+                "./assets/graphics/fonts/puae000-e07f.png", GameFontBase.SIZE_KEYCAP, GameFontBase.SIZE_KEYCAP)
 
         val shk = arrayOf(
                 GameFontBase.asciiSheet,
@@ -78,7 +80,8 @@ constructor() : GameFontBase() {
                 GameFontBase.romanianSheet,
                 GameFontBase.romanianSheetEF,
                 GameFontBase.thaiSheet,
-                null // Filler
+                null, // Filler
+                GameFontBase.keycapSheet
         )
         GameFontBase.sheetKey = shk
     }

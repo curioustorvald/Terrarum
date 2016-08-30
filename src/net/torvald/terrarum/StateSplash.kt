@@ -32,7 +32,7 @@ class StateSplash : BasicGameState() {
     var opacity = 0f
 
     val fadeTime = 500
-    var fadeTimer = 0
+    var fadeTimer = -1
 
     var anykey_hit = false
 
@@ -67,13 +67,14 @@ class StateSplash : BasicGameState() {
 
     override fun update(container: GameContainer, game: StateBasedGame, delta: Int) {
         // next splash or load next scene
-        if (anykey_hit && opened) {
+        if (anykey_hit && opacity < 0.0001f) {
             game.enterState(Terrarum.STATE_ID_GAME)
         }
 
         // fade-in
         if (delta < deltathre) {
             init = true
+            fadeTimer += delta
 
             if (opacity < 1f && !anykey_hit) {
                 opacity = FastMath.interpolateLinear(
@@ -93,11 +94,9 @@ class StateSplash : BasicGameState() {
         }
 
         // auto dismiss
-        if (opened && fadeTimer >= auto_dismiss)
-            //doAnykeyThingy()
-
-        fadeTimer += delta
-        println(fadeTimer)
+        if (opened && fadeTimer >= auto_dismiss) {
+            doAnykeyThingy()
+        }
     }
 
     override fun getID(): Int = Terrarum.STATE_ID_SPLASH
@@ -111,19 +110,12 @@ class StateSplash : BasicGameState() {
         Typography.printCentered(thisG, Lang["APP_WARNING_HEALTH_AND_SAFETY"],
                 thisG.font.lineHeight * 2)
 
-        Typography.printCentered(thisG, Lang["MENU_LABEL_PRESS_ANYKEY_CONTINUE"],
+        Typography.printCentered(thisG, Lang["MENU_LABEL_PRESS_ANYKEY"],
                 Terrarum.HEIGHT - thisG.font.lineHeight.times(3))
 
         imageGallery.render(container, thisG)
 
         g.drawImage(fadeSheet, 0f, 0f, Color(1f, 1f, 1f, opacity))
-    }
-
-    private fun knowYourPlace(i: Int): Int {
-        val gutter = (imageBoardHeight - virtualImageHeight.times(pictogramCollection.size)).toFloat().div(
-                pictogramCollection.size + 1f
-        )
-        return (gutter * i.plus(1) + virtualImageHeight * i).roundInt()
     }
 
     override fun keyPressed(key: Int, c: Char) {

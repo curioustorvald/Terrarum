@@ -227,8 +227,8 @@ constructor() : BasicGameState() {
     private fun setAppTitle() {
         Terrarum.appgc.setTitle(
                 "Simple Slick Game" +
-                " — FPS: ${Terrarum.appgc.fps} (${Terrarum.TARGET_INTERNAL_FPS})" +
-                " — ${memInUse}M / ${totalVMMem}M")
+                " — F: ${Terrarum.appgc.fps} (${Terrarum.TARGET_INTERNAL_FPS})" +
+                " — M: ${memInUse}M / ${totalVMMem}M")
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
@@ -431,7 +431,10 @@ constructor() : BasicGameState() {
             val actor = actorContainer[i]
             val actorIndex = i
             if (actor is Visible && !actor.inUpdateRange()) {
-                actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
+                // inactive instead of delete, if not flagged to delete
+                if (!actor.flagDespawn)
+                    actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
+
                 actorContainer.removeAt(actorIndex)
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1

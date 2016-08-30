@@ -18,6 +18,8 @@ object DefaultConfig {
         jsonObject.addProperty("notificationshowuptime", 6500)
         jsonObject.addProperty("multithread", true) // experimental!
 
+
+
         // control-gamepad
         jsonObject.addProperty("joypadkeyn", 4)
         jsonObject.addProperty("joypadkeyw", 1)
@@ -33,6 +35,10 @@ object DefaultConfig {
         jsonObject.addProperty("joypadlsticky", 1)
         jsonObject.addProperty("joypadrstickx", 2)
         jsonObject.addProperty("joypadrsticky", 3) // logitech indices
+
+        jsonObject.addProperty("joypadlabelstyle", "generic") // "nwii", "logitech", "sonyps", "msxb360", "generic"
+
+
 
         // control-keyboard (Java key codes. This is what Minecraft also uses)
         jsonObject.addProperty("keyup", Key.E)

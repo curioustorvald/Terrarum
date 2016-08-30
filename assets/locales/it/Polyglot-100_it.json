@@ -325,7 +325,7 @@
             },
             {
                 "n": "CONTEXT_ITEM_GAUNTLETS",
-                "s": "Guanti d’armatura"
+                "s": "Guanti d'armatura"
             },
             {
                 "n": "CONTEXT_ITEM_GEM",
@@ -521,11 +521,11 @@
             },
             {
                 "n": "CONTEXT_MEDAL_GOLD",
-                "s": "Medaglia d’oro"
+                "s": "Medaglia d'oro"
             },
             {
                 "n": "CONTEXT_MEDAL_SILVER",
-                "s": "Medaglia d’argento"
+                "s": "Medaglia d'argento"
             },
             {
                 "n": "CONTEXT_METAL_BRONZE",
@@ -609,7 +609,7 @@
             },
             {
                 "n": "CREDITS_ANIMATION_DIRECTOR",
-                "s": "Direttore dell’animazione"
+                "s": "Direttore dell'animazione"
             },
             {
                 "n": "CREDITS_ANIMATOR",
@@ -737,7 +737,7 @@
             },
             {
                 "n": "CREDITS_INTERFACE_ARTIST",
-                "s": "Artista per l’interfaccia"
+                "s": "Artista per l'interfaccia"
             },
             {
                 "n": "CREDITS_JUNIOR",
@@ -929,7 +929,7 @@
             },
             {
                 "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
-                "s": "L’altro giocatore si è disconnesso."
+                "s": "L'altro giocatore si è disconnesso."
             },
             {
                 "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
@@ -1245,11 +1245,11 @@
             },
             {
                 "n": "GAME_GENRE_ACTION",
-                "s": "Gioco d’azione"
+                "s": "Gioco d'azione"
             },
             {
                 "n": "GAME_GENRE_ADVENTURE",
-                "s": "Gioco d’avventura"
+                "s": "Gioco d'avventura"
             },
             {
                 "n": "GAME_GENRE_CARD",
@@ -1373,7 +1373,7 @@
             },
             {
                 "n": "GAME_INVENTORY_CAPACITY",
-                "s": "Capacità dell’ inventario"
+                "s": "Capacità dell' inventario"
             },
             {
                 "n": "GAME_INVENTORY_DROP",
@@ -2025,7 +2025,7 @@
             },
             {
                 "n": "MENU_LABEL_GALLERY",
-                "s": "Galleria d’arte"
+                "s": "Galleria d'arte"
             },
             {
                 "n": "MENU_LABEL_GOODBYE",

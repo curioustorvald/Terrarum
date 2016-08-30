@@ -52,7 +52,10 @@ object GameController {
         else if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
             // test tile place
             try {
-                Terrarum.ingame.world.setTileTerrain(mouseTileX, mouseTileY, Terrarum.ingame.player.actorValue.getAsInt("selectedtile")!!)
+                Terrarum.ingame.world.setTileTerrain(
+                        mouseTileX, mouseTileY,
+                        Terrarum.ingame.player.actorValue.getAsInt("__selectedtile")!!
+                )
             }
             catch (e: ArrayIndexOutOfBoundsException) {
             }

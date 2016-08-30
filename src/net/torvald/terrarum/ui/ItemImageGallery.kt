@@ -16,8 +16,7 @@ class ItemImageGallery(
         val width: Int,
         val height: Int,
         val imageList: ArrayList<Image>,
-        val column: Int = 1
-) : UIItem {
+        val column: Int = 1) : UIItem {
 
     override fun update(gc: GameContainer, delta: Int) {
     }

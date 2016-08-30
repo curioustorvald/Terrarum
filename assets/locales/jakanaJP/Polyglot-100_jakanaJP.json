@@ -2113,19 +2113,19 @@
             },
             {
                 "n": "MENU_LABEL_PRESS_ANYKEY",
-                "s": "いずれかのキーを押す"
+                "s": "いずれかのキーを おす"
             },
             {
                 "n": "MENU_LABEL_PRESS_ANYKEY_CONTINUE",
-                "s": "続けるにはいずれかのキーを押す"
+                "s": "つづけるには いずれかのキーを おす"
             },
             {
                 "n": "MENU_LABEL_PRESS_START",
-                "s": "STARTボタンを押す"
+                "s": "STARTボタンを おす"
             },
             {
                 "n": "MENU_LABEL_PRESS_START_CONTINUE",
-                "s": "続けるにはSTARTボタンを押す"
+                "s": "つづけるには STARTボタンを おす"
             },
             {
                 "n": "MENU_LABEL_PREVIOUS",

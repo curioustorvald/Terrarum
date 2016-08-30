@@ -113,9 +113,15 @@ object Lang {
     operator fun get(key: String): String {
         fun fallback(): String = langpack["${key}_$FALLBACK_LANG_CODE"] ?: "ERRNULL:$key"
 
-        val ret = langpack["${key}_${Terrarum.gameLocale}"]
 
-        return if (ret.isNullOrEmpty()) fallback() else ret!!
+        val ret = langpack["${key}_${Terrarum.gameLocale}"]
+        val ret2 = if (ret.isNullOrEmpty()) fallback() else ret!!
+
+        // special treatment
+        if (key.startsWith("MENU_LABEL_PRESS_START_SYMBOL"))
+            return ret2.replace('>', Terrarum.joypadLabelStart)
+
+        return ret2
     }
 
     fun pluraliseLang(key: String, count: Int): String {

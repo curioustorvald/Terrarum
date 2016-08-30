@@ -58,7 +58,8 @@ object PBSigrid {
 
         p.actorValue[AVKey.BASEDEFENCE] = 141
 
-        p.actorValue["selectedtile"] = 16
+        p.actorValue["__selectedtile"] = 16 // test code; replace with <tile_item>.primaryUse(gc, delta)
+        p.actorValue["__aimhelper"] = true
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 10, 0)
 

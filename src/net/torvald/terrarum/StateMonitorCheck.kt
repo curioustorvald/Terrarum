@@ -41,12 +41,7 @@ class StateMonitorCheck : BasicGameState() {
 
         private val backgroundCol = Color(0x404040)
 
-        private val colourLUT = arrayOf(
-                0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x40,
-                0x48, 0x50, 0x58, 0x60, 0x68, 0x70, 0x78, 0x80,
-                0x88, 0x90, 0x98, 0xA0, 0xA8, 0xB0, 0xB8, 0xC0,
-                0xC8, 0xD0, 0xD8, 0xE0, 0xE8, 0xF0, 0xF8, 0xFF
-        )
+        private val colourLUT = IntArray(32, { 255.times(it + 1).div(32) })
 
         val pictograms = ArrayList<Image>()
         lateinit var imageGallery: ItemImageGallery
@@ -147,7 +142,7 @@ class StateMonitorCheck : BasicGameState() {
 
             // anykey
             Typography.printCentered(
-                    g, Lang["MENU_LABEL_PRESS_ANYKEY_CONTINUE"],
+                    g, Lang["MENU_LABEL_PRESS_ANYKEY"],
                     anykeyY,
                     this
             )

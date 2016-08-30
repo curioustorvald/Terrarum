@@ -1,5 +1,8 @@
 package net.torvald.serialise
 
+import java.io.IOException
+import java.io.InputStream
+
 /**
  * Created by minjaesong on 16-08-24.
  */

@@ -34,6 +34,21 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         gameConfig = GameConfig()
 
+        joypadLabelStart = when (getConfigString("joypadlabelstyle")) {
+            "nwii"     -> 0xE04B.toChar() // + mark
+            "logitech" -> 0xE05A.toChar() // number 10
+            else       -> 0xE042.toChar() // > mark (sonyps, msxb360, generic)
+        }
+        joypadLableSelect = when (getConfigString("joypadlabelstyle")) {
+            "nwii"     -> 0xE04D.toChar() // - mark
+            "logitech" -> 0xE059.toChar() // number 9
+            "sonyps"   -> 0xE043.toChar() // solid rectangle
+            "msxb360"  -> 0xE041.toChar() // < mark
+            else       -> 0xE043.toChar() // solid rectangle
+        }
+
+
+
         getDefaultDirectory()
         createDirs()
 
@@ -69,6 +84,11 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         fontGame = GameFontWhite()
         fontSmallNumbers = TinyAlphNum()
+        fontControlGuide = SpriteSheetFont(SpriteSheet(
+                "./assets/graphics/fonts/" +
+                if (environment == RunningEnvironment.CONSOLE) "keycaps_gamepad.png"
+                else "keycaps.png", 18, 18)
+                , ' ')
 
         hasController = gc.input.controllerCount > 0
         if (hasController) {
@@ -133,7 +153,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         lateinit var environment: RunningEnvironment
 
         private val localeSimple = arrayOf("de", "en", "es", "it")
-        var gameLocale = "####" // locale override
+        var gameLocale = "####" // lateinit placeholder
             set(value) {
                 if (localeSimple.contains(value.substring(0..1)))
                     field = value.substring(0..1)
@@ -145,6 +165,23 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             private set
         lateinit var fontSmallNumbers: Font
             private set
+        lateinit var fontControlGuide: Font
+            private set
+
+        var joypadLabelStart: Char = 0x00.toChar() // lateinit
+        var joypadLableSelect:Char = 0x00.toChar() // lateinit
+        var joypadLabelNinA:  Char = 0x00.toChar() // lateinit TODO
+        var joypadLabelNinB:  Char = 0x00.toChar() // lateinit TODO
+        var joypadLabelNinX:  Char = 0x00.toChar() // lateinit TODO
+        var joypadLabelNinY:  Char = 0x00.toChar() // lateinit TODO
+        var joypadLabelNinL:  Char = 0x00.toChar() // lateinit TODO
+        var joypadLabelNinR:  Char = 0x00.toChar() // lateinit TODO
+        var joypadLabelNinZL: Char = 0x00.toChar() // lateinit TODO
+        var joypadLabelNinZR: Char = 0x00.toChar() // lateinit TODO
+        val joypadLabelLEFT  = 0xE068.toChar()
+        val joypadLabelDOWN  = 0xE069.toChar()
+        val joypadLabelUP    = 0xE06A.toChar()
+        val joypadLabelRIGHT = 0xE06B.toChar()
 
         // 0x0 - 0xF: Game-related
         // 0x10 - 0x1F: Config

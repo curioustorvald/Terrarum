@@ -521,11 +521,11 @@
             },
             {
                 "n": "CONTEXT_MEDAL_GOLD",
-                "s": "Médaille d’or"
+                "s": "Médaille d'or"
             },
             {
                 "n": "CONTEXT_MEDAL_SILVER",
-                "s": "Médaille d’argent"
+                "s": "Médaille d'argent"
             },
             {
                 "n": "CONTEXT_METAL_BRONZE",
@@ -609,7 +609,7 @@
             },
             {
                 "n": "CREDITS_ANIMATION_DIRECTOR",
-                "s": "Directeur de l’Animation"
+                "s": "Directeur de l'Animation"
             },
             {
                 "n": "CREDITS_ANIMATOR",
@@ -737,7 +737,7 @@
             },
             {
                 "n": "CREDITS_INTERFACE_ARTIST",
-                "s": "Artiste d’interfaces"
+                "s": "Artiste d'interfaces"
             },
             {
                 "n": "CREDITS_JUNIOR",
@@ -905,7 +905,7 @@
             },
             {
                 "n": "ERROR_GENERIC_ERRCODE",
-                "s": "Code d’erreur :"
+                "s": "Code d'erreur :"
             },
             {
                 "n": "ERROR_GENERIC_INVALID_KEY",
@@ -917,7 +917,7 @@
             },
             {
                 "n": "ERROR_GENERIC_TEXT",
-                "s": "Une erreur s’est produite."
+                "s": "Une erreur s'est produite."
             },
             {
                 "n": "ERROR_NETWORK_CONNECTION_LOST",
@@ -925,15 +925,15 @@
             },
             {
                 "n": "ERROR_NETWORK_DISCONNECTED_YOUR_OPPONENT",
-                "s": "Votre adversaire s’est déconnecté."
+                "s": "Votre adversaire s'est déconnecté."
             },
             {
                 "n": "ERROR_NETWORK_DISCONNECTED_YOUR_PLAYER",
-                "s": "L’autre joueur s’est déconnecté."
+                "s": "L'autre joueur s'est déconnecté."
             },
             {
                 "n": "ERROR_NETWORK_DISCONNECTED_YOUR_TEAMMATE",
-                "s": "Votre coéquipier s’est déconnecté."
+                "s": "Votre coéquipier s'est déconnecté."
             },
             {
                 "n": "ERROR_NETWORK_SERVER",
@@ -997,7 +997,7 @@
             },
             {
                 "n": "GAME_ACTION_CROUCH",
-                "s": "S’accroupir"
+                "s": "S'accroupir"
             },
             {
                 "n": "GAME_ACTION_DODGE",
@@ -1073,7 +1073,7 @@
             },
             {
                 "n": "GAME_ACTION_RUN_AWAY",
-                "s": "S’enfuir"
+                "s": "S'enfuir"
             },
             {
                 "n": "GAME_ACTION_SHOOT",
@@ -1117,7 +1117,7 @@
             },
             {
                 "n": "GAME_CHARACTER_EXP",
-                "s": "Points d’expérience"
+                "s": "Points d'expérience"
             },
             {
                 "n": "GAME_CHARACTER_FEMALE",
@@ -1181,7 +1181,7 @@
             },
             {
                 "n": "GAME_CHARACTER_SPAWN_POINT",
-                "s": "Point d’Apparition"
+                "s": "Point d'Apparition"
             },
             {
                 "n": "GAME_CHARACTER_TRANSGENDER",
@@ -1245,11 +1245,11 @@
             },
             {
                 "n": "GAME_GENRE_ACTION",
-                "s": "Jeu d’action"
+                "s": "Jeu d'action"
             },
             {
                 "n": "GAME_GENRE_ADVENTURE",
-                "s": "Jeu d’aventure"
+                "s": "Jeu d'aventure"
             },
             {
                 "n": "GAME_GENRE_CARD",
@@ -1293,7 +1293,7 @@
             },
             {
                 "n": "GAME_GENRE_PUZZLE",
-                "s": "Jeu d’énigmes"
+                "s": "Jeu d'énigmes"
             },
             {
                 "n": "GAME_GENRE_QUIZ",
@@ -1373,7 +1373,7 @@
             },
             {
                 "n": "GAME_INVENTORY_CAPACITY",
-                "s": "Capacité de l’inventaire"
+                "s": "Capacité de l'inventaire"
             },
             {
                 "n": "GAME_INVENTORY_DROP",
@@ -1425,7 +1425,7 @@
             },
             {
                 "n": "GAME_LABEL_PLEASE_BE_CAREFUL",
-                "s": "S’il vous plaît soyez prudent."
+                "s": "S'il vous plaît soyez prudent."
             },
             {
                 "n": "GAME_LABEL_TACTICS",
@@ -1477,7 +1477,7 @@
             },
             {
                 "n": "GAME_OBJECTIVE_ESCAPE",
-                "s": "S’échapper"
+                "s": "S'échapper"
             },
             {
                 "n": "GAME_OBJECTIVE_GAME_FINISHED",
@@ -2025,7 +2025,7 @@
             },
             {
                 "n": "MENU_LABEL_GALLERY",
-                "s": "Galerie d’art"
+                "s": "Galerie d'art"
             },
             {
                 "n": "MENU_LABEL_GOODBYE",
@@ -2257,7 +2257,7 @@
             },
             {
                 "n": "MENU_LOGIN_REGISTER",
-                "s": "S’inscrire"
+                "s": "S'inscrire"
             },
             {
                 "n": "MENU_LOGIN_REMEMBER",
@@ -2337,7 +2337,7 @@
             },
             {
                 "n": "MENU_NAME_USER",
-                "s": "Nom d’utilisateur"
+                "s": "Nom d'utilisateur"
             },
             {
                 "n": "MENU_OPTIONS",
@@ -2557,7 +2557,7 @@
             },
             {
                 "n": "MENU_VR_HMD_ORIENT_RESET",
-                "s": "Restaurer l’orientation du HDM"
+                "s": "Restaurer l'orientation du HDM"
             },
             {
                 "n": "MENU_VR_VIRTUAL_REALITY",

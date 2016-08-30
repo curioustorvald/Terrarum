@@ -78,6 +78,7 @@ constructor() : Font {
             || (c.toInt() >= 0xE47 && c.toInt() <= 0xE4E)
             || (c.toInt() == 0xE31)
     private fun isThaiEF(c: Char) = c.toInt() == 0xE40
+    private fun isKeycap(c: Char) = c.toInt() >= 0xE000 && c.toInt() <= 0xE07F
 
 
 
@@ -138,6 +139,9 @@ constructor() : Font {
     private fun thaiEFIndexX(c: Char) = 3
     private fun thaiEFIndexY(c: Char) = 0
 
+    private fun keycapIndexX(c: Char) = (c.toInt() - 0xE000) % 16
+    private fun keycapIndexY(c: Char) = (c.toInt() - 0xE000) / 16
+
     private val narrowWidthSheets = arrayOf(
             SHEET_ASCII_EF,
             SHEET_EXTA_EF,
@@ -193,6 +197,8 @@ constructor() : Font {
                 len += W_UNIHAN
             else if (isThaiDiacritics(s[i]))
                 len += 0 // set width of the glyph as -W_LATIN_WIDE
+            else if (ctype == SHEET_KEYCAP)
+                len += SIZE_KEYCAP
             else
                 len += W_LATIN_WIDE
 
@@ -435,6 +441,10 @@ constructor() : Font {
                         sheetX = thaiIndexX(ch)
                         sheetY = thaiIndexY(ch)
                     }
+                    SHEET_KEYCAP -> {
+                        sheetX = keycapIndexX(ch)
+                        sheetY = keycapIndexY(ch)
+                    }
                     else             -> {
                         sheetX = ch.toInt() % 16
                         sheetY = ch.toInt() / 16
@@ -455,9 +465,9 @@ constructor() : Font {
                             Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
 
                             // to deal with the height difference of the sheets
-                            Math.round(y).toFloat() + (if (prevInstance == SHEET_CJK_PUNCT) -1
-
-                            else if (prevInstance == SHEET_FW_UNI) (H - H_HANGUL) / 2
+                            Math.round(y).toFloat() + (if (prevInstance == SHEET_CJK_PUNCT) -1 // height hack
+                            else if (prevInstance == SHEET_FW_UNI) (H - H_HANGUL) / 2    // completely legit height adjustment
+                            else if (prevInstance == SHEET_KEYCAP) (H - SIZE_KEYCAP) / 2 // completely legit height adjustment
                             else 0).toFloat(),
 
                             scale.toFloat(), thisCol
@@ -522,6 +532,8 @@ constructor() : Font {
             return SHEET_THAI_EM
         else if (c.isColourCode())
             return SHEET_COLOURCODE
+        else if (isKeycap(c))
+            return SHEET_KEYCAP
         else
             return SHEET_ASCII_EM// fixed width punctuations
         // fixed width
@@ -584,6 +596,7 @@ constructor() : Font {
         lateinit internal var romanianSheet: SpriteSheet
         lateinit internal var romanianSheetEF: SpriteSheet
         lateinit internal var thaiSheet: SpriteSheet
+        lateinit internal var keycapSheet: SpriteSheet
 
         internal val JUNG_COUNT = 21
         internal val JONG_COUNT = 28
@@ -599,6 +612,8 @@ constructor() : Font {
         internal val H_HANGUL = 16
         internal val H_UNIHAN = 16
         internal val H_KANA = 20
+
+        internal val SIZE_KEYCAP = 18
 
         internal val SHEET_ASCII_EM = 0
         internal val SHEET_ASCII_EF = 1
@@ -621,6 +636,7 @@ constructor() : Font {
         internal val SHEET_EXTB_ROMANIAN_EF = 18
         internal val SHEET_THAI_EM = 19
         internal val SHEET_THAI_EF = 20
+        internal val SHEET_KEYCAP = 21
         internal val SHEET_COLOURCODE = 255
 
         lateinit internal var sheetKey: Array<SpriteSheet?>

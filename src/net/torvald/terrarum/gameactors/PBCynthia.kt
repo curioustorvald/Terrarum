@@ -13,7 +13,7 @@ object PBCynthia {
         CreatureRawInjector.inject(p.actorValue, "CreatureHuman.json")
 
         p.actorValue[AVKey._PLAYER_QUICKBARSEL] = 0
-        p.actorValue["selectedtile"] = 16
+        p.actorValue["__selectedtile"] = 16
 
 
         p.sprite = SpriteAnimation()

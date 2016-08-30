@@ -17,8 +17,8 @@ abstract class Actor : Comparable<Actor>, Runnable {
      * @return Reference ID. (32768-0x7FFF_FFFF)
      */
     abstract var referenceID: Int
-
     abstract var actorValue: ActorValue
+    abstract var flagDespawn: Boolean
 
     override fun equals(other: Any?) = referenceID == (other as Actor).referenceID
     override fun hashCode() = referenceID

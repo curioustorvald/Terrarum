@@ -5,9 +5,9 @@ import com.jme3.math.FastMath
 /**
  * Created by minjaesong on 16-03-22.
  */
-object MovementInterpolator {
+object Movement{
     /**
-     * Pretty fast at the beginning, getting slow over time.
+     * Fast at the beginning, getting slow over time.
      */
     fun fastPullOut(scale: Float, start: Float = 0f, end: Float = 1f): Float =
             if (scale < 0f) start

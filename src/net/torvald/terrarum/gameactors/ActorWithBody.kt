@@ -127,7 +127,9 @@ open class ActorWithBody : Actor(), Visible {
      * Flags and Properties
      */
 
+
     var grounded = false
+    override var flagDespawn = false
     /** Default to 'false'  */
     var isVisible = false
     /** Default to 'true'  */
@@ -269,7 +271,7 @@ open class ActorWithBody : Actor(), Visible {
     }
 
     override fun update(gc: GameContainer, delta: Int) {
-        if (isUpdate) {
+        if (isUpdate && !flagDespawn) {
 
             /**
              * Temporary variables to reset
