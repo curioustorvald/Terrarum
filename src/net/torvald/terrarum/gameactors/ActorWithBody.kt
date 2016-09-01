@@ -186,9 +186,9 @@ open class ActorWithBody : Actor(), Visible {
 
     @Transient internal val BASE_FRICTION = 0.3
 
-    @Transient val KINEMATIC = 1 // does not be budged by external forces
-    @Transient val DYNAMIC = 2
-    @Transient val STATIC = 3 // does not be budged by external forces, target of collision
+    @Transient val KINEMATIC = 1 // does not displaced by external forces
+    @Transient val DYNAMIC = 2   // displaced by external forces
+    @Transient val STATIC = 3    // does not displaced by external forces, target of collision
     var collisionType = DYNAMIC
 
     @Transient private val CCD_TICK = 1.0 / 16.0
@@ -214,7 +214,11 @@ open class ActorWithBody : Actor(), Visible {
     internal var walledLeft = false
     internal var walledRight = false
 
+    /**
+     * true: This actor had just made collision
+     */
     var ccdCollided = false
+        private set
 
     var isWalkingH = false
     var isWalkingV = false
@@ -944,6 +948,8 @@ open class ActorWithBody : Actor(), Visible {
 
         assertPrinted = true
     }
+
+    internal fun flagDespawn() { flagDespawn = true }
 
     companion object {
 

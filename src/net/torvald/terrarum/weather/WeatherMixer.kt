@@ -2,6 +2,7 @@ package net.torvald.terrarum.weather
 
 import com.jme3.math.FastMath
 import net.torvald.JsonFetcher
+import net.torvald.colourutil.CIELchUtil
 import net.torvald.colourutil.ColourUtil
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
@@ -108,11 +109,8 @@ object WeatherMixer {
         // interpolate R, G and B
         val scale = (timeInSec % dataPointDistance).toFloat() / dataPointDistance // [0.0, 1.0]
 
-        val r = interpolateLinear(scale, colourThis.red, colourNext.red)
-        val g = interpolateLinear(scale, colourThis.green, colourNext.green)
-        val b = interpolateLinear(scale, colourThis.blue, colourNext.blue)
-
-        val newCol = ColourUtil.toSlickColor(r, g, b)
+        //val newCol = ColourUtil.getGradient(scale, colourThis, colourNext)
+        val newCol = CIELchUtil.getGradient(scale, colourThis, colourNext)
 
         /* // very nice monitor code
         // 65 -> 66 | 300 | 19623 | RGB8(255, 0, 255) -[41%]-> RGB8(193, 97, 23) | * `230`40`160`
@@ -126,19 +124,6 @@ object WeatherMixer {
     }
 
     fun Color.toStringRGB() = "RGB8(${this.red}, ${this.green}, ${this.blue})"
-
-    fun interpolateLinear(scale: Float, startValue: Int, endValue: Int): Int {
-        if (startValue == endValue) {
-            return startValue
-        }
-        if (scale <= 0f) {
-            return startValue
-        }
-        if (scale >= 1f) {
-            return endValue
-        }
-        return Math.round((1f - scale) * startValue + scale * endValue)
-    }
 
     fun getWeatherList(classification: String) = weatherList[classification]!!
     fun getRandomWeather(classification: String) =

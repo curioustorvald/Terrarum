@@ -200,7 +200,7 @@ constructor() : BasicGameState() {
         // determine whether the inactive actor should be re-active
         wakeDormantActors()
         // determine whether the actor should be active or dormant
-        InactivateDistantActors()
+        KillOrKnockdownActors()
         updateActors(gc, delta)
         // TODO thread pool(?)
         CollisionSolver.process()
@@ -424,17 +424,21 @@ constructor() : BasicGameState() {
      * If the actor must be dormant, the target actor will be put to the list specifically for them.
      * if the actor is not to be dormant, it will be just ignored.
      */
-    fun InactivateDistantActors() {
+    fun KillOrKnockdownActors() {
         var actorContainerSize = actorContainer.size
         var i = 0
         while (i < actorContainerSize) { // loop through actorContainer
             val actor = actorContainer[i]
             val actorIndex = i
-            if (actor is Visible && !actor.inUpdateRange()) {
-                // inactive instead of delete, if not flagged to delete
-                if (!actor.flagDespawn)
-                    actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
-
+            // kill actors flagged to despawn
+            if (actor.flagDespawn) {
+                actorContainer.removeAt(actorIndex)
+                actorContainerSize -= 1
+                i-- // array removed 1 elem, so we also decrement counter by 1
+            }
+            // inactivate distant actors
+            else if (actor is Visible && !actor.inUpdateRange()) {
+                actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
                 actorContainer.removeAt(actorIndex)
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1

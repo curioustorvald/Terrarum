@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.colourutil.CIELabUtil.brighterLab
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -34,18 +34,28 @@ open class ProjectileSimple(
 
         damage = bulletDatabase[type][0] as Int
         displayColour = bulletDatabase[type][1] as Color
+
+        collisionType = KINEMATIC
     }
 
     override fun update(gc: GameContainer, delta: Int) {
-        // hit something and despawn! (use ```flagDespawn = true```)
-
+        // hit something and despawn
+        if (ccdCollided) flagDespawn()
 
         super.update(gc, delta)
     }
 
     override fun drawBody(gc: GameContainer, g: Graphics) {
         // draw trail of solid colour (Terraria style maybe?)
-
+        g.lineWidth = 3f
+        g.drawGradientLine(
+                nextHitbox.centeredX.toFloat(),
+                nextHitbox.centeredY.toFloat(),
+                displayColour,
+                hitbox.centeredX.toFloat(),
+                hitbox.centeredY.toFloat(),
+                displayColour.brighterLab(0.8f)
+        )
     }
 
     companion object {

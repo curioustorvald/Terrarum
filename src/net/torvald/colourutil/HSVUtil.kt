@@ -4,6 +4,8 @@ import com.jme3.math.FastMath
 import org.newdawn.slick.Color
 
 /**
+ * OBSOLETE; use CIELchUtil for natural-looking colour
+ *
  * Created by minjaesong on 16-01-16.
  */
 object HSVUtil {
@@ -20,7 +22,7 @@ object HSVUtil {
      * *
      * @link http://www.rapidtables.com/convert/color/hsv-to-rgb.htm
      */
-    fun toRGB(H: Float, S: Float, V: Float): Color {
+    fun toRGB(H: Float, S: Float, V: Float, alpha: Float = 1f): Color {
         var H = H
         H %= 360f
 
@@ -64,12 +66,11 @@ object HSVUtil {
             B_prime = X
         }
 
-        return Color(
-                R_prime + m, G_prime + m, B_prime + m)
+        return Color(R_prime + m, G_prime + m, B_prime + m, alpha)
     }
 
     fun toRGB(hsv: HSV): Color {
-        return toRGB(hsv.h, hsv.s, hsv.v)
+        return toRGB(hsv.h * 360, hsv.s, hsv.v, hsv.alpha)
     }
 
     fun fromRGB(color: Color): HSV {
@@ -104,7 +105,14 @@ object HSVUtil {
         h *= 60f
         if (h < 0) h += 360f
 
-        return HSV(h, s, v)
+        return HSV(h.div(360f), s, v, color.a)
     }
 
 }
+
+/**
+ * @param h : Hue in 0.0 - 1.0 (360 deg)
+ * @param s : Saturation in 0.0 - 1.0
+ * @param v : Value in 0.0 - 1.0
+ */
+data class HSV(var h: Float = 0f, var s: Float = 0f, var v: Float = 0f, var alpha: Float = 1f)
