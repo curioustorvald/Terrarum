@@ -24,17 +24,25 @@ Any contribution in this project must be made sorely in English, so be sure to u
 * Writing tests
 * Code review
 * Guidelines
-    - Quintessential: write code that even an imbecile can understand.
+    - Well-documented. (comments, people, comments!)
 
 
 ### Contributing translations ###
 
 * Writing text
-  You will need to fiddle with .csv files in ./res/locales
+  You will need to fiddle with .json files in ./res/locales/<Language code>
 * Languagus with apparent grammatical gender
   Any gender discrimination should *not* exist in this game, so please choose vocabularies that is gender-neutral. If such behaviour is not possible in the target language, please use male gender, but try your best to avoid the situation.
 
 Note: Right-to-left languages (arabic, hebrew, etc.) are not supported.
+
+
+### Contributing artworks ###
+
+* RGB we mean is always sRGB, _pure white_ we say is always D65 (6 500 K). If you have a monitor calibration device, this is our desired target.
+* Master material for picture (e.g. psd) can be either RGB/8 or Lab/16.
+* To comply with the game's art style, only the 12-bit colours must be used (each channel: 0x00, 0x11, 0x22 .. 0xEE, 0xFF), though there is some exception.
+* Every final audio must be in OGG/Vorbis, q 10.
 
 
 ## Who do I talk to? ##

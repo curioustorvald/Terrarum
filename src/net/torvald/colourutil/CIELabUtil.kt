@@ -42,17 +42,40 @@ object CIELabUtil {
     private fun CIELab.toRGB() = this.toXYZ().toRGB()
 
     fun Color.toXYZ(): CIEXYZ {
-        val x = 0.4124564f * r + 0.3575761f * g + 0.1804375f * b
-        val y = 0.2126729f * r + 0.7151522f * g + 0.0721750f * b
-        val z = 0.0193339f * r + 0.1191920f * g + 0.9503041f * b
+        val newR = if (r > 0.04045f)
+            ((r + 0.055f) / 1.055f).powerOf(2.4f)
+        else r / 12.92f
+        val newG = if (g > 0.04045f)
+            ((g + 0.055f) / 1.055f).powerOf(2.4f)
+        else g / 12.92f
+        val newB = if (b > 0.04045f)
+            ((b + 0.055f) / 1.055f).powerOf(2.4f)
+        else b / 12.92f
+
+        val x = 0.4124564f * newR + 0.3575761f * newG + 0.1804375f * newB
+        val y = 0.2126729f * newR + 0.7151522f * newG + 0.0721750f * newB
+        val z = 0.0193339f * newR + 0.1191920f * newG + 0.9503041f * newB
 
         return CIEXYZ(x, y, z, a)
     }
 
     fun CIEXYZ.toRGB(): Color {
-        val r =  3.2404542f * x + -1.5371385f * y + -0.4985314f * z
-        val g = -0.9692660f * x +  1.8760108f * y +  0.0415560f * z
-        val b =  0.0556434f * x + -0.2040259f * y +  1.0572252f * z
+        var r =  3.2404542f * x + -1.5371385f * y + -0.4985314f * z
+        var g = -0.9692660f * x +  1.8760108f * y +  0.0415560f * z
+        var b =  0.0556434f * x + -0.2040259f * y +  1.0572252f * z
+
+        if (r > 0.0031308f)
+            r = 1.055f * r.powerOf(1f / 2.4f) - 0.055f
+        else
+            r *= 12.92f
+        if (g > 0.0031308f)
+            g = 1.055f * r.powerOf(1f / 2.4f) - 0.055f
+        else
+            g *= 12.92f
+        if (b > 0.0031308f)
+            b = 1.055f * r.powerOf(1f / 2.4f) - 0.055f
+        else
+            b *= 12.92f
 
         return Color(r, g, b, alpha)
     }
@@ -93,6 +116,7 @@ object CIELabUtil {
 
     private fun Float.cbrt() = FastMath.pow(this, 1f / 3f)
     private fun Float.cube() = this * this * this
+    private fun Float.powerOf(exp: Float) = FastMath.pow(this, exp)
 }
 
 data class CIEXYZ(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, val alpha: Float = 1f)

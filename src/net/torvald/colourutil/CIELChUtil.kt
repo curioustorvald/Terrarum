@@ -13,14 +13,14 @@ import org.newdawn.slick.Color
  * Created by minjaesong on 16-09-01.
  */
 
-object CIELchUtil {
+object CIELChUtil {
 
     /** Sweet Lch linear gradient */
     fun getGradient(scale: Float, fromCol: Color, toCol: Color): Color {
-        val from = fromCol.toLch()
-        val to = toCol.toLch()
+        val from = fromCol.toLCh()
+        val to = toCol.toLCh()
         val newL = FastMath.interpolateLinear(scale, from.L, to.L)
-        val newC = FastMath.interpolateLinear(scale, from.c, to.c)
+        val newC = FastMath.interpolateLinear(scale, from.C, to.C)
         val newAlpha = FastMath.interpolateLinear(scale, from.alpha, to.alpha)
         val newH: Float
 
@@ -31,25 +31,25 @@ object CIELchUtil {
         else
             newH = FastMath.interpolateLinear(scale, from.h, to.h)
 
-        return CIELch(newL, newC, newH, newAlpha).toRGB()
+        return CIELCh(newL, newC, newH, newAlpha).toRGB()
     }
 
-    fun CIELab.toLch(): CIELch {
+    fun CIELab.toLCh(): CIELCh {
         val c = (a.sqr() + b.sqr()).sqrt()
         val h = FastMath.atan2(b, a)
 
-        return CIELch(L, c, h, alpha)
+        return CIELCh(L, c, h, alpha)
     }
 
-    fun CIELch.toLab(): CIELab {
-        val a = c * FastMath.cos(h)
-        val b = c * FastMath.sin(h)
+    fun CIELCh.toLab(): CIELab {
+        val a = C * FastMath.cos(h)
+        val b = C * FastMath.sin(h)
 
         return CIELab(L, a, b, alpha)
     }
 
-    private fun Color.toLch() = this.toXYZ().toLab().toLch()
-    private fun CIELch.toRGB() = this.toLab().toXYZ().toRGB()
+    private fun Color.toLCh() = this.toXYZ().toLab().toLCh()
+    private fun CIELCh.toRGB() = this.toLab().toXYZ().toRGB()
 
     private fun Float.sqr() = this * this
     private fun Float.sqrt() = Math.sqrt(this.toDouble()).toFloat()
@@ -59,7 +59,7 @@ object CIELchUtil {
 
 /**
  * @param L : Luminosity in 0.0 - 1.0
- * @param c : Chroma (saturation) in 0.0 - 1.0
+ * @param C : Chroma (saturation) in 0.0 - 1.0
  * @param h : Hue in radian (-pi to pi)
  */
-data class CIELch(var L: Float = 0f, var c: Float = 0f, var h: Float = 0f, var alpha: Float = 1f)
+data class CIELCh(var L: Float = 0f, var C: Float = 0f, var h: Float = 0f, var alpha: Float = 1f)

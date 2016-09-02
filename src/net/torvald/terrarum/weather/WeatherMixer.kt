@@ -2,7 +2,7 @@ package net.torvald.terrarum.weather
 
 import com.jme3.math.FastMath
 import net.torvald.JsonFetcher
-import net.torvald.colourutil.CIELchUtil
+import net.torvald.colourutil.CIELChUtil
 import net.torvald.colourutil.ColourUtil
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
@@ -110,7 +110,7 @@ object WeatherMixer {
         val scale = (timeInSec % dataPointDistance).toFloat() / dataPointDistance // [0.0, 1.0]
 
         //val newCol = ColourUtil.getGradient(scale, colourThis, colourNext)
-        val newCol = CIELchUtil.getGradient(scale, colourThis, colourNext)
+        val newCol = CIELChUtil.getGradient(scale, colourThis, colourNext)
 
         /* // very nice monitor code
         // 65 -> 66 | 300 | 19623 | RGB8(255, 0, 255) -[41%]-> RGB8(193, 97, 23) | * `230`40`160`
