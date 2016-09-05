@@ -5,8 +5,11 @@ import org.dyn4j.geometry.Vector2
 /**
  * Created by minjaesong on 16-08-29.
  */
-class ProjectileHoming(type: Int, position: Vector2, velocity: Vector2, luminosity: Int = 0) :
-        ProjectileSimple(type, position, velocity, luminosity) {
+class ProjectileHoming(
+        type: Int,
+        fromPoint: Vector2, // projected coord
+        toPoint: Vector2, // arriving coord
+        override var luminosity: Int = 0) : ProjectileSimple(type, fromPoint, toPoint, luminosity) {
 
 
 

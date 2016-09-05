@@ -99,6 +99,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
+        //addState(StateTestingSandbox())
         //addState(StateSplash())
         //addState(StateMonitorCheck())
         //addState(StateFontTester())
@@ -192,6 +193,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         val STATE_ID_CONFIG_CALIBRATE = 0x11
 
         val STATE_ID_TEST_FONT = 0x100
+        val STATE_ID_TEST_SHIT = 0x5617
 
         var hasController = false
         val CONTROLLER_DEADZONE = 0.1f

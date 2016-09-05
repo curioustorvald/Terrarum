@@ -15,7 +15,7 @@ import org.newdawn.slick.Color
 
 object CIELChUtil {
 
-    /** Sweet Lch linear gradient */
+    /** Sweet LCh linear gradient */
     fun getGradient(scale: Float, fromCol: Color, toCol: Color): Color {
         val from = fromCol.toLCh()
         val to = toCol.toLCh()

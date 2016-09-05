@@ -60,20 +60,20 @@ object CIELabUtil {
     }
 
     fun CIEXYZ.toRGB(): Color {
-        var r =  3.2404542f * x + -1.5371385f * y + -0.4985314f * z
-        var g = -0.9692660f * x +  1.8760108f * y +  0.0415560f * z
-        var b =  0.0556434f * x + -0.2040259f * y +  1.0572252f * z
+        var r =  3.2404542f * x - 1.5371385f * y - 0.4985314f * z
+        var g = -0.9692660f * x + 1.8760108f * y + 0.0415560f * z
+        var b =  0.0556434f * x - 0.2040259f * y + 1.0572252f * z
 
         if (r > 0.0031308f)
             r = 1.055f * r.powerOf(1f / 2.4f) - 0.055f
         else
             r *= 12.92f
         if (g > 0.0031308f)
-            g = 1.055f * r.powerOf(1f / 2.4f) - 0.055f
+            g = 1.055f * g.powerOf(1f / 2.4f) - 0.055f
         else
             g *= 12.92f
         if (b > 0.0031308f)
-            b = 1.055f * r.powerOf(1f / 2.4f) - 0.055f
+            b = 1.055f * b.powerOf(1f / 2.4f) - 0.055f
         else
             b *= 12.92f
 

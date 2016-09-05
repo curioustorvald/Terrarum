@@ -86,7 +86,7 @@ object LightmapRenderer {
          * * true: overscanning is limited to 8 tiles in width (overscan_opaque)
          * * false: overscanning will fully applied to 32 tiles in width (overscan_open)
          */
-        /*val rect_width = for_x_end - for_x_start
+        val rect_width = for_x_end - for_x_start
         val rect_height_rem_hbars = for_y_end - for_y_start - 2
         val noop_mask = BitSet(2 * (rect_width) +
                                2 * (rect_height_rem_hbars))
@@ -148,11 +148,11 @@ object LightmapRenderer {
         // build noop map
         for (i in 0..rect_size) {
             val point = edgeToMaskNum(i)
-            val tile = Terrarum.game.map.getTileFromTerrain(point.first, point.second) ?: TileNameCode.NULL
+            val tile = Terrarum.ingame.world.getTileFromTerrain(point.first, point.second) ?: TileNameCode.NULL
             val isSolid = TilePropCodex.getProp(tile).isSolid
 
             noop_mask.set(i, isSolid)
-        }*/
+        }
 
         /**
          * Updating order:
