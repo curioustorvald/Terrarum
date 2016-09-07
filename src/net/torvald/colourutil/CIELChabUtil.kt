@@ -7,7 +7,8 @@ import net.torvald.colourutil.CIELabUtil.toXYZ
 import org.newdawn.slick.Color
 
 /**
- * RGB in this code is always sRGB.
+ * Cylindrical modification of CIELab colour space
+ *
  * reference: http://www.brucelindbloom.com/index.html?Equations.html
  *
  * Created by minjaesong on 16-09-01.
@@ -15,7 +16,7 @@ import org.newdawn.slick.Color
 
 object CIELChUtil {
 
-    /** Sweet LCh linear gradient */
+    /** Sweet LCh_ab linear gradient */
     fun getGradient(scale: Float, fromCol: Color, toCol: Color): Color {
         val from = fromCol.toLCh()
         val to = toCol.toLCh()
@@ -48,8 +49,8 @@ object CIELChUtil {
         return CIELab(L, a, b, alpha)
     }
 
-    private fun Color.toLCh() = this.toXYZ().toLab().toLCh()
-    private fun CIELCh.toRGB() = this.toLab().toXYZ().toRGB()
+    fun Color.toLCh() = this.toXYZ().toLab().toLCh()
+    fun CIELCh.toRGB() = this.toLab().toXYZ().toRGB()
 
     private fun Float.sqr() = this * this
     private fun Float.sqrt() = Math.sqrt(this.toDouble()).toFloat()

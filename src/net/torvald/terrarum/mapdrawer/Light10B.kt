@@ -7,7 +7,7 @@ import org.newdawn.slick.Color
  * Created by minjaesong on 16-07-08.
  */
 
-class Light10B {
+/*class Light10B {
     
     private var data = 0
 
@@ -192,4 +192,4 @@ class Light10B {
             (this.rawG() + other.rawG()).clampChannel() ,
             (this.rawB() + other.rawB()).clampChannel()
     )
-}
+}*/

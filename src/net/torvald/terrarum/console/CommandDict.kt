@@ -38,6 +38,8 @@ object CommandDict {
             Pair("help", Help()),
             Pair("version", Version()),
             Pair("seed", Seed()),
+            Pair("testgetlight", TestGetLight()),
+            Pair("println", EchoConsole()),
 
             // Test codes
             Pair("bulletintest", SetBulletin()),

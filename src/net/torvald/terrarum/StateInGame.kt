@@ -16,6 +16,7 @@ import net.torvald.terrarum.gamemap.GameWorld
 import net.torvald.terrarum.gamemap.WorldSimulator
 import net.torvald.terrarum.gamemap.WorldTime
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
+import net.torvald.terrarum.mapdrawer.LightmapRenderer.constructRGBFromInt
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.mapgenerator.WorldGenerator
@@ -121,8 +122,8 @@ constructor() : BasicGameState() {
 
 
         // add new player and put it to actorContainer
-        //player = PBSigrid.create()
-        player = PBCynthia.create()
+        player = PBSigrid.create()
+        //player = PBCynthia.create()
         //player.setNoClip(true);
         addActor(player)
 
@@ -177,7 +178,11 @@ constructor() : BasicGameState() {
         WeatherMixer.update(gc, delta)
         TileStats.update()
         if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
-            world.globalLight = globalLightByTime.toInt()
+            world.globalLight = constructRGBFromInt(
+                    globalLightByTime.redByte,
+                    globalLightByTime.greenByte,
+                    globalLightByTime.blueByte
+            )
 
 
         ///////////////////////////
@@ -438,7 +443,9 @@ constructor() : BasicGameState() {
             }
             // inactivate distant actors
             else if (actor is Visible && !actor.inUpdateRange()) {
-                actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
+                if (actor !is Projectile) { // if it's a projectile, just kill it.
+                    actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
+                }
                 actorContainer.removeAt(actorIndex)
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1
@@ -570,3 +577,5 @@ constructor() : BasicGameState() {
         return -(low + 1)  // key not found
     }
 }
+
+fun Color.toInt() = redByte.shl(16) or greenByte.shl(8) or blueByte

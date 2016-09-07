@@ -193,6 +193,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         val STATE_ID_CONFIG_CALIBRATE = 0x11
 
         val STATE_ID_TEST_FONT = 0x100
+        val STATE_ID_TEST_TTY = 0x110
         val STATE_ID_TEST_SHIT = 0x5617
 
         var hasController = false

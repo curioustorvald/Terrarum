@@ -5,7 +5,9 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamemap.WorldTime
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
+import net.torvald.terrarum.toInt
 import net.torvald.terrarum.weather.WeatherMixer
+import org.newdawn.slick.Color
 
 /**
  * Created by minjaesong on 16-06-16.

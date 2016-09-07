@@ -12,7 +12,7 @@ object PBCynthia {
         val p: Player = Player()
         CreatureRawInjector.inject(p.actorValue, "CreatureHuman.json")
 
-        p.actorValue[AVKey._PLAYER_QUICKBARSEL] = 0
+        p.actorValue[AVKey.__PLAYER_QUICKBARSEL] = 0
         p.actorValue["__selectedtile"] = 16
 
 

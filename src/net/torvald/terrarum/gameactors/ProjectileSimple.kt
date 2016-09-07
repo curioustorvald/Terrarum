@@ -1,7 +1,9 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.colourutil.CIELabUtil.brighterLab
+import net.torvald.colourutil.CIELabUtil.darkerLab
+import net.torvald.point.Point2d
 import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.terrarum.Terrarum
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -14,16 +16,21 @@ import java.util.*
  * Created by minjaesong on 16-08-29.
  */
 open class ProjectileSimple(
-        type: Int,
+        private val type: Int,
         fromPoint: Vector2, // projected coord
-        toPoint: Vector2, // arriving coord
-        override var luminosity: Int = 0) : ActorWithBody(), Luminous {
+        toPoint: Vector2    // arriving coord
+        ) : ActorWithBody(), Luminous, Projectile {
 
     val damage: Int
     val displayColour: Color
     /** scalar part of velocity */
     val speed: Int
 
+
+    override var luminosity: Int
+        get() = bulletDatabase[type][OFFSET_LUMINOSITY] as Int
+        set(value) {
+        }
     /**
      * Arguments:
      *
@@ -32,8 +39,14 @@ open class ProjectileSimple(
      */
     override val lightBoxList = ArrayList<Hitbox>()
 
+    val lifetimeMax = 2500
+    var lifetimeCounter = 0
+
+    val posPre: Point2d
+
     init {
-        hitbox.set(fromPoint.x, fromPoint.y, 2.0, 2.0) // 2.0: size of the hitbox in pixels
+        setPosition(fromPoint.x, fromPoint.y)
+        posPre = Point2d(fromPoint.x, fromPoint.y)
         // lightbox sized 8x8 centered to the bullet
         lightBoxList.add(Hitbox(-4.0, -4.0, 8.0, 8.0))
         this.velocity.set(velocity)
@@ -43,16 +56,10 @@ open class ProjectileSimple(
         isNoSubjectToGrav = bulletDatabase[type][OFFSET_NOGRAVITY] as Boolean
         speed = bulletDatabase[type][OFFSET_SPEED] as Int
 
-        if (displayColour == Color(254, 0, 0, 0)) {
-            sprite = bulletDatabase[type][OFFSET_SPRITE] as SpriteAnimation
-        }
+        setHitboxDimension(2, 2, 0, 0) // should be following sprite's properties if there IS one
 
 
-
-        val initVelo = Vector2(speed.toDouble(), 0.0)
-        initVelo.setDirection((fromPoint to toPoint).direction)
-
-        velocity.set(initVelo)
+        velocity.set((fromPoint to toPoint).setMagnitude(speed.toDouble()))
 
 
 
@@ -61,34 +68,42 @@ open class ProjectileSimple(
 
     override fun update(gc: GameContainer, delta: Int) {
         // hit something and despawn
-        if (ccdCollided || grounded) flagDespawn()
+        lifetimeCounter += delta
+        if ((ccdCollided || grounded) || lifetimeCounter >= lifetimeMax) flagDespawn()
+
+        posPre.set(centrePosPoint)
 
         super.update(gc, delta)
     }
 
     override fun drawBody(gc: GameContainer, g: Graphics) {
+        val colourTail = displayColour.darker(0f) // clone a colour
+        colourTail.a = 0.16f
+
         // draw trail of solid colour (Terraria style maybe?)
-        g.lineWidth = 3f
+        g.lineWidth = 2f * Terrarum.ingame.screenZoom
         g.drawGradientLine(
-                nextHitbox.centeredX.toFloat(),
-                nextHitbox.centeredY.toFloat(),
+                hitbox.centeredX.toFloat() * Terrarum.ingame.screenZoom,
+                hitbox.centeredY.toFloat() * Terrarum.ingame.screenZoom,
                 displayColour,
-                hitbox.centeredX.toFloat(),
-                hitbox.centeredY.toFloat(),
-                displayColour.brighterLab(0.8f)
+                posPre.x.toFloat() * Terrarum.ingame.screenZoom,
+                posPre.y.toFloat() * Terrarum.ingame.screenZoom,
+                colourTail
         )
     }
 
+    override fun drawGlow(gc: GameContainer, g: Graphics) = drawBody(gc, g)
+
     companion object {
         val OFFSET_DAMAGE = 0
-        val OFFSET_COL = 1 // set it to Color(254, 0, 0, 0) to use sprite
+        val OFFSET_COL = 1 // Color or SpriteAnimation
         val OFFSET_NOGRAVITY = 2
         val OFFSET_SPEED = 3
-        val OFFSET_SPRITE = 4
+        val OFFSET_LUMINOSITY = 4
         val bulletDatabase = arrayOf(
                 // damage, display colour, no gravity, speed
-                arrayOf(7, Color(0xFF5429), true, 50),
-                arrayOf(8, Color(0xFF5429), true, 50)
+                arrayOf(7, Color(0xFF5429), true, 40, 32),
+                arrayOf(8, Color(0xFF5429), true, 20, 0)
                 // ...
         )
     }

@@ -58,6 +58,7 @@ object PBSigrid {
 
         p.actorValue[AVKey.BASEDEFENCE] = 141
 
+        p.actorValue[AVKey.__PLAYER_QUICKBARSEL] = 0
         p.actorValue["__selectedtile"] = 16 // test code; replace with <tile_item>.primaryUse(gc, delta)
         p.actorValue["__aimhelper"] = true
 

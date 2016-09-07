@@ -79,5 +79,5 @@ object AVKey {
 
 
 
-    const val _PLAYER_QUICKBARSEL = "__quickbarselection"
+    const val __PLAYER_QUICKBARSEL = "__quickbarselection"
 }

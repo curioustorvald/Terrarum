@@ -4,8 +4,17 @@ import com.jme3.math.FastMath
 import org.newdawn.slick.Color
 
 /**
+ * A modification of CIEXYZ that is useful for surface colours
+ *
+ * If you are trying to mix some colour with other, especially one that
+ * requires additive mixing (such as illuminant), USE CIELuvUtil, this is
+ * not for you.
+ *
  * RGB in this code is always sRGB.
  * reference: http://www.brucelindbloom.com/index.html?Equations.html
+ *
+ * If you're using Mac, you can play around with this colour space with
+ * ColorSync Utility's calculator.
  *
  * Created by minjaesong on 16-09-01.
  */
@@ -38,10 +47,12 @@ object CIELabUtil {
         return CIELab(newL, newA, newB, newAlpha).toRGB()
     }
 
-    private fun Color.toLab() = this.toXYZ().toLab()
-    private fun CIELab.toRGB() = this.toXYZ().toRGB()
+    fun Color.toLab() = this.toXYZ().toLab()
+    fun RGB.toLab() = this.toXYZ().toLab()
+    fun CIELab.toRGB() = this.toXYZ().toRGB()
+    fun CIELab.toRawRGB() = this.toXYZ().toRawRGB()
 
-    fun Color.toXYZ(): CIEXYZ {
+    fun RGB.toXYZ(): CIEXYZ {
         val newR = if (r > 0.04045f)
             ((r + 0.055f) / 1.055f).powerOf(2.4f)
         else r / 12.92f
@@ -56,13 +67,15 @@ object CIELabUtil {
         val y = 0.2126729f * newR + 0.7151522f * newG + 0.0721750f * newB
         val z = 0.0193339f * newR + 0.1191920f * newG + 0.9503041f * newB
 
-        return CIEXYZ(x, y, z, a)
+        return CIEXYZ(x, y, z, alpha)
     }
 
-    fun CIEXYZ.toRGB(): Color {
-        var r =  3.2404542f * x - 1.5371385f * y - 0.4985314f * z
-        var g = -0.9692660f * x + 1.8760108f * y + 0.0415560f * z
-        var b =  0.0556434f * x - 0.2040259f * y + 1.0572252f * z
+    fun Color.toXYZ(): CIEXYZ = RGB(this).toXYZ()
+
+    fun CIEXYZ.toRawRGB(): RGB {
+        var r = 3.2404542f * X - 1.5371385f * Y - 0.4985314f * Z
+        var g = -0.9692660f * X + 1.8760108f * Y + 0.0415560f * Z
+        var b = 0.0556434f * X - 0.2040259f * Y + 1.0572252f * Z
 
         if (r > 0.0031308f)
             r = 1.055f * r.powerOf(1f / 2.4f) - 0.055f
@@ -77,13 +90,18 @@ object CIELabUtil {
         else
             b *= 12.92f
 
-        return Color(r, g, b, alpha)
+        return RGB(r, g, b, alpha)
+    }
+
+    fun CIEXYZ.toRGB(): Color {
+        val rgb = this.toRawRGB()
+        return Color(rgb.r, rgb.g, rgb.b, rgb.alpha)
     }
 
     fun CIEXYZ.toLab(): CIELab {
-        val x = pivotXYZ(x / whitePoint.x)
-        val y = pivotXYZ(y / whitePoint.y)
-        val z = pivotXYZ(z / whitePoint.z)
+        val x = pivotXYZ(X / D65.X)
+        val y = pivotXYZ(Y / D65.Y)
+        val z = pivotXYZ(Z / D65.Z)
 
         val L = Math.max(0f, 116 * y - 16)
         val a = 500 * (x - y)
@@ -101,23 +119,28 @@ object CIELabUtil {
         val z3 = z.cube()
 
         return CIEXYZ(
-                whitePoint.x * if (x3 > epsilon) x3 else (x - 16f / 116f) / 7.787f,
-                whitePoint.y * if (L > kappa * epsilon) (L.plus(16f) / 116f).cube() else L / kappa,
-                whitePoint.z * if (z3 > epsilon) z3 else (z - 16f / 116f) / 7.787f,
+                D65.X * if (x3 > epsilon) x3 else (x - 16f / 116f) / 7.787f,
+                D65.Y * if (L > kappa * epsilon) (L.plus(16f) / 116f).cube() else L / kappa,
+                D65.Z * if (z3 > epsilon) z3 else (z - 16f / 116f) / 7.787f,
                 alpha
         )
     }
 
     private fun pivotXYZ(n: Float) = if (n > epsilon) n.cbrt() else (kappa * n + 16f) / 116f
 
-    val epsilon = 0.008856f
-    val kappa = 903.3f
-    val whitePoint = CIEXYZ(95.047f, 100f, 108.883f)
-
     private fun Float.cbrt() = FastMath.pow(this, 1f / 3f)
     private fun Float.cube() = this * this * this
     private fun Float.powerOf(exp: Float) = FastMath.pow(this, exp)
 }
 
-data class CIEXYZ(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, val alpha: Float = 1f)
+internal val D65 = CIEXYZ(95.047f, 100f, 108.883f)
+val epsilon = 216.0.div(24389.0).toFloat()
+val kappa = 24389.0.div(27.0).toFloat()
+
+data class CIEXYZ(var X: Float = 0f, var Y: Float = 0f, var Z: Float = 0f, val alpha: Float = 1f)
 data class CIELab(var L: Float = 0f, var a: Float = 0f, var b: Float = 0f, val alpha: Float = 1f)
+data class RGB(var r: Float = 0f, var g: Float = 0f, var b: Float = 0f, val alpha: Float = 1f) {
+    constructor(color: Color) : this() {
+        r = color.r; g = color.g; b = color.b
+    }
+}

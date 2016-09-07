@@ -7,7 +7,6 @@ import net.torvald.colourutil.ColourUtil
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamemap.WorldTime
-import net.torvald.terrarum.mapdrawer.Light10B
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -32,7 +31,7 @@ object WeatherMixer {
 
     private var skyBoxCurrent = Rectangle(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
     private var skyBoxNext = Rectangle(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
-    val globalLightNow = Light10B(0)
+    val globalLightNow = Color(0)
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
@@ -91,11 +90,14 @@ object WeatherMixer {
         g.fill(skyBoxCurrent, skyColourFill)
 
         // calculate global light
-        globalLightNow.fromSlickColor(getGradientColour(lightColourMap, 0, timeNow))
+        val gradCol = getGradientColour(lightColourMap, 0, timeNow)
+        globalLightNow.r = gradCol.r
+        globalLightNow.g = gradCol.g
+        globalLightNow.b = gradCol.b
     }
 
-    fun getGlobalLightOfTime(timeInSec: Int): Light10B =
-            Light10B(getGradientColour(currentWeather.globalLightColourMap, 0, timeInSec))
+    fun getGlobalLightOfTime(timeInSec: Int): Color =
+            getGradientColour(currentWeather.globalLightColourMap, 0, timeInSec)
 
     fun getGradientColour(image: Image, row: Int, timeInSec: Int): Color {
         val dataPointDistance = WorldTime.DAY_LENGTH / image.width

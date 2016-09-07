@@ -5,9 +5,11 @@ import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.ProjectileSimple
 import net.torvald.terrarum.tileproperties.TileNameCode
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import net.torvald.terrarum.ui.UIHandler
+import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.Input
 
 /**
@@ -15,10 +17,16 @@ import org.newdawn.slick.Input
  */
 object GameController {
 
-    fun processInput(input: Input) {
-        val mouseTileX = ((MapCamera.cameraX + input.mouseX / Terrarum.ingame.screenZoom) / MapDrawer.TILE_SIZE).toInt()
-        val mouseTileY = ((MapCamera.cameraY + input.mouseY / Terrarum.ingame.screenZoom) / MapDrawer.TILE_SIZE).toInt()
+    val mouseX: Float
+        get() = (MapCamera.cameraX + Terrarum.appgc.input.mouseX / Terrarum.ingame.screenZoom)
+    val mouseY: Float
+        get() = (MapCamera.cameraY + Terrarum.appgc.input.mouseY / Terrarum.ingame.screenZoom)
+    val mouseTileX: Int
+        get() = (mouseX / MapDrawer.TILE_SIZE).toInt()
+    val mouseTileY: Int
+        get() = (mouseY / MapDrawer.TILE_SIZE).toInt()
 
+    fun processInput(input: Input) {
 
         KeyToggler.update(input)
 
@@ -47,6 +55,7 @@ object GameController {
             }
             catch (e: ArrayIndexOutOfBoundsException) {
             }
+
 
         }
         else if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
@@ -100,7 +109,13 @@ object GameController {
     }
 
     fun mousePressed(button: Int, x: Int, y: Int) {
-
+        if (button == 0) {
+            Terrarum.ingame.addActor(ProjectileSimple(
+                    0,
+                    Terrarum.ingame.player.centrePosition,
+                    Vector2(mouseX.toDouble(), mouseY.toDouble())
+            ))
+        }
     }
 
     fun mouseReleased(button: Int, x: Int, y: Int) {

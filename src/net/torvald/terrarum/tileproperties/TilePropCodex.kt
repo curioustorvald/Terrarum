@@ -33,9 +33,8 @@ object TilePropCodex {
 
             println("[TilePropCodex] Building tile properties table")
 
-            records.forEach { record -> setProp(
-                    tileProps[idDamageToIndex(intVal(record, "id"), intVal(record, "dmg"))]
-                    , record)
+            records.forEach { setProp(
+                    tileProps[idDamageToIndex(intVal(it, "id"), intVal(it, "dmg"))], it)
             }
         }
         catch (e: IOException) {

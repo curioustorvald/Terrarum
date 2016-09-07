@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import com.jme3.math.FastMath
+import net.torvald.point.Point2d
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gamemap.GameWorld
 import net.torvald.terrarum.mapdrawer.MapDrawer
@@ -36,6 +37,7 @@ open class ActorWithBody : Actor(), Visible {
     /**
      * * Position: top-left point
      * * Unit: pixel
+     * !! external class should not hitbox.set(); use setHitboxDimension() and setPosition()
      */
     override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
     @Transient val nextHitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
@@ -261,6 +263,13 @@ open class ActorWithBody : Actor(), Visible {
                 baseHitboxH * scale)
     }
 
+    val centrePosition: Vector2
+        get() = Vector2(hitbox.centeredX, hitbox.centeredY)
+    val centrePosPoint: Point2d
+        get() = Point2d(hitbox.centeredX, hitbox.centeredY)
+    val feetPosition: Vector2
+        get() = Vector2(hitbox.centeredX, hitbox.posY + hitbox.height)
+
     override fun run() = update(Terrarum.appgc, Terrarum.ingame.UPDATE_DELTA)
 
     /**
@@ -325,8 +334,10 @@ open class ActorWithBody : Actor(), Visible {
                  * If and only if:
                  *     This body is NON-STATIC and the other body is STATIC
                  */
-                displaceByCCD()
-                applyNormalForce()
+                if (!isPlayerNoClip) {
+                    displaceByCCD()
+                    applyNormalForce()
+                }
 
                 setHorizontalFriction()
                 if (isPlayerNoClip) // or hanging on the rope, etc.
@@ -342,6 +353,10 @@ open class ActorWithBody : Actor(), Visible {
             // cheap solution for sticking into the wall while Left or Right is held
             walledLeft =  isTouchingSide(nextHitbox, COLLIDING_LEFT)
             walledRight = isTouchingSide(nextHitbox, COLLIDING_RIGHT)
+            if (isPlayerNoClip) {
+                walledLeft = false
+                walledRight = false
+            }
         }
     }
 
@@ -428,7 +443,8 @@ open class ActorWithBody : Actor(), Visible {
             else if (moveDelta.y < 0.0) { // or was moving upward?
                 grounded = false
                 if (isTouchingSide(nextHitbox, COLLIDING_TOP)) { // actor hit something on its top
-                    hitAndForciblyReflectY()
+                    //hitAndForciblyReflectY()
+                    hitAndReflectY()
                 }
                 else { // the actor is not grounded at all
                 }
@@ -491,6 +507,7 @@ open class ActorWithBody : Actor(), Visible {
         }
     }
 
+    @Deprecated("it's no use!")
     private fun hitAndForciblyReflectY() {
         if (veloY.abs() * CEILING_HIT_ELASTICITY > A_PIXEL)
             veloY = -veloY * CEILING_HIT_ELASTICITY
