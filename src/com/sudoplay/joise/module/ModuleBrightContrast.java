@@ -85,7 +85,7 @@ public class ModuleBrightContrast extends SourcedModule {
   @Override
   public double get(double x, double y) {
     double val = source.get(x, y);
-    // apply brightness
+    // apply colourKey
     val += bright.get(x, y);
     // subtract threshold, scale by factor, add threshold
     double t = threshold.get(x, y);
@@ -98,7 +98,7 @@ public class ModuleBrightContrast extends SourcedModule {
   @Override
   public double get(double x, double y, double z) {
     double val = source.get(x, y, z);
-    // apply brightness
+    // apply colourKey
     val += bright.get(x, y, z);
     // subtract threshold, scale by factor, add threshold
     double t = threshold.get(x, y, z);
@@ -111,7 +111,7 @@ public class ModuleBrightContrast extends SourcedModule {
   @Override
   public double get(double x, double y, double z, double w) {
     double val = source.get(x, y, z, w);
-    // apply brightness
+    // apply colourKey
     val += bright.get(x, y, z, w);
     // subtract threshold, scale by factor, add threshold
     double t = threshold.get(x, y, z, w);
@@ -124,7 +124,7 @@ public class ModuleBrightContrast extends SourcedModule {
   @Override
   public double get(double x, double y, double z, double w, double u, double v) {
     double val = source.get(x, y, z, w, u, v);
-    // apply brightness
+    // apply colourKey
     val += bright.get(x, y, z, w, u, v);
     // subtract threshold, scale by factor, add threshold
     double t = threshold.get(x, y, z, w, u, v);
@@ -139,7 +139,7 @@ public class ModuleBrightContrast extends SourcedModule {
 
     ModulePropertyMap props = new ModulePropertyMap(this);
 
-    writeScalar("brightness", bright, props, map);
+    writeScalar("colourKey", bright, props, map);
     writeScalar("contrastFactor", factor, props, map);
     writeScalar("contrastThreshold", threshold, props, map);
     writeSource(props, map);
@@ -152,7 +152,7 @@ public class ModuleBrightContrast extends SourcedModule {
   public Module buildFromPropertyMap(ModulePropertyMap props,
       ModuleInstanceMap map) {
 
-    readScalar("brightness", "setBrightness", props, map);
+    readScalar("colourKey", "setBrightness", props, map);
     readScalar("contrastFactor", "setContrastFactor", props, map);
     readScalar("contrastThreshold", "setContrastThreshold", props, map);
     readSource(props, map);

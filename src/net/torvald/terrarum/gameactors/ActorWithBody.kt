@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 import com.jme3.math.FastMath
 import net.torvald.point.Point2d
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gamemap.GameWorld
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import net.torvald.spriteanimation.SpriteAnimation
@@ -162,7 +162,7 @@ open class ActorWithBody : Actor(), Visible {
      */
     @Transient private val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
     /**
-     * Gravitational Constant G. Load from gamemap.
+     * Gravitational Constant G. Load from gameworld.
      * [m / s^2]
      * s^2 = 1/FPS = 1/60 if FPS is targeted to 60
      * meter to pixel : 24/FPS

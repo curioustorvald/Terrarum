@@ -13,8 +13,8 @@ abstract class Actor : Comparable<Actor>, Runnable {
     abstract fun update(gc: GameContainer, delta: Int)
 
     /**
-     * Valid RefID is equal to or greater than 32768.
-     * @return Reference ID. (32768-0x7FFF_FFFF)
+     * Valid RefID is equal to or greater than 16777216.
+     * @return Reference ID. (16777216-0x7FFF_FFFF)
      */
     abstract var referenceID: Int
     abstract var actorValue: ActorValue
@@ -40,7 +40,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
         var ret: Int
         do {
             ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
-        } while (Terrarum.ingame.hasActor(ret) || ret < ItemPropCodex.ITEM_UNIQUE_MAX) // check for collision
+        } while (Terrarum.ingame.hasActor(ret) || ret < ItemPropCodex.ITEM_COUNT_MAX) // check for collision
         return ret
     }
 }

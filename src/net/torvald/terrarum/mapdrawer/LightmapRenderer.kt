@@ -191,6 +191,8 @@ object LightmapRenderer {
             }
         }
 
+        // O(36n) == O(n) where n is a size of the map.
+        // Because of inevitable overlaps on the area, it only works with ADDITIVE blend (aka maxblend)
         try {
             // Round 1
             for (y in for_y_start - overscan_open..for_y_end) {
@@ -230,6 +232,8 @@ object LightmapRenderer {
     private fun calculate(x: Int, y: Int): Int = calculate(x, y, false)
 
     private fun calculate(x: Int, y: Int, doNotCalculateAmbient: Boolean): Int {
+        // O(9n) == O(n) where n is a size of the map.
+
         var lightLevelThis: Int = 0
         val thisTerrain = Terrarum.ingame.world.getTileFromTerrain(x, y)
         val thisWall = Terrarum.ingame.world.getTileFromWall(x, y)

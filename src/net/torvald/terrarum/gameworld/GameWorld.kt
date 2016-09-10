@@ -1,5 +1,5 @@
 
-package net.torvald.terrarum.gamemap
+package net.torvald.terrarum.gameworld
 
 import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.gameactors.roundInt

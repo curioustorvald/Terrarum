@@ -5,7 +5,7 @@ package net.torvald.terrarum.gamecontroller
  */
 object Key {
 
-    val RET = 28
+    val RETURN = 28
     val BACKSPACE = 14
     val GRAVE = 41
     val TAB = 15

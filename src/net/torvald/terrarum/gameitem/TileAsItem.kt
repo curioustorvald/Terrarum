@@ -36,4 +36,19 @@ class TileAsItem(tileNum: Int) : InventoryItem {
     override fun effectWhenThrown(gc: GameContainer, delta_t: Int) {
         throw UnsupportedOperationException()
     }
+
+    /**
+     * Effects applied (continuously or not) while thrown to the world
+     */
+    override fun effectWhenTakenOut(gc: GameContainer, delta: Int) {
+        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    /**
+     * Effects applied (continuously or not) while thrown to the world,
+     * called by the proxy Actor
+     */
+    override fun worldActorEffect(gc: GameContainer, delta: Int) {
+        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }

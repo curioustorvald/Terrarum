@@ -99,6 +99,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
+        addState(StateVTTest())
         //addState(StateTestingSandbox())
         //addState(StateSplash())
         //addState(StateMonitorCheck())
@@ -409,29 +410,29 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
 fun main(args: Array<String>) = Terrarum.main(args)
 
-fun setBlendMul() {
+fun blendMul() {
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glColorMask(true, true, true, true)
     GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)
 }
 
-fun setBlendNormal() {
+fun blendNormal() {
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glColorMask(true, true, true, true)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
 }
 
-fun setBlendAlphaMap() {
+fun blendAlphaMap() {
     GL11.glDisable(GL11.GL_BLEND)
     GL11.glColorMask(false, false, false, true)
 }
 
-fun setBlendScreen() {
+fun blendScreen() {
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glColorMask(true, true, true, true)
     GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_COLOR)}
 
-fun setBlendDisable() {
+fun blendDisable() {
     GL11.glDisable(GL11.GL_BLEND)
 }
 

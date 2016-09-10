@@ -2,14 +2,14 @@ package net.torvald.terrarum.ui
 
 import com.jme3.math.FastMath
 import net.torvald.imagefont.GameFontBase
-import net.torvald.terrarum.gamemap.PairedMapLayer
+import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.setBlendNormal
-import net.torvald.terrarum.setBlendScreen
+import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.blendScreen
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -201,7 +201,7 @@ class BasicDebugInfoWindow : UICanvas {
         g.drawString("255", x.toFloat() + w + 1 - 8*3, y.toFloat() + h + 2)
         g.drawString("Histogramme", x + w / 2 - 5.5f * 8, y.toFloat() + h + 2)
 
-        setBlendScreen()
+        blendScreen()
         for (c in 0..2) {
             for (i in 0..255) {
                 var histogram_value = if (i == 255) 0 else histogram.get(c)[i]
@@ -220,7 +220,7 @@ class BasicDebugInfoWindow : UICanvas {
                 g.fillRect(bar_x, bar_y, bar_w, bar_h)
             }
         }
-        setBlendNormal()
+        blendNormal()
     }
 
     private fun line(i: Int): Float = i * 10f

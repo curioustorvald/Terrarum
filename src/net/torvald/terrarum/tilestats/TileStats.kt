@@ -1,8 +1,8 @@
 package net.torvald.terrarum.tilestats
 
 import net.torvald.terrarum.gameactors.Player
-import net.torvald.terrarum.gamemap.GameWorld
-import net.torvald.terrarum.gamemap.MapLayer
+import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum

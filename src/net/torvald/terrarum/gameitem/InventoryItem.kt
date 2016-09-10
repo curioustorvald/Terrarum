@@ -9,58 +9,58 @@ interface InventoryItem {
     /**
      * Internal ID of an Item, Long
      * 0-4096: Tiles
-     * 4097-32767: Various items
-     * >=32768: Actor RefID
+     * 4097-32767: Static items
+     * 32768-16777215: Dynamic items
+     * >= 16777216: Actor RefID
      */
-    var itemID: Int
+    val itemID: Int
 
     /**
-     * Weight of the item, Float
+     * Weight of the item
      */
     var mass: Double
 
     /**
      * Scale of the item. Real mass: mass * (scale^3)
+     *
+     * For static item, it must be 1.0. If you tinkered the item to be bigger,
+     * it must be re-assigned as Dynamic Item
      */
     var scale: Double
 
     /**
      * Effects applied continuously while in pocket
-     * @param gc
-     * *
-     * @param delta_t
      */
-    fun effectWhileInPocket(gc: GameContainer, delta_t: Int)
+    fun effectWhileInPocket(gc: GameContainer, delta: Int)
 
     /**
      * Effects applied immediately only once if picked up
-     * @param gc
-     * *
-     * @param delta_t
      */
-    fun effectWhenPickedUp(gc: GameContainer, delta_t: Int)
+    fun effectWhenPickedUp(gc: GameContainer, delta: Int)
 
     /**
      * Effects applied (continuously or not) while primary button (usually left mouse button) is down
-     * @param gc
-     * *
-     * @param delta_t
      */
-    fun primaryUse(gc: GameContainer, delta_t: Int)
+    fun primaryUse(gc: GameContainer, delta: Int)
 
     /**
      * Effects applied (continuously or not) while secondary button (usually right mouse button) is down
-     * @param gc
-     * *
-     * @param delta_t
      */
-    fun secondaryUse(gc: GameContainer, delta_t: Int)
+    fun secondaryUse(gc: GameContainer, delta: Int)
 
     /**
      * Effects applied immediately only once if thrown from pocket
-     * @param gc
-     * *
-     * @param delta_t
      */
-    fun effectWhenThrown(gc: GameContainer, delta_t: Int)
+    fun effectWhenThrown(gc: GameContainer, delta: Int)
+
+    /**
+     * Effects applied (continuously or not) while thrown to the world
+     */
+    fun effectWhenTakenOut(gc: GameContainer, delta: Int)
+
+    /**
+     * Effects applied (continuously or not) while thrown to the world,
+     * called by the proxy Actor
+     */
+    fun worldActorEffect(gc: GameContainer, delta: Int)
 }

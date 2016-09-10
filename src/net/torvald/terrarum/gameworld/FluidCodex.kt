@@ -1,4 +1,4 @@
-package net.torvald.terrarum.gamemap
+package net.torvald.terrarum.gameworld
 
 /**
  * Created by minjaesong on 16-08-06.

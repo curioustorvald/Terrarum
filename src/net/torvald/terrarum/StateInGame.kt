@@ -12,9 +12,9 @@ import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.gamemap.GameWorld
-import net.torvald.terrarum.gamemap.WorldSimulator
-import net.torvald.terrarum.gamemap.WorldTime
+import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.WorldSimulator
+import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.mapdrawer.LightmapRenderer.constructRGBFromInt
 import net.torvald.terrarum.mapdrawer.MapCamera
@@ -179,9 +179,9 @@ constructor() : BasicGameState() {
         TileStats.update()
         if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
             world.globalLight = constructRGBFromInt(
-                    globalLightByTime.redByte,
-                    globalLightByTime.greenByte,
-                    globalLightByTime.blueByte
+                    WeatherMixer.globalLightNow.redByte,
+                    WeatherMixer.globalLightNow.greenByte,
+                    WeatherMixer.globalLightNow.blueByte
             )
 
 
@@ -237,7 +237,7 @@ constructor() : BasicGameState() {
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
-        setBlendNormal()
+        blendNormal()
 
 
         drawSkybox(g)
@@ -274,12 +274,12 @@ constructor() : BasicGameState() {
         MapDrawer.render(gc, g)
 
 
-        setBlendMul()
+        blendMul()
             MapDrawer.drawEnvOverlay(g)
 
-            if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) setBlendMul() else setBlendNormal()
+            if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul() else blendNormal()
             LightmapRenderer.draw(g)
-        setBlendNormal()
+        blendNormal()
 
 
         //////////////////////
@@ -481,8 +481,6 @@ constructor() : BasicGameState() {
             actorContainer.forEach { it.update(gc, delta) }
         }
     }
-
-    private val globalLightByTime = WeatherMixer.globalLightNow
 
     fun Double.sqr() = this * this
     fun Int.sqr() = this * this

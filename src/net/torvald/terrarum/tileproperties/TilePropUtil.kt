@@ -3,7 +3,7 @@ package net.torvald.terrarum.tileproperties
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gamemap.WorldTime
+import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.weather.WeatherMixer

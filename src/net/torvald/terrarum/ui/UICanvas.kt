@@ -50,3 +50,5 @@ interface UICanvas {
      */
     fun endClosing(gc: GameContainer, delta: Int)
 }
+
+const val OPENCLOSE_GENERIC = 200

@@ -6,7 +6,7 @@ import net.torvald.colourutil.CIELChUtil
 import net.torvald.colourutil.ColourUtil
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gamemap.WorldTime
+import net.torvald.terrarum.gameworld.WorldTime
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -96,6 +96,9 @@ object WeatherMixer {
         globalLightNow.b = gradCol.b
     }
 
+    /**
+     * Get a GL of specific time
+     */
     fun getGlobalLightOfTime(timeInSec: Int): Color =
             getGradientColour(currentWeather.globalLightColourMap, 0, timeInSec)
 

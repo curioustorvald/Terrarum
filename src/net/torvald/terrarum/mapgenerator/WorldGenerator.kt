@@ -1,7 +1,7 @@
 package net.torvald.terrarum.mapgenerator
 
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.gamemap.GameWorld
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.tileproperties.TileNameCode
 import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise

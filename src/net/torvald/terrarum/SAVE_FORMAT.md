@@ -44,8 +44,8 @@
 Directory:
 
     +--- <save1>
-     --- 2a93bc5fd...f823   Actor/Faction/etc. data
-     --- 423bdc838...93bd   Actor/Faction/etc. data
+     --- 2a93bc5fd...f823   Actor/DynamicItem/Faction/etc. data (JSON)
+     --- 423bdc838...93bd   Actor/DynamicItem/Faction/etc. data (JSON)
      --- Items_list.txt     Human-readable
      --- Materials_list.txt Human-readable
      --- Tiles_list.txt     Human-readable

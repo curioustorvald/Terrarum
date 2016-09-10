@@ -23,7 +23,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /*
- * Kotlin translated and modified code Copyright (c) 2016 Torvald aka skyhi14.
+ * Kotlin translated and modified code Copyright (c) 2016 Minjaesong (Torvald).
  */
 package org.dyn4j.geometry
 

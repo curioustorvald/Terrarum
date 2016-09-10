@@ -1,8 +1,8 @@
 package net.torvald.terrarum.tileproperties
 
 import net.torvald.CSVFetcher
-import net.torvald.terrarum.gamemap.MapLayer
-import net.torvald.terrarum.gamemap.PairedMapLayer
+import net.torvald.terrarum.gameworld.MapLayer
+import net.torvald.terrarum.gameworld.PairedMapLayer
 import org.apache.commons.csv.CSVRecord
 
 import java.io.IOException

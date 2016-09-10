@@ -84,7 +84,7 @@ class ConsoleWindow : UICanvas, KeyboardControlled {
             historyIndex = -1
 
         // execute
-        if (key == Key.RET && commandInputPool!!.length > 0) {
+        if (key == Key.RETURN && commandInputPool!!.length > 0) {
             commandHistory.add(commandInputPool!!.toString())
             executeCommand()
             commandInputPool = StringBuilder()

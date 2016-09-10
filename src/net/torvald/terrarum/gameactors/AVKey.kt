@@ -78,6 +78,12 @@ object AVKey {
     const val MAGICREGENRATEMULT = "$MAGICREGENRATE$MULT"
 
 
+    /** String
+     * UUID for certain fixtures
+     */
+    const val UUID = "uuid"
+
+
 
     const val __PLAYER_QUICKBARSEL = "__quickbarselection"
 }

@@ -2,8 +2,8 @@ package net.torvald.terrarum.ui
 
 import net.torvald.imagefont.GameFontWhite
 import com.jme3.math.FastMath
-import net.torvald.terrarum.setBlendDisable
-import net.torvald.terrarum.setBlendNormal
+import net.torvald.terrarum.blendDisable
+import net.torvald.terrarum.blendNormal
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
 
@@ -55,7 +55,7 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        setBlendDisable()
+        blendDisable()
 
         drawSegments(g)
         g.setDrawMode(Graphics.MODE_ALPHA_MAP)
@@ -69,7 +69,7 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
             g.drawString(messagesList[i], (messageWindowRadius + 4).toFloat(), (messageWindowRadius + GLYPH_HEIGHT * i).toFloat())
         }
 
-        setBlendNormal()
+        blendNormal()
     }
 
     override fun processInput(input: Input) {

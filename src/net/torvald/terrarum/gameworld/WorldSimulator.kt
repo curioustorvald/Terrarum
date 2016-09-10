@@ -1,10 +1,10 @@
-package net.torvald.terrarum.gamemap
+package net.torvald.terrarum.gameworld
 
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.gameactors.roundInt
-import net.torvald.terrarum.gamemap.WorldSimulator.isSolid
+import net.torvald.terrarum.gameworld.WorldSimulator.isSolid
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.tileproperties.TileNameCode

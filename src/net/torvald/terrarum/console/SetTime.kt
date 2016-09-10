@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.gamemap.WorldTime
+import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.Terrarum
 
 /**

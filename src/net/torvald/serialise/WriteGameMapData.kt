@@ -1,6 +1,6 @@
 package net.torvald.serialise
 
-import net.torvald.terrarum.gamemap.GameWorld
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.Terrarum
 import java.io.IOException
 import java.nio.file.Files

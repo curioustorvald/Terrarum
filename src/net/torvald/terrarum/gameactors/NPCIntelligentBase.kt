@@ -53,7 +53,12 @@ open class NPCIntelligentBase : ActorWithBody()
         }
 
         override fun effectWhenThrown(gc: GameContainer, delta_t: Int) {
+        }
 
+        override fun effectWhenTakenOut(gc: GameContainer, delta: Int) {
+        }
+
+        override fun worldActorEffect(gc: GameContainer, delta: Int) {
         }
     }
 

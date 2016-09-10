@@ -1,6 +1,6 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.terrarum.setBlendNormal
+import net.torvald.terrarum.blendNormal
 import org.newdawn.slick.Color
 import org.newdawn.slick.Image
 import org.newdawn.slick.SpriteSheet

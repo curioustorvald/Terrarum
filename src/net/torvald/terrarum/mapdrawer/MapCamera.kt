@@ -1,14 +1,14 @@
 package net.torvald.terrarum.mapdrawer
 
-import net.torvald.terrarum.gamemap.GameWorld
-import net.torvald.terrarum.gamemap.PairedMapLayer
+import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.tileproperties.TileNameCode
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import com.jme3.math.FastMath
 import net.torvald.terrarum.concurrent.ThreadPool
-import net.torvald.terrarum.setBlendMul
-import net.torvald.terrarum.setBlendNormal
+import net.torvald.terrarum.blendMul
+import net.torvald.terrarum.blendNormal
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -247,15 +247,15 @@ object MapCamera {
         /**
          * render to camera
          */
-        setBlendNormal()
+        blendNormal()
         drawTiles(WALL, false)
         drawTiles(TERRAIN, false)
     }
 
     fun renderFront(gc: GameContainer, g: Graphics) {
-        setBlendMul()
+        blendMul()
         drawTiles(TERRAIN, true)
-        setBlendNormal()
+        blendNormal()
     }
 
     private fun drawTiles(mode: Int, drawModeTilesBlendMul: Boolean) {

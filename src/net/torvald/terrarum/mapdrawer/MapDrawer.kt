@@ -1,6 +1,6 @@
 package net.torvald.terrarum.mapdrawer
 
-import net.torvald.terrarum.gamemap.GameWorld
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.tileproperties.TileNameCode
 import net.torvald.terrarum.tilestats.TileStats

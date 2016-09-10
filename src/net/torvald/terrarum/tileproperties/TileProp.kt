@@ -1,7 +1,7 @@
 package net.torvald.terrarum.tileproperties
 
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gamemap.WorldTime
+import net.torvald.terrarum.gameworld.WorldTime
 
 /**
  * Created by minjaesong on 16-02-16.
