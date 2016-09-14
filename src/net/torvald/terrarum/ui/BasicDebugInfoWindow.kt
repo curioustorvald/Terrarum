@@ -155,9 +155,9 @@ class BasicDebugInfoWindow : UICanvas {
                 (Terrarum.WIDTH - 2 - 6*8).toFloat(), 10f)
 
         g.color = GameFontBase.codeToCol["g"]
-        g.drawString("${Terrarum.ingame.memInUse}M",
+        g.drawString("${Terrarum.memInUse}M",
                 (Terrarum.WIDTH - 11 * 8 - 2).toFloat(), 2f)
-        g.drawString("/${Terrarum.ingame.totalVMMem}M",
+        g.drawString("/${Terrarum.totalVMMem}M",
                 (Terrarum.WIDTH - 6 * 8 - 2).toFloat(), 2f)
 
         /**

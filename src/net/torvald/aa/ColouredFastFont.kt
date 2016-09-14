@@ -1,6 +1,6 @@
 package net.torvald.aa
 
-import net.torvald.terrarum.virtualcomputers.terminal.Terminal
+import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 import org.newdawn.slick.Color
 import org.newdawn.slick.Font
 import org.newdawn.slick.Image

@@ -14,7 +14,7 @@ object TilePropCodex {
 
     private lateinit var tileProps: Array<TileProp>
 
-    val CSV_PATH = "./src/net/torvald/terrarum/tileproperties/tileprop.csv"
+    val CSV_PATH = "/net/torvald/terrarum/tileproperties/tileprop.csv"
 
     const val TILE_UNIQUE_MAX = MapLayer.RANGE * PairedMapLayer.RANGE
 

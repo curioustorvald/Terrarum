@@ -76,11 +76,6 @@ constructor() : BasicGameState() {
 
     private val CORES = ThreadPool.POOL_SIZE
 
-    val memInUse: Long
-        get() = ManagementFactory.getMemoryMXBean().heapMemoryUsage.used shr 20
-    val totalVMMem: Long
-        get() = Runtime.getRuntime().maxMemory() shr 20
-
     val auth = Authenticator()
 
     val KEY_LIGHTMAP_RENDER = Key.F7
@@ -231,9 +226,9 @@ constructor() : BasicGameState() {
 
     private fun setAppTitle() {
         Terrarum.appgc.setTitle(
-                "Simple Slick Game" +
+                "${Terrarum.NAME}" +
                 " — F: ${Terrarum.appgc.fps} (${Terrarum.TARGET_INTERNAL_FPS})" +
-                " — M: ${memInUse}M / ${totalVMMem}M")
+                " — M: ${Terrarum.memInUse}M / ${Terrarum.totalVMMem}M")
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {

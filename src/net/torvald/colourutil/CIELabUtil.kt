@@ -133,12 +133,25 @@ object CIELabUtil {
     private fun Float.powerOf(exp: Float) = FastMath.pow(this, exp)
 }
 
-internal val D65 = CIEXYZ(95.047f, 100f, 108.883f)
-val epsilon = 216.0.div(24389.0).toFloat()
-val kappa = 24389.0.div(27.0).toFloat()
+internal val D65 = CIEXYZ(0.95047f, 1.00f, 1.08883f)
+val epsilon = 216f/24389f
+val kappa = 24389f/27f
 
-data class CIEXYZ(var X: Float = 0f, var Y: Float = 0f, var Z: Float = 0f, val alpha: Float = 1f)
+/** Range: X, Y, Z: 0 - 1.0+ (One-based-plus) */
+data class CIEXYZ(var X: Float = 0f, var Y: Float = 0f, var Z: Float = 0f, val alpha: Float = 1f) {
+    init {
+        if (X > 2f || Y > 2f || Z > 2f)
+            throw IllegalArgumentException("Value range error - CIEXYZ is one-based (0.0 - 1.0+): ($X, $Y, $Z)")
+    }
+}
+/**
+ * Range:
+ * L: 0-100.0
+ * u, v: -100+ - 100+
+ * (Hundred-based-plus)
+ */
 data class CIELab(var L: Float = 0f, var a: Float = 0f, var b: Float = 0f, val alpha: Float = 1f)
+/** Range: r, g, b: 0 - 1.0 (One-based) */
 data class RGB(var r: Float = 0f, var g: Float = 0f, var b: Float = 0f, val alpha: Float = 1f) {
     constructor(color: Color) : this() {
         r = color.r; g = color.g; b = color.b

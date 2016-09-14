@@ -5,6 +5,7 @@ import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVRecord
 
 import java.io.IOException
+import java.io.InputStreamReader
 import java.nio.file.FileSystems
 import java.nio.file.Files
 
@@ -24,6 +25,24 @@ object CSVFetcher {
 
         val csvParser = CSVParser.parse(
                 csvString!!.toString(),
+                CSVFormat.DEFAULT.withIgnoreSurroundingSpaces()
+                        .withHeader()
+                        .withIgnoreEmptyLines()
+                        .withDelimiter(';')
+                        .withCommentMarker('#')
+                        .withNullString("N/A")
+                        .withRecordSeparator('\n')
+        )
+
+        val csvRecordList = csvParser.records
+        csvParser.close()
+
+        return csvRecordList
+    }
+
+    fun readFromString(csv: String): List<CSVRecord> {
+        val csvParser = CSVParser.parse(
+                csv,
                 CSVFormat.DEFAULT.withIgnoreSurroundingSpaces()
                         .withHeader()
                         .withIgnoreEmptyLines()

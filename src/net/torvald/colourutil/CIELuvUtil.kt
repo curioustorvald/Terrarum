@@ -99,4 +99,10 @@ object CIELuvUtil {
     private fun Float.cube() = this * this * this
 }
 
+/**
+ * Range:
+ * L: 0-100.0
+ * u, v: -100+ - 100+
+ * (Hundred-based-plus)
+ */
 data class CIELuv(var L: Float = 0f, var u: Float = 0f, var v: Float = 0f, val alpha: Float = 1f)

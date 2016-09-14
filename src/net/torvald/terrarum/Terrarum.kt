@@ -13,6 +13,7 @@ import org.newdawn.slick.*
 import org.newdawn.slick.state.StateBasedGame
 import java.io.File
 import java.io.IOException
+import java.lang.management.ManagementFactory
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.logging.FileHandler
@@ -104,8 +105,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         //addState(StateSplash())
         //addState(StateMonitorCheck())
         //addState(StateFontTester())
-        ingame = StateInGame()
-        addState(ingame)
+
+        //ingame = StateInGame()
+        //addState(ingame)
     }
 
     companion object {
@@ -151,6 +153,11 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             private set
         lateinit var defaultSaveDir: String
             private set
+
+        val memInUse: Long
+            get() = ManagementFactory.getMemoryMXBean().heapMemoryUsage.used shr 20
+        val totalVMMem: Long
+            get() = Runtime.getRuntime().maxMemory() shr 20
 
         lateinit var environment: RunningEnvironment
 
@@ -408,7 +415,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
     }
 }
 
-fun main(args: Array<String>) = Terrarum.main(args)
+fun main(args: Array<String>) {
+    Terrarum.main(args)
+}
 
 fun blendMul() {
     GL11.glEnable(GL11.GL_BLEND)

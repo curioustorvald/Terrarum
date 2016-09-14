@@ -17,6 +17,7 @@
       <root url="jar://$PROJECT_DIR$/lib/slick.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/OpenComputers-JNLua.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/OpenComputers-LuaJ.jar!/" />
+      <root url="file://$PROJECT_DIR$/lib" />
     </CLASSES>
     <JAVADOC>
       <root url="http://slick.ninjacave.com/javadoc/" />
@@ -25,11 +26,14 @@
       <root url="https://commons.apache.org/proper/commons-csv/archives/1.1/apidocs/index.html" />
     </JAVADOC>
     <NATIVE>
-      <root url="file://$PROJECT_DIR$/lib/natives" />
+      <root url="file://$PROJECT_DIR$/lib" />
     </NATIVE>
     <SOURCES>
       <root url="file://$USER_HOME$/Downloads/slick/src" />
       <root url="jar://$PROJECT_DIR$/lib/kotlin-runtime-sources.jar!/" />
+      <root url="file://$PROJECT_DIR$/lib" />
     </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" type="SOURCES" />
   </library>
 </component>

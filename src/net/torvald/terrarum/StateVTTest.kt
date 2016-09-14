@@ -1,14 +1,13 @@
 package net.torvald.terrarum
 
 import net.torvald.terrarum.gamecontroller.Key
-import net.torvald.terrarum.virtualcomputers.terminal.SimpleTextTerminal
-import org.newdawn.slick.Color
+import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
 import org.newdawn.slick.state.BasicGameState
 import org.newdawn.slick.state.StateBasedGame
-import java.util.*
 
 /**
  * ComputerCraft/OpenComputers like-alike, just for fun!
@@ -17,19 +16,24 @@ import java.util.*
  */
 class StateVTTest : BasicGameState() {
 
-    val vt = SimpleTextTerminal(SimpleTextTerminal.ELECTRIC_BLUE, 80, 25)
+    val vt = SimpleTextTerminal(SimpleTextTerminal.IBM_GREEN, 80, 25)
+    val computerInside = BaseTerrarumComputer(vt)
 
     val vtUI = Image(vt.displayW, vt.displayH)
 
-    override fun init(container: GameContainer, game: StateBasedGame) {
 
+    init {
+    }
+
+    override fun init(container: GameContainer, game: StateBasedGame) {
+        vt.openInput()
     }
 
     override fun update(container: GameContainer, game: StateBasedGame, delta: Int) {
-        Terrarum.appgc.setTitle("VT — F: ${container.fps}")
+        Terrarum.appgc.setTitle("VT — F: ${container.fps}" +
+                                " — M: ${Terrarum.memInUse}M / ${Terrarum.totalVMMem}M")
         vt.update(container, delta)
-
-
+        computerInside.update(container, delta)
     }
 
     override fun getID() = Terrarum.STATE_ID_TEST_TTY
@@ -46,10 +50,16 @@ class StateVTTest : BasicGameState() {
 
     override fun keyPressed(key: Int, c: Char) {
         super.keyPressed(key, c)
+        vt.keyPressed(key, c)
 
-        if (key == Key.RETURN)
-            vt.printChar(10.toChar())
-        else
-            vt.printChar(c)
+        if (key == Key.RETURN) {
+            val input = vt.closeInput()
+
+            computerInside.runCommand(input, "consoleinput")
+
+            vt.openInput()
+
+            computerInside.runCommand("io.write(_COMPUTER.prompt)", "prompt")
+        }
     }
 }
