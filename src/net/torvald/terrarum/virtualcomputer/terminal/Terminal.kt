@@ -6,19 +6,19 @@ import org.newdawn.slick.Graphics
 import org.newdawn.slick.Input
 
 /**
- * A tty (terminal)
+ * A terminal
  *
- * Framebuffer : use net.torvald.aa.AAFrame
+ * Framebuffer: USE net.torvald.aa.AAFrame
  *
  * Background color is fixed; text color is variable
  *
  * Created by minjaesong on 16-09-07.
  */
-interface Terminal {
-    val width: Int
+interface Terminal : Teletype {
+    override val width: Int
     val height: Int
-    val coloursCount: Int
-    var cursorX: Int
+    override val coloursCount: Int
+    override var cursorX: Int
     var cursorY: Int
     var cursorBlink: Boolean
     var backColour: Int
@@ -27,13 +27,13 @@ interface Terminal {
     var lastInputByte: Int
 
     // to be used in UI
-    val displayW: Int
+    override val displayW: Int
     val displayH: Int
 
     fun getColor(index: Int): Color
-    fun update(gc: GameContainer, delta: Int)
-    fun render(gc: GameContainer, g: Graphics)
-    fun keyPressed(key: Int, c: Char)
+    override fun update(gc: GameContainer, delta: Int)
+    override fun render(gc: GameContainer, g: Graphics)
+    override fun keyPressed(key: Int, c: Char)
 
     // API calls
     fun setCursor(x: Int, y: Int)
@@ -44,14 +44,17 @@ interface Terminal {
      *  It is also not affected by the control sequences; just print them out as symbol */
     fun emitChar(c: Char)
     /** Prints a char and move cursor accordingly. */
-    fun printChar(c: Char)
+    override fun printChar(c: Char)
     /** Emits a string. Does not move cursor */
     fun emitString(s: String)
-    /** Emits a string and move cursor accordingly. */
+    /** Emits a string and move cursor accordingly, then do LF */
     fun printString(s: String, x: Int = cursorX, y: Int = cursorY)
+    /** Emits a string and move cursor accordingly. */
+    fun writeString(s: String, x: Int = cursorX, y: Int = cursorY)
     fun clear()
     fun clearLine()
-    fun scroll(amount: Int = 1)
+    override fun newLine()
+    override fun scroll(amount: Int)
     fun setColour(back: Int, fore: Int)
     fun resetColour()
     /**
@@ -60,7 +63,7 @@ interface Terminal {
      */
     fun beep(freq: Float = 1000f, duration: Int = 200)
     /** for "beep code" on modern BIOS. Pattern: - . */
-    fun beep(pattern: String)
+    override fun bell(pattern: String)
     /** Requires keyPressed() event to be processed.
      *
      *  null indicates the input stream is waiting for an input

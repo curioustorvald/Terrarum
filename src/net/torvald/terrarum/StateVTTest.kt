@@ -2,7 +2,11 @@ package net.torvald.terrarum
 
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.terminal.ColouredTextTerminal
 import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
+import net.torvald.terrarum.virtualcomputer.terminal.Teletype
+import net.torvald.terrarum.virtualcomputer.terminal.TeletypeTerminal
+import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
@@ -16,7 +20,7 @@ import org.newdawn.slick.state.StateBasedGame
  */
 class StateVTTest : BasicGameState() {
 
-    val vt = SimpleTextTerminal(SimpleTextTerminal.IBM_GREEN, 80, 25)
+    val vt = SimpleTextTerminal(SimpleTextTerminal.AMBER, 80, 25)
     val computerInside = BaseTerrarumComputer(vt)
 
     val vtUI = Image(vt.displayW, vt.displayH)
@@ -38,6 +42,8 @@ class StateVTTest : BasicGameState() {
 
     override fun getID() = Terrarum.STATE_ID_TEST_TTY
 
+    private val paperColour = Color(0xfffce6)
+
     override fun render(container: GameContainer, game: StateBasedGame, g: Graphics) {
         vt.render(container, vtUI.graphics)
 
@@ -45,7 +51,7 @@ class StateVTTest : BasicGameState() {
                 Terrarum.WIDTH.minus(vtUI.width).div(2f),
                 Terrarum.HEIGHT.minus(vtUI.height).div(2f))
 
-        //vtUI.graphics.flush()
+        vtUI.graphics.flush()
     }
 
     override fun keyPressed(key: Int, c: Char) {
@@ -55,11 +61,11 @@ class StateVTTest : BasicGameState() {
         if (key == Key.RETURN) {
             val input = vt.closeInput()
 
-            computerInside.runCommand(input, "consoleinput")
+            computerInside.runCommand(input, "=prompt")
 
             vt.openInput()
 
-            computerInside.runCommand("io.write(_COMPUTER.prompt)", "prompt")
+            computerInside.runCommand("io.write(_COMPUTER.prompt)", "=prompt")
         }
     }
 }

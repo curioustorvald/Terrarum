@@ -15,7 +15,7 @@ class TinyAlphNum : Font {
     internal val W = 8
     internal val H = 8
 
-    private val chars = arrayOf(
+    /*private val chars = arrayOf(
             '0','1','2','3','4','5','6','7',
             '8','9','[','#','@',':','>','?',
             ' ','A','B','C','D','E','F','G',
@@ -25,11 +25,11 @@ class TinyAlphNum : Font {
             '+','/','S','T','U','V','W','X',
             'Y','Z','_',',','%','=','"','!'
     )
-    private val mappingTable = HashMap<Int, Int>()
+    private val mappingTable = HashMap<Int, Int>()*/
 
     init {
-        fontSheet = SpriteSheet("./assets/graphics/fonts/alphanumeric_small.png", W, H)
-        chars.forEachIndexed { i, c -> mappingTable[c.toInt()] = i }
+        fontSheet = SpriteSheet("./assets/graphics/fonts/cp949.png", W, H)
+        //chars.forEachIndexed { i, c -> mappingTable[c.toInt()] = i }
     }
 
     override fun getHeight(str: String): Int = H
@@ -52,15 +52,29 @@ class TinyAlphNum : Font {
         var thisCol = col
         var textPosOffset = 0
         for (i in 0..text.length - 1) {
-            val index = charToSpriteNum(text.toUpperCase().codePointAt(i))
+            //val index = charToSpriteNum(text.toUpperCase().codePointAt(i))
             val ch = text[i]
+            val index = ch.toInt() and 0xFF
 
             if (ch.isColourCode()) {
                 thisCol = GameFontBase.colourKey[ch]!!
                 continue
             }
             if (index != null) {
-                fontSheet.getSubImage(index % 8, index / 8).draw(
+                // shadow
+                fontSheet.getSubImage(index % 16, index / 16).draw(
+                        x + textPosOffset + 1, y, thisCol.darker(0.5f)
+                )
+                fontSheet.getSubImage(index % 16, index / 16).draw(
+                        x + textPosOffset + 1, y + 1, thisCol.darker(0.5f)
+                )
+                fontSheet.getSubImage(index % 16, index / 16).draw(
+                        x + textPosOffset, y + 1, thisCol.darker(0.5f)
+                )
+
+
+                // main
+                fontSheet.getSubImage(index % 16, index / 16).draw(
                         x + textPosOffset, y, thisCol
                 )
             }
@@ -72,7 +86,7 @@ class TinyAlphNum : Font {
         throw UnsupportedOperationException()
     }
 
-    private fun charToSpriteNum(ch: Int): Int? = mappingTable[ch]
+    //private fun charToSpriteNum(ch: Int): Int? = mappingTable[ch]
 
     fun Char.isColourCode() = GameFontBase.colourKey.containsKey(this)
 }

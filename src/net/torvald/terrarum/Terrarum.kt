@@ -100,14 +100,14 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
-        addState(StateVTTest())
+        //addState(StateVTTest())
         //addState(StateTestingSandbox())
         //addState(StateSplash())
         //addState(StateMonitorCheck())
         //addState(StateFontTester())
 
-        //ingame = StateInGame()
-        //addState(ingame)
+        ingame = StateInGame()
+        addState(ingame)
     }
 
     companion object {
@@ -439,7 +439,8 @@ fun blendAlphaMap() {
 fun blendScreen() {
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glColorMask(true, true, true, true)
-    GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_COLOR)}
+    GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_COLOR)
+}
 
 fun blendDisable() {
     GL11.glDisable(GL11.GL_BLEND)

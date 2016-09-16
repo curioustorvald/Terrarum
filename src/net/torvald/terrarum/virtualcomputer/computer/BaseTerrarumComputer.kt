@@ -5,10 +5,7 @@ import li.cil.repack.org.luaj.vm2.LuaError
 import li.cil.repack.org.luaj.vm2.LuaValue
 import li.cil.repack.org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.virtualcomputer.lualib.TermLib
-import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
-import net.torvald.terrarum.virtualcomputer.terminal.Terminal
-import net.torvald.terrarum.virtualcomputer.terminal.TerminalInputStream
-import net.torvald.terrarum.virtualcomputer.terminal.TerminalPrintStream
+import net.torvald.terrarum.virtualcomputer.terminal.*
 import org.newdawn.slick.GameContainer
 import java.io.*
 
@@ -19,7 +16,7 @@ import java.io.*
  *
  * Created by minjaesong on 16-09-10.
  */
-class BaseTerrarumComputer(term: Terminal?) {
+class BaseTerrarumComputer(term: Teletype?) {
 
     val luaJ_globals: Globals = JsePlatform.standardGlobals()
 
@@ -40,7 +37,8 @@ class BaseTerrarumComputer(term: Terminal?) {
             luaJ_globals.STDERR = termErr
             luaJ_globals.STDIN = termIn
 
-            loadTermLib(term)
+            // load libraries
+            TermLib(luaJ_globals, term)
         }
 
         // ROM BASIC
@@ -134,22 +132,5 @@ class BaseTerrarumComputer(term: Terminal?) {
         }
 
         val DEBUGTHRE = true
-    }
-
-    /////////////////////////
-    // MANUAU LIBRARY LOAD //
-    /////////////////////////
-    private fun loadTermLib(term: Terminal) {
-        luaJ_globals["term"] = LuaValue.tableOf()
-        luaJ_globals["term"]["test"] = TermLib.Test(term)
-        luaJ_globals["term"]["setCursorPos"] = TermLib.MoveCursor(term)
-        luaJ_globals["term"]["setcursorpos"] = TermLib.MoveCursor(term)
-        luaJ_globals["term"]["gotoxy"]       = TermLib.MoveCursor(term) // pascal-style alias
-        luaJ_globals["term"]["getCursorPos"] = TermLib.GetCursorPos(term)
-        luaJ_globals["term"]["getcursorpos"] = TermLib.GetCursorPos(term)
-        luaJ_globals["term"]["setCursorBlink"] = TermLib.SetCursorBlink(term)
-        luaJ_globals["term"]["setcursorblink"] = TermLib.SetCursorBlink(term)
-        luaJ_globals["term"]["getSize"] = TermLib.GetSize(term)
-        luaJ_globals["term"]["getsize"] = TermLib.GetSize(term)
     }
 }

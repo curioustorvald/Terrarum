@@ -6,10 +6,8 @@ import java.io.InputStream
 /**
  * Created by minjaesong on 16-09-10.
  */
-class TerminalInputStream(val term: Terminal) : InputStream() {
+class TerminalInputStream(val term: Teletype) : InputStream() {
     override fun read(): Int {
-        val ret = term.lastInputByte
-        term.lastInputByte = -1
-        return ret
+        return -1
     }
 }

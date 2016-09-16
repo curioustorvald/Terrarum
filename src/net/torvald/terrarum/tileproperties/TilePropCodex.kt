@@ -29,7 +29,7 @@ object TilePropCodex {
 
         try {
             // todo verify CSV using pre-calculated SHA256 hash
-            val records = CSVFetcher(CSV_PATH)
+            val records = CSVFetcher.readFromString(TilePropCSV.text)
 
             println("[TilePropCodex] Building tile properties table")
 

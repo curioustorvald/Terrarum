@@ -31,7 +31,8 @@ open class SimpleTextTerminal(
             Color(0xaa, 0xaa, 0xaa)  // light grey
     )                                // THESE ARE THE STANDARD
 
-    override val coloursCount = colours.size
+    override val coloursCount: Int
+        get() = colours.size
 
     open protected val backDefault = 0 // STANDARD
     open protected val foreDefault = 3 // STANDARD
@@ -59,12 +60,9 @@ open class SimpleTextTerminal(
 
     private val TABSIZE = 4
 
-    private val ASCII_NUL = 0.toChar()
-
     private var cursorBlinkTimer = 0
     private val cursorBlinkLen = 250
     private var cursorBlinkOn = true
-
 
 
     override fun getColor(index: Int): Color = colours[index]
@@ -177,21 +175,6 @@ open class SimpleTextTerminal(
         screenBuffer.drawBuffer(cursorX, cursorY, c.toInt().and(0xFF).toChar(), colourKey)
     }
 
-    val asciiControlInUse = charArrayOf(
-            ASCII_NUL,
-            ASCII_BEL,
-            ASCII_BS,
-            ASCII_TAB,
-            ASCII_LF,
-            ASCII_FF,
-            ASCII_CR,
-            ASCII_DEL,
-            ASCII_DC1,
-            ASCII_DC2,
-            ASCII_DC3,
-            ASCII_DC4
-    )
-
     /** Prints a char and move cursor accordingly. */
     override fun printChar(c: Char) {
         wrap()
@@ -204,7 +187,7 @@ open class SimpleTextTerminal(
                 ASCII_BEL -> beep()
                 ASCII_BS  -> { cursorX -= 1; wrap() }
                 ASCII_TAB -> { cursorX = (cursorX).div(TABSIZE).times(TABSIZE) + TABSIZE }
-                ASCII_LF  -> { cursorX = 0; cursorY += 1; wrap() }
+                ASCII_LF  -> newLine()
                 ASCII_FF  -> clear()
                 ASCII_CR  -> { cursorX = 0 }
                 ASCII_DEL -> { cursorX -= 1; wrap(); emitChar(colourKey.shl(8)) }
@@ -213,14 +196,30 @@ open class SimpleTextTerminal(
         }
     }
 
-    /** Emits a string and move cursor accordingly. */
+    /** (TTY): Prints a series of chars and move cursor accordingly, then LF
+     * (term): printString() on current cursor pos */
+    override fun printChars(s: String) {
+        printString(s, cursorX, cursorY)
+    }
+
+    /** (TTY): Prints a series of chars and move cursor accordingly
+     * (term): writeString() on current cursor pos */
+    override fun writeChars(s: String) {
+        writeString(s, cursorX, cursorY)
+    }
+
+    /** Emits a string and move cursor accordingly, then do LF */
     override fun printString(s: String, x: Int, y: Int) {
+        writeString(s, x, y)
+        newLine()
+    }
+
+    /** Emits a string and move cursor accordingly. */
+    override fun writeString(s: String, x: Int, y: Int) {
         setCursor(x, y)
         emitString(s)
         val absCursorPos = cursorX + cursorY * width + s.length
         setCursor(absCursorPos % width, absCursorPos / width)
-
-        printChar(ASCII_LF)
     }
 
     /** Emits a string. Does not move cursor */
@@ -245,7 +244,13 @@ open class SimpleTextTerminal(
             screenBuffer.drawBuffer(i, cursorY, 0.toChar(), colourKey)
     }
 
+    override fun newLine() {
+        cursorX = 0; cursorY += 1; wrap()
+    }
+
     override fun scroll(amount: Int) {
+        if (amount < 0) throw IllegalArgumentException("cannot scroll up")
+
         val offset = amount * width
         for (i in offset..screenBuffer.sizeof.ushr(1) - 1) {
             screenBuffer.frameBuffer[i - offset] = screenBuffer.frameBuffer[i]
@@ -341,7 +346,7 @@ open class SimpleTextTerminal(
     }
 
     /** for "beep code" on modern BIOS. Pattern: - . */
-    override fun beep(pattern: String) {
+    override fun bell(pattern: String) {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -390,6 +395,7 @@ open class SimpleTextTerminal(
         val ELECTRIC_BLUE = Color(0, 239, 255) // imaginary, 486 nm
         val RED = Color(250, 0, 0) // <= 645 nm
 
+        val ASCII_NUL = 0.toChar()
         val ASCII_BEL = 7.toChar()   // *BEEP!*
         val ASCII_BS = 8.toChar()    // x = x - 1
         val ASCII_TAB = 9.toChar()   // move cursor to next (TABSIZE * yy) pos (5 -> 8, 3- > 4, 4 -> 8)
@@ -401,6 +407,21 @@ open class SimpleTextTerminal(
         val ASCII_DC2 = 18.toChar()  // foreground colour 1
         val ASCII_DC3 = 19.toChar()  // foreground colour 2
         val ASCII_DC4 = 20.toChar()  // foreground colour 3
+
+        val asciiControlInUse = charArrayOf(
+                ASCII_NUL,
+                ASCII_BEL,
+                ASCII_BS,
+                ASCII_TAB,
+                ASCII_LF,
+                ASCII_FF,
+                ASCII_CR,
+                ASCII_DEL,
+                ASCII_DC1,
+                ASCII_DC2,
+                ASCII_DC3,
+                ASCII_DC4
+        )
     }
 
     private val DEBUG = true
