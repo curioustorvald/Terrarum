@@ -8,7 +8,7 @@ import java.util.*
 /**
  * Created by minjaesong on 16-06-17.
  */
-class FixturesTikiTorch : FixturesBase(), Luminous {
+class FixtureTikiTorch : FixtureBase(), Luminous {
 
     override var luminosity: Int
         get() = TilePropCodex.getProp(TileNameCode.TORCH).luminosity

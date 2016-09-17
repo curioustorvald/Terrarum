@@ -27,6 +27,8 @@ require("ROMLIB")
 
 -- load bios, if any
 
+
+
 -- load Lua prompt, if bios is not found
 print("Rom basic " .. _COMPUTER.DC2 .. _VERSION .. _COMPUTER.DC4)
 -- print(_COMPUTER.DC2 .. freemem .. _COMPUTER.DC4 .. " bytes free"

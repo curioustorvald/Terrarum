@@ -4,19 +4,24 @@ import li.cil.repack.org.luaj.vm2.Globals
 import li.cil.repack.org.luaj.vm2.LuaError
 import li.cil.repack.org.luaj.vm2.LuaValue
 import li.cil.repack.org.luaj.vm2.lib.jse.JsePlatform
-import net.torvald.terrarum.virtualcomputer.lualib.TermLib
+import net.torvald.terrarum.KVHashMap
+import net.torvald.terrarum.gameactors.ActorValue
+import net.torvald.terrarum.virtualcomputer.luaapi.Filesystem
+import net.torvald.terrarum.virtualcomputer.luaapi.Term
 import net.torvald.terrarum.virtualcomputer.terminal.*
+import net.torvald.terrarum.virtualcomputer.worldobject.FixtureComputerBase
 import org.newdawn.slick.GameContainer
 import java.io.*
 
 /**
- * A part that makes "computer fixtures" actually work
+ * A part that makes "computer fixture" actually work
+ *
+ * @param avFixtureComputer : actor values for FixtureComputerBase
  *
  * @param term : terminal that is connected to the computer fixtures, null if not connected any.
- *
  * Created by minjaesong on 16-09-10.
  */
-class BaseTerrarumComputer(term: Teletype?) {
+class BaseTerrarumComputer(term: Teletype? = null) {
 
     val luaJ_globals: Globals = JsePlatform.standardGlobals()
 
@@ -27,7 +32,35 @@ class BaseTerrarumComputer(term: Teletype?) {
     var termIn: InputStream? = null
         private set
 
+    val UUID = "testsession"//java.util.UUID.randomUUID().toString()
+
+    val computerValue = KVHashMap()
+    
     init {
+        computerValue["memslot0"] = -1 // -1 indicates mem slot is empty
+        computerValue["memslot1"] = -1 // put index of item here
+        computerValue["memslot2"] = -1 // ditto.
+        computerValue["memslot3"] = -1 // do.
+
+        computerValue["processor"] = -1 // do.
+
+        // as in "dev/hda"; refers hard disk drive (and no partitioning)
+        computerValue["hda"] = "testhda" // 'UUID rendered as String' or "none"
+        computerValue["hdb"] = "none"
+        computerValue["hdc"] = "none"
+        computerValue["hdd"] = "none"
+        // as in "dev/fd1"; refers floppy disk drive
+        computerValue["fd1"] = "none"
+        computerValue["fd2"] = "none"
+        computerValue["fd3"] = "none"
+        computerValue["fd4"] = "none"
+        // SCSI connected optical drive
+        computerValue["sda"] = "none"
+
+        // boot device
+        computerValue["boot"] = computerValue.getAsString("hda")!!
+        
+        
         if (term != null) {
             termOut = TerminalPrintStream(term)
             termErr = TerminalPrintStream(term)
@@ -38,7 +71,8 @@ class BaseTerrarumComputer(term: Teletype?) {
             luaJ_globals.STDIN = termIn
 
             // load libraries
-            TermLib(luaJ_globals, term)
+            Term(luaJ_globals, term)
+            Filesystem(luaJ_globals, this)
         }
 
         // ROM BASIC

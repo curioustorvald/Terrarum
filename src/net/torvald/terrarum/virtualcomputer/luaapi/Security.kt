@@ -1,5 +1,6 @@
-package net.torvald.terrarum.virtualcomputer.lualib
+package net.torvald.terrarum.virtualcomputer.luaapi
 
+import li.cil.repack.org.luaj.vm2.Globals
 import li.cil.repack.org.luaj.vm2.LuaValue
 import li.cil.repack.org.luaj.vm2.lib.OneArgFunction
 import net.torvald.terrarum.gameworld.toUint
@@ -10,7 +11,19 @@ import java.security.SecureRandom
 /**
  * Created by minjaesong on 16-09-15.
  */
-class SecurityLib {
+internal class Security(globals: Globals) {
+
+    init {
+        // load things. WARNING: THIS IS MANUAL!
+        globals["security"] = LuaValue.tableOf()
+        globals["security"]["toSHA256"] = SHA256sum()
+        globals["security"]["toSHA1"] = SHA1sum()
+        globals["security"]["toMD5"] = MD5sum()
+        globals["security"]["randomBytes"] = SecureRandomHex()
+        globals["security"]["decodeBase64"] = DecodeBase64()
+        globals["security"]["encodeBase64"] = EncodeBase64()
+    }
+
     /** @return byteArray as String */
     class SHA256sum : OneArgFunction() {
         override fun call(p0: LuaValue): LuaValue {

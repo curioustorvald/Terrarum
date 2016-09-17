@@ -1,4 +1,4 @@
-package net.torvald.terrarum.virtualcomputer.lualib
+package net.torvald.terrarum.virtualcomputer.luaapi
 
 import li.cil.repack.org.luaj.vm2.*
 import li.cil.repack.org.luaj.vm2.lib.*
@@ -10,37 +10,37 @@ import net.torvald.terrarum.virtualcomputer.terminal.Terminal
  *
  * Created by minjaesong on 16-09-12.
  */
-internal class TermLib(globals: Globals, term: Teletype) {
+internal class Term(globals: Globals, term: Teletype) {
 
     init {
         // load things. WARNING: THIS IS MANUAL!
         globals["term"] = LuaValue.tableOf()
-        globals["term"]["write"] = TermLib.WriteString(term)
-        globals["term"]["print"] = TermLib.PrintString(term)
-        globals["term"]["newLine"] = TermLib.NewLine(term)
-        globals["term"]["moveCursor"] = TermLib.MoveCursor(term) // TTY function
-        globals["term"]["width"] = TermLib.GetWidth(term)
-        globals["term"]["scroll"] = TermLib.Scroll(term)
-        globals["term"]["isTeletype"] = TermLib.IsTeletype(term)
+        globals["term"]["write"] = Term.WriteString(term)
+        globals["term"]["print"] = Term.PrintString(term)
+        globals["term"]["newLine"] = Term.NewLine(term)
+        globals["term"]["moveCursor"] = Term.MoveCursor(term) // TTY function
+        globals["term"]["width"] = Term.GetWidth(term)
+        globals["term"]["scroll"] = Term.Scroll(term)
+        globals["term"]["isTeletype"] = Term.IsTeletype(term)
 
         if (term is Terminal) {
-            globals["term"]["emitRaw"] = TermLib.EmitRaw(term)
-            globals["term"]["emit"] = TermLib.Emit(term)
-            globals["term"]["resetColor"] = TermLib.ResetColour(term)
-            globals["term"]["resetColour"] = TermLib.ResetColour(term)
-            globals["term"]["clear"] = TermLib.Clear(term)
-            globals["term"]["clearLine"] = TermLib.ClearLine(term)
-            globals["term"]["moveCursor"] = TermLib.SetCursorPos(term)
-            globals["term"]["getCursor"] = TermLib.GetCursorPos(term)
-            globals["term"]["getX"] = TermLib.GetCursorX(term)
-            globals["term"]["getY"] = TermLib.GetCursorY(term)
-            globals["term"]["blink"] = TermLib.SetCursorBlink(term)
-            globals["term"]["size"] = TermLib.GetSize(term)
-            globals["term"]["isCol"] = TermLib.IsColour(term)
-            globals["term"]["setForeCol"] = TermLib.SetForeColour(term)
-            globals["term"]["setBackCol"] = TermLib.SetBackColour(term)
-            globals["term"]["foreCol"] = TermLib.GetForeColour(term)
-            globals["term"]["backCol"] = TermLib.GetBackColour(term)
+            globals["term"]["emitRaw"] = Term.EmitRaw(term)
+            globals["term"]["emit"] = Term.Emit(term)
+            globals["term"]["resetColor"] = Term.ResetColour(term)
+            globals["term"]["resetColour"] = Term.ResetColour(term)
+            globals["term"]["clear"] = Term.Clear(term)
+            globals["term"]["clearLine"] = Term.ClearLine(term)
+            globals["term"]["moveCursor"] = Term.SetCursorPos(term)
+            globals["term"]["getCursor"] = Term.GetCursorPos(term)
+            globals["term"]["getX"] = Term.GetCursorX(term)
+            globals["term"]["getY"] = Term.GetCursorY(term)
+            globals["term"]["blink"] = Term.SetCursorBlink(term)
+            globals["term"]["size"] = Term.GetSize(term)
+            globals["term"]["isCol"] = Term.IsColour(term)
+            globals["term"]["setForeCol"] = Term.SetForeColour(term)
+            globals["term"]["setBackCol"] = Term.SetBackColour(term)
+            globals["term"]["foreCol"] = Term.GetForeColour(term)
+            globals["term"]["backCol"] = Term.GetBackColour(term)
         }
     }
 

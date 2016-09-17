@@ -1,7 +1,7 @@
 package net.torvald.terrarum.virtualcomputer.worldobject
 
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameactors.FixturesBase
+import net.torvald.terrarum.gameactors.FixtureBase
 import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
 import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 import net.torvald.terrarum.virtualcomputer.worldobject.ui.UITextTerminal
@@ -11,7 +11,7 @@ import java.util.*
 /**
  * Created by minjaesong on 16-09-08.
  */
-class FixturesBasicTerminal(phosphor: Color) : FixturesBase() {
+class FixtureBasicTerminal(phosphor: Color) : FixtureBase() {
 
     val vt: Terminal = SimpleTextTerminal(phosphor, 80, 25)
     val ui = UITextTerminal(vt)

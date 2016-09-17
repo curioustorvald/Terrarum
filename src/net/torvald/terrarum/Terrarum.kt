@@ -100,14 +100,14 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
-        //addState(StateVTTest())
+        addState(StateVTTest())
         //addState(StateTestingSandbox())
         //addState(StateSplash())
         //addState(StateMonitorCheck())
         //addState(StateFontTester())
 
-        ingame = StateInGame()
-        addState(ingame)
+        //ingame = StateInGame()
+        //addState(ingame)
     }
 
     companion object {
@@ -412,6 +412,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             }
             return cfg!!
         }
+
+        val currentSaveDir: File
+            get() = File(defaultSaveDir + "/test") // TODO TEST CODE
     }
 }
 

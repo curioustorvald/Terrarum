@@ -133,14 +133,14 @@ local function cHexToInt(c)
     end
 end
 
---                 str,  str,     str
+--                    str,     str,     str
 term.blit = function(text, foreCol, backCol)
     assert(
         type(text) == "string" and type(backCol) == "string" and type(foreCol) == "string",
         "bad argument: (string, string, string expected, got "..type(text)..", "..type(foreCol)..", "..type(backCol)..")"
     )
     if #text ~= #foreCol or #text ~= #backCol or #foreCol ~= #backCol then
-        error("rrguments must be the same length")
+        error("arguments must be the same length")
     end
 
     for i = 1, #text do
@@ -162,7 +162,20 @@ term.setBackgroundColor = function(cccol) term.setBackCol(ccToGameCol[normaliseC
 term.getBackgroundColor = function() return term.getBackCol() end
 
 
+--------------------
+-- FILESYSTEM API --
+--------------------
+
+fs.makeDir = function(p) fs.mkdir(p) end
+fs.move = function(a, b) fs.mv(a, b) end
+fs.copy = function(a, b) fs.cp(a, b) end
+fs.delete = function(p) fs.rm(p) end
+fs.combine = function(a, b) return fs.concat(a, b) end
+fs.getDir = function(p) return fs.parent(p) end
 
 
+------------------
+-- DOWN AND OUT --
+------------------
 
 if _COMPUTER.verbose then print("ComputerCraft compatibility layer successfully loaded.") end

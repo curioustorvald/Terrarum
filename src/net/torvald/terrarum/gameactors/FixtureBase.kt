@@ -5,7 +5,7 @@ import net.torvald.spriteanimation.SpriteAnimation
 /**
  * Created by minjaesong on 16-06-17.
  */
-open class FixturesBase : ActorWithBody() {
+open class FixtureBase : ActorWithBody() {
     /**
      * 0: Open
      * 1: Blocked
