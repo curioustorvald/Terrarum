@@ -2,6 +2,9 @@
    Created by minjaesong on 16-09-15.
 --]]
 
+-------------
+-- ALIASES --
+-------------
 
 fs.run = function(p)
     local f = fs.open(p, "r")
@@ -10,6 +13,9 @@ fs.run = function(p)
 end
 
 _G.loadstring = _G.load
+
+_G.print = term.print
+
 
 --------------
 -- HEXUTILS --

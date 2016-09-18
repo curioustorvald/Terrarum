@@ -93,6 +93,7 @@ open class SimpleTextTerminal(
     open protected val colourScreen = if (colour) Color(4, 4, 4) else Color(19, 19, 19)
 
 
+
     override fun getColor(index: Int): Color = colours[index]
 
     override fun update(gc: GameContainer, delta: Int) {
@@ -191,14 +192,14 @@ open class SimpleTextTerminal(
 
     /** Emits a bufferChar. Does not move cursor
      *  It is also not affected by the control sequences; just print them out as symbol */
-    override fun emitChar(bufferChar: Int) {
-        screenBuffer.drawBuffer(cursorX, cursorY, bufferChar.toChar())
+    override fun emitChar(bufferChar: Int, x: Int, y: Int) {
+        screenBuffer.drawBuffer(x, y, bufferChar.toChar())
     }
 
     /** Emits a char. Does not move cursor
      *  It is also not affected by the control sequences; just print them out as symbol */
-    override fun emitChar(c: Char) {
-        screenBuffer.drawBuffer(cursorX, cursorY, c.toInt().and(0xFF).toChar(), colourKey)
+    override fun emitChar(c: Char, x: Int, y: Int) {
+        screenBuffer.drawBuffer(x, y, c.toInt().and(0xFF).toChar(), colourKey)
     }
 
     /** Prints a char and move cursor accordingly. */
@@ -244,18 +245,21 @@ open class SimpleTextTerminal(
     /** Emits a string and move cursor accordingly. */
     override fun writeString(s: String, x: Int, y: Int) {
         setCursor(x, y)
-        emitString(s)
-        val absCursorPos = cursorX + cursorY * width + s.length
-        setCursor(absCursorPos % width, absCursorPos / width)
+
+        for (i in 0..s.length - 1) {
+            printChar(s[i])
+            wrap()
+        }
     }
 
-    /** Emits a string. Does not move cursor */
-    override fun emitString(s: String) {
-        val x = cursorX
-        val y = cursorY
+    /** Emits a string, does not affected by control sequences. Does not move cursor */
+    override fun emitString(s: String, x: Int, y: Int) {
+        setCursor(x, y)
 
-        for (i in 0..s.length - 1)
-            printChar(s[i])
+        for (i in 0..s.length - 1) {
+            emitChar(s[i])
+            wrap()
+        }
 
         setCursor(x, y)
     }

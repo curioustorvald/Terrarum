@@ -6,6 +6,7 @@ import li.cil.repack.org.luaj.vm2.lib.TwoArgFunction
 import li.cil.repack.org.luaj.vm2.lib.ZeroArgFunction
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.luaapi.Term.Companion.checkIBM437
 import java.io.*
 import java.nio.file.Files
 import java.nio.file.Path
@@ -368,7 +369,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
 
     private class FileClassWriteBytes(val fos: FileOutputStream): OneArgFunction() {
         override fun call(byteString: LuaValue): LuaValue {
-            val byteString = byteString.checkjstring()
+            val byteString = byteString.checkIBM437()
             val bytearr = ByteArray(byteString.length, { byteString[it].toByte() })
             fos.write(bytearr)
 
@@ -378,7 +379,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
 
     private class FileClassPrintText(val fw: FileWriter): OneArgFunction() {
         override fun call(string: LuaValue): LuaValue {
-            val text = string.checkjstring()
+            val text = string.checkIBM437()
             fw.write(text)
             return LuaValue.NONE
         }
@@ -386,7 +387,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
 
     private class FileClassPrintlnText(val fw: FileWriter): OneArgFunction() {
         override fun call(string: LuaValue): LuaValue {
-            val text = string.checkjstring() + "\n"
+            val text = string.checkIBM437() + "\n"
             fw.write(text)
             return LuaValue.NONE
         }
@@ -415,7 +416,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
     private class FileClassReadAllBytes(val path: Path): ZeroArgFunction() {
         override fun call(): LuaValue {
             val byteArr = Files.readAllBytes(path)
-            val s: String = java.lang.String(byteArr, "ISO-8859-1").toString()
+            val s: String = java.lang.String(byteArr, "IBM437").toString()
             return LuaValue.valueOf(s)
         }
     }

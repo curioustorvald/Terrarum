@@ -4,6 +4,7 @@ import li.cil.repack.org.luaj.vm2.*
 import li.cil.repack.org.luaj.vm2.lib.*
 import net.torvald.terrarum.virtualcomputer.terminal.Teletype
 import net.torvald.terrarum.virtualcomputer.terminal.Terminal
+import java.nio.charset.Charset
 
 /**
  * APIs must have some extent of compatibility with ComputerCraft by dan200
@@ -26,6 +27,7 @@ internal class Term(globals: Globals, term: Teletype) {
         if (term is Terminal) {
             globals["term"]["emitRaw"] = Term.EmitRaw(term)
             globals["term"]["emit"] = Term.Emit(term)
+            globals["term"]["emitString"] = Term.EmitString(term)
             globals["term"]["resetColor"] = Term.ResetColour(term)
             globals["term"]["resetColour"] = Term.ResetColour(term)
             globals["term"]["clear"] = Term.Clear(term)
@@ -44,18 +46,28 @@ internal class Term(globals: Globals, term: Teletype) {
         }
     }
 
+    companion object {
+        fun LuaValue.checkIBM437(): String {
+            if (this is LuaString)
+                return m_bytes.copyOfRange(m_offset, m_length).toString(Charset.forName("ISO-8859-1"))
+                // it only works if Charset is ISO-8859, despite of the name "IBM437"
+            else
+                throw LuaError("bad argument (string expected, got ${this.typename()})")
+        }
+    }
+    
     class WriteString(val tty: Teletype) : LuaFunction() {
         override fun call(p0: LuaValue): LuaValue {
             if (tty is Terminal)
-                tty.writeString(p0.checkjstring())
+                tty.writeString(p0.checkIBM437())
             else
-                tty.writeChars(p0.checkjstring())
+                tty.writeChars(p0.checkIBM437())
             return LuaValue.NONE
         }
 
         override fun call(s: LuaValue, x: LuaValue, y: LuaValue): LuaValue {
             if (tty is Terminal)
-                tty.writeString(s.checkjstring(), x.checkint(), y.checkint())
+                tty.writeString(s.checkIBM437(), x.checkint(), y.checkint())
             else
                 throw LuaError("couldn't move cursor; TTY is one-dimensional")
             return LuaValue.NONE
@@ -65,15 +77,15 @@ internal class Term(globals: Globals, term: Teletype) {
     class PrintString(val tty: Teletype) : LuaFunction() {
         override fun call(p0: LuaValue): LuaValue {
             if (tty is Terminal)
-                tty.printString(p0.checkjstring())
+                tty.printString(p0.checkIBM437())
             else
-                tty.printChars(p0.checkjstring())
+                tty.printChars(p0.checkIBM437())
             return LuaValue.NONE
         }
 
         override fun call(s: LuaValue, x: LuaValue, y: LuaValue): LuaValue {
             if (tty is Terminal)
-                tty.printString(s.checkjstring(), x.checkint(), y.checkint())
+                tty.printString(s.checkIBM437(), x.checkint(), y.checkint())
             else
                 throw LuaError("couldn't move cursor; TTY is one-dimensional")
             return LuaValue.NONE
@@ -87,16 +99,23 @@ internal class Term(globals: Globals, term: Teletype) {
         }
     }
 
-    class EmitRaw(val term: Terminal) : OneArgFunction() {
-        override fun call(p0: LuaValue): LuaValue {
-            term.emitChar(p0.checkint())
+    class EmitRaw(val term: Terminal) : ThreeArgFunction() {
+        override fun call(p0: LuaValue, x: LuaValue, y: LuaValue): LuaValue {
+            term.emitChar(p0.checkint(), x.checkint(), y.checkint())
             return LuaValue.NONE
         }
     }
 
-    class Emit(val term: Terminal) : OneArgFunction() {
-        override fun call(p0: LuaValue): LuaValue {
-            term.emitChar(p0.checkint().toChar())
+    class Emit(val term: Terminal) : ThreeArgFunction() {
+        override fun call(p0: LuaValue, x: LuaValue, y: LuaValue): LuaValue {
+            term.emitChar(p0.checkint().toChar(), x.checkint(), y.checkint())
+            return LuaValue.NONE
+        }
+    }
+
+    class EmitString(val term: Terminal) : ThreeArgFunction() {
+        override fun call(p0: LuaValue, x: LuaValue, y: LuaValue): LuaValue {
+            term.emitString(p0.checkIBM437(), x.checkint(), y.checkint())
             return LuaValue.NONE
         }
     }

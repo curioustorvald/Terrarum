@@ -39,14 +39,14 @@ interface Terminal : Teletype {
     fun setCursor(x: Int, y: Int)
     /** Emits a bufferChar. Does not move cursor
      *  It is also not affected by the control sequences; just print them out as symbol */
-    fun emitChar(bufferChar: Int)
+    fun emitChar(bufferChar: Int, x: Int = cursorX, y: Int = cursorY)
     /** Emits a char. Does not move cursor
      *  It is also not affected by the control sequences; just print them out as symbol */
-    fun emitChar(c: Char)
+    fun emitChar(c: Char, x: Int = cursorX, y: Int = cursorY)
     /** Prints a char and move cursor accordingly. */
     override fun printChar(c: Char)
-    /** Emits a string. Does not move cursor */
-    fun emitString(s: String)
+    /** Emits a string, does not affected by control sequences. Does not move cursor */
+    fun emitString(s: String, x: Int = cursorX, y: Int = cursorY)
     /** Emits a string and move cursor accordingly, then do LF */
     fun printString(s: String, x: Int = cursorX, y: Int = cursorY)
     /** Emits a string and move cursor accordingly. */
