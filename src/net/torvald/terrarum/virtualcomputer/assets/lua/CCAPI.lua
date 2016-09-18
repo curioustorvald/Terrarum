@@ -87,7 +87,7 @@ end
 
 
 local function normaliseCCcol(cccol)
-    if cccol >= 0x1 and cccol <= 0x8FFF then
+    if cccol >= 0x1 and cccol <= 0xFFFF then
         return intLog2(cccol)
     else
         error("invalid CC Colors: "..cccol)
@@ -110,9 +110,9 @@ local function cHexToInt(c)
         if c >= 48 and c <= 57 then
             return c - 48
         elseif c >= 65 and c <= 70 then
-            return c - 65
+            return c - 65 + 10
         elseif c >= 97 and c <= 102 then
-            return c - 97
+            return c - 97 + 10
         else
             return 0
         end
@@ -120,9 +120,9 @@ local function cHexToInt(c)
         if c:byte(1) >= 48 and c:byte(1) <= 57 then
             return c:byte(1) - 48
         elseif c:byte(1) >= 65 and c:byte(1) <= 70 then
-            return c:byte(1) - 65
+            return c:byte(1) - 65 + 10
         elseif c:byte(1) >= 97 and c:byte(1) <= 102 then
-            return c:byte(1) - 97
+            return c:byte(1) - 97 + 10
         else
             --error("unrepresentable: " .. c)
             -- return black, as defined in http://www.computercraft.info/wiki/Term.blit
@@ -144,8 +144,8 @@ term.blit = function(text, foreCol, backCol)
     end
 
     for i = 1, #text do
-        term.setForeCol(cHexToInt(foreCol:byte(i)))
-        term.setBackCol(cHexToInt(backCol:byte(i)))
+        term.setForeCol(ccToGameCol[1 + cHexToInt(foreCol:byte(i))])
+        term.setBackCol(ccToGameCol[1 + cHexToInt(backCol:byte(i))])
         term.emit(text:byte(i))
         term.moveCursor(term.getX() + 1, term.getY())
     end
