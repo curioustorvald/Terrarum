@@ -7,6 +7,7 @@ import li.cil.repack.org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.virtualcomputer.luaapi.Filesystem
+import net.torvald.terrarum.virtualcomputer.luaapi.Security
 import net.torvald.terrarum.virtualcomputer.luaapi.Term
 import net.torvald.terrarum.virtualcomputer.terminal.*
 import net.torvald.terrarum.virtualcomputer.worldobject.FixtureComputerBase
@@ -32,10 +33,12 @@ class BaseTerrarumComputer(term: Teletype? = null) {
     var termIn: InputStream? = null
         private set
 
-    val UUID = "testsession"//java.util.UUID.randomUUID().toString()
+    val UUID = java.util.UUID.randomUUID().toString()
 
     val computerValue = KVHashMap()
-    
+
+    var isHalted = false
+
     init {
         computerValue["memslot0"] = -1 // -1 indicates mem slot is empty
         computerValue["memslot1"] = -1 // put index of item here
@@ -72,6 +75,7 @@ class BaseTerrarumComputer(term: Teletype? = null) {
 
             // load libraries
             Term(luaJ_globals, term)
+            Security(luaJ_globals)
             Filesystem(luaJ_globals, this)
         }
 
@@ -104,7 +108,7 @@ class BaseTerrarumComputer(term: Teletype? = null) {
     var threadRun = false
 
     fun runCommand(line: String, env: String) {
-        if (!threadRun) {
+        if (!threadRun && !isHalted) {
             currentExecutionThread = Thread(ThreadRunCommand(luaJ_globals, line, env))
             currentExecutionThread.start()
             threadRun = true
@@ -112,7 +116,7 @@ class BaseTerrarumComputer(term: Teletype? = null) {
     }
 
     fun runCommand(reader: Reader, filename: String) {
-        if (!threadRun) {
+        if (!threadRun && !isHalted) {
             currentExecutionThread = Thread(ThreadRunCommand(luaJ_globals, reader, filename))
             currentExecutionThread.start()
             threadRun = true
@@ -158,7 +162,7 @@ class BaseTerrarumComputer(term: Teletype? = null) {
                 chunk.call()
             }
             catch (e: LuaError) {
-                lua.STDERR.println("${SimpleTextTerminal.ASCII_DC2}${e.message}${SimpleTextTerminal.ASCII_DC4}")
+                lua.STDERR.println("${SimpleTextTerminal.ASCII_DLE}${e.message}${SimpleTextTerminal.ASCII_DC4}")
                 if (DEBUGTHRE) e.printStackTrace(System.err)
             }
 

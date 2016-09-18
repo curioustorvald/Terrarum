@@ -2,7 +2,6 @@ package net.torvald.terrarum
 
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
-import net.torvald.terrarum.virtualcomputer.terminal.ColouredTextTerminal
 import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
 import net.torvald.terrarum.virtualcomputer.terminal.Teletype
 import net.torvald.terrarum.virtualcomputer.terminal.TeletypeTerminal
@@ -20,7 +19,7 @@ import org.newdawn.slick.state.StateBasedGame
  */
 class StateVTTest : BasicGameState() {
 
-    val vt = SimpleTextTerminal(SimpleTextTerminal.AMBER, 80, 25)
+    val vt = SimpleTextTerminal(SimpleTextTerminal.WHITE, 80, 43, colour = true)
     val computerInside = BaseTerrarumComputer(vt)
 
     val vtUI = Image(vt.displayW, vt.displayH)
@@ -65,7 +64,8 @@ class StateVTTest : BasicGameState() {
 
             vt.openInput()
 
-            computerInside.runCommand("io.write(_COMPUTER.prompt)", "=prompt")
+            if (!computerInside.isHalted)
+                computerInside.runCommand("io.write(_COMPUTER.prompt)", "=prompt")
         }
     }
 }

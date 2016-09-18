@@ -7,6 +7,8 @@ import li.cil.repack.org.luaj.vm2.lib.ZeroArgFunction
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
 import java.io.*
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.*
 
 /**
@@ -24,7 +26,9 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         globals["fs"]["list"] = ListFiles(computer)
         globals["fs"]["exists"] = FileExists(computer)
         globals["fs"]["isDir"] = IsDirectory(computer)
+        globals["fs"]["isFile"] = IsFile(computer)
         globals["fs"]["isReadOnly"] = IsReadOnly(computer)
+        globals["fs"]["getSize"] = GetSize(computer)
         globals["fs"]["listFiles"] = ListFiles(computer)
         globals["fs"]["mkdir"] = Mkdir(computer)
         globals["fs"]["mv"] = Mv(computer)
@@ -33,6 +37,9 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         globals["fs"]["concat"] = ConcatPath(computer)
         globals["fs"]["open"] = OpenFile(computer)
         globals["fs"]["parent"] = GetParentDir(computer)
+        globals["__haltsystemexplicit__"] = HaltComputer(computer)
+        globals["fs"]["dostring"] = DoString(computer)
+        // fs.run defined in ROMLIB
     }
 
     companion object {
@@ -250,29 +257,54 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
 
             when (mode) {
                 "r"  -> {
-                    val fr = FileReader(file)
-                    luaClass["close"] = FileClassClose(fr)
-                    luaClass["readLine"] = FileClassReadLine(fr)
-                    luaClass["readAll"] = FileClassReadAll(fr)
+                    try {
+                        val fr = FileReader(file)
+                        luaClass["close"] = FileClassClose(fr)
+                        luaClass["readLine"] = FileClassReadLine(fr)
+                        luaClass["readAll"] = FileClassReadAll(file.toPath())
+                    }
+                    catch (e: FileNotFoundException) {
+                        e.printStackTrace()
+                        throw LuaError("$path: No such file.")
+                    }
                 }
                 "rb" -> {
-                    val fis = FileInputStream(file)
-                    luaClass["close"] = FileClassClose(fis)
-                    luaClass["read"] = FileClassReadByte(fis)
+                    try {
+                        val fis = FileInputStream(file)
+                        luaClass["close"] = FileClassClose(fis)
+                        luaClass["read"] = FileClassReadByte(fis)
+                        luaClass["readAll"] = FileClassReadAll(file.toPath())
+                    }
+                    catch (e: FileNotFoundException) {
+                        e.printStackTrace()
+                        throw LuaError("$path: No such file.")
+                    }
                 }
                 "w", "a"  -> {
-                    val fw = FileWriter(file,  (mode.startsWith('a')))
-                    luaClass["close"] = FileClassClose(fw)
-                    luaClass["write"] = FileClassPrintText(fw)
-                    luaClass["writeLine"] = FileClassPrintlnText(fw)
-                    luaClass["flush"] = FileClassFlush(fw)
+                    try {
+                        val fw = FileWriter(file, (mode.startsWith('a')))
+                        luaClass["close"] = FileClassClose(fw)
+                        luaClass["write"] = FileClassPrintText(fw)
+                        luaClass["writeLine"] = FileClassPrintlnText(fw)
+                        luaClass["flush"] = FileClassFlush(fw)
+                    }
+                    catch (e: FileNotFoundException) {
+                        e.printStackTrace()
+                        throw LuaError("$path: Is a directory.")
+                    }
                 }
                 "wb", "ab" -> {
-                    val fos = FileOutputStream(file, (mode.startsWith('a')))
-                    luaClass["close"] = FileClassClose(fos)
-                    luaClass["write"] = FileClassWriteByte(fos)
-                    luaClass["writeBytes"] = FileClassWriteBytes(fos)
-                    luaClass["flush"] = FileClassFlush(fos)
+                    try {
+                        val fos = FileOutputStream(file, (mode.startsWith('a')))
+                        luaClass["close"] = FileClassClose(fos)
+                        luaClass["write"] = FileClassWriteByte(fos)
+                        luaClass["writeBytes"] = FileClassWriteBytes(fos)
+                        luaClass["flush"] = FileClassFlush(fos)
+                    }
+                    catch (e: FileNotFoundException) {
+                        e.printStackTrace()
+                        throw LuaError("$path: Is a directory.")
+                    }
                 }
             }
 
@@ -293,6 +325,21 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
                 pathSB.deleteCharAt(pathSB.lastIndex - 1)
 
             return LuaValue.valueOf(pathSB.toString())
+        }
+    }
+
+    class HaltComputer(val computer: BaseTerrarumComputer): ZeroArgFunction() {
+        override fun call(): LuaValue {
+            computer.isHalted = true
+            computer.luaJ_globals.load("""print("system halted.")""", "=").call()
+            return LuaValue.NONE
+        }
+    }
+
+    class DoString(val computer: BaseTerrarumComputer): OneArgFunction() {
+        override fun call(script: LuaValue): LuaValue {
+            computer.luaJ_globals.load(script.checkjstring()).call()
+            return LuaValue.NONE
         }
     }
 
@@ -373,14 +420,22 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         }
     }
 
-    private class FileClassReadAll(val fr: FileReader): ZeroArgFunction() {
+    private class FileClassReadAllBytes(val path: Path): ZeroArgFunction() {
         override fun call(): LuaValue {
-            return LuaValue.valueOf(fr.readText())
+            val byteArr = Files.readAllBytes(path)
+            val s: String = java.lang.String(byteArr, "ISO-8859-1").toString()
+            return LuaValue.valueOf(s)
+        }
+    }
+
+    private class FileClassReadAll(val path: Path): ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return FileClassReadAllBytes(path).call()
         }
     }
 
     private class FileClassReadLine(val fr: FileReader): ZeroArgFunction() {
-        val scanner = Scanner(fr.readText()) // keeps the scanner status persistent
+        val scanner = Scanner(fr.readText()) // no closing; keep the scanner status persistent
 
         override fun call(): LuaValue {
             return if (scanner.hasNextLine()) LuaValue.valueOf(scanner.nextLine())

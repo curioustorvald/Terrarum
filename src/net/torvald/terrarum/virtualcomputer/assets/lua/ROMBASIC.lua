@@ -20,18 +20,20 @@ _COMPUTER.prompt = function()
 end
 _COMPUTER.verbose = true -- print debug info
 _COMPUTER.loadedCLayer = {} -- list of loaded compatibility layers
+_COMPUTER.bootloader = "/boot/efi"
+_COMPUTER.OEM = ""
 
 -- load libraries that coded in Lua
 require("ROMLIB")
 
-
 -- load bios, if any
-
-
-
--- load Lua prompt, if bios is not found
-print("Rom basic " .. _COMPUTER.DC2 .. _VERSION .. _COMPUTER.DC4)
--- print(_COMPUTER.DC2 .. freemem .. _COMPUTER.DC4 .. " bytes free"
-print("Ok")
--- prompt start
---_COMPUTER.prompt()
+if fs.exists(_COMPUTER.bootloader) then shell.run(_COMPUTER.bootloader) end
+if shell.status == shell.halt then
+    __haltsystemexplicit__()
+else
+    -- load Lua prompt, if bios is not found
+    if (#_COMPUTER.OEM > 0) then print(_COMPUTER.OEM) end
+    print("Rom basic " .. _COMPUTER.DC2 .. _VERSION .. _COMPUTER.DC4)
+    -- print(_COMPUTER.DC2 .. freemem .. _COMPUTER.DC4 .. " bytes free"
+    print("Ok")
+end

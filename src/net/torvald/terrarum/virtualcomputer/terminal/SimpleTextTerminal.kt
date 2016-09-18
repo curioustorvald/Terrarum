@@ -18,21 +18,46 @@ import java.nio.ByteBuffer
  * Created by minjaesong on 16-09-07.
  */
 open class SimpleTextTerminal(
-        val phosphor: Color, override val width: Int, override val height: Int
+        phosphorColour: Color, override val width: Int, override val height: Int, colour: Boolean = false
 ) : Terminal {
     /**
      * Terminals must support AT LEAST 4 colours.
      * Color index 0 must be default background, index 3 must be default foreground
      */
-    open protected val colours = arrayOf(
-            Color(0x00, 0x00, 0x00), // black
-            Color(0xff, 0xff, 0xff), // white
-            Color(0x55, 0x55, 0x55), // dim grey
-            Color(0xaa, 0xaa, 0xaa)  // light grey
-    )                                // THESE ARE THE STANDARD
+    open protected val colours = if (colour)
+        arrayOf(
+                Color(0x00, 0x00, 0x00), // 0 black
+                Color(0xff, 0xff, 0xff), // 1 white
+                Color(0x55, 0x55, 0x55), // 2 dim grey
+                Color(0xaa, 0xaa, 0xaa), // 3 light grey
+
+                Color(0xff, 0xff, 0x00), // 4 yellow
+                Color(0xff, 0x66, 0x00), // 5 orange
+                Color(0xdd, 0x00, 0x00), // 6 red
+                Color(0xff, 0x00, 0x99), // 7 magenta
+
+                Color(0x33, 0x00, 0x99), // 8 purple
+                Color(0x00, 0x00, 0xcc), // 9 blue
+                Color(0x00, 0x99, 0xff), //10 cyan
+                Color(0x66, 0xff, 0x33), //11 lime
+
+                Color(0x00, 0xaa, 0x00), //12 green
+                Color(0x00, 0x66, 0x00), //13 dark green
+                Color(0x66, 0x33, 0x00), //14 brown
+                Color(0x99, 0x66, 0x33)  //15 tan
+        )                                // THESE ARE THE STANDARD
+    else
+        arrayOf(
+                Color(0x00, 0x00, 0x00), // black
+                Color(0xff, 0xff, 0xff), // white
+                Color(0x55, 0x55, 0x55), // dim grey
+                Color(0xaa, 0xaa, 0xaa)  // light grey
+        )                                // THESE ARE THE STANDARD
 
     override val coloursCount: Int
         get() = colours.size
+
+    val errorColour = if (coloursCount > 4) 6 else 1
 
     open protected val backDefault = 0 // STANDARD
     open protected val foreDefault = 3 // STANDARD
@@ -48,7 +73,7 @@ open class SimpleTextTerminal(
 
     val screenBuffer = AAFrame(width, height)
 
-    open protected val fontRef = "./assets/graphics/fonts/MDA.png"
+    open protected val fontRef = "./assets/graphics/fonts/cp949.png"
     open protected val fontImg = Image(fontRef)
     open protected val fontW = fontImg.width / 16
     open protected val fontH = fontImg.height / 16
@@ -63,6 +88,9 @@ open class SimpleTextTerminal(
     private var cursorBlinkTimer = 0
     private val cursorBlinkLen = 250
     private var cursorBlinkOn = true
+
+    val phosphor = if (colour) WHITE else phosphorColour
+    open protected val colourScreen = if (colour) Color(4, 4, 4) else Color(19, 19, 19)
 
 
     override fun getColor(index: Int): Color = colours[index]
@@ -101,8 +129,6 @@ open class SimpleTextTerminal(
             scroll()
         }
     }
-
-    open protected val colourScreen = Color(0x191919)
 
     /**
      * pass UIcanvas to the parameter "g"
@@ -192,6 +218,7 @@ open class SimpleTextTerminal(
                 ASCII_CR  -> { cursorX = 0 }
                 ASCII_DEL -> { cursorX -= 1; wrap(); emitChar(colourKey.shl(8)) }
                 ASCII_DC1, ASCII_DC2, ASCII_DC3, ASCII_DC4 -> { foreColour = c - ASCII_DC1 }
+                ASCII_DLE -> { foreColour = errorColour }
             }
         }
     }
@@ -407,6 +434,7 @@ open class SimpleTextTerminal(
         val ASCII_DC2 = 18.toChar()  // foreground colour 1
         val ASCII_DC3 = 19.toChar()  // foreground colour 2
         val ASCII_DC4 = 20.toChar()  // foreground colour 3
+        val ASCII_DLE = 16.toChar()  // error message colour
 
         val asciiControlInUse = charArrayOf(
                 ASCII_NUL,
@@ -420,7 +448,8 @@ open class SimpleTextTerminal(
                 ASCII_DC1,
                 ASCII_DC2,
                 ASCII_DC3,
-                ASCII_DC4
+                ASCII_DC4,
+                ASCII_DLE
         )
     }
 
