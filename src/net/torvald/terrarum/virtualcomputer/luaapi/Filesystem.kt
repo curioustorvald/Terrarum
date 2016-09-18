@@ -38,7 +38,6 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         globals["fs"]["open"] = OpenFile(computer)
         globals["fs"]["parent"] = GetParentDir(computer)
         globals["__haltsystemexplicit__"] = HaltComputer(computer)
-        globals["fs"]["dostring"] = DoString(computer)
         // fs.run defined in ROMLIB
     }
 
@@ -332,13 +331,6 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         override fun call(): LuaValue {
             computer.isHalted = true
             computer.luaJ_globals.load("""print("system halted.")""", "=").call()
-            return LuaValue.NONE
-        }
-    }
-
-    class DoString(val computer: BaseTerrarumComputer): OneArgFunction() {
-        override fun call(script: LuaValue): LuaValue {
-            computer.luaJ_globals.load(script.checkjstring()).call()
             return LuaValue.NONE
         }
     }

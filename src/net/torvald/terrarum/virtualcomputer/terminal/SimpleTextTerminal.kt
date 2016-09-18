@@ -73,7 +73,7 @@ open class SimpleTextTerminal(
 
     val screenBuffer = AAFrame(width, height)
 
-    open protected val fontRef = "./assets/graphics/fonts/cp949.png"
+    open protected val fontRef = "./assets/graphics/fonts/MDA.png"
     open protected val fontImg = Image(fontRef)
     open protected val fontW = fontImg.width / 16
     open protected val fontH = fontImg.height / 16

@@ -6,9 +6,10 @@
 fs.run = function(p)
     local f = fs.open(p, "r")
     local s = f.readAll()
-    fs.dostring(s)
+    load(s)()
 end
 
+_G.loadstring = _G.load
 
 --------------
 -- HEXUTILS --
