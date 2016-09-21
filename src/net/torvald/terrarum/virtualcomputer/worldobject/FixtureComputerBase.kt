@@ -14,17 +14,6 @@ import java.util.*
  */
 open class FixtureComputerBase() : FixtureBase() {
 
-    val processorCycle: Int // number of Lua statement to process per tick (1/100 s)
-        get() = ComputerPartsCodex.getProcessorCycles(computerInside!!.computerValue.getAsInt("processor") ?: -1)
-    val memSize: Int // max: 8 GB
-        get() {
-            var size = 0
-            for (i in 0..3)
-                size += ComputerPartsCodex.getRamSize(computerInside!!.computerValue.getAsInt("memSlot$i") ?: -1)
-
-            return size
-        }
-
     /** Connected terminal */
     var terminal: FixtureBasicTerminal? = null
 
@@ -70,6 +59,7 @@ open class FixtureComputerBase() : FixtureBase() {
     fun keyPressed(key: Int, c: Char) {
         if (terminal != null) {
             terminal!!.vt.keyPressed(key, c)
+            computerInside!!.keyPressed(key, c)
         }
     }
 }

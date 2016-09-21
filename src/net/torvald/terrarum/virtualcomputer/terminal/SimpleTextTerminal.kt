@@ -29,7 +29,7 @@ open class SimpleTextTerminal(
                 Color(0x00, 0x00, 0x00), // 0 black
                 Color(0xff, 0xff, 0xff), // 1 white
                 Color(0x55, 0x55, 0x55), // 2 dim grey
-                Color(0xaa, 0xaa, 0xaa), // 3 light grey
+                Color(0xaa, 0xaa, 0xaa), // 3 bright grey
 
                 Color(0xff, 0xff, 0x00), // 4 yellow
                 Color(0xff, 0x66, 0x00), // 5 orange
@@ -39,7 +39,7 @@ open class SimpleTextTerminal(
                 Color(0x33, 0x00, 0x99), // 8 purple
                 Color(0x00, 0x00, 0xcc), // 9 blue
                 Color(0x00, 0x99, 0xff), //10 cyan
-                Color(0x66, 0xff, 0x33), //11 lime
+                Color(0x55, 0xff, 0x00), //11 lime
 
                 Color(0x00, 0xaa, 0x00), //12 green
                 Color(0x00, 0x66, 0x00), //13 dark green
@@ -83,7 +83,7 @@ open class SimpleTextTerminal(
     override val displayH = fontH * height
 
 
-    private val TABSIZE = 4
+    var TABSIZE = 4
 
     private var cursorBlinkTimer = 0
     private val cursorBlinkLen = 250
@@ -185,6 +185,7 @@ open class SimpleTextTerminal(
 
     }
 
+    /** Unlike lua function, this one in Zero-based. */
     override fun setCursor(x: Int, y: Int) {
         cursorX = x
         cursorY = y
@@ -387,18 +388,31 @@ open class SimpleTextTerminal(
     /**
      * Technically, this is different from Java's InputStream
      */
-    fun openInput() {
+    override fun openInput() {
+        lastStreamInput = null
+        lastKeyPress = null
         inputOpen = true
         if (DEBUG) println("[SimpleTextTerminal] openInput()")
     }
 
-    fun closeInput(): String {
+    override fun closeInputKey(keyFromUI: Int): Int {
         inputOpen = false
-        val ret = sb.toString()
+        lastKeyPress = keyFromUI
+
+        if (DEBUG) println("[SimpleTextTerminal] closeInputKey(), $keyFromUI")
+        return keyFromUI
+    }
+
+    override var lastStreamInput: String? = null
+    override var lastKeyPress: Int? = null
+
+    override fun closeInputString(): String {
+        inputOpen = false
+        lastStreamInput = sb.toString()
         sb = StringBuilder()
 
-        if (DEBUG) println("[SimpleTextTerminal] closeInput(), $ret")
-        return ret
+        if (DEBUG) println("[SimpleTextTerminal] closeInputString(), $lastStreamInput")
+        return lastStreamInput!!
     }
 
     override fun keyPressed(key: Int, c: Char) {

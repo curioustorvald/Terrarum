@@ -32,7 +32,6 @@ internal class Term(globals: Globals, term: Teletype) {
             globals["term"]["resetColour"] = Term.ResetColour(term)
             globals["term"]["clear"] = Term.Clear(term)
             globals["term"]["clearLine"] = Term.ClearLine(term)
-            globals["term"]["moveCursor"] = Term.SetCursorPos(term)
             globals["term"]["getCursor"] = Term.GetCursorPos(term)
             globals["term"]["getX"] = Term.GetCursorX(term)
             globals["term"]["getY"] = Term.GetCursorY(term)
@@ -141,10 +140,10 @@ internal class Term(globals: Globals, term: Teletype) {
         }
     }
 
-    /** term.setCursorPos(number x, number y) */
+    /** term.setCursorPos(number x, number y), One-based */
     class SetCursorPos(val term: Terminal) : TwoArgFunction() {
         override fun call(x: LuaValue, y: LuaValue): LuaValue {
-            term.setCursor(x.checkint(), y.checkint())
+            term.setCursor(x.checkint() - 1, y.checkint() - 1)
             return LuaValue.NONE
         }
     }
@@ -158,22 +157,23 @@ internal class Term(globals: Globals, term: Teletype) {
         }
     }
 
+    /** One-based */
     class GetCursorPos(val term: Terminal) : VarArgFunction() {
         override fun invoke(args: Varargs?): Varargs {
-            val ret = arrayOf(LuaValue.valueOf(term.cursorX), LuaValue.valueOf(term.cursorY))
+            val ret = arrayOf(LuaValue.valueOf(term.cursorX + 1), LuaValue.valueOf(term.cursorY + 1))
             return LuaValue.varargsOf(ret)
         }
     }
 
     class GetCursorX(val term: Terminal) : ZeroArgFunction() {
         override fun call(): LuaValue {
-            return LuaValue.valueOf(term.cursorX)
+            return LuaValue.valueOf(term.cursorX + 1)
         }
     }
 
     class GetCursorY(val term: Terminal) : ZeroArgFunction() {
         override fun call(): LuaValue {
-            return LuaValue.valueOf(term.cursorY)
+            return LuaValue.valueOf(term.cursorY + 1)
         }
     }
 

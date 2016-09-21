@@ -14,14 +14,14 @@ object ComputerPartsCodex {
 
     init {
         // in kilobytes
-        rams.put(4864,  128.KiB()) // 64k is not enough for Lua, so we start here.
-        rams.put(4865,  192.KiB())
-        rams.put(4866,  256.KiB())
-        rams.put(4867,  320.KiB()) // 320 * 2 = "640k ought to be enough for anybody" --Someone that is NOT Bill Gates
-        rams.put(4868,  480.KiB())
-        rams.put(4869,  512.KiB())
-        rams.put(4870, 1024.KiB()) // server ops hate it
-        rams.put(4871, 2048.KiB()) // wait, we can multiplayer?
+        rams.put(4864,  16.MiB())
+        rams.put(4865,  24.MiB())
+        rams.put(4866,  32.MiB())
+        rams.put(4867,  64.MiB())
+        rams.put(4868,  96.MiB())
+        rams.put(4869, 128.MiB())
+        rams.put(4870, 160.MiB())
+        rams.put(4871, 256.MiB())
 
         processors.put(4872, 1000)
         processors.put(4873, 2000)
@@ -52,4 +52,5 @@ object ComputerPartsCodex {
     private fun Int.MB() = this * 1000000 // 1 MB == 1 000 000 bytes, bitches!
     private fun Int.kB() = this * 1000
     private fun Int.KiB() = this.shr(10)
+    private fun Int.MiB() = this.shr(20)
 }

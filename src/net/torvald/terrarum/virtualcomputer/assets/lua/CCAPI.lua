@@ -55,7 +55,9 @@ colors.yellow = 0x10
 colors.lime = 0x20
 colors.pink = 0x40
 colors.gray = 0x80
+colors.grey = 0x80
 colors.lightGray = 0x100
+colors.lightGrey = 0x100
 colors.cyan = 0x200
 colors.purple = 0x400
 colors.blue = 0x800
@@ -64,28 +66,6 @@ colors.green = 0x2000
 colors.red = 0x4000
 colors.black = 0x8000
 
-colors.combine = function(...)
-    local ret = 0
-    for _, c in ipairs(...) do
-        ret = bor(ret, c)
-    end
-    return ret
-end
-
-local function containsCol(target, cccol)
-    return bit32.band(target, cccol) > 0
-end
-
-colors.subtract = function(cccol, ...)
-    for _, c in ipairs(...) do
-        if not containsCol(cccol, c) then
-            cccol = bit32.bxor(cccol, c)
-        end
-    end
-    return cccol
-end
-
-
 local function normaliseCCcol(cccol)
     if cccol >= 0x1 and cccol <= 0xFFFF then
         return intLog2(cccol)
@@ -93,6 +73,9 @@ local function normaliseCCcol(cccol)
         error("invalid CC Colors: "..cccol)
     end
 end
+
+
+_G.colours = _G.colors
 
 
 --------------
@@ -172,6 +155,7 @@ fs.copy = function(a, b) fs.cp(a, b) end
 fs.delete = function(p) fs.rm(p) end
 fs.combine = function(a, b) return fs.concat(a, b) end
 fs.getDir = function(p) return fs.parent(p) end
+fs.run = function(p) fs.dofile(p) end
 
 
 ------------------

@@ -24,25 +24,28 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
     init {
         // load things. WARNING: THIS IS MANUAL!
         globals["fs"] = LuaValue.tableOf()
-        globals["fs"]["list"] = ListFiles(computer)
-        globals["fs"]["exists"] = FileExists(computer)
-        globals["fs"]["isDir"] = IsDirectory(computer)
+        globals["fs"]["list"] = ListFiles(computer) // CC compliant
+        globals["fs"]["exists"] = FileExists(computer) // CC/OC compliant
+        globals["fs"]["isDir"] = IsDirectory(computer) // CC compliant
         globals["fs"]["isFile"] = IsFile(computer)
-        globals["fs"]["isReadOnly"] = IsReadOnly(computer)
-        globals["fs"]["getSize"] = GetSize(computer)
-        globals["fs"]["listFiles"] = ListFiles(computer)
+        globals["fs"]["isReadOnly"] = IsReadOnly(computer) // CC compliant
+        globals["fs"]["getSize"] = GetSize(computer) // CC compliant
         globals["fs"]["mkdir"] = Mkdir(computer)
         globals["fs"]["mv"] = Mv(computer)
         globals["fs"]["cp"] = Cp(computer)
         globals["fs"]["rm"] = Rm(computer)
-        globals["fs"]["concat"] = ConcatPath(computer)
-        globals["fs"]["open"] = OpenFile(computer)
+        globals["fs"]["concat"] = ConcatPath(computer) // OC compliant
+        globals["fs"]["open"] = OpenFile(computer) //CC compliant
         globals["fs"]["parent"] = GetParentDir(computer)
-        globals["__haltsystemexplicit__"] = HaltComputer(computer)
-        // fs.run defined in ROMLIB
+        // fs.dofile defined in ROMLIB
     }
 
     companion object {
+        fun ensurePathSanity(path: LuaValue) {
+            if (path.checkIBM437().contains(Regex("""\.\.""")))
+                throw LuaError("'..' on path is not supported.")
+        }
+
         val isCaseInsensitive: Boolean
             get() {
                 // TODO add: force case insensitive in config
@@ -72,7 +75,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
 
         fun isValidFilename(name: String) = !name.contains(invalidChars)
 
-        fun validatePath(path: String): String {
+        fun validatePath(path: String) : String {
             if (!isValidFilename(path)) {
                 throw IOException("path contains invalid characters")
             }
@@ -82,7 +85,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         /** actual directory: <appdata>/Saves/<savename>/computers/<drivename>/
          * directs media/ directory to /<uuid> directory
          */
-        fun BaseTerrarumComputer.getRealPath(luapath: LuaValue): String {
+        fun BaseTerrarumComputer.getRealPath(luapath: LuaValue) : String {
             // direct mounted paths to real path
             val computerDir = Terrarum.currentSaveDir.absolutePath + "/computers/"
             /* if not begins with "(/?)media/", direct to boot
@@ -96,7 +99,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
              */
             
             // remove first '/' in path
-            var path = luapath.checkjstring()
+            var path = luapath.checkIBM437()
             if (path.startsWith('/')) path = path.substring(1)
             // replace '\' with '/'
             path.replace('\\', '/')
@@ -111,7 +114,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
             }
         }
 
-        fun combinePath(base: String, local: String): String {
+        fun combinePath(base: String, local: String) : String {
             return "$base$local".replace("//", "/").replace("\\\\", "\\")
         }
     }
@@ -121,8 +124,10 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
      *
      * actual directory: <appdata>/Saves/<savename>/computers/<drivename>/
      */
-    class ListFiles(val computer: BaseTerrarumComputer): OneArgFunction() {
-        override fun call(path: LuaValue): LuaValue {
+    class ListFiles(val computer: BaseTerrarumComputer) : OneArgFunction() {
+        override fun call(path: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(path)
+
             val table = LuaTable()
             val file = File(computer.getRealPath(path))
             file.list().forEachIndexed { i, s -> table.insert(i, LuaValue.valueOf(s)) }
@@ -130,33 +135,43 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         }
     }
 
-    class FileExists(val computer: BaseTerrarumComputer): OneArgFunction() {
-        override fun call(path: LuaValue): LuaValue {
+    class FileExists(val computer: BaseTerrarumComputer) : OneArgFunction() {
+        override fun call(path: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(path)
+
             return LuaValue.valueOf(File(computer.getRealPath(path)).exists())
         }
     }
 
-    class IsDirectory(val computer: BaseTerrarumComputer): OneArgFunction() {
-        override fun call(path: LuaValue): LuaValue {
+    class IsDirectory(val computer: BaseTerrarumComputer) : OneArgFunction() {
+        override fun call(path: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(path)
+
             return LuaValue.valueOf(File(computer.getRealPath(path)).isDirectory)
         }
     }
 
-    class IsFile(val computer: BaseTerrarumComputer): OneArgFunction() {
-        override fun call(path: LuaValue): LuaValue {
+    class IsFile(val computer: BaseTerrarumComputer) : OneArgFunction() {
+        override fun call(path: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(path)
+
             return LuaValue.valueOf(File(computer.getRealPath(path)).isFile)
         }
     }
 
-    class IsReadOnly(val computer: BaseTerrarumComputer): OneArgFunction() {
-        override fun call(path: LuaValue): LuaValue {
+    class IsReadOnly(val computer: BaseTerrarumComputer) : OneArgFunction() {
+        override fun call(path: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(path)
+
             return LuaValue.valueOf(!File(computer.getRealPath(path)).canWrite())
         }
     }
 
     /** we have 4GB file size limit */
-    class GetSize(val computer: BaseTerrarumComputer): OneArgFunction() {
-        override fun call(path: LuaValue): LuaValue {
+    class GetSize(val computer: BaseTerrarumComputer) : OneArgFunction() {
+        override fun call(path: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(path)
+
             return LuaValue.valueOf(File(computer.getRealPath(path)).length().toInt())
         }
     }
@@ -166,8 +181,10 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
     /**
      * difference with ComputerCraft: it returns boolean, true on successful.
      */
-    class Mkdir(val computer: BaseTerrarumComputer): OneArgFunction() {
-        override fun call(path: LuaValue): LuaValue {
+    class Mkdir(val computer: BaseTerrarumComputer) : OneArgFunction() {
+        override fun call(path: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(path)
+
             return LuaValue.valueOf(File(computer.getRealPath(path)).mkdir())
         }
     }
@@ -175,14 +192,17 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
     /**
      * moves a directory, overwrites the target
      */
-    class Mv(val computer: BaseTerrarumComputer): TwoArgFunction() {
-        override fun call(from: LuaValue, to: LuaValue): LuaValue {
+    class Mv(val computer: BaseTerrarumComputer) : TwoArgFunction() {
+        override fun call(from: LuaValue, to: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(from)
+            Filesystem.ensurePathSanity(to)
+
             val fromFile = File(computer.getRealPath(from))
-            fromFile.copyRecursively(
+            var success = fromFile.copyRecursively(
                     File(computer.getRealPath(to)), overwrite = true
-            )
-            fromFile.deleteRecursively()
-            return LuaValue.NONE
+            ) // ignore IntelliJ's observation; it's opposite from redundant
+            success = fromFile.deleteRecursively()
+            return LuaValue.valueOf(success)
         }
     }
 
@@ -190,8 +210,11 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
      * copies a directory, overwrites the target
      * difference with ComputerCraft: it returns boolean, true on successful.
      */
-    class Cp(val computer: BaseTerrarumComputer): TwoArgFunction() {
-        override fun call(from: LuaValue, to: LuaValue): LuaValue {
+    class Cp(val computer: BaseTerrarumComputer) : TwoArgFunction() {
+        override fun call(from: LuaValue, to: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(from)
+            Filesystem.ensurePathSanity(to)
+
             return LuaValue.valueOf(
                     File(computer.getRealPath(from)).copyRecursively(
                             File(computer.getRealPath(to)), overwrite = true
@@ -203,17 +226,22 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
     /**
      * difference with ComputerCraft: it returns boolean, true on successful.
      */
-    class Rm(val computer: BaseTerrarumComputer): OneArgFunction() {
-        override fun call(path: LuaValue): LuaValue {
+    class Rm(val computer: BaseTerrarumComputer) : OneArgFunction() {
+        override fun call(path: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(path)
+
             return LuaValue.valueOf(
                     File(computer.getRealPath(path)).deleteRecursively()
             )
         }
     }
 
-    class ConcatPath(val computer: BaseTerrarumComputer): TwoArgFunction() {
-        override fun call(base: LuaValue, local: LuaValue): LuaValue {
-            val combinedPath = combinePath(base.checkjstring(), local.checkjstring())
+    class ConcatPath(val computer: BaseTerrarumComputer) : TwoArgFunction() {
+        override fun call(base: LuaValue, local: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(base)
+            Filesystem.ensurePathSanity(local)
+
+            val combinedPath = combinePath(base.checkIBM437(), local.checkIBM437())
             return LuaValue.valueOf(combinedPath)
         }
     }
@@ -244,9 +272,13 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
      *      writeBytes = function(string as bytearray)
      * }
      */
-    class OpenFile(val computer: BaseTerrarumComputer): TwoArgFunction() {
-        override fun call(path: LuaValue, mode: LuaValue): LuaValue {
-            val mode = mode.checkjstring().toLowerCase()
+    class OpenFile(val computer: BaseTerrarumComputer) : TwoArgFunction() {
+        override fun call(path: LuaValue, mode: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(path)
+
+            
+
+            val mode = mode.checkIBM437().toLowerCase()
             val luaClass = LuaTable()
             val file = File(computer.getRealPath(path))
 
@@ -254,6 +286,9 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
                 throw LuaError("Cannot open file for " +
                                "${if (mode.startsWith('w')) "read" else "append"} mode" +
                                ": is readonly.")
+
+
+
 
             when (mode) {
                 "r"  -> {
@@ -312,9 +347,11 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         }
     }
 
-    class GetParentDir(val computer: BaseTerrarumComputer): OneArgFunction() {
-        override fun call(path: LuaValue): LuaValue {
-            var pathSB = StringBuilder(path.checkjstring())
+    class GetParentDir(val computer: BaseTerrarumComputer) : OneArgFunction() {
+        override fun call(path: LuaValue) : LuaValue {
+            Filesystem.ensurePathSanity(path)
+
+            var pathSB = StringBuilder(path.checkIBM437())
 
             // backward travel, drop chars until '/' has encountered
             while (!pathSB.endsWith('/') && !pathSB.endsWith('\\'))
@@ -328,22 +365,13 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         }
     }
 
-    class HaltComputer(val computer: BaseTerrarumComputer): ZeroArgFunction() {
-        override fun call(): LuaValue {
-            computer.isHalted = true
-            computer.luaJ_globals.load("""print("system halted.")""", "=").call()
-            return LuaValue.NONE
-        }
-    }
-
-
 
     //////////////////////////////
     // OpenFile implementations //
     //////////////////////////////
 
-    private class FileClassClose(val fo: Any): ZeroArgFunction() {
-        override fun call(): LuaValue {
+    private class FileClassClose(val fo: Any) : ZeroArgFunction() {
+        override fun call() : LuaValue {
             if (fo is FileOutputStream)
                 fo.close()
             else if (fo is FileWriter)
@@ -359,16 +387,16 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         }
     }
 
-    private class FileClassWriteByte(val fos: FileOutputStream): OneArgFunction() {
-        override fun call(byte: LuaValue): LuaValue {
+    private class FileClassWriteByte(val fos: FileOutputStream) : OneArgFunction() {
+        override fun call(byte: LuaValue) : LuaValue {
             fos.write(byte.checkint())
 
             return LuaValue.NONE
         }
     }
 
-    private class FileClassWriteBytes(val fos: FileOutputStream): OneArgFunction() {
-        override fun call(byteString: LuaValue): LuaValue {
+    private class FileClassWriteBytes(val fos: FileOutputStream) : OneArgFunction() {
+        override fun call(byteString: LuaValue) : LuaValue {
             val byteString = byteString.checkIBM437()
             val bytearr = ByteArray(byteString.length, { byteString[it].toByte() })
             fos.write(bytearr)
@@ -377,24 +405,24 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         }
     }
 
-    private class FileClassPrintText(val fw: FileWriter): OneArgFunction() {
-        override fun call(string: LuaValue): LuaValue {
+    private class FileClassPrintText(val fw: FileWriter) : OneArgFunction() {
+        override fun call(string: LuaValue) : LuaValue {
             val text = string.checkIBM437()
             fw.write(text)
             return LuaValue.NONE
         }
     }
 
-    private class FileClassPrintlnText(val fw: FileWriter): OneArgFunction() {
-        override fun call(string: LuaValue): LuaValue {
+    private class FileClassPrintlnText(val fw: FileWriter) : OneArgFunction() {
+        override fun call(string: LuaValue) : LuaValue {
             val text = string.checkIBM437() + "\n"
             fw.write(text)
             return LuaValue.NONE
         }
     }
 
-    private class FileClassFlush(val fo: Any): ZeroArgFunction() {
-        override fun call(): LuaValue {
+    private class FileClassFlush(val fo: Any) : ZeroArgFunction() {
+        override fun call() : LuaValue {
             if (fo is FileOutputStream)
                 fo.flush()
             else if (fo is FileWriter)
@@ -406,31 +434,31 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         }
     }
 
-    private class FileClassReadByte(val fis: FileInputStream): ZeroArgFunction() {
-        override fun call(): LuaValue {
+    private class FileClassReadByte(val fis: FileInputStream) : ZeroArgFunction() {
+        override fun call() : LuaValue {
             val readByte = fis.read()
             return if (readByte == -1) LuaValue.NIL else LuaValue.valueOf(readByte)
         }
     }
 
-    private class FileClassReadAllBytes(val path: Path): ZeroArgFunction() {
-        override fun call(): LuaValue {
+    private class FileClassReadAllBytes(val path: Path) : ZeroArgFunction() {
+        override fun call() : LuaValue {
             val byteArr = Files.readAllBytes(path)
             val s: String = java.lang.String(byteArr, "IBM437").toString()
             return LuaValue.valueOf(s)
         }
     }
 
-    private class FileClassReadAll(val path: Path): ZeroArgFunction() {
-        override fun call(): LuaValue {
+    private class FileClassReadAll(val path: Path) : ZeroArgFunction() {
+        override fun call() : LuaValue {
             return FileClassReadAllBytes(path).call()
         }
     }
 
-    private class FileClassReadLine(val fr: FileReader): ZeroArgFunction() {
+    private class FileClassReadLine(val fr: FileReader) : ZeroArgFunction() {
         val scanner = Scanner(fr.readText()) // no closing; keep the scanner status persistent
 
-        override fun call(): LuaValue {
+        override fun call() : LuaValue {
             return if (scanner.hasNextLine()) LuaValue.valueOf(scanner.nextLine())
                    else LuaValue.NIL
         }

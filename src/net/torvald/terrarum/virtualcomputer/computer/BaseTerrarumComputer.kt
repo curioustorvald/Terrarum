@@ -3,13 +3,16 @@ package net.torvald.terrarum.virtualcomputer.computer
 import li.cil.repack.org.luaj.vm2.Globals
 import li.cil.repack.org.luaj.vm2.LuaError
 import li.cil.repack.org.luaj.vm2.LuaValue
+import li.cil.repack.org.luaj.vm2.lib.ZeroArgFunction
 import li.cil.repack.org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.virtualcomputer.luaapi.Filesystem
+import net.torvald.terrarum.virtualcomputer.luaapi.HostAccessProvider
 import net.torvald.terrarum.virtualcomputer.luaapi.Security
 import net.torvald.terrarum.virtualcomputer.luaapi.Term
 import net.torvald.terrarum.virtualcomputer.terminal.*
+import net.torvald.terrarum.virtualcomputer.worldobject.ComputerPartsCodex
 import net.torvald.terrarum.virtualcomputer.worldobject.FixtureComputerBase
 import org.newdawn.slick.GameContainer
 import java.io.*
@@ -22,7 +25,9 @@ import java.io.*
  * @param term : terminal that is connected to the computer fixtures, null if not connected any.
  * Created by minjaesong on 16-09-10.
  */
-class BaseTerrarumComputer(term: Teletype? = null) {
+class BaseTerrarumComputer(val term: Teletype? = null) {
+
+    val DEBUG_UNLIMITED_MEM = false
 
     val luaJ_globals: Globals = JsePlatform.standardGlobals()
 
@@ -33,6 +38,20 @@ class BaseTerrarumComputer(term: Teletype? = null) {
     var termIn: InputStream? = null
         private set
 
+    val processorCycle: Int // number of Lua statement to process per tick (1/100 s)
+        get() = ComputerPartsCodex.getProcessorCycles(computerValue.getAsInt("processor") ?: 0)
+    val memSize: Int // max: 8 GB
+        get() {
+            if (DEBUG_UNLIMITED_MEM) return 1.shl(30)// 1 GB
+
+            var size = 0
+            for (i in 0..3)
+                size += ComputerPartsCodex.getRamSize(computerValue.getAsInt("memSlot$i") ?: 0)
+
+            return 16.shl(20)
+            return size
+        }
+
     val UUID = java.util.UUID.randomUUID().toString()
 
     val computerValue = KVHashMap()
@@ -40,7 +59,7 @@ class BaseTerrarumComputer(term: Teletype? = null) {
     var isHalted = false
 
     init {
-        computerValue["memslot0"] = -1 // -1 indicates mem slot is empty
+        computerValue["memslot0"] = 4864 // -1 indicates mem slot is empty
         computerValue["memslot1"] = -1 // put index of item here
         computerValue["memslot2"] = -1 // ditto.
         computerValue["memslot3"] = -1 // do.
@@ -77,11 +96,15 @@ class BaseTerrarumComputer(term: Teletype? = null) {
             Term(luaJ_globals, term)
             Security(luaJ_globals)
             Filesystem(luaJ_globals, this)
+            HostAccessProvider(luaJ_globals, this)
         }
 
         // ROM BASIC
-        val inputStream = javaClass.getResourceAsStream("/net/torvald/terrarum/virtualcomputer/assets/lua/ROMBASIC.lua")
-        runCommand(InputStreamReader(inputStream), "rombasic")
+        val inputStream = javaClass.getResourceAsStream("/net/torvald/terrarum/virtualcomputer/assets/lua/BOOT.lua")
+        runCommand(InputStreamReader(inputStream), "=boot")
+
+        // computer-related global functions
+        luaJ_globals["getTotalMem"] = LuaFunGetTotalMem(this)
     }
 
     var threadTimer = 0
@@ -102,6 +125,10 @@ class BaseTerrarumComputer(term: Teletype? = null) {
                 unsetThreadRun()
             }
         }
+    }
+
+    fun keyPressed(key: Int, c: Char) {
+
     }
 
     var currentExecutionThread = Thread()
@@ -165,10 +192,14 @@ class BaseTerrarumComputer(term: Teletype? = null) {
                 lua.STDERR.println("${SimpleTextTerminal.ASCII_DLE}${e.message}${SimpleTextTerminal.ASCII_DC4}")
                 if (DEBUGTHRE) e.printStackTrace(System.err)
             }
-
-            lua.load("_COMPUTER.prompt()").call()
         }
 
         val DEBUGTHRE = true
+    }
+
+    class LuaFunGetTotalMem(val computer: BaseTerrarumComputer) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return LuaValue.valueOf(computer.memSize)
+        }
     }
 }

@@ -6,15 +6,107 @@
 -- ALIASES --
 -------------
 
-fs.run = function(p)
+fs.dofile = function(p)
     local f = fs.open(p, "r")
     local s = f.readAll()
-    load(s)()
+    _G.runscript(s, "="..p)
 end
 
 _G.loadstring = _G.load
 
 _G.print = term.print
+
+--_G.dofile = function(f) fs.dofile(f) end
+
+
+-----------------------------------------
+-- INPUTSTREAM AND SCANNER (java-like) --
+-----------------------------------------
+--[[
+In whatever code that actually runs everything (computer),
+  there must be:
+
+override fun keyPressed(key: Int, c: Char) {
+    super.keyPressed(key, c)
+    vt.keyPressed(key, c)
+
+    if (key == Key.RETURN) {
+        val input = vt.closeInputString()
+    }
+}
+
+...it basically says to close the input if RETURN is hit,
+  and THIS exact part will close the input for this function.
+]]
+_G.__scanForLine__ = function()
+    native.closeInputString()
+    native.openInput()
+    _G.__scanMode__ = "line"
+    local s
+    repeat -- we can do this ONLY IF lua execution process is SEPARATE THREAD
+        s = native.getLastStreamInput()
+    until s
+    -- input is closed when RETURN is hit. See above comments.
+    return s
+end
+
+-- use Keys API to identify the keycode
+_G.__scanForChar__ = function()
+    native.closeInputString()
+    native.openInput()
+    _G.__scanMode__ = "a_key"
+    local key
+    repeat -- we can do this ONLY IF lua execution process is SEPARATE THREAD
+        key = native.getLastKeyPress()
+    until key
+    -- input is closed when any key is hit. See above comments.
+    return key
+end
+
+io.read = _G.__scanForLine__
+
+
+-----------------
+-- PRINTSTREAM --
+-----------------
+
+io.write = function(...)
+    local args = {...}
+    for _, v in ipairs(args) do
+        local s = tostring(v)
+        term.write(s)
+    end
+end
+-- for some reason, inputstream above kills 'print' function.
+-- So we rewrite it.
+_G.print = function(...)
+    local args = {...}
+
+    io.write(args[1])
+
+    if (#args > 1) then
+        for i = 2, #args do
+            io.write("\t")
+            io.write(args[i])
+        end
+    end
+
+    io.write("\n")
+end
+
+
+---------------
+-- SHELL API --
+---------------
+
+_G.shell = {}
+shell.status = shell.ok
+
+shell.run = function(p) fs.dofile(p) end
+
+
+shell.ok = 0
+shell.halt = 127
 
 
 --------------
@@ -60,20 +152,6 @@ _G.hexutils.toHexString = function(byteString)
 
     return ret
 end
-
-
----------------
--- SHELL API --
----------------
-
-_G.shell = {}
-shell.status = shell.ok
-
-shell.run = function(p) fs.run(p) end
-
-
-shell.ok = 0
-shell.halt = 127
 
 
 --------------

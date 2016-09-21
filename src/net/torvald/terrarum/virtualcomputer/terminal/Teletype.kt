@@ -34,5 +34,12 @@ interface Teletype {
     fun newLine()
     fun scroll(amount: Int = 1)
 
+    fun openInput()
+    fun closeInputKey(keyFromUI: Int): Int
+    fun closeInputString(): String
+
     fun bell(pattern: String = ".")
+
+    var lastStreamInput: String?
+    var lastKeyPress: Int?
 }

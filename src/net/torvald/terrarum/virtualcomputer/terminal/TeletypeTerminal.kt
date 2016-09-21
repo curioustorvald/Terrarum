@@ -134,18 +134,31 @@ class TeletypeTerminal : Teletype {
     /**
      * Technically, this is different from Java's InputStream
      */
-    fun openInput() {
+    override fun openInput() {
+        lastStreamInput = null
+        lastKeyPress = null
         inputOpen = true
-        if (DEBUG) println("[SimpleTextTerminal] openInput()")
+        if (DEBUG) println("[TeletypeTerminal] openInput()")
     }
 
-    fun closeInput(): String {
+    override fun closeInputKey(keyFromUI: Int): Int {
         inputOpen = false
-        val ret = sb.toString()
+        lastKeyPress = keyFromUI
+
+        if (DEBUG) println("[TeletypeTerminal] closeInputKey(), $keyFromUI")
+        return keyFromUI
+    }
+
+    override var lastStreamInput: String? = null
+    override var lastKeyPress: Int? = null
+
+    override fun closeInputString(): String {
+        inputOpen = false
+        lastStreamInput = sb.toString()
         sb = StringBuilder()
 
-        if (DEBUG) println("[SimpleTextTerminal] closeInput(), $ret")
-        return ret
+        if (DEBUG) println("[TeletypeTerminal] closeInputString(), $lastStreamInput")
+        return lastStreamInput!!
     }
 
     override fun keyPressed(key: Int, c: Char) {

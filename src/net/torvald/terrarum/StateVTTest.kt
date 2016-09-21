@@ -19,7 +19,7 @@ import org.newdawn.slick.state.StateBasedGame
  */
 class StateVTTest : BasicGameState() {
 
-    val vt = SimpleTextTerminal(SimpleTextTerminal.WHITE, 80, 25, colour = true)
+    val vt = SimpleTextTerminal(SimpleTextTerminal.IBM_GREEN, 80, 25, colour = false)
     val computerInside = BaseTerrarumComputer(vt)
 
     val vtUI = Image(vt.displayW, vt.displayH)
@@ -29,7 +29,7 @@ class StateVTTest : BasicGameState() {
     }
 
     override fun init(container: GameContainer, game: StateBasedGame) {
-        vt.openInput()
+        //vt.openInput()
     }
 
     override fun update(container: GameContainer, game: StateBasedGame, delta: Int) {
@@ -57,15 +57,13 @@ class StateVTTest : BasicGameState() {
         super.keyPressed(key, c)
         vt.keyPressed(key, c)
 
-        if (key == Key.RETURN) {
-            val input = vt.closeInput()
-
-            computerInside.runCommand(input, "=prompt")
-
-            vt.openInput()
-
-            if (!computerInside.isHalted)
-                computerInside.runCommand("io.write(_COMPUTER.prompt)", "=prompt")
+        if (!computerInside.isHalted) {
+            if (key == Key.RETURN && computerInside.luaJ_globals["__scanMode__"].checkjstring() == "line") {
+                vt.closeInputString() // cut input by pressing Key.RETURN
+            }
+            else if (computerInside.luaJ_globals["__scanMode__"].checkjstring() == "a_key") {
+                vt.closeInputKey(key) // cut input by pressing any key
+            }
         }
     }
 }
