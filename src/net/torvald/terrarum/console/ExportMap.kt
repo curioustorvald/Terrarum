@@ -67,7 +67,7 @@ class ExportMap : ConsoleCommand {
     override fun printUsage() {
         val echo = Echo()
         echo.execute("Usage: export <name>")
-        echo.execute("Exports current map into visible image.")
+        echo.execute("Exports current map into echo image.")
         echo.execute("The image can be found at %adddata%/terrarum/Exports")
     }
 

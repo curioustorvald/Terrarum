@@ -253,7 +253,7 @@ constructor() : BasicGameState() {
         // draw actors //
         /////////////////
         actorContainer.forEach { actor ->
-            if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
+            if (actor is Visible && actor.inScreen() && actor !is Player) { // if echo and within screen
                 actor.drawBody(gc, g)
             }
         }
@@ -281,7 +281,7 @@ constructor() : BasicGameState() {
         // draw actor glows //
         //////////////////////
         actorContainer.forEach { actor ->
-            if (actor is Visible && actor.inScreen() && actor !is Player) { // if visible and within screen
+            if (actor is Visible && actor.inScreen() && actor !is Player) { // if echo and within screen
                 actor.drawGlow(gc, g)
             }
         }

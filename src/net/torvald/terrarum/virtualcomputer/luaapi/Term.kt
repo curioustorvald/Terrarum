@@ -32,11 +32,15 @@ internal class Term(globals: Globals, term: Teletype) {
             globals["term"]["resetColour"] = Term.ResetColour(term)
             globals["term"]["clear"] = Term.Clear(term)
             globals["term"]["clearLine"] = Term.ClearLine(term)
+            globals["term"]["setCursor"] = Term.SetCursor(term)
             globals["term"]["getCursor"] = Term.GetCursorPos(term)
             globals["term"]["getX"] = Term.GetCursorX(term)
             globals["term"]["getY"] = Term.GetCursorY(term)
+            globals["term"]["setX"] = Term.SetCursorX(term)
+            globals["term"]["setY"] = Term.SetCursorY(term)
             globals["term"]["blink"] = Term.SetCursorBlink(term)
             globals["term"]["size"] = Term.GetSize(term)
+            globals["term"]["height"] = Term.GetHeight(term)
             globals["term"]["isCol"] = Term.IsColour(term)
             globals["term"]["setForeCol"] = Term.SetForeColour(term)
             globals["term"]["setBackCol"] = Term.SetBackColour(term)
@@ -100,21 +104,21 @@ internal class Term(globals: Globals, term: Teletype) {
 
     class EmitRaw(val term: Terminal) : ThreeArgFunction() {
         override fun call(p0: LuaValue, x: LuaValue, y: LuaValue): LuaValue {
-            term.emitChar(p0.checkint(), x.checkint(), y.checkint())
+            term.emitChar(p0.checkint(), x.checkint() - 1, y.checkint() - 1)
             return LuaValue.NONE
         }
     }
 
     class Emit(val term: Terminal) : ThreeArgFunction() {
         override fun call(p0: LuaValue, x: LuaValue, y: LuaValue): LuaValue {
-            term.emitChar(p0.checkint().toChar(), x.checkint(), y.checkint())
+            term.emitChar(p0.checkint().toChar(), x.checkint() - 1, y.checkint() - 1)
             return LuaValue.NONE
         }
     }
 
     class EmitString(val term: Terminal) : ThreeArgFunction() {
         override fun call(p0: LuaValue, x: LuaValue, y: LuaValue): LuaValue {
-            term.emitString(p0.checkIBM437(), x.checkint(), y.checkint())
+            term.emitString(p0.checkIBM437(), x.checkint() - 1, y.checkint() - 1)
             return LuaValue.NONE
         }
     }
@@ -140,19 +144,18 @@ internal class Term(globals: Globals, term: Teletype) {
         }
     }
 
-    /** term.setCursorPos(number x, number y), One-based */
-    class SetCursorPos(val term: Terminal) : TwoArgFunction() {
-        override fun call(x: LuaValue, y: LuaValue): LuaValue {
-            term.setCursor(x.checkint() - 1, y.checkint() - 1)
-            return LuaValue.NONE
-        }
-    }
-
     /** term.setCursorPos(number x) */
     class MoveCursor(val tty: Teletype) : OneArgFunction() {
         override fun call(p0: LuaValue): LuaValue {
             for (i in 1..p0.checkint())
                 tty.printChar(' ')
+            return LuaValue.NONE
+        }
+    }
+
+    class SetCursor(val term: Terminal) : TwoArgFunction() {
+        override fun call(x: LuaValue, y: LuaValue): LuaValue {
+            term.setCursor(x.checkint() - 1, y.checkint() - 1)
             return LuaValue.NONE
         }
     }
@@ -177,6 +180,20 @@ internal class Term(globals: Globals, term: Teletype) {
         }
     }
 
+    class SetCursorX(val term: Terminal) : OneArgFunction() {
+        override fun call(p0: LuaValue): LuaValue {
+            term.setCursor(p0.checkint() - 1, term.cursorY)
+            return LuaValue.NONE
+        }
+    }
+
+    class SetCursorY(val term: Terminal) : OneArgFunction() {
+        override fun call(p0: LuaValue): LuaValue {
+            term.setCursor(term.cursorX - 1, p0.checkint())
+            return LuaValue.NONE
+        }
+    }
+
     /** term.setCursorBlink(boolean bool) */
     class SetCursorBlink(val term: Terminal) : OneArgFunction() {
         override fun call(p0: LuaValue): LuaValue {
@@ -195,6 +212,12 @@ internal class Term(globals: Globals, term: Teletype) {
     class GetWidth(val tty: Teletype) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(tty.width)
+        }
+    }
+
+    class GetHeight(val terminal: Terminal) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return LuaValue.valueOf(terminal.height)
         }
     }
 

@@ -38,6 +38,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         globals["fs"]["open"] = OpenFile(computer) //CC compliant
         globals["fs"]["parent"] = GetParentDir(computer)
         // fs.dofile defined in ROMLIB
+        // fs.fetchText defined in ROMLIB
     }
 
     companion object {
@@ -300,7 +301,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
                     }
                     catch (e: FileNotFoundException) {
                         e.printStackTrace()
-                        throw LuaError("$path: No such file.")
+                        throw LuaError("$path: no such file.")
                     }
                 }
                 "rb" -> {
@@ -312,7 +313,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
                     }
                     catch (e: FileNotFoundException) {
                         e.printStackTrace()
-                        throw LuaError("$path: No such file.")
+                        throw LuaError("$path: no such file.")
                     }
                 }
                 "w", "a"  -> {
@@ -325,7 +326,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
                     }
                     catch (e: FileNotFoundException) {
                         e.printStackTrace()
-                        throw LuaError("$path: Is a directory.")
+                        throw LuaError("$path: is a directory.")
                     }
                 }
                 "wb", "ab" -> {
@@ -338,7 +339,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
                     }
                     catch (e: FileNotFoundException) {
                         e.printStackTrace()
-                        throw LuaError("$path: Is a directory.")
+                        throw LuaError("$path: is a directory.")
                     }
                 }
             }

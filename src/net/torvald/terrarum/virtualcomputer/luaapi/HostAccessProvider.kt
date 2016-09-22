@@ -1,6 +1,7 @@
 package net.torvald.terrarum.virtualcomputer.luaapi
 
 import li.cil.repack.org.luaj.vm2.Globals
+import li.cil.repack.org.luaj.vm2.LuaFunction
 import li.cil.repack.org.luaj.vm2.LuaTable
 import li.cil.repack.org.luaj.vm2.LuaValue
 import li.cil.repack.org.luaj.vm2.lib.OneArgFunction
@@ -61,9 +62,14 @@ internal class HostAccessProvider(globals: Globals, computer: BaseTerrarumComput
         }
     }
 
-    class NativeOpenInput(val term: Teletype) : ZeroArgFunction() {
+    class NativeOpenInput(val term: Teletype) : LuaFunction() {
         override fun call(): LuaValue {
-            term.openInput()
+            term.openInput(true)
+            return LuaValue.NONE
+        }
+
+        override fun call(echo: LuaValue): LuaValue {
+            term.openInput(if (echo.checkint() == 1) false else true)
             return LuaValue.NONE
         }
     }

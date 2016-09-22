@@ -6,10 +6,10 @@
 -- ALIASES --
 -------------
 
-fs.dofile = function(p)
+fs.dofile = function(p, ...)
     local f = fs.open(p, "r")
     local s = f.readAll()
-    _G.runscript(s, "="..p)
+    _G.runscript(s, "="..p, ...)
 end
 
 _G.loadstring = _G.load
@@ -18,6 +18,15 @@ _G.print = term.print
 
 --_G.dofile = function(f) fs.dofile(f) end
 
+_G.boot = function() fs.dofile("/boot/efi") end
+
+
+fs.fetchText = function(p)
+    local file = fs.open(p, "r")
+    local text = file.readAll()
+    file.close()
+    return text
+end
 
 -----------------------------------------
 -- INPUTSTREAM AND SCANNER (java-like) --
@@ -38,9 +47,9 @@ override fun keyPressed(key: Int, c: Char) {
 ...it basically says to close the input if RETURN is hit,
   and THIS exact part will close the input for this function.
 ]]
-_G.__scanForLine__ = function()
+_G.__scanforline__ = function(echo) -- pass '1' to not echo; pass nothing to echo
     native.closeInputString()
-    native.openInput()
+    native.openInput(echo or 0)
     _G.__scanMode__ = "line"
     local s
     repeat -- we can do this ONLY IF lua execution process is SEPARATE THREAD
@@ -51,9 +60,9 @@ _G.__scanForLine__ = function()
 end
 
 -- use Keys API to identify the keycode
-_G.__scanForChar__ = function()
+_G.__scanforchar__ = function(echo) -- pass '1' to not echo; pass nothing to echo
     native.closeInputString()
-    native.openInput()
+    native.openInput(echo or 0)
     _G.__scanMode__ = "a_key"
     local key
     repeat -- we can do this ONLY IF lua execution process is SEPARATE THREAD
@@ -63,7 +72,7 @@ _G.__scanForChar__ = function()
     return key
 end
 
-io.read = _G.__scanForLine__
+io.read = _G.__scanforline__
 
 
 -----------------

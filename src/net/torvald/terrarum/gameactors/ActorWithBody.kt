@@ -14,7 +14,7 @@ import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 
 /**
- * Base class for every actor that has physical (or visible) body. This includes furnishings, paintings, gadgets, etc.
+ * Base class for every actor that has physical (or echo) body. This includes furnishings, paintings, gadgets, etc.
  *
  * Created by minjaesong on 16-03-14.
  */
@@ -959,7 +959,7 @@ open class ActorWithBody : Actor(), Visible {
 
         // warnings
         if (sprite == null && isVisible)
-            println("[ActorWithBody] Caution: actor ${this.javaClass.simpleName} is visible but the sprite was not set.")
+            println("[ActorWithBody] Caution: actor ${this.javaClass.simpleName} is echo but the sprite was not set.")
         else if (sprite != null && !isVisible)
             println("[ActorWithBody] Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
 

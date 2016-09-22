@@ -130,9 +130,11 @@ The path for the argument of functions blocks `\,.\,.\,' to be entered, preventi
 	\\ \\
 	fs.open(\textbf{path}: string, \textbf{mode}: string) & file & Opens file and returns its handle. See section \emph{File Handler} for details.
 	\\ \\
+	fs.parent(\textbf{path}: string) & string & Returs parent directory to the \textbf{path}.
+	\\ \\
 	fs.dofile(\textbf{path}: string) & nil & Loads the script on \textbf{path} and executes it.
 	\\ \\
-	fs.parent(\textbf{path}: string) & string & Returs parent directory to the \textbf{path}.
+	fs.fetchText(\textbf{path}: string) & string & Opens the file on \textbf{path} and returns its contents as a plain text.
 \end{tabularx}
 
 \subsection{File Handler}
@@ -226,6 +228,8 @@ The Terminal API provides functions for sending text to the terminals, and drawi
 
 \subsection{Functions}
 
+Note: cursor coordinates starts from one, not zero.
+
 \begin{tabularx}{\textwidth}{l l X}
 	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
 	\\ \\
@@ -236,9 +240,9 @@ The Terminal API provides functions for sending text to the terminals, and drawi
 	\\ \\
 	term.newLine() & nil & Make a new line.
 	\\ \\
-	term.moveCursor(\textbf{x}: int, \textbf{y}: int) & nil & Moves cursor to (\textbf{x}, \textbf{y}), starting from 1.
+	term.moveCursor(\textbf{x}: int) & nil & Moves cursor horizontally, starting from 1.
 	\\ \\
-	term.width() & int & Returns the width of the terminal. Meant to be used with teletypes.
+	term.width() & int & Returns the width of the terminal. Graphic terminals also can use this.
 	\\ \\
 	term.scroll(\textbf{n}: int) & nil & Make a new line \textbf{n} times.
 	\\ \\
@@ -258,15 +262,23 @@ The Terminal API provides functions for sending text to the terminals, and drawi
 	\\ \\
 	term.clearLine() & nil & Clears current line on the screen buffer, does not moves cursor.
 	\\ \\
+	term.setCursor(\textbf{x}: int, \textbf{y}: int) & nil & Moves cursor to (\textbf{x}, \textbf{y})
+	\\ \\
 	term.getCursor() & int, int & Returns current coordinates of the cursor.
 	\\ \\
 	term.getX() & int & Returns X coordinate of the cursor.
 	\\ \\
 	term.getY() & int & Returns Y coordinate of the cursor.
 	\\ \\
+	term.setX(int) & nil & Sets X coordinate of the cursor.
+	\\ \\
+	term.setY(int) & nil & Sets Y coordinate of the cursor.
+	\\ \\
 	term.blink(bool) & nil & Sets cursor blinking. \textbf{true} makes the cursor blink.
 	\\ \\
 	term.size() & int, int & Returns width and height of the terminal.
+	\\ \\
+	term.height() & int & Returns height of the terminal. 
 	\\ \\
 	term.isCol() & bool & Returns if the terminal supports colour.
 	\\ \\

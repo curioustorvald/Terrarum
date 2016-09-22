@@ -670,7 +670,7 @@ object LightmapRenderer {
             var blues = IntArray(MUL) // do.
             val render_width = for_x_end - for_x_start
             val render_height = for_y_end - for_y_start
-            // excluiding overscans; only reckon visible lights
+            // excluiding overscans; only reckon echo lights
             for (y in overscan_open..render_height + overscan_open + 1) {
                 for (x in overscan_open..render_width + overscan_open + 1) {
                     reds[lightmap[y][x].rawR()] += 1

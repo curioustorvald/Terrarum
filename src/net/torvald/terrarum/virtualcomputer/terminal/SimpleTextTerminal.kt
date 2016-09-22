@@ -18,7 +18,8 @@ import java.nio.ByteBuffer
  * Created by minjaesong on 16-09-07.
  */
 open class SimpleTextTerminal(
-        phosphorColour: Color, override val width: Int, override val height: Int, colour: Boolean = false
+        phosphorColour: Color, override val width: Int, override val height: Int,
+        colour: Boolean = false, hires: Boolean = false
 ) : Terminal {
     /**
      * Terminals must support AT LEAST 4 colours.
@@ -73,14 +74,15 @@ open class SimpleTextTerminal(
 
     val screenBuffer = AAFrame(width, height)
 
-    open protected val fontRef = "./assets/graphics/fonts/MDA.png"
+    open protected val fontRef = "./assets/graphics/fonts/${if (hires) "milky.png" else "MDA.png"}"
     open protected val fontImg = Image(fontRef)
     open protected val fontW = fontImg.width / 16
     open protected val fontH = fontImg.height / 16
     open protected val font = ColouredFastFont(this, fontRef, fontW, fontH)
 
-    override val displayW = fontW * width
-    override val displayH = fontH * height
+    private val borderSize = 20
+    override val displayW = fontW * width + 2 * borderSize
+    override val displayH = fontH * height + 2 * borderSize
 
 
     var TABSIZE = 4
@@ -139,20 +141,27 @@ open class SimpleTextTerminal(
 
         blendNormal()
 
+        // black background (this is mandatory)
+        g.color = Color.black
+        g.fillRect(0f, 0f, displayW.toFloat(), displayH.toFloat())
+
+
+        // screen buffer
         for (y in 0..height - 1) {
             for (x in 0..width - 1) {
                 val ch = screenBuffer.getChar(x, y)
 
                 // background
                 g.color = getColor(screenBuffer.getBackgroundColour(x, y))
-                g.fillRect(fontW * x.toFloat(), fontH * y.toFloat(), fontW.toFloat(), fontH.toFloat())
+                g.fillRect(fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize,
+                        fontW.toFloat(), fontH.toFloat())
 
                 // foreground
                 if (ch.toInt() != 0 && ch.toInt() != 32) {
                     g.color = getColor(screenBuffer.getForegroundColour(x, y))
                     g.drawString(
                             Character.toString(ch),
-                            fontW * x.toFloat(), fontH * y.toFloat())
+                            fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize)
                 }
             }
         }
@@ -162,8 +171,8 @@ open class SimpleTextTerminal(
         g.color = getColor(foreDefault)
         if (cursorBlinkOn && cursorBlink)
             g.fillRect(
-                    fontW * cursorX.toFloat(),
-                    fontH * cursorY.toFloat(),
+                    fontW * cursorX.toFloat() + borderSize,
+                    fontH * cursorY.toFloat() + borderSize,
                     fontW.toFloat(),
                     fontH.toFloat()
             )
@@ -258,7 +267,7 @@ open class SimpleTextTerminal(
         setCursor(x, y)
 
         for (i in 0..s.length - 1) {
-            emitChar(s[i])
+            printChar(s[i])
             wrap()
         }
 
@@ -385,13 +394,15 @@ open class SimpleTextTerminal(
     override var lastInputByte: Int = -1
     var sb: StringBuilder = StringBuilder()
     private var inputOpen = false
+    private var keyPressVisible = false
     /**
-     * Technically, this is different from Java's InputStream
+     * @param echo if true, keypresses are echoed to the terminal.
      */
-    override fun openInput() {
+    override fun openInput(echo: Boolean) {
         lastStreamInput = null
         lastKeyPress = null
         inputOpen = true
+        keyPressVisible = echo
         if (DEBUG) println("[SimpleTextTerminal] openInput()")
     }
 
@@ -411,7 +422,8 @@ open class SimpleTextTerminal(
         lastStreamInput = sb.toString()
         sb = StringBuilder()
 
-        if (DEBUG) println("[SimpleTextTerminal] closeInputString(), $lastStreamInput")
+        if (DEBUG)
+            println("[SimpleTextTerminal] closeInputString(), ${if (keyPressVisible) lastStreamInput else "<keypress hidden>"}")
         return lastStreamInput!!
     }
 
@@ -421,7 +433,7 @@ open class SimpleTextTerminal(
         if (inputOpen) {
             if (c == ASCII_CR)
                 printChar(ASCII_LF)
-            else
+            else if (keyPressVisible)
                 printChar(c)
             if (!asciiControlInUse.contains(c)) sb.append(c)
             else if (c == ASCII_DEL && sb.length > 0) sb.deleteCharAt(sb.length - 1)
@@ -437,7 +449,7 @@ open class SimpleTextTerminal(
         val AMBER = Color(255, 183, 0) // P3, 602 nm
         val IBM_GREEN = Color(74, 255, 0) // P39, 525 nm
         val WHITE = Color(228, 234, 255) // P4, 7 500 K
-        val ELECTRIC_BLUE = Color(0, 239, 255) // imaginary, 486 nm
+        val ELECTRIC_BLUE = Color(0, 226, 255) // imaginary, 483 nm
         val RED = Color(250, 0, 0) // <= 645 nm
 
         val ASCII_NUL = 0.toChar()

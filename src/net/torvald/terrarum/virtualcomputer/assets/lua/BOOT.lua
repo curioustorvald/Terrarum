@@ -19,8 +19,8 @@ _G.DLE = string.char(16) -- default error colour
 _G.getMem = function() collectgarbage() return collectgarbage("count") * 1024 end
 -- getTotalMem: implemented in Kotlin class
 _G.getFreeMem = function() return getTotalMem() - getMem() end
-_G.runscript = function(s, env)
-    local code, reason = load(s, env)
+_G.runscript = function(s, source, ...)
+    local code, reason = load(s, source)
 
     if _G.getFreeMem() <= 0 then
         print("out of memory")
@@ -29,9 +29,9 @@ _G.runscript = function(s, env)
     end
 
     if code then
-        xpcall(code, eprint)
+        xpcall(code(...), eprint)
     else
-        print(DLE..tostring(reason))
+        print(DLE..tostring(reason)) -- it catches syntax errors
     end
 end
 _G.__scanMode__ = "UNINIT" -- part of inputstream implementation
@@ -59,16 +59,22 @@ if shell.status == shell.halt then
 end
 
 -- load Lua prompt, if bios is not found
-if (#_COMPUTER.OEM > 0) then print(_COMPUTER.OEM) end
 print("Rom basic "..DC2.._VERSION..DC4)
+print("Copyright (C) 1994-2015 Lua.org, PUC-Rio")
 print(DC2..tostring(math.floor(getFreeMem()/1024+0.5))..DC4.." Kbytes free")
+print("To boot your system, run 'boot()'")
 print("Ok")
 
 while not native.isHalted() do
-    io.write(_COMPUTER.prompt)
-    local s = io.read()
-    runscript(s, "=stdin")
+    while not native.isHalted() do
+        io.write(_COMPUTER.prompt)
+        local s = io.read()
+        xpcall(
+            function() _G.runscript(s, "=stdin") end,
+            function(s) print(DLE..s) end -- it catches logical errors
+        )
+    end
 end
-
 native.closeInputString()
+__haltsystemexplicit__()
 return

@@ -132,9 +132,9 @@ class TeletypeTerminal : Teletype {
     val DEBUG = true
 
     /**
-     * Technically, this is different from Java's InputStream
+     * @param echo if true, keypresses are echoed to the terminal.
      */
-    override fun openInput() {
+    override fun openInput(echo: Boolean) {
         lastStreamInput = null
         lastKeyPress = null
         inputOpen = true
