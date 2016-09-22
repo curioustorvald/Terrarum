@@ -29,7 +29,7 @@ class BaseTerrarumComputer(val term: Teletype? = null) {
 
     val DEBUG_UNLIMITED_MEM = false
 
-    val luaJ_globals: Globals = JsePlatform.standardGlobals()
+    val luaJ_globals: Globals = JsePlatform.debugGlobals()
 
     var termOut: PrintStream? = null
         private set

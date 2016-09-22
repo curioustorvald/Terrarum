@@ -60,7 +60,7 @@ _G.__scanforline__ = function(echo) -- pass '1' to not echo; pass nothing to ech
 end
 
 -- use Keys API to identify the keycode
-_G.__scanforchar__ = function(echo) -- pass '1' to not echo; pass nothing to echo
+_G.__scanforkey__ = function(echo) -- pass '1' to not echo; pass nothing to echo
     native.closeInputString()
     native.openInput(echo or 0)
     _G.__scanMode__ = "a_key"

@@ -38,7 +38,7 @@ internal class Term(globals: Globals, term: Teletype) {
             globals["term"]["getY"] = Term.GetCursorY(term)
             globals["term"]["setX"] = Term.SetCursorX(term)
             globals["term"]["setY"] = Term.SetCursorY(term)
-            globals["term"]["blink"] = Term.SetCursorBlink(term)
+            globals["term"]["setCursorBlink"] = Term.SetCursorBlink(term)
             globals["term"]["size"] = Term.GetSize(term)
             globals["term"]["height"] = Term.GetHeight(term)
             globals["term"]["isCol"] = Term.IsColour(term)

@@ -62,19 +62,17 @@ end
 print("Rom basic "..DC2.._VERSION..DC4)
 print("Copyright (C) 1994-2015 Lua.org, PUC-Rio")
 print(DC2..tostring(math.floor(getFreeMem()/1024+0.5))..DC4.." Kbytes free")
-print("To boot your system, run 'boot()'")
 print("Ok")
 
 while not native.isHalted() do
-    while not native.isHalted() do
-        io.write(_COMPUTER.prompt)
-        local s = io.read()
-        xpcall(
-            function() _G.runscript(s, "=stdin") end,
-            function(s) print(DLE..s) end -- it catches logical errors
-        )
-    end
+    io.write(_COMPUTER.prompt)
+    local s = io.read()
+    xpcall(
+        function() _G.runscript(s, "=stdin") end,
+        function(s) print(DLE..s) end -- it catches logical errors
+    )
 end
+
 native.closeInputString()
 __haltsystemexplicit__()
 return

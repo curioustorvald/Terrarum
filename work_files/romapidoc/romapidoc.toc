@@ -27,3 +27,4 @@
 \contentsline {chapter}{\chapternumberline {4}Peripherals}{27}{chapter.4}
 \contentsline {section}{\numberline {4.1}Line Printer}{28}{section.4.1}
 \contentsline {subsection}{\numberline {4.1.1}Functions}{28}{subsection.4.1.1}
+\contentsline {chapter}{\chapternumberline {5}References}{29}{chapter.5}

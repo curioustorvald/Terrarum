@@ -274,7 +274,7 @@ Note: cursor coordinates starts from one, not zero.
 	\\ \\
 	term.setY(int) & nil & Sets Y coordinate of the cursor.
 	\\ \\
-	term.blink(bool) & nil & Sets cursor blinking. \textbf{true} makes the cursor blink.
+	term.setCursorBlink(bool) & nil & Sets cursor blinking. \textbf{true} makes the cursor blink.
 	\\ \\
 	term.size() & int, int & Returns width and height of the terminal.
 	\\ \\
@@ -464,6 +464,16 @@ Line printers do not work indefinitely; ignoring the obvious depletion of ink, b
 	\\ \\
 	lp.reset() & nil & Resets the line printer.
 \end{tabularx}
+
+\chapter{References}
+
+Some of the texts are taken from following sources:
+
+\begin{itemize}
+\item Lua Manual version 5.2, Lua.org, POC-Rio
+\item ComputerCraft, dan200
+\item OpenComputers, MightyPirates
+\end{itemize}
 
 \afterpage{\pagestyle{empty}\null\newpage}
 
