@@ -106,7 +106,7 @@ class BaseTerrarumComputer(val term: Teletype? = null) {
 
         // secure the sandbox
         luaJ_globals["io"] = LuaValue.NIL
-        // dubug is sandboxed in OpenComputers code
+        // dubug should be sandboxed in BOOT.lua (use OpenComputers code)
         //val sethook = luaJ_globals["debug"]["sethook"]
         //luaJ_globals["debug"] = LuaValue.NIL
 
