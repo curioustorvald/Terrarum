@@ -131,6 +131,9 @@ class BaseTerrarumComputer() {
 
         // computer-related global functions
         luaJ_globals["totalMemory"] = LuaFunGetTotalMem(this)
+
+        luaJ_globals["computer"] = LuaTable()
+        luaJ_globals["emittone"] = ComputerEmitTone(this)
     }
 
     var threadTimer = 0
@@ -233,7 +236,7 @@ class BaseTerrarumComputer() {
         }
     }
 
-    class EmitTone(val computer: BaseTerrarumComputer) : TwoArgFunction() {
+    class ComputerEmitTone(val computer: BaseTerrarumComputer) : TwoArgFunction() {
         override fun call(millisec: LuaValue, freq: LuaValue): LuaValue {
             computer.playTone(millisec.toint(), freq.tofloat())
             return LuaValue.NONE
@@ -251,18 +254,27 @@ class BaseTerrarumComputer() {
 
     /**
      * @param duration : milliseconds
+     * @param rampUp
+     * @param rampDown
+     *
+     *     ,---. (true, true) ,---- (true, false) ----. (false, true) ----- (false, false)
      */
-    private fun makeAudioData(duration: Int, freq: Float): ByteBuffer {
+    private fun makeAudioData(duration: Int, freq: Float,
+                              rampUp: Boolean = true, rampDown: Boolean = true): ByteBuffer {
         val audioData = BufferUtils.createByteBuffer(duration.times(sampleRate).div(1000))
 
         val realDuration = duration * sampleRate / 1000
-        val chopSize = freq * 2f / sampleRate
+        val chopSize = freq / sampleRate
 
         val amp = Math.max(4600f / freq, 1f)
-        val nHarmonics = 2
+        val nHarmonics = if (freq >= 5400) 1
+                         else if (freq >= 3600) 2
+                         else if (freq >= 1800) 3
+                         else 4
 
-        val transitionThre = 2300f
+        val transitionThre = 1150f
 
+        // TODO volume ramping?
         if (freq == 0f) {
             for (x in 0..realDuration - 1) {
                 audioData.put(0x00.toByte())
@@ -270,7 +282,7 @@ class BaseTerrarumComputer() {
         }
         else if (freq < transitionThre) { // chopper generator (for low freq)
             for (x in 0..realDuration - 1) {
-                var sine: Float = amp * FastMath.cos(FastMath.PI * x * chopSize)
+                var sine: Float = amp * FastMath.cos(FastMath.TWO_PI * x * chopSize)
                 if (sine > 1f) sine = 1f
                 else if (sine < -1f) sine = -1f
                 audioData.put(
@@ -281,9 +293,8 @@ class BaseTerrarumComputer() {
         else { // harmonics generator (for high freq)
             for (x in 0..realDuration - 1) {
                 var sine: Float = 0f
-                for (k in 0..nHarmonics) { // mix only odd harmonics to make squarewave
-                    sine += (1f / (2*k + 1)) *
-                            FastMath.sin((2 * k + 1) * FastMath.PI * x * chopSize)
+                for (k in 1..nHarmonics) { // mix only odd harmonics in order to make a squarewave
+                    sine += FastMath.sin(FastMath.TWO_PI * (2*k - 1) * chopSize * x) / (2*k - 1)
                 }
                 audioData.put(
                         (0.5f + 0.5f * sine).times(0xFF).toByte()

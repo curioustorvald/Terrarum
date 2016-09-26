@@ -124,7 +124,7 @@ open class SimpleTextTerminal(
         // complete beep queue
         if (beepCursor >= beepQueue.size) {
             clearBeepQueue()
-            println("!! Beep queue clear")
+            // println("!! Beep queue clear")
         }
 
         // actually play queue
@@ -345,7 +345,7 @@ open class SimpleTextTerminal(
      * @param freg: Frequency (float)
      */
     override fun beep(duration: Int, freq: Float) {
-        println("!! Beep playing row $beepCursor, d ${Math.min(duration, maxDuration)} f $freq")
+        // println("!! Beep playing row $beepCursor, d ${Math.min(duration, maxDuration)} f $freq")
         host.playTone(Math.min(duration, maxDuration), freq)
     }
 

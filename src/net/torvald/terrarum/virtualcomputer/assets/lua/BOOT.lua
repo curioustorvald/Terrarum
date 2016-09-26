@@ -954,7 +954,7 @@ _G._VERSION = "Luaj-jse 3.0.1 (Lua 5.2.3)"
 _G.EMDASH = string.char(0xC4)
 _G.UNCHECKED = string.char(0x9C) -- box unchecked
 _G.CHECKED = string.char(0x9D) -- box checked
-_G.MONEYSYM = string.char(0x9E) -- currency sign
+_G.MONEY = string.char(0x9E) -- currency sign
 _G.MIDDOT = string.char(0xFA) -- middle dot sign
 _G.DC1 = string.char(17) -- black
 _G.DC2 = string.char(18) -- white
@@ -988,6 +988,7 @@ computer.verbose = true -- print debug info
 computer.loadedCLayer = {} -- list of loaded compatibility layers
 computer.bootloader = "/boot/efi"
 computer.OEM = ""
+computer.beep = emittone
 computer.totalMemory = _G.totalMemory
 local getMemory = function()
     collectgarbage()
