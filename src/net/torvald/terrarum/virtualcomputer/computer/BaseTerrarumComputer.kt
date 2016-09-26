@@ -10,6 +10,7 @@ import li.cil.repack.org.luaj.vm2.lib.ZeroArgFunction
 import li.cil.repack.org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.ActorValue
+import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.virtualcomputer.luaapi.*
 import net.torvald.terrarum.virtualcomputer.terminal.*
 import net.torvald.terrarum.virtualcomputer.worldobject.ComputerPartsCodex
@@ -247,7 +248,7 @@ class BaseTerrarumComputer() {
     // BEEPER DRIVER //
     ///////////////////
 
-    private val sampleRate = 22050
+    private val sampleRate = 44100
     private var beepSource: Int? = null
     private var beepBuffer: Int? = null
     var audioData: ByteBuffer? = null
@@ -267,12 +268,15 @@ class BaseTerrarumComputer() {
         val chopSize = freq / sampleRate
 
         val amp = Math.max(4600f / freq, 1f)
-        val nHarmonics = if (freq >= 5400) 1
-                         else if (freq >= 3600) 2
-                         else if (freq >= 1800) 3
-                         else 4
+        val nHarmonics = if (freq >= 22050f) 1
+                         else if (freq >= 11025f) 2
+                         else if (freq >= 5512.5f) 3
+                         else if (freq >= 2756.25f) 4
+                         else if (freq >= 1378.125f) 5
+                         else if (freq >= 689.0625f) 6
+                         else 7
 
-        val transitionThre = 1150f
+        val transitionThre = 974.47218f
 
         // TODO volume ramping?
         if (freq == 0f) {
@@ -283,10 +287,10 @@ class BaseTerrarumComputer() {
         else if (freq < transitionThre) { // chopper generator (for low freq)
             for (x in 0..realDuration - 1) {
                 var sine: Float = amp * FastMath.cos(FastMath.TWO_PI * x * chopSize)
-                if (sine > 1f) sine = 1f
-                else if (sine < -1f) sine = -1f
+                if (sine > 0.79f) sine = 0.79f
+                else if (sine < -0.79f) sine = -0.79f
                 audioData.put(
-                        (0.5f + 0.5f * sine).times(0xFF).toByte()
+                        (0.5f + 0.5f * sine).times(0xFF).roundInt().toByte()
                 )
             }
         }
@@ -297,7 +301,7 @@ class BaseTerrarumComputer() {
                     sine += FastMath.sin(FastMath.TWO_PI * (2*k - 1) * chopSize * x) / (2*k - 1)
                 }
                 audioData.put(
-                        (0.5f + 0.5f * sine).times(0xFF).toByte()
+                        (0.5f + 0.5f * sine).times(0xFF).roundInt().toByte()
                 )
             }
         }
