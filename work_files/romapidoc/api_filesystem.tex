@@ -1,0 +1,77 @@
+The Filesystem API provides functions for manipulating files and the filesystem.
+
+The path for the argument of functions blocks `\,.\,.\,' to be entered, preventing users from access outside of the computer and eliminating the potential of harming the real computer of the innocent players.
+
+\subsection{Functions}
+
+\begin{tabularx}{\textwidth}{l l X}
+	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
+	\\ \\
+	\endhead
+	fs.list(\textbf{path}: string) & table & Returns list of files in \textbf{path}, in lua table.
+	\\ \\
+	fs.exists(\textbf{path}: string) & bool & Checks if \textbf{path} exists on the filesystem.
+	\\ \\
+	fs.isDir(\textbf{path}: string) & bool & Checks if \textbf{path} is a directory.
+	\\ \\
+	fs.isFile(\textbf{path}: string) & bool & Checks if \textbf{path} is a file.
+	\\ \\
+	fs.isReadOnly(\textbf{path}: string) & bool & Checks if \textbf{path} is read only.
+	\\ \\
+	fs.getSize(\textbf{path}: string) & int & Returns a size of the file/directory, in bytes.
+	\\ \\
+	fs.mkdir(\textbf{path}: string) & bool & Create a directory to \textbf{path}. Returns \textbf{true} upon success.
+	\\ \\
+	fs.mv(\textbf{from}: string, \textbf{dest}: string) & bool & Moves the directory to the destination. Subdirectories / files will also be moved. Returns \textbf{true} upon success.
+	\\ \\
+	fs.cp(\textbf{from}: string, \textbf{dest}: string) & bool & Copies the directory to the destination. Subdirectories / files will also be copied. Returns \textbf{true} upon success.
+	\\ \\
+	fs.rm(\textbf{path}: string) & bool & Deletes the \textbf{path}. If \textbf{path} is a directory, all its members will also be deleted. Returns \textbf{true} upon success.
+	\\ \\
+	fs.concat(\textbf{p1}: string, \textbf{p2}: string) & string & Concatenates two paths and return new path as string.
+	\\ \\
+	fs.open(\textbf{path}: string, \textbf{mode}: string) & file & Opens file and returns its handle. See section \emph{File Handler} for details.
+	\\ \\
+	fs.parent(\textbf{path}: string) & string & Returs parent directory to the \textbf{path}.
+	\\ \\
+	fs.dofile(\textbf{path}: string) & nil & Loads the script on \textbf{path} and executes it.
+	\\ \\
+	fs.fetchText(\textbf{path}: string) & string & Opens the file on \textbf{path} and returns its contents as a plain text.
+\end{tabularx}
+
+\subsection{File Handler}
+
+When it comes to opening a file, there are six modes available---r, w, a, rb, wb, ab, each represents \textbf{r}ead, \textbf{w}rite, \textbf{a}ppend and \textbf{b}yte.
+
+\begin{tabularx}{\textwidth}{l X}
+	\textbf{\large Function} & \textbf{\large Description}
+	\\ \\
+	\endhead
+	file.close() & Closes the file. Any data wrote will be actually wrote to disk when this function is called.
+	\\ \\
+	file.flush() & (in write/append mode) Flushes the data to the file, keeps the handle available afterwards
+	\\ \\
+	\multicolumn{2}{c}{\textbf{Read mode}}
+	\\ \\ 
+	file.readLine() & Reads text from the file line by line. Returns string of line, or \emph{nil} if there is no next line.
+	\\ \\
+	file.readAll() & Reads and returns whole text in the file as string.
+	\\ \\
+	\multicolumn{2}{c}{\textbf{Read binary mode}}
+	\\ \\
+	file.read() & Reads single byte in the file as int, or \emph{-1} if end-of-file is reached.
+	\\ \\
+	file.readAll() & Reads and returns whole byte in the file as string.
+	\\ \\
+	\multicolumn{2}{c}{\textbf{Write/append mode}}
+	\\ \\
+	file.write(string) & Writes \textbf{string} to the file.
+	\\ \\
+	file.writeLine(string) & Writes \textbf{string} to the file and append line feed.
+	\\ \\
+	\multicolumn{2}{c}{\textbf{Write/append binary mode}}
+	\\ \\
+	file.write(int) & Writes \textbf{int} to the file.
+	\\ \\
+	file.writeBytes(string) & Writes \textbf{string} to the file and append line feed.
+\end{tabularx}

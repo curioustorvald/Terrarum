@@ -13,6 +13,9 @@ object Key {
     val SPACE = 57
     val CAPS_LOCK = 58
     val L_CONTROL = 29
+
+    // same position keys
+    val L_ALT = 56
     val L_COMMAND = 219 // Mac
 
     val DELETE = 211

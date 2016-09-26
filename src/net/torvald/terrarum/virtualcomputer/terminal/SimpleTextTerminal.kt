@@ -91,8 +91,8 @@ open class SimpleTextTerminal(
     private val cursorBlinkLen = 250
     private var cursorBlinkOn = true
 
-    val phosphor = if (colour) WHITE else phosphorColour
-    open protected val colourScreen = if (colour) Color(4, 4, 4) else Color(19, 19, 19)
+    val phosphor = if (colour) WHITE7500 else phosphorColour
+    open protected val colourScreen = if (colour) Color(8, 8, 8) else Color(19, 19, 19)
 
 
 
@@ -447,10 +447,11 @@ open class SimpleTextTerminal(
 
     companion object {
         val AMBER = Color(255, 183, 0) // P3, 602 nm
-        val IBM_GREEN = Color(74, 255, 0) // P39, 525 nm
-        val WHITE = Color(228, 234, 255) // P4, 7 500 K
+        val GREEN = Color(74, 255, 0) // P39, 525 nm
+        val WHITE = Color(204, 223, 255) // approximation of white CRT I own
+        val WHITE7500 = Color(0xe4eaff)
         val ELECTRIC_BLUE = Color(0, 226, 255) // imaginary, 483 nm
-        val RED = Color(250, 0, 0) // <= 645 nm
+        val RED = Color(250, 51, 0) // 632 nm
 
         val ASCII_NUL = 0.toChar()
         val ASCII_BEL = 7.toChar()   // *BEEP!*

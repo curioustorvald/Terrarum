@@ -6,6 +6,8 @@
 -- ALIASES --
 -------------
 
+_G.io = {}
+
 fs.dofile = function(p, ...)
     local f = fs.open(p, "r")
     local s = f.readAll()
@@ -14,11 +16,7 @@ end
 
 _G.loadstring = _G.load
 
-_G.print = term.print
-
 --_G.dofile = function(f) fs.dofile(f) end
-
-_G.boot = function() fs.dofile("/boot/efi") end
 
 
 fs.fetchText = function(p)
@@ -60,7 +58,7 @@ _G.__scanforline__ = function(echo) -- pass '1' to not echo; pass nothing to ech
 end
 
 -- use Keys API to identify the keycode
-_G.__scanforkey__ = function(echo) -- pass '1' to not echo; pass nothing to echo
+--[[_G.__scanforkey__ = function(echo) -- pass '1' to not echo; pass nothing to echo
     native.closeInputString()
     native.openInput(echo or 0)
     _G.__scanMode__ = "a_key"
@@ -70,10 +68,11 @@ _G.__scanforkey__ = function(echo) -- pass '1' to not echo; pass nothing to echo
     until key
     -- input is closed when any key is hit. See above comments.
     return key
-end
+end]] -- DELETED: use _G.input.isKeyDown(keycode)
+
+input.readLine = _G.__scanforline__
 
 io.read = _G.__scanforline__
-
 
 -----------------
 -- PRINTSTREAM --
@@ -82,7 +81,12 @@ io.read = _G.__scanforline__
 io.write = function(...)
     local args = {...}
     for _, v in ipairs(args) do
-        local s = tostring(v)
+        local s
+        if v == nil then
+            s = "nil"
+        else
+            s = tostring(v)
+        end
         term.write(s)
     end
 end
@@ -111,7 +115,22 @@ end
 _G.shell = {}
 shell.status = shell.ok
 
-shell.run = function(p) fs.dofile(p) end
+shell.run = function(path)
+    -- check for interpreter key "#!"
+    local f = fs.open(path, "r")
+    local s = ""
+    repeat
+        s = f.readLine()
+        if (s == nil) then return end -- empty file
+    until #s > 0
+
+    if s:sub(1,2) == "#!" then
+        local interpreter = s:sub(3)
+        fs.dofile(interpreter..".lua", path)
+    else
+        fs.dofile(path)
+    end
+end
 
 
 shell.ok = 0
@@ -167,123 +186,193 @@ end
 -- KEYS API --
 --------------
 -- ComputerCraft compliant
-local keycodeDic = {
-["30"] = "a",
-["48"] = "b",
-["46"] = "c",
-["32"] = "d",
-["18"] = "e",
-["33"] = "f",
-["34"] = "g",
-["35"] = "h",
-["23"] = "i",
-["36"] = "j",
-["37"] = "k",
-["38"] = "l",
-["50"] = "m",
-["49"] = "n",
-["24"] = "o",
-["25"] = "p",
-["16"] = "q",
-["19"] = "r",
-["31"] = "s",
-["20"] = "t",
-["22"] = "u",
-["47"] = "v",
-["17"] = "w",
-["45"] = "x",
-["21"] = "y",
-["44"] = "z",
-["2"] = "one",
-["3"] = "two",
-["4"] = "three",
-["5"] = "four",
-["6"] = "five",
-["7"] = "six",
-["8"] = "seven",
-["9"] = "eight",
-["10"] = "nine",
-["11"] = "zero",
-["12"] = "minus",
-["13"] = "equals",
-["14"] = "backspace",
-["15"] = "tab",
-["26"] = "leftBracket",
-["27"] = "rightBracket",
-["28"] = "enter",
-["29"] = "leftCtrl",
-["39"] = "semiColon",
-["40"] = "apostrophe",
-["41"] = "grave",
-["42"] = "leftShift",
-["43"] = "backslash",
-["51"] = "comma",
-["52"] = "period",
-["53"] = "slash",
-["54"] = "rightShift",
-["55"] = "multiply",
-["56"] = "leftAlt",
-["57"] = "space",
-["58"] = "capsLock",
-["59"] = "f1",
-["60"] = "f2",
-["61"] = "f3",
-["62"] = "f4",
-["63"] = "f5",
-["64"] = "f6",
-["65"] = "f7",
-["66"] = "f8",
-["67"] = "f9",
-["68"] = "f10",
-["69"] = "numLock",
-["70"] = "scollLock",
-["71"] = "numPad7",
-["72"] = "numPad8",
-["73"] = "numPad9",
-["74"] = "numPadSubtract",
-["75"] = "numPad4",
-["76"] = "numPad5",
-["77"] = "numPad6",
-["78"] = "numPadAdd",
-["79"] = "numPad1",
-["80"] = "numPad2",
-["81"] = "numPad3",
-["82"] = "numPad0",
-["83"] = "numPadDecimal",
-["87"] = "f11",
-["88"] = "f12",
-["89"] = "f13",
-["90"] = "f14",
-["91"] = "f15",
-["-1"] = "kana",
-["-1"] = "convert",
-["-1"] = "noconvert",
-["-1"] = "yen",
-["-1"] = "numPadEquals",
-["144"] = "cimcumflex",
-["145"] = "at",
-["146"] = "colon",
-["147"] = "underscore",
-["-1"] = "kanji",
-["-1"] = "stop",
-["-1"] = "ax",
-["156"] = "numPadEnter",
-["157"] = "rightCtrl",
-["-1"] = "numPadComma",
-["181"] = "numPadDivide",
-["184"] = "rightAlt",
-["197"] = "pause",
-["199"] = "home",
-["200"] = "up",
-["201"] = "pageUp",
-["203"] = "left",
-["208"] = "right",
-["207"] = "end",
-["205"] = "down",
-["209"] = "pageDown",
-["210"] = "insert",
-["211"] = "delete",
+local keycodeNumToName = {
+    ["30"] = "a",
+    ["48"] = "b",
+    ["46"] = "c",
+    ["32"] = "d",
+    ["18"] = "e",
+    ["33"] = "f",
+    ["34"] = "g",
+    ["35"] = "h",
+    ["23"] = "i",
+    ["36"] = "j",
+    ["37"] = "k",
+    ["38"] = "l",
+    ["50"] = "m",
+    ["49"] = "n",
+    ["24"] = "o",
+    ["25"] = "p",
+    ["16"] = "q",
+    ["19"] = "r",
+    ["31"] = "s",
+    ["20"] = "t",
+    ["22"] = "u",
+    ["47"] = "v",
+    ["17"] = "w",
+    ["45"] = "x",
+    ["21"] = "y",
+    ["44"] = "z",
+    ["2"] = "one",
+    ["3"] = "two",
+    ["4"] = "three",
+    ["5"] = "four",
+    ["6"] = "five",
+    ["7"] = "six",
+    ["8"] = "seven",
+    ["9"] = "eight",
+    ["10"] = "nine",
+    ["11"] = "zero",
+    ["12"] = "minus",
+    ["13"] = "equals",
+    ["14"] = "backspace",
+    ["15"] = "tab",
+    ["26"] = "leftBracket",
+    ["27"] = "rightBracket",
+    ["28"] = "enter",
+    ["29"] = "leftCtrl",
+    ["39"] = "semiColon",
+    ["40"] = "apostrophe",
+    ["41"] = "grave",
+    ["42"] = "leftShift",
+    ["43"] = "backslash",
+    ["51"] = "comma",
+    ["52"] = "period",
+    ["53"] = "slash",
+    ["54"] = "rightShift",
+    ["55"] = "multiply",
+    ["56"] = "leftAlt",
+    ["57"] = "space",
+    ["58"] = "capsLock",
+    ["59"] = "f1",
+    ["60"] = "f2",
+    ["61"] = "f3",
+    ["62"] = "f4",
+    ["63"] = "f5",
+    ["64"] = "f6",
+    ["65"] = "f7",
+    ["66"] = "f8",
+    ["67"] = "f9",
+    ["68"] = "f10",
+    ["69"] = "numLock",
+    ["70"] = "scollLock",
+    ["87"] = "f11",
+    ["88"] = "f12",
+    ["89"] = "f13",
+    ["90"] = "f14",
+    ["91"] = "f15",
+    ["144"] = "cimcumflex",
+    ["145"] = "at",
+    ["146"] = "colon",
+    ["147"] = "underscore",
+    ["157"] = "rightCtrl",
+    ["184"] = "rightAlt",
+    ["197"] = "pause",
+    ["199"] = "home",
+    ["200"] = "up",
+    ["201"] = "pageUp",
+    ["203"] = "left",
+    ["208"] = "right",
+    ["207"] = "end",
+    ["205"] = "down",
+    ["209"] = "pageDown",
+    ["210"] = "insert",
+    ["211"] = "delete",
+    ["219"] = "leftCommand"
 }
 
-_G.keys = {}
-_G.keys.getName = function(code) return keycodeDic[tostring(code)] end
+_G.keys = {
+    ["a"] = 30,
+    ["b"] = 48,
+    ["c"] = 46,
+    ["d"] = 32,
+    ["e"] = 18,
+    ["f"] = 33,
+    ["g"] = 34,
+    ["h"] = 35,
+    ["i"] = 23,
+    ["j"] = 36,
+    ["k"] = 37,
+    ["l"] = 38,
+    ["m"] = 50,
+    ["n"] = 49,
+    ["o"] = 24,
+    ["p"] = 25,
+    ["q"] = 16,
+    ["r"] = 19,
+    ["s"] = 31,
+    ["t"] = 20,
+    ["u"] = 22,
+    ["v"] = 47,
+    ["w"] = 17,
+    ["x"] = 45,
+    ["y"] = 21,
+    ["z"] = 44,
+    ["one"] = 2,
+    ["two"] = 3,
+    ["three"] = 4,
+    ["four"] = 5,
+    ["five"] = 6,
+    ["six"] = 7,
+    ["seven"] = 8,
+    ["eight"] = 9,
+    ["nine"] = 10,
+    ["zero"] = 11,
+    ["minus"] = 12,
+    ["equals"] = 13,
+    ["backspace"] = 14,
+    ["tab"] = 15,
+    ["leftBracket"] = 26,
+    ["rightBracket"] = 27,
+    ["enter"] = 28,
+    ["leftCtrl"] = 29,
+    ["semiColon"] = 39,
+    ["apostrophe"] = 40,
+    ["grave"] = 41,
+    ["leftShift"] = 42,
+    ["backslash"] = 43,
+    ["comma"] = 51,
+    ["period"] = 52,
+    ["slash"] = 53,
+    ["rightShift"] = 54,
+    ["multiply"] = 55,
+    ["leftAlt"] = 56,
+    ["space"] = 57,
+    ["capsLock"] = 58,
+    ["f1"] = 59,
+    ["f2"] = 60,
+    ["f3"] = 61,
+    ["f4"] = 62,
+    ["f5"] = 63,
+    ["f6"] = 64,
+    ["f7"] = 65,
+    ["f8"] = 66,
+    ["f9"] = 67,
+    ["f10"] = 68,
+    ["numLock"] = 69,
+    ["scollLock"] = 70,
+    ["f11"] = 87,
+    ["f12"] = 88,
+    ["f13"] = 89,
+    ["f14"] = 90,
+    ["f15"] = 91,
+    ["cimcumflex"] = 144,
+    ["at"] = 145,
+    ["colon"] = 146,
+    ["underscore"] = 147,
+    ["rightCtrl"] = 157,
+    ["rightAlt"] = 184,
+    ["pause"] = 197,
+    ["home"] = 199,
+    ["up"] = 200,
+    ["pageUp"] = 201,
+    ["left"] = 203,
+    ["right"] = 208,
+    ["end"] = 207,
+    ["down"] = 205,
+    ["pageDown"] = 209,
+    ["insert"] = 210,
+    ["delete"] = 211,
+    ["leftCommand"] = 219
+}
+_G.keys.getName = function(code) return keycodeNumToName[tostring(code)] end

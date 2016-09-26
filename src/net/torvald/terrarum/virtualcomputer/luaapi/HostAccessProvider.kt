@@ -37,7 +37,10 @@ internal class HostAccessProvider(globals: Globals, computer: BaseTerrarumComput
 
     class PrintLn(): OneArgFunction() {
         override fun call(p0: LuaValue): LuaValue {
-            println(p0.checkIBM437())
+            if (p0.isnumber())
+                println(p0.checkdouble())
+            else
+                println(p0.checkIBM437())
             return LuaValue.NONE
         }
     }
@@ -91,7 +94,7 @@ internal class HostAccessProvider(globals: Globals, computer: BaseTerrarumComput
     class HaltComputer(val computer: BaseTerrarumComputer) : ZeroArgFunction() {
         override fun call() : LuaValue {
             computer.isHalted = true
-            computer.luaJ_globals.load("""print("system halted")""").call()
+            computer.luaJ_globals.load("""print(DC4.."system halted")""").call()
             return LuaValue.NONE
         }
     }

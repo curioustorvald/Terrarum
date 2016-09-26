@@ -1,0 +1,18 @@
+The line printer is a printer that operates on line basis. It only prints text in line-by-line, hence the name, on almost endlessly long roll of papers; it has no notion of page, it just prints. If you want some pages to keep, you must tear them out yourself.
+
+Line printers do not work indefinitely; ignoring the obvious depletion of ink, belt for loading paper will be out of service on about 50 000 lines of printing, give or take a few, or paper will jam if the printer had struck with the unluckiness.
+
+\subsection{Functions}
+
+\begin{tabularx}{\textwidth}{l l X}
+	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
+	\\ \\
+	\endhead
+	lp.print(string) & nil & Prints a line of string.
+	\\ \\
+	lp.scroll(\textbf{n}: int) & nil & Scrolls the paper by \textbf{n} lines.
+	\\ \\
+	lp.status() & int & Returns a status of the line printer.
+	\\ \\
+	lp.reset() & nil & Resets the line printer.
+\end{tabularx}

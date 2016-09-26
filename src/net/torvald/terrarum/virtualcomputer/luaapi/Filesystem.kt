@@ -456,6 +456,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         }
     }
 
+    /** returns NO line separator! */
     private class FileClassReadLine(val fr: FileReader) : ZeroArgFunction() {
         val scanner = Scanner(fr.readText()) // no closing; keep the scanner status persistent
 

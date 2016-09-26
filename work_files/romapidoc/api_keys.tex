@@ -1,0 +1,72 @@
+The Keys library helps you with Input API to get key code by key's names, or identify a key code.
+
+Notes on compatibility with ComputerCraft: although this library is ComputerCraft-compliant, but Numpads are \emph{not} supported whatsoever. \textit{Come on, it's not like everyone has or likes numpad on their keyboard.}
+
+\begin{tabularx}{\textwidth}{l l X}
+	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
+	\\ \\
+	\endhead
+	keys.<key name: String> & int & Returns key code corresponds to the key name.
+	\\ \\
+	keys.getName(keycode: int) & string & Returns key name corresponds to the keycode.
+\end{tabularx}
+
+\subsection{Accepted Key Names}
+
+\emph{NOTE: following sets are considered as the same keys.}
+
+\begin{itemize}
+\item leftAlt --- leftCommand
+
+(leftAlt is often recognised as leftCommand on macOS)
+
+\item leftControl --- capsLock --- backspace
+
+(colemak key layout puts secondary backspace on capsLock, Happy Hacking Keyboard puts Control on the location of Caps Lock)
+\end{itemize}
+
+\begin{tasks}[counter-format=\-](5)
+	\task (\emph{a} to \emph{z})
+	\task (\emph{zero} to \emph{nine})
+	\task minus
+	\task equals
+	\task backspace
+	\task tab
+	\task leftBracket
+	\task rightBracket
+	\task enter
+	\task leftCtrl
+	\task semiColon
+	\task apostrophe
+	\task grave
+	\task leftShift
+	\task backslash
+	\task comma
+	\task period
+	\task slash
+	\task rightShift
+	\task multiply
+	\task leftAlt
+	\task space
+	\task capsLock
+	\task scollLock
+	\task (\emph{f1} to \emph{f15})
+	\task cimcumflex
+	\task at
+	\task colon
+	\task underscore
+	\task rightCtrl
+	\task rightAlt
+	\task pause
+	\task home
+	\task up
+	\task pageUp
+	\task left
+	\task right
+	\task end
+	\task down
+	\task pageDown
+	\task insert
+	\task delete
+	\task leftCommand
+\end{tasks}

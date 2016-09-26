@@ -2,19 +2,18 @@ package net.torvald.terrarum.virtualcomputer.computer
 
 import li.cil.repack.org.luaj.vm2.Globals
 import li.cil.repack.org.luaj.vm2.LuaError
+import li.cil.repack.org.luaj.vm2.LuaTable
 import li.cil.repack.org.luaj.vm2.LuaValue
 import li.cil.repack.org.luaj.vm2.lib.ZeroArgFunction
 import li.cil.repack.org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.ActorValue
-import net.torvald.terrarum.virtualcomputer.luaapi.Filesystem
-import net.torvald.terrarum.virtualcomputer.luaapi.HostAccessProvider
-import net.torvald.terrarum.virtualcomputer.luaapi.Security
-import net.torvald.terrarum.virtualcomputer.luaapi.Term
+import net.torvald.terrarum.virtualcomputer.luaapi.*
 import net.torvald.terrarum.virtualcomputer.terminal.*
 import net.torvald.terrarum.virtualcomputer.worldobject.ComputerPartsCodex
 import net.torvald.terrarum.virtualcomputer.worldobject.FixtureComputerBase
 import org.newdawn.slick.GameContainer
+import org.newdawn.slick.Input
 import java.io.*
 
 /**
@@ -40,15 +39,14 @@ class BaseTerrarumComputer(val term: Teletype? = null) {
 
     val processorCycle: Int // number of Lua statement to process per tick (1/100 s)
         get() = ComputerPartsCodex.getProcessorCycles(computerValue.getAsInt("processor") ?: 0)
-    val memSize: Int // max: 8 GB
+    val memSize: Int // in bytes; max: 8 GB
         get() {
-            if (DEBUG_UNLIMITED_MEM) return 1.shl(30)// 1 GB
+            if (DEBUG_UNLIMITED_MEM) return 16.shl(20)// 16 MB
 
             var size = 0
             for (i in 0..3)
-                size += ComputerPartsCodex.getRamSize(computerValue.getAsInt("memSlot$i") ?: 0)
+                size += ComputerPartsCodex.getRamSize(computerValue.getAsInt("memSlot$i")!!)
 
-            return 16.shl(20)
             return size
         }
 
@@ -57,6 +55,9 @@ class BaseTerrarumComputer(val term: Teletype? = null) {
     val computerValue = KVHashMap()
 
     var isHalted = false
+
+    lateinit var input: Input
+        private set
 
     init {
         computerValue["memslot0"] = 4864 // -1 indicates mem slot is empty
@@ -83,34 +84,46 @@ class BaseTerrarumComputer(val term: Teletype? = null) {
         computerValue["boot"] = computerValue.getAsString("hda")!!
         
         
-        if (term != null) {
-            termOut = TerminalPrintStream(term)
-            termErr = TerminalPrintStream(term)
-            termIn = TerminalInputStream(term)
+        if (term != null) initSandbox(term)
+    }
 
-            luaJ_globals.STDOUT = termOut
-            luaJ_globals.STDERR = termErr
-            luaJ_globals.STDIN = termIn
+    fun initSandbox(term: Teletype) {
+        termOut = TerminalPrintStream(term)
+        termErr = TerminalPrintStream(term)
+        termIn = TerminalInputStream(term)
 
-            // load libraries
-            Term(luaJ_globals, term)
-            Security(luaJ_globals)
-            Filesystem(luaJ_globals, this)
-            HostAccessProvider(luaJ_globals, this)
-        }
+        luaJ_globals.STDOUT = termOut
+        luaJ_globals.STDERR = termErr
+        luaJ_globals.STDIN = termIn
+
+        // load libraries
+        Term(luaJ_globals, term)
+        Security(luaJ_globals)
+        Filesystem(luaJ_globals, this)
+        HostAccessProvider(luaJ_globals, this)
+        Input(luaJ_globals, this)
+        Http(luaJ_globals, this)
+
+        // secure the sandbox
+        luaJ_globals["io"] = LuaValue.NIL
+        val sethook = luaJ_globals["debug"]["sethook"]
+        luaJ_globals["debug"] = LuaValue.NIL
 
         // ROM BASIC
         val inputStream = javaClass.getResourceAsStream("/net/torvald/terrarum/virtualcomputer/assets/lua/BOOT.lua")
         runCommand(InputStreamReader(inputStream), "=boot")
 
         // computer-related global functions
-        luaJ_globals["getTotalMem"] = LuaFunGetTotalMem(this)
+        luaJ_globals["totalMemory"] = LuaFunGetTotalMem(this)
     }
 
     var threadTimer = 0
     val threadMaxTime = 2000
 
     fun update(gc: GameContainer, delta: Int) {
+        input = gc.input
+
+
         if (currentExecutionThread.state == Thread.State.TERMINATED)
             unsetThreadRun()
 

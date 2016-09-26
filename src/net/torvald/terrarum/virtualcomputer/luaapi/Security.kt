@@ -9,6 +9,8 @@ import org.apache.commons.codec.digest.DigestUtils
 import java.security.SecureRandom
 
 /**
+ * Hashes, CSPRNG, Base64
+ *
  * Created by minjaesong on 16-09-15.
  */
 internal class Security(globals: Globals) {
