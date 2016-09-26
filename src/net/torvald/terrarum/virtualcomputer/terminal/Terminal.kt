@@ -58,11 +58,16 @@ interface Terminal : Teletype {
     fun setColour(back: Int, fore: Int)
     fun resetColour()
     /**
-     * @param freg: Frequency (float)
      * @param duration: milliseconds
+     * @param freg: Frequency (float)
      */
-    fun beep(freq: Float = 1000f, duration: Int = 200)
-    /** for "beep code" on modern BIOS. Pattern: - . */
+    fun beep(duration: Int = 80, freq: Float = 1000f)
+    /**
+     * Pattern: - .
+     * .     80 ms
+     * -    200 ms
+     * ( )   80 ms
+     */
     override fun bell(pattern: String)
     /** Requires keyPressed() event to be processed.
      *

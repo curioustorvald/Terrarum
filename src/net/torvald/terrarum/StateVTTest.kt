@@ -20,13 +20,15 @@ import org.newdawn.slick.state.StateBasedGame
 class StateVTTest : BasicGameState() {
 
     // HiRes: 100x64, LoRes: 80x25
-    val vt = SimpleTextTerminal(SimpleTextTerminal.GREEN, 80, 25, colour = false, hires = false)
-    val computerInside = BaseTerrarumComputer(vt)
+    val computerInside = BaseTerrarumComputer()
+    val vt = SimpleTextTerminal(SimpleTextTerminal.GREEN, 80, 25, computerInside, colour = false, hires = false)
+
 
     val vtUI = Image(vt.displayW, vt.displayH)
 
 
     init {
+        computerInside.attachTerminal(vt)
     }
 
     override fun init(container: GameContainer, game: StateBasedGame) {

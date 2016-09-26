@@ -5,12 +5,14 @@ import net.torvald.aa.ColouredFastFont
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.blendScreen
+import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
 import org.lwjgl.BufferUtils
 import org.lwjgl.openal.AL
 import org.lwjgl.openal.AL10
 import org.lwjgl.openal.AL11
 import org.newdawn.slick.*
 import java.nio.ByteBuffer
+import java.util.*
 
 /**
  * Default text terminal, four text colours (black, grey, lgrey, white).
@@ -18,7 +20,7 @@ import java.nio.ByteBuffer
  * Created by minjaesong on 16-09-07.
  */
 open class SimpleTextTerminal(
-        phosphorColour: Color, override val width: Int, override val height: Int,
+        phosphorColour: Color, override val width: Int, override val height: Int, private val host: BaseTerrarumComputer,
         colour: Boolean = false, hires: Boolean = false
 ) : Terminal {
     /**
@@ -107,13 +109,31 @@ open class SimpleTextTerminal(
 
         wrap()
 
-        // beep AL-related
-        if (beepSource != null && AL10.alGetSourcei(beepSource!!, AL10.AL_SOURCE_STATE) != AL10.AL_PLAYING) {
-            AL10.alDeleteSources(beepSource!!)
-            AL10.alDeleteBuffers(beepBuffer!!)
-            beepSource = null
-            beepBuffer == null
+        // start beep queue
+        if (beepQueue.size > 0 && beepCursor == -1) {
+            beepCursor = 0
         }
+
+        // continue beep queue
+        if (beepCursor >= 0 && beepQueueLineExecTimer >= beepQueueGetLenOfPtn(beepCursor)) {
+            beepQueueLineExecTimer -= beepQueueGetLenOfPtn(beepCursor)
+            beepCursor += 1
+            beepQueueFired = false
+        }
+
+        // complete beep queue
+        if (beepCursor >= beepQueue.size) {
+            clearBeepQueue()
+            println("!! Beep queue clear")
+        }
+
+        // actually play queue
+        if (beepCursor >= 0 && beepQueue.size > 0 && !beepQueueFired) {
+            beep(beepQueue[beepCursor].first, beepQueue[beepCursor].second)
+            beepQueueFired = true
+        }
+
+        if (beepQueueFired) beepQueueLineExecTimer += delta
     }
 
     private fun wrap() {
@@ -312,84 +332,47 @@ open class SimpleTextTerminal(
         foreColour = foreDefault
     }
 
-    private val sampleRate = 22050
     private val maxDuration = 10000
-    private val beepSamples = maxDuration.div(1000).times(sampleRate)
-    private var beepSource: Int? = null
-    private var beepBuffer: Int? = null
 
-    override fun beep(freq: Float, duration: Int) {
-        throw NotImplementedError("errenous OpenAL behaviour; *grunts*")
+    // let's regard it as a tracker...
+    private val beepQueue = ArrayList<Pair<Int, Float>>()
+    private var beepCursor = -1
+    private var beepQueueLineExecTimer = 0 // millisec
+    private var beepQueueFired = false
 
-        val audioData = BufferUtils.createByteBuffer(duration.times(sampleRate).div(1000))
-
-        var chop = false
-        val realDuration = Math.min(maxDuration, duration)
-
-        for (i in 0..realDuration - 1) {
-            if (i.mod(freq) < 1.0) chop = !chop
-            audioData.put(if (chop) 0xFF.toByte() else 0x00.toByte())
-        }
-
-        audioData.rewind()
-
-
-
-        // Clear error stack.
-        AL10.alGetError()
-
-        beepBuffer = AL10.alGenBuffers()
-        checkALError()
-
-        try {
-            AL10.alBufferData(beepBuffer!!, AL10.AL_FORMAT_MONO8, audioData, sampleRate)
-            checkALError()
-
-            beepSource = AL10.alGenSources()
-            checkALError()
-
-            try {
-                AL10.alSourceQueueBuffers(beepSource!!, beepBuffer!!)
-                checkALError()
-
-                AL10.alSource3f(beepSource!!, AL10.AL_POSITION, 0f, 0f, 1f)
-                AL10.alSourcef(beepSource!!, AL10.AL_REFERENCE_DISTANCE, 1f)
-                AL10.alSourcef(beepSource!!, AL10.AL_MAX_DISTANCE, 1f)
-                AL10.alSourcef(beepSource!!, AL10.AL_GAIN, 0.3f)
-                checkALError()
-
-                AL10.alSourcePlay(beepSource!!)
-                checkALError()
-
-            }
-            catch (e: ALException) {
-                AL10.alDeleteSources(beepSource!!)
-            }
-        }
-        catch (e: ALException) {
-            if (beepSource != null) AL10.alDeleteSources(beepSource!!)
-        }
-
-
-        /*def checkFinished = AL10.alGetSourcei(source, AL10.AL_SOURCE_STATE) != AL10.AL_PLAYING && {
-            AL10.alDeleteSources(source)
-            AL10.alDeleteBuffers(buffer)
-            true
-        }*/
-    }
-
-    // Custom implementation of Util.checkALError() that uses our custom exception.
-    private fun checkALError() {
-        val errorCode = AL10.alGetError()
-        if (errorCode != AL10.AL_NO_ERROR) {
-            throw ALException(errorCode)
-        }
+    /**
+     * @param duration: milliseconds
+     * @param freg: Frequency (float)
+     */
+    override fun beep(duration: Int, freq: Float) {
+        println("!! Beep playing row $beepCursor, d ${Math.min(duration, maxDuration)} f $freq")
+        host.playTone(Math.min(duration, maxDuration), freq)
     }
 
     /** for "beep code" on modern BIOS. Pattern: - . */
     override fun bell(pattern: String) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        clearBeepQueue()
+        for (c in pattern) {
+            when (c) {
+                '.' -> { enqueueBeep(80, 1000f); enqueueBeep(80, 0f) }
+                '-' -> { enqueueBeep(250, 1000f); enqueueBeep(80, 0f) }
+                ' ' -> { enqueueBeep(250, 0f) }
+                else -> throw IllegalArgumentException("Unacceptable pattern: $c (from '$pattern')")
+            }
+        }
     }
+
+    fun clearBeepQueue() {
+        beepQueue.clear()
+        beepCursor = -1
+        beepQueueLineExecTimer = 0
+    }
+
+    fun enqueueBeep(duration: Int, freq: Float) {
+        beepQueue.add(Pair(Math.min(duration, maxDuration), freq))
+    }
+
+    fun beepQueueGetLenOfPtn(ptnIndex: Int) = beepQueue[ptnIndex].first
 
     override var lastInputByte: Int = -1
     var sb: StringBuilder = StringBuilder()

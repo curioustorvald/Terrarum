@@ -1,9 +1,11 @@
 package net.torvald.terrarum.virtualcomputer.computer
 
+import com.jme3.math.FastMath
 import li.cil.repack.org.luaj.vm2.Globals
 import li.cil.repack.org.luaj.vm2.LuaError
 import li.cil.repack.org.luaj.vm2.LuaTable
 import li.cil.repack.org.luaj.vm2.LuaValue
+import li.cil.repack.org.luaj.vm2.lib.TwoArgFunction
 import li.cil.repack.org.luaj.vm2.lib.ZeroArgFunction
 import li.cil.repack.org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.KVHashMap
@@ -12,9 +14,13 @@ import net.torvald.terrarum.virtualcomputer.luaapi.*
 import net.torvald.terrarum.virtualcomputer.terminal.*
 import net.torvald.terrarum.virtualcomputer.worldobject.ComputerPartsCodex
 import net.torvald.terrarum.virtualcomputer.worldobject.FixtureComputerBase
+import org.lwjgl.BufferUtils
+import org.lwjgl.openal.AL
+import org.lwjgl.openal.AL10
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
 import java.io.*
+import java.nio.ByteBuffer
 
 /**
  * A part that makes "computer fixture" actually work
@@ -24,11 +30,12 @@ import java.io.*
  * @param term : terminal that is connected to the computer fixtures, null if not connected any.
  * Created by minjaesong on 16-09-10.
  */
-class BaseTerrarumComputer(val term: Teletype? = null) {
+class BaseTerrarumComputer() {
 
     val DEBUG_UNLIMITED_MEM = false
 
-    val luaJ_globals: Globals = JsePlatform.debugGlobals()
+    lateinit var luaJ_globals: Globals
+        private set
 
     var termOut: PrintStream? = null
         private set
@@ -59,6 +66,9 @@ class BaseTerrarumComputer(val term: Teletype? = null) {
     lateinit var input: Input
         private set
 
+    lateinit var term: Teletype
+        private set
+
     init {
         computerValue["memslot0"] = 4864 // -1 indicates mem slot is empty
         computerValue["memslot1"] = -1 // put index of item here
@@ -82,12 +92,17 @@ class BaseTerrarumComputer(val term: Teletype? = null) {
 
         // boot device
         computerValue["boot"] = computerValue.getAsString("hda")!!
-        
-        
-        if (term != null) initSandbox(term)
+
+    }
+
+    fun attachTerminal(term: Teletype) {
+        this.term = term
+        initSandbox(term)
     }
 
     fun initSandbox(term: Teletype) {
+        luaJ_globals = JsePlatform.debugGlobals()
+
         termOut = TerminalPrintStream(term)
         termErr = TerminalPrintStream(term)
         termIn = TerminalInputStream(term)
@@ -200,6 +215,7 @@ class BaseTerrarumComputer(val term: Teletype? = null) {
                 else
                     throw IllegalArgumentException("Unsupported mode: $mode")
 
+
                 chunk.call()
             }
             catch (e: LuaError) {
@@ -216,4 +232,119 @@ class BaseTerrarumComputer(val term: Teletype? = null) {
             return LuaValue.valueOf(computer.memSize)
         }
     }
+
+    class EmitTone(val computer: BaseTerrarumComputer) : TwoArgFunction() {
+        override fun call(millisec: LuaValue, freq: LuaValue): LuaValue {
+            computer.playTone(millisec.toint(), freq.tofloat())
+            return LuaValue.NONE
+        }
+    }
+
+    ///////////////////
+    // BEEPER DRIVER //
+    ///////////////////
+
+    private val sampleRate = 22050
+    private var beepSource: Int? = null
+    private var beepBuffer: Int? = null
+    var audioData: ByteBuffer? = null
+
+    /**
+     * @param duration : milliseconds
+     */
+    private fun makeAudioData(duration: Int, freq: Float): ByteBuffer {
+        val audioData = BufferUtils.createByteBuffer(duration.times(sampleRate).div(1000))
+
+        val realDuration = duration * sampleRate / 1000
+        val chopSize = freq * 2f / sampleRate
+
+        val amp = Math.max(4600f / freq, 1f)
+        val nHarmonics = 2
+
+        val transitionThre = 2300f
+
+        if (freq == 0f) {
+            for (x in 0..realDuration - 1) {
+                audioData.put(0x00.toByte())
+            }
+        }
+        else if (freq < transitionThre) { // chopper generator (for low freq)
+            for (x in 0..realDuration - 1) {
+                var sine: Float = amp * FastMath.cos(FastMath.PI * x * chopSize)
+                if (sine > 1f) sine = 1f
+                else if (sine < -1f) sine = -1f
+                audioData.put(
+                        (0.5f + 0.5f * sine).times(0xFF).toByte()
+                )
+            }
+        }
+        else { // harmonics generator (for high freq)
+            for (x in 0..realDuration - 1) {
+                var sine: Float = 0f
+                for (k in 0..nHarmonics) { // mix only odd harmonics to make squarewave
+                    sine += (1f / (2*k + 1)) *
+                            FastMath.sin((2 * k + 1) * FastMath.PI * x * chopSize)
+                }
+                audioData.put(
+                        (0.5f + 0.5f * sine).times(0xFF).toByte()
+                )
+            }
+        }
+
+        audioData.rewind()
+
+        return audioData
+    }
+
+    internal fun playTone(leninmilli: Int, freq: Float) {
+        audioData = makeAudioData(leninmilli, freq)
+
+
+        if (!AL.isCreated()) AL.create()
+
+
+        // Clear error stack.
+        AL10.alGetError()
+
+        beepBuffer = AL10.alGenBuffers()
+        checkALError()
+
+        try {
+            AL10.alBufferData(beepBuffer!!, AL10.AL_FORMAT_MONO8, audioData, sampleRate)
+            checkALError()
+
+            beepSource = AL10.alGenSources()
+            checkALError()
+
+            try {
+                AL10.alSourceQueueBuffers(beepSource!!, beepBuffer!!)
+                checkALError()
+
+                AL10.alSource3f(beepSource!!, AL10.AL_POSITION, 0f, 0f, 1f)
+                AL10.alSourcef(beepSource!!, AL10.AL_REFERENCE_DISTANCE, 1f)
+                AL10.alSourcef(beepSource!!, AL10.AL_MAX_DISTANCE, 1f)
+                AL10.alSourcef(beepSource!!, AL10.AL_GAIN, 0.3f)
+                checkALError()
+
+                AL10.alSourcePlay(beepSource!!)
+                checkALError()
+
+            }
+            catch (e: ALException) {
+                AL10.alDeleteSources(beepSource!!)
+            }
+        }
+        catch (e: ALException) {
+            if (beepSource != null) AL10.alDeleteSources(beepSource!!)
+        }
+    }
+
+    // Custom implementation of Util.checkALError() that uses our custom exception.
+    private fun checkALError() {
+        val errorCode = AL10.alGetError()
+        if (errorCode != AL10.AL_NO_ERROR) {
+            throw ALException(errorCode)
+        }
+    }
+
 }

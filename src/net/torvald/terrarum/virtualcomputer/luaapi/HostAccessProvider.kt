@@ -22,11 +22,11 @@ internal class HostAccessProvider(globals: Globals, computer: BaseTerrarumComput
         globals["native"]["println"] = PrintLn()
         globals["native"]["isHalted"] = IsHalted(computer)
 
-        globals["native"]["closeInputString"] = NativeCloseInputString(computer.term!!)
-        globals["native"]["closeInputKey"] = NativeCloseInputKey(computer.term!!)
-        globals["native"]["openInput"] = NativeOpenInput(computer.term!!)
-        globals["native"]["getLastStreamInput"] = NativeGetLastStreamInput(computer.term!!)
-        globals["native"]["getLastKeyPress"] = NativeGetLastKeyPress(computer.term!!)
+        globals["native"]["closeInputString"] = NativeCloseInputString(computer.term)
+        globals["native"]["closeInputKey"] = NativeCloseInputKey(computer.term)
+        globals["native"]["openInput"] = NativeOpenInput(computer.term)
+        globals["native"]["getLastStreamInput"] = NativeGetLastStreamInput(computer.term)
+        globals["native"]["getLastKeyPress"] = NativeGetLastKeyPress(computer.term)
 
         // while lua's dofile/require is fixiated to fs, this command allows
         // libraries in JAR to be loaded.

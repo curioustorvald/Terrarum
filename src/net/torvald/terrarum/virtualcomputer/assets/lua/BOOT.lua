@@ -950,7 +950,7 @@ sandbox._G = sandbox
 package.path = "/net/torvald/terrarum/virtualcomputer/assets/lua/?.lua;" .. package.path
 
 -- global variables
-_G._VERSION = "Luaj-jse 5.2.3"
+_G._VERSION = "Luaj-jse 3.0.1 (Lua 5.2.3)"
 _G.EMDASH = string.char(0xC4)
 _G.UNCHECKED = string.char(0x9C) -- box unchecked
 _G.CHECKED = string.char(0x9D) -- box checked
@@ -962,6 +962,8 @@ _G.DC3 = string.char(19) -- dim grey
 _G.DC4 = string.char(20) -- light grey
 _G.DLE = string.char(16) -- default error colour
 _G.runscript = function(s, src, ...)
+    if s:byte(1) == 27 then error("Bytecode execution is prohibited.") end
+
     local code, reason = load(s, src)
 
     if code then
@@ -971,6 +973,8 @@ _G.runscript = function(s, src, ...)
     end
 end
 _G.__scanMode__ = "UNINIT" -- part of inputstream implementation
+_G.bell = function(patn) term.bell(patn or ".") end
+_G.beep = _G.bell
 
 local screenbufferdim = term.width() * term.height()
 local screencolours = 4
@@ -994,6 +998,9 @@ computer.freeMemory = function() return totalMemory() - getMemory() end
 
 -- load libraries that coded in Lua
 require("ROMLIB")
+
+-- POST passed, initialise beeper
+beep "."
 
 -- load bios, if any
 if fs.exists(computer.bootloader) then shell.run(computer.bootloader) end

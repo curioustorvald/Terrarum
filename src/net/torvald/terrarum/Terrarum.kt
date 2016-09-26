@@ -100,8 +100,8 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
-        //addState(StateVTTest())
-        addState(StateTestingSandbox())
+        addState(StateVTTest())
+        //addState(StateTestingSandbox())
         //addState(StateSplash())
         //addState(StateMonitorCheck())
         //addState(StateFontTester())

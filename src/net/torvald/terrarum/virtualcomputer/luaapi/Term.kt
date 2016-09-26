@@ -24,6 +24,7 @@ internal class Term(globals: Globals, term: Teletype) {
         globals["term"]["width"] = Term.GetWidth(term)
         globals["term"]["scroll"] = Term.Scroll(term)
         globals["term"]["isTeletype"] = Term.IsTeletype(term)
+        globals["term"]["bell"] = Term.Bell(term)
 
         if (term is Terminal) {
             globals["term"]["emitRaw"] = Term.EmitRaw(term)
@@ -59,7 +60,14 @@ internal class Term(globals: Globals, term: Teletype) {
                 throw LuaError("bad argument (string expected, got ${this.typename()})")
         }
     }
-    
+
+    class Bell(val tty: Teletype) : OneArgFunction() {
+        override fun call(pattern: LuaValue): LuaValue {
+            tty.bell(pattern.checkjstring())
+            return LuaValue.NONE
+        }
+    }
+
     class WriteString(val tty: Teletype) : LuaFunction() {
         override fun call(p0: LuaValue): LuaValue {
             if (tty is Terminal)
