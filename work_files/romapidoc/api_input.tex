@@ -1,0 +1,18 @@
+The Input API provides access to game's Input API to get input-related informations.
+
+\subsection{Functions}
+
+\begin{tabularx}{\textwidth}{l l X}
+	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
+	\\ \\
+	\endhead
+	input.isKeyDown(keycode: int) & bool & Checks whether the key is down. By combining with `and' or `or' statement, you can inquire for multiple keys being down simultaneously.
+	\\ \\
+	input.readLine() & string & Reads a line of string and returns it.
+\end{tabularx}
+
+You can use \emph{Keys} Library with this API. Examples:
+
+\begin{itemize}
+\item input.isKeyDown(keys.q)
+\end{itemize}

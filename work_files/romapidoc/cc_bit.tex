@@ -1,0 +1,22 @@
+The Bit API is for manipulating numbers using bitwise binary operations. The ROMBASIC already comes with Lua's bit32 library so make sure to use that for your casual usage.
+
+\subsection{Functions}
+
+\begin{tabularx}{\textwidth}{l X}
+	\textbf{\large Function} & \textbf{\large Notes}
+	\\ \\
+	\endhead
+	bit.blshift(n, bits) & Alias of bit32.lshift(n, bits)
+	\\ \\
+	bit.brshift(n, bits) & Alias of bit32.arshift(n, bits)
+	\\ \\
+	bit.blogic\_rshift(n, bits) & Alias of bit32.brshift(n, bits)
+	\\ \\
+	bit.bxor(m, n) & Alias of bit32.bxor(m, n)
+	\\ \\
+	bit.bor(m, n) & Alias of bit32.bor(m, n)
+	\\ \\
+	bit.band(m, n) & Alias of bit32.band(m, n)
+	\\ \\
+	bit.bnot(n) & Alias of bit32.bnot(n)
+\end{tabularx}

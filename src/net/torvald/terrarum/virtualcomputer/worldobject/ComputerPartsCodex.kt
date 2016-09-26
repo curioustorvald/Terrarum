@@ -14,14 +14,14 @@ object ComputerPartsCodex {
 
     init {
         // in kilobytes
-        rams.put(4864,  16.MiB())
-        rams.put(4865,  24.MiB())
-        rams.put(4866,  32.MiB())
-        rams.put(4867,  64.MiB())
-        rams.put(4868,  96.MiB())
-        rams.put(4869, 128.MiB())
-        rams.put(4870, 160.MiB())
-        rams.put(4871, 256.MiB())
+        rams.put(4864,  128.KiB())
+        rams.put(4865,  192.KiB())
+        rams.put(4866,  256.KiB())
+        rams.put(4867,  384.KiB())
+        rams.put(4868,  512.KiB())
+        rams.put(4869,  768.KiB())
+        rams.put(4870, 1024.KiB())
+        rams.put(4871, 2048.KiB())
 
         processors.put(4872, 1000)
         processors.put(4873, 2000)
@@ -51,6 +51,6 @@ object ComputerPartsCodex {
 
     private fun Int.MB() = this * 1000000 // 1 MB == 1 000 000 bytes, bitches!
     private fun Int.kB() = this * 1000
-    private fun Int.KiB() = this.shr(10)
-    private fun Int.MiB() = this.shr(20)
+    private fun Int.KiB() = this.shl(10)
+    private fun Int.MiB() = this.shl(20)
 }

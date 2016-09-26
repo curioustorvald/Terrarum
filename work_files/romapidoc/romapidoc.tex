@@ -15,6 +15,7 @@
 
 \usepackage{ltablex}
 \usepackage{parskip}
+\usepackage{tasks}
 
 \frenchspacing
 \setlength{\parindent}{0pt}
@@ -22,7 +23,9 @@
 \setsecnumdepth{subsection}
 
 
-
+%% Idioms %%
+\hyphenation{Com-put-er-Craft}
+\hyphenation{O-pen-Com-put-ers}
 
 
 
@@ -95,348 +98,46 @@
 \chapter{APIs and Libraries}
 
 \section{Filesystem}
-
-The Filesystem API provides functions for manipulating files and the filesystem.
-
-The path for the argument of functions blocks `\,.\,.\,' to be entered, preventing users from access outside of the computer and eliminating the potential of harming the real computer of the innocent players.
-
-\subsection{Functions}
-
-\begin{tabularx}{\textwidth}{l l X}
-	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
-	\\ \\
-	\endhead
-	fs.list(\textbf{path}: string) & table & Returns list of files in \textbf{path}, in lua table.
-	\\ \\
-	fs.exists(\textbf{path}: string) & bool & Checks if \textbf{path} exists on the filesystem.
-	\\ \\
-	fs.isDir(\textbf{path}: string) & bool & Checks if \textbf{path} is a directory.
-	\\ \\
-	fs.isFile(\textbf{path}: string) & bool & Checks if \textbf{path} is a file.
-	\\ \\
-	fs.isReadOnly(\textbf{path}: string) & bool & Checks if \textbf{path} is read only.
-	\\ \\
-	fs.getSize(\textbf{path}: string) & int & Returns a size of the file/directory, in bytes.
-	\\ \\
-	fs.mkdir(\textbf{path}: string) & bool & Create a directory to \textbf{path}. Returns \textbf{true} upon success.
-	\\ \\
-	fs.mv(\textbf{from}: string, \textbf{dest}: string) & bool & Moves the directory to the destination. Subdirectories / files will also be moved. Returns \textbf{true} upon success.
-	\\ \\
-	fs.cp(\textbf{from}: string, \textbf{dest}: string) & bool & Copies the directory to the destination. Subdirectories / files will also be copied. Returns \textbf{true} upon success.
-	\\ \\
-	fs.rm(\textbf{path}: string) & bool & Deletes the \textbf{path}. If \textbf{path} is a directory, all its members will also be deleted. Returns \textbf{true} upon success.
-	\\ \\
-	fs.concat(\textbf{p1}: string, \textbf{p2}: string) & string & Concatenates two paths and return new path as string.
-	\\ \\
-	fs.open(\textbf{path}: string, \textbf{mode}: string) & file & Opens file and returns its handle. See section \emph{File Handler} for details.
-	\\ \\
-	fs.parent(\textbf{path}: string) & string & Returs parent directory to the \textbf{path}.
-	\\ \\
-	fs.dofile(\textbf{path}: string) & nil & Loads the script on \textbf{path} and executes it.
-	\\ \\
-	fs.fetchText(\textbf{path}: string) & string & Opens the file on \textbf{path} and returns its contents as a plain text.
-\end{tabularx}
-
-\subsection{File Handler}
-
-When it comes to opening a file, there are six modes available---r, w, a, rb, wb, ab, each represents \textbf{r}ead, \textbf{w}rite, \textbf{a}ppend and \textbf{b}yte.
-
-\begin{tabularx}{\textwidth}{l X}
-	\textbf{\large Function} & \textbf{\large Description}
-	\\ \\
-	\endhead
-	file.close() & Closes the file. Any data wrote will be actually wrote to disk when this function is called.
-	\\ \\
-	file.flush() & (in write/append mode) Flushes the data to the file, keeps the handle available afterwards
-	\\ \\
-	\multicolumn{2}{c}{\textbf{Read mode}}
-	\\ \\ 
-	file.readLine() & Reads text from the file line by line. Returns string of line, or \emph{nil} if there is no next line.
-	\\ \\
-	file.readAll() & Reads and returns whole text in the file as string.
-	\\ \\
-	\multicolumn{2}{c}{\textbf{Read binary mode}}
-	\\ \\
-	file.read() & Reads single byte in the file as int, or \emph{-1} if end-of-file is reached.
-	\\ \\
-	file.readAll() & Reads and returns whole byte in the file as string.
-	\\ \\
-	\multicolumn{2}{c}{\textbf{Write/append mode}}
-	\\ \\
-	file.write(string) & Writes \textbf{string} to the file.
-	\\ \\
-	file.writeLine(string) & Writes \textbf{string} to the file and append line feed.
-	\\ \\
-	\multicolumn{2}{c}{\textbf{Write/append binary mode}}
-	\\ \\
-	file.write(int) & Writes \textbf{int} to the file.
-	\\ \\
-	file.writeBytes(string) & Writes \textbf{string} to the file and append line feed.
-\end{tabularx}
+\input{api_filesystem}
 
 \section{Hexutils}
+\input{api_hexutils}
 
-The Hexutils library provides utility to convert byte value to hexadecimal string.
+\section{Input}
+\input{api_input}
 
-\subsection{Functions}
-
-\begin{tabularx}{\textwidth}{l l X}
-	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
-	\\ \\
-	\endhead
-	hexutils.toHexString(\textbf{bytes}: string) & string & Converts byte array to the string of its hexadecimal representations.
-\end{tabularx}
-
+\section{Keys}
+\input{api_keys}
 
 \section{Security}
-
-The Serurity API provides functions for security purposes, such as hashing and CSPRNG\footnote{Cryptographically secure psuedo-random number generator}.
-
-\subsection{Functions}
-
-\begin{tabularx}{\textwidth}{l l X}
-	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
-	\\ \\
-	\endhead
-	security.toSHA1(string) & string & Returns SHA-256 hash of input string in array of bytes (as a string)
-	\\ \\
-	security.toSHA256(string) & string & Returns SHA-1 hash of input string in array of bytes
-		\\ \\
-	security.toMD5(string) & string & Returns MD-5 hash of input string in array of bytes
-	\\ \\
-	security.randomBytes(\textbf{len}: int) & string & Returns byte array of random values in desired \textbf{len}gth.
-	\\ \\
-	security.decodeBase64(string) & string & Decodes Base64 string and returns the result as string.
-	\\ \\
-	security.encodeBase64(string) & string & Encodes input string as Base64 format and returns the result as array of bytes.
-\end{tabularx}
+\input{api_security}
 
 \section{Shell}
-
-
-
-\begin{tabularx}{\textwidth}{l l X}
-	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
-	\\ \\
-	\endhead
-	shell.run(\textbf{path}: string) & nil & Loads the script on \textbf{path} and executes it.
-\end{tabularx}
+\input{api_shell}
 
 \section{Terminal}
-
-The Terminal API provides functions for sending text to the terminals, and drawing text-mode graphics. The API expects connected terminal to use Codepage 437. See section \emph{Codepage} for details.
-
-\subsection{Functions}
-
-Note: cursor coordinates starts from one, not zero.
-
-\begin{tabularx}{\textwidth}{l l X}
-	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
-	\\ \\
-	\endhead
-	term.write(string) & nil & Writes string to the current cursor position. Line feed is not appended.
-	\\ \\
-	term.print(string) & nil & Writes string to the current cursor position and make a new line.
-	\\ \\
-	term.newLine() & nil & Make a new line.
-	\\ \\
-	term.moveCursor(\textbf{x}: int) & nil & Moves cursor horizontally, starting from 1.
-	\\ \\
-	term.width() & int & Returns the width of the terminal. Graphic terminals also can use this.
-	\\ \\
-	term.scroll(\textbf{n}: int) & nil & Make a new line \textbf{n} times.
-	\\ \\
-	term.isTeletype() & bool & Returns \textbf{true} if the terminal is teletype.
-	\\ \\
-	\multicolumn{3}{c}{\textbf{Graphic terminals only}}
-	\\ \\
-	term.emit(\textbf{c}: int, \textbf{x}: int, \textbf{y}: int) & nil & Emits \textbf{c} into (\textbf{x}, \textbf{y}), control sequence will not be processed and printed as symbols instead. Cursor will not be moved.
-	\\ \\
-	term.emitRaw(\textbf{bufferChar}: int) & nil & Emits \textbf{bufferChar} into into (\textbf{x}, \textbf{y}). Buffer char means a single character actually stored into the screen buffer, has four bits for back- and foreground colours respectively, and eight bits for a letter.
-	\\ \\
-	term.emitString(\textbf{s}, \textbf{x}: int, \textbf{y}: int) & nil & Emits \textbf{s} (a string) into (\textbf{x}, \textbf{y}), printing control sequences as symbols. Cursor will not be moved.
-	\\ \\
-	\begin{tabular}[t]{@{}l@{}}term.resetColour()\\term.resetColor()\end{tabular} & nil & Resets any colour changes to the defaults.
-	\\ \\
-	term.clear() & nil & Clears whole screen buffer and move cursor to (1, 1)
-	\\ \\
-	term.clearLine() & nil & Clears current line on the screen buffer, does not moves cursor.
-	\\ \\
-	term.setCursor(\textbf{x}: int, \textbf{y}: int) & nil & Moves cursor to (\textbf{x}, \textbf{y})
-	\\ \\
-	term.getCursor() & int, int & Returns current coordinates of the cursor.
-	\\ \\
-	term.getX() & int & Returns X coordinate of the cursor.
-	\\ \\
-	term.getY() & int & Returns Y coordinate of the cursor.
-	\\ \\
-	term.setX(int) & nil & Sets X coordinate of the cursor.
-	\\ \\
-	term.setY(int) & nil & Sets Y coordinate of the cursor.
-	\\ \\
-	term.setCursorBlink(bool) & nil & Sets cursor blinking. \textbf{true} makes the cursor blink.
-	\\ \\
-	term.size() & int, int & Returns width and height of the terminal.
-	\\ \\
-	term.height() & int & Returns height of the terminal. 
-	\\ \\
-	term.isCol() & bool & Returns if the terminal supports colour.
-	\\ \\
-	term.setForeCol(\textbf{col}: int) & nil & Sets foreground colour to \textbf{col}
-	\\ \\
-	term.setBackCol(\textbf{col}: int) & nil & Sets background colour to \textbf{col}.
-	\\ \\
-	term.foreCol() & int & Returns current foreground colour.
-	\\ \\
-	term.backCol() & int & Returns current background colour.
-\end{tabularx}
-
-\subsection{Standard Colours}
-
-\begin{tabularx}{\textwidth}{c l c l c l c l}
-	0 & \textcolor{black}{Black} & 1 & White & 2 & \textcolor{dimgrey}{Dim grey} & 3 & \textcolor{brightgrey}{Bright grey}
-	\\ \\
-	4 & \textcolor{yellow}{Yellow} & 5 & \textcolor{orange}{Orange} & 6 & \textcolor{red}{Red} & 7 & \textcolor{magenta}{Magenta}
-	\\ \\
-	8 & \textcolor{purple}{Purple} & 9 & \textcolor{blue}{Blue} & 10 & \textcolor{cyan}{Cyan} & 11 & \textcolor{lime}{Lime}
-	\\ \\
-	12 & \textcolor{green}{Green} & 13 & \textcolor{darkgreen}{Dark green} & 14 & \textcolor{brown}{Brown} & 15 & \textcolor{tan}{Tan}
-\end{tabularx}
-
-Non-colour terminals support colour index of 0--3.
-
-\subsection{Codepage}
-
-{\center\includegraphics[height=21em]{mda.pdf}}
-
-Character 0x9D (currency symbol) and 0xFA (middle dot) can be accessed with following Lua constants: \emph{MONEYSYM} and \emph{MIDDOT}.
-
-\subsection{Accepted Control Sequences}
-
-\begin{tabularx}{\textwidth}{c X c X}
-	\textbf{\large No.} & \textbf{\large Description} & \textbf{\large No.} & \textbf{\large Description}
-	\\ \\
-	\endhead
-	7 & BEL. Emits short beep. & 8 & BS. Moves cursor to left 1 character.
-	\\ \\
-	9 & TAB. Inserts appropriate horizontal space. Tab size is variable. & 10 & LF. Prints a new line.
-	\\ \\
-	12 & FF. Clears everything in screen buffer and moves cursor to (1, 1) & 13 & CR. Moves x coordinate of cursor to 1.
-	\\ \\
-	16 & DLE. Sets foreground colour to the default STDERR colour. & 127 & DEL. Backspace and deletes one character.
-	\\ \\
-	17 & DC1. Sets foreground colour to 0. (black) & 18 & DC2. Sets foreground colour to 1. (white)
-	\\ \\
-	19 & DC3. Sets foreground colour to 2. (dim grey) & 20 & DC4. Sets foreground colour to 3. (bright grey)
-\end{tabularx}
-
-
+\input{api_terminal}
 
 \section{Lua Globals}
+\input{luaglobals}
 
-ROMBASIC adds global functions and constants for operability.
-
-\subsection{Functions}
-
-\begin{tabularx}{\textwidth}{l l X}
-	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
-	\\ \\
-	\endhead
-	\unemph{\_G.}runScript(\textbf{fun}: str, \textbf{env}: str) & nil & Runs Lua script \textbf{fun} with the environment tag \textbf{env}.
-	\\ \\
-	\unemph{\_G.}getMem() & int & Returns the current memory usage in bytes.
-	\\ \\
-	\unemph{\_G.}getTotalMem() & int & Returns the total size of the memory installed in the computer, in bytes.
-	\\ \\
-	\unemph{\_G.}getFreeMem() & int & Returns the amount of free memory on the computer.
-\end{tabularx}
-
-\subsection{Constants}
-
-\begin{tabularx}{\textwidth}{l l X}
-	\textbf{\large Name} & \textbf{\large Type} & \textbf{\large Description}
-	\\ \\
-	\endhead
-	\unemph{\_G.}MONEYSYM & string & Currency symbol used in the world. Code 0x9D
-	\\ \\
-	\unemph{\_G.}MIDDOT & string & Middle dot used in typography. Code 0xFA (note: 0xF9 is a Dot Product used in Mathematics)
-	\\ \\
-	\unemph{\_G.}DC1 & string & Ascii control sequence DC1. Used to change foreground colour to black.
-	\\ \\
-	\unemph{\_G.}DC2 & string & Ascii control sequence DC2. Used to change foreground colour to white.
-	\\ \\
-	\unemph{\_G.}DC3 & string & Ascii control sequence DC3. Used to change foreground colour to dim grey.
-	\\ \\
-	\unemph{\_G.}DC4 & string & Ascii control sequence DC4. Used to change foreground colour to bright grey.
-	\\ \\
-	\unemph{\_G.}DLE & string & Ascii control sequence DLE. Used to change foreground colour to terminal's default error text colour.
-	\\ \\
-	\_COMPUTER.prompt & string & Default text for prompt input indicator.
-	\\ \\
-	\_COMPUTER.verbose & bool & Sets whether print debug information to the console.
-	\\ \\
-	\_COMPUTER.loadedCLayer & table & List of names of compatibility layers has been loaded.
-	\\ \\
-	\_COMPUTER.bootloader & string & Path to the boot file. Should point to the EFI (/boot/efi).
-	\\ \\
-	\_COMPUTER.OEM & string & Manufacturer of the computer. If you \emph{are} a manufacturer, you may want to fill in this variable with your own company's name.
-\end{tabularx}
+\section{Changes from Generic Lua Environment}
+\input{luadifferences}
 
 
 \chapter[Compatibility Layers---ComputerCraft]{{\LARGE Compatibility Layers} \\ ComputerCraft}
 
 \section{Bit}
-
-The Bit API is for manipulating numbers using bitwise binary operations. The ROMBASIC already comes with Lua's bit32 library so make sure to use that for your casual usage.
-
-\subsection{Functions}
-
-\begin{tabularx}{\textwidth}{l X}
-	\textbf{\large Function} & \textbf{\large Notes}
-	\\ \\
-	\endhead
-	bit.blshift(n, bits) & Alias of bit32.lshift(n, bits)
-	\\ \\
-	bit.brshift(n, bits) & Alias of bit32.arshift(n, bits)
-	\\ \\
-	bit.blogic\_rshift(n, bits) & Alias of bit32.brshift(n, bits)
-	\\ \\
-	bit.bxor(m, n) & Alias of bit32.bxor(m, n)
-	\\ \\
-	bit.bor(m, n) & Alias of bit32.bor(m, n)
-	\\ \\
-	bit.band(m, n) & Alias of bit32.band(m, n)
-	\\ \\
-	bit.bnot(n) & Alias of bit32.bnot(n)
-\end{tabularx}
+\input{cc_bit}
 
 \section{Colors}
-
-The Colors API allows you to manipulate sets of colors. This is useful in colors on Advanced Computers and Advanced Monitors. British spellings are also supported.
-
-\subsection{Constants}
-
-When the colours are used in ComputerCraft's Term API, nearest console colours will be used. Below is the table of colours coded with their substitutions.
-
-\begin{tabularx}{\textwidth}{l l l l}
-	colors.white & colors.\textcolor{orange}{orange} & colors.\textcolor{magenta}{magenta} & colors.\textcolor{cyan}{lightBlue}
-	\\ \\
-	colors.\textcolor{yellow}{yellow} & colors.\textcolor{lime}{lime} & colors.\textcolor{tan}{pink} & colors.\textcolor{dimgrey}{gray}
-	\\ \\
-	colors.\textcolor{brightgrey}{lightGray} & colors.\textcolor{cyan}{cyan} & colors.\textcolor{purple}{purple} & colors.\textcolor{blue}{blue}
-	\\ \\
-	colors.\textcolor{brown}{brown} & colors.\textcolor{green}{green} & colors.\textcolor{red}{red} & colors.\textcolor{black}{black}
-\end{tabularx}
-
-Note that pink is understood as \textcolor{tan}{tan} when it is used, lightBlue and cyan are merged to \textcolor{cyan}{cyan}.
-
-\subsection{Functions}
-
-All three functions are not supported, as there is no bundled cable thus there is no use of them.
+\input{cc_colors}
 
 \section{Term}
 
 \section{Filesystem}
+
+
 
 \chapter[Compatibility Layers---OpenComputers]{{\LARGE Compatibility Layers} \\ OpenComputers}
 
@@ -445,25 +146,9 @@ All three functions are not supported, as there is no bundled cable thus there i
 \chapter{Peripherals}
 
 \section{Line Printer}
+\input{peri_lp}
 
-The line printer is a printer that operates on line basis. It only prints text in line-by-line, hence the name, on almost endlessly long roll of papers; it has no notion of page, it just prints. If you want some pages to keep, you must tear them out yourself.
 
-Line printers do not work indefinitely; ignoring the obvious depletion of ink, belt for loading paper will be out of service on about 50 000 lines of printing, give or take a few, or paper will jam if the printer had struck with the unluckiness.
-
-\subsection{Functions}
-
-\begin{tabularx}{\textwidth}{l l X}
-	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
-	\\ \\
-	\endhead
-	lp.print(string) & nil & Prints a line of string.
-	\\ \\
-	lp.scroll(\textbf{n}: int) & nil & Scrolls the paper by \textbf{n} lines.
-	\\ \\
-	lp.status() & int & Returns a status of the line printer.
-	\\ \\
-	lp.reset() & nil & Resets the line printer.
-\end{tabularx}
 
 \chapter{References}
 

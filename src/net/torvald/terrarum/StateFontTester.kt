@@ -15,12 +15,9 @@ class StateFontTester : BasicGameState() {
     val textToPrint = "Font printer 서체 인쇄기"
 
     lateinit var canvas: Graphics
-    lateinit var gameFont: Font
 
     override fun init(gc: GameContainer, game: StateBasedGame) {
         canvas = Graphics(1024, 1024)
-
-        gameFont = GameFontWhite()
 
         Terrarum.gameLocale = "fiFI"
     }
@@ -30,7 +27,7 @@ class StateFontTester : BasicGameState() {
     }
 
     override fun render(gc: GameContainer, game: StateBasedGame, g: Graphics) {
-        g.font = gameFont
+        g.font = Terrarum.fontGame
 
         val text = arrayOf(
                 Lang["APP_WARNING_HEALTH_AND_SAFETY"],
@@ -46,6 +43,11 @@ class StateFontTester : BasicGameState() {
         for (i in 0..text.size - 1) {
             g.drawString(text[i], 10f, 10f + (g.font.lineHeight * i))
         }
+
+        g.font = Terrarum.fontSmallNumbers
+
+        g.drawString("The true master needs but one channel", 0f, 64f)
+        g.drawString("Press a key to start", 0f, 64f + 16f)
     }
 
     override fun getID(): Int = Terrarum.STATE_ID_TEST_FONT

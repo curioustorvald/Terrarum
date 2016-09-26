@@ -1,0 +1,20 @@
+The Serurity API provides functions for security purposes, such as hashing and CSPRNG\footnote{Cryptographically secure psuedo-random number generator}.
+
+\subsection{Functions}
+
+\begin{tabularx}{\textwidth}{l l X}
+	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
+	\\ \\
+	\endhead
+	security.toSHA1(string) & string & Returns SHA-256 hash of input string in array of bytes (as a string)
+	\\ \\
+	security.toSHA256(string) & string & Returns SHA-1 hash of input string in array of bytes
+		\\ \\
+	security.toMD5(string) & string & Returns MD-5 hash of input string in array of bytes
+	\\ \\
+	security.randomBytes(\textbf{len}: int) & string & Returns byte array of random values in desired \textbf{len}gth.
+	\\ \\
+	security.decodeBase64(string) & string & Decodes Base64 string and returns the result as string.
+	\\ \\
+	security.encodeBase64(string) & string & Encodes input string as Base64 format and returns the result as array of bytes.
+\end{tabularx}

@@ -19,8 +19,8 @@ import org.newdawn.slick.state.StateBasedGame
  */
 class StateVTTest : BasicGameState() {
 
-    // HiRes: 100x62, LoRes: 80x25
-    val vt = SimpleTextTerminal(SimpleTextTerminal.ELECTRIC_BLUE, 80, 25, colour = false, hires = false)
+    // HiRes: 100x64, LoRes: 80x25
+    val vt = SimpleTextTerminal(SimpleTextTerminal.GREEN, 80, 25, colour = false, hires = false)
     val computerInside = BaseTerrarumComputer(vt)
 
     val vtUI = Image(vt.displayW, vt.displayH)

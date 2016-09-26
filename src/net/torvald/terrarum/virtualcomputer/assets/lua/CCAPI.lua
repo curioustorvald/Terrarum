@@ -12,7 +12,7 @@
 if term.isTeletype() then error("This is a teletype; cannot use CCAPI layer") end
 
 
-table.insert(_COMPUTER.loadedCLayer, "CCAPI")
+table.insert(computer.loadedCLayer, "CCAPI")
 
 
 local function intLog2(i)
@@ -34,7 +34,7 @@ _G.bit = {} -- CC's weird BIT API
 
 bit.blshift = function(n, bits) bit32.lshift(n, bits) end
 bit.brshift = function(n, bits) bit32.arshift(n, bits) end
-bit.blogic_rshift = function(n, bits) bit32.brshift(n, bits) end
+bit.blogic_rshift = function(n, bits) bit32.rshift(n, bits) end
 bit.bxor = function(m, n) bit32.bxor(m, n) end
 bit.bor = function(m, n) bit32.bor(m, n) end
 bit.band = function(m, n) bit32.band(m, n) end
@@ -162,4 +162,4 @@ fs.run = function(p) fs.dofile(p) end
 -- DOWN AND OUT --
 ------------------
 
-if _COMPUTER.verbose then print("ComputerCraft compatibility layer successfully loaded.") end
+if computer.verbose then print("ComputerCraft compatibility layer successfully loaded.") end

@@ -1,0 +1,51 @@
+ROMBASIC adds global functions and constants for operability.
+
+\subsection{Functions}
+
+\begin{tabularx}{\textwidth}{l l X}
+	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
+	\\ \\
+	\endhead
+	\unemph{\_G.}runScript(\textbf{fun}: str, \textbf{env}: str) & nil & Runs Lua script \textbf{fun} with the environment tag \textbf{env}.
+	\\ \\
+	computer.totalMemory() & int & Returns the total size of the memory installed in the computer, in bytes.
+	\\ \\
+	computer.freeMemory() & int & Returns the amount of free memory on the computer.
+\end{tabularx}
+
+\subsection{Constants}
+
+\begin{tabularx}{\textwidth}{l l X}
+	\textbf{\large Name} & \textbf{\large Type} & \textbf{\large Description}
+	\\ \\
+	\endhead
+	\unemph{\_G.}EMDASH & string & EM dash represented by box-drawing character. Code 0xC4
+	\\ \\
+	\unemph{\_G.}UNCHECKED & string & Unchecked checkbox. Code 0x9C
+	\\ \\
+	\unemph{\_G.}CHECKED & string & Checked checkbox. Code 0x9D
+	\\ \\
+	\unemph{\_G.}MONEYSYM & string & Currency symbol used in the world. Code 0x9E
+	\\ \\
+	\unemph{\_G.}MIDDOT & string & Middle dot used in typography. Code 0xFA (note: 0xF9 is a Dot Product used in Mathematics)
+	\\ \\
+	\unemph{\_G.}DC1 & string & Ascii control sequence DC1. Used to change foreground colour to black.
+	\\ \\
+	\unemph{\_G.}DC2 & string & Ascii control sequence DC2. Used to change foreground colour to white.
+	\\ \\
+	\unemph{\_G.}DC3 & string & Ascii control sequence DC3. Used to change foreground colour to dim grey.
+	\\ \\
+	\unemph{\_G.}DC4 & string & Ascii control sequence DC4. Used to change foreground colour to bright grey.
+	\\ \\
+	\unemph{\_G.}DLE & string & Ascii control sequence DLE. Used to change foreground colour to terminal's default error text colour.
+	\\ \\
+	computer.prompt & string & Default text for prompt input indicator.
+	\\ \\
+	computer.verbose & bool & Sets whether print debug information to the console.
+	\\ \\
+	computer.loadedCLayer & table & List of names of compatibility layers has been loaded.
+	\\ \\
+	computer.bootloader & string & Path to the boot file. Should point to the EFI (/boot/efi).
+	\\ \\
+	computer.OEM & string & Manufacturer of the computer. If you \emph{are} a manufacturer, you may want to fill in this variable with your own company's name.
+\end{tabularx}

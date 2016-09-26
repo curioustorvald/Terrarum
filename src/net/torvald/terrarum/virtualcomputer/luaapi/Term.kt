@@ -7,7 +7,8 @@ import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 import java.nio.charset.Charset
 
 /**
- * APIs must have some extent of compatibility with ComputerCraft by dan200
+ * Controls terminal as if it was a monitor
+ * (not sending control sequences but just drives it, as if it was not a terminal @ 9600 baud)
  *
  * Created by minjaesong on 16-09-12.
  */
