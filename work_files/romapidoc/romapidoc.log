@@ -1,4 +1,4 @@
-This is LuaTeX, Version beta-0.80.0 (TeX Live 2015) (rev 5238)  (format=lualatex 2015.10.5)  27 SEP 2016 00:50
+This is LuaTeX, Version beta-0.80.0 (TeX Live 2015) (rev 5238)  (format=lualatex 2015.10.5)  28 SEP 2016 00:42
  restricted \write18 enabled.
  file:line:error style messages enabled.
 **romapidoc.tex
@@ -552,7 +552,7 @@ luatexbase-attr: luatexbase.attributes["luaotfload@cursbase"] = 6
 luatexbase-attr: luatexbase.attributes["luaotfload@curscurs"] = 7
 luatexbase-attr: luatexbase.attributes["luaotfload@cursdone"] = 8
 luatexbase-attr: luatexbase.attributes["luaotfload@state"] = 9
-luaotfload | main : fontloader loaded in 0.029 seconds
+luaotfload | main : fontloader loaded in 0.032 seconds
 luatexbase-mcb: inserting 'luaotfload.node_processor'
 at position 1 in 'pre_linebreak_filter'
 luatexbase-mcb: inserting 'luaotfload.node_processor'
@@ -1534,6 +1534,13 @@ Underfull \hbox (badness 2707) in paragraph at lines 20--20
 
 ] (./api_shell.tex) [13
 
+] (./api_speaker.tex
+Underfull \hbox (badness 6961) in paragraph at lines 10--10
+[][]|\EU2/MyriadPro(0)/m/n/10 En-queues speaker driv-ing
+ []
+
+) [14
+
 ] (./api_terminal.tex
 Underfull \hbox (badness 2165) in paragraph at lines 66--66
 \EU2/MyriadPro(0)/m/n/10 nal. Graphic ter-mi-nals also can
@@ -1577,11 +1584,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 66--66
 [][]|\EU2/MyriadPro(0)/m/n/10 Re-turns cur-rent back-ground
  []
 
-[14
+[15
 
-] [15]
+] [16]
 \cpimagew=\skip279
- <mda.png, id=184, 4625.28pt x 1798.72pt>
+ <mda.png, id=194, 4625.28pt x 1798.72pt>
 File: mda.png Graphic file (type png)
  <use mda.png>
 Package pdftex.def Info: mda.png used on input line 88.
@@ -1589,19 +1596,14 @@ Package pdftex.def Info: mda.png used on input line 88.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [16]
+ [17]
 Underfull \hbox (badness 6658) in paragraph at lines 109--109
 [][]|\EU2/MyriadPro(0)/m/n/10 DEL. Backspace and deletes
  []
 
-) [17<./mda.png>] (./luaglobals.tex
+) [18<./mda.png>] (./luaglobals.tex
 Underfull \hbox (badness 1092) in paragraph at lines 16--16
 \EU2/MyriadPro(0)/m/n/10 ory in-stalled in the com-puter, in
- []
-
-
-Overfull \hbox (38.91pt too wide) in alignment at lines 55--55
- [] [] [] 
  []
 
 
@@ -1639,76 +1641,68 @@ Underfull \hbox (badness 6364) in paragraph at lines 55--55
 [][]|\EU2/MyriadPro(0)/m/n/10 Ascii con-trol se-quence DLE. Used to
  []
 
+[19
 
-Package longtable Warning: Column widths have changed
-(longtable)                in table 1.12 on input line 55.
-
-[18
-
-]) [19] (./luadifferences.tex) [20
+] [20]) [21] (./luadifferences.tex) [22
 
 ]
-luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf" [21
+luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf" [23
 
-] (./cc_bit.tex) [22
+] (./cc_bit.tex) [24
 
 
 ]
-(./cc_colors.tex) [23
-
-] [24
-
-] [25
+(./cc_colors.tex) [25
 
 ] [26
 
-] [27] [28
+] [27
+
+] [28
+
+] [29] [30
 
 
-] [29] (./peri_lp.tex) [30
+] [31] (./peri_lp.tex) [32
 
 
 ]
-[31
+[33
 
-] [32
+] [34
 
-] [33
+] [35
 
 ]
 \tf@toc=\write5
 
 \openout5 = romapidoc.toc
-
-
-Package longtable Warning: Table widths have changed. Rerun LaTeX.
-
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 165.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 165.
-(./romapidoc.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 165.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 165.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 168.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 168.
+ (./romapidoc.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 168.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 168.
 Package rerunfilecheck Info: File `romapidoc.out' has not changed.
-(rerunfilecheck)             Checksum: A4B98F6CE220B3C970CC4D5ECA7A4CF8;2202.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 165.
+(rerunfilecheck)             Checksum: 08AA264EF0CA42804AF136BDE97F5E44;2293.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 168.
 )
 
 Here is how much of LuaTeX's memory you used:
- 27266 strings out of 494693
+ 27283 strings out of 494693
  125070,662416 words of node,token memory allocated
- 778 words of node memory still in use:
+ 780 words of node memory still in use:
    3 hlist, 1 vlist, 1 rule, 2 glue, 1 kern, 5 attribute, 141 glue_spec, 5 attri
 bute_list, 2 write nodes
-   avail lists: 2:14493,3:271,4:3580,5:1301,6:6145,7:343,8:21,9:884,10:390
- 30200 multiletter control sequences out of 65536+600000
+   avail lists: 2:14449,3:272,4:3579,5:1301,6:6145,7:343,8:22,9:884,10:390
+ 30205 multiletter control sequences out of 65536+600000
  62 fonts using 5300671 bytes
  67i,12n,59p,1189b,492s stack positions out of 5000i,500n,10000p,200000b,100000s
 </Library/Fonts/MyriadPro-It.otf></Library/Fonts/MyriadPro-Regular.otf></Library
 /Fonts/MyriadPro-Bold.otf>
-Output written on romapidoc.pdf (33 pages, 95556 bytes).
+Output written on romapidoc.pdf (35 pages, 97609 bytes).
 
-PDF statistics: 304 PDF objects out of 1000 (max. 8388607)
- 255 compressed objects within 3 object streams
- 85 named destinations out of 1000 (max. 131072)
- 153 words of extra memory for PDF output out of 10000 (max. 10000000)
+PDF statistics: 320 PDF objects out of 1000 (max. 8388607)
+ 269 compressed objects within 3 object streams
+ 91 named destinations out of 1000 (max. 131072)
+ 161 words of extra memory for PDF output out of 10000 (max. 10000000)
 

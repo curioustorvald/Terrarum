@@ -6,10 +6,30 @@
    Some codes were taken from OpenComputers, which is distributed under MIT
 --]]
 
-_G.computer = {}
 computer.realTime = function() return 0 end
 
-if totalMemory() == 0 then print("no RAM installed") __haltsystemexplicit__() return end
+-- global variables
+_G._VERSION = "Luaj-jse 3.0.1 (Lua 5.2.3)"
+_G.EMDASH = string.char(0xC4)
+_G.UNCHECKED = string.char(0x9C) -- box unchecked
+_G.CHECKED = string.char(0x9D) -- box checked
+_G.MONEY = string.char(0x9E) -- currency sign
+_G.MIDDOT = string.char(0xFA) -- middle dot sign
+_G.DC1 = string.char(17) -- black
+_G.DC2 = string.char(18) -- white
+_G.DC3 = string.char(19) -- dim grey
+_G.DC4 = string.char(20) -- light grey
+_G.DLE = string.char(16) -- default error colour
+
+_G.bell = function(patn) term.bell(patn or ".") end
+_G.beep = _G.bell
+
+if totalMemory() == 0 then
+    bell "="
+    print("no RAM installed")
+    __haltsystemexplicit__()
+    return
+end
 
 
 local hookInterval = 100
@@ -949,18 +969,7 @@ sandbox._G = sandbox
 -- path for any ingame libraries
 package.path = "/net/torvald/terrarum/virtualcomputer/assets/lua/?.lua;" .. package.path
 
--- global variables
-_G._VERSION = "Luaj-jse 3.0.1 (Lua 5.2.3)"
-_G.EMDASH = string.char(0xC4)
-_G.UNCHECKED = string.char(0x9C) -- box unchecked
-_G.CHECKED = string.char(0x9D) -- box checked
-_G.MONEY = string.char(0x9E) -- currency sign
-_G.MIDDOT = string.char(0xFA) -- middle dot sign
-_G.DC1 = string.char(17) -- black
-_G.DC2 = string.char(18) -- white
-_G.DC3 = string.char(19) -- dim grey
-_G.DC4 = string.char(20) -- light grey
-_G.DLE = string.char(16) -- default error colour
+-- global functions
 _G.runscript = function(s, src, ...)
     if s:byte(1) == 27 then error("Bytecode execution is prohibited.") end
 
@@ -973,8 +982,6 @@ _G.runscript = function(s, src, ...)
     end
 end
 _G.__scanMode__ = "UNINIT" -- part of inputstream implementation
-_G.bell = function(patn) term.bell(patn or ".") end
-_G.beep = _G.bell
 
 local screenbufferdim = term.width() * term.height()
 local screencolours = 4
@@ -982,7 +989,6 @@ if term.isCol() then screencolours = 8
 elseif term.isTeletype() then screencolours = 1 end
 local screenbuffersize = screenbufferdim * screencolours / 8
 
---_G.computer = {} -- standard console colours
 computer.prompt = DC3.."> "..DC4
 computer.verbose = true -- print debug info
 computer.loadedCLayer = {} -- list of loaded compatibility layers
@@ -990,6 +996,7 @@ computer.bootloader = "/boot/efi"
 computer.OEM = ""
 computer.beep = emittone
 computer.totalMemory = _G.totalMemory
+computer.bellpitch = 1000
 local getMemory = function()
     collectgarbage()
     return collectgarbage("count") * 1024 - 6.5*1048576 + screenbuffersize

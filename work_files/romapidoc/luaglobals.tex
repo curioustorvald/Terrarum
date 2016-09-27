@@ -8,7 +8,7 @@ ROMBASIC adds global functions and constants for operability.
 	\endhead
 	\unemph{\_G.}runScript(\textbf{fun}: str, \textbf{env}: str) & nil & Runs Lua script \textbf{fun} with the environment tag \textbf{env}.
 	\\ \\
-	\unemph{\_G.}bell(\textbf{pattern}: str) & nil & Strike bell (or beeper) with pattern. Accepted pattern letters: . - (space) Aliased to \unemph{\_G.}beep.
+	\unemph{\_G.}bell(\textbf{pattern}: str) & nil & Strike bell (or beeper) with pattern. See section \emph{Bell Codes} for more information. Aliased to \unemph{\_G.}beep.
 	\\ \\
 	computer.totalMemory() & int & Returns the total size of the memory installed in the computer, in bytes.
 	\\ \\
@@ -52,4 +52,16 @@ ROMBASIC adds global functions and constants for operability.
 	computer.OEM & string & Manufacturer of the computer. If you \emph{are} a manufacturer, you may want to fill in this variable with your own company's name.
 	\\ \\
 	computer.beep(\textbf{len}, \textbf{freq}) & nil & Generates square wave. \textbf{len} is integer, in milliseconds, \textbf{freq} is number, in Hertz.
+\end{tabularx}
+
+\subsection{Bell Codes}
+
+Bell Codes are patterns for driving bell/beeper. Each code is followed by short break of 50 milliseconds.
+
+\begin{tabularx}{\textwidth}{l X l X}
+	\textbf{.} (dot) & Short beep. 50 ms & \textbf{-} (dash) & Medium beep. 200 ms
+	\\ \\
+	\textbf{=} (equal) & Long beep. 500 ms & \textbf{,} (comma) & Short break. 50 ms
+	\\ \\
+	(space) & Break. 200 ms
 \end{tabularx}

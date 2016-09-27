@@ -22,6 +22,7 @@ import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
 import java.io.*
 import java.nio.ByteBuffer
+import java.util.*
 
 /**
  * A part that makes "computer fixture" actually work
@@ -34,6 +35,8 @@ import java.nio.ByteBuffer
 class BaseTerrarumComputer() {
 
     val DEBUG_UNLIMITED_MEM = false
+    val DEBUG = false
+
 
     lateinit var luaJ_globals: Globals
         private set
@@ -112,6 +115,8 @@ class BaseTerrarumComputer() {
         luaJ_globals.STDERR = termErr
         luaJ_globals.STDIN = termIn
 
+        luaJ_globals["bit"] = luaJ_globals["bit32"]
+
         // load libraries
         Term(luaJ_globals, term)
         Security(luaJ_globals)
@@ -119,6 +124,8 @@ class BaseTerrarumComputer() {
         HostAccessProvider(luaJ_globals, this)
         Input(luaJ_globals, this)
         Http(luaJ_globals, this)
+        PcSpeakerDriver(luaJ_globals, this)
+
 
         // secure the sandbox
         luaJ_globals["io"] = LuaValue.NIL
@@ -134,7 +141,7 @@ class BaseTerrarumComputer() {
         luaJ_globals["totalMemory"] = LuaFunGetTotalMem(this)
 
         luaJ_globals["computer"] = LuaTable()
-        luaJ_globals["emittone"] = ComputerEmitTone(this)
+        if (DEBUG) luaJ_globals["emittone"] = ComputerEmitTone(this)
     }
 
     var threadTimer = 0
@@ -158,6 +165,10 @@ class BaseTerrarumComputer() {
                 unsetThreadRun()
             }
         }
+
+        driveBeepQueueManager(delta)
+
+
     }
 
     fun keyPressed(key: Int, c: Char) {
@@ -189,6 +200,8 @@ class BaseTerrarumComputer() {
     }
 
     class ThreadRunCommand : Runnable {
+
+        val DEBUGTHRE = true
 
         val mode: Int
         val arg1: Any
@@ -227,8 +240,6 @@ class BaseTerrarumComputer() {
                 if (DEBUGTHRE) e.printStackTrace(System.err)
             }
         }
-
-        val DEBUGTHRE = true
     }
 
     class LuaFunGetTotalMem(val computer: BaseTerrarumComputer) : ZeroArgFunction() {
@@ -247,6 +258,58 @@ class BaseTerrarumComputer() {
     ///////////////////
     // BEEPER DRIVER //
     ///////////////////
+
+    private val beepMaxLen = 10000
+    // let's regard it as a tracker...
+    private val beepQueue = ArrayList<Pair<Int, Float>>()
+    private var beepCursor = -1
+    private var beepQueueLineExecTimer = 0 // millisec
+    private var beepQueueFired = false
+
+    private fun driveBeepQueueManager(delta: Int) {
+        // start beep queue
+        if (beepQueue.size > 0 && beepCursor == -1) {
+            beepCursor = 0
+        }
+
+        // continue beep queue
+        if (beepCursor >= 0 && beepQueueLineExecTimer >= beepQueueGetLenOfPtn(beepCursor)) {
+            beepQueueLineExecTimer -= beepQueueGetLenOfPtn(beepCursor)
+            beepCursor += 1
+            beepQueueFired = false
+        }
+
+        // complete beep queue
+        if (beepCursor >= beepQueue.size) {
+            clearBeepQueue()
+            if (DEBUG) println("!! Beep queue clear")
+        }
+
+        // actually play queue
+        if (beepCursor >= 0 && beepQueue.size > 0 && !beepQueueFired) {
+            playTone(beepQueue[beepCursor].first, beepQueue[beepCursor].second)
+            beepQueueFired = true
+        }
+
+        if (beepQueueFired) beepQueueLineExecTimer += delta
+    }
+
+    fun clearBeepQueue() {
+        beepQueue.clear()
+        beepCursor = -1
+        beepQueueLineExecTimer = 0
+    }
+
+    fun enqueueBeep(duration: Int, freq: Float) {
+        beepQueue.add(Pair(Math.min(duration, beepMaxLen), freq))
+    }
+
+    fun beepQueueGetLenOfPtn(ptnIndex: Int) = beepQueue[ptnIndex].first
+
+
+    ////////////////////
+    // TONE GENERATOR //
+    ////////////////////
 
     private val sampleRate = 44100
     private var beepSource: Int? = null
@@ -311,7 +374,7 @@ class BaseTerrarumComputer() {
         return audioData
     }
 
-    internal fun playTone(leninmilli: Int, freq: Float) {
+    private fun playTone(leninmilli: Int, freq: Float) {
         audioData = makeAudioData(leninmilli, freq)
 
 

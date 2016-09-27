@@ -11,25 +11,27 @@
 \contentsline {section}{\numberline {1.5}Security}{12}{section.1.5}
 \contentsline {subsection}{\numberline {1.5.1}Functions}{12}{subsection.1.5.1}
 \contentsline {section}{\numberline {1.6}Shell}{13}{section.1.6}
-\contentsline {section}{\numberline {1.7}Terminal}{14}{section.1.7}
-\contentsline {subsection}{\numberline {1.7.1}Functions}{14}{subsection.1.7.1}
-\contentsline {subsection}{\numberline {1.7.2}Standard Colours}{16}{subsection.1.7.2}
-\contentsline {subsection}{\numberline {1.7.3}Codepage}{17}{subsection.1.7.3}
-\contentsline {subsection}{\numberline {1.7.4}Accepted Control Sequences}{17}{subsection.1.7.4}
-\contentsline {section}{\numberline {1.8}Lua Globals}{18}{section.1.8}
-\contentsline {subsection}{\numberline {1.8.1}Functions}{18}{subsection.1.8.1}
-\contentsline {subsection}{\numberline {1.8.2}Constants}{18}{subsection.1.8.2}
-\contentsline {section}{\numberline {1.9}Changes from Generic Lua Environment}{20}{section.1.9}
-\contentsline {chapter}{\chapternumberline {2}Compatibility Layers---ComputerCraft}{21}{chapter.2}
-\contentsline {section}{\numberline {2.1}Bit}{22}{section.2.1}
-\contentsline {subsection}{\numberline {2.1.1}Functions}{22}{subsection.2.1.1}
-\contentsline {section}{\numberline {2.2}Colors}{23}{section.2.2}
-\contentsline {subsection}{\numberline {2.2.1}Constants}{23}{subsection.2.2.1}
-\contentsline {subsection}{\numberline {2.2.2}Functions}{23}{subsection.2.2.2}
-\contentsline {section}{\numberline {2.3}Term}{24}{section.2.3}
-\contentsline {section}{\numberline {2.4}Filesystem}{25}{section.2.4}
-\contentsline {chapter}{\chapternumberline {3}Compatibility Layers---OpenComputers}{27}{chapter.3}
-\contentsline {chapter}{\chapternumberline {4}Peripherals}{29}{chapter.4}
-\contentsline {section}{\numberline {4.1}Line Printer}{30}{section.4.1}
-\contentsline {subsection}{\numberline {4.1.1}Functions}{30}{subsection.4.1.1}
-\contentsline {chapter}{\chapternumberline {5}References}{31}{chapter.5}
+\contentsline {section}{\numberline {1.7}Speaker}{14}{section.1.7}
+\contentsline {section}{\numberline {1.8}Terminal}{15}{section.1.8}
+\contentsline {subsection}{\numberline {1.8.1}Functions}{15}{subsection.1.8.1}
+\contentsline {subsection}{\numberline {1.8.2}Standard Colours}{17}{subsection.1.8.2}
+\contentsline {subsection}{\numberline {1.8.3}Codepage}{18}{subsection.1.8.3}
+\contentsline {subsection}{\numberline {1.8.4}Accepted Control Sequences}{18}{subsection.1.8.4}
+\contentsline {section}{\numberline {1.9}Lua Globals}{19}{section.1.9}
+\contentsline {subsection}{\numberline {1.9.1}Functions}{19}{subsection.1.9.1}
+\contentsline {subsection}{\numberline {1.9.2}Constants}{19}{subsection.1.9.2}
+\contentsline {subsection}{\numberline {1.9.3}Bell Codes}{20}{subsection.1.9.3}
+\contentsline {section}{\numberline {1.10}Changes from Generic Lua Environment}{22}{section.1.10}
+\contentsline {chapter}{\chapternumberline {2}Compatibility Layers---ComputerCraft}{23}{chapter.2}
+\contentsline {section}{\numberline {2.1}Bit}{24}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Functions}{24}{subsection.2.1.1}
+\contentsline {section}{\numberline {2.2}Colors}{25}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Constants}{25}{subsection.2.2.1}
+\contentsline {subsection}{\numberline {2.2.2}Functions}{25}{subsection.2.2.2}
+\contentsline {section}{\numberline {2.3}Term}{26}{section.2.3}
+\contentsline {section}{\numberline {2.4}Filesystem}{27}{section.2.4}
+\contentsline {chapter}{\chapternumberline {3}Compatibility Layers---OpenComputers}{29}{chapter.3}
+\contentsline {chapter}{\chapternumberline {4}Peripherals}{31}{chapter.4}
+\contentsline {section}{\numberline {4.1}Line Printer}{32}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Functions}{32}{subsection.4.1.1}
+\contentsline {chapter}{\chapternumberline {5}References}{33}{chapter.5}

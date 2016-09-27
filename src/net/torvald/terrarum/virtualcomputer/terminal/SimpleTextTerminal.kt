@@ -23,6 +23,9 @@ open class SimpleTextTerminal(
         phosphorColour: Color, override val width: Int, override val height: Int, private val host: BaseTerrarumComputer,
         colour: Boolean = false, hires: Boolean = false
 ) : Terminal {
+
+    private val DEBUG = false
+
     /**
      * Terminals must support AT LEAST 4 colours.
      * Color index 0 must be default background, index 3 must be default foreground
@@ -108,32 +111,6 @@ open class SimpleTextTerminal(
         }
 
         wrap()
-
-        // start beep queue
-        if (beepQueue.size > 0 && beepCursor == -1) {
-            beepCursor = 0
-        }
-
-        // continue beep queue
-        if (beepCursor >= 0 && beepQueueLineExecTimer >= beepQueueGetLenOfPtn(beepCursor)) {
-            beepQueueLineExecTimer -= beepQueueGetLenOfPtn(beepCursor)
-            beepCursor += 1
-            beepQueueFired = false
-        }
-
-        // complete beep queue
-        if (beepCursor >= beepQueue.size) {
-            clearBeepQueue()
-            // println("!! Beep queue clear")
-        }
-
-        // actually play queue
-        if (beepCursor >= 0 && beepQueue.size > 0 && !beepQueueFired) {
-            beep(beepQueue[beepCursor].first, beepQueue[beepCursor].second)
-            beepQueueFired = true
-        }
-
-        if (beepQueueFired) beepQueueLineExecTimer += delta
     }
 
     private fun wrap() {
@@ -332,47 +309,37 @@ open class SimpleTextTerminal(
         foreColour = foreDefault
     }
 
-    private val maxDuration = 10000
-
-    // let's regard it as a tracker...
-    private val beepQueue = ArrayList<Pair<Int, Float>>()
-    private var beepCursor = -1
-    private var beepQueueLineExecTimer = 0 // millisec
-    private var beepQueueFired = false
-
     /**
      * @param duration: milliseconds
      * @param freg: Frequency (float)
      */
     override fun beep(duration: Int, freq: Float) {
         // println("!! Beep playing row $beepCursor, d ${Math.min(duration, maxDuration)} f $freq")
-        host.playTone(Math.min(duration, maxDuration), freq)
+        host.clearBeepQueue()
+        host.enqueueBeep(duration, freq)
     }
 
-    /** for "beep code" on modern BIOS. Pattern: - . */
+    /** for "beep code" on modern BIOS. */
     override fun bell(pattern: String) {
-        clearBeepQueue()
+        host.clearBeepQueue()
+
+        val freq: Float =
+                if (host.luaJ_globals["computer"]["bellpitch"].isnil())
+                    1000f
+                else
+                    host.luaJ_globals["computer"]["bellpitch"].checkdouble().toFloat()
+
         for (c in pattern) {
             when (c) {
-                '.' -> { enqueueBeep(80, 1000f); enqueueBeep(80, 0f) }
-                '-' -> { enqueueBeep(250, 1000f); enqueueBeep(80, 0f) }
-                ' ' -> { enqueueBeep(250, 0f) }
+                '.' -> { host.enqueueBeep(50, freq);  host.enqueueBeep(50, 0f) }
+                '-' -> { host.enqueueBeep(200, freq); host.enqueueBeep(50, 0f) }
+                '=' -> { host.enqueueBeep(500, freq); host.enqueueBeep(50, 0f) }
+                ' ' -> { host.enqueueBeep(200, 0f) }
+                ',' -> { host.enqueueBeep(50, 0f) }
                 else -> throw IllegalArgumentException("Unacceptable pattern: $c (from '$pattern')")
             }
         }
     }
-
-    fun clearBeepQueue() {
-        beepQueue.clear()
-        beepCursor = -1
-        beepQueueLineExecTimer = 0
-    }
-
-    fun enqueueBeep(duration: Int, freq: Float) {
-        beepQueue.add(Pair(Math.min(duration, maxDuration), freq))
-    }
-
-    fun beepQueueGetLenOfPtn(ptnIndex: Int) = beepQueue[ptnIndex].first
 
     override var lastInputByte: Int = -1
     var sb: StringBuilder = StringBuilder()
@@ -466,8 +433,6 @@ open class SimpleTextTerminal(
                 ASCII_DLE
         )
     }
-
-    private val DEBUG = true
 }
 
 class ALException(errorCode: Int) : Exception("ALerror: $errorCode") {
