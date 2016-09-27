@@ -26,19 +26,13 @@ local function intLog2(i)
 end
 
 
--------------
--- BIT API --
--------------
+-----------------------
+-- BIT API Extension --
+-----------------------
 
-_G.bit = {} -- CC's weird BIT API
-
-bit.blshift = function(n, bits) bit32.lshift(n, bits) end
-bit.brshift = function(n, bits) bit32.arshift(n, bits) end
-bit.blogic_rshift = function(n, bits) bit32.rshift(n, bits) end
-bit.bxor = function(m, n) bit32.bxor(m, n) end
-bit.bor = function(m, n) bit32.bor(m, n) end
-bit.band = function(m, n) bit32.band(m, n) end
-bit.bnot = function(n) bit32.bnot(n) end
+bit.blshift = bit32.lshift(n, bits)
+bit.brshift = bit32.arshift(n, bits)
+bit.blogic_rshift = bit32.rshift(n, bits)
 
 
 ----------------
@@ -134,28 +128,28 @@ term.blit = function(text, foreCol, backCol)
     end
 end
 
-term.getCursorPos = function() return term.getCursor() end
-term.setCursorPos = function(x, y) term.moveCursor(x, y) end
-term.setCursorBlink = function(b) term.blink(b) end
-term.isColor = function() return term.isCol() end
-term.getSize = function() return term.size() end
+term.getCursorPos = term.getCursor
+term.setCursorPos = term.moveCursor
+term.setCursorBlink = term.blink
+term.isColor = term.isCol
+term.getSize = term.size
 term.setTextColor = function(cccol) term.setForeCol(ccToGameCol[normaliseCCcol(cccol)]) end
-term.getTextColor = function() return term.getForeCol() end
+term.getTextColor = term.getForeCol
 term.setBackgroundColor = function(cccol) term.setBackCol(ccToGameCol[normaliseCCcol(cccol)]) end
-term.getBackgroundColor = function() return term.getBackCol() end
+term.getBackgroundColor = term.getBackCol
 
 
 --------------------
 -- FILESYSTEM API --
 --------------------
 
-fs.makeDir = function(p) fs.mkdir(p) end
-fs.move = function(a, b) fs.mv(a, b) end
-fs.copy = function(a, b) fs.cp(a, b) end
-fs.delete = function(p) fs.rm(p) end
-fs.combine = function(a, b) return fs.concat(a, b) end
-fs.getDir = function(p) return fs.parent(p) end
-fs.run = function(p) fs.dofile(p) end
+fs.makeDir = fs.mkdir
+fs.move = fs.mv
+fs.copy = fs.cp
+fs.delete = fs.rm
+fs.combine = fs.concat
+fs.getDir = fs.parent
+fs.run = fs.dofile
 
 
 ------------------

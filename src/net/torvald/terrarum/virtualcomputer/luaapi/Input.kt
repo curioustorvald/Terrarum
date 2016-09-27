@@ -22,14 +22,14 @@ class Input(globals: Globals, computer: BaseTerrarumComputer) {
         val keys_caps = intArrayOf(Key.CAPS_LOCK, Key.BACKSPACE, Key.L_CONTROL)
     }
 
-    class IsKeyDown(val computer: BaseTerrarumComputer) : OneArgFunction() {
+    class IsKeyDown(val host: BaseTerrarumComputer) : OneArgFunction() {
         override fun call(keyCode: LuaValue): LuaValue {
             val key = keyCode.checkint()
 
             // L_Alt and L_COMMAND are homogeneous
             if (keys_alt.contains(key)) {
                 for (k in keys_alt) {
-                    val down = computer.input.isKeyDown(k)
+                    val down = host.input.isKeyDown(k)
                     if (down) return LuaValue.valueOf(true)
                 }
             }
@@ -37,12 +37,12 @@ class Input(globals: Globals, computer: BaseTerrarumComputer) {
             // Caps, Backspace, L_Control, for Colemak and HHKB
             if (keys_caps.contains(key)) {
                 for (k in keys_caps) {
-                    val down = computer.input.isKeyDown(k)
+                    val down = host.input.isKeyDown(k)
                     if (down) return LuaValue.valueOf(true)
                 }
             }
 
-            return LuaValue.valueOf(computer.input.isKeyDown(keyCode.checkint()))
+            return LuaValue.valueOf(host.input.isKeyDown(keyCode.checkint()))
         }
     }
 }
