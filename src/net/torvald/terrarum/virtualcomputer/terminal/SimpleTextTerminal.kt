@@ -60,6 +60,9 @@ open class SimpleTextTerminal(
                 Color(0xaa, 0xaa, 0xaa)  // light grey
         )                                // THESE ARE THE STANDARD
 
+    val phosphor = if (colour) WHITE7500 else phosphorColour
+    open protected val colourScreen = if (colour) Color(8, 8, 8) else Color(19, 19, 19)
+
     override val coloursCount: Int
         get() = colours.size
 
@@ -79,7 +82,12 @@ open class SimpleTextTerminal(
 
     val screenBuffer = AAFrame(width, height)
 
-    open protected val fontRef = "./assets/graphics/fonts/${if (hires) "milky.png" else "MDA.png"}"
+    open protected val fontRef =
+            "./assets/graphics/fonts/${
+                if (hires) "milky.png"
+                else if (phosphor == GREEN || phosphor == AMBER) "MDA.png"
+                else "milkymda.png"
+            }"
     open protected val fontImg = Image(fontRef)
     open protected val fontW = fontImg.width / 16
     open protected val fontH = fontImg.height / 16
@@ -95,9 +103,6 @@ open class SimpleTextTerminal(
     private var cursorBlinkTimer = 0
     private val cursorBlinkLen = 250
     private var cursorBlinkOn = true
-
-    val phosphor = if (colour) WHITE7500 else phosphorColour
-    open protected val colourScreen = if (colour) Color(8, 8, 8) else Color(19, 19, 19)
 
 
 
@@ -399,8 +404,8 @@ open class SimpleTextTerminal(
         val AMBER = Color(255, 183, 0) // P3, 602 nm
         val GREEN = Color(74, 255, 0) // P39, 525 nm
         val WHITE = Color(204, 223, 255) // approximation of white CRT I own
-        val WHITE7500 = Color(0xe4eaff)
-        val ELECTRIC_BLUE = Color(0, 226, 255) // imaginary, 483 nm
+        private val WHITE7500 = Color(0xe4eaff)
+        val BLUE_NOVELTY = Color(0, 226, 255) // imaginary, 483 nm
         val RED = Color(250, 51, 0) // 632 nm
 
         val ASCII_NUL = 0.toChar()
