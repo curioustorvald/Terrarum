@@ -1,6 +1,6 @@
 package net.torvald.terrarum.virtualcomputer.luaapi
 
-import li.cil.repack.org.luaj.vm2.Globals
+import org.luaj.vm2.Globals
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
 
 /**

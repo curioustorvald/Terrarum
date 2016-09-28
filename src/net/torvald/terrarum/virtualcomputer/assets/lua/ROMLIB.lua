@@ -8,11 +8,11 @@
 
 _G.io = {}
 
-fs.dofile = function(p, ...)
+--[[fs.dofile = function(p, ...)
     local f = fs.open(p, "r")
     local s = f.readAll()
     _G.runscript(s, "="..p, ...)
-end
+end]] -- implementation moved to BOOT.lua
 
 _G.loadstring = _G.load
 
@@ -46,12 +46,12 @@ override fun keyPressed(key: Int, c: Char) {
   and THIS exact part will close the input for this function.
 ]]
 _G.__scanforline__ = function(echo) -- pass '1' to not echo; pass nothing to echo
-    native.closeInputString()
-    native.openInput(echo or 0)
+    machine.closeInputString()
+    machine.openInput(echo or 0)
     _G.__scanMode__ = "line"
     local s
     repeat -- we can do this ONLY IF lua execution process is SEPARATE THREAD
-        s = native.getLastStreamInput()
+        s = machine.getLastStreamInput()
     until s
     -- input is closed when RETURN is hit. See above comments.
     return s
@@ -59,12 +59,12 @@ end
 
 -- use Keys API to identify the keycode
 --[[_G.__scanforkey__ = function(echo) -- pass '1' to not echo; pass nothing to echo
-    native.closeInputString()
-    native.openInput(echo or 0)
+    machine.closeInputString()
+    machine.openInput(echo or 0)
     _G.__scanMode__ = "a_key"
     local key
     repeat -- we can do this ONLY IF lua execution process is SEPARATE THREAD
-        key = native.getLastKeyPress()
+        key = machine.getLastKeyPress()
     until key
     -- input is closed when any key is hit. See above comments.
     return key

@@ -1,0 +1,33 @@
+The OS library provides functions and constants for the system. Most of the functions in the standard Lua are faithfully reconstructed, but there are some functions that behaves differently.
+
+\begin{tabularx}{\textwidth}{l l X}
+	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
+	\\ \\
+	\endhead
+	os.clock() & number & Returns time passed since the computer is on.
+	\\ \\
+	os.date(format: string) & string & Returns world's current time in desired format, or default if no arguments are provided. NOTE: displaying different time is not possible; Lua's TIME\_T is only 32 bit, world's history can be much longer.
+\end{tabularx}
+
+\subsection{Date Format String}
+
+\begin{tabularx}{\textwidth}{c X c X}
+	\textbf{\large } & \textbf{\large Description} & \textbf{\large } & \textbf{\large Description}
+	\\ \\
+	\endhead
+	\textbf{\%a} & Short day name. (e.g. ``Tys'') & \textbf{\%A} & Full day name. (e.g. ``Tysdag'')
+	\\ \\
+	\textbf{\%b} & Short month name. (e.g. ``Gran'') & \textbf{\%B} & Full month name. (e.g. ``Granite'')
+	\\ \\
+	\textbf{\%c} & Date and time. (e.g. ``25-03-12 08:30:00'') & \textbf{\%d} & Current days.
+	\\ \\
+	\textbf{\%H} & Current hours. & \textbf{\%M} & Current minutes.
+	\\ \\
+	\textbf{\%m} & Current months. & \textbf{\%S} & Current seconds.
+	\\ \\
+	\textbf{\%w} & Current day of week in int. & \textbf{\%x} & Full date. (e.g. ``25-03-12'')
+	\\ \\
+	\textbf{\%X} & Full clock time. (e.g. ``08:30:00'') & \textbf{\%Y} & Current year. (e.g. ``125'')
+	\\ \\
+	\textbf{\%y} & Last two digits of current year. (e.g. ``25'') & \textbf{\%\%} & Per cent mark.
+\end{tabularx}

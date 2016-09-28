@@ -61,13 +61,8 @@ interface Terminal : Teletype {
      * @param duration: milliseconds
      * @param freg: Frequency (float)
      */
-    fun beep(duration: Int = 80, freq: Float = 1000f)
-    /**
-     * Pattern: - .
-     * .     80 ms
-     * -    200 ms
-     * ( )   80 ms
-     */
+    fun emitTone(duration: Int, freq: Float)
+
     override fun bell(pattern: String)
     /** Requires keyPressed() event to be processed.
      *

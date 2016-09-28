@@ -13,7 +13,7 @@ class SetTime : ConsoleCommand {
 
             Terrarum.ingame.world.time.setTime(timeToSet)
 
-            Echo().execute("Set time to ${Terrarum.ingame.world.time.elapsedSeconds()} " +
+            Echo().execute("Set time to ${Terrarum.ingame.world.time.elapsedSeconds} " +
                            "(${Terrarum.ingame.world.time.hours}h${formatMin(Terrarum.ingame.world.time.minutes)})")
         }
         else {

@@ -76,7 +76,7 @@ object WeatherMixer {
     fun render(g: Graphics) {
 
         // we will not care for nextSkybox for now
-        val timeNow = Terrarum.ingame.world.time.elapsedSeconds()
+        val timeNow = Terrarum.ingame.world.time.elapsedSeconds
         val skyboxColourMap = currentWeather.skyboxGradColourMap
         val lightColourMap = currentWeather.globalLightColourMap
 

@@ -6,10 +6,32 @@
    Some codes were taken from OpenComputers, which is distributed under MIT
 --]]
 
+-- global functions
+_G.runscript = function(s, src, ...)
+    if s:byte(1) == 27 then error("Bytecode execution is prohibited.") end
+
+    local code, reason = load(s, src)
+
+    if code then
+        xpcall(code(...), eprint)
+    else
+        print(DLE..tostring(reason)) -- it catches syntax errors
+    end
+end
+
+fs.dofile = function(p, ...)
+    local f = fs.open(p, "r")
+    local s = f.readAll()
+    _G.runscript(s, "="..p, ...)
+end
+
+-- EFI is expected to locate in "boot/efi"
+if fs.exists("boot/efi") then fs.dofile("boot/efi") end
+
 computer.realTime = function() return 0 end
 
 -- global variables
-_G._VERSION = "Luaj-jse 3.0.1 (Lua 5.2.3)"
+_G._VERSION = _VERSION.." (Lua 5.2.3)"
 _G.EMDASH = string.char(0xC4)
 _G.UNCHECKED = string.char(0x9C) -- box unchecked
 _G.CHECKED = string.char(0x9D) -- box checked
@@ -969,18 +991,6 @@ sandbox._G = sandbox
 -- path for any ingame libraries
 package.path = "/net/torvald/terrarum/virtualcomputer/assets/lua/?.lua;" .. package.path
 
--- global functions
-_G.runscript = function(s, src, ...)
-    if s:byte(1) == 27 then error("Bytecode execution is prohibited.") end
-
-    local code, reason = load(s, src)
-
-    if code then
-        xpcall(code(...), eprint)
-    else
-        print(DLE..tostring(reason)) -- it catches syntax errors
-    end
-end
 _G.__scanMode__ = "UNINIT" -- part of inputstream implementation
 
 local screenbufferdim = term.width() * term.height()
@@ -989,14 +999,15 @@ if term.isCol() then screencolours = 8
 elseif term.isTeletype() then screencolours = 1 end
 local screenbuffersize = screenbufferdim * screencolours / 8
 
-computer.prompt = DC3.."> "..DC4
-computer.verbose = true -- print debug info
-computer.loadedCLayer = {} -- list of loaded compatibility layers
-computer.bootloader = "/boot/efi"
-computer.OEM = ""
+if not computer.prompt then computer.prompt = DC3.."> "..DC4 end
+if not computer.verbose then computer.verbose = true end -- print debug info
+if not computer.loadedCLayer then computer.loadedCLayer = {} end -- list of loaded compatibility layers
+-- if no bootloader is pre-defined via EFI, use default one
+if not computer.bootloader then computer.bootloader = "/boot/bootloader" end
+if not computer.OEM then computer.OEM = "" end
 computer.beep = emittone
 computer.totalMemory = _G.totalMemory
-computer.bellpitch = 1000
+if not computer.bellpitch then computer.bellpitch = 1000 end
 local getMemory = function()
     collectgarbage()
     return collectgarbage("count") * 1024 - 6.5*1048576 + screenbuffersize
@@ -1021,7 +1032,7 @@ print("Rom basic "..DC2.._VERSION..DC4)
 print("Copyright (C) 1994-2013 Lua.org, PUC-Rio")
 print("Ok")
 
-while not native.isHalted() do
+while not machine.isHalted() do
     term.setCursorBlink(true)
     io.write(computer.prompt)
     local s = __scanforline__()
@@ -1039,5 +1050,5 @@ while not native.isHalted() do
 end
 
 ::quit::
-native.closeInputString()
+machine.closeInputString()
 return

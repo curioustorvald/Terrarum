@@ -1,8 +1,8 @@
 package net.torvald.terrarum.virtualcomputer.luaapi
 
-import li.cil.repack.org.luaj.vm2.Globals
-import li.cil.repack.org.luaj.vm2.LuaValue
-import li.cil.repack.org.luaj.vm2.lib.OneArgFunction
+import org.luaj.vm2.Globals
+import org.luaj.vm2.LuaValue
+import org.luaj.vm2.lib.OneArgFunction
 import net.torvald.terrarum.gameworld.toUint
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.digest.DigestUtils

@@ -1,9 +1,9 @@
 package net.torvald.terrarum.virtualcomputer.luaapi
 
-import li.cil.repack.org.luaj.vm2.*
-import li.cil.repack.org.luaj.vm2.lib.OneArgFunction
-import li.cil.repack.org.luaj.vm2.lib.TwoArgFunction
-import li.cil.repack.org.luaj.vm2.lib.ZeroArgFunction
+import org.luaj.vm2.*
+import org.luaj.vm2.lib.OneArgFunction
+import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.ZeroArgFunction
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
 import net.torvald.terrarum.virtualcomputer.luaapi.Term.Companion.checkIBM437

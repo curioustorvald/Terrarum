@@ -140,6 +140,8 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         var VSYNC = true
         val VSYNC_TRIGGER_THRESHOLD = 56
 
+        var gameStarted = false
+
         lateinit var ingame: StateInGame
         lateinit var gameConfig: GameConfig
 

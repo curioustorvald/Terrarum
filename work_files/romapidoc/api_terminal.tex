@@ -20,6 +20,8 @@ Note: cursor coordinates starts from one, not zero.
 	\\ \\
 	term.scroll(\textbf{n}: int) & nil & Make a new line \textbf{n} times.
 	\\ \\
+	term.bell(pattern: string) & nil & Strikes a bell. Go to section \emph{Lua Globals} > \emph{Bell Codes} for accepted patterns.
+	\\ \\
 	term.isTeletype() & bool & Returns \textbf{true} if the terminal is teletype.
 	\\ \\
 	\multicolumn{3}{c}{\textbf{Graphic terminals only}}
@@ -95,7 +97,7 @@ Character 0x9E (currency symbol) and 0xFA (middle dot) can be accessed with foll
 	\textbf{\large No.} & \textbf{\large Description} & \textbf{\large No.} & \textbf{\large Description}
 	\\ \\
 	\endhead
-	7 & BEL. Emits short beep. & 8 & BS. Moves cursor to left 1 character.
+	7 & BEL. Emits short emitTone. & 8 & BS. Moves cursor to left 1 character.
 	\\ \\
 	9 & TAB. Inserts appropriate horizontal space. Tab size is variable. & 10 & LF. Prints a new line.
 	\\ \\

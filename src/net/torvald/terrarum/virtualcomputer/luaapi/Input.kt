@@ -1,9 +1,9 @@
 package net.torvald.terrarum.virtualcomputer.luaapi
 
-import li.cil.repack.org.luaj.vm2.Globals
-import li.cil.repack.org.luaj.vm2.LuaTable
-import li.cil.repack.org.luaj.vm2.LuaValue
-import li.cil.repack.org.luaj.vm2.lib.OneArgFunction
+import org.luaj.vm2.Globals
+import org.luaj.vm2.LuaTable
+import org.luaj.vm2.LuaValue
+import org.luaj.vm2.lib.OneArgFunction
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
 

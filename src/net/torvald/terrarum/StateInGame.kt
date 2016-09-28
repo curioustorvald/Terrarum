@@ -93,6 +93,8 @@ constructor() : BasicGameState() {
     @Throws(SlickException::class)
     override fun init(gameContainer: GameContainer, stateBasedGame: StateBasedGame) {
         // state init code. Executed before the game goes into any "state" in states in StateBasedGame.java
+
+        Terrarum.gameStarted = true
     }
 
     override fun enter(gc: GameContainer, sbg: StateBasedGame) {

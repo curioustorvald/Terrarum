@@ -223,7 +223,7 @@ open class SimpleTextTerminal(
         }
         else {
             when (c) {
-                ASCII_BEL -> beep()
+                ASCII_BEL -> bell(".")
                 ASCII_BS  -> { cursorX -= 1; wrap() }
                 ASCII_TAB -> { cursorX = (cursorX).div(TABSIZE).times(TABSIZE) + TABSIZE }
                 ASCII_LF  -> newLine()
@@ -318,13 +318,13 @@ open class SimpleTextTerminal(
      * @param duration: milliseconds
      * @param freg: Frequency (float)
      */
-    override fun beep(duration: Int, freq: Float) {
+    override fun emitTone(duration: Int, freq: Float) {
         // println("!! Beep playing row $beepCursor, d ${Math.min(duration, maxDuration)} f $freq")
         host.clearBeepQueue()
         host.enqueueBeep(duration, freq)
     }
 
-    /** for "beep code" on modern BIOS. */
+    /** for "emitTone code" on modern BIOS. */
     override fun bell(pattern: String) {
         host.clearBeepQueue()
 
@@ -336,7 +336,7 @@ open class SimpleTextTerminal(
 
         for (c in pattern) {
             when (c) {
-                '.' -> { host.enqueueBeep(50, freq);  host.enqueueBeep(50, 0f) }
+                '.' -> { host.enqueueBeep(80, freq);  host.enqueueBeep(50, 0f) }
                 '-' -> { host.enqueueBeep(200, freq); host.enqueueBeep(50, 0f) }
                 '=' -> { host.enqueueBeep(500, freq); host.enqueueBeep(50, 0f) }
                 ' ' -> { host.enqueueBeep(200, 0f) }

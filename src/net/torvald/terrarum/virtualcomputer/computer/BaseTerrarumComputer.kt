@@ -1,20 +1,18 @@
 package net.torvald.terrarum.virtualcomputer.computer
 
 import com.jme3.math.FastMath
-import li.cil.repack.org.luaj.vm2.Globals
-import li.cil.repack.org.luaj.vm2.LuaError
-import li.cil.repack.org.luaj.vm2.LuaTable
-import li.cil.repack.org.luaj.vm2.LuaValue
-import li.cil.repack.org.luaj.vm2.lib.TwoArgFunction
-import li.cil.repack.org.luaj.vm2.lib.ZeroArgFunction
-import li.cil.repack.org.luaj.vm2.lib.jse.JsePlatform
+import org.luaj.vm2.Globals
+import org.luaj.vm2.LuaError
+import org.luaj.vm2.LuaTable
+import org.luaj.vm2.LuaValue
+import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.ZeroArgFunction
+import org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.KVHashMap
-import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.virtualcomputer.luaapi.*
 import net.torvald.terrarum.virtualcomputer.terminal.*
 import net.torvald.terrarum.virtualcomputer.worldobject.ComputerPartsCodex
-import net.torvald.terrarum.virtualcomputer.worldobject.FixtureComputerBase
 import org.lwjgl.BufferUtils
 import org.lwjgl.openal.AL
 import org.lwjgl.openal.AL10
@@ -73,6 +71,12 @@ class BaseTerrarumComputer() {
     lateinit var term: Teletype
         private set
 
+    // os-related functions. These are called "machine" library-wise.
+    private val startupTimestamp: Long = System.currentTimeMillis()
+    /** Time elapsed since the power is on. */
+    val milliTime: Int
+        get() = (System.currentTimeMillis() - startupTimestamp).toInt()
+
     init {
         computerValue["memslot0"] = 4864 // -1 indicates mem slot is empty
         computerValue["memslot1"] = -1 // put index of item here
@@ -96,7 +100,6 @@ class BaseTerrarumComputer() {
 
         // boot device
         computerValue["boot"] = computerValue.getAsString("hda")!!
-
     }
 
     fun attachTerminal(term: Teletype) {
@@ -125,6 +128,7 @@ class BaseTerrarumComputer() {
         Input(luaJ_globals, this)
         Http(luaJ_globals, this)
         PcSpeakerDriver(luaJ_globals, this)
+        WorldInformationProvider(luaJ_globals)
 
 
         // secure the sandbox
@@ -141,6 +145,7 @@ class BaseTerrarumComputer() {
         luaJ_globals["totalMemory"] = LuaFunGetTotalMem(this)
 
         luaJ_globals["computer"] = LuaTable()
+        // rest of the "computer" APIs should be implemented in BOOT.lua
         if (DEBUG) luaJ_globals["emittone"] = ComputerEmitTone(this)
     }
 
@@ -167,8 +172,6 @@ class BaseTerrarumComputer() {
         }
 
         driveBeepQueueManager(delta)
-
-
     }
 
     fun keyPressed(key: Int, c: Char) {
@@ -267,19 +270,19 @@ class BaseTerrarumComputer() {
     private var beepQueueFired = false
 
     private fun driveBeepQueueManager(delta: Int) {
-        // start beep queue
+        // start emitTone queue
         if (beepQueue.size > 0 && beepCursor == -1) {
             beepCursor = 0
         }
 
-        // continue beep queue
+        // continue emitTone queue
         if (beepCursor >= 0 && beepQueueLineExecTimer >= beepQueueGetLenOfPtn(beepCursor)) {
             beepQueueLineExecTimer -= beepQueueGetLenOfPtn(beepCursor)
             beepCursor += 1
             beepQueueFired = false
         }
 
-        // complete beep queue
+        // complete emitTone queue
         if (beepCursor >= beepQueue.size) {
             clearBeepQueue()
             if (DEBUG) println("!! Beep queue clear")

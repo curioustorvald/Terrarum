@@ -1,36 +1,35 @@
 package net.torvald.terrarum.virtualcomputer.luaapi
 
-import li.cil.repack.org.luaj.vm2.Globals
-import li.cil.repack.org.luaj.vm2.LuaFunction
-import li.cil.repack.org.luaj.vm2.LuaTable
-import li.cil.repack.org.luaj.vm2.LuaValue
-import li.cil.repack.org.luaj.vm2.lib.OneArgFunction
-import li.cil.repack.org.luaj.vm2.lib.ZeroArgFunction
+import org.luaj.vm2.lib.OneArgFunction
+import org.luaj.vm2.lib.ZeroArgFunction
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
 import net.torvald.terrarum.virtualcomputer.luaapi.Term.Companion.checkIBM437
 import net.torvald.terrarum.virtualcomputer.terminal.Teletype
+import org.luaj.vm2.*
 
 /**
  * Provide Lua an access to computer object that is in Java
+ *
+ * The "machine" refers to the computer fixture itself in the game world.
  *
  * Created by minjaesong on 16-09-19.
  */
 internal class HostAccessProvider(globals: Globals, computer: BaseTerrarumComputer) {
 
     init {
-        globals["native"] = LuaTable()
-        globals["native"]["println"] = PrintLn()
-        globals["native"]["isHalted"] = IsHalted(computer)
+        globals["machine"] = LuaTable()
+        globals["machine"]["println"] = PrintLn()
+        globals["machine"]["isHalted"] = IsHalted(computer)
 
-        globals["native"]["closeInputString"] = NativeCloseInputString(computer.term)
-        globals["native"]["closeInputKey"] = NativeCloseInputKey(computer.term)
-        globals["native"]["openInput"] = NativeOpenInput(computer.term)
-        globals["native"]["getLastStreamInput"] = NativeGetLastStreamInput(computer.term)
-        globals["native"]["getLastKeyPress"] = NativeGetLastKeyPress(computer.term)
+        globals["machine"]["closeInputString"] = NativeCloseInputString(computer.term)
+        globals["machine"]["closeInputKey"] = NativeCloseInputKey(computer.term)
+        globals["machine"]["openInput"] = NativeOpenInput(computer.term)
+        globals["machine"]["getLastStreamInput"] = NativeGetLastStreamInput(computer.term)
+        globals["machine"]["getLastKeyPress"] = NativeGetLastKeyPress(computer.term)
 
-        // while lua's dofile/require is fixiated to fs, this command allows
-        // libraries in JAR to be loaded.
-        //globals["native"]["loadBuiltInLib"] = NativeLoadBuiltInLib()
+        globals["machine"]["milliTime"] = NativeGetMilliTime(computer)
+
+        globals["machine"]["sleep"] = NativeBusySleep(computer)
 
         globals["__haltsystemexplicit__"] = HaltComputer(computer)
     }
@@ -95,6 +94,23 @@ internal class HostAccessProvider(globals: Globals, computer: BaseTerrarumComput
         override fun call() : LuaValue {
             computer.isHalted = true
             computer.luaJ_globals.load("""print(DC4.."system halted")""").call()
+            return LuaValue.NONE
+        }
+    }
+
+    /** Time elapsed since the power is on. */
+    class NativeGetMilliTime(val computer: BaseTerrarumComputer) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return LuaValue.valueOf(computer.milliTime)
+        }
+    }
+
+    class NativeBusySleep(val computer: BaseTerrarumComputer) : OneArgFunction() {
+        override fun call(mills: LuaValue): LuaValue {
+            val starttime = computer.milliTime
+            val sleeptime = mills.checkint()
+            if (sleeptime > 1000) throw LuaError("Cannot busy-sleep more than a second.")
+            while (computer.milliTime - starttime < sleeptime) { }
             return LuaValue.NONE
         }
     }
