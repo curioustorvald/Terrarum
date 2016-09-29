@@ -1,4 +1,4 @@
-This is LuaTeX, Version beta-0.80.0 (TeX Live 2015) (rev 5238)  (format=lualatex 2015.10.5)  29 SEP 2016 00:19
+This is LuaTeX, Version beta-0.80.0 (TeX Live 2015) (rev 5238)  (format=lualatex 2015.10.5)  29 SEP 2016 19:27
  restricted \write18 enabled.
  file:line:error style messages enabled.
 **romapidoc.tex
@@ -552,7 +552,7 @@ luatexbase-attr: luatexbase.attributes["luaotfload@cursbase"] = 6
 luatexbase-attr: luatexbase.attributes["luaotfload@curscurs"] = 7
 luatexbase-attr: luatexbase.attributes["luaotfload@cursdone"] = 8
 luatexbase-attr: luatexbase.attributes["luaotfload@state"] = 9
-luaotfload | main : fontloader loaded in 0.031 seconds
+luaotfload | main : fontloader loaded in 0.057 seconds
 luatexbase-mcb: inserting 'luaotfload.node_processor'
 at position 1 in 'pre_linebreak_filter'
 luatexbase-mcb: inserting 'luaotfload.node_processor'
@@ -1224,7 +1224,7 @@ File: tasks.cfg 2014/07/29 v0.10a tasks instances
 . Defining command \settasks with sig. 'm' on line 710.
 .................................................
 )
-Package hyperref Info: Option `unicode' set `true' on input line 83.
+Package hyperref Info: Option `unicode' set `true' on input line 89.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/hyperref/puenc.def
 File: puenc.def 2012/11/06 v6.83m Hyperref: PDF Unicode definition (HO)
@@ -1232,30 +1232,30 @@ File: puenc.def 2012/11/06 v6.83m Hyperref: PDF Unicode definition (HO)
 (./romapidoc.aux)
 \openout1 = romapidoc.aux
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for EU2/lmr/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for T3/cmr/m/n on input line 87.
-LaTeX Font Info:    Try loading font information for T3+cmr on input line 87.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for EU2/lmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for T3/cmr/m/n on input line 93.
+LaTeX Font Info:    Try loading font information for T3+cmr on input line 93.
  (/usr/local/texlive/2015/texmf-dist/tex/latex/tipa/t3cmr.fd
 File: t3cmr.fd 2001/12/31 TIPA font definitions
 )
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 87.
-LaTeX Font Info:    ... okay on input line 87.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
 
 (/usr/local/texlive/2015/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -1291,64 +1291,64 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 .................................................
 \symlegacymaths=\mathgroup4
 LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
-(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 87.
-LaTeX Font Info:    Redeclaring math accent \acute on input line 87.
-LaTeX Font Info:    Redeclaring math accent \grave on input line 87.
-LaTeX Font Info:    Redeclaring math accent \ddot on input line 87.
-LaTeX Font Info:    Redeclaring math accent \tilde on input line 87.
-LaTeX Font Info:    Redeclaring math accent \bar on input line 87.
-LaTeX Font Info:    Redeclaring math accent \breve on input line 87.
-LaTeX Font Info:    Redeclaring math accent \check on input line 87.
-LaTeX Font Info:    Redeclaring math accent \hat on input line 87.
-LaTeX Font Info:    Redeclaring math accent \dot on input line 87.
-LaTeX Font Info:    Redeclaring math accent \mathring on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \colon on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \Delta on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \Theta on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \Xi on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \Pi on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \Phi on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \Psi on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \Omega on input line 87.
-LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 87.
-LaTeX Font Info:    Redeclaring symbol font `operators' on input line 87.
+(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 93.
+LaTeX Font Info:    Redeclaring math accent \acute on input line 93.
+LaTeX Font Info:    Redeclaring math accent \grave on input line 93.
+LaTeX Font Info:    Redeclaring math accent \ddot on input line 93.
+LaTeX Font Info:    Redeclaring math accent \tilde on input line 93.
+LaTeX Font Info:    Redeclaring math accent \bar on input line 93.
+LaTeX Font Info:    Redeclaring math accent \breve on input line 93.
+LaTeX Font Info:    Redeclaring math accent \check on input line 93.
+LaTeX Font Info:    Redeclaring math accent \hat on input line 93.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 93.
+LaTeX Font Info:    Redeclaring math accent \mathring on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \colon on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 93.
+LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 93.
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 93.
 LaTeX Font Info:    Encoding `OT1' has changed to `EU2' for symbol font
-(Font)              `operators' in the math version `normal' on input line 87.
+(Font)              `operators' in the math version `normal' on input line 93.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  OT1/cmr/m/n --> EU2/MyriadPro(0)/m/n on input line 87.
+(Font)                  OT1/cmr/m/n --> EU2/MyriadPro(0)/m/n on input line 93.
 LaTeX Font Info:    Encoding `OT1' has changed to `EU2' for symbol font
-(Font)              `operators' in the math version `bold' on input line 87.
+(Font)              `operators' in the math version `bold' on input line 93.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  OT1/cmr/bx/n --> EU2/MyriadPro(0)/m/n on input line 87.
+(Font)                  OT1/cmr/bx/n --> EU2/MyriadPro(0)/m/n on input line 93.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
 (Font)                  EU2/MyriadPro(0)/m/n --> EU2/MyriadPro(0)/m/n on input l
-ine 87.
+ine 93.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> EU2/MyriadPro(0)/m/it on input line 87.
+(Font)                  OT1/cmr/m/it --> EU2/MyriadPro(0)/m/it on input line 93.
 
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> EU2/MyriadPro(0)/bx/n on input line 87.
+(Font)                  OT1/cmr/bx/n --> EU2/MyriadPro(0)/bx/n on input line 93.
 
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> EU2/lmss/m/n on input line 87.
+(Font)                  OT1/cmss/m/n --> EU2/lmss/m/n on input line 93.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> EU2/lmtt/m/n on input line 87.
+(Font)                  OT1/cmtt/m/n --> EU2/lmtt/m/n on input line 93.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
 (Font)                  EU2/MyriadPro(0)/m/n --> EU2/MyriadPro(0)/bx/n on input 
-line 87.
+line 93.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
-(Font)                  OT1/cmr/bx/it --> EU2/MyriadPro(0)/bx/it on input line 8
-7.
+(Font)                  OT1/cmr/bx/it --> EU2/MyriadPro(0)/bx/it on input line 9
+3.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> EU2/lmss/bx/n on input line 87.
+(Font)                  OT1/cmss/bx/n --> EU2/lmss/bx/n on input line 93.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> EU2/lmtt/bx/n on input line 87.
+(Font)                  OT1/cmtt/m/n --> EU2/lmtt/bx/n on input line 93.
 \AtBeginShipoutBox=\box267
-Package hyperref Info: Link coloring OFF on input line 87.
+Package hyperref Info: Link coloring OFF on input line 93.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
@@ -1360,10 +1360,10 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 Redoing nameref's sectioning
 Redoing nameref's label
-LaTeX Info: Redefining \nameref on input line 87.
-LaTeX Info: Redefining \ref on input line 87.
-LaTeX Info: Redefining \pageref on input line 87.
-LaTeX Info: Redefining \nameref on input line 87.
+LaTeX Info: Redefining \nameref on input line 93.
+LaTeX Info: Redefining \ref on input line 93.
+LaTeX Info: Redefining \pageref on input line 93.
+LaTeX Info: Redefining \nameref on input line 93.
 (./romapidoc.out) (./romapidoc.out)
 \@outlinefile=\write4
 
@@ -1375,11 +1375,11 @@ luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-It.otf"
 luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Regular.otf"
 luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Regular.otf"
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 89.
+(Font)              <10.95> on input line 95.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 89.
+(Font)              <8> on input line 95.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 89.
+(Font)              <6> on input line 95.
  [1
 
 {/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2
@@ -1389,22 +1389,27 @@ luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Regular.otf"
 luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf" (./romapid
 oc.toc
 luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf"
+luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf"
 luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Regular.otf"
 luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Regular.otf"
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 1.
+(Font)              <7> on input line 2.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 1.
-) [3] [4
+(Font)              <5> on input line 2.
+ [3])
+LaTeX Font Info:    Font shape `EU2/MyriadPro(0)/m/sl' in size <10> not availabl
+e
+(Font)              Font shape `EU2/MyriadPro(0)/m/it' tried instead on input li
+ne 104.
+luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-It.otf"
+luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-It.otf" [4]
+luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Regular.otf"
+luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf" [5
 
 ]
-luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Regular.otf"
-luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf" [5]
-luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Regular.otf"
-luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf"
 (./api_filesystem.tex
+luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Regular.otf"
 luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf"
-luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-It.otf"
 Underfull \hbox (badness 2735) in paragraph at lines 40--40
 [][]|\EU2/MyriadPro(0)/m/n/10 Moves the di-rec-tory to the
  []
@@ -1424,12 +1429,7 @@ Underfull \hbox (badness 1655) in paragraph at lines 40--40
 \EU2/MyriadPro(0)/m/n/10 des-ti-na-tion. Sub-di-rec-to-ries /
  []
 
-LaTeX Font Info:    Font shape `EU2/MyriadPro(0)/m/sl' in size <10> not availabl
-e
-(Font)              Font shape `EU2/MyriadPro(0)/m/it' tried instead on input li
-ne 40.
-luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-It.otf"
-luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-It.otf" [6
+[6
 
 
 ] [7]) [8] (./api_hexutils.tex
@@ -1438,6 +1438,7 @@ Underfull \hbox (badness 4792) in paragraph at lines 10--10
  []
 
 ) [9
+
 
 ] (./api_input.tex
 Underfull \hbox (badness 1515) in paragraph at lines 12--12
@@ -1450,6 +1451,7 @@ Underfull \hbox (badness 3884) in paragraph at lines 12--12
  []
 
 ) [10
+
 
 ] (./api_keys.tex
 Overfull \hbox (3.01012pt too wide) in paragraph at lines 3--4
@@ -1503,7 +1505,10 @@ Overfull \hbox (5.03001pt too wide) in paragraph at lines 72--72
 []|\EU2/MyriadPro(0)/m/n/10 underscore| 
  []
 
+[11
 
+
+]
 Overfull \hbox (4.14001pt too wide) in paragraph at lines 72--72
 []|\EU2/MyriadPro(0)/m/n/10 pageDown| 
  []
@@ -1513,16 +1518,15 @@ Overfull \hbox (15.58pt too wide) in paragraph at lines 72--72
 []|\EU2/MyriadPro(0)/m/n/10 leftCommand| 
  []
 
-) [11
-
-] (./api_os.tex
+) [12] (./api_os.tex
 Underfull \hbox (badness 10000) in paragraph at lines 33--33
 [][]|\EU2/MyriadPro(0)/m/n/10 Short month name. (e.g.
  []
 
-) [12
+[13
 
-] (./api_security.tex
+
+]) [14] (./api_security.tex
 Underfull \hbox (badness 3354) in paragraph at lines 20--20
 [][]|\EU2/MyriadPro(0)/m/n/10 Re-turns SHA-256 hash of in-put
  []
@@ -1537,16 +1541,28 @@ Underfull \hbox (badness 2707) in paragraph at lines 20--20
 [][]|\EU2/MyriadPro(0)/m/n/10 En-codes in-put string as Base64
  []
 
-) [13
+) [15
 
-] (./api_shell.tex) [14
+
+] (./api_shell.tex) [16
+
 
 ] (./api_speaker.tex
-Underfull \hbox (badness 6961) in paragraph at lines 10--10
+Overfull \hbox (0.686pt too wide) in alignment at lines 11--11
+ [] [] [] 
+ []
+
+
+Underfull \hbox (badness 1577) in paragraph at lines 11--11
 [][]|\EU2/MyriadPro(0)/m/n/10 En-queues speaker driv-ing
  []
 
-) [15
+
+Package longtable Warning: Column widths have changed
+(longtable)                in table 8.1 on input line 11.
+
+) [17
+
 
 ] (./api_terminal.tex
 Underfull \hbox (badness 2165) in paragraph at lines 68--68
@@ -1591,11 +1607,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 68--68
 [][]|\EU2/MyriadPro(0)/m/n/10 Re-turns cur-rent back-ground
  []
 
-[16
+[18
 
-] [17]
+
+] [19]
 \cpimagew=\skip279
- <mda.png, id=206, 4625.28pt x 1798.72pt>
+ <mda.png, id=310, 4625.28pt x 1798.72pt>
 File: mda.png Graphic file (type png)
  <use mda.png>
 Package pdftex.def Info: mda.png used on input line 90.
@@ -1603,12 +1620,12 @@ Package pdftex.def Info: mda.png used on input line 90.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [18]
+ [20]
 Underfull \hbox (badness 6658) in paragraph at lines 111--111
 [][]|\EU2/MyriadPro(0)/m/n/10 DEL. Backspace and deletes
  []
 
-) [19<./mda.png>] (./luaglobals.tex
+) [21<./mda.png>] (./luaglobals.tex
 Underfull \hbox (badness 1092) in paragraph at lines 16--16
 \EU2/MyriadPro(0)/m/n/10 ory in-stalled in the com-puter, in
  []
@@ -1628,73 +1645,80 @@ Underfull \hbox (badness 2591) in paragraph at lines 55--55
 \EU2/MyriadPro(0)/m/n/10 change fore-ground colour to dim
  []
 
-[20
+[22
+
+
+] [23]) (./luadifferences.tex) [24] (./api_machine.tex) [25
+
 
 ]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [21])
-(./luadifferences.tex) [22] (./api_machine.tex) [23
-
-] [24
+luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf" [26
 
 ]
-luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf" [25] (./cc
-_bit.tex)
-[26
+(./cc_bit.tex) [27
 
 
-] (./cc_colors.tex) [27
+] (./cc_colors.tex) [28
 
-] [28
 
 ] [29
 
+
 ] [30
 
-] [31] [32
+
+] [31
+
+] [32
+
+] (./peri_lp.tex)
+[33
 
 
-] [33] (./peri_lp.tex)
-[34
+] [34
 
 
 ] [35
 
-] [36
-
-] [37
+] [36] [37
 
 ]
 \tf@toc=\write5
 
 \openout5 = romapidoc.toc
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 173.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 173.
- (./romapidoc.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 173.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 173.
+
+
+Package longtable Warning: Table widths have changed. Rerun LaTeX.
+
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 182.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 182.
+(./romapidoc.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 182.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 182.
 Package rerunfilecheck Info: File `romapidoc.out' has not changed.
-(rerunfilecheck)             Checksum: 36E048903F7D7E12751FBA89BBC694EF;2202.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 173.
+(rerunfilecheck)             Checksum: E6AA534E637E70890D852319B9FFD1B2;4249.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 182.
 )
 
 Here is how much of LuaTeX's memory you used:
- 27311 strings out of 494693
+ 27337 strings out of 494693
  125070,662416 words of node,token memory allocated
- 782 words of node memory still in use:
+ 794 words of node memory still in use:
    3 hlist, 1 vlist, 1 rule, 2 glue, 1 kern, 5 attribute, 141 glue_spec, 5 attri
 bute_list, 2 write nodes
-   avail lists: 2:15165,3:285,4:3728,5:1382,6:6439,7:355,8:23,9:917,10:405
- 30213 multiletter control sequences out of 65536+600000
- 62 fonts using 5300671 bytes
- 67i,12n,59p,1189b,492s stack positions out of 5000i,500n,10000p,200000b,100000s
+   avail lists: 2:15095,3:297,4:3729,5:1384,6:6444,7:355,8:30,9:919,10:406
+ 30235 multiletter control sequences out of 65536+600000
+ 62 fonts using 5300367 bytes
+ 67i,12n,59p,1189b,507s stack positions out of 5000i,500n,10000p,200000b,100000s
+LuaTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist,
+ replaced by a fixed one
+
 </Library/Fonts/MyriadPro-It.otf></Library/Fonts/MyriadPro-Regular.otf></Library
 /Fonts/MyriadPro-Bold.otf>
-Output written on romapidoc.pdf (37 pages, 100709 bytes).
+Output written on romapidoc.pdf (37 pages, 103609 bytes).
 
-PDF statistics: 339 PDF objects out of 1000 (max. 8388607)
- 286 compressed objects within 3 object streams
- 99 named destinations out of 1000 (max. 131072)
- 169 words of extra memory for PDF output out of 10000 (max. 10000000)
+PDF statistics: 429 PDF objects out of 1000 (max. 8388607)
+ 372 compressed objects within 4 object streams
+ 106 named destinations out of 1000 (max. 131072)
+ 321 words of extra memory for PDF output out of 10000 (max. 10000000)
 

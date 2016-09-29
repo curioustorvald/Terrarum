@@ -1,6 +1,6 @@
 The Terminal API provides functions for sending text to the terminals, and drawing text-mode graphics. The API expects connected terminal to use Codepage 437. See section \emph{Codepage} for details.
 
-\subsection{Functions}
+\section{Functions}
 
 Note: cursor coordinates starts from one, not zero.
 
@@ -67,7 +67,7 @@ Note: cursor coordinates starts from one, not zero.
 	term.backCol() & int & Returns current background colour.
 \end{tabularx}
 
-\subsection{Standard Colours}
+\section{Standard Colours}
 
 \begin{tabularx}{\textwidth}{c l c l c l c l}
 	0 & \textcolor{black}{Black} & 1 & White & 2 & \textcolor{dimgrey}{Dim grey} & 3 & \textcolor{brightgrey}{Bright grey}
@@ -81,7 +81,7 @@ Note: cursor coordinates starts from one, not zero.
 
 Non-colour terminals support colour index of 0--3.
 
-\subsection{Codepage}
+\section{Codepage}
 
 \newlength{\cpimagew}
 \setlength{\cpimagew}{\linewidth}
@@ -91,7 +91,7 @@ Non-colour terminals support colour index of 0--3.
 
 Character 0x9E (currency symbol) and 0xFA (middle dot) can be accessed with following Lua constants: \emph{MONEY} and \emph{MIDDOT}. See \emph{Lua Globals} > \emph{Constants} section.
 
-\subsection{Accepted Control Sequences}
+\section{Accepted Control Sequences}
 
 \begin{tabularx}{\textwidth}{c X c X}
 	\textbf{\large No.} & \textbf{\large Description} & \textbf{\large No.} & \textbf{\large Description}

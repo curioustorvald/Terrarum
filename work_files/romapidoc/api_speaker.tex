@@ -4,7 +4,8 @@ The Speaker API provides means to control computer's built-in beeper speaker.
 	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
 	\\ \\
 	\endhead
-	speaker.enqueue(len: int, freq: num) & nil & Enqueues speaker driving information. Queues will be started automatically.
+	speaker.enqueue(len: int, freq: num\footnote{Frequency in hertz (double) or the name of the note (``A-5'', ``B3'', ``F\#2'', ``Db6'', \ldots)}) & nil & Enqueues speaker driving information. Queues will be started automatically.
 	\\ \\
 	speaker.clear() & nil & Clears speaker queue.
+	\\ \\
 \end{tabularx}

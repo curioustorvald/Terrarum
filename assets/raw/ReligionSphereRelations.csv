@@ -2,10 +2,21 @@
 # 0: neutral, 1: amicable (welcoming), -1: hostile (will not barter, like 'unassigned' neutral)
 # -2: enemy (this is the holy war! WAAAGH!!)
 
+# Put some ideas here:
+
+# ABSTRACT (ideologies, philosophies, etc.) #
 # war: WAAAGH!!
 # randomness: All hail the Random Number God!
 # strength: tranees; disciplinants
 # brute: mostly "brute" wild mobs, or spheres that is fond of brute-ness
+
+# TANGIBLE (certain creatures, (gem)stones, metals) #
+# steels: dwarven1
+# stones: dwarven2
+# octocat: a chimera creature of octopus and cat. put that to the gitchen!
+
+
+
 
 "↓from  to→";"strength";"harmony";"war";"randomness";"wealth";"brute";"helix"
 "strength"  ;       "1";      "1";  "0";         "0";     "0";    "0";    "0"

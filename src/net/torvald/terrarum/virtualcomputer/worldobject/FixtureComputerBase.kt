@@ -33,7 +33,7 @@ open class FixtureComputerBase() : FixtureBase() {
 
     fun attachTerminal(uuid: String) {
         val fetchedTerminal = getTerminalByUUID(uuid)
-        computerInside = BaseTerrarumComputer()
+        computerInside = BaseTerrarumComputer(8)
         computerInside!!.attachTerminal(fetchedTerminal!!)
         actorValue["computerid"] = computerInside!!.UUID
     }

@@ -1,40 +1,41 @@
-\contentsline {chapter}{\chapternumberline {1}APIs and Libraries}{5}{chapter.1}
-\contentsline {section}{\numberline {1.1}Filesystem}{6}{section.1.1}
-\contentsline {subsection}{\numberline {1.1.1}Functions}{6}{subsection.1.1.1}
-\contentsline {subsection}{\numberline {1.1.2}File Handler}{7}{subsection.1.1.2}
-\contentsline {section}{\numberline {1.2}Hexutils}{9}{section.1.2}
-\contentsline {subsection}{\numberline {1.2.1}Functions}{9}{subsection.1.2.1}
-\contentsline {section}{\numberline {1.3}Input}{10}{section.1.3}
-\contentsline {subsection}{\numberline {1.3.1}Functions}{10}{subsection.1.3.1}
-\contentsline {section}{\numberline {1.4}Keys}{11}{section.1.4}
-\contentsline {subsection}{\numberline {1.4.1}Accepted Key Names}{11}{subsection.1.4.1}
-\contentsline {section}{\numberline {1.5}OS}{12}{section.1.5}
-\contentsline {subsection}{\numberline {1.5.1}Date Format String}{12}{subsection.1.5.1}
-\contentsline {section}{\numberline {1.6}Security}{13}{section.1.6}
-\contentsline {subsection}{\numberline {1.6.1}Functions}{13}{subsection.1.6.1}
-\contentsline {section}{\numberline {1.7}Shell}{14}{section.1.7}
-\contentsline {section}{\numberline {1.8}Speaker}{15}{section.1.8}
-\contentsline {section}{\numberline {1.9}Terminal}{16}{section.1.9}
-\contentsline {subsection}{\numberline {1.9.1}Functions}{16}{subsection.1.9.1}
-\contentsline {subsection}{\numberline {1.9.2}Standard Colours}{18}{subsection.1.9.2}
-\contentsline {subsection}{\numberline {1.9.3}Codepage}{19}{subsection.1.9.3}
-\contentsline {subsection}{\numberline {1.9.4}Accepted Control Sequences}{19}{subsection.1.9.4}
-\contentsline {section}{\numberline {1.10}Lua Globals}{20}{section.1.10}
-\contentsline {subsection}{\numberline {1.10.1}Functions}{20}{subsection.1.10.1}
-\contentsline {subsection}{\numberline {1.10.2}Constants}{20}{subsection.1.10.2}
-\contentsline {subsection}{\numberline {1.10.3}Bell Codes}{22}{subsection.1.10.3}
-\contentsline {subsection}{\numberline {1.10.4}Changes from Generic Lua Environment}{22}{subsection.1.10.4}
-\contentsline {section}{\numberline {1.11}Machine}{23}{section.1.11}
-\contentsline {chapter}{\chapternumberline {2}Compatibility Layers---ComputerCraft}{25}{chapter.2}
-\contentsline {section}{\numberline {2.1}Bit}{26}{section.2.1}
-\contentsline {subsection}{\numberline {2.1.1}Functions}{26}{subsection.2.1.1}
-\contentsline {section}{\numberline {2.2}Colors}{27}{section.2.2}
-\contentsline {subsection}{\numberline {2.2.1}Constants}{27}{subsection.2.2.1}
-\contentsline {subsection}{\numberline {2.2.2}Functions}{27}{subsection.2.2.2}
-\contentsline {section}{\numberline {2.3}Term}{28}{section.2.3}
-\contentsline {section}{\numberline {2.4}Filesystem}{29}{section.2.4}
-\contentsline {chapter}{\chapternumberline {3}Compatibility Layers---OpenComputers}{31}{chapter.3}
-\contentsline {chapter}{\chapternumberline {4}Peripherals}{33}{chapter.4}
-\contentsline {section}{\numberline {4.1}Line Printer}{34}{section.4.1}
-\contentsline {subsection}{\numberline {4.1.1}Functions}{34}{subsection.4.1.1}
-\contentsline {chapter}{\chapternumberline {5}References}{35}{chapter.5}
+\contentsline {part}{\partnumberline {I}APIs and Libraries}{5}{part.1}
+\contentsline {chapter}{\chapternumberline {1}Filesystem}{6}{chapter.1}
+\contentsline {section}{\numberline {1.1}Functions}{6}{section.1.1}
+\contentsline {section}{\numberline {1.2}File Handler}{7}{section.1.2}
+\contentsline {chapter}{\chapternumberline {2}Hexutils}{9}{chapter.2}
+\contentsline {section}{\numberline {2.1}Functions}{9}{section.2.1}
+\contentsline {chapter}{\chapternumberline {3}Input}{10}{chapter.3}
+\contentsline {section}{\numberline {3.1}Functions}{10}{section.3.1}
+\contentsline {chapter}{\chapternumberline {4}Keys}{11}{chapter.4}
+\contentsline {section}{\numberline {4.1}Accepted Key Names}{11}{section.4.1}
+\contentsline {chapter}{\chapternumberline {5}OS}{13}{chapter.5}
+\contentsline {section}{\numberline {5.1}Date Format String}{13}{section.5.1}
+\contentsline {chapter}{\chapternumberline {6}Security}{15}{chapter.6}
+\contentsline {section}{\numberline {6.1}Functions}{15}{section.6.1}
+\contentsline {chapter}{\chapternumberline {7}Shell}{16}{chapter.7}
+\contentsline {chapter}{\chapternumberline {8}Speaker}{17}{chapter.8}
+\contentsline {chapter}{\chapternumberline {9}Terminal}{18}{chapter.9}
+\contentsline {section}{\numberline {9.1}Functions}{18}{section.9.1}
+\contentsline {section}{\numberline {9.2}Standard Colours}{20}{section.9.2}
+\contentsline {section}{\numberline {9.3}Codepage}{21}{section.9.3}
+\contentsline {section}{\numberline {9.4}Accepted Control Sequences}{21}{section.9.4}
+\contentsline {chapter}{\chapternumberline {10}Lua Globals}{22}{chapter.10}
+\contentsline {section}{\numberline {10.1}Functions}{22}{section.10.1}
+\contentsline {section}{\numberline {10.2}Constants}{22}{section.10.2}
+\contentsline {section}{\numberline {10.3}Bell Codes}{24}{section.10.3}
+\contentsline {subsection}{\numberline {10.3.1}Changes from Generic Lua Environment}{24}{subsection.10.3.1}
+\contentsline {chapter}{\chapternumberline {11}Machine}{25}{chapter.11}
+\contentsline {part}{\partnumberline {II}Compatibility Layers---ComputerCraft}{26}{part.2}
+\contentsline {chapter}{\chapternumberline {12}Bit}{27}{chapter.12}
+\contentsline {section}{\numberline {12.1}Functions}{27}{section.12.1}
+\contentsline {chapter}{\chapternumberline {13}Colors}{28}{chapter.13}
+\contentsline {section}{\numberline {13.1}Constants}{28}{section.13.1}
+\contentsline {section}{\numberline {13.2}Functions}{28}{section.13.2}
+\contentsline {chapter}{\chapternumberline {14}Term}{29}{chapter.14}
+\contentsline {chapter}{\chapternumberline {15}Filesystem}{30}{chapter.15}
+\contentsline {part}{\partnumberline {III}Compatibility Layers---OpenComputers}{31}{part.3}
+\contentsline {part}{\partnumberline {IV}Peripherals}{32}{part.4}
+\contentsline {chapter}{\chapternumberline {16}Line Printer}{33}{chapter.16}
+\contentsline {section}{\numberline {16.1}Functions}{33}{section.16.1}
+\contentsline {chapter}{\chapternumberline {17}PSG}{34}{chapter.17}
+\contentsline {part}{\partnumberline {V}References}{35}{part.5}

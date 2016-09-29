@@ -1,6 +1,6 @@
 % !TEX TS-program = lualatex
 
-\documentclass[10pt, stock]{memoir}
+\documentclass[10pt, stock, openany]{memoir}
 
 
 \usepackage{fontspec}
@@ -26,15 +26,6 @@
 %% Idioms %%
 \hyphenation{Com-put-er-Craft}
 \hyphenation{O-pen-Com-put-ers}
-
-
-
-\aliaspagestyle{part}{empty}
-\aliaspagestyle{chapter}{empty}
-\makeatletter
-\renewcommand\memendofchapterhook{%
-  \clearpage\m@mindentafterchapter\@afterheading}
-\makeatother
 
 
 
@@ -68,8 +59,23 @@
 \posttitle{\par\end{flushright}\vskip 0.5em}
 
 % new sections are new page
-\let\oldsection\section
-\renewcommand\section{\clearpage\oldsection}
+\let\oldsection\chapter
+\renewcommand\chapter{\clearpage\oldsection}
+
+% chapter title -- no now page after
+\renewcommand\chapterheadstart{} % kill the drop
+\renewcommand\afterchapternum{\vskip 0.5em} % space between number and title
+\makeatletter
+\renewcommand\memendofchapterhook{%
+\m@mindentafterchapter\@afterheading}
+\makeatother
+
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+
+\aliaspagestyle{part}{empty}
+\aliaspagestyle{chapter}{empty}
 
 
 % The title
@@ -95,70 +101,73 @@
 
 
 
-\chapter{APIs and Libraries}
+\part{APIs and Libraries}
 
-\section{Filesystem}
+\chapter{Filesystem}
 \input{api_filesystem}
 
-\section{Hexutils}
+\chapter{Hexutils}
 \input{api_hexutils}
 
-\section{Input}
+\chapter{Input}
 \input{api_input}
 
-\section{Keys}
+\chapter{Keys}
 \input{api_keys}
 
-\section{OS}
+\chapter{OS}
 \input{api_os}
 
-\section{Security}
+\chapter{Security}
 \input{api_security}
 
-\section{Shell}
+\chapter{Shell}
 \input{api_shell}
 
-\section{Speaker}
+\chapter{Speaker}
 \input{api_speaker}
 
-\section{Terminal}
+\chapter{Terminal}
 \input{api_terminal}
 
-\section{Lua Globals}
+\chapter{Lua Globals}
 \input{luaglobals}
 \subsection{Changes from Generic Lua Environment}
 \input{luadifferences}
 
-\section{Machine}
+\chapter{Machine}
 \input{api_machine}
 
 
-\chapter[Compatibility Layers---ComputerCraft]{{\LARGE Compatibility Layers} \\ ComputerCraft}
+\part[Compatibility Layers---ComputerCraft]{{\LARGE Compatibility Layers} \\ ComputerCraft}
 
-\section{Bit}
+\chapter{Bit}
 \input{cc_bit}
 
-\section{Colors}
+\chapter{Colors}
 \input{cc_colors}
 
-\section{Term}
+\chapter{Term}
 
-\section{Filesystem}
-
-
-
-\chapter[Compatibility Layers---OpenComputers]{{\LARGE Compatibility Layers} \\ OpenComputers}
+\chapter{Filesystem}
 
 
 
-\chapter{Peripherals}
+\part[Compatibility Layers---OpenComputers]{{\LARGE Compatibility Layers} \\ OpenComputers}
 
-\section{Line Printer}
+
+
+\part{Peripherals}
+
+\chapter{Line Printer}
 \input{peri_lp}
 
+\chapter{PSG}
+%\input{peri_psg}
 
 
-\chapter{References}
+
+\part{References}
 
 Some of the texts are taken from following sources:
 

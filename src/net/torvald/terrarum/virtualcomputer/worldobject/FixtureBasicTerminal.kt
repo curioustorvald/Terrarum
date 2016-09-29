@@ -14,7 +14,7 @@ import java.util.*
  */
 class FixtureBasicTerminal(phosphor: Color) : FixtureBase() {
 
-    val computer = BaseTerrarumComputer()
+    val computer = BaseTerrarumComputer(8)
     val vt: Terminal = SimpleTextTerminal(phosphor, 80, 25, computer)
     val ui = UITextTerminal(vt)
 

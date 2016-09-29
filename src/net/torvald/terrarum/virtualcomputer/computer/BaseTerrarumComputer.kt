@@ -1,6 +1,5 @@
 package net.torvald.terrarum.virtualcomputer.computer
 
-import com.jme3.math.FastMath
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
@@ -11,6 +10,7 @@ import org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.virtualcomputer.luaapi.*
+import net.torvald.terrarum.virtualcomputer.peripheral.*
 import net.torvald.terrarum.virtualcomputer.terminal.*
 import net.torvald.terrarum.virtualcomputer.worldobject.ComputerPartsCodex
 import org.lwjgl.BufferUtils
@@ -30,10 +30,13 @@ import java.util.*
  * @param term : terminal that is connected to the computer fixtures, null if not connected any.
  * Created by minjaesong on 16-09-10.
  */
-class BaseTerrarumComputer() {
+class BaseTerrarumComputer(peripheralSlots: Int) {
+
+    var maxPeripherals: Int = peripheralSlots
+        private set
 
     val DEBUG_UNLIMITED_MEM = false
-    val DEBUG = false
+    val DEBUG = true
 
 
     lateinit var luaJ_globals: Globals
@@ -71,6 +74,8 @@ class BaseTerrarumComputer() {
     lateinit var term: Teletype
         private set
 
+    val peripheralTable = ArrayList<Peripheral>()
+
     // os-related functions. These are called "machine" library-wise.
     private val startupTimestamp: Long = System.currentTimeMillis()
     /** Time elapsed since the power is on. */
@@ -102,6 +107,28 @@ class BaseTerrarumComputer() {
         computerValue["boot"] = computerValue.getAsString("hda")!!
     }
 
+    fun attachPeripheral(peri: Peripheral) {
+        if (peripheralTable.size < maxPeripherals) {
+            peripheralTable.add(peri)
+            peri.loadLib()
+            println("[BaseTerrarumComputer] loading peripheral $peri")
+        }
+        else {
+            throw Error("No vacant peripheral slot")
+        }
+    }
+
+    fun detachPeripheral(peri: Peripheral) {
+        if (peripheralTable.contains(peri)) {
+            peripheralTable.remove(peri)
+            peri.unloadLib()
+            println("[BaseTerrarumComputer] unloading peripheral $peri")
+        }
+        else {
+            throw IllegalArgumentException("Peripheral not exists: $peri")
+        }
+    }
+
     fun attachTerminal(term: Teletype) {
         this.term = term
         initSandbox(term)
@@ -126,7 +153,7 @@ class BaseTerrarumComputer() {
         Filesystem(luaJ_globals, this)
         HostAccessProvider(luaJ_globals, this)
         Input(luaJ_globals, this)
-        Http(luaJ_globals, this)
+        PeripheralInternet(luaJ_globals, this)
         PcSpeakerDriver(luaJ_globals, this)
         WorldInformationProvider(luaJ_globals)
 
@@ -146,7 +173,16 @@ class BaseTerrarumComputer() {
 
         luaJ_globals["computer"] = LuaTable()
         // rest of the "computer" APIs should be implemented in BOOT.lua
-        if (DEBUG) luaJ_globals["emittone"] = ComputerEmitTone(this)
+
+
+
+        // load every peripheral if we're in DEBUG
+        if (DEBUG) {
+            maxPeripherals = 32
+            attachPeripheral(PeripheralInternet(luaJ_globals, this))
+            attachPeripheral(PeripheralPSG(luaJ_globals, this))
+            // ...
+        }
     }
 
     var threadTimer = 0
@@ -253,7 +289,7 @@ class BaseTerrarumComputer() {
 
     class ComputerEmitTone(val computer: BaseTerrarumComputer) : TwoArgFunction() {
         override fun call(millisec: LuaValue, freq: LuaValue): LuaValue {
-            computer.playTone(millisec.toint(), freq.tofloat())
+            computer.playTone(millisec.checkint(), freq.checkdouble())
             return LuaValue.NONE
         }
     }
@@ -264,7 +300,7 @@ class BaseTerrarumComputer() {
 
     private val beepMaxLen = 10000
     // let's regard it as a tracker...
-    private val beepQueue = ArrayList<Pair<Int, Float>>()
+    private val beepQueue = ArrayList<Pair<Int, Double>>()
     private var beepCursor = -1
     private var beepQueueLineExecTimer = 0 // millisec
     private var beepQueueFired = false
@@ -285,7 +321,8 @@ class BaseTerrarumComputer() {
         // complete emitTone queue
         if (beepCursor >= beepQueue.size) {
             clearBeepQueue()
-            if (DEBUG) println("!! Beep queue clear")
+            AL.destroy()
+            if (DEBUG) println("[BaseTerrarumComputer] !! Beep queue clear")
         }
 
         // actually play queue
@@ -303,7 +340,7 @@ class BaseTerrarumComputer() {
         beepQueueLineExecTimer = 0
     }
 
-    fun enqueueBeep(duration: Int, freq: Float) {
+    fun enqueueBeep(duration: Int, freq: Double) {
         beepQueue.add(Pair(Math.min(duration, beepMaxLen), freq))
     }
 
@@ -326,48 +363,48 @@ class BaseTerrarumComputer() {
      *
      *     ,---. (true, true) ,---- (true, false) ----. (false, true) ----- (false, false)
      */
-    private fun makeAudioData(duration: Int, freq: Float,
+    private fun makeAudioData(duration: Int, freq: Double,
                               rampUp: Boolean = true, rampDown: Boolean = true): ByteBuffer {
         val audioData = BufferUtils.createByteBuffer(duration.times(sampleRate).div(1000))
 
         val realDuration = duration * sampleRate / 1000
         val chopSize = freq / sampleRate
 
-        val amp = Math.max(4600f / freq, 1f)
-        val nHarmonics = if (freq >= 22050f) 1
-                         else if (freq >= 11025f) 2
-                         else if (freq >= 5512.5f) 3
-                         else if (freq >= 2756.25f) 4
-                         else if (freq >= 1378.125f) 5
-                         else if (freq >= 689.0625f) 6
+        val amp = Math.max(4600.0 / freq, 1.0)
+        val nHarmonics = if (freq >= 22050.0) 1
+                         else if (freq >= 11025.0) 2
+                         else if (freq >= 5512.5) 3
+                         else if (freq >= 2756.25) 4
+                         else if (freq >= 1378.125) 5
+                         else if (freq >= 689.0625) 6
                          else 7
 
-        val transitionThre = 974.47218f
+        val transitionThre = 974.47218
 
         // TODO volume ramping?
-        if (freq == 0f) {
+        if (freq == 0.0) {
             for (x in 0..realDuration - 1) {
                 audioData.put(0x00.toByte())
             }
         }
         else if (freq < transitionThre) { // chopper generator (for low freq)
             for (x in 0..realDuration - 1) {
-                var sine: Float = amp * FastMath.cos(FastMath.TWO_PI * x * chopSize)
-                if (sine > 0.79f) sine = 0.79f
-                else if (sine < -0.79f) sine = -0.79f
+                var sine: Double = amp * Math.cos(Math.PI * 2 * x * chopSize)
+                if (sine > 0.79) sine = 0.79
+                else if (sine < -0.79) sine = -0.79
                 audioData.put(
-                        (0.5f + 0.5f * sine).times(0xFF).roundInt().toByte()
+                        (0.5 + 0.5 * sine).times(0xFF).roundInt().toByte()
                 )
             }
         }
         else { // harmonics generator (for high freq)
             for (x in 0..realDuration - 1) {
-                var sine: Float = 0f
+                var sine: Double = 0.0
                 for (k in 1..nHarmonics) { // mix only odd harmonics in order to make a squarewave
-                    sine += FastMath.sin(FastMath.TWO_PI * (2*k - 1) * chopSize * x) / (2*k - 1)
+                    sine += Math.sin(Math.PI * 2 * (2*k - 1) * chopSize * x) / (2*k - 1)
                 }
                 audioData.put(
-                        (0.5f + 0.5f * sine).times(0xFF).roundInt().toByte()
+                        (0.5 + 0.5 * sine).times(0xFF).roundInt().toByte()
                 )
             }
         }
@@ -377,7 +414,7 @@ class BaseTerrarumComputer() {
         return audioData
     }
 
-    private fun playTone(leninmilli: Int, freq: Float) {
+    private fun playTone(leninmilli: Int, freq: Double) {
         audioData = makeAudioData(leninmilli, freq)
 
 

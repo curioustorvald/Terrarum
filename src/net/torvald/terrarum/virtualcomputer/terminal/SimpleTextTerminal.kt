@@ -318,7 +318,7 @@ open class SimpleTextTerminal(
      * @param duration: milliseconds
      * @param freg: Frequency (float)
      */
-    override fun emitTone(duration: Int, freq: Float) {
+    override fun emitTone(duration: Int, freq: Double) {
         // println("!! Beep playing row $beepCursor, d ${Math.min(duration, maxDuration)} f $freq")
         host.clearBeepQueue()
         host.enqueueBeep(duration, freq)
@@ -328,19 +328,19 @@ open class SimpleTextTerminal(
     override fun bell(pattern: String) {
         host.clearBeepQueue()
 
-        val freq: Float =
+        val freq: Double =
                 if (host.luaJ_globals["computer"]["bellpitch"].isnil())
-                    1000f
+                    1000.0
                 else
-                    host.luaJ_globals["computer"]["bellpitch"].checkdouble().toFloat()
+                    host.luaJ_globals["computer"]["bellpitch"].checkdouble()
 
         for (c in pattern) {
             when (c) {
-                '.' -> { host.enqueueBeep(80, freq);  host.enqueueBeep(50, 0f) }
-                '-' -> { host.enqueueBeep(200, freq); host.enqueueBeep(50, 0f) }
-                '=' -> { host.enqueueBeep(500, freq); host.enqueueBeep(50, 0f) }
-                ' ' -> { host.enqueueBeep(200, 0f) }
-                ',' -> { host.enqueueBeep(50, 0f) }
+                '.' -> { host.enqueueBeep(80, freq);  host.enqueueBeep(50, 0.0) }
+                '-' -> { host.enqueueBeep(200, freq); host.enqueueBeep(50, 0.0) }
+                '=' -> { host.enqueueBeep(500, freq); host.enqueueBeep(50, 0.0) }
+                ' ' -> { host.enqueueBeep(200, 0.0) }
+                ',' -> { host.enqueueBeep(50, 0.0) }
                 else -> throw IllegalArgumentException("Unacceptable pattern: $c (from '$pattern')")
             }
         }

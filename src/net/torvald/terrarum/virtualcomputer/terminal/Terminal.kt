@@ -61,7 +61,7 @@ interface Terminal : Teletype {
      * @param duration: milliseconds
      * @param freg: Frequency (float)
      */
-    fun emitTone(duration: Int, freq: Float)
+    fun emitTone(duration: Int, freq: Double)
 
     override fun bell(pattern: String)
     /** Requires keyPressed() event to be processed.
