@@ -47,7 +47,7 @@ _G.bell = function(patn) term.bell(patn or ".") end
 _G.beep = _G.bell
 
 if totalMemory() == 0 then
-    bell "="
+    bell "==="
     print("no RAM installed")
     __haltsystemexplicit__()
     return
@@ -371,353 +371,353 @@ do
         p = p:copy()
         ::init:: -- using goto's to optimize tail recursion
         if p ~= ms.p_end then
-        local p0 = p:char()
-        if p0 == '(' then  -- start capture
-        if p:char(1) == ')' then  -- position capture?
-        s = start_capture(ms, s, p:copy(2), CAP_POSITION)
-        else
-            s = start_capture(ms, s, p:copy(1), CAP_UNFINISHED)
-        end
-        goto brk
-        elseif p0 == ')' then  -- end capture
-        s = end_capture(ms, s, p:copy(1))
-        goto brk
-        elseif p0 == '$' then
-            if p + 1 ~= ms.p_end then  -- is the `$' the last char in pattern?
-            goto dflt  -- no; go to default
-            end
-            s = (s == ms.src_end) and s or nil  -- check end of string
-            goto brk
-        elseif p0 == L_ESC then  -- escaped sequences not in the format class[*+?-]?
-        local p1 = p:char(1)
-        if p1 == 'b' then  -- balanced string?
-        s = matchbalance(ms, s, p:copy(2))
-        if s ~= nil then
-            p:step(4)
-            goto init  -- return match(ms, s, p + 4)
-        end
-        -- else fail (s == nil)
-        elseif p1 == 'f' then  -- frontier?
-        p:step(2)
-        if p:char() ~= '[' then
-            error("missing [ after %f in pattern")
-        end
-        local ep = classend(ms, p)  -- points to what is next
-        local previous = (s == ms.src_init) and '\0' or s:char(-1)
-        if not matchbracketclass(previous, p, ep:copy(-1)) and
-                matchbracketclass(s:char(), p, ep:copy(-1))
-        then
-            p = ep
-            goto init  -- return match(ms, s, ep)
-        end
-        s = nil  -- match failed
-        elseif isdigit(p:char(1)) then  -- capture results (%0-%9)?
-        s = match_capture(ms, s, p:char(1))
-        if s ~= nil then
-            p:step(2)
-            goto init  -- return match(ms, s, p + 2)
-        end
-        else
-            goto dflt
-        end
-        goto brk
-        end
-        ::dflt:: do
-        local ep = classend(ms, p)  -- points to what is next
-        local ep0 = ep:char()
-        if not singlematch(ms, s, p, ep) then
-            if ep0 == '*' or ep0 == '?' or ep0 == '-' then  -- accept empty?
-            p = ep:copy(1)
-            goto init  -- return match(ms, s, ep + 1)
-            else  -- '+' or no suffix
-            s = nil  -- fail
-            end
-        else  -- matched once
-        if ep0 == '?' then  -- optional
-        local res = match(ms, s:copy(1), ep:copy(1))
-        if res ~= nil then
-            s = res
-        else
-            p = ep:copy(1)
-            goto init  -- else return match(ms, s, ep + 1)
-        end
-        elseif ep0 == '+' then  -- 1 or more repetitions
-        s = max_expand(ms, s:copy(1), p, ep)  -- 1 match already done
-        elseif ep0 == '*' then  -- 0 or more repetitions
-        s = max_expand(ms, s, p, ep)
-        elseif ep0 == '-' then  -- 0 or more repetitions (minimum)
-        s = min_expand(ms, s, p, ep)
-        else
-            s:step()
-            p = ep
-            goto init  -- else return match(ms, s+1, ep);
-        end
-        end
-    end
-    ::brk::
-    end
-    return s
-end
-
-local function push_onecapture(ms, i, s, e)
-    if i >= ms.level then
-        if i == 0 then  -- ms->level == 0, too
-        return s:head(e - s)  -- add whole match
-        else
-            error("invalid capture index")
-        end
-    else
-        local l = ms.capture[i].len;
-        if l == CAP_UNFINISHED then error("unfinished capture") end
-        if l == CAP_POSITION then
-            return ms.capture[i].init - ms.src_init + 1
-        else
-            return ms.capture[i].init:head(l)
-        end
-    end
-end
-
-local function push_captures(ms, s, e)
-    local nlevels = (ms.level == 0 and s) and 1 or ms.level
-    local captures = {}
-    for i = 0, nlevels - 1 do
-        table.insert(captures, push_onecapture(ms, i, s, e))
-    end
-    return table.unpack(captures)
-end
-
--- check whether pattern has no special characters
-local function nospecials(p)
-    for i = 1, #p do
-        for j = 1, #SPECIALS do
-            if p:sub(i, i) == SPECIALS:sub(j, j) then
-                return false
-            end
-        end
-    end
-    return true
-end
-
-local function str_find_aux(str, pattern, init, plain, find)
-    checkArg(1, str, "string")
-    checkArg(2, pattern, "string")
-    checkArg(3, init, "number", "nil")
-
-    if #str < SHORT_STRING then
-        return (find and string_find or string_match)(str, pattern, init, plain)
-    end
-
-    local s = strptr(str)
-    local p = strptr(pattern)
-    local init = posrelat(init or 1, #str)
-    if init < 1 then init = 1
-    elseif init > #str + 1 then  -- start after string's end?
-    return nil  -- cannot find anything
-    end
-    -- explicit request or no special characters?
-    if find and (plain or nospecials(pattern)) then
-        -- do a plain search
-        local s2 = string_find(str, pattern, init, true)
-        if s2 then
-            return s2-s.pos + 1, s2 - s.pos + p:len()
-        end
-    else
-        local s1 = s:copy(init - 1)
-        local anchor = p:char() == '^'
-        if anchor then p:step() end
-        local ms = {
-            src_init = s,
-            src_end = s:copy(s:len()),
-            p_end = p:copy(p:len()),
-            capture = {}
-        }
-        repeat
-            ms.level = 0
-            local res = match(ms, s1, p)
-            if res ~= nil then
-                if find then
-                    return s1.pos - s.pos + 1, res.pos - s.pos, push_captures(ms, nil, nil)
+            local p0 = p:char()
+            if p0 == '(' then  -- start capture
+                if p:char(1) == ')' then  -- position capture?
+                    s = start_capture(ms, s, p:copy(2), CAP_POSITION)
                 else
-                    return push_captures(ms, s1, res)
+                    s = start_capture(ms, s, p:copy(1), CAP_UNFINISHED)
+                end
+                goto brk
+            elseif p0 == ')' then  -- end capture
+                s = end_capture(ms, s, p:copy(1))
+                goto brk
+            elseif p0 == '$' then
+                if p + 1 ~= ms.p_end then  -- is the `$' the last char in pattern?
+                    goto dflt  -- no; go to default
+                end
+                s = (s == ms.src_end) and s or nil  -- check end of string
+                goto brk
+            elseif p0 == L_ESC then  -- escaped sequences not in the format class[*+?-]?
+                local p1 = p:char(1)
+                if p1 == 'b' then  -- balanced string?
+                    s = matchbalance(ms, s, p:copy(2))
+                    if s ~= nil then
+                        p:step(4)
+                        goto init  -- return match(ms, s, p + 4)
+                    end
+                    -- else fail (s == nil)
+                elseif p1 == 'f' then  -- frontier?
+                    p:step(2)
+                    if p:char() ~= '[' then
+                        error("missing [ after %f in pattern")
+                    end
+                    local ep = classend(ms, p)  -- points to what is next
+                    local previous = (s == ms.src_init) and '\0' or s:char(-1)
+                    if not matchbracketclass(previous, p, ep:copy(-1)) and
+                            matchbracketclass(s:char(), p, ep:copy(-1))
+                    then
+                        p = ep
+                        goto init  -- return match(ms, s, ep)
+                    end
+                    s = nil  -- match failed
+                elseif isdigit(p:char(1)) then  -- capture results (%0-%9)?
+                    s = match_capture(ms, s, p:char(1))
+                    if s ~= nil then
+                        p:step(2)
+                        goto init  -- return match(ms, s, p + 2)
+                    end
+                else
+                    goto dflt
+                end
+                goto brk
+            end
+            ::dflt:: do
+                local ep = classend(ms, p)  -- points to what is next
+                local ep0 = ep:char()
+                if not singlematch(ms, s, p, ep) then
+                        if ep0 == '*' or ep0 == '?' or ep0 == '-' then  -- accept empty?
+                            p = ep:copy(1)
+                            goto init  -- return match(ms, s, ep + 1)
+                        else  -- '+' or no suffix
+                            s = nil  -- fail
+                        end
+                    else  -- matched once
+                    if ep0 == '?' then  -- optional
+                        local res = match(ms, s:copy(1), ep:copy(1))
+                        if res ~= nil then
+                            s = res
+                        else
+                            p = ep:copy(1)
+                            goto init  -- else return match(ms, s, ep + 1)
+                        end
+                    elseif ep0 == '+' then  -- 1 or more repetitions
+                        s = max_expand(ms, s:copy(1), p, ep)  -- 1 match already done
+                    elseif ep0 == '*' then  -- 0 or more repetitions
+                        s = max_expand(ms, s, p, ep)
+                    elseif ep0 == '-' then  -- 0 or more repetitions (minimum)
+                        s = min_expand(ms, s, p, ep)
+                    else
+                        s:step()
+                        p = ep
+                        goto init  -- else return match(ms, s+1, ep);
+                    end
                 end
             end
-        until s1:step() > ms.src_end or anchor
-    end
-    return nil  -- not found
-end
-
-local function str_find(s, pattern, init, plain)
-    return str_find_aux(s, pattern, init, plain, true)
-end
-
-local function str_match(s, pattern, init)
-    return str_find_aux(s, pattern, init, false, false)
-end
-
-local function str_gmatch(s, pattern)
-    checkArg(1, s, "string")
-    checkArg(2, pattern, "string")
-
-    if #s < SHORT_STRING then
-        return string_gmatch(s, pattern, repl, n)
+        ::brk::
+        end
+    return s
     end
 
-    local s = strptr(s)
-    local p = strptr(pattern)
-    local start = 0
-    return function()
-        ms = {
-            src_init = s,
-            src_end = s:copy(s:len()),
-            p_end = p:copy(p:len()),
-            capture = {}
-        }
-        for offset = start, ms.src_end.pos - 1 do
-            local src = s:copy(offset)
-            ms.level = 0
-            local e = match(ms, src, p)
-            if e ~= nil then
-                local newstart = e - s
-                if e == src then newstart = newstart + 1 end -- empty match? go at least one position
-                start = newstart
-                return push_captures(ms, src, e)
+    local function push_onecapture(ms, i, s, e)
+        if i >= ms.level then
+            if i == 0 then  -- ms->level == 0, too
+            return s:head(e - s)  -- add whole match
+            else
+                error("invalid capture index")
             end
+        else
+            local l = ms.capture[i].len;
+            if l == CAP_UNFINISHED then error("unfinished capture") end
+            if l == CAP_POSITION then
+                return ms.capture[i].init - ms.src_init + 1
+            else
+                return ms.capture[i].init:head(l)
+            end
+        end
+    end
+
+    local function push_captures(ms, s, e)
+        local nlevels = (ms.level == 0 and s) and 1 or ms.level
+        local captures = {}
+        for i = 0, nlevels - 1 do
+            table.insert(captures, push_onecapture(ms, i, s, e))
+        end
+        return table.unpack(captures)
+    end
+
+    -- check whether pattern has no special characters
+    local function nospecials(p)
+        for i = 1, #p do
+            for j = 1, #SPECIALS do
+                if p:sub(i, i) == SPECIALS:sub(j, j) then
+                    return false
+                end
+            end
+        end
+        return true
+    end
+
+    local function str_find_aux(str, pattern, init, plain, find)
+        checkArg(1, str, "string")
+        checkArg(2, pattern, "string")
+        checkArg(3, init, "number", "nil")
+
+        if #str < SHORT_STRING then
+            return (find and string_find or string_match)(str, pattern, init, plain)
+        end
+
+        local s = strptr(str)
+        local p = strptr(pattern)
+        local init = posrelat(init or 1, #str)
+        if init < 1 then init = 1
+        elseif init > #str + 1 then  -- start after string's end?
+        return nil  -- cannot find anything
+        end
+        -- explicit request or no special characters?
+        if find and (plain or nospecials(pattern)) then
+            -- do a plain search
+            local s2 = string_find(str, pattern, init, true)
+            if s2 then
+                return s2-s.pos + 1, s2 - s.pos + p:len()
+            end
+        else
+            local s1 = s:copy(init - 1)
+            local anchor = p:char() == '^'
+            if anchor then p:step() end
+            local ms = {
+                src_init = s,
+                src_end = s:copy(s:len()),
+                p_end = p:copy(p:len()),
+                capture = {}
+            }
+            repeat
+                ms.level = 0
+                local res = match(ms, s1, p)
+                if res ~= nil then
+                    if find then
+                        return s1.pos - s.pos + 1, res.pos - s.pos, push_captures(ms, nil, nil)
+                    else
+                        return push_captures(ms, s1, res)
+                    end
+                end
+            until s1:step() > ms.src_end or anchor
         end
         return nil  -- not found
     end
-end
 
-local function add_s(ms, b, s, e, r)
-    local news = tostring(r)
-    local i = 1
-    while i <= #news do
-        if news:sub(i, i) ~= L_ESC then
-            b = b .. news:sub(i, i)
-        else
-            i = i + 1  -- skip ESC
-            if not isdigit(news:sub(i, i)) then
-                b = b .. news:sub(i, i)
-            elseif news:sub(i, i) == '0' then
-                b = b .. s:head(e - s)
-            else
-                b = b .. push_onecapture(ms, news:sub(i, i) - '1', s, e)  -- add capture to accumulated result
+    local function str_find(s, pattern, init, plain)
+        return str_find_aux(s, pattern, init, plain, true)
+    end
+
+    local function str_match(s, pattern, init)
+        return str_find_aux(s, pattern, init, false, false)
+    end
+
+    local function str_gmatch(s, pattern)
+        checkArg(1, s, "string")
+        checkArg(2, pattern, "string")
+
+        if #s < SHORT_STRING then
+            return string_gmatch(s, pattern, repl, n)
+        end
+
+        local s = strptr(s)
+        local p = strptr(pattern)
+        local start = 0
+        return function()
+            ms = {
+                src_init = s,
+                src_end = s:copy(s:len()),
+                p_end = p:copy(p:len()),
+                capture = {}
+            }
+            for offset = start, ms.src_end.pos - 1 do
+                local src = s:copy(offset)
+                ms.level = 0
+                local e = match(ms, src, p)
+                if e ~= nil then
+                    local newstart = e - s
+                    if e == src then newstart = newstart + 1 end -- empty match? go at least one position
+                    start = newstart
+                    return push_captures(ms, src, e)
+                end
             end
+            return nil  -- not found
         end
-        i = i + 1
-    end
-    return b
-end
-
-local function add_value(ms, b, s, e, r, tr)
-    local res
-    if tr == "function" then
-        res = r(push_captures(ms, s, e))
-    elseif tr == "table" then
-        res = r[push_onecapture(ms, 0, s, e)]
-    else  -- LUA_TNUMBER or LUA_TSTRING
-    return add_s(ms, b, s, e, r)
-    end
-    if not res then  -- nil or false?
-    res = s:head(e - s)  -- keep original text
-    elseif type(res) ~= "string" and type(res) ~= "number" then
-        error("invalid replacement value (a "..type(res)..")")
-    end
-    return b .. res  -- add result to accumulator
-end
-
-local function str_gsub(s, pattern, repl, n)
-    checkArg(1, s, "string")
-    checkArg(2, pattern, "string")
-    checkArg(3, repl, "number", "string", "function", "table")
-    checkArg(4, n, "number", "nil")
-
-    if #s < SHORT_STRING or type(repl) == "function" then
-        return string_gsub(s, pattern, repl, n)
     end
 
-    local src = strptr(s);
-    local p = strptr(pattern)
-    local tr = type(repl)
-    local max_s = n or (#s + 1)
-    local anchor = p:char() == '^'
-    if anchor then
-        p:step()  -- skip anchor character
-    end
-    n = 0
-    local b = ""
-    local ms = {
-        src_init = src:copy(),
-        src_end = src:copy(src:len()),
-        p_end = p:copy(p:len()),
-        capture = {}
-    }
-    while n < max_s do
-        ms.level = 0
-        local e = match(ms, src, p)
-        if e then
-            n = n + 1
-            b = add_value(ms, b, src, e, repl, tr)
+    local function add_s(ms, b, s, e, r)
+        local news = tostring(r)
+        local i = 1
+        while i <= #news do
+            if news:sub(i, i) ~= L_ESC then
+                b = b .. news:sub(i, i)
+            else
+                i = i + 1  -- skip ESC
+                if not isdigit(news:sub(i, i)) then
+                    b = b .. news:sub(i, i)
+                elseif news:sub(i, i) == '0' then
+                    b = b .. s:head(e - s)
+                else
+                    b = b .. push_onecapture(ms, news:sub(i, i) - '1', s, e)  -- add capture to accumulated result
+                end
+            end
+            i = i + 1
         end
-        if e and e > src then  -- non empty match?
-        src = e  -- skip it
-        elseif src < ms.src_end then
-            b = b .. src:char()
-            src:step()
-        else break
-        end
-        if anchor then break end
+        return b
     end
-    b = b .. src:head()
-    return b, n  -- number of substitutions
-end
 
-string.find = str_find
-string.match = str_match
-string.gmatch = str_gmatch
-string.gsub = str_gsub
+    local function add_value(ms, b, s, e, r, tr)
+        local res
+        if tr == "function" then
+            res = r(push_captures(ms, s, e))
+        elseif tr == "table" then
+            res = r[push_onecapture(ms, 0, s, e)]
+        else  -- LUA_TNUMBER or LUA_TSTRING
+        return add_s(ms, b, s, e, r)
+        end
+        if not res then  -- nil or false?
+        res = s:head(e - s)  -- keep original text
+        elseif type(res) ~= "string" and type(res) ~= "number" then
+            error("invalid replacement value (a "..type(res)..")")
+        end
+        return b .. res  -- add result to accumulator
+    end
+
+    local function str_gsub(s, pattern, repl, n)
+        checkArg(1, s, "string")
+        checkArg(2, pattern, "string")
+        checkArg(3, repl, "number", "string", "function", "table")
+        checkArg(4, n, "number", "nil")
+
+        if #s < SHORT_STRING or type(repl) == "function" then
+            return string_gsub(s, pattern, repl, n)
+        end
+
+        local src = strptr(s);
+        local p = strptr(pattern)
+        local tr = type(repl)
+        local max_s = n or (#s + 1)
+        local anchor = p:char() == '^'
+        if anchor then
+            p:step()  -- skip anchor character
+        end
+        n = 0
+        local b = ""
+        local ms = {
+            src_init = src:copy(),
+            src_end = src:copy(src:len()),
+            p_end = p:copy(p:len()),
+            capture = {}
+        }
+        while n < max_s do
+            ms.level = 0
+            local e = match(ms, src, p)
+            if e then
+                n = n + 1
+                b = add_value(ms, b, src, e, repl, tr)
+            end
+            if e and e > src then  -- non empty match?
+            src = e  -- skip it
+            elseif src < ms.src_end then
+                b = b .. src:char()
+                src:step()
+            else break
+            end
+            if anchor then break end
+        end
+        b = b .. src:head()
+        return b, n  -- number of substitutions
+    end
+
+    string.find = str_find
+    string.match = str_match
+    string.gmatch = str_gmatch
+    string.gsub = str_gsub
 end
 
 -------------------------------------------------------------------------------
 
 local function spcall(...)
-local result = table.pack(pcall(...))
-if not result[1] then
-error(tostring(result[2]), 0)
-else
-return table.unpack(result, 2, result.n)
-end
+    local result = table.pack(pcall(...))
+    if not result[1] then
+        error(tostring(result[2]), 0)
+    else
+        return table.unpack(result, 2, result.n)
+    end
 end
 
 local sgcco
 
 local function sgcf(self, gc)
-while true do
-self, gc = coroutine.yield(pcall(gc, self))
-end
+    while true do
+        self, gc = coroutine.yield(pcall(gc, self))
+    end
 end
 
 local function sgc(self)
-local oldDeadline, oldHitDeadline = deadline, hitDeadline
-local mt = debug.getmetatable(self)
-mt = rawget(mt, "mt")
-local gc = rawget(mt, "__gc")
-if type(gc) ~= "function" then
-return
-end
-if not sgcco then
-sgcco = coroutine.create(sgcf)
-end
-debug.sethook(sgcco, checkDeadline, "", hookInterval)
-deadline, hitDeadline = math.min(oldDeadline, computer.realTime() + 0.5), true
-local _, result, reason = coroutine.resume(sgcco, self, gc)
-debug.sethook(sgcco)
-if coroutine.status(sgcco) == "dead" then
-sgcco = nil
-end
-deadline, hitDeadline = oldDeadline, oldHitDeadline
-if not result then
-error(reason, 0)
-end
+    local oldDeadline, oldHitDeadline = deadline, hitDeadline
+    local mt = debug.getmetatable(self)
+    mt = rawget(mt, "mt")
+    local gc = rawget(mt, "__gc")
+    if type(gc) ~= "function" then
+        return
+    end
+    if not sgcco then
+        sgcco = coroutine.create(sgcf)
+    end
+    debug.sethook(sgcco, checkDeadline, "", hookInterval)
+    deadline, hitDeadline = math.min(oldDeadline, computer.realTime() + 0.5), true
+    local _, result, reason = coroutine.resume(sgcco, self, gc)
+    debug.sethook(sgcco)
+    if coroutine.status(sgcco) == "dead" then
+        sgcco = nil
+    end
+    deadline, hitDeadline = oldDeadline, oldHitDeadline
+    if not result then
+        error(reason, 0)
+    end
 end
 
 --[[ This is the global environment we make available to userland programs. ]]
@@ -727,262 +727,262 @@ end
 -- persisted.
 local sandbox, libprocess
 sandbox = {
-assert = assert,
-dofile = nil, -- in boot/*_base.lua
-error = error,
-_G = nil, -- see below
-getmetatable = function(t)
-if type(t) == "string" then -- don't allow messing with the string mt
-return nil
-end
-local result = getmetatable(t)
--- check if we have a wrapped __gc using mt
-if type(result) == "table" and system.allowGC() and rawget(result, "__gc") == sgc then
-result = rawget(result, "mt")
-end
-return result
-end,
-ipairs = ipairs,
-load = function(ld, source, mode, env)
-if not system.allowBytecode() then
-mode = "t"
-end
-return load(ld, source, mode, env or sandbox)
-end,
-loadfile = nil, -- in boot/*_base.lua
-next = next,
-pairs = pairs,
-pcall = function(...)
-local result = table.pack(pcall(...))
-checkDeadline()
-return table.unpack(result, 1, result.n)
-end,
-print = nil, -- in boot/*_base.lua
-rawequal = rawequal,
-rawget = rawget,
-rawlen = rawlen,
-rawset = rawset,
-select = select,
-setmetatable = function(t, mt)
-if type(mt) ~= "table" then
-return setmetatable(t, mt)
-end
-if rawget(mt, "__gc") ~= nil then -- If __gc is set to ANYTHING not `nil`, we're gonna have issues
--- Garbage collector callbacks apparently can't be sandboxed after
--- all, because hooks are disabled while they're running. So we just
--- disable them altogether by default.
-if system.allowGC() then
--- For all user __gc functions we enforce a much tighter deadline.
--- This is because these functions may be called from the main
--- thread under certain circumstanced (such as when saving the world),
--- which can lead to noticeable lag if the __gc function behaves badly.
-local sbmt = {} -- sandboxed metatable. only for __gc stuff, so it's
--- kinda ok to have a shallow copy instead... meh.
-for k, v in next, mt do
-sbmt[k] = v
-end
-sbmt.__gc = sgc
-sbmt.mt = mt
-mt = sbmt
-else
--- Don't allow marking for finalization, but use the raw metatable.
-local gc = rawget(mt, "__gc")
-rawset(mt, "__gc", nil) -- remove __gc
-local ret = table.pack(pcall(setmetatable, t, mt))
-rawset(mt, "__gc", gc) -- restore __gc
-if not ret[1] then error(ret[2], 0) end
-return table.unpack(ret, 2, ret.n)
-end
-end
-return setmetatable(t, mt)
-end,
-tonumber = tonumber,
-tostring = tostring,
-type = type,
-_VERSION = _VERSION:match("5.3") and "Lua 5.3" or "Lua 5.2",
-xpcall = function(f, msgh, ...)
-local handled = false
-local result = table.pack(xpcall(f, function(...)
-if handled then
-return ...
-else
-handled = true
-return msgh(...)
-end
-end, ...))
-checkDeadline()
-return table.unpack(result, 1, result.n)
-end,
+    assert = assert,
+    dofile = nil, -- in boot/*_base.lua
+    error = error,
+    _G = nil, -- see below
+    getmetatable = function(t)
+    if type(t) == "string" then -- don't allow messing with the string mt
+    return nil
+    end
+    local result = getmetatable(t)
+    -- check if we have a wrapped __gc using mt
+    if type(result) == "table" and system.allowGC() and rawget(result, "__gc") == sgc then
+    result = rawget(result, "mt")
+    end
+    return result
+    end,
+    ipairs = ipairs,
+    load = function(ld, source, mode, env)
+    if not system.allowBytecode() then
+    mode = "t"
+    end
+    return load(ld, source, mode, env or sandbox)
+    end,
+    loadfile = nil, -- in boot/*_base.lua
+    next = next,
+    pairs = pairs,
+    pcall = function(...)
+    local result = table.pack(pcall(...))
+    checkDeadline()
+    return table.unpack(result, 1, result.n)
+    end,
+    print = nil, -- in boot/*_base.lua
+    rawequal = rawequal,
+    rawget = rawget,
+    rawlen = rawlen,
+    rawset = rawset,
+    select = select,
+    setmetatable = function(t, mt)
+    if type(mt) ~= "table" then
+    return setmetatable(t, mt)
+    end
+    if rawget(mt, "__gc") ~= nil then -- If __gc is set to ANYTHING not `nil`, we're gonna have issues
+    -- Garbage collector callbacks apparently can't be sandboxed after
+    -- all, because hooks are disabled while they're running. So we just
+    -- disable them altogether by default.
+    if system.allowGC() then
+    -- For all user __gc functions we enforce a much tighter deadline.
+    -- This is because these functions may be called from the main
+    -- thread under certain circumstanced (such as when saving the world),
+    -- which can lead to noticeable lag if the __gc function behaves badly.
+    local sbmt = {} -- sandboxed metatable. only for __gc stuff, so it's
+    -- kinda ok to have a shallow copy instead... meh.
+    for k, v in next, mt do
+    sbmt[k] = v
+    end
+    sbmt.__gc = sgc
+    sbmt.mt = mt
+    mt = sbmt
+    else
+    -- Don't allow marking for finalization, but use the raw metatable.
+    local gc = rawget(mt, "__gc")
+    rawset(mt, "__gc", nil) -- remove __gc
+    local ret = table.pack(pcall(setmetatable, t, mt))
+    rawset(mt, "__gc", gc) -- restore __gc
+    if not ret[1] then error(ret[2], 0) end
+    return table.unpack(ret, 2, ret.n)
+    end
+    end
+    return setmetatable(t, mt)
+    end,
+    tonumber = tonumber,
+    tostring = tostring,
+    type = type,
+    _VERSION = _VERSION:match("5.3") and "Lua 5.3" or "Lua 5.2",
+    xpcall = function(f, msgh, ...)
+    local handled = false
+    local result = table.pack(xpcall(f, function(...)
+    if handled then
+    return ...
+    else
+    handled = true
+    return msgh(...)
+    end
+    end, ...))
+    checkDeadline()
+    return table.unpack(result, 1, result.n)
+    end,
 
-coroutine = {
-create = coroutine.create,
-resume = function(co, ...) -- custom resume part for bubbling sysyields
-checkArg(1, co, "thread")
-local args = table.pack(...)
-while true do -- for consecutive sysyields
-debug.sethook(co, checkDeadline, "", hookInterval)
-local result = table.pack(
-coroutine.resume(co, table.unpack(args, 1, args.n)))
-debug.sethook(co) -- avoid gc issues
-checkDeadline()
-if result[1] then -- success: (true, sysval?, ...?)
-if coroutine.status(co) == "dead" then -- return: (true, ...)
-return true, table.unpack(result, 2, result.n)
-elseif result[2] ~= nil then -- yield: (true, sysval)
-args = table.pack(coroutine.yield(result[2]))
-else -- yield: (true, nil, ...)
-return true, table.unpack(result, 3, result.n)
-end
-else -- error: result = (false, string)
-return false, result[2]
-end
-end
-end,
-running = coroutine.running,
-status = coroutine.status,
-wrap = function(f) -- for bubbling coroutine.resume
-local co = coroutine.create(f)
-return function(...)
-local result = table.pack(sandbox.coroutine.resume(co, ...))
-if result[1] then
-return table.unpack(result, 2, result.n)
-else
-error(result[2], 0)
-end
-end
-end,
-yield = function(...) -- custom yield part for bubbling sysyields
-return coroutine.yield(nil, ...)
-end
-},
+    coroutine = {
+    create = coroutine.create,
+    resume = function(co, ...) -- custom resume part for bubbling sysyields
+    checkArg(1, co, "thread")
+    local args = table.pack(...)
+    while true do -- for consecutive sysyields
+    debug.sethook(co, checkDeadline, "", hookInterval)
+    local result = table.pack(
+    coroutine.resume(co, table.unpack(args, 1, args.n)))
+    debug.sethook(co) -- avoid gc issues
+    checkDeadline()
+    if result[1] then -- success: (true, sysval?, ...?)
+    if coroutine.status(co) == "dead" then -- return: (true, ...)
+    return true, table.unpack(result, 2, result.n)
+    elseif result[2] ~= nil then -- yield: (true, sysval)
+    args = table.pack(coroutine.yield(result[2]))
+    else -- yield: (true, nil, ...)
+    return true, table.unpack(result, 3, result.n)
+    end
+    else -- error: result = (false, string)
+    return false, result[2]
+    end
+    end
+    end,
+    running = coroutine.running,
+    status = coroutine.status,
+    wrap = function(f) -- for bubbling coroutine.resume
+    local co = coroutine.create(f)
+    return function(...)
+    local result = table.pack(sandbox.coroutine.resume(co, ...))
+    if result[1] then
+    return table.unpack(result, 2, result.n)
+    else
+    error(result[2], 0)
+    end
+    end
+    end,
+    yield = function(...) -- custom yield part for bubbling sysyields
+    return coroutine.yield(nil, ...)
+    end
+    },
 
-string = {
-byte = string.byte,
-char = string.char,
-dump = string.dump,
-find = string.find,
-format = string.format,
-gmatch = string.gmatch,
-gsub = string.gsub,
-len = string.len,
-lower = string.lower,
-match = string.match,
-rep = string.rep,
-reverse = string.reverse,
-sub = string.sub,
-upper = string.upper
-},
+    string = {
+    byte = string.byte,
+    char = string.char,
+    dump = string.dump,
+    find = string.find,
+    format = string.format,
+    gmatch = string.gmatch,
+    gsub = string.gsub,
+    len = string.len,
+    lower = string.lower,
+    match = string.match,
+    rep = string.rep,
+    reverse = string.reverse,
+    sub = string.sub,
+    upper = string.upper
+    },
 
-table = {
-concat = table.concat,
-insert = table.insert,
-pack = table.pack,
-remove = table.remove,
-sort = table.sort,
-unpack = table.unpack
-},
+    table = {
+    concat = table.concat,
+    insert = table.insert,
+    pack = table.pack,
+    remove = table.remove,
+    sort = table.sort,
+    unpack = table.unpack
+    },
 
-math = {
-abs = math.abs,
-acos = math.acos,
-asin = math.asin,
-atan = math.atan,
-atan2 = math.atan2,
-ceil = math.ceil,
-cos = math.cos,
-cosh = math.cosh,
-deg = math.deg,
-exp = math.exp,
-floor = math.floor,
-fmod = math.fmod,
-frexp = math.frexp,
-huge = math.huge,
-ldexp = math.ldexp,
-log = math.log,
-max = math.max,
-min = math.min,
-modf = math.modf,
-pi = math.pi,
-pow = math.pow or function(a, b) -- Deprecated in Lua 5.3
-return a^b
-end,
-rad = math.rad,
-random = function(...)
-return spcall(math.random, ...)
-end,
-randomseed = function(seed)
-spcall(math.randomseed, seed)
-end,
-sin = math.sin,
-sinh = math.sinh,
-sqrt = math.sqrt,
-tan = math.tan,
-tanh = math.tanh
-},
+    math = {
+    abs = math.abs,
+    acos = math.acos,
+    asin = math.asin,
+    atan = math.atan,
+    atan2 = math.atan2,
+    ceil = math.ceil,
+    cos = math.cos,
+    cosh = math.cosh,
+    deg = math.deg,
+    exp = math.exp,
+    floor = math.floor,
+    fmod = math.fmod,
+    frexp = math.frexp,
+    huge = math.huge,
+    ldexp = math.ldexp,
+    log = math.log,
+    max = math.max,
+    min = math.min,
+    modf = math.modf,
+    pi = math.pi,
+    pow = math.pow or function(a, b) -- Deprecated in Lua 5.3
+    return a^b
+    end,
+    rad = math.rad,
+    random = function(...)
+    return spcall(math.random, ...)
+    end,
+    randomseed = function(seed)
+    spcall(math.randomseed, seed)
+    end,
+    sin = math.sin,
+    sinh = math.sinh,
+    sqrt = math.sqrt,
+    tan = math.tan,
+    tanh = math.tanh
+    },
 
--- Deprecated in Lua 5.3.
-bit32 = bit32 and {
-arshift = bit32.arshift,
-band = bit32.band,
-bnot = bit32.bnot,
-bor = bit32.bor,
-btest = bit32.btest,
-bxor = bit32.bxor,
-extract = bit32.extract,
-replace = bit32.replace,
-lrotate = bit32.lrotate,
-lshift = bit32.lshift,
-rrotate = bit32.rrotate,
-rshift = bit32.rshift
-},
+    -- Deprecated in Lua 5.3.
+    bit32 = bit32 and {
+    arshift = bit32.arshift,
+    band = bit32.band,
+    bnot = bit32.bnot,
+    bor = bit32.bor,
+    btest = bit32.btest,
+    bxor = bit32.bxor,
+    extract = bit32.extract,
+    replace = bit32.replace,
+    lrotate = bit32.lrotate,
+    lshift = bit32.lshift,
+    rrotate = bit32.rrotate,
+    rshift = bit32.rshift
+    },
 
-io = nil, -- in lib/io.lua
+    io = nil, -- in lib/io.lua
 
-os = {
-clock = os.clock,
-date = function(format, time)
-return spcall(os.date, format, time)
-end,
-difftime = function(t2, t1)
-return t2 - t1
-end,
-execute = nil, -- in boot/*_os.lua
-exit = nil, -- in boot/*_os.lua
-remove = nil, -- in boot/*_os.lua
-rename = nil, -- in boot/*_os.lua
-time = function(table)
-checkArg(1, table, "table", "nil")
-return os.time(table)
-end,
-tmpname = nil, -- in boot/*_os.lua
-},
+    os = {
+    clock = os.clock,
+    date = function(format, time)
+    return spcall(os.date, format, time)
+    end,
+    difftime = function(t2, t1)
+    return t2 - t1
+    end,
+    execute = nil, -- in boot/*_os.lua
+    exit = nil, -- in boot/*_os.lua
+    remove = nil, -- in boot/*_os.lua
+    rename = nil, -- in boot/*_os.lua
+    time = function(table)
+    checkArg(1, table, "table", "nil")
+    return os.time(table)
+    end,
+    tmpname = nil, -- in boot/*_os.lua
+    },
 
-debug = {
-getinfo = function(...)
-local result = debug.getinfo(...)
-if result then
--- Only make primitive information available in the sandbox.
-return {
-source = result.source,
-short_src = result.short_src,
-linedefined = result.linedefined,
-lastlinedefined = result.lastlinedefined,
-what = result.what,
-currentline = result.currentline,
-nups = result.nups,
-nparams = result.nparams,
-isvararg = result.isvararg,
-name = result.name,
-namewhat = result.namewhat,
-istailcall = result.istailcall
-}
-end
-end,
-traceback = debug.traceback
-},
+    debug = {
+    getinfo = function(...)
+    local result = debug.getinfo(...)
+    if result then
+    -- Only make primitive information available in the sandbox.
+    return {
+    source = result.source,
+    short_src = result.short_src,
+    linedefined = result.linedefined,
+    lastlinedefined = result.lastlinedefined,
+    what = result.what,
+    currentline = result.currentline,
+    nups = result.nups,
+    nparams = result.nparams,
+    isvararg = result.isvararg,
+    name = result.name,
+    namewhat = result.namewhat,
+    istailcall = result.istailcall
+    }
+    end
+    end,
+    traceback = debug.traceback
+    },
 
 
-checkArg = checkArg
+    checkArg = checkArg
 }
 sandbox._G = sandbox
 

@@ -311,7 +311,7 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
             beepCursor = 0
         }
 
-        // continue emitTone queue
+        // advance emitTone queue
         if (beepCursor >= 0 && beepQueueLineExecTimer >= beepQueueGetLenOfPtn(beepCursor)) {
             beepQueueLineExecTimer -= beepQueueGetLenOfPtn(beepCursor)
             beepCursor += 1
@@ -321,7 +321,6 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         // complete emitTone queue
         if (beepCursor >= beepQueue.size) {
             clearBeepQueue()
-            AL.destroy()
             if (DEBUG) println("[BaseTerrarumComputer] !! Beep queue clear")
         }
 
@@ -329,6 +328,12 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         if (beepCursor >= 0 && beepQueue.size > 0 && !beepQueueFired) {
             playTone(beepQueue[beepCursor].first, beepQueue[beepCursor].second)
             beepQueueFired = true
+
+            // delete sources that is finished. AL is limited to 256 sources. If you exceed it,
+            // we won't get any more sounds played.
+            AL10.alSourcei(oldBeepSource, AL10.AL_BUFFER, 0)
+            AL10.alDeleteSources(oldBeepSource)
+            AL10.alDeleteBuffers(oldBeepBuffer)
         }
 
         if (beepQueueFired) beepQueueLineExecTimer += delta
@@ -338,6 +343,8 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         beepQueue.clear()
         beepCursor = -1
         beepQueueLineExecTimer = 0
+
+        //AL.destroy()
     }
 
     fun enqueueBeep(duration: Int, freq: Double) {
@@ -352,8 +359,10 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
     ////////////////////
 
     private val sampleRate = 44100
-    private var beepSource: Int? = null
-    private var beepBuffer: Int? = null
+    private var beepSource: Int = -1
+    private var beepBuffer: Int = -1
+    private var oldBeepSource: Int = -1
+    private var oldBeepBuffer: Int = -1
     var audioData: ByteBuffer? = null
 
     /**
@@ -424,36 +433,37 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         // Clear error stack.
         AL10.alGetError()
 
+        oldBeepBuffer = beepBuffer
         beepBuffer = AL10.alGenBuffers()
         checkALError()
 
         try {
-            AL10.alBufferData(beepBuffer!!, AL10.AL_FORMAT_MONO8, audioData, sampleRate)
+            AL10.alBufferData(beepBuffer, AL10.AL_FORMAT_MONO8, audioData, sampleRate)
             checkALError()
 
+            oldBeepSource = beepSource
             beepSource = AL10.alGenSources()
             checkALError()
 
             try {
-                AL10.alSourceQueueBuffers(beepSource!!, beepBuffer!!)
+                AL10.alSourceQueueBuffers(beepSource, beepBuffer)
                 checkALError()
 
-                AL10.alSource3f(beepSource!!, AL10.AL_POSITION, 0f, 0f, 1f)
-                AL10.alSourcef(beepSource!!, AL10.AL_REFERENCE_DISTANCE, 1f)
-                AL10.alSourcef(beepSource!!, AL10.AL_MAX_DISTANCE, 1f)
-                AL10.alSourcef(beepSource!!, AL10.AL_GAIN, 0.3f)
+                AL10.alSource3f(beepSource, AL10.AL_POSITION, 0f, 0f, 1f)
+                AL10.alSourcef(beepSource, AL10.AL_REFERENCE_DISTANCE, 1f)
+                AL10.alSourcef(beepSource, AL10.AL_MAX_DISTANCE, 1f)
+                AL10.alSourcef(beepSource, AL10.AL_GAIN, 0.3f)
                 checkALError()
 
-                AL10.alSourcePlay(beepSource!!)
+                AL10.alSourcePlay(beepSource)
                 checkALError()
-
             }
             catch (e: ALException) {
-                AL10.alDeleteSources(beepSource!!)
+                AL10.alDeleteSources(beepSource)
             }
         }
         catch (e: ALException) {
-            if (beepSource != null) AL10.alDeleteSources(beepSource!!)
+            AL10.alDeleteSources(beepSource)
         }
     }
 
