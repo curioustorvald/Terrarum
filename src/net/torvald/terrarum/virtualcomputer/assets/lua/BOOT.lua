@@ -8,7 +8,7 @@
 
 -- global functions
 _G.runscript = function(s, src, ...)
-    if s:byte(1) == 27 then error("Bytecode execution is prohibited.") end
+    if s:byte(1) == 27 then error("Bytecode execution is prohibited.") end -- untested; it's Lua 5.1 code and we're 5.2
 
     local code, reason = load(s, src)
 
@@ -52,7 +52,6 @@ if totalMemory() == 0 then
     __haltsystemexplicit__()
     return
 end
-
 
 local hookInterval = 100
 local deadline = math.huge
@@ -1005,7 +1004,6 @@ if not computer.loadedCLayer then computer.loadedCLayer = {} end -- list of load
 -- if no bootloader is pre-defined via EFI, use default one
 if not computer.bootloader then computer.bootloader = "/boot/bootloader" end
 if not computer.OEM then computer.OEM = "" end
-computer.beep = emittone
 computer.totalMemory = _G.totalMemory
 if not computer.bellpitch then computer.bellpitch = 1000 end
 local getMemory = function()
@@ -1019,7 +1017,7 @@ computer.freeMemory = function() return totalMemory() - getMemory() end
 require("ROMLIB")
 
 -- POST passed, initialise beeper
-beep "."
+speaker.enqueue(80, 1000) -- term.bell sometimes get squelched
 
 -- load bios, if any
 if fs.exists(computer.bootloader) then shell.run(computer.bootloader) end

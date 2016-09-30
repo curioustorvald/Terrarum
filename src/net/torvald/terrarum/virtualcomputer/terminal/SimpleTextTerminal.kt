@@ -405,8 +405,9 @@ open class SimpleTextTerminal(
         val GREEN = Color(74, 255, 0) // P39, 525 nm
         val WHITE = Color(204, 223, 255) // approximation of white CRT I own
         private val WHITE7500 = Color(0xe4eaff)
-        val BLUE_NOVELTY = Color(0, 226, 255) // imaginary, 483 nm
+        val BLUE_NOVELTY = Color(0x27d7ff)
         val RED = Color(250, 51, 0) // 632 nm
+        val AMETHYST_NOVELTY = Color(0xc095ff)
 
         val ASCII_NUL = 0.toChar()
         val ASCII_BEL = 7.toChar()   // *BEEP!*
