@@ -1,4 +1,4 @@
-This is LuaTeX, Version beta-0.80.0 (TeX Live 2015) (rev 5238)  (format=lualatex 2015.10.5)  29 SEP 2016 19:27
+This is LuaTeX, Version beta-0.80.0 (TeX Live 2015) (rev 5238)  (format=lualatex 2015.10.5)  30 SEP 2016 20:18
  restricted \write18 enabled.
  file:line:error style messages enabled.
 **romapidoc.tex
@@ -552,7 +552,7 @@ luatexbase-attr: luatexbase.attributes["luaotfload@cursbase"] = 6
 luatexbase-attr: luatexbase.attributes["luaotfload@curscurs"] = 7
 luatexbase-attr: luatexbase.attributes["luaotfload@cursdone"] = 8
 luatexbase-attr: luatexbase.attributes["luaotfload@state"] = 9
-luaotfload | main : fontloader loaded in 0.057 seconds
+luaotfload | main : fontloader loaded in 0.030 seconds
 luatexbase-mcb: inserting 'luaotfload.node_processor'
 at position 1 in 'pre_linebreak_filter'
 luatexbase-mcb: inserting 'luaotfload.node_processor'
@@ -1460,66 +1460,66 @@ al-though this li-brary is ComputerCraft-
  []
 
 
-Underfull \hbox (badness 2150) in paragraph at lines 12--12
+Underfull \hbox (badness 2150) in paragraph at lines 14--14
 [][]|\EU2/MyriadPro(0)/m/n/10 Re-turns key name cor-re-sponds to
  []
 
 
-Overfull \hbox (9.77664pt too wide) in paragraph at lines 72--72
+Overfull \hbox (9.77664pt too wide) in paragraph at lines 74--74
 []|\EU2/MyriadPro(0)/m/n/10 (\EU2/MyriadPro(0)/m/it/10 zero \EU2/MyriadPro(0)/m
 /n/10 to \EU2/MyriadPro(0)/m/it/10 nine\EU2/MyriadPro(0)/m/n/10 )| 
  []
 
 
-Overfull \hbox (1.58002pt too wide) in paragraph at lines 72--72
+Overfull \hbox (1.58002pt too wide) in paragraph at lines 74--74
 []|\EU2/MyriadPro(0)/m/n/10 backspace| 
  []
 
 
-Overfull \hbox (2.65999pt too wide) in paragraph at lines 72--72
+Overfull \hbox (2.65999pt too wide) in paragraph at lines 74--74
 []|\EU2/MyriadPro(0)/m/n/10 leftBracket| 
  []
 
 
-Overfull \hbox (9.01001pt too wide) in paragraph at lines 72--72
+Overfull \hbox (9.01001pt too wide) in paragraph at lines 74--74
 []|\EU2/MyriadPro(0)/m/n/10 rightBracket| 
  []
 
 
-Overfull \hbox (2.23003pt too wide) in paragraph at lines 72--72
+Overfull \hbox (2.23003pt too wide) in paragraph at lines 74--74
 []|\EU2/MyriadPro(0)/m/n/10 semiColon| 
  []
 
 
-Overfull \hbox (6.18004pt too wide) in paragraph at lines 72--72
+Overfull \hbox (6.18004pt too wide) in paragraph at lines 74--74
 []|\EU2/MyriadPro(0)/m/n/10 apostrophe| 
- []
-
-
-Overfull \hbox (6.32997pt too wide) in paragraph at lines 72--72
-[]|\EU2/MyriadPro(0)/m/n/10 cimcumflex| 
- []
-
-
-Overfull \hbox (5.03001pt too wide) in paragraph at lines 72--72
-[]|\EU2/MyriadPro(0)/m/n/10 underscore| 
  []
 
 [11
 
 
 ]
-Overfull \hbox (4.14001pt too wide) in paragraph at lines 72--72
+Overfull \hbox (6.32997pt too wide) in paragraph at lines 74--74
+[]|\EU2/MyriadPro(0)/m/n/10 cimcumflex| 
+ []
+
+
+Overfull \hbox (5.03001pt too wide) in paragraph at lines 74--74
+[]|\EU2/MyriadPro(0)/m/n/10 underscore| 
+ []
+
+
+Overfull \hbox (4.14001pt too wide) in paragraph at lines 74--74
 []|\EU2/MyriadPro(0)/m/n/10 pageDown| 
  []
 
 
-Overfull \hbox (15.58pt too wide) in paragraph at lines 72--72
+Overfull \hbox (15.58pt too wide) in paragraph at lines 74--74
 []|\EU2/MyriadPro(0)/m/n/10 leftCommand| 
  []
 
 ) [12] (./api_os.tex
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
+Underfull \hbox (badness 10000) in paragraph at lines 35--35
 [][]|\EU2/MyriadPro(0)/m/n/10 Short month name. (e.g.
  []
 
@@ -1548,18 +1548,39 @@ Underfull \hbox (badness 2707) in paragraph at lines 20--20
 
 
 ] (./api_speaker.tex
-Overfull \hbox (0.686pt too wide) in alignment at lines 11--11
- [] [] [] 
- []
-
-
-Underfull \hbox (badness 1577) in paragraph at lines 11--11
+Underfull \hbox (badness 1577) in paragraph at lines 18--18
 [][]|\EU2/MyriadPro(0)/m/n/10 En-queues speaker driv-ing
  []
 
 
-Package longtable Warning: Column widths have changed
-(longtable)                in table 8.1 on input line 11.
+Underfull \hbox (badness 2384) in paragraph at lines 18--18
+[][]|\EU2/MyriadPro(0)/m/n/10 Re-tunes speaker to spec-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 18--18
+\EU2/MyriadPro(0)/m/n/10 i-fied tun-ing (e.g. ``A415'',
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 18--18
+\EU2/MyriadPro(0)/m/n/10 ``C256'', ``A#440''). If no
+ []
+
+
+Underfull \hbox (badness 5403) in paragraph at lines 18--18
+\EU2/MyriadPro(0)/m/n/10 ar-gu-ment is given, A440
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 18--18
+\EU2/MyriadPro(0)/m/n/10 to match-ing fre-quency
+ []
+
+
+Underfull \hbox (badness 1264) in paragraph at lines 18--18
+\EU2/MyriadPro(0)/m/n/10 based on cur-rent speaker
+ []
 
 ) [17
 
@@ -1612,7 +1633,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 68--68
 
 ] [19]
 \cpimagew=\skip279
- <mda.png, id=310, 4625.28pt x 1798.72pt>
+ <mda.png, id=341, 4625.28pt x 1798.72pt>
 File: mda.png Graphic file (type png)
  <use mda.png>
 Package pdftex.def Info: mda.png used on input line 90.
@@ -1686,28 +1707,24 @@ luaotfload | load : Lookup/name: "MyriadPro" -> "MyriadPro-Bold.otf" [26
 \tf@toc=\write5
 
 \openout5 = romapidoc.toc
-
-
-Package longtable Warning: Table widths have changed. Rerun LaTeX.
-
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 182.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 182.
-(./romapidoc.aux)
+ (./romapidoc.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 182.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 182.
 Package rerunfilecheck Info: File `romapidoc.out' has not changed.
-(rerunfilecheck)             Checksum: E6AA534E637E70890D852319B9FFD1B2;4249.
+(rerunfilecheck)             Checksum: E2557CFA1EFA2AD5ABDDE2C6217CA0AA;4851.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 182.
 )
 
 Here is how much of LuaTeX's memory you used:
- 27337 strings out of 494693
+ 27351 strings out of 494693
  125070,662416 words of node,token memory allocated
  794 words of node memory still in use:
    3 hlist, 1 vlist, 1 rule, 2 glue, 1 kern, 5 attribute, 141 glue_spec, 5 attri
 bute_list, 2 write nodes
-   avail lists: 2:15095,3:297,4:3729,5:1384,6:6444,7:355,8:30,9:919,10:406
- 30235 multiletter control sequences out of 65536+600000
+   avail lists: 1:1,2:15095,3:297,4:3729,5:1384,6:6444,7:355,8:31,9:919,10:406
+ 30242 multiletter control sequences out of 65536+600000
  62 fonts using 5300367 bytes
  67i,12n,59p,1189b,507s stack positions out of 5000i,500n,10000p,200000b,100000s
 LuaTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist,
@@ -1715,10 +1732,10 @@ LuaTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist,
 
 </Library/Fonts/MyriadPro-It.otf></Library/Fonts/MyriadPro-Regular.otf></Library
 /Fonts/MyriadPro-Bold.otf>
-Output written on romapidoc.pdf (37 pages, 103609 bytes).
+Output written on romapidoc.pdf (37 pages, 105016 bytes).
 
-PDF statistics: 429 PDF objects out of 1000 (max. 8388607)
- 372 compressed objects within 4 object streams
- 106 named destinations out of 1000 (max. 131072)
- 321 words of extra memory for PDF output out of 10000 (max. 10000000)
+PDF statistics: 461 PDF objects out of 1000 (max. 8388607)
+ 403 compressed objects within 5 object streams
+ 113 named destinations out of 1000 (max. 131072)
+ 369 words of extra memory for PDF output out of 10000 (max. 10000000)
 

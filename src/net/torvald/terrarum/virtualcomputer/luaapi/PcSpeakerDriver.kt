@@ -6,6 +6,7 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import org.luaj.vm2.LuaFunction
 import org.luaj.vm2.lib.OneArgFunction
 
 /**
@@ -90,7 +91,7 @@ class PcSpeakerDriver(val globals: Globals, host: BaseTerrarumComputer) {
         }
     }
 
-    class Retune(val globals: Globals) : OneArgFunction() {
+    class Retune(val globals: Globals) : LuaFunction() {
         /**
          * Examples: C256, A440, A#440, ...
          */
@@ -100,16 +101,22 @@ class PcSpeakerDriver(val globals: Globals, host: BaseTerrarumComputer) {
             val baseNote = if (tuneName.contains("#") || tuneName.contains("b")) tuneName.substring(0, 2) else tuneName.substring(0, 1)
             val freq = tuneName.replace(Regex("""[^0-9]"""), "").toInt()
 
-            // we're assuming C4, C#4, ... A4, A#4, B4
-            val diffPivot = arrayOf(11, 12, 13, 14, 3, 4, 5, 6, 7, 8, 9, 10) // 2^(12 / n)
+            // we're assuming the input to be C4, C#4, ... A4, A#4, B4
+            // diffPivot corsp. to G#4, A4, ...
+            val diffPivot = arrayOf(-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10) // 2^(12 / n)
             var diff = diffPivot[NOTE_NAMES.indexOf(baseNote)]
             if (diff < 0) diff = diffPivot[NOTE_NAMES_ALT.indexOf(baseNote)] // search again
             if (diff < 0) throw IllegalArgumentException("Unknown note: $baseNote") // failed to search
 
-            val exp = 12.0 / diff
-            val basefreq = freq * Math.pow(2.0, exp) / 32.0 // converts whatever baseNote to A0
+            val exp = -diff / 12.0
+            val basefreq = freq * Math.pow(2.0, exp) / if (diff >= 3) 8.0 else 16.0 // converts whatever baseNote to A0
 
             globals["speaker"]["__basefreq__"] = basefreq
+            return LuaValue.NONE
+        }
+
+        override fun call(): LuaValue {
+            globals["speaker"]["__basefreq__"] = LuaValue.valueOf(BASE_FREQ)
             return LuaValue.NONE
         }
     }

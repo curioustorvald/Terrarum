@@ -1,5 +1,7 @@
 The Speaker API provides means to control computer's built-in beeper speaker.
 
+\section{Functions}
+
 \begin{tabularx}{\textwidth}{l l X}
 	\textbf{\large Function} & \textbf{\large Return} & \textbf{\large Description}
 	\\ \\
@@ -8,4 +10,18 @@ The Speaker API provides means to control computer's built-in beeper speaker.
 	\\ \\
 	speaker.clear() & nil & Clears speaker queue.
 	\\ \\
+	speaker.retune(str or nil) & nil & Retunes speaker to specified tuning (e.g. ``A415'', ``C256'', ``A\#440''). If no argument is given, A440 will be used.
+	\\ \\
+	speaker.resetTune() & nil & Retunes speaker to A440.
+	\\ \\
+	speaker.toFreq(string) & int & Translates input note name to matching frequency based on current speaker tunining.
+\end{tabularx}
+
+\section{Constants}
+
+\begin{tabularx}{\textwidth}{l l X}
+	\textbf{\large Name} & \textbf{\large Type} & \textbf{\large Description}
+	\\ \\
+	\endhead
+	speaker.\_\_basefreq\_\_ & number & Frequency of note A-0.
 \end{tabularx}

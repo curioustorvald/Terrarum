@@ -7,13 +7,18 @@
 \contentsline {chapter}{\chapternumberline {3}Input}{10}{chapter.3}
 \contentsline {section}{\numberline {3.1}Functions}{10}{section.3.1}
 \contentsline {chapter}{\chapternumberline {4}Keys}{11}{chapter.4}
-\contentsline {section}{\numberline {4.1}Accepted Key Names}{11}{section.4.1}
+\contentsline {section}{\numberline {4.1}Functions}{11}{section.4.1}
+\contentsline {section}{\numberline {4.2}Accepted Key Names}{11}{section.4.2}
 \contentsline {chapter}{\chapternumberline {5}OS}{13}{chapter.5}
-\contentsline {section}{\numberline {5.1}Date Format String}{13}{section.5.1}
+\contentsline {section}{\numberline {5.1}Functions}{13}{section.5.1}
+\contentsline {section}{\numberline {5.2}Date Format String}{13}{section.5.2}
 \contentsline {chapter}{\chapternumberline {6}Security}{15}{chapter.6}
 \contentsline {section}{\numberline {6.1}Functions}{15}{section.6.1}
 \contentsline {chapter}{\chapternumberline {7}Shell}{16}{chapter.7}
+\contentsline {section}{\numberline {7.1}Functions}{16}{section.7.1}
 \contentsline {chapter}{\chapternumberline {8}Speaker}{17}{chapter.8}
+\contentsline {section}{\numberline {8.1}Functions}{17}{section.8.1}
+\contentsline {section}{\numberline {8.2}Constants}{17}{section.8.2}
 \contentsline {chapter}{\chapternumberline {9}Terminal}{18}{chapter.9}
 \contentsline {section}{\numberline {9.1}Functions}{18}{section.9.1}
 \contentsline {section}{\numberline {9.2}Standard Colours}{20}{section.9.2}
@@ -25,6 +30,7 @@
 \contentsline {section}{\numberline {10.3}Bell Codes}{24}{section.10.3}
 \contentsline {subsection}{\numberline {10.3.1}Changes from Generic Lua Environment}{24}{subsection.10.3.1}
 \contentsline {chapter}{\chapternumberline {11}Machine}{25}{chapter.11}
+\contentsline {section}{\numberline {11.1}Functions}{25}{section.11.1}
 \contentsline {part}{\partnumberline {II}Compatibility Layers---ComputerCraft}{26}{part.2}
 \contentsline {chapter}{\chapternumberline {12}Bit}{27}{chapter.12}
 \contentsline {section}{\numberline {12.1}Functions}{27}{section.12.1}
