@@ -6,6 +6,8 @@
    Some codes were taken from OpenComputers, which is distributed under MIT
 --]]
 
+_G._TERRARUM = true -- for multi-env programs
+
 -- global functions
 _G.runscript = function(s, src, ...)
     if s:byte(1) == 27 then error("Bytecode execution is prohibited.") end -- untested; it's Lua 5.1 code and we're 5.2
@@ -24,9 +26,6 @@ fs.dofile = function(p, ...)
     local s = f.readAll()
     _G.runscript(s, "="..p, ...)
 end
-
--- EFI is expected to locate in "boot/efi"
-if fs.exists("boot/efi") then fs.dofile("boot/efi") end
 
 computer.realTime = function() return 0 end
 
@@ -77,7 +76,7 @@ local function checkArg(n, have, ...)
         end
     end
     if not check(...) then
-        local msg = string.format("bad argument #%d (%s expected, got %s)",
+        local msg = string.format("BAD argument #%d (%s expected, got %s)",
             n, table.concat({...}, " or "), have)
         error(msg, 3)
     end
@@ -99,7 +98,7 @@ do
     local SHORT_STRING = 500 -- use native implementations for short strings
 
     local string_find, string_lower, string_match, string_gmatch, string_gsub =
-    string.find, string.lower, string.match, string.gmatch, string.gsub
+        string.find, string.lower, string.match, string.gmatch, string.gsub
 
     local match -- forward declaration
 
@@ -1002,33 +1001,34 @@ if not computer.prompt then computer.prompt = DC3.."> "..DC4 end
 if not computer.verbose then computer.verbose = true end -- print debug info
 if not computer.loadedCLayer then computer.loadedCLayer = {} end -- list of loaded compatibility layers
 -- if no bootloader is pre-defined via EFI, use default one
-if not computer.bootloader then computer.bootloader = "/boot/bootloader" end
+if not computer.bootloader then computer.bootloader = "/boot/efi" end
 if not computer.OEM then computer.OEM = "" end
-computer.totalMemory = _G.totalMemory
-if not computer.bellpitch then computer.bellpitch = 1000 end
+machine.totalMemory = _G.totalMemory
+if not computer.bellpitch then computer.bellpitch = 950 end
 local getMemory = function()
     collectgarbage()
     return collectgarbage("count") * 1024 - 6.5*1048576 + screenbuffersize
 end -- that magic number: how much basic system takes
 -- totalMemory: implemented in Kotlin class
-computer.freeMemory = function() return totalMemory() - getMemory() end
+machine.freeMemory = function() return totalMemory() - getMemory() end
 
 -- load libraries that coded in Lua
 require("ROMLIB")
 
 -- POST passed, initialise beeper
-speaker.enqueue(80, 1000) -- term.bell sometimes get squelched
+speaker.enqueue(80, computer.bellpitch) -- term.bell sometimes get squelched
 
 -- load bios, if any
 if fs.exists(computer.bootloader) then shell.run(computer.bootloader) end
+
 -- halt/run luaprompt upon the termination of bios.
 -- Valid BIOS should load OS and modify 'shell.status' to 'shell.halt' before terminating itself.
 if shell.status == shell.halt then __haltsystemexplicit__() goto quit end
 
 -- load Lua prompt, if bios is not found
 print("Rom basic "..DC2.._VERSION..DC4)
-print("Copyright (C) 1994-2013 Lua.org, PUC-Rio")
-print("Ok")
+print("Lua is copyrighted (C) 1994-2013 Lua.org, PUC-Rio")
+print()
 
 while not machine.isHalted() do
     term.setCursorBlink(true)

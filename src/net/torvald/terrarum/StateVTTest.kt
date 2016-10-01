@@ -21,7 +21,7 @@ class StateVTTest : BasicGameState() {
 
     // HiRes: 100x64, LoRes: 80x25
     val computerInside = BaseTerrarumComputer(8)
-    val vt = SimpleTextTerminal(SimpleTextTerminal.GREEN, 80, 25,
+    val vt = SimpleTextTerminal(SimpleTextTerminal.AMETHYST_NOVELTY, 80, 25,
             computerInside, colour = false, hires = false)
 
 

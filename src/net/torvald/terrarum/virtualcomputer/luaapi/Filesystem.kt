@@ -18,6 +18,9 @@ import java.util.*
  *      media/hda/  ->  .../computers/<uuid for the hda>/
  * 
  * Created by minjaesong on 16-09-17.
+ *
+ *
+ * NOTE: Don't convert '\' to '/'! Rev-slash is used for escape character in sh, and we're sh-compatible!
  */
 internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
 
@@ -102,8 +105,6 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
             // remove first '/' in path
             var path = luapath.checkIBM437()
             if (path.startsWith('/')) path = path.substring(1)
-            // replace '\' with '/'
-            path.replace('\\', '/')
             
             if (path.startsWith("media/")) {
                 val device = path.substring(6, 9)
@@ -116,7 +117,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         }
 
         fun combinePath(base: String, local: String) : String {
-            return "$base$local".replace("//", "/").replace("\\\\", "\\")
+            return "$base$local".replace("//", "/")
         }
     }
 
@@ -355,11 +356,11 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
             var pathSB = StringBuilder(path.checkIBM437())
 
             // backward travel, drop chars until '/' has encountered
-            while (!pathSB.endsWith('/') && !pathSB.endsWith('\\'))
+            while (!pathSB.endsWith('/'))
                 pathSB.deleteCharAt(pathSB.lastIndex - 1)
 
             // drop trailing '/'
-            if (pathSB.endsWith('/') || pathSB.endsWith('\\'))
+            if (pathSB.endsWith('/'))
                 pathSB.deleteCharAt(pathSB.lastIndex - 1)
 
             return LuaValue.valueOf(pathSB.toString())

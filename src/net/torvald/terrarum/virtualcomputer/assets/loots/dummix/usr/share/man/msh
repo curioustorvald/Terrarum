@@ -1,0 +1,12 @@
+NAME
+	msh - the Moonshell
+
+SYNOPSIS
+	msh [file]
+
+COPYRIGHT
+	See copyright information for the game you are actually playing.
+
+DESCRIPTION
+	Moonshell  is a Lua prompt that reads lua script from the user,  or execute
+	a file user had put as an argument.

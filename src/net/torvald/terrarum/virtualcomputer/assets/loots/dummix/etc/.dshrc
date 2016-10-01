@@ -1,0 +1,8 @@
+-- dsh aliases
+os.dshenv.aliases = {
+	lua = "exec msh",
+	sh = "dsh",
+	shutdown = "exit",
+	less = "exec lessismore",
+	more = "exec lessismore"
+}

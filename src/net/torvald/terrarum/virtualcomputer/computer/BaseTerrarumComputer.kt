@@ -191,9 +191,10 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
     fun update(gc: GameContainer, delta: Int) {
         input = gc.input
 
-
         if (currentExecutionThread.state == Thread.State.TERMINATED)
             unsetThreadRun()
+
+
 
         // time the execution time of the thread
         if (threadRun) {
@@ -205,9 +206,15 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
                 //currentExecutionThread.interrupt()
                 unsetThreadRun()
             }
+
+            driveBeepQueueManager(delta)
         }
 
-        driveBeepQueueManager(delta)
+
+
+        if (isHalted) {
+            currentExecutionThread.interrupt()
+        }
     }
 
     fun keyPressed(key: Int, c: Char) {
@@ -239,8 +246,6 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
     }
 
     class ThreadRunCommand : Runnable {
-
-        val DEBUGTHRE = true
 
         val mode: Int
         val arg1: Any
@@ -276,7 +281,7 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
             }
             catch (e: LuaError) {
                 lua.STDERR.println("${SimpleTextTerminal.ASCII_DLE}${e.message}${SimpleTextTerminal.ASCII_DC4}")
-                if (DEBUGTHRE) e.printStackTrace(System.err)
+                e.printStackTrace(System.err)
             }
         }
     }
