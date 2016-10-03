@@ -30,28 +30,20 @@ local function endsWithSlash(p)
     return p:byte(#p) == 47
 end
 
-local function errorCmdNotFound(cmd)
-    print(cmd..": command not found")
-end
-
-local function errorNoSuchFile(cmd)
-    print(cmd..": No such file")
-end
-
-local function errorNoSuchFileOrDir(cmd)
-    print(cmd..": No such file or directory")
-end
-
---local __DSHDEBUG__ = 0x51621D
+__DSHDEBUG__ = 0x51621D
 
 local function debug(msg)
     if __DSHDEBUG__ then print("DEBUG", msg) end
 end
 
+local function printErr(msg)
+    print(DLE..msg)
+end
+
 -- BUILTINS -------------------------------------------------------------------
 
-local function cd(args)
-    local dir = args[1]
+local function cd(tArgs)
+    local dir = tArgs[1]
 
     if (dir == nil or #dir < 1) then return end
 
@@ -60,7 +52,7 @@ local function cd(args)
     local chkdir = expandPath(dir)
 
     if not fs.exists(chkdir) then
-        errorNoSuchFileOrDir("cd: "..dir)
+        os.errorNoSuchFileOrDir("cd: "..dir)
         return
     end
 
@@ -86,25 +78,24 @@ local function cd(args)
     end
 end
 
-local function exit(args)
+local function exit(tArgs)
     exitshell = true
 end
 
-local function exec(args)
-    --debug("EXEC\t"..table.concat(args, " "))
+local function exec(tArgs)
+    debug("EXECARGS\t"..table.concat(tArgs, ", "))
 
-    if (args[1] == nil or #args[1] < 1) then return end
+    if (tArgs[1] == nil or #tArgs[1] < 1) then return end
 
-    local filePath = args[1]
-    local fullFilePath = expandPath(args[1])
+    local filePath = tArgs[1]
+    local fullFilePath = expandPath(tArgs[1])
     local execArgs = {}
-    for i, v in ipairs(args) do 
+    for i, v in ipairs(tArgs) do 
         if (i >= 2) then table.insert(execArgs, v) end
     end
     local execByPathFileExists = false
     local execByPathArg = ""
 
-    --fs.dofile(fullFilePath, execArgs)
     -- do some sophisticated file-matching
     -- step 1: exact file
     if fs.isFile(fullFilePath) then shell.run(fullFilePath, execArgs)
@@ -137,9 +128,9 @@ local function exec(args)
         return EXIT_SUCCESS
     else
         if filePath:byte(1) == 46 or filePath:byte(1) == 47 then
-            errorNoSuchFile(filePath)
+            os.errorNoSuchFile(filePath)
         else
-            errorCmdNotFound(filePath)
+            os.errorCmdNotFound(filePath)
         end
     end
 
@@ -156,9 +147,11 @@ local builtins = {
     clear = term.clear
 }
 
-local function runcommand(str)
+local function runcommand(str, recurse)
     if #str < 1 then return end
 
+    local cmdFound = false
+    
     -- simple cmd parse: WORD ARG1 ARG2 ARG3 ...
     local args = {}
     local command = ""
@@ -169,20 +162,30 @@ local function runcommand(str)
 
     if builtins[command] then -- try for builtins table
         builtins[command](args)
-        return EXIT_SUCCESS
+        cmdFound = true
+        return true
     else
+
+        -- FIXME: 'exec programname args' works, but not 'programname args'
+
         -- try for os.dshenv.aliases
         if os.dshenv.aliases[command] then
             --builtins[os.dshenv.aliases[command]](args)
-            runcommand(os.dshenv.aliases[command])
-            return EXIT_SUCCESS
+            if not recurse then
+                cmdFound = runcommand(os.dshenv.aliases[command], true)
+            end
         else
             -- try to launch as program
-            table.insert(args, 1, command)
-            exec(args)
+            if not recurse then
+                cmdFound = runcommand("exec "..str, true)
+            end
         end
     end
 
+    -- command not found (really)
+    if not cmdFound then
+        os.errorCmdNotFound(command)
+    end
 end
 
 -- END OF SYNTAX PARSER -------------------------------------------------------
@@ -235,11 +238,11 @@ local time = os.date()
 print(time)
 
 repeat
+    term.setCursorBlink(true)
     io.write(getPromptText())
     local s = input.readLine()
     runcommand(s)
 until exitshell
 
-::terminate::
 collectgarbage()
 return EXIT_SUCCESS

@@ -24,7 +24,8 @@ end
 fs.dofile = function(p, ...)
     local f = fs.open(p, "r")
     local s = f.readAll()
-    _G.runscript(s, "="..p, ...)
+    f.close()
+    _G.runscript(s, p, ...)
 end
 
 computer.realTime = function() return 0 end
@@ -726,7 +727,13 @@ end
 local sandbox, libprocess
 sandbox = {
     assert = assert,
-    dofile = nil, -- in boot/*_base.lua
+    dofile = function(filename)
+            local program, reason = loadfile(filename)
+            if not program then
+            return error(reason .. ':' .. filename, 0)
+            end
+            return program()
+    end, -- in boot/*_base.lua
     error = error,
     _G = nil, -- see below
     getmetatable = function(t)
@@ -747,7 +754,26 @@ sandbox = {
     end
     return load(ld, source, mode, env or sandbox)
     end,
-    loadfile = nil, -- in boot/*_base.lua
+    loadfile = function(filename, mode, env)
+        local file, reason = io.open(filename)
+        if not file then
+            return nil, reason
+        end
+        local source, reason = file:read("*a")
+        file:close()
+        if not source then
+            return nil, reason
+        end
+        if string.sub(source, 1, 1) == "#" then
+            local endline = string.find(source, "\n", 2, true)
+            if endline then
+                source = string.sub(source, endline + 1)
+            else
+                source = ""
+            end
+        end
+        return load(source, "=" .. filename, mode, env)
+    end, -- in boot/*_base.lua
     next = next,
     pairs = pairs,
     pcall = function(...)
@@ -755,7 +781,7 @@ sandbox = {
     checkDeadline()
     return table.unpack(result, 1, result.n)
     end,
-    print = nil, -- in boot/*_base.lua
+    print = _G.print, -- in boot/*_base.lua
     rawequal = rawequal,
     rawget = rawget,
     rawlen = rawlen,
@@ -1019,7 +1045,7 @@ require("ROMLIB")
 speaker.enqueue(80, computer.bellpitch) -- term.bell sometimes get squelched
 
 -- load bios, if any
-if fs.exists(computer.bootloader) then shell.run(computer.bootloader) end
+if fs.exists(computer.bootloader) then fs.dofile(computer.bootloader) end
 
 -- halt/run luaprompt upon the termination of bios.
 -- Valid BIOS should load OS and modify 'shell.status' to 'shell.halt' before terminating itself.

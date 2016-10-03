@@ -6,7 +6,7 @@
 -- ALIASES --
 -------------
 
-_G.io = {}
+_G.io = {} -- we make our own sandbox'd system
 
 --[[fs.dofile = function(p, ...)
     local f = fs.open(p, "r")
@@ -70,9 +70,42 @@ end
     return key
 end]] -- DELETED: use _G.input.isKeyDown(keycode)
 
+---                 ---
+-- IO IMPLEMENTATION --
+---                 ---
+
+
 input.readLine = _G.__scanforline__
 
-io.read = _G.__scanforline__
+io.__openfile__ = "stdin"
+io.stdin = "stdin"
+io.stdout = "stdout"
+io.stderr = "stderr"
+
+io.open = fs.open
+
+io.input = function(luafile)
+    io.__openfile__ = luafile
+end
+
+io.read = function(option)
+    if io.__openfile__ == "stdin" then
+        return _G.__scanforline__()
+    end
+
+    function _readAll()
+        return io.__openfile__.readAll()
+    end
+
+    function _readLine()
+        return io.__openfile__.readLine()
+    end
+
+    options = {}
+    options["*n"] = function() error("Read number is not supported, yet!") end--_readNumber
+    options["*a"] = _readAll
+    options["*l"] = _readLine
+end
 
 -----------------
 -- PRINTSTREAM --
@@ -115,20 +148,26 @@ end
 _G.shell = {}
 shell.status = shell.ok
 
-shell.run = function(path)
+-- run a script with path (string) and argstable (table)
+shell.run = function(path, argstable)
     -- check for interpreter key "#!"
     local f = fs.open(path, "r")
-    local s = ""
-    repeat
-        s = f.readLine()
-        if (s == nil) then return end -- empty file
-    until #s > 0
+    local s = f.readAll()
+    f.close()
 
     if s:sub(1,2) == "#!" then
         local interpreter = s:sub(3)
-        fs.dofile(interpreter..".lua", path)
+        if not argstable then
+            xpcall(function() fs.dofile(interpreter..".lua", path) end, function(err) print(DLE..err) end)
+        else
+            xpcall(function() fs.dofile(interpreter..".lua", path, table.unpack(argstable)) end, function(err) print(DLE..err) end)
+        end
     else
-        fs.dofile(path)
+        if not argstable then
+            xpcall(function() fs.dofile(path) end, function(err) print(DLE..err) end)
+        else
+            xpcall(function() fs.dofile(path, table.unpack(argstable)) end, function(err) print(DLE..err) end)
+        end
     end
 end
 
@@ -272,9 +311,9 @@ local keycodeNumToName = {
     ["200"] = "up",
     ["201"] = "pageUp",
     ["203"] = "left",
-    ["208"] = "right",
+    ["205"] = "right",
     ["207"] = "end",
-    ["205"] = "down",
+    ["208"] = "down",
     ["209"] = "pageDown",
     ["210"] = "insert",
     ["211"] = "delete",
@@ -367,9 +406,9 @@ _G.keys = {
     ["up"] = 200,
     ["pageUp"] = 201,
     ["left"] = 203,
-    ["right"] = 208,
+    ["right"] = 205,
     ["end"] = 207,
-    ["down"] = 205,
+    ["down"] = 208,
     ["pageDown"] = 209,
     ["insert"] = 210,
     ["delete"] = 211,

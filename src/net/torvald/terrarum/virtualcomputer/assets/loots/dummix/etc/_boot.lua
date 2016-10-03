@@ -11,7 +11,8 @@ dirlist = {
 	"/usr", 
 	"/usr/bin", -- more utilities and binaries (e.g. less/more, nano)
 	"/home", -- home directory for user
-	"/home/bin" -- user-installed apps
+	"/home/bin", -- user-installed apps
+	"/media" -- auto mounts (e.g. "/media/fd1", "/media/hdb", "/media/sda")
 }
 -- just make them if they don't exist
 for _, dir in ipairs(dirlist) do
@@ -42,6 +43,21 @@ end
 os.defaultshell = "/bin/dsh.lua"
 os.clock = function() return machine.milliTime() / 1000 end -- uptime of the computer, in seconds
 
+
+function os.errorCmdNotFound(cmd)
+    print(cmd..": command not found")
+end
+
+function os.errorNoSuchFile(cmd)
+    print(cmd..": No such file")
+end
+
+function os.errorNoSuchFileOrDir(cmd)
+    print(cmd..": No such file or directory")
+end
+function os.errorIsDir(cmd)
+    print(cmd.." is a directory")
+end
 
 
 -- run default shell
