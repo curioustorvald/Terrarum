@@ -15,6 +15,7 @@ class Input(globals: Globals, computer: BaseTerrarumComputer) {
     init {
         globals["input"] = LuaTable()
         globals["input"]["isKeyDown"] = IsKeyDown(computer)
+        // input.readLine defined in ROMLIB
     }
 
     companion object {

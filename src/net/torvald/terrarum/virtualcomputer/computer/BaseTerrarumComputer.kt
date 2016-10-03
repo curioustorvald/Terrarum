@@ -91,12 +91,12 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         computerValue["processor"] = -1 // do.
 
         // as in "dev/hda"; refers hard disk drive (and no partitioning)
-        computerValue["hda"] = "testhda" // 'UUID rendered as String' or "none"
-        computerValue["hdb"] = "none"
+        computerValue["hda"] = "uuid_testhda" // 'UUID rendered as String' or "none"
+        computerValue["hdb"] = "uuid_testhdb"
         computerValue["hdc"] = "none"
         computerValue["hdd"] = "none"
         // as in "dev/fd1"; refers floppy disk drive
-        computerValue["fd1"] = "none"
+        computerValue["fd1"] = "uuid_testfd1"
         computerValue["fd2"] = "none"
         computerValue["fd3"] = "none"
         computerValue["fd4"] = "none"
@@ -159,7 +159,7 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
 
 
         // secure the sandbox
-        luaJ_globals["io"] = LuaValue.NIL
+        //luaJ_globals["io"] = LuaValue.NIL
         // dubug should be sandboxed in BOOT.lua (use OpenComputers code)
         //val sethook = luaJ_globals["debug"]["sethook"]
         //luaJ_globals["debug"] = LuaValue.NIL
@@ -207,12 +207,13 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
                 unsetThreadRun()
             }
 
-            driveBeepQueueManager(delta)
         }
 
 
-
-        if (isHalted) {
+        if (!isHalted) {
+            driveBeepQueueManager(delta)
+        }
+        else {
             currentExecutionThread.interrupt()
         }
     }
@@ -326,7 +327,6 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         // complete emitTone queue
         if (beepCursor >= beepQueue.size) {
             clearBeepQueue()
-            if (DEBUG) println("[BaseTerrarumComputer] !! Beep queue clear")
         }
 
         // actually play queue
@@ -350,6 +350,8 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         beepQueueLineExecTimer = 0
 
         //AL.destroy()
+
+        if (DEBUG) println("[BaseTerrarumComputer] !! Beep queue clear")
     }
 
     fun enqueueBeep(duration: Int, freq: Double) {

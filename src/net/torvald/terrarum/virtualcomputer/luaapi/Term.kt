@@ -118,6 +118,7 @@ internal class Term(globals: Globals, term: Teletype) {
         }
     }
 
+    // emitchar
     class Emit(val term: Terminal) : ThreeArgFunction() {
         override fun call(p0: LuaValue, x: LuaValue, y: LuaValue): LuaValue {
             term.emitChar(p0.checkint().toChar(), x.checkint() - 1, y.checkint() - 1)

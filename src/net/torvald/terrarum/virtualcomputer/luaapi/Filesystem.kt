@@ -10,6 +10,7 @@ import net.torvald.terrarum.virtualcomputer.luaapi.Term.Companion.checkIBM437
 import java.io.*
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.*
 
 /**
@@ -20,7 +21,9 @@ import java.util.*
  * Created by minjaesong on 16-09-17.
  *
  *
- * NOTE: Don't convert '\' to '/'! Rev-slash is used for escape character in sh, and we're sh-compatible!
+ * NOTES:
+ *      Don't convert '\' to '/'! Rev-slash is used for escape character in sh, and we're sh-compatible!
+ *      Use .absoluteFile whenever possible; there's fuckin oddity! (http://bugs.java.com/bugdatabase/view_bug.do;:YfiG?bug_id=4483097)
  */
 internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
 
@@ -40,7 +43,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         globals["fs"]["concat"] = ConcatPath(computer) // OC compliant
         globals["fs"]["open"] = OpenFile(computer) //CC compliant
         globals["fs"]["parent"] = GetParentDir(computer)
-        // fs.dofile defined in ROMLIB
+        // fs.dofile defined in BOOT
         // fs.fetchText defined in ROMLIB
     }
 
@@ -48,29 +51,34 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         fun ensurePathSanity(path: LuaValue) {
             if (path.checkIBM437().contains(Regex("""\.\.""")))
                 throw LuaError("'..' on path is not supported.")
+            if (!isValidFilename(path.checkIBM437()))
+                throw IOException("path contains invalid characters")
         }
 
         val isCaseInsensitive: Boolean
-            get() {
-                // TODO add: force case insensitive in config
-                try {
-                    val uuid = UUID.randomUUID().toString()
-                    val lowerCase = File(Terrarum.currentSaveDir, uuid + "oc_rox")
-                    val upperCase = File(Terrarum.currentSaveDir, uuid + "OC_ROX")
-                    // This should NEVER happen but could also lead to VERY weird bugs, so we
-                    // make sure the files don't exist.
-                    lowerCase.exists() && lowerCase.delete()
-                    upperCase.exists() && upperCase.delete()
-                    lowerCase.createNewFile()
-                    val insensitive = upperCase.exists()
-                    lowerCase.delete()
-                    return insensitive
-                }
-                catch (e: IOException) {
-                    println("[Filesystem] Couldn't determine if file system is case sensitive, falling back to insensitive.")
-                    return true
-                }
+
+        init {
+            try {
+                val uuid = UUID.randomUUID().toString()
+                val lowerCase = File(Terrarum.currentSaveDir, uuid + "oc_rox")
+                val upperCase = File(Terrarum.currentSaveDir, uuid + "OC_ROX")
+                // This should NEVER happen but could also lead to VERY weird bugs, so we
+                // make sure the files don't exist.
+                if (lowerCase.exists()) lowerCase.delete()
+                if (upperCase.exists()) upperCase.delete()
+
+                lowerCase.createNewFile()
+
+                val insensitive = upperCase.exists()
+                lowerCase.delete()
+
+                isCaseInsensitive = insensitive
             }
+            catch (e: IOException) {
+                println("[Filesystem] Couldn't determine if file system is case sensitive, falling back to insensitive.")
+                isCaseInsensitive = true
+            }
+        }
 
         // Worst-case: we're on Windows or using a FAT32 partition mounted in *nix.
         // Note: we allow / as the path separator and expect all \s to be converted
@@ -79,11 +87,11 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
 
         fun isValidFilename(name: String) = !name.contains(invalidChars)
 
-        fun validatePath(path: String) : String {
-            if (!isValidFilename(path)) {
+        fun String.validatePath() : String {
+            if (!isValidFilename(this)) {
                 throw IOException("path contains invalid characters")
             }
-            return path
+            return this
         }
 
         /** actual directory: <appdata>/Saves/<savename>/computers/<drivename>/
@@ -103,7 +111,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
              */
             
             // remove first '/' in path
-            var path = luapath.checkIBM437()
+            var path = luapath.checkIBM437().validatePath()
             if (path.startsWith('/')) path = path.substring(1)
             
             if (path.startsWith("media/")) {
@@ -131,7 +139,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
             Filesystem.ensurePathSanity(path)
 
             val table = LuaTable()
-            val file = File(computer.getRealPath(path))
+            val file = File(computer.getRealPath(path)).absoluteFile
             file.list().forEachIndexed { i, s -> table.insert(i, LuaValue.valueOf(s)) }
             return table
         }
@@ -141,7 +149,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         override fun call(path: LuaValue) : LuaValue {
             Filesystem.ensurePathSanity(path)
 
-            return LuaValue.valueOf(File(computer.getRealPath(path)).exists())
+            return LuaValue.valueOf(Files.exists(Paths.get(computer.getRealPath(path)).toAbsolutePath()))
         }
     }
 
@@ -149,7 +157,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         override fun call(path: LuaValue) : LuaValue {
             Filesystem.ensurePathSanity(path)
 
-            return LuaValue.valueOf(File(computer.getRealPath(path)).isDirectory)
+            return LuaValue.valueOf(Files.isDirectory(Paths.get(computer.getRealPath(path)).toAbsolutePath()))
         }
     }
 
@@ -157,7 +165,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         override fun call(path: LuaValue) : LuaValue {
             Filesystem.ensurePathSanity(path)
 
-            return LuaValue.valueOf(File(computer.getRealPath(path)).isFile)
+            return LuaValue.valueOf(!Files.isDirectory(Paths.get(computer.getRealPath(path)).toAbsolutePath()))
         }
     }
 
@@ -165,7 +173,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         override fun call(path: LuaValue) : LuaValue {
             Filesystem.ensurePathSanity(path)
 
-            return LuaValue.valueOf(!File(computer.getRealPath(path)).canWrite())
+            return LuaValue.valueOf(!Files.isWritable(Paths.get(computer.getRealPath(path)).toAbsolutePath()))
         }
     }
 
@@ -174,7 +182,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         override fun call(path: LuaValue) : LuaValue {
             Filesystem.ensurePathSanity(path)
 
-            return LuaValue.valueOf(File(computer.getRealPath(path)).length().toInt())
+            return LuaValue.valueOf(Files.size(Paths.get(computer.getRealPath(path)).toAbsolutePath()).toInt())
         }
     }
 
@@ -187,7 +195,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         override fun call(path: LuaValue) : LuaValue {
             Filesystem.ensurePathSanity(path)
 
-            return LuaValue.valueOf(File(computer.getRealPath(path)).mkdir())
+            return LuaValue.valueOf(File(computer.getRealPath(path)).absoluteFile.mkdir())
         }
     }
 
@@ -199,11 +207,12 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
             Filesystem.ensurePathSanity(from)
             Filesystem.ensurePathSanity(to)
 
-            val fromFile = File(computer.getRealPath(from))
+            val fromFile = File(computer.getRealPath(from)).absoluteFile
             var success = fromFile.copyRecursively(
-                    File(computer.getRealPath(to)), overwrite = true
-            ) // ignore IntelliJ's observation; it's opposite from redundant
-            success = fromFile.deleteRecursively()
+                    File(computer.getRealPath(to)).absoluteFile, overwrite = true
+            )
+            if (success) success = fromFile.deleteRecursively()
+            else return LuaValue.valueOf(false)
             return LuaValue.valueOf(success)
         }
     }
@@ -218,8 +227,8 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
             Filesystem.ensurePathSanity(to)
 
             return LuaValue.valueOf(
-                    File(computer.getRealPath(from)).copyRecursively(
-                            File(computer.getRealPath(to)), overwrite = true
+                    File(computer.getRealPath(from)).absoluteFile.copyRecursively(
+                            File(computer.getRealPath(to)).absoluteFile, overwrite = true
                     )
             )
         }
@@ -233,7 +242,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
             Filesystem.ensurePathSanity(path)
 
             return LuaValue.valueOf(
-                    File(computer.getRealPath(path)).deleteRecursively()
+                    File(computer.getRealPath(path)).absoluteFile.deleteRecursively()
             )
         }
     }
@@ -243,7 +252,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
             Filesystem.ensurePathSanity(base)
             Filesystem.ensurePathSanity(local)
 
-            val combinedPath = combinePath(base.checkIBM437(), local.checkIBM437())
+            val combinedPath = combinePath(base.checkIBM437().validatePath(), local.checkIBM437().validatePath())
             return LuaValue.valueOf(combinedPath)
         }
     }
@@ -282,9 +291,9 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
 
             val mode = mode.checkIBM437().toLowerCase()
             val luaClass = LuaTable()
-            val file = File(computer.getRealPath(path))
+            val file = File(computer.getRealPath(path)).absoluteFile
 
-            if (mode.contains("[aw]") && !file.canWrite())
+            if (mode.contains(Regex("""[aw]""")) && !file.canWrite())
                 throw LuaError("Cannot open file for " +
                                "${if (mode.startsWith('w')) "read" else "append"} mode" +
                                ": is readonly.")
