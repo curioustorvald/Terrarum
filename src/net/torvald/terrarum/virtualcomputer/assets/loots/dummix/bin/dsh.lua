@@ -98,9 +98,11 @@ local function exec(tArgs)
 
     -- do some sophisticated file-matching
     -- step 1: exact file
-    if fs.isFile(fullFilePath) then shell.run(fullFilePath, execArgs)
+    if fs.exists(fullFilePath) and fs.isFile(fullFilePath) then 
+        shell.run(fullFilePath, execArgs)
     -- step 2: try appending ".lua"
-    elseif fs.isFile(fullFilePath..".lua") then shell.run(fullFilePath..".lua", execArgs)
+    elseif fs.exists(fullFilePath..".lua") and fs.isFile(fullFilePath..".lua") then 
+        shell.run(fullFilePath..".lua", execArgs)
     -- step 3: parse os.path (just like $PATH)
     -- step 3.1: exact file; step 3.2: append ".lua"
     elseif not startsFromRoot(filePath) then
@@ -110,11 +112,11 @@ local function exec(tArgs)
 
             debug(path..filePath)
 
-            if fs.isFile(path..filePath) then
+            if fs.exists(path..filePath) and fs.isFile(path..filePath) then
                 execByPathArg = path..filePath
                 execByPathFileExists = true
                 break
-            elseif fs.isFile(path..filePath..".lua") then
+            elseif fs.exists(path..filePath..".lua") and fs.isFile(path..filePath..".lua") then
                 execByPathArg = path..filePath..".lua"
                 execByPathFileExists = true
                 break
