@@ -12,8 +12,10 @@ constructor(var width: Int, var height: Int) {
     /**
      * 0000_0000_00000000
 
-     * Upper bits:  Background colour 0 black 1 dark grey 2 grey 3 white
-     * Middle bits: Foreground colour ditto.
+     * Upper bits:  Background colour
+     *
+     * Middle bits: Foreground colour
+     *
      * Lower 8 bits: CP437
      */
     internal val frameBuffer: CharArray
@@ -25,7 +27,7 @@ constructor(var width: Int, var height: Int) {
     }
 
     fun drawBuffer(x: Int, y: Int, c: Char, colourKey: Int) {
-        if (y * width + x >= frameBuffer.size)
+        if (y * width + x >= frameBuffer.size || y * width + x < 0)
             throw ArrayIndexOutOfBoundsException("x: $x, y; $y")
         frameBuffer[y * width + x] = ((c.toInt().and(0xFF)) + colourKey.shl(8)).toChar()
     }

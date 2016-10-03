@@ -5,6 +5,7 @@ import net.torvald.aa.ColouredFastFont
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.blendScreen
+import net.torvald.terrarum.gameactors.abs
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
 import org.lwjgl.BufferUtils
 import org.lwjgl.openal.AL
@@ -205,13 +206,15 @@ open class SimpleTextTerminal(
     /** Emits a bufferChar. Does not move cursor
      *  It is also not affected by the control sequences; just print them out as symbol */
     override fun emitChar(bufferChar: Int, x: Int, y: Int) {
-        screenBuffer.drawBuffer(x, y, bufferChar.toChar())
+        try { screenBuffer.drawBuffer(x, y, bufferChar.toChar()) }
+        catch (e: ArrayIndexOutOfBoundsException) { e.printStackTrace() }
     }
 
     /** Emits a char. Does not move cursor
      *  It is also not affected by the control sequences; just print them out as symbol */
     override fun emitChar(c: Char, x: Int, y: Int) {
-        screenBuffer.drawBuffer(x, y, c.toInt().and(0xFF).toChar(), colourKey)
+        try { screenBuffer.drawBuffer(x, y, c.toInt().and(0xFF).toChar(), colourKey) }
+        catch (e: ArrayIndexOutOfBoundsException) { e.printStackTrace() }
     }
 
     /** Prints a char and move cursor accordingly. */
@@ -292,15 +295,31 @@ open class SimpleTextTerminal(
     }
 
     override fun scroll(amount: Int) {
-        if (amount < 0) throw IllegalArgumentException("cannot scroll up")
+        val offset = amount.times(width).abs()
+        val bsize = screenBuffer.sizeof.ushr(1)
 
-        val offset = amount * width
-        for (i in offset..screenBuffer.sizeof.ushr(1) - 1) {
-            screenBuffer.frameBuffer[i - offset] = screenBuffer.frameBuffer[i]
+        if (amount == 0) return
+
+        if (amount > 0) {
+            for (i in 0..bsize - 1) {
+                if (i < Math.min(bsize, bsize - offset - 1))
+                    // displace contents in buffer
+                    screenBuffer.frameBuffer[i] = screenBuffer.frameBuffer[i + offset]
+                else
+                    // clean up garbages
+                    screenBuffer.frameBuffer[i] = 0.toChar()
+            }
+            cursorY -= amount
         }
-        for (c in 1..amount) {
-            cursorY -= 1
-            clearLine()
+        else {
+            for (i in bsize - 1 downTo 0) {
+                if (i > Math.max(offset - 1, 0))
+                    // displace contents in buffer
+                    screenBuffer.frameBuffer[i] = screenBuffer.frameBuffer[i - offset]
+                else
+                    screenBuffer.frameBuffer[i] = 0.toChar()
+            }
+            cursorY += amount
         }
     }
 
