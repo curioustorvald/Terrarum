@@ -34,7 +34,7 @@ The path for the argument of functions blocks `\,.\,.\,' to be passed, preventin
 	\\ \\
 	fs.parent(\textbf{path}: string) & string & Returs parent directory to the \textbf{path}.
 	\\ \\
-	fs.dofile(\textbf{path}: string) & nil & Loads the script on \textbf{path} and executes it.
+	fs.dofile(\textbf{path}: string) & nil & Loads the script on \textbf{path} and executes it. NOTE: do not use this directly, instead use \textbf{shell.run(path, tArgs)}; fs.dofile does not provide any error handling.
 	\\ \\
 	fs.fetchText(\textbf{path}: string) & string & Opens the file on \textbf{path} and returns its contents as a plain text.
 \end{tabularx}

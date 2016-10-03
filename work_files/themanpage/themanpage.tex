@@ -1,0 +1,119 @@
+% !TEX TS-program = lualatex
+
+\documentclass[10pt, stock]{memoir}
+
+
+\usepackage{fontspec}
+\setmainfont{MyriadPro}
+
+\usepackage{fapapersize}
+\usefapapersize{148mm,210mm,15mm,15mm,20mm,15mm}
+\usepackage{afterpage}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\usepackage{ltablex}
+\usepackage{parskip}
+
+\frenchspacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{10pt}
+\setsecnumdepth{subsection}
+
+
+%% Idioms %%
+\hyphenation{Com-put-er-Craft}
+\hyphenation{O-pen-Com-put-ers}
+\hyphenation{ROM-BASIC}
+
+
+
+\definecolor{black}{HTML}{000000}
+\definecolor{white}{HTML}{FFFFFF}
+\definecolor{dimgrey}{HTML}{555555}
+\definecolor{brightgrey}{HTML}{AAAAAA}
+
+\definecolor{yellow}{HTML}{FFFF00}
+\definecolor{orange}{HTML}{FF6600}
+\definecolor{red}{HTML}{DD0000}
+\definecolor{magenta}{HTML}{FF0099}
+
+\definecolor{purple}{HTML}{330099}
+\definecolor{blue}{HTML}{0000CC}
+\definecolor{cyan}{HTML}{0099FF}
+\definecolor{lime}{HTML}{55FF00}
+
+\definecolor{green}{HTML}{00AA00}
+\definecolor{darkgreen}{HTML}{006600}
+\definecolor{brown}{HTML}{663300}
+\definecolor{tan}{HTML}{996633}
+
+
+
+\newcommand{\unemph}[1]{\textcolor{brightgrey}{#1}}
+
+
+% Title styling
+\pretitle{\begin{flushright}\HUGE}
+\posttitle{\par\end{flushright}\vskip 0.5em}
+
+% new sections are new page
+\let\oldsection\chapter
+\renewcommand\chapter{\clearpage\oldsection}
+
+% chapter title -- no now page after
+%\renewcommand\chapterheadstart{} % kill the drop
+\renewcommand\afterchapternum{\vskip 0.5em} % space between number and title
+\makeatletter
+\renewcommand\memendofchapterhook{%
+\newpage\m@mindentafterchapter\@afterheading}
+\makeatother
+
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+
+\aliaspagestyle{part}{empty}
+\aliaspagestyle{chapter}{empty}
+
+
+% The title
+\title{\textbf{THE MANPAGE} \\ \vspace{7mm} \large For the Game \emph{Terrarum}\quad ·\quad First Edition}
+\date{}
+\author{}
+\hypersetup{
+	pdfauthor={Terrarum Developers},
+	pdftitle={THE MANPAGE},
+	unicode=true
+}
+
+
+
+\begin{document}
+\begin{titlingpage}
+\maketitle{}
+\end{titlingpage}
+
+\setcounter{page}{3}
+
+\tableofcontents*
+
+
+
+\chapter{Main Applications}
+
+\section{DSH}
+\input{man_dsh}
+
+\section{MSH}
+\input{man_msh}
+
+
+
+\chapter{References}
+
+
+\afterpage{\pagestyle{empty}\null\newpage}
+
+\end{document}
