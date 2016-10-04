@@ -40,6 +40,10 @@ local function printErr(msg)
     print(DLE..msg)
 end
 
+local function shallowCopy(t)
+    return {table.unpack(t)}
+end
+
 -- BUILTINS -------------------------------------------------------------------
 
 local function cd(tArgs)
@@ -47,14 +51,7 @@ local function cd(tArgs)
 
     if (dir == nil or #dir < 1) then return end
 
-    -- check if the directory exists
-
-    local chkdir = expandPath(dir)
-
-    if not fs.exists(chkdir) then
-        os.errorNoSuchFileOrDir("cd: "..dir)
-        return
-    end
+    local oldWorkingDir = shallowCopy(os.workingDir)
 
     -- parse dir by delimeter '/'
     if (dir:byte(1) == 47) then -- if dir begins with '/'
@@ -69,12 +66,22 @@ local function cd(tArgs)
         if (word == "..") then
             if (#os.workingDir > 1) then
                 os.workingDir[#os.workingDir] = nil -- pops an element to oblivion
+            else
+                -- pass
             end
         elseif (word == ".") then
             -- pass
         else
             table.insert(os.workingDir, word)
         end
+    end
+
+
+    -- check if the directory exists
+    if not fs.isDir(os.fullWorkPath()) then
+        os.errorNoSuchFileOrDir("cd: "..dir)
+        os.workingDir = oldWorkingDir
+        return
     end
 end
 
@@ -98,10 +105,10 @@ local function exec(tArgs)
 
     -- do some sophisticated file-matching
     -- step 1: exact file
-    if fs.exists(fullFilePath) and fs.isFile(fullFilePath) then 
+    if fs.isFile(fullFilePath) then
         shell.run(fullFilePath, execArgs)
     -- step 2: try appending ".lua"
-    elseif fs.exists(fullFilePath..".lua") and fs.isFile(fullFilePath..".lua") then 
+    elseif fs.isFile(fullFilePath..".lua") then
         shell.run(fullFilePath..".lua", execArgs)
     -- step 3: parse os.path (just like $PATH)
     -- step 3.1: exact file; step 3.2: append ".lua"
@@ -112,11 +119,11 @@ local function exec(tArgs)
 
             debug(path..filePath)
 
-            if fs.exists(path..filePath) and fs.isFile(path..filePath) then
+            if fs.isFile(path..filePath) then
                 execByPathArg = path..filePath
                 execByPathFileExists = true
                 break
-            elseif fs.exists(path..filePath..".lua") and fs.isFile(path..filePath..".lua") then
+            elseif fs.isFile(path..filePath..".lua") then
                 execByPathArg = path..filePath..".lua"
                 execByPathFileExists = true
                 break
@@ -196,7 +203,10 @@ end
 exitshell = false
 
 -- load up aliases
-if fs.exists("/etc/.dshrc") then fs.dofile("/etc/.dshrc") end
+if fs.isFile("/etc/.dshrc") then
+    fs.dofile("/etc/.dshrc")
+    machine.println("[dummix/dsh.lua] Dsh aliases successfully loaded.")
+end
 
 
 -- END OF INIT SHELL ----------------------------------------------------------

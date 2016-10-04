@@ -25,7 +25,9 @@ os.version = "0.0"
 os.EXIT_SUCCESS = 0
 os.workingDir = {"", "home"} -- index 1 must be ""!
 os.path = "home/bin/;/usr/bin/;/bin/" -- infamous $path
-
+os.fullWorkPath = function()
+	return table.concat(os.workingDir, "/")
+end
 -- @param  "path/of/arbitrary"
 -- @return /working/dir/path/of/arbitrary
 --         input path's trailing '/' is PRESERVED.
@@ -35,10 +37,7 @@ os.expandPath = function(p)
 		return p
 	end
 
-	return table.concat(os.workingDir, "/").."/"..p
-end
-os.fullWorkPath = function()
-	return table.concat(os.workingDir, "/")
+	return os.fullWorkPath().."/"..p
 end
 os.defaultshell = "/bin/dsh.lua"
 os.clock = function() return machine.milliTime() / 1000 end -- uptime of the computer, in seconds

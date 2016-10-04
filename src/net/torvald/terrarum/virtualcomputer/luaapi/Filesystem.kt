@@ -9,6 +9,7 @@ import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
 import net.torvald.terrarum.virtualcomputer.luaapi.Term.Companion.checkIBM437
 import java.io.*
 import java.nio.file.Files
+import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
@@ -145,6 +146,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         }
     }
 
+    /** Don't use this. Use isFile */
     class FileExists(val computer: BaseTerrarumComputer) : OneArgFunction() {
         override fun call(path: LuaValue) : LuaValue {
             Filesystem.ensurePathSanity(path)
@@ -165,7 +167,23 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         override fun call(path: LuaValue) : LuaValue {
             Filesystem.ensurePathSanity(path)
 
-            return LuaValue.valueOf(!Files.isDirectory(Paths.get(computer.getRealPath(path)).toAbsolutePath()))
+            // check if the path is file by checking:
+            // 1. isfile
+            // 2. canwrite
+            // 3. length
+            // Why? Our Java simply wants to fuck you.
+
+            val path = Paths.get(computer.getRealPath(path)).toAbsolutePath()
+            var result = false
+            result = Files.isRegularFile(path)
+
+            if (!result) result = Files.isWritable(path)
+
+            if (!result)
+                try { result = Files.size(path) > 0 }
+                catch (e: NoSuchFileException) { result = false }
+
+            return LuaValue.valueOf(result)
         }
     }
 
