@@ -21,8 +21,8 @@ class StateVTTest : BasicGameState() {
 
     // HiRes: 100x64, LoRes: 80x25
     val computerInside = BaseTerrarumComputer(8)
-    val vt = SimpleTextTerminal(SimpleTextTerminal.AMETHYST_NOVELTY, 80, 25,
-            computerInside, colour = true, hires = false)
+    val vt = SimpleTextTerminal(SimpleTextTerminal.WHITE, 80, 25,
+            computerInside, colour = false, hires = false)
 
 
     val vtUI = Image(vt.displayW, vt.displayH)
@@ -47,14 +47,40 @@ class StateVTTest : BasicGameState() {
 
     private val paperColour = Color(0xfffce6)
 
+    val vtUIrenderX = Terrarum.WIDTH.minus(vtUI.width).div(2f)
+    val vtUIrenderY = Terrarum.HEIGHT.minus(vtUI.height).div(2f)
+
     override fun render(container: GameContainer, game: StateBasedGame, g: Graphics) {
         vt.render(container, vtUI.graphics)
 
-        g.drawImage(vtUI,
-                Terrarum.WIDTH.minus(vtUI.width).div(2f),
-                Terrarum.HEIGHT.minus(vtUI.height).div(2f))
 
-        vtUI.graphics.flush()
+        blendNormal()
+        g.drawImage(vtUI, vtUIrenderX, vtUIrenderY)
+
+
+        // cursor
+        if (vt.cursorBlinkOn) {
+            g.color = vt.getColor(if (vt.cursorBlink) vt.foreDefault else vt.backDefault)
+
+            g.fillRect(
+                    vt.fontW * vt.cursorX.toFloat() + vt.borderSize + vtUIrenderX,
+                    vt.fontH * vt.cursorY.toFloat() + vt.borderSize + vtUIrenderY,
+                    vt.fontW.toFloat(),
+                    vt.fontH.toFloat()
+            )
+        }
+
+
+        // not-pure-black screen
+        /*g.color = vt.colourScreen
+        blendScreen()
+        g.fillRect(vtUIrenderX, vtUIrenderY, vt.displayW.toFloat(), vt.displayH.toFloat())
+
+
+        // colour overlay
+        g.color = vt.phosphor
+        blendMul()
+        g.fillRect(vtUIrenderX, vtUIrenderY, vt.displayW.toFloat(), vt.displayH.toFloat())*/
     }
 
     override fun keyPressed(key: Int, c: Char) {

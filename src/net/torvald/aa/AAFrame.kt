@@ -1,13 +1,16 @@
 package net.torvald.aa
 
 import net.torvald.terrarum.gameworld.toUint
+import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
 import org.newdawn.slick.*
 
 /**
+ * @param terminal: for sending redraw only
+ *
  * Created by minjaesong on 16-08-10.
  */
 class AAFrame @Throws(SlickException::class)
-constructor(var width: Int, var height: Int) {
+constructor(var width: Int, var height: Int, var terminal: SimpleTextTerminal) {
 
     /**
      * 0000_0000_00000000
@@ -30,6 +33,8 @@ constructor(var width: Int, var height: Int) {
         if (y * width + x >= frameBuffer.size || y * width + x < 0)
             throw ArrayIndexOutOfBoundsException("x: $x, y; $y")
         frameBuffer[y * width + x] = ((c.toInt().and(0xFF)) + colourKey.shl(8)).toChar()
+
+        terminal.redraw()
     }
 
     fun drawBuffer(x: Int, y: Int, raw: Char): Boolean =
@@ -37,6 +42,7 @@ constructor(var width: Int, var height: Int) {
             false
         else {
             frameBuffer[y * width + x] = raw
+            terminal.redraw()
             true
         }
 
@@ -45,6 +51,7 @@ constructor(var width: Int, var height: Int) {
             val char = (other[i].toUint().shl(8) + other[i + 1].toUint()).toChar()
             frameBuffer[i.ushr(1)] = char
         }
+        terminal.redraw()
     }
 
     fun getBackgroundColour(x: Int, y: Int): Int {
@@ -71,6 +78,7 @@ constructor(var width: Int, var height: Int) {
                 drawBuffer(x, y, 0.toChar(), background.shl(4))
             }
         }
+        terminal.redraw()
     }
 
     fun drawFromOther(other: AAFrame) {
@@ -80,6 +88,7 @@ constructor(var width: Int, var height: Int) {
                 frameBuffer[y * width + x] = other.getRaw(x, y)!!
             }
         }
+        terminal.redraw()
     }
 
     private fun checkOOB(x: Int, y: Int) = (x < 0 || y < 0 || x >= width || y >= height)

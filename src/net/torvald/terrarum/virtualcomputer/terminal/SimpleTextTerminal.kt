@@ -62,15 +62,15 @@ open class SimpleTextTerminal(
         )                                // THESE ARE THE STANDARD
 
     val phosphor = if (colour) WHITE7500 else phosphorColour
-    open protected val colourScreen = if (colour) Color(8, 8, 8) else Color(19, 19, 19)
+    open val colourScreen = if (colour) Color(8, 8, 8) else Color(19, 19, 19)
 
     override val coloursCount: Int
         get() = colours.size
 
     val errorColour = if (coloursCount > 4) 6 else 1
 
-    open protected val backDefault = 0 // STANDARD
-    open protected val foreDefault = 3 // STANDARD
+    open val backDefault = 0 // STANDARD
+    open val foreDefault = 3 // STANDARD
 
     override var backColour = backDefault
     override var foreColour = foreDefault
@@ -81,7 +81,7 @@ open class SimpleTextTerminal(
     override var cursorY = 0
     override var cursorBlink = true
 
-    val screenBuffer = AAFrame(width, height)
+    val screenBuffer = AAFrame(width, height, this)
 
     open protected val fontRef =
             "./assets/graphics/fonts/${
@@ -90,11 +90,11 @@ open class SimpleTextTerminal(
                 else "milkymda.png"
             }"
     open protected val fontImg = Image(fontRef)
-    open protected val fontW = fontImg.width / 16
-    open protected val fontH = fontImg.height / 16
+    open val fontW = fontImg.width / 16
+    open val fontH = fontImg.height / 16
     open protected val font = ColouredFastFont(this, fontRef, fontW, fontH)
 
-    private val borderSize = 20
+    val borderSize = 20
     override val displayW = fontW * width + 2 * borderSize
     override val displayH = fontH * height + 2 * borderSize
 
@@ -103,8 +103,11 @@ open class SimpleTextTerminal(
 
     private var cursorBlinkTimer = 0
     private val cursorBlinkLen = 250
-    private var cursorBlinkOn = true
+    var cursorBlinkOn = true
+        private set
 
+
+    private var redrawSemaphore = false
 
 
     override fun getColor(index: Int): Color = colours[index]
@@ -140,61 +143,63 @@ open class SimpleTextTerminal(
      * pass UIcanvas to the parameter "g"
      */
     override fun render(gc: GameContainer, g: Graphics) {
+        // FIXME don't redraw every time it's slow
         g.font = font
 
-        blendNormal()
 
-        // black background (this is mandatory)
-        g.color = Color.black
-        g.fillRect(0f, 0f, displayW.toFloat(), displayH.toFloat())
+        // don't redraw() every fucking time, you're wasting your precious process cycle
+        if (redrawSemaphore) {
+
+            blendNormal()
+
+            // black background (this is mandatory)
+            g.color = Color.black
+            g.fillRect(0f, 0f, displayW.toFloat(), displayH.toFloat())
 
 
-        // screen buffer
-        for (y in 0..height - 1) {
-            for (x in 0..width - 1) {
-                val ch = screenBuffer.getChar(x, y)
+            // screen buffer
+            for (y in 0..height - 1) {
+                for (x in 0..width - 1) {
+                    val ch = screenBuffer.getChar(x, y)
 
-                // background
-                g.color = getColor(screenBuffer.getBackgroundColour(x, y))
-                g.fillRect(fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize,
-                        fontW.toFloat(), fontH.toFloat())
+                    // background
+                    g.color = getColor(screenBuffer.getBackgroundColour(x, y))
+                    g.fillRect(fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize,
+                            fontW.toFloat(), fontH.toFloat())
 
-                // foreground
-                if (ch.toInt() != 0 && ch.toInt() != 32) {
-                    g.color = getColor(screenBuffer.getForegroundColour(x, y))
-                    g.drawString(
-                            Character.toString(ch),
-                            fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize)
+                    // foreground
+                    if (ch.toInt() != 0 && ch.toInt() != 32) {
+                        g.color = getColor(screenBuffer.getForegroundColour(x, y))
+                        g.drawString(
+                                Character.toString(ch),
+                                fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize)
+                    }
                 }
             }
+
+            redrawSemaphore = false
         }
 
 
         // cursor
-        g.color = getColor(foreDefault)
-        if (cursorBlinkOn && cursorBlink)
+        /*if (cursorBlinkOn) {
+            g.color = getColor(if (cursorBlink) foreDefault else backDefault)
+
             g.fillRect(
                     fontW * cursorX.toFloat() + borderSize,
                     fontH * cursorY.toFloat() + borderSize,
                     fontW.toFloat(),
                     fontH.toFloat()
             )
-
-
-        // not-pure-black screen
-        g.color = colourScreen
-        blendScreen()
-        g.fillRect(0f, 0f, displayW.toFloat(), displayH.toFloat())
-
-
-        // colour overlay
-        g.color = phosphor
-        blendMul()
-        g.fillRect(0f, 0f, displayW.toFloat(), displayH.toFloat())
+        }*/
 
 
         blendNormal()
 
+    }
+
+    fun redraw() {
+        redrawSemaphore = true
     }
 
     /** Unlike lua function, this one in Zero-based. */

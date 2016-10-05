@@ -10,7 +10,7 @@ _G._TERRARUM = true -- for multi-env programs
 
 -- global functions
 _G.runscript = function(s, src, ...)
-    if s:byte(1) == 27 then error("Bytecode execution is prohibited.") end -- untested; it's Lua 5.1 code and we're 5.2
+    if s:byte(1) == 0x1b then error("Bytecode execution is prohibited.") end -- exact MAGIC is 0x1b 'L' 'u' 'a'
 
     local code, reason = load(s, src)
 

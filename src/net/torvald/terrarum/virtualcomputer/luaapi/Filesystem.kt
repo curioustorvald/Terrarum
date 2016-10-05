@@ -141,7 +141,10 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
 
             val table = LuaTable()
             val file = File(computer.getRealPath(path)).absoluteFile
-            file.list().forEachIndexed { i, s -> table.insert(i, LuaValue.valueOf(s)) }
+            try {
+                file.list().forEachIndexed { i, s -> table.insert(i, LuaValue.valueOf(s)) }
+            }
+            catch (e: NullPointerException) {}
             return table
         }
     }
