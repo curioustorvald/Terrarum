@@ -31,8 +31,8 @@ local function printUsage()
 end
 
 if args[1] == nil or #args[1] <= 0 then printUsage() return end
-if not fs.exists(args[1]) then os.errorNoSuchFileOrDir(args[1]) return end
-if not fs.isFile(args[1]) then os.errorIsDir(args[1]) return end
+filepath = os.expandPath(args[1])
+if not fs.isFile(filepath) then os.errorNoSuchFile(filepath) return end
 
 function log10(n)
 	if n < 1 then return 0
@@ -55,7 +55,7 @@ end
 lines = {}
 displayHeight = term.height() - 1 -- bottom one line for prompt
 
-local file = fs.open(args[1], "r")
+local file = fs.open(filepath, "r")
 local line = ""
 repeat
 	line = file.readLine()

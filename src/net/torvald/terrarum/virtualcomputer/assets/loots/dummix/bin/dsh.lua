@@ -30,7 +30,7 @@ local function endsWithSlash(p)
     return p:byte(#p) == 47
 end
 
-__DSHDEBUG__ = 0x51621D
+--__DSHDEBUG__ = 0x51621D
 
 local function debug(msg)
     if __DSHDEBUG__ then print("DEBUG", msg) end
@@ -55,32 +55,29 @@ local function cd(tArgs)
 
     -- parse dir by delimeter '/'
     if (dir:byte(1) == 47) then -- if dir begins with '/'
-        os.workingDir = {""}
-    end
+        os.setWorkingDir(dir)
+    else
+        for word in string.gmatch(dir, "[^/]+") do
 
-    for word in string.gmatch(dir, "[^/]+") do
-        -- 'execute' directory
-        -- Rules: '..' pops os.workingDir
-        --        if dir begins with '/', re-build os.workingDir
-        --        otherwise, push the 'word' to os.workingDir
-        if (word == "..") then
-            if (#os.workingDir > 1) then
-                os.workingDir[#os.workingDir] = nil -- pops an element to oblivion
-            else
+            machine.println("CD word: "..word)
+
+            -- 'execute' directory
+            -- Rules: '..' pops os.workingDir
+            --        if dir begins with '/', re-build os.workingDir
+            --        otherwise, push the 'word' to os.workingDir
+            if (word == "..") then
+                os.popWorkingDir()
+            elseif (word == ".") then
                 -- pass
+            else
+                os.pushWorkingDir(word)
             end
-        elseif (word == ".") then
-            -- pass
-        else
-            table.insert(os.workingDir, word)
         end
     end
-
-
     -- check if the directory exists
     if not fs.isDir(os.fullWorkPath()) then
         os.errorNoSuchFileOrDir("cd: "..dir)
-        os.workingDir = oldWorkingDir
+        os.workingDir = shallowCopy(oldWorkingDir)
         return
     end
 end

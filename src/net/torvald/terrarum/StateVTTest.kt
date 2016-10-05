@@ -22,7 +22,7 @@ class StateVTTest : BasicGameState() {
     // HiRes: 100x64, LoRes: 80x25
     val computerInside = BaseTerrarumComputer(8)
     val vt = SimpleTextTerminal(SimpleTextTerminal.WHITE, 80, 25,
-            computerInside, colour = false, hires = false)
+            computerInside, colour = true, hires = false)
 
 
     val vtUI = Image(vt.displayW, vt.displayH)

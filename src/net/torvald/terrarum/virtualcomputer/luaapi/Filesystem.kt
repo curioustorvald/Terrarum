@@ -139,6 +139,8 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         override fun call(path: LuaValue) : LuaValue {
             Filesystem.ensurePathSanity(path)
 
+            println("ListFiles: got path ${path.checkIBM437()}")
+
             val table = LuaTable()
             val file = File(computer.getRealPath(path)).absoluteFile
             try {
@@ -162,7 +164,10 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
         override fun call(path: LuaValue) : LuaValue {
             Filesystem.ensurePathSanity(path)
 
-            return LuaValue.valueOf(Files.isDirectory(Paths.get(computer.getRealPath(path)).toAbsolutePath()))
+            val isDir = Files.isDirectory(Paths.get(computer.getRealPath(path)).toAbsolutePath())
+            val exists = Files.exists(Paths.get(computer.getRealPath(path)).toAbsolutePath())
+
+            return LuaValue.valueOf(isDir || exists)
         }
     }
 
