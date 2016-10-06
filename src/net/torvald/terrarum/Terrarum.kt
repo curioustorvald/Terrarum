@@ -245,6 +245,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
                 appgc.setVSync(VSYNC)
                 appgc.setMaximumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS) // 10 ms
                 appgc.setMinimumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS - 1) // 9 ms
+                appgc.setMultiSample(4)
 
                 appgc.setShowFPS(false)
 

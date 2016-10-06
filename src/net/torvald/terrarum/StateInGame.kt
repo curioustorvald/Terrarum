@@ -234,6 +234,7 @@ constructor() : BasicGameState() {
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
+        g.isAntiAlias = true
         blendNormal()
 
 
