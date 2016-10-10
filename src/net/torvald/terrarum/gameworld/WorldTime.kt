@@ -56,6 +56,8 @@ class WorldTime {
         val HOUR_MIN: Int = 60
         val GAME_MIN_TO_REAL_SEC: Float = 60f
 
+        val YEAR_DAYS: Int = 365
+
         fun parseTime(s: String): Int =
                 if (s.length >= 4) {
                     s.toLowerCase().substringBefore('h').toInt() * WorldTime.HOUR_SEC +
@@ -103,9 +105,6 @@ class WorldTime {
     val elapsedSeconds: Int
         get() = (HOUR_SEC * hours + MINUTE_SEC * minutes + seconds) % DAY_LENGTH
 
-    val isLeapYear: Boolean
-        get() = years % 4 == 0 && years % 100 != 0 || years % 400 == 0
-
     /** Sets time of this day. */
     fun setTime(t: Int) {
         days += t / DAY_LENGTH
@@ -148,11 +147,11 @@ class WorldTime {
         if (dayOfWeek == 7) {
             dayOfWeek = 0
         }
-        if ((months == 12 || months == 7 && isLeapYear) && days == 31) {
+        if (months == 12 && days == 31) {
             dayOfWeek = 7
         }
 
-        if ((months == 12 || months == 7 && isLeapYear) && days == 32) {
+        if (months == 12 && days == 32) {
             days = 1
             months = 1
             years++
@@ -173,7 +172,14 @@ class WorldTime {
         }
     }
 
-    fun getFormattedTime() = "${String.format("%02d", hours)}h${String.format("%02d", minutes)}"
+    /** Format: "%A %d %B %Y %X" */
+    fun getFormattedTime() = "${getDayNameFull()} " +
+                             "$days " +
+                             "${getMonthNameFull()} " +
+                             "$years " +
+                             "${String.format("%02d", hours)}:" +
+                             "${String.format("%02d", minutes)}:" +
+                             "${String.format("%02d", seconds)}"
 
     fun getDayNameFull() = DAY_NAMES[dayOfWeek]
     fun getDayNameShort() = DAY_NAMES_SHORT[dayOfWeek]

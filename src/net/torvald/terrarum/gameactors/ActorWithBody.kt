@@ -130,8 +130,8 @@ open class ActorWithBody : Actor(), Visible {
      */
 
 
-    var grounded = false
-    override var flagDespawn = false
+    @Volatile var grounded = false
+    override @Volatile var flagDespawn = false
     /** Default to 'false'  */
     var isVisible = false
     /** Default to 'true'  */
@@ -146,7 +146,7 @@ open class ActorWithBody : Actor(), Visible {
      * think of a grass cutting on the Zelda games. It would also make a great puzzle to solve.
      * --minjaesong)
      */
-    var isChronostasis = false
+    @Volatile var isChronostasis = false
 
     /**
      * Constants
@@ -213,8 +213,8 @@ open class ActorWithBody : Actor(), Visible {
     @Transient private var assertPrinted = false
 
     // to use with Controller (incl. player)
-    internal var walledLeft = false
-    internal var walledRight = false
+    internal @Volatile var walledLeft = false
+    internal @Volatile var walledRight = false
 
     /**
      * true: This actor had just made collision

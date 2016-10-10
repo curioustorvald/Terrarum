@@ -9,7 +9,7 @@ import net.torvald.terrarum.mapdrawer.MapDrawer
 object PBCynthia {
 
     fun create(): Player {
-        val p: Player = Player()
+        val p: Player = Player(GameDate(100, 143)) // random value thrown
         CreatureRawInjector.inject(p.actorValue, "CreatureHuman.json")
 
         p.actorValue[AVKey.__PLAYER_QUICKBARSEL] = 0

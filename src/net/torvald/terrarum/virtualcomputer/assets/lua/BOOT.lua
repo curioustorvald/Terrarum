@@ -455,7 +455,7 @@ do
             end
         ::brk::
         end
-    return s
+        return s
     end
 
     local function push_onecapture(ms, i, s, e)

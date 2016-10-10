@@ -19,7 +19,7 @@ import java.util.*
  * Created by minjaesong on 16-03-14.
  */
 
-class Player : ActorWithBody(), Controllable, Pocketed, Factionable, Luminous, LandHolder {
+class Player(born: GameDate) : HistoricalFigure(born), Controllable, Pocketed, Factionable, Luminous, LandHolder {
 
     /**
      * empirical value.

@@ -3,9 +3,9 @@ package net.torvald.terrarum.gameworld
 /**
  * Created by minjaesong on 16-01-17.
  */
-class MapLayer(var width: Int, var height: Int) : Iterable<Byte> {
+class MapLayer(val width: Int, val height: Int) : Iterable<Byte> {
 
-    internal var data: Array<ByteArray>
+    internal @Volatile var data: Array<ByteArray> // in parallel programming: do not trust your register; always read freshly from RAM!
 
     init {
         data = Array(height) { ByteArray(width) }

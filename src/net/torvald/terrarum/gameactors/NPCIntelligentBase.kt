@@ -10,7 +10,7 @@ import java.util.*
 /**
  * Created by minjaesong on 16-03-14.
  */
-open class NPCIntelligentBase : ActorWithBody()
+open class NPCIntelligentBase(born: GameDate) : HistoricalFigure(born)
         , AIControlled, Pocketed, CanBeAnItem, Factionable, LandHolder {
 
     override var actorAI: ActorAI = object : ActorAI {

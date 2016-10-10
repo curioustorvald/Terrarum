@@ -16,7 +16,7 @@ import java.io.IOException
 object PBSigrid {
 
     fun create(): Player {
-        val p = Player()
+        val p = Player(GameDate(-2147483648, 0)) // XD
 
         p.sprite = SpriteAnimation()
         p.sprite!!.setDimension(28, 51)

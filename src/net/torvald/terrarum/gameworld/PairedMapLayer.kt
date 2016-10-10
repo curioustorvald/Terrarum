@@ -7,7 +7,7 @@ import java.util.function.Consumer
 /**
  * Created by minjaesong on 16-02-15.
  */
-class PairedMapLayer(width: Int, var height: Int) : Iterable<Byte> {
+class PairedMapLayer(width: Int, val height: Int) : Iterable<Byte> {
 
     /**
      * 0b_xxxx_yyyy, x for lower index, y for higher index
@@ -17,9 +17,9 @@ class PairedMapLayer(width: Int, var height: Int) : Iterable<Byte> {
      * 0110 1101 is interpreted as
      * 6 for tile 0, 13 for tile 1.
      */
-    internal var dataPair: Array<ByteArray>
+    internal @Volatile var dataPair: Array<ByteArray>
 
-    var width: Int = 0
+    val width: Int
 
     init {
         this.width = width / 2
