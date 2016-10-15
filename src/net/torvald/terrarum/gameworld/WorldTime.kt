@@ -1,5 +1,7 @@
 package net.torvald.terrarum.gameworld
 
+import net.torvald.terrarum.gameactors.GameDate
+
 /**
  * The World Calendar implementation of Dwarven Calendar (we're talking about DF!)
  *
@@ -15,6 +17,8 @@ package net.torvald.terrarum.gameworld
  * Created by minjaesong on 16-01-24.
  */
 class WorldTime {
+    internal var TIME_T = 0L // TODO use it! Epoch: Year 125, 1st Granite, 0h00:00
+
     internal var seconds: Int // 0 - 59
     internal var minutes: Int // 0 - 59
     internal var hours: Int // 0 - 21
@@ -44,6 +48,9 @@ class WorldTime {
     )
     val MONTH_NAMES_SHORT = arrayOf("Opal", "Obsi", "Gran", "Slat", "Fels", "Hema",
             "Mala", "Gale", "Lime", "Sand", "Timb", "Moon")
+
+    val currentTimeAsGameDate: GameDate
+        get() = GameDate(years, yearlyDays)
 
     @Transient val REAL_SEC_IN_MILLI = 1000
 

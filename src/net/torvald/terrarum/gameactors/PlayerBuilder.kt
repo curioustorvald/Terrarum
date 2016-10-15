@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameactors
 
+import net.torvald.terrarum.Terrarum
 import org.newdawn.slick.SlickException
 import java.io.IOException
 
@@ -12,7 +13,7 @@ object PlayerBuilder {
 
     @Throws(IOException::class, SlickException::class)
     fun create(): Player {
-        val p: Player = Player()
+        val p: Player = Player(Terrarum.ingame.world.time.currentTimeAsGameDate)
         CreatureRawInjector.inject(p.actorValue, "CreatureHuman.json")
 
         // attach sprite
