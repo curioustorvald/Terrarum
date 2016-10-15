@@ -55,7 +55,8 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        blendDisable()
+        // using the texture
+        /*blendDisable()
 
         drawSegments(g)
         g.setDrawMode(Graphics.MODE_ALPHA_MAP)
@@ -69,7 +70,19 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
             g.drawString(messagesList[i], (messageWindowRadius + 4).toFloat(), (messageWindowRadius + GLYPH_HEIGHT * i).toFloat())
         }
 
+        blendNormal()*/
+
+        // scroll-like, kinda Microsoft-y
         blendNormal()
+        g.color = Color(0f, 0f, 0f, 0.7f)
+        g.fillRect(0f, 0f, width.toFloat(), height.toFloat())
+        g.color = Color(1f, 1f, 1f, 0.5f)
+        g.fillRect(0f, 0f, 2f, height.toFloat())
+        g.fillRect(width - 2f, 0f, 2f, height.toFloat())
+        for (i in 0..Math.min(messagesList.size, MESSAGES_DISPLAY) - 1) {
+            g.color = fontCol
+            g.drawString(messagesList[i], (messageWindowRadius + 4).toFloat(), (messageWindowRadius + GLYPH_HEIGHT * i).toFloat())
+        }
     }
 
     override fun processInput(input: Input) {
