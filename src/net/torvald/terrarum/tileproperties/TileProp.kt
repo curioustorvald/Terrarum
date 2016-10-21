@@ -41,4 +41,6 @@ class TileProp {
     var friction: Int = 0
 
     var dynamicLuminosityFunction: Int = 0
+
+    var material: String = ""
 }
