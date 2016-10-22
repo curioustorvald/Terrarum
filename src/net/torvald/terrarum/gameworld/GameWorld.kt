@@ -1,9 +1,6 @@
 
 package net.torvald.terrarum.gameworld
 
-import net.torvald.terrarum.gameactors.Player
-import net.torvald.terrarum.gameactors.roundInt
-import net.torvald.terrarum.mapdrawer.MapDrawer
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.SlickException
 
@@ -89,8 +86,8 @@ constructor(//properties
         get() = terrainDamage.dataPair
 
     fun getTileFromWall(x: Int, y: Int): Int? {
-        val wall: Int? = layerWall.getTile(x, y)
-        val wallDamage: Int? = getWallDamage(x, y)
+        val wall: Int? = layerWall.getTile(x fmod width, y)
+        val wallDamage: Int? = getWallDamage(x fmod width, y)
         return if (wall == null || wallDamage == null)
             null
         else
@@ -98,8 +95,8 @@ constructor(//properties
     }
 
     fun getTileFromTerrain(x: Int, y: Int): Int? {
-        val terrain: Int? = layerTerrain.getTile(x, y)
-        val terrainDamage: Int? = getTerrainDamage(x, y)
+        val terrain: Int? = layerTerrain.getTile(x fmod width, y)
+        val terrainDamage: Int? = getTerrainDamage(x fmod width, y)
         return if (terrain == null || terrainDamage == null)
             null
         else
@@ -107,15 +104,15 @@ constructor(//properties
     }
 
     fun getTileFromWire(x: Int, y: Int): Int? {
-        return layerWire.getTile(x, y)
+        return layerWire.getTile(x fmod width, y)
     }
 
     fun getWallDamage(x: Int, y: Int): Int? {
-        return wallDamage.getData(x, y)
+        return wallDamage.getData(x fmod width, y)
     }
 
     fun getTerrainDamage(x: Int, y: Int): Int? {
-        return terrainDamage.getData(x, y)
+        return terrainDamage.getData(x fmod width, y)
     }
 
     /**
@@ -127,7 +124,7 @@ constructor(//properties
      * @param combinedTilenum (tilenum * 16) + damage
      */
     fun setTileWall(x: Int, y: Int, combinedTilenum: Int) {
-        setTileWall(x, y, (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
+        setTileWall(x fmod width, y, (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
     }
 
     /**
@@ -139,21 +136,21 @@ constructor(//properties
      * @param combinedTilenum (tilenum * 16) + damage
      */
     fun setTileTerrain(x: Int, y: Int, combinedTilenum: Int) {
-        setTileTerrain(x, y, (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
+        setTileTerrain(x fmod width, y, (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
     }
 
     fun setTileWall(x: Int, y: Int, tile: Byte, damage: Int) {
-        layerWall.setTile(x, y, tile)
-        wallDamage.setData(x, y, damage)
+        layerWall.setTile(x fmod width, y, tile)
+        wallDamage.setData(x fmod width, y, damage)
     }
 
     fun setTileTerrain(x: Int, y: Int, tile: Byte, damage: Int) {
-        layerTerrain.setTile(x, y, tile)
-        terrainDamage.setData(x, y, damage)
+        layerTerrain.setTile(x fmod width, y, tile)
+        terrainDamage.setData(x fmod width, y, damage)
     }
 
     fun setTileWire(x: Int, y: Int, tile: Byte) {
-        layerWire.data[y][x] = tile
+        layerWire.data[y][x fmod width] = tile
     }
 
     fun getTileFrom(mode: Int, x: Int, y: Int): Int? {
@@ -226,3 +223,5 @@ constructor(//properties
         @Transient val LAYERS: Byte = 4 // terrain, wall (terrainDamage + wallDamage), wire
     }
 }
+
+infix fun Int.fmod(other: Int) = Math.floorMod(this, other)

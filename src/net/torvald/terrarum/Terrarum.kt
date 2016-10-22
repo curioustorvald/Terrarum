@@ -85,11 +85,6 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         fontGame = GameFontWhite()
         fontSmallNumbers = TinyAlphNum()
-        fontControlGuide = SpriteSheetFont(SpriteSheet(
-                "./assets/graphics/fonts/" +
-                if (environment == RunningEnvironment.CONSOLE) "keycaps_gamepad.png"
-                else "keycaps.png", 18, 18)
-                , ' ')
 
         hasController = gc.input.controllerCount > 0
         if (hasController) {
@@ -175,8 +170,6 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         lateinit var fontGame: Font
             private set
         lateinit var fontSmallNumbers: Font
-            private set
-        lateinit var fontControlGuide: Font
             private set
 
         var joypadLabelStart: Char = 0x00.toChar() // lateinit

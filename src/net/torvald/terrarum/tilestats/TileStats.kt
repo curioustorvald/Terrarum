@@ -38,10 +38,10 @@ object TileStats {
         val noZoomCameraY = Math.round(FastMath.clamp(
                 player.hitbox.centeredY.toFloat() - renderHeight / 2, TSIZE.toFloat(), map.width * TSIZE - renderHeight - TSIZE.toFloat()))
 
-        val for_x_start = MapCamera.div16(noZoomCameraX)
-        val for_y_start = MapCamera.div16(noZoomCameraY)
-        val for_y_end = MapCamera.clampHTile(for_y_start + MapCamera.div16(renderHeight) + 2)
-        val for_x_end = MapCamera.clampWTile(for_x_start + MapCamera.div16(renderWidth) + 2)
+        val for_x_start = noZoomCameraX / TSIZE
+        val for_y_start = noZoomCameraY / TSIZE
+        val for_y_end = MapCamera.clampHTile(for_y_start + (renderHeight / TSIZE) + 2)
+        val for_x_end = MapCamera.clampWTile(for_x_start + (renderWidth  / TSIZE) + 2)
 
         for (y in for_y_start..for_y_end - 1) {
             for (x in for_x_start..for_x_end - 1) {

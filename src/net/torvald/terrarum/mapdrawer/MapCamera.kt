@@ -20,7 +20,7 @@ import java.util.*
  * Created by minjaesong on 16-01-19.
  */
 object MapCamera {
-    val WORLD: GameWorld = Terrarum.ingame.world;
+    val WORLD: GameWorld = Terrarum.ingame.world
 
     var cameraX = 0
         private set
@@ -237,10 +237,16 @@ object MapCamera {
         renderHeight = FastMath.ceil(Terrarum.HEIGHT / Terrarum.ingame.screenZoom)
 
         // position - (WH / 2)
-        cameraX = Math.round(FastMath.clamp(
+        /*cameraX = Math.round(FastMath.clamp(
                 player.hitbox.centeredX.toFloat() - renderWidth / 2, TSIZE.toFloat(), WORLD.width * TSIZE - renderWidth - TSIZE.toFloat()))
         cameraY = Math.round(FastMath.clamp(
                 player.hitbox.centeredY.toFloat() - renderHeight / 2, TSIZE.toFloat(), WORLD.height * TSIZE - renderHeight - TSIZE.toFloat()))
+*/
+        cameraX = Math.round( // X only: ROUNDWORLD implementation
+                player.hitbox.centeredX.toFloat() - renderWidth / 2)
+        cameraY = Math.round(FastMath.clamp(
+                player.hitbox.centeredY.toFloat() - renderHeight / 2, TSIZE.toFloat(), WORLD.height * TSIZE - renderHeight - TSIZE.toFloat()))
+
     }
 
     fun renderBehind(gc: GameContainer, g: Graphics) {
@@ -259,11 +265,11 @@ object MapCamera {
     }
 
     private fun drawTiles(mode: Int, drawModeTilesBlendMul: Boolean) {
-        val for_y_start = MapCamera.div16(MapCamera.cameraY)
-        val for_y_end = MapCamera.clampHTile(for_y_start + MapCamera.div16(MapCamera.renderHeight) + 2)
+        val for_y_start = MapCamera.cameraY / TSIZE
+        val for_y_end = MapCamera.clampHTile(for_y_start + (MapCamera.renderHeight / TSIZE) + 2)
 
-        val for_x_start = MapCamera.div16(MapCamera.cameraX)
-        val for_x_end = MapCamera.clampWTile(for_x_start + MapCamera.div16(MapCamera.renderWidth) + 2)
+        val for_x_start = MapCamera.cameraX / TSIZE - 1
+        val for_x_end = for_x_start + (MapCamera.renderWidth / TSIZE) + 2
 
         // initialise
         MapCamera.tilesetBook[mode].startUse()
@@ -273,22 +279,22 @@ object MapCamera {
             for (x in for_x_start..for_x_end - 1) {
 
                 val thisTile: Int?
-                if (mode % 3 == MapCamera.WALL)
-                    thisTile = MapCamera.WORLD.getTileFromWall(x, y)
-                else if (mode % 3 == MapCamera.TERRAIN)
-                    thisTile = MapCamera.WORLD.getTileFromTerrain(x, y)
-                else if (mode % 3 == MapCamera.WIRE)
-                    thisTile = MapCamera.WORLD.getTileFromWire(x, y)
+                if (mode % 3 == WALL)
+                    thisTile = WORLD.getTileFromWall(x, y)
+                else if (mode % 3 == TERRAIN)
+                    thisTile = WORLD.getTileFromTerrain(x, y)
+                else if (mode % 3 == WIRE)
+                    thisTile = WORLD.getTileFromWire(x, y)
                 else
                     throw IllegalArgumentException()
 
-                val noDamageLayer = mode % 3 == MapCamera.WIRE
+                val noDamageLayer = mode % 3 == WIRE
 
                 // draw
                 try {
                     if (
 
-                    (mode == MapCamera.WALL || mode == MapCamera.TERRAIN)       // not an air tile
+                    (mode == WALL || mode == TERRAIN)       // not an air tile
 
                     && (thisTile ?: 0) > 0
                     &&
@@ -354,10 +360,10 @@ object MapCamera {
      */
     fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
         val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] = WORLD.getTileFrom(mode, x - 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  WORLD.getTileFrom(mode, x - 1, y) ?: 4096
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = WORLD.getTileFrom(mode, x + 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_UP] = WORLD.getTileFrom(mode, x, y - 1) ?: 4906
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] = WORLD.getTileFrom(mode, x, y + 1) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_UP] =    WORLD.getTileFrom(mode, x    , y - 1) ?: 4906
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] =  WORLD.getTileFrom(mode, x    , y + 1) ?: 4096
 
         // try for
         var ret = 0
@@ -372,10 +378,10 @@ object MapCamera {
 
     fun getNearbyTilesInfoNonSolid(x: Int, y: Int, mode: Int): Int {
         val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] = WORLD.getTileFrom(mode, x - 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  WORLD.getTileFrom(mode, x - 1, y) ?: 4096
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = WORLD.getTileFrom(mode, x + 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_UP] = WORLD.getTileFrom(mode, x, y - 1) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] = WORLD.getTileFrom(mode, x, y + 1) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_UP] =    WORLD.getTileFrom(mode, x    , y - 1) ?: 4906
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] =  WORLD.getTileFrom(mode, x    , y + 1) ?: 4096
 
         // try for
         var ret = 0
@@ -396,10 +402,10 @@ object MapCamera {
     fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
         val nearbyTiles = IntArray(4)
         val NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] = WORLD.getTileFrom(TERRAIN, x - 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  WORLD.getTileFrom(TERRAIN, x - 1, y) ?: 4096
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = WORLD.getTileFrom(TERRAIN, x + 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] = WORLD.getTileFrom(TERRAIN, x, y + 1) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_BACK] = WORLD.getTileFrom(WALL, x, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] =  WORLD.getTileFrom(TERRAIN, x    , y + 1) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_BACK] =  WORLD.getTileFrom(WALL,    x    , y) ?: 4096
 
         try {
             if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_DOWN]).isSolid)
@@ -438,20 +444,6 @@ object MapCamera {
         }
     }
 
-    fun div16(x: Int): Int = x and 0x7FFFFFFF shr 4
-    fun mod16(x: Int): Int = x and 15
-    fun quantise16(x: Int): Int = x and 0xFFFFFFF0.toInt()
-
-    fun clampW(x: Int): Int {
-        if (x < 0) {
-            return 0
-        } else if (x > WORLD.width * TSIZE) {
-            return WORLD.width * TSIZE
-        } else {
-            return x
-        }
-    }
-
     fun clampH(x: Int): Int {
         if (x < 0) {
             return 0
@@ -482,11 +474,11 @@ object MapCamera {
         }
     }
 
-    fun getRenderStartX(): Int = div16(cameraX)
-    fun getRenderStartY(): Int = div16(cameraY)
+    fun getRenderStartX(): Int = cameraX / TSIZE
+    fun getRenderStartY(): Int = cameraY / TSIZE
 
-    fun getRenderEndX(): Int = clampWTile(getRenderStartX() + div16(renderWidth) + 2)
-    fun getRenderEndY(): Int = clampHTile(getRenderStartY() + div16(renderHeight) + 2)
+    fun getRenderEndX(): Int = clampWTile(getRenderStartX() +(renderWidth  / TSIZE) + 2)
+    fun getRenderEndY(): Int = clampHTile(getRenderStartY() +(renderHeight / TSIZE) + 2)
 
     fun isConnectSelf(b: Int?): Boolean = TILES_CONNECT_SELF.contains(b)
     fun isConnectMutual(b: Int?): Boolean = TILES_CONNECT_MUTUAL.contains(b)

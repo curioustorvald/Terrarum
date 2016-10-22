@@ -39,8 +39,8 @@ open class ActorWithBody : Actor(), Visible {
      * * Unit: pixel
      * !! external class should not hitbox.set(); use setHitboxDimension() and setPosition()
      */
-    override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
-    @Transient val nextHitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
+    override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)       // Hitbox is implemented using Double;
+    @Transient val nextHitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // 52 mantissas ought to be enough for anybody...
 
     /**
      * Velocity vector for newtonian sim.
@@ -346,7 +346,7 @@ open class ActorWithBody : Actor(), Visible {
                 // apply our compensation to actual hitbox
                 updateHitbox()
 
-                // make sure the actor does not go out of the map
+                // make sure if the actor tries to go out of the map, loop back instead
                 clampHitbox()
             }
 
@@ -862,8 +862,18 @@ open class ActorWithBody : Actor(), Visible {
         }
 
     private fun clampHitbox() {
+        val worldsizePxl = world.width.times(TSIZE)
+
         hitbox.setPositionFromPoint(
-                clampW(hitbox.pointedX), clampH(hitbox.pointedY))
+                //clampW(hitbox.pointedX),
+                if (hitbox.pointedX < 0)
+                    hitbox.pointedX + worldsizePxl
+                else if (hitbox.pointedX >= worldsizePxl)
+                    hitbox.pointedX - worldsizePxl
+                else
+                    hitbox.pointedX, // ROUNDWORLD impl
+                clampH(hitbox.pointedY)
+        )
     }
 
     private fun setNewNextHitbox() {
