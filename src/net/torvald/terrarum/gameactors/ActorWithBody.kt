@@ -443,8 +443,7 @@ open class ActorWithBody : Actor(), Visible {
             else if (moveDelta.y < 0.0) { // or was moving upward?
                 grounded = false
                 if (isTouchingSide(nextHitbox, COLLIDING_TOP)) { // actor hit something on its top
-                    //hitAndForciblyReflectY()
-                    hitAndReflectY()
+                    hitAndForciblyReflectY() // prevents sticking to the ceiling
                 }
                 else { // the actor is not grounded at all
                 }
@@ -507,7 +506,9 @@ open class ActorWithBody : Actor(), Visible {
         }
     }
 
-    @Deprecated("it's no use!")
+    /**
+     * prevents sticking to the ceiling
+     */
     private fun hitAndForciblyReflectY() {
         if (veloY.abs() * CEILING_HIT_ELASTICITY > A_PIXEL)
             veloY = -veloY * CEILING_HIT_ELASTICITY
@@ -965,7 +966,7 @@ open class ActorWithBody : Actor(), Visible {
     private fun assertInit() {
         // errors
         if (baseHitboxW == 0 || baseHitboxH == 0)
-            throw RuntimeException("Hitbox dimension was not set.")
+            throw Error("Hitbox dimension was not set.")
 
         // warnings
         if (sprite == null && isVisible)

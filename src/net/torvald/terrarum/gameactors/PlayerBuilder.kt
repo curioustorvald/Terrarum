@@ -11,9 +11,8 @@ object PlayerBuilder {
     private val JSONPATH = "./assets/raw/"
     private val jsonString = String()
 
-    @Throws(IOException::class, SlickException::class)
-    fun create(): Player {
-        val p: Player = Player(Terrarum.ingame.world.time.currentTimeAsGameDate)
+    fun create(): Actor {
+        val p: Actor = Player(Terrarum.ingame.world.time.currentTimeAsGameDate)
         CreatureRawInjector.inject(p.actorValue, "CreatureHuman.json")
 
         // attach sprite

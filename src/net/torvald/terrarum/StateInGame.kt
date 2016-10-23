@@ -58,7 +58,9 @@ constructor() : BasicGameState() {
     lateinit var debugWindow: UIHandler
     lateinit var notifier: UIHandler
 
-    lateinit internal var player: Player
+    lateinit internal var playerWrapper: AnyPlayer
+    internal val player: HistoricalFigure // currently POSSESSED actor :)
+        get() = playerWrapper.actor
 
     //private var GRADIENT_IMAGE: Image? = null
     //private var skyBox: Rectangle? = null
@@ -119,7 +121,7 @@ constructor() : BasicGameState() {
 
 
         // add new player and put it to actorContainer
-        player = PBSigrid.create()
+        playerWrapper = AnyPlayer(PBSigrid.create())
         //player = PBCynthia.create()
         //player.setNoClip(true);
         addActor(player)
@@ -199,6 +201,8 @@ constructor() : BasicGameState() {
         ///////////////////////////
         // actor-related updates //
         ///////////////////////////
+        repossessActor()
+
         // determine whether the inactive actor should be re-active
         wakeDormantActors()
         // determine whether the actor should be active or dormant
@@ -224,6 +228,31 @@ constructor() : BasicGameState() {
 
         // determine if lightmap blending should be done
         Terrarum.gameConfig["smoothlighting"] = KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH)
+    }
+
+    private fun repossessActor() {
+        // check if currently pocessed actor is removed from game
+        if (!hasActor(player))
+            // re-possess canonical player
+            changePossession(Player.PLAYER_REF_ID) // TODO completely other behaviour?
+    }
+
+    private fun changePossession(newActor: AnyPlayer) {
+        if (!hasActor(player)) {
+            throw IllegalArgumentException("No such actor in actorContainer: $newActor")
+        }
+
+        playerWrapper = newActor
+        WorldSimulator(world, player, UPDATE_DELTA)
+    }
+
+    private fun changePossession(refid: Int) {
+        if (!hasActor(refid)) {
+            throw IllegalArgumentException("No such actor in actorContainer: $refid")
+        }
+
+        playerWrapper = AnyPlayer(getActorByID(refid) as HistoricalFigure)
+        WorldSimulator(world, player, UPDATE_DELTA)
     }
 
     private fun setAppTitle() {
@@ -319,7 +348,7 @@ constructor() : BasicGameState() {
         }
         // fluidmap debug
         if (KeyToggler.isOn(Key.F4))
-            WorldSimulator.drawFluidMapDebug(player, g)
+            WorldSimulator.drawFluidMapDebug(g)
 
 
         //////////////
@@ -482,7 +511,7 @@ constructor() : BasicGameState() {
 
     fun Double.sqr() = this * this
     fun Int.sqr() = this * this
-    private fun distToActorSqr(a: Visible, p: Player): Double =
+    private fun distToActorSqr(a: Visible, p: ActorWithBody): Double =
             (a.hitbox.centeredX - p.hitbox.centeredX).sqr() + (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
     /** whether the actor is within screen */
     private fun Visible.inScreen() = distToActorSqr(this, player) <=

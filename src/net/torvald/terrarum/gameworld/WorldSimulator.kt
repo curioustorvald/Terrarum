@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameworld
 
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.HistoricalFigure
 import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.gameworld.WorldSimulator.isSolid
@@ -37,14 +38,15 @@ object WorldSimulator {
     val colourNone = Color(0x808080)
     val colourWater = Color(0x66BBFF)
 
-    operator fun invoke(world: GameWorld, p: Player, delta: Int) {
+    // TODO future Kotlin feature -- typealias AnyPlayer: HistoricalFigure
+    operator fun invoke(world: GameWorld, p: HistoricalFigure, delta: Int) {
         updateXFrom = p.hitbox.centeredX.div(MapDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
         updateYFrom = p.hitbox.centeredY.div(MapDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
         updateXTo = updateXFrom + DOUBLE_RADIUS
         updateYTo = updateYFrom + DOUBLE_RADIUS
 
-        moveFluids(world, p, delta)
-        displaceFallables(world, p, delta)
+        moveFluids(world, delta)
+        displaceFallables(world, delta)
     }
 
     /**
@@ -52,7 +54,7 @@ object WorldSimulator {
      * which means you'll need to modify the code A LOT if you're going to implement zero- or
      * reverse-gravity.
      */
-    fun moveFluids(world: GameWorld, p: Player, delta: Int) {
+    fun moveFluids(world: GameWorld, delta: Int) {
         ////////////////////
         // build fluidmap //
         ////////////////////
@@ -121,7 +123,7 @@ object WorldSimulator {
      * displace fallable tiles. It is scanned bottom-left first. To achieve the sens ofreal
      * falling, each tiles are displaced by ONLY ONE TILE below.
      */
-    fun displaceFallables(world: GameWorld, p: Player, delta: Int) {
+    fun displaceFallables(world: GameWorld, delta: Int) {
         for (y in updateYFrom..updateYTo) {
             for (x in updateXFrom..updateXTo) {
                 val tile = world.getTileFromTerrain(x, y) ?: TileNameCode.STONE
@@ -146,7 +148,7 @@ object WorldSimulator {
         }
     }
 
-    fun drawFluidMapDebug(p: Player, g: Graphics) {
+    fun drawFluidMapDebug(g: Graphics) {
         g.font = Terrarum.fontSmallNumbers
         g.color = colourWater
 

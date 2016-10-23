@@ -46,7 +46,7 @@ object PBSigrid {
          * fixed value, or 'base value', from creature strength of Dwarf Fortress.
          * Human race uses 1000. (see CreatureHuman.json)
          */
-        p.actorValue[AVKey.STRENGTH] = 1414
+        p.actorValue[AVKey.STRENGTH] = 1414 // this is test character, after all.
         p.actorValue[AVKey.ENCUMBRANCE] = 1000
         p.actorValue[AVKey.BASEHEIGHT] = 46
 
@@ -59,8 +59,8 @@ object PBSigrid {
         p.actorValue[AVKey.BASEDEFENCE] = 141
 
         p.actorValue[AVKey.__PLAYER_QUICKBARSEL] = 0
-        p.actorValue["__selectedtile"] = 16 // test code; replace with <tile_item>.primaryUse(gc, delta)
-        p.actorValue["__aimhelper"] = true
+        p.actorValue["__selectedtile"] = 147 // test code; replace with <tile_item>.primaryUse(gc, delta)
+        p.actorValue["__aimhelper"] = true // TODO when you'll gonna implement it?
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 10, 0)
 

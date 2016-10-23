@@ -32,8 +32,8 @@ object GameController {
 
 
         if (!Terrarum.ingame.consoleHandler.isTakingControl) {
-            if (Terrarum.ingame.player.vehicleRiding != null) {
-                Terrarum.ingame.player.vehicleRiding!!.processInput(input)
+            if (Terrarum.ingame.player is Player && (Terrarum.ingame.player as Player).vehicleRiding != null) {
+                (Terrarum.ingame.player as Player).vehicleRiding!!.processInput(input)
             }
 
             Terrarum.ingame.player.processInput(input)
@@ -83,8 +83,8 @@ object GameController {
 
 
         if (!Terrarum.ingame.consoleHandler.isTakingControl) {
-            if (Terrarum.ingame.player.vehicleRiding != null) {
-                Terrarum.ingame.player.vehicleRiding!!.keyPressed(key, c)
+            if (Terrarum.ingame.player is Player && (Terrarum.ingame.player as Player).vehicleRiding != null) {
+                (Terrarum.ingame.player as Player).vehicleRiding!!.keyPressed(key, c)
             }
 
             Terrarum.ingame.player.keyPressed(key, c)

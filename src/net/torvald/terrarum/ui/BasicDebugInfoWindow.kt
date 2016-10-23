@@ -100,7 +100,7 @@ class BasicDebugInfoWindow : UICanvas {
         printLine(g, 5, "grounded $ccG${player.grounded}")
         printLine(g, 6, "noClip $ccG${player.noClip}")
 
-        printLine(g, 7, "jump $ccG${player.jumpAcc}")
+        //printLine(g, 7, "jump $ccG${player.jumpAcc}")
 
         val lightVal: String
         val mtX = mouseTileX.toString()

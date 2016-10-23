@@ -16,6 +16,8 @@ import org.newdawn.slick.SlickException
 import java.util.*
 
 /**
+ * Game player (YOU!)
+ *
  * Created by minjaesong on 16-03-14.
  */
 
@@ -53,7 +55,7 @@ class Player(born: GameDate) : HistoricalFigure(born), Controllable, Pocketed, F
     @Transient private var prevHMoveKey = KEY_NULL
     @Transient private var prevVMoveKey = KEY_NULL
 
-    internal var noClip = false
+    override internal var noClip = false
 
     @Transient private val AXIS_POSMAX = 1.0f
     @Transient private val GAMEPAD_JUMP = 7
@@ -491,11 +493,11 @@ class Player(born: GameDate) : HistoricalFigure(born), Controllable, Pocketed, F
         }
     }
 
-    fun isNoClip(): Boolean {
+    override fun isNoClip(): Boolean {
         return noClip
     }
 
-    fun setNoClip(b: Boolean) {
+    override fun setNoClip(b: Boolean) {
         noClip = b
     }
 
