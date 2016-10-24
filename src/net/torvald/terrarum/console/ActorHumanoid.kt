@@ -6,6 +6,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
+import net.torvald.terrarum.realestate.RealEstateUtility
 import org.dyn4j.geometry.Vector2
 import org.lwjgl.input.Controller
 import org.lwjgl.input.Controllers
@@ -30,18 +31,18 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
      * Absolute tile index. index(x, y) = y * map.width + x
      * The arraylist will be saved in JSON format with GSON.
      */
-    override var houseDesignation: ArrayList<Long>? = null
+    override var houseDesignation: ArrayList<Long>? = ArrayList()
 
     override fun addHouseTile(x: Int, y: Int) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (houseDesignation != null) houseDesignation!!.add(RealEstateUtility.getAbsoluteTileNumber(x, y))
     }
 
     override fun removeHouseTile(x: Int, y: Int) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (houseDesignation != null) houseDesignation!!.remove(RealEstateUtility.getAbsoluteTileNumber(x, y))
     }
 
     override fun clearHouseDesignation() {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (houseDesignation != null) houseDesignation!!.clear()
     }
 
     /**
