@@ -1,20 +1,41 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.console.ActorHumanoid
-import net.torvald.terrarum.gameactors.ai.ActorAI
-import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameitem.InventoryItem
-import net.torvald.terrarum.realestate.RealEstateUtility.getAbsoluteTileNumber
+import org.luaj.vm2.Globals
+import org.luaj.vm2.LoadState
+import org.luaj.vm2.LuaError
+import org.luaj.vm2.LuaValue
+import org.luaj.vm2.compiler.LuaC
+import org.luaj.vm2.lib.*
+import org.luaj.vm2.lib.jse.JseBaseLib
+import org.luaj.vm2.lib.jse.JseMathLib
 import org.newdawn.slick.GameContainer
-import java.util.*
+import java.io.InputStreamReader
+import java.io.Reader
 
 /**
  * Created by minjaesong on 16-03-14.
  */
-open class HumanoidNPC(born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
+open class HumanoidNPC(aiFile: String, born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
 
-    override var actorAI: ActorAI = object : ActorAI {
-        // TODO fully establish ActorAI so that I can implement AI here
+    override val scriptPath: String = aiFile
+
+    companion object {
+        protected val luag = Globals()
+
+        init {
+            luag.load(JseBaseLib())
+            luag.load(TableLib())
+            luag.load(StringLib())
+            luag.load(TableLib())
+            luag.load(CoroutineLib())
+            luag.load(Bit32Lib())
+            luag.load(PackageLib())
+            luag.load(JseMathLib())
+            LoadState.install(luag)
+            LuaC.install(luag)
+        }
     }
 
     // we're having InventoryItem data so that this class could be somewhat universal
@@ -74,4 +95,65 @@ open class HumanoidNPC(born: GameDate) : ActorHumanoid(born), AIControlled, CanB
     }
 
 
+    init {
+        val inputStream = javaClass.getResourceAsStream(scriptPath)
+        runCommand(InputStreamReader(inputStream), scriptPath)
+    }
+
+
+    override fun update(gc: GameContainer, delta: Int) {
+        super.update(gc, delta)
+
+    }
+
+    var currentExecutionThread = Thread()
+    var threadRun = false
+
+    fun runCommand(reader: Reader, filename: String) {
+        if (!threadRun && !flagDespawn) {
+            currentExecutionThread = Thread(ThreadRunCommand(luag, reader, filename))
+            currentExecutionThread.start()
+            threadRun = true
+        }
+    }
+
+    class ThreadRunCommand : Runnable {
+
+        val mode: Int
+        val arg1: Any
+        val arg2: String
+        val lua: Globals
+
+        constructor(luaInstance: Globals, line: String, env: String) {
+            mode = 0
+            arg1 = line
+            arg2 = env
+            lua = luaInstance
+        }
+
+        constructor(luaInstance: Globals, reader: Reader, filename: String) {
+            mode = 1
+            arg1 = reader
+            arg2 = filename
+            lua = luaInstance
+        }
+
+        override fun run() {
+            try {
+                val chunk: LuaValue
+                if (mode == 0)
+                    chunk = lua.load(arg1 as String, arg2)
+                else if (mode == 1)
+                    chunk = lua.load(arg1 as Reader, arg2)
+                else
+                    throw IllegalArgumentException("Unsupported mode: $mode")
+
+
+                chunk.call()
+            }
+            catch (e: LuaError) {
+                e.printStackTrace(System.err)
+            }
+        }
+    }
 }

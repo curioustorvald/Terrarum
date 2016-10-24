@@ -5,6 +5,8 @@ import org.newdawn.slick.Color
 import net.torvald.colourutil.CIELabUtil.toXYZ
 import net.torvald.colourutil.CIELabUtil.toRawRGB
 import net.torvald.colourutil.CIELabUtil.toRGB
+import net.torvald.colourutil.CIELuvUtil.toLuv
+import net.torvald.colourutil.CIELuvUtil.toXYZ
 
 /**
  * A modification of CIEXYZ that is useful for additive mixtures of lights.
@@ -91,13 +93,13 @@ object CIELuvUtil {
         return CIEXYZ(X, Y, Z, alpha)
     }
 
-    fun Color.toLuv() = this.toXYZ().toLuv()
-    fun CIELuv.toRawRGB() = this.toXYZ().toRawRGB()
-    fun CIELuv.toRGB() = this.toXYZ().toRGB()
-
     private fun Float.cbrt() = FastMath.pow(this, 1f / 3f)
     private fun Float.cube() = this * this * this
 }
+
+fun Color.toLuv() = this.toXYZ().toLuv()
+fun CIELuv.toRawRGB() = this.toXYZ().toRawRGB()
+fun CIELuv.toRGB() = this.toXYZ().toRGB()
 
 /**
  * Range:

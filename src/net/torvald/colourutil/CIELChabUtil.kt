@@ -1,6 +1,8 @@
 package net.torvald.colourutil
 
 import com.jme3.math.FastMath
+import net.torvald.colourutil.CIELChUtil.toLCh
+import net.torvald.colourutil.CIELChUtil.toLab
 import net.torvald.colourutil.CIELabUtil.toLab
 import net.torvald.colourutil.CIELabUtil.toRGB
 import net.torvald.colourutil.CIELabUtil.toXYZ
@@ -49,14 +51,14 @@ object CIELChUtil {
         return CIELab(L, a, b, alpha)
     }
 
-    fun Color.toLCh() = this.toXYZ().toLab().toLCh()
-    fun CIELCh.toRGB() = this.toLab().toXYZ().toRGB()
-
     private fun Float.sqr() = this * this
     private fun Float.sqrt() = Math.sqrt(this.toDouble()).toFloat()
 
     private fun Float.abs() = FastMath.abs(this)
 }
+
+fun Color.toLCh() = this.toXYZ().toLab().toLCh()
+fun CIELCh.toRGB() = this.toLab().toXYZ().toRGB()
 
 /**
  * @param L : Luminosity in 0.0 - 1.0

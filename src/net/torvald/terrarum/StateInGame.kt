@@ -272,7 +272,7 @@ constructor() : BasicGameState() {
 
 
         // make camara work //
-        // compensate for zoom. UIs have to be treated specially! (see UIHandler)
+        // compensate for zoom. UIs must be treated specially! (see UIHandler)
         g.translate(-MapCamera.cameraX * screenZoom, -MapCamera.cameraY * screenZoom)
 
 

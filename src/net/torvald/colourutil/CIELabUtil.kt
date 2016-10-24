@@ -1,6 +1,10 @@
 package net.torvald.colourutil
 
 import com.jme3.math.FastMath
+import net.torvald.colourutil.CIELabUtil.toLab
+import net.torvald.colourutil.CIELabUtil.toRGB
+import net.torvald.colourutil.CIELabUtil.toRawRGB
+import net.torvald.colourutil.CIELabUtil.toXYZ
 import org.newdawn.slick.Color
 
 /**
@@ -46,11 +50,6 @@ object CIELabUtil {
 
         return CIELab(newL, newA, newB, newAlpha).toRGB()
     }
-
-    fun Color.toLab() = this.toXYZ().toLab()
-    fun RGB.toLab() = this.toXYZ().toLab()
-    fun CIELab.toRGB() = this.toXYZ().toRGB()
-    fun CIELab.toRawRGB() = this.toXYZ().toRawRGB()
 
     fun RGB.toXYZ(): CIEXYZ {
         val newR = if (r > 0.04045f)
@@ -132,6 +131,11 @@ object CIELabUtil {
     private fun Float.cube() = this * this * this
     private fun Float.powerOf(exp: Float) = FastMath.pow(this, exp)
 }
+
+fun Color.toLab() = this.toXYZ().toLab()
+fun RGB.toLab() = this.toXYZ().toLab()
+fun CIELab.toRGB() = this.toXYZ().toRGB()
+fun CIELab.toRawRGB() = this.toXYZ().toRawRGB()
 
 internal val D65 = CIEXYZ(0.95047f, 1.00f, 1.08883f)
 val epsilon = 216f/24389f
