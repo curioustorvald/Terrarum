@@ -16,8 +16,7 @@ factionamicable : Amicable faction. Players can give/take items of actors of thi
                   in game.
 
 factionneutral  : Explicit neutrality. If the assigned actor is intelligent (NPC AV), players can
-                  barter with them. Unassigned faction will be treated like neutral, but players
-                  cannot barter with them.
+                  barter with them. Unassigned faction will be treated like "disliked"
 
 factionhostile  : Assigned faction will attack players on the sight. e.g. 'wildlifehostile'
 
