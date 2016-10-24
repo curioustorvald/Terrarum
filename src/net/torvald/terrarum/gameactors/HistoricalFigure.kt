@@ -11,7 +11,7 @@ import org.newdawn.slick.Input
  *
  * Created by minjaesong on 16-10-10.
  */
-open class HistoricalFigure(val born: GameDate, val dead: GameDate? = null) : ActorWithBody(), Controllable {
+open class HistoricalFigure(val born: GameDate, val dead: GameDate? = null) : ActorWithBody() {
 
     init {
         this.actorValue["_bornyear"] = born.year
@@ -23,21 +23,6 @@ open class HistoricalFigure(val born: GameDate, val dead: GameDate? = null) : Ac
         }
     }
 
-    override fun processInput(input: Input) {
-        // let out children play
-    }
-
-    override fun keyPressed(key: Int, c: Char) {
-        // let out children play
-    }
-
-    open internal var noClip = false
-
-    open fun isNoClip() = noClip
-
-    open fun setNoClip(b: Boolean) {
-        noClip = b
-    }
 }
 
 data class GameDate(val year: Int, val yearlyDay: Int) {

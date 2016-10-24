@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.audio.AudioResourceLibrary
 import net.torvald.terrarum.concurrent.ThreadPool
+import net.torvald.terrarum.console.ActorHumanoid
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandDict
@@ -59,7 +60,7 @@ constructor() : BasicGameState() {
     lateinit var notifier: UIHandler
 
     lateinit internal var playerWrapper: AnyPlayer
-    internal val player: HistoricalFigure // currently POSSESSED actor :)
+    internal val player: ActorHumanoid // currently POSSESSED actor :)
         get() = playerWrapper.actor
 
     //private var GRADIENT_IMAGE: Image? = null
@@ -251,13 +252,13 @@ constructor() : BasicGameState() {
             throw IllegalArgumentException("No such actor in actorContainer: $refid")
         }
 
-        playerWrapper = AnyPlayer(getActorByID(refid) as HistoricalFigure)
+        playerWrapper = AnyPlayer(getActorByID(refid) as ActorHumanoid)
         WorldSimulator(world, player, UPDATE_DELTA)
     }
 
     private fun setAppTitle() {
         Terrarum.appgc.setTitle(
-                "${Terrarum.NAME}" +
+                Terrarum.NAME +
                 " — F: ${Terrarum.appgc.fps} (${Terrarum.TARGET_INTERNAL_FPS})" +
                 " — M: ${Terrarum.memInUse}M / ${Terrarum.totalVMMem}M")
     }

@@ -4,6 +4,7 @@ import net.torvald.JsonFetcher
 import net.torvald.random.Fudge3
 import net.torvald.terrarum.langpack.Lang
 import com.google.gson.JsonObject
+import net.torvald.terrarum.console.ActorHumanoid
 import org.newdawn.slick.SlickException
 import java.io.IOException
 import java.security.SecureRandom
@@ -40,7 +41,7 @@ object CreatureRawInjector {
         // setAVMultiplyFromOne(actorValueRef, elementsMultiplyFromOne, jsonObj)
         setAVBooleans(actorValueRef, elementsBoolean, jsonObj)
 
-        actorValueRef[AVKey.ACCEL] = Player.WALK_ACCEL_BASE
+        actorValueRef[AVKey.ACCEL] = ActorHumanoid.WALK_ACCEL_BASE
         actorValueRef[AVKey.ACCELMULT] = 1.0
     }
 

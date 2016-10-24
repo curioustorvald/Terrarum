@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.terrarum.console.ActorHumanoid
 import net.torvald.terrarum.mapdrawer.MapDrawer
 
 /**
@@ -23,7 +24,7 @@ object PBCynthia {
         p.sprite!!.setRowsAndFrames(1, 1)
         p.sprite!!.setAsVisible()
 
-        p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: Player.BASE_HEIGHT, 9, 0)
+        p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 9, 0)
 
         p.setPosition((4096 * MapDrawer.TILE_SIZE).toDouble(), (300 * 16).toDouble())
 

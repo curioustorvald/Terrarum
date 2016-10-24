@@ -4,6 +4,7 @@ import net.torvald.JsonFetcher
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.spriteanimation.SpriteAnimation
 import com.google.gson.JsonObject
+import net.torvald.terrarum.console.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import org.newdawn.slick.SlickException
@@ -36,7 +37,7 @@ object PBSigrid {
         p.actorValue[AVKey.SCALE] = 1.0
         p.actorValue[AVKey.SPEED] = 4.0
         p.actorValue[AVKey.SPEEDMULT] = 1.0
-        p.actorValue[AVKey.ACCEL] = Player.WALK_ACCEL_BASE
+        p.actorValue[AVKey.ACCEL] = ActorHumanoid.WALK_ACCEL_BASE
         p.actorValue[AVKey.ACCELMULT] = 1.0
         p.actorValue[AVKey.JUMPPOWER] = 5.0
 
