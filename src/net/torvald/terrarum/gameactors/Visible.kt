@@ -4,7 +4,7 @@ import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 
 /**
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 16-01-25.
  */
 interface Visible {
     val hitbox: Hitbox

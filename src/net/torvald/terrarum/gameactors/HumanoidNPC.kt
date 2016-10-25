@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.console.ActorHumanoid
+import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameitem.InventoryItem
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
@@ -15,7 +15,7 @@ import java.io.InputStreamReader
 import java.io.Reader
 
 /**
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 16-01-31.
  */
 open class HumanoidNPC(aiFile: String, born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
 

@@ -6,7 +6,7 @@ import net.torvald.terrarum.itemproperties.ItemPropCodex
 import org.newdawn.slick.GameContainer
 
 /**
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 15-12-31.
  */
 abstract class Actor : Comparable<Actor>, Runnable {
 

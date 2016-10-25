@@ -6,7 +6,7 @@ import org.newdawn.slick.Input
 /**
  * Actors that has movement controlled by Keyboard or AI
  *
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 15-12-31.
  */
 interface Controllable {
 

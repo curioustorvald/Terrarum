@@ -6,7 +6,7 @@ import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.console.ActorHumanoid
+import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.UIQuickBar
 import org.dyn4j.geometry.Vector2
 import org.lwjgl.input.Controller
@@ -19,7 +19,7 @@ import java.util.*
 /**
  * Game player (YOU!)
  *
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 15-12-31.
  */
 
 class Player(born: GameDate) : ActorHumanoid(born) {

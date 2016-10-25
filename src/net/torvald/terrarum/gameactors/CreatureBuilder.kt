@@ -9,7 +9,7 @@ import org.newdawn.slick.SlickException
 import java.io.IOException
 
 /**
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 16-02-05.
  */
 
 object CreatureBuilder {

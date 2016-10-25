@@ -4,14 +4,14 @@ import net.torvald.JsonFetcher
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.spriteanimation.SpriteAnimation
 import com.google.gson.JsonObject
-import net.torvald.terrarum.console.ActorHumanoid
+import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import org.newdawn.slick.SlickException
 import java.io.IOException
 
 /**
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 16-02-03.
  */
 
 object PlayerBuilderSigrid {

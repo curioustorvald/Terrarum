@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 import java.util.*
 
 /**
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 16-02-20.
  */
 interface LandHolder {
 

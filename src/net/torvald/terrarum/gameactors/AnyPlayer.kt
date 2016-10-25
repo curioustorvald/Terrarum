@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.console.ActorHumanoid
+import net.torvald.terrarum.gameactors.ActorHumanoid
 import org.newdawn.slick.Input
 
 /**

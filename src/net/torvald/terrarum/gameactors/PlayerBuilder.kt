@@ -5,7 +5,7 @@ import org.newdawn.slick.SlickException
 import java.io.IOException
 
 /**
- * Created by minjaesong on 16-03-15.
+ * Created by minjaesong on 16-02-03.
  */
 object PlayerBuilder {
     private val JSONPATH = "./assets/raw/"

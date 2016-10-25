@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 /**
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 16-01-15.
  */
 interface Pocketed {
 

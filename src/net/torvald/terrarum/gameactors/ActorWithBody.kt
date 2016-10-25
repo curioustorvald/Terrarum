@@ -16,7 +16,7 @@ import org.newdawn.slick.Graphics
 /**
  * Base class for every actor that has physical (or echo) body. This includes furnishings, paintings, gadgets, etc.
  *
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 16-01-13.
  */
 open class ActorWithBody : Actor(), Visible {
 

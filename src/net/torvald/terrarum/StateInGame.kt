@@ -3,7 +3,7 @@ package net.torvald.terrarum
 import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.audio.AudioResourceLibrary
 import net.torvald.terrarum.concurrent.ThreadPool
-import net.torvald.terrarum.console.ActorHumanoid
+import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandDict
