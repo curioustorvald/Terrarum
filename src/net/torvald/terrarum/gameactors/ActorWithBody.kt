@@ -51,10 +51,10 @@ open class ActorWithBody : Actor(), Visible {
     internal val velocity = Vector2(0.0, 0.0)
     var veloX: Double
         get() = velocity.x
-        private set(value) { velocity.x = value }
+        protected set(value) { velocity.x = value }
     var veloY: Double
         get() = velocity.y
-        private set(value) { velocity.y = value }
+        protected set(value) { velocity.y = value }
 
     val moveDelta = Vector2(0.0, 0.0)
     @Transient private val VELO_HARD_LIMIT = 100.0
@@ -65,10 +65,10 @@ open class ActorWithBody : Actor(), Visible {
     var controllerVel: Vector2? = if (this is Controllable) Vector2() else null
     var walkX: Double
         get() = controllerVel!!.x
-        internal set(value) { controllerVel!!.x = value }
+        protected set(value) { controllerVel!!.x = value }
     var walkY: Double
         get() = controllerVel!!.y
-        internal set(value) { controllerVel!!.y = value }
+        protected set(value) { controllerVel!!.y = value }
 
     /**
      * Physical properties.

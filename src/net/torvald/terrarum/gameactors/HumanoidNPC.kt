@@ -106,6 +106,38 @@ open class HumanoidNPC(aiFile: String, born: GameDate) : ActorHumanoid(born), AI
 
     }
 
+    override fun moveLeft() { // hit the buttons on the controller box
+        isLeftDown = true
+    }
+
+    override fun moveRight() { // hit the buttons on the controller box
+        isRightDown = true
+    }
+
+    override fun moveUp() { // hit the buttons on the controller box
+        isUpDown = true
+    }
+
+    override fun moveDown() { // hit the buttons on the controller box
+        isDownDown = true
+    }
+
+    override fun moveJump() { // hit the buttons on the controller box
+        isJumpDown = true
+    }
+
+    /** fly toward arbitrary angle  WARNING: the map is looped! */
+    override fun moveTo(bearing: Double) {
+        // if your NPC should fly, override this
+        throw UnsupportedOperationException("Humans cannot fly :p")
+    }
+
+    /** fly toward arbitrary coord  WARNING: the map is looped! */
+    override fun moveTo(toX: Double, toY: Double) {
+        // if your NPC should fly, override this
+        throw UnsupportedOperationException("Humans cannot fly :p")
+    }
+
     var currentExecutionThread = Thread()
     var threadRun = false
 

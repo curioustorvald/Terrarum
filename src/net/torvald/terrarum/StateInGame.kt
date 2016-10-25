@@ -122,7 +122,7 @@ constructor() : BasicGameState() {
 
 
         // add new player and put it to actorContainer
-        playerWrapper = AnyPlayer(PBSigrid.create())
+        playerWrapper = AnyPlayer(PlayerBuilderSigrid.create())
         //player = PBCynthia.create()
         //player.setNoClip(true);
         addActor(player)

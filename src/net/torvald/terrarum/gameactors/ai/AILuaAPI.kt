@@ -1,9 +1,6 @@
 package net.torvald.terrarum.gameactors.ai
 
-import net.torvald.colourutil.CIELab
-import net.torvald.colourutil.CIELabUtil
-import net.torvald.colourutil.RGB
-import net.torvald.colourutil.toLab
+import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
@@ -19,12 +16,20 @@ import org.luaj.vm2.lib.ZeroArgFunction
 internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
 
     init {
+        if (actor !is AIControlled) throw IllegalArgumentException("The actor is not AIControlled! $actor")
+
         // load things. WARNING: THIS IS MANUAL!
         g["ai"] = LuaValue.tableOf()
         g["ai"]["getNearestActor"] = GetNearestActor()
         g["ai"]["getNearestPlayer"] = GetNearestPlayer()
         g["ai"]["getX"] = GetX(actor)
         g["ai"]["getY"] = GetY(actor)
+        g["ai"]["moveUp"] = MoveUp(actor)
+        g["ai"]["moveDown"] = MoveDown(actor)
+        g["ai"]["moveLeft"] = MoveLeft(actor)
+        g["ai"]["moveRight"] = MoveRight(actor)
+        g["ai"]["moveTo"] = MoveTo(actor)
+
     }
 
     companion object {
@@ -42,12 +47,13 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
             t["height"] = actor.hitbox.height
 
             val lumrgb: Int = actor.actorValue.getAsInt(AVKey.LUMINOSITY) ?: 0
+            val MUL_2 = LightmapRenderer.MUL_2
+            val MUL = LightmapRenderer.MUL
+            val CHMAX = LightmapRenderer.CHANNEL_MAX
             t["luminosity_rgb"] = lumrgb
-            t["luminosity"] = RGB( // perceived luminosity
-                    lumrgb.div(LightmapRenderer.MUL_2).mod(LightmapRenderer.MUL) / LightmapRenderer.CHANNEL_MAX_FLOAT,
-                    lumrgb.div(LightmapRenderer.MUL_2).mod(LightmapRenderer.MUL) / LightmapRenderer.CHANNEL_MAX_FLOAT,
-                    lumrgb.div(LightmapRenderer.MUL_2).mod(LightmapRenderer.MUL) / LightmapRenderer.CHANNEL_MAX_FLOAT
-            ).toLab().L.div(100.0)
+            t["luminosity"] = (lumrgb.div(MUL_2).and(CHMAX).times(3) +
+                              lumrgb.div(MUL).and(CHMAX).times(4) +
+                              lumrgb.and(1023)) / 8
 
             return t
         }
@@ -92,6 +98,46 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
     class GetY(val actor: ActorWithBody) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(actor.hitbox.centeredY)
+        }
+    }
+
+    class MoveLeft(val actor: AIControlled) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            actor.moveLeft()
+            return LuaValue.NONE
+        }
+    }
+
+    class MoveRight(val actor: AIControlled) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            actor.moveRight()
+            return LuaValue.NONE
+        }
+    }
+
+    class MoveUp(val actor: AIControlled) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            actor.moveUp()
+            return LuaValue.NONE
+        }
+    }
+
+    class MoveDown(val actor: AIControlled) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            actor.moveDown()
+            return LuaValue.NONE
+        }
+    }
+
+    class MoveTo(val actor: AIControlled) : LuaFunction() {
+        override fun call(bearing: LuaValue): LuaValue {
+            actor.moveTo(bearing.checkdouble())
+            return LuaValue.NONE
+        }
+
+        override fun call(toX: LuaValue, toY: LuaValue): LuaValue {
+            actor.moveTo(toX.checkdouble(), toY.checkdouble())
+            return LuaValue.NONE
         }
     }
 

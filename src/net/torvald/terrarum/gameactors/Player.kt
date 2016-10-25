@@ -29,7 +29,7 @@ class Player(born: GameDate) : ActorHumanoid(born) {
     internal val quickBarRegistration = IntArray(UIQuickBar.SLOT_COUNT, { -1 })
 
     companion object {
-        @Transient const val PLAYER_REF_ID: Int = 0x51621D
+        @Transient const val PLAYER_REF_ID: Int = 0x91A7E2
     }
 
     /**

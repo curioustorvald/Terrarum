@@ -1,4 +1,4 @@
-package net.torvald.terrarum.console
+package net.torvald.terrarum.gameactors
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
@@ -120,15 +120,45 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     @Transient private val AXIS_POSMAX = 1.0f
     @Transient private val GAMEPAD_JUMP = 7
 
+    protected var isUpDown = false
+    protected var isDownDown = false
+    protected var isLeftDown = false
+    protected var isRightDown = false
+    protected var isJumpDown = false
+    protected val isGamer: Boolean
+        get() = this is Player
+
 
     override fun update(gc: GameContainer, delta: Int) {
         super.update(gc, delta)
+
+        // don't put this into keyPressed; execution order is important!
+        updateGamerControlBox(gc.input)
 
         updateMovementControl()
         updateSprite(delta)
 
         if (noClip) {
             grounded = true
+        }
+
+        // reset control box of AI
+        if (!isGamer) {
+            isUpDown = false
+            isDownDown = false
+            isLeftDown = false
+            isRightDown = false
+            isJumpDown = false
+        }
+    }
+
+    private fun updateGamerControlBox(input: Input) {
+        if (isGamer) {
+            isUpDown = isFuncDown(input, EnumKeyFunc.MOVE_UP)
+            isLeftDown = isFuncDown(input, EnumKeyFunc.MOVE_LEFT)
+            isDownDown = isFuncDown(input, EnumKeyFunc.MOVE_DOWN)
+            isRightDown = isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)
+            isJumpDown = isFuncDown(input, EnumKeyFunc.JUMP)
         }
     }
 
@@ -145,7 +175,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     }
 
     override fun processInput(input: Input) {
-        if (Terrarum.hasController) {
+        if (isGamer && Terrarum.hasController) {
             gamepad = Controllers.getController(0)
             axisX = gamepad!!.getAxisValue(0)
             axisY = gamepad!!.getAxisValue(1)
@@ -162,29 +192,27 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         /**
          * L-R stop
          */
-        if (Terrarum.hasController && !isWalkingH) {
+        if (isGamer && Terrarum.hasController && !isWalkingH) {
             if (axisX == 0f) {
                 walkHStop()
             }
         }
         // ↑F, ↑S
-        if (isWalkingH && !isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+        if (isWalkingH && !isLeftDown && !isRightDown) {
             walkHStop()
             prevHMoveKey = KEY_NULL
         }
         /**
          * U-D stop
          */
-        if (Terrarum.hasController) {
+        if (isGamer && Terrarum.hasController) {
             if (axisY == 0f) {
                 walkVStop()
             }
         }
         // ↑E
         // ↑D
-        if (isNoClip()
-            && !isFuncDown(input, EnumKeyFunc.MOVE_UP)
-            && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+        if (isNoClip() && !isUpDown && !isDownDown) {
             walkVStop()
             prevVMoveKey = KEY_NULL
         }
@@ -193,21 +221,21 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
          * Left/Right movement
          */
 
-        if (Terrarum.hasController) {
+        if (isGamer && Terrarum.hasController) {
             if (axisX != 0f) {
                 walkHorizontal(axisX < 0f, axisX.abs())
             }
         }
         // ↑F, ↓S
-        if (isFuncDown(input, EnumKeyFunc.MOVE_RIGHT) && !isFuncDown(input, EnumKeyFunc.MOVE_LEFT)) {
+        if (isRightDown && !isLeftDown) {
             walkHorizontal(false, AXIS_POSMAX)
             prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
         } // ↓F, ↑S
-        else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && !isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+        else if (isLeftDown && !isRightDown) {
             walkHorizontal(true, AXIS_POSMAX)
             prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
         } // ↓F, ↓S
-        /*else if (isFuncDown(input, EnumKeyFunc.MOVE_LEFT) && isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)) {
+        /*else if (isLeftDown && isRightDown) {
                if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
                    walkHorizontal(false, AXIS_POSMAX)
                    prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
@@ -221,21 +249,21 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
          * Up/Down movement
          */
         if (noClip) {
-            if (Terrarum.hasController) {
+            if (isGamer && Terrarum.hasController) {
                 if (axisY != 0f) {
                     walkVertical(axisY < 0, axisY.abs())
                 }
             }
             // ↑E, ↓D
-            if (isFuncDown(input, EnumKeyFunc.MOVE_DOWN) && !isFuncDown(input, EnumKeyFunc.MOVE_UP)) {
+            if (isDownDown && !isUpDown) {
                 walkVertical(false, AXIS_POSMAX)
                 prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
             } // ↓E, ↑D
-            else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && !isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+            else if (isUpDown && !isDownDown) {
                 walkVertical(true, AXIS_POSMAX)
                 prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
             } // ↓E, ↓D
-            /*else if (isFuncDown(input, EnumKeyFunc.MOVE_UP) && isFuncDown(input, EnumKeyFunc.MOVE_DOWN)) {
+            /*else if (isUpDown && isDownDown) {
                 if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
                     walkVertical(false, AXIS_POSMAX)
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
@@ -249,7 +277,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         /**
          * Jump control
          */
-        if (isFuncDown(input, EnumKeyFunc.JUMP) || Terrarum.hasController && gamepad!!.isButtonPressed(GAMEPAD_JUMP)) {
+        if (isJumpDown || isGamer && Terrarum.hasController && gamepad!!.isButtonPressed(GAMEPAD_JUMP)) {
             if (!noClip) {
                 if (grounded) {
                     jumping = true
@@ -365,53 +393,12 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     // stops; let the friction kick in by doing nothing to the velocity here
     private fun walkHStop() {
-        /*if (veloX > 0) {
-            veloX -= actorValue.getAsDouble(AVKey.ACCEL)!! *
-                    actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                    Math.sqrt(scale)
-
-            // compensate overshoot
-            if (veloX < 0) veloX = 0f
-        } else if (veloX < 0) {
-            veloX += actorValue.getAsDouble(AVKey.ACCEL)!! *
-                    actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                    Math.sqrt(scale)
-
-            // compensate overshoot
-            if (veloX > 0) veloX = 0f
-        } else {
-            veloX = 0f
-        }*/
-
-        //veloX = 0f
-
         walkCounterX = 0
         isWalkingH = false
     }
 
     // stops; let the friction kick in by doing nothing to the velocity here
     private fun walkVStop() {
-        /*if (veloY > 0) {
-            veloY -= WALK_STOP_ACCEL *
-                    actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                    Math.sqrt(scale)
-
-            // compensate overshoot
-            if (veloY < 0)
-                veloY = 0f
-        } else if (veloY < 0) {
-            veloY += WALK_STOP_ACCEL *
-                    actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                    Math.sqrt(scale)
-
-            // compensate overshoot
-            if (veloY > 0) veloY = 0f
-        } else {
-            veloY = 0f
-        }*/
-
-        ///veloY = 0f
-
         walkCounterY = 0
         isWalkingV = false
     }
@@ -436,27 +423,27 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         }
 
         if (jumping) {
-            // increment jump counter
-            if (jumpCounter < len) jumpCounter += 1
+            if (isGamer) { // jump power increases as the gamer hits JUMP longer time
+                // increment jump counter
+                if (jumpCounter < len) jumpCounter += 1
 
-            // linear time mode
-            val init = (len + 1) / 2.0
-            var timedJumpCharge = init - init / len * jumpCounter
-            if (timedJumpCharge < 0) timedJumpCharge = 0.0
+                // linear time mode
+                val init = (len + 1) / 2.0
+                var timedJumpCharge = init - init / len * jumpCounter
+                if (timedJumpCharge < 0) timedJumpCharge = 0.0
 
-            // one that uses jumpFunc(x)
-            //val timedJumpCharge = jumpFunc(jumpCounter)
+                // one that uses jumpFunc(x)
+                //val timedJumpCharge = jumpFunc(jumpCounter)
 
-            jumpAcc = -pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
+                jumpAcc = -pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
 
-            applyForce(Vector2(0.0, jumpAcc))
+                applyForce(Vector2(0.0, jumpAcc))
+            }
+            else { // no such minute control for AIs
+                //veloY -= pwr * Math.sqrt(scale)
+                jumpAcc = -pwr * Math.sqrt(scale)
+            }
         }
-
-        // for mob ai:
-        //super.setVeloY(veloY
-        //        -
-        //        pwr * Math.sqrt(scale)
-        //);
     }
 
     private fun isFuncDown(input: Input, fn: EnumKeyFunc): Boolean {

@@ -7,7 +7,7 @@ import net.torvald.terrarum.mapdrawer.MapDrawer
 /**
  * Created by minjaesong on 16-03-25.
  */
-object PBCynthia {
+object PlayerBuilderCynthia {
 
     fun create(): Player {
         val p: Player = Player(GameDate(100, 143)) // random value thrown

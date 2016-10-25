@@ -14,10 +14,12 @@ import java.io.IOException
  * Created by minjaesong on 16-03-14.
  */
 
-object PBSigrid {
+object PlayerBuilderSigrid {
 
     fun create(): Player {
         val p = Player(GameDate(-2147483648, 0)) // XD
+
+        p.referenceID = 0x51621D // the only constant of this procedural universe
 
         p.sprite = SpriteAnimation()
         p.sprite!!.setDimension(28, 51)
