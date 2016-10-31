@@ -258,6 +258,9 @@ object WorldGenerator {
 
     /**
      * http://accidentalnoise.sourceforge.net/minecraftworlds.html
+     *
+     * TODO have it seamless
+     *      use MappingMode.SEAMLESS_XY ?
      */
     private fun raise3(): Array<BitSet> {
         val noiseMap = Array(HEIGHT, { BitSet(WIDTH) })

@@ -23,8 +23,8 @@ open class ActorWithBody : Actor(), Visible {
     override var referenceID: Int = generateUniqueReferenceID()
     override var actorValue: ActorValue = ActorValue()
 
-    @Transient var sprite: SpriteAnimation? = null
-    @Transient var spriteGlow: SpriteAnimation? = null
+    @Transient internal var sprite: SpriteAnimation? = null
+    @Transient internal var spriteGlow: SpriteAnimation? = null
 
     @Transient private val world: GameWorld = Terrarum.ingame.world
 
@@ -227,6 +227,16 @@ open class ActorWithBody : Actor(), Visible {
 
     init {
         // some initialiser goes here...
+    }
+
+    fun makeNewSprite(w: Int, h: Int) {
+        sprite = SpriteAnimation()
+        sprite!!.setDimension(w, h)
+    }
+
+    fun makeNewSpriteGlow(w: Int, h: Int) {
+        spriteGlow = SpriteAnimation()
+        spriteGlow!!.setDimension(w, h)
     }
 
     /**
@@ -1016,6 +1026,7 @@ fun Double.roundInt(): Int = Math.round(this).toInt()
 fun Float.roundInt(): Int = Math.round(this).toInt()
 fun Double.abs() = Math.abs(this)
 fun Double.sqr() = this * this
+fun Double.sqrt() = Math.sqrt(this)
 fun Int.abs() = if (this < 0) -this else this
 fun Double.bipolarClamp(limit: Double) =
         if      (this > 0 && this > limit)   limit

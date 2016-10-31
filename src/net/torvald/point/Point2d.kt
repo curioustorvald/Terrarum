@@ -1,5 +1,7 @@
 package net.torvald.point
 
+import net.torvald.terrarum.gameactors.sqr
+import net.torvald.terrarum.gameactors.sqrt
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -46,4 +48,6 @@ class Point2d(var x: Double, var y: Double) : Cloneable {
     operator fun div(other: Point2d) = Point2d(x / other.x, y / other.y)
 
     fun toVector() = Vector2(x, y)
+
+    fun length(other: Point2d) = ((this.x - other.x).sqr() + (this.y - other.y).sqr()).sqrt()
 }

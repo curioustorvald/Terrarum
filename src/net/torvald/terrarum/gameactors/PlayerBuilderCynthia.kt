@@ -17,8 +17,7 @@ object PlayerBuilderCynthia {
         p.actorValue["__selectedtile"] = 16
 
 
-        p.sprite = SpriteAnimation()
-        p.sprite!!.setDimension(26, 42)
+        p.makeNewSprite(26, 42)
         p.sprite!!.setSpriteImage("assets/graphics/sprites/test_player_2.png")
         p.sprite!!.setDelay(200)
         p.sprite!!.setRowsAndFrames(1, 1)
