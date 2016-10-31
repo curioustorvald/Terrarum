@@ -59,7 +59,7 @@ constructor() : BasicGameState() {
     lateinit var debugWindow: UIHandler
     lateinit var notifier: UIHandler
 
-    lateinit internal var playerWrapper: AnyPlayer
+    lateinit internal var playerWrapper: PossessedPlayerWrapper
     internal val player: ActorHumanoid // currently POSSESSED actor :)
         get() = playerWrapper.actor
 
@@ -126,7 +126,7 @@ constructor() : BasicGameState() {
 
 
         // add new player and put it to actorContainer
-        playerWrapper = AnyPlayer(PlayerBuilderSigrid.create())
+        playerWrapper = PossessedPlayerWrapper(PlayerBuilderSigrid.create())
         //player = PBCynthia.create()
         //player.setNoClip(true);
         addActor(player)
@@ -242,7 +242,7 @@ constructor() : BasicGameState() {
             changePossession(Player.PLAYER_REF_ID) // TODO completely other behaviour?
     }
 
-    private fun changePossession(newActor: AnyPlayer) {
+    private fun changePossession(newActor: PossessedPlayerWrapper) {
         if (!hasActor(player)) {
             throw IllegalArgumentException("No such actor in actorContainer: $newActor")
         }
@@ -256,7 +256,7 @@ constructor() : BasicGameState() {
             throw IllegalArgumentException("No such actor in actorContainer: $refid")
         }
 
-        playerWrapper = AnyPlayer(getActorByID(refid) as ActorHumanoid)
+        playerWrapper = PossessedPlayerWrapper(getActorByID(refid) as ActorHumanoid)
         WorldSimulator(world, player, UPDATE_DELTA)
     }
 
