@@ -120,22 +120,12 @@ constructor(val UI: UICanvas) {
             UIGraphicInstance.font = Terrarum.fontGame
 
             UI.render(gc, UIGraphicInstance)
-            if (sbg.currentStateID == Terrarum.STATE_ID_GAME) {
-                ingameGraphics.drawImage(UIDrawnCanvas.getScaledCopy(scale),
-                        posX + MapCamera.cameraX * Terrarum.ingame.screenZoom - (UI.width / 2f * scale.minus(1)),
-                        posY + MapCamera.cameraY * Terrarum.ingame.screenZoom - (UI.height / 2f * scale.minus(1)),
-                        Color(1f, 1f, 1f, opacity)
-                )// compensate for screenZoom AND camera translation
-                // (see Game.render -> g.translate())
-            }
-            else {
-                ingameGraphics.drawImage(UIDrawnCanvas.getScaledCopy(scale),
-                        posX.toFloat() - (UI.width / 2f * scale.minus(1)),
-                        posY.toFloat() - (UI.height / 2f * scale.minus(1)),
-                        Color(1f, 1f, 1f, opacity)
-                )
 
-            }
+            ingameGraphics.drawImage(UIDrawnCanvas.getScaledCopy(scale),
+                    posX.toFloat() - (UI.width / 2f * scale.minus(1)),
+                    posY.toFloat() - (UI.height / 2f * scale.minus(1)),
+                    Color(1f, 1f, 1f, opacity)
+            )
         }
     }
 

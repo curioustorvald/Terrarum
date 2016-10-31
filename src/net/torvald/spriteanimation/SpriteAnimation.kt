@@ -120,9 +120,6 @@ constructor() {
      * @param scale
      */
     @JvmOverloads fun render(g: Graphics, posX: Float, posY: Float, scale: Float = 1f) {
-        var scale = scale
-        scale *= Terrarum.ingame.screenZoom
-
         // Null checking
         if (currentImage == null) {
             currentImage = getScaledSprite(scale)
@@ -139,8 +136,8 @@ constructor() {
 
             flippedImage.startUse()
             flippedImage.drawEmbedded(
-                    Math.round(posX * Terrarum.ingame.screenZoom).toFloat(),
-                    FastMath.floor(posY * Terrarum.ingame.screenZoom).toFloat(),
+                    Math.round(posX).toFloat(),
+                    FastMath.floor(posY).toFloat(),
                     FastMath.floor(width * scale).toFloat(),
                     FastMath.floor(height * scale).toFloat()
             )
