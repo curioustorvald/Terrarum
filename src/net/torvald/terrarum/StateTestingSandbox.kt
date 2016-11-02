@@ -4,6 +4,7 @@ package net.torvald.terrarum
 import com.jme3.math.FastMath
 import net.torvald.point.Point2d
 import net.torvald.random.HQRNG
+import net.torvald.random.TileableValueNoise
 import net.torvald.terrarum.gameactors.floorInt
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.virtualcomputer.terminal.ALException
@@ -28,29 +29,57 @@ import javax.sound.sampled.AudioSystem
  */
 class StateTestingSandbox : BasicGameState() {
 
-
-    override fun init(container: GameContainer?, game: StateBasedGame?) {
-    }
-
     val lightning_start = Point2d(50.0, 200.0)
     val lightning_end = Point2d(750.0, 200.0)
 
-    val bolt = LightingBolt(lightning_start, lightning_end, 20)
+    val bolt = LightingBolt(lightning_start, lightning_end, 50)
+
+    val noiseGen = TileableValueNoise(12, 0.5f, 128)
+
+    override fun init(container: GameContainer?, game: StateBasedGame?) {
+        noiseGen.generate(seed)
+    }
 
     override fun update(container: GameContainer?, game: StateBasedGame?, delta: Int) {
-
     }
 
     override fun getID() = Terrarum.STATE_ID_TEST_SHIT
+
+
+    private var regenTime = 17
+    private var seed = 1L
 
     override fun render(container: GameContainer, game: StateBasedGame, g: Graphics) {
         g.color = Color.white
         g.lineWidth = 3f
 
         //g.drawLine(lightning_start, lightning_end)
-        bolt.draw(g)
+        //bolt.draw(g)
+
+
+        val amp = 60f
+        val xoff = 10f
+        val yoff = 300f
+
+        for (x in noiseGen.width downTo 1) {
+            val pStart = noiseGen[x] * amp + yoff
+            val pEnd = noiseGen[x - 1] * amp + yoff
+            val step = 6
+
+            g.drawLine((noiseGen.width - x) * step + xoff, pStart,
+                    (noiseGen.width - x +1) * step + xoff, pEnd)
+        }
+
+        g.color = Color.red
+        g.lineWidth = 1f
+
+        g.drawLine(xoff, yoff, xoff + noiseGen.width * 6, yoff)
+
     }
 
+    override fun keyPressed(key: Int, c: Char) {
+        if (c == ' ') noiseGen.generate(++seed)
+    }
 }
 
 fun Graphics.drawLine(p1: Point2d, p2: Point2d) {
