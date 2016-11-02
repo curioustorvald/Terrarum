@@ -68,6 +68,9 @@ class StateTestingSandbox : BasicGameState() {
         //g.drawLine(lightning_start, lightning_end)
         //bolt.draw(g)
 
+        // TODO rotational transformmation for the points
+        // (newX, newY) = (x cos(theta) - y sin(theta), x sin(theta) + y cos(theta))
+
 
         val ampY = 40f
         val ampX = 3
