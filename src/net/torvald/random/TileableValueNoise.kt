@@ -36,7 +36,7 @@ class TileableValueNoise(
         octaveLoop@ for (octcnt in 0..octaves - 1) { // 1, 2, 3, 4, ...
             val i = octavesIntStream[octcnt] // 1, 2, 4, 8, ...
             // octave 1 samples four points
-            val samples = 4 * i
+            val samples = 8 * i
             val amp = FastMath.pow(persistency, octcnt.toFloat()) // 1/1, 1/2, 1/3, 1/4, ...
             var pointThis = 0f
             var pointNext = rng.nextBipolarFloat()
@@ -69,7 +69,7 @@ class TileableValueNoise(
                 }
             }
             catch (e: ArithmeticException) {
-                println("[TileableValueNoise] division by zero error occured, aborting further octave iteration.")
+                //println("[TileableValueNoise] division by zero error occured, aborting further octave iteration.")
                 break@octaveLoop
             } // division by zero; which means octave value was too high
         }

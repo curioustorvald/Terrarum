@@ -2,6 +2,7 @@ package net.torvald.terrarum
 
 
 import com.jme3.math.FastMath
+import net.torvald.colourutil.ColourTemp
 import net.torvald.point.Point2d
 import net.torvald.random.HQRNG
 import net.torvald.random.TileableValueNoise
@@ -29,56 +30,74 @@ import javax.sound.sampled.AudioSystem
  */
 class StateTestingSandbox : BasicGameState() {
 
-    val lightning_start = Point2d(50.0, 200.0)
-    val lightning_end = Point2d(750.0, 200.0)
+    val lightning_start = Point2d(50.0, 100.0)
+    val lightning_end = Point2d(750.0, 300.0)
 
     val bolt = LightingBolt(lightning_start, lightning_end, 50)
 
-    val noiseGen = TileableValueNoise(6, 0.4f, 128)
 
     override fun init(container: GameContainer?, game: StateBasedGame?) {
-        noiseGen.generate(seed)
+        reseed(genOnly = true)
     }
 
     override fun update(container: GameContainer?, game: StateBasedGame?, delta: Int) {
+        /*timer += delta
+        if (timer > regenTime) {
+            timer -= regenTime
+            reseed()
+        }*/
     }
 
     override fun getID() = Terrarum.STATE_ID_TEST_SHIT
 
 
+    private var timer = 0
     private var regenTime = 17
+
     private var seed = 1L
 
+    val samples = 256
+
+    val lightningXgen = TileableValueNoise(8, 0.67f, samples)
+    val lightningYgen = TileableValueNoise(8, 0.36f, samples)
+
     override fun render(container: GameContainer, game: StateBasedGame, g: Graphics) {
-        g.color = Color.white
+        g.color = ColourTemp(7500)
         g.lineWidth = 3f
 
         //g.drawLine(lightning_start, lightning_end)
         //bolt.draw(g)
 
 
-        val amp = 60f
+        val ampY = 40f
+        val ampX = 3
         val xoff = 10f
         val yoff = 300f
 
-        for (x in 0..noiseGen.width - 1) {
-            val pStart = noiseGen[x] * amp + yoff
-            val pEnd = noiseGen[x + 1] * amp + yoff
-            val step = 6
+        for (x in 0..lightningYgen.width - 1) {
+            val pXstart = (x     + lightningXgen[x    ]) * ampX + xoff
+            val pXend =   (x + 1 + lightningXgen[x + 1]) * ampX + xoff
+            val pYstart = lightningYgen[x    ] * ampY + yoff
+            val pYend =   lightningYgen[x + 1] * ampY + yoff
 
-            g.drawLine(x  * step + xoff, pStart,
-                    (x+1) * step + xoff, pEnd)
+            g.drawLine(pXstart, pYstart, pXend, pYend)
         }
 
         g.color = Color.red
         g.lineWidth = 1f
 
-        g.drawLine(xoff, yoff, xoff + noiseGen.width * 6, yoff)
+        g.drawLine(xoff, yoff, xoff + lightningYgen.width * ampX, yoff)
 
     }
 
     override fun keyPressed(key: Int, c: Char) {
-        if (c == ' ') noiseGen.generate(++seed)
+        if (c == ' ') reseed()
+    }
+
+    private fun reseed(genOnly: Boolean = false) {
+        if (!genOnly) seed = System.nanoTime()
+        lightningXgen.generate(0x51621DL xor seed)
+        lightningYgen.generate(seed)
     }
 }
 
