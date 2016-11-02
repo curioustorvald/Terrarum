@@ -16,6 +16,11 @@ import java.util.*
 class TileableValueNoise(
         val octaves: Int, val persistency: Float, val width: Int) {
 
+    init {
+        // FIXME wow, such primitive!
+        if (!FastMath.isPowerOfTwo(width)) throw Error("width is not power of two!")
+    }
+
     private val noiseData = Array<Float>(width + 1, { 0f })
     private var noiseGenerated = false
 
@@ -25,41 +30,48 @@ class TileableValueNoise(
         // initialise
         Arrays.fill(noiseData, 0f)
 
+        val octavesIntStream = Array(octaves, { 1.shl(it) }) // array of (1, 2, 4, 8, ...)
 
-        for (i in 1..octaves) {
+
+        octaveLoop@ for (octcnt in 0..octaves - 1) { // 1, 2, 3, 4, ...
+            val i = octavesIntStream[octcnt] // 1, 2, 4, 8, ...
             // octave 1 samples four points
             val samples = 4 * i
-            val amp = FastMath.pow(persistency, (i - 1).toFloat())
-
+            val amp = FastMath.pow(persistency, octcnt.toFloat()) // 1/1, 1/2, 1/3, 1/4, ...
             var pointThis = 0f
             var pointNext = rng.nextBipolarFloat()
             var pointLoop = pointThis
 
+            try {
+                for (x in 0..width) {
+                    val thisSampleStart: Int = // 0-256 -> 0-4 -> 0-256(qnt)
+                            (x / width.toFloat() * samples).floorInt() * (width / samples)
+                    val nextSampleStart: Int =
+                            (x / width.toFloat() * samples).floorInt().plus(1) * (width / samples)
+                    val stepWithinWindow: Int = x % (nextSampleStart - thisSampleStart)
+                    val windowScale: Float = stepWithinWindow.toFloat() / (width / samples)
 
-            for (x in 0..width) {
-                val thisSampleStart: Int = // 0-256 -> 0-4 -> 0-256(qnt)
-                        (x / width.toFloat() * samples).floorInt() * (width / samples)
-                val nextSampleStart: Int =
-                        (x / width.toFloat() * samples).floorInt().plus(1) * (width / samples)
-                val stepWithinWindow: Int = x % (width / samples)
-                val windowScale: Float = stepWithinWindow.toFloat() / (width / samples)
+                    // next pair of points
+                    if (stepWithinWindow == 0 && x > 0) {
+                        pointThis = pointNext
+                        pointNext = if (nextSampleStart >= width) pointLoop else rng.nextBipolarFloat()
+                    }
 
-                // next pair of points
-                if (stepWithinWindow == 0 && x > 0) {
-                    pointThis = pointNext
-                    pointNext = if (nextSampleStart >= width) pointLoop else rng.nextBipolarFloat()
-                }
 
-                
-                // additive mix
-                val noiseValue = FastMath.interpolateLinear(windowScale, pointThis, pointNext) * amp
-                noiseData[x] += noiseValue
-                
+                    // additive mix
+                    val noiseValue = FastMath.interpolateLinear(windowScale, pointThis, pointNext) * amp
+                    noiseData[x] += noiseValue
 
-                /*println("x: $x\tstart: $thisSampleStart\tnext: $nextSampleStart\t" +
+
+                    /*println("x: $x\tstart: $thisSampleStart\tnext: $nextSampleStart\t" +
                         "window: $stepWithinWindow\t" +
                         "pThis: $pointThis\tpNext: $pointNext\tvalue: $noiseValue")*/
+                }
             }
+            catch (e: ArithmeticException) {
+                println("[TileableValueNoise] division by zero error occured, aborting further octave iteration.")
+                break@octaveLoop
+            } // division by zero; which means octave value was too high
         }
 
         for (x in 0..width - 1) {

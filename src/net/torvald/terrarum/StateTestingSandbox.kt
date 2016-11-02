@@ -34,7 +34,7 @@ class StateTestingSandbox : BasicGameState() {
 
     val bolt = LightingBolt(lightning_start, lightning_end, 50)
 
-    val noiseGen = TileableValueNoise(12, 0.5f, 128)
+    val noiseGen = TileableValueNoise(6, 0.4f, 128)
 
     override fun init(container: GameContainer?, game: StateBasedGame?) {
         noiseGen.generate(seed)
@@ -61,13 +61,13 @@ class StateTestingSandbox : BasicGameState() {
         val xoff = 10f
         val yoff = 300f
 
-        for (x in noiseGen.width downTo 1) {
+        for (x in 0..noiseGen.width - 1) {
             val pStart = noiseGen[x] * amp + yoff
-            val pEnd = noiseGen[x - 1] * amp + yoff
+            val pEnd = noiseGen[x + 1] * amp + yoff
             val step = 6
 
-            g.drawLine((noiseGen.width - x) * step + xoff, pStart,
-                    (noiseGen.width - x +1) * step + xoff, pEnd)
+            g.drawLine(x  * step + xoff, pStart,
+                    (x+1) * step + xoff, pEnd)
         }
 
         g.color = Color.red
