@@ -14,11 +14,13 @@ import java.util.*
  * Created by minjaesong on 16-10-28.
  */
 class TileableValueNoise(
-        val octaves: Int, val persistency: Float, val width: Int) {
+        val octaves: Int, val persistency: Float, val width: Int, val initSamples: Int = 4) {
 
     init {
         // FIXME wow, such primitive!
         if (!FastMath.isPowerOfTwo(width)) throw Error("width is not power of two!")
+        if (!FastMath.isPowerOfTwo(initSamples)) throw Error("initSamples is not power of two!")
+        if (initSamples < 2) throw Error("initSamples must be equal to or greater than 2, and power of two!")
     }
 
     private val noiseData = Array<Float>(width + 1, { 0f })
@@ -36,7 +38,7 @@ class TileableValueNoise(
         octaveLoop@ for (octcnt in 0..octaves - 1) { // 1, 2, 3, 4, ...
             val i = octavesIntStream[octcnt] // 1, 2, 4, 8, ...
             // octave 1 samples four points
-            val samples = 8 * i
+            val samples = initSamples * i
             val amp = FastMath.pow(persistency, octcnt.toFloat()) // 1/1, 1/2, 1/3, 1/4, ...
             var pointThis = 0f
             var pointNext = rng.nextBipolarFloat()

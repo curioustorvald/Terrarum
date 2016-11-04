@@ -54,12 +54,12 @@ class StateTestingSandbox : BasicGameState() {
     private var timer = 0
     private var regenTime = 17
 
-    private var seed = 1L
+    private var seed = System.nanoTime()
 
-    val samples = 256
+    val samples = 128
 
-    val lightningXgen = TileableValueNoise(8, 0.67f, samples)
-    val lightningYgen = TileableValueNoise(8, 0.36f, samples)
+    val lightningXgen = TileableValueNoise(8, 0.67f, samples, 8)
+    val lightningYgen = TileableValueNoise(8, 0.58f, samples, 4)
 
     override fun render(container: GameContainer, game: StateBasedGame, g: Graphics) {
         g.color = ColourTemp(7500)
@@ -73,7 +73,7 @@ class StateTestingSandbox : BasicGameState() {
 
 
         val ampY = 40f
-        val ampX = 3
+        val ampX = 6
         val xoff = 10f
         val yoff = 300f
 
