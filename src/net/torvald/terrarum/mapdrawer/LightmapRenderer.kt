@@ -6,7 +6,7 @@ import net.torvald.terrarum.tileproperties.TilePropCodex
 import com.jme3.math.FastMath
 import net.torvald.colourutil.RGB
 import net.torvald.colourutil.CIELuvUtil.additiveLuv
-import net.torvald.terrarum.gameactors.Visible
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.tileproperties.TileNameCode
 import net.torvald.terrarum.tileproperties.TilePropUtil
 import org.newdawn.slick.Color
@@ -175,7 +175,7 @@ object LightmapRenderer {
         // scan for luminous actors and store their lighting info to the lanterns
         lanternMap.clear()
         Terrarum.ingame.actorContainer.forEach { it ->
-            if (it is Luminous && it is Visible) {
+            if (it is Luminous && it is ActorWithBody) {
                 // put lanterns to the area the luminantBox is occupying
                 for (lightBox in it.lightBoxList) {
                     val lightBoxX = it.hitbox.posX + lightBox.posX

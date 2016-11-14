@@ -46,6 +46,12 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
             t["width"] = actor.hitbox.width
             t["height"] = actor.hitbox.height
 
+            t["mass"] = actor.mass
+
+            t["collision_type"] = actor.collisionType
+
+            t["strength"] = actor.actorValue.getAsInt(AVKey.STRENGTH) ?: 0
+
             val lumrgb: Int = actor.actorValue.getAsInt(AVKey.LUMINOSITY) ?: 0
             val MUL_2 = LightmapRenderer.MUL_2
             val MUL = LightmapRenderer.MUL
@@ -53,7 +59,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
             t["luminosity_rgb"] = lumrgb
             t["luminosity"] = (lumrgb.div(MUL_2).and(CHMAX).times(3) +
                               lumrgb.div(MUL).and(CHMAX).times(4) +
-                              lumrgb.and(1023)) / 8
+                              lumrgb.and(1023)) / 8 // quick luminosity calculation
 
             return t
         }

@@ -18,13 +18,15 @@ import org.newdawn.slick.Graphics
  *
  * Created by minjaesong on 16-01-13.
  */
-open class ActorWithBody : Actor(), Visible {
+open class ActorWithBody : Actor() {
 
     override var referenceID: Int = generateUniqueReferenceID()
     override var actorValue: ActorValue = ActorValue()
 
     @Transient internal var sprite: SpriteAnimation? = null
     @Transient internal var spriteGlow: SpriteAnimation? = null
+
+    internal var drawMode: DrawMode = DrawMode.NORMAL
 
     @Transient private val world: GameWorld = Terrarum.ingame.world
 
@@ -39,7 +41,7 @@ open class ActorWithBody : Actor(), Visible {
      * * Unit: pixel
      * !! external class should not hitbox.set(); use setHitboxDimension() and setPosition()
      */
-    override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)       // Hitbox is implemented using Double;
+    val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)       // Hitbox is implemented using Double;
     @Transient val nextHitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // 52 mantissas ought to be enough for anybody...
 
     /**
@@ -898,7 +900,7 @@ open class ActorWithBody : Actor(), Visible {
 
     private fun updateHitbox() = hitbox.reassign(nextHitbox)
 
-    override fun drawGlow(gc: GameContainer, g: Graphics) {
+    open fun drawGlow(gc: GameContainer, g: Graphics) {
         if (isVisible && spriteGlow != null) {
             if (!sprite!!.flippedHorizontal()) {
                 spriteGlow!!.render(g,
@@ -916,8 +918,14 @@ open class ActorWithBody : Actor(), Visible {
         }
     }
 
-    override fun drawBody(gc: GameContainer, g: Graphics) {
+    open fun drawBody(gc: GameContainer, g: Graphics) {
         if (isVisible && sprite != null) {
+            when (drawMode) {
+                DrawMode.NORMAL -> blendNormal()
+                DrawMode.MULTIPLY -> blendMul()
+                DrawMode.SCREEN -> blendScreen()
+            }
+
             if (!sprite!!.flippedHorizontal()) {
                 sprite!!.render(g,
                         (hitbox.posX - hitboxTranslateX * scale).toFloat(),
@@ -934,11 +942,11 @@ open class ActorWithBody : Actor(), Visible {
         }
     }
 
-    override fun updateGlowSprite(gc: GameContainer, delta: Int) {
+    open fun updateGlowSprite(gc: GameContainer, delta: Int) {
         if (spriteGlow != null) spriteGlow!!.update(delta)
     }
 
-    override fun updateBodySprite(gc: GameContainer, delta: Int) {
+    open fun updateBodySprite(gc: GameContainer, delta: Int) {
         if (sprite != null) sprite!!.update(delta)
     }
 
@@ -1048,3 +1056,7 @@ fun absMax(left: Double, right: Double): Double {
 }
 fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
 fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0
+
+enum class DrawMode {
+    NORMAL, SCREEN, MULTIPLY
+}

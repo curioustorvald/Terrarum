@@ -299,7 +299,7 @@ constructor() : BasicGameState() {
         // draw actors //
         /////////////////
         actorContainer.forEach { actor ->
-            if (actor is Visible && actor.inScreen() && actor !is Player) { // if echo and within screen
+            if (actor is ActorWithBody && actor.inScreen() && actor !is Player) { // if echo and within screen
                 actor.drawBody(gc, actorsDrawFrameBuffer.graphics)
             }
         }
@@ -327,7 +327,7 @@ constructor() : BasicGameState() {
         // draw actor glows //
         //////////////////////
         actorContainer.forEach { actor ->
-            if (actor is Visible && actor.inScreen() && actor !is Player) { // if echo and within screen
+            if (actor is ActorWithBody && actor.inScreen() && actor !is Player) { // if echo and within screen
                 actor.drawGlow(gc, actorsDrawFrameBuffer.graphics)
             }
         }
@@ -340,7 +340,7 @@ constructor() : BasicGameState() {
         // draw reference ID if debugWindow is open
         if (debugWindow.isVisible) {
             actorContainer.forEachIndexed { i, actor ->
-                if (actor is Visible) {
+                if (actor is ActorWithBody) {
                     actorsDrawFrameBuffer.graphics.color = Color.white
                     actorsDrawFrameBuffer.graphics.font = Terrarum.fontSmallNumbers
                     actorsDrawFrameBuffer.graphics.drawString(
@@ -463,7 +463,7 @@ constructor() : BasicGameState() {
         while (i < actorContainerSize) { // loop through actorContainerInactive
             val actor = actorContainerInactive[i]
             val actorIndex = i
-            if (actor is Visible && actor.inUpdateRange()) {
+            if (actor is ActorWithBody && actor.inUpdateRange()) {
                 addActor(actor) // duplicates are checked here
                 actorContainerInactive.removeAt(actorIndex)
                 actorContainerSize -= 1
@@ -491,7 +491,7 @@ constructor() : BasicGameState() {
                 i-- // array removed 1 elem, so we also decrement counter by 1
             }
             // inactivate distant actors
-            else if (actor is Visible && !actor.inUpdateRange()) {
+            else if (actor is ActorWithBody && !actor.inUpdateRange()) {
                 if (actor !is Projectile) { // if it's a projectile, just kill it.
                     actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
                 }
@@ -533,14 +533,14 @@ constructor() : BasicGameState() {
 
     fun Double.sqr() = this * this
     fun Int.sqr() = this * this
-    private fun distToActorSqr(a: Visible, p: ActorWithBody): Double =
+    private fun distToActorSqr(a: ActorWithBody, p: ActorWithBody): Double =
             (a.hitbox.centeredX - p.hitbox.centeredX).sqr() + (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
     /** whether the actor is within screen */
-    private fun Visible.inScreen() = distToActorSqr(this, player) <=
+    private fun ActorWithBody.inScreen() = distToActorSqr(this, player) <=
                                      (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr() +
                                       Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr())
     /** whether the actor is within update range */
-    private fun Visible.inUpdateRange() = distToActorSqr(this, player) <= ACTOR_UPDATE_RANGE.sqr()
+    private fun ActorWithBody.inUpdateRange() = distToActorSqr(this, player) <= ACTOR_UPDATE_RANGE.sqr()
     /**
      * actorContainer extensions
      */
