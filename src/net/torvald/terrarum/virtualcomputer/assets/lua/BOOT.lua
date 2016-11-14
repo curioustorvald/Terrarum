@@ -1045,33 +1045,14 @@ require("ROMLIB")
 speaker.enqueue(80, computer.bellpitch) -- term.bell sometimes get squelched
 
 -- load bios, if any
-if fs.exists(computer.bootloader) then fs.dofile(computer.bootloader) end
+--if fs.exists(computer.bootloader) then fs.dofile(computer.bootloader) end
 
 -- halt/run luaprompt upon the termination of bios.
 -- Valid BIOS should load OS and modify 'shell.status' to 'shell.halt' before terminating itself.
 if shell.status == shell.halt then __haltsystemexplicit__() goto quit end
 
 -- load Lua prompt, if bios is not found
-print("Rom basic "..DC2.._VERSION..DC4)
-print("Lua is copyrighted (C) 1994-2013 Lua.org, PUC-Rio")
-print()
-
-while not machine.isHalted() do
-    term.setCursorBlink(true)
-    io.write(computer.prompt)
-    local s = __scanforline__()
-    xpcall(
-        function()
-            if s:byte(1) == 61 then -- print out value
-                s1 = string.sub(s, 2)
-                _G.runscript("print(tostring("..s1.."))\n", "=stdin")
-            else
-                _G.runscript(s, "=stdin")
-            end
-        end,
-        function(err) print(DLE..err) end -- it catches logical errors
-    )
-end
+dofile "/net/torvald/terrarum/virtualcomputer/assets/lua/TBASIC.lua"
 
 ::quit::
 machine.closeInputString()
