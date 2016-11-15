@@ -86,7 +86,16 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         fontGame = GameFontWhite()
         fontSmallNumbers = TinyAlphNum()
 
-        hasController = gc.input.controllerCount > 0
+        try {
+            hasController = gc.input.controllerCount > 0
+
+            // check if the first controller is actually available
+            Controllers.getController(0).getAxisValue(0)
+        }
+        catch (e: ArrayIndexOutOfBoundsException) {
+            hasController = false
+        }
+
         if (hasController) {
             for (c in 0..Controllers.getController(0).axisCount - 1) {
                 Controllers.getController(0).setDeadZone(c, CONTROLLER_DEADZONE)
@@ -140,12 +149,14 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         lateinit var ingame: StateInGame
         lateinit var gameConfig: GameConfig
 
-        lateinit var OSName: String
+        lateinit var OSName: String // System.getProperty("os.name")
             private set
-        lateinit var OSVersion: String
+        lateinit var OSVersion: String // System.getProperty("os.version")
             private set
-        lateinit var OperationSystem: String
+        lateinit var OperationSystem: String // all caps "WINDOWS, "OSX", "LINUX", "SOLARIS", "UNKNOWN"
             private set
+        val isWin81: Boolean
+            get() = OperationSystem == "WINDOWS" && OSVersion.toDouble() >= 8.1
         lateinit var defaultDir: String
             private set
         lateinit var defaultSaveDir: String
@@ -296,6 +307,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
             defaultSaveDir = defaultDir + "/Saves"
             configDir = defaultDir + "/config.json"
+
+            println("os.name: '$OSName'")
+            println("os.version: '$OSVersion'")
         }
 
         private fun createDirs() {

@@ -229,7 +229,9 @@ constructor() : BasicGameState() {
         /////////////////////////
         // app-related updates //
         /////////////////////////
-        Terrarum.appgc.setVSync(Terrarum.appgc.fps >= Terrarum.VSYNC_TRIGGER_THRESHOLD)
+        if (!Terrarum.isWin81) {
+            Terrarum.appgc.setVSync(Terrarum.appgc.fps >= Terrarum.VSYNC_TRIGGER_THRESHOLD) // windows 10 has some trouble with this...
+        }
 
         // determine if lightmap blending should be done
         Terrarum.gameConfig["smoothlighting"] = KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH)
