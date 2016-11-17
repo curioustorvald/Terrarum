@@ -1,7 +1,6 @@
 package net.torvald.terrarum.mapgenerator
 
 import net.torvald.random.HQRNG
-import com.sun.javaws.exceptions.InvalidArgumentException
 
 import java.util.Random
 

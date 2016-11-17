@@ -89,8 +89,10 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         try {
             hasController = gc.input.controllerCount > 0
 
-            // check if the first controller is actually available
-            Controllers.getController(0).getAxisValue(0)
+            if (hasController) {
+                // check if the first controller is actually available
+                Controllers.getController(0).getAxisValue(0)
+            }
         }
         catch (e: ArrayIndexOutOfBoundsException) {
             hasController = false

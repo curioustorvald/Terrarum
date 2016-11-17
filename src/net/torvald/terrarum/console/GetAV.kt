@@ -1,6 +1,5 @@
 package net.torvald.terrarum.console
 
-import com.sun.javaws.exceptions.InvalidArgumentException
 import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.Terrarum
 
