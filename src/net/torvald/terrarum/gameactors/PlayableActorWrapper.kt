@@ -9,7 +9,7 @@ import org.newdawn.slick.Input
  * @param actor : here you 'snap in' the actor you wish to control
  * Created by minjaesong on 16-10-23.
  */
-class PossessedPlayerWrapper(val actor: ActorHumanoid) {
+class PlayableActorWrapper(val actor: ActorHumanoid) {
 
     init {
         if (actor !is Controllable)

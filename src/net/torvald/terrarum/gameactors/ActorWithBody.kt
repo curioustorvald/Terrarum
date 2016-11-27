@@ -172,7 +172,7 @@ open class ActorWithBody : Actor() {
     @Transient private val gravitation: Vector2 = world.gravitation
     @Transient val DRAG_COEFF_DEFAULT = 1.2
     /** Drag coefficient. Parachutes have much higher value than bare body (1.2) */
-    private var DRAG_COEFF: Double
+    var dragCoefficient: Double
         get() = actorValue.getAsDouble(AVKey.DRAGCOEFF) ?: DRAG_COEFF_DEFAULT
         set(value) {
             if (value < 0)
@@ -424,7 +424,7 @@ open class ActorWithBody : Actor() {
              * Drag of atmosphere
              * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity sqr) * A (area)
              */
-            val D: Vector2 = Vector2(veloX.magnSqr(), veloY.magnSqr()) * DRAG_COEFF * 0.5 * A// * tileDensityFluid.toDouble()
+            val D: Vector2 = Vector2(veloX.magnSqr(), veloY.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
 
             val V: Vector2 = (W - D) / mass * SI_TO_GAME_ACC
 
