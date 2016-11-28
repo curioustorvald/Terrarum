@@ -39,10 +39,10 @@ open class ProjectileSimple(
      */
     override val lightBoxList = ArrayList<Hitbox>()
 
-    val lifetimeMax = 2500
-    var lifetimeCounter = 0
+    private val lifetimeMax = 2500
+    private var lifetimeCounter = 0
 
-    val posPre: Point2d
+    private val posPre: Point2d
 
     init {
         setPosition(fromPoint.x, fromPoint.y)
