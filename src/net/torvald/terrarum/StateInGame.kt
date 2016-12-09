@@ -275,8 +275,6 @@ constructor() : BasicGameState() {
         actorsDrawFrameBuffer.graphics.clear()
         uisDrawFrameBuffer.graphics.clear()
 
-
-        gwin.isAntiAlias = true
         blendNormal()
 
 

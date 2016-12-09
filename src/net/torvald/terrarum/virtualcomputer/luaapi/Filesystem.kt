@@ -56,7 +56,7 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
                 throw IOException("path contains invalid characters")
         }
 
-        val isCaseInsensitive: Boolean
+        var isCaseInsensitive: Boolean
 
         init {
             try {

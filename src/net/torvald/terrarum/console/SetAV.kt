@@ -27,7 +27,7 @@ internal class SetAV : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         fun parseAVInput(arg: String): Any {
-            val `val`: Any
+            var `val`: Any
 
             try {
                 `val` = Integer(arg) // try for integer
