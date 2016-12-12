@@ -55,7 +55,7 @@ object PlayerBuilderSigrid {
 
         p.actorValue[AVKey.INTELLIGENT] = true
 
-        p.actorValue[AVKey.LUMINOSITY] = 0//95487100
+        p.actorValue[AVKey.LUMINOSITY] = 95487100
 
         p.actorValue[AVKey.BASEDEFENCE] = 141
 
@@ -70,6 +70,14 @@ object PlayerBuilderSigrid {
         p.setPosition((4096 * MapDrawer.TILE_SIZE).toDouble(), (300 * 16).toDouble())
 
         p.faction.add(FactionFactory.create("FactionSigrid.json"))
+
+
+
+        // Test fill up inventory
+
+
+
+
 
         return p
     }

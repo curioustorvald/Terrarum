@@ -18,7 +18,7 @@ class CodexEdictis : ConsoleCommand {
         }
         else {
             try {
-                val commandObj = CommandDict.get(args[1].toLowerCase())
+                val commandObj = CommandDict[args[1].toLowerCase()]
                 commandObj.printUsage()
             }
             catch (e: NullPointerException) {
