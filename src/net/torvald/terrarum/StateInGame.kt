@@ -1,6 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.imagefont.GameFontBase
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.audio.AudioResourceLibrary
 import net.torvald.terrarum.concurrent.ThreadPool
 import net.torvald.terrarum.gameactors.ActorHumanoid
@@ -59,9 +60,9 @@ constructor() : BasicGameState() {
     lateinit var debugWindow: UIHandler
     lateinit var notifier: UIHandler
 
-    lateinit internal var playableActorWrapper: PlayableActorWrapper
+    lateinit internal var playableActorDelegate: PlayableActorDelegate
     internal val player: ActorHumanoid // currently POSSESSED actor :)
-        get() = playableActorWrapper.actor
+        get() = playableActorDelegate.actor
 
     //private var GRADIENT_IMAGE: Image? = null
     //private var skyBox: Rectangle? = null
@@ -74,9 +75,8 @@ constructor() : BasicGameState() {
     val actorsDrawFrameBuffer = Image(Terrarum.WIDTH, Terrarum.HEIGHT)
     val uisDrawFrameBuffer = Image(Terrarum.WIDTH, Terrarum.HEIGHT)
 
-    private lateinit var shader12BitCol: Shader
-    private lateinit var shaderBlurH: Shader
-    private lateinit var shaderBlurV: Shader
+    //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
+    //private lateinit var shaderBlur: Shader
 
     private val useShader: Boolean = false
     private val shaderProgram = 0
@@ -107,9 +107,8 @@ constructor() : BasicGameState() {
     override fun enter(gc: GameContainer, sbg: StateBasedGame) {
         // load things when the game entered this "state"
         // load necessary shaders
-        shader12BitCol = Shader.makeShader("./assets/4096.vrt", "./assets/4096.frg")
-        shaderBlurH = Shader.makeShader("./assets/blurH.vrt", "./assets/blur.frg")
-        shaderBlurV = Shader.makeShader("./assets/blurV.vrt", "./assets/blur.frg")
+        //shader12BitCol = Shader.makeShader("./assets/4096.vert", "./assets/4096.frag")
+        //shaderBlur = Shader.makeShader("./assets/blur.vert", "./assets/blur.frag")
 
         // init map as chosen size
         world = GameWorld(8192, 2048)
@@ -117,16 +116,15 @@ constructor() : BasicGameState() {
         // generate terrain for the map
         WorldGenerator.attachMap(world)
         WorldGenerator.SEED = 0x51621D2
-        //mapgenerator.setSeed(new HQRNG().nextLong());
+        //WorldGenerator.SEED = HQRNG().nextLong()
         WorldGenerator.generateMap()
 
 
-        RoguelikeRandomiser.seed = 0x540198
-        //RoguelikeRandomiser.setSeed(new HQRNG().nextLong());
+        RoguelikeRandomiser.seed = HQRNG().nextLong()
 
 
         // add new player and put it to actorContainer
-        playableActorWrapper = PlayableActorWrapper(PlayerBuilderSigrid.create())
+        playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid.create())
         //player = PBCynthia.create()
         //player.setNoClip(true);
         addActor(player)
@@ -244,12 +242,12 @@ constructor() : BasicGameState() {
             changePossession(Player.PLAYER_REF_ID) // TODO completely other behaviour?
     }
 
-    private fun changePossession(newActor: PlayableActorWrapper) {
+    private fun changePossession(newActor: PlayableActorDelegate) {
         if (!hasActor(player)) {
             throw IllegalArgumentException("No such actor in actorContainer: $newActor")
         }
 
-        playableActorWrapper = newActor
+        playableActorDelegate = newActor
         WorldSimulator(world, player, UPDATE_DELTA)
     }
 
@@ -258,7 +256,7 @@ constructor() : BasicGameState() {
             throw IllegalArgumentException("No such actor in actorContainer: $refid")
         }
 
-        playableActorWrapper = PlayableActorWrapper(getActorByID(refid) as ActorHumanoid)
+        playableActorDelegate = PlayableActorDelegate(getActorByID(refid) as ActorHumanoid)
         WorldSimulator(world, player, UPDATE_DELTA)
     }
 
