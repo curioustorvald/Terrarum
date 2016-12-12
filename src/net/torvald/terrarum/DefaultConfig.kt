@@ -55,6 +55,8 @@ object DefaultConfig {
         jsonObject.addProperty("keyquicksel", Key.CAPS_LOCK) // pie menu
         val keyquickselalt = JsonArray(); keyquickselalt.add(Key.BACKSPACE); keyquickselalt.add(Key.L_COMMAND); keyquickselalt.add(Key.L_CONTROL)
         // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command
+        // so these keys are treated as the same.
+        // FOR ~~FUCKS~~ERGONOMICS' SAKE DON'T USE CTRL AND ALT AS A KEY!
         jsonObject.add("keyquickselalt", keyquickselalt)
 
         jsonObject.addProperty("keyjump", Key.SPACE)

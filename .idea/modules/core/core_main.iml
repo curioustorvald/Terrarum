@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":core:main" external.linked.project.path="$MODULE_DIR$/../../../core" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="terrarum_renewed" external.system.module.type="sourceSet" external.system.module.version="1.0" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/../../../core/build/classes/main" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../core/src">
+      <sourceFolder url="file://$MODULE_DIR$/../../../core/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../core/src/main/kotlin" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../core/src/main/resources" type="java-resource" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Gradle: com.badlogicgames.gdx:gdx:1.9.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.0.5-2" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-runtime:1.0.5-2" level="project" />
+  </component>
+</module>

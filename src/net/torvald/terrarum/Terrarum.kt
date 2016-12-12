@@ -38,13 +38,13 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         joypadLabelStart = when (getConfigString("joypadlabelstyle")) {
             "nwii"     -> 0xE04B.toChar() // + mark
             "logitech" -> 0xE05A.toChar() // number 10
-            else       -> 0xE042.toChar() // > mark (sonyps, msxb360, generic)
+            else       -> 0xE042.toChar() // |> mark (sonyps, msxb360, generic)
         }
         joypadLableSelect = when (getConfigString("joypadlabelstyle")) {
             "nwii"     -> 0xE04D.toChar() // - mark
             "logitech" -> 0xE059.toChar() // number 9
             "sonyps"   -> 0xE043.toChar() // solid rectangle
-            "msxb360"  -> 0xE041.toChar() // < mark
+            "msxb360"  -> 0xE041.toChar() // <| mark
             else       -> 0xE043.toChar() // solid rectangle
         }
 
@@ -142,7 +142,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         lateinit var appgc: AppGameContainer
 
         var WIDTH =  1072
-        var HEIGHT = 742 // IMAX ratio
+        var HEIGHT = 742 // IMAX ratiso
         var VSYNC = true
         val VSYNC_TRIGGER_THRESHOLD = 56
 
