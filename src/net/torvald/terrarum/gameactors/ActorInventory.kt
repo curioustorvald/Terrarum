@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameactors
 
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemPropCodex
 import java.util.*
@@ -21,7 +22,7 @@ class ActorInventory() {
     private var capacityMode: Int
 
     /**
-     * HashMap&lt;ReferenceID, Amounts&gt;
+     * HashMap<ReferenceID, Amounts>
      */
     private val itemList: HashMap<Int, Int> = HashMap()
 
@@ -78,6 +79,8 @@ class ActorInventory() {
         return itemList
     }
 
+    fun forEach(consumer: (Int, Int) -> Unit) = itemList.forEach(consumer)
+
     /**
      * Get clone of the itemList
      * @return
@@ -97,6 +100,9 @@ class ActorInventory() {
         return weight
     }
 
+    /**
+     * Real amount
+     */
     fun getTotalCount(): Int {
         var count = 0
 
@@ -107,26 +113,26 @@ class ActorInventory() {
         return count
     }
 
+    /**
+     * Unique amount, multiple items are calculated as one
+     */
     fun getTotalUniqueCount(): Int {
         return itemList.entries.size
     }
 
-    fun appendToPocket(item: InventoryItem) {
-        appendToPocket(item, 1)
+    fun add(item: InventoryItem) {
+        add(item, 1)
     }
 
-    fun appendToPocket(item: InventoryItem, count: Int) {
+    fun add(item: InventoryItem, count: Int) {
         val key = item.itemID
 
-        // if (key == Player.PLAYER_REF_ID)
-        //     throw new IllegalArgumentException("Attempted to put player into the inventory.");
+        if (key == Player.PLAYER_REF_ID || key == Terrarum.ingame.player.referenceID)
+            throw IllegalArgumentException("Attempted to put active player or human player into the inventory.")
 
-        if (itemList.containsKey(key))
-        // increment amount if it already has specified item
-            itemList.put(key, itemList[key]!! + count)
-        else
-        // add new entry if it does not have specified item
-            itemList.put(key, count)
+        // If we already have the item, increment the amount
+        // If not, add item with specified amount
+        itemList.put(key, itemList[key] ?: 0 + count)
     }
 
     /**

@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.gameitem.InventoryItemAdapter
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
@@ -39,7 +40,7 @@ open class HumanoidNPC(aiFile: String, born: GameDate) : ActorHumanoid(born), AI
     }
 
     // we're having InventoryItem data so that this class could be somewhat universal
-    override var itemData: InventoryItem = object : InventoryItem {
+    override var itemData: InventoryItem = object : InventoryItemAdapter() {
         override var itemID = referenceID
 
         override var mass: Double
@@ -54,29 +55,8 @@ open class HumanoidNPC(aiFile: String, born: GameDate) : ActorHumanoid(born), AI
                 actorValue[AVKey.SCALE] = value
             }
 
-        override fun effectWhileInPocket(gc: GameContainer, delta: Int) {
-
-        }
-
-        override fun effectWhenPickedUp(gc: GameContainer, delta: Int) {
-
-        }
-
-        override fun primaryUse(gc: GameContainer, delta: Int) {
-            // TODO do not allow primary_use
-        }
-
         override fun secondaryUse(gc: GameContainer, delta: Int) {
             // TODO place this Actor to the world
-        }
-
-        override fun effectWhenThrown(gc: GameContainer, delta: Int) {
-        }
-
-        override fun effectWhenTakenOut(gc: GameContainer, delta: Int) {
-        }
-
-        override fun worldActorEffect(gc: GameContainer, delta: Int) {
         }
     }
 

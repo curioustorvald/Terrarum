@@ -5,7 +5,11 @@ import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.CanBeAnItem
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameitem.InventoryItemAdapter
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.tileproperties.TileProp
+import net.torvald.terrarum.tileproperties.TilePropCodex
+import org.apache.commons.csv.CSVRecord
 import org.newdawn.slick.GameContainer
 import java.util.*
 
@@ -14,23 +18,39 @@ import java.util.*
  */
 object ItemPropCodex {
 
-    val CSV_PATH = "./src/com/torvald/terrarum/itemproperties/itemprop.csv"
-
     /**
      * <ItemID or RefID for Actor, TheItem>
      * Will return corresponding Actor if ID >= 16777216
      */
-    private val itemCodex = ArrayList<InventoryItem>()
+    private val itemCodex = HashMap<Int, InventoryItem>()
     private val dynamicItemDescription = HashMap<Int, KVHashMap>()
 
-    val ITEM_TILE_MAX = GameWorld.TILES_SUPPORTED
+    val ITEM_TILE_MAX = GameWorld.TILES_SUPPORTED - 1 // 4095
     val ITEM_COUNT_MAX = 16777216
     val ITEM_DYNAMIC_MAX = ITEM_COUNT_MAX - 1
     val ITEM_STATIC_MAX = 32767
     val ITEM_DYNAMIC_MIN = ITEM_STATIC_MAX + 1
-    val ITEM_STATIC_MIN = ITEM_TILE_MAX
+    val ITEM_STATIC_MIN = ITEM_TILE_MAX + 1 // 4096
 
     init {
+        // tile items
+        for (i in 0..ITEM_TILE_MAX) {
+            itemCodex[i] = object : InventoryItemAdapter() {
+                override val itemID: Int = i
+                override var mass: Double = TilePropCodex.getProp(i).density / 1000.0
+                // no need to set setter as scale would not change
+                override var scale: Double = 1.0
+
+                override fun primaryUse(gc: GameContainer, delta: Int) {
+                    // TODO base punch attack
+                }
+
+                override fun secondaryUse(gc: GameContainer, delta: Int) {
+                    // TODO place block to the world
+                }
+            }
+        }
+
         // read prop in csv and fill itemCodex
 
         // read from save (if applicable) and fill dynamicItemDescription
@@ -38,7 +58,7 @@ object ItemPropCodex {
 
     fun getProp(code: Int): InventoryItem {
         if (code < ITEM_STATIC_MAX) // generic item
-            return itemCodex[code] // from CSV
+            return itemCodex[code]!! // from CSV
         else if (code < ITEM_DYNAMIC_MAX) {
             TODO("read from dynamicitem description (JSON)")
         }

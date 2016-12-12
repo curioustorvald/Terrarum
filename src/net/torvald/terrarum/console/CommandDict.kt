@@ -40,6 +40,7 @@ object CommandDict {
             Pair("seed", Seed()),
             Pair("testgetlight", TestGetLight()),
             Pair("println", EchoConsole()),
+            Pair("inventory", Inventory()),
 
             // Test codes
             Pair("bulletintest", SetBulletin()),
