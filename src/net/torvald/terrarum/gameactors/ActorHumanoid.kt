@@ -6,6 +6,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
+import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.realestate.RealEstateUtility
 import org.dyn4j.geometry.Vector2
 import org.lwjgl.input.Controller
@@ -24,6 +25,12 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory = ActorInventory()
+
+    override var itemHolding: InventoryItem
+        get() = throw TODO("itemHolding")
+        set(value) {
+            throw TODO("itemHolding")
+        }
 
     /** Must be set by PlayerFactory */
     override var faction: HashSet<Faction> = HashSet()
@@ -126,7 +133,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     protected var isRightDown = false
     protected var isJumpDown = false
     protected val isGamer: Boolean
-        get() = this is Player
+        get() = this is Player // FIXME true iff composed by PlayableActorDelegate
 
 
     override fun update(gc: GameContainer, delta: Int) {
@@ -174,7 +181,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         }
     }
 
-    override fun processInput(input: Input) {
+    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
         if (isGamer && Terrarum.hasController) {
             gamepad = Controllers.getController(0)
             axisX = gamepad!!.getAxisValue(0)
@@ -187,6 +194,24 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             if (Math.abs(axisY) < Terrarum.CONTROLLER_DEADZONE) axisY = 0f
             if (Math.abs(axisRX) < Terrarum.CONTROLLER_DEADZONE) axisRX = 0f
             if (Math.abs(axisRY) < Terrarum.CONTROLLER_DEADZONE) axisRY = 0f
+        }
+
+        ///////////////////
+        // MOUSE CONTROL //
+        ///////////////////
+        // PRIMARY/SECONDARY IS FIXED TO LEFT/RIGHT BUTTON //
+
+        /**
+         * Primary Use
+         */
+        // Left mouse
+        if (isGamer && input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+            itemHolding.primaryUse(gc, delta)
+        }
+
+        // Right mouse
+        if (isGamer && input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
+            itemHolding.secondaryUse(gc, delta)
         }
 
         /**

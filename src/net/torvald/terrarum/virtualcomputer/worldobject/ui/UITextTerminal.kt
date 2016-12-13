@@ -61,7 +61,7 @@ class UITextTerminal(val terminal: Terminal) : UICanvas, KeyboardControlled, Mou
         terminal.render(gc, terminalDisplay.graphics)
     }
 
-    override fun processInput(input: Input) {
+    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
     }
 
     /**

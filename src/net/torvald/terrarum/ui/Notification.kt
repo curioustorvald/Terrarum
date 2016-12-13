@@ -67,7 +67,7 @@ constructor() : UICanvas {
         handler!!.opacity = 0f
     }
 
-    override fun processInput(input: Input) {
+    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
     }
 
     fun sendNotification(message: Array<String>) {

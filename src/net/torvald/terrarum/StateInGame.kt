@@ -188,8 +188,8 @@ constructor() : BasicGameState() {
         ///////////////////////////
         // input-related updates //
         ///////////////////////////
-        GameController.processInput(gc.input)
-        uiContainer.forEach { it.processInput(gc.input) }
+        GameController.processInput(gc, delta, gc.input)
+        uiContainer.forEach { it.processInput(gc, delta, gc.input) }
 
 
         ////////////////////////////

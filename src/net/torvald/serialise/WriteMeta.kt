@@ -5,6 +5,7 @@ import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.itemproperties.ItemPropCodex
 import net.torvald.terrarum.itemproperties.MaterialPropCodex
+import net.torvald.terrarum.tileproperties.TilePropCSV
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.FileInputStream
@@ -42,24 +43,17 @@ object WriteMeta {
         val savenameAsByteArray: ByteArray =
                 (savegameName ?: saveDirectoryName).toByteArray(Charsets.UTF_8)
 
-        // define files to get hash
-        val fileArray: Array<File> = arrayOf(
-                File(TilePropCodex.CSV_PATH)
-                , File(ItemPropCodex.CSV_PATH)
-                , File(MaterialPropCodex.CSV_PATH)
-                //,
+        // define Strings to be hashed
+        val props = arrayOf(
+                TilePropCSV.text
+                //, (item, mat, ...)
         )
 
-        // get and store hash from fileArray
-        for (file in fileArray) {
-            val inputStream = FileInputStream(file)
-            val hash = DigestUtils.sha256(inputStream)
-
-            hashArray.add(hash)
-        }
+        // get and store hash from the list
+        props.map { hashArray.add(DigestUtils.sha256(it)) }
 
         // open file and delete it
-        val metaPath = Paths.get("${Terrarum.defaultSaveDir}" +
+        val metaPath = Paths.get("$Terrarum.defaultSaveDir" +
                                        "/$saveDirectoryName/$META_FILENAME")
         val metaTempPath = Files.createTempFile(metaPath.toString(), "_temp")
 

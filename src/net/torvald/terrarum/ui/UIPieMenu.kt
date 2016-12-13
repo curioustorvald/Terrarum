@@ -68,7 +68,7 @@ class UIPieMenu : UICanvas {
         }
     }
 
-    override fun processInput(input: Input) {
+    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
         if (handler!!.isOpened || handler!!.isOpening) {
             val cursorPos = Vector2(input.mouseX.toDouble(), input.mouseY.toDouble())
             val centre = Vector2(Terrarum.WIDTH / 2.0, Terrarum.HEIGHT / 2.0)

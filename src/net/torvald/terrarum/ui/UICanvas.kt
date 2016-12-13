@@ -28,7 +28,7 @@ interface UICanvas {
 
     fun render(gc: GameContainer, g: Graphics)
 
-    fun processInput(input: Input)
+    fun processInput(gc: GameContainer, delta: Int, input: Input)
 
     /**
      * Do not modify handler!!.openCloseCounter here.

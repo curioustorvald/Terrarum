@@ -40,7 +40,7 @@ class BasicDebugInfoWindow : UICanvas {
     val ccR = GameFontBase.colToCode["r"]
     val ccM = GameFontBase.colToCode["m"]
 
-    override fun processInput(input: Input) {
+    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
 
     }
 

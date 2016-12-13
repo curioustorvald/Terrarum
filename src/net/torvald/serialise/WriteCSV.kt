@@ -20,9 +20,9 @@ object WriteCSV {
     val META_FILENAME_MAT = "worldinfo4"
 
     fun write(saveDirectoryName: String): Boolean {
-        val tileCSV = CSVFetcher.readCSVasString(TilePropCodex.CSV_PATH)
-        val itemCSV = CSVFetcher.readCSVasString(ItemPropCodex.CSV_PATH)
-        val matCSV = CSVFetcher.readCSVasString(MaterialPropCodex.CSV_PATH)
+        //val tileCSV = CSVFetcher.readCSVasString(TilePropCodex.CSV_PATH)
+        //val itemCSV = CSVFetcher.readCSVasString(ItemPropCodex.CSV_PATH)
+        //val matCSV = CSVFetcher.readCSVasString(MaterialPropCodex.CSV_PATH)
 
         val pathTile = Paths.get("${Terrarum.defaultSaveDir}" +
                                        "/$saveDirectoryName/${META_FILENAME_TILE}")
@@ -37,9 +37,9 @@ object WriteCSV {
         // TODO gzip
 
         // write CSV to path
-        Files.write(tempPathTile, tileCSV.toByteArray(Charsets.UTF_8))
-        Files.write(tempPathItem, itemCSV.toByteArray(Charsets.UTF_8))
-        Files.write(tempPathMat, matCSV.toByteArray(Charsets.UTF_8))
+        //Files.write(tempPathTile, tileCSV.toByteArray(Charsets.UTF_8))
+        //Files.write(tempPathItem, itemCSV.toByteArray(Charsets.UTF_8))
+        //Files.write(tempPathMat, matCSV.toByteArray(Charsets.UTF_8))
 
         // replace savemeta with tempfile
         try {

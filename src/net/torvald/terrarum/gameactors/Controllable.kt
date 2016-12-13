@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import org.dyn4j.geometry.Vector2
+import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
 
 /**
@@ -10,7 +11,7 @@ import org.newdawn.slick.Input
  */
 interface Controllable {
 
-    fun processInput(input: Input)
+    fun processInput(gc: GameContainer, delta: Int, input: Input)
 
     fun keyPressed(key: Int, c: Char)
 
