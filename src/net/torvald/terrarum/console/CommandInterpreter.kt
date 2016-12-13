@@ -33,7 +33,7 @@ object CommandInterpreter {
 
     fun execute(command: String) {
         val cmd: Array<CommandInput?> = parse(command)
-        val echo = Echo()
+
         val error = Error()
 
         for (single_command in cmd) {
@@ -46,7 +46,7 @@ object CommandInterpreter {
                     commandObj = CommandDict[single_command.name.toLowerCase()]
                 }
                 else {
-                    if (Terrarum.ingame.auth.b()) {
+                    if (Authenticator.b()) {
                         commandObj = CommandDict[single_command.name.toLowerCase()]
                     }
                     else {
@@ -59,7 +59,7 @@ object CommandInterpreter {
 
             }
             finally {
-                echo.execute("$ccW> $single_command") // prints out the input
+                Echo.execute("$ccW> $single_command") // prints out the input
                 println("${ZonedDateTime.now()} [CommandInterpreter] issuing command '$single_command'")
                 try {
                     if (commandObj != null) {
@@ -73,7 +73,7 @@ object CommandInterpreter {
                 catch (e: Exception) {
                     System.err.print("[CommandInterpreter] ")
                     e.printStackTrace()
-                    error.execute(Lang["ERROR_GENERIC_TEXT"])
+                    Error.execute(Lang["ERROR_GENERIC_TEXT"])
                 }
 
             }
@@ -115,7 +115,7 @@ object CommandInterpreter {
         val sb = StringBuilder()
         val formatter = Formatter(sb)
 
-        Error().execute(
+        Error.execute(
                 formatter.format(Lang["DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN"], cmdname).toString())
     }
 

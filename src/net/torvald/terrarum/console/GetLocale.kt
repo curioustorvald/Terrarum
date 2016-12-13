@@ -6,9 +6,9 @@ import net.torvald.terrarum.Terrarum
 /**
  * Created by minjaesong on 16-01-22.
  */
-class GetLocale : ConsoleCommand {
+internal object GetLocale : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        Echo().execute(
+        Echo.execute(
                 "Locale: "
                 + Lang["MENU_LANGUAGE_THIS"]
                 + " ("
@@ -17,8 +17,8 @@ class GetLocale : ConsoleCommand {
     }
 
     override fun printUsage() {
-        val echo = Echo()
-        echo.execute("Usage: getlocale")
-        echo.execute("Get name of locale currently using.")
+
+        Echo.execute("Usage: getlocale")
+        Echo.execute("Get name of locale currently using.")
     }
 }

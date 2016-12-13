@@ -7,7 +7,7 @@ import net.torvald.terrarum.Terrarum
 /**
  * Created by minjaesong on 16-01-15.
  */
-internal class SetAV : ConsoleCommand {
+internal object SetAV : ConsoleCommand {
 
     val ccW = GameFontBase.colToCode["w"]
     val ccG = GameFontBase.colToCode["g"]
@@ -16,13 +16,13 @@ internal class SetAV : ConsoleCommand {
     val ccM = GameFontBase.colToCode["m"]
 
     override fun printUsage() {
-        val echo = Echo()
-        echo.execute("${ccW}Set actor value of specific target to desired value.")
-        echo.execute("${ccW}Usage: ${ccY}setav ${ccG}(id) <av> <val>")
-        echo.execute("${ccW}blank ID for player. Data type will be inferred automatically.")
-        echo.execute("${ccR}Contaminated (e.g. double -> string) ActorValue will crash the game,")
-        echo.execute("${ccR}so make sure it will not happen before you issue the command!")
-        echo.execute("${ccW}Use ${ccG}__true ${ccW}and ${ccG}__false ${ccW}for boolean value.")
+
+        Echo.execute("${ccW}Set actor value of specific target to desired value.")
+        Echo.execute("${ccW}Usage: ${ccY}setav ${ccG}(id) <av> <val>")
+        Echo.execute("${ccW}blank ID for player. Data type will be inferred automatically.")
+        Echo.execute("${ccR}Contaminated (e.g. double -> string) ActorValue will crash the game,")
+        Echo.execute("${ccR}so make sure it will not happen before you issue the command!")
+        Echo.execute("${ccW}Use ${ccG}__true ${ccW}and ${ccG}__false ${ccW}for boolean value.")
     }
 
     override fun execute(args: Array<String>) {
@@ -53,7 +53,7 @@ internal class SetAV : ConsoleCommand {
             return `val`
         }
 
-        val echo = Echo()
+
         val error = Error()
 
         // setav <id, or blank for player> <av> <val>
@@ -65,13 +65,13 @@ internal class SetAV : ConsoleCommand {
 
             // check if av is number
             if (args[1].isNum()) {
-                error.execute("Illegal ActorValue ${args[1]}: ActorValue cannot be a number.")
+                Error.execute("Illegal ActorValue ${args[1]}: ActorValue cannot be a number.")
                 System.err.println("[SetAV] Illegal ActorValue ${args[1]}: ActorValue cannot be a number.")
                 return
             }
 
             Terrarum.ingame.player.actorValue[args[1]] = `val`
-            echo.execute("${ccW}Set $ccM${args[1]} ${ccW}for ${ccY}player ${ccW}to $ccG$`val`")
+            Echo.execute("${ccW}Set $ccM${args[1]} ${ccW}for ${ccY}player ${ccW}to $ccG$`val`")
             println("[SetAV] set ActorValue '${args[1]}' for player to '$`val`'.")
         }
         else if (args.size == 4) {
@@ -82,18 +82,18 @@ internal class SetAV : ConsoleCommand {
 
                 // check if av is number
                 if (args[2].isNum()) {
-                    error.execute("Illegal ActorValue ${args[2]}: ActorValue cannot be a number.")
+                    Error.execute("Illegal ActorValue ${args[2]}: ActorValue cannot be a number.")
                     System.err.println("[SetAV] Illegal ActorValue ${args[2]}: ActorValue cannot be a number.")
                     return
                 }
 
                 actor.actorValue[args[2]] = `val`
-                echo.execute("${ccW}Set $ccM${args[2]} ${ccW}for $ccY$id ${ccW}to $ccG$`val`")
+                Echo.execute("${ccW}Set $ccM${args[2]} ${ccW}for $ccY$id ${ccW}to $ccG$`val`")
                 println("[SetAV] set ActorValue '${args[2]}' for $actor to '$`val`'.")
             }
             catch (e: IllegalArgumentException) {
                 if (args.size == 4) {
-                    error.execute("${args[1]}: no actor with this ID.")
+                    Error.execute("${args[1]}: no actor with this ID.")
                     System.err.println("[SetAV] ${args[1]}: no actor with this ID.")
                 }
             }

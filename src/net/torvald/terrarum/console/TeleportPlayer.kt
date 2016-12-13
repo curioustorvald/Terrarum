@@ -7,7 +7,7 @@ import net.torvald.terrarum.Terrarum
 /**
  * Created by minjaesong on 16-01-24.
  */
-class TeleportPlayer : ConsoleCommand {
+internal object TeleportPlayer : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         if (args.size != 3) {
@@ -22,7 +22,7 @@ class TeleportPlayer : ConsoleCommand {
                 y = args[2].toInt() * MapDrawer.TILE_SIZE + MapDrawer.TILE_SIZE / 2
             }
             catch (e: NumberFormatException) {
-                Echo().execute("Wrong number input.")
+                Echo.execute("Wrong number input.")
                 return
             }
 
@@ -31,6 +31,6 @@ class TeleportPlayer : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo().execute("Usage: teleport [x-tile] [y-tile]")
+        Echo.execute("Usage: teleport [x-tile] [y-tile]")
     }
 }

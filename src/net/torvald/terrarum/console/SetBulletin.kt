@@ -7,7 +7,7 @@ import net.torvald.terrarum.ui.Notification
 /**
  * Created by minjaesong on 16-01-23.
  */
-class SetBulletin : ConsoleCommand {
+internal object SetBulletin : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val testMsg = arrayOf(
                 Lang["ERROR_SAVE_CORRUPTED"],

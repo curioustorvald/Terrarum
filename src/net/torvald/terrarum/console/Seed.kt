@@ -6,18 +6,18 @@ import net.torvald.terrarum.Terrarum
 /**
  * Created by minjaesong on 16-06-16.
  */
-class Seed : ConsoleCommand {
+internal object Seed : ConsoleCommand {
     val ccG = GameFontBase.colToCode["g"]
     val ccW = GameFontBase.colToCode["w"]
     val ccY = GameFontBase.colToCode["y"]
     //                                tsalagi
 
     override fun execute(args: Array<String>) {
-        Echo().execute("Map$ccW: $ccG${Terrarum.ingame.world.generatorSeed}")
+        Echo.execute("Map$ccW: $ccG${Terrarum.ingame.world.generatorSeed}")
         // TODO display randomiser seed
     }
 
     override fun printUsage() {
-        Echo().execute("prints out the generator seed of the current game.")
+        Echo.execute("prints out the generator seed of the current game.")
     }
 }

@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import net.torvald.gadgets.HistoryArray
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandInterpreter
 import net.torvald.terrarum.gamecontroller.Key
 import org.newdawn.slick.Color
@@ -171,7 +172,7 @@ class ConsoleWindow : UICanvas, KeyboardControlled {
         commandHistory = HistoryArray<String>(COMMAND_HISTORY_MAX)
         commandInputPool = StringBuilder()
 
-        if (Terrarum.ingame.auth.b()) {
+        if (Authenticator.b()) {
             sendMessage("${Terrarum.NAME} ${Terrarum.VERSION_STRING}")
             sendMessage(Lang["DEV_MESSAGE_CONSOLE_CODEX"])
         }

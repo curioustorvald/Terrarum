@@ -6,7 +6,7 @@ import net.torvald.terrarum.Terrarum
 /**
  * Created by minjaesong on 16-02-17.
  */
-class SetGlobalLightOverride : ConsoleCommand {
+internal object SetGlobalLightOverride : ConsoleCommand {
 
     var lightOverride = false
         private set
@@ -23,10 +23,10 @@ class SetGlobalLightOverride : ConsoleCommand {
                 Terrarum.ingame.world.globalLight = GL
             }
             catch (e: NumberFormatException) {
-                Echo().execute("Wrong number input.")
+                Echo.execute("Wrong number input.")
             }
             catch (e1: IllegalArgumentException) {
-                Echo().execute("Range: 0-" + LightmapRenderer.CHANNEL_MAX + " per channel")
+                Echo.execute("Range: 0-" + LightmapRenderer.CHANNEL_MAX + " per channel")
             }
 
         }
@@ -35,7 +35,7 @@ class SetGlobalLightOverride : ConsoleCommand {
                 val GL = args[1].toInt()
 
                 if (GL.toInt() < 0 || GL.toInt() >= LightmapRenderer.COLOUR_RANGE_SIZE) {
-                    Echo().execute("Range: 0-" + (LightmapRenderer.COLOUR_RANGE_SIZE - 1))
+                    Echo.execute("Range: 0-" + (LightmapRenderer.COLOUR_RANGE_SIZE - 1))
                 }
                 else {
                     Terrarum.ingame.world.globalLight = GL
@@ -45,7 +45,7 @@ class SetGlobalLightOverride : ConsoleCommand {
                 if (args[1].toLowerCase() == "none")
                     lightOverride = false
                 else
-                    Echo().execute("Wrong number input.")
+                    Echo.execute("Wrong number input.")
             }
 
         }
@@ -55,6 +55,6 @@ class SetGlobalLightOverride : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo().execute("Usage: setgl [raw_value|r g b|“none”]")
+        Echo.execute("Usage: setgl [raw_value|r g b|“none”]")
     }
 }

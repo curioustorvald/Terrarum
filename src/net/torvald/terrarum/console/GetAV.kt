@@ -6,7 +6,7 @@ import net.torvald.terrarum.Terrarum
 /**
  * Created by minjaesong on 16-01-19.
  */
-class GetAV : ConsoleCommand {
+internal object GetAV : ConsoleCommand {
 
     val ccW = GameFontBase.colToCode["w"]
     val ccG = GameFontBase.colToCode["g"]
@@ -16,19 +16,16 @@ class GetAV : ConsoleCommand {
     val ccO = GameFontBase.colToCode["o"]
 
     override fun execute(args: Array<String>) {
-        val echo = Echo()
-        val error = Error()
-
         try {
             if (args.size == 1) {
                 // print all actorvalue of player
                 val av = Terrarum.ingame.player.actorValue
                 val keyset = av.keySet
 
-                echo.execute("$ccW== ActorValue list for ${ccY}player $ccW==")
+                Echo.execute("$ccW== ActorValue list for ${ccY}player $ccW==")
                 println("[GetAV] == ActorValue list for 'player' ==")
                 keyset.forEach { elem ->
-                    echo.execute("$ccM$elem $ccW= $ccG${av[elem as String]}")
+                    Echo.execute("$ccM$elem $ccW= $ccG${av[elem as String]}")
                     println("[GetAV] $elem = ${av[elem]}")
                 }
             }
@@ -38,7 +35,7 @@ class GetAV : ConsoleCommand {
             else if (args.size == 2) {
                 // check if args[1] is number or not
                 if (!args[1].isNum()) { // args[1] is ActorValue name
-                    echo.execute("${ccW}player.$ccM${args[1]} $ccW= " +
+                    Echo.execute("${ccW}player.$ccM${args[1]} $ccW= " +
                                  ccG +
                                  Terrarum.ingame.player.actorValue[args[1]] +
                                  " $ccO" +
@@ -56,15 +53,15 @@ class GetAV : ConsoleCommand {
                     val av = actor.actorValue
                     val keyset = av.keySet
 
-                    echo.execute("$ccW== ActorValue list for $ccY$actor $ccW==")
+                    Echo.execute("$ccW== ActorValue list for $ccY$actor $ccW==")
                     println("[GetAV] == ActorValue list for '$actor' ==")
                     if (keyset.size == 0) {
-                        echo.execute("$ccK(nothing)")
+                        Echo.execute("$ccK(nothing)")
                         println("[GetAV] (nothing)")
                     }
                     else {
                         keyset.forEach { elem ->
-                            echo.execute("$ccM$elem $ccW= $ccG${av[elem as String]}")
+                            Echo.execute("$ccM$elem $ccW= $ccG${av[elem as String]}")
                             println("[GetAV] $elem = ${av[elem]}")
                         }
                     }
@@ -73,7 +70,7 @@ class GetAV : ConsoleCommand {
             else if (args.size == 3) {
                 val id = args[1].toInt()
                 val av = args[2]
-                echo.execute("$ccW$id.$ccM$av $ccW= $ccG" +
+                Echo.execute("$ccW$id.$ccM$av $ccW= $ccG" +
                              Terrarum.ingame.getActorByID(id).actorValue[av] +
                              " $ccO" +
                              Terrarum.ingame.getActorByID(id).actorValue[av]!!.javaClass.simpleName
@@ -87,11 +84,11 @@ class GetAV : ConsoleCommand {
         }
         catch (e: NullPointerException) {
             if (args.size == 2) {
-                error.execute(args[1] + ": actor value does not exist.")
+                Error.execute(args[1] + ": actor value does not exist.")
                 System.err.println("[GetAV] ${args[1]}: actor value does not exist.")
             }
             else if (args.size == 3) {
-                error.execute(args[2] + ": actor value does not exist.")
+                Error.execute(args[2] + ": actor value does not exist.")
                 System.err.println("[GetAV] ${args[2]}: actor value does not exist.")
             }
             else {
@@ -99,7 +96,7 @@ class GetAV : ConsoleCommand {
             }
         }
         catch (e1: IllegalArgumentException) {
-            error.execute("${args[1]}: no actor with this ID.")
+            Error.execute("${args[1]}: no actor with this ID.")
             System.err.println("[GetAV] ${args[1]}: no actor with this ID.")
         }
 
@@ -116,9 +113,8 @@ class GetAV : ConsoleCommand {
     }
 
     override fun printUsage() {
-        val echo = Echo()
-        echo.execute("${ccW}Get desired ActorValue of specific target.")
-        echo.execute("${ccW}Usage: ${ccY}getav ${ccG}(id) <av>")
-        echo.execute("${ccW}blank ID for player")
+        Echo.execute("${ccW}Get desired ActorValue of specific target.")
+        Echo.execute("${ccW}Usage: ${ccY}getav ${ccG}(id) <av>")
+        Echo.execute("${ccW}blank ID for player")
     }
 }

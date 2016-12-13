@@ -9,7 +9,7 @@ import java.util.Arrays
 /**
  * Created by minjaesong on 16-01-16.
  */
-internal class Echo : ConsoleCommand {
+internal object Echo : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val argsWoHeader = Array<String>(args.size - 1, {it -> args[it + 1]})
         argsWoHeader.forEach { execute(it) }

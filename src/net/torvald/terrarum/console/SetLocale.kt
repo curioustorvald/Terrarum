@@ -11,25 +11,25 @@ import java.io.IOException
 /**
  * Created by minjaesong on 16-01-25.
  */
-class SetLocale : ConsoleCommand {
+internal object SetLocale : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             val prevLocale = Terrarum.gameLocale
             Terrarum.gameLocale = args[1]
             try {
-                Echo().execute("Set locale to '" + Terrarum.gameLocale + "'.")
+                Echo.execute("Set locale to '" + Terrarum.gameLocale + "'.")
             }
             catch (e: IOException) {
-                Echo().execute("could not read lang file.")
+                Echo.execute("could not read lang file.")
                 Terrarum.gameLocale = prevLocale
             }
 
         }
         else if (args.size == 1) {
-            val echo = Echo()
-            echo.execute("Locales:")
 
-            Lang.languageList.forEach { echo.execute("--> $it") }
+            Echo.execute("Locales:")
+
+            Lang.languageList.forEach { Echo.execute("--> $it") }
         }
         else {
             printUsage()
@@ -37,6 +37,6 @@ class SetLocale : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo().execute("Usage: setlocale [locale]")
+        Echo.execute("Usage: setlocale [locale]")
     }
 }
