@@ -6,14 +6,14 @@ import net.torvald.terrarum.langpack.Lang
 /**
  * Created by minjaesong on 16-04-23.
  */
-class Version : ConsoleCommand {
+internal object Version : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        val echo = Echo()
-        echo.execute("${Terrarum.NAME} ${Terrarum.VERSION_STRING}")
-        echo.execute("Polyglot language pack version ${Lang.POLYGLOT_VERSION}")
+
+        Echo.execute("${Terrarum.NAME} ${Terrarum.VERSION_STRING}")
+        Echo.execute("Polyglot language pack version ${Lang.POLYGLOT_VERSION}")
     }
 
     override fun printUsage() {
-        Echo().execute("Prints out current version of the application")
+        Echo.execute("Prints out current version of the application")
     }
 }

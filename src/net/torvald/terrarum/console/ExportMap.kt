@@ -11,7 +11,7 @@ import java.util.HashMap
 /**
  * Created by minjaesong on 16-01-17.
  */
-class ExportMap : ConsoleCommand {
+internal object ExportMap : ConsoleCommand {
 
     //private var mapData: ByteArray? = null
     // private var mapDataPointer = 0
@@ -45,11 +45,11 @@ class ExportMap : ConsoleCommand {
             try {
                 RasterWriter.writePNG_RGB(
                         Terrarum.ingame.world.width, Terrarum.ingame.world.height, mapData, dir + args[1] + ".png")
-                Echo().execute("ExportMap: exported to " + args[1] + ".png")
+                Echo.execute("ExportMap: exported to " + args[1] + ".png")
 
             }
             catch (e: IOException) {
-                Echo().execute("ExportMap: IOException raised.")
+                Echo.execute("ExportMap: IOException raised.")
                 e.printStackTrace()
             }
 
@@ -65,10 +65,10 @@ class ExportMap : ConsoleCommand {
     }
 
     override fun printUsage() {
-        val echo = Echo()
-        echo.execute("Usage: export <name>")
-        echo.execute("Exports current map into echo image.")
-        echo.execute("The image can be found at %adddata%/terrarum/Exports")
+
+        Echo.execute("Usage: export <name>")
+        Echo.execute("Exports current map into echo image.")
+        Echo.execute("The image can be found at %adddata%/terrarum/Exports")
     }
 
     private fun buildColorTable() {

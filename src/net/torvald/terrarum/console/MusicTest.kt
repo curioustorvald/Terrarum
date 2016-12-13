@@ -7,7 +7,7 @@ import java.io.File
 /**
  * Created by minjaesong on 16-08-02.
  */
-class MusicTest : ConsoleCommand {
+internal object MusicTest : ConsoleCommand {
 
     var music: Music? = null
 
@@ -39,7 +39,7 @@ class MusicTest : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo().execute("Usage: musictest filename/in/res/sounds/test")
-        Echo().execute("musictest stop to stop playback")
+        Echo.execute("Usage: musictest filename/in/res/sounds/test")
+        Echo.execute("musictest stop to stop playback")
     }
 }

@@ -9,7 +9,7 @@ import net.torvald.terrarum.itemproperties.ItemPropCodex
 /**
  * Created by SKYHi14 on 2016-12-12.
  */
-class Inventory : ConsoleCommand {
+internal object Inventory : ConsoleCommand {
 
     private var target: ActorInventory = Terrarum.ingame.player.inventory
 
@@ -29,13 +29,13 @@ class Inventory : ConsoleCommand {
 
     private fun listInventory() {
         if (target.getTotalUniqueCount() == 0) {
-            Echo().execute("(inventory empty)")
+            Echo.execute("(inventory empty)")
         } else {
             target.forEach { refId, amount ->
                 if (amount == 0) {
-                    Error().execute("Unexpected zero-amounted item: ID $refId")
+                    Error.execute("Unexpected zero-amounted item: ID $refId")
                 }
-                Echo().execute("ID $refId${if (amount > 1) " ($amount)" else ""}")
+                Echo.execute("ID $refId${if (amount > 1) " ($amount)" else ""}")
             }
         }
     }
@@ -43,7 +43,7 @@ class Inventory : ConsoleCommand {
     private fun setTarget(actorRefId: Int = Player.PLAYER_REF_ID) {
         val actor = Terrarum.ingame.getActorByID(actorRefId)
         if (actor !is Pocketed) {
-            Error().execute("Cannot edit inventory of incompatible actor: $actor")
+            Error.execute("Cannot edit inventory of incompatible actor: $actor")
         } else {
             target = actor.inventory
         }
@@ -58,8 +58,8 @@ class Inventory : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo().execute("Usage: inventory command arguments")
-        Echo().execute("Available commands:")
-        Echo().execute("list | assign slot | add itemid [amount] | target [actorid]")
+        Echo.execute("Usage: inventory command arguments")
+        Echo.execute("Available commands:")
+        Echo.execute("list | assign slot | add itemid [amount] | target [actorid]")
     }
 }

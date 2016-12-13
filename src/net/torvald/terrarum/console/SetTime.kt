@@ -6,14 +6,14 @@ import net.torvald.terrarum.Terrarum
 /**
  * Created by minjaesong on 16-03-20.
  */
-class SetTime : ConsoleCommand {
+internal object SetTime : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             val timeToSet = WorldTime.parseTime(args[1])
 
             Terrarum.ingame.world.time.setTime(timeToSet)
 
-            Echo().execute("Set time to ${Terrarum.ingame.world.time.elapsedSeconds} " +
+            Echo.execute("Set time to ${Terrarum.ingame.world.time.elapsedSeconds} " +
                            "(${Terrarum.ingame.world.time.hours}h${formatMin(Terrarum.ingame.world.time.minutes)})")
         }
         else {
@@ -26,6 +26,6 @@ class SetTime : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo().execute("usage: settime <39201-in sec or 13h32-in hour>")
+        Echo.execute("usage: settime <39201-in sec or 13h32-in hour>")
     }
 }

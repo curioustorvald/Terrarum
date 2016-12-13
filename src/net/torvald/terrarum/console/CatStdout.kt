@@ -7,10 +7,8 @@ import java.nio.file.Files
 /**
  * Created by minjaesong on 16-02-10.
  */
-class CatStdout : ConsoleCommand {
+internal object CatStdout : ConsoleCommand {
     override fun execute(args: Array<String>) {
-
-        val echo = Echo()
 
         if (args.size == 1) {
             printUsage()
@@ -18,15 +16,15 @@ class CatStdout : ConsoleCommand {
         }
 
         try {
-            Files.lines(FileSystems.getDefault().getPath(args[1])).forEach({ echo.execute(it) })
+            Files.lines(FileSystems.getDefault().getPath(args[1])).forEach({ Echo.execute(it) })
         }
         catch (e: IOException) {
-            echo.execute("CatStdout: could not read file -- IOException")
+            Echo.execute("CatStdout: could not read file -- IOException")
         }
 
     }
 
     override fun printUsage() {
-        Echo().execute("usage: cat 'path/to/text/file")
+        Echo.execute("usage: cat 'path/to/text/file")
     }
 }

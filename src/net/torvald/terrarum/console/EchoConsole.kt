@@ -3,7 +3,7 @@ package net.torvald.terrarum.console
 /**
  * Created by minjaesong on 16-09-07.
  */
-class EchoConsole : ConsoleCommand {
+internal object EchoConsole : ConsoleCommand {
     /**
      * Args 0: command given
      * Args 1: first argument

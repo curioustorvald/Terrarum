@@ -10,7 +10,7 @@ import net.torvald.terrarum.gameactors.Player
 /**
  * Created by minjaesong on 16-02-17.
  */
-class GetFactioning : ConsoleCommand {
+internal object GetFactioning : ConsoleCommand {
     val ccW = GameFontBase.colToCode["w"]
     val ccG = GameFontBase.colToCode["g"]
     val ccY = GameFontBase.colToCode["y"]
@@ -21,62 +21,62 @@ class GetFactioning : ConsoleCommand {
     private val PRINT_INDENTATION = "$ccK    --> $ccW"
 
     override fun execute(args: Array<String>) {
-        val echo = Echo()
+
         val error = Error()
 
         fun printOutFactioning(id: Int) {
             val a = Terrarum.ingame.getActorByID(id)
             if (a is Factionable) {
-                echo.execute("$ccW== Faction assignment for $ccY${if (id == Player.PLAYER_REF_ID) "player" else id.toString()} $ccW==")
+                Echo.execute("$ccW== Faction assignment for $ccY${if (id == Player.PLAYER_REF_ID) "player" else id.toString()} $ccW==")
                 println("[GetFactioning] == Faction assignment for '${if (id == Player.PLAYER_REF_ID) "player" else id.toString()}' ==")
 
                 // get all factioning data of player
                 val factionSet = a.faction
 
                 if (factionSet.isEmpty()) {
-                    echo.execute("The actor has empty faction set.")
+                    Echo.execute("The actor has empty faction set.")
                     println("[GetFactioning] The actor has empty faction set.")
                     return
                 }
 
                 val count = factionSet.size
-                echo.execute("$ccG${count.toString()} $ccW${Lang.pluralise(" faction", count)} assigned.")
+                Echo.execute("$ccG${count.toString()} $ccW${Lang.pluralise(" faction", count)} assigned.")
                 println("[GetFactioning] ${count.toString()} ${Lang.pluralise(" faction", count)} assigned.")
 
                 for (faction in factionSet) {
-                    echo.execute("${ccW}faction $ccM${faction.factionName}")
+                    Echo.execute("${ccW}faction $ccM${faction.factionName}")
                     println("[GetFactioning] faction '${faction.factionName}'")
-                    echo.execute("$ccY    Amicable")
+                    Echo.execute("$ccY    Amicable")
                     println("[GetFactioning]     Amicable")
                     faction.factionAmicable.forEach { s ->
-                        echo.execute(PRINT_INDENTATION + s)
+                        Echo.execute(PRINT_INDENTATION + s)
                         println("[GetFactioning]     --> $s")
                     }
 
-                    echo.execute("$ccY    Explicit neutral")
+                    Echo.execute("$ccY    Explicit neutral")
                     println("[GetFactioning]     Explicit neutral")
                     faction.factionNeutral.forEach { s ->
-                        echo.execute(PRINT_INDENTATION + s)
+                        Echo.execute(PRINT_INDENTATION + s)
                         println("[GetFactioning]     --> $s")
                     }
 
-                    echo.execute("$ccY    Hostile")
+                    Echo.execute("$ccY    Hostile")
                     println("[GetFactioning]     Hostile")
                     faction.factionHostile.forEach { s ->
-                        echo.execute(PRINT_INDENTATION + s)
+                        Echo.execute(PRINT_INDENTATION + s)
                         println("[GetFactioning]     --> $s")
                     }
 
-                    echo.execute("$ccY    Fearful")
+                    Echo.execute("$ccY    Fearful")
                     println("[GetFactioning]     Fearful")
                     faction.factionFearful.forEach { s ->
-                        echo.execute(PRINT_INDENTATION + s)
+                        Echo.execute(PRINT_INDENTATION + s)
                         println("[GetFactioning]     --> $s")
                     }
                 }
             }
             else {
-                error.execute("The actor is not factionable.")
+                Error.execute("The actor is not factionable.")
                 System.err.println("[GetFactioning] The actor is not factionable.")
             }
         }
@@ -86,7 +86,7 @@ class GetFactioning : ConsoleCommand {
         }
         else {
             if (!args[1].isNum()) {
-                error.execute("Invalid actor ID input.")
+                Error.execute("Invalid actor ID input.")
                 System.err.println("[GetFactioning] Invalid actor ID input.")
                 return
             }
@@ -95,7 +95,7 @@ class GetFactioning : ConsoleCommand {
                 printOutFactioning(actorID)
             }
             catch (e: IllegalArgumentException) {
-                error.execute("${args[1]}: no actor with this ID.")
+                Error.execute("${args[1]}: no actor with this ID.")
                 System.err.println("[GetFactioning] ${args[1]}: no actor with this ID.")
             }
         }

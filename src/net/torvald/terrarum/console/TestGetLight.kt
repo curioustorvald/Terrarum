@@ -5,7 +5,7 @@ import net.torvald.terrarum.mapdrawer.LightmapRenderer
 /**
  * Created by minjaesong on 16-09-07.
  */
-class TestGetLight : ConsoleCommand {
+internal object TestGetLight : ConsoleCommand {
     /**
      * Args 0: command given
      * Args 1: first argument
@@ -16,7 +16,7 @@ class TestGetLight : ConsoleCommand {
         val x = args[1].toInt()
         val y = args[2].toInt()
         val l = LightmapRenderer.getLightRawPos(16, 16)
-        EchoConsole().execute(l.toString())
+        EchoConsole.execute(l.toString())
     }
 
     override fun printUsage() {

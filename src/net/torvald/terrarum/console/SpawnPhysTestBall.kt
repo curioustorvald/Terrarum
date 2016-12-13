@@ -9,7 +9,7 @@ import net.torvald.terrarum.Terrarum
 /**
  * Created by minjaesong on 16-03-05.
  */
-class SpawnPhysTestBall : ConsoleCommand {
+internal object SpawnPhysTestBall : ConsoleCommand {
     @Throws(Exception::class)
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
@@ -33,6 +33,6 @@ class SpawnPhysTestBall : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo().execute("usage: spawnball [elasticity]")
+        Echo.execute("usage: spawnball [elasticity]")
     }
 }

@@ -11,7 +11,7 @@ import java.io.IOException
 /**
  * Created by minjaesong on 16-02-10.
  */
-class GsonTest : ConsoleCommand {
+internal object GsonTest : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             val avelem = Gson().toJsonTree(Terrarum.ingame.player)
@@ -27,10 +27,10 @@ class GsonTest : ConsoleCommand {
                 bufferedWriter.write(jsonString)
                 bufferedWriter.close()
 
-                Echo().execute("GsonTest: exported to " + args[1] + ".json")
+                Echo.execute("GsonTest: exported to " + args[1] + ".json")
             }
             catch (e: IOException) {
-                Echo().execute("GsonTest: IOException raised.")
+                Echo.execute("GsonTest: IOException raised.")
                 e.printStackTrace()
             }
 
@@ -41,7 +41,7 @@ class GsonTest : ConsoleCommand {
     }
 
     override fun printUsage() {
-        val echo = Echo()
-        echo.execute("Usage: gsontest filename-without-extension")
+
+        Echo.execute("Usage: gsontest filename-without-extension")
     }
 }

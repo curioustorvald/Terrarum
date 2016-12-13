@@ -8,7 +8,7 @@ import java.util.Formatter
 /**
  * Created by minjaesong on 16-01-16.
  */
-class CodexEdictis : ConsoleCommand {
+internal object CodexEdictis : ConsoleCommand {
 
     val ccW = GameFontBase.colToCode["o"]
 
@@ -25,24 +25,22 @@ class CodexEdictis : ConsoleCommand {
                 val sb = StringBuilder()
                 val formatter = Formatter(sb)
 
-                Echo().execute("Codex: " + formatter.format(Lang["DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN"], args[1]).toString())
+                Echo.execute("Codex: " + formatter.format(Lang["DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN"], args[1]).toString())
             }
 
         }
     }
 
     override fun printUsage() {
-        val echo = Echo()
-        echo.execute("Usage: codex (command)")
-        echo.execute("shows how to use 'command'")
-        echo.execute("leave blank to get list of available commands")
+        Echo.execute("Usage: codex (command)")
+        Echo.execute("shows how to use 'command'")
+        Echo.execute("leave blank to get list of available commands")
     }
 
     private fun printList() {
-        val echo = Echo()
-        echo.execute(Lang["DEV_MESSAGE_CONSOLE_AVAILABLE_COMMANDS"])
+        Echo.execute(Lang["DEV_MESSAGE_CONSOLE_AVAILABLE_COMMANDS"])
         CommandDict.dict.forEach { name, cmd ->
-            echo.execute("$ccW• " + name)
+            Echo.execute("$ccW• " + name)
             cmd.printUsage()
         }
     }

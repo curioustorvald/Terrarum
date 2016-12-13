@@ -7,7 +7,7 @@ import net.torvald.terrarum.ui.ConsoleWindow
 /**
  * Created by minjaesong on 16-04-25.
  */
-class Error : ConsoleCommand {
+internal object Error : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val argsWoHeader = Array<String>(args.size - 1, {it -> args[it + 1]})
         argsWoHeader.forEach { execute(it) }

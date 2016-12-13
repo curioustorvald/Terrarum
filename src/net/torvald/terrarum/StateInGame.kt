@@ -83,8 +83,6 @@ constructor() : BasicGameState() {
 
     private val CORES = ThreadPool.POOL_SIZE
 
-    val auth = Authenticator()
-
     val KEY_LIGHTMAP_RENDER = Key.F7
     val KEY_LIGHTMAP_SMOOTH = Key.F8
 

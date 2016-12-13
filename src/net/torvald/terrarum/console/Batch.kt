@@ -6,7 +6,7 @@ import java.nio.file.Files
 /**
  * Created by minjaesong on 16-03-07.
  */
-class Batch : ConsoleCommand {
+internal object Batch : ConsoleCommand {
     @Throws(Exception::class)
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
@@ -19,6 +19,6 @@ class Batch : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo().execute("Usage: batch path/to/batch.txt")
+        Echo.execute("Usage: batch path/to/batch.txt")
     }
 }

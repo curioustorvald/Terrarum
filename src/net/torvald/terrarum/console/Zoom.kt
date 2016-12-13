@@ -5,7 +5,7 @@ import net.torvald.terrarum.Terrarum
 /**
  * Created by minjaesong on 16-01-25.
  */
-class Zoom : ConsoleCommand {
+internal object Zoom : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
 
@@ -14,7 +14,7 @@ class Zoom : ConsoleCommand {
                 zoom = args[1].toFloat()
             }
             catch (e: NumberFormatException) {
-                Echo().execute("Wrong number input.")
+                Echo.execute("Wrong number input.")
                 return
             }
 
@@ -29,7 +29,7 @@ class Zoom : ConsoleCommand {
 
             System.gc()
 
-            Echo().execute("Set screen zoom to " + zoom.toString())
+            Echo.execute("Set screen zoom to " + zoom.toString())
         }
         else {
             printUsage()
@@ -37,6 +37,6 @@ class Zoom : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo().execute("Usage: zoom [zoom]")
+        Echo.execute("Usage: zoom [zoom]")
     }
 }
