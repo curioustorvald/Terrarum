@@ -5,6 +5,8 @@ import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.CanBeAnItem
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gamecontroller.mouseTileX
+import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.gameitem.InventoryItemAdapter
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.tileproperties.TileProp
@@ -46,7 +48,13 @@ object ItemPropCodex {
                 }
 
                 override fun secondaryUse(gc: GameContainer, delta: Int) {
-                    // TODO place block to the world
+                    // TODO check if occupied by ANY ActorWithBodies
+
+                    Terrarum.ingame.world.setTileTerrain(
+                            gc.mouseTileX,
+                            gc.mouseTileY,
+                            i
+                    )
                 }
             }
         }

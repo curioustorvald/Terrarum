@@ -13,13 +13,6 @@ import org.newdawn.slick.GameContainer
  * Created by minjaesong on 16-09-08.
  */
 open class DynamicItem(val baseItemID: Int, val newMass: Double? = null, val newScale: Double? = null) : InventoryItem {
-    /**
-     * Effects applied (continuously or not) while thrown to the world,
-     * called by the proxy Actor
-     */
-    override fun worldActorEffect(gc: GameContainer, delta: Int) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     /**
      * Internal ID of an Item, Long

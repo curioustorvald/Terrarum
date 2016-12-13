@@ -85,7 +85,7 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
         }
     }
 
-    override fun processInput(input: Input) {
+    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
 
     }
 

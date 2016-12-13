@@ -149,7 +149,7 @@ class StateMonitorCheck : BasicGameState() {
 
         }
 
-        override fun processInput(input: Input) {
+        override fun processInput(gc: GameContainer, delta: Int, input: Input) {
         }
 
         override fun doOpening(gc: GameContainer, delta: Int) {

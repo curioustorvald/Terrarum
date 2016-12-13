@@ -128,7 +128,7 @@ class ConsoleWindow : UICanvas, KeyboardControlled {
 
     }
 
-    override fun processInput(input: Input) {
+    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
 
     }
 

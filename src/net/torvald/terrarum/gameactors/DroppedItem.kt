@@ -26,7 +26,7 @@ class DroppedItem(private val item: InventoryItem) : ActorWithBody() {
     }
 
     override fun update(gc: GameContainer, delta: Int) {
-        item.worldActorEffect(gc, delta)
+        item.effectWhenTakenOut(gc, delta)
     }
 
     override fun drawBody(gc: GameContainer, g: Graphics) {

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.gameactors.ActorHumanoid
+import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
 
 /**
@@ -16,8 +17,8 @@ class PlayableActorDelegate(val actor: ActorHumanoid) {
             throw IllegalArgumentException("Player must be 'Controllable'!")
     }
 
-    fun processInput(input: Input) {
-        (actor as Controllable).processInput(input)
+    fun processInput(gc: GameContainer, delta: Int, input: Input) {
+        (actor as Controllable).processInput(gc, delta, input)
     }
 
     fun keyPressed(key: Int, c: Char) {

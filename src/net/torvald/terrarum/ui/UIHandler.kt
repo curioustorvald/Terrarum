@@ -190,9 +190,9 @@ constructor(val UI: UICanvas) {
         }
     }
 
-    fun processInput(input: Input) {
+    fun processInput(gc: GameContainer, delta: Int, input: Input) {
         if (isVisible) {
-            UI.processInput(input)
+            UI.processInput(gc, delta, input)
         }
     }
 
