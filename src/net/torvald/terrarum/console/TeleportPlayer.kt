@@ -22,7 +22,7 @@ internal object TeleportPlayer : ConsoleCommand {
                 y = args[2].toInt() * MapDrawer.TILE_SIZE + MapDrawer.TILE_SIZE / 2
             }
             catch (e: NumberFormatException) {
-                Echo.execute("Wrong number input.")
+                Echo("Wrong number input.")
                 return
             }
 
@@ -31,6 +31,6 @@ internal object TeleportPlayer : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo.execute("Usage: teleport [x-tile] [y-tile]")
+        Echo("Usage: teleport [x-tile] [y-tile]")
     }
 }

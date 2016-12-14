@@ -17,19 +17,19 @@ internal object SetLocale : ConsoleCommand {
             val prevLocale = Terrarum.gameLocale
             Terrarum.gameLocale = args[1]
             try {
-                Echo.execute("Set locale to '" + Terrarum.gameLocale + "'.")
+                Echo("Set locale to '" + Terrarum.gameLocale + "'.")
             }
             catch (e: IOException) {
-                Echo.execute("could not read lang file.")
+                Echo("could not read lang file.")
                 Terrarum.gameLocale = prevLocale
             }
 
         }
         else if (args.size == 1) {
 
-            Echo.execute("Locales:")
+            Echo("Locales:")
 
-            Lang.languageList.forEach { Echo.execute("--> $it") }
+            Lang.languageList.forEach { Echo("--> $it") }
         }
         else {
             printUsage()
@@ -37,6 +37,6 @@ internal object SetLocale : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo.execute("Usage: setlocale [locale]")
+        Echo("Usage: setlocale [locale]")
     }
 }

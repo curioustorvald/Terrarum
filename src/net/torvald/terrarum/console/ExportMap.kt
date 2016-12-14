@@ -45,11 +45,11 @@ internal object ExportMap : ConsoleCommand {
             try {
                 RasterWriter.writePNG_RGB(
                         Terrarum.ingame.world.width, Terrarum.ingame.world.height, mapData, dir + args[1] + ".png")
-                Echo.execute("ExportMap: exported to " + args[1] + ".png")
+                Echo("ExportMap: exported to " + args[1] + ".png")
 
             }
             catch (e: IOException) {
-                Echo.execute("ExportMap: IOException raised.")
+                Echo("ExportMap: IOException raised.")
                 e.printStackTrace()
             }
 
@@ -66,9 +66,9 @@ internal object ExportMap : ConsoleCommand {
 
     override fun printUsage() {
 
-        Echo.execute("Usage: export <name>")
-        Echo.execute("Exports current map into echo image.")
-        Echo.execute("The image can be found at %adddata%/terrarum/Exports")
+        Echo("Usage: export <name>")
+        Echo("Exports current map into echo image.")
+        Echo("The image can be found at %adddata%/terrarum/Exports")
     }
 
     private fun buildColorTable() {

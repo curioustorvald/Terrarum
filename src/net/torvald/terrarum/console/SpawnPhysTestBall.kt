@@ -33,6 +33,6 @@ internal object SpawnPhysTestBall : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo.execute("usage: spawnball [elasticity]")
+        Echo("usage: spawnball [elasticity]")
     }
 }

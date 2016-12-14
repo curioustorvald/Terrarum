@@ -28,6 +28,9 @@ internal object Echo : ConsoleCommand {
         (Terrarum.ingame.consoleHandler.UI as ConsoleWindow).sendMessage(sb.toString())
     }
 
+    operator fun invoke(args: Array<String>) = execute(args)
+    operator fun invoke(single_line: String) = execute(single_line)
+
     override fun printUsage() {
 
     }

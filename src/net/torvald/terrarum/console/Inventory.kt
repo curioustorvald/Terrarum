@@ -29,13 +29,13 @@ internal object Inventory : ConsoleCommand {
 
     private fun listInventory() {
         if (target.getTotalUniqueCount() == 0) {
-            Echo.execute("(inventory empty)")
+            Echo("(inventory empty)")
         } else {
             target.forEach { refId, amount ->
                 if (amount == 0) {
-                    Error.execute("Unexpected zero-amounted item: ID $refId")
+                    EchoError("Unexpected zero-amounted item: ID $refId")
                 }
-                Echo.execute("ID $refId${if (amount > 1) " ($amount)" else ""}")
+                Echo("ID $refId${if (amount > 1) " ($amount)" else ""}")
             }
         }
     }
@@ -43,7 +43,7 @@ internal object Inventory : ConsoleCommand {
     private fun setTarget(actorRefId: Int = Player.PLAYER_REF_ID) {
         val actor = Terrarum.ingame.getActorByID(actorRefId)
         if (actor !is Pocketed) {
-            Error.execute("Cannot edit inventory of incompatible actor: $actor")
+            EchoError("Cannot edit inventory of incompatible actor: $actor")
         } else {
             target = actor.inventory
         }
@@ -58,8 +58,8 @@ internal object Inventory : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo.execute("Usage: inventory command arguments")
-        Echo.execute("Available commands:")
-        Echo.execute("list | assign slot | add itemid [amount] | target [actorid]")
+        Echo("Usage: inventory command arguments")
+        Echo("Available commands:")
+        Echo("list | assign slot | add itemid [amount] | target [actorid]")
     }
 }

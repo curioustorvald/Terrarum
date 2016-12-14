@@ -27,56 +27,56 @@ internal object GetFactioning : ConsoleCommand {
         fun printOutFactioning(id: Int) {
             val a = Terrarum.ingame.getActorByID(id)
             if (a is Factionable) {
-                Echo.execute("$ccW== Faction assignment for $ccY${if (id == Player.PLAYER_REF_ID) "player" else id.toString()} $ccW==")
+                Echo("$ccW== Faction assignment for $ccY${if (id == Player.PLAYER_REF_ID) "player" else id.toString()} $ccW==")
                 println("[GetFactioning] == Faction assignment for '${if (id == Player.PLAYER_REF_ID) "player" else id.toString()}' ==")
 
                 // get all factioning data of player
                 val factionSet = a.faction
 
                 if (factionSet.isEmpty()) {
-                    Echo.execute("The actor has empty faction set.")
+                    Echo("The actor has empty faction set.")
                     println("[GetFactioning] The actor has empty faction set.")
                     return
                 }
 
                 val count = factionSet.size
-                Echo.execute("$ccG${count.toString()} $ccW${Lang.pluralise(" faction", count)} assigned.")
+                Echo("$ccG${count.toString()} $ccW${Lang.pluralise(" faction", count)} assigned.")
                 println("[GetFactioning] ${count.toString()} ${Lang.pluralise(" faction", count)} assigned.")
 
                 for (faction in factionSet) {
-                    Echo.execute("${ccW}faction $ccM${faction.factionName}")
+                    Echo("${ccW}faction $ccM${faction.factionName}")
                     println("[GetFactioning] faction '${faction.factionName}'")
-                    Echo.execute("$ccY    Amicable")
+                    Echo("$ccY    Amicable")
                     println("[GetFactioning]     Amicable")
                     faction.factionAmicable.forEach { s ->
-                        Echo.execute(PRINT_INDENTATION + s)
+                        Echo(PRINT_INDENTATION + s)
                         println("[GetFactioning]     --> $s")
                     }
 
-                    Echo.execute("$ccY    Explicit neutral")
+                    Echo("$ccY    Explicit neutral")
                     println("[GetFactioning]     Explicit neutral")
                     faction.factionNeutral.forEach { s ->
-                        Echo.execute(PRINT_INDENTATION + s)
+                        Echo(PRINT_INDENTATION + s)
                         println("[GetFactioning]     --> $s")
                     }
 
-                    Echo.execute("$ccY    Hostile")
+                    Echo("$ccY    Hostile")
                     println("[GetFactioning]     Hostile")
                     faction.factionHostile.forEach { s ->
-                        Echo.execute(PRINT_INDENTATION + s)
+                        Echo(PRINT_INDENTATION + s)
                         println("[GetFactioning]     --> $s")
                     }
 
-                    Echo.execute("$ccY    Fearful")
+                    Echo("$ccY    Fearful")
                     println("[GetFactioning]     Fearful")
                     faction.factionFearful.forEach { s ->
-                        Echo.execute(PRINT_INDENTATION + s)
+                        Echo(PRINT_INDENTATION + s)
                         println("[GetFactioning]     --> $s")
                     }
                 }
             }
             else {
-                Error.execute("The actor is not factionable.")
+                EchoError("The actor is not factionable.")
                 System.err.println("[GetFactioning] The actor is not factionable.")
             }
         }
@@ -86,7 +86,7 @@ internal object GetFactioning : ConsoleCommand {
         }
         else {
             if (!args[1].isNum()) {
-                Error.execute("Invalid actor ID input.")
+                EchoError("Invalid actor ID input.")
                 System.err.println("[GetFactioning] Invalid actor ID input.")
                 return
             }
@@ -95,7 +95,7 @@ internal object GetFactioning : ConsoleCommand {
                 printOutFactioning(actorID)
             }
             catch (e: IllegalArgumentException) {
-                Error.execute("${args[1]}: no actor with this ID.")
+                EchoError("${args[1]}: no actor with this ID.")
                 System.err.println("[GetFactioning] ${args[1]}: no actor with this ID.")
             }
         }

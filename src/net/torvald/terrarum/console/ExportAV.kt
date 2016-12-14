@@ -16,10 +16,10 @@ internal object ExportAV : ConsoleCommand {
                         Terrarum.ingame.player.actorValue,
                         Terrarum.defaultDir + "/Exports/" + args[1] + ".json")
 
-                Echo.execute("ExportAV: exported to " + args[1] + ".json")
+                Echo("ExportAV: exported to " + args[1] + ".json")
             }
             catch (e: IOException) {
-                Echo.execute("ExportAV: IOException raised.")
+                Echo("ExportAV: IOException raised.")
                 e.printStackTrace()
             }
 
@@ -30,8 +30,8 @@ internal object ExportAV : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo.execute("Export ActorValue as JSON format.")
-        Echo.execute("Usage: exportav (id) filename-without-extension")
-        Echo.execute("blank ID for player")
+        Echo("Export ActorValue as JSON format.")
+        Echo("Usage: exportav (id) filename-without-extension")
+        Echo("blank ID for player")
     }
 }
