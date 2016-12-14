@@ -6,10 +6,10 @@ package net.torvald.terrarum.console
 internal object ForceGC : ConsoleCommand {
     override fun execute(args: Array<String>) {
         System.gc()
-        Echo.execute("Invoked System.gc")
+        Echo("Invoked System.gc")
     }
 
     override fun printUsage() {
-        Echo.execute("Invoke garbage collection of JVM.")
+        Echo("Invoke garbage collection of JVM.")
     }
 }

@@ -27,10 +27,10 @@ internal object GsonTest : ConsoleCommand {
                 bufferedWriter.write(jsonString)
                 bufferedWriter.close()
 
-                Echo.execute("GsonTest: exported to " + args[1] + ".json")
+                Echo("GsonTest: exported to " + args[1] + ".json")
             }
             catch (e: IOException) {
-                Echo.execute("GsonTest: IOException raised.")
+                Echo("GsonTest: IOException raised.")
                 e.printStackTrace()
             }
 
@@ -42,6 +42,6 @@ internal object GsonTest : ConsoleCommand {
 
     override fun printUsage() {
 
-        Echo.execute("Usage: gsontest filename-without-extension")
+        Echo("Usage: gsontest filename-without-extension")
     }
 }

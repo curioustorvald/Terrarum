@@ -16,15 +16,15 @@ internal object CatStdout : ConsoleCommand {
         }
 
         try {
-            Files.lines(FileSystems.getDefault().getPath(args[1])).forEach({ Echo.execute(it) })
+            Files.lines(FileSystems.getDefault().getPath(args[1])).forEach({ Echo(it) })
         }
         catch (e: IOException) {
-            Echo.execute("CatStdout: could not read file -- IOException")
+            Echo("CatStdout: could not read file -- IOException")
         }
 
     }
 
     override fun printUsage() {
-        Echo.execute("usage: cat 'path/to/text/file")
+        Echo("usage: cat 'path/to/text/file")
     }
 }

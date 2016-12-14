@@ -39,7 +39,7 @@ internal object MusicTest : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo.execute("Usage: musictest filename/in/res/sounds/test")
-        Echo.execute("musictest stop to stop playback")
+        Echo("Usage: musictest filename/in/res/sounds/test")
+        Echo("musictest stop to stop playback")
     }
 }

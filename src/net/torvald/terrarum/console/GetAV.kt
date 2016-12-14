@@ -22,10 +22,10 @@ internal object GetAV : ConsoleCommand {
                 val av = Terrarum.ingame.player.actorValue
                 val keyset = av.keySet
 
-                Echo.execute("$ccW== ActorValue list for ${ccY}player $ccW==")
+                Echo("$ccW== ActorValue list for ${ccY}player $ccW==")
                 println("[GetAV] == ActorValue list for 'player' ==")
                 keyset.forEach { elem ->
-                    Echo.execute("$ccM$elem $ccW= $ccG${av[elem as String]}")
+                    Echo("$ccM$elem $ccW= $ccG${av[elem as String]}")
                     println("[GetAV] $elem = ${av[elem]}")
                 }
             }
@@ -35,7 +35,7 @@ internal object GetAV : ConsoleCommand {
             else if (args.size == 2) {
                 // check if args[1] is number or not
                 if (!args[1].isNum()) { // args[1] is ActorValue name
-                    Echo.execute("${ccW}player.$ccM${args[1]} $ccW= " +
+                    Echo("${ccW}player.$ccM${args[1]} $ccW= " +
                                  ccG +
                                  Terrarum.ingame.player.actorValue[args[1]] +
                                  " $ccO" +
@@ -53,15 +53,15 @@ internal object GetAV : ConsoleCommand {
                     val av = actor.actorValue
                     val keyset = av.keySet
 
-                    Echo.execute("$ccW== ActorValue list for $ccY$actor $ccW==")
+                    Echo("$ccW== ActorValue list for $ccY$actor $ccW==")
                     println("[GetAV] == ActorValue list for '$actor' ==")
                     if (keyset.size == 0) {
-                        Echo.execute("$ccK(nothing)")
+                        Echo("$ccK(nothing)")
                         println("[GetAV] (nothing)")
                     }
                     else {
                         keyset.forEach { elem ->
-                            Echo.execute("$ccM$elem $ccW= $ccG${av[elem as String]}")
+                            Echo("$ccM$elem $ccW= $ccG${av[elem as String]}")
                             println("[GetAV] $elem = ${av[elem]}")
                         }
                     }
@@ -70,7 +70,7 @@ internal object GetAV : ConsoleCommand {
             else if (args.size == 3) {
                 val id = args[1].toInt()
                 val av = args[2]
-                Echo.execute("$ccW$id.$ccM$av $ccW= $ccG" +
+                Echo("$ccW$id.$ccM$av $ccW= $ccG" +
                              Terrarum.ingame.getActorByID(id).actorValue[av] +
                              " $ccO" +
                              Terrarum.ingame.getActorByID(id).actorValue[av]!!.javaClass.simpleName
@@ -84,11 +84,11 @@ internal object GetAV : ConsoleCommand {
         }
         catch (e: NullPointerException) {
             if (args.size == 2) {
-                Error.execute(args[1] + ": actor value does not exist.")
+                EchoError(args[1] + ": actor value does not exist.")
                 System.err.println("[GetAV] ${args[1]}: actor value does not exist.")
             }
             else if (args.size == 3) {
-                Error.execute(args[2] + ": actor value does not exist.")
+                EchoError(args[2] + ": actor value does not exist.")
                 System.err.println("[GetAV] ${args[2]}: actor value does not exist.")
             }
             else {
@@ -96,7 +96,7 @@ internal object GetAV : ConsoleCommand {
             }
         }
         catch (e1: IllegalArgumentException) {
-            Error.execute("${args[1]}: no actor with this ID.")
+            EchoError("${args[1]}: no actor with this ID.")
             System.err.println("[GetAV] ${args[1]}: no actor with this ID.")
         }
 
@@ -113,8 +113,8 @@ internal object GetAV : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo.execute("${ccW}Get desired ActorValue of specific target.")
-        Echo.execute("${ccW}Usage: ${ccY}getav ${ccG}(id) <av>")
-        Echo.execute("${ccW}blank ID for player")
+        Echo("${ccW}Get desired ActorValue of specific target.")
+        Echo("${ccW}Usage: ${ccY}getav ${ccG}(id) <av>")
+        Echo("${ccW}blank ID for player")
     }
 }

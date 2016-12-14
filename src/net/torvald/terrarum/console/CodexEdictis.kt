@@ -25,22 +25,22 @@ internal object CodexEdictis : ConsoleCommand {
                 val sb = StringBuilder()
                 val formatter = Formatter(sb)
 
-                Echo.execute("Codex: " + formatter.format(Lang["DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN"], args[1]).toString())
+                Echo("Codex: " + formatter.format(Lang["DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN"], args[1]).toString())
             }
 
         }
     }
 
     override fun printUsage() {
-        Echo.execute("Usage: codex (command)")
-        Echo.execute("shows how to use 'command'")
-        Echo.execute("leave blank to get list of available commands")
+        Echo("Usage: codex (command)")
+        Echo("shows how to use 'command'")
+        Echo("leave blank to get list of available commands")
     }
 
     private fun printList() {
-        Echo.execute(Lang["DEV_MESSAGE_CONSOLE_AVAILABLE_COMMANDS"])
+        Echo(Lang["DEV_MESSAGE_CONSOLE_AVAILABLE_COMMANDS"])
         CommandDict.dict.forEach { name, cmd ->
-            Echo.execute("$ccW• " + name)
+            Echo("$ccW• " + name)
             cmd.printUsage()
         }
     }

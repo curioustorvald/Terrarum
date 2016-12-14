@@ -11,7 +11,7 @@ object CommandDict {
 
     internal var dict: HashMap<String, ConsoleCommand> = hashMapOf(
             Pair("echo", Echo),
-            Pair("error", Error),
+            Pair("error", EchoError),
             Pair("setav", SetAV),
             Pair("qqq", QuitApp),
             Pair("codex", CodexEdictis),

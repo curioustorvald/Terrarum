@@ -19,7 +19,7 @@ internal object Authenticator : ConsoleCommand {
             if ("65b9aa150332ed7096134efb20220e5ebec04d4dbe1c537ff3816f68c2391c1c".equals(hashedPwd, ignoreCase = true)) {
                 // aryll
                 val msg = if (a) "Locked" else "Authenticated"
-                Echo.execute(msg)
+                Echo(msg)
                 println("[Authenticator] " + msg)
                 a = !a
                 (Terrarum.ingame.consoleHandler.UI as ConsoleWindow).reset()

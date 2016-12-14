@@ -11,10 +11,10 @@ internal object ToggleNoClip : ConsoleCommand {
         val status = Terrarum.ingame.player.isNoClip()
 
         Terrarum.ingame.player.setNoClip(!status)
-        Echo.execute("Set no-clip status to " + (!status).toString())
+        Echo("Set no-clip status to " + (!status).toString())
     }
 
     override fun printUsage() {
-        Echo.execute("toggle no-clip status of player")
+        Echo("toggle no-clip status of player")
     }
 }

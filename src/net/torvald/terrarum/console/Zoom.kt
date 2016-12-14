@@ -14,7 +14,7 @@ internal object Zoom : ConsoleCommand {
                 zoom = args[1].toFloat()
             }
             catch (e: NumberFormatException) {
-                Echo.execute("Wrong number input.")
+                Echo("Wrong number input.")
                 return
             }
 
@@ -29,7 +29,7 @@ internal object Zoom : ConsoleCommand {
 
             System.gc()
 
-            Echo.execute("Set screen zoom to " + zoom.toString())
+            Echo("Set screen zoom to " + zoom.toString())
         }
         else {
             printUsage()
@@ -37,6 +37,6 @@ internal object Zoom : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo.execute("Usage: zoom [zoom]")
+        Echo("Usage: zoom [zoom]")
     }
 }

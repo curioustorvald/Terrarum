@@ -13,7 +13,7 @@ internal object SetTime : ConsoleCommand {
 
             Terrarum.ingame.world.time.setTime(timeToSet)
 
-            Echo.execute("Set time to ${Terrarum.ingame.world.time.elapsedSeconds} " +
+            Echo("Set time to ${Terrarum.ingame.world.time.elapsedSeconds} " +
                            "(${Terrarum.ingame.world.time.hours}h${formatMin(Terrarum.ingame.world.time.minutes)})")
         }
         else {
@@ -26,6 +26,6 @@ internal object SetTime : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo.execute("usage: settime <39201-in sec or 13h32-in hour>")
+        Echo("usage: settime <39201-in sec or 13h32-in hour>")
     }
 }

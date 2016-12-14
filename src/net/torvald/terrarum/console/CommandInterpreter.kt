@@ -59,7 +59,7 @@ object CommandInterpreter {
 
             }
             finally {
-                Echo.execute("$ccW> $single_command") // prints out the input
+                Echo("$ccW> $single_command") // prints out the input
                 println("${ZonedDateTime.now()} [CommandInterpreter] issuing command '$single_command'")
                 try {
                     if (commandObj != null) {
@@ -73,7 +73,7 @@ object CommandInterpreter {
                 catch (e: Exception) {
                     System.err.print("[CommandInterpreter] ")
                     e.printStackTrace()
-                    Error.execute(Lang["ERROR_GENERIC_TEXT"])
+                    EchoError(Lang["ERROR_GENERIC_TEXT"])
                 }
 
             }
@@ -115,7 +115,7 @@ object CommandInterpreter {
         val sb = StringBuilder()
         val formatter = Formatter(sb)
 
-        Error.execute(
+        EchoError(
                 formatter.format(Lang["DEV_MESSAGE_CONSOLE_COMMAND_UNKNOWN"], cmdname).toString())
     }
 

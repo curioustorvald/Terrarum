@@ -19,6 +19,6 @@ internal object Batch : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo.execute("Usage: batch path/to/batch.txt")
+        Echo("Usage: batch path/to/batch.txt")
     }
 }

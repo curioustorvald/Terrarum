@@ -13,11 +13,11 @@ internal object Seed : ConsoleCommand {
     //                                tsalagi
 
     override fun execute(args: Array<String>) {
-        Echo.execute("Map$ccW: $ccG${Terrarum.ingame.world.generatorSeed}")
+        Echo("Map$ccW: $ccG${Terrarum.ingame.world.generatorSeed}")
         // TODO display randomiser seed
     }
 
     override fun printUsage() {
-        Echo.execute("prints out the generator seed of the current game.")
+        Echo("prints out the generator seed of the current game.")
     }
 }
