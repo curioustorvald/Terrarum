@@ -11,27 +11,29 @@ import net.torvald.terrarum.itemproperties.ItemPropCodex
  */
 internal object Inventory : ConsoleCommand {
 
-    private var target: ActorInventory = Terrarum.ingame.player.inventory
+    private var target: Pocketed = Terrarum.ingame.player
 
     override fun execute(args: Array<String>) {
         if (args.size == 1) {
             printUsage()
-        } else {
+        }
+        else {
             when (args[1]) {
                 "list"   -> listInventory()
                 "add"    -> addItem(args[2].toInt(), args[3].toInt())
                 "target" -> setTarget(args[2].toInt())
-                "assign" -> assignQuickBar(args[2].toInt(), args[3].toInt())
+                "hold"  -> holdItem(args[2].toInt())
                 else     -> printUsage()
             }
         }
     }
 
     private fun listInventory() {
-        if (target.getTotalUniqueCount() == 0) {
+        if (target.inventory.getTotalUniqueCount() == 0) {
             Echo("(inventory empty)")
-        } else {
-            target.forEach { refId, amount ->
+        }
+        else {
+            target.inventory.forEach { refId, amount ->
                 if (amount == 0) {
                     EchoError("Unexpected zero-amounted item: ID $refId")
                 }
@@ -44,22 +46,29 @@ internal object Inventory : ConsoleCommand {
         val actor = Terrarum.ingame.getActorByID(actorRefId)
         if (actor !is Pocketed) {
             EchoError("Cannot edit inventory of incompatible actor: $actor")
-        } else {
-            target = actor.inventory
+        }
+        else {
+            target = actor
         }
     }
 
     private fun addItem(refId: Int, amount: Int = 1) {
-        target.add(ItemPropCodex.getProp(refId), amount)
+        target.inventory.add(ItemPropCodex.getProp(refId), amount)
     }
 
-    private fun assignQuickBar(refId: Int, index: Int) {
+    private fun holdItem(refId: Int) {
+        // if the item does not exist, add it first
+        if (!target.inventory.contains(refId)) {
+            target.inventory.add(refId)
+        }
 
+        target.itemHolding = ItemPropCodex.getProp(refId)
     }
 
     override fun printUsage() {
         Echo("Usage: inventory command arguments")
         Echo("Available commands:")
-        Echo("list | assign slot | add itemid [amount] | target [actorid]")
+        Echo("list | assign slot | add itemid [amount] | target [actorid] | hold itemid")
+        Echo("equip itemid")
     }
 }

@@ -53,10 +53,14 @@ open class ActorWithBody : Actor() {
     internal val velocity = Vector2(0.0, 0.0)
     var veloX: Double
         get() = velocity.x
-        protected set(value) { velocity.x = value }
+        protected set(value) {
+            velocity.x = value
+        }
     var veloY: Double
         get() = velocity.y
-        protected set(value) { velocity.y = value }
+        protected set(value) {
+            velocity.y = value
+        }
 
     val moveDelta = Vector2(0.0, 0.0)
     @Transient private val VELO_HARD_LIMIT = 100.0
@@ -67,10 +71,14 @@ open class ActorWithBody : Actor() {
     var controllerVel: Vector2? = if (this is Controllable) Vector2() else null
     var walkX: Double
         get() = controllerVel!!.x
-        protected set(value) { controllerVel!!.x = value }
+        protected set(value) {
+            controllerVel!!.x = value
+        }
     var walkY: Double
         get() = controllerVel!!.y
-        protected set(value) { controllerVel!!.y = value }
+        protected set(value) {
+            controllerVel!!.y = value
+        }
 
     /**
      * Physical properties.
@@ -114,7 +122,9 @@ open class ActorWithBody : Actor() {
      * Formula: restitution = 1.0 - elasticity
      */
     var restitution: Double
-        set(value) { elasticity = 1.0 - value }
+        set(value) {
+            elasticity = 1.0 - value
+        }
         get() = 1.0 - elasticity
 
     @Transient private val CEILING_HIT_ELASTICITY = 0.3
@@ -363,7 +373,7 @@ open class ActorWithBody : Actor() {
             }
 
             // cheap solution for sticking into the wall while Left or Right is held
-            walledLeft =  isTouchingSide(nextHitbox, COLLIDING_LEFT)
+            walledLeft = isTouchingSide(nextHitbox, COLLIDING_LEFT)
             walledRight = isTouchingSide(nextHitbox, COLLIDING_RIGHT)
             if (isPlayerNoClip) {
                 walledLeft = false
@@ -462,7 +472,7 @@ open class ActorWithBody : Actor() {
             }
             // axis X
             if (isTouchingSide(nextHitbox, COLLIDING_LEFT) || isTouchingSide(nextHitbox, COLLIDING_RIGHT)
-                    && moveDelta.x != 0.0) { // check right and left
+                && moveDelta.x != 0.0) { // check right and left
                 // the actor is hitting the wall
                 hitAndReflectX()
             }
@@ -475,7 +485,7 @@ open class ActorWithBody : Actor() {
     private fun displaceByCCD() {
         ccdCollided = false
 
-        if (!isNoCollideWorld){
+        if (!isNoCollideWorld) {
             if (!isColliding(nextHitbox, COLLIDING_ALLSIDE))
                 return
 
@@ -534,7 +544,10 @@ open class ActorWithBody : Actor() {
         if (isNoCollideWorld) return false
 
         // offsets will stretch and shrink detection box according to the argument
-        val x1: Double; val x2: Double; val y1: Double; val y2: Double
+        val x1: Double;
+        val x2: Double;
+        val y1: Double;
+        val y2: Double
         if (option == COLLIDING_LR || option == COLLIDING_UD) {
             val offsetX = if (option == COLLIDING_LR) A_PIXEL else 0.0
             val offsetY = if (option == COLLIDING_UD) A_PIXEL else 0.0
@@ -578,15 +591,18 @@ open class ActorWithBody : Actor() {
         }
 
         val txStart = x1.div(TSIZE).floorInt()
-        val txEnd =   x2.div(TSIZE).floorInt()
+        val txEnd = x2.div(TSIZE).floorInt()
         val tyStart = y1.div(TSIZE).floorInt()
-        val tyEnd =   y2.div(TSIZE).floorInt()
+        val tyEnd = y2.div(TSIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
 
     private fun isTouchingSide(hitbox: Hitbox, option: Int): Boolean {
-        val x1: Double; val x2: Double; val y1: Double; val y2: Double
+        val x1: Double;
+        val x2: Double;
+        val y1: Double;
+        val y2: Double
         if (option == COLLIDING_TOP) {
             x1 = hitbox.posX
             x2 = hitbox.endPointX
@@ -614,16 +630,19 @@ open class ActorWithBody : Actor() {
         else throw IllegalArgumentException()
 
         val txStart = x1.div(TSIZE).floorInt()
-        val txEnd =   x2.div(TSIZE).floorInt()
+        val txEnd = x2.div(TSIZE).floorInt()
         val tyStart = y1.div(TSIZE).floorInt()
-        val tyEnd =   y2.div(TSIZE).floorInt()
+        val tyEnd = y2.div(TSIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
 
 
     private fun isCollidingSide(hitbox: Hitbox, option: Int): Boolean {
-        val x1: Double; val x2: Double; val y1: Double; val y2: Double
+        val x1: Double;
+        val x2: Double;
+        val y1: Double;
+        val y2: Double
         if (option == COLLIDING_TOP) {
             x1 = hitbox.posX
             x2 = hitbox.endPointX
@@ -804,8 +823,8 @@ open class ActorWithBody : Actor() {
                     if (!isWalkingH)
                         Hitbox(nextHitbox.posX, nextHitbox.posY,
                                 nextHitbox.width + 2.0, nextHitbox.height + 2.0)
-                        // when not walking, enlarge the hitbox for calculation so that
-                        // feet tiles are also counted
+                    // when not walking, enlarge the hitbox for calculation so that
+                    // feet tiles are also counted
                     else
                         nextHitbox.clone()
 
@@ -823,6 +842,7 @@ open class ActorWithBody : Actor() {
 
             return friction
         }
+
     fun Int.tileFrictionToMult(): Double = this / 16.0
 
     /**
@@ -908,7 +928,8 @@ open class ActorWithBody : Actor() {
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
                         (scale).toFloat()
                 )
-            } else {
+            }
+            else {
                 spriteGlow!!.render(g,
                         (hitbox.posX - scale).toFloat(),
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
@@ -921,9 +942,9 @@ open class ActorWithBody : Actor() {
     open fun drawBody(gc: GameContainer, g: Graphics) {
         if (isVisible && sprite != null) {
             when (drawMode) {
-                DrawMode.NORMAL -> blendNormal()
+                DrawMode.NORMAL   -> blendNormal()
                 DrawMode.MULTIPLY -> blendMul()
-                DrawMode.SCREEN -> blendScreen()
+                DrawMode.SCREEN   -> blendScreen()
             }
 
             if (!sprite!!.flippedHorizontal()) {
@@ -932,7 +953,8 @@ open class ActorWithBody : Actor() {
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
                         (scale).toFloat()
                 )
-            } else {
+            }
+            else {
                 sprite!!.render(g,
                         (hitbox.posX - scale).toFloat(),
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
@@ -951,22 +973,26 @@ open class ActorWithBody : Actor() {
     }
 
     private fun clampW(x: Double): Double =
-        if (x < TSIZE + nextHitbox.width / 2) {
-            TSIZE + nextHitbox.width / 2
-        } else if (x >= (world.width * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.width / 2) {
-            (world.width * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.width / 2
-        } else {
-            x
-        }
+            if (x < TSIZE + nextHitbox.width / 2) {
+                TSIZE + nextHitbox.width / 2
+            }
+            else if (x >= (world.width * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.width / 2) {
+                (world.width * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.width / 2
+            }
+            else {
+                x
+            }
 
     private fun clampH(y: Double): Double =
-        if (y < TSIZE + nextHitbox.height) {
-            TSIZE + nextHitbox.height
-        } else if (y >= (world.height * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.height) {
-            (world.height * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.height
-        } else {
-            y
-        }
+            if (y < TSIZE + nextHitbox.height) {
+                TSIZE + nextHitbox.height
+            }
+            else if (y >= (world.height * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.height) {
+                (world.height * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.height
+            }
+            else {
+                y
+            }
 
     private fun clampWtile(x: Int): Int =
             if (x < 0) 0 else if (x >= world.width) world.width - 1 else x
@@ -995,7 +1021,9 @@ open class ActorWithBody : Actor() {
         assertPrinted = true
     }
 
-    internal fun flagDespawn() { flagDespawn = true }
+    internal fun flagDespawn() {
+        flagDespawn = true
+    }
 
     companion object {
 
@@ -1037,23 +1065,25 @@ fun Double.sqr() = this * this
 fun Double.sqrt() = Math.sqrt(this)
 fun Int.abs() = if (this < 0) -this else this
 fun Double.bipolarClamp(limit: Double) =
-        if      (this > 0 && this > limit)   limit
+        if (this > 0 && this > limit) limit
         else if (this < 0 && this < -limit) -limit
         else this
+
 fun absMax(left: Double, right: Double): Double {
     if (left > 0 && right > 0)
         if (left > right) return left
-        else              return right
+        else return right
     else if (left < 0 && right < 0)
         if (left < right) return left
-        else              return right
+        else return right
     else {
         val absL = left.abs()
         val absR = right.abs()
         if (absL > absR) return left
-        else             return right
+        else return right
     }
 }
+
 fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
 fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0
 

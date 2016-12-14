@@ -6,6 +6,7 @@ import net.torvald.spriteanimation.SpriteAnimation
 import com.google.gson.JsonObject
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
+import net.torvald.terrarum.itemproperties.ItemPropCodex
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import org.newdawn.slick.SlickException
 import java.io.IOException
@@ -74,7 +75,8 @@ object PlayerBuilderSigrid {
 
 
         // Test fill up inventory
-
+        p.inventory.add(16)
+        p.itemHolding = ItemPropCodex.getProp(16)
 
 
 

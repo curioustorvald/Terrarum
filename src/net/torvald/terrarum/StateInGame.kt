@@ -60,9 +60,9 @@ constructor() : BasicGameState() {
     lateinit var debugWindow: UIHandler
     lateinit var notifier: UIHandler
 
-    lateinit internal var playableActorDelegate: PlayableActorDelegate
+    internal var playableActorDelegate: PlayableActorDelegate? = null
     internal val player: ActorHumanoid // currently POSSESSED actor :)
-        get() = playableActorDelegate.actor
+        get() = playableActorDelegate!!.actor
 
     //private var GRADIENT_IMAGE: Image? = null
     //private var skyBox: Rectangle? = null

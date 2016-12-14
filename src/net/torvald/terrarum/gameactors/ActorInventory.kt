@@ -51,6 +51,43 @@ class ActorInventory() {
         }
     }
 
+    fun add(item: InventoryItem, count: Int = 1) = add(item.itemID, count)
+    fun add(itemID: Int, count: Int = 1) {
+        if (itemID == Player.PLAYER_REF_ID)
+            throw IllegalArgumentException("Attempted to put human player into the inventory.")
+        if (Terrarum.ingame.playableActorDelegate != null &&
+                itemID == Terrarum.ingame.player.referenceID)
+            throw IllegalArgumentException("Attempted to put active player into the inventory.")
+
+        // If we already have the item, increment the amount
+        // If not, add item with specified amount
+        itemList.put(itemID, itemList[itemID] ?: 0 + count)
+    }
+
+    fun remove(item: InventoryItem, count: Int = 1) = remove(item.itemID, count)
+    fun remove(itemID: Int, count: Int = 1) {
+        // check if the item does NOT exist
+        if (itemList[itemID] == null) {
+            return
+        }
+        else {
+            // remove the existence of the item if count <= 0
+            if (itemList[itemID]!! - count <= 0) {
+                itemList.remove(itemID)
+            }
+            // else, decrement the item count
+            else {
+                itemList.put(itemID, itemList[itemID]!! - count)
+            }
+        }
+    }
+
+
+    fun contains(item: InventoryItem) = itemList.containsKey(item.itemID)
+    fun contains(itemID: Int) = itemList.containsKey(itemID)
+
+    fun forEach(consumer: (Int, Int) -> Unit) = itemList.forEach(consumer)
+
     /**
      * Get capacity of inventory
      * @return
@@ -78,8 +115,6 @@ class ActorInventory() {
     fun getItemList(): Map<Int, Int>? {
         return itemList
     }
-
-    fun forEach(consumer: (Int, Int) -> Unit) = itemList.forEach(consumer)
 
     /**
      * Get clone of the itemList
@@ -118,21 +153,6 @@ class ActorInventory() {
      */
     fun getTotalUniqueCount(): Int {
         return itemList.entries.size
-    }
-
-    fun add(item: InventoryItem) {
-        add(item, 1)
-    }
-
-    fun add(item: InventoryItem, count: Int) {
-        val key = item.itemID
-
-        if (key == Player.PLAYER_REF_ID || key == Terrarum.ingame.player.referenceID)
-            throw IllegalArgumentException("Attempted to put active player or human player into the inventory.")
-
-        // If we already have the item, increment the amount
-        // If not, add item with specified amount
-        itemList.put(key, itemList[key] ?: 0 + count)
     }
 
     /**
