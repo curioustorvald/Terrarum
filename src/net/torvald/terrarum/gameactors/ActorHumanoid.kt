@@ -7,6 +7,7 @@ import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.gameitem.InventoryItemAdapter
 import net.torvald.terrarum.realestate.RealEstateUtility
 import org.dyn4j.geometry.Vector2
 import org.lwjgl.input.Controller
@@ -26,11 +27,8 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory = ActorInventory()
 
-    override var itemHolding: InventoryItem
-        get() = throw TODO("itemHolding")
-        set(value) {
-            throw TODO("itemHolding")
-        }
+    override var itemHolding: InventoryItem? = null
+    override val itemEquipped = ArrayList<InventoryItem>()
 
     /** Must be set by PlayerFactory */
     override var faction: HashSet<Faction> = HashSet()
@@ -136,6 +134,13 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         get() = this is Player // FIXME true iff composed by PlayableActorDelegate
 
 
+    private val nullItem = object : InventoryItemAdapter() {
+        override val itemID: Int = 0
+        override var mass: Double = 0.0
+        override var scale: Double = 1.0
+    }
+    
+
     override fun update(gc: GameContainer, delta: Int) {
         super.update(gc, delta)
 
@@ -206,12 +211,12 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
          */
         // Left mouse
         if (isGamer && input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-            itemHolding.primaryUse(gc, delta)
+            (itemHolding ?: nullItem).primaryUse(gc, delta)
         }
 
         // Right mouse
         if (isGamer && input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
-            itemHolding.secondaryUse(gc, delta)
+            (itemHolding ?: nullItem).secondaryUse(gc, delta)
         }
 
         /**
