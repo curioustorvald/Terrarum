@@ -44,6 +44,14 @@ open class ActorWithBody : Actor() {
     val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)       // Hitbox is implemented using Double;
     @Transient val nextHitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // 52 mantissas ought to be enough for anybody...
 
+    val tilewiseHitbox: Hitbox
+        get() = Hitbox.fromTwoPoints(
+                hitbox.posX.div(TILE_SIZE).floor(),
+                hitbox.posY.div(TILE_SIZE).floor(),
+                hitbox.endPointX.div(TILE_SIZE).floor(),
+                hitbox.endPointY.div(TILE_SIZE).floor()
+        )
+
     /**
      * Velocity vector for newtonian sim.
      * Acceleration: used in code like:

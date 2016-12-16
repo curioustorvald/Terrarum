@@ -1,11 +1,13 @@
 package net.torvald.terrarum.itemproperties
 
+import net.torvald.point.Point2d
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.CanBeAnItem
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.gameitem.EquipPosition
@@ -49,8 +51,13 @@ object ItemPropCodex {
                 }
 
                 override fun secondaryUse(gc: GameContainer, delta: Int) {
-                    // TODO check if occupied by ANY ActorWithBodies
-
+                    val mousePoint = Point2d(gc.mouseTileX.toDouble(), gc.mouseTileY.toDouble())
+                    // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
+                    Terrarum.ingame.actorContainer.forEach {
+                        if (it is ActorWithBody && it.tilewiseHitbox.intersects(mousePoint))
+                            return
+                    }
+                    // filter passed, do the job
                     Terrarum.ingame.world.setTileTerrain(
                             gc.mouseTileX,
                             gc.mouseTileY,
