@@ -6,11 +6,11 @@ import java.util.*
  * Created by minjaesong on 16-09-08.
  */
 object ComputerPartsCodex {
-    val rams = HashMap<Int, Int>() // itemID, capacity in bytes (0 bytes - 8 GBytes)
-    val processors = HashMap<Int, Int>() // itemID, cycles
-    val harddisks = HashMap<Int, Int>() // itemID, capacity in bytes
-    val diskettes = HashMap<Int, Int>() // itemID, capacity in bytes
-    val opticaldiscs = HashMap<Int, Int>() // itemID, capacity in bytes
+    val rams = HashMap<Int, Int>() // id, capacity in bytes (0 bytes - 8 GBytes)
+    val processors = HashMap<Int, Int>() // id, cycles
+    val harddisks = HashMap<Int, Int>() // id, capacity in bytes
+    val diskettes = HashMap<Int, Int>() // id, capacity in bytes
+    val opticaldiscs = HashMap<Int, Int>() // id, capacity in bytes
 
     init {
         // in kilobytes

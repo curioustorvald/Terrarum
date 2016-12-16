@@ -9,7 +9,6 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.gameitem.EquipPosition
-import net.torvald.terrarum.gameitem.InventoryItemAdapter
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.tileproperties.TileProp
 import net.torvald.terrarum.tileproperties.TilePropCodex
@@ -39,12 +38,11 @@ object ItemPropCodex {
     init {
         // tile items
         for (i in 0..ITEM_TILE_MAX) {
-            itemCodex[i] = object : InventoryItemAdapter() {
-                override val itemID: Int = i
+            itemCodex[i] = object : InventoryItem() {
+                override val id: Int = i
                 override val equipPosition = EquipPosition.HAND_GRIP
-                override var mass: Double = TilePropCodex.getProp(i).density / 1000.0
-                // no need to set setter as scale would not change
-                override var scale: Double = 1.0
+                override var mass: Double = TilePropCodex[i].density / 1000.0
+                override var scale: Double = 1.0 // no need to set setter as scale would not change
 
                 override fun primaryUse(gc: GameContainer, delta: Int) {
                     // TODO base punch attack
@@ -67,7 +65,7 @@ object ItemPropCodex {
         // read from save (if applicable) and fill dynamicItemDescription
     }
 
-    fun getProp(code: Int): InventoryItem {
+    operator fun get(code: Int): InventoryItem {
         if (code < ITEM_STATIC_MAX) // generic item
             return itemCodex[code]!! // from CSV
         else if (code < ITEM_DYNAMIC_MAX) {

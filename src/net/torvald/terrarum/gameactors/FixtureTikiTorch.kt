@@ -11,7 +11,7 @@ import java.util.*
 class FixtureTikiTorch : FixtureBase(), Luminous {
 
     override var luminosity: Int
-        get() = TilePropCodex.getProp(TileNameCode.TORCH).luminosity
+        get() = TilePropCodex[TileNameCode.TORCH].luminosity
         set(value) {
             throw UnsupportedOperationException()
         }
@@ -35,6 +35,6 @@ class FixtureTikiTorch : FixtureBase(), Luminous {
 
         actorValue[AVKey.BASEMASS] = 1.0
 
-        luminosity = TilePropCodex.getProp(TileNameCode.TORCH).luminosity
+        luminosity = TilePropCodex[TileNameCode.TORCH].luminosity
     }
 }

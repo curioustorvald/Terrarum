@@ -26,16 +26,16 @@ open class ActorWithBody : Actor() {
     @Transient internal var sprite: SpriteAnimation? = null
     @Transient internal var spriteGlow: SpriteAnimation? = null
 
-    internal var drawMode: DrawMode = DrawMode.NORMAL
+    protected var drawMode: DrawMode = DrawMode.NORMAL
 
     @Transient private val world: GameWorld = Terrarum.ingame.world
 
-    var hitboxTranslateX: Double = 0.0// relative to spritePosX
-    var hitboxTranslateY: Double = 0.0// relative to spritePosY
-    var baseHitboxW: Int = 0
-    var baseHitboxH: Int = 0
-    internal var baseSpriteWidth: Int = 0
-    internal var baseSpriteHeight: Int = 0
+    protected var hitboxTranslateX: Double = 0.0// relative to spritePosX
+    protected var hitboxTranslateY: Double = 0.0// relative to spritePosY
+    protected var baseHitboxW: Int = 0
+    protected var baseHitboxH: Int = 0
+    protected var baseSpriteWidth: Int = 0
+    protected var baseSpriteHeight: Int = 0
     /**
      * * Position: top-left point
      * * Unit: pixel
@@ -228,6 +228,11 @@ open class ActorWithBody : Actor() {
     internal @Volatile var walledLeft = false
     internal @Volatile var walledRight = false
 
+    protected val gameContainer: GameContainer
+        get() = Terrarum.appgc
+    protected val updateDelta: Int
+        get() = Terrarum.ingame.UPDATE_DELTA
+
     /**
      * true: This actor had just made collision
      */
@@ -292,7 +297,7 @@ open class ActorWithBody : Actor() {
     val feetPosition: Vector2
         get() = Vector2(hitbox.centeredX, hitbox.posY + hitbox.height)
 
-    override fun run() = update(Terrarum.appgc, Terrarum.ingame.UPDATE_DELTA)
+    override fun run() = update(gameContainer, updateDelta)
 
     /**
      * Add vector value to the velocity, in the time unit of single frame.
@@ -681,7 +686,7 @@ open class ActorWithBody : Actor() {
         for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
                 val tile = world.getTileFromTerrain(x, y)
-                if (TilePropCodex.getProp(tile).isSolid)
+                if (TilePropCodex[tile].isSolid)
                     return true
             }
         }
@@ -723,7 +728,7 @@ open class ActorWithBody : Actor() {
             }
 
             // evaluate
-            if (TilePropCodex.getProp(world.getTileFromTerrain(tileX, tileY)).isFluid) {
+            if (TilePropCodex[world.getTileFromTerrain(tileX, tileY)].isFluid) {
                 contactAreaCounter += 1
             }
         }
@@ -733,7 +738,7 @@ open class ActorWithBody : Actor() {
 
     private fun setHorizontalFriction() {
         val friction = if (isPlayerNoClip)
-            BASE_FRICTION * TilePropCodex.getProp(TileNameCode.STONE).friction.tileFrictionToMult()
+            BASE_FRICTION * TilePropCodex[TileNameCode.STONE].friction.tileFrictionToMult()
         else
             BASE_FRICTION * bodyFriction.tileFrictionToMult()
 
@@ -760,7 +765,7 @@ open class ActorWithBody : Actor() {
 
     private fun setVerticalFriction() {
         val friction = if (isPlayerNoClip)
-            BASE_FRICTION * TilePropCodex.getProp(TileNameCode.STONE).friction.tileFrictionToMult()
+            BASE_FRICTION * TilePropCodex[TileNameCode.STONE].friction.tileFrictionToMult()
         else
             BASE_FRICTION * bodyFriction.tileFrictionToMult()
 
@@ -835,7 +840,7 @@ open class ActorWithBody : Actor() {
 
             for (x in tilePosXStart..tilePosXEnd) {
                 val tile = world.getTileFromTerrain(x, tilePosY)
-                val thisFriction = TilePropCodex.getProp(tile).friction
+                val thisFriction = TilePropCodex[tile].friction
 
                 if (thisFriction > friction) friction = thisFriction
             }
@@ -860,7 +865,7 @@ open class ActorWithBody : Actor() {
             for (y in tilePosXStart..tilePosYEnd) {
                 for (x in tilePosXStart..tilePosXEnd) {
                     val tile = world.getTileFromTerrain(x, y)
-                    val prop = TilePropCodex.getProp(tile)
+                    val prop = TilePropCodex[tile]
 
                     if (prop.isFluid && prop.density > density)
                         density = prop.density
@@ -885,7 +890,7 @@ open class ActorWithBody : Actor() {
             for (y in tilePosYStart..tilePosYEnd) {
                 for (x in tilePosXStart..tilePosXEnd) {
                     val tile = world.getTileFromTerrain(x, y)
-                    val thisFluidDensity = TilePropCodex.getProp(tile).density
+                    val thisFluidDensity = TilePropCodex[tile].density
 
                     if (thisFluidDensity > density) density = thisFluidDensity
                 }
