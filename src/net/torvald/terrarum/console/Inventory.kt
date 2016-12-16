@@ -21,7 +21,8 @@ internal object Inventory : ConsoleCommand {
         else {
             when (args[1]) {
                 "list"   -> listInventory()
-                "add"    -> addItem(args[2].toInt(), args[3].toInt())
+                "add"    -> if (args.size > 3) addItem(args[2].toInt(), args[3].toInt())
+                            else               addItem(args[2].toInt())
                 "target" -> setTarget(args[2].toInt())
                 "equip"  -> equipItem(args[2].toInt())
                 else     -> printUsage()
@@ -54,11 +55,11 @@ internal object Inventory : ConsoleCommand {
     }
 
     private fun addItem(refId: Int, amount: Int = 1) {
-        target.inventory.add(ItemPropCodex.getProp(refId), amount)
+        target.inventory.add(ItemPropCodex[refId], amount)
     }
 
     private fun equipItem(refId: Int) {
-        val item = ItemPropCodex.getProp(refId)
+        val item = ItemPropCodex[refId]
 
         // if the item does not exist, add it first
         if (!target.inventory.contains(item)) {
