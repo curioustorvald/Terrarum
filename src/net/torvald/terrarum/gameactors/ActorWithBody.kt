@@ -7,11 +7,14 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.tileproperties.TilePropCodex
 import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.terrarum.mapdrawer.MapDrawer.TILE_SIZE
 import net.torvald.terrarum.tileproperties.TileNameCode
+import net.torvald.terrarum.tileproperties.TileProp
 import org.dyn4j.Epsilon
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
+import java.util.*
 
 /**
  * Base class for every actor that has physical (or echo) body. This includes furnishings, paintings, gadgets, etc.
@@ -832,27 +835,9 @@ open class ActorWithBody : Actor() {
     internal val bodyFriction: Int
         get() {
             var friction = 0
-            val frictionCalcHitbox =
-                    if (!isWalkingH)
-                        Hitbox(nextHitbox.posX,
-                                nextHitbox.posY,
-                                nextHitbox.width + 2.0,
-                                nextHitbox.height + 2.0)
-                    // when not walking, enlarge the hitbox for calculation so that
-                    // feet tiles are also counted
-                    else
-                        nextHitbox.clone()
-
-            // take highest value
-            val tilePosXStart = (frictionCalcHitbox.posX / TILE_SIZE).floorInt()
-            val tilePosXEnd = (frictionCalcHitbox.hitboxEnd.x / TILE_SIZE).floorInt()
-            val tilePosY = (frictionCalcHitbox.pointedY / TILE_SIZE).floorInt()
-
-            for (x in tilePosXStart..tilePosXEnd) {
-                val tile = world.getTileFromTerrain(x, tilePosY)
-                val thisFriction = TilePropCodex[tile].friction
-
-                if (thisFriction > friction) friction = thisFriction
+            forEachFeetTile {
+                if (it?.friction ?: 4 > friction) // 4: friction of the air
+                    friction = it?.friction ?: 4
             }
 
             return friction
@@ -866,21 +851,13 @@ open class ActorWithBody : Actor() {
     private val tileDensityFluid: Int
         get() {
             var density = 0
-
-            // take highest value
-            val tilePosXStart = (hitbox.posX / TILE_SIZE).roundInt()
-            val tilePosXEnd = (hitbox.hitboxEnd.x / TILE_SIZE).roundInt()
-            val tilePosYStart = (hitbox.posY / TILE_SIZE).roundInt()
-            val tilePosYEnd = (hitbox.hitboxEnd.y / TILE_SIZE).roundInt()
-            for (y in tilePosXStart..tilePosYEnd) {
-                for (x in tilePosXStart..tilePosXEnd) {
-                    val tile = world.getTileFromTerrain(x, y)
-                    val prop = TilePropCodex[tile]
-
-                    if (prop.isFluid && prop.density > density)
-                        density = prop.density
+            forEachOccupyingTile {
+                // get max density for each tile
+                if (it?.isFluid ?: false && it?.density ?: 0 > density) {
+                    density = it?.density ?: 0
                 }
             }
+
             return density
         }
 
@@ -891,18 +868,10 @@ open class ActorWithBody : Actor() {
     private val tileDensity: Int
         get() {
             var density = 0
-
-            //get highest fluid density
-            val tilePosXStart = (nextHitbox.posX / TILE_SIZE).roundInt()
-            val tilePosYStart = (nextHitbox.posY / TILE_SIZE).roundInt()
-            val tilePosXEnd = (nextHitbox.hitboxEnd.x / TILE_SIZE).roundInt()
-            val tilePosYEnd = (nextHitbox.hitboxEnd.y / TILE_SIZE).roundInt()
-            for (y in tilePosYStart..tilePosYEnd) {
-                for (x in tilePosXStart..tilePosXEnd) {
-                    val tile = world.getTileFromTerrain(x, y)
-                    val thisFluidDensity = TilePropCodex[tile].density
-
-                    if (thisFluidDensity > density) density = thisFluidDensity
+            forEachOccupyingTile {
+                // get max density for each tile
+                if (it?.density ?: 0 > density) {
+                    density = it?.density ?: 0
                 }
             }
 
@@ -1038,6 +1007,54 @@ open class ActorWithBody : Actor() {
 
     internal fun flagDespawn() {
         flagDespawn = true
+    }
+
+    private fun forEachOccupyingTileNum(consumer: (Int?) -> Unit) {
+        val tiles = ArrayList<Int?>()
+        for (y in tilewiseHitbox.posY.toInt()..tilewiseHitbox.endPointY.toInt()) {
+            for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endPointX.toInt()) {
+                tiles.add(world.getTileFromTerrain(x, y))
+            }
+        }
+
+        return tiles.forEach(consumer)
+    }
+
+    private fun forEachOccupyingTile(consumer: (TileProp?) -> Unit) {
+        val tileProps = ArrayList<TileProp?>()
+        for (y in tilewiseHitbox.posY.toInt()..tilewiseHitbox.endPointY.toInt()) {
+            for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endPointX.toInt()) {
+                tileProps.add(TilePropCodex[world.getTileFromTerrain(x, y)])
+            }
+        }
+
+        return tileProps.forEach(consumer)
+    }
+
+    private fun forEachFeetTileNum(consumer: (Int?) -> Unit) {
+        val tiles = ArrayList<Int?>()
+
+        // offset 1 pixel to the down so that friction would work
+        val y = nextHitbox.endPointY.plus(1.0).div(TILE_SIZE).floorInt()
+
+        for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endPointX.toInt()) {
+            tiles.add(world.getTileFromTerrain(x, y))
+        }
+
+        return tiles.forEach(consumer)
+    }
+
+    private fun forEachFeetTile(consumer: (TileProp?) -> Unit) {
+        val tileProps = ArrayList<TileProp?>()
+
+        // offset 1 pixel to the down so that friction would work
+        val y = nextHitbox.endPointY.plus(1.0).div(TILE_SIZE).floorInt()
+
+        for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endPointX.toInt()) {
+            tileProps.add(TilePropCodex[world.getTileFromTerrain(x, y)])
+        }
+
+        return tileProps.forEach(consumer)
     }
 
     companion object {
