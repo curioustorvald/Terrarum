@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.gameactors.ActorHumanoid
+import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.gameitem.InventoryItemAdapter
 import org.luaj.vm2.Globals
@@ -42,6 +43,7 @@ open class HumanoidNPC(aiFile: String, born: GameDate) : ActorHumanoid(born), AI
     // we're having InventoryItem data so that this class could be somewhat universal
     override var itemData: InventoryItem = object : InventoryItemAdapter() {
         override var itemID = referenceID
+        override val equipPosition: Int = EquipPosition.HAND_GRIP
 
         override var mass: Double
             get() = actorValue.getAsDouble(AVKey.BASEMASS)!!

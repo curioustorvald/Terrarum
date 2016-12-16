@@ -10,13 +10,9 @@ interface Pocketed {
 
     var inventory: ActorInventory
 
-    /** Item currentry holding, like tools/weapons/scrolls/magic/etc.
-     *  Null if not holding anything
-     */
-    var itemHolding: InventoryItem?
     /**
      * List of all equipped items (tools, armours, rings, necklaces, etc.)
      */
-    val itemEquipped: ArrayList<InventoryItem>
+    val itemEquipped: Array<InventoryItem?>
 
 }

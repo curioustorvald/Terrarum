@@ -7,6 +7,7 @@ import org.newdawn.slick.GameContainer
  */
 abstract class InventoryItemAdapter : InventoryItem {
     override abstract val itemID: Int
+    override abstract val equipPosition: Int
     override abstract var mass: Double
     override abstract var scale: Double
 
@@ -25,6 +26,9 @@ abstract class InventoryItemAdapter : InventoryItem {
     override fun effectWhenThrown(gc: GameContainer, delta: Int) {
     }
 
-    override fun effectWhenTakenOut(gc: GameContainer, delta: Int) {
+    override fun effectWhenEquipped(gc: GameContainer, delta: Int) {
+    }
+
+    override fun effectWhenUnEquipped(gc: GameContainer, delta: Int) {
     }
 }
