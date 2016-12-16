@@ -4,24 +4,25 @@ import net.torvald.point.Point2d
 import org.dyn4j.geometry.Vector2
 
 /**
+ * Constructor: (top-left position, width, height)
+ *
+ * Can also use Hitbox.fromTwoPoints(x1, y1, x2, y2
+ *
  * Created by minjaesong on 16-01-15.
  */
 class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
 
     @Volatile var hitboxStart: Point2d
         private set
-    @Volatile var hitboxEnd: Point2d
-        private set
+    val hitboxEnd: Point2d
+        get() = Point2d(hitboxStart.x + width, hitboxStart.y + height)
     var width: Double = 0.0
         private set
     var height: Double = 0.0
         private set
 
-    val HALF_PIXEL = 0.5
-
     init {
         hitboxStart = Point2d(x1, y1)
-        hitboxEnd = Point2d(x1 + width, y1 + height)
         this.width = width
         this.height = height
     }
@@ -35,7 +36,7 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
      * @return pointX
      */
     val pointedX: Double
-        get() = hitboxStart.x + width / 2
+        get() = centeredX
 
     /**
      * Returns bottom-centered point of hitbox.
@@ -56,21 +57,22 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
      * @param width
      * @param height
      */
-    fun set(x1: Double, y1: Double, width: Double, height: Double): Hitbox {
+    fun setFromWidthHeight(x1: Double, y1: Double, width: Double, height: Double): Hitbox {
         hitboxStart = Point2d(x1, y1)
-        hitboxEnd = Point2d(x1 + width, y1 + height)
         this.width = width
         this.height = height
         return this
     }
-    fun reassign(other: Hitbox) = set(other.posX, other.posY, other.width, other.height)
+    fun setFromTwoPoints(x1: Double, y1: Double, x2: Double, y2: Double): Hitbox {
+        return setFromWidthHeight(x1, y1, x2 - x1, y2 - y1)
+    }
+    fun reassign(other: Hitbox) = setFromTwoPoints(other.posX, other.posY, other.endPointX, other.endPointY)
 
     fun translate(x: Double, y: Double) = setPosition(posX + x, posY + y)
     fun translate(vec: Vector2) = translate(vec.x, vec.y)
 
     fun setPosition(x1: Double, y1: Double): Hitbox {
         hitboxStart = Point2d(x1, y1)
-        hitboxEnd = Point2d(x1 + width, y1 + height)
         return this
     }
     fun setPosition(vector: Vector2) = setPosition(vector.x, vector.y)
@@ -80,7 +82,6 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
 
     fun setPositionFromPoint(x1: Double, y1: Double): Hitbox {
         hitboxStart = Point2d(x1 - width / 2, y1 - height)
-        hitboxEnd = Point2d(hitboxStart.x + width, hitboxStart.y + height)
         return this
     }
 
@@ -100,14 +101,6 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
         return this
     }
 
-    /*fun snapToPixel(): Hitbox {
-        hitboxStart.x = Math.round(hitboxStart.x - HALF_PIXEL).toDouble()
-        hitboxStart.y = Math.round(hitboxStart.y - HALF_PIXEL).toDouble()
-        hitboxEnd.x = Math.round(hitboxEnd.x - HALF_PIXEL).toDouble()
-        hitboxEnd.y = Math.round(hitboxEnd.y - HALF_PIXEL).toDouble()
-        return this
-    }*/
-
     /**
      * Returns x value of start point
      * @return top-left point posX
@@ -123,12 +116,21 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
         get() = hitboxStart.y
 
     val centeredX: Double
-        get() = (hitboxStart.x + hitboxEnd.x) * 0.5f
+        get() = (hitboxStart.x + hitboxEnd.x) * 0.5
 
     val centeredY: Double
-        get() = (hitboxStart.y + hitboxEnd.y) * 0.5f
+        get() = (hitboxStart.y + hitboxEnd.y) * 0.5
+
+    fun intersects(position: Point2d) =
+            (position.x >= posX && position.x <= posX + width) &&
+            (position.y >= posY && position.y <= posY + height)
 
     fun toVector(): Vector2 = Vector2(posX, posY)
 
     fun clone(): Hitbox = Hitbox(posX, posY, width, height)
+
+    companion object {
+        fun fromTwoPoints(x1: Double, y1: Double, x2: Double, y2: Double) =
+                Hitbox(x1, y1, x2 - x1, y2 - y1)
+    }
 }
