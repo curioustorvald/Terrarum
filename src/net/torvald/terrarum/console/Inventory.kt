@@ -4,6 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorInventory
 import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.gameactors.Pocketed
+import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.itemproperties.ItemPropCodex
 
 /**
@@ -22,7 +23,7 @@ internal object Inventory : ConsoleCommand {
                 "list"   -> listInventory()
                 "add"    -> addItem(args[2].toInt(), args[3].toInt())
                 "target" -> setTarget(args[2].toInt())
-                "hold"  -> holdItem(args[2].toInt())
+                "equip"  -> equipItem(args[2].toInt())
                 else     -> printUsage()
             }
         }
@@ -56,19 +57,20 @@ internal object Inventory : ConsoleCommand {
         target.inventory.add(ItemPropCodex.getProp(refId), amount)
     }
 
-    private fun holdItem(refId: Int) {
+    private fun equipItem(refId: Int) {
+        val item = ItemPropCodex.getProp(refId)
+
         // if the item does not exist, add it first
-        if (!target.inventory.contains(refId)) {
-            target.inventory.add(refId)
+        if (!target.inventory.contains(item)) {
+            target.inventory.add(item)
         }
 
-        target.itemHolding = ItemPropCodex.getProp(refId)
+        target.itemEquipped[item.equipPosition] = item
     }
 
     override fun printUsage() {
         Echo("Usage: inventory command arguments")
         Echo("Available commands:")
-        Echo("list | assign slot | add itemid [amount] | target [actorid] | hold itemid")
-        Echo("equip itemid")
+        Echo("list | assign slot | add itemid [amount] | target [actorid] | equip itemid")
     }
 }

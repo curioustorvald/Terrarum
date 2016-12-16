@@ -6,6 +6,7 @@ import net.torvald.spriteanimation.SpriteAnimation
 import com.google.gson.JsonObject
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
+import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.itemproperties.ItemPropCodex
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import org.newdawn.slick.SlickException
@@ -61,7 +62,7 @@ object PlayerBuilderSigrid {
         p.actorValue[AVKey.BASEDEFENCE] = 141
 
         p.actorValue[AVKey.__PLAYER_QUICKBARSEL] = 0
-        p.actorValue["__selectedtile"] = 147 // test code; replace with <tile_item>.primaryUse(gc, delta)
+        //p.actorValue["__selectedtile"] = 147 // test code; replace with <tile_item>.primaryUse(gc, delta)
         p.actorValue["__aimhelper"] = true // TODO when you'll gonna implement it?
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 10, 0)
@@ -76,7 +77,7 @@ object PlayerBuilderSigrid {
 
         // Test fill up inventory
         p.inventory.add(16)
-        p.itemHolding = ItemPropCodex.getProp(16)
+        p.itemEquipped[EquipPosition.HAND_GRIP] = ItemPropCodex.getProp(16)
 
 
 

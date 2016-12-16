@@ -12,7 +12,8 @@ import org.newdawn.slick.GameContainer
  *
  * Created by minjaesong on 16-09-08.
  */
-open class DynamicItem(val baseItemID: Int, val newMass: Double? = null, val newScale: Double? = null) : InventoryItem {
+open class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: Double? = null)
+    : InventoryItemAdapter() {
 
     /**
      * Internal ID of an Item, Long
@@ -22,6 +23,13 @@ open class DynamicItem(val baseItemID: Int, val newMass: Double? = null, val new
      * >= 16777216: Actor RefID
      */
     override val itemID: Int = generateUniqueDynamicItemID()
+
+    override val equipPosition: Int = // default to HAND_GRIP if no baseItemID given
+            if (baseItemID != null)
+                ItemPropCodex.getProp(baseItemID).equipPosition
+            else
+                EquipPosition.HAND_GRIP
+
 
     private fun generateUniqueDynamicItemID(): Int {
         var ret: Int
@@ -55,38 +63,18 @@ open class DynamicItem(val baseItemID: Int, val newMass: Double? = null, val new
 
     init {
         // set mass to the value from item codex using baseItemID
-        // if you forget this, the game will throw NullPointerException!
-        if (newMass != null) mass = newMass
-        if (newScale != null) scale = newScale
+        if (baseItemID == null) {
+            mass = newMass!!
+        }
+        else {
+            mass = newMass ?: ItemPropCodex.getProp(baseItemID).mass
+        }
+
+        if (baseItemID == null) {
+            scale = newScale!!
+        }
+        else {
+            scale = newScale ?: ItemPropCodex.getProp(baseItemID).scale
+        }
     }
-
-    /**
-     * Effects applied continuously while in pocket
-     */
-    override fun effectWhileInPocket(gc: GameContainer, delta: Int) { }
-
-    /**
-     * Effects applied immediately only once if picked up
-     */
-    override fun effectWhenPickedUp(gc: GameContainer, delta: Int) { }
-
-    /**
-     * Effects applied (continuously or not) while primary button (usually left mouse button) is down
-     */
-    override fun primaryUse(gc: GameContainer, delta: Int) { }
-
-    /**
-     * Effects applied (continuously or not) while secondary button (usually right mouse button) is down
-     */
-    override fun secondaryUse(gc: GameContainer, delta: Int) { }
-
-    /**
-     * Effects applied immediately only once if thrown from pocket
-     */
-    override fun effectWhenThrown(gc: GameContainer, delta: Int) { }
-
-    /**
-     * Effects applied (continuously or not) while thrown to the world
-     */
-    override fun effectWhenTakenOut(gc: GameContainer, delta: Int) { }
 }

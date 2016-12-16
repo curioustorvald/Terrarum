@@ -6,6 +6,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
+import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.gameitem.InventoryItemAdapter
 import net.torvald.terrarum.realestate.RealEstateUtility
@@ -27,8 +28,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory = ActorInventory()
 
-    override var itemHolding: InventoryItem? = null
-    override val itemEquipped = ArrayList<InventoryItem>()
+    override val itemEquipped = Array<InventoryItem?>(EquipPosition.INDEX_MAX + 1, { null })
 
     /** Must be set by PlayerFactory */
     override var faction: HashSet<Faction> = HashSet()
@@ -136,6 +136,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     private val nullItem = object : InventoryItemAdapter() {
         override val itemID: Int = 0
+        override val equipPosition: Int = EquipPosition.NULL
         override var mass: Double = 0.0
         override var scale: Double = 1.0
     }
@@ -211,12 +212,12 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
          */
         // Left mouse
         if (isGamer && input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-            (itemHolding ?: nullItem).primaryUse(gc, delta)
+            (itemEquipped[EquipPosition.HAND_GRIP] ?: nullItem).primaryUse(gc, delta)
         }
 
         // Right mouse
         if (isGamer && input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
-            (itemHolding ?: nullItem).secondaryUse(gc, delta)
+            (itemEquipped[EquipPosition.HAND_GRIP] ?: nullItem).secondaryUse(gc, delta)
         }
 
         /**
