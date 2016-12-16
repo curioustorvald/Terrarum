@@ -18,8 +18,8 @@ import java.util.*
  */
 
 object LightmapRenderer {
-    val overscan_open: Int = Math.min(32, 256f.div(TilePropCodex.getProp(TileNameCode.AIR).opacity and 0xFF).toFloat().ceil())
-    val overscan_opaque: Int = Math.min(8, 256f.div(TilePropCodex.getProp(TileNameCode.STONE).opacity and 0xFF).toFloat().ceil())
+    val overscan_open: Int = Math.min(32, 256f.div(TilePropCodex[TileNameCode.AIR].opacity and 0xFF).toFloat().ceil())
+    val overscan_opaque: Int = Math.min(8, 256f.div(TilePropCodex[TileNameCode.STONE].opacity and 0xFF).toFloat().ceil())
 
     private val LIGHTMAP_WIDTH = Terrarum.ingame.ZOOM_MIN.inv().times(Terrarum.WIDTH)
             .div(MapDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
@@ -152,7 +152,7 @@ object LightmapRenderer {
         for (i in 0..rect_size) {
             val point = edgeToMaskNum(i)
             val tile = Terrarum.ingame.world.getTileFromTerrain(point.first, point.second) ?: TileNameCode.NULL
-            val isSolid = TilePropCodex.getProp(tile).isSolid
+            val isSolid = TilePropCodex[tile].isSolid
 
             noop_mask.set(i, isSolid)
         }
@@ -237,8 +237,8 @@ object LightmapRenderer {
         var lightLevelThis: Int = 0
         val thisTerrain = Terrarum.ingame.world.getTileFromTerrain(x, y)
         val thisWall = Terrarum.ingame.world.getTileFromWall(x, y)
-        val thisTileLuminosity = TilePropCodex.getProp(thisTerrain).luminosity
-        val thisTileOpacity = TilePropCodex.getProp(thisTerrain).opacity
+        val thisTileLuminosity = TilePropCodex[thisTerrain].luminosity
+        val thisTileOpacity = TilePropCodex[thisTerrain].opacity
         val sunLight = Terrarum.ingame.world.globalLight
 
         // MIX TILE

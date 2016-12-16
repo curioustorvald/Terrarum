@@ -12,17 +12,17 @@ import org.newdawn.slick.Graphics
 class DroppedItem(private val item: InventoryItem) : ActorWithBody() {
 
     init {
-        if (item.itemID >= ItemPropCodex.ITEM_COUNT_MAX)
+        if (item.id >= ItemPropCodex.ITEM_COUNT_MAX)
             throw RuntimeException("Attempted to create DroppedItem actor of a real actor; the real actor must be dropped instead.")
 
         isVisible = true
 
-        mass = if (item.itemID < TilePropCodex.TILE_UNIQUE_MAX)
-            TilePropCodex.getProp(item.itemID).density / 1000.0
+        mass = if (item.id < TilePropCodex.TILE_UNIQUE_MAX)
+            TilePropCodex[item.id].density / 1000.0
         else
-            ItemPropCodex.getProp(item.itemID).mass
+            ItemPropCodex[item.id].mass
 
-        scale = ItemPropCodex.getProp(item.itemID).scale
+        scale = ItemPropCodex[item.id].scale
     }
 
     override fun update(gc: GameContainer, delta: Int) {

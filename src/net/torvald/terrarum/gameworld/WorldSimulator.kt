@@ -206,13 +206,13 @@ object WorldSimulator {
         }
     }
 
-    fun Int.isFluid() = TilePropCodex.getProp(this).isFluid
-    fun Int.isSolid() = this.fluidLevel() == FLUID_MAX || TilePropCodex.getProp(this).isSolid
-    //fun Int.viscosity() = TilePropCodex.getProp(this).
+    fun Int.isFluid() = TilePropCodex[this].isFluid
+    fun Int.isSolid() = this.fluidLevel() == FLUID_MAX || TilePropCodex[this].isSolid
+    //fun Int.viscosity() = TilePropCodex[this].
     fun Int.fluidLevel() = if (!this.isFluid()) 0 else (this % FLUID_MAX) + 1
     fun Int.fluidType() = this / FLUID_MAX
     fun Int.isEven() = (this and 0x01) == 0
-    fun Int.isFallable() = TilePropCodex.getProp(this).isFallable
+    fun Int.isFallable() = TilePropCodex[this].isFallable
 
     private fun placeFluid(world: GameWorld, x: Int, y: Int, fluidType: Byte, amount: Int) {
         if (world.layerTerrain.isInBound(x, y)) {

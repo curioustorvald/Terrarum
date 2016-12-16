@@ -43,7 +43,7 @@ object TilePropCodex {
 
     }
 
-    fun getProp(index: Int, damage: Int): TileProp {
+    fun get(index: Int, damage: Int): TileProp {
         try {
             tileProps[idDamageToIndex(index, damage)].id
         }
@@ -54,7 +54,7 @@ object TilePropCodex {
         return tileProps[idDamageToIndex(index, damage)]
     }
 
-    fun getProp(rawIndex: Int?): TileProp {
+    operator fun get(rawIndex: Int?): TileProp {
         try {
             tileProps[rawIndex ?: TileNameCode.NULL].id
         }

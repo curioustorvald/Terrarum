@@ -3,7 +3,6 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
-import net.torvald.terrarum.gameitem.InventoryItemAdapter
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
@@ -41,8 +40,8 @@ open class HumanoidNPC(aiFile: String, born: GameDate) : ActorHumanoid(born), AI
     }
 
     // we're having InventoryItem data so that this class could be somewhat universal
-    override var itemData: InventoryItem = object : InventoryItemAdapter() {
-        override var itemID = referenceID
+    override var itemData: InventoryItem = object : InventoryItem() {
+        override var id = referenceID
         override val equipPosition: Int = EquipPosition.HAND_GRIP
 
         override var mass: Double

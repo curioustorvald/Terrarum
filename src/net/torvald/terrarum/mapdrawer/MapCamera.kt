@@ -387,8 +387,8 @@ object MapCamera {
         var ret = 0
         for (i in 0..3) {
             try {
-                if (!TilePropCodex.getProp(nearbyTiles[i]).isSolid &&
-                        !TilePropCodex.getProp(nearbyTiles[i]).isFluid) {
+                if (!TilePropCodex[nearbyTiles[i]].isSolid &&
+                    !TilePropCodex[nearbyTiles[i]].isFluid) {
                     ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
                 }
             } catch (e: ArrayIndexOutOfBoundsException) {
@@ -408,26 +408,26 @@ object MapCamera {
         nearbyTiles[NEARBY_TILE_KEY_BACK] =  WORLD.getTileFrom(WALL,    x    , y) ?: 4096
 
         try {
-            if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_DOWN]).isSolid)
+            if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolid)
                 // has tile on the bottom
                 return 3
-            else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_RIGHT]).isSolid
-                    && TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_LEFT]).isSolid)
+            else if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid
+                    && TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid)
                 // has tile on both sides
                 return 0
-            else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_RIGHT]).isSolid)
+            else if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid)
                 // has tile on the right
                 return 2
-            else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_LEFT]).isSolid)
+            else if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid)
                 // has tile on the left
                 return 1
-            else if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_BACK]).isSolid)
+            else if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_BACK]].isSolid)
                 // has tile on the back
                 return 0
             else
                 return 3
         } catch (e: ArrayIndexOutOfBoundsException) {
-            return if (TilePropCodex.getProp(nearbyTiles[NEARBY_TILE_KEY_DOWN]).isSolid)
+            return if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolid)
                 // has tile on the bottom
                 3 else 0
         }

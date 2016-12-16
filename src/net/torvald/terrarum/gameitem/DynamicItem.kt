@@ -13,7 +13,7 @@ import org.newdawn.slick.GameContainer
  * Created by minjaesong on 16-09-08.
  */
 open class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: Double? = null)
-    : InventoryItemAdapter() {
+    : InventoryItem() {
 
     /**
      * Internal ID of an Item, Long
@@ -22,11 +22,11 @@ open class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: 
      * 32768-16777215: Dynamic items
      * >= 16777216: Actor RefID
      */
-    override val itemID: Int = generateUniqueDynamicItemID()
+    override val id: Int = generateUniqueDynamicItemID()
 
     override val equipPosition: Int = // default to HAND_GRIP if no baseItemID given
             if (baseItemID != null)
-                ItemPropCodex.getProp(baseItemID).equipPosition
+                ItemPropCodex[baseItemID].equipPosition
             else
                 EquipPosition.HAND_GRIP
 
@@ -67,14 +67,14 @@ open class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: 
             mass = newMass!!
         }
         else {
-            mass = newMass ?: ItemPropCodex.getProp(baseItemID).mass
+            mass = newMass ?: ItemPropCodex[baseItemID].mass
         }
 
         if (baseItemID == null) {
             scale = newScale!!
         }
         else {
-            scale = newScale ?: ItemPropCodex.getProp(baseItemID).scale
+            scale = newScale ?: ItemPropCodex[baseItemID].scale
         }
     }
 }

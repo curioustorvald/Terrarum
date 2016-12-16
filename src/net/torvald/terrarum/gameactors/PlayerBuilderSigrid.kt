@@ -77,7 +77,7 @@ object PlayerBuilderSigrid {
 
         // Test fill up inventory
         p.inventory.add(16)
-        p.itemEquipped[EquipPosition.HAND_GRIP] = ItemPropCodex.getProp(16)
+        p.equipItem(ItemPropCodex[16])
 
 
 
