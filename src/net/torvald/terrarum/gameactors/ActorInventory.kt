@@ -24,7 +24,7 @@ class ActorInventory() {
     /**
      * HashMap<ReferenceID, Amounts>
      */
-    private val itemList: HashMap<Int, Int> = HashMap()
+    private val itemList: HashMap<InventoryItem, Int> = HashMap()
 
     /**
      * Default constructor with no encumbrance.
@@ -51,42 +51,42 @@ class ActorInventory() {
         }
     }
 
-    fun add(item: InventoryItem, count: Int = 1) = add(item.itemID, count)
-    fun add(itemID: Int, count: Int = 1) {
-        if (itemID == Player.PLAYER_REF_ID)
+    fun add(itemID: Int, count: Int = 1) = add(ItemPropCodex[itemID], count)
+    fun add(item: InventoryItem, count: Int = 1) {
+        if (item.id == Player.PLAYER_REF_ID)
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
         if (Terrarum.ingame.playableActorDelegate != null &&
-                itemID == Terrarum.ingame.player.referenceID)
+                item.id == Terrarum.ingame.player.referenceID)
             throw IllegalArgumentException("Attempted to put active player into the inventory.")
 
         // If we already have the item, increment the amount
         // If not, add item with specified amount
-        itemList.put(itemID, itemList[itemID] ?: 0 + count)
+        itemList.put(item, itemList[item] ?: 0 + count)
     }
 
-    fun remove(item: InventoryItem, count: Int = 1) = remove(item.itemID, count)
-    fun remove(itemID: Int, count: Int = 1) {
+    fun remove(itemID: Int, count: Int = 1) = remove(ItemPropCodex[itemID], count)
+    fun remove(item: InventoryItem, count: Int = 1) {
         // check if the item does NOT exist
-        if (itemList[itemID] == null) {
+        if (itemList[item] == null) {
             return
         }
         else {
             // remove the existence of the item if count <= 0
-            if (itemList[itemID]!! - count <= 0) {
-                itemList.remove(itemID)
+            if (itemList[item]!! - count <= 0) {
+                itemList.remove(item)
             }
             // else, decrement the item count
             else {
-                itemList.put(itemID, itemList[itemID]!! - count)
+                itemList.put(item, itemList[item]!! - count)
             }
         }
     }
 
 
-    fun contains(item: InventoryItem) = itemList.containsKey(item.itemID)
-    fun contains(itemID: Int) = itemList.containsKey(itemID)
+    fun contains(item: InventoryItem) = itemList.containsKey(item)
+    fun contains(itemID: Int) = itemList.containsKey(ItemPropCodex[itemID])
 
-    fun forEach(consumer: (Int, Int) -> Unit) = itemList.forEach(consumer)
+    fun forEach(consumer: (InventoryItem, Int) -> Unit) = itemList.forEach(consumer)
 
     /**
      * Get capacity of inventory
@@ -112,7 +112,7 @@ class ActorInventory() {
      * Get reference to the itemList
      * @return
      */
-    fun getItemList(): Map<Int, Int>? {
+    fun getItemList(): Map<InventoryItem, Int>? {
         return itemList
     }
 
@@ -121,16 +121,13 @@ class ActorInventory() {
      * @return
      */
     @Suppress("UNCHECKED_CAST")
-    fun getCopyOfItemList(): Map<Int, Int>? {
-        return itemList.clone() as Map<Int, Int>
+    fun getCopyOfItemList(): Map<InventoryItem, Int>? {
+        return itemList.clone() as Map<InventoryItem, Int>
     }
 
     fun getTotalWeight(): Double {
         var weight = 0.0
-
-        for (item in itemList.entries) {
-            weight += ItemPropCodex.getProp(item.key).mass * item.value
-        }
+        itemList.forEach { item, i -> weight += item.mass * i }
 
         return weight
     }
@@ -140,10 +137,7 @@ class ActorInventory() {
      */
     fun getTotalCount(): Int {
         var count = 0
-
-        for (item in itemList.entries) {
-            count += item.value
-        }
+        itemList.forEach { item, i -> count += i }
 
         return count
     }
@@ -152,7 +146,7 @@ class ActorInventory() {
      * Unique amount, multiple items are calculated as one
      */
     fun getTotalUniqueCount(): Int {
-        return itemList.entries.size
+        return itemList.size
     }
 
     /**

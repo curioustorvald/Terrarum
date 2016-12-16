@@ -8,7 +8,6 @@ import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
-import net.torvald.terrarum.gameitem.InventoryItemAdapter
 import net.torvald.terrarum.realestate.RealEstateUtility
 import org.dyn4j.geometry.Vector2
 import org.lwjgl.input.Controller
@@ -134,13 +133,12 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         get() = this is Player // FIXME true iff composed by PlayableActorDelegate
 
 
-    private val nullItem = object : InventoryItemAdapter() {
-        override val itemID: Int = 0
+    private val nullItem = object : InventoryItem() {
+        override val id: Int = 0
         override val equipPosition: Int = EquipPosition.NULL
         override var mass: Double = 0.0
         override var scale: Double = 1.0
     }
-    
 
     override fun update(gc: GameContainer, delta: Int) {
         super.update(gc, delta)
@@ -162,6 +160,33 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             isLeftDown = false
             isRightDown = false
             isJumpDown = false
+        }
+
+        // update inventory items
+        inventory.forEach { item, amount ->
+            if (!itemEquipped.contains(item)) { // unequipped
+                item.effectWhileInPocket(gc, delta)
+            }
+            else { // equipped
+                item.effectWhenEquipped(gc, delta)
+            }
+        }
+    }
+
+    fun unequipItem(item: InventoryItem) {
+        for (i in 0..itemEquipped.size - 1) {
+            val it = itemEquipped[i]
+            if (item == it) {
+                it.effectWhenUnEquipped(gameContainer, updateDelta)
+                itemEquipped[i] = null // remove from the array by nulling it
+                break
+            }
+        }
+    }
+
+    fun equipItem(item: InventoryItem) {
+        if (item.equipPosition >= 0) {
+            itemEquipped[item.equipPosition] = item
         }
     }
 
