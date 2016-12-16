@@ -5,7 +5,7 @@ import org.newdawn.slick.GameContainer
 /**
  * Created by minjaesong on 16-01-16.
  */
-interface InventoryItem {
+abstract class InventoryItem {
     /**
      * Internal ID of an Item, Long
      * 0-4095: Tiles
@@ -13,18 +13,18 @@ interface InventoryItem {
      * 32768-16777215: Dynamic items
      * >= 16777216: Actor RefID
      */
-    val itemID: Int
+    abstract val id: Int
 
     /**
      * Where to equip the item
      */
-    val equipPosition: Int
+    abstract val equipPosition: Int
 
     /**
      * Base mass of the item. Real mass must be calculated from
      *      mass * scale^3
      */
-    var mass: Double
+    abstract var mass: Double
 
     /**
      * Scale of the item.
@@ -32,42 +32,56 @@ interface InventoryItem {
      * For static item, it must be 1.0. If you tinkered the item to be bigger,
      * it must be re-assigned as Dynamic Item
      */
-    var scale: Double
+    abstract var scale: Double
 
     /**
      * Effects applied continuously while in pocket
      */
-    fun effectWhileInPocket(gc: GameContainer, delta: Int)
+    open fun effectWhileInPocket(gc: GameContainer, delta: Int) { }
 
     /**
      * Effects applied immediately only once if picked up
      */
-    fun effectWhenPickedUp(gc: GameContainer, delta: Int)
+    open fun effectWhenPickedUp(gc: GameContainer, delta: Int) { }
 
     /**
      * Effects applied (continuously or not) while primary button (usually left mouse button) is down
      */
-    fun primaryUse(gc: GameContainer, delta: Int)
+    open fun primaryUse(gc: GameContainer, delta: Int) { }
 
     /**
      * Effects applied (continuously or not) while secondary button (usually right mouse button) is down
      */
-    fun secondaryUse(gc: GameContainer, delta: Int)
+    open fun secondaryUse(gc: GameContainer, delta: Int) { }
 
     /**
      * Effects applied immediately only once if thrown from pocket
      */
-    fun effectWhenThrown(gc: GameContainer, delta: Int)
+    open fun effectWhenThrown(gc: GameContainer, delta: Int) { }
 
     /**
-     * Effects applied (continuously or not) when equipped
+     * Effects applied (continuously or not) when equipped (drawn)
      */
-    fun effectWhenEquipped(gc: GameContainer, delta: Int)
+    open fun effectWhenEquipped(gc: GameContainer, delta: Int) { }
 
     /**
      * Effects applied only once when unequipped
      */
-    fun effectWhenUnEquipped(gc: GameContainer, delta: Int)
+    open fun effectWhenUnEquipped(gc: GameContainer, delta: Int) { }
+
+    
+    override fun toString(): String {
+        return id.toString()
+    }
+
+    override fun hashCode(): Int {
+        return id
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null) return false
+        return id == (other as InventoryItem).id
+    }
 }
 
 object EquipPosition {
