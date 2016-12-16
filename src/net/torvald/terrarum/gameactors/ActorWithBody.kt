@@ -190,8 +190,8 @@ open class ActorWithBody : Actor() {
             actorValue[AVKey.DRAGCOEFF] = value
         }
 
-    @Transient private val UD_COMPENSATOR_MAX = TSIZE
-    @Transient private val LR_COMPENSATOR_MAX = TSIZE
+    @Transient private val UD_COMPENSATOR_MAX = TILE_SIZE
+    @Transient private val LR_COMPENSATOR_MAX = TILE_SIZE
 
     /**
      * Post-hit invincibility, in milliseconds
@@ -277,13 +277,13 @@ open class ActorWithBody : Actor() {
      * @param y
      */
     fun setPosition(x: Double, y: Double) {
-        hitbox.set(
+        hitbox.setFromWidthHeight(
                 x - (baseHitboxW / 2 - hitboxTranslateX) * scale,
                 y - (baseHitboxH - hitboxTranslateY) * scale,
                 baseHitboxW * scale,
                 baseHitboxH * scale)
 
-        nextHitbox.set(
+        nextHitbox.setFromWidthHeight(
                 x - (baseHitboxW / 2 - hitboxTranslateX) * scale,
                 y - (baseHitboxH - hitboxTranslateY) * scale,
                 baseHitboxW * scale,
@@ -595,10 +595,10 @@ open class ActorWithBody : Actor() {
             }
         }
 
-        val txStart = x1.div(TSIZE).floorInt()
-        val txEnd = x2.div(TSIZE).floorInt()
-        val tyStart = y1.div(TSIZE).floorInt()
-        val tyEnd = y2.div(TSIZE).floorInt()
+        val txStart = x1.div(TILE_SIZE).floorInt()
+        val txEnd = x2.div(TILE_SIZE).floorInt()
+        val tyStart = y1.div(TILE_SIZE).floorInt()
+        val tyEnd = y2.div(TILE_SIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
@@ -634,10 +634,10 @@ open class ActorWithBody : Actor() {
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.div(TSIZE).floorInt()
-        val txEnd = x2.div(TSIZE).floorInt()
-        val tyStart = y1.div(TSIZE).floorInt()
-        val tyEnd = y2.div(TSIZE).floorInt()
+        val txStart = x1.div(TILE_SIZE).floorInt()
+        val txEnd = x2.div(TILE_SIZE).floorInt()
+        val tyStart = y1.div(TILE_SIZE).floorInt()
+        val tyEnd = y2.div(TILE_SIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
@@ -674,10 +674,10 @@ open class ActorWithBody : Actor() {
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.div(TSIZE).roundInt()
-        val txEnd = x2.div(TSIZE).roundInt()
-        val tyStart = y1.div(TSIZE).roundInt()
-        val tyEnd = y2.div(TSIZE).roundInt()
+        val txStart = x1.div(TILE_SIZE).roundInt()
+        val txEnd = x2.div(TILE_SIZE).roundInt()
+        val tyStart = y1.div(TILE_SIZE).roundInt()
+        val tyEnd = y2.div(TILE_SIZE).roundInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
@@ -826,17 +826,19 @@ open class ActorWithBody : Actor() {
             var friction = 0
             val frictionCalcHitbox =
                     if (!isWalkingH)
-                        Hitbox(nextHitbox.posX, nextHitbox.posY,
-                                nextHitbox.width + 2.0, nextHitbox.height + 2.0)
+                        Hitbox(nextHitbox.posX,
+                                nextHitbox.posY,
+                                nextHitbox.width + 2.0,
+                                nextHitbox.height + 2.0)
                     // when not walking, enlarge the hitbox for calculation so that
                     // feet tiles are also counted
                     else
                         nextHitbox.clone()
 
             // take highest value
-            val tilePosXStart = (frictionCalcHitbox.posX / TSIZE).floorInt()
-            val tilePosXEnd = (frictionCalcHitbox.hitboxEnd.x / TSIZE).floorInt()
-            val tilePosY = (frictionCalcHitbox.pointedY / TSIZE).floorInt()
+            val tilePosXStart = (frictionCalcHitbox.posX / TILE_SIZE).floorInt()
+            val tilePosXEnd = (frictionCalcHitbox.hitboxEnd.x / TILE_SIZE).floorInt()
+            val tilePosY = (frictionCalcHitbox.pointedY / TILE_SIZE).floorInt()
 
             for (x in tilePosXStart..tilePosXEnd) {
                 val tile = world.getTileFromTerrain(x, tilePosY)
@@ -858,10 +860,10 @@ open class ActorWithBody : Actor() {
             var density = 0
 
             // take highest value
-            val tilePosXStart = (hitbox.posX / TSIZE).roundInt()
-            val tilePosXEnd = (hitbox.hitboxEnd.x / TSIZE).roundInt()
-            val tilePosYStart = (hitbox.posY / TSIZE).roundInt()
-            val tilePosYEnd = (hitbox.hitboxEnd.y / TSIZE).roundInt()
+            val tilePosXStart = (hitbox.posX / TILE_SIZE).roundInt()
+            val tilePosXEnd = (hitbox.hitboxEnd.x / TILE_SIZE).roundInt()
+            val tilePosYStart = (hitbox.posY / TILE_SIZE).roundInt()
+            val tilePosYEnd = (hitbox.hitboxEnd.y / TILE_SIZE).roundInt()
             for (y in tilePosXStart..tilePosYEnd) {
                 for (x in tilePosXStart..tilePosXEnd) {
                     val tile = world.getTileFromTerrain(x, y)
@@ -883,10 +885,10 @@ open class ActorWithBody : Actor() {
             var density = 0
 
             //get highest fluid density
-            val tilePosXStart = (nextHitbox.posX / TSIZE).roundInt()
-            val tilePosYStart = (nextHitbox.posY / TSIZE).roundInt()
-            val tilePosXEnd = (nextHitbox.hitboxEnd.x / TSIZE).roundInt()
-            val tilePosYEnd = (nextHitbox.hitboxEnd.y / TSIZE).roundInt()
+            val tilePosXStart = (nextHitbox.posX / TILE_SIZE).roundInt()
+            val tilePosYStart = (nextHitbox.posY / TILE_SIZE).roundInt()
+            val tilePosXEnd = (nextHitbox.hitboxEnd.x / TILE_SIZE).roundInt()
+            val tilePosYEnd = (nextHitbox.hitboxEnd.y / TILE_SIZE).roundInt()
             for (y in tilePosYStart..tilePosYEnd) {
                 for (x in tilePosXStart..tilePosXEnd) {
                     val tile = world.getTileFromTerrain(x, y)
@@ -900,7 +902,7 @@ open class ActorWithBody : Actor() {
         }
 
     private fun clampHitbox() {
-        val worldsizePxl = world.width.times(TSIZE)
+        val worldsizePxl = world.width.times(TILE_SIZE)
 
         hitbox.setPositionFromPoint(
                 //clampW(hitbox.pointedX),
@@ -915,7 +917,7 @@ open class ActorWithBody : Actor() {
     }
 
     private fun setNewNextHitbox() {
-        nextHitbox.set(
+        nextHitbox.setFromWidthHeight(
                 hitbox.posX + moveDelta.x,
                 hitbox.posY + moveDelta.y,
                 baseHitboxW * scale,
@@ -978,22 +980,22 @@ open class ActorWithBody : Actor() {
     }
 
     private fun clampW(x: Double): Double =
-            if (x < TSIZE + nextHitbox.width / 2) {
-                TSIZE + nextHitbox.width / 2
+            if (x < TILE_SIZE + nextHitbox.width / 2) {
+                TILE_SIZE + nextHitbox.width / 2
             }
-            else if (x >= (world.width * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.width / 2) {
-                (world.width * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.width / 2
+            else if (x >= (world.width * TILE_SIZE).toDouble() - TILE_SIZE.toDouble() - nextHitbox.width / 2) {
+                (world.width * TILE_SIZE).toDouble() - 1.0 - TILE_SIZE.toDouble() - nextHitbox.width / 2
             }
             else {
                 x
             }
 
     private fun clampH(y: Double): Double =
-            if (y < TSIZE + nextHitbox.height) {
-                TSIZE + nextHitbox.height
+            if (y < TILE_SIZE + nextHitbox.height) {
+                TILE_SIZE + nextHitbox.height
             }
-            else if (y >= (world.height * TSIZE).toDouble() - TSIZE.toDouble() - nextHitbox.height) {
-                (world.height * TSIZE).toDouble() - 1.0 - TSIZE.toDouble() - nextHitbox.height
+            else if (y >= (world.height * TILE_SIZE).toDouble() - TILE_SIZE.toDouble() - nextHitbox.height) {
+                (world.height * TILE_SIZE).toDouble() - 1.0 - TILE_SIZE.toDouble() - nextHitbox.height
             }
             else {
                 y
@@ -1010,7 +1012,7 @@ open class ActorWithBody : Actor() {
         get() = this is Player && this.isNoClip()
 
     private val AUTO_CLIMB_RATE: Int
-        get() = Math.min(TSIZE / 8 * Math.sqrt(scale), TSIZE.toDouble()).toInt()
+        get() = Math.min(TILE_SIZE / 8 * Math.sqrt(scale), TILE_SIZE.toDouble()).toInt()
 
     private fun assertInit() {
         // errors
@@ -1032,7 +1034,7 @@ open class ActorWithBody : Actor() {
 
     companion object {
 
-        @Transient private val TSIZE = MapDrawer.TILE_SIZE
+        @Transient private val TILE_SIZE = MapDrawer.TILE_SIZE
 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
