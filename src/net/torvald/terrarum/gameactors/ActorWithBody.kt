@@ -46,10 +46,10 @@ open class ActorWithBody : Actor() {
 
     val tilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
-                hitbox.posX.div(TILE_SIZE).floor(),
-                hitbox.posY.div(TILE_SIZE).floor(),
-                hitbox.endPointX.div(TILE_SIZE).floor(),
-                hitbox.endPointY.div(TILE_SIZE).floor()
+                nextHitbox.posX.div(TILE_SIZE).floor(),
+                nextHitbox.posY.div(TILE_SIZE).floor(),
+                nextHitbox.endPointX.div(TILE_SIZE).floor(),
+                nextHitbox.endPointY.div(TILE_SIZE).floor()
         )
 
     /**
