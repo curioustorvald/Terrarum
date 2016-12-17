@@ -9,6 +9,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.concurrent.ThreadPool
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.mapdrawer.MapDrawer.TILE_SIZE
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -20,20 +21,20 @@ import java.util.*
  * Created by minjaesong on 16-01-19.
  */
 object MapCamera {
-    val WORLD: GameWorld = Terrarum.ingame.world
+    val world: GameWorld = Terrarum.ingame.world
 
     var cameraX = 0
         private set
     var cameraY = 0
         private set
 
-    private val TSIZE = MapDrawer.TILE_SIZE
+    private val TILE_SIZE = MapDrawer.TILE_SIZE
 
-    var tilesWall: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wall.png", TSIZE, TSIZE)
+    var tilesWall: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wall.png", TILE_SIZE, TILE_SIZE)
         private set
-    var tilesTerrain: SpriteSheet = SpriteSheet("./assets/graphics/terrain/terrain.tga", TSIZE, TSIZE)
+    var tilesTerrain: SpriteSheet = SpriteSheet("./assets/graphics/terrain/terrain.tga", TILE_SIZE, TILE_SIZE)
         private set // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
-    var tilesWire: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wire.png", TSIZE, TSIZE)
+    var tilesWire: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wire.png", TILE_SIZE, TILE_SIZE)
         private set
     var tilesetBook: Array<SpriteSheet> = arrayOf(tilesWall, tilesTerrain, tilesWire)
         private set
@@ -238,14 +239,14 @@ object MapCamera {
 
         // position - (WH / 2)
         /*cameraX = Math.round(FastMath.clamp(
-                player.hitbox.centeredX.toFloat() - renderWidth / 2, TSIZE.toFloat(), WORLD.width * TSIZE - renderWidth - TSIZE.toFloat()))
+                player.hitbox.centeredX.toFloat() - renderWidth / 2, TILE_SIZE.toFloat(), world.width * TILE_SIZE - renderWidth - TILE_SIZE.toFloat()))
         cameraY = Math.round(FastMath.clamp(
-                player.hitbox.centeredY.toFloat() - renderHeight / 2, TSIZE.toFloat(), WORLD.height * TSIZE - renderHeight - TSIZE.toFloat()))
+                player.hitbox.centeredY.toFloat() - renderHeight / 2, TILE_SIZE.toFloat(), world.height * TILE_SIZE - renderHeight - TILE_SIZE.toFloat()))
 */
         cameraX = Math.round( // X only: ROUNDWORLD implementation
                 player.hitbox.centeredX.toFloat() - renderWidth / 2)
         cameraY = Math.round(FastMath.clamp(
-                player.hitbox.centeredY.toFloat() - renderHeight / 2, TSIZE.toFloat(), WORLD.height * TSIZE - renderHeight - TSIZE.toFloat()))
+                player.hitbox.centeredY.toFloat() - renderHeight / 2, TILE_SIZE.toFloat(), world.height * TILE_SIZE - renderHeight - TILE_SIZE.toFloat()))
 
     }
 
@@ -265,11 +266,11 @@ object MapCamera {
     }
 
     private fun drawTiles(mode: Int, drawModeTilesBlendMul: Boolean) {
-        val for_y_start = MapCamera.cameraY / TSIZE
-        val for_y_end = MapCamera.clampHTile(for_y_start + (MapCamera.renderHeight / TSIZE) + 2)
+        val for_y_start = MapCamera.cameraY / TILE_SIZE
+        val for_y_end = MapCamera.clampHTile(for_y_start + (MapCamera.renderHeight / TILE_SIZE) + 2)
 
-        val for_x_start = MapCamera.cameraX / TSIZE - 1
-        val for_x_end = for_x_start + (MapCamera.renderWidth / TSIZE) + 2
+        val for_x_start = MapCamera.cameraX / TILE_SIZE - 1
+        val for_x_end = for_x_start + (MapCamera.renderWidth / TILE_SIZE) + 2
 
         // initialise
         MapCamera.tilesetBook[mode].startUse()
@@ -280,11 +281,11 @@ object MapCamera {
 
                 val thisTile: Int?
                 if (mode % 3 == WALL)
-                    thisTile = WORLD.getTileFromWall(x, y)
+                    thisTile = world.getTileFromWall(x, y)
                 else if (mode % 3 == TERRAIN)
-                    thisTile = WORLD.getTileFromTerrain(x, y)
+                    thisTile = world.getTileFromTerrain(x, y)
                 else if (mode % 3 == WIRE)
-                    thisTile = WORLD.getTileFromWire(x, y)
+                    thisTile = world.getTileFromWire(x, y)
                 else
                     throw IllegalArgumentException()
 
@@ -360,10 +361,10 @@ object MapCamera {
      */
     fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
         val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  WORLD.getTileFrom(mode, x - 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = WORLD.getTileFrom(mode, x + 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_UP] =    WORLD.getTileFrom(mode, x    , y - 1) ?: 4906
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] =  WORLD.getTileFrom(mode, x    , y + 1) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFrom(mode, x    , y - 1) ?: 4906
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(mode, x    , y + 1) ?: 4096
 
         // try for
         var ret = 0
@@ -378,10 +379,10 @@ object MapCamera {
 
     fun getNearbyTilesInfoNonSolid(x: Int, y: Int, mode: Int): Int {
         val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  WORLD.getTileFrom(mode, x - 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = WORLD.getTileFrom(mode, x + 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_UP] =    WORLD.getTileFrom(mode, x    , y - 1) ?: 4906
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] =  WORLD.getTileFrom(mode, x    , y + 1) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFrom(mode, x    , y - 1) ?: 4906
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(mode, x    , y + 1) ?: 4096
 
         // try for
         var ret = 0
@@ -402,10 +403,10 @@ object MapCamera {
     fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
         val nearbyTiles = IntArray(4)
         val NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  WORLD.getTileFrom(TERRAIN, x - 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = WORLD.getTileFrom(TERRAIN, x + 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] =  WORLD.getTileFrom(TERRAIN, x    , y + 1) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_BACK] =  WORLD.getTileFrom(WALL,    x    , y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(TERRAIN, x - 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(TERRAIN, x    , y + 1) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_BACK] = world.getTileFrom(WALL,    x    , y) ?: 4096
 
         try {
             if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolid)
@@ -436,19 +437,19 @@ object MapCamera {
     private fun drawTile(mode: Int, tilewisePosX: Int, tilewisePosY: Int, sheetX: Int, sheetY: Int) {
         if (Terrarum.ingame.screenZoom == 1f) {
             tilesetBook[mode].renderInUse(
-                    FastMath.floor((tilewisePosX * TSIZE).toFloat()), FastMath.floor((tilewisePosY * TSIZE).toFloat()), sheetX, sheetY)
+                    FastMath.floor((tilewisePosX * TILE_SIZE).toFloat()), FastMath.floor((tilewisePosY * TILE_SIZE).toFloat()), sheetX, sheetY)
         } else {
             tilesetBook[mode].getSprite(
                     sheetX, sheetY).drawEmbedded(
-                    Math.round(tilewisePosX.toFloat() * TSIZE.toFloat() * Terrarum.ingame.screenZoom).toFloat(), Math.round(tilewisePosY.toFloat() * TSIZE.toFloat() * Terrarum.ingame.screenZoom).toFloat(), FastMath.ceil(TSIZE * Terrarum.ingame.screenZoom).toFloat(), FastMath.ceil(TSIZE * Terrarum.ingame.screenZoom).toFloat())
+                    Math.round(tilewisePosX.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).toFloat(), Math.round(tilewisePosY.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).toFloat(), FastMath.ceil(TILE_SIZE * Terrarum.ingame.screenZoom).toFloat(), FastMath.ceil(TILE_SIZE * Terrarum.ingame.screenZoom).toFloat())
         }
     }
 
     fun clampH(x: Int): Int {
         if (x < 0) {
             return 0
-        } else if (x > WORLD.height * TSIZE) {
-            return WORLD.height * TSIZE
+        } else if (x > world.height * TILE_SIZE) {
+            return world.height * TILE_SIZE
         } else {
             return x
         }
@@ -457,8 +458,8 @@ object MapCamera {
     fun clampWTile(x: Int): Int {
         if (x < 0) {
             return 0
-        } else if (x > WORLD.width) {
-            return WORLD.width
+        } else if (x > world.width) {
+            return world.width
         } else {
             return x
         }
@@ -467,18 +468,18 @@ object MapCamera {
     fun clampHTile(x: Int): Int {
         if (x < 0) {
             return 0
-        } else if (x > WORLD.height) {
-            return WORLD.height
+        } else if (x > world.height) {
+            return world.height
         } else {
             return x
         }
     }
 
-    fun getRenderStartX(): Int = cameraX / TSIZE
-    fun getRenderStartY(): Int = cameraY / TSIZE
+    fun getRenderStartX(): Int = cameraX / TILE_SIZE
+    fun getRenderStartY(): Int = cameraY / TILE_SIZE
 
-    fun getRenderEndX(): Int = clampWTile(getRenderStartX() +(renderWidth  / TSIZE) + 2)
-    fun getRenderEndY(): Int = clampHTile(getRenderStartY() +(renderHeight / TSIZE) + 2)
+    fun getRenderEndX(): Int = clampWTile(getRenderStartX() + (renderWidth / TILE_SIZE) + 2)
+    fun getRenderEndY(): Int = clampHTile(getRenderStartY() + (renderHeight / TILE_SIZE) + 2)
 
     fun isConnectSelf(b: Int?): Boolean = TILES_CONNECT_SELF.contains(b)
     fun isConnectMutual(b: Int?): Boolean = TILES_CONNECT_MUTUAL.contains(b)
@@ -487,6 +488,6 @@ object MapCamera {
     fun isBlendMul(b: Int?): Boolean = TILES_BLEND_MUL.contains(b)
 
     fun tileInCamera(x: Int, y: Int) =
-            x >= cameraX.div(TSIZE) && y >= cameraY.div(TSIZE) &&
-            x <= cameraX.plus(renderWidth).div(TSIZE) && y <= cameraY.plus(renderWidth).div(TSIZE)
+            x >= cameraX.div(TILE_SIZE) && y >= cameraY.div(TILE_SIZE) &&
+            x <= cameraX.plus(renderWidth).div(TILE_SIZE) && y <= cameraY.plus(renderWidth).div(TILE_SIZE)
 }

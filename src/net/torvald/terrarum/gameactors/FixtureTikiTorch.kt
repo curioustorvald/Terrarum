@@ -28,13 +28,11 @@ class FixtureTikiTorch : FixtureBase(), Luminous {
 
         sprite = SpriteAnimation()
         sprite!!.setDimension(10, 27)
-        sprite!!.setSpriteImage("res/graphics/sprites/fixtures/tiki_torch.png")
+        sprite!!.setSpriteImage("assets/graphics/sprites/fixtures/tiki_torch.png")
         sprite!!.setDelay(200)
         sprite!!.setRowsAndFrames(1, 1)
         sprite!!.setAsVisible()
 
         actorValue[AVKey.BASEMASS] = 1.0
-
-        luminosity = TileCodex[Tile.TORCH].luminosity
     }
 }

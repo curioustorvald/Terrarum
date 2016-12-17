@@ -21,6 +21,7 @@ import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.mapdrawer.LightmapRenderer.constructRGBFromInt
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.mapdrawer.MapDrawer.TILE_SIZE
 import net.torvald.terrarum.mapgenerator.WorldGenerator
 import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.tileproperties.TileCodex
@@ -236,7 +237,7 @@ constructor() : BasicGameState() {
     private fun repossessActor() {
         // check if currently pocessed actor is removed from game
         if (!hasActor(player))
-            // re-possess canonical player
+        // re-possess canonical player
             changePossession(Player.PLAYER_REF_ID) // TODO completely other behaviour?
     }
 
@@ -280,8 +281,8 @@ constructor() : BasicGameState() {
         // make camara work //
         // compensate for zoom. UIs must be treated specially! (see UIHandler)
         //g.translate(-MapCamera.cameraX * screenZoom, -MapCamera.cameraY * screenZoom)
-        tilesDrawFrameBuffer.graphics.translate(-MapCamera.cameraX * screenZoom, -MapCamera.cameraY * screenZoom)
-        actorsDrawFrameBuffer.graphics.translate(-MapCamera.cameraX * screenZoom, -MapCamera.cameraY * screenZoom)
+        tilesDrawFrameBuffer.graphics.translate(-MapCamera.cameraX.toFloat(), -MapCamera.cameraY.toFloat())
+        actorsDrawFrameBuffer.graphics.translate(-MapCamera.cameraX.toFloat(), -MapCamera.cameraY.toFloat())
         // TODO add new framebuffer so that whole map is zoomed at once, yet not the UI
 
 
@@ -295,7 +296,7 @@ constructor() : BasicGameState() {
         // draw actors //
         /////////////////
         actorContainer.forEach { actor ->
-            if (actor is ActorWithBody && actor.inScreen() && actor !is Player) { // if echo and within screen
+            if (actor is ActorWithBody && actor.inScreen() && actor !is Player) {
                 actor.drawBody(gc, actorsDrawFrameBuffer.graphics)
             }
         }
@@ -312,10 +313,10 @@ constructor() : BasicGameState() {
 
 
         blendMul()
-            MapDrawer.drawEnvOverlay(actorsDrawFrameBuffer.graphics)
+        MapDrawer.drawEnvOverlay(actorsDrawFrameBuffer.graphics)
 
-            if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul() else blendNormal()
-            LightmapRenderer.draw(actorsDrawFrameBuffer.graphics)
+        if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul() else blendNormal()
+        LightmapRenderer.draw(actorsDrawFrameBuffer.graphics)
         blendNormal()
 
 
@@ -323,7 +324,7 @@ constructor() : BasicGameState() {
         // draw actor glows //
         //////////////////////
         actorContainer.forEach { actor ->
-            if (actor is ActorWithBody && actor.inScreen() && actor !is Player) { // if echo and within screen
+            if (actor is ActorWithBody && actor.inScreen() && actor !is Player) {
                 actor.drawGlow(gc, actorsDrawFrameBuffer.graphics)
             }
         }
@@ -382,7 +383,7 @@ constructor() : BasicGameState() {
         GameController.keyPressed(key, c)
 
         if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
-                || key == Terrarum.getConfigInt("keyquicksel")) {
+            || key == Terrarum.getConfigInt("keyquicksel")) {
             uiAliases[UI_PIE_MENU]!!.setAsOpen()
             uiAliases[UI_QUICK_BAR]!!.setAsClose()
         }
@@ -394,7 +395,7 @@ constructor() : BasicGameState() {
         GameController.keyReleased(key, c)
 
         if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
-                || key == Terrarum.getConfigInt("keyquicksel")) {
+            || key == Terrarum.getConfigInt("keyquicksel")) {
             uiAliases[UI_PIE_MENU]!!.setAsClose()
             uiAliases[UI_QUICK_BAR]!!.setAsOpen()
         }
@@ -529,18 +530,36 @@ constructor() : BasicGameState() {
 
     fun Double.sqr() = this * this
     fun Int.sqr() = this * this
-    private fun distToActorSqr(a: ActorWithBody, p: ActorWithBody): Double =
-            (a.hitbox.centeredX - p.hitbox.centeredX).sqr() + (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
+    private fun distToActorSqr(a: ActorWithBody, p: ActorWithBody) =
+            Math.min(// take min of normal position and wrapped (x < 0) position
+                    (a.hitbox.centeredX - p.hitbox.centeredX).sqr() +
+                    (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
+                    (a.hitbox.centeredX - p.hitbox.centeredX + world.width * TILE_SIZE).sqr() +
+                    (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
+            )
+    private fun distToCameraSqr(a: ActorWithBody) =
+            Math.min(
+                    (a.hitbox.posX - MapCamera.cameraX).sqr() +
+                    (a.hitbox.posY - MapCamera.cameraY).sqr(),
+                    (a.hitbox.posX - MapCamera.cameraX + world.width * TILE_SIZE).sqr() +
+                    (a.hitbox.posY - MapCamera.cameraY).sqr()
+            )
+
     /** whether the actor is within screen */
-    private fun ActorWithBody.inScreen() = distToActorSqr(this, player) <=
-                                     (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr() +
-                                      Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr())
+    private fun ActorWithBody.inScreen() =
+            distToCameraSqr(this) <=
+            (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr() +
+             Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr())
+
+
     /** whether the actor is within update range */
-    private fun ActorWithBody.inUpdateRange() = distToActorSqr(this, player) <= ACTOR_UPDATE_RANGE.sqr()
+    private fun ActorWithBody.inUpdateRange() = distToCameraSqr(this) <= ACTOR_UPDATE_RANGE.sqr()
+
     /**
      * actorContainer extensions
      */
     fun hasActor(actor: Actor) = hasActor(actor.referenceID)
+
     fun hasActor(ID: Int): Boolean =
             if (actorContainer.size == 0)
                 false
