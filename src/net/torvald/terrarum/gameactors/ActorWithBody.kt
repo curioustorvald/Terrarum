@@ -324,12 +324,6 @@ open class ActorWithBody : Actor() {
     override fun update(gc: GameContainer, delta: Int) {
         if (isUpdate && !flagDespawn) {
 
-            /**
-             * Temporary variables to reset
-             */
-            ccdCollided = false
-            /******************************/
-
             if (!assertPrinted) assertInit()
 
             // make NoClip work for player
@@ -507,8 +501,11 @@ open class ActorWithBody : Actor() {
 
             // do some CCD between hitbox and nextHitbox
             val ccdDelta = (nextHitbox.toVector() - hitbox.toVector())
-            if (ccdDelta.x != 0.0 || ccdDelta.y != 0.0)
-                ccdDelta.set(ccdDelta.setMagnitude(CCD_TICK))
+            if (ccdDelta.x != 0.0 || ccdDelta.y != 0.0) {
+                //ccdDelta.set(ccdDelta.setMagnitude(CCD_TICK)) // fixed tick
+                val displacement = Math.min(1.0.div(velocity.magnitude * 2), 0.5) // adaptive tick
+                ccdDelta.set(ccdDelta.setMagnitude(displacement))
+            }
 
             //println("deltaMax: $deltaMax")
             //println("ccdDelta: $ccdDelta")
@@ -560,9 +557,9 @@ open class ActorWithBody : Actor() {
         if (isNoCollideWorld) return false
 
         // offsets will stretch and shrink detection box according to the argument
-        val x1: Double;
-        val x2: Double;
-        val y1: Double;
+        val x1: Double
+        val x2: Double
+        val y1: Double
         val y2: Double
         if (option == COLLIDING_LR || option == COLLIDING_UD) {
             val offsetX = if (option == COLLIDING_LR) A_PIXEL else 0.0
@@ -615,9 +612,9 @@ open class ActorWithBody : Actor() {
     }
 
     private fun isTouchingSide(hitbox: Hitbox, option: Int): Boolean {
-        val x1: Double;
-        val x2: Double;
-        val y1: Double;
+        val x1: Double
+        val x2: Double
+        val y1: Double
         val y2: Double
         if (option == COLLIDING_TOP) {
             x1 = hitbox.posX
@@ -655,9 +652,9 @@ open class ActorWithBody : Actor() {
 
 
     private fun isCollidingSide(hitbox: Hitbox, option: Int): Boolean {
-        val x1: Double;
-        val x2: Double;
-        val y1: Double;
+        val x1: Double
+        val x2: Double
+        val y1: Double
         val y2: Double
         if (option == COLLIDING_TOP) {
             x1 = hitbox.posX
