@@ -246,7 +246,8 @@ object MapCamera {
         cameraX = Math.round( // X only: ROUNDWORLD implementation
                 player.hitbox.centeredX.toFloat() - renderWidth / 2)
         cameraY = Math.round(FastMath.clamp(
-                player.hitbox.centeredY.toFloat() - renderHeight / 2, TILE_SIZE.toFloat(), world.height * TILE_SIZE - renderHeight - TILE_SIZE.toFloat()))
+                player.hitbox.centeredY.toFloat() - renderHeight / 2,
+                TILE_SIZE.toFloat(), world.height * TILE_SIZE - renderHeight - TILE_SIZE.toFloat()))
 
     }
 
@@ -270,7 +271,7 @@ object MapCamera {
         val for_y_end = MapCamera.clampHTile(for_y_start + (MapCamera.renderHeight / TILE_SIZE) + 2)
 
         val for_x_start = MapCamera.cameraX / TILE_SIZE - 1
-        val for_x_end = for_x_start + (MapCamera.renderWidth / TILE_SIZE) + 2
+        val for_x_end = for_x_start + (MapCamera.renderWidth / TILE_SIZE) + 3
 
         // initialise
         MapCamera.tilesetBook[mode].startUse()
@@ -435,14 +436,11 @@ object MapCamera {
     }
 
     private fun drawTile(mode: Int, tilewisePosX: Int, tilewisePosY: Int, sheetX: Int, sheetY: Int) {
-        if (Terrarum.ingame.screenZoom == 1f) {
-            tilesetBook[mode].renderInUse(
-                    FastMath.floor((tilewisePosX * TILE_SIZE).toFloat()), FastMath.floor((tilewisePosY * TILE_SIZE).toFloat()), sheetX, sheetY)
-        } else {
-            tilesetBook[mode].getSprite(
-                    sheetX, sheetY).drawEmbedded(
-                    Math.round(tilewisePosX.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).toFloat(), Math.round(tilewisePosY.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).toFloat(), FastMath.ceil(TILE_SIZE * Terrarum.ingame.screenZoom).toFloat(), FastMath.ceil(TILE_SIZE * Terrarum.ingame.screenZoom).toFloat())
-        }
+        tilesetBook[mode].renderInUse(
+                FastMath.floor((tilewisePosX * TILE_SIZE).toFloat()),
+                FastMath.floor((tilewisePosY * TILE_SIZE).toFloat()),
+                sheetX, sheetY
+        )
     }
 
     fun clampH(x: Int): Int {
