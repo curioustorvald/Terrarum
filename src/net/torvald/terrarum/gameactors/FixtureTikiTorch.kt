@@ -1,8 +1,8 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.terrarum.tileproperties.TileNameCode
-import net.torvald.terrarum.tileproperties.TilePropCodex
+import net.torvald.terrarum.tileproperties.Tile
+import net.torvald.terrarum.tileproperties.TileCodex
 import java.util.*
 
 /**
@@ -11,7 +11,7 @@ import java.util.*
 class FixtureTikiTorch : FixtureBase(), Luminous {
 
     override var luminosity: Int
-        get() = TilePropCodex[TileNameCode.TORCH].luminosity
+        get() = TileCodex[Tile.TORCH].luminosity
         set(value) {
             throw UnsupportedOperationException()
         }
@@ -35,6 +35,6 @@ class FixtureTikiTorch : FixtureBase(), Luminous {
 
         actorValue[AVKey.BASEMASS] = 1.0
 
-        luminosity = TilePropCodex[TileNameCode.TORCH].luminosity
+        luminosity = TileCodex[Tile.TORCH].luminosity
     }
 }

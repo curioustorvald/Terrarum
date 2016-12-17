@@ -7,7 +7,7 @@ import com.google.gson.JsonObject
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.gameitem.EquipPosition
-import net.torvald.terrarum.itemproperties.ItemPropCodex
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import org.newdawn.slick.SlickException
 import java.io.IOException
@@ -77,7 +77,7 @@ object PlayerBuilderSigrid {
 
         // Test fill up inventory
         p.inventory.add(16)
-        p.equipItem(ItemPropCodex[16])
+        p.equipItem(ItemCodex[16])
 
 
 

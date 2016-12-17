@@ -23,7 +23,7 @@ import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.mapgenerator.WorldGenerator
 import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
-import net.torvald.terrarum.tileproperties.TilePropCodex
+import net.torvald.terrarum.tileproperties.TileCodex
 import net.torvald.terrarum.tilestats.TileStats
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.weather.WeatherMixer
@@ -113,8 +113,8 @@ constructor() : BasicGameState() {
 
         // generate terrain for the map
         WorldGenerator.attachMap(world)
-        WorldGenerator.SEED = 0x51621D2
-        //WorldGenerator.SEED = HQRNG().nextLong()
+        //WorldGenerator.SEED = 0x51621D2
+        WorldGenerator.SEED = HQRNG().nextLong()
         WorldGenerator.generateMap()
 
 

@@ -8,8 +8,8 @@ import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.gameworld.WorldSimulator.isSolid
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
-import net.torvald.terrarum.tileproperties.TileNameCode
-import net.torvald.terrarum.tileproperties.TilePropCodex
+import net.torvald.terrarum.tileproperties.Tile
+import net.torvald.terrarum.tileproperties.TileCodex
 import org.newdawn.slick.Color
 import org.newdawn.slick.Graphics
 
@@ -67,10 +67,10 @@ object WorldSimulator {
         /////////////////////////////////////////////////////////////
         for (y in updateYFrom..updateYTo) {
             for (x in updateXFrom..updateXTo) {
-                val tile = world.getTileFromTerrain(x, y) ?: TileNameCode.STONE
-                val tileBottom = world.getTileFromTerrain(x, y + 1) ?: TileNameCode.STONE
-                val tileLeft = world.getTileFromTerrain(x - 1, y) ?: TileNameCode.STONE
-                val tileRight = world.getTileFromTerrain(x + 1, y) ?: TileNameCode.STONE
+                val tile = world.getTileFromTerrain(x, y) ?: Tile.STONE
+                val tileBottom = world.getTileFromTerrain(x, y + 1) ?: Tile.STONE
+                val tileLeft = world.getTileFromTerrain(x - 1, y) ?: Tile.STONE
+                val tileRight = world.getTileFromTerrain(x + 1, y) ?: Tile.STONE
                 if (tile.isFluid()) {
 
                     // move down if not obstructed
@@ -126,21 +126,21 @@ object WorldSimulator {
     fun displaceFallables(world: GameWorld, delta: Int) {
         for (y in updateYFrom..updateYTo) {
             for (x in updateXFrom..updateXTo) {
-                val tile = world.getTileFromTerrain(x, y) ?: TileNameCode.STONE
-                val tileBelow = world.getTileFromTerrain(x, y + 1) ?: TileNameCode.STONE
+                val tile = world.getTileFromTerrain(x, y) ?: Tile.STONE
+                val tileBelow = world.getTileFromTerrain(x, y + 1) ?: Tile.STONE
 
                 if (tile.isFallable()) {
                     // displace fluid. This statement must precede isSolid()
                     if (tileBelow.isFluid()) {
                         // remove tileThis to create air pocket
-                        world.setTileTerrain(x, y, TileNameCode.AIR)
+                        world.setTileTerrain(x, y, Tile.AIR)
 
                         pour(world, x, y, drain(world, x, y, tileBelow.fluidLevel()))
                         // place our tile
                         world.setTileTerrain(x, y + 1, tile)
                     }
                     else if (!tileBelow.isSolid()) {
-                        world.setTileTerrain(x, y, TileNameCode.AIR)
+                        world.setTileTerrain(x, y, Tile.AIR)
                         world.setTileTerrain(x, y + 1, tile)
                     }
                 }
@@ -186,7 +186,7 @@ object WorldSimulator {
     private fun worldToFluidMap(world: GameWorld) {
         for (y in updateYFrom..updateYTo) {
             for (x in updateXFrom..updateXTo) {
-                val tile = world.getTileFromTerrain(x, y) ?: TileNameCode.STONE
+                val tile = world.getTileFromTerrain(x, y) ?: Tile.STONE
                 if (tile.isFluid()) {
                     fluidMap[y - updateYFrom][x - updateXFrom] = tile.fluidLevel()
                     fluidTypeMap[y - updateYFrom][x - updateXFrom] = tile.fluidType().toByte()
@@ -206,13 +206,13 @@ object WorldSimulator {
         }
     }
 
-    fun Int.isFluid() = TilePropCodex[this].isFluid
-    fun Int.isSolid() = this.fluidLevel() == FLUID_MAX || TilePropCodex[this].isSolid
-    //fun Int.viscosity() = TilePropCodex[this].
+    fun Int.isFluid() = TileCodex[this].isFluid
+    fun Int.isSolid() = this.fluidLevel() == FLUID_MAX || TileCodex[this].isSolid
+    //fun Int.viscosity() = TileCodex[this].
     fun Int.fluidLevel() = if (!this.isFluid()) 0 else (this % FLUID_MAX) + 1
     fun Int.fluidType() = this / FLUID_MAX
     fun Int.isEven() = (this and 0x01) == 0
-    fun Int.isFallable() = TilePropCodex[this].isFallable
+    fun Int.isFallable() = TileCodex[this].isFallable
 
     private fun placeFluid(world: GameWorld, x: Int, y: Int, fluidType: Byte, amount: Int) {
         if (world.layerTerrain.isInBound(x, y)) {
@@ -220,7 +220,7 @@ object WorldSimulator {
                 world.setTileTerrain(x, y, fluidType, amount - 1)
             }
             else if (amount == 0 && world.getTileFromTerrain(x, y)!!.isFluid()) {
-                world.setTileTerrain(x, y, TileNameCode.AIR)
+                world.setTileTerrain(x, y, Tile.AIR)
             }
         }
     }

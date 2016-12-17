@@ -6,8 +6,8 @@ import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ProjectileSimple
-import net.torvald.terrarum.tileproperties.TileNameCode
-import net.torvald.terrarum.tileproperties.TilePropCodex
+import net.torvald.terrarum.tileproperties.Tile
+import net.torvald.terrarum.tileproperties.TileCodex
 import net.torvald.terrarum.ui.UIHandler
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.GameContainer
@@ -58,8 +58,8 @@ object GameController {
         // test tile remove
         /*if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
             try {
-                Terrarum.ingame.world.setTileTerrain(mouseTileX, mouseTileY, TileNameCode.AIR)
-                // terrarum.game.map.setTileWall(mouseTileX, mouseTileY, TileNameCode.AIR);
+                Terrarum.ingame.world.setTileTerrain(mouseTileX, mouseTileY, Tile.AIR)
+                // terrarum.game.map.setTileWall(mouseTileX, mouseTileY, Tile.AIR);
             }
             catch (e: ArrayIndexOutOfBoundsException) {
             }

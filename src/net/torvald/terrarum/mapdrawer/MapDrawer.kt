@@ -2,7 +2,7 @@ package net.torvald.terrarum.mapdrawer
 
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.tileproperties.TileNameCode
+import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tilestats.TileStats
 import com.jme3.math.FastMath
 import net.torvald.colourutil.ColourTemp
@@ -23,14 +23,14 @@ object MapDrawer {
         private set
 
     private val TILES_COLD = intArrayOf(
-              TileNameCode.ICE_MAGICAL
-            , TileNameCode.ICE_FRAGILE
-            , TileNameCode.ICE_NATURAL
-            , TileNameCode.SNOW)
+              Tile.ICE_MAGICAL
+            , Tile.ICE_FRAGILE
+            , Tile.ICE_NATURAL
+            , Tile.SNOW)
 
     private val TILES_WARM = intArrayOf(
-              TileNameCode.SAND_DESERT
-            , TileNameCode.SAND_RED)
+              Tile.SAND_DESERT
+            , Tile.SAND_RED)
 
     fun update(gc: GameContainer, delta_t: Int) {
     }

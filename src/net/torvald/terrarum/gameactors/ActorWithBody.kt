@@ -5,10 +5,10 @@ import net.torvald.point.Point2d
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.mapdrawer.MapDrawer
-import net.torvald.terrarum.tileproperties.TilePropCodex
+import net.torvald.terrarum.tileproperties.TileCodex
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.mapdrawer.MapDrawer.TILE_SIZE
-import net.torvald.terrarum.tileproperties.TileNameCode
+import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileProp
 import org.dyn4j.Epsilon
 import org.dyn4j.geometry.Vector2
@@ -694,7 +694,7 @@ open class ActorWithBody : Actor() {
         for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
                 val tile = world.getTileFromTerrain(x, y)
-                if (TilePropCodex[tile].isSolid)
+                if (TileCodex[tile].isSolid)
                     return true
             }
         }
@@ -736,7 +736,7 @@ open class ActorWithBody : Actor() {
             }
 
             // evaluate
-            if (TilePropCodex[world.getTileFromTerrain(tileX, tileY)].isFluid) {
+            if (TileCodex[world.getTileFromTerrain(tileX, tileY)].isFluid) {
                 contactAreaCounter += 1
             }
         }
@@ -746,7 +746,7 @@ open class ActorWithBody : Actor() {
 
     private fun setHorizontalFriction() {
         val friction = if (isPlayerNoClip)
-            BASE_FRICTION * TilePropCodex[TileNameCode.STONE].friction.tileFrictionToMult()
+            BASE_FRICTION * TileCodex[Tile.STONE].friction.tileFrictionToMult()
         else
             BASE_FRICTION * bodyFriction.tileFrictionToMult()
 
@@ -773,7 +773,7 @@ open class ActorWithBody : Actor() {
 
     private fun setVerticalFriction() {
         val friction = if (isPlayerNoClip)
-            BASE_FRICTION * TilePropCodex[TileNameCode.STONE].friction.tileFrictionToMult()
+            BASE_FRICTION * TileCodex[Tile.STONE].friction.tileFrictionToMult()
         else
             BASE_FRICTION * bodyFriction.tileFrictionToMult()
 
@@ -833,8 +833,8 @@ open class ActorWithBody : Actor() {
         get() {
             var friction = 0
             forEachFeetTile {
-                if (it?.friction ?: 4 > friction) // 4: friction of the air
-                    friction = it?.friction ?: 4
+                if (it?.friction ?: TileCodex[Tile.AIR].friction > friction)
+                    friction = it?.friction ?: TileCodex[Tile.AIR].friction
             }
 
             return friction
@@ -1021,7 +1021,7 @@ open class ActorWithBody : Actor() {
         val tileProps = ArrayList<TileProp?>()
         for (y in tilewiseHitbox.posY.toInt()..tilewiseHitbox.endPointY.toInt()) {
             for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endPointX.toInt()) {
-                tileProps.add(TilePropCodex[world.getTileFromTerrain(x, y)])
+                tileProps.add(TileCodex[world.getTileFromTerrain(x, y)])
             }
         }
 
@@ -1048,7 +1048,7 @@ open class ActorWithBody : Actor() {
         val y = nextHitbox.endPointY.plus(1.0).div(TILE_SIZE).floorInt()
 
         for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endPointX.toInt()) {
-            tileProps.add(TilePropCodex[world.getTileFromTerrain(x, y)])
+            tileProps.add(TileCodex[world.getTileFromTerrain(x, y)])
         }
 
         return tileProps.forEach(consumer)

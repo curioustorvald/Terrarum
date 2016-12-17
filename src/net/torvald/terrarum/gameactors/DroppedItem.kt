@@ -1,8 +1,8 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.gameitem.InventoryItem
-import net.torvald.terrarum.itemproperties.ItemPropCodex
-import net.torvald.terrarum.tileproperties.TilePropCodex
+import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.tileproperties.TileCodex
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 
@@ -12,17 +12,17 @@ import org.newdawn.slick.Graphics
 class DroppedItem(private val item: InventoryItem) : ActorWithBody() {
 
     init {
-        if (item.id >= ItemPropCodex.ITEM_COUNT_MAX)
+        if (item.id >= ItemCodex.ITEM_COUNT_MAX)
             throw RuntimeException("Attempted to create DroppedItem actor of a real actor; the real actor must be dropped instead.")
 
         isVisible = true
 
-        mass = if (item.id < TilePropCodex.TILE_UNIQUE_MAX)
-            TilePropCodex[item.id].density / 1000.0
+        mass = if (item.id < TileCodex.TILE_UNIQUE_MAX)
+            TileCodex[item.id].density / 1000.0
         else
-            ItemPropCodex[item.id].mass
+            ItemCodex[item.id].mass
 
-        scale = ItemPropCodex[item.id].scale
+        scale = ItemCodex[item.id].scale
     }
 
     override fun update(gc: GameContainer, delta: Int) {

@@ -3,10 +3,10 @@ package net.torvald.serialise
 import net.torvald.terrarum.mapgenerator.WorldGenerator
 import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.itemproperties.ItemPropCodex
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialPropCodex
 import net.torvald.terrarum.tileproperties.TilePropCSV
-import net.torvald.terrarum.tileproperties.TilePropCodex
+import net.torvald.terrarum.tileproperties.TileCodex
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.FileInputStream
 import java.io.File

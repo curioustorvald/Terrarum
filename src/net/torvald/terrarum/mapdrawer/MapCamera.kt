@@ -3,8 +3,8 @@ package net.torvald.terrarum.mapdrawer
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.tileproperties.TileNameCode
-import net.torvald.terrarum.tileproperties.TilePropCodex
+import net.torvald.terrarum.tileproperties.Tile
+import net.torvald.terrarum.tileproperties.TileCodex
 import com.jme3.math.FastMath
 import net.torvald.terrarum.concurrent.ThreadPool
 import net.torvald.terrarum.blendMul
@@ -63,48 +63,48 @@ object MapCamera {
      * These are the tiles that only connects to itself, will not connect to colour variants
      */
     val TILES_CONNECT_SELF = arrayOf(
-              TileNameCode.ICE_MAGICAL
-            , TileNameCode.GLASS_CRUDE
-            , TileNameCode.GLASS_CLEAN
-            , TileNameCode.ILLUMINATOR_BLACK
-            , TileNameCode.ILLUMINATOR_BLUE
-            , TileNameCode.ILLUMINATOR_BROWN
-            , TileNameCode.ILLUMINATOR_CYAN
-            , TileNameCode.ILLUMINATOR_FUCHSIA
-            , TileNameCode.ILLUMINATOR_GREEN
-            , TileNameCode.ILLUMINATOR_GREEN_DARK
-            , TileNameCode.ILLUMINATOR_GREY_DARK
-            , TileNameCode.ILLUMINATOR_GREY_LIGHT
-            , TileNameCode.ILLUMINATOR_GREY_MED
-            , TileNameCode.ILLUMINATOR_ORANGE
-            , TileNameCode.ILLUMINATOR_PURPLE
-            , TileNameCode.ILLUMINATOR_RED
-            , TileNameCode.ILLUMINATOR_TAN
-            , TileNameCode.ILLUMINATOR_WHITE
-            , TileNameCode.ILLUMINATOR_YELLOW
-            , TileNameCode.ILLUMINATOR_BLACK_OFF
-            , TileNameCode.ILLUMINATOR_BLUE_OFF
-            , TileNameCode.ILLUMINATOR_BROWN_OFF
-            , TileNameCode.ILLUMINATOR_CYAN_OFF
-            , TileNameCode.ILLUMINATOR_FUCHSIA_OFF
-            , TileNameCode.ILLUMINATOR_GREEN_OFF
-            , TileNameCode.ILLUMINATOR_GREEN_DARK_OFF
-            , TileNameCode.ILLUMINATOR_GREY_DARK_OFF
-            , TileNameCode.ILLUMINATOR_GREY_LIGHT_OFF
-            , TileNameCode.ILLUMINATOR_GREY_MED_OFF
-            , TileNameCode.ILLUMINATOR_ORANGE_OFF
-            , TileNameCode.ILLUMINATOR_PURPLE_OFF
-            , TileNameCode.ILLUMINATOR_RED_OFF
-            , TileNameCode.ILLUMINATOR_TAN_OFF
-            , TileNameCode.ILLUMINATOR_WHITE_OFF
-            , TileNameCode.ILLUMINATOR_YELLOW
-            , TileNameCode.SANDSTONE
-            , TileNameCode.SANDSTONE_BLACK
-            , TileNameCode.SANDSTONE_DESERT
-            , TileNameCode.SANDSTONE_RED
-            , TileNameCode.SANDSTONE_WHITE
-            , TileNameCode.SANDSTONE_GREEN
-            , TileNameCode.DAYLIGHT_CAPACITOR
+              Tile.ICE_MAGICAL
+            , Tile.GLASS_CRUDE
+            , Tile.GLASS_CLEAN
+            , Tile.ILLUMINATOR_BLACK
+            , Tile.ILLUMINATOR_BLUE
+            , Tile.ILLUMINATOR_BROWN
+            , Tile.ILLUMINATOR_CYAN
+            , Tile.ILLUMINATOR_FUCHSIA
+            , Tile.ILLUMINATOR_GREEN
+            , Tile.ILLUMINATOR_GREEN_DARK
+            , Tile.ILLUMINATOR_GREY_DARK
+            , Tile.ILLUMINATOR_GREY_LIGHT
+            , Tile.ILLUMINATOR_GREY_MED
+            , Tile.ILLUMINATOR_ORANGE
+            , Tile.ILLUMINATOR_PURPLE
+            , Tile.ILLUMINATOR_RED
+            , Tile.ILLUMINATOR_TAN
+            , Tile.ILLUMINATOR_WHITE
+            , Tile.ILLUMINATOR_YELLOW
+            , Tile.ILLUMINATOR_BLACK_OFF
+            , Tile.ILLUMINATOR_BLUE_OFF
+            , Tile.ILLUMINATOR_BROWN_OFF
+            , Tile.ILLUMINATOR_CYAN_OFF
+            , Tile.ILLUMINATOR_FUCHSIA_OFF
+            , Tile.ILLUMINATOR_GREEN_OFF
+            , Tile.ILLUMINATOR_GREEN_DARK_OFF
+            , Tile.ILLUMINATOR_GREY_DARK_OFF
+            , Tile.ILLUMINATOR_GREY_LIGHT_OFF
+            , Tile.ILLUMINATOR_GREY_MED_OFF
+            , Tile.ILLUMINATOR_ORANGE_OFF
+            , Tile.ILLUMINATOR_PURPLE_OFF
+            , Tile.ILLUMINATOR_RED_OFF
+            , Tile.ILLUMINATOR_TAN_OFF
+            , Tile.ILLUMINATOR_WHITE_OFF
+            , Tile.ILLUMINATOR_YELLOW
+            , Tile.SANDSTONE
+            , Tile.SANDSTONE_BLACK
+            , Tile.SANDSTONE_DESERT
+            , Tile.SANDSTONE_RED
+            , Tile.SANDSTONE_WHITE
+            , Tile.SANDSTONE_GREEN
+            , Tile.DAYLIGHT_CAPACITOR
     )
 
     /**
@@ -112,75 +112,75 @@ object MapCamera {
      * It holds different shading rule to discriminate with group 01, index 0 is middle tile.
      */
     val TILES_CONNECT_MUTUAL = arrayOf(
-              TileNameCode.STONE
-            , TileNameCode.STONE_QUARRIED
-            , TileNameCode.STONE_TILE_WHITE
-            , TileNameCode.STONE_BRICKS
-            , TileNameCode.DIRT
-            , TileNameCode.GRASS
-            , TileNameCode.PLANK_BIRCH
-            , TileNameCode.PLANK_BLOODROSE
-            , TileNameCode.PLANK_EBONY
-            , TileNameCode.PLANK_NORMAL
-            , TileNameCode.SAND
-            , TileNameCode.SAND_WHITE
-            , TileNameCode.SAND_RED
-            , TileNameCode.SAND_DESERT
-            , TileNameCode.SAND_BLACK
-            , TileNameCode.SAND_GREEN
-            , TileNameCode.GRAVEL
-            , TileNameCode.GRAVEL_GREY
-            , TileNameCode.SNOW
-            , TileNameCode.ICE_NATURAL
-            , TileNameCode.ORE_COPPER
-            , TileNameCode.ORE_IRON
-            , TileNameCode.ORE_GOLD
-            , TileNameCode.ORE_SILVER
-            , TileNameCode.ORE_ILMENITE
-            , TileNameCode.ORE_AURICHALCUM
+              Tile.STONE
+            , Tile.STONE_QUARRIED
+            , Tile.STONE_TILE_WHITE
+            , Tile.STONE_BRICKS
+            , Tile.DIRT
+            , Tile.GRASS
+            , Tile.PLANK_BIRCH
+            , Tile.PLANK_BLOODROSE
+            , Tile.PLANK_EBONY
+            , Tile.PLANK_NORMAL
+            , Tile.SAND
+            , Tile.SAND_WHITE
+            , Tile.SAND_RED
+            , Tile.SAND_DESERT
+            , Tile.SAND_BLACK
+            , Tile.SAND_GREEN
+            , Tile.GRAVEL
+            , Tile.GRAVEL_GREY
+            , Tile.SNOW
+            , Tile.ICE_NATURAL
+            , Tile.ORE_COPPER
+            , Tile.ORE_IRON
+            , Tile.ORE_GOLD
+            , Tile.ORE_SILVER
+            , Tile.ORE_ILMENITE
+            , Tile.ORE_AURICHALCUM
 
-            , TileNameCode.WATER
-            , TileNameCode.WATER_1
-            , TileNameCode.WATER_2
-            , TileNameCode.WATER_3
-            , TileNameCode.WATER_4
-            , TileNameCode.WATER_5
-            , TileNameCode.WATER_6
-            , TileNameCode.WATER_7
-            , TileNameCode.WATER_8
-            , TileNameCode.WATER_9
-            , TileNameCode.WATER_10
-            , TileNameCode.WATER_11
-            , TileNameCode.WATER_12
-            , TileNameCode.WATER_13
-            , TileNameCode.WATER_14
-            , TileNameCode.WATER_15
-            , TileNameCode.LAVA
-            , TileNameCode.LAVA_1
-            , TileNameCode.LAVA_2
-            , TileNameCode.LAVA_3
-            , TileNameCode.LAVA_4
-            , TileNameCode.LAVA_5
-            , TileNameCode.LAVA_6
-            , TileNameCode.LAVA_7
-            , TileNameCode.LAVA_8
-            , TileNameCode.LAVA_9
-            , TileNameCode.LAVA_10
-            , TileNameCode.LAVA_11
-            , TileNameCode.LAVA_12
-            , TileNameCode.LAVA_13
-            , TileNameCode.LAVA_14
-            , TileNameCode.LAVA_15
+            , Tile.WATER
+            , Tile.WATER_1
+            , Tile.WATER_2
+            , Tile.WATER_3
+            , Tile.WATER_4
+            , Tile.WATER_5
+            , Tile.WATER_6
+            , Tile.WATER_7
+            , Tile.WATER_8
+            , Tile.WATER_9
+            , Tile.WATER_10
+            , Tile.WATER_11
+            , Tile.WATER_12
+            , Tile.WATER_13
+            , Tile.WATER_14
+            , Tile.WATER_15
+            , Tile.LAVA
+            , Tile.LAVA_1
+            , Tile.LAVA_2
+            , Tile.LAVA_3
+            , Tile.LAVA_4
+            , Tile.LAVA_5
+            , Tile.LAVA_6
+            , Tile.LAVA_7
+            , Tile.LAVA_8
+            , Tile.LAVA_9
+            , Tile.LAVA_10
+            , Tile.LAVA_11
+            , Tile.LAVA_12
+            , Tile.LAVA_13
+            , Tile.LAVA_14
+            , Tile.LAVA_15
     )
 
     /**
      * Torches, levers, switches, ...
      */
     val TILES_WALL_STICKER = arrayOf(
-              TileNameCode.TORCH
-            , TileNameCode.TORCH_FROST
-            , TileNameCode.TORCH_OFF
-            , TileNameCode.TORCH_FROST_OFF
+              Tile.TORCH
+            , Tile.TORCH_FROST
+            , Tile.TORCH_OFF
+            , Tile.TORCH_FROST_OFF
     )
 
     /**
@@ -196,38 +196,38 @@ object MapCamera {
      * i.e. red hues get lost if you dive into the water
      */
     val TILES_BLEND_MUL = arrayOf(
-              TileNameCode.WATER
-            , TileNameCode.WATER_1
-            , TileNameCode.WATER_2
-            , TileNameCode.WATER_3
-            , TileNameCode.WATER_4
-            , TileNameCode.WATER_5
-            , TileNameCode.WATER_6
-            , TileNameCode.WATER_7
-            , TileNameCode.WATER_8
-            , TileNameCode.WATER_9
-            , TileNameCode.WATER_10
-            , TileNameCode.WATER_11
-            , TileNameCode.WATER_12
-            , TileNameCode.WATER_13
-            , TileNameCode.WATER_14
-            , TileNameCode.WATER_15
-            , TileNameCode.LAVA
-            , TileNameCode.LAVA_1
-            , TileNameCode.LAVA_2
-            , TileNameCode.LAVA_3
-            , TileNameCode.LAVA_4
-            , TileNameCode.LAVA_5
-            , TileNameCode.LAVA_6
-            , TileNameCode.LAVA_7
-            , TileNameCode.LAVA_8
-            , TileNameCode.LAVA_9
-            , TileNameCode.LAVA_10
-            , TileNameCode.LAVA_11
-            , TileNameCode.LAVA_12
-            , TileNameCode.LAVA_13
-            , TileNameCode.LAVA_14
-            , TileNameCode.LAVA_15
+              Tile.WATER
+            , Tile.WATER_1
+            , Tile.WATER_2
+            , Tile.WATER_3
+            , Tile.WATER_4
+            , Tile.WATER_5
+            , Tile.WATER_6
+            , Tile.WATER_7
+            , Tile.WATER_8
+            , Tile.WATER_9
+            , Tile.WATER_10
+            , Tile.WATER_11
+            , Tile.WATER_12
+            , Tile.WATER_13
+            , Tile.WATER_14
+            , Tile.WATER_15
+            , Tile.LAVA
+            , Tile.LAVA_1
+            , Tile.LAVA_2
+            , Tile.LAVA_3
+            , Tile.LAVA_4
+            , Tile.LAVA_5
+            , Tile.LAVA_6
+            , Tile.LAVA_7
+            , Tile.LAVA_8
+            , Tile.LAVA_9
+            , Tile.LAVA_10
+            , Tile.LAVA_11
+            , Tile.LAVA_12
+            , Tile.LAVA_13
+            , Tile.LAVA_14
+            , Tile.LAVA_15
     )
 
     fun update(gc: GameContainer, delta_t: Int) {
@@ -387,8 +387,8 @@ object MapCamera {
         var ret = 0
         for (i in 0..3) {
             try {
-                if (!TilePropCodex[nearbyTiles[i]].isSolid &&
-                    !TilePropCodex[nearbyTiles[i]].isFluid) {
+                if (!TileCodex[nearbyTiles[i]].isSolid &&
+                    !TileCodex[nearbyTiles[i]].isFluid) {
                     ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
                 }
             } catch (e: ArrayIndexOutOfBoundsException) {
@@ -408,26 +408,26 @@ object MapCamera {
         nearbyTiles[NEARBY_TILE_KEY_BACK] =  WORLD.getTileFrom(WALL,    x    , y) ?: 4096
 
         try {
-            if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolid)
+            if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolid)
                 // has tile on the bottom
                 return 3
-            else if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid
-                    && TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid)
+            else if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid
+                     && TileCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid)
                 // has tile on both sides
                 return 0
-            else if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid)
+            else if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid)
                 // has tile on the right
                 return 2
-            else if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid)
+            else if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid)
                 // has tile on the left
                 return 1
-            else if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_BACK]].isSolid)
+            else if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_BACK]].isSolid)
                 // has tile on the back
                 return 0
             else
                 return 3
         } catch (e: ArrayIndexOutOfBoundsException) {
-            return if (TilePropCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolid)
+            return if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolid)
                 // has tile on the bottom
                 3 else 0
         }

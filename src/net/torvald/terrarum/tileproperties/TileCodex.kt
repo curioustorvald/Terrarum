@@ -10,7 +10,7 @@ import java.io.IOException
 /**
  * Created by minjaesong on 16-02-16.
  */
-object TilePropCodex {
+object TileCodex {
 
     private lateinit var tileProps: Array<TileProp>
 
@@ -31,7 +31,7 @@ object TilePropCodex {
             // todo verify CSV using pre-calculated SHA256 hash
             val records = CSVFetcher.readFromString(TilePropCSV.text)
 
-            println("[TilePropCodex] Building tile properties table")
+            println("[TileCodex] Building tile properties table")
 
             records.forEach { setProp(
                     tileProps[idDamageToIndex(intVal(it, "id"), intVal(it, "dmg"))], it)
@@ -56,13 +56,13 @@ object TilePropCodex {
 
     operator fun get(rawIndex: Int?): TileProp {
         try {
-            tileProps[rawIndex ?: TileNameCode.NULL].id
+            tileProps[rawIndex ?: Tile.NULL].id
         }
         catch (e: NullPointerException) {
             throw NullPointerException("Tile prop with raw id $rawIndex does not exist.")
         }
 
-        return tileProps[rawIndex ?: TileNameCode.NULL]
+        return tileProps[rawIndex ?: Tile.NULL]
     }
 
     private fun setProp(prop: TileProp, record: CSVRecord) {
