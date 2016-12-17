@@ -1108,6 +1108,7 @@ open class ActorWithBody : Actor() {
 
 fun Double.floorInt() = Math.floor(this).toInt()
 fun Float.floorInt() = FastMath.floor(this).toInt()
+fun Float.ceilInt() = FastMath.ceil(this).toInt()
 fun Double.round() = Math.round(this).toDouble()
 fun Double.floor() = Math.floor(this)
 fun Double.ceil() = this.floor() + 1.0

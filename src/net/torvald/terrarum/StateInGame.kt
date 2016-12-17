@@ -72,8 +72,8 @@ constructor() : BasicGameState() {
     val ZOOM_MAX = 2.0f
     val ZOOM_MIN = 0.5f
 
-    val tilesDrawFrameBuffer = Image(Terrarum.WIDTH, Terrarum.HEIGHT)
-    val actorsDrawFrameBuffer = Image(Terrarum.WIDTH, Terrarum.HEIGHT)
+    val tilesDrawFrameBuffer =  Image(Terrarum.WIDTH.div(ZOOM_MIN).ceilInt(), Terrarum.HEIGHT.div(ZOOM_MIN).ceilInt())
+    val actorsDrawFrameBuffer = Image(Terrarum.WIDTH.div(ZOOM_MIN).ceilInt(), Terrarum.HEIGHT.div(ZOOM_MIN).ceilInt())
     val uisDrawFrameBuffer = Image(Terrarum.WIDTH, Terrarum.HEIGHT)
 
     //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
