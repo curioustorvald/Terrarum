@@ -326,8 +326,7 @@ object LightmapRenderer {
                 var x = this_x_start
                 while (x < this_x_end) {
                     // smoothing enabled
-                    if (Terrarum.ingame.screenZoom >= 1
-                        && Terrarum.gameConfig.getAsBoolean("smoothlighting") ?: false) {
+                    if (Terrarum.gameConfig.getAsBoolean("smoothlighting") ?: false) {
 
                         val thisLightLevel = getLight(x, y) ?: 0
 
@@ -344,10 +343,10 @@ object LightmapRenderer {
 
                                 g.color = Color(0)
                                 g.fillRect(
-                                        (x.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
-                                        (y.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
-                                        ((TILE_SIZE * Terrarum.ingame.screenZoom).ceil() * zeroLevelCounter).toFloat(),
-                                        (TILE_SIZE * Terrarum.ingame.screenZoom).ceil().toFloat()
+                                        (x.toFloat() * TILE_SIZE).round().toFloat(),
+                                        (y.toFloat() * TILE_SIZE).round().toFloat(),
+                                        (TILE_SIZE * zeroLevelCounter).toFloat(),
+                                        (TILE_SIZE).toFloat()
                                 )
 
                                 x += zeroLevelCounter - 1
@@ -385,12 +384,12 @@ object LightmapRenderer {
                                     g.color = colourMapItoL[iy * 2 + ix].normaliseToColour()
 
                                     g.fillRect(
-                                            (x.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round()
-                                            + ix * TILE_SIZE / 2 * Terrarum.ingame.screenZoom,
-                                            (y.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round()
-                                            + iy * TILE_SIZE / 2 * Terrarum.ingame.screenZoom,
-                                            (TILE_SIZE * Terrarum.ingame.screenZoom / 2).ceil().toFloat(),
-                                            (TILE_SIZE * Terrarum.ingame.screenZoom / 2).ceil().toFloat()
+                                            (x.toFloat() * TILE_SIZE).round()
+                                            + ix * TILE_SIZE / 2f,
+                                            (y.toFloat() * TILE_SIZE).round()
+                                            + iy * TILE_SIZE / 2f,
+                                            (TILE_SIZE / 2f).ceil().toFloat(),
+                                            (TILE_SIZE / 2f).ceil().toFloat()
                                     )
                                 }
                             }
@@ -411,10 +410,10 @@ object LightmapRenderer {
 
                             g.color = (getLight(x, y) ?: 0).normaliseToColour()
                             g.fillRect(
-                                    (x.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
-                                    (y.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
-                                    ((TILE_SIZE * Terrarum.ingame.screenZoom).ceil() * sameLevelCounter).toFloat(),
-                                    (TILE_SIZE * Terrarum.ingame.screenZoom).ceil().toFloat()
+                                    (x.toFloat() * TILE_SIZE).round().toFloat(),
+                                    (y.toFloat() * TILE_SIZE).round().toFloat(),
+                                    (TILE_SIZE.toFloat().ceil() * sameLevelCounter).toFloat(),
+                                     TILE_SIZE.toFloat().ceil().toFloat()
                             )
 
                             x += sameLevelCounter - 1
