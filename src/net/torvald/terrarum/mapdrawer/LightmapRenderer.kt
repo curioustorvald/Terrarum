@@ -7,6 +7,7 @@ import com.jme3.math.FastMath
 import net.torvald.colourutil.RGB
 import net.torvald.colourutil.CIELuvUtil.additiveLuv
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.mapdrawer.MapCamera.world
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TilePropUtil
 import org.newdawn.slick.Color
@@ -38,7 +39,7 @@ object LightmapRenderer {
     private val OFFSET_G = 1
     private val OFFSET_B = 0
 
-    private const val TSIZE = MapDrawer.TILE_SIZE
+    private const val TILE_SIZE = MapDrawer.TILE_SIZE
 
     // color model related constants
     const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB
@@ -79,11 +80,11 @@ object LightmapRenderer {
     }
 
     fun renderLightMap() {
-        for_x_start = MapCamera.cameraX / TSIZE - 1 // fix for premature lightmap rendering
-        for_y_start = MapCamera.cameraY / TSIZE - 1 // on topmost/leftmost side
+        for_x_start = MapCamera.cameraX / TILE_SIZE - 1 // fix for premature lightmap rendering
+        for_y_start = MapCamera.cameraY / TILE_SIZE - 1 // on topmost/leftmost side
 
-        for_x_end = for_x_start + MapCamera.renderWidth / TSIZE + 3
-        for_y_end = for_y_start + MapCamera.renderHeight / TSIZE + 2 // same fix as above
+        for_x_end = for_x_start + MapCamera.renderWidth / TILE_SIZE + 3
+        for_y_end = for_y_start + MapCamera.renderHeight / TILE_SIZE + 2 // same fix as above
 
         /**
          * * true: overscanning is limited to 8 tiles in width (overscan_opaque)
@@ -182,11 +183,15 @@ object LightmapRenderer {
                     val lightBoxY = it.hitbox.posY + lightBox.posY
                     val lightBoxW = lightBox.width
                     val lightBoxH = lightBox.height
-                    for (y in lightBoxY.div(TSIZE).floorInt()
-                            ..lightBoxY.plus(lightBoxH).div(TSIZE).floorInt())
-                        for (x in lightBoxX.div(TSIZE).floorInt()
-                                ..lightBoxX.plus(lightBoxW).div(TSIZE).floorInt())
+                    for (y in lightBoxY.div(TILE_SIZE).floorInt()
+                            ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
+                        for (x in lightBoxX.div(TILE_SIZE).floorInt()
+                                ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
                             lanternMap.add(Lantern(x, y, it.luminosity))
+                            // Q&D fix for Roundworld anormaly
+                            lanternMap.add(Lantern(x + world.width, y, it.luminosity))
+                        }
+                    }
                 }
             }
         }
@@ -339,10 +344,10 @@ object LightmapRenderer {
 
                                 g.color = Color(0)
                                 g.fillRect(
-                                        (x.toFloat() * TSIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
-                                        (y.toFloat() * TSIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
-                                        ((TSIZE * Terrarum.ingame.screenZoom).ceil() * zeroLevelCounter).toFloat(),
-                                        (TSIZE * Terrarum.ingame.screenZoom).ceil().toFloat()
+                                        (x.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
+                                        (y.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
+                                        ((TILE_SIZE * Terrarum.ingame.screenZoom).ceil() * zeroLevelCounter).toFloat(),
+                                        (TILE_SIZE * Terrarum.ingame.screenZoom).ceil().toFloat()
                                 )
 
                                 x += zeroLevelCounter - 1
@@ -380,12 +385,12 @@ object LightmapRenderer {
                                     g.color = colourMapItoL[iy * 2 + ix].normaliseToColour()
 
                                     g.fillRect(
-                                            (x.toFloat() * TSIZE.toFloat() * Terrarum.ingame.screenZoom).round()
-                                                    + ix * TSIZE / 2 * Terrarum.ingame.screenZoom,
-                                            (y.toFloat() * TSIZE.toFloat() * Terrarum.ingame.screenZoom).round()
-                                                    + iy * TSIZE / 2 * Terrarum.ingame.screenZoom,
-                                            (TSIZE * Terrarum.ingame.screenZoom / 2).ceil().toFloat(),
-                                            (TSIZE * Terrarum.ingame.screenZoom / 2).ceil().toFloat()
+                                            (x.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round()
+                                            + ix * TILE_SIZE / 2 * Terrarum.ingame.screenZoom,
+                                            (y.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round()
+                                            + iy * TILE_SIZE / 2 * Terrarum.ingame.screenZoom,
+                                            (TILE_SIZE * Terrarum.ingame.screenZoom / 2).ceil().toFloat(),
+                                            (TILE_SIZE * Terrarum.ingame.screenZoom / 2).ceil().toFloat()
                                     )
                                 }
                             }
@@ -406,10 +411,10 @@ object LightmapRenderer {
 
                             g.color = (getLight(x, y) ?: 0).normaliseToColour()
                             g.fillRect(
-                                    (x.toFloat() * TSIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
-                                    (y.toFloat() * TSIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
-                                    ((TSIZE * Terrarum.ingame.screenZoom).ceil() * sameLevelCounter).toFloat(),
-                                    (TSIZE * Terrarum.ingame.screenZoom).ceil().toFloat()
+                                    (x.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
+                                    (y.toFloat() * TILE_SIZE.toFloat() * Terrarum.ingame.screenZoom).round().toFloat(),
+                                    ((TILE_SIZE * Terrarum.ingame.screenZoom).ceil() * sameLevelCounter).toFloat(),
+                                    (TILE_SIZE * Terrarum.ingame.screenZoom).ceil().toFloat()
                             )
 
                             x += sameLevelCounter - 1

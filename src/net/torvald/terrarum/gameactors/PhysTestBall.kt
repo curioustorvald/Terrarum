@@ -1,5 +1,7 @@
 package net.torvald.terrarum.gameactors
 
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.mapdrawer.MapDrawer.TILE_SIZE
 import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -25,6 +27,12 @@ class PhysTestBall : ActorWithBody() {
         g.color = color
         g.fillOval(
                 hitbox.posX.toFloat(),
+                hitbox.posY.toFloat(),
+                hitbox.width.toFloat(),
+                hitbox.height.toFloat())
+
+        g.fillOval(
+                hitbox.posX.toFloat() + Terrarum.ingame.world.width * TILE_SIZE,
                 hitbox.posY.toFloat(),
                 hitbox.width.toFloat(),
                 hitbox.height.toFloat())

@@ -30,7 +30,6 @@ object CommandDict {
             Pair("setgl", SetGlobalLightOverride),
             Pair("getfaction", GetFactioning),
             Pair("auth", Authenticator),
-            Pair("spawnball", SpawnPhysTestBall),
             Pair("batch", Batch),
             Pair("settime", SetTime),
             Pair("gettime", GetTime),
@@ -38,7 +37,6 @@ object CommandDict {
             Pair("help", Help),
             Pair("version", Version),
             Pair("seed", Seed),
-            Pair("testgetlight", TestGetLight),
             Pair("println", EchoConsole),
             Pair("inventory", Inventory),
 
@@ -47,6 +45,9 @@ object CommandDict {
             Pair("gsontest", GsonTest),
             Pair("tips", PrintRandomTips),
             Pair("langtest", LangTest),
+            Pair("testgetlight", TestGetLight),
+            Pair("spawnball", SpawnPhysTestBall),
+            Pair("spawntorch", SpawnTikiTorch),
             Pair("musictest", MusicTest)
     )
 
