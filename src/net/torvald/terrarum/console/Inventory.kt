@@ -5,7 +5,7 @@ import net.torvald.terrarum.gameactors.ActorInventory
 import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.gameactors.Pocketed
 import net.torvald.terrarum.gameitem.EquipPosition
-import net.torvald.terrarum.itemproperties.ItemPropCodex
+import net.torvald.terrarum.itemproperties.ItemCodex
 
 /**
  * Created by SKYHi14 on 2016-12-12.
@@ -55,11 +55,11 @@ internal object Inventory : ConsoleCommand {
     }
 
     private fun addItem(refId: Int, amount: Int = 1) {
-        target.inventory.add(ItemPropCodex[refId], amount)
+        target.inventory.add(ItemCodex[refId], amount)
     }
 
     private fun equipItem(refId: Int) {
-        val item = ItemPropCodex[refId]
+        val item = ItemCodex[refId]
 
         // if the item does not exist, add it first
         if (!target.inventory.contains(item)) {

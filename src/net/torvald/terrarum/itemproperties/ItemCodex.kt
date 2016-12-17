@@ -1,27 +1,23 @@
 package net.torvald.terrarum.itemproperties
 
 import net.torvald.point.Point2d
-import net.torvald.random.HQRNG
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.CanBeAnItem
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.tileproperties.TileProp
-import net.torvald.terrarum.tileproperties.TilePropCodex
-import org.apache.commons.csv.CSVRecord
+import net.torvald.terrarum.tileproperties.TileCodex
 import org.newdawn.slick.GameContainer
 import java.util.*
 
 /**
  * Created by minjaesong on 16-03-15.
  */
-object ItemPropCodex {
+object ItemCodex {
 
     /**
      * <ItemID or RefID for Actor, TheItem>
@@ -43,7 +39,7 @@ object ItemPropCodex {
             itemCodex[i] = object : InventoryItem() {
                 override val id: Int = i
                 override val equipPosition = EquipPosition.HAND_GRIP
-                override var mass: Double = TilePropCodex[i].density / 1000.0
+                override var mass: Double = TileCodex[i].density / 1000.0
                 override var scale: Double = 1.0 // no need to set setter as scale would not change
 
                 override fun primaryUse(gc: GameContainer, delta: Int) {

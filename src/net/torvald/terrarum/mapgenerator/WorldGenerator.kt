@@ -2,7 +2,7 @@ package net.torvald.terrarum.mapgenerator
 
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.tileproperties.TileNameCode
+import net.torvald.terrarum.tileproperties.Tile
 import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
@@ -112,32 +112,32 @@ object WorldGenerator {
          */
 
         //val noiseArray = arrayOf(
-                //  TaggedJoise("Carving caves", noiseRidged(1.7f, 1.4f), 1f, TILE_MACRO_ALL, TILE_MACRO_ALL, TileNameCode.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END)
-                //, TaggedJoise("Collapsing caves", noiseBlobs(0.5f, 0.5f), 0.3f, TileNameCode.AIR, TileNameCode.STONE, TileNameCode.STONE, NoiseFilterUniform)
+                //  TaggedJoise("Carving caves", noiseRidged(1.7f, 1.4f), 1f, TILE_MACRO_ALL, TILE_MACRO_ALL, Tile.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END)
+                //, TaggedJoise("Collapsing caves", noiseBlobs(0.5f, 0.5f), 0.3f, Tile.AIR, Tile.STONE, Tile.STONE, NoiseFilterUniform)
 //
-                //, TaggedJoise("Putting stone patches on the ground", noiseBlobs(0.8f, 0.8f), 1.02f, intArrayOf(TileNameCode.DIRT, TileNameCode.GRASS), TileNameCode.DIRT, TileNameCode.STONE, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
-                //, TaggedJoise("Placing dirt spots in the cave", noiseBlobs(0.5f, 0.5f), 0.98f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.DIRT, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
-                //, TaggedJoise("Quarrying some stone into gravels", noiseBlobs(0.5f, 0.5f), 0.98f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.GRAVEL, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
+                //, TaggedJoise("Putting stone patches on the ground", noiseBlobs(0.8f, 0.8f), 1.02f, intArrayOf(Tile.DIRT, Tile.GRASS), Tile.DIRT, Tile.STONE, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
+                //, TaggedJoise("Placing dirt spots in the cave", noiseBlobs(0.5f, 0.5f), 0.98f, Tile.STONE, Tile.STONE, Tile.DIRT, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
+                //, TaggedJoise("Quarrying some stone into gravels", noiseBlobs(0.5f, 0.5f), 0.98f, Tile.STONE, Tile.STONE, Tile.GRAVEL, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
 //
-                //, TaggedJoise("Growing copper veins", noiseRidged(1.7f, 1.7f), 1.68f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.ORE_COPPER)
-                //, TaggedJoise("Cutting copper veins", noiseBlobs(0.4f, 0.4f), 0.26f, TileNameCode.ORE_COPPER, TileNameCode.STONE, TileNameCode.STONE)
+                //, TaggedJoise("Growing copper veins", noiseRidged(1.7f, 1.7f), 1.68f, Tile.STONE, Tile.STONE, Tile.ORE_COPPER)
+                //, TaggedJoise("Cutting copper veins", noiseBlobs(0.4f, 0.4f), 0.26f, Tile.ORE_COPPER, Tile.STONE, Tile.STONE)
 //
-                //, TaggedJoise("Growing iron veins", noiseRidged(1.7f, 1.7f), 1.68f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.ORE_IRON)
-                //, TaggedJoise("Cutting iron veins", noiseBlobs(0.7f, 0.7f), 0.26f, TileNameCode.ORE_IRON, TileNameCode.STONE, TileNameCode.STONE)
+                //, TaggedJoise("Growing iron veins", noiseRidged(1.7f, 1.7f), 1.68f, Tile.STONE, Tile.STONE, Tile.ORE_IRON)
+                //, TaggedJoise("Cutting iron veins", noiseBlobs(0.7f, 0.7f), 0.26f, Tile.ORE_IRON, Tile.STONE, Tile.STONE)
 //
-                //, TaggedJoise("Growing silver veins", noiseRidged(1.7f, 1.7f), 1.71f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.ORE_SILVER)
-                //, TaggedJoise("Cutting silver veins", noiseBlobs(0.7f, 0.7f), 0.26f, TileNameCode.ORE_SILVER, TileNameCode.STONE, TileNameCode.STONE)
+                //, TaggedJoise("Growing silver veins", noiseRidged(1.7f, 1.7f), 1.71f, Tile.STONE, Tile.STONE, Tile.ORE_SILVER)
+                //, TaggedJoise("Cutting silver veins", noiseBlobs(0.7f, 0.7f), 0.26f, Tile.ORE_SILVER, Tile.STONE, Tile.STONE)
 //
-                //, TaggedJoise("Growing gold veins", noiseRidged(1.7f, 1.7f), 1.73f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.ORE_GOLD)
-                //, TaggedJoise("Cutting gold veins", noiseBlobs(0.7f, 0.7f), 0.26f, TileNameCode.ORE_GOLD, TileNameCode.STONE, TileNameCode.STONE)
+                //, TaggedJoise("Growing gold veins", noiseRidged(1.7f, 1.7f), 1.73f, Tile.STONE, Tile.STONE, Tile.ORE_GOLD)
+                //, TaggedJoise("Cutting gold veins", noiseBlobs(0.7f, 0.7f), 0.26f, Tile.ORE_GOLD, Tile.STONE, Tile.STONE)
 //              //  FIXME gem clusters are too large
-                //, TaggedJoise("Growing topaz clusters", noiseBlobs(0.9f, 0.9f), 2f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.RAW_TOPAZ)
-                //, TaggedJoise("Growing aluminium oxide clusters", noiseBlobs(0.9f, 0.9f), 1.7f, TileNameCode.STONE, TileNameCode.STONE, intArrayOf(TileNameCode.RAW_RUBY, TileNameCode.RAW_SAPPHIRE))
-                //, TaggedJoise("Growing emerald clusters", noiseBlobs(0.9f, 0.9f), 1.7f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.RAW_EMERALD)
-                //, TaggedJoise("Growing hearts of white", noiseBlobs(0.9f, 0.9f), 1.83f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.RAW_DIAMOND)
-                //, TaggedJoise("Growing hearts of violet", noiseRidged(2.5f, 2.5f), 1.75f, TileNameCode.STONE, TileNameCode.STONE, TileNameCode.RAW_AMETHYST)
+                //, TaggedJoise("Growing topaz clusters", noiseBlobs(0.9f, 0.9f), 2f, Tile.STONE, Tile.STONE, Tile.RAW_TOPAZ)
+                //, TaggedJoise("Growing aluminium oxide clusters", noiseBlobs(0.9f, 0.9f), 1.7f, Tile.STONE, Tile.STONE, intArrayOf(Tile.RAW_RUBY, Tile.RAW_SAPPHIRE))
+                //, TaggedJoise("Growing emerald clusters", noiseBlobs(0.9f, 0.9f), 1.7f, Tile.STONE, Tile.STONE, Tile.RAW_EMERALD)
+                //, TaggedJoise("Growing hearts of white", noiseBlobs(0.9f, 0.9f), 1.83f, Tile.STONE, Tile.STONE, Tile.RAW_DIAMOND)
+                //, TaggedJoise("Growing hearts of violet", noiseRidged(2.5f, 2.5f), 1.75f, Tile.STONE, Tile.STONE, Tile.RAW_AMETHYST)
 //
-                //, TaggedJoise("Cutting over-grown hearts", noiseBlobs(0.7f, 0.7f), 0.17f, TileNameCode.RAW_AMETHYST, TileNameCode.STONE, TileNameCode.STONE)
+                //, TaggedJoise("Cutting over-grown hearts", noiseBlobs(0.7f, 0.7f), 0.17f, Tile.RAW_AMETHYST, Tile.STONE, Tile.STONE)
         //)
         //processNoiseLayers(noiseArray)
 
@@ -489,11 +489,11 @@ object WorldGenerator {
             for (i in 0..HEIGHT - pillarOffset - 1) {
 
                 if (i < DIRT_LAYER_DEPTH) {
-                    world.setTileTerrain(x, i + pillarOffset, TileNameCode.DIRT)
-                    world.setTileWall(x, i + pillarOffset, TileNameCode.DIRT)
+                    world.setTileTerrain(x, i + pillarOffset, Tile.DIRT)
+                    world.setTileWall(x, i + pillarOffset, Tile.DIRT)
                 } else {
-                    world.setTileTerrain(x, i + pillarOffset, TileNameCode.STONE)
-                    world.setTileWall(x, i + pillarOffset, TileNameCode.STONE)
+                    world.setTileTerrain(x, i + pillarOffset, Tile.STONE)
+                    world.setTileWall(x, i + pillarOffset, Tile.STONE)
                 }
 
             }
@@ -558,11 +558,11 @@ object WorldGenerator {
         for (x in 0..WIDTH - 1) {
             for (y in 0..HEIGHT - 1) {
                 if (terrainMap[clamp(y + DIRT_LAYER_DEPTH, 0, HEIGHT - 1)].get(x)) {
-                    // map.setTileTerrain(x, y, TileNameCode.DIRT)
-                    // map.setTileWall(x, y, TileNameCode.DIRT)
+                    // map.setTileTerrain(x, y, Tile.DIRT)
+                    // map.setTileWall(x, y, Tile.DIRT)
                     val tile =
-                            if (y < dirtStoneLine[x]) TileNameCode.DIRT
-                            else                      TileNameCode.STONE
+                            if (y < dirtStoneLine[x]) Tile.DIRT
+                            else                      Tile.STONE
                     world.setTileTerrain(x, y, tile)
                     world.setTileWall(x, y, tile)
                 }
@@ -729,7 +729,7 @@ object WorldGenerator {
         val nIslands = random.nextInt(nIslandsMax - nIslandsMin) + nIslandsMin
         val prevIndex = -1
 
-        val tiles = intArrayOf(TileNameCode.AIR, TileNameCode.STONE, TileNameCode.DIRT, TileNameCode.GRASS)
+        val tiles = intArrayOf(Tile.AIR, Tile.STONE, Tile.DIRT, Tile.GRASS)
 
         for (i in 0..nIslands - 1) {
             var currentIndex = random.nextInt(FloatingIslandsPreset.PRESETS)
@@ -758,7 +758,7 @@ object WorldGenerator {
         for (i in HEIGHT * 14 / 15..HEIGHT - 1) {
             for (j in 0..WIDTH - 1) {
                 if (world.terrainArray[i][j].toInt() == 0) {
-                    world.setTileTerrain(j, i, TileNameCode.LAVA)
+                    world.setTileTerrain(j, i, Tile.LAVA)
                 }
             }
         }
@@ -786,8 +786,8 @@ object WorldGenerator {
 
                     if (nearbyWallTile == null) break;
 
-                    if (i != 4 && thisTile == TileNameCode.DIRT && nearbyWallTile == TileNameCode.AIR) {
-                        world.setTileTerrain(x, y, TileNameCode.GRASS)
+                    if (i != 4 && thisTile == Tile.DIRT && nearbyWallTile == Tile.AIR) {
+                        world.setTileTerrain(x, y, Tile.GRASS)
                         break
                     }
                 }
@@ -797,7 +797,7 @@ object WorldGenerator {
     }
 
     private fun isGrassOrDirt(x: Int, y: Int): Boolean {
-        return world.getTileFromTerrain(x, y) == TileNameCode.GRASS || world.getTileFromTerrain(x, y) == TileNameCode.DIRT
+        return world.getTileFromTerrain(x, y) == Tile.GRASS || world.getTileFromTerrain(x, y) == Tile.DIRT
     }
 
     private fun replaceIfTerrain(ifTileRaw: Int, x: Int, y: Int, replaceTileRaw: Int) {
@@ -816,19 +816,19 @@ object WorldGenerator {
 
     private fun fillOcean() {
         val thisSandList = intArrayOf(
-                TileNameCode.SAND, TileNameCode.SAND, TileNameCode.SAND, TileNameCode.SAND,
-                TileNameCode.SAND_WHITE, TileNameCode.SAND_WHITE, TileNameCode.SAND_WHITE,
-                TileNameCode.SAND_BLACK, TileNameCode.SAND_BLACK, TileNameCode.SAND_GREEN
+                Tile.SAND, Tile.SAND, Tile.SAND, Tile.SAND,
+                Tile.SAND_WHITE, Tile.SAND_WHITE, Tile.SAND_WHITE,
+                Tile.SAND_BLACK, Tile.SAND_BLACK, Tile.SAND_GREEN
                 )
         val thisRand = HQRNG(SEED xor random.nextLong())
         val thisSand = thisSandList[thisRand.nextInt(thisSandList.size)]
-        // val thisSand = TileNameCode.SAND_GREEN
+        // val thisSand = Tile.SAND_GREEN
 
-        val thisSandStr = if (thisSand == TileNameCode.SAND_BLACK)
+        val thisSandStr = if (thisSand == Tile.SAND_BLACK)
             "black"
-        else if (thisSand == TileNameCode.SAND_GREEN)
+        else if (thisSand == Tile.SAND_GREEN)
             "green"
-        else if (thisSand == TileNameCode.SAND)
+        else if (thisSand == Tile.SAND)
             "yellow"
         else
             "white"
@@ -840,11 +840,11 @@ object WorldGenerator {
             if (ix < OCEAN_WIDTH) {
                 if (worldOceanPosition == TYPE_OCEAN_LEFT) {
                     for (y in getTerrainHeightFromHeightMap(OCEAN_WIDTH)..getTerrainHeightFromHeightMap(ix) - 1) {
-                        world.setTileTerrain(ix, y, TileNameCode.WATER)
+                        world.setTileTerrain(ix, y, Tile.WATER)
                     }
                 } else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
                     for (y in getTerrainHeightFromHeightMap(world.width - 1 - OCEAN_WIDTH)..getTerrainHeightFromHeightMap(world.width - 1 - ix) - 1) {
-                        world.setTileTerrain(world.width - 1 - ix, y, TileNameCode.WATER)
+                        world.setTileTerrain(world.width - 1 - ix, y, Tile.WATER)
                     }
                 }
             }
@@ -874,17 +874,17 @@ object WorldGenerator {
         for (y in 0..world.height - 1 - 1) {
             for (x in 0..getFrozenAreaWidth(y) - 1) {
                 if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
-                    replaceIfTerrain(TileNameCode.DIRT, x, y, TileNameCode.SNOW)
-                    replaceIfTerrain(TileNameCode.STONE, x, y, TileNameCode.ICE_NATURAL)
+                    replaceIfTerrain(Tile.DIRT, x, y, Tile.SNOW)
+                    replaceIfTerrain(Tile.STONE, x, y, Tile.ICE_NATURAL)
 
-                    replaceIfWall(TileNameCode.DIRT, x, y, TileNameCode.SNOW)
-                    replaceIfWall(TileNameCode.STONE, x, y, TileNameCode.ICE_NATURAL)
+                    replaceIfWall(Tile.DIRT, x, y, Tile.SNOW)
+                    replaceIfWall(Tile.STONE, x, y, Tile.ICE_NATURAL)
                 } else {
-                    replaceIfTerrain(TileNameCode.DIRT, world.width - 1 - x, y, TileNameCode.SNOW)
-                    replaceIfTerrain(TileNameCode.STONE, world.width - 1 - x, y, TileNameCode.ICE_NATURAL)
+                    replaceIfTerrain(Tile.DIRT, world.width - 1 - x, y, Tile.SNOW)
+                    replaceIfTerrain(Tile.STONE, world.width - 1 - x, y, Tile.ICE_NATURAL)
 
-                    replaceIfWall(TileNameCode.DIRT, world.width - 1 - x, y, TileNameCode.SNOW)
-                    replaceIfWall(TileNameCode.STONE, world.width - 1 - x, y, TileNameCode.ICE_NATURAL)
+                    replaceIfWall(Tile.DIRT, world.width - 1 - x, y, Tile.SNOW)
+                    replaceIfWall(Tile.STONE, world.width - 1 - x, y, Tile.ICE_NATURAL)
                 }
             }
         }

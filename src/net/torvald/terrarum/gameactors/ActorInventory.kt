@@ -2,7 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitem.InventoryItem
-import net.torvald.terrarum.itemproperties.ItemPropCodex
+import net.torvald.terrarum.itemproperties.ItemCodex
 import java.util.*
 
 /**
@@ -51,7 +51,7 @@ class ActorInventory() {
         }
     }
 
-    fun add(itemID: Int, count: Int = 1) = add(ItemPropCodex[itemID], count)
+    fun add(itemID: Int, count: Int = 1) = add(ItemCodex[itemID], count)
     fun add(item: InventoryItem, count: Int = 1) {
         if (item.id == Player.PLAYER_REF_ID)
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
@@ -64,7 +64,7 @@ class ActorInventory() {
         itemList.put(item, itemList[item] ?: 0 + count)
     }
 
-    fun remove(itemID: Int, count: Int = 1) = remove(ItemPropCodex[itemID], count)
+    fun remove(itemID: Int, count: Int = 1) = remove(ItemCodex[itemID], count)
     fun remove(item: InventoryItem, count: Int = 1) {
         // check if the item does NOT exist
         if (itemList[item] == null) {
@@ -84,7 +84,7 @@ class ActorInventory() {
 
 
     fun contains(item: InventoryItem) = itemList.containsKey(item)
-    fun contains(itemID: Int) = itemList.containsKey(ItemPropCodex[itemID])
+    fun contains(itemID: Int) = itemList.containsKey(ItemCodex[itemID])
 
     fun forEach(consumer: (InventoryItem, Int) -> Unit) = itemList.forEach(consumer)
 

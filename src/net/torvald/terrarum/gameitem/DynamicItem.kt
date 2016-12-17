@@ -2,7 +2,7 @@ package net.torvald.terrarum.gameitem
 
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.KVHashMap
-import net.torvald.terrarum.itemproperties.ItemPropCodex
+import net.torvald.terrarum.itemproperties.ItemCodex
 import org.newdawn.slick.GameContainer
 
 /**
@@ -26,7 +26,7 @@ open class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: 
 
     override val equipPosition: Int = // default to HAND_GRIP if no baseItemID given
             if (baseItemID != null)
-                ItemPropCodex[baseItemID].equipPosition
+                ItemCodex[baseItemID].equipPosition
             else
                 EquipPosition.HAND_GRIP
 
@@ -35,7 +35,7 @@ open class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: 
         var ret: Int
         do {
             ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
-        } while (ItemPropCodex.hasItem(ret) || ret < ItemPropCodex.ITEM_DYNAMIC_MIN || ret > ItemPropCodex.ITEM_DYNAMIC_MAX) // check for collision
+        } while (ItemCodex.hasItem(ret) || ret < ItemCodex.ITEM_DYNAMIC_MIN || ret > ItemCodex.ITEM_DYNAMIC_MAX) // check for collision
         return ret
     }
 
@@ -67,14 +67,14 @@ open class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: 
             mass = newMass!!
         }
         else {
-            mass = newMass ?: ItemPropCodex[baseItemID].mass
+            mass = newMass ?: ItemCodex[baseItemID].mass
         }
 
         if (baseItemID == null) {
             scale = newScale!!
         }
         else {
-            scale = newScale ?: ItemPropCodex[baseItemID].scale
+            scale = newScale ?: ItemCodex[baseItemID].scale
         }
     }
 }

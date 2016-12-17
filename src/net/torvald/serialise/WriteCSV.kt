@@ -1,10 +1,10 @@
 package net.torvald.serialise
 
 import net.torvald.CSVFetcher
-import net.torvald.terrarum.itemproperties.ItemPropCodex
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialPropCodex
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.tileproperties.TilePropCodex
+import net.torvald.terrarum.tileproperties.TileCodex
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -20,8 +20,8 @@ object WriteCSV {
     val META_FILENAME_MAT = "worldinfo4"
 
     fun write(saveDirectoryName: String): Boolean {
-        //val tileCSV = CSVFetcher.readCSVasString(TilePropCodex.CSV_PATH)
-        //val itemCSV = CSVFetcher.readCSVasString(ItemPropCodex.CSV_PATH)
+        //val tileCSV = CSVFetcher.readCSVasString(TileCodex.CSV_PATH)
+        //val itemCSV = CSVFetcher.readCSVasString(ItemCodex.CSV_PATH)
         //val matCSV = CSVFetcher.readCSVasString(MaterialPropCodex.CSV_PATH)
 
         val pathTile = Paths.get("${Terrarum.defaultSaveDir}" +

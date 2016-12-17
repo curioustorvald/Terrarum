@@ -2,7 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.itemproperties.ItemPropCodex
+import net.torvald.terrarum.itemproperties.ItemCodex
 import org.newdawn.slick.GameContainer
 
 /**
@@ -40,7 +40,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
         var ret: Int
         do {
             ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
-        } while (Terrarum.ingame.hasActor(ret) || ret < ItemPropCodex.ITEM_COUNT_MAX) // check for collision
+        } while (Terrarum.ingame.hasActor(ret) || ret < ItemCodex.ITEM_COUNT_MAX) // check for collision
         return ret
     }
 }
