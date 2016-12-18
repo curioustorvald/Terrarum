@@ -11,10 +11,7 @@ import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.mapdrawer.MapDrawer.TILE_SIZE
 import org.lwjgl.opengl.GL11
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.SlickException
-import org.newdawn.slick.SpriteSheet
+import org.newdawn.slick.*
 import java.util.*
 
 /**
@@ -255,17 +252,17 @@ object MapCamera {
          * render to camera
          */
         blendNormal()
-        drawTiles(WALL, false)
-        drawTiles(TERRAIN, false)
+        drawTiles(g, WALL, false)
+        drawTiles(g, TERRAIN, false)
     }
 
     fun renderFront(gc: GameContainer, g: Graphics) {
         blendMul()
-        drawTiles(TERRAIN, true)
+        drawTiles(g, TERRAIN, true)
         blendNormal()
     }
 
-    private fun drawTiles(mode: Int, drawModeTilesBlendMul: Boolean) {
+    private fun drawTiles(g: Graphics, mode: Int, drawModeTilesBlendMul: Boolean) {
         val for_y_start = MapCamera.cameraY / TILE_SIZE
         val for_y_end = MapCamera.clampHTile(for_y_start + (MapCamera.renderHeight / TILE_SIZE) + 2)
 
@@ -274,6 +271,8 @@ object MapCamera {
 
         // initialise
         MapCamera.tilesetBook[mode].startUse()
+
+        var zeroTileCounter = 0
 
         // loop
         for (y in for_y_start..for_y_end) {
@@ -294,23 +293,19 @@ object MapCamera {
                 // draw
                 try {
                     if (
-
-                    (mode == WALL || mode == TERRAIN)       // not an air tile
-
-                    && (thisTile ?: 0) > 0
-                    &&
+                    (mode == WALL || mode == TERRAIN) &&  // not an air tile
+                    (thisTile ?: 0) > 0) //&& // commented out: meh
                     // check if light level of nearby or this tile is illuminated
-                    (    LightmapRenderer.getValueFromMap(x, y) ?: 0 > 0
-                         || LightmapRenderer.getValueFromMap(x - 1, y) ?: 0 > 0
-                         || LightmapRenderer.getValueFromMap(x + 1, y) ?: 0 > 0
-                         || LightmapRenderer.getValueFromMap(x, y - 1) ?: 0 > 0
-                         || LightmapRenderer.getValueFromMap(x, y + 1) ?: 0 > 0
-                         || LightmapRenderer.getValueFromMap(x - 1, y - 1) ?: 0 > 0
-                         || LightmapRenderer.getValueFromMap(x + 1, y + 1) ?: 0 > 0
-                         || LightmapRenderer.getValueFromMap(x + 1, y - 1) ?: 0 > 0
-                         || LightmapRenderer.getValueFromMap(x - 1, y + 1) ?: 0 > 0)
-                    ) {
-
+                    /*(    LightmapRenderer.getValueFromMap(x, y) ?: 0 > 0 ||
+                         LightmapRenderer.getValueFromMap(x - 1, y) ?: 0 > 0 ||
+                         LightmapRenderer.getValueFromMap(x + 1, y) ?: 0 > 0 ||
+                         LightmapRenderer.getValueFromMap(x, y - 1) ?: 0 > 0 ||
+                         LightmapRenderer.getValueFromMap(x, y + 1) ?: 0 > 0 ||
+                         LightmapRenderer.getValueFromMap(x - 1, y - 1) ?: 0 > 0 ||
+                         LightmapRenderer.getValueFromMap(x + 1, y + 1) ?: 0 > 0 ||
+                         LightmapRenderer.getValueFromMap(x + 1, y - 1) ?: 0 > 0 ||
+                         LightmapRenderer.getValueFromMap(x - 1, y + 1) ?: 0 > 0)
+                    )*/ {
                         val nearbyTilesInfo: Int
                         if (isPlatform(thisTile)) {
                             nearbyTilesInfo = getNearbyTilesInfoPlatform(x, y)
@@ -346,6 +341,9 @@ object MapCamera {
                             // or else they will not look like they should be when backed with wall
                             drawTile(mode, x, y, thisTileX, thisTileY)
                         }
+                    } // end if (not an air and is illuminated)
+                    else {
+                        zeroTileCounter++
                     }
                 } catch (e: NullPointerException) {
                     // do nothing. WARNING: This exception handling may hide erratic behaviour completely.

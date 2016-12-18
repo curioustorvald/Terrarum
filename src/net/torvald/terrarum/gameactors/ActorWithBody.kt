@@ -29,7 +29,7 @@ open class ActorWithBody : Actor() {
     @Transient internal var sprite: SpriteAnimation? = null
     @Transient internal var spriteGlow: SpriteAnimation? = null
 
-    protected var drawMode: DrawMode = DrawMode.NORMAL
+    var drawMode = BLEND_NORMAL
 
     @Transient private val world: GameWorld = Terrarum.ingame.world
 
@@ -211,10 +211,7 @@ open class ActorWithBody : Actor() {
 
     @Transient internal val BASE_FRICTION = 0.3
 
-    @Transient val KINEMATIC = 1 // does not displaced by external forces
-    @Transient val DYNAMIC = 2   // displaced by external forces
-    @Transient val STATIC = 3    // does not displaced by external forces, target of collision
-    var collisionType = DYNAMIC
+    var collisionType = COLLISION_DYNAMIC
 
     @Transient private val CCD_TICK = 1.0 / 16.0
     @Transient private val CCD_TRY_MAX = 12800
@@ -935,9 +932,9 @@ open class ActorWithBody : Actor() {
     open fun drawBody(gc: GameContainer, g: Graphics) {
         if (isVisible && sprite != null) {
             when (drawMode) {
-                DrawMode.NORMAL   -> blendNormal()
-                DrawMode.MULTIPLY -> blendMul()
-                DrawMode.SCREEN   -> blendScreen()
+                BLEND_NORMAL   -> blendNormal()
+                BLEND_MULTIPLY -> blendMul()
+                BLEND_SCREEN   -> blendScreen()
             }
 
             if (!sprite!!.flippedHorizontal()) {
@@ -1080,6 +1077,16 @@ open class ActorWithBody : Actor() {
 
     companion object {
 
+        /**
+         *  Enumerations that exported to JSON
+         */
+        @Transient const val COLLISION_KINEMATIC = 1 // does not displaced by external forces
+        @Transient const val COLLISION_DYNAMIC = 2   // displaced by external forces
+        @Transient const val COLLISION_STATIC = 3    // does not displaced by external forces, target of collision
+        @Transient const val BLEND_NORMAL = 4
+        @Transient const val BLEND_SCREEN = 5
+        @Transient const val BLEND_MULTIPLY = 6
+
         @Transient private val TILE_SIZE = MapDrawer.TILE_SIZE
 
         private fun div16TruncateToMapWidth(x: Int): Int {
@@ -1140,7 +1147,3 @@ fun absMax(left: Double, right: Double): Double {
 
 fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
 fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0
-
-enum class DrawMode {
-    NORMAL, SCREEN, MULTIPLY
-}

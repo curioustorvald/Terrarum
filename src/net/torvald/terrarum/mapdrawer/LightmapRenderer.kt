@@ -304,10 +304,22 @@ object LightmapRenderer {
 
             ambient = darkenColoured(ambient, thisTileOpacity) // get real ambient by appling opacity value
 
-            // mix and return lightlevel and ambient
+
             return lightLevelThis maxBlend ambient
+            // mix and return lightlevel and ambient
+            /*val retLevel = lightLevelThis maxBlend ambient
+            // hack: make sure (3,3,3) become 0
+            return if (retLevel.rawR() < 4 && retLevel.rawG() < 4 && retLevel.rawB() < 4)
+                0
+            else
+                retLevel*/
         }
         else {
+            // hack: make sure (3,3,3) become 0
+            /*return if (lightLevelThis.rawR() < 4 && lightLevelThis.rawG() < 4 && lightLevelThis.rawB() < 4)
+                0
+            else
+                lightLevelThis*/
             return lightLevelThis
         }
     }

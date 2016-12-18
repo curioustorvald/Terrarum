@@ -43,7 +43,7 @@ class Player(born: GameDate) : ActorHumanoid(born) {
         isVisible = true
         referenceID = PLAYER_REF_ID // forcibly set ID
         density = BASE_DENSITY
-        collisionType = KINEMATIC
+        collisionType = COLLISION_KINEMATIC
 
         try {
             gamepad = Controllers.getController(0)
