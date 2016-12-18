@@ -63,7 +63,7 @@ open class ProjectileSimple(
 
 
 
-        collisionType = KINEMATIC
+        collisionType = COLLISION_KINEMATIC
     }
 
     override fun update(gc: GameContainer, delta: Int) {
