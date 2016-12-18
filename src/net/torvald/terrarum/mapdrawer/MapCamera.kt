@@ -64,48 +64,48 @@ object MapCamera {
      * These are the tiles that only connects to itself, will not connect to colour variants
      */
     val TILES_CONNECT_SELF = arrayOf(
-              Tile.ICE_MAGICAL
-            , Tile.GLASS_CRUDE
-            , Tile.GLASS_CLEAN
-            , Tile.ILLUMINATOR_BLACK
-            , Tile.ILLUMINATOR_BLUE
-            , Tile.ILLUMINATOR_BROWN
-            , Tile.ILLUMINATOR_CYAN
-            , Tile.ILLUMINATOR_FUCHSIA
-            , Tile.ILLUMINATOR_GREEN
-            , Tile.ILLUMINATOR_GREEN_DARK
-            , Tile.ILLUMINATOR_GREY_DARK
-            , Tile.ILLUMINATOR_GREY_LIGHT
-            , Tile.ILLUMINATOR_GREY_MED
-            , Tile.ILLUMINATOR_ORANGE
-            , Tile.ILLUMINATOR_PURPLE
-            , Tile.ILLUMINATOR_RED
-            , Tile.ILLUMINATOR_TAN
-            , Tile.ILLUMINATOR_WHITE
-            , Tile.ILLUMINATOR_YELLOW
-            , Tile.ILLUMINATOR_BLACK_OFF
-            , Tile.ILLUMINATOR_BLUE_OFF
-            , Tile.ILLUMINATOR_BROWN_OFF
-            , Tile.ILLUMINATOR_CYAN_OFF
-            , Tile.ILLUMINATOR_FUCHSIA_OFF
-            , Tile.ILLUMINATOR_GREEN_OFF
-            , Tile.ILLUMINATOR_GREEN_DARK_OFF
-            , Tile.ILLUMINATOR_GREY_DARK_OFF
-            , Tile.ILLUMINATOR_GREY_LIGHT_OFF
-            , Tile.ILLUMINATOR_GREY_MED_OFF
-            , Tile.ILLUMINATOR_ORANGE_OFF
-            , Tile.ILLUMINATOR_PURPLE_OFF
-            , Tile.ILLUMINATOR_RED_OFF
-            , Tile.ILLUMINATOR_TAN_OFF
-            , Tile.ILLUMINATOR_WHITE_OFF
-            , Tile.ILLUMINATOR_YELLOW
-            , Tile.SANDSTONE
-            , Tile.SANDSTONE_BLACK
-            , Tile.SANDSTONE_DESERT
-            , Tile.SANDSTONE_RED
-            , Tile.SANDSTONE_WHITE
-            , Tile.SANDSTONE_GREEN
-            , Tile.DAYLIGHT_CAPACITOR
+            Tile.ICE_MAGICAL,
+            Tile.GLASS_CRUDE,
+            Tile.GLASS_CLEAN,
+            Tile.ILLUMINATOR_BLACK,
+            Tile.ILLUMINATOR_BLUE,
+            Tile.ILLUMINATOR_BROWN,
+            Tile.ILLUMINATOR_CYAN,
+            Tile.ILLUMINATOR_FUCHSIA,
+            Tile.ILLUMINATOR_GREEN,
+            Tile.ILLUMINATOR_GREEN_DARK,
+            Tile.ILLUMINATOR_GREY_DARK,
+            Tile.ILLUMINATOR_GREY_LIGHT,
+            Tile.ILLUMINATOR_GREY_MED,
+            Tile.ILLUMINATOR_ORANGE,
+            Tile.ILLUMINATOR_PURPLE,
+            Tile.ILLUMINATOR_RED,
+            Tile.ILLUMINATOR_TAN,
+            Tile.ILLUMINATOR_WHITE,
+            Tile.ILLUMINATOR_YELLOW,
+            Tile.ILLUMINATOR_BLACK_OFF,
+            Tile.ILLUMINATOR_BLUE_OFF,
+            Tile.ILLUMINATOR_BROWN_OFF,
+            Tile.ILLUMINATOR_CYAN_OFF,
+            Tile.ILLUMINATOR_FUCHSIA_OFF,
+            Tile.ILLUMINATOR_GREEN_OFF,
+            Tile.ILLUMINATOR_GREEN_DARK_OFF,
+            Tile.ILLUMINATOR_GREY_DARK_OFF,
+            Tile.ILLUMINATOR_GREY_LIGHT_OFF,
+            Tile.ILLUMINATOR_GREY_MED_OFF,
+            Tile.ILLUMINATOR_ORANGE_OFF,
+            Tile.ILLUMINATOR_PURPLE_OFF,
+            Tile.ILLUMINATOR_RED_OFF,
+            Tile.ILLUMINATOR_TAN_OFF,
+            Tile.ILLUMINATOR_WHITE_OFF,
+            Tile.ILLUMINATOR_YELLOW,
+            Tile.SANDSTONE,
+            Tile.SANDSTONE_BLACK,
+            Tile.SANDSTONE_DESERT,
+            Tile.SANDSTONE_RED,
+            Tile.SANDSTONE_WHITE,
+            Tile.SANDSTONE_GREEN,
+            Tile.DAYLIGHT_CAPACITOR
     )
 
     /**
@@ -113,82 +113,86 @@ object MapCamera {
      * It holds different shading rule to discriminate with group 01, index 0 is middle tile.
      */
     val TILES_CONNECT_MUTUAL = arrayOf(
-              Tile.STONE
-            , Tile.STONE_QUARRIED
-            , Tile.STONE_TILE_WHITE
-            , Tile.STONE_BRICKS
-            , Tile.DIRT
-            , Tile.GRASS
-            , Tile.PLANK_BIRCH
-            , Tile.PLANK_BLOODROSE
-            , Tile.PLANK_EBONY
-            , Tile.PLANK_NORMAL
-            , Tile.SAND
-            , Tile.SAND_WHITE
-            , Tile.SAND_RED
-            , Tile.SAND_DESERT
-            , Tile.SAND_BLACK
-            , Tile.SAND_GREEN
-            , Tile.GRAVEL
-            , Tile.GRAVEL_GREY
-            , Tile.SNOW
-            , Tile.ICE_NATURAL
-            , Tile.ORE_COPPER
-            , Tile.ORE_IRON
-            , Tile.ORE_GOLD
-            , Tile.ORE_SILVER
-            , Tile.ORE_ILMENITE
-            , Tile.ORE_AURICHALCUM
+            Tile.STONE,
+            Tile.STONE_QUARRIED,
+            Tile.STONE_TILE_WHITE,
+            Tile.STONE_BRICKS,
+            Tile.DIRT,
+            Tile.GRASS,
+            Tile.PLANK_BIRCH,
+            Tile.PLANK_BLOODROSE,
+            Tile.PLANK_EBONY,
+            Tile.PLANK_NORMAL,
+            Tile.SAND,
+            Tile.SAND_WHITE,
+            Tile.SAND_RED,
+            Tile.SAND_DESERT,
+            Tile.SAND_BLACK,
+            Tile.SAND_GREEN,
+            Tile.GRAVEL,
+            Tile.GRAVEL_GREY,
+            Tile.SNOW,
+            Tile.ICE_NATURAL,
+            Tile.ORE_COPPER,
+            Tile.ORE_IRON,
+            Tile.ORE_GOLD,
+            Tile.ORE_SILVER,
+            Tile.ORE_ILMENITE,
+            Tile.ORE_AURICHALCUM,
 
-            , Tile.WATER
-            , Tile.WATER_1
-            , Tile.WATER_2
-            , Tile.WATER_3
-            , Tile.WATER_4
-            , Tile.WATER_5
-            , Tile.WATER_6
-            , Tile.WATER_7
-            , Tile.WATER_8
-            , Tile.WATER_9
-            , Tile.WATER_10
-            , Tile.WATER_11
-            , Tile.WATER_12
-            , Tile.WATER_13
-            , Tile.WATER_14
-            , Tile.WATER_15
-            , Tile.LAVA
-            , Tile.LAVA_1
-            , Tile.LAVA_2
-            , Tile.LAVA_3
-            , Tile.LAVA_4
-            , Tile.LAVA_5
-            , Tile.LAVA_6
-            , Tile.LAVA_7
-            , Tile.LAVA_8
-            , Tile.LAVA_9
-            , Tile.LAVA_10
-            , Tile.LAVA_11
-            , Tile.LAVA_12
-            , Tile.LAVA_13
-            , Tile.LAVA_14
-            , Tile.LAVA_15
+            Tile.WATER,
+            Tile.WATER_1,
+            Tile.WATER_2,
+            Tile.WATER_3,
+            Tile.WATER_4,
+            Tile.WATER_5,
+            Tile.WATER_6,
+            Tile.WATER_7,
+            Tile.WATER_8,
+            Tile.WATER_9,
+            Tile.WATER_10,
+            Tile.WATER_11,
+            Tile.WATER_12,
+            Tile.WATER_13,
+            Tile.WATER_14,
+            Tile.WATER_15,
+            Tile.LAVA,
+            Tile.LAVA_1,
+            Tile.LAVA_2,
+            Tile.LAVA_3,
+            Tile.LAVA_4,
+            Tile.LAVA_5,
+            Tile.LAVA_6,
+            Tile.LAVA_7,
+            Tile.LAVA_8,
+            Tile.LAVA_9,
+            Tile.LAVA_10,
+            Tile.LAVA_11,
+            Tile.LAVA_12,
+            Tile.LAVA_13,
+            Tile.LAVA_14,
+            Tile.LAVA_15
     )
 
     /**
      * Torches, levers, switches, ...
      */
     val TILES_WALL_STICKER = arrayOf(
-              Tile.TORCH
-            , Tile.TORCH_FROST
-            , Tile.TORCH_OFF
-            , Tile.TORCH_FROST_OFF
+            Tile.TORCH,
+            Tile.TORCH_FROST,
+            Tile.TORCH_OFF,
+            Tile.TORCH_FROST_OFF
     )
 
     /**
      * platforms, ...
      */
-    val TILES_WALL_STICKER_CONNECT_SELF = arrayOf<Int>(
-
+    val TILES_WALL_STICKER_CONNECT_SELF = arrayOf(
+            Tile.PLATFORM_BIRCH,
+            Tile.PLATFORM_BLOODROSE,
+            Tile.PLATFORM_EBONY,
+            Tile.PLATFORM_STONE,
+            Tile.PLATFORM_WOODEN
     )
 
     /**
@@ -197,38 +201,38 @@ object MapCamera {
      * i.e. red hues get lost if you dive into the water
      */
     val TILES_BLEND_MUL = arrayOf(
-              Tile.WATER
-            , Tile.WATER_1
-            , Tile.WATER_2
-            , Tile.WATER_3
-            , Tile.WATER_4
-            , Tile.WATER_5
-            , Tile.WATER_6
-            , Tile.WATER_7
-            , Tile.WATER_8
-            , Tile.WATER_9
-            , Tile.WATER_10
-            , Tile.WATER_11
-            , Tile.WATER_12
-            , Tile.WATER_13
-            , Tile.WATER_14
-            , Tile.WATER_15
-            , Tile.LAVA
-            , Tile.LAVA_1
-            , Tile.LAVA_2
-            , Tile.LAVA_3
-            , Tile.LAVA_4
-            , Tile.LAVA_5
-            , Tile.LAVA_6
-            , Tile.LAVA_7
-            , Tile.LAVA_8
-            , Tile.LAVA_9
-            , Tile.LAVA_10
-            , Tile.LAVA_11
-            , Tile.LAVA_12
-            , Tile.LAVA_13
-            , Tile.LAVA_14
-            , Tile.LAVA_15
+            Tile.WATER,
+            Tile.WATER_1,
+            Tile.WATER_2,
+            Tile.WATER_3,
+            Tile.WATER_4,
+            Tile.WATER_5,
+            Tile.WATER_6,
+            Tile.WATER_7,
+            Tile.WATER_8,
+            Tile.WATER_9,
+            Tile.WATER_10,
+            Tile.WATER_11,
+            Tile.WATER_12,
+            Tile.WATER_13,
+            Tile.WATER_14,
+            Tile.WATER_15,
+            Tile.LAVA,
+            Tile.LAVA_1,
+            Tile.LAVA_2,
+            Tile.LAVA_3,
+            Tile.LAVA_4,
+            Tile.LAVA_5,
+            Tile.LAVA_6,
+            Tile.LAVA_7,
+            Tile.LAVA_8,
+            Tile.LAVA_9,
+            Tile.LAVA_10,
+            Tile.LAVA_11,
+            Tile.LAVA_12,
+            Tile.LAVA_13,
+            Tile.LAVA_14,
+            Tile.LAVA_15
     )
 
     fun update(gc: GameContainer, delta_t: Int) {
@@ -238,11 +242,6 @@ object MapCamera {
         renderHeight = FastMath.ceil(Terrarum.HEIGHT / Terrarum.ingame.screenZoom)
 
         // position - (WH / 2)
-        /*cameraX = Math.round(FastMath.clamp(
-                player.hitbox.centeredX.toFloat() - renderWidth / 2, TILE_SIZE.toFloat(), world.width * TILE_SIZE - renderWidth - TILE_SIZE.toFloat()))
-        cameraY = Math.round(FastMath.clamp(
-                player.hitbox.centeredY.toFloat() - renderHeight / 2, TILE_SIZE.toFloat(), world.height * TILE_SIZE - renderHeight - TILE_SIZE.toFloat()))
-*/
         cameraX = Math.round( // X only: ROUNDWORLD implementation
                 player.hitbox.centeredX.toFloat() - renderWidth / 2)
         cameraY = Math.round(FastMath.clamp(
@@ -313,13 +312,19 @@ object MapCamera {
                     ) {
 
                         val nearbyTilesInfo: Int
-                        if (MapCamera.isWallSticker(thisTile)) {
-                            nearbyTilesInfo = MapCamera.getNearbyTilesInfoWallSticker(x, y)
-                        } else if (MapCamera.isConnectMutual(thisTile)) {
-                            nearbyTilesInfo = MapCamera.getNearbyTilesInfoNonSolid(x, y, mode)
-                        } else if (MapCamera.isConnectSelf(thisTile)) {
-                            nearbyTilesInfo = MapCamera.getNearbyTilesInfo(x, y, mode, thisTile)
-                        } else {
+                        if (isPlatform(thisTile)) {
+                            nearbyTilesInfo = getNearbyTilesInfoPlatform(x, y)
+                        }
+                        else if (isWallSticker(thisTile)) {
+                            nearbyTilesInfo = getNearbyTilesInfoWallSticker(x, y)
+                        }
+                        else if (isConnectMutual(thisTile)) {
+                            nearbyTilesInfo = getNearbyTilesInfoNonSolid(x, y, mode)
+                        }
+                        else if (isConnectSelf(thisTile)) {
+                            nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile)
+                        }
+                        else {
                             nearbyTilesInfo = 0
                         }
 
@@ -433,6 +438,46 @@ object MapCamera {
                 // has tile on the bottom
                 3 else 0
         }
+    }
+
+    fun getNearbyTilesInfoPlatform(x: Int, y: Int): Int {
+        val nearbyTiles = IntArray(4)
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  world.getTileFrom(TERRAIN, x - 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y) ?: 4096
+
+        if ((TileCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
+            TileCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid) ||
+            isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT]) &&
+            isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT])) // LR solid || LR platform
+            return 0
+        else if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
+                 !isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT]) &&
+                 !TileCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid &&
+                 !isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT])) // L solid and not platform && R not solid and not platform
+            return 4
+        else if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid &&
+                 !isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT]) &&
+                 !TileCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
+                 !isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT])) // R solid and not platform && L not solid and nto platform
+            return 6
+        else if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
+                 !isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT])) // L solid && L not platform
+            return 3
+        else if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid &&
+                 !isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT])) // R solid && R not platform
+            return 5
+        else if ((TileCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid ||
+                  isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT])) &&
+                 !TileCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid &&
+                 !isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT])) // L solid or platform && R not solid and not platform
+            return 1
+        else if ((TileCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid ||
+                  isPlatform(nearbyTiles[NEARBY_TILE_KEY_RIGHT])) &&
+                 !TileCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
+                 !isPlatform(nearbyTiles[NEARBY_TILE_KEY_LEFT])) // R solid or platform && L not solid and not platform
+            return 2
+        else
+            return 7
     }
 
     private fun drawTile(mode: Int, tilewisePosX: Int, tilewisePosY: Int, sheetX: Int, sheetY: Int) {

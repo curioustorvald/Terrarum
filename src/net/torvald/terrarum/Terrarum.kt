@@ -9,6 +9,7 @@ import net.torvald.JsonWriter
 import net.torvald.imagefont.TinyAlphNum
 import org.lwjgl.input.Controllers
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL20
 import org.newdawn.slick.*
 import org.newdawn.slick.state.StateBasedGame
 import java.io.File
@@ -316,12 +317,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         private fun createDirs() {
             val dirs = arrayOf(File(defaultSaveDir))
-
-            for (d in dirs) {
-                if (!d.exists()) {
-                    d.mkdirs()
-                }
-            }
+            dirs.forEach { if (!it.exists()) it.mkdirs() }
         }
 
         @Throws(IOException::class)
