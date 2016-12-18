@@ -30,7 +30,7 @@ object PlayerBuilderSigrid {
         p.sprite!!.setAsVisible()
 
         p.makeNewSpriteGlow(28, 51)
-        p.spriteGlow!!.setSpriteImage("assets/graphics/sprites/test_player_glow.png")
+        p.spriteGlow!!.setSpriteImage("assets/graphics/sprites/test_player_glow.tga")
         p.spriteGlow!!.setDelay(200)
         p.spriteGlow!!.setRowsAndFrames(1, 1)
         p.spriteGlow!!.setAsVisible()
