@@ -111,9 +111,9 @@ object WorldGenerator {
          * Done: variants of beach (SAND, SAND_BEACH, SAND_BLACK, SAND_GREEN)
          */
 
-        //val noiseArray = arrayOf(
-                //  TaggedJoise("Carving caves", noiseRidged(1.7f, 1.4f), 1f, TILE_MACRO_ALL, TILE_MACRO_ALL, Tile.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END)
-                //, TaggedJoise("Collapsing caves", noiseBlobs(0.5f, 0.5f), 0.3f, Tile.AIR, Tile.STONE, Tile.STONE, NoiseFilterUniform)
+        val noiseArray = arrayOf(
+                  TaggedJoise("Carving caves", noiseRidged(1.7f, 1.4f), 1f, TILE_MACRO_ALL, TILE_MACRO_ALL, Tile.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END)
+                , TaggedJoise("Collapsing caves", noiseBlobs(0.5f, 0.5f), 0.3f, Tile.AIR, Tile.STONE, Tile.STONE, NoiseFilterUniform)
 //
                 //, TaggedJoise("Putting stone patches on the ground", noiseBlobs(0.8f, 0.8f), 1.02f, intArrayOf(Tile.DIRT, Tile.GRASS), Tile.DIRT, Tile.STONE, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
                 //, TaggedJoise("Placing dirt spots in the cave", noiseBlobs(0.5f, 0.5f), 0.98f, Tile.STONE, Tile.STONE, Tile.DIRT, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
@@ -138,8 +138,8 @@ object WorldGenerator {
                 //, TaggedJoise("Growing hearts of violet", noiseRidged(2.5f, 2.5f), 1.75f, Tile.STONE, Tile.STONE, Tile.RAW_AMETHYST)
 //
                 //, TaggedJoise("Cutting over-grown hearts", noiseBlobs(0.7f, 0.7f), 0.17f, Tile.RAW_AMETHYST, Tile.STONE, Tile.STONE)
-        //)
-        //processNoiseLayers(noiseArray)
+        )
+        processNoiseLayers(noiseArray)
 
         /** TODO Cobaltite, Ilmenite, Aurichalcum (and possibly pitchblende?)  */
 
@@ -256,7 +256,7 @@ object WorldGenerator {
         return noiseArrayLocal
     }
 
-    private val TWO_PI = Math.PI * 2.0
+    val TWO_PI = Math.PI * 2.0
 
     /**
      * http://accidentalnoise.sourceforge.net/minecraftworlds.html
@@ -694,8 +694,8 @@ object WorldGenerator {
                 ThreadPool.map(
                         i,
                         ThreadProcessNoiseLayers(
-                                ((HEIGHT / Terrarum.CORES) * i).toInt(),
-                                ((HEIGHT / Terrarum.CORES) * i.plus(1)).toInt() - 1,
+                                ((HEIGHT / Terrarum.CORES) * i),
+                                ((HEIGHT / Terrarum.CORES) * i.plus(1)) - 1,
                                 noiseRecords
                         ),
                         "SampleJoiseMap"

@@ -12,10 +12,21 @@ class ThreadProcessNoiseLayers(val startIndex: Int, val endIndex: Int,
             println("[mapgenerator] ${record.message}...")
             for (y in startIndex..endIndex) {
                 for (x in 0..WorldGenerator.WIDTH - 1) {
-                    val noise: Float = record.noiseModule.get(
+                    // straight-line sampling
+                    /*val noise: Float = record.noiseModule.get(
                             x.toDouble() / 48.0, // 48: Fixed value
                             y.toDouble() / 48.0
-                    ).toFloat()
+                    ).toFloat()*/
+                    // circular sampling
+                    // Mapping function:
+                    //      World(x, y) -> Joise(sin x, y, cos x)
+                    val sampleDensity = 48.0 / 2 // 48.0: magic number from old code
+                    val sampleTheta = (x.toDouble() / WorldGenerator.WIDTH) * WorldGenerator.TWO_PI
+                    val sampleOffset = (WorldGenerator.WIDTH / sampleDensity) / 8.0
+                    val sampleX = Math.sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
+                    val sampleY = Math.cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+                    val sampleZ = y / sampleDensity
+                    val noise: Double = record.noiseModule.get(sampleX, sampleY, sampleZ)
 
                     val fromTerr = record.replaceFromTerrain
                     val fromWall = record.replaceFromWall
