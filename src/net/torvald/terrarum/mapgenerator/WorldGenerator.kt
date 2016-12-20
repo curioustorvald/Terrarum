@@ -256,6 +256,8 @@ object WorldGenerator {
         return noiseArrayLocal
     }
 
+    private val TWO_PI = Math.PI * 2.0
+
     /**
      * http://accidentalnoise.sourceforge.net/minecraftworlds.html
      *
@@ -405,11 +407,23 @@ object WorldGenerator {
         println("[mapgenerator] Raising and eroding terrain...")
         for (y in 0..(TERRAIN_UNDULATION - 1)) {
             for (x in 0..WIDTH) {
-                val map: Boolean = (
+                // straight-line sampling
+                /*val map: Boolean = (
                         joise.get(
                                 x / SCALE_X,
                                 y / SCALE_Y
-                        ) == 1.0)
+                        ) == 1.0)*/
+                // circular sampling
+                // Mapping function:
+                //      World(x, y) -> Joise(sin x, y, cos x)
+                val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
+                val sampleOffset = (WIDTH / SCALE_X) / 4.0
+                val sampleX = Math.sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
+                val sampleZ = Math.cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+                val sampleY = y / SCALE_Y
+                val map: Boolean = (
+                        joise.get(sampleX, sampleY, sampleZ) == 1.0
+                                   )
                 noiseMap[y + TERRAIN_AVERAGE_HEIGHT - (TERRAIN_UNDULATION / 2)].set(x, map)
             }
         }
