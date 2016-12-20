@@ -641,3 +641,4 @@ constructor() : BasicGameState() {
 }
 
 fun Color.toInt() = redByte.shl(16) or greenByte.shl(8) or blueByte
+fun Color.to10bit() = redByte.shl(20) or greenByte.shl(10) or blueByte

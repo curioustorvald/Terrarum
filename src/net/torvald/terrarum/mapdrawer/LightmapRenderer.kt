@@ -337,8 +337,10 @@ object LightmapRenderer {
                 // loop x
                 var x = this_x_start
                 while (x < this_x_end) {
-                    // smoothing enabled
-                    if (Terrarum.gameConfig.getAsBoolean("smoothlighting") ?: false) {
+                    // smoothing enabled and zoom is 0.75 or greater
+                    // (zoom of 0.5 should not smoothed, for performance)
+                    if (Terrarum.gameConfig.getAsBoolean("smoothlighting") ?: false &&
+                        Terrarum.ingame.screenZoom >= 0.75) {
 
                         val thisLightLevel = getLight(x, y) ?: 0
 
@@ -453,12 +455,20 @@ object LightmapRenderer {
      * @return darkened data (0-255) per channel
      */
     fun darkenColoured(data: Int, darken: Int): Int {
-        if (darken.toInt() < 0 || darken.toInt() >= COLOUR_RANGE_SIZE)
+        if (darken < 0 || darken >= COLOUR_RANGE_SIZE)
             throw IllegalArgumentException("darken: out of range ($darken)")
 
-        val r = data.r() * (1f - darken.r() * 4f)
-        val g = data.g() * (1f - darken.g() * 4f)
-        val b = data.b() * (1f - darken.b() * 4f)
+        // use equation with magic number 6.5:
+        // =>> val r = data.r() * (1f + brighten.r() * 6.5f) <<=
+        // gives 8-visible-tile penetration of sunlight, fairly smooth,
+        // DOES NOT GO BELOW (2,2,2)
+
+        val r = data.r() * (1f - darken.r() * 6.5f)
+        val g = data.g() * (1f - darken.g() * 6.5f)
+        val b = data.b() * (1f - darken.b() * 6.5f)
+        //val r = data.r() - darken.r()
+        //val g = data.g() - darken.g()
+        //val b = data.b() - darken.b()
 
         return constructRGBFromFloat(r.clampZero(), g.clampZero(), b.clampZero())
     }
@@ -471,12 +481,15 @@ object LightmapRenderer {
      * @return brightened data (0-255) per channel
      */
     fun brightenColoured(data: Int, brighten: Int): Int {
-        if (brighten.toInt() < 0 || brighten.toInt() >= COLOUR_RANGE_SIZE)
+        if (brighten < 0 || brighten >= COLOUR_RANGE_SIZE)
             throw IllegalArgumentException("brighten: out of range ($brighten)")
 
-        val r = data.r() * (1f + brighten.r() * 4f)
-        val g = data.g() * (1f + brighten.g() * 4f)
-        val b = data.b() * (1f + brighten.b() * 4f)
+        val r = data.r() * (1f + brighten.r() * 6.5f)
+        val g = data.g() * (1f + brighten.g() * 6.5f)
+        val b = data.b() * (1f + brighten.b() * 6.5f)
+        //val r = data.r() + brighten.r()
+        //val g = data.g() + brighten.g()
+        //val b = data.b() + brighten.b()
 
         return constructRGBFromFloat(r.clampChannel(), g.clampChannel(), b.clampChannel())
     }
