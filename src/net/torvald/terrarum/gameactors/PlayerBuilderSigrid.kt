@@ -9,6 +9,9 @@ import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.to10bit
+import net.torvald.terrarum.toInt
+import org.newdawn.slick.Color
 import org.newdawn.slick.SlickException
 import java.io.IOException
 
@@ -57,7 +60,7 @@ object PlayerBuilderSigrid {
 
         p.actorValue[AVKey.INTELLIGENT] = true
 
-        p.actorValue[AVKey.LUMINOSITY] = 95487100
+        p.actorValue[AVKey.LUMINOSITY] = Color(0x434aff).to10bit()
 
         p.actorValue[AVKey.BASEDEFENCE] = 141
 
