@@ -37,9 +37,12 @@ object CommandInterpreter {
         val error = Error()
 
         for (single_command in cmd) {
+
+            if (single_command == null || single_command.argsCount == 0) continue
+
             var commandObj: ConsoleCommand? = null
             try {
-                if (single_command!!.name.toLowerCase().startsWith("qqq")) {
+                if (single_command.name.toLowerCase().startsWith("qqq")) {
                     commandObj = CommandDict["qqq"]
                 }
                 else if (commandsNoAuth.contains(single_command.name.toLowerCase())) {
@@ -54,28 +57,20 @@ object CommandInterpreter {
                         throw NullPointerException() // if not authorised, say "Unknown command"
                     }
                 }
-            }
-            catch (e: NullPointerException) {
 
-            }
-            finally {
                 Echo("$ccW> $single_command") // prints out the input
                 println("${ZonedDateTime.now()} [CommandInterpreter] issuing command '$single_command'")
                 try {
-                    if (commandObj != null) {
-                        commandObj.execute(single_command!!.toStringArray())
-                    }
-                    else {
-                        echoUnknownCmd(single_command!!.name)
-                        // System.out.println("ee3");
-                    }
+                    commandObj.execute(single_command.toStringArray())
                 }
                 catch (e: Exception) {
                     System.err.print("[CommandInterpreter] ")
                     e.printStackTrace()
                     EchoError(Lang["ERROR_GENERIC_TEXT"])
                 }
-
+            }
+            catch (e: NullPointerException) {
+                echoUnknownCmd(single_command.name)
             }
         }
     }
