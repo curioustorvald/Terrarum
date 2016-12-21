@@ -112,9 +112,10 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         //addState(StateSplash())
         //addState(StateMonitorCheck())
         //addState(StateFontTester())
+        addState(StateNoiseTexGen())
 
-        ingame = StateInGame()
-        addState(ingame)
+        //ingame = StateInGame()
+        //addState(ingame)
     }
 
     companion object {
@@ -210,8 +211,10 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         val STATE_ID_CONFIG_CALIBRATE = 0x11
 
         val STATE_ID_TEST_FONT = 0x100
-        val STATE_ID_TEST_TTY = 0x110
-        val STATE_ID_TEST_SHIT = 0x5617
+        val STATE_ID_TEST_SHIT = 0x101
+        val STATE_ID_TEST_TTY = 0x102
+
+        val STATE_ID_TOOL_NOISEGEN = 0x200
 
         var hasController = false
         val CONTROLLER_DEADZONE = 0.1f
