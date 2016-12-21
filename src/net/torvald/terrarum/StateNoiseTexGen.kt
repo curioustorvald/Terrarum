@@ -28,6 +28,8 @@ class StateNoiseTexGen : BasicGameState() {
         println("Press SPACE to generate new noise")
     }
 
+    // TODO multithreaded
+
     private fun noiseRidged(): Joise {
         val ridged = ModuleFractal()
         ridged.setType(ModuleFractal.FractalType.RIDGEMULTI)

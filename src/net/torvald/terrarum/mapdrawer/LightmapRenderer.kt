@@ -540,13 +540,6 @@ object LightmapRenderer {
         return constructRGBFromInt(newR, newG, newB)
     }
 
-    // TODO LUT of 1024 entries (int resulting light, int rectified light)
-    val compLut = floatArrayOf(0f, 0.61328125f, 0.6875f, 0.68359375f, 0.66015625f, 0.62109375f, 0.56640625f, 0.515625f, 0.46484375f, 0.40625f, 0.3515625f, 0.29296875f, 0.234375f, 0.17578125f, 0.1171875f, 0.0546875f, 0f)
-    fun getComp(lum: Float) = FastMath.interpolateLinear(
-            lum.mod(1f / compLut.size),
-            compLut[lum.times(compLut.size).toInt() / compLut.size],
-            compLut[lum.times(compLut.size).toInt() / compLut.size + 1])
-
     /**
      * Deprecated: Fuck it, this vittupää just doesn't want to work
      */

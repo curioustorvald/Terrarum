@@ -457,7 +457,7 @@ open class ActorWithBody : Actor() {
                     hitAndForciblyReflectY()
                     grounded = false
                 }
-                else if (isColliding(nextHitbox)) { // FIXME if standing: standard box, if walking: top-squished box
+                else if (isColliding(nextHitbox)) {
                     hitAndReflectY()
                     grounded = true
                 }

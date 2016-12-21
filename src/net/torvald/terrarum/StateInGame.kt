@@ -283,7 +283,6 @@ constructor() : BasicGameState() {
         //g.translate(-MapCamera.cameraX * screenZoom, -MapCamera.cameraY * screenZoom)
         tilesDrawFrameBuffer.graphics.translate(-MapCamera.cameraX.toFloat(), -MapCamera.cameraY.toFloat())
         actorsDrawFrameBuffer.graphics.translate(-MapCamera.cameraX.toFloat(), -MapCamera.cameraY.toFloat())
-        // TODO add new framebuffer so that whole map is zoomed at once, yet not the UI
 
 
         /////////////////////////////
