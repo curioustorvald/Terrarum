@@ -8,8 +8,7 @@ import net.torvald.JsonFetcher
 import net.torvald.JsonWriter
 import net.torvald.imagefont.TinyAlphNum
 import org.lwjgl.input.Controllers
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL20
+import org.lwjgl.opengl.*
 import org.newdawn.slick.*
 import org.newdawn.slick.state.StateBasedGame
 import java.io.File
@@ -112,10 +111,10 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         //addState(StateSplash())
         //addState(StateMonitorCheck())
         //addState(StateFontTester())
-        addState(StateNoiseTexGen())
+        //addState(StateNoiseTexGen())
 
-        //ingame = StateInGame()
-        //addState(ingame)
+        ingame = StateInGame()
+        addState(ingame)
     }
 
     companion object {
@@ -442,7 +441,13 @@ fun blendMul() {
 fun blendNormal() {
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glColorMask(true, true, true, true)
-    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+    //GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+
+    // TODO seems working as intended (no more whitened-out semitransparent colour), but needs further investigation
+    GL14.glBlendFuncSeparate(
+            GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA,
+            GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA
+    )
 }
 
 fun blendAlphaMap() {
