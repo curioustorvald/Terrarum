@@ -103,8 +103,8 @@ object WorldGenerator {
 
         /**
          * Done: more perturbed overworld (harder to supra-navigate)
-         * Todo: veined ore distribution (metals) -- use veined simplex noise
-         * Todo: clustered gem distribution (clusters: [Ruby, Sapphire], Amethyst, Yellow topaz, emerald, diamond) -- use regular simplex noise
+         * Done: veined ore distribution (metals) -- use veined simplex noise
+         * Done: clustered gem distribution (clusters: [Ruby, Sapphire], Amethyst, Yellow topaz, emerald, diamond) -- use regular simplex noise
          * Todo: Lakes! Aquifers! Lava chambers!
          * Todo: deserts (variants: SAND_DESERT, SAND_RED)
          * Todo: volcano(es?)
@@ -260,9 +260,6 @@ object WorldGenerator {
 
     /**
      * http://accidentalnoise.sourceforge.net/minecraftworlds.html
-     *
-     * TODO have it seamless
-     *      use MappingMode.SEAMLESS_XY ?
      */
     private fun raise3(): Array<BitSet> {
         val noiseMap = Array(HEIGHT, { BitSet(WIDTH) })
