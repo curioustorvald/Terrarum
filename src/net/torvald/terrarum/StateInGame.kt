@@ -529,18 +529,27 @@ constructor() : BasicGameState() {
 
     fun Double.sqr() = this * this
     fun Int.sqr() = this * this
+    fun min(vararg d: Double): Double {
+        var ret = Double.MAX_VALUE
+        d.forEach { if (it < ret) ret = it }
+        return ret
+    }
     private fun distToActorSqr(a: ActorWithBody, p: ActorWithBody) =
-            Math.min(// take min of normal position and wrapped (x < 0) position
+            min(// take min of normal position and wrapped (x < 0) position
                     (a.hitbox.centeredX - p.hitbox.centeredX).sqr() +
                     (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
                     (a.hitbox.centeredX - p.hitbox.centeredX + world.width * TILE_SIZE).sqr() +
+                    (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
+                    (a.hitbox.centeredX - p.hitbox.centeredX - world.width * TILE_SIZE).sqr() +
                     (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
             )
     private fun distToCameraSqr(a: ActorWithBody) =
-            Math.min(
+            min(
                     (a.hitbox.posX - MapCamera.cameraX).sqr() +
                     (a.hitbox.posY - MapCamera.cameraY).sqr(),
                     (a.hitbox.posX - MapCamera.cameraX + world.width * TILE_SIZE).sqr() +
+                    (a.hitbox.posY - MapCamera.cameraY).sqr(),
+                    (a.hitbox.posX - MapCamera.cameraX - world.width * TILE_SIZE).sqr() +
                     (a.hitbox.posY - MapCamera.cameraY).sqr()
             )
 
