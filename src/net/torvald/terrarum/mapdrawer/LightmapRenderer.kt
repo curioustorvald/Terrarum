@@ -190,6 +190,7 @@ object LightmapRenderer {
                             lanternMap.add(Lantern(x, y, it.luminosity))
                             // Q&D fix for Roundworld anormaly
                             lanternMap.add(Lantern(x + world.width, y, it.luminosity))
+                            lanternMap.add(Lantern(x - world.width, y, it.luminosity))
                         }
                     }
                 }
@@ -237,7 +238,8 @@ object LightmapRenderer {
     private fun calculate(x: Int, y: Int): Int = calculate(x, y, false)
 
     private fun calculate(x: Int, y: Int, doNotCalculateAmbient: Boolean): Int {
-        // O(9n) == O(n) where n is a size of the map.
+        // O(9n) == O(n) where n is a size of the map
+        // TODO devise multithreading on this
 
         var lightLevelThis: Int = 0
         val thisTerrain = Terrarum.ingame.world.getTileFromTerrain(x, y)
