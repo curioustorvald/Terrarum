@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.terrarum.Terrarum.Companion.STATE_ID_TOOL_NOISEGEN
+import net.torvald.terrarum.concurrent.ThreadPool
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -16,12 +17,12 @@ import java.util.*
  */
 class StateNoiseTexGen : BasicGameState() {
 
-    private val imagesize = 512
-
-    private val noiseImage = Image(imagesize, imagesize)
-
-    private val sampleDensity = 4.0
-
+    companion object {
+        val imagesize = 512
+        val noiseImage = Image(imagesize, imagesize)
+        val sampleDensity = 1.0
+        val noiseMap = Array<FloatArray>(imagesize, { FloatArray(size = imagesize, init = { 0f }) })
+    }
     override fun init(p0: GameContainer?, p1: StateBasedGame?) {
         generateNoiseImage()
 
@@ -42,12 +43,22 @@ class StateNoiseTexGen : BasicGameState() {
         ridged_autocorrect.setRange(0.0, 1.0)
         ridged_autocorrect.setSource(ridged)
 
-        val ridged_scale = ModuleScaleDomain()
-        ridged_scale.setScaleX(1.0)
-        ridged_scale.setScaleY(1.0)
-        ridged_scale.setSource(ridged_autocorrect)
+        return Joise(ridged_autocorrect)
+    }
 
-        return Joise(ridged_scale)
+    private fun noiseSmokyFractal(): Joise {
+        val ridged = ModuleFractal()
+        ridged.setType(ModuleFractal.FractalType.FBM)
+        ridged.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        ridged.setNumOctaves(8)
+        ridged.setFrequency(1.0)
+        ridged.seed = Random().nextLong()
+
+        val ridged_autocorrect = ModuleAutoCorrect()
+        ridged_autocorrect.setRange(0.0, 1.0)
+        ridged_autocorrect.setSource(ridged)
+
+        return Joise(ridged_autocorrect)
     }
 
     private fun noiseBlobs(): Joise {
@@ -56,12 +67,11 @@ class StateNoiseTexGen : BasicGameState() {
         gradval.setType(ModuleBasisFunction.BasisType.GRADVAL)
         gradval.setInterpolation(ModuleBasisFunction.InterpolationType.QUINTIC)
 
-        val gradval_scale = ModuleScaleDomain()
-        gradval_scale.setScaleX(1.0)
-        gradval_scale.setScaleY(1.0)
-        gradval_scale.setSource(gradval)
+        val gradval_autocorrect = ModuleAutoCorrect()
+        gradval_autocorrect.setRange(0.0, 1.0)
+        gradval_autocorrect.setSource(gradval)
 
-        return Joise(gradval_scale)
+        return Joise(gradval_autocorrect)
     }
 
     private fun noiseSimplex(): Joise {
@@ -72,12 +82,11 @@ class StateNoiseTexGen : BasicGameState() {
         simplex.setNumOctaves(2)
         simplex.setFrequency(1.0)
 
-        val simplex_scale = ModuleScaleDomain()
-        simplex_scale.setScaleX(1.0)
-        simplex_scale.setScaleY(1.0)
-        simplex_scale.setSource(simplex)
+        val simplex_autocorrect = ModuleAutoCorrect()
+        simplex_autocorrect.setRange(0.0, 1.0)
+        simplex_autocorrect.setSource(simplex)
 
-        return Joise(simplex_scale)
+        return Joise(simplex_autocorrect)
     }
 
     private fun noiseCellular(): Joise {
@@ -86,48 +95,59 @@ class StateNoiseTexGen : BasicGameState() {
 
         val cellular = ModuleCellular()
         cellular.setCellularSource(cellgen)
+        cellular.setCoefficients(-1.0, 1.0, 0.0, 0.0)
 
-        return Joise(cellular)
+        val cellular_autocorrect = ModuleAutoCorrect()
+        cellular_autocorrect.setRange(0.0, 1.0)
+        cellular_autocorrect.setSource(cellular)
+
+        return Joise(cellular_autocorrect)
     }
 
     fun generateNoiseImage() {
-        val noiseModule = noiseCellular()
+        val noiseModule = noiseSmokyFractal() // change noise function here
 
         noiseImage.graphics.background = Color.black
 
-        for (sy in 0..imagesize - 1) {
-            for (sx in 0..imagesize - 1) {
-                val y = sy.toDouble() / imagesize
-                val x = sx.toDouble() / imagesize
-
-                val sampleOffset = sampleDensity
-                // 4-D toroidal sampling (looped H and V)
-                val sampleTheta1 = x * Math.PI * 2.0
-                val sampleTheta2 = y * Math.PI * 2.0
-                val sampleX = Math.sin(sampleTheta1) * sampleDensity + sampleDensity
-                val sampleY = Math.cos(sampleTheta1) * sampleDensity + sampleDensity
-                val sampleZ = Math.sin(sampleTheta2) * sampleDensity + sampleDensity
-                val sampleW = Math.cos(sampleTheta2) * sampleDensity + sampleDensity
-
-                val noise = noiseModule.get(
-                        sampleX, sampleY, sampleZ, sampleW
-                ).plus(1.0).div(2.0)
-
-                noiseImage.graphics.color = Color(noise.toFloat(), noise.toFloat(), noise.toFloat())
-                noiseImage.graphics.fillRect(sx.toFloat(), sy.toFloat(), 1f, 1f)
+        for (y in 0..imagesize - 1) {
+            for (x in 0..imagesize - 1) {
+                noiseMap[y][x] = 0f
             }
         }
 
-        noiseImage.graphics.flush()
+        for (i in 0..Terrarum.CORES - 1) {
+            ThreadPool.map(
+                    i,
+                    ThreadRunNoiseSampling(
+                            ((imagesize / Terrarum.CORES) * i),
+                            ((imagesize / Terrarum.CORES) * i.plus(1)) - 1,
+                            noiseModule
+                    ),
+                    "SampleJoiseMap"
+            )
+        }
+
+        ThreadPool.startAll()
     }
 
-    override fun update(p0: GameContainer?, p1: StateBasedGame?, p2: Int) {
-
+    override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
+        Terrarum.appgc.setTitle("${Terrarum.NAME} — F: ${Terrarum.appgc.fps}")
     }
 
     override fun getID() = STATE_ID_TOOL_NOISEGEN
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
+        for (sy in 0..imagesize - 1) {
+            for (sx in 0..imagesize - 1) {
+                val noise = noiseMap[sy][sx]
+
+                noiseImage.graphics.color = Color(noise, noise, noise)
+                noiseImage.graphics.fillRect(sx.toFloat(), sy.toFloat(), 1f, 1f)
+            }
+        }
+
+        noiseImage.graphics.flush()
+
         g.background = Color.cyan
         g.drawImage(noiseImage,
                 Terrarum.WIDTH.minus(imagesize).div(2).toFloat(),
@@ -139,6 +159,36 @@ class StateNoiseTexGen : BasicGameState() {
         if (c == ' ') {
             println("Generating noise, may take a while")
             generateNoiseImage()
+        }
+    }
+
+
+    class ThreadRunNoiseSampling(val startIndex: Int, val endIndex: Int, val joise: Joise) : Runnable {
+        override fun run() {
+            for (sy in startIndex..endIndex) {
+                for (sx in 0..imagesize - 1) {
+                    val y = sy.toDouble() / imagesize
+                    val x = sx.toDouble() / imagesize
+
+                    val sampleOffset = sampleDensity
+                    // 4-D toroidal sampling (looped H and V)
+                    val sampleTheta1 = x * Math.PI * 2.0
+                    val sampleTheta2 = y * Math.PI * 2.0
+                    val sampleX = Math.sin(sampleTheta1) * sampleDensity + sampleDensity
+                    val sampleY = Math.cos(sampleTheta1) * sampleDensity + sampleDensity
+                    val sampleZ = Math.sin(sampleTheta2) * sampleDensity + sampleDensity
+                    val sampleW = Math.cos(sampleTheta2) * sampleDensity + sampleDensity
+
+                    val noise = joise.get(
+                            sampleX, sampleY, sampleZ, sampleW
+                    ) // autocorrection REQUIRED!
+
+                    noiseMap[sy][sx] = noise.toFloat()
+
+                    //noiseImage.graphics.color = Color(noise.toFloat(), noise.toFloat(), noise.toFloat())
+                    //noiseImage.graphics.fillRect(sx.toFloat(), sy.toFloat(), 1f, 1f)
+                }
+            }
         }
     }
 }

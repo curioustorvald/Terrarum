@@ -111,10 +111,10 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         //addState(StateSplash())
         //addState(StateMonitorCheck())
         //addState(StateFontTester())
-        //addState(StateNoiseTexGen())
+        addState(StateNoiseTexGen())
 
-        ingame = StateInGame()
-        addState(ingame)
+        //ingame = StateInGame()
+        //addState(ingame)
     }
 
     companion object {
@@ -219,7 +219,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         val CONTROLLER_DEADZONE = 0.1f
 
         /** Available CPU cores */
-        val CORES = Runtime.getRuntime().availableProcessors();
+        val CORES = Runtime.getRuntime().availableProcessors()
 
         /**
          * If the game is multithreading.
