@@ -9,6 +9,7 @@ import com.sudoplay.joise.module.*
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.concurrent.ThreadPool
 import net.torvald.terrarum.gameactors.ThreadActorUpdate
+import net.torvald.terrarum.gameactors.roundInt
 import java.util.*
 
 object WorldGenerator {
@@ -687,12 +688,12 @@ object WorldGenerator {
     private fun processNoiseLayers(noiseRecords: Array<TaggedJoise>) {
         if (Terrarum.MULTITHREAD) {
             // set up indices
-            for (i in 0..Terrarum.CORES - 1) {
+            for (i in 0..Terrarum.THREADS - 1) {
                 ThreadPool.map(
                         i,
                         ThreadProcessNoiseLayers(
-                                ((HEIGHT / Terrarum.CORES) * i),
-                                ((HEIGHT / Terrarum.CORES) * i.plus(1)) - 1,
+                                HEIGHT.toFloat().div(Terrarum.THREADS).times(i).roundInt(),
+                                HEIGHT.toFloat().div(Terrarum.THREADS).times(i.plus(1)).roundInt() - 1,
                                 noiseRecords
                         ),
                         "SampleJoiseMap"

@@ -4,6 +4,7 @@ import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.terrarum.Terrarum.Companion.STATE_ID_TOOL_NOISEGEN
 import net.torvald.terrarum.concurrent.ThreadPool
+import net.torvald.terrarum.gameactors.roundInt
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -25,10 +26,8 @@ class StateNoiseTexGen : BasicGameState() {
     }
     override fun init(p0: GameContainer?, p1: StateBasedGame?) {
         generateNoiseImage()
-
-        println("Press SPACE to generate new noise")
     }
-    
+
     private fun noiseRidged(): Joise {
         val ridged = ModuleFractal()
         ridged.setType(ModuleFractal.FractalType.RIDGEMULTI)
@@ -47,6 +46,21 @@ class StateNoiseTexGen : BasicGameState() {
     private fun noiseSmokyFractal(): Joise {
         val ridged = ModuleFractal()
         ridged.setType(ModuleFractal.FractalType.FBM)
+        ridged.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        ridged.setNumOctaves(8)
+        ridged.setFrequency(1.0)
+        ridged.seed = Random().nextLong()
+
+        val ridged_autocorrect = ModuleAutoCorrect()
+        ridged_autocorrect.setRange(0.0, 1.0)
+        ridged_autocorrect.setSource(ridged)
+
+        return Joise(ridged_autocorrect)
+    }
+
+    private fun noiseBillowFractal(): Joise {
+        val ridged = ModuleFractal()
+        ridged.setType(ModuleFractal.FractalType.BILLOW)
         ridged.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         ridged.setNumOctaves(8)
         ridged.setFrequency(1.0)
@@ -103,7 +117,7 @@ class StateNoiseTexGen : BasicGameState() {
     }
 
     fun generateNoiseImage() {
-        val noiseModule = noiseSmokyFractal() // change noise function here
+        val noiseModule = noiseBillowFractal() // change noise function here
 
         noiseImage.graphics.background = Color.black
 
@@ -113,12 +127,12 @@ class StateNoiseTexGen : BasicGameState() {
             }
         }
 
-        for (i in 0..Terrarum.CORES - 1) {
+        for (i in 0..Terrarum.THREADS - 1) {
             ThreadPool.map(
                     i,
                     ThreadRunNoiseSampling(
-                            ((imagesize / Terrarum.CORES) * i),
-                            ((imagesize / Terrarum.CORES) * i.plus(1)) - 1,
+                            imagesize.toFloat().div(Terrarum.THREADS).times(i).roundInt(),
+                            imagesize.toFloat().div(Terrarum.THREADS).times(i.plus(1)).roundInt() - 1,
                             noiseModule
                     ),
                     "SampleJoiseMap"
@@ -135,6 +149,10 @@ class StateNoiseTexGen : BasicGameState() {
     override fun getID() = STATE_ID_TOOL_NOISEGEN
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
+        g.color = Color.red
+        g.drawString("Press SPACE to generate new noise", 8f, 8f)
+        g.drawString("CPUs: ${Terrarum.THREADS}", Terrarum.WIDTH - 90f, 8f)
+
         for (sy in 0..imagesize - 1) {
             for (sx in 0..imagesize - 1) {
                 val noise = noiseMap[sy][sx]
