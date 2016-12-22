@@ -512,8 +512,8 @@ constructor() : BasicGameState() {
                 ThreadPool.map(
                         i,
                         ThreadActorUpdate(
-                                ((actors / CORES) * i).toInt(),
-                                ((actors / CORES) * i.plus(1)).toInt() - 1,
+                                actors.div(Terrarum.THREADS).times(i).roundInt(),
+                                actors.div(Terrarum.THREADS).times(i.plus(1)).roundInt() - 1,
                                 gc, delta
                         ),
                         "ActorUpdate"
