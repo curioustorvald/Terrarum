@@ -900,6 +900,8 @@ open class ActorWithBody : Actor() {
 
     open fun drawGlow(gc: GameContainer, g: Graphics) {
         if (isVisible && spriteGlow != null) {
+            blendNormal()
+
             if (!sprite!!.flippedHorizontal()) {
                 spriteGlow!!.render(g,
                         (hitbox.posX - hitboxTranslateX * scale).toFloat(),
