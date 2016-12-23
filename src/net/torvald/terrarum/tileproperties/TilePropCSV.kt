@@ -4,7 +4,7 @@ package net.torvald.terrarum.tileproperties
  * Created by minjaesong on 16-09-11.
  */
 object TilePropCSV {
-    const val text = """
+    operator fun invoke() = """
  "id";"dmg";"name"                     ;  "opacity";"strength";"dsty";"mate";"fluid";"solid";"wall";  "lumcolor";"drop";"ddmg";"fall";"dlfn";"friction"
   "0";  "0";"TILE_AIR"                 ;  "8396808";       "0";   "1";"null";    "0";    "0";   "0";         "0";   "0";   "0";   "0";   "0";"4"
   "1";  "0";"TILE_STONE"               ; "33587232";      "25";"2400";"rock";    "0";    "1";   "1";         "0";   "1";   "0";   "0";   "0";"16"

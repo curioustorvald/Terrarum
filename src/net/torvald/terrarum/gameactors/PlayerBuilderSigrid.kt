@@ -21,7 +21,7 @@ import java.io.IOException
 
 object PlayerBuilderSigrid {
 
-    fun create(): Player {
+    operator fun invoke(): Player {
         val p = Player(GameDate(-2147483648, 0)) // XD
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
@@ -30,13 +30,11 @@ object PlayerBuilderSigrid {
         p.sprite!!.setSpriteImage("assets/graphics/sprites/test_player.png")
         p.sprite!!.setDelay(200)
         p.sprite!!.setRowsAndFrames(1, 1)
-        p.sprite!!.setAsVisible()
 
         p.makeNewSpriteGlow(28, 51)
         p.spriteGlow!!.setSpriteImage("assets/graphics/sprites/test_player_glow.tga")
         p.spriteGlow!!.setDelay(200)
         p.spriteGlow!!.setRowsAndFrames(1, 1)
-        p.spriteGlow!!.setAsVisible()
 
         p.actorValue = ActorValue()
         p.actorValue[AVKey.SCALE] = 1.0

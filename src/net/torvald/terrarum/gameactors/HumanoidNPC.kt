@@ -18,22 +18,15 @@ import java.io.Reader
 /**
  * Created by minjaesong on 16-01-31.
  */
-open class HumanoidNPC(aiFile: String, born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
+open class HumanoidNPC(luaScript: String, born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
 
-    override val scriptPath: String = aiFile
+    override val scriptPath: String = ""
 
     companion object {
         protected val luag = Globals()
 
         init {
             luag.load(JseBaseLib())
-            luag.load(TableLib())
-            luag.load(StringLib())
-            luag.load(TableLib())
-            luag.load(CoroutineLib())
-            luag.load(Bit32Lib())
-            luag.load(PackageLib())
-            luag.load(JseMathLib())
             LoadState.install(luag)
             LuaC.install(luag)
         }
@@ -77,8 +70,9 @@ open class HumanoidNPC(aiFile: String, born: GameDate) : ActorHumanoid(born), AI
 
 
     init {
-        val inputStream = javaClass.getResourceAsStream(scriptPath)
-        runCommand(InputStreamReader(inputStream), scriptPath)
+        //val inputStream = javaClass.getResourceAsStream(scriptPath)
+        //runCommand(InputStreamReader(inputStream), scriptPath)
+        runCommand(luaScript)
     }
 
 
@@ -125,6 +119,14 @@ open class HumanoidNPC(aiFile: String, born: GameDate) : ActorHumanoid(born), AI
     fun runCommand(reader: Reader, filename: String) {
         if (!threadRun && !flagDespawn) {
             currentExecutionThread = Thread(ThreadRunCommand(luag, reader, filename))
+            currentExecutionThread.start()
+            threadRun = true
+        }
+    }
+
+    fun runCommand(script: String) {
+        if (!threadRun && !flagDespawn) {
+            currentExecutionThread = Thread(ThreadRunCommand(luag, script, "="))
             currentExecutionThread.start()
             threadRun = true
         }

@@ -151,7 +151,7 @@ class BasicDebugInfoWindow : UICanvas {
         g.color = GameFontBase.codeToCol["y"]
         g.drawString("${ccY}MEM ", (Terrarum.WIDTH - 15 * 8 - 2).toFloat(), 2f)
         //g.drawString("${ccY}FPS $ccG${Terrarum.appgc.fps}", (Terrarum.WIDTH - 6 * 8 - 2).toFloat(), 10f)
-        g.drawString("${ccY}CPUs ${if (Terrarum.MULTITHREAD) ccG else ccR}${Terrarum.CORES}",
+        g.drawString("${ccY}CPUs ${if (Terrarum.MULTITHREAD) ccG else ccR}${Terrarum.THREADS}",
                 (Terrarum.WIDTH - 2 - 6*8).toFloat(), 10f)
 
         g.color = GameFontBase.codeToCol["g"]

@@ -23,7 +23,6 @@ import java.util.*
  */
 open class ActorWithBody : Actor() {
 
-    override var referenceID: Int = generateUniqueReferenceID()
     override var actorValue: ActorValue = ActorValue()
 
     @Transient internal var sprite: SpriteAnimation? = null
@@ -155,8 +154,8 @@ open class ActorWithBody : Actor() {
 
     @Volatile var grounded = false
     override @Volatile var flagDespawn = false
-    /** Default to 'false'  */
-    var isVisible = false
+    /** Default to 'true'  */
+    var isVisible = true
     /** Default to 'true'  */
     var isUpdate = true
     var isNoSubjectToGrav = false
@@ -255,12 +254,12 @@ open class ActorWithBody : Actor() {
     }
 
     fun makeNewSprite(w: Int, h: Int) {
-        sprite = SpriteAnimation()
+        sprite = SpriteAnimation(this)
         sprite!!.setDimension(w, h)
     }
 
     fun makeNewSpriteGlow(w: Int, h: Int) {
-        spriteGlow = SpriteAnimation()
+        spriteGlow = SpriteAnimation(this)
         spriteGlow!!.setDimension(w, h)
     }
 
@@ -943,6 +942,8 @@ open class ActorWithBody : Actor() {
 
     open fun drawBody(gc: GameContainer, g: Graphics) {
         if (isVisible && sprite != null) {
+
+
             when (drawMode) {
                 BLEND_NORMAL   -> blendNormal()
                 BLEND_MULTIPLY -> blendMul()

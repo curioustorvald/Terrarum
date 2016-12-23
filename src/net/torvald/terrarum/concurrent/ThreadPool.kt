@@ -7,7 +7,7 @@ import java.util.*
  * Created by minjaesong on 16-05-25.
  */
 object ThreadPool {
-    val POOL_SIZE = Terrarum.CORES + 1
+    val POOL_SIZE = Terrarum.THREADS + 1
 
     private val pool: Array<Thread?> = Array(POOL_SIZE, { null })
 

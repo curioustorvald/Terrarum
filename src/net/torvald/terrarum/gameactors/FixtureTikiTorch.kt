@@ -18,7 +18,6 @@ class FixtureTikiTorch : FixtureBase(), Luminous {
     override val lightBoxList: ArrayList<Hitbox>
 
     init {
-        isVisible = true
         density = 1200.0
 
         setHitboxDimension(10, 24, 0, 0)
@@ -26,12 +25,10 @@ class FixtureTikiTorch : FixtureBase(), Luminous {
         lightBoxList = ArrayList(1)
         lightBoxList.add(Hitbox(3.0, 0.0, 4.0, 3.0))
 
-        sprite = SpriteAnimation()
-        sprite!!.setDimension(10, 27)
+        makeNewSprite(10, 27)
         sprite!!.setSpriteImage("assets/graphics/sprites/fixtures/tiki_torch.png")
         sprite!!.setDelay(200)
         sprite!!.setRowsAndFrames(1, 1)
-        sprite!!.setAsVisible()
 
         actorValue[AVKey.BASEMASS] = 1.0
     }

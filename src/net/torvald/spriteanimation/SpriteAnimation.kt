@@ -7,13 +7,13 @@ package net.torvald.spriteanimation
 import net.torvald.terrarum.StateInGame
 import net.torvald.terrarum.Terrarum
 import com.jme3.math.FastMath
+import net.torvald.terrarum.gameactors.ActorWithBody
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
 import org.newdawn.slick.SlickException
 import org.newdawn.slick.SpriteSheet
 
-class SpriteAnimation @Throws(SlickException::class)
-constructor() {
+class SpriteAnimation(val parentActor: ActorWithBody) {
 
     private var spriteImage: SpriteSheet? = null
     var height: Int = 0
@@ -30,7 +30,8 @@ constructor() {
     private var animationRunning = true
     private var flipHorizontal = false
     private var flipVertical = false
-    private var visible = false
+    private val visible: Boolean
+        get() = parentActor.isVisible
 
     private val offsetX = 0
     private val offsetY = 0
@@ -79,14 +80,6 @@ constructor() {
     fun setRowsAndFrames(rows: Int, frames: Int) {
         nRows = rows
         nFrames = frames
-    }
-
-    fun setAsVisible() {
-        visible = true
-    }
-
-    fun setAsInvisible() {
-        visible = false
     }
 
     fun update(delta: Int) {
