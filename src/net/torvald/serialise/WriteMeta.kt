@@ -45,7 +45,7 @@ object WriteMeta {
 
         // define Strings to be hashed
         val props = arrayOf(
-                TilePropCSV.text
+                TilePropCSV()
                 //, (item, mat, ...)
         )
 

@@ -111,10 +111,10 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         //addState(StateSplash())
         //addState(StateMonitorCheck())
         //addState(StateFontTester())
-        addState(StateNoiseTexGen())
+        //addState(StateNoiseTexGen())
 
-        //ingame = StateInGame()
-        //addState(ingame)
+        ingame = StateInGame()
+        addState(ingame)
     }
 
     companion object {
@@ -218,17 +218,17 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         var hasController = false
         val CONTROLLER_DEADZONE = 0.1f
 
-        /** Available CPU cores */
-        val CORES = Runtime.getRuntime().availableProcessors()
+        /** Available CPU threads */
+        val THREADS = Runtime.getRuntime().availableProcessors()
 
         /**
          * If the game is multithreading.
          * True if:
          *
-         *     CORES >= 2 and config "multithread" is true
+         *     THREADS >= 2 and config "multithread" is true
          */
         val MULTITHREAD: Boolean
-            get() = CORES >= 2 && getConfigBoolean("multithread")
+            get() = THREADS >= 2 && getConfigBoolean("multithread")
 
         private lateinit var configDir: String
 
@@ -432,6 +432,8 @@ fun main(args: Array<String>) {
     Terrarum.main(args)
 }
 
+// I must say: What the fuck is wrong with you, Slick2D?!
+
 fun blendMul() {
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glColorMask(true, true, true, true)
@@ -445,8 +447,8 @@ fun blendNormal() {
 
     // TODO seems working as intended (no more whitened-out semitransparent colour), but needs further investigation
     GL14.glBlendFuncSeparate(
-            GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA,
-            GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA
+            GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, // blend func for RGB channels
+            GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA // blend func for alpha channels
     )
 }
 

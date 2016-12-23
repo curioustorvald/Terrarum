@@ -16,7 +16,7 @@ abstract class Actor : Comparable<Actor>, Runnable {
      * Valid RefID is equal to or greater than 16777216.
      * @return Reference ID. (16777216-0x7FFF_FFFF)
      */
-    abstract var referenceID: Int
+    open var referenceID: Int = generateUniqueReferenceID()
     abstract var actorValue: ActorValue
     abstract var flagDespawn: Boolean
 

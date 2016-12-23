@@ -16,7 +16,6 @@ class PhysTestBall : ActorWithBody() {
 
     init {
         setHitboxDimension(16, 16, 0, 0)
-        isVisible = true
         mass = 10.0
         density = 200.0
 

@@ -40,7 +40,6 @@ class Player(born: GameDate) : ActorHumanoid(born) {
      * @throws SlickException
      */
     init {
-        isVisible = true
         referenceID = PLAYER_REF_ID // forcibly set ID
         density = BASE_DENSITY
         collisionType = COLLISION_KINEMATIC

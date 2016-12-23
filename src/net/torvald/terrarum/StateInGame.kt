@@ -123,10 +123,16 @@ constructor() : BasicGameState() {
 
 
         // add new player and put it to actorContainer
-        playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid.create())
+        playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
         //player = PBCynthia.create()
         //player.setNoClip(true);
         addActor(player)
+
+
+        // test actor
+        addActor(PlayerBuilderCynthia())
+
+
 
         // init console window
         consoleHandler = UIHandler(ConsoleWindow())
@@ -488,7 +494,7 @@ constructor() : BasicGameState() {
             }
             // inactivate distant actors
             else if (actor is ActorWithBody && !actor.inUpdateRange()) {
-                if (actor !is Projectile) { // if it's a projectile, just kill it.
+                if (actor !is Projectile) { // if it's a projectile, don't inactivate it; just kill it.
                     actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
                 }
                 actorContainer.removeAt(actorIndex)
