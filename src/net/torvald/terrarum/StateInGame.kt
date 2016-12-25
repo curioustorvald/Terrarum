@@ -72,8 +72,7 @@ constructor() : BasicGameState() {
     val ZOOM_MAX = 2.0f
     val ZOOM_MIN = 0.5f
 
-    val tilesDrawFrameBuffer =  Image(Terrarum.WIDTH.div(ZOOM_MIN).ceilInt(), Terrarum.HEIGHT.div(ZOOM_MIN).ceilInt())
-    val actorsDrawFrameBuffer = Image(Terrarum.WIDTH.div(ZOOM_MIN).ceilInt(), Terrarum.HEIGHT.div(ZOOM_MIN).ceilInt())
+    val worldDrawFrameBuffer = Image(Terrarum.WIDTH.div(ZOOM_MIN).ceilInt(), Terrarum.HEIGHT.div(ZOOM_MIN).ceilInt())
     val uisDrawFrameBuffer = Image(Terrarum.WIDTH, Terrarum.HEIGHT)
 
     //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
@@ -274,27 +273,26 @@ constructor() : BasicGameState() {
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, gwin: Graphics) {
         // clean the shit beforehand
-        tilesDrawFrameBuffer.graphics.clear()
-        actorsDrawFrameBuffer.graphics.clear()
+        worldDrawFrameBuffer.graphics.clear()
         uisDrawFrameBuffer.graphics.clear()
 
         blendNormal()
 
 
-        drawSkybox(tilesDrawFrameBuffer.graphics)
+        // FIXME skybox is not scaled at all
+        drawSkybox(worldDrawFrameBuffer.graphics)
 
 
         // make camara work //
         // compensate for zoom. UIs must be treated specially! (see UIHandler)
         //g.translate(-MapCamera.cameraX * screenZoom, -MapCamera.cameraY * screenZoom)
-        tilesDrawFrameBuffer.graphics.translate(-MapCamera.cameraX.toFloat(), -MapCamera.cameraY.toFloat())
-        actorsDrawFrameBuffer.graphics.translate(-MapCamera.cameraX.toFloat(), -MapCamera.cameraY.toFloat())
+        worldDrawFrameBuffer.graphics.translate(-MapCamera.cameraX.toFloat(), -MapCamera.cameraY.toFloat())
 
 
         /////////////////////////////
         // draw map related stuffs //
         /////////////////////////////
-        MapCamera.renderBehind(gc, tilesDrawFrameBuffer.graphics)
+        MapCamera.renderBehind(gc, worldDrawFrameBuffer.graphics)
 
 
         /////////////////
@@ -302,10 +300,10 @@ constructor() : BasicGameState() {
         /////////////////
         actorContainer.forEach { actor ->
             if (actor is ActorWithBody && actor.inScreen() && actor !is Player) {
-                actor.drawBody(gc, actorsDrawFrameBuffer.graphics)
+                actor.drawBody(gc, worldDrawFrameBuffer.graphics)
             }
         }
-        player.drawBody(gc, actorsDrawFrameBuffer.graphics)
+        player.drawBody(gc, worldDrawFrameBuffer.graphics)
 
 
         /////////////////////////////
@@ -313,15 +311,15 @@ constructor() : BasicGameState() {
         /////////////////////////////
         LightmapRenderer.renderLightMap()
 
-        MapCamera.renderFront(gc, tilesDrawFrameBuffer.graphics)
-        MapDrawer.render(gc, tilesDrawFrameBuffer.graphics)
+        MapCamera.renderFront(gc, worldDrawFrameBuffer.graphics)
+        MapDrawer.render(gc, worldDrawFrameBuffer.graphics)
 
 
         blendMul()
-        MapDrawer.drawEnvOverlay(actorsDrawFrameBuffer.graphics)
+        MapDrawer.drawEnvOverlay(worldDrawFrameBuffer.graphics)
 
         if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul() else blendNormal()
-        LightmapRenderer.draw(actorsDrawFrameBuffer.graphics)
+        LightmapRenderer.draw(worldDrawFrameBuffer.graphics)
         blendNormal()
 
 
@@ -330,10 +328,10 @@ constructor() : BasicGameState() {
         //////////////////////
         actorContainer.forEach { actor ->
             if (actor is ActorWithBody && actor.inScreen() && actor !is Player) {
-                actor.drawGlow(gc, actorsDrawFrameBuffer.graphics)
+                actor.drawGlow(gc, worldDrawFrameBuffer.graphics)
             }
         }
-        player.drawGlow(gc, actorsDrawFrameBuffer.graphics)
+        player.drawGlow(gc, worldDrawFrameBuffer.graphics)
 
 
         ////////////////////////
@@ -343,17 +341,17 @@ constructor() : BasicGameState() {
         if (debugWindow.isVisible) {
             actorContainer.forEachIndexed { i, actor ->
                 if (actor is ActorWithBody) {
-                    actorsDrawFrameBuffer.graphics.color = Color.white
-                    actorsDrawFrameBuffer.graphics.font = Terrarum.fontSmallNumbers
-                    actorsDrawFrameBuffer.graphics.drawString(
+                    worldDrawFrameBuffer.graphics.color = Color.white
+                    worldDrawFrameBuffer.graphics.font = Terrarum.fontSmallNumbers
+                    worldDrawFrameBuffer.graphics.drawString(
                             actor.referenceID.toString(),
                             actor.hitbox.posX.toFloat(),
                             actor.hitbox.pointedY.toFloat() + 4
                     )
 
                     if (DEBUG_ARRAY) {
-                        actorsDrawFrameBuffer.graphics.color = GameFontBase.codeToCol["g"]
-                        actorsDrawFrameBuffer.graphics.drawString(
+                        worldDrawFrameBuffer.graphics.color = GameFontBase.codeToCol["g"]
+                        worldDrawFrameBuffer.graphics.drawString(
                                 i.toString(),
                                 actor.hitbox.posX.toFloat(),
                                 actor.hitbox.pointedY.toFloat() + 4 + 10
@@ -364,7 +362,7 @@ constructor() : BasicGameState() {
         }
         // fluidmap debug
         if (KeyToggler.isOn(Key.F4))
-            WorldSimulator.drawFluidMapDebug(actorsDrawFrameBuffer.graphics)
+            WorldSimulator.drawFluidMapDebug(worldDrawFrameBuffer.graphics)
 
 
         //////////////
@@ -379,8 +377,7 @@ constructor() : BasicGameState() {
         /////////////////
         // draw layers //
         /////////////////
-        gwin.drawImage(tilesDrawFrameBuffer, 0f, 0f)
-        gwin.drawImage(actorsDrawFrameBuffer.getScaledCopy(screenZoom), 0f, 0f)
+        gwin.drawImage(worldDrawFrameBuffer.getScaledCopy(screenZoom), 0f, 0f)
         gwin.drawImage(uisDrawFrameBuffer, 0f, 0f)
     }
 

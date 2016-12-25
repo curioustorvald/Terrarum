@@ -899,7 +899,7 @@ open class ActorWithBody : Actor() {
 
     open fun drawGlow(gc: GameContainer, g: Graphics) {
         if (isVisible && spriteGlow != null) {
-            blendNormal()
+            blendLightenOnly()
 
             if (!sprite!!.flippedHorizontal()) {
                 spriteGlow!!.render(g,
