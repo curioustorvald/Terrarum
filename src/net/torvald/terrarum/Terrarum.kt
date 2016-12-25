@@ -432,9 +432,12 @@ fun main(args: Array<String>) {
     Terrarum.main(args)
 }
 
-// I must say: What the fuck is wrong with you, Slick2D?!
+///////////////////////////////////
+// customised blending functions //
+///////////////////////////////////
 
 fun blendMul() {
+    // I must say: What the fuck is wrong with you, Slick2D? Your built-it blending is just fucking wrong.
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glColorMask(true, true, true, true)
     GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_ONE_MINUS_SRC_ALPHA)
@@ -445,10 +448,24 @@ fun blendNormal() {
     GL11.glColorMask(true, true, true, true)
     //GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
 
-    // TODO seems working as intended (no more whitened-out semitransparent colour), but needs further investigation
+    // semitransparent textures working as intended with this,
+    // but needs further investigation in the case of:
+    // TODO blend semitransparent over semitransparent
     GL14.glBlendFuncSeparate(
             GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, // blend func for RGB channels
             GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA // blend func for alpha channels
+    )
+}
+
+fun blendLightenOnly() {
+    GL11.glEnable(GL11.GL_BLEND)
+    GL14.glBlendFuncSeparate(
+            GL11.GL_ONE, GL11.GL_ONE, // blend func for RGB channels
+            GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA // blend func for alpha channels
+    )
+    GL20.glBlendEquationSeparate(
+            GL14.GL_MAX,
+            GL14.GL_FUNC_ADD
     )
 }
 
