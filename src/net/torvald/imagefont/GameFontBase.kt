@@ -263,17 +263,17 @@ constructor() : Font {
                         indexJong, jongRow
                 )*/
 
-                hangulSheet.getSubImage(indexCho, choRow).draw(
+                hangulSheet.getSubImage(indexCho, choRow).drawWithShadow(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
                         scale.toFloat(), thisCol
                 )
-                hangulSheet.getSubImage(indexJung, jungRow).draw(
+                hangulSheet.getSubImage(indexJung, jungRow).drawWithShadow(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
                         scale.toFloat(), thisCol
                 )
-                hangulSheet.getSubImage(indexJong, jongRow).draw(
+                hangulSheet.getSubImage(indexJong, jongRow).drawWithShadow(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f).toFloat(),
                         scale.toFloat(), thisCol
@@ -321,7 +321,7 @@ constructor() : Font {
                         wenQuanYiIndexX(ch),
                         wenQuanYi1IndexY(ch)
                 )*/
-                wenQuanYi_1.getSubImage(wenQuanYiIndexX(ch), wenQuanYi1IndexY(ch)).draw(
+                wenQuanYi_1.getSubImage(wenQuanYiIndexX(ch), wenQuanYi1IndexY(ch)).drawWithShadow(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round((H - H_UNIHAN) / 2 + y).toFloat(),
                         scale.toFloat(), thisCol
@@ -349,7 +349,7 @@ constructor() : Font {
                         wenQuanYiIndexX(ch),
                         wenQuanYi2IndexY(ch)
                 )*/
-                wenQuanYi_2.getSubImage(wenQuanYiIndexX(ch), wenQuanYi2IndexY(ch)).draw(
+                wenQuanYi_2.getSubImage(wenQuanYiIndexX(ch), wenQuanYi2IndexY(ch)).drawWithShadow(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round((H - H_UNIHAN) / 2 + y).toFloat(),
                         scale.toFloat(), thisCol
@@ -461,7 +461,7 @@ constructor() : Font {
                             else 0,
                             sheetX, sheetY
                     )*/
-                    sheetKey[prevInstance]!!.getSubImage(sheetX, sheetY).draw(
+                    sheetKey[prevInstance]!!.getSubImage(sheetX, sheetY).drawWithShadow(
                             Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
 
                             // to deal with the height difference of the sheets
@@ -738,5 +738,17 @@ constructor() : Font {
                 Pair("x", colourKey[0x1A.toChar()]),
                 Pair("k", colourKey[0x1B.toChar()])
         )
-    }
+
+    }// end of companion object
+}
+
+fun Image.drawWithShadow(x: Float, y: Float, color: Color) =
+        this.drawWithShadow(x, y, 1f, color)
+
+fun Image.drawWithShadow(x: Float, y: Float, scale: Float, color: Color) {
+    this.draw(x + 1, y + 1, scale, color.darker(0.5f))
+    this.draw(x    , y + 1, scale, color.darker(0.5f))
+    this.draw(x + 1, y    , scale, color.darker(0.5f))
+
+    this.draw(x, y, scale, color)
 }
