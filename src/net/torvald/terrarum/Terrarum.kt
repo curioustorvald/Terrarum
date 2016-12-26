@@ -186,16 +186,16 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         lateinit var fontSmallNumbers: Font
             private set
 
-        var joypadLabelStart: Char = 0x00.toChar() // lateinit
-        var joypadLableSelect:Char = 0x00.toChar() // lateinit
-        var joypadLabelNinA:  Char = 0x00.toChar() // lateinit TODO
-        var joypadLabelNinB:  Char = 0x00.toChar() // lateinit TODO
-        var joypadLabelNinX:  Char = 0x00.toChar() // lateinit TODO
-        var joypadLabelNinY:  Char = 0x00.toChar() // lateinit TODO
-        var joypadLabelNinL:  Char = 0x00.toChar() // lateinit TODO
-        var joypadLabelNinR:  Char = 0x00.toChar() // lateinit TODO
-        var joypadLabelNinZL: Char = 0x00.toChar() // lateinit TODO
-        var joypadLabelNinZR: Char = 0x00.toChar() // lateinit TODO
+        var joypadLabelStart: Char = 0xE000.toChar() // lateinit
+        var joypadLableSelect:Char = 0xE000.toChar() // lateinit
+        var joypadLabelNinA:  Char = 0xE000.toChar() // lateinit TODO
+        var joypadLabelNinB:  Char = 0xE000.toChar() // lateinit TODO
+        var joypadLabelNinX:  Char = 0xE000.toChar() // lateinit TODO
+        var joypadLabelNinY:  Char = 0xE000.toChar() // lateinit TODO
+        var joypadLabelNinL:  Char = 0xE000.toChar() // lateinit TODO
+        var joypadLabelNinR:  Char = 0xE000.toChar() // lateinit TODO
+        var joypadLabelNinZL: Char = 0xE000.toChar() // lateinit TODO
+        var joypadLabelNinZR: Char = 0xE000.toChar() // lateinit TODO
         val joypadLabelLEFT  = 0xE068.toChar()
         val joypadLabelDOWN  = 0xE069.toChar()
         val joypadLabelUP    = 0xE06A.toChar()

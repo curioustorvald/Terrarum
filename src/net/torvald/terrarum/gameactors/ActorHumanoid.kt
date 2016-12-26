@@ -22,7 +22,7 @@ import java.util.*
  * Created by minjaesong on 16-10-24.
  */
 open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
-: HistoricalFigure(birth, death), Controllable, Pocketed, Factionable, Luminous, LandHolder {
+    : HistoricalFigure(birth, death), Controllable, Pocketed, Factionable, Luminous, LandHolder {
 
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory = ActorInventory()
@@ -197,6 +197,22 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             isDownDown = isFuncDown(input, EnumKeyFunc.MOVE_DOWN)
             isRightDown = isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)
             isJumpDown = isFuncDown(input, EnumKeyFunc.JUMP)
+
+            if (Terrarum.hasController) {
+                gamepad = Controllers.getController(0)
+                axisX = gamepad!!.getAxisValue(0)
+                axisY = gamepad!!.getAxisValue(1)
+                axisRX = gamepad!!.getAxisValue(2)
+                axisRY = gamepad!!.getAxisValue(3)
+
+                // deadzonning
+                if (Math.abs(axisX) < Terrarum.CONTROLLER_DEADZONE) axisX = 0f
+                if (Math.abs(axisY) < Terrarum.CONTROLLER_DEADZONE) axisY = 0f
+                if (Math.abs(axisRX) < Terrarum.CONTROLLER_DEADZONE) axisRX = 0f
+                if (Math.abs(axisRY) < Terrarum.CONTROLLER_DEADZONE) axisRY = 0f
+
+                gamepad!!.isButtonPressed(GAMEPAD_JUMP)
+            }
         }
     }
 
@@ -204,29 +220,17 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         if (!noClip) {
             if (grounded) {
                 actorValue[AVKey.ACCELMULT] = 1.0
-            } else {
+            }
+            else {
                 actorValue[AVKey.ACCELMULT] = ACCEL_MULT_IN_FLIGHT
             }
-        } else {
+        }
+        else {
             actorValue[AVKey.ACCELMULT] = 1.0
         }
     }
 
     override fun processInput(gc: GameContainer, delta: Int, input: Input) {
-        if (isGamer && Terrarum.hasController) {
-            gamepad = Controllers.getController(0)
-            axisX = gamepad!!.getAxisValue(0)
-            axisY = gamepad!!.getAxisValue(1)
-            axisRX = gamepad!!.getAxisValue(2)
-            axisRY = gamepad!!.getAxisValue(3)
-
-            // deadzonning
-            if (Math.abs(axisX) < Terrarum.CONTROLLER_DEADZONE) axisX = 0f
-            if (Math.abs(axisY) < Terrarum.CONTROLLER_DEADZONE) axisY = 0f
-            if (Math.abs(axisRX) < Terrarum.CONTROLLER_DEADZONE) axisRX = 0f
-            if (Math.abs(axisRY) < Terrarum.CONTROLLER_DEADZONE) axisRY = 0f
-        }
-
         ///////////////////
         // MOUSE CONTROL //
         ///////////////////
@@ -333,16 +337,18 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         /**
          * Jump control
          */
-        if (isJumpDown || isGamer && Terrarum.hasController && gamepad!!.isButtonPressed(GAMEPAD_JUMP)) {
+        if (isJumpDown) {
             if (!noClip) {
                 if (grounded) {
                     jumping = true
                 }
                 jump()
-            } else {
+            }
+            else {
                 walkVertical(true, AXIS_POSMAX)
             }
-        } else {
+        }
+        else {
             jumping = false
             jumpCounter = 0
             jumpAcc = 0.0
@@ -376,7 +382,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
         if ((!walledLeft && left) || (!walledRight && !left)) {
             readonly_totalX =
-                    absMax( // keyboard
+                    absMax(// keyboard
                             actorValue.getAsDouble(AVKey.ACCEL)!! *
                             actorValue.getAsDouble(AVKey.ACCELMULT)!! *
                             Math.sqrt(scale) *
@@ -414,7 +420,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
      */
     private fun walkVertical(up: Boolean, absAxisVal: Float) {
         readonly_totalY =
-                absMax( // keyboard
+                absMax(// keyboard
                         actorValue.getAsDouble(AVKey.ACCEL)!! *
                         actorValue.getAsDouble(AVKey.ACCELMULT)!! *
                         Math.sqrt(scale) *
@@ -465,7 +471,6 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
      * TODO linear function (play Super Mario Bros. and you'll get what I'm talking about)
      */
     private fun jump() {
-
         val len = MAX_JUMP_LENGTH.toFloat()
         val pwr = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERMULT) ?: 1.0)
         val jumpLinearThre = 0.08
@@ -537,7 +542,8 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                 if (spriteGlow != null) {
                     spriteGlow!!.flip(true, false)
                 }
-            } else {
+            }
+            else {
                 sprite!!.flip(false, false)
                 if (spriteGlow != null) {
                     spriteGlow!!.flip(false, false)

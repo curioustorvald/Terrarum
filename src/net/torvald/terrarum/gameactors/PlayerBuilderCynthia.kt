@@ -16,6 +16,7 @@ object PlayerBuilderCynthia {
         InjectCreatureRaw(p.actorValue, "CreatureHuman.json")
 
         p.actorValue[AVKey.__PLAYER_QUICKBARSEL] = 0
+        p.actorValue[AVKey.NAME] = "Cynthia"
 
 
         p.makeNewSprite(26, 42)

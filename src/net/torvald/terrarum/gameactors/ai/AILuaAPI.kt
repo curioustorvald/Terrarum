@@ -16,12 +16,17 @@ import org.luaj.vm2.lib.ZeroArgFunction
 internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
 
     init {
-        if (actor !is AIControlled) throw IllegalArgumentException("The actor is not AIControlled! $actor")
+        if (actor !is AIControlled)
+            throw IllegalArgumentException("The actor is not AIControlled! $actor")
 
         // load things. WARNING: THIS IS MANUAL!
         g["ai"] = LuaValue.tableOf()
+
+        g["ai"]["getSelfActorInfo"] = GetSelfActorInfo(actor)
+
         g["ai"]["getNearestActor"] = GetNearestActor()
         g["ai"]["getNearestPlayer"] = GetNearestPlayer()
+
         g["ai"]["getX"] = GetX(actor)
         g["ai"]["getY"] = GetY(actor)
         g["ai"]["moveUp"] = MoveUp(actor)
@@ -29,10 +34,14 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         g["ai"]["moveLeft"] = MoveLeft(actor)
         g["ai"]["moveRight"] = MoveRight(actor)
         g["ai"]["moveTo"] = MoveTo(actor)
+        g["ai"]["jump"] = Jump(actor)
 
     }
 
     companion object {
+        /**
+         * Reads arbitrary ActorWithBody and returns its information as Lua table
+         */
         fun composeActorObject(actor: ActorWithBody): LuaTable {
             val t = LuaValue.tableOf()
 
@@ -48,7 +57,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
 
             t["mass"] = actor.mass
 
-            t["collision_type"] = actor.collisionType
+            t["collisionType"] = actor.collisionType
 
             t["strength"] = actor.actorValue.getAsInt(AVKey.STRENGTH) ?: 0
 
@@ -56,12 +65,18 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
             val MUL_2 = LightmapRenderer.MUL_2
             val MUL = LightmapRenderer.MUL
             val CHMAX = LightmapRenderer.CHANNEL_MAX
-            t["luminosity_rgb"] = lumrgb
+            t["luminosityRGB"] = lumrgb
             t["luminosity"] = (lumrgb.div(MUL_2).and(CHMAX).times(3) +
                               lumrgb.div(MUL).and(CHMAX).times(4) +
                               lumrgb.and(1023)) / 8 // quick luminosity calculation
 
             return t
+        }
+    }
+
+    class GetSelfActorInfo(val actor: ActorWithBody) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return composeActorObject(actor)
         }
     }
 
@@ -143,6 +158,13 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
 
         override fun call(toX: LuaValue, toY: LuaValue): LuaValue {
             actor.moveTo(toX.checkdouble(), toY.checkdouble())
+            return LuaValue.NONE
+        }
+    }
+
+    class Jump(val actor: AIControlled) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            actor.moveJump()
             return LuaValue.NONE
         }
     }

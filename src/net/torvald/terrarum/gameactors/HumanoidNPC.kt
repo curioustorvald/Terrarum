@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.gameactors.ActorHumanoid
+import net.torvald.terrarum.gameactors.ai.AILuaAPI
 import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
 import org.luaj.vm2.Globals
@@ -11,25 +12,23 @@ import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.*
 import org.luaj.vm2.lib.jse.JseBaseLib
 import org.luaj.vm2.lib.jse.JseMathLib
+import org.luaj.vm2.lib.jse.JsePlatform
 import org.newdawn.slick.GameContainer
+import org.newdawn.slick.Input
 import java.io.InputStreamReader
 import java.io.Reader
 
 /**
  * Created by minjaesong on 16-01-31.
  */
-open class HumanoidNPC(luaScript: String, born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
+open class HumanoidNPC(val luaScript: String, born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
 
     override val scriptPath: String = ""
 
-    companion object {
-        protected val luag = Globals()
+    protected val luag: Globals = JsePlatform.standardGlobals()
 
-        init {
-            luag.load(JseBaseLib())
-            LoadState.install(luag)
-            LuaC.install(luag)
-        }
+    init {
+        AILuaAPI(luag, this)
     }
 
     // we're having InventoryItem data so that this class could be somewhat universal
@@ -72,13 +71,15 @@ open class HumanoidNPC(luaScript: String, born: GameDate) : ActorHumanoid(born),
     init {
         //val inputStream = javaClass.getResourceAsStream(scriptPath)
         //runCommand(InputStreamReader(inputStream), scriptPath)
-        runCommand(luaScript)
     }
 
 
     override fun update(gc: GameContainer, delta: Int) {
         super.update(gc, delta)
+        //runCommand(luaScript)
+        luag.load(luaScript).call()
 
+        //moveRight()
     }
 
     override fun moveLeft() { // hit the buttons on the controller box
@@ -126,7 +127,7 @@ open class HumanoidNPC(luaScript: String, born: GameDate) : ActorHumanoid(born),
 
     fun runCommand(script: String) {
         if (!threadRun && !flagDespawn) {
-            currentExecutionThread = Thread(ThreadRunCommand(luag, script, "="))
+            currentExecutionThread = Thread(ThreadRunCommand(luag, script, ""))
             currentExecutionThread.start()
             threadRun = true
         }
