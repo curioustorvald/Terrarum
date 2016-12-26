@@ -60,24 +60,11 @@ class TinyAlphNum : Font {
                 thisCol = GameFontBase.colourKey[ch]!!
                 continue
             }
-            if (index != null) {
-                // shadow
-                fontSheet.getSubImage(index % 16, index / 16).draw(
-                        x + textPosOffset + 1, y, thisCol.darker(0.5f)
-                )
-                fontSheet.getSubImage(index % 16, index / 16).draw(
-                        x + textPosOffset + 1, y + 1, thisCol.darker(0.5f)
-                )
-                fontSheet.getSubImage(index % 16, index / 16).draw(
-                        x + textPosOffset, y + 1, thisCol.darker(0.5f)
-                )
 
+            fontSheet.getSubImage(index % 16, index / 16).drawWithShadow(
+                    x + textPosOffset, y, thisCol
+            )
 
-                // main
-                fontSheet.getSubImage(index % 16, index / 16).draw(
-                        x + textPosOffset, y, thisCol
-                )
-            }
             textPosOffset += W
         }
     }
