@@ -188,7 +188,7 @@ object LightmapRenderer {
                         for (x in lightBoxX.div(TILE_SIZE).floorInt()
                                 ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
                             lanternMap.add(Lantern(x, y, it.luminosity))
-                            // Q&D fix for Roundworld anormaly
+                            // Q&D fix for Roundworld anomaly
                             lanternMap.add(Lantern(x + world.width, y, it.luminosity))
                             lanternMap.add(Lantern(x - world.width, y, it.luminosity))
                         }

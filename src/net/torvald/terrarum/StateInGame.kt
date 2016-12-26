@@ -298,11 +298,13 @@ constructor() : BasicGameState() {
         /////////////////
         // draw actors //
         /////////////////
+        // --> Change of blend mode <-- introduced by ActorWithBody //
         actorContainer.forEach { actor ->
             if (actor is ActorWithBody && actor.inScreen() && actor !is Player) {
                 actor.drawBody(gc, worldDrawFrameBuffer.graphics)
             }
         }
+        // --> Change of blend mode <-- introduced by ActorWithBody //
         player.drawBody(gc, worldDrawFrameBuffer.graphics)
 
 
@@ -311,32 +313,37 @@ constructor() : BasicGameState() {
         /////////////////////////////
         LightmapRenderer.renderLightMap()
 
+        // --> blendMul() <-- by MapCamera.renderFront
         MapCamera.renderFront(gc, worldDrawFrameBuffer.graphics)
+        // --> blendNormal() <-- by MapCamera.renderFront
         MapDrawer.render(gc, worldDrawFrameBuffer.graphics)
 
 
-        blendMul()
+        // --> blendMul() <-- by MapCamera.drawEnvOverlay
         MapDrawer.drawEnvOverlay(worldDrawFrameBuffer.graphics)
 
-        if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul() else blendNormal()
+        if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul()
+        else blendNormal()
         LightmapRenderer.draw(worldDrawFrameBuffer.graphics)
-        blendNormal()
 
 
         //////////////////////
         // draw actor glows //
         //////////////////////
+        // --> blendLightenOnly() <-- introduced by ActorWithBody //
         actorContainer.forEach { actor ->
             if (actor is ActorWithBody && actor.inScreen() && actor !is Player) {
                 actor.drawGlow(gc, worldDrawFrameBuffer.graphics)
             }
         }
+        // --> blendLightenOnly() <-- introduced by ActorWithBody //
         player.drawGlow(gc, worldDrawFrameBuffer.graphics)
 
 
         ////////////////////////
         // debug informations //
         ////////////////////////
+        blendNormal()
         // draw reference ID if debugWindow is open
         if (debugWindow.isVisible) {
             actorContainer.forEachIndexed { i, actor ->

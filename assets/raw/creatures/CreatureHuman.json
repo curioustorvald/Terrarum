@@ -5,7 +5,7 @@
   "basemass": 60.0,
 
   "strength": 1000,
-  "strengthmult": [100,100,100,100,100,100,100],
+  "strengthmult": [90,95,98,100,102,105,110],
 
   "accel": 0.32,
 

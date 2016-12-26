@@ -907,7 +907,7 @@ open class ActorWithBody : Actor() {
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
                         (scale).toFloat()
                 )
-                // Q&D fix for Roundworld anormaly
+                // Q&D fix for Roundworld anomaly
                 spriteGlow!!.render(g,
                         (hitbox.posX - hitboxTranslateX * scale).toFloat() + world.width * TILE_SIZE,
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
@@ -925,7 +925,7 @@ open class ActorWithBody : Actor() {
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
                         (scale).toFloat()
                 )
-                // Q&D fix for Roundworld anormaly
+                // Q&D fix for Roundworld anomaly
                 spriteGlow!!.render(g,
                         (hitbox.posX - scale).toFloat() + world.width * TILE_SIZE,
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
@@ -956,7 +956,7 @@ open class ActorWithBody : Actor() {
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
                         (scale).toFloat()
                 )
-                // Q&D fix for Roundworld anormaly
+                // Q&D fix for Roundworld anomaly
                 sprite!!.render(g,
                         (hitbox.posX - hitboxTranslateX * scale).toFloat() + world.width * TILE_SIZE,
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
@@ -974,7 +974,7 @@ open class ActorWithBody : Actor() {
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
                         (scale).toFloat()
                 )
-                // Q&D fix for Roundworld anormaly
+                // Q&D fix for Roundworld anomaly
                 sprite!!.render(g,
                         (hitbox.posX - scale).toFloat() + world.width * TILE_SIZE,
                         (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),

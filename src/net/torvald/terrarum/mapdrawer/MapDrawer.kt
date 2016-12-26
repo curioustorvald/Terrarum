@@ -6,6 +6,7 @@ import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tilestats.TileStats
 import com.jme3.math.FastMath
 import net.torvald.colourutil.ColourTemp
+import net.torvald.terrarum.blendMul
 import org.newdawn.slick.*
 
 /**
@@ -48,6 +49,8 @@ object MapDrawer {
         val colTemp_warm = colTempLinearFunc(-(onscreen_warm_tiles / onscreen_tiles_cap))
         colTemp = colTemp_warm + colTemp_cold - ENV_COLTEMP_NOON
         val zoom = Terrarum.ingame.screenZoom
+
+        blendMul()
 
         g.color = ColourTemp(colTemp)
         //g.color = getColourFromMap(3022)

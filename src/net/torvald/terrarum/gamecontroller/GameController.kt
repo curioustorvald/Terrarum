@@ -45,40 +45,17 @@ object GameController {
                 (Terrarum.ingame.player as Player).vehicleRiding!!.processInput(gc, delta, input)
             }
 
-            Terrarum.ingame.player.processInput(gc, delta, input)
+            Terrarum.ingame.actorContainer.forEach {
+                if (it is Controllable) it.processInput(gc, delta, input)
+            }
 
-            for (ui in Terrarum.ingame.uiContainer) {
-                ui.processInput(gc, delta, input)
+            Terrarum.ingame.uiContainer.forEach {
+                it.processInput(gc, delta, input)
             }
         }
         else {
             Terrarum.ingame.consoleHandler.processInput(gc, delta, input)
         }
-
-
-        // test tile remove
-        /*if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-            try {
-                Terrarum.ingame.world.setTileTerrain(mouseTileX, mouseTileY, Tile.AIR)
-                // terrarum.game.map.setTileWall(mouseTileX, mouseTileY, Tile.AIR);
-            }
-            catch (e: ArrayIndexOutOfBoundsException) {
-            }
-
-
-        }
-        // test tile place
-        else if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
-            try {
-                Terrarum.ingame.world.setTileTerrain(
-                        mouseTileX, mouseTileY,
-                        Terrarum.ingame.player.actorValue.getAsInt("__selectedtile")!!
-                )
-            }
-            catch (e: ArrayIndexOutOfBoundsException) {
-            }
-
-        }*/
 
 
         ///////////////////
