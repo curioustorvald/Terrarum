@@ -219,14 +219,14 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     private fun updateMovementControl() {
         if (!noClip) {
             if (grounded) {
-                actorValue[AVKey.ACCELMULT] = 1.0
+                actorValue[AVKey.ACCELBUFF] = 1.0
             }
             else {
-                actorValue[AVKey.ACCELMULT] = ACCEL_MULT_IN_FLIGHT
+                actorValue[AVKey.ACCELBUFF] = ACCEL_MULT_IN_FLIGHT
             }
         }
         else {
-            actorValue[AVKey.ACCELMULT] = 1.0
+            actorValue[AVKey.ACCELBUFF] = 1.0
         }
     }
 
@@ -382,23 +382,15 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
         if ((!walledLeft && left) || (!walledRight && !left)) {
             readonly_totalX =
-                    absMax(// keyboard
-                            actorValue.getAsDouble(AVKey.ACCEL)!! *
-                            actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                            Math.sqrt(scale) *
-                            applyVelo(walkCounterX) *
-                            (if (left) -1f else 1f)
-                            , // gamepad
-                            actorValue.getAsDouble(AVKey.ACCEL)!! *
-                            actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                            Math.sqrt(scale) *
-                            (if (left) -1f else 1f) * absAxisVal
-                            // do not add applyVelo(walkCounterY) here, as it prevents player from moving with gamepad
+                    absMax( // keyboard
+                            avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f),
+                            // gamepad
+                            avAcceleration * (if (left) -1f else 1f) * absAxisVal
                     )
 
             //applyForce(Vector2(readonly_totalX, 0.0))
             walkX += readonly_totalX
-            walkX = absClamp(walkX, actorValue.getAsDouble(AVKey.SPEED)!! * actorValue.getAsDouble(AVKey.SPEEDMULT)!!)
+            walkX = walkX.bipolarClamp(avSpeedCap)
 
             walkCounterX += 1
 
@@ -420,21 +412,14 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
      */
     private fun walkVertical(up: Boolean, absAxisVal: Float) {
         readonly_totalY =
-                absMax(// keyboard
-                        actorValue.getAsDouble(AVKey.ACCEL)!! *
-                        actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                        Math.sqrt(scale) *
-                        applyVelo(walkCounterY) *
-                        (if (up) -1f else 1f)
-                        , // gamepad
-                        actorValue.getAsDouble(AVKey.ACCEL)!! *
-                        actorValue.getAsDouble(AVKey.ACCELMULT)!! *
-                        Math.sqrt(scale) *
-                        (if (up) -1f else 1f) * absAxisVal
+                absMax( // keyboard
+                        avAcceleration * applyVelo(walkCounterY) * (if (up) -1f else 1f),
+                        // gamepad
+                        avAcceleration * (if (up) -1f else 1f) * absAxisVal
                 )
 
         walkY += readonly_totalY
-        walkY = absClamp(walkY, actorValue.getAsDouble(AVKey.SPEED)!! * actorValue.getAsDouble(AVKey.SPEEDMULT)!!)
+        walkY = walkY.bipolarClamp(avSpeedCap)
 
         walkCounterY += 1
 
@@ -472,7 +457,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
      */
     private fun jump() {
         val len = MAX_JUMP_LENGTH.toFloat()
-        val pwr = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERMULT) ?: 1.0)
+        val pwr = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0)
         val jumpLinearThre = 0.08
 
         fun jumpFunc(x: Int): Double {
@@ -509,15 +494,6 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     private fun isFuncDown(input: Input, fn: EnumKeyFunc): Boolean {
         return input.isKeyDown(KeyMap.getKeyCode(fn))
-    }
-
-    private fun absClamp(i: Double, ceil: Double): Double {
-        if (i > 0)
-            return if (i > ceil) ceil else i
-        else if (i < 0)
-            return if (-i > ceil) -ceil else i
-        else
-            return 0.0
     }
 
     fun isNoClip(): Boolean {

@@ -6,38 +6,39 @@ package net.torvald.terrarum.gameactors
  * Created by minjaesong on 16-04-02.
  */
 object AVKey {
-    const val MULT = "mult"
+    const val BUFF = "buff"
 
     /** pixels per frame
      * walking/running speed
      */
     const val SPEED = "speed"
-    const val SPEEDMULT = "$SPEED$MULT"
+    const val SPEEDBUFF = "$SPEED$BUFF"
     /** pixels per frame squared
      * acceleration of the movement (e.g. running, flying, driving, etc.)
      */
     const val ACCEL = "accel"
-    const val ACCELMULT = "$ACCEL$MULT"
+    const val ACCELBUFF = "$ACCEL$BUFF"
     const val SCALE = "scale"
+    const val SCALEBUFF = "$SCALE$BUFF" // aka PHYSIQUE
     /** pixels */
     const val BASEHEIGHT = "baseheight"
     /** kilogrammes */
     const val BASEMASS = "basemass"
     /** pixels per frame */
     const val JUMPPOWER = "jumppower"
-    const val JUMPPOWERMULT = "$JUMPPOWER$MULT"
+    const val JUMPPOWERBUFF = "$JUMPPOWER$BUFF"
 
     /** Int
      * "Default" value of 1 000
      */
     const val STRENGTH = "strength"
+    const val STRENGTHBUFF = "$STRENGTH$BUFF"
     const val ENCUMBRANCE = "encumbrance"
     /** 30-bit RGB (Int)
      * 0000 0010000000 0010000000 0010000000
      *      ^ Red      ^ Green    ^ Blue
      */
     const val LUMINOSITY = "luminosity"
-    const val PHYSIQUEMULT = "physique$MULT"
     const val DRAGCOEFF = "dragcoeff"
 
     /** String
@@ -46,7 +47,7 @@ object AVKey {
     const val NAME = "name"
 
     /** String
-     * e.g. Duudson
+     * e.g. Duudsoni
      */
     const val RACENAME = "racename"
     /** String
@@ -72,10 +73,10 @@ object AVKey {
      * current defence point of worn armour(s)
      */
     const val ARMOURDEFENCE = "armourdefence"
-    const val ARMOURDEFENCEMULT = "$ARMOURDEFENCE$MULT"
+    const val ARMOURDEFENCEBUFF = "$ARMOURDEFENCE$BUFF"
 
     const val MAGICREGENRATE = "magicregenrate"
-    const val MAGICREGENRATEMULT = "$MAGICREGENRATE$MULT"
+    const val MAGICREGENRATEBUFF = "$MAGICREGENRATE$BUFF"
 
 
     /** String
