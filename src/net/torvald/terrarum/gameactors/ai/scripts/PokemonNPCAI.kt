@@ -40,9 +40,9 @@ function update(delta)
     elseif currentMode == "move" then
         -- move
         if moveMode == "left" then
-            ai.moveLeft()
+            ai.moveLeft(0.5)
         elseif moveMode == "right" then
-            ai.moveRight()
+            ai.moveRight(0.5)
         end
         -- reset counter
         if timeCounter >= countMax then

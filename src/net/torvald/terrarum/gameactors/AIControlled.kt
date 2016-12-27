@@ -8,11 +8,11 @@ package net.torvald.terrarum.gameactors
 interface AIControlled {
     val scriptPath: String
 
-    fun moveLeft()
-    fun moveRight()
-    fun moveUp()
-    fun moveDown()
-    fun moveJump()
+    fun moveLeft(amount: Float = 1f)
+    fun moveRight(amount: Float = 1f)
+    fun moveUp(amount: Float = 1f)
+    fun moveDown(amount: Float = 1f)
+    fun moveJump(amount: Float = 1f)
 
     /** fly toward arbitrary angle  WARNING: the map is looped! */
     fun moveTo(bearing: Double)

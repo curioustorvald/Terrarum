@@ -43,13 +43,6 @@ class Player(born: GameDate) : ActorHumanoid(born) {
         referenceID = PLAYER_REF_ID // forcibly set ID
         density = BASE_DENSITY
         collisionType = COLLISION_KINEMATIC
-
-        try {
-            gamepad = Controllers.getController(0)
-        }
-        catch (e: IndexOutOfBoundsException) {
-            println("[Player] gamepad not detected.")
-        }
     }
 
     override fun update(gc: GameContainer, delta: Int) {
