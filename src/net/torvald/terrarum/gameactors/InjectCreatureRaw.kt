@@ -17,7 +17,7 @@ object InjectCreatureRaw {
     // FIXME strength not injected properly?
 
     const val JSONPATH = "./assets/raw/creatures/"
-    private const val MULTIPLIER_RAW_ELEM_SUFFIX = AVKey.MULT
+    private const val JSONMULT = "mult" // one appears in JSON files
 
     /**
      * 'Injects' creature raw ActorValue to the ActorValue reference provided.
@@ -43,7 +43,7 @@ object InjectCreatureRaw {
         setAVBooleans(actorValueRef, elementsBoolean, jsonObj)
 
         actorValueRef[AVKey.ACCEL] = ActorHumanoid.WALK_ACCEL_BASE
-        actorValueRef[AVKey.ACCELMULT] = 1.0
+        actorValueRef[AVKey.ACCELBUFF] = 1.0
     }
 
     /**
@@ -60,11 +60,11 @@ object InjectCreatureRaw {
             // roll fudge dice and get value [-3, 3] as [0, 6]
             val varSelected = Fudge3(SecureRandom()).rollForArray()
             // get multiplier from json. Assuming percentile
-            val multiplier = jsonObject.get(s + MULTIPLIER_RAW_ELEM_SUFFIX).asJsonArray.get(varSelected).asInt
+            val multiplier = jsonObject.get(s + JSONMULT).asJsonArray.get(varSelected).asInt
             val realValue = baseValue * multiplier / 100.0
 
             avRef[s] = realValue
-            avRef[s + MULTIPLIER_RAW_ELEM_SUFFIX] = 1.0 // use multiplied value as 'base' for all sort of things
+            avRef[s + "buff"] = 1.0 // buffed value: use multiplied value as 'base' for all sort of things
         }
     }
 
@@ -113,7 +113,6 @@ object InjectCreatureRaw {
 
     /**
      * Fetch and set actor values that should multiplier be applied to the base value of 1.
-     * E.g. physiquemult
      * @param avRef
      * *
      * @param elemSet

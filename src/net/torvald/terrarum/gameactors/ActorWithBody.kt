@@ -23,6 +23,10 @@ import java.util.*
  */
 open class ActorWithBody : Actor() {
 
+
+    /** !! ActorValue macros are on the very bottom of the source !! **/
+
+
     override var actorValue: ActorValue = ActorValue()
 
     @Transient internal var sprite: SpriteAnimation? = null
@@ -93,10 +97,13 @@ open class ActorWithBody : Actor() {
     /**
      * Physical properties.
      */
+    /** Apparent scale. Use "avBaseScale" for base scale */
     var scale: Double
-        get() = actorValue.getAsDouble(AVKey.SCALE) ?: 1.0
-        set(value) = actorValue.set(AVKey.SCALE, value)
+        get() = (actorValue.getAsDouble(AVKey.SCALE) ?: 1.0) *
+                (actorValue.getAsDouble(AVKey.SCALEBUFF) ?: 1.0)
+        set(value) = actorValue.set(AVKey.SCALE, value / (actorValue.getAsDouble(AVKey.SCALEBUFF) ?: 1.0))
     @Transient val MASS_LOWEST = 0.1 // Kilograms
+    /** Apparent mass. Use "avBaseMass" for base mass */
     var mass: Double
         get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT * Math.pow(scale, 3.0)
         set(value) {
@@ -107,7 +114,7 @@ open class ActorWithBody : Actor() {
                 actorValue[AVKey.BASEMASS] = MASS_LOWEST
             }
 
-            actorValue[AVKey.BASEMASS] = value
+            actorValue[AVKey.BASEMASS] = value / Math.pow(scale, 3.0)
         }
     @Transient private val MASS_DEFAULT: Double = 60.0
     /** Valid range: [0, 1]  */
@@ -1134,16 +1141,45 @@ open class ActorWithBody : Actor() {
             return if (Math.abs(x) > ceil) ceil else x
         }
     }
+
+    // gameplay-related actorvalue macros
+
+    var avBaseScale: Double // use canonical "scale" for apparent scale (base * buff)
+        get() = actorValue.getAsDouble(AVKey.SCALE) ?: 1.0
+        set(value) { actorValue[AVKey.SCALE] = value }
+    /** Apparent strength */
+    var avStrength: Double
+        get() = (actorValue.getAsDouble(AVKey.STRENGTH) ?: 0.0) *
+                (actorValue.getAsDouble(AVKey.STRENGTHBUFF) ?: 0.0) * scale
+        set(value) {
+            actorValue[AVKey.STRENGTH] =
+                    value /
+                    ((actorValue.getAsDouble(AVKey.STRENGTHBUFF) ?: 1.0) * (avBaseStrength ?: 1.0))
+        }
+    var avBaseStrength: Double?
+        get() = actorValue.getAsDouble(AVKey.STRENGTH)
+        set(value) { actorValue[AVKey.STRENGTH] = value!! }
+    var avBaseMass: Double
+        get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT
+        set(value) { actorValue[AVKey.BASEMASS] = value }
+    val avAcceleration: Double
+        get() = actorValue.getAsDouble(AVKey.ACCEL)!! *
+                actorValue.getAsDouble(AVKey.ACCELBUFF)!! *
+                scale.sqrt()
+    val avSpeedCap: Double
+        get() = actorValue.getAsDouble(AVKey.SPEED)!! *
+                actorValue.getAsDouble(AVKey.SPEEDBUFF)!! *
+                scale.sqrt()
 }
 
 fun Double.floorInt() = Math.floor(this).toInt()
-fun Float.floorInt() = FastMath.floor(this).toInt()
-fun Float.ceilInt() = FastMath.ceil(this).toInt()
+fun Float.floorInt() = FastMath.floor(this)
+fun Float.ceilInt() = FastMath.ceil(this)
 fun Double.round() = Math.round(this).toDouble()
 fun Double.floor() = Math.floor(this)
 fun Double.ceil() = this.floor() + 1.0
 fun Double.roundInt(): Int = Math.round(this).toInt()
-fun Float.roundInt(): Int = Math.round(this).toInt()
+fun Float.roundInt(): Int = Math.round(this)
 fun Double.abs() = Math.abs(this)
 fun Double.sqr() = this * this
 fun Double.sqrt() = Math.sqrt(this)

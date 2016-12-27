@@ -39,13 +39,13 @@ object PlayerBuilderSigrid {
         p.actorValue = ActorValue()
         p.actorValue[AVKey.SCALE] = 1.0
         p.actorValue[AVKey.SPEED] = 4.0
-        p.actorValue[AVKey.SPEEDMULT] = 1.0
+        p.actorValue[AVKey.SPEEDBUFF] = 1.0
         p.actorValue[AVKey.ACCEL] = ActorHumanoid.WALK_ACCEL_BASE
-        p.actorValue[AVKey.ACCELMULT] = 1.0
+        p.actorValue[AVKey.ACCELBUFF] = 1.0
         p.actorValue[AVKey.JUMPPOWER] = 5.0
 
         p.actorValue[AVKey.BASEMASS] = 80.0
-        p.actorValue[AVKey.PHYSIQUEMULT] = 1 // Constant 1.0 for player, meant to be used by random mobs
+        p.actorValue[AVKey.SCALEBUFF] = 1.0 // Constant 1.0 for player, meant to be used by random mobs
         /**
          * fixed value, or 'base value', from creature strength of Dwarf Fortress.
          * Human race uses 1000. (see CreatureHuman.json)
