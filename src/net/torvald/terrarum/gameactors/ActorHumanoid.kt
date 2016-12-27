@@ -2,7 +2,6 @@ package net.torvald.terrarum.gameactors
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
@@ -11,7 +10,6 @@ import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.realestate.RealEstateUtility
 import org.dyn4j.geometry.Vector2
 import org.lwjgl.input.Controller
-import org.lwjgl.input.Controllers
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
 import java.util.*
@@ -86,7 +84,6 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     // MOVEMENT RELATED FUNCTIONS //
     ////////////////////////////////
 
-    var gamepad: Controller? = null
     var axisX = 0f
     var axisY = 0f
     var axisRX = 0f
@@ -121,7 +118,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     internal var noClip = false
 
-    @Transient private val AXIS_POSMAX = 1.0f
+    @Transient private val AXIS_KEYBOARD = -13372f // leetz
     @Transient private val GAMEPAD_JUMP = 7
 
     protected var isUpDown = false
@@ -160,6 +157,10 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             isLeftDown = false
             isRightDown = false
             isJumpDown = false
+            axisX = 0f
+            axisY = 0f
+            axisRX = 0f
+            axisRY = 0f
         }
 
         // update inventory items
@@ -198,12 +199,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             isRightDown = isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)
             isJumpDown = isFuncDown(input, EnumKeyFunc.JUMP)
 
-            if (Terrarum.hasController) {
-                gamepad = Controllers.getController(0)
-                axisX = gamepad!!.getAxisValue(0)
-                axisY = gamepad!!.getAxisValue(1)
-                axisRX = gamepad!!.getAxisValue(2)
-                axisRY = gamepad!!.getAxisValue(3)
+            if (Terrarum.controller != null) {
+                axisX =  Terrarum.controller!!.getAxisValue(3)
+                axisY =  Terrarum.controller!!.getAxisValue(2)
+                axisRX = Terrarum.controller!!.getAxisValue(1)
+                axisRY = Terrarum.controller!!.getAxisValue(0)
 
                 // deadzonning
                 if (Math.abs(axisX) < Terrarum.CONTROLLER_DEADZONE) axisX = 0f
@@ -211,7 +211,8 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                 if (Math.abs(axisRX) < Terrarum.CONTROLLER_DEADZONE) axisRX = 0f
                 if (Math.abs(axisRY) < Terrarum.CONTROLLER_DEADZONE) axisRY = 0f
 
-                gamepad!!.isButtonPressed(GAMEPAD_JUMP)
+                isJumpDown = isFuncDown(input, EnumKeyFunc.JUMP) ||
+                             Terrarum.controller!!.isButtonPressed(GAMEPAD_JUMP)
             }
         }
     }
@@ -230,6 +231,10 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         }
     }
 
+    private val hasController: Boolean
+        get() = if (isGamer) Terrarum.controller != null
+                else true
+    
     override fun processInput(gc: GameContainer, delta: Int, input: Input) {
         ///////////////////
         // MOUSE CONTROL //
@@ -252,7 +257,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         /**
          * L-R stop
          */
-        if (isGamer && Terrarum.hasController && !isWalkingH) {
+        if (hasController && !isWalkingH) {
             if (axisX == 0f) {
                 walkHStop()
             }
@@ -265,7 +270,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         /**
          * U-D stop
          */
-        if (isGamer && Terrarum.hasController) {
+        if (hasController) {
             if (axisY == 0f) {
                 walkVStop()
             }
@@ -281,26 +286,26 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
          * Left/Right movement
          */
 
-        if (isGamer && Terrarum.hasController) {
+        if (hasController) {
             if (axisX != 0f) {
                 walkHorizontal(axisX < 0f, axisX.abs())
             }
         }
         // ↑F, ↓S
         if (isRightDown && !isLeftDown) {
-            walkHorizontal(false, AXIS_POSMAX)
+            walkHorizontal(false, AXIS_KEYBOARD)
             prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
         } // ↓F, ↑S
         else if (isLeftDown && !isRightDown) {
-            walkHorizontal(true, AXIS_POSMAX)
+            walkHorizontal(true, AXIS_KEYBOARD)
             prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
         } // ↓F, ↓S
         /*else if (isLeftDown && isRightDown) {
                if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
-                   walkHorizontal(false, AXIS_POSMAX)
+                   walkHorizontal(false, AXIS_KEYBOARD)
                    prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
                } else if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)) {
-                   walkHorizontal(true, AXIS_POSMAX)
+                   walkHorizontal(true, AXIS_KEYBOARD)
                    prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
                }
            }*/
@@ -309,26 +314,26 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
          * Up/Down movement
          */
         if (noClip) {
-            if (isGamer && Terrarum.hasController) {
+            if (hasController) {
                 if (axisY != 0f) {
                     walkVertical(axisY < 0, axisY.abs())
                 }
             }
             // ↑E, ↓D
             if (isDownDown && !isUpDown) {
-                walkVertical(false, AXIS_POSMAX)
+                walkVertical(false, AXIS_KEYBOARD)
                 prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
             } // ↓E, ↑D
             else if (isUpDown && !isDownDown) {
-                walkVertical(true, AXIS_POSMAX)
+                walkVertical(true, AXIS_KEYBOARD)
                 prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
             } // ↓E, ↓D
             /*else if (isUpDown && isDownDown) {
                 if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
-                    walkVertical(false, AXIS_POSMAX)
+                    walkVertical(false, AXIS_KEYBOARD)
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
                 } else if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)) {
-                    walkVertical(true, AXIS_POSMAX)
+                    walkVertical(true, AXIS_KEYBOARD)
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
                 }
             }*/
@@ -345,7 +350,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                 jump()
             }
             else {
-                walkVertical(true, AXIS_POSMAX)
+                walkVertical(true, AXIS_KEYBOARD)
             }
         }
         else {
@@ -376,23 +381,33 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
      * Be warned.
      *
      * @param left (even if the game is joypad controlled, you must give valid value)
-     * @param absAxisVal (set AXIS_POSMAX if keyboard controlled)
+     * @param absAxisVal (set AXIS_KEYBOARD if keyboard controlled)
      * @author minjaesong
      */
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
         if ((!walledLeft && left) || (!walledRight && !left)) {
             readonly_totalX =
                     absMax( // keyboard
-                            avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f),
+                            if (absAxisVal == AXIS_KEYBOARD)
+                                avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f)
+                            else
+                                0.0
+                            ,
                             // gamepad
-                            avAcceleration * (if (left) -1f else 1f) * absAxisVal
+                            if (absAxisVal != AXIS_KEYBOARD)
+                                avAcceleration * (if (left) -1f else 1f) * absAxisVal
+                            else
+                                0.0
                     )
 
             //applyForce(Vector2(readonly_totalX, 0.0))
             walkX += readonly_totalX
+            walkX = readonly_totalX
             walkX = walkX.bipolarClamp(avSpeedCap)
 
-            walkCounterX += 1
+            if (absAxisVal == AXIS_KEYBOARD) {
+                walkCounterX += 1
+            }
 
             isWalkingH = true
         }
@@ -408,20 +423,29 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
      * @param up (even if the game is joypad controlled, you must give valid value)
      * *
-     * @param absAxisVal (set AXIS_POSMAX if keyboard controlled)
+     * @param absAxisVal (set AXIS_KEYBOARD if keyboard controlled)
      */
     private fun walkVertical(up: Boolean, absAxisVal: Float) {
         readonly_totalY =
                 absMax( // keyboard
-                        avAcceleration * applyVelo(walkCounterY) * (if (up) -1f else 1f),
+                        if (absAxisVal == AXIS_KEYBOARD)
+                            avAcceleration * applyVelo(walkCounterY) * (if (up) -1f else 1f)
+                        else
+                            0.0
+                        ,
                         // gamepad
-                        avAcceleration * (if (up) -1f else 1f) * absAxisVal
+                        if (absAxisVal != AXIS_KEYBOARD)
+                            avAcceleration * (if (up) -1f else 1f) * absAxisVal
+                        else
+                            0.0
                 )
 
         walkY += readonly_totalY
         walkY = walkY.bipolarClamp(avSpeedCap)
 
-        walkCounterY += 1
+        if (absAxisVal == AXIS_KEYBOARD) {
+            walkCounterY += 1
+        }
 
         isWalkingV = true
     }

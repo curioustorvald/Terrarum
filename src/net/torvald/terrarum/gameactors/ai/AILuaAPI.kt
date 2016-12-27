@@ -126,30 +126,54 @@ internal class AILuaAPI(val g: Globals, actor: ActorWithBody) {
         }
     }
 
-    class MoveLeft(val actor: AIControlled) : ZeroArgFunction() {
-        override fun call(): LuaValue {
+    class MoveLeft(val actor: AIControlled) : LuaFunction() {
+        override fun call(): LuaValue { // hard key press
             actor.moveLeft()
             return LuaValue.NONE
         }
+
+        /** @param amount [0.0 - 1.0] */
+        override fun call(amount: LuaValue): LuaValue { // stick tilt
+            actor.moveLeft(amount.checkdouble().toFloat())
+            return LuaValue.NONE
+        }
     }
 
-    class MoveRight(val actor: AIControlled) : ZeroArgFunction() {
-        override fun call(): LuaValue {
+    class MoveRight(val actor: AIControlled) : LuaFunction() {
+        override fun call(): LuaValue { // hard key press
             actor.moveRight()
             return LuaValue.NONE
         }
-    }
 
-    class MoveUp(val actor: AIControlled) : ZeroArgFunction() {
-        override fun call(): LuaValue {
-            actor.moveUp()
+        /** @param amount [0.0 - 1.0] */
+        override fun call(amount: LuaValue): LuaValue { // stick tilt
+            actor.moveRight(amount.checkdouble().toFloat())
             return LuaValue.NONE
         }
     }
 
-    class MoveDown(val actor: AIControlled) : ZeroArgFunction() {
-        override fun call(): LuaValue {
+    class MoveUp(val actor: AIControlled) : LuaFunction() {
+        override fun call(): LuaValue { // hard key press
+            actor.moveUp()
+            return LuaValue.NONE
+        }
+
+        /** @param amount [0.0 - 1.0] */
+        override fun call(amount: LuaValue): LuaValue { // stick tilt
+            actor.moveUp(amount.checkdouble().toFloat())
+            return LuaValue.NONE
+        }
+    }
+
+    class MoveDown(val actor: AIControlled) : LuaFunction() {
+        override fun call(): LuaValue { // hard key press
             actor.moveDown()
+            return LuaValue.NONE
+        }
+
+        /** @param amount [0.0 - 1.0] */
+        override fun call(amount: LuaValue): LuaValue { // stick tilt
+            actor.moveDown(amount.checkdouble().toFloat())
             return LuaValue.NONE
         }
     }
@@ -166,9 +190,15 @@ internal class AILuaAPI(val g: Globals, actor: ActorWithBody) {
         }
     }
 
-    class Jump(val actor: AIControlled) : ZeroArgFunction() {
+    class Jump(val actor: AIControlled) : LuaFunction() {
         override fun call(): LuaValue {
             actor.moveJump()
+            return LuaValue.NONE
+        }
+
+        /** @param amount [0.0 - 1.0] */
+        override fun call(amount: LuaValue): LuaValue { // stick tilt
+            actor.moveJump(amount.checkdouble().toFloat())
             return LuaValue.NONE
         }
     }

@@ -86,21 +86,30 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         fontGame = GameFontWhite()
         fontSmallNumbers = TinyAlphNum()
 
+        // search for real controller
+        // exclude controllers with name "Mouse", "keyboard"
+        val notControllerRegex = Regex("mouse|keyboard")
         try {
-            hasController = gc.input.controllerCount > 0
+            // gc.input.controllerCount is unreliable
+            for (i in 0..255) {
+                val controllerInQuo = Controllers.getController(i)
 
-            if (hasController) {
-                // check if the first controller is actually available
-                Controllers.getController(0).getAxisValue(0)
+                println("Controller $i: ${controllerInQuo.name}")
+
+                // check the name
+                if (!controllerInQuo.name.toLowerCase().contains(notControllerRegex)) {
+                    controller = controllerInQuo
+                    println("Controller $i selected: ${controller!!.name}")
+                    break
+                }
             }
         }
-        catch (e: ArrayIndexOutOfBoundsException) {
-            hasController = false
+        catch (e: IndexOutOfBoundsException) {
         }
 
-        if (hasController) {
-            for (c in 0..Controllers.getController(0).axisCount - 1) {
-                Controllers.getController(0).setDeadZone(c, CONTROLLER_DEADZONE)
+        if (controller != null) {
+            for (c in 0..controller!!.axisCount - 1) {
+                controller!!.setDeadZone(c, CONTROLLER_DEADZONE)
             }
         }
 
@@ -215,8 +224,10 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         val STATE_ID_TOOL_NOISEGEN = 0x200
 
-        var hasController = false
-        val CONTROLLER_DEADZONE = 0.1f
+        //var hasController = false
+        var controller: org.lwjgl.input.Controller? = null
+            private set
+        val CONTROLLER_DEADZONE = 0.2f
 
         /** Available CPU threads */
         val THREADS = Runtime.getRuntime().availableProcessors()

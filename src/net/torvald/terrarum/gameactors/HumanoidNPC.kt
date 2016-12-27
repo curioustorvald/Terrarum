@@ -84,23 +84,23 @@ open class HumanoidNPC(val luaScript: String, born: GameDate) : ActorHumanoid(bo
         //moveRight()
     }
 
-    override fun moveLeft() { // hit the buttons on the controller box
-        isLeftDown = true
+    override fun moveLeft(amount: Float) { // hit the buttons on the controller box
+        axisX = -amount
     }
 
-    override fun moveRight() { // hit the buttons on the controller box
-        isRightDown = true
+    override fun moveRight(amount: Float) { // hit the buttons on the controller box
+        axisX = amount
     }
 
-    override fun moveUp() { // hit the buttons on the controller box
-        isUpDown = true
+    override fun moveUp(amount: Float) { // hit the buttons on the controller box
+        axisY = -amount
     }
 
-    override fun moveDown() { // hit the buttons on the controller box
-        isDownDown = true
+    override fun moveDown(amount: Float) { // hit the buttons on the controller box
+        axisY = amount
     }
 
-    override fun moveJump() { // hit the buttons on the controller box
+    override fun moveJump(amount: Float) { // hit the buttons on the controller box
         isJumpDown = true
     }
 
