@@ -7,10 +7,14 @@ package net.torvald.terrarum.gameactors.ai.scripts
  */
 object PokemonNPCAI {
     operator fun invoke(): String = """
-ai.jump()
-ai.moveRight()
 
-thisActorInfo = ai.getSelfActorInfo()
-print(thisActorInfo.strength)
+counter = 1
+
+function update(delta)
+    ai.moveRight()
+    print("delta", delta)
+    counter = counter + delta
+    print("testcounter", counter)
+end
 """
 }

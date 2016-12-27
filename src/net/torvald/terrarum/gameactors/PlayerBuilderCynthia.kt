@@ -28,6 +28,13 @@ object PlayerBuilderCynthia {
 
         p.setPosition(4096.0 * MapDrawer.TILE_SIZE, 300.0 * MapDrawer.TILE_SIZE)
 
+
+
+
+        p.referenceID = 12345678
+
+
+
         return p
     }
 

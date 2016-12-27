@@ -4,10 +4,7 @@ import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.ai.AILuaAPI
 import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
-import org.luaj.vm2.Globals
-import org.luaj.vm2.LoadState
-import org.luaj.vm2.LuaError
-import org.luaj.vm2.LuaValue
+import org.luaj.vm2.*
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.*
 import org.luaj.vm2.lib.jse.JseBaseLib
@@ -27,8 +24,18 @@ open class HumanoidNPC(val luaScript: String, born: GameDate) : ActorHumanoid(bo
 
     protected val luag: Globals = JsePlatform.standardGlobals()
 
+    /**
+     * Initialised in init block.
+     * Use function "function update(delta)" to step the AI.
+     */
+    protected val luaInstance: LuaValue
+
+    private val aiLuaAPI: AILuaAPI
+
     init {
-        AILuaAPI(luag, this)
+        aiLuaAPI = AILuaAPI(luag, this)
+        luaInstance = luag.load(luaScript)
+        luaInstance.call()
     }
 
     // we're having InventoryItem data so that this class could be somewhat universal
@@ -67,17 +74,12 @@ open class HumanoidNPC(val luaScript: String, born: GameDate) : ActorHumanoid(bo
         isVisible = true
     }
 
-
-    init {
-        //val inputStream = javaClass.getResourceAsStream(scriptPath)
-        //runCommand(InputStreamReader(inputStream), scriptPath)
-    }
-
-
     override fun update(gc: GameContainer, delta: Int) {
         super.update(gc, delta)
+        aiLuaAPI.update(delta)
+
         //runCommand(luaScript)
-        luag.load(luaScript).call()
+        luag.get("update").call(delta.toLuaValue())
 
         //moveRight()
     }
@@ -172,4 +174,6 @@ open class HumanoidNPC(val luaScript: String, born: GameDate) : ActorHumanoid(bo
             }
         }
     }
+
+    fun Int.toLuaValue(): LuaValue = LuaInteger.valueOf(this)
 }

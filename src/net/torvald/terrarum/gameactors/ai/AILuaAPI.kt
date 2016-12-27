@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameactors.ai
 
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -13,13 +14,13 @@ import org.luaj.vm2.lib.ZeroArgFunction
 /**
  * Created by minjaesong on 16-10-24.
  */
-internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
+internal class AILuaAPI(val g: Globals, actor: ActorWithBody) {
 
     init {
         if (actor !is AIControlled)
             throw IllegalArgumentException("The actor is not AIControlled! $actor")
 
-        // load things. WARNING: THIS IS MANUAL!
+        // load functions and set up constants
         g["ai"] = LuaValue.tableOf()
 
         g["ai"]["getSelfActorInfo"] = GetSelfActorInfo(actor)
@@ -35,7 +36,10 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         g["ai"]["moveRight"] = MoveRight(actor)
         g["ai"]["moveTo"] = MoveTo(actor)
         g["ai"]["jump"] = Jump(actor)
+    }
 
+    fun update(delta: Int) {
+        // set up variables
     }
 
     companion object {
@@ -59,7 +63,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
 
             t["collisionType"] = actor.collisionType
 
-            t["strength"] = actor.actorValue.getAsInt(AVKey.STRENGTH) ?: 0
+            t["strength"] = actor.avStrength
 
             val lumrgb: Int = actor.actorValue.getAsInt(AVKey.LUMINOSITY) ?: 0
             val MUL_2 = LightmapRenderer.MUL_2
