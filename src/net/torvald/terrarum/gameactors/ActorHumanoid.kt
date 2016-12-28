@@ -127,7 +127,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     protected var isRightDown = false
     protected var isJumpDown = false
     protected val isGamer: Boolean
-        get() = this is Player // FIXME true iff composed by PlayableActorDelegate
+        get() = this == Terrarum.ingame.player
 
 
     private val nullItem = object : InventoryItem() {
@@ -387,23 +387,15 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
         if ((!walledLeft && left) || (!walledRight && !left)) {
             readonly_totalX =
-                    absMax( // keyboard
-                            if (absAxisVal == AXIS_KEYBOARD)
-                                avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f)
-                            else
-                                0.0
-                            ,
-                            // gamepad
-                            if (absAxisVal != AXIS_KEYBOARD)
-                                avAcceleration * (if (left) -1f else 1f) * absAxisVal
-                            else
-                                0.0
-                    )
+                    if (absAxisVal == AXIS_KEYBOARD)
+                        avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f)
+                    else
+                        avAcceleration * (if (left) -1f else 1f) * absAxisVal
 
-            //applyForce(Vector2(readonly_totalX, 0.0))
-            walkX += readonly_totalX
-            walkX = readonly_totalX
-            walkX = walkX.bipolarClamp(avSpeedCap)
+            if (absAxisVal != AXIS_KEYBOARD)
+                walkX = walkX.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal)
+            else
+                walkX = walkX.plus(readonly_totalX).bipolarClamp(avSpeedCap)
 
             if (absAxisVal == AXIS_KEYBOARD) {
                 walkCounterX += 1
@@ -413,10 +405,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         }
 
         // Heading flag
-        if (left)
-            walkHeading = LEFT
-        else
-            walkHeading = RIGHT
+        walkHeading = if (left) LEFT else RIGHT
     }
 
     /**
@@ -427,21 +416,15 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
      */
     private fun walkVertical(up: Boolean, absAxisVal: Float) {
         readonly_totalY =
-                absMax( // keyboard
-                        if (absAxisVal == AXIS_KEYBOARD)
-                            avAcceleration * applyVelo(walkCounterY) * (if (up) -1f else 1f)
-                        else
-                            0.0
-                        ,
-                        // gamepad
-                        if (absAxisVal != AXIS_KEYBOARD)
-                            avAcceleration * (if (up) -1f else 1f) * absAxisVal
-                        else
-                            0.0
-                )
+                if (absAxisVal == AXIS_KEYBOARD)
+                    avAcceleration * applyVelo(walkCounterY) * (if (up) -1f else 1f)
+                else
+                    avAcceleration * (if (up) -1f else 1f) * absAxisVal
 
-        walkY += readonly_totalY
-        walkY = walkY.bipolarClamp(avSpeedCap)
+        if (absAxisVal != AXIS_KEYBOARD)
+            walkY = walkY.plus(readonly_totalY).bipolarClamp(avSpeedCap * absAxisVal)
+        else
+            walkY = walkY.plus(readonly_totalY).bipolarClamp(avSpeedCap)
 
         if (absAxisVal == AXIS_KEYBOARD) {
             walkCounterY += 1

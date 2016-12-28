@@ -10,6 +10,7 @@ import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blendScreen
+import net.torvald.terrarum.gameactors.ActorHumanoid
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -80,9 +81,9 @@ class BasicDebugInfoWindow : UICanvas {
 
         printLine(g, 1, "posX "
                 + ccG
-                + "${hitbox.pointedX.toString()}"
+                + "${hitbox.pointedX}"
                 + " ("
-                + "${(hitbox.pointedX / MapDrawer.TILE_SIZE).toInt().toString()}"
+                + "${(hitbox.pointedX / MapDrawer.TILE_SIZE).toInt()}"
                 + ")")
         printLine(g, 2, "posY "
                 + ccG
@@ -143,6 +144,14 @@ class BasicDebugInfoWindow : UICanvas {
                 Terrarum.WIDTH - histogramW - 30,
                 Terrarum.HEIGHT - histogramH - 30
         )
+        if (Terrarum.controller != null) {
+            drawGamepadAxis(g,
+                    Terrarum.controller!!.getAxisValue(3),
+                    Terrarum.controller!!.getAxisValue(2),
+                    Terrarum.WIDTH - 135,
+                    40
+            )
+        }
 
         /**
          * Top right
@@ -195,7 +204,7 @@ class BasicDebugInfoWindow : UICanvas {
         val histogramMax = histogram.screen_tiles.toFloat()
 
         g.color = uiColour
-        g.fillRect(x.toFloat(), y.toFloat(), w.plus(1).toFloat(), h.toFloat())
+        g.fillRect(x.toFloat(), y.toFloat(), w.plus(1), h)
         g.color = Color.gray
         g.drawString("0", x.toFloat(), y.toFloat() + h + 2)
         g.drawString("255", x.toFloat() + w + 1 - 8*3, y.toFloat() + h + 2)
@@ -211,7 +220,7 @@ class BasicDebugInfoWindow : UICanvas {
                     }
                 }
 
-                val bar_x = x + (w / w.minus(1).toFloat()) * i.toFloat()
+                val bar_x = x + (w / w.minus(1f)) * i.toFloat()
                 val bar_h = FastMath.ceil(h / histogramMax * histogram_value.toFloat()).toFloat()
                 val bar_y = y + (h / histogramMax) - bar_h + h
                 val bar_w = 1f
@@ -221,6 +230,29 @@ class BasicDebugInfoWindow : UICanvas {
             }
         }
         blendNormal()
+    }
+
+    private fun drawGamepadAxis(g: Graphics, axisX: Float, axisY: Float, uiX: Int, uiY: Int) {
+        val uiColour = Color(0xAA000000.toInt())
+        val w = 128f
+        val h = 128f
+        val halfW = w / 2f
+        val halfH = h / 2f
+
+        val pointDX = axisX * halfW
+        val pointDY = axisY * halfH
+
+        val padName = if (Terrarum.controller!!.name.isEmpty()) "Gamepad"
+                      else Terrarum.controller!!.name
+
+        blendNormal()
+
+        g.color = uiColour
+        g.fillRect(uiX.toFloat(), uiY.toFloat(), w, h)
+        g.color = Color.white
+        g.drawLine(uiX + halfW, uiY + halfH, uiX + halfW + pointDX, uiY + halfH + pointDY)
+        g.color = Color.gray
+        g.drawString(padName, uiX + w / 2 - (padName.length) * 4, uiY.toFloat() + h + 2)
     }
 
     private fun line(i: Int): Float = i * 10f

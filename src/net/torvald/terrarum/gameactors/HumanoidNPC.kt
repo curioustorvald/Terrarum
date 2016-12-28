@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.ai.AILuaAPI
+import net.torvald.terrarum.gameactors.ai.scripts.EncapsulatedString
 import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
 import org.luaj.vm2.*
@@ -18,7 +19,7 @@ import java.io.Reader
 /**
  * Created by minjaesong on 16-01-31.
  */
-open class HumanoidNPC(val luaScript: String, born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
+open class HumanoidNPC(luaScript: EncapsulatedString, born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
 
     override val scriptPath: String = ""
 
@@ -34,7 +35,7 @@ open class HumanoidNPC(val luaScript: String, born: GameDate) : ActorHumanoid(bo
 
     init {
         aiLuaAPI = AILuaAPI(luag, this)
-        luaInstance = luag.load(luaScript)
+        luaInstance = luag.load(luaScript.getString(), luaScript.javaClass.simpleName)
         luaInstance.call()
     }
 
@@ -78,10 +79,7 @@ open class HumanoidNPC(val luaScript: String, born: GameDate) : ActorHumanoid(bo
         super.update(gc, delta)
         aiLuaAPI.update(delta)
 
-        //runCommand(luaScript)
         luag.get("update").call(delta.toLuaValue())
-
-        //moveRight()
     }
 
     override fun moveLeft(amount: Float) { // hit the buttons on the controller box

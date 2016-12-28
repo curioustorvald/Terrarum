@@ -12,7 +12,7 @@ object PlayerBuilderCynthia {
 
     operator fun invoke(): ActorWithBody {
         //val p: Player = Player(GameDate(100, 143)) // random value thrown
-        val p: HumanoidNPC = HumanoidNPC(PokemonNPCAI(), GameDate(100, 143)) // random value thrown
+        val p: HumanoidNPC = HumanoidNPC(PokemonNPCAI, GameDate(100, 143)) // random value thrown
         InjectCreatureRaw(p.actorValue, "CreatureHuman.json")
 
         p.actorValue[AVKey.__PLAYER_QUICKBARSEL] = 0

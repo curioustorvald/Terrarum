@@ -227,7 +227,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         //var hasController = false
         var controller: org.lwjgl.input.Controller? = null
             private set
-        val CONTROLLER_DEADZONE = 0.2f
+        val CONTROLLER_DEADZONE = 0.1f
 
         /** Available CPU threads */
         val THREADS = Runtime.getRuntime().availableProcessors()
