@@ -283,7 +283,6 @@ constructor() : BasicGameState() {
         blendNormal()
 
 
-        // FIXME skybox is not scaled at all
         drawSkybox(worldDrawFrameBuffer.graphics)
 
 

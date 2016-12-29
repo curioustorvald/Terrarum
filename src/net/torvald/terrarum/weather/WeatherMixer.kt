@@ -29,8 +29,6 @@ object WeatherMixer {
 
     lateinit var mixedWeather: BaseModularWeather
 
-    private var skyBoxCurrent = Rectangle(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
-    private var skyBoxNext = Rectangle(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
     val globalLightNow = Color(0)
 
     // Weather indices
@@ -84,10 +82,15 @@ object WeatherMixer {
         val skyColourFill = GradientFill(
                 0f, 0f,
                 getGradientColour(skyboxColourMap, 0, timeNow),
-                0f, Terrarum.HEIGHT.toFloat(),
+                0f, Terrarum.HEIGHT / Terrarum.ingame.screenZoom,
                 getGradientColour(skyboxColourMap, 1, timeNow)
         )
-        g.fill(skyBoxCurrent, skyColourFill)
+        g.fill(Rectangle(
+                0f, 0f,
+                Terrarum.WIDTH / Terrarum.ingame.screenZoom,
+                Terrarum.HEIGHT / Terrarum.ingame.screenZoom),
+                skyColourFill
+        )
 
         // calculate global light
         val gradCol = getGradientColour(lightColourMap, 0, timeNow)
