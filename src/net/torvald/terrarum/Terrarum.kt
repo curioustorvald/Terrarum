@@ -224,7 +224,6 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         val STATE_ID_TOOL_NOISEGEN = 0x200
 
-        //var hasController = false
         var controller: org.lwjgl.input.Controller? = null
             private set
         val CONTROLLER_DEADZONE = 0.1f

@@ -27,14 +27,18 @@ open class HumanoidNPC(luaScript: EncapsulatedString, born: GameDate) : ActorHum
 
     /**
      * Initialised in init block.
-     * Use function "function update(delta)" to step the AI.
+     * Use lua function "update(delta)" to step the AI.
      */
     protected val luaInstance: LuaValue
 
     private val aiLuaAPI: AILuaAPI
 
     init {
+        luag["io"] = LuaValue.NIL
+        luag["os"] = LuaValue.NIL
+        luag["luajava"] = LuaValue.NIL
         aiLuaAPI = AILuaAPI(luag, this)
+        // load the script and execute it (initialises target script)
         luaInstance = luag.load(luaScript.getString(), luaScript.javaClass.simpleName)
         luaInstance.call()
     }
@@ -77,8 +81,8 @@ open class HumanoidNPC(luaScript: EncapsulatedString, born: GameDate) : ActorHum
 
     override fun update(gc: GameContainer, delta: Int) {
         super.update(gc, delta)
-        aiLuaAPI.update(delta)
 
+        // run "update()" function in the script
         luag.get("update").call(delta.toLuaValue())
     }
 

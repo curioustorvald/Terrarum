@@ -4,11 +4,9 @@ import net.torvald.imagefont.GameFontBase
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.audio.AudioResourceLibrary
 import net.torvald.terrarum.concurrent.ThreadPool
+import net.torvald.terrarum.console.*
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.console.Authenticator
-import net.torvald.terrarum.console.CommandDict
-import net.torvald.terrarum.console.SetGlobalLightOverride
 import net.torvald.terrarum.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.gamecontroller.Key
@@ -226,6 +224,12 @@ constructor() : BasicGameState() {
         consoleHandler.update(gc, delta)
         debugWindow.update(gc, delta)
         notifier.update(gc, delta)
+
+        // update debuggers using javax.swing //
+        if (Authenticator.b()) {
+            AVTracker.update()
+            ActorsList.update()
+        }
 
 
         /////////////////////////

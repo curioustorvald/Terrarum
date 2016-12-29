@@ -3,19 +3,16 @@ package net.torvald.terrarum.ui
 import com.jme3.math.FastMath
 import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.gameworld.PairedMapLayer
-import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapdrawer.MapDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blendScreen
-import net.torvald.terrarum.gameactors.ActorHumanoid
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Input
-import java.util.*
 
 /**
  * Created by minjaesong on 16-03-14.
@@ -63,9 +60,6 @@ class BasicDebugInfoWindow : UICanvas {
 
         val player = Terrarum.ingame.player
 
-        val sb = StringBuilder()
-        val formatter = Formatter(sb)
-
         val mouseTileX = ((MapCamera.cameraX + gc.input.mouseX / Terrarum.ingame.screenZoom) / MapDrawer.TILE_SIZE).toInt()
         val mouseTileY = ((MapCamera.cameraY + gc.input.mouseY / Terrarum.ingame.screenZoom) / MapDrawer.TILE_SIZE).toInt()
 
@@ -112,7 +106,7 @@ class BasicDebugInfoWindow : UICanvas {
         val rawB = valRaw.rawB()
 
         lightVal = if (valRaw == -1) "—"
-                   else valRaw.toInt().toString() + " (" +
+                   else valRaw.toString() + " (" +
                     rawR.toString() + " " +
                     rawG.toString() + " " +
                     rawB.toString() + ")"
@@ -182,11 +176,11 @@ class BasicDebugInfoWindow : UICanvas {
     }
 
     private fun printLine(g: Graphics, l: Int, s: String) {
-        g.drawString(s, 10f, line(l).toFloat())
+        g.drawString(s, 10f, line(l))
     }
 
     private fun printLineColumn(g: Graphics, col: Int, row: Int, s: String) {
-        g.drawString(s, (10 + column(col)).toFloat(), line(row).toFloat())
+        g.drawString(s, (10 + column(col)), line(row))
     }
 
     val histogramW = 256
@@ -194,9 +188,9 @@ class BasicDebugInfoWindow : UICanvas {
 
     private fun drawHistogram(g: Graphics, histogram: LightmapRenderer.Histogram, x: Int, y: Int) {
         val uiColour = Color(0xAA000000.toInt())
-        val barR = Color(0xDD0000.toInt())
-        val barG = Color(0x00DD00.toInt())
-        val barB = Color(0x0000DD.toInt())
+        val barR = Color(0xDD0000)
+        val barG = Color(0x00DD00)
+        val barB = Color(0x0000DD)
         val barColour = arrayOf(barR, barG, barB)
         val w = histogramW.toFloat()
         val h = histogramH.toFloat()

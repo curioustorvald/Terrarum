@@ -16,7 +16,6 @@ internal object SetAV : ConsoleCommand {
     val ccM = GameFontBase.colToCode["m"]
 
     override fun printUsage() {
-
         Echo("${ccW}Set actor value of specific target to desired value.")
         Echo("${ccW}Usage: ${ccY}setav ${ccG}(id) <av> <val>")
         Echo("${ccW}blank ID for player. Data type will be inferred automatically.")

@@ -14,7 +14,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
 /**
  * Created by minjaesong on 16-10-24.
  */
-internal class AILuaAPI(val g: Globals, actor: ActorWithBody) {
+internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
 
     init {
         if (actor !is AIControlled)
@@ -36,10 +36,11 @@ internal class AILuaAPI(val g: Globals, actor: ActorWithBody) {
         g["ai"]["moveRight"] = MoveRight(actor)
         g["ai"]["moveTo"] = MoveTo(actor)
         g["ai"]["jump"] = Jump(actor)
-    }
 
-    fun update(delta: Int) {
-        // set up variables
+
+        g["game"] = LuaValue.tableOf()
+        g["game"]["version"] = GameVersion()
+        g["game"]["versionRaw"] = GameVersionRaw()
     }
 
     companion object {
@@ -47,35 +48,43 @@ internal class AILuaAPI(val g: Globals, actor: ActorWithBody) {
          * Reads arbitrary ActorWithBody and returns its information as Lua table
          */
         fun composeActorObject(actor: ActorWithBody): LuaTable {
-            val t = LuaValue.tableOf()
+            val t: LuaTable = LuaValue.tableOf()
 
-            t["name"] = actor.actorValue.getAsString(AVKey.NAME)
-            t["posX"] = actor.hitbox.centeredX
-            t["posY"] = actor.hitbox.centeredY
+            t["name"] = actor.actorValue.getAsString(AVKey.NAME).toLua()
+            t["posX"] = actor.hitbox.centeredX.toLua()
+            t["posY"] = actor.hitbox.centeredY.toLua()
 
-            t["veloX"] = actor.veloX
-            t["veloY"] = actor.veloY
+            t["veloX"] = actor.veloX.toLua()
+            t["veloY"] = actor.veloY.toLua()
 
-            t["width"] = actor.hitbox.width
-            t["height"] = actor.hitbox.height
+            t["width"] = actor.hitbox.width.toLua()
+            t["height"] = actor.hitbox.height.toLua()
 
-            t["mass"] = actor.mass
+            t["mass"] = actor.mass.toLua()
 
-            t["collisionType"] = actor.collisionType
+            t["collisionType"] = actor.collisionType.toLua()
 
-            t["strength"] = actor.avStrength
+            t["strength"] = actor.avStrength.toLua()
 
             val lumrgb: Int = actor.actorValue.getAsInt(AVKey.LUMINOSITY) ?: 0
             val MUL_2 = LightmapRenderer.MUL_2
             val MUL = LightmapRenderer.MUL
             val CHMAX = LightmapRenderer.CHANNEL_MAX
-            t["luminosityRGB"] = lumrgb
+            t["luminosityRGB"] = lumrgb.toLua()
             t["luminosity"] = (lumrgb.div(MUL_2).and(CHMAX).times(3) +
                               lumrgb.div(MUL).and(CHMAX).times(4) +
-                              lumrgb.and(1023)) / 8 // quick luminosity calculation
+                              lumrgb.and(1023)).div(8.0).toLua() // quick luminosity calculation
 
             return t
         }
+
+        fun Double.toLua() = LuaValue.valueOf(this)
+        fun Int.toLua() = LuaValue.valueOf(this)
+        fun String.toLua() = LuaValue.valueOf(this)
+        fun Double?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
+        fun Int?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
+        fun String?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
+
     }
 
     class GetSelfActorInfo(val actor: ActorWithBody) : ZeroArgFunction() {
@@ -203,4 +212,18 @@ internal class AILuaAPI(val g: Globals, actor: ActorWithBody) {
         }
     }
 
+
+
+
+    class GameVersion() : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return Terrarum.VERSION_STRING.toLua()
+        }
+    }
+
+    class GameVersionRaw() : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return Terrarum.VERSION_RAW.toLua()
+        }
+    }
 }

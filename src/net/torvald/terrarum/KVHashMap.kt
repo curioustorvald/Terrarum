@@ -2,6 +2,7 @@ package net.torvald.terrarum
 
 import com.google.gson.JsonPrimitive
 import java.util.*
+import java.util.function.Consumer
 
 /**
  * Created by minjaesong on 15-12-30.
@@ -101,5 +102,9 @@ open class KVHashMap {
 
     val keySet: Set<Any>
         get() = hashMap.keys
+
+    fun remove(key: String) {
+        hashMap.remove(key, hashMap[key])
+    }
 
 }
