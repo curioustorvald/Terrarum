@@ -22,11 +22,11 @@ abstract class Actor : Comparable<Actor>, Runnable {
 
     override fun equals(other: Any?) = referenceID == (other as Actor).referenceID
     override fun hashCode() = referenceID
-    override fun toString() = "Actor, " +
+    override fun toString() =
             if (actorValue.getAsString(AVKey.NAME).isNullOrEmpty())
-                "ID: ${hashCode()}"
+                "${hashCode()}"
             else
-                "ID: ${hashCode()} (${actorValue.getAsString(AVKey.NAME)})"
+                "${hashCode()} (${actorValue.getAsString(AVKey.NAME)})"
     override fun compareTo(other: Actor): Int = (this.referenceID - other.referenceID).sign()
 
     fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else 0
