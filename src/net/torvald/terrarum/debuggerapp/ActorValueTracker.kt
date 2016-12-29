@@ -77,8 +77,8 @@ class ActorValueTracker constructor() : JFrame() {
             override fun mousePressed(e: MouseEvent?) {
                 if (actorValue != null && modavInputKey.text.isNotBlank()) {
                     actorValue!!.remove(modavInputKey.text)
-                    Echo("${SetAV.ccW}Removed key ${SetAV.ccG}${modavInputKey.text} ${SetAV.ccW}of ${SetAV.ccY}${actor!!.referenceID}")
-                    println("[ActorValueTracker] Removed key '${modavInputKey.text}' of $actor")
+                    Echo("${SetAV.ccW}Removed ${SetAV.ccM}${modavInputKey.text} ${SetAV.ccW}of ${SetAV.ccY}${actor!!.referenceID}")
+                    println("[ActorValueTracker] Removed ActorValue '${modavInputKey.text}' of $actor")
                 }
             }
         })

@@ -39,6 +39,8 @@ object CommandDict {
             Pair("seed", Seed),
             Pair("println", EchoConsole),
             Pair("inventory", Inventory),
+            Pair("avtracker", AVTracker),
+            Pair("actorslist", ActorsList),
 
             // Test codes
             Pair("bulletintest", SetBulletin),
