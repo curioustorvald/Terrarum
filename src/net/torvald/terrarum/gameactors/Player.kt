@@ -4,7 +4,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
-import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.UIQuickBar

@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.ai.scripts.PokemonNPCAI
-import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 
 /**
  * Created by minjaesong on 16-03-25.
@@ -26,7 +26,7 @@ object PlayerBuilderCynthia {
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 9, 0)
 
-        p.setPosition(4096.0 * MapDrawer.TILE_SIZE, 300.0 * MapDrawer.TILE_SIZE)
+        p.setPosition(4096.0 * FeaturesDrawer.TILE_SIZE, 300.0 * FeaturesDrawer.TILE_SIZE)
 
 
 

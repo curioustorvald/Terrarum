@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.mapdrawer.MapDrawer.TILE_SIZE
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer

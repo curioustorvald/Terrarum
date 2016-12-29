@@ -6,8 +6,8 @@ import net.torvald.terrarum.gameactors.HistoricalFigure
 import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.gameworld.WorldSimulator.isSolid
-import net.torvald.terrarum.mapdrawer.MapCamera
-import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.mapdrawer.TilesDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex
 import org.newdawn.slick.Color
@@ -40,8 +40,8 @@ object WorldSimulator {
 
     // TODO future Kotlin feature -- typealias AnyPlayer: HistoricalFigure
     operator fun invoke(world: GameWorld, p: HistoricalFigure, delta: Int) {
-        updateXFrom = p.hitbox.centeredX.div(MapDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
-        updateYFrom = p.hitbox.centeredY.div(MapDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
+        updateXFrom = p.hitbox.centeredX.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
+        updateYFrom = p.hitbox.centeredY.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
         updateXTo = updateXFrom + DOUBLE_RADIUS
         updateYTo = updateYFrom + DOUBLE_RADIUS
 
@@ -155,16 +155,16 @@ object WorldSimulator {
         for (y in 0..fluidMap.size - 1) {
             for (x in 0..fluidMap[0].size - 1) {
                 val data = fluidMap[y][x]
-                if (MapCamera.tileInCamera(x + updateXFrom, y + updateYFrom)) {
+                if (TilesDrawer.tileInCamera(x + updateXFrom, y + updateYFrom)) {
                     if (data == 0)
                         g.color = colourNone
                     else
                         g.color = colourWater
 
                     g.drawString(data.toString(),
-                            updateXFrom.plus(x).times(MapDrawer.TILE_SIZE).toFloat()
+                            updateXFrom.plus(x).times(FeaturesDrawer.TILE_SIZE).toFloat()
                             + if (data < 10) 4f else 0f,
-                            updateYFrom.plus(y).times(MapDrawer.TILE_SIZE) + 4f
+                            updateYFrom.plus(y).times(FeaturesDrawer.TILE_SIZE) + 4f
                     )
                 }
 

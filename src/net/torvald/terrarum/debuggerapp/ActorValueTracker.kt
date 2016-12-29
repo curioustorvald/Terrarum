@@ -7,7 +7,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -177,8 +177,8 @@ class ActorValueTracker constructor() : JFrame() {
 
         if (actor != null) {
             sb.append("toString: ${actor!!}\n")
-            sb.append("X: ${actor!!.hitbox.pointedX} (${(actor!!.hitbox.pointedX / MapDrawer.TILE_SIZE).toInt()})\n")
-            sb.append("Y: ${actor!!.hitbox.pointedY} (${(actor!!.hitbox.pointedY / MapDrawer.TILE_SIZE).toInt()})")
+            sb.append("X: ${actor!!.hitbox.pointedX} (${(actor!!.hitbox.pointedX / FeaturesDrawer.TILE_SIZE).toInt()})\n")
+            sb.append("Y: ${actor!!.hitbox.pointedY} (${(actor!!.hitbox.pointedY / FeaturesDrawer.TILE_SIZE).toInt()})")
 
             avPosArea.text = "$sb"
             sb.setLength(0) // clear stringbuffer

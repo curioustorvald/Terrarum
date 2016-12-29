@@ -2,11 +2,12 @@ package net.torvald.terrarum.gamecontroller
 
 import net.torvald.terrarum.gameactors.Controllable
 import net.torvald.terrarum.gameactors.Player
-import net.torvald.terrarum.mapdrawer.MapCamera
-import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.mapdrawer.TilesDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ProjectileSimple
 import net.torvald.terrarum.gameactors.floorInt
+import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex
 import net.torvald.terrarum.ui.UIHandler
@@ -24,16 +25,16 @@ object GameController {
 
     /** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise) */
     internal val mouseX: Float
-        get() = (MapCamera.cameraX + Terrarum.appgc.input.mouseX / Terrarum.ingame.screenZoom)
+        get() = (MapCamera.x + Terrarum.appgc.input.mouseX / Terrarum.ingame.screenZoom)
     /** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise)*/
     internal val mouseY: Float
-        get() = (MapCamera.cameraY + Terrarum.appgc.input.mouseY / Terrarum.ingame.screenZoom)
+        get() = (MapCamera.y + Terrarum.appgc.input.mouseY / Terrarum.ingame.screenZoom)
     /** currently pointing tile coordinate */
     internal val mouseTileX: Int
-        get() = (mouseX / MapDrawer.TILE_SIZE).floorInt()
+        get() = (mouseX / FeaturesDrawer.TILE_SIZE).floorInt()
     /** currently pointing tile coordinate */
     internal val mouseTileY: Int
-        get() = (mouseY / MapDrawer.TILE_SIZE).floorInt()
+        get() = (mouseY / FeaturesDrawer.TILE_SIZE).floorInt()
 
     fun processInput(gc: GameContainer, delta: Int, input: Input) {
 
