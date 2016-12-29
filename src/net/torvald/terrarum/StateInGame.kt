@@ -17,9 +17,10 @@ import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.mapdrawer.LightmapRenderer.constructRGBFromInt
+import net.torvald.terrarum.mapdrawer.TilesDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.mapdrawer.MapCamera
-import net.torvald.terrarum.mapdrawer.MapDrawer
-import net.torvald.terrarum.mapdrawer.MapDrawer.TILE_SIZE
 import net.torvald.terrarum.mapgenerator.WorldGenerator
 import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.tileproperties.TileCodex
@@ -199,8 +200,9 @@ constructor() : BasicGameState() {
         ////////////////////////////
         // camera-related updates //
         ////////////////////////////
-        MapDrawer.update(gc, delta)
-        MapCamera.update(gc, delta)
+        FeaturesDrawer.update(gc, delta)
+        MapCamera.update()
+        TilesDrawer.update()
 
 
         ///////////////////////////
@@ -288,14 +290,14 @@ constructor() : BasicGameState() {
 
         // make camara work //
         // compensate for zoom. UIs must be treated specially! (see UIHandler)
-        //g.translate(-MapCamera.cameraX * screenZoom, -MapCamera.cameraY * screenZoom)
-        worldDrawFrameBuffer.graphics.translate(-MapCamera.cameraX.toFloat(), -MapCamera.cameraY.toFloat())
+        //g.translate(-MapCamera.x * screenZoom, -MapCamera.y * screenZoom)
+        worldDrawFrameBuffer.graphics.translate(-MapCamera.x.toFloat(), -MapCamera.y.toFloat())
 
 
         /////////////////////////////
         // draw map related stuffs //
         /////////////////////////////
-        MapCamera.renderBehind(gc, worldDrawFrameBuffer.graphics)
+        TilesDrawer.renderBehind(gc, worldDrawFrameBuffer.graphics)
 
 
         /////////////////
@@ -316,14 +318,14 @@ constructor() : BasicGameState() {
         /////////////////////////////
         LightmapRenderer.renderLightMap()
 
-        // --> blendMul() <-- by MapCamera.renderFront
-        MapCamera.renderFront(gc, worldDrawFrameBuffer.graphics)
-        // --> blendNormal() <-- by MapCamera.renderFront
-        MapDrawer.render(gc, worldDrawFrameBuffer.graphics)
+        // --> blendMul() <-- by TilesDrawer.renderFront
+        TilesDrawer.renderFront(gc, worldDrawFrameBuffer.graphics)
+        // --> blendNormal() <-- by TilesDrawer.renderFront
+        FeaturesDrawer.render(gc, worldDrawFrameBuffer.graphics)
 
 
-        // --> blendMul() <-- by MapCamera.drawEnvOverlay
-        MapDrawer.drawEnvOverlay(worldDrawFrameBuffer.graphics)
+        // --> blendMul() <-- by TilesDrawer.drawEnvOverlay
+        FeaturesDrawer.drawEnvOverlay(worldDrawFrameBuffer.graphics)
 
         if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul()
         else blendNormal()
@@ -558,12 +560,12 @@ constructor() : BasicGameState() {
             )
     private fun distToCameraSqr(a: ActorWithBody) =
             min(
-                    (a.hitbox.posX - MapCamera.cameraX).sqr() +
-                    (a.hitbox.posY - MapCamera.cameraY).sqr(),
-                    (a.hitbox.posX - MapCamera.cameraX + world.width * TILE_SIZE).sqr() +
-                    (a.hitbox.posY - MapCamera.cameraY).sqr(),
-                    (a.hitbox.posX - MapCamera.cameraX - world.width * TILE_SIZE).sqr() +
-                    (a.hitbox.posY - MapCamera.cameraY).sqr()
+                    (a.hitbox.posX - MapCamera.x).sqr() +
+                    (a.hitbox.posY - MapCamera.y).sqr(),
+                    (a.hitbox.posX - MapCamera.x + world.width * TILE_SIZE).sqr() +
+                    (a.hitbox.posY - MapCamera.y).sqr(),
+                    (a.hitbox.posX - MapCamera.x - world.width * TILE_SIZE).sqr() +
+                    (a.hitbox.posY - MapCamera.y).sqr()
             )
 
     /** whether the actor is within screen */

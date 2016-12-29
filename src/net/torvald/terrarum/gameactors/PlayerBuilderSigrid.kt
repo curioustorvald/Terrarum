@@ -8,7 +8,7 @@ import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.to10bit
 import net.torvald.terrarum.toInt
 import org.newdawn.slick.Color
@@ -70,7 +70,7 @@ object PlayerBuilderSigrid {
 
         p.inventory = ActorInventory(0x7FFFFFFF, true)
 
-        p.setPosition((4096 * MapDrawer.TILE_SIZE).toDouble(), (300 * 16).toDouble())
+        p.setPosition((4096 * FeaturesDrawer.TILE_SIZE).toDouble(), (300 * 16).toDouble())
 
         p.faction.add(FactionFactory.create("FactionSigrid.json"))
 

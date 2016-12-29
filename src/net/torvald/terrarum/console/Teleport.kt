@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.StateInGame
-import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithBody
 
@@ -16,8 +16,8 @@ internal object Teleport : ConsoleCommand {
             val x: Int
             val y: Int
             try {
-                x = args[1].toInt() * MapDrawer.TILE_SIZE + MapDrawer.TILE_SIZE / 2
-                y = args[2].toInt() * MapDrawer.TILE_SIZE + MapDrawer.TILE_SIZE / 2
+                x = args[1].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
+                y = args[2].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
             }
             catch (e: NumberFormatException) {
                 EchoError("Teleport: wrong number input.")
@@ -76,8 +76,8 @@ internal object Teleport : ConsoleCommand {
             val x: Int
             val y: Int
             try {
-                x = args[3].toInt() * MapDrawer.TILE_SIZE + MapDrawer.TILE_SIZE / 2
-                y = args[4].toInt() * MapDrawer.TILE_SIZE + MapDrawer.TILE_SIZE / 2
+                x = args[3].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
+                y = args[4].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
                 val actorID = args[1].toInt()
 
                 if (Terrarum.ingame.getActorByID(actorID) !is ActorWithBody) {

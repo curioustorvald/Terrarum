@@ -7,7 +7,7 @@ import com.jme3.math.FastMath
 import net.torvald.colourutil.RGB
 import net.torvald.colourutil.CIELuvUtil.additiveLuv
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.mapdrawer.MapCamera.world
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TilePropUtil
 import org.newdawn.slick.Color
@@ -19,13 +19,15 @@ import java.util.*
  */
 
 object LightmapRenderer {
-    val overscan_open: Int = Math.min(32, 256f.div(TileCodex[Tile.AIR].opacity and 0xFF).toFloat().ceil())
-    val overscan_opaque: Int = Math.min(8, 256f.div(TileCodex[Tile.STONE].opacity and 0xFF).toFloat().ceil())
+    private val world: GameWorld = Terrarum.ingame.world
+
+    val overscan_open: Int = Math.min(32, 256f.div(TileCodex[Tile.AIR].opacity and 0xFF).ceil())
+    val overscan_opaque: Int = Math.min(8, 256f.div(TileCodex[Tile.STONE].opacity and 0xFF).ceil())
 
     private val LIGHTMAP_WIDTH = Terrarum.ingame.ZOOM_MIN.inv().times(Terrarum.WIDTH)
-            .div(MapDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
+            .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
     private val LIGHTMAP_HEIGHT = Terrarum.ingame.ZOOM_MIN.inv().times(Terrarum.HEIGHT)
-            .div(MapDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
+            .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
 
     /**
      * 8-Bit RGB values
@@ -39,7 +41,7 @@ object LightmapRenderer {
     private val OFFSET_G = 1
     private val OFFSET_B = 0
 
-    private const val TILE_SIZE = MapDrawer.TILE_SIZE
+    private const val TILE_SIZE = FeaturesDrawer.TILE_SIZE
 
     // color model related constants
     const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB
@@ -80,11 +82,11 @@ object LightmapRenderer {
     }
 
     fun renderLightMap() {
-        for_x_start = MapCamera.cameraX / TILE_SIZE - 1 // fix for premature lightmap rendering
-        for_y_start = MapCamera.cameraY / TILE_SIZE - 1 // on topmost/leftmost side
+        for_x_start = MapCamera.x / TILE_SIZE - 1 // fix for premature lightmap rendering
+        for_y_start = MapCamera.y / TILE_SIZE - 1 // on topmost/leftmost side
 
-        for_x_end = for_x_start + MapCamera.renderWidth / TILE_SIZE + 3
-        for_y_end = for_y_start + MapCamera.renderHeight / TILE_SIZE + 2 // same fix as above
+        for_x_end = for_x_start + MapCamera.width / TILE_SIZE + 3
+        for_y_end = for_y_start + MapCamera.height / TILE_SIZE + 2 // same fix as above
 
         /**
          * * true: overscanning is limited to 8 tiles in width (overscan_opaque)

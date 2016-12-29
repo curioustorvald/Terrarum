@@ -12,7 +12,7 @@ import org.newdawn.slick.*
 /**
  * Created by minjaesong on 15-12-31.
  */
-object MapDrawer {
+object FeaturesDrawer {
     const val TILE_SIZE = 16
 
     private val ENV_COLTEMP_LOWEST = 5500
@@ -55,8 +55,8 @@ object MapDrawer {
         g.color = ColourTemp(colTemp)
         //g.color = getColourFromMap(3022)
         g.fillRect(
-                MapCamera.cameraX * zoom,
-                MapCamera.cameraY * zoom,
+                MapCamera.x * zoom,
+                MapCamera.y * zoom,
                 Terrarum.WIDTH * if (zoom < 1) 1f / zoom else zoom,
                 Terrarum.HEIGHT * if (zoom < 1) 1f / zoom else zoom
         )

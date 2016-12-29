@@ -4,11 +4,12 @@ import com.jme3.math.FastMath
 import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
-import net.torvald.terrarum.mapdrawer.MapCamera
-import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.mapdrawer.TilesDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blendScreen
+import net.torvald.terrarum.mapdrawer.MapCamera
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -60,8 +61,8 @@ class BasicDebugInfoWindow : UICanvas {
 
         val player = Terrarum.ingame.player
 
-        val mouseTileX = ((MapCamera.cameraX + gc.input.mouseX / Terrarum.ingame.screenZoom) / MapDrawer.TILE_SIZE).toInt()
-        val mouseTileY = ((MapCamera.cameraY + gc.input.mouseY / Terrarum.ingame.screenZoom) / MapDrawer.TILE_SIZE).toInt()
+        val mouseTileX = ((MapCamera.x + gc.input.mouseX / Terrarum.ingame.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
+        val mouseTileY = ((MapCamera.y + gc.input.mouseY / Terrarum.ingame.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
 
         g.font = Terrarum.fontSmallNumbers
         g.color = GameFontBase.codeToCol["y"]
@@ -77,13 +78,13 @@ class BasicDebugInfoWindow : UICanvas {
                 + ccG
                 + "${hitbox.pointedX}"
                 + " ("
-                + "${(hitbox.pointedX / MapDrawer.TILE_SIZE).toInt()}"
+                + "${(hitbox.pointedX / FeaturesDrawer.TILE_SIZE).toInt()}"
                 + ")")
         printLine(g, 2, "posY "
                 + ccG
                 + hitbox.pointedY.toString()
                 + " ("
-                + (hitbox.pointedY / MapDrawer.TILE_SIZE).toInt().toString()
+                + (hitbox.pointedY / FeaturesDrawer.TILE_SIZE).toInt().toString()
                 + ")")
 
         printLine(g, 3, "veloX reported $ccG${player.moveDelta.x}")
@@ -125,7 +126,7 @@ class BasicDebugInfoWindow : UICanvas {
          */
 
         printLineColumn(g, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
-        printLineColumn(g, 2, 2, "Env colour temp $ccG" + MapDrawer.colTemp)
+        printLineColumn(g, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
         printLineColumn(g, 2, 5, "Time $ccG${Terrarum.ingame.world.time.elapsedSeconds}" +
                                  " (${Terrarum.ingame.world.time.getFormattedTime()})")
         printLineColumn(g, 2, 6, "Mass $ccG${player.mass}")

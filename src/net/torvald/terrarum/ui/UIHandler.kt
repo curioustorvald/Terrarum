@@ -1,6 +1,6 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.terrarum.mapdrawer.MapCamera
+import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.Terrarum
 import com.jme3.math.FastMath
 import org.lwjgl.opengl.GL11

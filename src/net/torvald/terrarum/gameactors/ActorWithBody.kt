@@ -4,10 +4,10 @@ import com.jme3.math.FastMath
 import net.torvald.point.Point2d
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.tileproperties.TileCodex
 import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.terrarum.mapdrawer.MapDrawer.TILE_SIZE
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileProp
 import org.dyn4j.Epsilon
@@ -1117,7 +1117,7 @@ open class ActorWithBody : Actor() {
         @Transient const val BLEND_SCREEN = 5
         @Transient const val BLEND_MULTIPLY = 6
 
-        @Transient private val TILE_SIZE = MapDrawer.TILE_SIZE
+        @Transient private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)

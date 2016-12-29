@@ -3,8 +3,9 @@ package net.torvald.terrarum.console
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.PhysTestBall
-import net.torvald.terrarum.mapdrawer.MapCamera
+import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.mapdrawer.MapCamera
 
 /**
  * Created by minjaesong on 16-03-05.
@@ -20,8 +21,8 @@ internal object SpawnPhysTestBall : ConsoleCommand {
 
             val ball = PhysTestBall()
             ball.setPosition(
-                    (mouseX + MapCamera.cameraX).toDouble(),
-                    (mouseY + MapCamera.cameraY).toDouble()
+                    (mouseX + MapCamera.x).toDouble(),
+                    (mouseY + MapCamera.y).toDouble()
             )
             ball.elasticity = elasticity
 

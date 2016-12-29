@@ -3,8 +3,8 @@ package net.torvald.terrarum.tilestats
 import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.MapLayer
-import net.torvald.terrarum.mapdrawer.MapCamera
-import net.torvald.terrarum.mapdrawer.MapDrawer
+import net.torvald.terrarum.mapdrawer.TilesDrawer
+import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import com.jme3.math.FastMath
 
@@ -17,7 +17,7 @@ object TileStats {
 
     private val tilestat = ShortArray(GameWorld.TILES_SUPPORTED)
 
-    private val TSIZE = MapDrawer.TILE_SIZE
+    private val TSIZE = FeaturesDrawer.TILE_SIZE
 
     /**
      * Update tile stats from tiles on screen
@@ -40,8 +40,8 @@ object TileStats {
 
         val for_x_start = noZoomCameraX / TSIZE
         val for_y_start = noZoomCameraY / TSIZE
-        val for_y_end = MapCamera.clampHTile(for_y_start + (renderHeight / TSIZE) + 2)
-        val for_x_end = MapCamera.clampWTile(for_x_start + (renderWidth  / TSIZE) + 2)
+        val for_y_end = TilesDrawer.clampHTile(for_y_start + (renderHeight / TSIZE) + 2)
+        val for_x_end = TilesDrawer.clampWTile(for_x_start + (renderWidth / TSIZE) + 2)
 
         for (y in for_y_start..for_y_end - 1) {
             for (x in for_x_start..for_x_end - 1) {
