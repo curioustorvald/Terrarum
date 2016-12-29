@@ -75,7 +75,7 @@ internal object GetAV : ConsoleCommand {
                              " $ccO" +
                              Terrarum.ingame.getActorByID(id).actorValue[av]!!.javaClass.simpleName
                 )
-                println("id.av = " +
+                println("$id.$av = " +
                         Terrarum.ingame.getActorByID(id).actorValue[av] +
                         " " +
                         Terrarum.ingame.getActorByID(id).actorValue[av]!!.javaClass.simpleName

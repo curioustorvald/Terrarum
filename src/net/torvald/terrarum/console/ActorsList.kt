@@ -22,6 +22,6 @@ object ActorsList : ConsoleCommand {
     }
 
     fun update() {
-        jPanelInstances.forEach { it.setInfoLabel() }
+        jPanelInstances.forEach { it.update() }
     }
 }

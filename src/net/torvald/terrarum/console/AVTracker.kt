@@ -41,6 +41,6 @@ object AVTracker : ConsoleCommand {
     }
 
     fun update() {
-        jPanelInstances.forEach { it.setInfoLabel() }
+        jPanelInstances.forEach { it.update() }
     }
 }

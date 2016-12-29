@@ -1,5 +1,6 @@
 package net.torvald.terrarum.debuggerapp
 
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.SetAV
 import net.torvald.terrarum.gameactors.AVKey
@@ -24,11 +25,11 @@ class ActorValueTracker constructor() : JFrame() {
         setTrackingActor(actor)
     }
 
-    private val selectedActorLabel = JLabel("Actor not selected")
     private val avInfoArea = JTextArea()
     private val avInfoScroller = JScrollPane(avInfoArea)
     private val avPosArea = JTextArea()
     private val avPosScroller = JScrollPane(avPosArea)
+
     private var actor: ActorWithBody? = null
     private var actorValue: ActorValue? = null
 
@@ -37,6 +38,10 @@ class ActorValueTracker constructor() : JFrame() {
 
     private val buttonAddAV = JButton("Add/Mod")
     private val buttonDelAV = JButton("Delete")
+
+    //private val selectedActorLabel = JLabel("Selected actor: ")
+    private val actorIDField = JTextField()
+    private val buttonChangeActor = JButton("Change")
 
     init {
         title = "Actor value tracker"
@@ -51,6 +56,9 @@ class ActorValueTracker constructor() : JFrame() {
         avInfoScroller.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
         avPosScroller.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
 
+        if (actor != null) {
+            actorIDField.text = "${actor!!.referenceID}"
+        }
 
         // button listener for buttons
         buttonAddAV.addMouseListener(object : MouseListener {
@@ -82,16 +90,35 @@ class ActorValueTracker constructor() : JFrame() {
                 }
             }
         })
+        buttonChangeActor.addMouseListener(object : MouseListener {
+            override fun mouseEntered(e: MouseEvent?) { }
+            override fun mouseClicked(e: MouseEvent?) { }
+            override fun mouseReleased(e: MouseEvent?) { }
+            override fun mouseExited(e: MouseEvent?) { }
+            override fun mousePressed(e: MouseEvent?) {
+                if (actorIDField.text.toLowerCase() == "player") {
+                    actor = Terrarum.ingame.player
+                    actorValue = actor!!.actorValue
+                }
+                else if (actorIDField.text.isNotBlank()) {
+                    actor = Terrarum.ingame.getActorByID(actorIDField.text.toInt()) as ActorWithBody
+                    actorValue = actor!!.actorValue
+                }
+            }
+        })
 
 
         // panel elements
-        divPanel.add(selectedActorLabel, BorderLayout.PAGE_START)
+        val actorNameBar = JPanel()
+        actorNameBar.layout = BorderLayout(2, 0)
+        actorNameBar.add(JLabel("RefID: "), BorderLayout.LINE_START)
+        actorNameBar.add(actorIDField, BorderLayout.CENTER)
+        actorNameBar.add(buttonChangeActor, BorderLayout.LINE_END)
+
         val posAndAV = JPanel()
         posAndAV.layout = BorderLayout()
         posAndAV.add(avPosScroller, BorderLayout.PAGE_START)
         posAndAV.add(avInfoScroller, BorderLayout.CENTER)
-
-        divPanel.add(posAndAV, BorderLayout.CENTER)
 
         val toolbox = JPanel()
         toolbox.layout = BorderLayout()
@@ -115,13 +142,16 @@ class ActorValueTracker constructor() : JFrame() {
         modpanel.layout = BorderLayout(4, 2)
         modpanel.add(modpanelLabels, BorderLayout.LINE_START)
         modpanel.add(modpanelFields, BorderLayout.CENTER)
+        modpanel.add(JLabel(
+                "<html>Messed-up type or careless delete will crash the game.<br>" +
+                "Prepend two underscores for boolean literals.</html>"
+        ), BorderLayout.PAGE_END)
 
         toolbox.add(toolpanel, BorderLayout.PAGE_START)
         toolbox.add(modpanel, BorderLayout.CENTER)
-        modpanel.add(JLabel(
-                "<html>Messed-up type or careless delete will crash the game.</html>"
-        ), BorderLayout.PAGE_END)
 
+        divPanel.add(actorNameBar, BorderLayout.PAGE_START)
+        divPanel.add(posAndAV, BorderLayout.CENTER)
         divPanel.add(toolbox, BorderLayout.PAGE_END)
 
 
@@ -133,20 +163,20 @@ class ActorValueTracker constructor() : JFrame() {
     fun setTrackingActor(actor: Actor) {
         this.actorValue = actor.actorValue
 
-        selectedActorLabel.text = "Actor: $actor"
         this.title = "AVTracker — $actor"
 
         if (actor is ActorWithBody) {
             this.actor = actor
         }
 
-        setInfoLabel()
+        update()
     }
 
-    fun setInfoLabel() {
+    fun update() {
         val sb = StringBuilder()
 
         if (actor != null) {
+            sb.append("toString: ${actor!!}\n")
             sb.append("X: ${actor!!.hitbox.pointedX} (${(actor!!.hitbox.pointedX / MapDrawer.TILE_SIZE).toInt()})\n")
             sb.append("Y: ${actor!!.hitbox.pointedY} (${(actor!!.hitbox.pointedY / MapDrawer.TILE_SIZE).toInt()})")
 
@@ -156,16 +186,10 @@ class ActorValueTracker constructor() : JFrame() {
 
         if (actorValue != null) {
             for (key in actorValue!!.keySet) {
-                val value = actorValue!![key.toString()]
+                val value = actorValue!![key.toString()]!!
+                val type = value.javaClass.simpleName
 
-                sb.append("$key = ${
-                if (value is String)
-                    "\"$value\"" // name = "Sigrid"
-                else if (value is Boolean)
-                    "_$value" // intelligent = __true
-                else
-                    "$value" // scale = 1.0
-                }\n")
+                sb.append("$key = $value ($type)\n")
             }
 
             sb.deleteCharAt(sb.length - 1) // delete trailing \n
@@ -180,22 +204,17 @@ class ActorValueTracker constructor() : JFrame() {
 /*
 
 +--------------------------------+
-| Actor: 5333533 (Sigrid)    LBL |
+| Actor: [5333533     ] [Change] | LBL TFL BTN
 +--------------------------------+
-| X: 65532.655654747 (4095)  LBL |
-| Y: 3050.4935465 (190)      LBL |
+| X: 65532.655654747 (4095)      | TAR
+| Y: 3050.4935465 (190)          |
 | ...                            |
 +--------------------------------+
-| < TOOLBOX >                BTN |
+| [   Add/Mod   ] [   Delete   ] | BTN BTN
 +--------------------------------+
-| Key    [                     ] |
-| Value  [                     ] |
+| Key    [                     ] | LBL TFL
+| Value  [                     ] | LBL TFL
 +--------------------------------+
-
-
-
-
-
 
 
  */
