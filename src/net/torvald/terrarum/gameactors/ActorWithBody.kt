@@ -1165,6 +1165,7 @@ open class ActorWithBody : Actor() {
     val avAcceleration: Double
         get() = actorValue.getAsDouble(AVKey.ACCEL)!! *
                 actorValue.getAsDouble(AVKey.ACCELBUFF)!! *
+                (actorValue.getAsDouble(AVKey.ACCELMULT_MOVEMENT) ?: 1.0) *
                 scale.sqrt()
     val avSpeedCap: Double
         get() = actorValue.getAsDouble(AVKey.SPEED)!! *

@@ -220,14 +220,14 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     private fun updateMovementControl() {
         if (!noClip) {
             if (grounded) {
-                actorValue[AVKey.ACCELBUFF] = 1.0
+                actorValue[AVKey.ACCELMULT_MOVEMENT] = 1.0
             }
             else {
-                actorValue[AVKey.ACCELBUFF] = ACCEL_MULT_IN_FLIGHT
+                actorValue[AVKey.ACCELMULT_MOVEMENT] = ACCEL_MULT_IN_FLIGHT
             }
         }
         else {
-            actorValue[AVKey.ACCELBUFF] = 1.0
+            actorValue[AVKey.ACCELMULT_MOVEMENT] = 1.0
         }
     }
 
