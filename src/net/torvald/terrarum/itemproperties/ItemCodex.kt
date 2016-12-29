@@ -27,7 +27,7 @@ object ItemCodex {
     private val dynamicItemDescription = HashMap<Int, KVHashMap>()
 
     val ITEM_TILE_MAX = GameWorld.TILES_SUPPORTED - 1 // 4095
-    val ITEM_COUNT_MAX = 16777216
+    val ITEM_COUNT_MAX = 1048576
     val ITEM_DYNAMIC_MAX = ITEM_COUNT_MAX - 1
     val ITEM_STATIC_MAX = 32767
     val ITEM_DYNAMIC_MIN = ITEM_STATIC_MAX + 1
