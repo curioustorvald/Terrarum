@@ -52,11 +52,11 @@ class ActorsLister(
 
 
         this.add(divPanel)
-        this.setSize(300, 600)
+        this.setSize(300, 300)
         this.isVisible = true
     }
 
-    fun setInfoLabel() {
+    fun update() {
         countsLabel.text = "Total: ${actorContainer.size + actorContainerInactive.size}, " +
                            "Active: ${actorContainer.size}, Dormant: ${actorContainerInactive.size}"
 
@@ -78,16 +78,17 @@ class ActorsLister(
 /*
 
 +-------------------------------------+
-| Total: 3, Active: 2, Dormant: 1 LBL |
+| Total: 3, Active: 2, Dormant: 1     | LBL
 +-------------------------------------+
-| Active actors                   LBL |
+| Active actors                       | LBL
 ++-----------------------------------++
-||43232949                           ||
+||43232949                           || TAR
 ||5333533 (Sigrid)                   ||
 ++-----------------------------------++
-| Dormant actors                 LBL |
+|=====================================| SPN
+| Dormant actors                      | LBL
 ++-----------------------------------++
-||12345678 (Cynthia)                 ||
+||12345678 (Cynthia)                 || TAR
 ++===================================++
 
 
