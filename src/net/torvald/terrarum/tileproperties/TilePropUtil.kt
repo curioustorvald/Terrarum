@@ -25,10 +25,8 @@ object TilePropUtil {
     val pulsateRange = 0.034f
     val pulsateCycleDuration = 500 // in milliseconds
 
-    val random = HQRNG();
+    val random = HQRNG()
 
-    //var flickerPatternThis = getNewRandom()
-    //var flickerPatternNext = getNewRandom()
     var flickerP0 = getNewRandom()
     var flickerP1 = getNewRandom()
     var flickerP2 = getNewRandom()
@@ -39,9 +37,6 @@ object TilePropUtil {
     }
 
     private fun getTorchFlicker(baseLum: Int): Int {
-        //val funcY = linearInterpolation1D(flickerPatternThis, flickerPatternNext,
-        //        flickerFuncX.toFloat() / flickerFuncDomain
-        //)
         val funcY = FastMath.interpolateCatmullRom(0.0f, flickerFuncX.toFloat() / flickerFuncDomain,
                 flickerP0, flickerP1, flickerP2, flickerP3
         )
@@ -90,7 +85,7 @@ object TilePropUtil {
 
     private fun getNewRandom() = random.nextFloat().times(2).minus(1f) * flickerFuncRange
 
-    private fun linearInterpolation1D(a: Float, b: Float, x: Float) = a * (1 - x) + b * x;
+    private fun linearInterpolation1D(a: Float, b: Float, x: Float) = a * (1 - x) + b * x
 
     fun getDynamicLumFunc(baseLum: Int, type: Int): Int {
         return when (type) {
