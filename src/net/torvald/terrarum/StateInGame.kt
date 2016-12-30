@@ -80,8 +80,6 @@ constructor() : BasicGameState() {
     private val useShader: Boolean = false
     private val shaderProgram = 0
 
-    private val CORES = ThreadPool.POOL_SIZE
-
     val KEY_LIGHTMAP_RENDER = Key.F7
     val KEY_LIGHTMAP_SMOOTH = Key.F8
 
@@ -93,6 +91,9 @@ constructor() : BasicGameState() {
     private val UI_QUICK_BAR = "uiQuickBar"
     private val UI_INVENTORY_PLAYER = "uiInventoryPlayer"
     private val UI_INVENTORY_ANON = "uiInventoryAnon"
+
+    val paused: Boolean
+        get() = consoleHandler.isOpened
 
     @Throws(SlickException::class)
     override fun init(gameContainer: GameContainer, stateBasedGame: StateBasedGame) {
@@ -175,48 +176,51 @@ constructor() : BasicGameState() {
         setAppTitle()
 
 
-        ///////////////////////////
-        // world-related updates //
-        ///////////////////////////
-        world.updateWorldTime(delta)
-        WorldSimulator(world, player, delta)
-        WeatherMixer.update(gc, delta)
-        TileStats.update()
-        if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
-            world.globalLight = constructRGBFromInt(
-                    WeatherMixer.globalLightNow.redByte,
-                    WeatherMixer.globalLightNow.greenByte,
-                    WeatherMixer.globalLightNow.blueByte
-            )
+        if (!paused) {
+
+            ///////////////////////////
+            // world-related updates //
+            ///////////////////////////
+            world.updateWorldTime(delta)
+            WorldSimulator(world, player, delta)
+            WeatherMixer.update(gc, delta)
+            TileStats.update()
+            if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
+                world.globalLight = constructRGBFromInt(
+                        WeatherMixer.globalLightNow.redByte,
+                        WeatherMixer.globalLightNow.greenByte,
+                        WeatherMixer.globalLightNow.blueByte
+                )
 
 
-        ///////////////////////////
-        // input-related updates //
-        ///////////////////////////
-        GameController.processInput(gc, delta, gc.input)
-        uiContainer.forEach { it.processInput(gc, delta, gc.input) }
+            ///////////////////////////
+            // input-related updates //
+            ///////////////////////////
+            GameController.processInput(gc, delta, gc.input)
+            uiContainer.forEach { it.processInput(gc, delta, gc.input) }
 
 
-        ////////////////////////////
-        // camera-related updates //
-        ////////////////////////////
-        FeaturesDrawer.update(gc, delta)
-        MapCamera.update()
-        TilesDrawer.update()
+            ////////////////////////////
+            // camera-related updates //
+            ////////////////////////////
+            FeaturesDrawer.update(gc, delta)
+            MapCamera.update()
+            TilesDrawer.update()
 
 
-        ///////////////////////////
-        // actor-related updates //
-        ///////////////////////////
-        repossessActor()
+            ///////////////////////////
+            // actor-related updates //
+            ///////////////////////////
+            repossessActor()
 
-        // determine whether the inactive actor should be re-active
-        wakeDormantActors()
-        // determine whether the actor should be active or dormant
-        KillOrKnockdownActors()
-        updateActors(gc, delta)
-        // TODO thread pool(?)
-        CollisionSolver.process()
+            // determine whether the inactive actor should be re-active
+            wakeDormantActors()
+            // determine whether the actor should be active or dormant
+            KillOrKnockdownActors()
+            updateActors(gc, delta)
+            // TODO thread pool(?)
+            CollisionSolver.process()
+        }
 
 
         ////////////////////////
