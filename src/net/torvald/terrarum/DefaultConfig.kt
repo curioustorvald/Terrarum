@@ -6,6 +6,8 @@ import com.google.gson.JsonObject
 import net.torvald.terrarum.gamecontroller.Key
 
 /**
+ * Keys must be all lowercase
+ *
  * Created by minjaesong on 16-03-12.
  */
 object DefaultConfig {
@@ -31,10 +33,10 @@ object DefaultConfig {
         jsonObject.addProperty("joypadldown", 6)
         jsonObject.addProperty("joypadrdown", 7) // logitech indices
 
-        jsonObject.addProperty("joypadlstickx", 0)
-        jsonObject.addProperty("joypadlsticky", 1)
-        jsonObject.addProperty("joypadrstickx", 2)
-        jsonObject.addProperty("joypadrsticky", 3) // logitech indices
+        jsonObject.addProperty("joypadlstickx", 3)
+        jsonObject.addProperty("joypadlsticky", 2)
+        jsonObject.addProperty("joypadrstickx", 1)
+        jsonObject.addProperty("joypadrsticky", 0) // logitech indices
 
         jsonObject.addProperty("joypadlabelstyle", "generic") // "nwii", "logitech", "sonyps", "msxb360", "generic"
 
@@ -63,6 +65,10 @@ object DefaultConfig {
 
         val keyquickbars = JsonArray(); for (i in 2..11) keyquickbars.add(i) // NUM_1 to NUM_0
         jsonObject.add("keyquickbars", keyquickbars)
+
+        jsonObject.addProperty("mouseprimary", 0) // left mouse
+        jsonObject.addProperty("mousesecondary", 1) // right mouse
+
 
         jsonObject.addProperty("pcgamepadenv", "console")
 

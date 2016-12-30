@@ -18,13 +18,15 @@ object KeyMap {
         map_code.put(EnumKeyFunc.JUMP, Terrarum.getConfigInt("keyjump"))
         map_code.put(EnumKeyFunc.UI_CONSOLE, Key.GRAVE)
         map_code.put(EnumKeyFunc.UI_BASIC_INFO, Key.F3)
+        map_code.put(EnumKeyFunc.HAND_PRIMARY, Terrarum.getConfigInt("mousePrimary"))
+        map_code.put(EnumKeyFunc.HAND_SECONDARY, Terrarum.getConfigInt("mouseSecondary"))
     }
 
-    fun getKeyCode(fn: EnumKeyFunc): Int {
+    operator fun get(fn: EnumKeyFunc): Int {
         return map_code[fn]!!
     }
 
-    fun set(func: EnumKeyFunc, key: Int) {
+    operator fun set(func: EnumKeyFunc, key: Int) {
         map_code.put(func, key)
     }
 

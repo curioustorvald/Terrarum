@@ -200,10 +200,10 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             isJumpDown = isFuncDown(input, EnumKeyFunc.JUMP)
 
             if (Terrarum.controller != null) {
-                axisX =  Terrarum.controller!!.getAxisValue(3)
-                axisY =  Terrarum.controller!!.getAxisValue(2)
-                axisRX = Terrarum.controller!!.getAxisValue(1)
-                axisRY = Terrarum.controller!!.getAxisValue(0)
+                axisX =  Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadlstickx"))
+                axisY =  Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadlsticky"))
+                axisRX = Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadrstickx"))
+                axisRY = Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadrsticky"))
 
                 // deadzonning
                 if (Math.abs(axisX) < Terrarum.CONTROLLER_DEADZONE) axisX = 0f
@@ -239,18 +239,17 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         ///////////////////
         // MOUSE CONTROL //
         ///////////////////
-        // PRIMARY/SECONDARY IS FIXED TO LEFT/RIGHT BUTTON //
 
         /**
          * Primary Use
          */
         // Left mouse
-        if (isGamer && input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+        if (isGamer && isFuncDown(input, EnumKeyFunc.HAND_PRIMARY)) {
             (itemEquipped[EquipPosition.HAND_GRIP] ?: nullItem).primaryUse(gc, delta)
         }
 
         // Right mouse
-        if (isGamer && input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
+        if (isGamer && isFuncDown(input, EnumKeyFunc.HAND_SECONDARY)) {
             (itemEquipped[EquipPosition.HAND_GRIP] ?: nullItem).secondaryUse(gc, delta)
         }
 
@@ -294,11 +293,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         // ↑F, ↓S
         if (isRightDown && !isLeftDown) {
             walkHorizontal(false, AXIS_KEYBOARD)
-            prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
+            prevHMoveKey = KeyMap[EnumKeyFunc.MOVE_RIGHT]
         } // ↓F, ↑S
         else if (isLeftDown && !isRightDown) {
             walkHorizontal(true, AXIS_KEYBOARD)
-            prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
+            prevHMoveKey = KeyMap[EnumKeyFunc.MOVE_LEFT]
         } // ↓F, ↓S
         /*else if (isLeftDown && isRightDown) {
                if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
@@ -322,11 +321,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             // ↑E, ↓D
             if (isDownDown && !isUpDown) {
                 walkVertical(false, AXIS_KEYBOARD)
-                prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
+                prevVMoveKey = KeyMap[EnumKeyFunc.MOVE_DOWN]
             } // ↓E, ↑D
             else if (isUpDown && !isDownDown) {
                 walkVertical(true, AXIS_KEYBOARD)
-                prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
+                prevVMoveKey = KeyMap[EnumKeyFunc.MOVE_UP]
             } // ↓E, ↓D
             /*else if (isUpDown && isDownDown) {
                 if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
@@ -500,7 +499,10 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     }
 
     private fun isFuncDown(input: Input, fn: EnumKeyFunc): Boolean {
-        return input.isKeyDown(KeyMap.getKeyCode(fn))
+        return if (fn == EnumKeyFunc.HAND_PRIMARY || fn == EnumKeyFunc.HAND_SECONDARY)
+            input.isMouseButtonDown(KeyMap[fn])
+        else
+            input.isKeyDown(KeyMap[fn])
     }
 
     fun isNoClip(): Boolean {
