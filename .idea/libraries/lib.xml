@@ -28,6 +28,7 @@
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/lib/kotlin-runtime-sources.jar!/" />
       <root url="file://$PROJECT_DIR$/lib" />
+      <root url="file://$PROJECT_DIR$/lib/slick-source" />
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" type="SOURCES" />
