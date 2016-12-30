@@ -26,41 +26,38 @@ internal object SetAV : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         fun parseAVInput(arg: String): Any {
-            var `val`: Any
+            var inputval: Any
 
             try {
-                `val` = Integer(arg) // try for integer
+                inputval = Integer(arg) // try for integer
             }
             catch (e: NumberFormatException) {
 
                 try {
-                    `val` = arg.toDouble() // try for double
+                    inputval = arg.toDouble() // try for double
                 }
                 catch (ee: NumberFormatException) {
                     if (arg.equals("__true", ignoreCase = true)) {
-                        `val` = true
+                        inputval = true
                     }
                     else if (arg.equals("__false", ignoreCase = true)) {
-                        `val` = false
+                        inputval = false
                     }
                     else {
-                        `val` = arg // string if not number
+                        inputval = arg // string if not number
                     }
                 }
             }
 
-            return `val`
+            return inputval
         }
-
-
-        val error = Error()
 
         // setav <id, or blank for player> <av> <val>
         if (args.size != 4 && args.size != 3) {
             printUsage()
         }
         else if (args.size == 3) {
-            val `val` = parseAVInput(args[2])
+            val newValue = parseAVInput(args[2])
 
             // check if av is number
             if (args[1].isNum()) {
@@ -69,14 +66,14 @@ internal object SetAV : ConsoleCommand {
                 return
             }
 
-            Terrarum.ingame.player.actorValue[args[1]] = `val`
-            Echo("${ccW}Set $ccM${args[1]} ${ccW}for ${ccY}player ${ccW}to $ccG$`val`")
-            println("[SetAV] set ActorValue '${args[1]}' for player to '$`val`'.")
+            Terrarum.ingame.player.actorValue[args[1]] = newValue
+            Echo("${ccW}Set $ccM${args[1]} ${ccW}for ${ccY}player ${ccW}to $ccG$newValue")
+            println("[SetAV] set ActorValue '${args[1]}' for player to '$newValue'.")
         }
         else if (args.size == 4) {
             try {
                 val id = args[1].toInt()
-                val `val` = parseAVInput(args[3])
+                val newValue = parseAVInput(args[3])
                 val actor = Terrarum.ingame.getActorByID(id)
 
                 // check if av is number
@@ -86,9 +83,9 @@ internal object SetAV : ConsoleCommand {
                     return
                 }
 
-                actor.actorValue[args[2]] = `val`
-                Echo("${ccW}Set $ccM${args[2]} ${ccW}for $ccY$id ${ccW}to $ccG$`val`")
-                println("[SetAV] set ActorValue '${args[2]}' for $actor to '$`val`'.")
+                actor.actorValue[args[2]] = newValue
+                Echo("${ccW}Set $ccM${args[2]} ${ccW}for $ccY$id ${ccW}to $ccG$newValue")
+                println("[SetAV] set ActorValue '${args[2]}' for $actor to '$newValue'.")
             }
             catch (e: IllegalArgumentException) {
                 if (args.size == 4) {

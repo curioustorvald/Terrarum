@@ -213,9 +213,9 @@ constructor() : BasicGameState() {
             ///////////////////////////
             repossessActor()
 
-            // determine whether the inactive actor should be re-active
+            // determine whether the inactive actor should be activated
             wakeDormantActors()
-            // determine whether the actor should be active or dormant
+            // determine whether the actor should keep being activated or be dormant
             KillOrKnockdownActors()
             updateActors(gc, delta)
             // TODO thread pool(?)
@@ -624,11 +624,18 @@ constructor() : BasicGameState() {
     val DEBUG_ARRAY = false
 
     fun getActorByID(ID: Int): Actor {
-        if (actorContainer.size == 0) throw IllegalArgumentException("Actor with ID $ID does not exist.")
-
-        val index = actorContainer.binarySearch(ID)
-        if (index < 0)
+        if (actorContainer.size == 0 && actorContainerInactive.size == 0)
             throw IllegalArgumentException("Actor with ID $ID does not exist.")
+
+        var index = actorContainer.binarySearch(ID)
+        if (index < 0) {
+            index = actorContainerInactive.binarySearch(ID)
+
+            if (index < 0)
+                throw IllegalArgumentException("Actor with ID $ID does not exist.")
+            else
+                return actorContainerInactive[index]
+        }
         else
             return actorContainer[index]
     }
