@@ -5,5 +5,6 @@ package net.torvald.terrarum.gamecontroller
  */
 enum class EnumKeyFunc {
     UI_CONSOLE, UI_BASIC_INFO,
-    MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN, JUMP
+    MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN, JUMP,
+    HAND_PRIMARY, HAND_SECONDARY
 }

@@ -138,7 +138,7 @@ object GameController {
     }
 
     private fun keyPressedByCode(key: Int, fn: EnumKeyFunc): Boolean {
-        return KeyMap.getKeyCode(fn) == key
+        return KeyMap[fn] == key
     }
 }
 
