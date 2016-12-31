@@ -1,6 +1,6 @@
 *Terrarum* by Minjaesong (Torvald)
 
-Copyright (C) 2013-2016 Torvald. All rights reserved.
+Copyright (C) 2013-2017 Torvald. All rights reserved.
 mailto: alswo9628 *at* __gmail__ *dot* __com__
 
 You can use any assets (sprites, fonts, tiles and codes) for your own goods (e.g. texture pack for Minecraft), provided that you gave necessary credit to this game and me, and also notified me.
