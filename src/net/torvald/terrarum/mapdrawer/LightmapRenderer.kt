@@ -6,13 +6,17 @@ import net.torvald.terrarum.tileproperties.TileCodex
 import com.jme3.math.FastMath
 import net.torvald.colourutil.RGB
 import net.torvald.colourutil.CIELuvUtil.additiveLuv
+import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.abs
+import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TilePropUtil
 import org.newdawn.slick.Color
 import org.newdawn.slick.Graphics
 import java.util.*
+import java.util.concurrent.locks.ReentrantLock
 
 /**
  * Created by minjaesong on 16-01-25.
@@ -55,6 +59,7 @@ object LightmapRenderer {
     internal var for_y_start: Int = 0
     internal var for_x_end: Int = 0
     internal var for_y_end: Int = 0
+
 
     fun getLightRawPos(x: Int, y: Int) = lightmap[y][x]
 
@@ -112,9 +117,9 @@ object LightmapRenderer {
             else { // vertical edges without horizontal edge pair
                 return Pair(
                         if ((rect_width.even() && i.even()) || (rect_width.odd() && i.odd()))
-                            // if the index is on the left side of the box
-                             for_x_start
-                        else for_x_end ,
+                        // if the index is on the left side of the box
+                            for_x_start
+                        else for_x_end,
                         (i - rect_width).div(2) + for_y_start + 1
                 )
             }
@@ -135,7 +140,7 @@ object LightmapRenderer {
                 else return x - for_x_start + (rect_size - rect_width)
             }
             else { // between two edges
-                if (x < for_x_start)    return (y - for_y_start - 1) * 2 + rect_width
+                if (x < for_x_start) return (y - for_y_start - 1) * 2 + rect_width
                 else if (x > for_x_end) return (y - for_y_start - 1) * 2 + rect_width + 1
                 else return null
             }
@@ -145,8 +150,8 @@ object LightmapRenderer {
                 if (posToMaskNum(x, y) == null)
                     false
                 else if (!(x in for_x_start - overscan_opaque..for_x_end + overscan_opaque &&
-                             x in for_y_start - overscan_opaque..for_y_end + overscan_opaque))
-                     // point is within the range of overscan_open but not overscan_opaque
+                           x in for_y_start - overscan_opaque..for_y_end + overscan_opaque))
+                // point is within the range of overscan_open but not overscan_opaque
                     noop_mask.get(posToMaskNum(x, y)!!)
                 else // point within the overscan_opaque must be rendered, so no no-op
                     false
@@ -174,8 +179,40 @@ object LightmapRenderer {
          */
 
         purgeLightmap()
+        buildLanternmap()
 
-        // scan for luminous actors and store their lighting info to the lanterns
+        // O(36n) == O(n) where n is a size of the map.
+        // Because of inevitable overlaps on the area, it only works with ADDITIVE blend (aka maxblend)
+        // Round 1
+        for (y in for_y_start - overscan_open..for_y_end) {
+            for (x in for_x_start - overscan_open..for_x_end) {
+                setLight(x, y, calculate(x, y))
+            }
+        }
+
+        // Round 2
+        for (y in for_y_end + overscan_open downTo for_y_start) {
+            for (x in for_x_start - overscan_open..for_x_end) {
+                setLight(x, y, calculate(x, y))
+            }
+        }
+
+        // Round 3
+        for (y in for_y_end + overscan_open downTo for_y_start) {
+            for (x in for_x_end + overscan_open downTo for_x_start) {
+                setLight(x, y, calculate(x, y))
+            }
+        }
+
+        // Round 4
+        for (y in for_y_start - overscan_open..for_y_end) {
+            for (x in for_x_end + overscan_open downTo for_x_start) {
+                setLight(x, y, calculate(x, y))
+            }
+        }
+    }
+
+    private fun buildLanternmap() {
         lanternMap.clear()
         Terrarum.ingame.actorContainer.forEach { it ->
             if (it is Luminous && it is ActorWithBody) {
@@ -198,43 +235,6 @@ object LightmapRenderer {
                 }
             }
         }
-
-        // O(36n) == O(n) where n is a size of the map.
-        // Because of inevitable overlaps on the area, it only works with ADDITIVE blend (aka maxblend)
-        try {
-            // Round 1
-            for (y in for_y_start - overscan_open..for_y_end) {
-                for (x in for_x_start - overscan_open..for_x_end) {
-                    setLight(x, y, calculate(x, y))
-                }
-            }
-
-            // Round 2
-            for (y in for_y_end + overscan_open downTo for_y_start) {
-                for (x in for_x_start - overscan_open..for_x_end) {
-                    setLight(x, y, calculate(x, y))
-                }
-            }
-
-            // Round 3
-            for (y in for_y_end + overscan_open downTo for_y_start) {
-                for (x in for_x_end + overscan_open downTo for_x_start) {
-                    setLight(x, y, calculate(x, y))
-                }
-            }
-
-            // Round 4
-            for (y in for_y_start - overscan_open..for_y_end) {
-                for (x in for_x_end + overscan_open downTo for_x_start) {
-                    setLight(x, y, calculate(x, y))
-                }
-            }
-
-            TilePropUtil.dynamicLumFuncTickClock()
-        }
-        catch (e: ArrayIndexOutOfBoundsException) {
-        }
-
     }
 
     private fun calculate(x: Int, y: Int): Int = calculate(x, y, false)
@@ -266,9 +266,14 @@ object LightmapRenderer {
         // END MIX TILE
 
         // mix luminous actor
-        for ((posX, posY, luminosity) in lanternMap) {
+        /*for ((posX, posY, luminosity) in lanternMap) {
             if (posX == x && posY == y)
                 lightLevelThis = lightLevelThis maxBlend luminosity // maximise to not exceed 1.0 with normal (<= 1.0) light
+        }*/
+        for (i in 0..lanternMap.size - 1) {
+            val lmap = lanternMap[i]
+            if (lmap.posX == x && lmap.posY == y)
+                lightLevelThis = lightLevelThis maxBlend lmap.luminosity // maximise to not exceed 1.0 with normal (<= 1.0) light
         }
 
 
@@ -742,10 +747,10 @@ object LightmapRenderer {
 
         fun get(index: Int): IntArray {
             return when (index) {
-                RED -> reds
+                RED   -> reds
                 GREEN -> greens
-                BLUE -> blues
-                else -> throw IllegalArgumentException()
+                BLUE  -> blues
+                else  -> throw IllegalArgumentException()
             }
         }
     }
