@@ -1,18 +1,16 @@
 package net.torvald.imagefont
 
-import net.torvald.terrarum.Terrarum
 import org.newdawn.slick.*
 
 /**
  * Created by minjaesong on 16-01-20.
  */
-class GameFontWhite @Throws(SlickException::class)
-constructor() : GameFontBase() {
+class GameFontWhite : GameFontBase() {
 
     init {
 
         GameFontBase.hangulSheet = SpriteSheet(
-                "./assets/graphics/fonts/han_johab.png", GameFontBase.W_HANGUL, GameFontBase.H_HANGUL)
+                "./assets/graphics/fonts/hangul_johab.png", GameFontBase.W_HANGUL, GameFontBase.H_HANGUL)
         GameFontBase.asciiSheet = SpriteSheet(
                 "./assets/graphics/fonts/ascii_fullwidth.png", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.asciiSheetEF = SpriteSheet(
@@ -68,19 +66,19 @@ constructor() : GameFontBase() {
                 GameFontBase.extASheetEF,
                 GameFontBase.kanaSheet,
                 GameFontBase.cjkPunct,
-                null, // Filler
+                null, // Full unihan, filler because we're using WenQuanYi
                 GameFontBase.cyrilic,
                 GameFontBase.cyrilicEF,
                 GameFontBase.fullwidthForms,
                 GameFontBase.uniPunct,
                 GameFontBase.wenQuanYi_1,
-                GameFontBase.wenQuanYi_2, // uniHan
+                GameFontBase.wenQuanYi_2,
                 GameFontBase.greekSheet,
                 GameFontBase.greekSheetEF,
                 GameFontBase.romanianSheet,
                 GameFontBase.romanianSheetEF,
                 GameFontBase.thaiSheet,
-                null, // Filler
+                null, // Thai EF, filler because not being used right now
                 GameFontBase.keycapSheet
         )
         GameFontBase.sheetKey = shk

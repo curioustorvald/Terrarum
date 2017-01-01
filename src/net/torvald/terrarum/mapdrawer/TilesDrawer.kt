@@ -6,7 +6,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex
 import com.jme3.math.FastMath
-import net.torvald.terrarum.concurrent.ThreadPool
+import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE

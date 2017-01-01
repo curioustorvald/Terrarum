@@ -152,7 +152,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         lateinit var appgc: AppGameContainer
 
         var WIDTH =  1072
-        var HEIGHT = 742 // IMAX ratiso
+        var HEIGHT = 742 // IMAX ratio
         var VSYNC = true
         val VSYNC_TRIGGER_THRESHOLD = 56
 

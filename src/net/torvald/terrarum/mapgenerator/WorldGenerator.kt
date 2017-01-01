@@ -7,7 +7,7 @@ import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.concurrent.ThreadPool
+import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.ThreadActorUpdate
 import net.torvald.terrarum.gameactors.roundInt
 import java.util.*
@@ -689,7 +689,7 @@ object WorldGenerator {
         if (Terrarum.MULTITHREAD) {
             // set up indices
             for (i in 0..Terrarum.THREADS - 1) {
-                ThreadPool.map(
+                ThreadParallel.map(
                         i,
                         ThreadProcessNoiseLayers(
                                 HEIGHT.toFloat().div(Terrarum.THREADS).times(i).roundInt(),
@@ -700,7 +700,7 @@ object WorldGenerator {
                 )
             }
 
-            ThreadPool.startAll()
+            ThreadParallel.startAll()
             // FIXME game starts prematurely
             /* Console:
             [mapgenerator] Seed: 85336530

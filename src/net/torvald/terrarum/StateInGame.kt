@@ -3,7 +3,7 @@ package net.torvald.terrarum
 import net.torvald.imagefont.GameFontBase
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.audio.AudioResourceLibrary
-import net.torvald.terrarum.concurrent.ThreadPool
+import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.console.*
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.*
@@ -54,7 +54,7 @@ constructor() : BasicGameState() {
     val ACTORCONTAINER_INITIAL_SIZE = 128
     val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
-    val uiContainer = LinkedList<UIHandler>()
+    val uiContainer = ArrayList<UIHandler>()
 
     lateinit var consoleHandler: UIHandler
     lateinit var debugWindow: UIHandler
@@ -527,8 +527,8 @@ constructor() : BasicGameState() {
         if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD) {
             val actors = actorContainer.size.toFloat()
             // set up indices
-            for (i in 0..ThreadPool.POOL_SIZE - 1) {
-                ThreadPool.map(
+            for (i in 0..ThreadParallel.POOL_SIZE - 1) {
+                ThreadParallel.map(
                         i,
                         ThreadActorUpdate(
                                 actors.div(Terrarum.THREADS).times(i).roundInt(),
@@ -539,7 +539,7 @@ constructor() : BasicGameState() {
                 )
             }
 
-            ThreadPool.startAll()
+            ThreadParallel.startAll()
         }
         else {
             actorContainer.forEach { it.update(gc, delta) }
