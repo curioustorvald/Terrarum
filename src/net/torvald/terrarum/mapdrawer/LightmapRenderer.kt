@@ -293,7 +293,7 @@ object LightmapRenderer {
             ambient = ambient maxBlend darkenColoured(getLight(x - 1, y + 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
             ambient = ambient maxBlend darkenColoured(getLight(x + 1, y + 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
             ambient = ambient maxBlend darkenColoured(getLight(x    , y - 1) ?: 0, thisTileOpacity)
-            ambient = ambient maxBlend darkenColoured(getLight(x    , y - 1) ?: 0, thisTileOpacity)
+            ambient = ambient maxBlend darkenColoured(getLight(x    , y + 1) ?: 0, thisTileOpacity)
             ambient = ambient maxBlend darkenColoured(getLight(x - 1, y    ) ?: 0, thisTileOpacity)
             ambient = ambient maxBlend darkenColoured(getLight(x + 1, y    ) ?: 0, thisTileOpacity)
             return lightLevelThis maxBlend ambient
