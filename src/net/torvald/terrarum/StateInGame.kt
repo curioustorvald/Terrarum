@@ -266,6 +266,8 @@ constructor() : BasicGameState() {
     }
 
     private fun changePossession(refid: Int) {
+        // TODO prevent possessing other player on multiplayer
+
         if (!hasActor(refid)) {
             throw IllegalArgumentException("No such actor in actorContainer: $refid")
         }
@@ -309,12 +311,19 @@ constructor() : BasicGameState() {
         /////////////////
         // --> Change of blend mode <-- introduced by ActorWithBody //
         actorContainer.forEach { actor ->
-            if (actor is ActorWithBody && actor.inScreen() && actor !is Player) {
+            if (actor is ActorWithBody && actor.inScreen() && actor !is Player && !actor.drawTopmost) {
                 actor.drawBody(gc, worldDrawFrameBuffer.graphics)
             }
         }
         // --> Change of blend mode <-- introduced by ActorWithBody //
         player.drawBody(gc, worldDrawFrameBuffer.graphics)
+        // --> Change of blend mode <-- introduced by ActorWithBody //
+        actorContainer.forEach { actor ->
+            if (actor is ActorWithBody && actor.inScreen() && actor !is Player && actor.drawTopmost) {
+                actor.drawBody(gc, worldDrawFrameBuffer.graphics)
+            }
+        }
+        // --> Change of blend mode <-- introduced by ActorWithBody //
 
 
         /////////////////////////////

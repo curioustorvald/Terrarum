@@ -26,13 +26,14 @@ open class ActorWithBody : Actor() {
 
     /** !! ActorValue macros are on the very bottom of the source !! **/
 
-
     override var actorValue: ActorValue = ActorValue()
 
     @Transient internal var sprite: SpriteAnimation? = null
     @Transient internal var spriteGlow: SpriteAnimation? = null
 
     var drawMode = BLEND_NORMAL
+    /** for fake tiles. Draw on top of player(s) */
+    var drawTopmost = false
 
     @Transient private val world: GameWorld = Terrarum.ingame.world
 
