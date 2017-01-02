@@ -183,31 +183,33 @@ object LightmapRenderer {
 
         // O(36n) == O(n) where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with ADDITIVE blend (aka maxblend)
+
+
         // Round 1
         for (y in for_y_start - overscan_open..for_y_end) {
             for (x in for_x_start - overscan_open..for_x_end) {
-                setLight(x, y, calculate(x, y))
+                setLight(x, y, calculate(x, y, 1))
             }
         }
 
         // Round 2
         for (y in for_y_end + overscan_open downTo for_y_start) {
             for (x in for_x_start - overscan_open..for_x_end) {
-                setLight(x, y, calculate(x, y))
+                setLight(x, y, calculate(x, y, 2))
             }
         }
 
         // Round 3
         for (y in for_y_end + overscan_open downTo for_y_start) {
             for (x in for_x_end + overscan_open downTo for_x_start) {
-                setLight(x, y, calculate(x, y))
+                setLight(x, y, calculate(x, y, 3))
             }
         }
 
         // Round 4
         for (y in for_y_start - overscan_open..for_y_end) {
             for (x in for_x_end + overscan_open downTo for_x_start) {
-                setLight(x, y, calculate(x, y))
+                setLight(x, y, calculate(x, y, 4))
             }
         }
     }
@@ -237,9 +239,9 @@ object LightmapRenderer {
         }
     }
 
-    private fun calculate(x: Int, y: Int): Int = calculate(x, y, false)
+    private fun calculate(x: Int, y: Int, pass: Int): Int = calculate(x, y, pass, false)
 
-    private fun calculate(x: Int, y: Int, doNotCalculateAmbient: Boolean): Int {
+    private fun calculate(x: Int, y: Int, pass: Int, doNotCalculateAmbient: Boolean): Int {
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
 
@@ -279,56 +281,24 @@ object LightmapRenderer {
 
         if (!doNotCalculateAmbient) {
             // calculate ambient
-            var ambient: Int = 0
-            var nearby: Int
-            for (yoff in -1..1) {
-                for (xoff in -1..1) {
-                    /**
-                     * filter for 'v's as:
-                     * +-+-+-+
-                     * |a|v|a|
-                     * +-+-+-+
-                     * |v| |v|
-                     * +-+-+-+
-                     * |a|v|a|
-                     * +-+-+-+
-                     */
-                    if (xoff != yoff && -xoff != yoff) {
-                        // 'v' tiles
-                        nearby = getLight(x + xoff, y + yoff) ?: 0
-                    }
-                    else if (xoff != 0 && yoff != 0) {
-                        // 'a' tiles
-                        nearby = darkenUniformInt(getLight(x + xoff, y + yoff) ?: 0, 12)
-                        // mix some to have more 'spreading'
-                        // so that light spreads in a shape of an octagon instead of a diamond
-                    }
-                    else {
-                        nearby = 0 // exclude 'me' tile
-                    }
-
-                    ambient = ambient maxBlend nearby // keep base value as brightest nearby
-                }
-            }
-
-            ambient = darkenColoured(ambient, thisTileOpacity) // get real ambient by appling opacity value
-
-
+            /*  + * +
+             *  * @ *
+             *  + * +
+             *  sample ambient for eight points and apply attenuation for those
+             *  maxblend eight values and use it
+             */
+            var ambient = 0
+            ambient = ambient maxBlend darkenColoured(getLight(x - 1, y - 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
+            ambient = ambient maxBlend darkenColoured(getLight(x + 1, y - 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
+            ambient = ambient maxBlend darkenColoured(getLight(x - 1, y + 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
+            ambient = ambient maxBlend darkenColoured(getLight(x + 1, y + 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
+            ambient = ambient maxBlend darkenColoured(getLight(x    , y - 1) ?: 0, thisTileOpacity)
+            ambient = ambient maxBlend darkenColoured(getLight(x    , y - 1) ?: 0, thisTileOpacity)
+            ambient = ambient maxBlend darkenColoured(getLight(x - 1, y    ) ?: 0, thisTileOpacity)
+            ambient = ambient maxBlend darkenColoured(getLight(x + 1, y    ) ?: 0, thisTileOpacity)
             return lightLevelThis maxBlend ambient
-            // mix and return lightlevel and ambient
-            /*val retLevel = lightLevelThis maxBlend ambient
-            // hack: make sure (3,3,3) become 0
-            return if (retLevel.rawR() < 4 && retLevel.rawG() < 4 && retLevel.rawB() < 4)
-                0
-            else
-                retLevel*/
         }
         else {
-            // hack: make sure (3,3,3) become 0
-            /*return if (lightLevelThis.rawR() < 4 && lightLevelThis.rawG() < 4 && lightLevelThis.rawB() < 4)
-                0
-            else
-                lightLevelThis*/
             return lightLevelThis
         }
     }
@@ -480,6 +450,14 @@ object LightmapRenderer {
         //val b = data.b() - darken.b()
 
         return constructRGBFromFloat(r.clampZero(), g.clampZero(), b.clampZero())
+    }
+
+    fun scaleColour(data: Int, scale: Float): Int {
+        val r = data.r() * scale
+        val g = data.g() * scale
+        val b = data.b() * scale
+
+        return constructRGBFromFloat(r.clampOne(), g.clampOne(), b.clampOne())
     }
 
     /**
