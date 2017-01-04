@@ -536,7 +536,7 @@ constructor() : BasicGameState() {
         if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD) {
             val actors = actorContainer.size.toFloat()
             // set up indices
-            for (i in 0..ThreadParallel.POOL_SIZE - 1) {
+            for (i in 0..Terrarum.THREADS - 1) {
                 ThreadParallel.map(
                         i,
                         ThreadActorUpdate(
