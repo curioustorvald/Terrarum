@@ -90,7 +90,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     var axisRY = 0f
 
     /** empirical value. */
-    @Transient private val JUMP_ACCELERATION_MOD = 170.0 / 10000.0 //linear mode
+    @Transient private val JUMP_ACCELERATION_MOD = 51.0 / 10000.0 // (170 * (17/MAX_JUMP_LENGTH)^2) / 10000.0
     @Transient private val WALK_FRAMES_TO_MAX_ACCEL = 6
 
     @Transient private val LEFT = 1
@@ -104,12 +104,13 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     /** how long the walk button has down, in frames */
     internal var walkCounterX = 0
     internal var walkCounterY = 0
-    @Transient private val MAX_JUMP_LENGTH = 17 // use 17; in internal frames
+    @Transient private val MAX_JUMP_LENGTH = 31 // manages "heaviness" of the jump control. Higher = heavier
 
     private var readonly_totalX = 0.0
     private var readonly_totalY = 0.0
 
     internal var jumping = false
+    internal var airJumpingAllowed = false
 
     internal var walkHeading: Int = 0
 
@@ -343,8 +344,14 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
          */
         if (isJumpDown) {
             if (!noClip) {
-                if (grounded) {
+                if (airJumpingAllowed ||
+                    (!airJumpingAllowed && grounded)) {
                     jumping = true
+
+
+                    if (!isGamer) {
+                        println("[ActorHumanoid] jumping = true")
+                    }
                 }
                 jump()
             }
@@ -459,42 +466,37 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     /**
      * See ./work_files/Jump power by pressing time.gcx
      *
-     * TODO linear function (play Super Mario Bros. and you'll get what I'm talking about)
+     * TODO linear function (play Super Mario Bros. and you'll get what I'm talking about) -- SCRATCH THAT!
      */
     private fun jump() {
         val len = MAX_JUMP_LENGTH.toFloat()
         val pwr = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0)
-        val jumpLinearThre = 0.08
 
-        fun jumpFunc(x: Int): Double {
-            if (x >= len) return 0.0
-            val ret = pwr - 0.02 * x
-
-            if (ret < jumpLinearThre) return jumpLinearThre
-            else return ret
+        fun jumpFunc(counter: Int): Double {
+            // linear time mode
+            val init = (len + 1) / 2.0
+            var timedJumpCharge = init - init / len * counter
+            if (timedJumpCharge < 0) timedJumpCharge = 0.0
+            return timedJumpCharge
         }
 
         if (jumping) {
-            if (isGamer) { // jump power increases as the gamer hits JUMP longer time
-                // increment jump counter
-                if (jumpCounter < len) jumpCounter += 1
+            // increment jump counter
+            if (jumpCounter < len) jumpCounter += 1
 
-                // linear time mode
-                val init = (len + 1) / 2.0
-                var timedJumpCharge = init - init / len * jumpCounter
-                if (timedJumpCharge < 0) timedJumpCharge = 0.0
+            val timedJumpCharge = jumpFunc(jumpCounter)
 
-                // one that uses jumpFunc(x)
-                //val timedJumpCharge = jumpFunc(jumpCounter)
+            jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
 
-                jumpAcc = -pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
+            applyForce(Vector2(0.0, -jumpAcc))
+        }
 
-                applyForce(Vector2(0.0, jumpAcc))
-            }
-            else { // no such minute control for AIs
-                //veloY -= pwr * Math.sqrt(scale)
-                jumpAcc = -pwr * Math.sqrt(scale)
-            }
+        // release "jump key" of AIs
+        if (jumpCounter >= len && !isGamer) {
+            isJumpDown = false
+            jumping = false
+            jumpCounter = 0
+            jumpAcc = 0.0
         }
     }
 
