@@ -62,8 +62,8 @@ internal object Teleport : ConsoleCommand {
             }
 
             fromActor.setPosition(
-                    targetActor.feetPosition.x,
-                    targetActor.feetPosition.y
+                    targetActor.feetPosVector.x,
+                    targetActor.feetPosVector.y
             )
         }
         else if (args.size == 5) {

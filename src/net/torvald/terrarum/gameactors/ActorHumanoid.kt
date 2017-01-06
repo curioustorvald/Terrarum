@@ -347,11 +347,6 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                 if (airJumpingAllowed ||
                     (!airJumpingAllowed && grounded)) {
                     jumping = true
-
-
-                    if (!isGamer) {
-                        println("[ActorHumanoid] jumping = true")
-                    }
                 }
                 jump()
             }

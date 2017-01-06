@@ -533,7 +533,7 @@ constructor() : BasicGameState() {
      * NOTE: concurrency for actor updating is currently disabled because of it's poor performance
      */
     fun updateActors(gc: GameContainer, delta: Int) {
-        if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD) {
+        if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD && actorContainer.size > Terrarum.THREADS) {
             val actors = actorContainer.size.toFloat()
             // set up indices
             for (i in 0..Terrarum.THREADS - 1) {

@@ -5,16 +5,17 @@ import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
-import org.luaj.vm2.Globals
-import org.luaj.vm2.LuaFunction
-import org.luaj.vm2.LuaTable
-import org.luaj.vm2.LuaValue
+import net.torvald.terrarum.tileproperties.TileCodex
+import org.luaj.vm2.*
+import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 
 /**
  * Created by minjaesong on 16-10-24.
  */
 internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
+
+    // FIXME when actor jumps, the actor releases left/right stick
 
     init {
         if (actor !is AIControlled)
@@ -37,6 +38,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         g["ai"]["moveTo"] = MoveTo(actor)
         g["ai"]["jump"] = Jump(actor)
 
+        g["ai"]["getNearbyTiles"] = GetNearbyTiles(actor)
 
         g["game"] = LuaValue.tableOf()
         g["game"]["version"] = GameVersion()
@@ -48,7 +50,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
          * Reads arbitrary ActorWithBody and returns its information as Lua table
          */
         fun composeActorObject(actor: ActorWithBody): LuaTable {
-            val t: LuaTable = LuaValue.tableOf()
+            val t: LuaTable = LuaTable()
 
             t["name"] = actor.actorValue.getAsString(AVKey.NAME).toLua()
             t["posX"] = actor.hitbox.centeredX.toLua()
@@ -84,7 +86,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         fun Double?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
         fun Int?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
         fun String?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
-
+        fun Boolean.toInt() = if (this) 1 else 0
     }
 
     class GetSelfActorInfo(val actor: ActorWithBody) : ZeroArgFunction() {
@@ -212,16 +214,57 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         }
     }
 
+    class GetNearbyTiles(val actor: ActorWithBody) : OneArgFunction() {
+
+        /** @param radius: lookahead
+         *
+         *  3 will return 7x7 array, 0 will return 1x1, 1 will return 3x3
+         *
+         *  Index: [-3: y][-3: x] ... [0: y][0: x] ... [3: y][3: x]
+         *  Return value: bitset (int 0-7)
+         *      1 -- solidity
+         *      2 -- liquidity
+         *      3 -- gravity
+         */
+        override fun call(radius: LuaValue): LuaValue {
+            val radius = radius.checkint()
+
+            if (radius < 0) {
+                return LuaValue.NONE
+            }
+            else {
+                val luatable = LuaTable()
+                val feetTilePos = actor.feetPosTile
+                for (y in feetTilePos[1] - radius..feetTilePos[1] + radius) {
+                    luatable[y - feetTilePos[1]] = LuaTable()
+
+                    for (x in feetTilePos[0] - radius..feetTilePos[0] + radius) {
+                        val tile = TileCodex[Terrarum.ingame.world.getTileFromTerrain(x, y) ?: 4096]
+                        val solidity = tile.isSolid.toInt()
+                        val liquidity = tile.isFluid.toInt()
+                        val gravity = tile.isFallable.toInt()
+                        val tileFlag: Int = gravity.shl(2) + liquidity.shl(1) + solidity
+
+                        luatable[y - feetTilePos[1]][x - feetTilePos[0]] =
+                                LuaInteger.valueOf(tileFlag)
+                    }
+                }
+
+                return luatable
+            }
+        }
+    }
 
 
 
-    class GameVersion() : ZeroArgFunction() {
+
+    class GameVersion : ZeroArgFunction() {
         override fun call(): LuaValue {
             return Terrarum.VERSION_STRING.toLua()
         }
     }
 
-    class GameVersionRaw() : ZeroArgFunction() {
+    class GameVersionRaw : ZeroArgFunction() {
         override fun call(): LuaValue {
             return Terrarum.VERSION_RAW.toLua()
         }

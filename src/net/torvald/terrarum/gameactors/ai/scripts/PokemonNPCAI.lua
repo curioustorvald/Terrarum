@@ -1,36 +1,42 @@
-package net.torvald.terrarum.gameactors.ai.scripts
-
-/**
- * Randomly roams around.
- *
- * Created by SKYHi14 on 2016-12-23.
- */
-
-
-object PokemonNPCAI : EncapsulatedString() {
-    override fun getString() = """
+--
+-- Created by minjaesong on 2017-01-06.
+--
 timeCounter = 0
 countMax = 0
 moveMode = math.random() >= 0.5 and "left" or "right"
-currentMode = "turn"
+currentMode = "move"
 
 local function generateCountMax()
-    function generateTurn()
+    local function generateTurn()
         return 4600 + 1250 * math.random()
     end
 
-    function generateWalk()
-        return 568 + 342 * math.random()
+    local function generateWalk()
+        return 1645 + 402 * math.random()
     end
 
     return (currentMode == "move") and generateWalk() or generateTurn()
 end
 
-local function moveToDirection()
+local function moveToDirection(delta)
+    local tiles = ai.getNearbyTiles(1)
+
     if moveMode == "left" then
-        ai.moveLeft(0.5)
+        if bit32.band(bit32.bor(tiles[0][-1], tiles[-1][-1]), 1) == 1 then
+            ai.moveLeft(0.75)
+            ai.jump()
+        else
+            timeCounter = timeCounter + delta -- no countup when jumping
+            ai.moveLeft(0.5)
+        end
     elseif moveMode == "right" then
-        ai.moveRight(0.5)
+        if bit32.band(bit32.bor(tiles[0][1], tiles[-1][1]), 1) == 1 then
+            ai.moveRight(0.75)
+            ai.jump()
+        else
+            timeCounter = timeCounter + delta -- no countup when jumping
+            ai.moveRight(0.5)
+        end
     end
 end
 
@@ -47,10 +53,10 @@ end
 countMax = generateCountMax()
 
 function update(delta)
-    timeCounter = timeCounter + delta
-
     if currentMode == "move" then
-        moveToDirection()
+        moveToDirection(delta)
+    else
+        timeCounter = timeCounter + delta -- no countup when jumping
     end
 
     if timeCounter >= countMax then
@@ -62,6 +68,3 @@ function update(delta)
         end
     end
 end
-
-"""
-}
