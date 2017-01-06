@@ -2,7 +2,6 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.gameactors.ActorHumanoid
-import net.torvald.terrarum.gameactors.ai.scripts.PokemonNPCAI
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 
 /**
@@ -12,7 +11,8 @@ object PlayerBuilderCynthia {
 
     operator fun invoke(): ActorWithBody {
         //val p: Player = Player(GameDate(100, 143)) // random value thrown
-        val p: HumanoidNPC = HumanoidNPC(PokemonNPCAI, GameDate(100, 143)) // random value thrown
+        val p: HumanoidNPC = HumanoidNPC("/net/torvald/terrarum/gameactors/ai/scripts/PokemonNPCAI.lua",
+                GameDate(100, 143)) // random value thrown
         InjectCreatureRaw(p.actorValue, "CreatureHuman.json")
 
         p.actorValue[AVKey.__PLAYER_QUICKBARSEL] = 0

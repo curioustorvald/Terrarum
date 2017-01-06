@@ -2,7 +2,6 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.ai.AILuaAPI
-import net.torvald.terrarum.gameactors.ai.scripts.EncapsulatedString
 import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
 import org.luaj.vm2.*
@@ -19,9 +18,7 @@ import java.io.Reader
 /**
  * Created by minjaesong on 16-01-31.
  */
-open class HumanoidNPC(luaScript: EncapsulatedString, born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
-
-    override val scriptPath: String = ""
+open class HumanoidNPC(override val scriptPath: String, born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
 
     protected val luag: Globals = JsePlatform.standardGlobals()
 
@@ -39,7 +36,8 @@ open class HumanoidNPC(luaScript: EncapsulatedString, born: GameDate) : ActorHum
         luag["luajava"] = LuaValue.NIL
         aiLuaAPI = AILuaAPI(luag, this)
         // load the script and execute it (initialises target script)
-        luaInstance = luag.load(luaScript.getString(), luaScript.javaClass.simpleName)
+        val inputStream = javaClass.getResourceAsStream(scriptPath)
+        luaInstance = luag.load(InputStreamReader(inputStream), scriptPath.split(Regex("[\\/]")).last())
         luaInstance.call()
     }
 

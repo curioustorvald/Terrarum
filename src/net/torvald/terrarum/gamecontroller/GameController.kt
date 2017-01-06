@@ -115,7 +115,7 @@ object GameController {
         /*if (button == 0) {
             Terrarum.ingame.addActor(ProjectileSimple(
                     0,
-                    Terrarum.ingame.player.centrePosition,
+                    Terrarum.ingame.player.centrePosVector,
                     Vector2(mouseX.toDouble(), mouseY.toDouble())
             ))
         }*/

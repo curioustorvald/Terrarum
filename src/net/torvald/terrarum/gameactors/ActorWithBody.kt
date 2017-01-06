@@ -305,12 +305,16 @@ open class ActorWithBody : Actor() {
                 baseHitboxH * scale)
     }
 
-    val centrePosition: Vector2
+    val centrePosVector: Vector2
         get() = Vector2(hitbox.centeredX, hitbox.centeredY)
     val centrePosPoint: Point2d
         get() = Point2d(hitbox.centeredX, hitbox.centeredY)
-    val feetPosition: Vector2
-        get() = Vector2(hitbox.centeredX, hitbox.posY + hitbox.height)
+    val feetPosVector: Vector2
+        get() = Vector2(hitbox.centeredX, hitbox.endPointY)
+    val feetPosPoint: Point2d
+        get() = Point2d(hitbox.centeredX, hitbox.endPointY)
+    val feetPosTile: IntArray
+        get() = intArrayOf(tilewiseHitbox.centeredX.floorInt(), tilewiseHitbox.endPointY.floorInt())
 
     override fun run() = update(gameContainer, updateDelta)
 
