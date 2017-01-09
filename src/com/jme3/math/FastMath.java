@@ -99,7 +99,7 @@ final public class FastMath {
      * @param number The number to obtain the POT for.
      * @return The next power of two.
      */
-    public static int nearestPowerOfTwo(int number) {
+    public static int nextPowerOfTwo(int number) {
         number--;
         number |= number >> 1;
         number |= number >> 2;

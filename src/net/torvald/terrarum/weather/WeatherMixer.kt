@@ -82,15 +82,14 @@ object WeatherMixer {
         val skyColourFill = GradientFill(
                 0f, 0f,
                 getGradientColour(skyboxColourMap, 0, timeNow),
-                0f, Terrarum.HEIGHT / Terrarum.ingame.screenZoom,
+                0f, Terrarum.HEIGHT.toFloat(),// / Terrarum.ingame.screenZoom,
                 getGradientColour(skyboxColourMap, 1, timeNow)
         )
         g.fill(Rectangle(
                 0f, 0f,
-                Terrarum.WIDTH / Terrarum.ingame.screenZoom,
-                Terrarum.HEIGHT / Terrarum.ingame.screenZoom),
-                skyColourFill
-        )
+                Terrarum.WIDTH.toFloat(),// / Terrarum.ingame.screenZoom,
+                Terrarum.HEIGHT.toFloat()// / Terrarum.ingame.screenZoom
+        ),skyColourFill)
 
         // calculate global light
         val gradCol = getGradientColour(lightColourMap, 0, timeNow)

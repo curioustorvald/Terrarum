@@ -291,7 +291,12 @@ constructor() : BasicGameState() {
         blendNormal()
 
 
-        drawSkybox(worldDrawFrameBuffer.graphics)
+        drawSkybox(gwin)
+        /*drawSkybox(worldDrawFrameBuffer.graphics)
+        uisDrawFrameBuffer.graphics.color = Color(255, 255, 255, 0)
+        uisDrawFrameBuffer.graphics.fillRect(
+                0f, 0f, uisDrawFrameBuffer.width.toFloat(), uisDrawFrameBuffer.height.toFloat()
+        )*/
 
 
         // make camara work //
@@ -304,20 +309,19 @@ constructor() : BasicGameState() {
         // draw map related stuffs //
         /////////////////////////////
         TilesDrawer.renderBehind(gc, worldDrawFrameBuffer.graphics)
+        // --> blendNormal() <-- by TilesDrawer.renderBehind
 
 
         /////////////////
         // draw actors //
         /////////////////
-        // --> Change of blend mode <-- introduced by ActorWithBody //
         actorContainer.forEach { actor ->
             if (actor is ActorWithBody && actor.inScreen() && actor !is Player && !actor.drawTopmost) {
                 actor.drawBody(gc, worldDrawFrameBuffer.graphics)
             }
         }
-        // --> Change of blend mode <-- introduced by ActorWithBody //
         player.drawBody(gc, worldDrawFrameBuffer.graphics)
-        // --> Change of blend mode <-- introduced by ActorWithBody //
+        // actors that are drawTopmost
         actorContainer.forEach { actor ->
             if (actor is ActorWithBody && actor.inScreen() && actor !is Player && actor.drawTopmost) {
                 actor.drawBody(gc, worldDrawFrameBuffer.graphics)
@@ -331,13 +335,11 @@ constructor() : BasicGameState() {
         /////////////////////////////
         LightmapRenderer.renderLightMap()
 
-        // --> blendMul() <-- by TilesDrawer.renderFront
-        TilesDrawer.renderFront(gc, worldDrawFrameBuffer.graphics)
+        TilesDrawer.renderFront(gc, worldDrawFrameBuffer.graphics, false)
         // --> blendNormal() <-- by TilesDrawer.renderFront
         FeaturesDrawer.render(gc, worldDrawFrameBuffer.graphics)
 
 
-        // --> blendMul() <-- by TilesDrawer.drawEnvOverlay
         FeaturesDrawer.drawEnvOverlay(worldDrawFrameBuffer.graphics)
 
         if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul()
@@ -348,14 +350,19 @@ constructor() : BasicGameState() {
         //////////////////////
         // draw actor glows //
         //////////////////////
-        // --> blendLightenOnly() <-- introduced by ActorWithBody //
         actorContainer.forEach { actor ->
             if (actor is ActorWithBody && actor.inScreen() && actor !is Player) {
                 actor.drawGlow(gc, worldDrawFrameBuffer.graphics)
             }
         }
-        // --> blendLightenOnly() <-- introduced by ActorWithBody //
         player.drawGlow(gc, worldDrawFrameBuffer.graphics)
+        // actors that are drawTopmost
+        actorContainer.forEach { actor ->
+            if (actor is ActorWithBody && actor.inScreen() && actor !is Player && actor.drawTopmost) {
+                actor.drawGlow(gc, worldDrawFrameBuffer.graphics)
+            }
+        }
+        // --> blendLightenOnly() <-- introduced by ActorWithBody //
 
 
         ////////////////////////
