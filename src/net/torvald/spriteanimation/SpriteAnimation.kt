@@ -126,7 +126,6 @@ class SpriteAnimation(val parentActor: ActorWithBody) {
             }
 
             val flippedImage = currentImage!!.getFlippedCopy(flipHorizontal, flipVertical)
-            
             flippedImage.draw(
                     Math.round(posX).toFloat(),
                     FastMath.floor(posY).toFloat(),
