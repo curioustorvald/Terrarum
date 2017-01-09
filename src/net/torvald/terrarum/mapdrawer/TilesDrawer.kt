@@ -6,6 +6,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex
 import com.jme3.math.FastMath
+import net.torvald.terrarum.blendAlphaMap
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.blendNormal
@@ -25,13 +26,9 @@ object TilesDrawer {
     private val world: GameWorld = Terrarum.ingame.world
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
 
-    var tilesWall: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wall.png", TILE_SIZE, TILE_SIZE)
-        private set
     var tilesTerrain: SpriteSheet = SpriteSheet("./assets/graphics/terrain/terrain.tga", TILE_SIZE, TILE_SIZE)
         private set // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
     var tilesWire: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wire.png", TILE_SIZE, TILE_SIZE)
-        private set
-    var tilesetBook: Array<SpriteSheet> = arrayOf(tilesWall, tilesTerrain, tilesWire)
         private set
 
     val WALL = GameWorld.WALL
@@ -229,18 +226,45 @@ object TilesDrawer {
         val player = Terrarum.ingame.player
     }
 
+    val wallOverlayColour = Color(2f/3f, 2f/3f, 2f/3f, 1f)
+
     fun renderBehind(gc: GameContainer, g: Graphics) {
         /**
          * render to camera
          */
         blendNormal()
+
+        tilesTerrain.startUse()
         drawTiles(g, WALL, false)
+        tilesTerrain.endUse() // you absolutely need this
+
+        blendMul()
+
+        g.color = wallOverlayColour
+        g.fillRect(MapCamera.x.toFloat(), MapCamera.y.toFloat(),
+                MapCamera.width.toFloat() + 1, MapCamera.height.toFloat() + 1
+        )
+
+        blendNormal()
+
+        tilesTerrain.startUse() // you absolutely need this
         drawTiles(g, TERRAIN, false)
+        tilesTerrain.endUse()
     }
 
-    fun renderFront(gc: GameContainer, g: Graphics) {
+    fun renderFront(gc: GameContainer, g: Graphics, drawWires: Boolean) {
         blendMul()
+
+        tilesTerrain.startUse()
         drawTiles(g, TERRAIN, true)
+        tilesTerrain.endUse()
+
+        if (drawWires) {
+            tilesWire.startUse()
+            drawTiles(g, WIRE, false)
+            tilesWire.endUse()
+        }
+
         blendNormal()
     }
 
@@ -250,9 +274,6 @@ object TilesDrawer {
 
         val for_x_start = x / TILE_SIZE - 1
         val for_x_end = for_x_start + (width / TILE_SIZE) + 3
-
-        // initialise
-        TilesDrawer.tilesetBook[mode].startUse()
 
         var zeroTileCounter = 0
 
@@ -333,8 +354,6 @@ object TilesDrawer {
 
             }
         }
-
-        TilesDrawer.tilesetBook[mode].endUse()
     }
 
     /**
@@ -461,11 +480,20 @@ object TilesDrawer {
     }
 
     private fun drawTile(mode: Int, tilewisePosX: Int, tilewisePosY: Int, sheetX: Int, sheetY: Int) {
-        tilesetBook[mode].renderInUse(
-                FastMath.floor((tilewisePosX * TILE_SIZE).toFloat()),
-                FastMath.floor((tilewisePosY * TILE_SIZE).toFloat()),
-                sheetX, sheetY
-        )
+        if (mode == TERRAIN || mode == WALL)
+            tilesTerrain.renderInUse(
+                    FastMath.floor((tilewisePosX * TILE_SIZE).toFloat()),
+                    FastMath.floor((tilewisePosY * TILE_SIZE).toFloat()),
+                    sheetX, sheetY
+            )
+        else if (mode == WIRE)
+            tilesWire.renderInUse(
+                    FastMath.floor((tilewisePosX * TILE_SIZE).toFloat()),
+                    FastMath.floor((tilewisePosY * TILE_SIZE).toFloat()),
+                    sheetX, sheetY
+            )
+        else
+            throw IllegalArgumentException()
     }
 
     fun clampH(x: Int): Int {

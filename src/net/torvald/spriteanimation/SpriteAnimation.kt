@@ -126,15 +126,13 @@ class SpriteAnimation(val parentActor: ActorWithBody) {
             }
 
             val flippedImage = currentImage!!.getFlippedCopy(flipHorizontal, flipVertical)
-
-            flippedImage.startUse()
-            flippedImage.drawEmbedded(
+            
+            flippedImage.draw(
                     Math.round(posX).toFloat(),
                     FastMath.floor(posY).toFloat(),
                     FastMath.floor(width * scale).toFloat(),
                     FastMath.floor(height * scale).toFloat()
             )
-            flippedImage.endUse()
         }
     }
 
