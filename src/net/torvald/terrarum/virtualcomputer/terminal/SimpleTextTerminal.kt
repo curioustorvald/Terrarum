@@ -32,33 +32,34 @@ open class SimpleTextTerminal(
      * Color index 0 must be default background, index 3 must be default foreground
      */
     open protected val colours = if (colour)
+        // TODO colours updated; also update the documentation
         arrayOf(
-                Color(0x00, 0x00, 0x00), // 0 black
-                Color(0xff, 0xff, 0xff), // 1 white
-                Color(0x55, 0x55, 0x55), // 2 dim grey
-                Color(0xaa, 0xaa, 0xaa), // 3 bright grey
+                Color(0x000000), // 0 black
+                Color(0xffffff), // 1 white
+                Color(0x666666), // 2 dim grey
+                Color(0xcccccc), // 3 bright grey
 
-                Color(0xff, 0xff, 0x00), // 4 yellow
-                Color(0xff, 0x66, 0x00), // 5 orange
-                Color(0xdd, 0x00, 0x00), // 6 red
-                Color(0xff, 0x00, 0x99), // 7 magenta
+                Color(0xffee00), // 4 yellow
+                Color(0xee6600), // 5 orange
+                Color(0xee0000), // 6 red
+                Color(0xee22aa), // 7 magenta
 
-                Color(0x33, 0x00, 0x99), // 8 purple
-                Color(0x00, 0x00, 0xcc), // 9 blue
-                Color(0x00, 0x99, 0xff), //10 cyan
-                Color(0x55, 0xff, 0x00), //11 lime
+                Color(0x442277), // 8 purple
+                Color(0x3322ff), // 9 blue
+                Color(0x44aaff), //10 cyan
+                Color(0x55ff00), //11 lime
 
-                Color(0x00, 0xaa, 0x00), //12 green
-                Color(0x00, 0x66, 0x00), //13 dark green
-                Color(0x66, 0x33, 0x00), //14 brown
-                Color(0x99, 0x66, 0x33)  //15 tan
-        )                                // THESE ARE THE STANDARD
+                Color(0x339900), //12 green
+                Color(0x335533), //13 dark green
+                Color(0x553333), //14 brown
+                Color(0xaa6633)  //15 tan
+        )                        // THESE ARE THE STANDARD
     else
         arrayOf(
-                Color(0x00, 0x00, 0x00), // black
-                Color(0xff, 0xff, 0xff), // white
-                Color(0x55, 0x55, 0x55), // dim grey
-                Color(0xaa, 0xaa, 0xaa)  // light grey
+                Color(0x000000), // 0 black
+                Color(0xffffff), // 1 white
+                Color(0x666666), // 2 dim grey
+                Color(0xcccccc) // 3 bright grey
         )                                // THESE ARE THE STANDARD
 
     val phosphor = if (colour) WHITE7500 else phosphorColour
