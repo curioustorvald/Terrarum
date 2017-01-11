@@ -5,10 +5,7 @@ import com.sudoplay.joise.module.*
 import net.torvald.terrarum.Terrarum.Companion.STATE_ID_TOOL_NOISEGEN
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.roundInt
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Image
+import org.newdawn.slick.*
 import org.newdawn.slick.state.BasicGameState
 import org.newdawn.slick.state.StateBasedGame
 import java.util.*
@@ -20,9 +17,9 @@ class StateNoiseTexGen : BasicGameState() {
 
     companion object {
         val imagesize = 512
-        val noiseImage = Image(imagesize, imagesize)
         val sampleDensity = 1.0
-        val noiseMap = Array<FloatArray>(imagesize, { FloatArray(size = imagesize, init = { 0f }) })
+        val noiseImageBuffer = ImageBuffer(imagesize, imagesize)
+        var generating = false
     }
     override fun init(p0: GameContainer?, p1: StateBasedGame?) {
         generateNoiseImage()
@@ -119,11 +116,9 @@ class StateNoiseTexGen : BasicGameState() {
     fun generateNoiseImage() {
         val noiseModule = noiseBillowFractal() // change noise function here
 
-        noiseImage.graphics.background = Color.black
-
         for (y in 0..imagesize - 1) {
             for (x in 0..imagesize - 1) {
-                noiseMap[y][x] = 0f
+                noiseImageBuffer.setRGBA(x, y, 0, 0, 0, 255)
             }
         }
 
@@ -144,6 +139,8 @@ class StateNoiseTexGen : BasicGameState() {
 
     override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
         Terrarum.appgc.setTitle("${Terrarum.NAME} — F: ${Terrarum.appgc.fps}")
+
+        if (ThreadParallel.allFinished()) generating = false
     }
 
     override fun getID() = STATE_ID_TOOL_NOISEGEN
@@ -153,27 +150,17 @@ class StateNoiseTexGen : BasicGameState() {
         g.drawString("Press SPACE to generate new noise", 8f, 8f)
         g.drawString("CPUs: ${Terrarum.THREADS}", Terrarum.WIDTH - 90f, 8f)
 
-        for (sy in 0..imagesize - 1) {
-            for (sx in 0..imagesize - 1) {
-                val noise = noiseMap[sy][sx]
-
-                noiseImage.graphics.color = Color(noise, noise, noise)
-                noiseImage.graphics.fillRect(sx.toFloat(), sy.toFloat(), 1f, 1f)
-            }
-        }
-
-        noiseImage.graphics.flush()
-
         g.background = Color.cyan
-        g.drawImage(noiseImage,
+        g.drawImage(noiseImageBuffer.image,//noiseImage,
                 Terrarum.WIDTH.minus(imagesize).div(2).toFloat(),
                 Terrarum.HEIGHT.minus(imagesize).div(2).toFloat()
         )
     }
 
     override fun keyPressed(key: Int, c: Char) {
-        if (c == ' ') {
+        if (c == ' ' && !generating) {
             println("Generating noise, may take a while")
+            generating = true
             generateNoiseImage()
         }
     }
@@ -199,10 +186,9 @@ class StateNoiseTexGen : BasicGameState() {
                             sampleX, sampleY, sampleZ, sampleW
                     ) // autocorrection REQUIRED!
 
-                    noiseMap[sy][sx] = noise.toFloat()
+                    val noiseCol = noise.times(255f).toInt()
+                    noiseImageBuffer.setRGBA(sx, sy, noiseCol, noiseCol, noiseCol, 255)
 
-                    //noiseImage.graphics.color = Color(noise.toFloat(), noise.toFloat(), noise.toFloat())
-                    //noiseImage.graphics.fillRect(sx.toFloat(), sy.toFloat(), 1f, 1f)
                 }
             }
         }
