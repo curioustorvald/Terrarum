@@ -26,6 +26,14 @@ object ThreadParallel {
     }
 
     /**
+     * Start all thread in the pool and wait for them to all die. If the thread in the pool is NULL, it will simply ignored.
+     */
+    fun startAllWaitForDie() {
+        pool.forEach { it?.start() }
+        pool.forEach { it?.join() }
+    }
+
+    /**
      * Primitive locking
      */
     fun allFinished(): Boolean {
