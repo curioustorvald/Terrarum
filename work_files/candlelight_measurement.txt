@@ -1,0 +1,17 @@
+Result is XYZ: 13.186067 9.766694 0.811010, D50 Lab: 37.420406 27.343440 49.258766
+Result is XYZ: 13.421202 9.973600 0.850178, D50 Lab: 37.795008 27.250973 49.225695
+Result is XYZ: 12.516982 9.284402 0.753020, D50 Lab: 36.526198 26.764843 48.763588
+
+
+Result is XYZ: 14.059772 10.432068 0.984819, D50 Lab: 38.606975 27.797272 48.439663
+                           CCT = 1789K (Delta E 5.151260)
+ Closest Planckian temperature = 1760K (Delta E 2.311918)
+ Closest Daylight temperature  = 2500K (Delta E 71.610860)
+Result is XYZ: 13.635438 10.124139 0.977999, D50 Lab: 38.064313 27.461672 47.609786
+                           CCT = 1792K (Delta E 4.057336)
+ Closest Planckian temperature = 1769K (Delta E 1.822616)
+ Closest Daylight temperature  = 2500K (Delta E 70.617979)
+Result is XYZ: 13.878060 10.310479 0.943578, D50 Lab: 38.393993 27.576617 48.719630
+                           CCT = 1791K (Delta E 7.405568)
+ Closest Planckian temperature = 1749K (Delta E 3.329354)
+ Closest Daylight temperature  = 2500K (Delta E 72.778937)
