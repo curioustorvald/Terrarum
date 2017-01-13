@@ -58,7 +58,7 @@ object TilePropCSV {
  "10";  "2";"TILE_PLATFORM_EBONY"      ;  "8396808";       "1"; "N/A";"wood";    "0";    "0";   "0";         "0";  "10";   "2";   "0";   "0";"16"
  "10";  "3";"TILE_PLATFORM_BIRCH"      ;  "8396808";       "1"; "N/A";"wood";    "0";    "0";   "0";         "0";  "10";   "3";   "0";   "0";"16"
  "10";  "4";"TILE_PLATFORM_BLOODROSE"  ;  "8396808";       "1"; "N/A";"wood";    "0";    "0";   "0";         "0";  "10";   "4";   "0";   "0";"16"
- "11";  "0";"TILE_TORCH"               ;  "8396808";       "0"; "N/A";"fxtr";    "0";    "0";   "0"; "226629701";  "11";   "0";   "0";   "1";"16"
+ "11";  "0";"TILE_TORCH"               ;  "8396808";       "0"; "N/A";"fxtr";    "0";    "0";   "0"; "267553792";  "11";   "0";   "0";   "1";"16"
  "11";  "1";"TILE_TORCH_FROST"         ;  "8396808";       "0"; "N/A";"fxtr";    "0";    "0";   "0";  "81916159";  "11";   "1";   "0";   "1";"16"
  "12";  "0";"TILE_TORCH"               ;  "8396808";       "0"; "N/A";"fxtr";    "0";    "0";   "0";         "0";  "11";   "0";   "0";   "0";"16"
  "12";  "1";"TILE_TORCH_FROST"         ;  "8396808";       "0"; "N/A";"fxtr";    "0";    "0";   "0";         "0";  "11";   "1";   "0";   "0";"16"
@@ -159,7 +159,7 @@ object TilePropCSV {
 ## Illuminators ##
 
 # Illuminator white: RGB(228,238,234), simulation of a halophosphate FL lamp (If you want high CRI lamp, collect a daylight!)
-# Defalut torch : L 64 a 28 b 48 (Planckian 1 770 K); real candlelight colour taken from Spyder5 colorimeter
+# Defalut torch : Y 64 x 0.55183 y 0.40966 (Planckian ~1 770 K); real candlelight colour taken from Spyder5 colorimeter
 # Sunstone: Artificial sunlight, change colour over time in sync with sunlight. The light is set by game's code.
 # Sunlight capacitor: daylight at noon. Set by game's code.
 
