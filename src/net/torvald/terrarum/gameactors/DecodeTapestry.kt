@@ -1,11 +1,20 @@
 package net.torvald.terrarum.gameactors
 
+import com.jme3.math.FastMath
+import net.torvald.terrarum.gameworld.toUint
 import org.newdawn.slick.Color
+import org.newdawn.slick.Image
+import org.newdawn.slick.ImageBuffer
+import org.newdawn.slick.opengl.ImageData
+import org.newdawn.slick.opengl.TextureImpl
 import java.io.File
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
+import java.util.*
 
 object DecodeTapestry {
 
-    val colourIndices = arrayListOf(
+    val colourIndices64 = arrayOf(
             0x333.fourBitCol(),
             0x600.fourBitCol(),
             0xA36.fourBitCol(),
@@ -72,13 +81,116 @@ object DecodeTapestry {
             0xEBA.fourBitCol()
     )
 
+    val colourIndices16 = arrayOf(
+            0x000.fourBitCol(),
+            0xfff.fourBitCol(),
+            0x666.fourBitCol(),
+            0xccc.fourBitCol(),
+            0xfe0.fourBitCol(),
+            0xe60.fourBitCol(),
+            0xe00.fourBitCol(),
+            0xe2a.fourBitCol(),
+            0x427.fourBitCol(),
+            0x32f.fourBitCol(),
+            0x4af.fourBitCol(),
+            0x5f0.fourBitCol(),
+            0x390.fourBitCol(),
+            0x353.fourBitCol(),
+            0x533.fourBitCol(),
+            0xa63.fourBitCol()
+    )
+
     private fun Int.fourBitCol() = Color(
             this.and(0xF00).shl(12) + this.and(0xF00).shl(8) +
             this.and(0x0F0).shl(8) + this.and(0x0F0).shl(4) +
             this.and(0x00F).shl(4) + this.and(0x00F)
     )
 
-    operator fun invoke(file: File) {
+    val MAGIC = "TEAF".toByteArray(charset = Charset.forName("US-ASCII"))
+    val FORMAT_16 = 1
+    val FORMAT_64 = 2
 
+    operator fun invoke(fileObj: File): TapestryObject {
+        fun magicMismatch(magic: ByteArray): Boolean {
+            MAGIC.forEachIndexed { i, byte ->
+                if (byte != magic[i])
+                    return true
+            }
+            return false
+        }
+
+        val file = fileObj.readBytes()
+
+        val magic = file.copyOfRange(0, 4)
+
+        if (magicMismatch(magic))
+            throw RuntimeException("Invalid file --  type mismatch: expected header " +
+                                   "${MAGIC[0]} ${MAGIC[1]} ${MAGIC[2]} ${MAGIC[3]}; got " +
+                                   "${magic[0]} ${magic[1]} ${magic[2]} ${magic[3]}")
+
+        val colourModel = file[4].toUint()
+
+        if (colourModel != FORMAT_16 && colourModel != FORMAT_64)
+            throw RuntimeException("Invalid colour model: $colourModel")
+
+        val width = file[6].toUint().shl(8) + file[7].toUint()
+
+        val artNameBytes = ArrayList<Byte>()
+        val authorNameBytes = ArrayList<Byte>()
+
+        var readCounter = 8
+
+        while (file[readCounter] != 0x00.toByte()) {
+            artNameBytes.add(file[readCounter])
+            readCounter++
+        }
+
+        readCounter++ // jump over null terminator
+
+        while (file[readCounter] != 0x00.toByte()) {
+            authorNameBytes.add(file[readCounter])
+            readCounter++
+        }
+
+        readCounter++ // jump over null terminator
+
+
+
+        val artName = kotlin.text.String(artNameBytes.toByteArray(), charset = Charset.forName("UTF-8"))
+        val authorName = kotlin.text.String(authorNameBytes.toByteArray(), charset = Charset.forName("UTF-8"))
+
+        val imageDataSize = file.size - readCounter
+        val height = imageDataSize / width
+        val outImageData = ImageBuffer(width, height)
+        val counterOffset = readCounter
+        while (readCounter < file.size) {
+            val ofs = readCounter - counterOffset
+            val palIndex = file[readCounter].toUint()
+
+            if (colourModel == FORMAT_16) {
+                outImageData.setRGBA(
+                        ofs % width,
+                        ofs / width,
+                        colourIndices16[palIndex].redByte,
+                        colourIndices16[palIndex].greenByte,
+                        colourIndices16[palIndex].blueByte,
+                        255
+                )
+            }
+            else {
+                outImageData.setRGBA(
+                        ofs % width,
+                        ofs / width,
+                        colourIndices64[palIndex].redByte,
+                        colourIndices64[palIndex].greenByte,
+                        colourIndices64[palIndex].blueByte,
+                        255
+                )
+            }
+
+            readCounter++
+        }
+
+        return TapestryObject(outImageData.image.getScaledCopy(2f), artName, authorName)
     }
 }
