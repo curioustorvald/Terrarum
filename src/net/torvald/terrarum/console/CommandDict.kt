@@ -50,7 +50,8 @@ object CommandDict {
             Pair("testgetlight", TestGetLight),
             Pair("spawnball", SpawnPhysTestBall),
             Pair("spawntorch", SpawnTikiTorch),
-            Pair("musictest", MusicTest)
+            Pair("musictest", MusicTest),
+            Pair("spawntapestry", SpawnTapestry)
     )
 
     operator fun get(commandName: String): ConsoleCommand {
