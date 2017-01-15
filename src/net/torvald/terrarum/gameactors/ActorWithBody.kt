@@ -274,8 +274,8 @@ open class ActorWithBody : Actor() {
     /**
      * @param w
      * @param h
-     * @param tx +: translate drawn sprite to LEFT.
-     * @param ty +: translate drawn sprite to DOWN.
+     * @param tx positive: translate drawn sprite to LEFT.
+     * @param ty positive: translate drawn sprite to DOWN.
      * @see ActorWithBody.drawBody
      * @see ActorWithBody.drawGlow
      */
@@ -1180,6 +1180,7 @@ open class ActorWithBody : Actor() {
 
 fun Double.floorInt() = Math.floor(this).toInt()
 fun Float.floorInt() = FastMath.floor(this)
+fun Float.floor() = FastMath.floor(this).toFloat()
 fun Float.ceilInt() = FastMath.ceil(this)
 fun Double.round() = Math.round(this).toDouble()
 fun Double.floor() = Math.floor(this)

@@ -2,11 +2,13 @@ package net.torvald.terrarum.weather
 
 import com.jme3.math.FastMath
 import net.torvald.JsonFetcher
-import net.torvald.colourutil.CIELChUtil
+import net.torvald.colourutil.CIELChabUtil
+import net.torvald.colourutil.CIEXYZUtil
 import net.torvald.colourutil.ColourUtil
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.WorldTime
+import net.torvald.terrarum.getPixel
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -18,6 +20,11 @@ import java.util.*
 
 /**
  * Current, next are there for cross-fading two weathers
+ *
+ *
+ * Building a CLUT:
+ *     Brightest:Darkest must be "around" 10:1
+ *     Is RGBA-formatted (32-bit)
  *
  * Created by minjaesong on 16-07-11.
  */
@@ -110,14 +117,13 @@ object WeatherMixer {
         val phaseThis: Int = timeInSec / dataPointDistance // x-coord in gradmap
         val phaseNext: Int = (phaseThis + 1) % image.width
 
-        val colourThis = image.getColor(phaseThis, row)
-        val colourNext = image.getColor(phaseNext, row)
+        val colourThis = image.getPixel(phaseThis, row).toColor()
+        val colourNext = image.getPixel(phaseNext, row).toColor()
 
         // interpolate R, G and B
         val scale = (timeInSec % dataPointDistance).toFloat() / dataPointDistance // [0.0, 1.0]
 
-        //val newCol = ColourUtil.getGradient(scale, colourThis, colourNext)
-        val newCol = CIELChUtil.getGradient(scale, colourThis, colourNext)
+        val newCol = CIELChabUtil.getGradient(scale, colourThis, colourNext)
 
         /* // very nice monitor code
         // 65 -> 66 | 300 | 19623 | RGB8(255, 0, 255) -[41%]-> RGB8(193, 97, 23) | * `230`40`160`
@@ -205,3 +211,5 @@ object WeatherMixer {
         return BaseModularWeather(globalLight, skybox, classification, extraImages)
     }
 }
+
+fun IntArray.toColor() = Color(this[0], this[1], this[2], this[3])

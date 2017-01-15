@@ -7,6 +7,7 @@ import net.torvald.imagefont.GameFontWhite
 import net.torvald.JsonFetcher
 import net.torvald.JsonWriter
 import net.torvald.imagefont.TinyAlphNum
+import net.torvald.terrarum.gameworld.toUint
 import org.lwjgl.input.Controllers
 import org.lwjgl.opengl.*
 import org.newdawn.slick.*
@@ -14,6 +15,7 @@ import org.newdawn.slick.state.StateBasedGame
 import java.io.File
 import java.io.IOException
 import java.lang.management.ManagementFactory
+import java.nio.ByteOrder
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.logging.FileHandler
@@ -116,11 +118,12 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
         //addState(StateVTTest())
-        //addState(StateTestingSandbox())
+        //addState(StateTestingLightning())
         //addState(StateSplash())
         //addState(StateMonitorCheck())
         //addState(StateFontTester())
         //addState(StateNoiseTexGen())
+        //addState(StateBlurTest())
 
         ingame = StateInGame()
         addState(ingame)
@@ -219,8 +222,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         val STATE_ID_CONFIG_CALIBRATE = 0x11
 
         val STATE_ID_TEST_FONT = 0x100
-        val STATE_ID_TEST_SHIT = 0x101
+        val STATE_ID_TEST_LIGHTNING_GFX = 0x101
         val STATE_ID_TEST_TTY = 0x102
+        val STATE_ID_TEST_BLUR = 0x103
 
         val STATE_ID_TOOL_NOISEGEN = 0x200
 
@@ -491,4 +495,33 @@ fun blendDisable() {
 
 enum class RunningEnvironment {
     PC, CONSOLE, MOBILE
+}
+
+/** @return Intarray(R, G, B, A) */
+fun Image.getPixel(x: Int, y: Int): IntArray {
+    val textureWidth = this.texture.textureWidth
+    val hasAlpha = this.texture.hasAlpha()
+
+    val offset = (if (hasAlpha) 4 else 3) * (textureWidth * y + x) // 4: # of channels (RGBA)
+
+    if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
+        return intArrayOf(
+                this.texture.textureData[offset].toUint(),
+                this.texture.textureData[offset + 1].toUint(),
+                this.texture.textureData[offset + 2].toUint(),
+                if (hasAlpha)
+                    this.texture.textureData[offset + 3].toUint()
+                else 255
+        )
+    }
+    else {
+        return intArrayOf(
+                this.texture.textureData[offset + 2].toUint(),
+                this.texture.textureData[offset + 1].toUint(),
+                this.texture.textureData[offset].toUint(),
+                if (hasAlpha)
+                    this.texture.textureData[offset + 3].toUint()
+                else 255
+        )
+    }
 }

@@ -232,6 +232,9 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
             if (radius < 0) {
                 return LuaValue.NONE
             }
+            else if (radius > 8) {
+                throw IllegalArgumentException("Radius too large -- must be 8 or less")
+            }
             else {
                 val luatable = LuaTable()
                 val feetTilePos = actor.feetPosTile
