@@ -1,9 +1,13 @@
 package net.torvald.colourutil
 
+import net.torvald.terrarum.getPixel
+import net.torvald.terrarum.weather.toColor
 import org.newdawn.slick.Color
 import org.newdawn.slick.Image
+import net.torvald.colourutil.CIEXYZUtil.toColor
 
 /**
+ * RGB-modeled CCT calculator
  * Created by minjaesong on 16-07-26.
  */
 object ColourTemp {
@@ -14,5 +18,12 @@ object ColourTemp {
         return (K - 1000) / 10
     }
 
-    operator fun invoke(temp: Int): Color = envOverlayColourmap.getColor(colTempToImagePos(temp), 0)
+    /** returns sRGB-normalised colour */
+    operator fun invoke(temp: Int): Color =
+            envOverlayColourmap.getPixel(colTempToImagePos(temp), 0).toColor()
+
+    /** returns CIExyY-based colour converted to slick.color
+     * @param CIE_Y 0.0 - 1.0+ */
+    operator fun invoke(temp: Float, CIE_Y: Float): Color =
+            CIEXYZUtil.colourTempToXYZ(temp, CIE_Y).toColor()
 }

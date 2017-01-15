@@ -59,8 +59,8 @@ open class SimpleTextTerminal(
                 Color(0x000000), // 0 black
                 Color(0xffffff), // 1 white
                 Color(0x666666), // 2 dim grey
-                Color(0xcccccc) // 3 bright grey
-        )                                // THESE ARE THE STANDARD
+                Color(0xcccccc)  // 3 bright grey
+        )                        // THESE ARE THE STANDARD
 
     val phosphor = if (colour) WHITE7500 else phosphorColour
     open val colourScreen = if (colour) Color(8, 8, 8) else Color(19, 19, 19)

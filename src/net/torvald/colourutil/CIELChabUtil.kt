@@ -1,10 +1,11 @@
 package net.torvald.colourutil
 
 import com.jme3.math.FastMath
-import net.torvald.colourutil.CIELChUtil.toLCh
-import net.torvald.colourutil.CIELChUtil.toLab
+import net.torvald.colourutil.CIELChabUtil.toLCh
+import net.torvald.colourutil.CIELChabUtil.toLab
 import net.torvald.colourutil.CIELabUtil.toLab
-import net.torvald.colourutil.CIELabUtil.toRGB
+import net.torvald.colourutil.CIEXYZUtil.toXYZ
+import net.torvald.colourutil.CIEXYZUtil.toColor
 import net.torvald.colourutil.CIELabUtil.toXYZ
 import org.newdawn.slick.Color
 
@@ -16,7 +17,7 @@ import org.newdawn.slick.Color
  * Created by minjaesong on 16-09-01.
  */
 
-object CIELChUtil {
+object CIELChabUtil {
 
     /** Sweet LCh_ab linear gradient */
     fun getGradient(scale: Float, fromCol: Color, toCol: Color): Color {
@@ -34,7 +35,7 @@ object CIELChUtil {
         else
             newH = FastMath.interpolateLinear(scale, from.h, to.h)
 
-        return CIELCh(newL, newC, newH, newAlpha).toRGB()
+        return CIELCh(newL, newC, newH, newAlpha).toColor()
     }
 
     fun CIELab.toLCh(): CIELCh {
@@ -58,7 +59,7 @@ object CIELChUtil {
 }
 
 fun Color.toLCh() = this.toXYZ().toLab().toLCh()
-fun CIELCh.toRGB() = this.toLab().toXYZ().toRGB()
+fun CIELCh.toColor() = this.toLab().toXYZ().toColor()
 
 /**
  * @param L : Luminosity in 0.0 - 1.0

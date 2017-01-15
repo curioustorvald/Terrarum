@@ -28,7 +28,7 @@ import javax.sound.sampled.AudioSystem
 /**
  * Created by minjaesong on 16-09-05.
  */
-class StateTestingSandbox : BasicGameState() {
+class StateTestingLightning : BasicGameState() {
 
     val lightning_start = Point2d(50.0, 100.0)
     val lightning_end = Point2d(750.0, 300.0)
@@ -48,7 +48,7 @@ class StateTestingSandbox : BasicGameState() {
         }*/
     }
 
-    override fun getID() = Terrarum.STATE_ID_TEST_SHIT
+    override fun getID() = Terrarum.STATE_ID_TEST_LIGHTNING_GFX
 
 
     private var timer = 0
@@ -104,10 +104,6 @@ class StateTestingSandbox : BasicGameState() {
     }
 }
 
-fun Graphics.drawLine(p1: Point2d, p2: Point2d) {
-    drawLine(p1.x.toFloat(), p1.y.toFloat(), p2.x.toFloat(), p2.y.toFloat())
-}
-
 class LightingBolt(val start: Point2d, val end: Point2d, val segments: Int) {
     val mainBolt = LinkedList<Point2d>() //Pair<Length, Y-Pos>
 
@@ -133,5 +129,9 @@ class LightingBolt(val start: Point2d, val end: Point2d, val segments: Int) {
 
             g.drawLine(startpoint, endpoint)
         }
+    }
+
+    fun Graphics.drawLine(p1: Point2d, p2: Point2d) {
+        drawLine(p1.x.toFloat(), p1.y.toFloat(), p2.x.toFloat(), p2.y.toFloat())
     }
 }

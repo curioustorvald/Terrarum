@@ -3,8 +3,9 @@ package net.torvald.colourutil
 import com.jme3.math.FastMath
 import org.newdawn.slick.Color
 import net.torvald.colourutil.CIELabUtil.toXYZ
-import net.torvald.colourutil.CIELabUtil.toRawRGB
-import net.torvald.colourutil.CIELabUtil.toRGB
+import net.torvald.colourutil.CIEXYZUtil.toColor
+import net.torvald.colourutil.CIEXYZUtil.toRGB
+import net.torvald.colourutil.CIEXYZUtil.toXYZ
 import net.torvald.colourutil.CIELuvUtil.toLuv
 import net.torvald.colourutil.CIELuvUtil.toXYZ
 
@@ -25,7 +26,7 @@ object CIELuvUtil {
 
         val luv = this.toLuv()
         luv.L *= brighten
-        return luv.toRGB()
+        return luv.toColor()
     }
 
     fun Color.darkerLuv(scale: Float): Color {
@@ -33,7 +34,7 @@ object CIELuvUtil {
 
         val luv = this.toLuv()
         luv.L *= darken
-        return luv.toRGB()
+        return luv.toColor()
     }
 
     /**
@@ -55,7 +56,7 @@ object CIELuvUtil {
         val newU = thisLuv.u.times(otherLuv.L / newL) + otherLuv.u.times(otherLuv.L).times(1f - thisLuv.L).div(newL)
         val newV = thisLuv.v.times(otherLuv.L / newL) + otherLuv.v.times(otherLuv.L).times(1f - thisLuv.L).div(newL)
 
-        return CIELuv(newL, newU, newV).toRawRGB()
+        return CIELuv(newL, newU, newV).toRGB()
     }
 
     fun CIEXYZ.toLuv(): CIELuv {
@@ -98,8 +99,8 @@ object CIELuvUtil {
 }
 
 fun Color.toLuv() = this.toXYZ().toLuv()
-fun CIELuv.toRawRGB() = this.toXYZ().toRawRGB()
 fun CIELuv.toRGB() = this.toXYZ().toRGB()
+fun CIELuv.toColor() = this.toXYZ().toColor()
 
 /**
  * Range:

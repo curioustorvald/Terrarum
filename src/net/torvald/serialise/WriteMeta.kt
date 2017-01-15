@@ -11,6 +11,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import java.io.FileInputStream
 import java.io.File
 import java.io.IOException
+import java.nio.charset.Charset
 import java.nio.file.*
 import java.util.*
 
@@ -21,12 +22,8 @@ object WriteMeta {
 
     val META_FILENAME = "world"
 
-    val MAGIC: ByteArray = byteArrayOf(
-            'T'.toByte(),
-            'E'.toByte(),
-            'S'.toByte(),
-            'V'.toByte()
-    )
+    val MAGIC = "TESV".toByteArray(charset = Charset.forName("US-ASCII"))
+
 
     val BYTE_NULL: Byte = 0
 

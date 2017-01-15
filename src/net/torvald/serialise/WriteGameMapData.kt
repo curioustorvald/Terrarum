@@ -3,6 +3,7 @@ package net.torvald.serialise
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.Terrarum
 import java.io.IOException
+import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -15,12 +16,7 @@ object WriteGameMapData {
 
     val META_FILENAME = "worldinfo1"
 
-    val MAGIC: ByteArray = byteArrayOf(
-            'T'.toByte(),
-            'E'.toByte(),
-            'M'.toByte(),
-            'D'.toByte()
-    )
+    val MAGIC = "TEMD".toByteArray(charset = Charset.forName("US-ASCII"))
 
     val BYTE_NULL: Byte = 0
 

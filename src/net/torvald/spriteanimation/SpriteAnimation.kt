@@ -20,10 +20,10 @@ class SpriteAnimation(val parentActor: ActorWithBody) {
         private set
     var width: Int = 0
         private set
-    private var currentFrame = 1
-    private var currentRow = 1
-    private var nFrames: Int = 0
-    private var nRows: Int = 0
+    private var currentFrame = 1 // one-based!
+    private var currentRow = 1   // one-based!
+    private var nFrames: Int = 1
+    private var nRows: Int = 1
     private var delay = 200
     private var delta = 0
     private val looping = true
@@ -46,9 +46,12 @@ class SpriteAnimation(val parentActor: ActorWithBody) {
      * *
      * @throws SlickException
      */
-    @Throws(SlickException::class)
     fun setSpriteImage(imagePath: String) {
         spriteImage = SpriteSheet(imagePath, this.width, this.height)
+    }
+
+    fun setSpriteImage(image: Image) {
+        spriteImage = SpriteSheet(image, this.width, this.height)
     }
 
     /**
@@ -60,10 +63,9 @@ class SpriteAnimation(val parentActor: ActorWithBody) {
     }
 
     /**
-     * Sets sprite dimension. This is necessary.
-     * @param w
-     * *
-     * @param h
+     * Sets sprite dimension. This is necessary for this to work.
+     * @param w width of the animation frame
+     * @param h height of the animation frame
      */
     fun setDimension(w: Int, h: Int) {
         width = w

@@ -61,7 +61,7 @@ constructor(val UI: UICanvas) {
     var openCloseCounter: Int = 0
 
     init {
-        println("[UIHandler] Creating UI '${UI.javaClass.simpleName}'")
+        println("[UIHandler] Creating framebuffer for UI '${UI.javaClass.simpleName}'")
 
         UIDrawnCanvas = Image(UI.width, UI.height)
 

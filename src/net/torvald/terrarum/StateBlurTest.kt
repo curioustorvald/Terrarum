@@ -53,14 +53,17 @@ class StateBlurTest : BasicGameState() {
         g.flush()
     }
 
+    private val isLE: Boolean
+        get() = ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN
+
     /** three iterations of box blur \simeq gaussian blur */
     fun fastBoxBlur(from: Image, to: ImageBuffer, radius: Int) {
 
         /** 0xRRGGBBAA */
         fun getPixelData(index: Int): Int {
-            val r = from.texture.textureData[4 * index].toUint()
+            val r = from.texture.textureData[4 * index + if (isLE) 0 else 2].toUint()
             val g = from.texture.textureData[4 * index + 1].toUint()
-            val b = from.texture.textureData[4 * index + 2].toUint()
+            val b = from.texture.textureData[4 * index + if (isLE) 2 else 0].toUint()
 
             if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
                 return r.shl(16) or g.shl(8) or b
@@ -76,9 +79,9 @@ class StateBlurTest : BasicGameState() {
             val g = value.ushr(16).and(0xff)
             val b = value.ushr(8).and(0xff)
 
-            to.rgba[4 * index] = r.toByte()
+            to.rgba[4 * index + if (isLE) 0 else 2] = r.toByte()
             to.rgba[4 * index + 1] = g.toByte()
-            to.rgba[4 * index + 2] = b.toByte()
+            to.rgba[4 * index + if (isLE) 2 else 0] = b.toByte()
         }
 
         if (radius < 1) {
