@@ -53,10 +53,10 @@ class StateMonitorCheck : BasicGameState() {
 
         init {
             if (Terrarum.gameLocale.length >= 4 && Terrarum.gameLocale.contains(maru_alt))
-                pictograms.add(Image("./assets/graphics/gui/monitor_good_alt_maru.png"))
+                pictograms.add(Image("./assets/graphics/gui/monitor_good_alt_maru.tga"))
             else
-                pictograms.add(Image("./assets/graphics/gui/monitor_good.png"))
-            pictograms.add(Image("./assets/graphics/gui/monitor_bad.png"))
+                pictograms.add(Image("./assets/graphics/gui/monitor_good.tga"))
+            pictograms.add(Image("./assets/graphics/gui/monitor_bad.tga"))
 
             imageGallery = ItemImageGallery(0, instructionY, Terrarum.WIDTH, anykeyY - instructionY, pictograms)
         }

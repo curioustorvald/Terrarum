@@ -52,8 +52,8 @@ class StateSplash : BasicGameState() {
         // pre-load lang
         Lang["MENU_LANGUAGE_THIS"]
 
-        pictogramCollection.add(Image("./assets/graphics/gui/health_take_a_break.png"))
-        pictogramCollection.add(Image("./assets/graphics/gui/health_distance.png"))
+        pictogramCollection.add(Image("./assets/graphics/gui/health_take_a_break.tga"))
+        pictogramCollection.add(Image("./assets/graphics/gui/health_distance.tga"))
 
         fadeSheet = Image(Terrarum.WIDTH, Terrarum.HEIGHT)
         thisG = fadeSheet.graphics

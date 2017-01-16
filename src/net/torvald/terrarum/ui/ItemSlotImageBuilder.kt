@@ -20,11 +20,11 @@ object ItemSlotImageBuilder {
     private val colourWhite = Color(0xC0, 0xC0, 0xC0, 0xEE)
 
     private val numberFont = SpriteSheetFont(
-            SpriteSheet("./assets/graphics/fonts/numeric_small.png", 5, 8),
+            SpriteSheet("./assets/graphics/fonts/numeric_small.tga", 5, 8),
             '0'
     )
-    val slotImage = Image("./assets/graphics/gui/quickbar/item_slot.png") // must have same w/h as slotLarge
-    val slotLarge = Image("./assets/graphics/gui/quickbar/item_slot_large.png")
+    val slotImage = Image("./assets/graphics/gui/quickbar/item_slot.tga") // must have same w/h as slotLarge
+    val slotLarge = Image("./assets/graphics/gui/quickbar/item_slot_large.tga")
     private val canvas = Image(slotImage.width, slotImage.height)
     private val canvasLarge = Image(slotLarge.width, slotLarge.height)
 

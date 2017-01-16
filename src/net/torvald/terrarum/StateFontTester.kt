@@ -22,7 +22,7 @@ class StateFontTester : BasicGameState() {
         Terrarum.gameLocale = "fiFI"
 
         segfont = SpriteSheetFont(
-                SpriteSheet("./assets/graphics/fonts/24-seg_red.png", 22, 31),
+                SpriteSheet("./assets/graphics/fonts/24-seg_red.tga", 22, 31),
                 ' '
         )
     }

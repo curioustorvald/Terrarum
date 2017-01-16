@@ -192,7 +192,7 @@ class TeletypeTerminal : Teletype {
         private val mappingTable = HashMap<Int, Int>()
 
         init {
-            fontSheet = SpriteSheet("./assets/graphics/fonts/teletype_9x12.png", W, H)
+            fontSheet = SpriteSheet("./assets/graphics/fonts/teletype_9x12.tga", W, H)
             chars.forEachIndexed { i, c -> mappingTable[c.toInt()] = i }
         }
 

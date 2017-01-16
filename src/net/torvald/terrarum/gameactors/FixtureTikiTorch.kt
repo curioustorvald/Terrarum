@@ -26,7 +26,7 @@ class FixtureTikiTorch : FixtureBase(), Luminous {
         lightBoxList.add(Hitbox(3.0, 0.0, 4.0, 3.0))
 
         makeNewSprite(10, 27)
-        sprite!!.setSpriteImage("assets/graphics/sprites/fixtures/tiki_torch.png")
+        sprite!!.setSpriteImage("assets/graphics/sprites/fixtures/tiki_torch.tga")
         sprite!!.setDelay(200)
         sprite!!.setRowsAndFrames(1, 1)
 

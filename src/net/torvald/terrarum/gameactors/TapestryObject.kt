@@ -24,8 +24,8 @@ class TapestryObject(val image: Image, val artName: String, val artAuthor: Strin
         super.update(gc, delta)
     }
 
-    override fun drawBody(gc: GameContainer, g: Graphics) {
-        super.drawBody(gc, g)
+    override fun drawBody(g: Graphics) {
+        super.drawBody(g)
     }
 
     override fun updateBodySprite(gc: GameContainer, delta: Int) {

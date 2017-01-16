@@ -19,7 +19,7 @@ open class ProjectileSimple(
         private val type: Int,
         fromPoint: Vector2, // projected coord
         toPoint: Vector2    // arriving coord
-        ) : ActorWithBody(), Luminous, Projectile {
+        ) : ActorWithBody(ActorOrder.MIDTOP), Luminous, Projectile {
 
     val damage: Int
     val displayColour: Color
@@ -76,7 +76,7 @@ open class ProjectileSimple(
         super.update(gc, delta)
     }
 
-    override fun drawBody(gc: GameContainer, g: Graphics) {
+    override fun drawBody(g: Graphics) {
         val colourTail = displayColour.darker(0f) // clone a colour
         colourTail.a = 0.16f
 
@@ -92,7 +92,7 @@ open class ProjectileSimple(
         )
     }
 
-    override fun drawGlow(gc: GameContainer, g: Graphics) = drawBody(gc, g)
+    override fun drawGlow(g: Graphics) = drawBody(g)
 
     companion object {
         val OFFSET_DAMAGE = 0

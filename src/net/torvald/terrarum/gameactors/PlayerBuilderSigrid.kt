@@ -27,12 +27,12 @@ object PlayerBuilderSigrid {
         p.referenceID = 0x51621D // the only constant of this procedural universe
 
         p.makeNewSprite(28, 51)
-        p.sprite!!.setSpriteImage("assets/graphics/sprites/test_player.png")
+        p.sprite!!.setSpriteImage("assets/graphics/sprites/test_player.tga")
         p.sprite!!.setDelay(200)
         p.sprite!!.setRowsAndFrames(1, 1)
 
         p.makeNewSpriteGlow(28, 51)
-        p.spriteGlow!!.setSpriteImage("assets/graphics/sprites/test_player_glow.png")
+        p.spriteGlow!!.setSpriteImage("assets/graphics/sprites/test_player_glow.tga")
         p.spriteGlow!!.setDelay(200)
         p.spriteGlow!!.setRowsAndFrames(1, 1)
 

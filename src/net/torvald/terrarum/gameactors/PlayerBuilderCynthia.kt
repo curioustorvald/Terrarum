@@ -20,7 +20,7 @@ object PlayerBuilderCynthia {
 
 
         p.makeNewSprite(26, 42)
-        p.sprite!!.setSpriteImage("assets/graphics/sprites/test_player_2.png")
+        p.sprite!!.setSpriteImage("assets/graphics/sprites/test_player_2.tga")
         p.sprite!!.setDelay(200)
         p.sprite!!.setRowsAndFrames(1, 1)
 
@@ -31,7 +31,7 @@ object PlayerBuilderCynthia {
 
 
 
-        p.referenceID = 12345678
+        p.referenceID = 321321321
 
 
 

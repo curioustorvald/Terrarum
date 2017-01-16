@@ -56,6 +56,11 @@ constructor() : BasicGameState() {
     val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val uiContainer = ArrayList<UIHandler>()
 
+    private val actorsRenderBehind = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderMiddle = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderMidTop = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderFront  = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+
     lateinit var consoleHandler: UIHandler
     lateinit var debugWindow: UIHandler
     lateinit var notifier: UIHandler
@@ -72,7 +77,9 @@ constructor() : BasicGameState() {
     val ZOOM_MIN = 0.5f
 
     val worldDrawFrameBuffer = Image(Terrarum.WIDTH.div(ZOOM_MIN).ceilInt(), Terrarum.HEIGHT.div(ZOOM_MIN).ceilInt())
+    val worldG = worldDrawFrameBuffer.graphics
     val uisDrawFrameBuffer = Image(Terrarum.WIDTH, Terrarum.HEIGHT)
+    val uiG = uisDrawFrameBuffer.graphics
 
     //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
     //private lateinit var shaderBlur: Shader
@@ -285,48 +292,35 @@ constructor() : BasicGameState() {
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, gwin: Graphics) {
         // clean the shit beforehand
-        worldDrawFrameBuffer.graphics.clear()
-        uisDrawFrameBuffer.graphics.clear()
+        worldG.clear()
+        uiG.clear()
 
         blendNormal()
 
 
         drawSkybox(gwin)
-        /*drawSkybox(worldDrawFrameBuffer.graphics)
-        uisDrawFrameBuffer.graphics.color = Color(255, 255, 255, 0)
-        uisDrawFrameBuffer.graphics.fillRect(
-                0f, 0f, uisDrawFrameBuffer.width.toFloat(), uisDrawFrameBuffer.height.toFloat()
-        )*/
 
 
         // make camara work //
         // compensate for zoom. UIs must be treated specially! (see UIHandler)
-        //g.translate(-MapCamera.x * screenZoom, -MapCamera.y * screenZoom)
-        worldDrawFrameBuffer.graphics.translate(-MapCamera.x.toFloat(), -MapCamera.y.toFloat())
+        worldG.translate(-MapCamera.x.toFloat(), -MapCamera.y.toFloat())
 
 
         /////////////////////////////
         // draw map related stuffs //
         /////////////////////////////
-        TilesDrawer.renderBehind(gc, worldDrawFrameBuffer.graphics)
-        // --> blendNormal() <-- by TilesDrawer.renderBehind
-
+        TilesDrawer.renderWall(worldG)
+        actorsRenderBehind.forEach { actor -> actor.drawBody(worldG) }
+        actorsRenderBehind.forEach { actor -> actor.drawGlow(worldG) }
+        TilesDrawer.renderTerrain(worldG)
 
         /////////////////
         // draw actors //
         /////////////////
-        actorContainer.forEach { actor ->
-            if (actor is ActorWithBody && actor.inScreen() && actor !is Player && !actor.drawTopmost) {
-                actor.drawBody(gc, worldDrawFrameBuffer.graphics)
-            }
-        }
-        player.drawBody(gc, worldDrawFrameBuffer.graphics)
-        // actors that are drawTopmost
-        actorContainer.forEach { actor ->
-            if (actor is ActorWithBody && actor.inScreen() && actor !is Player && actor.drawTopmost) {
-                actor.drawBody(gc, worldDrawFrameBuffer.graphics)
-            }
-        }
+        actorsRenderMiddle.forEach { actor -> actor.drawBody(worldG) }
+        actorsRenderMidTop.forEach { actor -> actor.drawBody(worldG) }
+        player.drawBody(worldG)
+        actorsRenderFront.forEach { actor -> actor.drawBody(worldG) }
         // --> Change of blend mode <-- introduced by ActorWithBody //
 
 
@@ -335,33 +329,25 @@ constructor() : BasicGameState() {
         /////////////////////////////
         LightmapRenderer.renderLightMap()
 
-        TilesDrawer.renderFront(gc, worldDrawFrameBuffer.graphics, false)
+        TilesDrawer.renderFront(worldG, false)
         // --> blendNormal() <-- by TilesDrawer.renderFront
-        FeaturesDrawer.render(gc, worldDrawFrameBuffer.graphics)
+        FeaturesDrawer.render(gc, worldG)
 
 
-        FeaturesDrawer.drawEnvOverlay(worldDrawFrameBuffer.graphics)
+        FeaturesDrawer.drawEnvOverlay(worldG)
 
         if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul()
         else blendNormal()
-        LightmapRenderer.draw(worldDrawFrameBuffer.graphics)
+        LightmapRenderer.draw(worldG)
 
 
         //////////////////////
         // draw actor glows //
         //////////////////////
-        actorContainer.forEach { actor ->
-            if (actor is ActorWithBody && actor.inScreen() && actor !is Player) {
-                actor.drawGlow(gc, worldDrawFrameBuffer.graphics)
-            }
-        }
-        player.drawGlow(gc, worldDrawFrameBuffer.graphics)
-        // actors that are drawTopmost
-        actorContainer.forEach { actor ->
-            if (actor is ActorWithBody && actor.inScreen() && actor !is Player && actor.drawTopmost) {
-                actor.drawGlow(gc, worldDrawFrameBuffer.graphics)
-            }
-        }
+        actorsRenderMiddle.forEach { actor -> actor.drawGlow(worldG) }
+        actorsRenderMidTop.forEach { actor -> actor.drawGlow(worldG) }
+        player.drawGlow(worldG)
+        actorsRenderFront.forEach { actor -> actor.drawGlow(worldG) }
         // --> blendLightenOnly() <-- introduced by ActorWithBody //
 
 
@@ -373,17 +359,17 @@ constructor() : BasicGameState() {
         if (debugWindow.isVisible) {
             actorContainer.forEachIndexed { i, actor ->
                 if (actor is ActorWithBody) {
-                    worldDrawFrameBuffer.graphics.color = Color.white
-                    worldDrawFrameBuffer.graphics.font = Terrarum.fontSmallNumbers
-                    worldDrawFrameBuffer.graphics.drawString(
+                    worldG.color = Color.white
+                    worldG.font = Terrarum.fontSmallNumbers
+                    worldG.drawString(
                             actor.referenceID.toString(),
                             actor.hitbox.posX.toFloat(),
                             actor.hitbox.pointedY.toFloat() + 4
                     )
 
                     if (DEBUG_ARRAY) {
-                        worldDrawFrameBuffer.graphics.color = GameFontBase.codeToCol["g"]
-                        worldDrawFrameBuffer.graphics.drawString(
+                        worldG.color = GameFontBase.codeToCol["g"]
+                        worldG.drawString(
                                 i.toString(),
                                 actor.hitbox.posX.toFloat(),
                                 actor.hitbox.pointedY.toFloat() + 4 + 10
@@ -394,16 +380,16 @@ constructor() : BasicGameState() {
         }
         // fluidmap debug
         if (KeyToggler.isOn(Key.F4))
-            WorldSimulator.drawFluidMapDebug(worldDrawFrameBuffer.graphics)
+            WorldSimulator.drawFluidMapDebug(worldG)
 
 
         //////////////
         // draw UIs //
         //////////////
-        uiContainer.forEach { ui -> ui.render(gc, sbg, uisDrawFrameBuffer.graphics) }
-        debugWindow.render(gc, sbg, uisDrawFrameBuffer.graphics)
-        consoleHandler.render(gc, sbg, uisDrawFrameBuffer.graphics)
-        notifier.render(gc, sbg, uisDrawFrameBuffer.graphics)
+        uiContainer.forEach { ui -> ui.render(gc, sbg, uiG) }
+        debugWindow.render(gc, sbg, uiG)
+        consoleHandler.render(gc, sbg, uiG)
+        notifier.render(gc, sbg, uiG)
 
 
         /////////////////
@@ -609,7 +595,7 @@ constructor() : BasicGameState() {
             else
                 actorContainer.binarySearch(ID) >= 0
 
-    fun removeActor(actor: Actor) = removeActor(actor.referenceID)
+    fun removeActor(ID: Int) = removeActor(getActorByID(ID))
     /**
      * get index of the actor and delete by the index.
      * we can do this as the list is guaranteed to be sorted
@@ -618,10 +604,35 @@ constructor() : BasicGameState() {
      * Any values behind the index will be automatically pushed to front.
      * This is how remove function of [java.util.ArrayList] is defined.
      */
-    fun removeActor(ID: Int) {
-        if (ID == player.referenceID) throw RuntimeException("Attempted to remove player.")
-        val indexToDelete = actorContainer.binarySearch(ID)
-        if (indexToDelete >= 0) actorContainer.removeAt(indexToDelete)
+    fun removeActor(actor: Actor) {
+        if (actor.referenceID == player.referenceID) throw RuntimeException("Attempted to remove player.")
+        val indexToDelete = actorContainer.binarySearch(actor.referenceID)
+        if (indexToDelete >= 0) {
+            actorContainer.removeAt(indexToDelete)
+
+            // indexToDelete >= 0 means that the actor certainly exists in the game
+            // which means we don't need to check if i >= 0 again
+            if (actor is ActorWithBody) {
+                when (actor.renderOrder) {
+                    ActorOrder.BEHIND -> {
+                        val i = actorsRenderBehind.binarySearch(actor.referenceID)
+                        actorsRenderBehind.removeAt(i)
+                    }
+                    ActorOrder.MIDDLE -> {
+                        val i = actorsRenderMiddle.binarySearch(actor.referenceID)
+                        actorsRenderMiddle.removeAt(i)
+                    }
+                    ActorOrder.MIDTOP -> {
+                        val i = actorsRenderMidTop.binarySearch(actor.referenceID)
+                        actorsRenderMidTop.removeAt(i)
+                    }
+                    ActorOrder.FRONT  -> {
+                        val i = actorsRenderFront.binarySearch(actor.referenceID)
+                        actorsRenderFront.removeAt(i)
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -632,6 +643,15 @@ constructor() : BasicGameState() {
             throw RuntimeException("Actor with ID ${actor.referenceID} already exists.")
         actorContainer.add(actor)
         insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
+
+        if (actor is ActorWithBody) {
+            when (actor.renderOrder) {
+                ActorOrder.BEHIND -> actorsRenderBehind.add(actor)
+                ActorOrder.MIDDLE -> actorsRenderMiddle.add(actor)
+                ActorOrder.MIDTOP -> actorsRenderMidTop.add(actor)
+                ActorOrder.FRONT  -> actorsRenderFront.add(actor)
+            }
+        }
     }
 
     /**
@@ -668,9 +688,9 @@ constructor() : BasicGameState() {
         arr[j + 1] = x
     }
 
-    private fun ArrayList<Actor>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID)
+    private fun ArrayList<out Actor>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID)
 
-    private fun ArrayList<Actor>.binarySearch(ID: Int): Int {
+    private fun ArrayList<out Actor>.binarySearch(ID: Int): Int {
         // code from collections/Collections.kt
         var low = 0
         var high = actorContainer.size - 1

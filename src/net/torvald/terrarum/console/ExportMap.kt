@@ -82,8 +82,8 @@ internal object ExportMap : ConsoleCommand {
 
             try {
                 RasterWriter.writePNG_RGB(
-                        Terrarum.ingame.world.width, Terrarum.ingame.world.height, mapData, dir + args[1] + ".png")
-                Echo("ExportMap: exported to " + args[1] + ".png")
+                        Terrarum.ingame.world.width, Terrarum.ingame.world.height, mapData, dir + args[1] + ".tga")
+                Echo("ExportMap: exported to " + args[1] + ".tga")
 
             }
             catch (e: IOException) {

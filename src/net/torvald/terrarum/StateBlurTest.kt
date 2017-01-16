@@ -17,7 +17,7 @@ import java.nio.ByteOrder
 class StateBlurTest : BasicGameState() {
 
     /** Warning: the image must have a bit depth of 32! (use 32-bit PNG or TGA) */
-    private val testImage = Image("./assets/testimage_resized.png")
+    private val testImage = Image("./assets/testimage_resized.tga")
     private val bluredImage = ImageBuffer(testImage.width, testImage.height)
 
     override fun init(gc: GameContainer, sbg: StateBasedGame) {

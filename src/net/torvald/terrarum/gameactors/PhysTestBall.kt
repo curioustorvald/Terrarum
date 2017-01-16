@@ -10,7 +10,7 @@ import org.newdawn.slick.Graphics
 /**
  * Created by minjaesong on 16-03-05.
  */
-class PhysTestBall : ActorWithBody() {
+class PhysTestBall : ActorWithBody(ActorOrder.MIDDLE) {
 
     private var color = Color.orange
 
@@ -22,7 +22,7 @@ class PhysTestBall : ActorWithBody() {
         color = RoguelikeRandomiser.composeColourFrom(RoguelikeRandomiser.POTION_PRIMARY_COLSET)
     }
 
-    override fun drawBody(gc: GameContainer, g: Graphics) {
+    override fun drawBody(g: Graphics) {
         g.color = color
         g.fillOval(
                 hitbox.posX.toFloat(),

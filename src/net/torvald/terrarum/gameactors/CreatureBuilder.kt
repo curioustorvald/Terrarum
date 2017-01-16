@@ -19,7 +19,7 @@ object CreatureBuilder {
      */
     @Throws(IOException::class, SlickException::class)
     operator fun invoke(jsonFileName: String): ActorWithBody {
-        val actor = ActorWithBody()
+        val actor = ActorWithBody(ActorOrder.MIDDLE)
         InjectCreatureRaw(actor.actorValue, jsonFileName)
 
         return actor
