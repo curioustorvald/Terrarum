@@ -21,7 +21,7 @@ import java.util.*
  *
  * Created by minjaesong on 16-01-13.
  */
-open class ActorWithBody : Actor() {
+open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
 
 
     /** !! ActorValue macros are on the very bottom of the source !! **/
@@ -32,8 +32,6 @@ open class ActorWithBody : Actor() {
     @Transient internal var spriteGlow: SpriteAnimation? = null
 
     var drawMode = BLEND_NORMAL
-    /** for fake tiles. Draw on top of player(s) */
-    var drawTopmost = false
 
     @Transient private val world: GameWorld = Terrarum.ingame.world
 
@@ -909,7 +907,7 @@ open class ActorWithBody : Actor() {
 
     private fun updateHitbox() = hitbox.reassign(nextHitbox)
 
-    open fun drawGlow(gc: GameContainer, g: Graphics) {
+    open fun drawGlow(g: Graphics) {
         if (isVisible && spriteGlow != null) {
             blendLightenOnly()
 
@@ -952,7 +950,7 @@ open class ActorWithBody : Actor() {
         }
     }
 
-    open fun drawBody(gc: GameContainer, g: Graphics) {
+    open fun drawBody(g: Graphics) {
         if (isVisible && sprite != null) {
 
 

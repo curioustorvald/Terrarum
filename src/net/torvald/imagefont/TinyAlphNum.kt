@@ -28,7 +28,7 @@ class TinyAlphNum : Font {
     private val mappingTable = HashMap<Int, Int>()*/
 
     init {
-        fontSheet = SpriteSheet("./assets/graphics/fonts/milky.png", W, H)
+        fontSheet = SpriteSheet("./assets/graphics/fonts/milky.tga", W, H)
         //chars.forEachIndexed { i, c -> mappingTable[c.toInt()] = i }
     }
 

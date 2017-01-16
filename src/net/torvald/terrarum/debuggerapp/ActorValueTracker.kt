@@ -192,7 +192,9 @@ class ActorValueTracker constructor() : JFrame() {
                 sb.append("$key = $value ($type)\n")
             }
 
-            sb.deleteCharAt(sb.length - 1) // delete trailing \n
+            if (sb.isNotEmpty()) {
+                sb.deleteCharAt(sb.length - 1) // delete trailing \n
+            }
 
             avInfoArea.text = "$sb"
         }

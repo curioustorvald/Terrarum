@@ -121,10 +121,8 @@ constructor(val UI: UICanvas) {
 
             UI.render(gc, UIGraphicInstance)
 
-            ingameGraphics.drawImage(UIDrawnCanvas.getScaledCopy(scale),
-                    posX.toFloat() - (UI.width / 2f * scale.minus(1)),
-                    posY.toFloat() - (UI.height / 2f * scale.minus(1)),
-                    Color(1f, 1f, 1f, opacity)
+            ingameGraphics.drawImage(
+                    UIDrawnCanvas, posX.toFloat(), posY.toFloat(), Color(1f, 1f, 1f, opacity)
             )
         }
     }

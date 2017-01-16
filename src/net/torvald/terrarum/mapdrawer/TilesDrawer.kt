@@ -28,7 +28,7 @@ object TilesDrawer {
 
     var tilesTerrain: SpriteSheet = SpriteSheet("./assets/graphics/terrain/terrain.tga", TILE_SIZE, TILE_SIZE)
         private set // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
-    var tilesWire: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wire.png", TILE_SIZE, TILE_SIZE)
+    var tilesWire: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wire.tga", TILE_SIZE, TILE_SIZE)
         private set
 
     val WALL = GameWorld.WALL
@@ -228,7 +228,7 @@ object TilesDrawer {
 
     val wallOverlayColour = Color(2f/3f, 2f/3f, 2f/3f, 1f)
 
-    fun renderBehind(gc: GameContainer, g: Graphics) {
+    fun renderWall(g: Graphics) {
         /**
          * render to camera
          */
@@ -236,7 +236,7 @@ object TilesDrawer {
 
         tilesTerrain.startUse()
         drawTiles(g, WALL, false)
-        tilesTerrain.endUse() // you absolutely need this
+        tilesTerrain.endUse()
 
         blendMul()
 
@@ -246,17 +246,27 @@ object TilesDrawer {
         )
 
         blendNormal()
+    }
 
-        tilesTerrain.startUse() // you absolutely need this
-        drawTiles(g, TERRAIN, false)
+    fun renderTerrain(g: Graphics) {
+        /**
+         * render to camera
+         */
+        blendNormal()
+
+        tilesTerrain.startUse()
+        drawTiles(g, TERRAIN, false) // regular tiles
         tilesTerrain.endUse()
     }
 
-    fun renderFront(gc: GameContainer, g: Graphics, drawWires: Boolean) {
+    fun renderFront(g: Graphics, drawWires: Boolean) {
+        /**
+         * render to camera
+         */
         blendMul()
 
         tilesTerrain.startUse()
-        drawTiles(g, TERRAIN, true)
+        drawTiles(g, TERRAIN, true) // blendmul tiles
         tilesTerrain.endUse()
 
         if (drawWires) {

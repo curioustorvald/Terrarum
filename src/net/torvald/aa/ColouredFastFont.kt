@@ -33,7 +33,7 @@ class ColouredFastFont(val vt: Terminal, fontRef: String, val fontW: Int, val fo
         sheetImageBuffer = Image(sheetW, sheetH)
 
         for (i in 0..vt.coloursCount - 1) {
-            val sheet = SpriteSheet("$fontRef.$i.png", fontW, fontH)
+            val sheet = SpriteSheet("$fontRef.$i.tga", fontW, fontH)
             colouredSheet.add(sheet)
 
             //sheetImageBuffer.graphics.clear()

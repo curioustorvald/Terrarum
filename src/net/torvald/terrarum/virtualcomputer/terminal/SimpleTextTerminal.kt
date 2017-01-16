@@ -86,9 +86,9 @@ open class SimpleTextTerminal(
 
     open protected val fontRef =
             "./assets/graphics/fonts/${
-                if (hires) "milky.png"
-                else if (phosphor == GREEN || phosphor == AMBER) "MDA.png"
-                else "milkymda.png"
+                if (hires) "milky.tga"
+                else if (phosphor == GREEN || phosphor == AMBER) "MDA.tga"
+                else "milkymda.tga"
             }"
     open protected val fontImg = Image(fontRef)
     open val fontW = fontImg.width / 16

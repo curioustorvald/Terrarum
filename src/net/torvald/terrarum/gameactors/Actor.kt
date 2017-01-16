@@ -6,9 +6,11 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import org.newdawn.slick.GameContainer
 
 /**
+ * @param renderOrder invisible/technical -> ActorOrder.MIDDLE
+ *
  * Created by minjaesong on 15-12-31.
  */
-abstract class Actor : Comparable<Actor>, Runnable {
+abstract class Actor(val renderOrder: ActorOrder) : Comparable<Actor>, Runnable {
 
     abstract fun update(gc: GameContainer, delta: Int)
 
@@ -37,10 +39,29 @@ abstract class Actor : Comparable<Actor>, Runnable {
      * override var referenceID: Int = generateUniqueReferenceID()
      */
     fun generateUniqueReferenceID(): Int {
+        fun checkForCollision(value: Int) =
+                Terrarum.ingame.hasActor(value) ||
+                value < ItemCodex.ITEM_COUNT_MAX ||
+                value < when (renderOrder) {
+                    ActorOrder.BEHIND -> ItemCodex.ITEM_COUNT_MAX
+                    ActorOrder.MIDDLE -> 0x10000000
+                    ActorOrder.MIDTOP -> 0x60000000
+                    ActorOrder.FRONT  -> 0x70000000
+                } ||
+                value > when (renderOrder) {
+                    ActorOrder.BEHIND -> 0x0FFFFFFF
+                    ActorOrder.MIDDLE -> 0x5FFFFFFF
+                    ActorOrder.MIDTOP -> 0x6FFFFFFF
+                    ActorOrder.FRONT  -> 0x7FFFFFFF
+                }
+
         var ret: Int
         do {
             ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
-        } while (Terrarum.ingame.hasActor(ret) || ret < ItemCodex.ITEM_COUNT_MAX) // check for collision
+        } while (checkForCollision(ret)) // check for collision
         return ret
     }
+
 }
+
+enum class ActorOrder { BEHIND, MIDDLE, MIDTOP, FRONT }

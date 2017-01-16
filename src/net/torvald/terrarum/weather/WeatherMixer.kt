@@ -147,14 +147,14 @@ object WeatherMixer {
     fun readFromJson(path: String): BaseModularWeather {
         /* JSON structure:
 {
-  "globalLight": "colourmap/sky_colour.png", // integer for static, string (path to image) for dynamic
-  "skyboxGradColourMap": "colourmap/sky_colour.png", // integer for static, string (path to image) for dynamic
+  "globalLight": "colourmap/sky_colour.tga", // integer for static, string (path to image) for dynamic
+  "skyboxGradColourMap": "colourmap/sky_colour.tga", // integer for static, string (path to image) for dynamic
   "extraImages": [
       // if any, it will be like:
-      sun01.png,
-      clouds01.png,
-      clouds02.png,
-      auroraBlueViolet.png
+      sun01.tga,
+      clouds01.tga,
+      clouds02.tga,
+      auroraBlueViolet.tga
   ]
 }
          */
