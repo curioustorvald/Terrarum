@@ -5,6 +5,7 @@ import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
+import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex
 import org.luaj.vm2.*
 import org.luaj.vm2.lib.OneArgFunction
@@ -39,6 +40,8 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         g["ai"]["jump"] = Jump(actor)
 
         g["ai"]["getNearbyTiles"] = GetNearbyTiles(actor)
+        g["ai"]["getFloorsHeight"] = GetFloorsHeight(actor)
+        g["ai"]["getCeilingsHeight"] = GetCeilingsHeight(actor)
 
         g["game"] = LuaValue.tableOf()
         g["game"]["version"] = GameVersion()
@@ -87,6 +90,8 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         fun Int?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
         fun String?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
         fun Boolean.toInt() = if (this) 1 else 0
+
+        operator fun LuaTable.set(index: Int, value: Int) { this[index] = value.toLua() }
     }
 
     class GetSelfActorInfo(val actor: ActorWithBody) : ZeroArgFunction() {
@@ -215,19 +220,18 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
     }
 
     class GetNearbyTiles(val actor: ActorWithBody) : OneArgFunction() {
-
-        /** @param radius: lookahead
+        /** @param radius
          *
          *  3 will return 7x7 array, 0 will return 1x1, 1 will return 3x3
          *
-         *  Index: [-3: y][-3: x] ... [0: y][0: x] ... [3: y][3: x]
+         *  Index: [-3: y][-3: x] ... [0: y][0: x] ... [3: y][3: x] for radius 3
          *  Return value: bitset (int 0-7)
          *      1 -- solidity
          *      2 -- liquidity
          *      3 -- gravity
          */
-        override fun call(radius: LuaValue): LuaValue {
-            val radius = radius.checkint()
+        override fun call(arg: LuaValue): LuaValue {
+            val radius = arg.checkint()
 
             if (radius < 0) {
                 return LuaValue.NONE
@@ -248,8 +252,94 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
                         val gravity = tile.isFallable.toInt()
                         val tileFlag: Int = gravity.shl(2) + liquidity.shl(1) + solidity
 
-                        luatable[y - feetTilePos[1]][x - feetTilePos[0]] =
-                                LuaInteger.valueOf(tileFlag)
+                        luatable[y - feetTilePos[1]][x - feetTilePos[0]] = tileFlag.toLua()
+                    }
+                }
+
+                return luatable
+            }
+        }
+    }
+
+    class GetFloorsHeight(val actor: ActorWithBody) : OneArgFunction() {
+        /** @param radius
+         *
+         *  3 will return len:7 array, 0 will return len:1, 1 will return len:3
+         *
+         *  Index: [-3] .. [0] .. [3] for radius
+         *  Return value: floor height
+         *  0: body tile (legs area)
+         *  1: tile you can stand on
+         *  2+: tiles down there
+         */
+        override fun call(arg: LuaValue): LuaValue {
+            val radius = arg.checkint()
+
+            val searchDownLimit = 12
+
+            if (radius < 0) {
+                return LuaValue.NONE
+            }
+            else if (radius > 8) {
+                throw IllegalArgumentException("Radius too large -- must be 8 or less")
+            }
+            else {
+                val luatable = LuaTable()
+                val feetTilePos = actor.feetPosTile
+                for (x in feetTilePos[0] - radius..feetTilePos[0] + radius) {
+                    // search down
+                    var searchDownCounter = 0
+                    while (true) {
+                        val tile = Terrarum.ingame.world.getTileFromTerrain(x, feetTilePos[1] + searchDownCounter) ?: Tile.STONE
+                        if (TileCodex[tile].isSolid || searchDownCounter >= searchDownLimit) {
+                            luatable[x - feetTilePos[0]] = searchDownCounter
+                            break
+                        }
+                        searchDownCounter++
+                    }
+                }
+
+                return luatable
+            }
+        }
+    }
+
+    class GetCeilingsHeight(val actor: ActorWithBody) : OneArgFunction() {
+        /** @param radius
+         *
+         *  3 will return 7x7 array, 0 will return 1x1, 1 will return 3x3
+         *
+         *  Index: [-3] .. [0] .. [3] for radius
+         *  Return value: floor height
+         *  (-1): tile you can stand on
+         *  0: body tile (legs area)
+         *  1: body tile (may be vary depend on the size of the actor)
+         *  2+: tiles up there
+         */
+        override fun call(arg: LuaValue): LuaValue {
+            val radius = arg.checkint()
+
+            val searchUpLimit = 12
+
+            if (radius < 0) {
+                return LuaValue.NONE
+            }
+            else if (radius > 8) {
+                throw IllegalArgumentException("Radius too large -- must be 8 or less")
+            }
+            else {
+                val luatable = LuaTable()
+                val feetTilePos = actor.feetPosTile
+                for (x in feetTilePos[0] - radius..feetTilePos[0] + radius) {
+                    // search up
+                    var searchUpCounter = 0
+                    while (true) {
+                        val tile = Terrarum.ingame.world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Tile.STONE
+                        if (TileCodex[tile].isSolid || searchUpCounter >= searchUpLimit) {
+                            luatable[x - feetTilePos[0]] = searchUpCounter
+                            break
+                        }
+                        searchUpCounter++
                     }
                 }
 

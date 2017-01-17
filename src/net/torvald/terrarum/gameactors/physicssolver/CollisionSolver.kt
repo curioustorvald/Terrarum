@@ -49,22 +49,26 @@ object CollisionSolver {
         collListX.sortBy { it.pos }
 
         // set candidateX
-        for (it in collListX) {
+        collListX.forEach {
             if (it.kind == STARTPOINT) {
                 collCandidateStack.push(it)
             }
             else if (it.kind == ENDPOINT) {
                 val mark_this = it
                 val mark_other = collCandidateStack.pop()
-                val collCandidate: Pair<ActorWithBody, ActorWithBody>
-                if (mark_this < mark_other) // make sure actor with lower pos comes left
-                    collCandidate = Pair(mark_this.actor, mark_other.actor)
+                // make sure actor with lower ID comes first
+                val collCandidate = if (mark_this.actor < mark_other.actor)
+                    Pair(mark_this.actor, mark_other.actor)
                 else
-                    collCandidate = Pair(mark_other.actor, mark_this.actor)
+                    Pair(mark_other.actor, mark_this.actor)
 
-                collCandidateX.add(collCandidate)
+                // filter out Pair(E, E); Pair(A, B) if Pair(B, A) exists
+                if (mark_this.actor != mark_other.actor) {
+                    collCandidateX.add(collCandidate)
+                }
             }
         }
+
         collCandidateStack.clear()
 
         // mark list y
@@ -78,7 +82,7 @@ object CollisionSolver {
         collListY.sortBy { it.pos }
 
         // set candidateY
-        for (it in collListY) {
+        collListY.forEach {
             if (it.kind == STARTPOINT) {
                 collCandidateStack.push(it)
             }
@@ -86,12 +90,16 @@ object CollisionSolver {
                 val mark_this = it
                 val mark_other = collCandidateStack.pop()
                 val collCandidate: Pair<ActorWithBody, ActorWithBody>
-                if (mark_this < mark_other) // make sure actor with lower pos comes left
+                // make sure actor with lower ID comes first
+                if (mark_this.actor < mark_other.actor)
                     collCandidate = Pair(mark_this.actor, mark_other.actor)
                 else
                     collCandidate = Pair(mark_other.actor, mark_this.actor)
 
-                collCandidateY.add(collCandidate)
+                // filter out Pair(E, E); Pair(A, B) if Pair(B, A) exists
+                if (mark_this.actor != mark_other.actor) {
+                    collCandidateY.add(collCandidate)
+                }
             }
         }
         // look for overlaps in candidate X/Y and put them into collCandidates
@@ -99,8 +107,34 @@ object CollisionSolver {
         collCandidateY.retainAll(collCandidateX) // list Y will have intersection of X and Y now
         collCandidates = collCandidateY // renaming. X and Y won't be used anyway.
 
+        //collCandidates.forEach { println(it) }
+        //println("-----------------------")
+
         // solve collision for actors in collCandidates
         collCandidates.forEach { solveCollision(it.first, it.second) }
+    }
+
+    private fun pairEqv(a: Pair<Any?, Any?>, b: Pair<Any?, Any?>) =
+            (a.first == b.first && a.second == b.second) ||
+            (a.first == b.second && a.second == b.first)
+
+    /** Mimics java's original behaviour, with user-defined equals function */
+    fun ArrayList<Any?>.containsByFunc(other: Any?, equalsFun: (a: Any?, b: Any?) -> Boolean): Boolean {
+        fun indexOfEqFn(arrayList: ArrayList<Any?>, o: Any?): Int {
+            if (o == null) {
+                for (i in 0..size - 1)
+                    if (arrayList[i] == null)
+                        return i
+            }
+            else {
+                for (i in 0..size - 1)
+                    if (equalsFun(o, arrayList[i]))
+                        return i
+            }
+            return -1
+        }
+
+        return indexOfEqFn(this, other) >= 0
     }
 
     private fun solveCollision(a: ActorWithBody, b: ActorWithBody) {
@@ -110,12 +144,12 @@ object CollisionSolver {
         // we are going to filter them
         if (a isCollidingWith b) {
             // notify collision, but not solve it yet
-            // (e.g. player vs mob, will pass by but still takes damage)
 
+            //println("Collision: $a <-> $b")
+            // FIXME does work but has duplication
 
             // if they actually makes collision (e.g. player vs ball), solve it
             if (a makesCollisionWith b) {
-                // assuming perfect elastic collision; ignoring 'var elasticity'
                 val ux_1 = a.veloX
                 val ux_2 = b.veloX
                 val uy_1 = a.veloY
@@ -136,10 +170,10 @@ object CollisionSolver {
         }
     }
 
-    private infix fun ActorWithBody.makesCollisionWith(other: ActorWithBody): Boolean {
-        return true
-    }
-    
+    private infix fun ActorWithBody.makesCollisionWith(other: ActorWithBody) =
+        this.collisionType != ActorWithBody.COLLISION_NOCOLLIDE &&
+        other.collisionType != ActorWithBody.COLLISION_NOCOLLIDE
+
     private infix fun ActorWithBody.isCollidingWith(other: ActorWithBody): Boolean {
         val ax = this.hitbox.centeredX
         val ay = this.hitbox.centeredY
@@ -168,16 +202,11 @@ object CollisionSolver {
     fun Double.abs() = if (this < 0) -this else this
     fun Double.sqr() = this * this
 
-    class CollisionMarkings(
+    data class CollisionMarkings(
             val pos: Double,
             val kind: Int,
             val actor: ActorWithBody
-    ) : Comparable<CollisionMarkings> {
-        override fun compareTo(other: CollisionMarkings): Int =
-                if (this.pos > other.pos) 1
-                else if (this.pos < other.pos) -1
-                else 0
-    }
+    )
 
     /**
      * === Some useful physics knowledge ===

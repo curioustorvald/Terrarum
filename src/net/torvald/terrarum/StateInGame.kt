@@ -69,9 +69,6 @@ constructor() : BasicGameState() {
     internal val player: ActorHumanoid // currently POSSESSED actor :)
         get() = playableActorDelegate!!.actor
 
-    //private var GRADIENT_IMAGE: Image? = null
-    //private var skyBox: Rectangle? = null
-
     var screenZoom = 1.0f
     val ZOOM_MAX = 2.0f
     val ZOOM_MIN = 0.5f
@@ -99,7 +96,7 @@ constructor() : BasicGameState() {
     private val UI_INVENTORY_PLAYER = "uiInventoryPlayer"
     private val UI_INVENTORY_ANON = "uiInventoryAnon"
 
-    val paused: Boolean
+    var paused: Boolean = false
         get() = consoleHandler.isOpened
 
     @Throws(SlickException::class)
@@ -279,7 +276,11 @@ constructor() : BasicGameState() {
             throw IllegalArgumentException("No such actor in actorContainer: $refid")
         }
 
+        // take care of old delegate
+        playableActorDelegate!!.actor.collisionType = HumanoidNPC.DEFAULT_COLLISION_TYPE
+        // accept new delegate
         playableActorDelegate = PlayableActorDelegate(getActorByID(refid) as ActorHumanoid)
+        playableActorDelegate!!.actor.collisionType = ActorWithBody.COLLISION_KINEMATIC
         WorldSimulator(world, player, UPDATE_DELTA)
     }
 
@@ -298,13 +299,16 @@ constructor() : BasicGameState() {
         blendNormal()
 
 
-        drawSkybox(gwin)
+        drawSkybox(gwin) // drawing to gwin so that any lights from lamp wont "leak" to the skybox
+                         // e.g. Bright blue light on sunset
 
 
         // make camara work //
         // compensate for zoom. UIs must be treated specially! (see UIHandler)
         worldG.translate(-MapCamera.x.toFloat(), -MapCamera.y.toFloat())
 
+
+        blendNormal()
 
         /////////////////////////////
         // draw map related stuffs //

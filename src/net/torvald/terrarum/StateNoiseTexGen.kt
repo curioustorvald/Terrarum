@@ -40,7 +40,7 @@ class StateNoiseTexGen : BasicGameState() {
         return Joise(ridged_autocorrect)
     }
 
-    private fun noiseSmokyFractal(): Joise {
+    private fun noiseBrownian(): Joise {
         val ridged = ModuleFractal()
         ridged.setType(ModuleFractal.FractalType.FBM)
         ridged.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
@@ -114,7 +114,7 @@ class StateNoiseTexGen : BasicGameState() {
     }
 
     fun generateNoiseImage() {
-        val noiseModule = noiseBillowFractal() // change noise function here
+        val noiseModule = noiseBrownian() // change noise function here
 
         for (y in 0..imagesize - 1) {
             for (x in 0..imagesize - 1) {

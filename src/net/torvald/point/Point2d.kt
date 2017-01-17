@@ -49,6 +49,8 @@ class Point2d(var x: Double, var y: Double) : Cloneable {
 
     fun toVector() = Vector2(x, y)
 
+    fun copy() = Point2d(x, y)
+
     fun length(other: Point2d) = distSqr(other).sqrt()
     fun distSqr(other: Point2d) = ((this.x - other.x).sqr() + (this.y - other.y).sqr())
 }
