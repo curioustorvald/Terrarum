@@ -58,7 +58,7 @@ object PlayerBuilderSigrid {
 
         p.actorValue[AVKey.INTELLIGENT] = true
 
-        p.actorValue[AVKey.LUMINOSITY] = Color(0x434aff).to10bit()
+        //p.actorValue[AVKey.LUMINOSITY] = Color(0x434aff).to10bit()
 
         p.actorValue[AVKey.BASEDEFENCE] = 141
 

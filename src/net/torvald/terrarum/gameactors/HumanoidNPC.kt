@@ -30,7 +30,13 @@ open class HumanoidNPC(override val scriptPath: String, born: GameDate) : ActorH
 
     private val aiLuaAPI: AILuaAPI
 
+    companion object {
+        val DEFAULT_COLLISION_TYPE = ActorWithBody.COLLISION_DYNAMIC
+    }
+
     init {
+        collisionType = DEFAULT_COLLISION_TYPE
+
         luag["io"] = LuaValue.NIL
         luag["os"] = LuaValue.NIL
         luag["luajava"] = LuaValue.NIL

@@ -7,6 +7,8 @@ import net.torvald.colourutil.CIEXYZUtil
 import net.torvald.colourutil.ColourUtil
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blendMul
+import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.getPixel
 import org.newdawn.slick.Color
@@ -85,25 +87,29 @@ object WeatherMixer {
         val skyboxColourMap = currentWeather.skyboxGradColourMap
         val lightColourMap = currentWeather.globalLightColourMap
 
-        // draw skybox to provided (should be main) graphics instance
-        val skyColourFill = GradientFill(
-                0f, 0f,
-                getGradientColour(skyboxColourMap, 0, timeNow),
-                0f, Terrarum.HEIGHT.toFloat(),// / Terrarum.ingame.screenZoom,
-                getGradientColour(skyboxColourMap, 1, timeNow)
-        )
-        g.fill(Rectangle(
-                0f, 0f,
-                Terrarum.WIDTH.toFloat(),// / Terrarum.ingame.screenZoom,
-                Terrarum.HEIGHT.toFloat()// / Terrarum.ingame.screenZoom
-        ),skyColourFill)
-
         // calculate global light
         val gradCol = getGradientColour(lightColourMap, 0, timeNow)
         globalLightNow.r = gradCol.r
         globalLightNow.g = gradCol.g
         globalLightNow.b = gradCol.b
+
+        // draw skybox to provided (should be main) graphics instance
+        val skyColourFill = GradientFill(
+                0f, 0f,
+                getGradientColour(skyboxColourMap, 0, timeNow) * gradCol, // mul with globallight
+                0f, Terrarum.HEIGHT.toFloat(),// / Terrarum.ingame.screenZoom,
+                getGradientColour(skyboxColourMap, 1, timeNow) * gradCol  // mul with globallight
+        )
+
+        blendNormal()
+        g.fill(Rectangle(
+                0f, 0f,
+                Terrarum.WIDTH.toFloat(),// / Terrarum.ingame.screenZoom,
+                Terrarum.HEIGHT.toFloat()// / Terrarum.ingame.screenZoom
+        ), skyColourFill)
     }
+
+    operator fun Color.times(other: Color) = Color(this.r * other.r, this.g * other.g, this.b * other.b, 1f)
 
     /**
      * Get a GL of specific time

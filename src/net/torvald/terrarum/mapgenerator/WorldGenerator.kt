@@ -700,45 +700,21 @@ object WorldGenerator {
                 )
             }
 
-            ThreadParallel.startAll()
-            // FIXME game starts prematurely
-            /* Console:
-            [mapgenerator] Seed: 85336530
-            [mapgenerator] Raising and eroding terrain...
-            [mapgenerator] Shaping world...
-            [mapgenerator] Carving caves...
-            [mapgenerator] Carving caves...
-            [mapgenerator] Carving caves...
-            [mapgenerator] Flooding bottom lava...
-            [mapgenerator] Carving caves...
-            [mapgenerator] Planting grass...
-            [mapgenerator] Placing floating islands...
-            [UIHandler] Creating UI 'ConsoleWindow'
-            Mon Jun 13 00:43:57 KST 2016 INFO:Offscreen Buffers FBO=true PBUFFER=true PBUFFERRT=false
-            Mon Jun 13 00:43:57 KST 2016 DEBUG:Creating FBO 2048x256
-            [UIHandler] Creating UI 'BasicDebugInfoWindow'
-            Mon Jun 13 00:43:57 KST 2016 INFO:Offscreen Buffers FBO=true PBUFFER=true PBUFFERRT=false
-            Mon Jun 13 00:43:57 KST 2016 DEBUG:Creating FBO 2048x1024
-            [UIHandler] Creating UI 'Notification'
-            Mon Jun 13 00:43:57 KST 2016 INFO:Offscreen Buffers FBO=true PBUFFER=true PBUFFERRT=false
-            Mon Jun 13 00:43:57 KST 2016 DEBUG:Creating FBO 512x64
-            [mapgenerator] Collapsing caves...
-            [mapgenerator] Collapsing caves...
-            [mapgenerator] Collapsing caves...
-            [mapgenerator] Collapsing caves...
-             */
+            ThreadParallel.startAllWaitForDie()
         }
         else {
             ThreadProcessNoiseLayers(0, HEIGHT - 1, noiseRecords).run()
         }
     }
 
+    private val islandSpacing = 1024
+
     private fun generateFloatingIslands() {
         println("[mapgenerator] Placing floating islands...")
 
         val nIslandsMax = Math.round(world.width * 6f / 8192f)
         val nIslandsMin = Math.max(2, Math.round(world.width * 4f / 8192f))
-        val nIslands = random.nextInt(nIslandsMax - nIslandsMin) + nIslandsMin
+        val nIslands = random.nextInt(Math.max(1, nIslandsMax - nIslandsMin)) + nIslandsMin
         val prevIndex = -1
 
         val tiles = intArrayOf(Tile.AIR, Tile.STONE, Tile.DIRT, Tile.GRASS)
@@ -750,7 +726,7 @@ object WorldGenerator {
             }
             val island = FloatingIslandsPreset.generatePreset(currentIndex, random)
 
-            val startingPosX = random.nextInt(world.width - 2048) + 1024
+            val startingPosX = random.nextInt(islandSpacing) + islandSpacing * i
             val startingPosY = minimumFloatingIsleHeight + random.nextInt(minimumFloatingIsleHeight)
 
             for (j in island.indices) {

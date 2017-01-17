@@ -100,7 +100,9 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
     var scale: Double
         get() = (actorValue.getAsDouble(AVKey.SCALE) ?: 1.0) *
                 (actorValue.getAsDouble(AVKey.SCALEBUFF) ?: 1.0)
-        set(value) = actorValue.set(AVKey.SCALE, value / (actorValue.getAsDouble(AVKey.SCALEBUFF) ?: 1.0))
+        set(value) {
+            actorValue[AVKey.SCALE] = value / (actorValue.getAsDouble(AVKey.SCALEBUFF) ?: 1.0)
+        }
     @Transient val MASS_LOWEST = 0.1 // Kilograms
     /** Apparent mass. Use "avBaseMass" for base mass */
     var mass: Double
@@ -284,6 +286,10 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
         hitboxTranslateY = ty.toDouble()
     }
 
+    fun setPosition(pos: Point2d) = setPosition(pos.x, pos.y)
+    fun setPosition(pos: Vector2) = setPosition(pos.x, pos.y)
+
+
     /**
      * Set hitbox position from bottom-center point
      * @param x
@@ -291,14 +297,14 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
      */
     fun setPosition(x: Double, y: Double) {
         hitbox.setFromWidthHeight(
-                x - (baseHitboxW / 2 - hitboxTranslateX) * scale,
-                y - (baseHitboxH - hitboxTranslateY) * scale,
+                x - (baseHitboxW / 2 - hitboxTranslateX) * (1 - scale),
+                y - (baseHitboxH - hitboxTranslateY) * (1 - scale),
                 baseHitboxW * scale,
                 baseHitboxH * scale)
 
         nextHitbox.setFromWidthHeight(
-                x - (baseHitboxW / 2 - hitboxTranslateX) * scale,
-                y - (baseHitboxH - hitboxTranslateY) * scale,
+                x - (baseHitboxW / 2 - hitboxTranslateX) * (1 - scale),
+                y - (baseHitboxH - hitboxTranslateY) * (1 - scale),
                 baseHitboxW * scale,
                 baseHitboxH * scale)
     }
@@ -1113,9 +1119,12 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
         /**
          *  Enumerations that exported to JSON
          */
-        @Transient const val COLLISION_KINEMATIC = 1 // does not displaced by external forces
+        @Transient const val COLLISION_NOCOLLIDE = 0
+        @Transient const val COLLISION_KINEMATIC = 1 // does not displaced by external forces when collided, but it still can move (e.g. player, elevator)
         @Transient const val COLLISION_DYNAMIC = 2   // displaced by external forces
-        @Transient const val COLLISION_STATIC = 3    // does not displaced by external forces, target of collision
+        @Transient const val COLLISION_STATIC = 3    // does not displaced by external forces, target of collision (e.g. nonmoving static obj)
+        @Transient const val COLLISION_KNOCKBACK_GIVER = 4 // mobs
+        @Transient const val COLLISION_KNOCKBACK_TAKER = 5 // benevolent NPCs
         @Transient const val BLEND_NORMAL = 4
         @Transient const val BLEND_SCREEN = 5
         @Transient const val BLEND_MULTIPLY = 6
