@@ -22,6 +22,10 @@ import java.util.*
 open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     : HistoricalFigure(birth, death), Controllable, Pocketed, Factionable, Luminous, LandHolder {
 
+
+    // FIXME disable all water-related movement mods (slow ESDF velo while submerged)ssssst
+
+
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory = ActorInventory()
 
@@ -74,7 +78,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     @Transient val BASE_DENSITY = 980.0
 
     companion object {
-        @Transient internal const val ACCEL_MULT_IN_FLIGHT: Double = 0.21
+        //@Transient internal const val ACCEL_MULT_IN_FLIGHT: Double = 0.21
         @Transient internal const val WALK_ACCEL_BASE: Double = 0.67
 
         @Transient const val BASE_HEIGHT = 40
@@ -144,7 +148,6 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         // don't put this into keyPressed; execution order is important!
         updateGamerControlBox(gc.input)
 
-        updateMovementControl()
         updateSprite(delta)
 
         if (noClip) {
@@ -215,20 +218,6 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                 isJumpDown = isFuncDown(input, EnumKeyFunc.JUMP) ||
                              Terrarum.controller!!.isButtonPressed(GAMEPAD_JUMP)
             }
-        }
-    }
-
-    private fun updateMovementControl() {
-        if (!noClip) {
-            if (grounded) {
-                actorValue[AVKey.ACCELMULT_MOVEMENT] = 1.0
-            }
-            else {
-                actorValue[AVKey.ACCELMULT_MOVEMENT] = ACCEL_MULT_IN_FLIGHT
-            }
-        }
-        else {
-            actorValue[AVKey.ACCELMULT_MOVEMENT] = 1.0
         }
     }
 
