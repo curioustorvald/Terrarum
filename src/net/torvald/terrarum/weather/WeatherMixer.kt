@@ -2,9 +2,7 @@ package net.torvald.terrarum.weather
 
 import com.jme3.math.FastMath
 import net.torvald.JsonFetcher
-import net.torvald.colourutil.CIELChabUtil
-import net.torvald.colourutil.CIEXYZUtil
-import net.torvald.colourutil.ColourUtil
+import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendMul
@@ -96,9 +94,9 @@ object WeatherMixer {
         // draw skybox to provided (should be main) graphics instance
         val skyColourFill = GradientFill(
                 0f, 0f,
-                getGradientColour(skyboxColourMap, 0, timeNow) * gradCol, // mul with globallight
+                getGradientColour(skyboxColourMap, 0, timeNow),
                 0f, Terrarum.HEIGHT.toFloat(),// / Terrarum.ingame.screenZoom,
-                getGradientColour(skyboxColourMap, 1, timeNow) * gradCol  // mul with globallight
+                getGradientColour(skyboxColourMap, 1, timeNow)
         )
 
         blendNormal()
@@ -108,6 +106,8 @@ object WeatherMixer {
                 Terrarum.HEIGHT.toFloat()// / Terrarum.ingame.screenZoom
         ), skyColourFill)
     }
+
+    fun Float.clampOne() = if (this > 1) 1f else this
 
     operator fun Color.times(other: Color) = Color(this.r * other.r, this.g * other.g, this.b * other.b, 1f)
 
