@@ -24,6 +24,9 @@ import java.util.*
 open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
 
 
+    // FIXME disable all water-related movement mods (slow ESDF velo while submerged)
+
+
     /** !! ActorValue macros are on the very bottom of the source !! **/
 
     override var actorValue: ActorValue = ActorValue()
@@ -248,6 +251,8 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
     protected val updateDelta: Int
         get() = Terrarum.ingame.UPDATE_DELTA
 
+    @Transient private var accelMultMovement = 1.0
+
     /**
      * true: This actor had just made collision
      */
@@ -355,6 +360,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
              * Actual physics thing (altering velocity) starts from here
              */
 
+            updateMovementControl()
             // Combine velo and walk
             applyMovementVelocity()
 
@@ -384,8 +390,9 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
                 }
 
                 setHorizontalFriction()
-                if (isPlayerNoClip) // or hanging on the rope, etc.
+                if (isPlayerNoClip) { // or hanging on the rope, etc.
                     setVerticalFriction()
+                }
 
                 // apply our compensation to actual hitbox
                 updateHitbox()
@@ -401,6 +408,30 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
                 walledLeft = false
                 walledRight = false
             }
+        }
+    }
+
+    /** about get going
+     * for about stopping, see setHorizontalFriction */
+    private fun updateMovementControl() {
+        /* if not submerged:
+                if grounded:
+                    feetTileFriction
+                else:
+                    bodyTileFriction
+           else:
+                linearMix(not submerged, fluidViscosity, submergedRatio)
+         */
+        if (!isPlayerNoClip) {
+            if (grounded) {
+                accelMultMovement = feetFriction.frictionToMult()
+            }
+            else {
+                accelMultMovement = bodyFriction.frictionToMult()
+            }
+        }
+        else {
+            accelMultMovement = 1.0
         }
     }
 
@@ -756,11 +787,15 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
         return contactAreaCounter
     }
 
+    /** about stopping
+     * for about get moving, see updateMovementControl */
     private fun setHorizontalFriction() {
         val friction = if (isPlayerNoClip)
-            BASE_FRICTION * TileCodex[Tile.STONE].friction.tileFrictionToMult()
-        else
-            BASE_FRICTION * bodyFriction.tileFrictionToMult()
+            BASE_FRICTION * TileCodex[Tile.STONE].friction.frictionToMult()
+        else {
+            // TODO status quo if !submerged else linearBlend(feetFriction, bodyFriction, submergedRatio)
+            BASE_FRICTION * (if (grounded) feetFriction else bodyFriction).frictionToMult()
+        }
 
         if (veloX < 0) {
             veloX += friction
@@ -785,9 +820,9 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
 
     private fun setVerticalFriction() {
         val friction = if (isPlayerNoClip)
-            BASE_FRICTION * TileCodex[Tile.STONE].friction.tileFrictionToMult()
+            BASE_FRICTION * TileCodex[Tile.STONE].friction.frictionToMult()
         else
-            BASE_FRICTION * bodyFriction.tileFrictionToMult()
+            BASE_FRICTION * bodyFriction.frictionToMult()
 
         if (veloY < 0) {
             veloY += friction
@@ -827,24 +862,23 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
         }
     }*/
 
-    /*private val submergedVolume: Double
+    private val submergedRatio: Double
+        get() = submergedHeight / hitbox.height
+
+    private val submergedVolume: Double
         get() = submergedHeight * hitbox.width * hitbox.width
 
     private val submergedHeight: Double
         get() = Math.max(
                 getContactingAreaFluid(COLLIDING_LEFT),
                 getContactingAreaFluid(COLLIDING_RIGHT)
-        ).toDouble()*/
+        ).toDouble()
 
 
-    /**
-     * Get highest friction value from surrounding tiles
-     * @return
-     */
     internal val bodyFriction: Int
         get() {
             var friction = 0
-            forEachFeetTile {
+            forEachOccupyingTile { // get max friction
                 if (it?.friction ?: TileCodex[Tile.AIR].friction > friction)
                     friction = it?.friction ?: TileCodex[Tile.AIR].friction
             }
@@ -852,7 +886,22 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
             return friction
         }
 
-    fun Int.tileFrictionToMult(): Double = this / 16.0
+    /**
+     * Get highest friction value from surrounding tiles
+     * @return
+     */
+    internal val feetFriction: Int // FIXME sharp turn on ice is still possible as on soil/rocks
+        get() {
+            var friction = 0
+            forEachFeetTile { // get max friction
+                if (it?.friction ?: TileCodex[Tile.AIR].friction > friction)
+                    friction = it?.friction ?: TileCodex[Tile.AIR].friction
+            }
+
+            return friction
+        }
+
+    fun Int.frictionToMult(): Double = this / 16.0
 
     /**
      * Get highest tile density from occupying tiles, fluid only
@@ -1177,7 +1226,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
     val avAcceleration: Double
         get() = actorValue.getAsDouble(AVKey.ACCEL)!! *
                 actorValue.getAsDouble(AVKey.ACCELBUFF)!! *
-                (actorValue.getAsDouble(AVKey.ACCELMULT_MOVEMENT) ?: 1.0) *
+                accelMultMovement *
                 scale.sqrt()
     val avSpeedCap: Double
         get() = actorValue.getAsDouble(AVKey.SPEED)!! *
