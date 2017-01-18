@@ -77,6 +77,7 @@ object TileCodex {
         prop.drop = intVal(record, "drop")
         prop.dropDamage = intVal(record, "ddmg")
         prop.friction = intVal(record, "friction")
+        prop.viscosity = intVal(record, "vscs")
 
         prop.isFluid = boolVal(record, "fluid")
         prop.isSolid = boolVal(record, "solid")

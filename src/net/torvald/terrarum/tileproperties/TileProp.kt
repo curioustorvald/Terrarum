@@ -19,6 +19,7 @@ class TileProp {
 
     var strength: Int = 0
     var density: Int = 0
+    var viscosity: Int = 0
 
     var isFluid: Boolean = false
     var isSolid: Boolean = false

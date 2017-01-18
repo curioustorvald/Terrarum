@@ -19,7 +19,6 @@ object AVKey {
     const val ACCEL = "accel"
     const val ACCELBUFF = "$ACCEL$BUFF"
     /** internal value used by ActorHumanoid to implement friction in walkfunction */
-    const val ACCELMULT_MOVEMENT = "__accelmultmvmt"
     const val SCALE = "scale"
     const val SCALEBUFF = "$SCALE$BUFF" // aka PHYSIQUE
     /** pixels */
