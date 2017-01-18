@@ -251,8 +251,6 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
     protected val updateDelta: Int
         get() = Terrarum.ingame.UPDATE_DELTA
 
-    @Transient private var accelMultMovement = 1.0
-
     /**
      * true: This actor had just made collision
      */
@@ -360,7 +358,6 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
              * Actual physics thing (altering velocity) starts from here
              */
 
-            updateMovementControl()
             // Combine velo and walk
             applyMovementVelocity()
 
@@ -408,30 +405,6 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
                 walledLeft = false
                 walledRight = false
             }
-        }
-    }
-
-    /** about get going
-     * for about stopping, see setHorizontalFriction */
-    private fun updateMovementControl() {
-        /* if not submerged:
-                if grounded:
-                    feetTileFriction
-                else:
-                    bodyTileFriction
-           else:
-                linearMix(not submerged, fluidViscosity, submergedRatio)
-         */
-        if (!isPlayerNoClip) {
-            if (grounded) {
-                accelMultMovement = feetFriction.frictionToMult()
-            }
-            else {
-                accelMultMovement = bodyFriction.frictionToMult()
-            }
-        }
-        else {
-            accelMultMovement = 1.0
         }
     }
 
@@ -885,12 +858,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
 
             return friction
         }
-
-    /**
-     * Get highest friction value from surrounding tiles
-     * @return
-     */
-    internal val feetFriction: Int // FIXME sharp turn on ice is still possible as on soil/rocks
+    internal val feetFriction: Int
         get() {
             var friction = 0
             forEachFeetTile { // get max friction
@@ -902,6 +870,57 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
         }
 
     fun Int.frictionToMult(): Double = this / 16.0
+
+    internal val bodyViscosity: Int
+        get() {
+            var viscosity = 0
+            forEachOccupyingTile { // get max viscosity
+                if (it?.viscosity ?: 0 > viscosity)
+                    viscosity = it?.viscosity ?: 0
+            }
+
+            return viscosity
+        }
+    internal val feetViscosity: Int
+        get() {
+            var viscosity = 0
+            forEachFeetTile { // get max viscosity
+                if (it?.viscosity ?: 0 > viscosity)
+                    viscosity = it?.viscosity ?: 0
+            }
+
+            return viscosity
+        }
+
+    fun Int.viscosityToMult(): Double = 16.0 / (16.0 + this)
+
+    internal val speedCapByTile: Double
+        get() {
+            val notSubmergedCap = if (grounded)
+                feetViscosity.viscosityToMult()
+            else
+                bodyViscosity.viscosityToMult()
+            val normalisedViscocity = bodyViscosity.viscosityToMult()
+
+            return interpolateLinear(submergedRatio, notSubmergedCap, normalisedViscocity)
+        }
+    /** about get going
+     * for about stopping, see setHorizontalFriction */
+    internal val accelMultMovement: Double
+        get() {
+            if (!isPlayerNoClip) {
+                val notSubmergedAccel = if (grounded)
+                    feetFriction.frictionToMult()
+                else
+                    bodyFriction.frictionToMult()
+                val normalisedViscocity = bodyViscosity.viscosityToMult()
+
+                return interpolateLinear(submergedRatio, notSubmergedAccel, normalisedViscocity)
+            }
+            else {
+                return 1.0
+            }
+        }
 
     /**
      * Get highest tile density from occupying tiles, fluid only
@@ -1231,6 +1250,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
     val avSpeedCap: Double
         get() = actorValue.getAsDouble(AVKey.SPEED)!! *
                 actorValue.getAsDouble(AVKey.SPEEDBUFF)!! *
+                speedCapByTile *
                 scale.sqrt()
 }
 
@@ -1269,3 +1289,16 @@ fun absMax(left: Double, right: Double): Double {
 
 fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
 fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0
+
+fun interpolateLinear(scale: Double, startValue: Double, endValue: Double): Double {
+    if (startValue == endValue) {
+        return startValue
+    }
+    if (scale <= 0f) {
+        return startValue
+    }
+    if (scale >= 1f) {
+        return endValue
+    }
+    return (1f - scale) * startValue + scale * endValue
+}
