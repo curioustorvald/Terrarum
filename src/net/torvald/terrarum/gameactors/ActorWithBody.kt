@@ -23,10 +23,6 @@ import java.util.*
  */
 open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
 
-
-    // FIXME disable all water-related movement mods (slow ESDF velo while submerged)
-
-
     /** !! ActorValue macros are on the very bottom of the source !! **/
 
     override var actorValue: ActorValue = ActorValue()

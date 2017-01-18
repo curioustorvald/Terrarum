@@ -22,10 +22,6 @@ import java.util.*
 open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     : HistoricalFigure(birth, death), Controllable, Pocketed, Factionable, Luminous, LandHolder {
 
-
-    // FIXME disable all water-related movement mods (slow ESDF velo while submerged)ssssst
-
-
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory = ActorInventory()
 
