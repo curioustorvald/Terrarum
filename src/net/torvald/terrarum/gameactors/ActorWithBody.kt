@@ -326,10 +326,10 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
      *
      * Since we're adding some value every frame, the value is equivalent to the acceleration.
      * Look for Newton's second law for the background knowledge.
-     * @param vec : Acceleration in Vector2
+     * @param acc : Acceleration in Vector2
      */
-    fun applyForce(vec: Vector2) {
-        velocity += vec
+    fun applyForce(acc: Vector2) {
+        velocity += acc.times(speedMultByTile)
     }
 
     override fun update(gc: GameContainer, delta: Int) {
@@ -383,7 +383,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
                 }
 
                 setHorizontalFriction()
-                if (isPlayerNoClip) { // or hanging on the rope, etc.
+                if (isPlayerNoClip) { // TODO also hanging on the rope, etc.
                     setVerticalFriction()
                 }
 
@@ -404,6 +404,16 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
         }
     }
 
+    /**
+     * Similar to applyForce but deals with walking. Read below:
+     *
+     * how speedcap is achieved with moveDelta:
+     * moveDelta is (velo + walk), but this added value is reset every update.
+     * if it wasn't, it will go like this:
+     *  F 0     velo + walk
+     *  F 1     velo + walk + velo + walk
+     * as a result, the speed will keep increase without it
+     */
     private fun applyMovementVelocity() {
         if (this is Controllable) {
             // decide whether to ignore walkX
@@ -890,7 +900,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
 
     fun Int.viscosityToMult(): Double = 16.0 / (16.0 + this)
 
-    internal val speedCapByTile: Double
+    internal val speedMultByTile: Double
         get() {
             val notSubmergedCap = if (grounded)
                 feetViscosity.viscosityToMult()
@@ -1246,7 +1256,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
     val avSpeedCap: Double
         get() = actorValue.getAsDouble(AVKey.SPEED)!! *
                 actorValue.getAsDouble(AVKey.SPEEDBUFF)!! *
-                speedCapByTile *
+                speedMultByTile *
                 scale.sqrt()
 }
 
