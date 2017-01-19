@@ -5,8 +5,9 @@ timeCounter = 0
 countMax = 0
 moveMode = math.random() >= 0.5 and "left" or "right"
 currentMode = "move"
+jumpheight = 6 -- lol
 
-local function generateCountMax()
+function generateCountMax()
     local function generateTurn()
         return 4600 + 1250 * math.random()
     end
@@ -18,39 +19,51 @@ local function generateCountMax()
     return (currentMode == "move") and generateWalk() or generateTurn()
 end
 
-local function moveToDirection(delta)
+function moveToDirection(delta)
     local tiles = ai.getNearbyTiles(1)
+    local ledges = ai.getLedgesHeight(1)
 
     if moveMode == "left" then
         if bit32.band(bit32.bor(tiles[0][-1], tiles[-1][-1]), 1) == 1 then
-            ai.moveLeft(0.75)
-            ai.jump()
+            ai.moveLeft(0.8)
+            if ledges[-1] <= jumpheight then -- no futile jumps
+                ai.jump()
+            end
         else
-            timeCounter = timeCounter + delta -- no countup when jumping
             ai.moveLeft(0.5)
         end
     elseif moveMode == "right" then
         if bit32.band(bit32.bor(tiles[0][1], tiles[-1][1]), 1) == 1 then
-            ai.moveRight(0.75)
-            ai.jump()
+            ai.moveRight(0.8)
+            if ledges[1] <= jumpheight then -- no futile jumps
+                ai.jump()
+            end
         else
-            timeCounter = timeCounter + delta -- no countup when jumping
             ai.moveRight(0.5)
         end
     end
+
+    timeCounter = timeCounter + delta
 end
 
-local function toggleCurrentMode()
+function toggleCurrentMode()
     currentMode = (currentMode == "move") and "turn" or "move"
 end
 
-local function toggleMoveMode()
+function toggleMoveMode()
     moveMode = (moveMode == "left") and "right" or "left"
 end
 
 -------------------------------------------------------------------------------
 
 countMax = generateCountMax()
+
+function toggleCondition()
+    local floorsheight = ai.getFloorsHeight(1)
+    return timeCounter >= countMax or
+            -- avoid great falls
+            (timeCounter > 150 and (floorsheight[-1] > jumpheight or floorsheight[1] > jumpheight))
+end
 
 function update(delta)
     if currentMode == "move" then
@@ -59,7 +72,7 @@ function update(delta)
         timeCounter = timeCounter + delta -- no countup when jumping
     end
 
-    if timeCounter >= countMax then
+    if toggleCondition() then
         timeCounter = 0
         toggleCurrentMode()
         countMax = generateCountMax()
