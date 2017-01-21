@@ -7,21 +7,29 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.tileproperties.TileCodex
 import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.terrarum.gamecontroller.Key
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileProp
 import org.dyn4j.Epsilon
 import org.dyn4j.geometry.Vector2
+import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
+import org.newdawn.slick.Image
 import java.util.*
 
 /**
- * Base class for every actor that has physical (or echo) body. This includes furnishings, paintings, gadgets, etc.
+ * Base class for every actor that has animated sprites. This includes furnishings, paintings, gadgets, etc.
+ * Also has all the physics
+ *
+ * @param renderOrder Rendering order (BEHIND, MIDDLE, MIDTOP, FRONT)
+ * @param physics
  *
  * Created by minjaesong on 16-01-13.
  */
-open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
+open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : ActorVisible(renderOrder) {
 
     /** !! ActorValue macros are on the very bottom of the source !! **/
 
@@ -38,14 +46,12 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
     protected var hitboxTranslateY: Double = 0.0// relative to spritePosY
     protected var baseHitboxW: Int = 0
     protected var baseHitboxH: Int = 0
-    protected var baseSpriteWidth: Int = 0
-    protected var baseSpriteHeight: Int = 0
     /**
      * * Position: top-left point
      * * Unit: pixel
      * !! external class should not hitbox.set(); use setHitboxDimension() and setPosition()
      */
-    val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)       // Hitbox is implemented using Double;
+    override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)       // Hitbox is implemented using Double;
     @Transient val nextHitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // 52 mantissas ought to be enough for anybody...
 
     val tilewiseHitbox: Hitbox
@@ -100,7 +106,10 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
         get() = (actorValue.getAsDouble(AVKey.SCALE) ?: 1.0) *
                 (actorValue.getAsDouble(AVKey.SCALEBUFF) ?: 1.0)
         set(value) {
+            val scaleDelta = value - scale
             actorValue[AVKey.SCALE] = value / (actorValue.getAsDouble(AVKey.SCALEBUFF) ?: 1.0)
+            // reposition
+            translatePosition(-baseHitboxW * scaleDelta / 2, -baseHitboxH * scaleDelta)
         }
     @Transient val MASS_LOWEST = 0.1 // Kilograms
     /** Apparent mass. Use "avBaseMass" for base mass */
@@ -110,7 +119,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
             if (value <= 0)
                 throw IllegalArgumentException("mass cannot be less than or equal to zero.")
             else if (value < MASS_LOWEST) {
-                println("[ActorWithBody] input too small; using $MASS_LOWEST instead.")
+                println("[ActorWithSprite] input too small; using $MASS_LOWEST instead.")
                 actorValue[AVKey.BASEMASS] = MASS_LOWEST
             }
 
@@ -123,7 +132,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
             if (value < 0)
                 throw IllegalArgumentException("invalid elasticity value $value; valid elasticity value is [0, 1].")
             else if (value >= ELASTICITY_MAX) {
-                println("[ActorWithBody] Elasticity were capped to $ELASTICITY_MAX.")
+                println("[ActorWithSprite] Elasticity were capped to $ELASTICITY_MAX.")
                 field = ELASTICITY_MAX
             }
             else
@@ -149,7 +158,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
     var density = 1000.0
         set(value) {
             if (value < 0)
-                throw IllegalArgumentException("[ActorWithBody] $value: density cannot be negative.")
+                throw IllegalArgumentException("[ActorWithSprite] $value: density cannot be negative.")
 
             field = value
         }
@@ -164,7 +173,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
     /** Default to 'true'  */
     var isVisible = true
     /** Default to 'true'  */
-    var isUpdate = true
+    var isUpdate = physics
     var isNoSubjectToGrav = false
     var isNoCollideWorld = false
     var isNoSubjectToFluidResistance = false
@@ -178,19 +187,6 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
     @Volatile var isChronostasis = false
 
     /**
-     * Constants
-     */
-
-    @Transient private val METER = 24.0
-    /**
-     * [m / s^2] * SI_TO_GAME_ACC -> [px / InternalFrame^2]
-     */
-    @Transient private val SI_TO_GAME_ACC = METER / (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS).toDouble()
-    /**
-     * [m / s] * SI_TO_GAME_VEL -> [px / InternalFrame]
-     */
-    @Transient private val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
-    /**
      * Gravitational Constant G. Load from gameworld.
      * [m / s^2]
      * s^2 = 1/FPS = 1/60 if FPS is targeted to 60
@@ -203,7 +199,7 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
         get() = actorValue.getAsDouble(AVKey.DRAGCOEFF) ?: DRAG_COEFF_DEFAULT
         set(value) {
             if (value < 0)
-                throw IllegalArgumentException("[ActorWithBody] drag coefficient cannot be negative.")
+                throw IllegalArgumentException("[ActorWithSprite] drag coefficient cannot be negative.")
             actorValue[AVKey.DRAGCOEFF] = value
         }
 
@@ -260,23 +256,33 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
         // some initialiser goes here...
     }
 
-    fun makeNewSprite(w: Int, h: Int) {
-        sprite = SpriteAnimation(this)
-        sprite!!.setDimension(w, h)
+    fun makeNewSprite(w: Int, h: Int, image: Image) {
+        sprite = SpriteAnimation(this, w, h)
+        sprite!!.setSpriteImage(image)
     }
 
-    fun makeNewSpriteGlow(w: Int, h: Int) {
-        spriteGlow = SpriteAnimation(this)
-        spriteGlow!!.setDimension(w, h)
+    fun makeNewSprite(w: Int, h: Int, imageref: String) {
+        sprite = SpriteAnimation(this, w, h)
+        sprite!!.setSpriteImage(imageref)
+    }
+
+    fun makeNewSpriteGlow(w: Int, h: Int, image: Image) {
+        spriteGlow = SpriteAnimation(this, w, h)
+        spriteGlow!!.setSpriteImage(image)
+    }
+
+    fun makeNewSpriteGlow(w: Int, h: Int, imageref: String) {
+        spriteGlow = SpriteAnimation(this, w, h)
+        spriteGlow!!.setSpriteImage(imageref)
     }
 
     /**
      * @param w
      * @param h
-     * @param tx positive: translate drawn sprite to LEFT.
-     * @param ty positive: translate drawn sprite to DOWN.
-     * @see ActorWithBody.drawBody
-     * @see ActorWithBody.drawGlow
+     * @param tx positive: translate sprite to LEFT.
+     * @param ty positive: translate sprite to DOWN.
+     * @see ActorWithSprite.drawBody
+     * @see ActorWithSprite.drawGlow
      */
     fun setHitboxDimension(w: Int, h: Int, tx: Int, ty: Int) {
         baseHitboxH = h
@@ -296,16 +302,21 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
      */
     fun setPosition(x: Double, y: Double) {
         hitbox.setFromWidthHeight(
-                x - (baseHitboxW / 2 - hitboxTranslateX) * (1 - scale),
-                y - (baseHitboxH - hitboxTranslateY) * (1 - scale),
+                x - (baseHitboxW / 2 - hitboxTranslateX) * scale,
+                y - (baseHitboxH - hitboxTranslateY) * scale,
                 baseHitboxW * scale,
                 baseHitboxH * scale)
 
         nextHitbox.setFromWidthHeight(
-                x - (baseHitboxW / 2 - hitboxTranslateX) * (1 - scale),
-                y - (baseHitboxH - hitboxTranslateY) * (1 - scale),
+                x - (baseHitboxW / 2 - hitboxTranslateX) * scale,
+                y - (baseHitboxH - hitboxTranslateY) * scale,
                 baseHitboxW * scale,
                 baseHitboxH * scale)
+    }
+
+    private fun translatePosition(dx: Double, dy: Double) {
+        hitbox.translate(dx, dy)
+        nextHitbox.translate(dx, dy)
     }
 
     val centrePosVector: Vector2
@@ -342,12 +353,6 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
                 isNoSubjectToGrav = isPlayerNoClip
                 isNoCollideWorld = isPlayerNoClip
                 isNoSubjectToFluidResistance = isPlayerNoClip
-            }
-
-            // set sprite dimension vars if there IS sprite for the actor
-            if (sprite != null) {
-                baseSpriteHeight = sprite!!.height
-                baseSpriteWidth = sprite!!.width
             }
 
             /**
@@ -987,50 +992,64 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
 
     private fun updateHitbox() = hitbox.reassign(nextHitbox)
 
-    open fun drawGlow(g: Graphics) {
+    override open fun drawGlow(g: Graphics) {
         if (isVisible && spriteGlow != null) {
             blendLightenOnly()
 
             if (!sprite!!.flippedHorizontal()) {
                 spriteGlow!!.render(g,
                         (hitbox.posX - hitboxTranslateX * scale).toFloat(),
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
                 // Q&D fix for Roundworld anomaly
                 spriteGlow!!.render(g,
                         (hitbox.posX - hitboxTranslateX * scale).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
                 spriteGlow!!.render(g,
                         (hitbox.posX - hitboxTranslateX * scale).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
             }
             else {
                 spriteGlow!!.render(g,
                         (hitbox.posX - scale).toFloat(),
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
                 // Q&D fix for Roundworld anomaly
                 spriteGlow!!.render(g,
                         (hitbox.posX - scale).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
                 spriteGlow!!.render(g,
                         (hitbox.posX - scale).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
             }
         }
+
+
+        // debug hitbox
+        if (KeyToggler.isOn(Key.F11)) {
+            g.color = Color(1f, 0f, 1f, 1f)
+            blendNormal()
+            g.lineWidth = 1f
+            g.drawRect(
+                    hitbox.posX.toFloat(),
+                    hitbox.posY.toFloat(),
+                    hitbox.width.toFloat(),
+                    hitbox.height.toFloat()
+            )
+        }
     }
 
-    open fun drawBody(g: Graphics) {
+    override open fun drawBody(g: Graphics) {
         if (isVisible && sprite != null) {
 
 
@@ -1043,36 +1062,36 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
             if (!sprite!!.flippedHorizontal()) {
                 sprite!!.render(g,
                         (hitbox.posX - hitboxTranslateX * scale).toFloat(),
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
                 // Q&D fix for Roundworld anomaly
                 sprite!!.render(g,
                         (hitbox.posX - hitboxTranslateX * scale).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
                 sprite!!.render(g,
                         (hitbox.posX - hitboxTranslateX * scale).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
             }
             else {
                 sprite!!.render(g,
                         (hitbox.posX - scale).toFloat(),
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
                 // Q&D fix for Roundworld anomaly
                 sprite!!.render(g,
                         (hitbox.posX - scale).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
                 sprite!!.render(g,
                         (hitbox.posX - scale).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale - (baseSpriteHeight - baseHitboxH) * scale + 2).toFloat(),
+                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                         (scale).toFloat()
                 )
             }
@@ -1129,9 +1148,9 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
 
         // warnings
         if (sprite == null && isVisible)
-            println("[ActorWithBody] Caution: actor ${this.javaClass.simpleName} is echo but the sprite was not set.")
+            println("[ActorWithSprite] Caution: actor ${this.javaClass.simpleName} is echo but the sprite was not set.")
         else if (sprite != null && !isVisible)
-            println("[ActorWithBody] Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
+            println("[ActorWithSprite] Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
 
         assertPrinted = true
     }
@@ -1191,12 +1210,29 @@ open class ActorWithBody(renderOrder: ActorOrder) : Actor(renderOrder) {
     companion object {
 
         /**
+         * Constants
+         */
+
+        @Transient private val METER = 24.0
+        /**
+         * [m / s^2] * SI_TO_GAME_ACC -> [px / InternalFrame^2]
+         */
+        @Transient val SI_TO_GAME_ACC = METER / (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS).toDouble()
+        /**
+         * [m / s] * SI_TO_GAME_VEL -> [px / InternalFrame]
+         */
+        @Transient val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
+
+        /**
          *  Enumerations that exported to JSON
          */
         @Transient const val COLLISION_NOCOLLIDE = 0
-        @Transient const val COLLISION_KINEMATIC = 1 // does not displaced by external forces when collided, but it still can move (e.g. player, elevator)
-        @Transient const val COLLISION_DYNAMIC = 2   // displaced by external forces
-        @Transient const val COLLISION_STATIC = 3    // does not displaced by external forces, target of collision (e.g. nonmoving static obj)
+        /** does not displaced by external forces when collided, but it still can move (e.g. player, elevator) */
+        @Transient const val COLLISION_KINEMATIC = 1
+        /** displaced by external forces */
+        @Transient const val COLLISION_DYNAMIC = 2
+        /** does not displaced by external forces, target of collision (e.g. nonmoving static obj) */
+        @Transient const val COLLISION_STATIC = 3
         @Transient const val COLLISION_KNOCKBACK_GIVER = 4 // mobs
         @Transient const val COLLISION_KNOCKBACK_TAKER = 5 // benevolent NPCs
         @Transient const val BLEND_NORMAL = 4

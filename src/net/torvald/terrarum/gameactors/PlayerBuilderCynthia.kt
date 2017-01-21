@@ -9,7 +9,7 @@ import net.torvald.terrarum.mapdrawer.FeaturesDrawer
  */
 object PlayerBuilderCynthia {
 
-    operator fun invoke(): ActorWithBody {
+    operator fun invoke(): ActorWithSprite {
         //val p: Player = Player(GameDate(100, 143)) // random value thrown
         val p: HumanoidNPC = HumanoidNPC("/net/torvald/terrarum/gameactors/ai/scripts/PokemonNPCAI.lua",
                 GameDate(100, 143)) // random value thrown
@@ -19,8 +19,7 @@ object PlayerBuilderCynthia {
         p.actorValue[AVKey.NAME] = "Cynthia"
 
 
-        p.makeNewSprite(26, 42)
-        p.sprite!!.setSpriteImage("assets/graphics/sprites/test_player_2.tga")
+        p.makeNewSprite(26, 42, "assets/graphics/sprites/test_player_2.tga")
         p.sprite!!.setDelay(200)
         p.sprite!!.setRowsAndFrames(1, 1)
 

@@ -10,13 +10,14 @@ import org.newdawn.slick.Image
 /**
  * Created by SKYHi14 on 2017-01-07.
  */
-class TapestryObject(val image: Image, val artName: String, val artAuthor: String) : FixtureBase() {
+class TapestryObject(val image: Image, val artName: String, val artAuthor: String) : FixtureBase(physics = false) {
+
+    // physics = false only speeds up for ~2 frames with 50 tapestries
 
     init {
-        makeNewSprite(image.width, image.height)
+        image.filter = Image.FILTER_NEAREST
+        makeNewSprite(image.width, image.height, image)
         setHitboxDimension(image.width, image.height, 0, 0)
-        sprite!!.setSpriteImage(image)
-        isNoSubjectToGrav = true
         setPosition(Terrarum.appgc.mouseX, Terrarum.appgc.mouseY)
     }
 

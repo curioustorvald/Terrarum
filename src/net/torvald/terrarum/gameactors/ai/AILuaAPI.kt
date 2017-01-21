@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors.ai
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.ActorWithSprite
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex
@@ -14,7 +14,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
 /**
  * Created by minjaesong on 16-10-24.
  */
-internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
+internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
 
     // FIXME when actor jumps, the actor releases left/right stick
 
@@ -42,6 +42,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         g["ai"]["getNearbyTiles"] = GetNearbyTiles(actor)
         g["ai"]["getFloorsHeight"] = GetFloorsHeight(actor)
         g["ai"]["getCeilingsHeight"] = GetCeilingsHeight(actor)
+        g["ai"]["getLedgesHeight"] = GetLedgesHeight(actor)
 
         g["game"] = LuaValue.tableOf()
         g["game"]["version"] = GameVersion()
@@ -50,9 +51,9 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
 
     companion object {
         /**
-         * Reads arbitrary ActorWithBody and returns its information as Lua table
+         * Reads arbitrary ActorWithSprite and returns its information as Lua table
          */
-        fun composeActorObject(actor: ActorWithBody): LuaTable {
+        fun composeActorObject(actor: ActorWithSprite): LuaTable {
             val t: LuaTable = LuaTable()
 
             t["name"] = actor.actorValue.getAsString(AVKey.NAME).toLua()
@@ -94,7 +95,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         operator fun LuaTable.set(index: Int, value: Int) { this[index] = value.toLua() }
     }
 
-    class GetSelfActorInfo(val actor: ActorWithBody) : ZeroArgFunction() {
+    class GetSelfActorInfo(val actor: ActorWithSprite) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return composeActorObject(actor)
         }
@@ -130,13 +131,13 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         }
     }
 
-    class GetX(val actor: ActorWithBody) : ZeroArgFunction() {
+    class GetX(val actor: ActorWithSprite) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(actor.hitbox.centeredX)
         }
     }
 
-    class GetY(val actor: ActorWithBody) : ZeroArgFunction() {
+    class GetY(val actor: ActorWithSprite) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(actor.hitbox.centeredY)
         }
@@ -219,7 +220,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         }
     }
 
-    class GetNearbyTiles(val actor: ActorWithBody) : OneArgFunction() {
+    class GetNearbyTiles(val actor: ActorWithSprite) : OneArgFunction() {
         /** @param radius
          *
          *  3 will return 7x7 array, 0 will return 1x1, 1 will return 3x3
@@ -261,7 +262,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         }
     }
 
-    class GetFloorsHeight(val actor: ActorWithBody) : OneArgFunction() {
+    class GetFloorsHeight(val actor: ActorWithSprite) : OneArgFunction() {
         /** @param radius
          *
          *  3 will return len:7 array, 0 will return len:1, 1 will return len:3
@@ -304,14 +305,13 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
         }
     }
 
-    class GetCeilingsHeight(val actor: ActorWithBody) : OneArgFunction() {
-        /** @param radius
+    class GetCeilingsHeight(val actor: ActorWithSprite) : OneArgFunction() {
+        /** @param arg radius
          *
          *  3 will return 7x7 array, 0 will return 1x1, 1 will return 3x3
          *
          *  Index: [-3] .. [0] .. [3] for radius
          *  Return value: floor height
-         *  (-1): tile you can stand on
          *  0: body tile (legs area)
          *  1: body tile (may be vary depend on the size of the actor)
          *  2+: tiles up there
@@ -336,6 +336,48 @@ internal class AILuaAPI(g: Globals, actor: ActorWithBody) {
                     while (true) {
                         val tile = Terrarum.ingame.world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Tile.STONE
                         if (TileCodex[tile].isSolid || searchUpCounter >= searchUpLimit) {
+                            luatable[x - feetTilePos[0]] = searchUpCounter
+                            break
+                        }
+                        searchUpCounter++
+                    }
+                }
+
+                return luatable
+            }
+        }
+    }
+
+    class GetLedgesHeight(val actor: ActorWithSprite) : OneArgFunction() {
+        /** @param arg radius
+         * ==
+         *    <- (non-solid found)
+         * ==
+         * ==
+         * ==
+         * == @  -> ledge height: 4
+         * =================
+         */
+        override fun call(arg: LuaValue): LuaValue {
+            val radius = arg.checkint()
+
+            val searchUpLimit = 12
+
+            if (radius < 0) {
+                return LuaValue.NONE
+            }
+            else if (radius > 8) {
+                throw IllegalArgumentException("Radius too large -- must be 8 or less")
+            }
+            else {
+                val luatable = LuaTable()
+                val feetTilePos = actor.feetPosTile
+                for (x in feetTilePos[0] - radius..feetTilePos[0] + radius) {
+                    // search up
+                    var searchUpCounter = 0
+                    while (true) {
+                        val tile = Terrarum.ingame.world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Tile.STONE
+                        if (!TileCodex[tile].isSolid || searchUpCounter >= searchUpLimit) {
                             luatable[x - feetTilePos[0]] = searchUpCounter
                             break
                         }

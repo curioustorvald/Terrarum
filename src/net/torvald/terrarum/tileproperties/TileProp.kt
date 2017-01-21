@@ -24,6 +24,7 @@ class TileProp {
     var isFluid: Boolean = false
     var isSolid: Boolean = false
     var isWallable: Boolean = false
+    var isVertFriction: Boolean = false
 
     /**
      * @param luminosity Raw RGB value, without alpha

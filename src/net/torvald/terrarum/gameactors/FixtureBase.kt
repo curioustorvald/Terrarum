@@ -5,7 +5,7 @@ import net.torvald.spriteanimation.SpriteAnimation
 /**
  * Created by minjaesong on 16-06-17.
  */
-open class FixtureBase : ActorWithBody(ActorOrder.BEHIND) {
+open class FixtureBase(physics: Boolean = true) : ActorWithSprite(ActorOrder.BEHIND, physics) {
     /**
      * 0: Open
      * 1: Blocked

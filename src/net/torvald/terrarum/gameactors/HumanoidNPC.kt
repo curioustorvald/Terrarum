@@ -31,7 +31,7 @@ open class HumanoidNPC(override val scriptPath: String, born: GameDate) : ActorH
     private val aiLuaAPI: AILuaAPI
 
     companion object {
-        val DEFAULT_COLLISION_TYPE = ActorWithBody.COLLISION_DYNAMIC
+        val DEFAULT_COLLISION_TYPE = ActorWithSprite.COLLISION_DYNAMIC
     }
 
     init {

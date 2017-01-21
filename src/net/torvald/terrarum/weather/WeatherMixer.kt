@@ -7,6 +7,9 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.gameactors.ParticleTestRain
+import net.torvald.terrarum.gamecontroller.Key
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.getPixel
 import org.newdawn.slick.Color
@@ -76,6 +79,16 @@ object WeatherMixer {
     fun update(gc: GameContainer, delta: Int) {
         currentWeather = weatherList[WEATHER_GENERIC]!![0]
 
+        // test rain toggled by F2
+
+        if (KeyToggler.isOn(Key.F2)) {
+            val playerPos = Terrarum.ingame.player.centrePosPoint
+            val rainParticle = ParticleTestRain(
+                    playerPos.x + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
+                    playerPos.y - Terrarum.HALFH
+            )
+            Terrarum.ingame.addActor(rainParticle)
+        }
     }
 
     fun render(g: Graphics) {

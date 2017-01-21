@@ -20,11 +20,11 @@ function generateCountMax()
 end
 
 function moveToDirection(delta)
-    local tiles = ai.getNearbyTiles(1)
+    local pits = ai.getFloorsHeight(2)
     local ledges = ai.getLedgesHeight(1)
 
     if moveMode == "left" then
-        if bit32.band(bit32.bor(tiles[0][-1], tiles[-1][-1]), 1) == 1 then
+        if pits[-1] == 1 then
             ai.moveLeft(0.8)
             if ledges[-1] <= jumpheight then -- no futile jumps
                 ai.jump()
@@ -33,7 +33,7 @@ function moveToDirection(delta)
             ai.moveLeft(0.5)
         end
     elseif moveMode == "right" then
-        if bit32.band(bit32.bor(tiles[0][1], tiles[-1][1]), 1) == 1 then
+        if pits[1] == 1 then
             ai.moveRight(0.8)
             if ledges[1] <= jumpheight then -- no futile jumps
                 ai.jump()

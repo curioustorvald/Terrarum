@@ -361,7 +361,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
      * this code base, ACCELERATION must be changed (in other words, we must deal with JERK) accordingly
      * to the FRICTION.
      *
-     * So I'm adding walkX/Y and getting the ActorWithBody.setNewNextHitbox to use the velocity value of
+     * So I'm adding walkX/Y and getting the ActorWithSprite.setNewNextHitbox to use the velocity value of
      * walkX/Y + velocity, which is stored in variable moveDelta.
      *
      * Be warned.

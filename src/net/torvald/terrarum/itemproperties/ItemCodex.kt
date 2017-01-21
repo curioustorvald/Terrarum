@@ -5,7 +5,7 @@ import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.CanBeAnItem
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.ActorWithSprite
 import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.gameitem.EquipPosition
@@ -50,7 +50,7 @@ object ItemCodex {
                     val mousePoint = Point2d(gc.mouseTileX.toDouble(), gc.mouseTileY.toDouble())
                     // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
                     Terrarum.ingame.actorContainer.forEach {
-                        if (it is ActorWithBody && it.tilewiseHitbox.intersects(mousePoint))
+                        if (it is ActorWithSprite && it.tilewiseHitbox.intersects(mousePoint))
                             return
                     }
                     // filter passed, do the job

@@ -64,4 +64,9 @@ abstract class Actor(val renderOrder: ActorOrder) : Comparable<Actor>, Runnable 
 
 }
 
-enum class ActorOrder { BEHIND, MIDDLE, MIDTOP, FRONT }
+enum class ActorOrder {
+    BEHIND, // tapestries, some particles (obstructed by terrain)
+    MIDDLE, // actors
+    MIDTOP, // bullets, thrown items
+    FRONT   // fake tiles
+}

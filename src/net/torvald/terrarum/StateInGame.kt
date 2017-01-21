@@ -24,6 +24,7 @@ import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.mapgenerator.WorldGenerator
 import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.tileproperties.TileCodex
+import net.torvald.terrarum.tileproperties.TilePropUtil
 import net.torvald.terrarum.tilestats.TileStats
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.weather.WeatherMixer
@@ -36,6 +37,8 @@ import org.newdawn.slick.state.StateBasedGame
 import shader.Shader
 import java.lang.management.ManagementFactory
 import java.util.*
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
 
 /**
  * Created by minjaesong on 15-12-30.
@@ -56,10 +59,10 @@ constructor() : BasicGameState() {
     val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val uiContainer = ArrayList<UIHandler>()
 
-    private val actorsRenderBehind = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderMiddle = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderMidTop = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderFront  = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderBehind = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderMiddle = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderMidTop = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderFront  = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
 
     lateinit var consoleHandler: UIHandler
     lateinit var debugWindow: UIHandler
@@ -127,8 +130,6 @@ constructor() : BasicGameState() {
 
         // add new player and put it to actorContainer
         playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
-        //player = PBCynthia.create()
-        //player.setNoClip(true);
         addActor(player)
 
 
@@ -185,8 +186,9 @@ constructor() : BasicGameState() {
             ///////////////////////////
             // world-related updates //
             ///////////////////////////
+            TilePropUtil.dynamicLumFuncTickClock()
             world.updateWorldTime(delta)
-            WorldSimulator(world, player, delta)
+            WorldSimulator(player, delta)
             WeatherMixer.update(gc, delta)
             TileStats.update()
             if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
@@ -255,9 +257,13 @@ constructor() : BasicGameState() {
 
     private fun repossessActor() {
         // check if currently pocessed actor is removed from game
-        if (!hasActor(player))
-        // re-possess canonical player
-            changePossession(Player.PLAYER_REF_ID) // TODO completely other behaviour?
+        if (!hasActor(player)) {
+            // re-possess canonical player
+            if (hasActor(Player.PLAYER_REF_ID))
+                changePossession(Player.PLAYER_REF_ID)
+            else
+                changePossession(0x51621D) // FIXME fallback debug mode (FIXME is there for a reminder visible in ya IDE)
+        }
     }
 
     private fun changePossession(newActor: PlayableActorDelegate) {
@@ -266,7 +272,7 @@ constructor() : BasicGameState() {
         }
 
         playableActorDelegate = newActor
-        WorldSimulator(world, player, UPDATE_DELTA)
+        WorldSimulator(player, UPDATE_DELTA)
     }
 
     private fun changePossession(refid: Int) {
@@ -280,8 +286,8 @@ constructor() : BasicGameState() {
         playableActorDelegate!!.actor.collisionType = HumanoidNPC.DEFAULT_COLLISION_TYPE
         // accept new delegate
         playableActorDelegate = PlayableActorDelegate(getActorByID(refid) as ActorHumanoid)
-        playableActorDelegate!!.actor.collisionType = ActorWithBody.COLLISION_KINEMATIC
-        WorldSimulator(world, player, UPDATE_DELTA)
+        playableActorDelegate!!.actor.collisionType = ActorWithSprite.COLLISION_KINEMATIC
+        WorldSimulator(player, UPDATE_DELTA)
     }
 
     private fun setAppTitle() {
@@ -325,7 +331,7 @@ constructor() : BasicGameState() {
         actorsRenderMidTop.forEach { actor -> actor.drawBody(worldG) }
         player.drawBody(worldG)
         actorsRenderFront.forEach { actor -> actor.drawBody(worldG) }
-        // --> Change of blend mode <-- introduced by ActorWithBody //
+        // --> Change of blend mode <-- introduced by ActorVisible //
 
 
         /////////////////////////////
@@ -352,7 +358,7 @@ constructor() : BasicGameState() {
         actorsRenderMidTop.forEach { actor -> actor.drawGlow(worldG) }
         player.drawGlow(worldG)
         actorsRenderFront.forEach { actor -> actor.drawGlow(worldG) }
-        // --> blendLightenOnly() <-- introduced by ActorWithBody //
+        // --> blendLightenOnly() <-- introduced by ActorVisible //
 
 
         ////////////////////////
@@ -362,7 +368,7 @@ constructor() : BasicGameState() {
         // draw reference ID if debugWindow is open
         if (debugWindow.isVisible) {
             actorContainer.forEachIndexed { i, actor ->
-                if (actor is ActorWithBody) {
+                if (actor is ActorVisible) {
                     worldG.color = Color.white
                     worldG.font = Terrarum.fontSmallNumbers
                     worldG.drawString(
@@ -401,6 +407,13 @@ constructor() : BasicGameState() {
         /////////////////
         gwin.drawImage(worldDrawFrameBuffer.getScaledCopy(screenZoom), 0f, 0f)
         gwin.drawImage(uisDrawFrameBuffer, 0f, 0f)
+
+
+        // centre marker
+        /*gwin.color = Color(0x00FFFF)
+        gwin.lineWidth = 1f
+        gwin.drawLine(Terrarum.WIDTH / 2f, 0f, Terrarum.WIDTH / 2f, Terrarum.HEIGHT.toFloat())
+        gwin.drawLine(0f, Terrarum.HEIGHT / 2f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT / 2f)*/
     }
 
     override fun keyPressed(key: Int, c: Char) {
@@ -484,7 +497,7 @@ constructor() : BasicGameState() {
         while (i < actorContainerSize) { // loop through actorContainerInactive
             val actor = actorContainerInactive[i]
             val actorIndex = i
-            if (actor is ActorWithBody && actor.inUpdateRange()) {
+            if (actor is ActorVisible && actor.inUpdateRange()) {
                 addActor(actor) // duplicates are checked here
                 actorContainerInactive.removeAt(actorIndex)
                 actorContainerSize -= 1
@@ -507,12 +520,12 @@ constructor() : BasicGameState() {
             val actorIndex = i
             // kill actors flagged to despawn
             if (actor.flagDespawn) {
-                actorContainer.removeAt(actorIndex)
+                removeActor(actor)
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1
             }
             // inactivate distant actors
-            else if (actor is ActorWithBody && !actor.inUpdateRange()) {
+            else if (actor is ActorVisible && !actor.inUpdateRange()) {
                 if (actor !is Projectile) { // if it's a projectile, don't inactivate it; just kill it.
                     actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
                 }
@@ -559,7 +572,7 @@ constructor() : BasicGameState() {
         d.forEach { if (it < ret) ret = it }
         return ret
     }
-    private fun distToActorSqr(a: ActorWithBody, p: ActorWithBody) =
+    private fun distToActorSqr(a: ActorVisible, p: ActorVisible) =
             min(// take min of normal position and wrapped (x < 0) position
                     (a.hitbox.centeredX - p.hitbox.centeredX).sqr() +
                     (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
@@ -568,7 +581,7 @@ constructor() : BasicGameState() {
                     (a.hitbox.centeredX - p.hitbox.centeredX - world.width * TILE_SIZE).sqr() +
                     (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
             )
-    private fun distToCameraSqr(a: ActorWithBody) =
+    private fun distToCameraSqr(a: ActorVisible) =
             min(
                     (a.hitbox.posX - MapCamera.x).sqr() +
                     (a.hitbox.posY - MapCamera.y).sqr(),
@@ -579,14 +592,14 @@ constructor() : BasicGameState() {
             )
 
     /** whether the actor is within screen */
-    private fun ActorWithBody.inScreen() =
+    private fun ActorVisible.inScreen() =
             distToCameraSqr(this) <=
             (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr() +
              Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr())
 
 
     /** whether the actor is within update range */
-    private fun ActorWithBody.inUpdateRange() = distToCameraSqr(this) <= ACTOR_UPDATE_RANGE.sqr()
+    private fun ActorVisible.inUpdateRange() = distToCameraSqr(this) <= ACTOR_UPDATE_RANGE.sqr()
 
     /**
      * actorContainer extensions
@@ -596,8 +609,21 @@ constructor() : BasicGameState() {
     fun hasActor(ID: Int): Boolean =
             if (actorContainer.size == 0)
                 false
-            else
-                actorContainer.binarySearch(ID) >= 0
+            else {
+                // TODO cherche for inactive
+                val binsearch = actorContainer.binarySearch(ID)
+                if (binsearch < 0) {
+                    if (actorContainerInactive.size == 0) false
+                    else {
+                        val binsearch2 = actorContainerInactive.binarySearch(ID)
+
+                        binsearch2 >= 0
+                    }
+                }
+                else {
+                    true
+                }
+            }
 
     fun removeActor(ID: Int) = removeActor(getActorByID(ID))
     /**
@@ -616,7 +642,7 @@ constructor() : BasicGameState() {
 
             // indexToDelete >= 0 means that the actor certainly exists in the game
             // which means we don't need to check if i >= 0 again
-            if (actor is ActorWithBody) {
+            if (actor is ActorVisible) {
                 when (actor.renderOrder) {
                     ActorOrder.BEHIND -> {
                         val i = actorsRenderBehind.binarySearch(actor.referenceID)
@@ -648,12 +674,12 @@ constructor() : BasicGameState() {
         actorContainer.add(actor)
         insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
 
-        if (actor is ActorWithBody) {
+        if (actor is ActorVisible) {
             when (actor.renderOrder) {
-                ActorOrder.BEHIND -> actorsRenderBehind.add(actor)
-                ActorOrder.MIDDLE -> actorsRenderMiddle.add(actor)
-                ActorOrder.MIDTOP -> actorsRenderMidTop.add(actor)
-                ActorOrder.FRONT  -> actorsRenderFront.add(actor)
+                ActorOrder.BEHIND -> { actorsRenderBehind.add(actor); insertionSortLastElemAV(actorsRenderBehind) }
+                ActorOrder.MIDDLE -> { actorsRenderMiddle.add(actor); insertionSortLastElemAV(actorsRenderMiddle) }
+                ActorOrder.MIDTOP -> { actorsRenderMidTop.add(actor); insertionSortLastElemAV(actorsRenderMidTop) }
+                ActorOrder.FRONT  -> { actorsRenderFront .add(actor); insertionSortLastElemAV(actorsRenderFront ) }
             }
         }
     }
@@ -681,15 +707,26 @@ constructor() : BasicGameState() {
     }
 
     private fun insertionSortLastElem(arr: ArrayList<Actor>) {
-        var j: Int
-        val index: Int = arr.size - 1
-        val x = arr[index]
-        j = index - 1
-        while (j > 0 && arr[j] > x) {
-            arr[j + 1] = arr[j]
-            j -= 1
+        lock(ReentrantLock()) {
+            var j = arr.lastIndex - 1
+            val x = arr.last()
+            while (j >= 0 && arr[j] > x) {
+                arr[j + 1] = arr[j]
+                j -= 1
+            }
+            arr[j + 1] = x
         }
-        arr[j + 1] = x
+    }
+    private fun insertionSortLastElemAV(arr: ArrayList<ActorVisible>) { // out-projection doesn't work, duh
+        lock(ReentrantLock()) {
+            var j = arr.lastIndex - 1
+            val x = arr.last()
+            while (j >= 0 && arr[j] > x) {
+                arr[j + 1] = arr[j]
+                j -= 1
+            }
+            arr[j + 1] = x
+        }
     }
 
     private fun ArrayList<out Actor>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID)
@@ -711,6 +748,16 @@ constructor() : BasicGameState() {
                 return mid // key found
         }
         return -(low + 1)  // key not found
+    }
+
+    inline fun lock(lock: Lock, body: () -> Unit) {
+        lock.lock()
+        try {
+            body()
+        }
+        finally {
+            lock.unlock()
+        }
     }
 }
 

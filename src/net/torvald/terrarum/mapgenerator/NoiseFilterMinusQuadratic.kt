@@ -30,7 +30,7 @@ import com.jme3.math.FastMath
  * Created by minjaesong on 16-03-31.
  */
 object NoiseFilterMinusQuadratic : NoiseFilter {
-    override fun getGrad(func_argX: Int, start: Float, end: Float): Float {
+    override fun getGrad(func_argX: Int, start: Double, end: Double): Double {
         val graph_gradient = -FastMath.pow(FastMath.sqr((1 - WorldGenerator.TERRAIN_AVERAGE_HEIGHT).toFloat()), -1f) * // 1/4 -> 3/4 -> 9/16 -> 16/9
                              (start - end) / FastMath.sqr(WorldGenerator.HEIGHT.toFloat()) *
                              FastMath.sqr((func_argX - WorldGenerator.TERRAIN_AVERAGE_HEIGHT).toFloat()) + start
