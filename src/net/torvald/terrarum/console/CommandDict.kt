@@ -41,6 +41,7 @@ object CommandDict {
             Pair("inventory", Inventory),
             Pair("avtracker", AVTracker),
             Pair("actorslist", ActorsList),
+            Pair("setscale", SetScale),
 
             // Test codes
             Pair("bulletintest", SetBulletin),

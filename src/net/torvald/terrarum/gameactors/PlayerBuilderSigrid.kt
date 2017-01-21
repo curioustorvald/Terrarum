@@ -26,13 +26,11 @@ object PlayerBuilderSigrid {
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
 
-        p.makeNewSprite(28, 51)
-        p.sprite!!.setSpriteImage("assets/graphics/sprites/test_player.tga")
+        p.makeNewSprite(28, 51, "assets/graphics/sprites/test_player.tga")
         p.sprite!!.setDelay(200)
         p.sprite!!.setRowsAndFrames(1, 1)
 
-        p.makeNewSpriteGlow(28, 51)
-        p.spriteGlow!!.setSpriteImage("assets/graphics/sprites/test_player_glow.tga")
+        p.makeNewSpriteGlow(28, 51, "assets/graphics/sprites/test_player_glow.tga")
         p.spriteGlow!!.setDelay(200)
         p.spriteGlow!!.setRowsAndFrames(1, 1)
 
@@ -66,7 +64,7 @@ object PlayerBuilderSigrid {
         //p.actorValue["__selectedtile"] = 147 // test code; replace with <tile_item>.primaryUse(gc, delta)
         p.actorValue["__aimhelper"] = true // TODO when you'll gonna implement it?
 
-        p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 10, 0)
+        p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 11, -2) // FIXME offsetY of -2: Have no idea about the error; it's just supposed to be zero
 
         p.inventory = ActorInventory(0x7FFFFFFF, true)
 

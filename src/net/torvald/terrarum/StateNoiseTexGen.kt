@@ -55,6 +55,23 @@ class StateNoiseTexGen : BasicGameState() {
         return Joise(ridged_autocorrect)
     }
 
+    private fun noiseBrownianGranite(): Joise {
+        val ridged = ModuleFractal()
+        ridged.setType(ModuleFractal.FractalType.FBM)
+        ridged.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        ridged.setNumOctaves(2)
+        ridged.setFrequency(16.0)
+        ridged.seed = Random().nextLong()
+
+        val brownian_select = ModuleSelect()
+        brownian_select.setControlSource(ridged)
+        brownian_select.setThreshold(0.8)
+        brownian_select.setLowSource(0.0)
+        brownian_select.setHighSource(1.0)
+
+        return Joise(brownian_select)
+    }
+
     private fun noiseBillowFractal(): Joise {
         val ridged = ModuleFractal()
         ridged.setType(ModuleFractal.FractalType.BILLOW)
@@ -68,19 +85,6 @@ class StateNoiseTexGen : BasicGameState() {
         ridged_autocorrect.setSource(ridged)
 
         return Joise(ridged_autocorrect)
-    }
-
-    private fun noiseBlobs(): Joise {
-        val gradval = ModuleBasisFunction()
-        gradval.seed = Random().nextLong()
-        gradval.setType(ModuleBasisFunction.BasisType.GRADVAL)
-        gradval.setInterpolation(ModuleBasisFunction.InterpolationType.QUINTIC)
-
-        val gradval_autocorrect = ModuleAutoCorrect()
-        gradval_autocorrect.setRange(0.0, 1.0)
-        gradval_autocorrect.setSource(gradval)
-
-        return Joise(gradval_autocorrect)
     }
 
     private fun noiseSimplex(): Joise {
@@ -114,7 +118,7 @@ class StateNoiseTexGen : BasicGameState() {
     }
 
     fun generateNoiseImage() {
-        val noiseModule = noiseBrownian() // change noise function here
+        val noiseModule = noiseBrownianGranite() // change noise function here
 
         for (y in 0..imagesize - 1) {
             for (x in 0..imagesize - 1) {

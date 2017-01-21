@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors.physicssolver
 
-import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.ActorWithSprite
 
 /**
  * Created by minjaesong on 16-05-01.
@@ -11,7 +11,7 @@ object VelocitySolver {
 
     }
 
-    private fun applyGravity(actor: ActorWithBody) {
+    private fun applyGravity(actor: ActorWithSprite) {
 
     }
 

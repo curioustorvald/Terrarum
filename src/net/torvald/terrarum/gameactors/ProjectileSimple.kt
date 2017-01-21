@@ -4,6 +4,8 @@ import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.point.Point2d
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.tileproperties.Tile
+import net.torvald.terrarum.tileproperties.TileCodex
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -15,11 +17,13 @@ import java.util.*
  *
  * Created by minjaesong on 16-08-29.
  */
+
+// TODO simplified, lightweight physics (does not call PhysicsSolver)
 open class ProjectileSimple(
         private val type: Int,
         fromPoint: Vector2, // projected coord
         toPoint: Vector2    // arriving coord
-        ) : ActorWithBody(ActorOrder.MIDTOP), Luminous, Projectile {
+        ) : ActorWithSprite(ActorOrder.MIDTOP), Luminous, Projectile {
 
     val damage: Int
     val displayColour: Color
@@ -69,7 +73,12 @@ open class ProjectileSimple(
     override fun update(gc: GameContainer, delta: Int) {
         // hit something and despawn
         lifetimeCounter += delta
-        if ((ccdCollided || grounded) || lifetimeCounter >= lifetimeMax) flagDespawn()
+        if (ccdCollided || grounded || lifetimeCounter >= lifetimeMax ||
+            // stuck check
+            TileCodex[Terrarum.ingame.world.getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Tile.STONE].isSolid
+                ) {
+            flagDespawn()
+        }
 
         posPre.set(centrePosPoint)
 

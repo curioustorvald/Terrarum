@@ -32,11 +32,11 @@ object WorldGenerator {
     var TERRAIN_AVERAGE_HEIGHT: Int = 0
     private var minimumFloatingIsleHeight: Int = 0
 
-    private val NOISE_GRAD_START = 0.67f
-    private val NOISE_GRAD_END = 0.56f
+    private val NOISE_GRAD_START = 0.67
+    private val NOISE_GRAD_END = 0.56
 
-    private val NOISE_SIMPLEX_ORE_START = 1.42f
-    private val NOISE_SIMPLEX_ORE_END = 1.28f
+    private val NOISE_SIMPLEX_ORE_START = 1.42
+    private val NOISE_SIMPLEX_ORE_END = 1.28
 
     private val HILL_WIDTH = 256 // power of two!
     //private val MAX_HILL_HEIGHT = 100
@@ -51,8 +51,8 @@ object WorldGenerator {
     private var GLACIER_MOUNTAIN_WIDTH = 900
     private val GLACIER_MOUNTAIN_HEIGHT = 300
 
-    private val CAVEGEN_THRE_START = 0.95f
-    private val CAVEGEN_THRE_END = 0.67f
+    private val CAVEGEN_THRE_START = 0.95
+    private val CAVEGEN_THRE_END = 0.67
 
 
     private var worldOceanPosition: Int = -1
@@ -113,12 +113,12 @@ object WorldGenerator {
          */
 
         val noiseArray = arrayOf(
-                  TaggedJoise("Carving caves", noiseRidged(1.7f, 1.4f), 1f, TILE_MACRO_ALL, TILE_MACRO_ALL, Tile.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END)
-                , TaggedJoise("Collapsing caves", noiseBlobs(0.5f, 0.5f), 0.3f, Tile.AIR, Tile.STONE, Tile.STONE, NoiseFilterUniform)
+                  TaggedJoise("Carving caves", noiseRidged(1.7, 1.4), 1.0, TILE_MACRO_ALL, TILE_MACRO_ALL, Tile.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END)
+                , TaggedJoise("Collapsing caves", noiseBlobs(0.5), 0.3, Tile.AIR, Tile.STONE, Tile.STONE, NoiseFilterUniform)
 //
-                //, TaggedJoise("Putting stone patches on the ground", noiseBlobs(0.8f, 0.8f), 1.02f, intArrayOf(Tile.DIRT, Tile.GRASS), Tile.DIRT, Tile.STONE, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
-                //, TaggedJoise("Placing dirt spots in the cave", noiseBlobs(0.5f, 0.5f), 0.98f, Tile.STONE, Tile.STONE, Tile.DIRT, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
-                //, TaggedJoise("Quarrying some stone into gravels", noiseBlobs(0.5f, 0.5f), 0.98f, Tile.STONE, Tile.STONE, Tile.GRAVEL, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
+                //, TaggedJoise("Putting stone patches on the ground", noiseBlobs(0.8), 1.02f, intArrayOf(Tile.DIRT, Tile.GRASS), Tile.DIRT, Tile.STONE, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
+                //, TaggedJoise("Placing dirt spots in the cave", noiseBlobs(0.5), 0.98f, Tile.STONE, Tile.STONE, Tile.DIRT, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
+                //, TaggedJoise("Quarrying some stone into gravels", noiseBlobs(0.5), 0.98f, Tile.STONE, Tile.STONE, Tile.GRAVEL, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
 //
                 //, TaggedJoise("Growing copper veins", noiseRidged(1.7f, 1.7f), 1.68f, Tile.STONE, Tile.STONE, Tile.ORE_COPPER)
                 //, TaggedJoise("Cutting copper veins", noiseBlobs(0.4f, 0.4f), 0.26f, Tile.ORE_COPPER, Tile.STONE, Tile.STONE)
@@ -165,7 +165,7 @@ object WorldGenerator {
 
     /* 1. Raise */
 
-    private fun noiseRidged(xStretch: Float, yStretch: Float): Joise {
+    private fun noiseRidged(xStretch: Double, yStretch: Double): Joise {
         val ridged = ModuleFractal()
         ridged.setType(ModuleFractal.FractalType.RIDGEMULTI)
         ridged.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
@@ -185,18 +185,21 @@ object WorldGenerator {
         return Joise(ridged_scale)
     }
 
-    private fun noiseBlobs(xStretch: Float, yStretch: Float): Joise {
-        val gradval = ModuleBasisFunction()
-        gradval.seed = SEED xor random.nextLong()
-        gradval.setType(ModuleBasisFunction.BasisType.GRADVAL)
-        gradval.setInterpolation(ModuleBasisFunction.InterpolationType.QUINTIC)
+    private fun noiseBlobs(frequency: Double): Joise {
+        val ridged = ModuleFractal()
+        ridged.setType(ModuleFractal.FractalType.FBM)
+        ridged.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        ridged.setNumOctaves(2)
+        ridged.setFrequency(frequency)
+        ridged.seed = Random().nextLong()
 
-        val gradval_scale = ModuleScaleDomain()
-        gradval_scale.setScaleX(1.0 / xStretch)
-        gradval_scale.setScaleY(1.0 / yStretch)
-        gradval_scale.setSource(gradval)
+        val brownian_select = ModuleSelect()
+        brownian_select.setControlSource(ridged)
+        brownian_select.setThreshold(0.8)
+        brownian_select.setLowSource(0.0)
+        brownian_select.setHighSource(1.0)
 
-        return Joise(gradval_scale)
+        return Joise(ridged)
     }
 
     /**
@@ -596,8 +599,8 @@ object WorldGenerator {
      */
     private fun carveByMap(noisemap: Any, scarcity: Float, tile: Int, message: String,
                            filter: NoiseFilter = NoiseFilterQuadratic,
-                           filterStart: Float = NOISE_GRAD_START,
-                           filterEnd: Float = NOISE_GRAD_END) {
+                           filterStart: Double = NOISE_GRAD_START,
+                           filterEnd: Double = NOISE_GRAD_END) {
         println("[mapgenerator] " + message)
 
         for (y in 0..HEIGHT - 1) {
@@ -626,8 +629,8 @@ object WorldGenerator {
 
     private fun fillByMap(noisemap: Any, scarcity: Float, replaceFrom: Int, replaceTo: Int, message: String,
                           filter: NoiseFilter = NoiseFilterQuadratic,
-                          filterStart: Float = NOISE_GRAD_START,
-                          filterEnd: Float = NOISE_GRAD_END) {
+                          filterStart: Double = NOISE_GRAD_START,
+                          filterEnd: Double = NOISE_GRAD_END) {
         println("[mapgenerator] " + message)
 
         for (y in 0..HEIGHT - 1) {
@@ -657,8 +660,8 @@ object WorldGenerator {
 
     private fun fillByMap(noisemap: Any, scarcity: Float, replaceFrom: Int, tile: IntArray, message: String,
                           filter: NoiseFilter = NoiseFilterQuadratic,
-                          filterStart: Float = NOISE_GRAD_START,
-                          filterEnd: Float = NOISE_GRAD_END) {
+                          filterStart: Double = NOISE_GRAD_START,
+                          filterEnd: Double = NOISE_GRAD_END) {
         println("[mapgenerator] " + message)
 
         for (y in 0..HEIGHT - 1) {
@@ -953,10 +956,10 @@ object WorldGenerator {
     data class TaggedSimplexNoise(var noiseModule: SimplexNoise, var xStretch: Float, var yStretch: Float)
 
     data class TaggedJoise(var message: String,
-                           var noiseModule: Joise, var scarcity: Float,
+                           var noiseModule: Joise, var scarcity: Double,
                            var replaceFromTerrain: Any, var replaceFromWall: Int,
                            var replaceTo: Any,
                            var filter: NoiseFilter = NoiseFilterQuadratic,
-                           var filterArg1: Float = NOISE_GRAD_START,
-                           var filterArg2: Float = NOISE_GRAD_END)
+                           var filterArg1: Double = NOISE_GRAD_START,
+                           var filterArg2: Double = NOISE_GRAD_END)
 }

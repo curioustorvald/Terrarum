@@ -3,7 +3,7 @@ package net.torvald.terrarum.console
 import net.torvald.terrarum.StateInGame
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.ActorWithSprite
 
 /**
  * Created by minjaesong on 16-01-24.
@@ -31,8 +31,8 @@ internal object Teleport : ConsoleCommand {
                 EchoError("missing 'to' on teleport command")
                 return
             }
-            val fromActor: ActorWithBody
-            val targetActor: ActorWithBody
+            val fromActor: ActorWithSprite
+            val targetActor: ActorWithSprite
             try {
                 val fromActorID = args[1].toInt()
                 val targetActorID = if (args[3].toLowerCase() == "player")
@@ -43,13 +43,13 @@ internal object Teleport : ConsoleCommand {
                 // if from == target, ignore the action
                 if (fromActorID == targetActorID) return
 
-                if (Terrarum.ingame.getActorByID(fromActorID) !is ActorWithBody ||
-                    Terrarum.ingame.getActorByID(targetActorID) !is ActorWithBody) {
+                if (Terrarum.ingame.getActorByID(fromActorID) !is ActorWithSprite ||
+                    Terrarum.ingame.getActorByID(targetActorID) !is ActorWithSprite) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    fromActor = Terrarum.ingame.getActorByID(fromActorID) as ActorWithBody
-                    targetActor = Terrarum.ingame.getActorByID(targetActorID) as ActorWithBody
+                    fromActor = Terrarum.ingame.getActorByID(fromActorID) as ActorWithSprite
+                    targetActor = Terrarum.ingame.getActorByID(targetActorID) as ActorWithSprite
                 }
             }
             catch (e: NumberFormatException) {
@@ -72,7 +72,7 @@ internal object Teleport : ConsoleCommand {
                 return
             }
 
-            val actor: ActorWithBody
+            val actor: ActorWithSprite
             val x: Int
             val y: Int
             try {
@@ -80,11 +80,11 @@ internal object Teleport : ConsoleCommand {
                 y = args[4].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
                 val actorID = args[1].toInt()
 
-                if (Terrarum.ingame.getActorByID(actorID) !is ActorWithBody) {
+                if (Terrarum.ingame.getActorByID(actorID) !is ActorWithSprite) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    actor = Terrarum.ingame.getActorByID(actorID) as ActorWithBody
+                    actor = Terrarum.ingame.getActorByID(actorID) as ActorWithSprite
                 }
             }
             catch (e: NumberFormatException) {

@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 /**
  * Created by minjaesong on 16-04-26.
  */
-class WeaponSwung(val itemID: Int) : ActorWithBody(ActorOrder.MIDTOP), Luminous {
+class WeaponSwung(val itemID: Int) : ActorWithSprite(ActorOrder.MIDTOP), Luminous {
     // just let the solver use AABB; it's cheap but works just enough
 
     /**

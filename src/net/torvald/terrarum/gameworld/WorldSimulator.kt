@@ -24,7 +24,7 @@ object WorldSimulator {
     const val FLUID_UPDATING_SQUARE_RADIUS = 64 // larger value will have dramatic impact on performance
     const private val DOUBLE_RADIUS = FLUID_UPDATING_SQUARE_RADIUS * 2
 
-    private val fluidMap = Array<IntArray>(DOUBLE_RADIUS, { IntArray(DOUBLE_RADIUS) })
+    private val fluidMap = Array<ByteArray>(DOUBLE_RADIUS, { ByteArray(DOUBLE_RADIUS) })
     private val fluidTypeMap = Array<ByteArray>(DOUBLE_RADIUS, { ByteArray(DOUBLE_RADIUS) })
 
     const val DISPLACE_CAP = 4
@@ -38,23 +38,28 @@ object WorldSimulator {
     val colourNone = Color(0x808080)
     val colourWater = Color(0x66BBFF)
 
+    private val world = Terrarum.ingame.world
+
     // TODO future Kotlin feature -- typealias AnyPlayer: HistoricalFigure
-    operator fun invoke(world: GameWorld, p: HistoricalFigure, delta: Int) {
+    operator fun invoke(p: HistoricalFigure, delta: Int) {
         updateXFrom = p.hitbox.centeredX.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
         updateYFrom = p.hitbox.centeredY.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
         updateXTo = updateXFrom + DOUBLE_RADIUS
         updateYTo = updateYFrom + DOUBLE_RADIUS
 
-        moveFluids(world, delta)
-        displaceFallables(world, delta)
+        moveFluids(delta)
+        displaceFallables(delta)
     }
 
     /**
      * displace fluids. Note that the code assumes the gravity pulls things downward ONLY,
      * which means you'll need to modify the code A LOT if you're going to implement zero- or
      * reverse-gravity.
+     *
+     * Procedure: CP world fluidmap -> sim on fluidmap -> CP fluidmap world
+     * TODO multithread
      */
-    fun moveFluids(world: GameWorld, delta: Int) {
+    fun moveFluids(delta: Int) {
         ////////////////////
         // build fluidmap //
         ////////////////////
@@ -74,7 +79,7 @@ object WorldSimulator {
                 if (tile.isFluid()) {
 
                     // move down if not obstructed
-                    if (!tileBottom.isSolid()) {
+                    /*if (!tileBottom.isSolid()) {
                         val drainage = drain(world, x, y, DISPLACE_CAP)
                         pour(world, x, y + 1, drainage)
                     }
@@ -106,7 +111,11 @@ object WorldSimulator {
                     // nowhere open; do default (fill top)
                     else {
                         pour(world, x, y - 1, DISPLACE_CAP)
+                    }*/
+                    if (!tileBottom.isSolid()) {
+                        pour(x, y + 1, drain(x, y, FLUID_MAX))
                     }
+
                 }
             }
         }
@@ -123,7 +132,7 @@ object WorldSimulator {
      * displace fallable tiles. It is scanned bottom-left first. To achieve the sens ofreal
      * falling, each tiles are displaced by ONLY ONE TILE below.
      */
-    fun displaceFallables(world: GameWorld, delta: Int) {
+    fun displaceFallables(delta: Int) {
         for (y in updateYFrom..updateYTo) {
             for (x in updateXFrom..updateXTo) {
                 val tile = world.getTileFromTerrain(x, y) ?: Tile.STONE
@@ -135,7 +144,7 @@ object WorldSimulator {
                         // remove tileThis to create air pocket
                         world.setTileTerrain(x, y, Tile.AIR)
 
-                        pour(world, x, y, drain(world, x, y, tileBelow.fluidLevel()))
+                        pour(x, y, drain(x, y, tileBelow.fluidLevel().toInt()))
                         // place our tile
                         world.setTileTerrain(x, y + 1, tile)
                     }
@@ -156,7 +165,7 @@ object WorldSimulator {
             for (x in 0..fluidMap[0].size - 1) {
                 val data = fluidMap[y][x]
                 if (TilesDrawer.tileInCamera(x + updateXFrom, y + updateYFrom)) {
-                    if (data == 0)
+                    if (data == 0.toByte())
                         g.color = colourNone
                     else
                         g.color = colourWater
@@ -188,7 +197,7 @@ object WorldSimulator {
             for (x in updateXFrom..updateXTo) {
                 val tile = world.getTileFromTerrain(x, y) ?: Tile.STONE
                 if (tile.isFluid()) {
-                    fluidMap[y - updateYFrom][x - updateXFrom] = tile.fluidLevel()
+                    fluidMap[y - updateYFrom][x - updateXFrom] = tile.fluidLevel().toByte()
                     fluidTypeMap[y - updateYFrom][x - updateXFrom] = tile.fluidType().toByte()
                 }
             }
@@ -209,8 +218,8 @@ object WorldSimulator {
     fun Int.isFluid() = TileCodex[this].isFluid
     fun Int.isSolid() = this.fluidLevel() == FLUID_MAX || TileCodex[this].isSolid
     //fun Int.viscosity() = TileCodex[this].
-    fun Int.fluidLevel() = if (!this.isFluid()) 0 else (this % FLUID_MAX) + 1
-    fun Int.fluidType() = this / FLUID_MAX
+    fun Int.fluidLevel() = if (!this.isFluid()) 0 else (this % FLUID_MAX).plus(1)
+    fun Int.fluidType() = (this / 16) // 0 - 255, 255 being water, 254 being lava
     fun Int.isEven() = (this and 0x01) == 0
     fun Int.isFallable() = TileCodex[this].isFallable
 
@@ -231,10 +240,11 @@ object WorldSimulator {
      * (intended drainage - this) will give you how much fluid is not yet drained.
      * TODO add fluidType support
      */
-    private fun drain(world: GameWorld, x: Int, y: Int, amount: Int): Int {
-        val displacement = Math.min(fluidMap[y - updateYFrom][x - updateXFrom], amount)
+    private fun drain(x: Int, y: Int, amount: Int): Int {
+        val displacement = Math.min(fluidMap[y - updateYFrom][x - updateXFrom].toInt(), amount)
 
-        fluidMap[y - updateYFrom][x - updateXFrom] -= displacement
+        fluidMap[y - updateYFrom][x - updateXFrom] =
+                (fluidMap[y - updateYFrom][x - updateXFrom] - displacement).toByte()
 
         return displacement
     }
@@ -243,7 +253,7 @@ object WorldSimulator {
      * @param x and y: world tile coord
      * TODO add fluidType support
      */
-    private fun pour(world: GameWorld, x: Int, y: Int, amount: Int) {
+    private fun pour(x: Int, y: Int, amount: Int) {
         /**
          * @param x and y: world tile coord
          * @return spillage
@@ -256,10 +266,10 @@ object WorldSimulator {
             val addrY = worldYPos - updateYFrom
 
             if (addrX >= 0 && addrY >= 0 && addrX < DOUBLE_RADIUS && addrY < DOUBLE_RADIUS) {
-                fluidMap[addrY][addrX] += volume
+                fluidMap[addrY][addrX] = (fluidMap[addrY][addrX] + volume).toByte()
                 if (fluidMap[addrY][addrX] > FLUID_MAX) {
                     spil = fluidMap[addrY][addrX] - FLUID_MAX
-                    fluidMap[addrY][addrX] = FLUID_MAX
+                    fluidMap[addrY][addrX] = FLUID_MAX.toByte()
                 }
             }
 

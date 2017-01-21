@@ -20,6 +20,6 @@ object SpawnTapestry : ConsoleCommand {
     }
 
     override fun printUsage() {
-        println("Usage: spawntapestry <tapestry_file>")
+        Echo("Usage: spawntapestry <tapestry_file>")
     }
 }

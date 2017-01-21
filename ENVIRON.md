@@ -20,3 +20,13 @@ Colour overlay is set to 6 500 K as untouched. The value must be
 ## Sunlight ##
 
 Sunlight of the midday must have colour temperature of 5 700 K.
+
+
+## Weather effects ##
+
+* Wind
+    - Blows away sands/snows
+    - Tilts raindrops/snowfall
+    
+* Precipitation
+    - Rain, snow

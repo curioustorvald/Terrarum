@@ -33,7 +33,15 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
     var previousState: Int? = null // to be used with temporary states like StateMonitorCheck
 
+    val systemArch = System.getProperty("os.arch")
+
+    private val thirtyTwoBitArchs = arrayOf("i386", "i686", "ppc", "x86", "x86_32") // I know I should Write Once, Run Everywhere; but just in case :)
+    val is32Bit = thirtyTwoBitArchs.contains(systemArch)
+
     init {
+
+        // just in case
+        println("[Terrarum] os.arch = $systemArch")
 
         gameConfig = GameConfig()
 
@@ -67,7 +75,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         else
             gameLocale = gameLocaleFromConfig
 
-        println("[terrarum] Locale: " + gameLocale)
+        println("[Terrarum] Locale: " + gameLocale)
 
         try {
             Controllers.getController(0)
@@ -127,6 +135,12 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         ingame = StateInGame()
         addState(ingame)
+
+
+        // foolproof
+        if (stateCount < 1) {
+            throw Error("Please add or un-comment addState statements")
+        }
     }
 
     companion object {
@@ -158,16 +172,18 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         var HEIGHT = 742 // IMAX ratio
         var VSYNC = true
         val VSYNC_TRIGGER_THRESHOLD = 56
+        val HALFW: Int
+            get() = WIDTH.ushr(1)
+        val HALFH: Int
+            get() = HEIGHT.ushr(1)
 
         var gameStarted = false
 
         lateinit var ingame: StateInGame
         lateinit var gameConfig: GameConfig
 
-        lateinit var OSName: String // System.getProperty("os.name")
-            private set
-        lateinit var OSVersion: String // System.getProperty("os.version")
-            private set
+        val OSName = System.getProperty("os.name")
+        val OSVersion = System.getProperty("os.version")
         lateinit var OperationSystem: String // all caps "WINDOWS, "OSX", "LINUX", "SOLARIS", "UNKNOWN"
             private set
         val isWin81: Boolean
@@ -268,7 +284,8 @@ constructor(gamename: String) : StateBasedGame(gamename) {
                 appgc.setVSync(VSYNC)
                 appgc.setMaximumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS) // 10 ms
                 appgc.setMinimumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS - 1) // 9 ms
-                appgc.setMultiSample(4)
+
+                appgc.setMultiSample(0)
 
                 appgc.setShowFPS(false)
 
@@ -299,9 +316,6 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         }
 
         private fun getDefaultDirectory() {
-            OSName = System.getProperty("os.name")
-            OSVersion = System.getProperty("os.version")
-
             val OS = System.getProperty("os.name").toUpperCase()
             if (OS.contains("WIN")) {
                 OperationSystem = "WINDOWS"
@@ -327,8 +341,8 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             defaultSaveDir = defaultDir + "/Saves"
             configDir = defaultDir + "/config.json"
 
-            println("os.name: '$OSName'")
-            println("os.version: '$OSVersion'")
+            println("[Terrarum] os.name = $OSName")
+            println("[Terrarum] os.version = $OSVersion")
         }
 
         private fun createDirs() {

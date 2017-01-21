@@ -7,19 +7,15 @@ package net.torvald.spriteanimation
 import net.torvald.terrarum.StateInGame
 import net.torvald.terrarum.Terrarum
 import com.jme3.math.FastMath
-import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.ActorWithSprite
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
 import org.newdawn.slick.SlickException
 import org.newdawn.slick.SpriteSheet
 
-class SpriteAnimation(val parentActor: ActorWithBody) {
+class SpriteAnimation(val parentActor: ActorWithSprite, val cellWidth: Int, val cellHeight: Int) {
 
     private var spriteImage: SpriteSheet? = null
-    var height: Int = 0
-        private set
-    var width: Int = 0
-        private set
     private var currentFrame = 1 // one-based!
     private var currentRow = 1   // one-based!
     private var nFrames: Int = 1
@@ -47,11 +43,11 @@ class SpriteAnimation(val parentActor: ActorWithBody) {
      * @throws SlickException
      */
     fun setSpriteImage(imagePath: String) {
-        spriteImage = SpriteSheet(imagePath, this.width, this.height)
+        spriteImage = SpriteSheet(imagePath, cellWidth, cellHeight)
     }
 
     fun setSpriteImage(image: Image) {
-        spriteImage = SpriteSheet(image, this.width, this.height)
+        spriteImage = SpriteSheet(image, cellWidth, cellHeight)
     }
 
     /**
@@ -60,16 +56,6 @@ class SpriteAnimation(val parentActor: ActorWithBody) {
      */
     fun setDelay(delay: Int) {
         this.delay = delay
-    }
-
-    /**
-     * Sets sprite dimension. This is necessary for this to work.
-     * @param w width of the animation frame
-     * @param h height of the animation frame
-     */
-    fun setDimension(w: Int, h: Int) {
-        width = w
-        height = h
     }
 
     /**
@@ -115,6 +101,10 @@ class SpriteAnimation(val parentActor: ActorWithBody) {
      * @param scale
      */
     @JvmOverloads fun render(g: Graphics, posX: Float, posY: Float, scale: Float = 1f) {
+        if (cellWidth == 0 || cellHeight == 0) {
+            throw Error("Sprite width or height is set to zero! ($cellWidth, $cellHeight); master: $parentActor")
+        }
+
         // Null checking
         if (currentImage == null) {
             currentImage = getScaledSprite(scale)
@@ -131,8 +121,8 @@ class SpriteAnimation(val parentActor: ActorWithBody) {
             flippedImage.draw(
                     Math.round(posX).toFloat(),
                     FastMath.floor(posY).toFloat(),
-                    FastMath.floor(width * scale).toFloat(),
-                    FastMath.floor(height * scale).toFloat()
+                    FastMath.floor(cellWidth * scale).toFloat(),
+                    FastMath.floor(cellHeight * scale).toFloat()
             )
         }
     }

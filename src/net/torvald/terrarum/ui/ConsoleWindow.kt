@@ -65,7 +65,12 @@ class ConsoleWindow : UICanvas, KeyboardControlled {
         // text and cursor
         g.color = Color.white
         g.drawString(input, 1f + drawOffX, drawOffY)
+
+        g.color = Color(0x7f7f7f)
         g.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 2f, inputDrawHeight.toFloat())
+        g.color = Color.white
+        g.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 1f, inputDrawHeight.toFloat() - 1)
+
 
         // messages
         for (i in 0..MESSAGES_DISPLAY_COUNT - 1) {
@@ -85,13 +90,13 @@ class ConsoleWindow : UICanvas, KeyboardControlled {
             historyIndex = -1
 
         // execute
-        if (key == Key.RETURN && commandInputPool!!.length > 0) {
+        if (key == Key.RETURN && commandInputPool!!.isNotEmpty()) {
             commandHistory.add(commandInputPool!!.toString())
             executeCommand()
             commandInputPool = StringBuilder()
         }
         // erase last letter
-        else if (key == Key.BACKSPACE && commandInputPool!!.length > 0) {
+        else if (key == Key.BACKSPACE && commandInputPool!!.isNotEmpty()) {
             commandInputPool!!.deleteCharAt(commandInputPool!!.length - 1)
         }
         // append acceptable letter

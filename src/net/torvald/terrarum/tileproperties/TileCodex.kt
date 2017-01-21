@@ -12,16 +12,14 @@ import java.io.IOException
  */
 object TileCodex {
 
-    private lateinit var tileProps: Array<TileProp>
+    private var tileProps: Array<TileProp>
 
     val CSV_PATH = "/net/torvald/terrarum/tileproperties/tileprop.csv"
 
     const val TILE_UNIQUE_MAX = MapLayer.RANGE * PairedMapLayer.RANGE
 
     init {
-        tileProps = Array<TileProp>(TILE_UNIQUE_MAX + 1,
-                {i -> TileProp() }
-        )
+        tileProps = Array<TileProp>(TILE_UNIQUE_MAX + 1, { i -> TileProp() })
 
         for (i in tileProps.indices) {
             tileProps[i] = TileProp()
@@ -83,6 +81,7 @@ object TileCodex {
         prop.isSolid = boolVal(record, "solid")
         prop.isWallable = boolVal(record, "wall")
         prop.isFallable = boolVal(record, "fall")
+        prop.isVertFriction = boolVal(record, "fv")
 
         prop.dynamicLuminosityFunction = intVal(record, "dlfn")
 
