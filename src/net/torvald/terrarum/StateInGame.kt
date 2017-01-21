@@ -55,8 +55,10 @@ constructor() : BasicGameState() {
      * list of Actors that is sorted by Actors' referenceID
      */
     val ACTORCONTAINER_INITIAL_SIZE = 128
+    val PARTICLES_MAX = 768
     val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
+    val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX)
     val uiContainer = ArrayList<UIHandler>()
 
     private val actorsRenderBehind = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
@@ -224,6 +226,7 @@ constructor() : BasicGameState() {
             // determine whether the actor should keep being activated or be dormant
             KillOrKnockdownActors()
             updateActors(gc, delta)
+            particlesContainer.forEach { it.update(gc, delta) }
             // TODO thread pool(?)
             CollisionSolver.process()
         }
@@ -232,7 +235,7 @@ constructor() : BasicGameState() {
         ////////////////////////
         // ui-related updates //
         ////////////////////////
-        uiContainer.forEach { ui -> ui.update(gc, delta) }
+        uiContainer.forEach { it.update(gc, delta) }
         consoleHandler.update(gc, delta)
         debugWindow.update(gc, delta)
         notifier.update(gc, delta)
@@ -320,17 +323,19 @@ constructor() : BasicGameState() {
         // draw map related stuffs //
         /////////////////////////////
         TilesDrawer.renderWall(worldG)
-        actorsRenderBehind.forEach { actor -> actor.drawBody(worldG) }
-        actorsRenderBehind.forEach { actor -> actor.drawGlow(worldG) }
+        actorsRenderBehind.forEach { it.drawBody(worldG) }
+        actorsRenderBehind.forEach { it.drawGlow(worldG) }
+        particlesContainer.forEach { it.drawBody(worldG) }
+        particlesContainer.forEach { it.drawGlow(worldG) }
         TilesDrawer.renderTerrain(worldG)
 
         /////////////////
         // draw actors //
         /////////////////
-        actorsRenderMiddle.forEach { actor -> actor.drawBody(worldG) }
-        actorsRenderMidTop.forEach { actor -> actor.drawBody(worldG) }
+        actorsRenderMiddle.forEach { it.drawBody(worldG) }
+        actorsRenderMidTop.forEach { it.drawBody(worldG) }
         player.drawBody(worldG)
-        actorsRenderFront.forEach { actor -> actor.drawBody(worldG) }
+        actorsRenderFront.forEach { it.drawBody(worldG) }
         // --> Change of blend mode <-- introduced by ActorVisible //
 
 
@@ -354,10 +359,10 @@ constructor() : BasicGameState() {
         //////////////////////
         // draw actor glows //
         //////////////////////
-        actorsRenderMiddle.forEach { actor -> actor.drawGlow(worldG) }
-        actorsRenderMidTop.forEach { actor -> actor.drawGlow(worldG) }
+        actorsRenderMiddle.forEach { it.drawGlow(worldG) }
+        actorsRenderMidTop.forEach { it.drawGlow(worldG) }
         player.drawGlow(worldG)
-        actorsRenderFront.forEach { actor -> actor.drawGlow(worldG) }
+        actorsRenderFront.forEach { it.drawGlow(worldG) }
         // --> blendLightenOnly() <-- introduced by ActorVisible //
 
 
@@ -396,7 +401,7 @@ constructor() : BasicGameState() {
         //////////////
         // draw UIs //
         //////////////
-        uiContainer.forEach { ui -> ui.render(gc, sbg, uiG) }
+        uiContainer.forEach { it.render(gc, sbg, uiG) }
         debugWindow.render(gc, sbg, uiG)
         consoleHandler.render(gc, sbg, uiG)
         notifier.render(gc, sbg, uiG)
@@ -682,6 +687,10 @@ constructor() : BasicGameState() {
                 ActorOrder.FRONT  -> { actorsRenderFront .add(actor); insertionSortLastElemAV(actorsRenderFront ) }
             }
         }
+    }
+
+    fun addParticle(particle: ParticleBase) {
+        particlesContainer.add(particle)
     }
 
     /**

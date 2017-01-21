@@ -11,7 +11,7 @@ import org.newdawn.slick.state.StateBasedGame
 import java.util.*
 
 /**
- * Created by SKYHi14 on 2016-12-21.
+ * Created by minjaesong on 2016-12-21.
  */
 class StateNoiseTexGen : BasicGameState() {
 

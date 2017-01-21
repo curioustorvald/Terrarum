@@ -5,7 +5,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
 
 /**
- * Created by SKYHi14 on 2016-12-30.
+ * Created by minjaesong on 2016-12-30.
  */
 object MapCamera {
     private val world: GameWorld = Terrarum.ingame.world

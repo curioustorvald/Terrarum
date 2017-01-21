@@ -4,7 +4,7 @@ import com.jme3.math.FastMath
 import org.newdawn.slick.Color
 
 /**
- * Created by SKYHi14 on 2017-01-12.
+ * Created by minjaesong on 2017-01-12.
  */
 object CIEXYZUtil {
     fun Color.brighterXYZ(scale: Float): Color {

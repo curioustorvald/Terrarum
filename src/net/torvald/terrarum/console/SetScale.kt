@@ -4,7 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithSprite
 
 /**
- * Created by SKYHi14 on 2017-01-20.
+ * Created by minjaesong on 2017-01-20.
  */
 object SetScale : ConsoleCommand {
     override fun execute(args: Array<String>) {

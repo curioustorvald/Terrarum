@@ -8,7 +8,7 @@ import java.util.*
 import javax.swing.*
 
 /**
- * Created by SKYHi14 on 2016-12-29.
+ * Created by minjaesong on 2016-12-29.
  */
 class ActorsLister(
         val actorContainer: ArrayList<Actor>,

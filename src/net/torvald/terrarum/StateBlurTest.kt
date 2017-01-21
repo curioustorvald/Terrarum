@@ -12,7 +12,7 @@ import java.nio.ByteOrder
 /**
  * Software rendering test for blur
  *
- * Created by SKYHi14 on 2017-01-12.
+ * Created by minjaesong on 2017-01-12.
  */
 class StateBlurTest : BasicGameState() {
 

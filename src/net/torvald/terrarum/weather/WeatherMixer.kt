@@ -79,15 +79,17 @@ object WeatherMixer {
     fun update(gc: GameContainer, delta: Int) {
         currentWeather = weatherList[WEATHER_GENERIC]!![0]
 
-        // test rain toggled by F2
 
+        // test rain toggled by F2
         if (KeyToggler.isOn(Key.F2)) {
             val playerPos = Terrarum.ingame.player.centrePosPoint
-            val rainParticle = ParticleTestRain(
-                    playerPos.x + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
-                    playerPos.y - Terrarum.HALFH
-            )
-            Terrarum.ingame.addActor(rainParticle)
+            kotlin.repeat(4) { // 4 seems good
+                val rainParticle = ParticleTestRain(
+                        playerPos.x + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
+                        playerPos.y - Terrarum.HALFH
+                )
+                Terrarum.ingame.addParticle(rainParticle)
+            }
         }
     }
 
