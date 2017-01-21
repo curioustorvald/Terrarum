@@ -13,7 +13,7 @@ import java.util.*
  * -- I couldn't observe any significant boost in performance but this one seems
  *    to give 3-4 more frames per second.
  *
- * Created by SKYHi14 on 2017-01-02.
+ * Created by minjaesong on 2017-01-02.
  *
  *
  * Remarks:

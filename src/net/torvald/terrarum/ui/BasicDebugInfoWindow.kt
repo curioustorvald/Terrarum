@@ -174,6 +174,8 @@ class BasicDebugInfoWindow : UICanvas {
                 (2 + 17*8).toFloat(), Terrarum.HEIGHT - 10f)
         g.drawString("${ccY}Dormant $ccG${Terrarum.ingame.actorContainerInactive.size}",
                 (2 + 28*8).toFloat(), Terrarum.HEIGHT - 10f)
+        g.drawString("${ccM}Particles $ccG${Terrarum.ingame.particlesContainer.elemCount}",
+                (2 + 41*8).toFloat(), Terrarum.HEIGHT - 10f)
     }
 
     private fun printLine(g: Graphics, l: Int, s: String) {

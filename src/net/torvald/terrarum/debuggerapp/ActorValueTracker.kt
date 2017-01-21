@@ -17,7 +17,7 @@ import java.awt.event.MouseListener
 import javax.swing.*
 
 /**
- * Created by SKYHi14 on 2016-12-29.
+ * Created by minjaesong on 2016-12-29.
  */
 class ActorValueTracker constructor() : JFrame() {
 

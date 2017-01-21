@@ -8,7 +8,7 @@ import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.itemproperties.ItemCodex
 
 /**
- * Created by SKYHi14 on 2016-12-12.
+ * Created by minjaesong on 2016-12-12.
  */
 internal object Inventory : ConsoleCommand {
 

@@ -5,7 +5,7 @@ import net.torvald.terrarum.debuggerapp.ActorsLister
 import java.util.*
 
 /**
- * Created by SKYHi14 on 2016-12-29.
+ * Created by minjaesong on 2016-12-29.
  */
 object ActorsList : ConsoleCommand {
     private val jPanelInstances = ArrayList<ActorsLister>()

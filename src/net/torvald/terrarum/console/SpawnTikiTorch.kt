@@ -6,7 +6,7 @@ import net.torvald.terrarum.gamecontroller.mouseX
 import net.torvald.terrarum.gamecontroller.mouseY
 
 /**
- * Created by SKYHi14 on 2016-12-17.
+ * Created by minjaesong on 2016-12-17.
  */
 object SpawnTikiTorch : ConsoleCommand {
     override fun execute(args: Array<String>) {

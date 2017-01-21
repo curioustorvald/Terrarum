@@ -13,16 +13,14 @@ import org.newdawn.slick.Image
 /**
  * Actors with static sprites and very simple physics
  *
- * Created by SKYHi14 on 2017-01-20.
+ * Created by minjaesong on 2017-01-20.
  */
-open class ParticleBase(renderOrder: ActorOrder, maxLifeTime: Int? = null) : ActorVisible(renderOrder), Projectile {
+open class ParticleBase(renderOrder: ActorOrder, maxLifeTime: Int? = null) : Runnable {
 
-    override var actorValue = ActorValue()
-    override @Volatile var flagDespawn = false
+    /** Will NOT actually delete from the CircularArray */
+    @Volatile var flagDespawn = false
 
-    override fun run() {
-        TODO("not implemented")
-    }
+    override fun run() = update(Terrarum.appgc, Terrarum.ingame.UPDATE_DELTA)
 
     var isNoSubjectToGrav = false
     var dragCoefficient = 3.0
@@ -31,38 +29,47 @@ open class ParticleBase(renderOrder: ActorOrder, maxLifeTime: Int? = null) : Act
     private var lifetimeCounter = 0
 
     open val velocity = Vector2(0.0, 0.0)
+    open val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
 
-    open lateinit var image: Image
+    open lateinit var body: Image
+    open var glow: Image? = null
 
     init {
 
     }
 
-    override fun update(gc: GameContainer, delta: Int) {
-        lifetimeCounter += delta
-        if (velocity.isZero || lifetimeCounter >= lifetimeMax ||
-            // simple stuck check
-            TileCodex[Terrarum.ingame.world.getTileFromTerrain(
-                    hitbox.pointedX.div(TILE_SIZE).floorInt(),
-                    hitbox.pointedY.div(TILE_SIZE).floorInt()
-            ) ?: Tile.STONE].isSolid) {
-            flagDespawn = true
+    fun update(gc: GameContainer, delta: Int) {
+        if (!flagDespawn) {
+            lifetimeCounter += delta
+            if (velocity.isZero || lifetimeCounter >= lifetimeMax ||
+                // simple stuck check
+                TileCodex[Terrarum.ingame.world.getTileFromTerrain(
+                        hitbox.pointedX.div(TILE_SIZE).floorInt(),
+                        hitbox.pointedY.div(TILE_SIZE).floorInt()
+                ) ?: Tile.STONE].isSolid) {
+                flagDespawn = true
+            }
+
+            // gravity, winds, etc. (external forces)
+            if (!isNoSubjectToGrav) {
+                velocity += Terrarum.ingame.world.gravitation / dragCoefficient * SI_TO_GAME_ACC
+            }
+
+
+            // combine external forces
+            hitbox.translate(velocity)
         }
-
-        // gravity, winds, etc. (external forces)
-        if (!isNoSubjectToGrav) {
-            velocity += Terrarum.ingame.world.gravitation / dragCoefficient * SI_TO_GAME_ACC
-        }
-
-
-        // combine external forces
-        hitbox.translate(velocity)
     }
 
-    override fun drawBody(g: Graphics) {
-        g.drawImage(image, hitbox.centeredX.toFloat(), hitbox.centeredY.toFloat())
+    fun drawBody(g: Graphics) {
+        if (!flagDespawn) {
+            g.drawImage(body, hitbox.centeredX.toFloat(), hitbox.centeredY.toFloat())
+        }
     }
 
-    override fun drawGlow(g: Graphics) {
+    fun drawGlow(g: Graphics) {
+        if (!flagDespawn && glow != null) {
+            g.drawImage(glow, hitbox.centeredX.toFloat(), hitbox.centeredY.toFloat())
+        }
     }
 }

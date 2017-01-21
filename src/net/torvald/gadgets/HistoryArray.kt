@@ -47,7 +47,7 @@ class HistoryArray<T>(val historyMax: Int) {
     /**
      * Iterate from latest to oldest
      */
-    fun forEach(action: Consumer<T?>) = history.forEach(action)
+    fun forEach(action: (T?) -> Unit) = history.forEach(action)
 
     val latest: T?
         get() = this[0]

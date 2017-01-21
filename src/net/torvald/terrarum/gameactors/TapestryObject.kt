@@ -8,7 +8,7 @@ import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
 
 /**
- * Created by SKYHi14 on 2017-01-07.
+ * Created by minjaesong on 2017-01-07.
  */
 class TapestryObject(val image: Image, val artName: String, val artAuthor: String) : FixtureBase(physics = false) {
 
