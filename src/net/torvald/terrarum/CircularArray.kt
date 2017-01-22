@@ -27,11 +27,21 @@ class CircularArray<T>(val size: Int) {
     }
 
     fun forEach(action: (T) -> Unit) {
-        if (tail >= head) { // queue not full
+        /*if (tail >= head) { // queue not full
             (head..tail - 1).map { buffer[it] }.forEach { action(it) }
         }
         else { // queue full
             (0..size - 1).map { buffer[(it + head) % size] }.forEach { action(it) }
+        }*/
+
+        // has slightly better iteration performance than lambda
+        if (tail >= head) {
+            for (i in head..tail - 1)
+                action(buffer[i])
+        }
+        else {
+            for (i in 0..size - 1)
+                action(buffer[(i + head) % size])
         }
     }
 
