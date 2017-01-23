@@ -480,10 +480,6 @@ end
 
 -- END OF LEXER ---------------------------------------------------------------
 
-local testprogram = [[
-10 PRINT "Hello, world!"
-]]
-
 
 _G._TBASIC.EXEC = function(cmdstring) -- you can access this interpreter with this global function
 	_TBASIC._INTPRTR.RESET()

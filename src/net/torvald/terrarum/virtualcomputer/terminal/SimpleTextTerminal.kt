@@ -2,9 +2,7 @@ package net.torvald.terrarum.virtualcomputer.terminal
 
 import net.torvald.aa.AAFrame
 import net.torvald.aa.ColouredFastFont
-import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.blendMul
-import net.torvald.terrarum.blendScreen
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.abs
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
 import org.lwjgl.BufferUtils
@@ -178,13 +176,11 @@ open class SimpleTextTerminal(
                 }
             }
 
-            redrawSemaphore = false
         }
 
-
         // cursor
-        /*if (cursorBlinkOn) {
-            g.color = getColor(if (cursorBlink) foreDefault else backDefault)
+        if (cursorBlinkOn) {
+            g.color = getColor(if (cursorBlink) foreDefault else backDefault) screen colourScreen mul phosphor
 
             g.fillRect(
                     fontW * cursorX.toFloat() + borderSize,
@@ -192,8 +188,40 @@ open class SimpleTextTerminal(
                     fontW.toFloat(),
                     fontH.toFloat()
             )
-        }*/
+        }
+        else {
+            val x = cursorX
+            val y = cursorY
+            val ch = screenBuffer.getChar(x, y)
 
+            // background
+            g.color = getColor(screenBuffer.getBackgroundColour(x, y)) screen colourScreen mul phosphor
+            g.fillRect(fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize,
+                    fontW.toFloat(), fontH.toFloat())
+
+            // foreground
+            if (ch.toInt() != 0 && ch.toInt() != 32) {
+                g.color = getColor(screenBuffer.getForegroundColour(x, y)) screen colourScreen mul phosphor
+                g.drawString(
+                        Character.toString(ch),
+                        fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize)
+            }
+        }
+
+        if (redrawSemaphore) {
+            // colour base
+            g.color = colourScreen
+            blendScreen()
+            g.fillRect(0f, 0f, fontW * width.toFloat() + 2 * borderSize, fontH * height.toFloat() + 2 * borderSize)
+
+            // colour overlay
+            g.color = phosphor
+            blendMul()
+            g.fillRect(0f, 0f, fontW * width.toFloat() + 2 * borderSize, fontH * height.toFloat() + 2 * borderSize)
+
+
+            redrawSemaphore = false
+        }
 
         blendNormal()
 
