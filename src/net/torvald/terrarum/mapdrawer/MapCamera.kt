@@ -11,14 +11,18 @@ object MapCamera {
     private val world: GameWorld = Terrarum.ingame.world
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
 
-    var x = 0
+    var x: Int = 0
         private set
-    var y = 0
+    var y: Int = 0
         private set
     var width: Int = 0
         private set
     var height: Int = 0
         private set
+    val xCentre: Int
+        get() = x + width.ushr(1)
+    val yCentre: Int
+        get() = y + height.ushr(1)
 
     fun update() {
         val player = Terrarum.ingame.player
