@@ -132,6 +132,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         //addState(StateFontTester())
         //addState(StateNoiseTexGen())
         //addState(StateBlurTest())
+        //addState(StateShaderTest())
 
         ingame = StateInGame()
         addState(ingame)
@@ -241,6 +242,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         val STATE_ID_TEST_LIGHTNING_GFX = 0x101
         val STATE_ID_TEST_TTY = 0x102
         val STATE_ID_TEST_BLUR = 0x103
+        val STATE_ID_TEST_SHADER = 0x104
 
         val STATE_ID_TOOL_NOISEGEN = 0x200
 
@@ -539,3 +541,20 @@ fun Image.getPixel(x: Int, y: Int): IntArray {
         )
     }
 }
+
+fun Color.toInt() = redByte.shl(16) or greenByte.shl(8) or blueByte
+fun Color.to10bit() = redByte.shl(20) or greenByte.shl(10) or blueByte
+
+infix fun Color.screen(other: Color) = Color(
+        1f - (1f - this.r) * (1f - other.r),
+        1f - (1f - this.g) * (1f - other.g),
+        1f - (1f - this.b) * (1f - other.b),
+        1f - (1f - this.a) * (1f - other.a)
+)
+
+infix fun Color.mul(other: Color) = Color(
+        this.r * other.r,
+        this.g * other.g,
+        this.b * other.b,
+        this.a * other.a
+)
