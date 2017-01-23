@@ -1060,40 +1060,54 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
             }
 
             if (!sprite!!.flippedHorizontal()) {
-                sprite!!.render(g,
-                        (hitbox.posX - hitboxTranslateX * scale).toFloat(),
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
-                // Q&D fix for Roundworld anomaly
-                sprite!!.render(g,
-                        (hitbox.posX - hitboxTranslateX * scale).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
-                sprite!!.render(g,
-                        (hitbox.posX - hitboxTranslateX * scale).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
+                if (MapCamera.xCentre > halfWorldW && centrePosPoint.x < halfWorldW) {
+                    // camera center neg, actor center pos
+                    sprite!!.render(g,
+                            (hitbox.posX - hitboxTranslateX * scale).toFloat() + world.width * TILE_SIZE,
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
+                else if (MapCamera.xCentre < halfWorldW && centrePosPoint.x >= halfWorldW) {
+                    // camera center pos, actor center neg
+                    sprite!!.render(g,
+                            (hitbox.posX - hitboxTranslateX * scale).toFloat() - world.width * TILE_SIZE,
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
+                else {
+                    sprite!!.render(g,
+                            (hitbox.posX - hitboxTranslateX * scale).toFloat(),
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
             }
             else {
-                sprite!!.render(g,
-                        (hitbox.posX - scale).toFloat(),
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
-                // Q&D fix for Roundworld anomaly
-                sprite!!.render(g,
-                        (hitbox.posX - scale).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
-                sprite!!.render(g,
-                        (hitbox.posX - scale).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
+                if (MapCamera.xCentre > halfWorldW && centrePosPoint.x < halfWorldW) {
+                    // camera center neg, actor center pos
+                    sprite!!.render(g,
+                            (hitbox.posX - scale).toFloat() + world.width * TILE_SIZE,
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
+                else if (MapCamera.xCentre < halfWorldW && centrePosPoint.x >= halfWorldW) {
+                    // camera center pos, actor center neg
+                    sprite!!.render(g,
+                            (hitbox.posX - scale).toFloat() - world.width * TILE_SIZE,
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
+                else {
+                    sprite!!.render(g,
+                            (hitbox.posX - scale).toFloat(),
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
             }
         }
     }
