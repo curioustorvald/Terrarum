@@ -1,12 +1,14 @@
 ## Aperçu ##
 
-This unnamed project is to create a side-view flatformer game, an attempt to create friendlier *Dwarf Fortress* adventurer mode, with more rogue-like stuff such as permanent death, randomness and *lots of fun*.
+This project is to create a side-view flatformer game, an attempt to create friendlier *Dwarf Fortress* adventurer mode, with more rogue-like stuff such as permanent death, randomness and *lots of fun*.
 
-This project mainly uses Kotlin and Python/Lua/etc. for tools.
+Backend used is LWJGL/Slick2D, frontend — the Engine — is custom-built. The repository contains both frontend and the actual game, as well as documentation for the backends.
 
-Documentations and resources for work (such as .psd) are also included in the repository. You will need Mac computer to read and edit documentations in .gcx and .numbers format.
+This project mainly uses Kotlin as a main language and Python/Lua for tools.
 
-Any contribution in this project must be made sorely in English, so be sure to use English in codes, comments, etc.
+Documentations and resources for work (such as .psd) are also included in the repository. You will need Mac computer to read and edit documentations in .gcx and .numbers format. (we're planning to change them)
+
+Any contribution in this project must be made sorely in English, Korean part is just there for my Korean friend; so be sure to use English in codes, comments, etc.
 
 ## Setup ##
 
@@ -15,6 +17,28 @@ Any contribution in this project must be made sorely in English, so be sure to u
     - Working copy of IntelliJ IDEA from JetBrains s.r.o., community edition is okay to use.
   
 * Required libraries are included in the repository.
+
+
+## The Engine ##
+
+The Engine is custom built to suit the needs most. Following list is our aims:
+
+* Reasonable performance on vast world, on JVM
+    - At least better than Notch's codes...
+    
+* Thread scalability
+    - Multithreaded environments are commonplace in this era; even in the Intel Pentium G. We aim to introduce performance boost by supporting multithreads, without the limitation of threads count.
+    
+* Lightweight physics solver, as light as we need
+    - This game is not exactly a physics toy, albeit some could add the fun; see how physics works well on field exploration in _The Legend of Zelda: Breath of the Wild_.
+    - Currently implemented: gravity (NOT artificial), friction, buoyancy (WIP), air/fluid density and termination velocity
+    - Planned: artificial gravitation, wind, joints
+    
+* Cellular Automata fluid simulation
+    - It should be enough — period.
+    
+    
+Because of this, we just couldn't use solutions out there. For example, Tiled is too slow and has large memory footprint for our vast world; we can't use JBox2d nor Dyn4j as we don't need any sophisticated physics simulation, and can't use them anyway as we have literally _millions_ of rigid bodies (tiles) and actors. (Trivia: we _do_ use Dyn4j's Vector2 class)
 
 
 ## Contribution guidelines ##
