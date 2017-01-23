@@ -703,7 +703,7 @@ constructor() : Font {
                 Pair(0x14.toChar(), Color(0xFFA0E0)), //f uchsia
                 Pair(0x15.toChar(), Color(0xE0A0FF)), //*m agenta (purple)
                 Pair(0x16.toChar(), Color(0x8080FF)), //*b lue
-                Pair(0x17.toChar(), Color(0xFF80FF)), //c yan
+                Pair(0x17.toChar(), Color(0x80FFFF)), //c yan
                 Pair(0x18.toChar(), Color(0x80FF80)), //*g reen
                 Pair(0x19.toChar(), Color(0x008000)), //v iridian
                 Pair(0x1A.toChar(), Color(0x805030)), //x (khaki)

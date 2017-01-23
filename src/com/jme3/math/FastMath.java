@@ -851,4 +851,16 @@ final public class FastMath {
         for (int i = 1; i < f.length; i++) max = (f[i] > max) ? f[i] : max;
         return max;
     }
+
+    public static int min(int... f) {
+        int min = f[0];
+        for (int i = 1; i < f.length; i++) min = (f[i] < min) ? f[i] : min;
+        return min;
+    }
+
+    public static int max(int... f) {
+        int max = f[0];
+        for (int i = 1; i < f.length; i++) max = (f[i] > max) ? f[i] : max;
+        return max;
+    }
 }

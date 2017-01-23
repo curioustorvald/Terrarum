@@ -432,17 +432,12 @@ object LightmapRenderer {
         if (darken < 0 || darken >= COLOUR_RANGE_SIZE)
             throw IllegalArgumentException("darken: out of range ($darken)")
 
-        // use equation with magic number 6.5:
-        // =>> val r = data.r() * (1f + brighten.r() * 6.5f) <<=
-        // gives 8-visible-tile penetration of sunlight, fairly smooth,
-        // DOES NOT GO BELOW (2,2,2)
+        // use equation with magic number 9.0
+        // smooooooth
 
-        val r = data.r() * (1f - darken.r() * 6.5f)
-        val g = data.g() * (1f - darken.g() * 6.5f)
-        val b = data.b() * (1f - darken.b() * 6.5f)
-        //val r = data.r() - darken.r()
-        //val g = data.g() - darken.g()
-        //val b = data.b() - darken.b()
+        val r = data.r() * (1f - darken.r() * 9.0f)
+        val g = data.g() * (1f - darken.g() * 9.0f)
+        val b = data.b() * (1f - darken.b() * 9.0f)
 
         return constructRGBFromFloat(r.clampZero(), g.clampZero(), b.clampZero())
     }
@@ -629,6 +624,13 @@ object LightmapRenderer {
     private fun Float.clampChannel() = if (this > CHANNEL_MAX_DECIMAL) CHANNEL_MAX_DECIMAL else this
 
     fun getValueFromMap(x: Int, y: Int): Int? = getLight(x, y)
+    fun getLowestRGB(x: Int, y: Int): Int? {
+        val value = getLight(x, y)
+        if (value == null)
+            return null
+        else
+            return FastMath.min(value.rawR(), value.rawG(), value.rawB())
+    }
 
     private fun purgeLightmap() {
         for (y in 0..LIGHTMAP_HEIGHT - 1) {

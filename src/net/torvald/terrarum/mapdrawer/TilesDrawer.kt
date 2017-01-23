@@ -278,6 +278,8 @@ object TilesDrawer {
         blendNormal()
     }
 
+    private val tileDrawLightThreshold = 2
+
     private fun drawTiles(g: Graphics, mode: Int, drawModeTilesBlendMul: Boolean) {
         val for_y_start = y / TILE_SIZE
         val for_y_end = TilesDrawer.clampHTile(for_y_start + (height / TILE_SIZE) + 2)
@@ -305,59 +307,72 @@ object TilesDrawer {
 
                 // draw
                 try {
-                    if (
-                    (mode == WALL || mode == TERRAIN) &&  // not an air tile
-                    (thisTile ?: 0) > 0) //&& // commented out: meh
+                    if ((mode == WALL || mode == TERRAIN) &&  // not an air tile
+                        (thisTile ?: 0) != Tile.AIR) {
                     // check if light level of nearby or this tile is illuminated
-                    /*(    LightmapRenderer.getValueFromMap(x, y) ?: 0 > 0 ||
-                         LightmapRenderer.getValueFromMap(x - 1, y) ?: 0 > 0 ||
-                         LightmapRenderer.getValueFromMap(x + 1, y) ?: 0 > 0 ||
-                         LightmapRenderer.getValueFromMap(x, y - 1) ?: 0 > 0 ||
-                         LightmapRenderer.getValueFromMap(x, y + 1) ?: 0 > 0 ||
-                         LightmapRenderer.getValueFromMap(x - 1, y - 1) ?: 0 > 0 ||
-                         LightmapRenderer.getValueFromMap(x + 1, y + 1) ?: 0 > 0 ||
-                         LightmapRenderer.getValueFromMap(x + 1, y - 1) ?: 0 > 0 ||
-                         LightmapRenderer.getValueFromMap(x - 1, y + 1) ?: 0 > 0)
-                    )*/ {
-                        val nearbyTilesInfo: Int
-                        if (isPlatform(thisTile)) {
-                            nearbyTilesInfo = getNearbyTilesInfoPlatform(x, y)
-                        }
-                        else if (isWallSticker(thisTile)) {
-                            nearbyTilesInfo = getNearbyTilesInfoWallSticker(x, y)
-                        }
-                        else if (isConnectMutual(thisTile)) {
-                            nearbyTilesInfo = getNearbyTilesInfoNonSolid(x, y, mode)
-                        }
-                        else if (isConnectSelf(thisTile)) {
-                            nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile)
-                        }
+                        if ( LightmapRenderer.getLowestRGB(x, y) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getLowestRGB(x - 1, y) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getLowestRGB(x + 1, y) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getLowestRGB(x, y - 1) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getLowestRGB(x, y + 1) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getLowestRGB(x - 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getLowestRGB(x + 1, y + 1) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getLowestRGB(x + 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getLowestRGB(x - 1, y + 1) ?: 0 >= tileDrawLightThreshold) {
+                                // blackness
+                                /*if (zeroTileCounter > 0) {
+                                    g.color = Color.black
+                                    g.fillRect(
+                                        (x - zeroTileCounter) * TILE_SIZE.toFloat(), y * TILE_SIZE.toFloat(),
+                                        zeroTileCounter * TILE_SIZE.toFloat(), TILE_SIZE.toFloat()
+                                    )
+                                    g.color = Color.white
+                                    zeroTileCounter = 0
+                                }*/
+
+
+                                val nearbyTilesInfo: Int
+                                if (isPlatform(thisTile)) {
+                                    nearbyTilesInfo = getNearbyTilesInfoPlatform(x, y)
+                                }
+                                else if (isWallSticker(thisTile)) {
+                                    nearbyTilesInfo = getNearbyTilesInfoWallSticker(x, y)
+                                }
+                                else if (isConnectMutual(thisTile)) {
+                                    nearbyTilesInfo = getNearbyTilesInfoNonSolid(x, y, mode)
+                                }
+                                else if (isConnectSelf(thisTile)) {
+                                    nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile)
+                                }
+                                else {
+                                    nearbyTilesInfo = 0
+                                }
+
+
+                                val thisTileX: Int
+                                if (!noDamageLayer)
+                                    thisTileX = PairedMapLayer.RANGE * ((thisTile ?: 0) % PairedMapLayer.RANGE) + nearbyTilesInfo
+                                else
+                                    thisTileX = nearbyTilesInfo
+
+                                val thisTileY = (thisTile ?: 0) / PairedMapLayer.RANGE
+
+                                if (drawModeTilesBlendMul) {
+                                    if (TilesDrawer.isBlendMul(thisTile)) {
+                                        drawTile(mode, x, y, thisTileX, thisTileY)
+                                    }
+                                }
+                                else {
+                                    // do NOT add "if (!isBlendMul(thisTile))"!
+                                    // or else they will not look like they should be when backed with wall
+                                    drawTile(mode, x, y, thisTileX, thisTileY)
+                                }
+                        } // end if (is illuminated)
                         else {
-                            nearbyTilesInfo = 0
+                            zeroTileCounter++
+                            drawTile(mode, x, y, 1, 0) // black patch
                         }
-
-
-                        val thisTileX: Int
-                        if (!noDamageLayer)
-                            thisTileX = PairedMapLayer.RANGE * ((thisTile ?: 0) % PairedMapLayer.RANGE) + nearbyTilesInfo
-                        else
-                            thisTileX = nearbyTilesInfo
-
-                        val thisTileY = (thisTile ?: 0) / PairedMapLayer.RANGE
-
-                        if (drawModeTilesBlendMul) {
-                            if (TilesDrawer.isBlendMul(thisTile)) {
-                                drawTile(mode, x, y, thisTileX, thisTileY)
-                            }
-                        } else {
-                            // do NOT add "if (!isBlendMul(thisTile))"!
-                            // or else they will not look like they should be when backed with wall
-                            drawTile(mode, x, y, thisTileX, thisTileY)
-                        }
-                    } // end if (not an air and is illuminated)
-                    else {
-                        zeroTileCounter++
-                    }
+                    } // end if (not an air)
                 } catch (e: NullPointerException) {
                     // do nothing. WARNING: This exception handling may hide erratic behaviour completely.
                 }

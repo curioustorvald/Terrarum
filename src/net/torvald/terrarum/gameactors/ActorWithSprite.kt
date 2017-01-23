@@ -10,6 +10,7 @@ import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
+import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileProp
 import org.dyn4j.Epsilon
@@ -19,17 +20,19 @@ import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
 import java.util.*
+import kotlin.reflect.jvm.internal.impl.resolve.constants.DoubleValue
 
 /**
  * Base class for every actor that has animated sprites. This includes furnishings, paintings, gadgets, etc.
  * Also has all the physics
  *
  * @param renderOrder Rendering order (BEHIND, MIDDLE, MIDTOP, FRONT)
- * @param physics
+ * @param immobileBody use realistic air friction (1/1000 of "unrealistic" canonical setup)
+ * @param physics use physics simulation
  *
  * Created by minjaesong on 16-01-13.
  */
-open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : ActorVisible(renderOrder) {
+open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = false, physics: Boolean = true) : ActorVisible(renderOrder) {
 
     /** !! ActorValue macros are on the very bottom of the source !! **/
 
@@ -343,6 +346,8 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
         velocity += acc.times(speedMultByTile)
     }
 
+    private val bounceDampenVelThreshold = 0.5
+
     override fun update(gc: GameContainer, delta: Int) {
         if (isUpdate && !flagDespawn) {
 
@@ -388,7 +393,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
                 }
 
                 setHorizontalFriction()
-                if (isPlayerNoClip) { // TODO also hanging on the rope, etc.
+                if (immobileBody || isPlayerNoClip) { // TODO also hanging on the rope, etc.
                     setVerticalFriction()
                 }
 
@@ -424,28 +429,28 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
             // decide whether to ignore walkX
             if (!(isCollidingSide(hitbox, COLLIDING_LEFT) && walkX < 0)
                 || !(isCollidingSide(hitbox, COLLIDING_RIGHT) && walkX > 0)
-            ) {
+                    ) {
                 moveDelta.x = veloX + walkX
             }
 
             // decide whether to ignore walkY
             if (!(isCollidingSide(hitbox, COLLIDING_TOP) && walkY < 0)
                 || !(isCollidingSide(hitbox, COLLIDING_BOTTOM) && walkY > 0)
-            ) {
+                    ) {
                 moveDelta.y = veloY + walkY
             }
         }
         else {
             if (!isCollidingSide(hitbox, COLLIDING_LEFT)
                 || !isCollidingSide(hitbox, COLLIDING_RIGHT)
-            ) {
+                    ) {
                 moveDelta.x = veloX
             }
 
             // decide whether to ignore walkY
             if (!isCollidingSide(hitbox, COLLIDING_TOP)
                 || !isCollidingSide(hitbox, COLLIDING_BOTTOM)
-            ) {
+                    ) {
                 moveDelta.y = veloY
             }
         }
@@ -771,6 +776,13 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
         return contactAreaCounter
     }
 
+    private fun getTileFriction(tile: Int) =
+            if (immobileBody && tile == Tile.AIR)
+                TileCodex[Tile.AIR].friction.frictionToMult().div(1000)
+                        .times(if (!grounded) elasticity else 1.0)
+            else
+                TileCodex[tile].friction.frictionToMult()
+
     /** about stopping
      * for about get moving, see updateMovementControl */
     private fun setHorizontalFriction() {
@@ -778,7 +790,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
             BASE_FRICTION * TileCodex[Tile.STONE].friction.frictionToMult()
         else {
             // TODO status quo if !submerged else linearBlend(feetFriction, bodyFriction, submergedRatio)
-            BASE_FRICTION * (if (grounded) feetFriction else bodyFriction).frictionToMult()
+            BASE_FRICTION * if (grounded) feetFriction else bodyFriction
         }
 
         if (veloX < 0) {
@@ -806,7 +818,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
         val friction = if (isPlayerNoClip)
             BASE_FRICTION * TileCodex[Tile.STONE].friction.frictionToMult()
         else
-            BASE_FRICTION * bodyFriction.frictionToMult()
+            BASE_FRICTION * bodyFriction
 
         if (veloY < 0) {
             veloY += friction
@@ -859,22 +871,24 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
         ).toDouble()
 
 
-    internal val bodyFriction: Int
+    internal val bodyFriction: Double
         get() {
-            var friction = 0
-            forEachOccupyingTile { // get max friction
-                if (it?.friction ?: TileCodex[Tile.AIR].friction > friction)
-                    friction = it?.friction ?: TileCodex[Tile.AIR].friction
+            var friction = 0.0
+            forEachOccupyingTileNum {
+                // get max friction
+                if (getTileFriction(it ?: Tile.AIR) > friction)
+                    friction = getTileFriction(it ?: Tile.AIR)
             }
 
             return friction
         }
-    internal val feetFriction: Int
+    internal val feetFriction: Double
         get() {
-            var friction = 0
-            forEachFeetTile { // get max friction
-                if (it?.friction ?: TileCodex[Tile.AIR].friction > friction)
-                    friction = it?.friction ?: TileCodex[Tile.AIR].friction
+            var friction = 0.0
+            forEachFeetTileNum {
+                // get max friction
+                if (getTileFriction(it ?: Tile.AIR) > friction)
+                    friction = getTileFriction(it ?: Tile.AIR)
             }
 
             return friction
@@ -885,7 +899,8 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
     internal val bodyViscosity: Int
         get() {
             var viscosity = 0
-            forEachOccupyingTile { // get max viscosity
+            forEachOccupyingTile {
+                // get max viscosity
                 if (it?.viscosity ?: 0 > viscosity)
                     viscosity = it?.viscosity ?: 0
             }
@@ -895,7 +910,8 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
     internal val feetViscosity: Int
         get() {
             var viscosity = 0
-            forEachFeetTile { // get max viscosity
+            forEachFeetTile {
+                // get max viscosity
                 if (it?.viscosity ?: 0 > viscosity)
                     viscosity = it?.viscosity ?: 0
             }
@@ -921,9 +937,9 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
         get() {
             if (!isPlayerNoClip) {
                 val notSubmergedAccel = if (grounded)
-                    feetFriction.frictionToMult()
+                    feetFriction
                 else
-                    bodyFriction.frictionToMult()
+                    bodyFriction
                 val normalisedViscocity = bodyViscosity.viscosityToMult()
 
                 return interpolateLinear(submergedRatio, notSubmergedAccel, normalisedViscocity)
@@ -992,7 +1008,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
 
     private fun updateHitbox() = hitbox.reassign(nextHitbox)
 
-    override open fun drawGlow(g: Graphics) {
+    override fun drawGlow(g: Graphics) {
         if (isVisible && spriteGlow != null) {
             blendLightenOnly()
 
@@ -1033,25 +1049,12 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
                 )
             }
         }
-
-
-        // debug hitbox
-        if (KeyToggler.isOn(Key.F11)) {
-            g.color = Color(1f, 0f, 1f, 1f)
-            blendNormal()
-            g.lineWidth = 1f
-            g.drawRect(
-                    hitbox.posX.toFloat(),
-                    hitbox.posY.toFloat(),
-                    hitbox.width.toFloat(),
-                    hitbox.height.toFloat()
-            )
-        }
     }
 
-    override open fun drawBody(g: Graphics) {
-        if (isVisible && sprite != null) {
+    private val halfWorldW = world.width.times(TILE_SIZE).ushr(1)
 
+    override fun drawBody(g: Graphics) {
+        if (isVisible && sprite != null) {
 
             when (drawMode) {
                 BLEND_NORMAL   -> blendNormal()
@@ -1282,7 +1285,9 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
 
     var avBaseScale: Double // use canonical "scale" for apparent scale (base * buff)
         get() = actorValue.getAsDouble(AVKey.SCALE) ?: 1.0
-        set(value) { actorValue[AVKey.SCALE] = value }
+        set(value) {
+            actorValue[AVKey.SCALE] = value
+        }
     /** Apparent strength */
     var avStrength: Double
         get() = (actorValue.getAsDouble(AVKey.STRENGTH) ?: 0.0) *
@@ -1294,10 +1299,14 @@ open class ActorWithSprite(renderOrder: ActorOrder, physics: Boolean = true) : A
         }
     var avBaseStrength: Double?
         get() = actorValue.getAsDouble(AVKey.STRENGTH)
-        set(value) { actorValue[AVKey.STRENGTH] = value!! }
+        set(value) {
+            actorValue[AVKey.STRENGTH] = value!!
+        }
     var avBaseMass: Double
         get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT
-        set(value) { actorValue[AVKey.BASEMASS] = value }
+        set(value) {
+            actorValue[AVKey.BASEMASS] = value
+        }
     val avAcceleration: Double
         get() = actorValue.getAsDouble(AVKey.ACCEL)!! *
                 actorValue.getAsDouble(AVKey.ACCELBUFF)!! *

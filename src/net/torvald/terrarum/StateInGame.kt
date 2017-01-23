@@ -381,15 +381,35 @@ constructor() : BasicGameState() {
                             actor.hitbox.posX.toFloat(),
                             actor.hitbox.pointedY.toFloat() + 4
                     )
+                }
+            }
+        }
+        // debug physics
+        if (KeyToggler.isOn(Key.F11)) {
+            actorContainer.forEachIndexed { i, actor ->
+                if (actor is ActorWithSprite) {
+                    worldG.color = Color(1f, 0f, 1f, 1f)
+                    worldG.font = Terrarum.fontSmallNumbers
+                    worldG.lineWidth = 1f
+                    worldG.drawRect(
+                            actor.hitbox.posX.toFloat(),
+                            actor.hitbox.posY.toFloat(),
+                            actor.hitbox.width.toFloat(),
+                            actor.hitbox.height.toFloat()
+                    )
 
-                    if (DEBUG_ARRAY) {
-                        worldG.color = GameFontBase.codeToCol["g"]
-                        worldG.drawString(
-                                i.toString(),
-                                actor.hitbox.posX.toFloat(),
-                                actor.hitbox.pointedY.toFloat() + 4 + 10
-                        )
-                    }
+                    // velocity
+                    worldG.color = Color(0x80FFFF)
+                    worldG.drawString(
+                            "vX ${actor.velocity.x}", // doesn't work for NPCs/Player
+                            actor.hitbox.posX.toFloat(),
+                            actor.hitbox.pointedY.toFloat() + 4 + 8
+                    )
+                    worldG.drawString(
+                            "vY ${actor.velocity.y}",
+                            actor.hitbox.posX.toFloat(),
+                            actor.hitbox.pointedY.toFloat() + 4 + 8 * 2
+                    )
                 }
             }
         }
@@ -674,17 +694,30 @@ constructor() : BasicGameState() {
      * Check for duplicates, append actor and sort the list
      */
     fun addActor(actor: Actor) {
-        if (hasActor(actor.referenceID))
-            throw RuntimeException("Actor with ID ${actor.referenceID} already exists.")
-        actorContainer.add(actor)
-        insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
+        if (hasActor(actor.referenceID)) {
+            println("[StateInGame] Replacing actor $actor")
+            removeActor(actor)
+            addActor(actor)
+        }
+        else {
+            actorContainer.add(actor)
+            insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
 
-        if (actor is ActorVisible) {
-            when (actor.renderOrder) {
-                ActorOrder.BEHIND -> { actorsRenderBehind.add(actor); insertionSortLastElemAV(actorsRenderBehind) }
-                ActorOrder.MIDDLE -> { actorsRenderMiddle.add(actor); insertionSortLastElemAV(actorsRenderMiddle) }
-                ActorOrder.MIDTOP -> { actorsRenderMidTop.add(actor); insertionSortLastElemAV(actorsRenderMidTop) }
-                ActorOrder.FRONT  -> { actorsRenderFront .add(actor); insertionSortLastElemAV(actorsRenderFront ) }
+            if (actor is ActorVisible) {
+                when (actor.renderOrder) {
+                    ActorOrder.BEHIND -> {
+                        actorsRenderBehind.add(actor); insertionSortLastElemAV(actorsRenderBehind)
+                    }
+                    ActorOrder.MIDDLE -> {
+                        actorsRenderMiddle.add(actor); insertionSortLastElemAV(actorsRenderMiddle)
+                    }
+                    ActorOrder.MIDTOP -> {
+                        actorsRenderMidTop.add(actor); insertionSortLastElemAV(actorsRenderMidTop)
+                    }
+                    ActorOrder.FRONT  -> {
+                        actorsRenderFront.add(actor); insertionSortLastElemAV(actorsRenderFront)
+                    }
+                }
             }
         }
     }
@@ -692,11 +725,6 @@ constructor() : BasicGameState() {
     fun addParticle(particle: ParticleBase) {
         particlesContainer.add(particle)
     }
-
-    /**
-     * Whether the game should display actorContainer elem number when F3 is on
-     */
-    val DEBUG_ARRAY = false
 
     fun getActorByID(ID: Int): Actor {
         if (actorContainer.size == 0 && actorContainerInactive.size == 0)
@@ -743,10 +771,11 @@ constructor() : BasicGameState() {
     private fun ArrayList<out Actor>.binarySearch(ID: Int): Int {
         // code from collections/Collections.kt
         var low = 0
-        var high = actorContainer.size - 1
+        var high = this.size - 1
 
         while (low <= high) {
             val mid = (low + high).ushr(1) // safe from overflows
+
             val midVal = get(mid)
 
             if (ID > midVal.referenceID)

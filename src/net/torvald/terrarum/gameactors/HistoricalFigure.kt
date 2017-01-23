@@ -11,7 +11,7 @@ import org.newdawn.slick.Input
  *
  * Created by minjaesong on 16-10-10.
  */
-open class HistoricalFigure(val born: GameDate, val dead: GameDate? = null) : ActorWithSprite(ActorOrder.MIDDLE) {
+open class HistoricalFigure(val born: GameDate, val dead: GameDate? = null, realAirFriction: Boolean = false) : ActorWithSprite(ActorOrder.MIDDLE, realAirFriction) {
 
     init {
         this.actorValue["_bornyear"] = born.year

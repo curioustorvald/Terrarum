@@ -40,6 +40,7 @@ object WeatherMixer {
     lateinit var mixedWeather: BaseModularWeather
 
     val globalLightNow = Color(0)
+    private val world = Terrarum.ingame.world
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
@@ -90,7 +91,15 @@ object WeatherMixer {
                 )
                 Terrarum.ingame.addParticle(rainParticle)
             }
+            globalLightNow.set(getGlobalLightOfTime(world.time.elapsedSeconds).darker(0.3f))
         }
+    }
+
+    private fun Color.set(other: Color) {
+        this.r = other.r
+        this.g = other.g
+        this.b = other.b
+        this.a = other.a
     }
 
     fun render(g: Graphics) {
