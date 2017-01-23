@@ -20,7 +20,6 @@ import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
 import java.util.*
-import kotlin.reflect.jvm.internal.impl.resolve.constants.DoubleValue
 
 /**
  * Base class for every actor that has animated sprites. This includes furnishings, paintings, gadgets, etc.
@@ -1012,46 +1011,61 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
         if (isVisible && spriteGlow != null) {
             blendLightenOnly()
 
-            if (!sprite!!.flippedHorizontal()) {
-                spriteGlow!!.render(g,
-                        (hitbox.posX - hitboxTranslateX * scale).toFloat(),
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
-                // Q&D fix for Roundworld anomaly
-                spriteGlow!!.render(g,
-                        (hitbox.posX - hitboxTranslateX * scale).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
-                spriteGlow!!.render(g,
-                        (hitbox.posX - hitboxTranslateX * scale).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
+            if (!spriteGlow!!.flippedHorizontal()) {
+                if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
+                    // camera center neg, actor center pos
+                    spriteGlow!!.render(g,
+                            (hitbox.posX - hitboxTranslateX * scale).toFloat() + world.width * TILE_SIZE,
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
+                else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
+                    // camera center pos, actor center neg
+                    spriteGlow!!.render(g,
+                            (hitbox.posX - hitboxTranslateX * scale).toFloat() - world.width * TILE_SIZE,
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
+                else {
+                    spriteGlow!!.render(g,
+                            (hitbox.posX - hitboxTranslateX * scale).toFloat(),
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
             }
             else {
-                spriteGlow!!.render(g,
-                        (hitbox.posX - scale).toFloat(),
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
-                // Q&D fix for Roundworld anomaly
-                spriteGlow!!.render(g,
-                        (hitbox.posX - scale).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
-                spriteGlow!!.render(g,
-                        (hitbox.posX - scale).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                        (scale).toFloat()
-                )
+                if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
+                    // camera center neg, actor center pos
+                    spriteGlow!!.render(g,
+                            (hitbox.posX - scale).toFloat() + world.width * TILE_SIZE,
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
+                else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
+                    // camera center pos, actor center neg
+                    spriteGlow!!.render(g,
+                            (hitbox.posX - scale).toFloat() - world.width * TILE_SIZE,
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
+                else {
+                    spriteGlow!!.render(g,
+                            (hitbox.posX - scale).toFloat(),
+                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
+                            (scale).toFloat()
+                    )
+                }
             }
         }
     }
 
-    private val halfWorldW = world.width.times(TILE_SIZE).ushr(1)
+    val leftsidePadding = world.width.times(TILE_SIZE) - MapCamera.width.ushr(1)
+    val rightsidePadding = MapCamera.width.ushr(1)
 
     override fun drawBody(g: Graphics) {
         if (isVisible && sprite != null) {
@@ -1063,7 +1077,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
             }
 
             if (!sprite!!.flippedHorizontal()) {
-                if (MapCamera.xCentre > halfWorldW && centrePosPoint.x < halfWorldW) {
+                if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                     // camera center neg, actor center pos
                     sprite!!.render(g,
                             (hitbox.posX - hitboxTranslateX * scale).toFloat() + world.width * TILE_SIZE,
@@ -1071,7 +1085,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                             (scale).toFloat()
                     )
                 }
-                else if (MapCamera.xCentre < halfWorldW && centrePosPoint.x >= halfWorldW) {
+                else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                     // camera center pos, actor center neg
                     sprite!!.render(g,
                             (hitbox.posX - hitboxTranslateX * scale).toFloat() - world.width * TILE_SIZE,
@@ -1088,7 +1102,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 }
             }
             else {
-                if (MapCamera.xCentre > halfWorldW && centrePosPoint.x < halfWorldW) {
+                if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                     // camera center neg, actor center pos
                     sprite!!.render(g,
                             (hitbox.posX - scale).toFloat() + world.width * TILE_SIZE,
@@ -1096,7 +1110,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                             (scale).toFloat()
                     )
                 }
-                else if (MapCamera.xCentre < halfWorldW && centrePosPoint.x >= halfWorldW) {
+                else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                     // camera center pos, actor center neg
                     sprite!!.render(g,
                             (hitbox.posX - scale).toFloat() - world.width * TILE_SIZE,
