@@ -132,11 +132,11 @@ constructor() : BasicGameState() {
 
         // add new player and put it to actorContainer
         playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
-        addActor(player)
+        addNewActor(player)
 
 
         // test actor
-        addActor(PlayerBuilderCynthia())
+        addNewActor(PlayerBuilderCynthia())
 
 
 
@@ -178,7 +178,11 @@ constructor() : BasicGameState() {
         //AudioResourceLibrary.ambientsWoods[0].play()
     }
 
+    var particlesActive = 0
+        private set
+
     override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
+        particlesActive = 0
         UPDATE_DELTA = delta
         setAppTitle()
 
@@ -226,7 +230,7 @@ constructor() : BasicGameState() {
             // determine whether the actor should keep being activated or be dormant
             KillOrKnockdownActors()
             updateActors(gc, delta)
-            particlesContainer.forEach { it.update(gc, delta) }
+            particlesContainer.forEach { if (!it.flagDespawn) particlesActive++; it.update(gc, delta) }
             // TODO thread pool(?)
             CollisionSolver.process()
         }
@@ -260,9 +264,9 @@ constructor() : BasicGameState() {
 
     private fun repossessActor() {
         // check if currently pocessed actor is removed from game
-        if (!hasActor(player)) {
+        if (!theGameHasActor(player)) {
             // re-possess canonical player
-            if (hasActor(Player.PLAYER_REF_ID))
+            if (theGameHasActor(Player.PLAYER_REF_ID))
                 changePossession(Player.PLAYER_REF_ID)
             else
                 changePossession(0x51621D) // FIXME fallback debug mode (FIXME is there for a reminder visible in ya IDE)
@@ -270,8 +274,8 @@ constructor() : BasicGameState() {
     }
 
     private fun changePossession(newActor: PlayableActorDelegate) {
-        if (!hasActor(player)) {
-            throw IllegalArgumentException("No such actor in actorContainer: $newActor")
+        if (!theGameHasActor(player)) {
+            throw IllegalArgumentException("No such actor in the game: $newActor")
         }
 
         playableActorDelegate = newActor
@@ -281,8 +285,8 @@ constructor() : BasicGameState() {
     private fun changePossession(refid: Int) {
         // TODO prevent possessing other player on multiplayer
 
-        if (!hasActor(refid)) {
-            throw IllegalArgumentException("No such actor in actorContainer: $refid")
+        if (!theGameHasActor(refid)) {
+            throw IllegalArgumentException("No such actor in the game: $refid (elemsActive: ${actorContainer.size}, elemsInactive: ${actorContainerInactive.size})")
         }
 
         // take care of old delegate
@@ -297,7 +301,7 @@ constructor() : BasicGameState() {
         Terrarum.appgc.setTitle(
                 Terrarum.NAME +
                 " — F: ${Terrarum.appgc.fps} (${Terrarum.TARGET_INTERNAL_FPS})" +
-                " — M: ${Terrarum.memInUse}M / ${Terrarum.totalVMMem}M")
+                " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M")
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, gwin: Graphics) {
@@ -399,14 +403,14 @@ constructor() : BasicGameState() {
                     )
 
                     // velocity
-                    worldG.color = Color(0x80FFFF)
+                    worldG.color = GameFontBase.codeToCol["g"]
                     worldG.drawString(
-                            "vX ${actor.velocity.x}", // doesn't work for NPCs/Player
+                            "${0x7F.toChar()}X ${actor.velocity.x}", // doesn't work for NPCs/Player
                             actor.hitbox.posX.toFloat(),
                             actor.hitbox.pointedY.toFloat() + 4 + 8
                     )
                     worldG.drawString(
-                            "vY ${actor.velocity.y}",
+                            "${0x7F.toChar()}Y ${actor.velocity.y}",
                             actor.hitbox.posX.toFloat(),
                             actor.hitbox.pointedY.toFloat() + 4 + 8 * 2
                     )
@@ -521,10 +525,8 @@ constructor() : BasicGameState() {
         var i = 0
         while (i < actorContainerSize) { // loop through actorContainerInactive
             val actor = actorContainerInactive[i]
-            val actorIndex = i
             if (actor is ActorVisible && actor.inUpdateRange()) {
-                addActor(actor) // duplicates are checked here
-                actorContainerInactive.removeAt(actorIndex)
+                activateDormantActor(actor) // duplicates are checked here
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1
             }
@@ -629,26 +631,22 @@ constructor() : BasicGameState() {
     /**
      * actorContainer extensions
      */
-    fun hasActor(actor: Actor) = hasActor(actor.referenceID)
+    fun theGameHasActor(actor: Actor) = theGameHasActor(actor.referenceID)
 
-    fun hasActor(ID: Int): Boolean =
+    fun theGameHasActor(ID: Int): Boolean =
+            isActive(ID) || isInactive(ID)
+
+    fun isActive(ID: Int): Boolean =
             if (actorContainer.size == 0)
                 false
-            else {
-                // TODO cherche for inactive
-                val binsearch = actorContainer.binarySearch(ID)
-                if (binsearch < 0) {
-                    if (actorContainerInactive.size == 0) false
-                    else {
-                        val binsearch2 = actorContainerInactive.binarySearch(ID)
+            else
+                actorContainer.binarySearch(ID) >= 0
 
-                        binsearch2 >= 0
-                    }
-                }
-                else {
-                    true
-                }
-            }
+    fun isInactive(ID: Int): Boolean =
+            if (actorContainerInactive.size == 0)
+                false
+            else
+                actorContainerInactive.binarySearch(ID) >= 0
 
     fun removeActor(ID: Int) = removeActor(getActorByID(ID))
     /**
@@ -693,13 +691,42 @@ constructor() : BasicGameState() {
     /**
      * Check for duplicates, append actor and sort the list
      */
-    fun addActor(actor: Actor) {
-        if (hasActor(actor.referenceID)) {
-            println("[StateInGame] Replacing actor $actor")
-            removeActor(actor)
-            addActor(actor)
+    fun addNewActor(actor: Actor) {
+        if (theGameHasActor(actor.referenceID)) {
+            throw Error("The actor $actor already exists in the game")
         }
         else {
+            actorContainer.add(actor)
+            insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
+
+            if (actor is ActorVisible) {
+                when (actor.renderOrder) {
+                    ActorOrder.BEHIND -> {
+                        actorsRenderBehind.add(actor); insertionSortLastElemAV(actorsRenderBehind)
+                    }
+                    ActorOrder.MIDDLE -> {
+                        actorsRenderMiddle.add(actor); insertionSortLastElemAV(actorsRenderMiddle)
+                    }
+                    ActorOrder.MIDTOP -> {
+                        actorsRenderMidTop.add(actor); insertionSortLastElemAV(actorsRenderMidTop)
+                    }
+                    ActorOrder.FRONT  -> {
+                        actorsRenderFront.add(actor); insertionSortLastElemAV(actorsRenderFront)
+                    }
+                }
+            }
+        }
+    }
+
+    fun activateDormantActor(actor: Actor) {
+        if (!isInactive(actor.referenceID)) {
+            if (isActive(actor.referenceID))
+                throw Error("The actor $actor is already activated")
+            else
+                throw Error("The actor $actor already exists in the game")
+        }
+        else {
+            actorContainerInactive.remove(actor)
             actorContainer.add(actor)
             insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
 
