@@ -25,6 +25,7 @@ import java.util.*
 object TilesDrawer {
     private val world: GameWorld = Terrarum.ingame.world
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
+    private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
     var tilesTerrain: SpriteSheet = SpriteSheet("./assets/graphics/terrain/terrain.tga", TILE_SIZE, TILE_SIZE)
         private set // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
@@ -310,25 +311,21 @@ object TilesDrawer {
                     if ((mode == WALL || mode == TERRAIN) &&  // not an air tile
                         (thisTile ?: 0) != Tile.AIR) {
                     // check if light level of nearby or this tile is illuminated
-                        if ( LightmapRenderer.getLowestRGB(x, y) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getLowestRGB(x - 1, y) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getLowestRGB(x + 1, y) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getLowestRGB(x, y - 1) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getLowestRGB(x, y + 1) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getLowestRGB(x - 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getLowestRGB(x + 1, y + 1) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getLowestRGB(x + 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getLowestRGB(x - 1, y + 1) ?: 0 >= tileDrawLightThreshold) {
+                        if ( LightmapRenderer.getHighestRGB(x, y) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x - 1, y) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x + 1, y) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x, y - 1) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x, y + 1) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x - 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x + 1, y + 1) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x + 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x - 1, y + 1) ?: 0 >= tileDrawLightThreshold) {
                                 // blackness
-                                /*if (zeroTileCounter > 0) {
-                                    g.color = Color.black
-                                    g.fillRect(
-                                        (x - zeroTileCounter) * TILE_SIZE.toFloat(), y * TILE_SIZE.toFloat(),
-                                        zeroTileCounter * TILE_SIZE.toFloat(), TILE_SIZE.toFloat()
-                                    )
-                                    g.color = Color.white
+                                if (zeroTileCounter > 0) {
+                                    /* unable to do anything */
+
                                     zeroTileCounter = 0
-                                }*/
+                                }
 
 
                                 val nearbyTilesInfo: Int
@@ -370,7 +367,19 @@ object TilesDrawer {
                         } // end if (is illuminated)
                         else {
                             zeroTileCounter++
-                            drawTile(mode, x, y, 1, 0) // black patch
+                            //drawTile(mode, x, y, 1, 0) // black patch
+                            GL11.glColor4f(0f, 0f, 0f, 1f)
+
+                            GL11.glTexCoord2f(0f, 0f)
+                            GL11.glVertex3f(x * TILE_SIZE.toFloat(), y * TILE_SIZE.toFloat(), 0f)
+                            GL11.glTexCoord2f(0f, 0f + TILE_SIZE)
+                            GL11.glVertex3f(x * TILE_SIZE.toFloat(), (y + 1) * TILE_SIZE.toFloat(), 0f)
+                            GL11.glTexCoord2f(0f + TILE_SIZE, 0f + TILE_SIZE)
+                            GL11.glVertex3f((x + 1) * TILE_SIZE.toFloat(), (y + 1) * TILE_SIZE.toFloat(), 0f)
+                            GL11.glTexCoord2f(0f + TILE_SIZE, 0f)
+                            GL11.glVertex3f((x + 1) * TILE_SIZE.toFloat(), y * TILE_SIZE.toFloat(), 0f)
+
+                            GL11.glColor4f(1f, 1f, 1f, 1f)
                         }
                     } // end if (not an air)
                 } catch (e: NullPointerException) {

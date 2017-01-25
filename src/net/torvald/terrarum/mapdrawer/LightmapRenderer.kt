@@ -421,6 +421,8 @@ object LightmapRenderer {
 
     }
 
+    val lightScalingMagic = 8f
+
     /**
      * Subtract each channel's RGB value.
      *
@@ -432,12 +434,12 @@ object LightmapRenderer {
         if (darken < 0 || darken >= COLOUR_RANGE_SIZE)
             throw IllegalArgumentException("darken: out of range ($darken)")
 
-        // use equation with magic number 9.0
-        // smooooooth
+        // use equation with magic number 8.0
+        // should draw somewhat exponential curve when you plot the propagation of light in-game
 
-        val r = data.r() * (1f - darken.r() * 9.0f)
-        val g = data.g() * (1f - darken.g() * 9.0f)
-        val b = data.b() * (1f - darken.b() * 9.0f)
+        val r = data.r() * (1f - darken.r() * lightScalingMagic)
+        val g = data.g() * (1f - darken.g() * lightScalingMagic)
+        val b = data.b() * (1f - darken.b() * lightScalingMagic)
 
         return constructRGBFromFloat(r.clampZero(), g.clampZero(), b.clampZero())
     }
@@ -461,12 +463,9 @@ object LightmapRenderer {
         if (brighten < 0 || brighten >= COLOUR_RANGE_SIZE)
             throw IllegalArgumentException("brighten: out of range ($brighten)")
 
-        val r = data.r() * (1f + brighten.r() * 6.5f)
-        val g = data.g() * (1f + brighten.g() * 6.5f)
-        val b = data.b() * (1f + brighten.b() * 6.5f)
-        //val r = data.r() + brighten.r()
-        //val g = data.g() + brighten.g()
-        //val b = data.b() + brighten.b()
+        val r = data.r() * (1f + brighten.r() * lightScalingMagic)
+        val g = data.g() * (1f + brighten.g() * lightScalingMagic)
+        val b = data.b() * (1f + brighten.b() * lightScalingMagic)
 
         return constructRGBFromFloat(r.clampChannel(), g.clampChannel(), b.clampChannel())
     }
@@ -498,6 +497,7 @@ object LightmapRenderer {
             constructRGBFromFloat(-brighten, -brighten, -brighten)
         else
             constructRGBFromFloat(brighten, brighten, brighten)
+
         return if (brighten < 0)
             darkenColoured(data, modifier)
         else
@@ -624,12 +624,12 @@ object LightmapRenderer {
     private fun Float.clampChannel() = if (this > CHANNEL_MAX_DECIMAL) CHANNEL_MAX_DECIMAL else this
 
     fun getValueFromMap(x: Int, y: Int): Int? = getLight(x, y)
-    fun getLowestRGB(x: Int, y: Int): Int? {
+    fun getHighestRGB(x: Int, y: Int): Int? {
         val value = getLight(x, y)
         if (value == null)
             return null
         else
-            return FastMath.min(value.rawR(), value.rawG(), value.rawB())
+            return FastMath.max(value.rawR(), value.rawG(), value.rawB())
     }
 
     private fun purgeLightmap() {
