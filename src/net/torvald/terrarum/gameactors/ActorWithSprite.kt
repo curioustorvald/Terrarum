@@ -65,39 +65,31 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
         )
 
     /**
+     * TODO external force? do we need this? we have moveDelta
+     *
      * Velocity vector for newtonian sim.
      * Acceleration: used in code like:
      *     veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
-    internal val velocity = Vector2(0.0, 0.0)
-    var veloX: Double
-        get() = velocity.x
-        protected set(value) {
-            velocity.x = value
-        }
-    var veloY: Double
-        get() = velocity.y
-        protected set(value) {
-            velocity.y = value
-        }
+    internal val externalForce = Vector2(0.0, 0.0)
 
-    val moveDelta = Vector2(0.0, 0.0)
+    val moveDelta = Vector2(0.0, 0.0) // moveDelta = velocity + controllerMoveDelta
     @Transient private val VELO_HARD_LIMIT = 100.0
 
     /**
      * for "Controllable" actors
      */
-    var controllerVel: Vector2? = if (this is Controllable) Vector2() else null
+    var controllerMoveDelta: Vector2? = if (this is Controllable) Vector2() else null
     var walkX: Double
-        get() = controllerVel!!.x
+        get() = controllerMoveDelta!!.x
         protected set(value) {
-            controllerVel!!.x = value
+            controllerMoveDelta!!.x = value
         }
     var walkY: Double
-        get() = controllerVel!!.y
+        get() = controllerMoveDelta!!.y
         protected set(value) {
-            controllerVel!!.y = value
+            controllerMoveDelta!!.y = value
         }
 
     /**
@@ -154,8 +146,6 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
             elasticity = 1.0 - value
         }
         get() = 1.0 - elasticity
-
-    @Transient private val CEILING_HIT_ELASTICITY = 0.3
 
     var density = 1000.0
         set(value) {
@@ -342,7 +332,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
      * @param acc : Acceleration in Vector2
      */
     fun applyForce(acc: Vector2) {
-        velocity += acc.times(speedMultByTile)
+        externalForce += acc * speedMultByTile
     }
 
     private val bounceDampenVelThreshold = 0.5
@@ -375,8 +365,8 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 }
 
                 // hard limit velocity
-                veloX = veloX.bipolarClamp(VELO_HARD_LIMIT)
-                veloY = veloY.bipolarClamp(VELO_HARD_LIMIT)
+                externalForce.x = externalForce.x.bipolarClamp(VELO_HARD_LIMIT)
+                externalForce.y = externalForce.y.bipolarClamp(VELO_HARD_LIMIT)
 
                 // Set 'next' position (hitbox) from canonical and walking velocity
                 setNewNextHitbox()
@@ -391,8 +381,12 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                     applyNormalForce()
                 }
 
-                setHorizontalFriction()
-                if (immobileBody || isPlayerNoClip) { // TODO also hanging on the rope, etc.
+                if (!immobileBody) { // TODO test no friction on immobileBody
+                    setHorizontalFriction()
+                }
+                //if (immobileBody || isPlayerNoClip) { // TODO also hanging on the rope, etc.
+                // TODO test no friction on immobileBody
+                if (isPlayerNoClip) { // TODO also hanging on the rope, etc.
                     setVerticalFriction()
                 }
 
@@ -429,28 +423,28 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
             if (!(isCollidingSide(hitbox, COLLIDING_LEFT) && walkX < 0)
                 || !(isCollidingSide(hitbox, COLLIDING_RIGHT) && walkX > 0)
                     ) {
-                moveDelta.x = veloX + walkX
+                moveDelta.x = externalForce.x + walkX
             }
 
             // decide whether to ignore walkY
             if (!(isCollidingSide(hitbox, COLLIDING_TOP) && walkY < 0)
                 || !(isCollidingSide(hitbox, COLLIDING_BOTTOM) && walkY > 0)
                     ) {
-                moveDelta.y = veloY + walkY
+                moveDelta.y = externalForce.y + walkY
             }
         }
         else {
             if (!isCollidingSide(hitbox, COLLIDING_LEFT)
                 || !isCollidingSide(hitbox, COLLIDING_RIGHT)
                     ) {
-                moveDelta.x = veloX
+                moveDelta.x = externalForce.x
             }
 
             // decide whether to ignore walkY
             if (!isCollidingSide(hitbox, COLLIDING_TOP)
                 || !isCollidingSide(hitbox, COLLIDING_BOTTOM)
                     ) {
-                moveDelta.y = veloY
+                moveDelta.y = externalForce.y
             }
         }
     }
@@ -475,7 +469,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
              * Drag of atmosphere
              * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity sqr) * A (area)
              */
-            val D: Vector2 = Vector2(veloX.magnSqr(), veloY.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
+            val D: Vector2 = Vector2(moveDelta.x.magnSqr(), moveDelta.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
 
             val V: Vector2 = (W - D) / mass * SI_TO_GAME_ACC
 
@@ -488,7 +482,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
             // axis Y. Using operand >= and hitting the ceiling will lock the player to the position
             if (moveDelta.y > 0.0) { // was moving downward?
                 if (isColliding(nextHitbox, COLLIDING_TOP)) { // hit the ceiling
-                    hitAndForciblyReflectY()
+                    hitAndReflectY() //hitAndForciblyReflectY()
                     grounded = false
                 }
                 else if (isColliding(nextHitbox)) {
@@ -534,7 +528,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
             val ccdDelta = (nextHitbox.toVector() - hitbox.toVector())
             if (ccdDelta.x != 0.0 || ccdDelta.y != 0.0) {
                 //ccdDelta.set(ccdDelta.setMagnitude(CCD_TICK)) // fixed tick
-                val displacement = Math.min(1.0.div(velocity.magnitude * 2), 0.5) // adaptive tick
+                val displacement = Math.min(1.0.div(moveDelta.magnitude * 2), 0.5) // adaptive tick
                 ccdDelta.set(ccdDelta.setMagnitude(displacement))
             }
 
@@ -551,35 +545,44 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
     }
 
     private fun hitAndReflectX() {
-        if ((veloX * elasticity).abs() > Epsilon.E) {
-            veloX *= -elasticity
+        if ((externalForce.x * elasticity).abs() >= MINIMUM_BOUNCE_THRESHOLD) { // > Epsilon.E) {
+            externalForce.x *= -elasticity
             if (this is Controllable) walkX *= -elasticity
         }
         else {
-            veloX = 0.0
+            externalForce.x = 0.0
             if (this is Controllable) walkX = 0.0
         }
     }
 
     private fun hitAndReflectY() {
-        if ((veloY * elasticity).abs() > Epsilon.E) {
-            veloY *= -elasticity
+        if (externalForce.y.abs() >= MINIMUM_BOUNCE_THRESHOLD) { //> Epsilon.E) {
+            externalForce.y *= -elasticity
             if (this is Controllable) walkY *= -elasticity
         }
         else {
-            veloY = 0.0
+            externalForce.y = 0.0
             if (this is Controllable) walkY *= 0.0
         }
     }
+
+    @Transient private val CEILING_HIT_ELASTICITY = 0.3
+    @Transient private val MINIMUM_BOUNCE_THRESHOLD = 0.1
 
     /**
      * prevents sticking to the ceiling
      */
     private fun hitAndForciblyReflectY() {
-        if (veloY.abs() * CEILING_HIT_ELASTICITY > A_PIXEL)
-            veloY = -veloY * CEILING_HIT_ELASTICITY
-        else
-            veloY = veloY.sign() * -A_PIXEL
+        // TODO HARK! I have changed veloX/Y to moveDelta.x/y
+        if (moveDelta.y < 0) {
+            if (moveDelta.y.abs() * CEILING_HIT_ELASTICITY > A_PIXEL)
+                moveDelta.y = -moveDelta.y * CEILING_HIT_ELASTICITY
+            else
+                moveDelta.y = moveDelta.y.sign() * -A_PIXEL
+        }
+        else {
+            throw Error("Check this out bitch (moveDelta.y = ${moveDelta.y})")
+        }
     }
 
     private fun isColliding(hitbox: Hitbox) = isColliding(hitbox, 0)
@@ -792,13 +795,13 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
             BASE_FRICTION * if (grounded) feetFriction else bodyFriction
         }
 
-        if (veloX < 0) {
-            veloX += friction
-            if (veloX > 0) veloX = 0.0 // compensate overshoot
+        if (externalForce.x < 0) {
+            externalForce.x += friction
+            if (externalForce.x > 0) externalForce.x = 0.0 // compensate overshoot
         }
-        else if (veloX > 0) {
-            veloX -= friction
-            if (veloX < 0) veloX = 0.0 // compensate overshoot
+        else if (externalForce.x > 0) {
+            externalForce.x -= friction
+            if (externalForce.x < 0) externalForce.x = 0.0 // compensate overshoot
         }
 
         if (this is Controllable) {
@@ -819,13 +822,13 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
         else
             BASE_FRICTION * bodyFriction
 
-        if (veloY < 0) {
-            veloY += friction
-            if (veloY > 0) veloX = 0.0 // compensate overshoot
+        if (externalForce.y < 0) {
+            externalForce.y += friction
+            if (externalForce.y > 0) externalForce.y = 0.0 // compensate overshoot
         }
-        else if (veloY > 0) {
-            veloY -= friction
-            if (veloY < 0) veloY = 0.0 // compensate overshoot
+        else if (externalForce.y > 0) {
+            externalForce.y -= friction
+            if (externalForce.y < 0) externalForce.y = 0.0 // compensate overshoot
         }
 
         if (this is Controllable) {

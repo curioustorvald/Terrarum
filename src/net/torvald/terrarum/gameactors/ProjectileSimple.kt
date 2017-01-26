@@ -53,7 +53,7 @@ open class ProjectileSimple(
         posPre = Point2d(fromPoint.x, fromPoint.y)
         // lightbox sized 8x8 centered to the bullet
         lightBoxList.add(Hitbox(-4.0, -4.0, 8.0, 8.0))
-        this.velocity.set(velocity)
+        //this.externalForce.set(velocity)
 
         damage = bulletDatabase[type][OFFSET_DAMAGE] as Int
         displayColour = bulletDatabase[type][OFFSET_COL] as Color
@@ -63,7 +63,7 @@ open class ProjectileSimple(
         setHitboxDimension(2, 2, 0, 0) // should be following sprite's properties if there IS one
 
 
-        velocity.set((fromPoint to toPoint).setMagnitude(speed.toDouble()))
+        externalForce.set((fromPoint to toPoint).setMagnitude(speed.toDouble()))
 
 
 

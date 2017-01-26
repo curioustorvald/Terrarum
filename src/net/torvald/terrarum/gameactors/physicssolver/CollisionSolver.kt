@@ -150,10 +150,10 @@ object CollisionSolver {
 
             // if they actually makes collision (e.g. player vs ball), solve it
             if (a makesCollisionWith b) {
-                val ux_1 = a.veloX
-                val ux_2 = b.veloX
-                val uy_1 = a.veloY
-                val uy_2 = b.veloY
+                val ux_1 = a.moveDelta.x
+                val ux_2 = b.moveDelta.x
+                val uy_1 = a.moveDelta.y
+                val uy_2 = b.moveDelta.y
                 val m1 = a.mass
                 val m2 = b.mass
 
