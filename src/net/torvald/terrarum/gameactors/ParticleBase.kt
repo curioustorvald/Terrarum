@@ -31,7 +31,7 @@ open class ParticleBase(renderOrder: ActorOrder, maxLifeTime: Int? = null) : Run
     open val velocity = Vector2(0.0, 0.0)
     open val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
 
-    open lateinit var body: Image
+    open lateinit var body: Image // you might want to use SpriteAnimation
     open var glow: Image? = null
 
     init {

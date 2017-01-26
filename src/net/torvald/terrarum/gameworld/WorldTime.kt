@@ -66,7 +66,7 @@ class WorldTime {
         val YEAR_DAYS: Int = 365
 
         fun parseTime(s: String): Int =
-                if (s.length >= 4) {
+                if (s.length >= 4 && s.contains('h')) {
                     s.toLowerCase().substringBefore('h').toInt() * WorldTime.HOUR_SEC +
                     s.toLowerCase().substringAfter('h').toInt() * WorldTime.MINUTE_SEC
                 }

@@ -11,6 +11,7 @@ import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
+import net.torvald.terrarum.mapdrawer.LightmapRenderer.normaliseToColour
 import net.torvald.terrarum.mapdrawer.MapCamera.x
 import net.torvald.terrarum.mapdrawer.MapCamera.y
 import net.torvald.terrarum.mapdrawer.MapCamera.height

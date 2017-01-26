@@ -4,6 +4,7 @@ import net.torvald.aa.AAFrame
 import net.torvald.aa.ColouredFastFont
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.abs
+import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
 import org.lwjgl.BufferUtils
 import org.lwjgl.openal.AL
@@ -106,8 +107,6 @@ open class SimpleTextTerminal(
         private set
 
 
-    private var redrawSemaphore = false
-
 
     override fun getColor(index: Int): Color = colours[index]
 
@@ -142,45 +141,40 @@ open class SimpleTextTerminal(
      * pass UIcanvas to the parameter "g"
      */
     override fun render(gc: GameContainer, g: Graphics) {
-        // FIXME don't redraw every time it's slow
         g.font = font
 
 
-        // don't redraw() every fucking time, you're wasting your precious process cycle
-        if (redrawSemaphore) {
+        blendNormal()
 
-            blendNormal()
-
-            // black background (this is mandatory)
-            g.color = Color.black
-            g.fillRect(0f, 0f, displayW.toFloat(), displayH.toFloat())
+        // black background (this is mandatory)
+        g.color = Color.black
+        g.fillRect(0f, 0f, displayW.toFloat(), displayH.toFloat())
 
 
-            // screen buffer
-            for (y in 0..height - 1) {
-                for (x in 0..width - 1) {
-                    val ch = screenBuffer.getChar(x, y)
+        // screen buffer
+        for (y in 0..height - 1) {
+            for (x in 0..width - 1) {
+                val ch = screenBuffer.getChar(x, y)
 
-                    // background
-                    g.color = getColor(screenBuffer.getBackgroundColour(x, y))
-                    g.fillRect(fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize,
-                            fontW.toFloat(), fontH.toFloat())
+                // background
+                g.color = getColor(screenBuffer.getBackgroundColour(x, y))
+                g.fillRect(fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize,
+                        fontW.toFloat(), fontH.toFloat())
 
-                    // foreground
-                    if (ch.toInt() != 0 && ch.toInt() != 32) {
-                        g.color = getColor(screenBuffer.getForegroundColour(x, y))
-                        g.drawString(
-                                Character.toString(ch),
-                                fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize)
-                    }
+                // foreground
+                if (ch.toInt() != 0 && ch.toInt() != 32) {
+                    g.color = getColor(screenBuffer.getForegroundColour(x, y))
+                    g.drawString(
+                            Character.toString(ch),
+                            fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize)
                 }
             }
-
         }
+
 
         // cursor
         if (cursorBlinkOn) {
-            g.color = getColor(if (cursorBlink) foreDefault else backDefault) screen colourScreen mul phosphor
+            g.color = getColor(if (cursorBlink) foreDefault else backDefault)
 
             g.fillRect(
                     fontW * cursorX.toFloat() + borderSize,
@@ -189,46 +183,21 @@ open class SimpleTextTerminal(
                     fontH.toFloat()
             )
         }
-        else {
-            val x = cursorX
-            val y = cursorY
-            val ch = screenBuffer.getChar(x, y)
 
-            // background
-            g.color = getColor(screenBuffer.getBackgroundColour(x, y)) screen colourScreen mul phosphor
-            g.fillRect(fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize,
-                    fontW.toFloat(), fontH.toFloat())
+        // colour base
+        g.color = colourScreen
+        blendScreen()
+        g.fillRect(0f, 0f, fontW * width.toFloat() + 2 * borderSize, fontH * height.toFloat() + 2 * borderSize)
 
-            // foreground
-            if (ch.toInt() != 0 && ch.toInt() != 32) {
-                g.color = getColor(screenBuffer.getForegroundColour(x, y)) screen colourScreen mul phosphor
-                g.drawString(
-                        Character.toString(ch),
-                        fontW * x.toFloat() + borderSize, fontH * y.toFloat() + borderSize)
-            }
-        }
-
-        if (redrawSemaphore) {
-            // colour base
-            g.color = colourScreen
-            blendScreen()
-            g.fillRect(0f, 0f, fontW * width.toFloat() + 2 * borderSize, fontH * height.toFloat() + 2 * borderSize)
-
-            // colour overlay
-            g.color = phosphor
-            blendMul()
-            g.fillRect(0f, 0f, fontW * width.toFloat() + 2 * borderSize, fontH * height.toFloat() + 2 * borderSize)
+        // colour overlay
+        g.color = phosphor
+        blendMul()
+        g.fillRect(0f, 0f, fontW * width.toFloat() + 2 * borderSize, fontH * height.toFloat() + 2 * borderSize)
 
 
-            redrawSemaphore = false
-        }
 
         blendNormal()
 
-    }
-
-    fun redraw() {
-        redrawSemaphore = true
     }
 
     /** Unlike lua function, this one in Zero-based. */
@@ -444,7 +413,7 @@ open class SimpleTextTerminal(
             else if (keyPressVisible)
                 printChar(c)
             if (!asciiControlInUse.contains(c)) sb.append(c)
-            else if (c == ASCII_DEL && sb.length > 0) sb.deleteCharAt(sb.length - 1)
+            else if (key == Key.BACKSPACE && sb.isNotEmpty()) sb.deleteCharAt(sb.length - 1)
         }
     }
 

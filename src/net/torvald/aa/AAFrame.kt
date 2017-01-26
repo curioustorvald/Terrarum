@@ -34,7 +34,7 @@ constructor(var width: Int, var height: Int, var terminal: SimpleTextTerminal) {
             throw ArrayIndexOutOfBoundsException("x: $x, y; $y")
         frameBuffer[y * width + x] = ((c.toInt().and(0xFF)) + colourKey.shl(8)).toChar()
 
-        terminal.redraw()
+        //terminal.redraw()
     }
 
     fun drawBuffer(x: Int, y: Int, raw: Char): Boolean =
@@ -42,7 +42,7 @@ constructor(var width: Int, var height: Int, var terminal: SimpleTextTerminal) {
             false
         else {
             frameBuffer[y * width + x] = raw
-            terminal.redraw()
+            //terminal.redraw()
             true
         }
 
@@ -51,7 +51,7 @@ constructor(var width: Int, var height: Int, var terminal: SimpleTextTerminal) {
             val char = (other[i].toUint().shl(8) + other[i + 1].toUint()).toChar()
             frameBuffer[i.ushr(1)] = char
         }
-        terminal.redraw()
+        //terminal.redraw()
     }
 
     fun getBackgroundColour(x: Int, y: Int): Int {
@@ -78,7 +78,7 @@ constructor(var width: Int, var height: Int, var terminal: SimpleTextTerminal) {
                 drawBuffer(x, y, 0.toChar(), background.shl(4))
             }
         }
-        terminal.redraw()
+        //terminal.redraw()
     }
 
     fun drawFromOther(other: AAFrame) {
@@ -88,7 +88,7 @@ constructor(var width: Int, var height: Int, var terminal: SimpleTextTerminal) {
                 frameBuffer[y * width + x] = other.getRaw(x, y)!!
             }
         }
-        terminal.redraw()
+        //terminal.redraw()
     }
 
     private fun checkOOB(x: Int, y: Int) = (x < 0 || y < 0 || x >= width || y >= height)

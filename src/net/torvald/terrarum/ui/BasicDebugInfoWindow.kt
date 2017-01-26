@@ -153,16 +153,19 @@ class BasicDebugInfoWindow : UICanvas {
          */
 
         g.color = GameFontBase.codeToCol["y"]
-        g.drawString("${ccY}MEM ", (Terrarum.WIDTH - 15 * 8 - 2).toFloat(), 2f)
+        g.drawString("${ccY}MEM ", (Terrarum.WIDTH - 21 * 8 - 2).toFloat(), 2f)
         //g.drawString("${ccY}FPS $ccG${Terrarum.appgc.fps}", (Terrarum.WIDTH - 6 * 8 - 2).toFloat(), 10f)
         g.drawString("${ccY}CPUs ${if (Terrarum.MULTITHREAD) ccG else ccR}${Terrarum.THREADS}",
                 (Terrarum.WIDTH - 2 - 6*8).toFloat(), 10f)
 
         g.color = GameFontBase.codeToCol["g"]
         g.drawString("${Terrarum.memInUse}M",
-                (Terrarum.WIDTH - 11 * 8 - 2).toFloat(), 2f)
-        g.drawString("/${Terrarum.totalVMMem}M",
-                (Terrarum.WIDTH - 6 * 8 - 2).toFloat(), 2f)
+                (Terrarum.WIDTH - 17 * 8 - 2).toFloat(), 2f)
+        g.drawString("/${Terrarum.memTotal}M/",
+                (Terrarum.WIDTH - 12 * 8 - 2).toFloat(), 2f)
+        g.color = GameFontBase.codeToCol["m"]
+        g.drawString("${Terrarum.memXmx}M",
+                (Terrarum.WIDTH - 5 * 8 - 2).toFloat(), 2f)
 
         /**
          * Bottom left
@@ -174,7 +177,7 @@ class BasicDebugInfoWindow : UICanvas {
                 (2 + 17*8).toFloat(), Terrarum.HEIGHT - 10f)
         g.drawString("${ccY}Dormant $ccG${Terrarum.ingame.actorContainerInactive.size}",
                 (2 + 28*8).toFloat(), Terrarum.HEIGHT - 10f)
-        g.drawString("${ccM}Particles $ccG${Terrarum.ingame.particlesContainer.elemCount}",
+        g.drawString("${ccM}Particles $ccG${Terrarum.ingame.particlesActive}",
                 (2 + 41*8).toFloat(), Terrarum.HEIGHT - 10f)
     }
 
