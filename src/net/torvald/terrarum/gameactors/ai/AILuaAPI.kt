@@ -60,8 +60,8 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
             t["posX"] = actor.hitbox.centeredX.toLua()
             t["posY"] = actor.hitbox.centeredY.toLua()
 
-            t["veloX"] = actor.veloX.toLua()
-            t["veloY"] = actor.veloY.toLua()
+            t["veloX"] = actor.moveDelta.x.toLua()
+            t["veloY"] = actor.moveDelta.y.toLua()
 
             t["width"] = actor.hitbox.width.toLua()
             t["height"] = actor.hitbox.height.toLua()
