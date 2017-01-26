@@ -14,16 +14,23 @@ class StateFontTester : BasicGameState() {
 
     lateinit var canvas: Graphics
 
-    lateinit var segfont: Font
+    //lateinit var segfont: Font
+
+    lateinit var mtfont: Font
 
     override fun init(gc: GameContainer, game: StateBasedGame) {
         canvas = Graphics(1024, 1024)
 
         Terrarum.gameLocale = "fiFI"
 
-        segfont = SpriteSheetFont(
+        /*segfont = SpriteSheetFont(
                 SpriteSheet("./assets/graphics/fonts/24-seg_red.tga", 22, 31),
                 ' '
+        )*/
+
+        mtfont = SpriteSheetFont(
+                SpriteSheet("./assets/graphics/fonts/mt-32.tga", 12, 16),
+                0.toChar()
         )
     }
 
@@ -50,9 +57,10 @@ class StateFontTester : BasicGameState() {
         }*/
 
         //g.font = Terrarum.fontSmallNumbers
-        g.font = segfont
+        //g.font = segfont
+        g.font = mtfont
 
-        val line = """print("Lua is copyrighted (C) 1994-2013 Lua.org, PUC-Rio")"""
+        val line = "    **** TERRAN BASIC V0.5 ****    "
 
         g.drawString(line, 10f, 10f)
     }

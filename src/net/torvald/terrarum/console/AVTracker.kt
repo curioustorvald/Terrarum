@@ -18,7 +18,7 @@ object AVTracker : ConsoleCommand {
             try {
                 val actorID = args[1].toInt()
 
-                if (Terrarum.ingame.hasActor(actorID)) {
+                if (Terrarum.ingame.theGameHasActor(actorID)) {
                     jPanelInstances.add(ActorValueTracker(Terrarum.ingame.getActorByID(actorID)))
                 }
                 else {

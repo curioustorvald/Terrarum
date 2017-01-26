@@ -4,8 +4,6 @@
 
 package net.torvald.spriteanimation
 
-import net.torvald.terrarum.StateInGame
-import net.torvald.terrarum.Terrarum
 import com.jme3.math.FastMath
 import net.torvald.terrarum.gameactors.ActorWithSprite
 import org.newdawn.slick.Graphics
@@ -214,26 +212,6 @@ class SpriteAnimation(val parentActor: ActorWithSprite, val cellWidth: Int, val 
 
     private fun getScaledSprite(scale: Float): Image {
         val selectedImage = spriteImage!!.getSprite(currentFrame - 1, currentRow - 1)
-        //Image selectedImage = sprites[currentRow - 1][currentFrame - 1];
-
-        // resample
-        /*float nearestResampleScale = (scale > 1) ? Math.round(scale) : 1;
-        float linearResampleScale = scale / nearestResampleScale;
-
-        // scale 1.8 -> resample in 2(nearest), then resample in 0.9(linear)
-        // scale by nearestResampleScale (2, 3, ...)
-        selectedImage.setFilter(Image.FILTER_NEAREST);
-        Image selImgNearestScaled = selectedImage.getScaledCopy(nearestResampleScale);
-        // scale by linearResampleScale (.x)
-        Image selImgLinearScaled;
-        if (scale % 1 > 0) {
-            selImgNearestScaled.setFilter(Image.FILTER_LINEAR);
-            selImgLinearScaled = selImgNearestScaled.getScaledCopy(linearResampleScale);
-            return selImgLinearScaled;
-        }
-        else {
-            return selImgNearestScaled;
-        }*/
         selectedImage.filter = Image.FILTER_NEAREST
         return selectedImage.getScaledCopy(scale)
     }

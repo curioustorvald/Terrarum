@@ -38,7 +38,7 @@ class StateVTTest : BasicGameState() {
 
     override fun update(container: GameContainer, game: StateBasedGame, delta: Int) {
         Terrarum.appgc.setTitle("VT — F: ${container.fps}" +
-                                " — M: ${Terrarum.memInUse}M / ${Terrarum.totalVMMem}M")
+                                " — M: ${Terrarum.memInUse}M / ${Terrarum.memXmx}M")
         vt.update(container, delta)
         computerInside.update(container, delta)
     }

@@ -195,8 +195,10 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             private set
 
         val memInUse: Long
-            get() = ManagementFactory.getMemoryMXBean().heapMemoryUsage.used shr 20
-        val totalVMMem: Long
+            get() = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) shr 20
+        val memTotal: Long
+            get() = Runtime.getRuntime().totalMemory() shr 20
+        val memXmx: Long
             get() = Runtime.getRuntime().maxMemory() shr 20
 
         lateinit var environment: RunningEnvironment
