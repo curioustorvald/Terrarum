@@ -123,3 +123,16 @@ see SAVE_FORMAT.md
 * Works like Ampere in electronics.
     - Health: Regen per time
     - Magic: Out power per time
+
+
+## Civilisation ##
+
+Based on _Millénaire_ Minecraft mod, they have limited resources, have ruler (one of those: town-ruler, country-ruler). Players can either help them or force their way into the head position, or even eliminating them.
+
+Villages can be either independent or part of larger country (_Dwarf Fortress_)
+
+
+## Level of technology ##
+
+Anything goes as long as it does not exceed TL11 of GURPS. Although the universe has the existence of traditional sorcery, the laws of physics of the universe itself is same as we know it. Simply put: NO FUCKING PERPETUAL MOTION AND PERFECT PROPHECY
+
