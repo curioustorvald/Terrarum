@@ -65,7 +65,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
         )
 
     /**
-     * TODO external force? do we need this? we have moveDelta
+     * Elevators/Movingwalks/etc.: edit hitbox manually!
      *
      * Velocity vector for newtonian sim.
      * Acceleration: used in code like:
@@ -506,9 +506,12 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 }
             }
             // axis X
-            if (isTouchingSide(nextHitbox, COLLIDING_LEFT) || isTouchingSide(nextHitbox, COLLIDING_RIGHT)
-                && moveDelta.x != 0.0) { // check right and left
+            if (isTouchingSide(nextHitbox, COLLIDING_LEFT) || isTouchingSide(nextHitbox, COLLIDING_RIGHT)) { // check right and left
                 // the actor is hitting the wall
+
+                // FIXME balls are stuck in this
+                if (referenceID != 321321321)
+                    println("$this trying to reflectX")
                 hitAndReflectX()
             }
         }
