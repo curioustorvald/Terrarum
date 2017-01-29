@@ -5,6 +5,23 @@ import net.torvald.terrarum.ui.ConsoleWindow
 import org.apache.commons.codec.digest.DigestUtils
 
 /**
+ *
+ * Password setting rules:
+ *
+ * For each releases new password should be set. The new password must:
+ *      - start with next alphabet of previous password
+ *          if previous password started with Z, the new password must start with A
+ *      - be a name appear in the Legend of Zelda series which officially released by Nintendo
+ *      - be lowercase
+ *      - BE CRACKABLE (crackstation.net)
+ *
+ * Example passwords would be:
+ *  aryll -> biggoron -> ciela -> ... -> linebeck -> midna -> navi -> ...
+ *
+ * Notes:
+ *      do NOT put plaintext anywhere in the code (except for comments maybe)
+ *      must use SHA-256
+ *
  * Created by minjaesong on 16-02-19.
  */
 internal object Authenticator : ConsoleCommand {
