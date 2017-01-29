@@ -38,9 +38,7 @@ object WorldGenerator {
     private val NOISE_SIMPLEX_ORE_START = 1.42
     private val NOISE_SIMPLEX_ORE_END = 1.28
 
-    private val HILL_WIDTH = 256 // power of two!
-    //private val MAX_HILL_HEIGHT = 100
-    private val TERRAIN_UNDULATION = 250
+    private val TERRAIN_UNDULATION = 200
 
     private val SIMPLEXGEN_LARGEST_FEATURE = 200
 
@@ -109,10 +107,11 @@ object WorldGenerator {
          * Todo: Lakes! Aquifers! Lava chambers!
          * Todo: deserts (variants: SAND_DESERT, SAND_RED)
          * Todo: volcano(es?)
-         * Done: variants of beach (SAND, SAND_BEACH, SAND_BLACK, SAND_GREEN)
+         * TODO: variants of beach (SAND, SAND_BEACH, SAND_BLACK, SAND_GREEN)
          */
 
         val noiseArray = arrayOf(
+                // TODO cave one featured in http://accidentalnoise.sourceforge.net/minecraftworlds.html
                   TaggedJoise("Carving caves", noiseRidged(1.7, 1.4), 1.0, TILE_MACRO_ALL, TILE_MACRO_ALL, Tile.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END)
                 , TaggedJoise("Collapsing caves", noiseBlobs(0.5), 0.3, Tile.AIR, Tile.STONE, Tile.STONE, NoiseFilterUniform)
 //
@@ -269,8 +268,15 @@ object WorldGenerator {
         val noiseMap = Array(HEIGHT, { BitSet(WIDTH) })
 
         // Height = Terrain undulation times 2.
-        val SCALE_X: Double = (TERRAIN_UNDULATION * 0.5).toDouble()
-        val SCALE_Y: Double = (TERRAIN_UNDULATION * 0.25).toDouble()
+        val SCALE_X: Double = TERRAIN_UNDULATION * 1.33
+        val SCALE_Y: Double = TERRAIN_UNDULATION * 1.0
+
+        /* Init */
+
+        val lowlandMagic: Long = 0x44A21A114DBE56 // maria lindberg
+        val highlandMagic: Long = 0x0114E091      // olive oyl
+        val mountainMagic: Long = 0x115AA4DE2504  // lisa anderson
+        val selectionMagic: Long = 0x44E10D9B100  // melody blue
 
         val ground_gradient = ModuleGradient()
         ground_gradient.setGradient(0.0, 0.0, 0.0, 1.0)
@@ -281,19 +287,19 @@ object WorldGenerator {
         lowland_shape_fractal.setType(ModuleFractal.FractalType.FBM)
         lowland_shape_fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
         lowland_shape_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        lowland_shape_fractal.setNumOctaves(4)
-        lowland_shape_fractal.setFrequency(0.6)
-        lowland_shape_fractal.seed = SEED xor random.nextLong()
-        //println(lowland_shape_fractal.seed)
+        lowland_shape_fractal.setNumOctaves(2)
+        lowland_shape_fractal.setFrequency(1.0)
+        lowland_shape_fractal.seed = SEED xor lowlandMagic
 
         val lowland_autocorrect = ModuleAutoCorrect()
-        lowland_autocorrect.setRange(0.0, 1.0)
         lowland_autocorrect.setSource(lowland_shape_fractal)
+        lowland_autocorrect.setLow(0.0)
+        lowland_autocorrect.setHigh(1.0)
 
         val lowland_scale = ModuleScaleOffset()
         lowland_scale.setSource(lowland_autocorrect)
-        lowland_scale.setScale(0.8)
-        lowland_scale.setOffset(-2.75)
+        lowland_scale.setScale(0.2)
+        lowland_scale.setOffset(-0.25)
 
         val lowland_y_scale = ModuleScaleDomain()
         lowland_y_scale.setSource(lowland_scale)
@@ -303,25 +309,26 @@ object WorldGenerator {
         lowland_terrain.setSource(ground_gradient)
         lowland_terrain.setAxisYSource(lowland_y_scale)
 
+
         /* highlands */
 
         val highland_shape_fractal = ModuleFractal()
         highland_shape_fractal.setType(ModuleFractal.FractalType.RIDGEMULTI)
         highland_shape_fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
         highland_shape_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        highland_shape_fractal.setNumOctaves(4)
-        highland_shape_fractal.setFrequency(0.5) // horizontal size. Higher == narrower
-        highland_shape_fractal.seed = SEED xor random.nextLong()
-        //println(highland_shape_fractal.seed)
+        highland_shape_fractal.setNumOctaves(2)
+        highland_shape_fractal.setFrequency(2.0)
+        highland_shape_fractal.seed = SEED xor highlandMagic
 
         val highland_autocorrect = ModuleAutoCorrect()
         highland_autocorrect.setSource(highland_shape_fractal)
-        highland_autocorrect.setRange(0.0, 1.0)
+        highland_autocorrect.setLow(0.0)
+        highland_autocorrect.setHigh(1.0)
 
         val highland_scale = ModuleScaleOffset()
         highland_scale.setSource(highland_autocorrect)
-        highland_scale.setScale(1.4) // vertical size. Higher == taller
-        highland_scale.setOffset(-2.25)
+        highland_scale.setScale(0.45)
+        highland_scale.setOffset(0.0)
 
         val highland_y_scale = ModuleScaleDomain()
         highland_y_scale.setSource(highland_scale)
@@ -331,55 +338,53 @@ object WorldGenerator {
         highland_terrain.setSource(ground_gradient)
         highland_terrain.setAxisYSource(highland_y_scale)
 
+
         /* mountains */
 
         val mountain_shape_fractal = ModuleFractal()
         mountain_shape_fractal.setType(ModuleFractal.FractalType.BILLOW)
         mountain_shape_fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
         mountain_shape_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        mountain_shape_fractal.setNumOctaves(6)
-        mountain_shape_fractal.setFrequency(0.55)
-        mountain_shape_fractal.seed = SEED xor random.nextLong()
-        //println(mountain_shape_fractal.seed)
+        mountain_shape_fractal.setNumOctaves(4)
+        mountain_shape_fractal.setFrequency(1.0)
+        mountain_shape_fractal.seed = SEED xor mountainMagic
 
         val mountain_autocorrect = ModuleAutoCorrect()
         mountain_autocorrect.setSource(mountain_shape_fractal)
-        mountain_autocorrect.setRange(0.0, 1.0)
+        mountain_autocorrect.setLow(0.0)
+        mountain_autocorrect.setHigh(1.0)
 
         val mountain_scale = ModuleScaleOffset()
         mountain_scale.setSource(mountain_autocorrect)
-        mountain_scale.setScale(1.66)
-        mountain_scale.setOffset(-1.25)
+        mountain_scale.setScale(0.75)
+        mountain_scale.setOffset(0.25)
 
         val mountain_y_scale = ModuleScaleDomain()
         mountain_y_scale.setSource(mountain_scale)
-        mountain_y_scale.setScaleY(0.1)
+        mountain_y_scale.setScaleY(0.1) // controls "quirkiness" of the mountain
 
         val mountain_terrain = ModuleTranslateDomain()
         mountain_terrain.setSource(ground_gradient)
         mountain_terrain.setAxisYSource(mountain_y_scale)
 
+
         /* selection */
 
         val terrain_type_fractal = ModuleFractal()
-        terrain_type_fractal.setType(ModuleFractal.FractalType.MULTI)
+        terrain_type_fractal.setType(ModuleFractal.FractalType.FBM)
         terrain_type_fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
         terrain_type_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
-        terrain_type_fractal.setNumOctaves(5)
-        terrain_type_fractal.setFrequency(0.4) // <= 0.33
-        terrain_type_fractal.seed = SEED xor random.nextLong()
-        //println(terrain_type_fractal.seed)
+        terrain_type_fractal.setNumOctaves(3)
+        terrain_type_fractal.setFrequency(0.5)
+        terrain_type_fractal.seed = SEED xor selectionMagic
 
         val terrain_autocorrect = ModuleAutoCorrect()
         terrain_autocorrect.setSource(terrain_type_fractal)
-        terrain_autocorrect.setRange(0.0, 1.0)
-
-        val terrain_type_scale = ModuleScaleDomain()
-        terrain_type_scale.setScaleY(0.33)
-        terrain_type_scale.setSource(terrain_autocorrect)
+        terrain_autocorrect.setLow(0.0)
+        terrain_autocorrect.setHigh(1.0)
 
         val terrain_type_cache = ModuleCache()
-        terrain_type_cache.setSource(terrain_type_scale)
+        terrain_type_cache.setSource(terrain_autocorrect)
 
         val highland_mountain_select = ModuleSelect()
         highland_mountain_select.setLowSource(highland_terrain)
@@ -395,12 +400,12 @@ object WorldGenerator {
         highland_lowland_select.setThreshold(0.25)
         highland_lowland_select.setFalloff(0.15)
 
-
         val ground_select = ModuleSelect()
         ground_select.setLowSource(0.0)
         ground_select.setHighSource(1.0)
         ground_select.setThreshold(0.5)
         ground_select.setControlSource(highland_lowland_select)
+
 
         val joise = Joise(ground_select)
 
@@ -414,17 +419,17 @@ object WorldGenerator {
                                 x / SCALE_X,
                                 y / SCALE_Y
                         ) == 1.0)*/
-                // circular sampling
+                // cylindrical sampling
                 // Mapping function:
                 //      World(x, y) -> Joise(sin x, y, cos x)
                 val sampleTheta = (x.toDouble() / WIDTH) * TWO_PI
                 val sampleOffset = (WIDTH / SCALE_X) / 4.0
                 val sampleX = Math.sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
                 val sampleZ = Math.cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                val sampleY = y / SCALE_Y
-                val map: Boolean = (
-                        joise.get(sampleX, sampleY, sampleZ) == 1.0
-                                   )
+                val sampleY = y / SCALE_Y * 1.5 - 0.6
+                val map: Boolean = joise.get(sampleX, sampleY, sampleZ) == 1.0
+
+                // FIXME joise.get(sampleX, sampleY, sampleZ) returns all zero
                 noiseMap[y + TERRAIN_AVERAGE_HEIGHT - (TERRAIN_UNDULATION / 2)].set(x, map)
             }
         }
