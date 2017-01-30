@@ -133,6 +133,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         //addState(StateNoiseTexGen())
         //addState(StateBlurTest())
         //addState(StateShaderTest())
+        //addState(StateNoiseTester())
 
         ingame = StateInGame()
         addState(ingame)
