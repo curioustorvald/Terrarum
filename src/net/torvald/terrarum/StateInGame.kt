@@ -300,8 +300,9 @@ constructor() : BasicGameState() {
     private fun setAppTitle() {
         Terrarum.appgc.setTitle(
                 Terrarum.NAME +
-                " — F: ${Terrarum.appgc.fps} (${Terrarum.TARGET_INTERNAL_FPS})")
-                //" — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M")
+                " — F: ${Terrarum.appgc.fps} (${Terrarum.TARGET_INTERNAL_FPS})" +
+                " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
+        )
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, gwin: Graphics) {
