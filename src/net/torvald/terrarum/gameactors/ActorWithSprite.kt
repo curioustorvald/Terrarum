@@ -460,18 +460,18 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
              * weight; gravitational force in action
              * W = mass * G (9.8 [m/s^2])
              */
-            val W: Vector2 = gravitation * mass
+            val W: Vector2 = gravitation * Terrarum.TARGET_FPS.toDouble()
             /**
              * Area
              */
-            val A: Double = scale * scale
+            val A: Double = (scale * baseHitboxW / METER) * (scale * baseHitboxW / METER)
             /**
              * Drag of atmosphere
              * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity sqr) * A (area)
              */
             val D: Vector2 = Vector2(moveDelta.x.magnSqr(), moveDelta.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
 
-            val V: Vector2 = (W - D) / mass * SI_TO_GAME_ACC
+            val V: Vector2 = (W - D) / Terrarum.TARGET_FPS.toDouble() * SI_TO_GAME_ACC
 
             applyForce(V)
         }
