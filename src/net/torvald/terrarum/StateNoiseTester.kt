@@ -197,8 +197,11 @@ class StateNoiseTester : BasicGameState() {
     }
 
     override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
-        Terrarum.appgc.setTitle("${Terrarum.NAME} — F: ${Terrarum.appgc.fps}"
-        + " — M: ${Terrarum.memInUse}M / ${Terrarum.totalVMMem}M")
+        Terrarum.appgc.setTitle(
+                Terrarum.NAME +
+                " — F: ${Terrarum.appgc.fps} (${Terrarum.TARGET_INTERNAL_FPS})" +
+                " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
+        )
 
 
         if (ThreadParallel.allFinished()) generating = false
