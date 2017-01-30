@@ -42,6 +42,7 @@ object CommandDict {
             Pair("avtracker", AVTracker),
             Pair("actorslist", ActorsList),
             Pair("setscale", SetScale),
+            Pair("kill", KillActor),
 
             // Test codes
             Pair("bulletintest", SetBulletin),
