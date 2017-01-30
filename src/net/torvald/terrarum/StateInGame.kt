@@ -194,7 +194,7 @@ constructor() : BasicGameState() {
             ///////////////////////////
             TilePropUtil.dynamicLumFuncTickClock()
             world.updateWorldTime(delta)
-            WorldSimulator(player, delta)
+            //WorldSimulator(player, delta)
             WeatherMixer.update(gc, delta)
             TileStats.update()
             if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
@@ -300,8 +300,8 @@ constructor() : BasicGameState() {
     private fun setAppTitle() {
         Terrarum.appgc.setTitle(
                 Terrarum.NAME +
-                " — F: ${Terrarum.appgc.fps} (${Terrarum.TARGET_INTERNAL_FPS})" +
-                " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M")
+                " — F: ${Terrarum.appgc.fps} (${Terrarum.TARGET_INTERNAL_FPS})")
+                //" — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M")
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, gwin: Graphics) {
@@ -405,12 +405,12 @@ constructor() : BasicGameState() {
                     // velocity
                     worldG.color = GameFontBase.codeToCol["g"]
                     worldG.drawString(
-                            "${0x7F.toChar()}X ${actor.velocity.x}", // doesn't work for NPCs/Player
+                            "${0x7F.toChar()}X ${actor.moveDelta.x}",
                             actor.hitbox.posX.toFloat(),
                             actor.hitbox.pointedY.toFloat() + 4 + 8
                     )
                     worldG.drawString(
-                            "${0x7F.toChar()}Y ${actor.velocity.y}",
+                            "${0x7F.toChar()}Y ${actor.moveDelta.y}",
                             actor.hitbox.posX.toFloat(),
                             actor.hitbox.pointedY.toFloat() + 4 + 8 * 2
                     )

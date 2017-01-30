@@ -3,7 +3,8 @@
 ### Looms for custom pattern ###
 
 - Players can create their own décors (hang on wall), dresses.
-- Two looms (216 colour mode, 4096 colour mode)
+- Two looms (16 palette mode, 64 palette mode)
+- __IMPLEMENTED__ — see net.torvald.terrarum.gameactors.DecodeTapestry
 
 
 ### Music making ###
@@ -25,13 +26,13 @@ Connect two or more tracker head to play the array of trackers play simultaneous
 
         <actorid>.json
         {
-            notes = [arr<int>, fixed size of 48],
+            notes = [arr<key: Int>(64)], // 64 notes per track
             speed = 120
         }
         
-        *int: (0-63) number of the note pitch that is struck. 32: Middle C (C3). 
-        'A' just above of Middle C (A3) has base pitch of 440 Hz.
-        *speed: in BPM
+    - key: C1-D6 (63 keys)  
+    - speed: in BPM  
+    - tuning: A440
         
         
 ## Aimhack ##

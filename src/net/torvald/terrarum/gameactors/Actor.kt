@@ -39,7 +39,7 @@ abstract class Actor(val renderOrder: ActorOrder) : Comparable<Actor>, Runnable 
      * override var referenceID: Int = generateUniqueReferenceID()
      */
     fun generateUniqueReferenceID(): Int {
-        fun itIsNotValid(value: Int) =
+        fun checkForCollision(value: Int) =
                 Terrarum.ingame.theGameHasActor(value) ||
                 value < ItemCodex.ITEM_COUNT_MAX ||
                 value < when (renderOrder) {
@@ -58,7 +58,7 @@ abstract class Actor(val renderOrder: ActorOrder) : Comparable<Actor>, Runnable 
         var ret: Int
         do {
             ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
-        } while (itIsNotValid(ret)) // check for collision
+        } while (checkForCollision(ret)) // check for collision
         return ret
     }
 
