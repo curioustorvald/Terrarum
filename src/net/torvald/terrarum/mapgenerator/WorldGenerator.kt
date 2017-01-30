@@ -49,8 +49,8 @@ object WorldGenerator {
     private var GLACIER_MOUNTAIN_WIDTH = 900
     private val GLACIER_MOUNTAIN_HEIGHT = 300
 
-    private val CAVEGEN_THRE_START = 0.95
-    private val CAVEGEN_THRE_END = 0.67
+    private val CAVEGEN_THRE_START = 0.4
+    private val CAVEGEN_THRE_END = 0.1
 
 
     private var worldOceanPosition: Int = -1
@@ -108,12 +108,17 @@ object WorldGenerator {
          * Todo: deserts (variants: SAND_DESERT, SAND_RED)
          * Todo: volcano(es?)
          * TODO: variants of beach (SAND, SAND_BEACH, SAND_BLACK, SAND_GREEN)
+         *
+         *
+         * Hark! We use cylindrical sampling
+         *
+         * x, z: X-axis sampling
+         * y:    Y-axis sampling
          */
-
         val noiseArray = arrayOf(
                 // TODO cave one featured in http://accidentalnoise.sourceforge.net/minecraftworlds.html
-                  TaggedJoise("Carving caves", noiseRidged(1.7, 1.4), 1.0, TILE_MACRO_ALL, TILE_MACRO_ALL, Tile.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END)
-                , TaggedJoise("Collapsing caves", noiseBlobs(0.5), 0.3, Tile.AIR, Tile.STONE, Tile.STONE, NoiseFilterUniform)
+                  TaggedJoise("Carving caves", noiseCave(), 1.0, TILE_MACRO_ALL, TILE_MACRO_ALL, Tile.AIR, NoiseFilterSqrt, CAVEGEN_THRE_START, CAVEGEN_THRE_END)
+//                , TaggedJoise("Collapsing caves", noiseBlobs(0.5), 0.3, Tile.AIR, Tile.STONE, Tile.STONE, NoiseFilterUniform)
 //
                 //, TaggedJoise("Putting stone patches on the ground", noiseBlobs(0.8), 1.02f, intArrayOf(Tile.DIRT, Tile.GRASS), Tile.DIRT, Tile.STONE, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
                 //, TaggedJoise("Placing dirt spots in the cave", noiseBlobs(0.5), 0.98f, Tile.STONE, Tile.STONE, Tile.DIRT, NoiseFilterQuadratic, NOISE_GRAD_END, NOISE_GRAD_START)
@@ -178,19 +183,69 @@ object WorldGenerator {
 
         val ridged_scale = ModuleScaleDomain()
         ridged_scale.setScaleX(xStretch.toDouble())
-        ridged_scale.setScaleY(yStretch.toDouble())
+        ridged_scale.setScaleY(xStretch.toDouble())
+        ridged_scale.setScaleZ(yStretch.toDouble())
         ridged_scale.setSource(ridged_autocorrect)
 
         return Joise(ridged_scale)
     }
 
+    private fun noiseCave(): Joise {
+        val caveMagic: Long = 0x00215741CDF // Urist McDF
+        val cavePerturbMagic: Long = 0xA2410C // Armok
+        val arbitraryScale = 4.0
+
+
+        val cave_shape = ModuleFractal()
+        cave_shape.setType(ModuleFractal.FractalType.RIDGEMULTI)
+        cave_shape.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+        cave_shape.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        cave_shape.setNumOctaves(1)
+        cave_shape.setFrequency(4.0)
+        cave_shape.seed = SEED xor caveMagic
+
+        val cave_select = ModuleSelect()
+        cave_select.setLowSource(1.0)
+        cave_select.setHighSource(0.0)
+        cave_select.setControlSource(cave_shape)
+        cave_select.setThreshold(0.8)
+        cave_select.setFalloff(0.0)
+
+        val cave_perturb_fractal = ModuleFractal()
+        cave_perturb_fractal.setType(ModuleFractal.FractalType.FBM)
+        cave_perturb_fractal.setAllSourceBasisTypes(ModuleBasisFunction.BasisType.GRADIENT)
+        cave_perturb_fractal.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
+        cave_perturb_fractal.setNumOctaves(6)
+        cave_perturb_fractal.setFrequency(3.0)
+        cave_perturb_fractal.seed = SEED xor cavePerturbMagic
+
+        val cave_perturb_scale = ModuleScaleOffset()
+        cave_perturb_scale.setSource(cave_perturb_fractal)
+        cave_perturb_scale.setScale(0.5)
+        cave_perturb_scale.setOffset(0.0)
+
+        val cave_perturb = ModuleTranslateDomain()
+        cave_perturb.setSource(cave_perturb_fractal)
+        cave_perturb.setAxisXSource(cave_perturb_scale)
+
+        val cave_scale = ModuleScaleDomain()
+        cave_scale.setScaleX(1.0 / arbitraryScale)
+        cave_scale.setScaleZ(1.0 / arbitraryScale)
+        cave_scale.setScaleY(1.0 / arbitraryScale)
+        cave_scale.setSource(cave_perturb)
+
+        return Joise(cave_scale)
+    }
+
     private fun noiseBlobs(frequency: Double): Joise {
+        val ridgedMagic: Long = 0x4114EC2AF7 // minecraft
+
         val ridged = ModuleFractal()
         ridged.setType(ModuleFractal.FractalType.FBM)
         ridged.setAllSourceInterpolationTypes(ModuleBasisFunction.InterpolationType.QUINTIC)
         ridged.setNumOctaves(2)
         ridged.setFrequency(frequency)
-        ridged.seed = Random().nextLong()
+        ridged.seed = SEED xor ridgedMagic
 
         val brownian_select = ModuleSelect()
         brownian_select.setControlSource(ridged)
@@ -273,10 +328,10 @@ object WorldGenerator {
 
         /* Init */
 
-        val lowlandMagic: Long = 0x44A21A114DBE56 // maria lindberg
-        val highlandMagic: Long = 0x0114E091      // olive oyl
-        val mountainMagic: Long = 0x115AA4DE2504  // lisa anderson
-        val selectionMagic: Long = 0x44E10D9B100  // melody blue
+        val lowlandMagic: Long = 0x41A21A114DBE56 // Maria Lindberg
+        val highlandMagic: Long = 0x0114E091      // Olive Oyl
+        val mountainMagic: Long = 0x115AA4DE2504  // Lisa Anderson
+        val selectionMagic: Long = 0x41E10D9B100  // Melody Blue
 
         val ground_gradient = ModuleGradient()
         ground_gradient.setGradient(0.0, 0.0, 0.0, 1.0)
