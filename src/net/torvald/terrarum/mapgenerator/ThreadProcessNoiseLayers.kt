@@ -24,8 +24,8 @@ class ThreadProcessNoiseLayers(val startIndex: Int, val endIndex: Int,
                     val sampleTheta = (x.toDouble() / WorldGenerator.WIDTH) * WorldGenerator.TWO_PI
                     val sampleOffset = (WorldGenerator.WIDTH / sampleDensity) / 8.0
                     val sampleX = Math.sin(sampleTheta) * sampleOffset + sampleOffset // plus sampleOffset to make only
-                    val sampleY = Math.cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
-                    val sampleZ = y / sampleDensity
+                    val sampleZ = Math.cos(sampleTheta) * sampleOffset + sampleOffset // positive points are to be sampled
+                    val sampleY = y / sampleDensity
                     val noise: Double = record.noiseModule.get(sampleX, sampleY, sampleZ)
 
                     val fromTerr = record.replaceFromTerrain
