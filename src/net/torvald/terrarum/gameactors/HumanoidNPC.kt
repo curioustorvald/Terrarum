@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.ai.AILuaAPI
 import net.torvald.terrarum.gameactors.ai.ActorAI
+import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
 import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
 import org.luaj.vm2.*
@@ -25,6 +26,10 @@ open class HumanoidNPC(
         override val ai: ActorAI, // it's there for written-in-Kotlin, "hard-wired" AIs
         born: GameDate
 ) : ActorHumanoid(born), AIControlled, CanBeAnItem {
+
+    constructor(luaAi: LuaAIWrapper, born: GameDate) : this(luaAi as ActorAI, born) {
+        luaAi.attachActor(this)
+    }
 
     companion object {
         val DEFAULT_COLLISION_TYPE = ActorWithSprite.COLLISION_DYNAMIC
