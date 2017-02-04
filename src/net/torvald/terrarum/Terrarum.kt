@@ -127,7 +127,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         //addState(StateVTTest())
         //addState(StateTestingLightning())
-        //addState(StateSplash())
+        addState(StateSplash())
         //addState(StateMonitorCheck())
         //addState(StateFontTester())
         //addState(StateNoiseTexGen())
