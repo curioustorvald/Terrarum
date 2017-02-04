@@ -38,9 +38,9 @@ object ItemCodex {
         for (i in 0..ITEM_TILE_MAX) {
             itemCodex[i] = object : InventoryItem() {
                 override val id: Int = i
-                override val equipPosition = EquipPosition.HAND_GRIP
-                override var mass: Double = TileCodex[i].density / 1000.0
+                override var baseMass: Double = TileCodex[i].density / 1000.0
                 override var scale: Double = 1.0 // no need to set setter as scale would not change
+                override var baseToolSize: Double? = null
 
                 override fun primaryUse(gc: GameContainer, delta: Int) {
                     // TODO base punch attack

@@ -510,8 +510,8 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 // the actor is hitting the wall
 
                 // FIXME balls are stuck in this
-                if (referenceID != 321321321)
-                    println("$this trying to reflectX")
+                //if (referenceID != 321321321)
+                //    println("$this trying to reflectX")
                 hitAndReflectX()
             }
         }
@@ -548,29 +548,37 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
     }
 
     private fun hitAndReflectX() {
-        if ((externalForce.x * elasticity).abs() >= MINIMUM_BOUNCE_THRESHOLD) { // > Epsilon.E) {
-            externalForce.x *= -elasticity
-            if (this is Controllable) walkX *= -elasticity
-        }
-        else {
-            externalForce.x = 0.0
-            if (this is Controllable) walkX = 0.0
-        }
+        // when it sticks, externalForce.x goes back and forth
+        /*
+1123921356 trying to reflectX
+1123921356	-1.3677473305837262
+1123921356 trying to reflectX
+1123921356	0.8150659571934893
+1123921356 trying to reflectX
+1123921356	-0.48545419966417575
+1123921356 trying to reflectX
+1123921356	0.28939570979162116
+1123921356 trying to reflectX
+1123921356	-0.17225986626214265
+1123921356 trying to reflectX
+1123921356	0.1027945259506898
+1123921356 trying to reflectX
+1123921356	-0.06108288092971576
+         */
+
+        externalForce.x *= -elasticity
+        if (this is Controllable) walkX *= -elasticity
+
+        println("$this\t${externalForce.x}")
     }
 
     private fun hitAndReflectY() {
-        if (externalForce.y.abs() >= MINIMUM_BOUNCE_THRESHOLD) { //> Epsilon.E) {
-            externalForce.y *= -elasticity
-            if (this is Controllable) walkY *= -elasticity
-        }
-        else {
-            externalForce.y = 0.0
-            if (this is Controllable) walkY *= 0.0
-        }
+        externalForce.y *= -elasticity
+        if (this is Controllable) walkY *= -elasticity
     }
 
     @Transient private val CEILING_HIT_ELASTICITY = 0.3
-    @Transient private val MINIMUM_BOUNCE_THRESHOLD = 0.1
+    @Transient private val MINIMUM_BOUNCE_THRESHOLD = 1.0
 
     /**
      * prevents sticking to the ceiling
