@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.ai.AILuaAPI
+import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
 import org.luaj.vm2.*
@@ -16,19 +17,14 @@ import java.io.InputStreamReader
 import java.io.Reader
 
 /**
+ * @param ai AI class. Use LuaAIWrapper for Lua script
+ *
  * Created by minjaesong on 16-01-31.
  */
-open class HumanoidNPC(override val scriptPath: String, born: GameDate) : ActorHumanoid(born), AIControlled, CanBeAnItem {
-
-    protected val luag: Globals = JsePlatform.standardGlobals()
-
-    /**
-     * Initialised in init block.
-     * Use lua function "update(delta)" to step the AI.
-     */
-    protected val luaInstance: LuaValue
-
-    private val aiLuaAPI: AILuaAPI
+open class HumanoidNPC(
+        override val ai: ActorAI, // it's there for written-in-Kotlin, "hard-wired" AIs
+        born: GameDate
+) : ActorHumanoid(born), AIControlled, CanBeAnItem {
 
     companion object {
         val DEFAULT_COLLISION_TYPE = ActorWithSprite.COLLISION_DYNAMIC
@@ -36,28 +32,16 @@ open class HumanoidNPC(override val scriptPath: String, born: GameDate) : ActorH
 
     init {
         collisionType = DEFAULT_COLLISION_TYPE
-
-        luag["io"] = LuaValue.NIL
-        luag["os"] = LuaValue.NIL
-        luag["luajava"] = LuaValue.NIL
-        aiLuaAPI = AILuaAPI(luag, this)
-        // load the script and execute it (initialises target script)
-        val inputStream = javaClass.getResourceAsStream(scriptPath)
-        luaInstance = luag.load(InputStreamReader(inputStream), scriptPath.split(Regex("[\\/]")).last())
-        luaInstance.call()
     }
 
     // we're having InventoryItem data so that this class could be somewhat universal
     override var itemData: InventoryItem = object : InventoryItem() {
         override var id = referenceID
-        override val equipPosition: Int = EquipPosition.HAND_GRIP
 
-        override var mass: Double
+        override var baseMass: Double
             get() = actorValue.getAsDouble(AVKey.BASEMASS)!!
-            set(value) {
-                actorValue[AVKey.BASEMASS] = value
-            }
-
+            set(value) { actorValue[AVKey.BASEMASS] = value }
+        override var baseToolSize: Double? = 0.0
         override var scale: Double
             get() = actorValue.getAsDouble(AVKey.SCALE)!!
             set(value) {
@@ -85,9 +69,7 @@ open class HumanoidNPC(override val scriptPath: String, born: GameDate) : ActorH
 
     override fun update(gc: GameContainer, delta: Int) {
         super.update(gc, delta)
-
-        // run "update()" function in the script
-        luag.get("update").call(delta.toLuaValue())
+        ai.update(delta)
     }
 
     override fun moveLeft(amount: Float) { // hit the buttons on the controller box
@@ -121,65 +103,4 @@ open class HumanoidNPC(override val scriptPath: String, born: GameDate) : ActorH
         // if your NPC should fly, override this
         throw UnsupportedOperationException("Humans cannot fly :p")
     }
-
-    var currentExecutionThread = Thread()
-    var threadRun = false
-
-    fun runCommand(reader: Reader, filename: String) {
-        if (!threadRun && !flagDespawn) {
-            currentExecutionThread = Thread(ThreadRunCommand(luag, reader, filename))
-            currentExecutionThread.start()
-            threadRun = true
-        }
-    }
-
-    fun runCommand(script: String) {
-        if (!threadRun && !flagDespawn) {
-            currentExecutionThread = Thread(ThreadRunCommand(luag, script, ""))
-            currentExecutionThread.start()
-            threadRun = true
-        }
-    }
-
-    class ThreadRunCommand : Runnable {
-
-        val mode: Int
-        val arg1: Any
-        val arg2: String
-        val lua: Globals
-
-        constructor(luaInstance: Globals, line: String, env: String) {
-            mode = 0
-            arg1 = line
-            arg2 = env
-            lua = luaInstance
-        }
-
-        constructor(luaInstance: Globals, reader: Reader, filename: String) {
-            mode = 1
-            arg1 = reader
-            arg2 = filename
-            lua = luaInstance
-        }
-
-        override fun run() {
-            try {
-                val chunk: LuaValue
-                if (mode == 0)
-                    chunk = lua.load(arg1 as String, arg2)
-                else if (mode == 1)
-                    chunk = lua.load(arg1 as Reader, arg2)
-                else
-                    throw IllegalArgumentException("Unsupported mode: $mode")
-
-
-                chunk.call()
-            }
-            catch (e: LuaError) {
-                e.printStackTrace(System.err)
-            }
-        }
-    }
-
-    fun Int.toLuaValue(): LuaValue = LuaInteger.valueOf(this)
 }
