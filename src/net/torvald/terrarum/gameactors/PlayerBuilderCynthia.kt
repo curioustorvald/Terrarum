@@ -16,7 +16,6 @@ object PlayerBuilderCynthia {
                 LuaAIWrapper("/net/torvald/terrarum/gameactors/ai/scripts/PokemonNPCAI.lua"),
                 GameDate(100, 143)) // random value thrown
         InjectCreatureRaw(p.actorValue, "CreatureHuman.json")
-        (p.ai as LuaAIWrapper).attachActor(p)
 
 
         p.actorValue[AVKey.__PLAYER_QUICKBARSEL] = 0
