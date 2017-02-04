@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameitem
 
+import net.torvald.terrarum.itemproperties.Material
 import org.newdawn.slick.GameContainer
 
 /**
@@ -15,16 +16,38 @@ abstract class InventoryItem {
      */
     abstract val id: Int
 
+    abstract var baseMass: Double
+
+    abstract var baseToolSize: Double?
+
     /**
      * Where to equip the item
      */
-    abstract val equipPosition: Int
+    var equipPosition: Int = EquipPosition.NULL
+
+    var material: Material? = null
 
     /**
-     * Base mass of the item. Real mass must be calculated from
-     *      mass * scale^3
+     * Apparent mass of the item. (basemass * scale^3)
      */
-    abstract var mass: Double
+    open var mass: Double
+        get() = baseMass * scale * scale * scale
+        set(value) { baseMass = value / (scale * scale * scale) }
+
+    /**
+     * Apparent tool size (or weight in kg). (baseToolSize  * scale^3)
+     */
+    open var toolSize: Double?
+        get() = if (baseToolSize != null) baseToolSize!! * scale * scale * scale else null
+        set(value) {
+            if (value != null)
+                if (baseToolSize != null)
+                    baseToolSize = value / (scale * scale * scale)
+                else
+                    throw NullPointerException("baseToolSize is null; this item is not a tool or you're doing it wrong")
+            else
+                throw NullPointerException("null input; nullify baseToolSize instead :p")
+        }
 
     /**
      * Scale of the item.

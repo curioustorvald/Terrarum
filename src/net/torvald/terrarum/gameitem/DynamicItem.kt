@@ -12,7 +12,7 @@ import org.newdawn.slick.GameContainer
  *
  * Created by minjaesong on 16-09-08.
  */
-open class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: Double? = null)
+open abstract class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: Double? = null)
     : InventoryItem() {
 
     /**
@@ -23,13 +23,6 @@ open class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: 
      * >= 16777216: Actor RefID
      */
     override val id: Int = generateUniqueDynamicItemID()
-
-    override val equipPosition: Int = // default to HAND_GRIP if no baseItemID given
-            if (baseItemID != null)
-                ItemCodex[baseItemID].equipPosition
-            else
-                EquipPosition.HAND_GRIP
-
 
     private fun generateUniqueDynamicItemID(): Int {
         var ret: Int

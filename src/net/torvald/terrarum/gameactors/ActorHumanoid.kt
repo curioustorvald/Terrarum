@@ -134,9 +134,9 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     private val nullItem = object : InventoryItem() {
         override val id: Int = 0
-        override val equipPosition: Int = EquipPosition.NULL
-        override var mass: Double = 0.0
         override var scale: Double = 1.0
+        override var baseMass: Double = 0.0
+        override var baseToolSize: Double? = null
     }
 
     override fun update(gc: GameContainer, delta: Int) {
