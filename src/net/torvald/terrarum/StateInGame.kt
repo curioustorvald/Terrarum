@@ -43,8 +43,7 @@ import java.util.concurrent.locks.ReentrantLock
 /**
  * Created by minjaesong on 15-12-30.
  */
-class StateInGame @Throws(SlickException::class)
-constructor() : BasicGameState() {
+class StateInGame : BasicGameState() {
     private val ACTOR_UPDATE_RANGE = 4096
 
     internal var game_mode = 0
