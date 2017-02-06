@@ -1,0 +1,22 @@
+Savegame metadata
+
+* Endianness: big
+* Filename: 'world'
+* Remarks: GZipped
+
+Ord  Hex  Description
+00   54   T
+01   45   E
+02   4D   S
+03   44   V
+
+04        Name of the world in UTF-8
+...  00   String terminator
+
+...       Terrain seed (8 bytes)
+...       Randomiser seed (8 bytes)
+
+...       SHA-256 hash of worldinfo1 when not compressed (32 bytes)
+...       SHA-256 hash of worldinfo2 when not compressed (32 bytes)
+...       SHA-256 hash of worldinfo3 when not compressed (32 bytes)
+...       SHA-256 hash of worldinfo4 when not compressed (32 bytes)
