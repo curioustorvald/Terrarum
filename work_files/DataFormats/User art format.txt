@@ -1,0 +1,42 @@
+Terrarum User Art format
+
+* Endianness: big
+
+* Palette colour is encoded as 0b0000RRRR 0bGGGGBBBB (yep, four bits are wasted)
+
+Ord  Hex  Description
+00   54   T
+01   45   E
+02   41   A
+03   46   F
+
+04        Colour model
+     00   Invalid
+     01   16 Colours
+     02   64 Colours
+     08   User-defined palette
+
+05        Number of swatches
+     00 - No palette mode (using defined palette)
+        - 256 colours (using user-defined)
+     nn - Colour count (1-255)
+
+06        Width of the image (MSB)
+07        Width of the image (LSB)
+
+08        Name of the art in UTF-8
+...  00   String terminator
+
+...       Name of the author in UTF-8
+...  00   String terminator
+
+...       Palette colour 0, if any (MSB)
+...       Palette colour 0, if any (LSB)
+...       Palette colour 1, if any (MSB)
+...       Palette colour 1, if any (LSB)
+...       Palette colour 2, if any (MSB)
+...       Palette colour 2, if any (LSB)
+
+...       Colour indices
+
+<EOF>

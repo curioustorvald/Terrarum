@@ -1,0 +1,47 @@
+Terrarum Game Map Format
+
+* Endianness: big
+
+Ord  Hex  Description
+00   54   T
+01   45   E
+02   4D   M
+03   44   D
+
+04   01   Number of bits per tile divided by 8, only 1 is supported
+
+05        Number of layers
+
+06   00   Reserved
+07   00   Reserved
+
+08        World width
+09        World width
+0A        World width
+0B        World width
+
+0C        World height
+0D        World height
+0E        World height
+0F        World height
+
+10        Default spawn coord X
+11        Default spawn coord X
+12        Default spawn coord X
+13        Default spawn coord X
+
+14        Default spawn coord Y
+15        Default spawn coord Y
+16        Default spawn coord Y
+17        Default spawn coord Y
+
+18        Terrain tiles data (MSB)
+
+...       Wall tiles data (MSB)
+
+...       Tiles data (LSB)
+     0bAAAABBBB - A: Terrain, B: Wall (0-15)
+
+...       Wire tiles data (0-255)
+
+<EOF>
