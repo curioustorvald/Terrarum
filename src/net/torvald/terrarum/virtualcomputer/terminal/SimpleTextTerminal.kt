@@ -3,6 +3,7 @@ package net.torvald.terrarum.virtualcomputer.terminal
 import net.torvald.aa.AAFrame
 import net.torvald.aa.ColouredFastFont
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameactors.DecodeTapestry
 import net.torvald.terrarum.gameactors.abs
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
@@ -15,7 +16,7 @@ import java.nio.ByteBuffer
 import java.util.*
 
 /**
- * Default text terminal, four text colours (black, grey, lgrey, white).
+ * Default text terminal.
  *
  * Created by minjaesong on 16-09-07.
  */
@@ -30,36 +31,7 @@ open class SimpleTextTerminal(
      * Terminals must support AT LEAST 4 colours.
      * Color index 0 must be default background, index 3 must be default foreground
      */
-    open protected val colours = if (colour)
-        // TODO colours updated; also update the documentation
-        arrayOf(
-                Color(0x000000), // 0 black
-                Color(0xffffff), // 1 white
-                Color(0x666666), // 2 dim grey
-                Color(0xcccccc), // 3 bright grey
-
-                Color(0xffee00), // 4 yellow
-                Color(0xee6600), // 5 orange
-                Color(0xee0000), // 6 red
-                Color(0xee22aa), // 7 magenta
-
-                Color(0x442277), // 8 purple
-                Color(0x3322ff), // 9 blue
-                Color(0x44aaff), //10 cyan
-                Color(0x55ff00), //11 lime
-
-                Color(0x339900), //12 green
-                Color(0x335533), //13 dark green
-                Color(0x553333), //14 brown
-                Color(0xaa6633)  //15 tan
-        )                        // THESE ARE THE STANDARD
-    else
-        arrayOf(
-                Color(0x000000), // 0 black
-                Color(0xffffff), // 1 white
-                Color(0x666666), // 2 dim grey
-                Color(0xcccccc)  // 3 bright grey
-        )                        // THESE ARE THE STANDARD
+    open protected val colours = if (colour) CLUT else CLUT.copyOfRange(0, 3)
 
     val phosphor = if (colour) WHITE7500 else phosphorColour
     open val colourScreen = if (colour) Color(8, 8, 8) else Color(19, 19, 19)
@@ -460,6 +432,8 @@ open class SimpleTextTerminal(
                 ASCII_DC4,
                 ASCII_DLE
         )
+
+        val CLUT = DecodeTapestry.colourIndices16
     }
 }
 

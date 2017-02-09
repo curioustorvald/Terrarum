@@ -18,7 +18,7 @@ object FeaturesDrawer {
     private val ENV_COLTEMP_LOWEST = 5500
     private val ENV_COLTEMP_HIGHEST = 7500
 
-    val ENV_COLTEMP_NOON = 6500 // 6500 == sRGB White == untouched!
+    val ENV_COLTEMP_NOON = 6500 // 6500 == sRGB White; do not touch!
 
     var colTemp: Int = 0
         private set
@@ -39,6 +39,10 @@ object FeaturesDrawer {
     fun render(gc: GameContainer, g: Graphics) {
     }
 
+    /**
+     * A colour filter used to provide effect that makes whole screen look warmer/cooler,
+     * usually targeted for the environmental temperature (desert/winterland), hence the name.
+     */
     fun drawEnvOverlay(g: Graphics) {
         val onscreen_tiles_max = FastMath.ceil(Terrarum.HEIGHT * Terrarum.WIDTH / FastMath.sqr(TILE_SIZE.toFloat())) * 2
         val onscreen_tiles_cap = onscreen_tiles_max / 4f
@@ -53,7 +57,6 @@ object FeaturesDrawer {
         blendMul()
 
         g.color = ColourTemp(colTemp)
-        //g.color = getColourFromMap(3022)
         g.fillRect(
                 MapCamera.x * zoom,
                 MapCamera.y * zoom,
