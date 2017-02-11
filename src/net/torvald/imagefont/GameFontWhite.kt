@@ -39,9 +39,7 @@ class GameFontWhite : GameFontBase() {
         GameFontBase.wenQuanYi_2 = SpriteSheet(
                 "./assets/graphics/fonts/wenquanyi_11pt_part2.tga", 16, 18, 2)
         GameFontBase.greekSheet = SpriteSheet(
-                "./assets/graphics/fonts/greek_fullwidth.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
-        GameFontBase.greekSheetEF = SpriteSheet(
-                "./assets/graphics/fonts/greek_ef.tga", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
+                "./assets/graphics/fonts/greek_variable.tga", 15, 19, 1)
         GameFontBase.romanianSheet = SpriteSheet(
                 "./assets/graphics/fonts/romana_fullwidth.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.romanianSheetEF = SpriteSheet(
@@ -65,7 +63,6 @@ class GameFontWhite : GameFontBase() {
                 GameFontBase.wenQuanYi_1,
                 GameFontBase.wenQuanYi_2,
                 GameFontBase.greekSheet,
-                GameFontBase.greekSheetEF,
                 GameFontBase.romanianSheet,
                 GameFontBase.romanianSheetEF,
                 GameFontBase.thaiSheet,
@@ -75,8 +72,9 @@ class GameFontWhite : GameFontBase() {
         GameFontBase.sheetKey = shk
 
 
-        buildAsciiWidthTable()
-        buildLatinExtAWidthTable()
-        buildCyrillicWidthTable()
+        buildWidthTable(asciiSheet, 0, 0..0xFF)
+        buildWidthTable(extASheet, 0x100, 0..0x7F)
+        buildWidthTable(cyrilic, 0x400, 0..0x5F)
+        buildWidthTable(greekSheet, 0x370, 0..0x5F)
     }
 }

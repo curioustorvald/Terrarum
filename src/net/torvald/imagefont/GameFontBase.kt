@@ -112,9 +112,6 @@ open class GameFontBase : Font {
     private fun greekIndexX(c: Char) = (c.toInt() - 0x370) % 16
     private fun greekIndexY(c: Char) = (c.toInt() - 0x370) / 16
 
-    private fun greekEFIndexX(c: Char) = greekEFList.indexOf(c) % 16
-    private fun greekEFIndexY(c: Char) = greekEFList.indexOf(c) / 16
-
     private fun romanianIndexX(c: Char) = c.toInt() - 0x218
     private fun romanianIndexY(c: Char) = 0
 
@@ -128,7 +125,6 @@ open class GameFontBase : Font {
     private fun keycapIndexY(c: Char) = (c.toInt() - 0xE000) / 16
 
     private val narrowWidthSheets = arrayOf(
-            SHEET_GREEK_EF,
             SHEET_EXTB_ROMANIAN_EF
     )
     private val unihanWidthSheets = arrayOf(
@@ -140,6 +136,12 @@ open class GameFontBase : Font {
     private val zeroWidthSheets = arrayOf(
             SHEET_COLOURCODE
     )
+    private val variableWidthSheets = arrayOf(
+            SHEET_ASCII_VARW,
+            SHEET_CYRILIC_VARW,
+            SHEET_EXTA_VARW,
+            SHEET_GREEK_VARW
+    )
 
 
     override fun getWidth(s: String) = getWidthSubstr(s, s.length)
@@ -150,14 +152,17 @@ open class GameFontBase : Font {
             val chr = s[i]
             val ctype = getSheetType(s[i])
 
-            if (chr.toInt() == 0x21B) // HAX!
+            if (chr.toInt() == 0x21B) // Romanian t; HAX!
                 len += 6
-            else if (
-                    ctype == SHEET_ASCII_VARW ||
-                    ctype == SHEET_EXTA_VARW ||
-                    ctype == SHEET_CYRILIC_VARW
-            )
-                len += asciiWidths[chr.toInt()]!!
+            else if (variableWidthSheets.contains(ctype)) {
+                try {
+                    len += asciiWidths[chr.toInt()]!!
+                }
+                catch (e: kotlin.KotlinNullPointerException) {
+                    println("KotlinNullPointerException on glyph number ${Integer.toHexString(chr.toInt()).toUpperCase()}")
+                    System.exit(1)
+                }
+            }
             else if (zeroWidthSheets.contains(ctype))
                 len += 0
             else if (narrowWidthSheets.contains(ctype))
@@ -271,12 +276,6 @@ open class GameFontBase : Font {
 
             if (isWenQuanYi1(ch)) {
                 val glyphW = getWidth("" + ch)
-                /*wenQuanYi_1.renderInUse(
-                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW),
-                        Math.round((H - H_UNIHAN) / 2 + y),
-                        wenQuanYiIndexX(ch),
-                        wenQuanYi1IndexY(ch)
-                )*/
                 wenQuanYi_1.getSubImage(wenQuanYiIndexX(ch), wenQuanYi1IndexY(ch)).drawWithShadow(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round((H - H_UNIHAN) / 2 + y).toFloat(),
@@ -299,12 +298,6 @@ open class GameFontBase : Font {
 
             if (isWenQuanYi2(ch)) {
                 val glyphW = getWidth("" + ch)
-                /*wenQuanYi_2.renderInUse(
-                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW),
-                        Math.round((H - H_UNIHAN) / 2 + y),
-                        wenQuanYiIndexX(ch),
-                        wenQuanYi2IndexY(ch)
-                )*/
                 wenQuanYi_2.getSubImage(wenQuanYiIndexX(ch), wenQuanYi2IndexY(ch)).drawWithShadow(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round((H - H_UNIHAN) / 2 + y).toFloat(),
@@ -365,13 +358,9 @@ open class GameFontBase : Font {
                         sheetX = uniPunctIndexX(ch)
                         sheetY = uniPunctIndexY(ch)
                     }
-                    SHEET_GREEK_EM   -> {
+                    SHEET_GREEK_VARW   -> {
                         sheetX = greekIndexX(ch)
                         sheetY = greekIndexY(ch)
-                    }
-                    SHEET_GREEK_EF   -> {
-                        sheetX = greekEFIndexX(ch)
-                        sheetY = greekEFIndexY(ch)
                     }
                     SHEET_EXTB_ROMANIAN_EM -> {
                         sheetX = romanianIndexX(ch)
@@ -428,9 +417,7 @@ open class GameFontBase : Font {
 
     private fun getSheetType(c: Char): Int {
         // EFs
-        if (isGreekEF(c))
-            return SHEET_GREEK_EF
-        else if (isRomanianEF(c))
+        if (isRomanianEF(c))
             return SHEET_EXTB_ROMANIAN_EF
         else if (isThaiEF(c))
             return SHEET_EXTA_VARW // will use fourth glyph in EXTA_EF
@@ -455,7 +442,7 @@ open class GameFontBase : Font {
         else if (isFullwidthUni(c))
             return SHEET_FW_UNI
         else if (isGreek(c))
-            return SHEET_GREEK_EM
+            return SHEET_GREEK_VARW
         else if (isRomanian(c))
             return SHEET_EXTB_ROMANIAN_EM
         else if (isThai(c))
@@ -504,19 +491,16 @@ open class GameFontBase : Font {
 
     fun Char.isColourCode() = colourKey.containsKey(this)
 
-    /**
-     * Assumes spritesheet to has 16x16 cells
-     */
-    fun buildAsciiWidthTable() {
+    fun buildWidthTable(sheet: SpriteSheet, codeOffset: Int, codeRange: IntRange, rows: Int = 16) {
         val binaryCodeOffset = 15
 
-        val cellW = asciiSheet.getSubImage(0, 0).width + 1  // should be 16
-        val cellH = asciiSheet.getSubImage(0, 0).height + 1 // should be 20
+        val cellW = sheet.getSubImage(0, 0).width + 1  // should be 16
+        val cellH = sheet.getSubImage(0, 0).height + 1 // should be 20
 
         // control chars
-        for (ccode in 0..255) {
-            val glyphX = ccode % 16
-            val glyphY = ccode / 16
+        for (ccode in codeRange) {
+            val glyphX = ccode % rows
+            val glyphY = ccode / rows
 
             val codeStartX = (glyphX * cellW) + binaryCodeOffset
             val codeStartY = (glyphY * cellH)
@@ -524,64 +508,12 @@ open class GameFontBase : Font {
             var glyphWidth = 0
             for (downCtr in 0..3) {
                 // if alpha is not zero, assume it's 1
-                if (asciiSheet.texture.getPixel(codeStartX, codeStartY + downCtr)[3] == 255) {
+                if (sheet.texture.getPixel(codeStartX, codeStartY + downCtr)[3] == 255) {
                     glyphWidth = glyphWidth or (1 shl downCtr)
                 }
             }
 
-            asciiWidths[ccode] = glyphWidth
-        }
-    }
-
-    fun buildLatinExtAWidthTable() {
-        val binaryCodeOffset = 15
-
-        val cellW = extASheet.getSubImage(0, 0).width + 1  // should be 16
-        val cellH = extASheet.getSubImage(0, 0).height + 1 // should be 20
-
-        // control chars
-        for (ccode in 0..127) {
-            val glyphX = ccode % 16
-            val glyphY = ccode / 16
-
-            val codeStartX = (glyphX * cellW) + binaryCodeOffset
-            val codeStartY = (glyphY * cellH)
-
-            var glyphWidth = 0
-            for (downCtr in 0..3) {
-                // if alpha is not zero, assume it's 1
-                if (extASheet.texture.getPixel(codeStartX, codeStartY + downCtr)[3] == 255) {
-                    glyphWidth = glyphWidth or (1 shl downCtr)
-                }
-            }
-
-            asciiWidths[0x100 + ccode] = glyphWidth
-        }
-    }
-
-    fun buildCyrillicWidthTable() {
-        val binaryCodeOffset = 15
-
-        val cellW = cyrilic.getSubImage(0, 0).width + 1  // should be 16
-        val cellH = cyrilic.getSubImage(0, 0).height + 1 // should be 20
-
-        // control chars
-        for (ccode in 0..0x5F) {
-            val glyphX = ccode % 16
-            val glyphY = ccode / 16
-
-            val codeStartX = (glyphX * cellW) + binaryCodeOffset
-            val codeStartY = (glyphY * cellH)
-
-            var glyphWidth = 0
-            for (downCtr in 0..3) {
-                // if alpha is not zero, assume it's 1
-                if (cyrilic.texture.getPixel(codeStartX, codeStartY + downCtr)[3] == 255) {
-                    glyphWidth = glyphWidth or (1 shl downCtr)
-                }
-            }
-
-            asciiWidths[0x400 + ccode] = glyphWidth
+            asciiWidths[codeOffset + ccode] = glyphWidth
         }
     }
 
@@ -603,7 +535,6 @@ open class GameFontBase : Font {
         lateinit internal var wenQuanYi_1: SpriteSheet
         lateinit internal var wenQuanYi_2: SpriteSheet
         lateinit internal var greekSheet: SpriteSheet
-        lateinit internal var greekSheetEF: SpriteSheet
         lateinit internal var romanianSheet: SpriteSheet
         lateinit internal var romanianSheetEF: SpriteSheet
         lateinit internal var thaiSheet: SpriteSheet
@@ -638,13 +569,12 @@ open class GameFontBase : Font {
         internal val SHEET_UNI_PUNCT = 9
         internal val SHEET_WENQUANYI_1 = 10
         internal val SHEET_WENQUANYI_2 = 11
-        internal val SHEET_GREEK_EM = 12
-        internal val SHEET_GREEK_EF = 13
-        internal val SHEET_EXTB_ROMANIAN_EM = 14
-        internal val SHEET_EXTB_ROMANIAN_EF = 15
-        internal val SHEET_THAI_EM = 16
-        internal val SHEET_THAI_EF = 17
-        internal val SHEET_KEYCAP = 18
+        internal val SHEET_GREEK_VARW = 12
+        internal val SHEET_EXTB_ROMANIAN_EM = 13
+        internal val SHEET_EXTB_ROMANIAN_EF = 14
+        internal val SHEET_THAI_EM = 15
+        internal val SHEET_THAI_EF = 16
+        internal val SHEET_KEYCAP = 17
 
         internal val SHEET_UNKNOWN = 254
         internal val SHEET_COLOURCODE = 255
