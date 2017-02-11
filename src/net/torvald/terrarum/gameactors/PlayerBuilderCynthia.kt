@@ -23,7 +23,7 @@ object PlayerBuilderCynthia {
 
 
         p.makeNewSprite(26, 42, "assets/graphics/sprites/test_player_2.tga")
-        p.sprite!!.setDelay(200)
+        p.sprite!!.delay = 200
         p.sprite!!.setRowsAndFrames(1, 1)
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 9, 0)

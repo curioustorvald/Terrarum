@@ -23,9 +23,9 @@ abstract class InventoryItem {
     /**
      * Where to equip the item
      */
-    var equipPosition: Int = EquipPosition.NULL
+    open var equipPosition: Int = EquipPosition.NULL
 
-    var material: Material? = null
+    open var material: Material? = null
 
     /**
      * Apparent mass of the item. (basemass * scale^3)

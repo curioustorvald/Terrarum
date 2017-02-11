@@ -130,7 +130,8 @@ class StateInGame : BasicGameState() {
 
 
         // add new player and put it to actorContainer
-        playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
+        //playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
+        playableActorDelegate = PlayableActorDelegate(PlayerBuilderTestSubject1())
         addNewActor(player)
 
 

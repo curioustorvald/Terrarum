@@ -342,6 +342,9 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
 
             if (!assertPrinted) assertInit()
 
+            if (sprite != null) sprite!!.update(delta)
+            if (spriteGlow != null) spriteGlow!!.update(delta)
+
             // make NoClip work for player
             if (this is Player) {
                 isNoSubjectToGrav = isPlayerNoClip
@@ -569,7 +572,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
         externalForce.x *= -elasticity
         if (this is Controllable) walkX *= -elasticity
 
-        println("$this\t${externalForce.x}")
+        //println("$this\t${externalForce.x}")
     }
 
     private fun hitAndReflectY() {
@@ -1141,14 +1144,6 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 }
             }
         }
-    }
-
-    open fun updateGlowSprite(gc: GameContainer, delta: Int) {
-        if (spriteGlow != null) spriteGlow!!.update(delta)
-    }
-
-    open fun updateBodySprite(gc: GameContainer, delta: Int) {
-        if (sprite != null) sprite!!.update(delta)
     }
 
     private fun clampW(x: Double): Double =

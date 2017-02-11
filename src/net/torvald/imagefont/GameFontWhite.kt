@@ -12,9 +12,7 @@ class GameFontWhite : GameFontBase() {
         GameFontBase.hangulSheet = SpriteSheet(
                 "./assets/graphics/fonts/hangul_johab.tga", GameFontBase.W_HANGUL, GameFontBase.H_HANGUL)
         GameFontBase.asciiSheet = SpriteSheet(
-                "./assets/graphics/fonts/ascii_fullwidth.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
-        GameFontBase.asciiSheetEF = SpriteSheet(
-                "./assets/graphics/fonts/ascii_special_ef.tga", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
+                "./assets/graphics/fonts/ascii_variable.tga", 16, 20)
         GameFontBase.runicSheet = SpriteSheet(
                 "./assets/graphics/fonts/futhark.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.extASheet = SpriteSheet(
@@ -59,7 +57,7 @@ class GameFontWhite : GameFontBase() {
 
         val shk = arrayOf(
                 GameFontBase.asciiSheet,
-                GameFontBase.asciiSheetEF,
+                null,
                 GameFontBase.hangulSheet,
                 GameFontBase.runicSheet,
                 GameFontBase.extASheet,
@@ -82,5 +80,8 @@ class GameFontWhite : GameFontBase() {
                 GameFontBase.keycapSheet
         )
         GameFontBase.sheetKey = shk
+
+
+        buildAsciiWidthTable()
     }
 }

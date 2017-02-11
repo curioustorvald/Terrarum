@@ -41,6 +41,8 @@ object ItemCodex {
                 override var baseMass: Double = TileCodex[i].density / 1000.0
                 override var scale: Double = 1.0 // no need to set setter as scale would not change
                 override var baseToolSize: Double? = null
+                override var equipPosition = EquipPosition.HAND_GRIP
+
 
                 override fun primaryUse(gc: GameContainer, delta: Int) {
                     // TODO base punch attack

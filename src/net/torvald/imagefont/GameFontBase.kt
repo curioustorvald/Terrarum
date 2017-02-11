@@ -1,14 +1,15 @@
 package net.torvald.imagefont
 
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.getPixel
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
+import java.util.*
 
 /**
  * Created by minjaesong on 16-01-27.
  */
-open class GameFontBase @Throws(SlickException::class)
-constructor() : Font {
+open class GameFontBase : Font {
 
     private fun getHan(hanIndex: Int): IntArray {
         val han_x = hanIndex % JONG_COUNT
@@ -54,7 +55,6 @@ constructor() : Font {
 
     }
 
-    private fun isAsciiEF(c: Char) = asciiEFList.contains(c)
     private fun isExtAEF(c: Char) = extAEFList.contains(c)
     private fun isHangul(c: Char) = c.toInt() >= 0xAC00 && c.toInt() < 0xD7A4
     private fun isAscii(c: Char) = c.toInt() > 0x20 && c.toInt() <= 0xFF
@@ -143,7 +143,6 @@ constructor() : Font {
     private fun keycapIndexY(c: Char) = (c.toInt() - 0xE000) / 16
 
     private val narrowWidthSheets = arrayOf(
-            SHEET_ASCII_EF,
             SHEET_EXTA_EF,
             SHEET_CYRILIC_EF,
             SHEET_GREEK_EF,
@@ -165,6 +164,7 @@ constructor() : Font {
     private fun getWidthSubstr(s: String, endIndex: Int): Int {
         var len = 0
         for (i in 0..endIndex - 1) {
+            val chr = s[i]
             val ctype = getSheetType(s[i])
 
             /*if (i > 0 && s[i].toInt() > 0x20) {
@@ -183,7 +183,11 @@ constructor() : Font {
 
             }*/
 
-            if (zeroWidthSheets.contains(ctype))
+            if (chr.toInt() == 0x21B) // HAX!
+                len += 6
+            else if (ctype == SHEET_ASCII_VARW) // HAX!
+                len += asciiWidths[chr.toInt()]!!
+            else if (zeroWidthSheets.contains(ctype))
                 len += 0
             else if (narrowWidthSheets.contains(ctype))
                 len += W_LATIN_NARROW
@@ -381,10 +385,6 @@ constructor() : Font {
                 val sheetX: Int
                 val sheetY: Int
                 when (prevInstance) {
-                    SHEET_ASCII_EF   -> {
-                        sheetX = asciiEFindexX(ch)
-                        sheetY = asciiEFindexY(ch)
-                    }
                     SHEET_EXTA_EF    -> {
                         sheetX = extAEFindexX(ch)
                         sheetY = extAEFindexY(ch)
@@ -492,9 +492,7 @@ constructor() : Font {
 
     private fun getSheetType(c: Char): Int {
         // EFs
-        if (isAsciiEF(c))
-            return SHEET_ASCII_EF
-        else if (isExtAEF(c))
+        if (isExtAEF(c))
             return SHEET_EXTA_EF
         else if (isCyrilicEF(c))
             return SHEET_CYRILIC_EF
@@ -513,7 +511,7 @@ constructor() : Font {
         else if (isUniHan(c))
             return SHEET_UNIHAN
         else if (isAscii(c))
-            return SHEET_ASCII_EM
+            return SHEET_ASCII_VARW
         else if (isExtA(c))
             return SHEET_EXTA_EM
         else if (isCyrilic(c))
@@ -535,7 +533,7 @@ constructor() : Font {
         else if (isKeycap(c))
             return SHEET_KEYCAP
         else
-            return SHEET_ASCII_EM// fixed width punctuations
+            return SHEET_UNKNOWN// fixed width punctuations
         // fixed width
         // fallback
     }
@@ -574,11 +572,45 @@ constructor() : Font {
 
     fun Char.isColourCode() = colourKey.containsKey(this)
 
+    /**
+     * Assumes spritesheet to has 16x16 cells
+     */
+    fun buildAsciiWidthTable() {
+        val binaryCodeOffset = 16
+
+        val cellW = asciiSheet.getSubImage(0, 0).width  // should be 16
+        val cellH = asciiSheet.getSubImage(0, 0).height // should be 20
+
+        asciiWidths = HashMap()
+
+        // control chars
+        for (ccode in 0..255) {
+            val glyphX = ccode % 16
+            val glyphY = ccode / 16
+
+            val codeStartX = (glyphX * cellW) + binaryCodeOffset
+            val codeStartY = (glyphY * cellH)
+
+            var glyphWidth = 0
+            for (downCtr in 0..3) {
+                // if alpha is not zero, assume it's 1
+                if (asciiSheet.texture.getPixel(codeStartX, codeStartY + downCtr)[3] != 0) {
+                    glyphWidth = glyphWidth or (1 shl downCtr)
+                }
+            }
+
+            println("Char $ccode, width: $glyphWidth")
+            asciiWidths[ccode] = glyphWidth
+        }
+    }
+
     companion object {
 
         lateinit internal var hangulSheet: SpriteSheet
         lateinit internal var asciiSheet: SpriteSheet
-        lateinit internal var asciiSheetEF: SpriteSheet
+
+        lateinit internal var asciiWidths: HashMap<Int, Int>
+
         lateinit internal var runicSheet: SpriteSheet
         lateinit internal var extASheet: SpriteSheet
         lateinit internal var extASheetEF: SpriteSheet
@@ -607,6 +639,7 @@ constructor() : Font {
         internal val W_UNIHAN = 16
         internal val W_LATIN_WIDE = 9 // width of regular letters, including m
         internal val W_LATIN_NARROW = 5 // width of letter f, t, i, l
+        internal val W_FLAG_VARIABLE: Int = -0x4E0E // neue
 
         internal val H = 20
         internal val H_HANGUL = 16
@@ -615,8 +648,7 @@ constructor() : Font {
 
         internal val SIZE_KEYCAP = 18
 
-        internal val SHEET_ASCII_EM = 0
-        internal val SHEET_ASCII_EF = 1
+        internal val SHEET_ASCII_VARW = 0
         internal val SHEET_HANGUL = 2
         internal val SHEET_RUNIC = 3
         internal val SHEET_EXTA_EM = 4
@@ -637,6 +669,8 @@ constructor() : Font {
         internal val SHEET_THAI_EM = 19
         internal val SHEET_THAI_EF = 20
         internal val SHEET_KEYCAP = 21
+
+        internal val SHEET_UNKNOWN = 254
         internal val SHEET_COLOURCODE = 255
 
         lateinit internal var sheetKey: Array<SpriteSheet?>
@@ -738,7 +772,6 @@ constructor() : Font {
                 Pair("x", colourKey[0x1A.toChar()]),
                 Pair("k", colourKey[0x1B.toChar()])
         )
-
     }// end of companion object
 }
 
