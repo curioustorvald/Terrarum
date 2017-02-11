@@ -63,7 +63,6 @@ open class GameFontBase : Font {
     private fun isCJKPunct(c: Char) = c.toInt() >= 0x3000 && c.toInt() < 0x3040
     private fun isUniHan(c: Char) = c.toInt() >= 0x3400 && c.toInt() < 0xA000
     private fun isCyrilic(c: Char) = c.toInt() >= 0x400 && c.toInt() < 0x460
-    private fun isCyrilicEF(c: Char) = cyrilecEFList.contains(c)
     private fun isFullwidthUni(c: Char) = c.toInt() >= 0xFF00 && c.toInt() < 0xFF20
     private fun isUniPunct(c: Char) = c.toInt() >= 0x2000 && c.toInt() < 0x2070
     private fun isWenQuanYi1(c: Char) = c.toInt() >= 0x33F3 && c.toInt() <= 0x69FC
@@ -99,9 +98,6 @@ open class GameFontBase : Font {
     private fun cyrilicIndexX(c: Char) = (c.toInt() - 0x400) % 16
     private fun cyrilicIndexY(c: Char) = (c.toInt() - 0x400) / 16
 
-    private fun cyrilicEFindexX(c: Char) = cyrilecEFList.indexOf(c) % 16
-    private fun cyrilicEFindexY(c: Char) = cyrilecEFList.indexOf(c) / 16
-
     private fun fullwidthUniIndexX(c: Char) = (c.toInt() - 0xFF00) % 16
     private fun fullwidthUniIndexY(c: Char) = (c.toInt() - 0xFF00) / 16
 
@@ -132,7 +128,6 @@ open class GameFontBase : Font {
     private fun keycapIndexY(c: Char) = (c.toInt() - 0xE000) / 16
 
     private val narrowWidthSheets = arrayOf(
-            SHEET_CYRILIC_EF,
             SHEET_GREEK_EF,
             SHEET_EXTB_ROMANIAN_EF
     )
@@ -155,25 +150,13 @@ open class GameFontBase : Font {
             val chr = s[i]
             val ctype = getSheetType(s[i])
 
-            /*if (i > 0 && s[i].toInt() > 0x20) {
-                // inter-Unihan-hangul Kerning
-                val cpre = getSheetType(s[i - 1])
-                if ((unihanWidthSheets.contains(cpre) || cpre == SHEET_HANGUL) && !(unihanWidthSheets.contains(ctype) || ctype == SHEET_HANGUL)
-
-                    || (unihanWidthSheets.contains(ctype) || ctype == SHEET_HANGUL) && !(unihanWidthSheets.contains(cpre) || cpre == SHEET_HANGUL)) {
-                    // margin after/before hangul/unihan
-                    len += 2
-                }
-                else if ((ctype == SHEET_HANGUL || ctype == SHEET_KANA) && (cpre == SHEET_HANGUL || cpre == SHEET_KANA)) {
-                    // margin between hangul/kana
-                    len += 1
-                }
-
-            }*/
-
             if (chr.toInt() == 0x21B) // HAX!
                 len += 6
-            else if (ctype == SHEET_ASCII_VARW || ctype == SHEET_EXTA_VARW)
+            else if (
+                    ctype == SHEET_ASCII_VARW ||
+                    ctype == SHEET_EXTA_VARW ||
+                    ctype == SHEET_CYRILIC_VARW
+            )
                 len += asciiWidths[chr.toInt()]!!
             else if (zeroWidthSheets.contains(ctype))
                 len += 0
@@ -235,25 +218,6 @@ open class GameFontBase : Font {
                 val jongRow = getHanFinalRow(hIndex)
 
                 val glyphW = getWidth(ch.toString())
-
-                /*// initials
-                hangulSheet.renderInUse(
-                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW),
-                        Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f),
-                        indexCho, choRow
-                )
-                // medials
-                hangulSheet.renderInUse(
-                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW),
-                        Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f),
-                        indexJung, jungRow
-                )
-                // finals
-                hangulSheet.renderInUse(
-                        Math.round(x + getWidthSubstr(s, i + 1) - glyphW),
-                        Math.round(((H - H_HANGUL) / 2).toFloat() + y + 1f),
-                        indexJong, jongRow
-                )*/
 
                 hangulSheet.getSubImage(indexCho, choRow).drawWithShadow(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
@@ -389,13 +353,9 @@ open class GameFontBase : Font {
                         sheetX = cjkPunctIndexX(ch)
                         sheetY = cjkPunctIndexY(ch)
                     }
-                    SHEET_CYRILIC_EM -> {
+                    SHEET_CYRILIC_VARW -> {
                         sheetX = cyrilicIndexX(ch)
                         sheetY = cyrilicIndexY(ch)
-                    }
-                    SHEET_CYRILIC_EF -> {
-                        sheetX = cyrilicEFindexX(ch)
-                        sheetY = cyrilicEFindexY(ch)
                     }
                     SHEET_FW_UNI     -> {
                         sheetX = fullwidthUniIndexX(ch)
@@ -437,14 +397,6 @@ open class GameFontBase : Font {
 
                 val glyphW = getWidth("" + ch)
                 try {
-                    /*sheetKey[prevInstance].renderInUse(
-                            Math.round(x + getWidthSubstr(s, i + 1) - glyphW) // Interchar: pull punct right next to hangul to the left
-                            + if (i > 0 && isHangul(s[i - 1])) -3 else 0,
-                            Math.round(y) + if (prevInstance == SHEET_CJK_PUNCT) -1
-                            else if (prevInstance == SHEET_FW_UNI) (H - H_HANGUL) / 2
-                            else 0,
-                            sheetX, sheetY
-                    )*/
                     sheetKey[prevInstance]!!.getSubImage(sheetX, sheetY).drawWithShadow(
                             Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
 
@@ -476,9 +428,7 @@ open class GameFontBase : Font {
 
     private fun getSheetType(c: Char): Int {
         // EFs
-        if (isCyrilicEF(c))
-            return SHEET_CYRILIC_EF
-        else if (isGreekEF(c))
+        if (isGreekEF(c))
             return SHEET_GREEK_EF
         else if (isRomanianEF(c))
             return SHEET_EXTB_ROMANIAN_EF
@@ -497,7 +447,7 @@ open class GameFontBase : Font {
         else if (isExtA(c))
             return SHEET_EXTA_VARW
         else if (isCyrilic(c))
-            return SHEET_CYRILIC_EM
+            return SHEET_CYRILIC_VARW
         else if (isUniPunct(c))
             return SHEET_UNI_PUNCT
         else if (isCJKPunct(c))
@@ -609,6 +559,32 @@ open class GameFontBase : Font {
         }
     }
 
+    fun buildCyrillicWidthTable() {
+        val binaryCodeOffset = 15
+
+        val cellW = cyrilic.getSubImage(0, 0).width + 1  // should be 16
+        val cellH = cyrilic.getSubImage(0, 0).height + 1 // should be 20
+
+        // control chars
+        for (ccode in 0..0x5F) {
+            val glyphX = ccode % 16
+            val glyphY = ccode / 16
+
+            val codeStartX = (glyphX * cellW) + binaryCodeOffset
+            val codeStartY = (glyphY * cellH)
+
+            var glyphWidth = 0
+            for (downCtr in 0..3) {
+                // if alpha is not zero, assume it's 1
+                if (cyrilic.texture.getPixel(codeStartX, codeStartY + downCtr)[3] == 255) {
+                    glyphWidth = glyphWidth or (1 shl downCtr)
+                }
+            }
+
+            asciiWidths[0x400 + ccode] = glyphWidth
+        }
+    }
+
     companion object {
 
         lateinit internal var hangulSheet: SpriteSheet
@@ -622,7 +598,6 @@ open class GameFontBase : Font {
         lateinit internal var cjkPunct: SpriteSheet
         // static SpriteSheet uniHan;
         lateinit internal var cyrilic: SpriteSheet
-        lateinit internal var cyrilicEF: SpriteSheet
         lateinit internal var fullwidthForms: SpriteSheet
         lateinit internal var uniPunct: SpriteSheet
         lateinit internal var wenQuanYi_1: SpriteSheet
@@ -643,7 +618,6 @@ open class GameFontBase : Font {
         internal val W_UNIHAN = 16
         internal val W_LATIN_WIDE = 9 // width of regular letters, including m
         internal val W_LATIN_NARROW = 5 // width of letter f, t, i, l
-        internal val W_FLAG_VARIABLE: Int = -0x4E0E // neue
 
         internal val H = 20
         internal val H_HANGUL = 16
@@ -659,31 +633,23 @@ open class GameFontBase : Font {
         internal val SHEET_KANA = 4
         internal val SHEET_CJK_PUNCT = 5
         internal val SHEET_UNIHAN = 6
-        internal val SHEET_CYRILIC_EM = 7
-        internal val SHEET_CYRILIC_EF = 8
-        internal val SHEET_FW_UNI = 9
-        internal val SHEET_UNI_PUNCT = 10
-        internal val SHEET_WENQUANYI_1 = 11
-        internal val SHEET_WENQUANYI_2 = 12
-        internal val SHEET_GREEK_EM = 13
-        internal val SHEET_GREEK_EF = 14
-        internal val SHEET_EXTB_ROMANIAN_EM = 15
-        internal val SHEET_EXTB_ROMANIAN_EF = 16
-        internal val SHEET_THAI_EM = 17
-        internal val SHEET_THAI_EF = 18
-        internal val SHEET_KEYCAP = 19
+        internal val SHEET_CYRILIC_VARW = 7
+        internal val SHEET_FW_UNI = 8
+        internal val SHEET_UNI_PUNCT = 9
+        internal val SHEET_WENQUANYI_1 = 10
+        internal val SHEET_WENQUANYI_2 = 11
+        internal val SHEET_GREEK_EM = 12
+        internal val SHEET_GREEK_EF = 13
+        internal val SHEET_EXTB_ROMANIAN_EM = 14
+        internal val SHEET_EXTB_ROMANIAN_EF = 15
+        internal val SHEET_THAI_EM = 16
+        internal val SHEET_THAI_EF = 17
+        internal val SHEET_KEYCAP = 18
 
         internal val SHEET_UNKNOWN = 254
         internal val SHEET_COLOURCODE = 255
 
         lateinit internal var sheetKey: Array<SpriteSheet?>
-        internal val cyrilecEFList = arrayOf(
-                0x406.toChar(),
-                0x407.toChar(),
-                0x456.toChar(),
-                0x457.toChar(),
-                0x458.toChar()
-        )
         internal val greekEFList = arrayOf(
                 0x390.toChar(),
                 0x399.toChar(),

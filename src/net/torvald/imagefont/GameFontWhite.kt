@@ -29,9 +29,7 @@ class GameFontWhite : GameFontBase() {
                 , W_UNIHAN, H_UNIHAN
         );*/
         GameFontBase.cyrilic = SpriteSheet(
-                "./assets/graphics/fonts/cyrilic_fullwidth.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
-        GameFontBase.cyrilicEF = SpriteSheet(
-                "./assets/graphics/fonts/cyrilic_ef.tga", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
+                "./assets/graphics/fonts/cyrilic_variable.tga", 15, 19, 1)
         GameFontBase.fullwidthForms = SpriteSheet(
                 "./assets/graphics/fonts/fullwidth_forms.tga", GameFontBase.W_UNIHAN, GameFontBase.H_UNIHAN)
         GameFontBase.uniPunct = SpriteSheet(
@@ -62,7 +60,6 @@ class GameFontWhite : GameFontBase() {
                 GameFontBase.cjkPunct,
                 null, // Full unihan, filler because we're using WenQuanYi
                 GameFontBase.cyrilic,
-                GameFontBase.cyrilicEF,
                 GameFontBase.fullwidthForms,
                 GameFontBase.uniPunct,
                 GameFontBase.wenQuanYi_1,
@@ -80,5 +77,6 @@ class GameFontWhite : GameFontBase() {
 
         buildAsciiWidthTable()
         buildLatinExtAWidthTable()
+        buildCyrillicWidthTable()
     }
 }
