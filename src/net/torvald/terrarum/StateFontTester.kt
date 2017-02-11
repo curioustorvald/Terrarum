@@ -72,14 +72,14 @@ nopqrstuvwxyz
 
         val line = "    **** TERRAN BASIC V0.5 ****    "
 
-        g.drawString("ABCDEFGHIJKLM", 10f, 10f)
-        g.drawString("NOPQRSTÜVWXYZ", 10f, 30f)
+        g.drawString("ABCDEFGHIJKLMN", 10f, 10f)
+        g.drawString("OPQRSTÜVWXYZÆŒ", 10f, 30f)
 
         g.drawString("abcdefghijklmno", 160f, 10f)
-        g.drawString("pqrstuvwxyzßŒ", 160f, 30f)
+        g.drawString("pqrstuvwxyzßæœ", 160f, 30f)
 
         g.drawString("1234567890", 320f, 10f)
-        g.drawString("minimum kerning keming Nannu Namu", 320f, 30f)
+        g.drawString("minimum kerning keming Narnu Namu", 320f, 30f)
 
         g.drawString("Syö salmiakkia perkele", 480f, 10f)
 
@@ -97,9 +97,9 @@ nopqrstuvwxyz
                 "britiske besiddelser, foreløbigt i 1957 og endeligt i 1963.",
                 "",
                 "διαφυλάξτε γενικά τη ζωή σας από βαθειά ψυχικά τραύματα",
+                "ΔΙΑΦΥΛΆΞΤΕ ΓΕΝΙΚΆ ΤΗ ΖΩΉ ΣΑΣ ΑΠΌ ΒΑΘΕΙΆ ΨΥΧΙΚΆ ΤΡΑΎΜΑΤΑ",
                 "Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства.",
                 "Příliš žluťoučký kůň úpěl ďábelské ódy.    Árvíztűrő tükörfúrógép ",
-                "Põdur Zagrebi tšellomängija-följetonist Ciqo külmetas kehvas garaažis ",
                 "Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich",
                 "Pijamalı hasta yağız şoföre çabucak güvendi.    Kŕdeľ ďatľov učí koňa žrať kôru.",
                 "Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwi",
@@ -113,7 +113,7 @@ nopqrstuvwxyz
                 "mála sem einkenndust af því að opinberir aðilar virtu ekki stjórnarskrárvarin réttindi einstaklingsins.",
                 "",
                 "Also supports:",
-                "키스의 고유조건은 입술끼리 만나야 하고 특별한 기술은 필요치 않다. 대한민국 머한민국 대구 머구 명작 띵작 유식 윾싀",
+                "키스의 고유조건은 입술끼리 만나야 하고 특별한 기술은 필요치 않다. 대한민국 머한민국 (대구) {머구} 명작 띵작 유식 윾싀",
                 "とりなくこゑす ゆめさませ みよあけわたる ひんかしを そらいろはえて おきつへに ほふねむれゐぬ もやのうち",
                 "鳥啼く声す 夢覚ませ 見よ明け渡る 東を 空色栄えて 沖つ辺に 帆船群れゐぬ 靄の中 (using WenQuanYi)",
                 ""
