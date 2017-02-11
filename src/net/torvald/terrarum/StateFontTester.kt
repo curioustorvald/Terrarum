@@ -76,27 +76,12 @@ nopqrstuvwxyz
         g.drawString("NOPQRSTÜVWXYZ", 10f, 30f)
 
         g.drawString("abcdefghijklmno", 160f, 10f)
-        g.drawString("pqrstuvwxyzßœ", 160f, 30f)
+        g.drawString("pqrstuvwxyzßŒ", 160f, 30f)
 
         g.drawString("1234567890", 320f, 10f)
         g.drawString("minimum kerning keming Nannu Namu", 320f, 30f)
 
         g.drawString("Syö salmiakkia perkele", 480f, 10f)
-
-        /*val text = arrayOf(
-                "Kedok Ketawa (The Laughing Mask) is a 1940 action film from the Dutch East Indies, in",
-                "present-day Indonesia. After a young couple falls in love, the title character, a",
-                "vigilante, helps them fight off criminals who have been sent to kidnap the woman by a",
-                "rich man who wants her as his wife. It was the first film of Union Films, one of four",
-                "new production houses established after the country's ailing film industry was revived",
-                "by the success of Albert Balink's Terang Boelan. Kedok Ketawa was directed by Jo An",
-                "Djan and stars Basoeki Resobowo, Fatimah, Oedjang (as the vigilante), S Poniman and",
-                "Eddy Kock. Featuring fighting, comedy, and singing, and advertised as an \"Indonesian",
-                "cocktail of violent actions ... and sweet romance\", the film received positive",
-                "reviews, particularly for its cinematography. Following the success of the film, Union",
-                "produced another six before being shut down in early 1942 during the Japanese",
-                "occupation. Screened until at least August 1944, the film may be lost."
-        )*/
 
         val text = arrayOf(
                 "The Olympic marmot (Marmota olympus) is a rodent in the squirrel family, Sciuridae.",
@@ -128,7 +113,7 @@ nopqrstuvwxyz
                 "mála sem einkenndust af því að opinberir aðilar virtu ekki stjórnarskrárvarin réttindi einstaklingsins.",
                 "",
                 "Also supports:",
-                "키스의 고유조건은 입술끼리 만나야 하고 특별한 기술은 필요치 않다.",
+                "키스의 고유조건은 입술끼리 만나야 하고 특별한 기술은 필요치 않다. 대한민국 머한민국 대구 머구 명작 띵작 유식 윾싀",
                 "とりなくこゑす ゆめさませ みよあけわたる ひんかしを そらいろはえて おきつへに ほふねむれゐぬ もやのうち",
                 "鳥啼く声す 夢覚ませ 見よ明け渡る 東を 空色栄えて 沖つ辺に 帆船群れゐぬ 靄の中 (using WenQuanYi)",
                 ""
