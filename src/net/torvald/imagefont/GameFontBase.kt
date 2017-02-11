@@ -55,9 +55,8 @@ open class GameFontBase : Font {
 
     }
 
-    private fun isExtAEF(c: Char) = extAEFList.contains(c)
     private fun isHangul(c: Char) = c.toInt() >= 0xAC00 && c.toInt() < 0xD7A4
-    private fun isAscii(c: Char) = c.toInt() > 0x20 && c.toInt() <= 0xFF
+    private fun isAscii(c: Char) = c.toInt() >= 0x20 && c.toInt() <= 0xFF
     private fun isRunic(c: Char) = runicList.contains(c)
     private fun isExtA(c: Char) = c.toInt() >= 0x100 && c.toInt() < 0x180
     private fun isKana(c: Char) = c.toInt() >= 0x3040 && c.toInt() < 0x3100
@@ -82,18 +81,8 @@ open class GameFontBase : Font {
 
 
 
-    private fun asciiEFindexX(c: Char) = asciiEFList.indexOf(c) % 16
-    private fun asciiEFindexY(c: Char) = asciiEFList.indexOf(c) / 16
-
     private fun extAindexX(c: Char) = (c.toInt() - 0x100) % 16
     private fun extAindexY(c: Char) = (c.toInt() - 0x100) / 16
-
-    private fun extAEFindexX(c: Char) =
-            if (isThaiEF(c)) 3  // thai เ
-            else extAEFList.indexOf(c) % 16
-    private fun extAEFindexY(c: Char) =
-            if (isThaiEF(c)) 0  // thai เ
-            else extAEFList.indexOf(c) / 16
 
     private fun runicIndexX(c: Char) = runicList.indexOf(c) % 16
     private fun runicIndexY(c: Char) = runicList.indexOf(c) / 16
@@ -143,7 +132,6 @@ open class GameFontBase : Font {
     private fun keycapIndexY(c: Char) = (c.toInt() - 0xE000) / 16
 
     private val narrowWidthSheets = arrayOf(
-            SHEET_EXTA_EF,
             SHEET_CYRILIC_EF,
             SHEET_GREEK_EF,
             SHEET_EXTB_ROMANIAN_EF
@@ -185,7 +173,7 @@ open class GameFontBase : Font {
 
             if (chr.toInt() == 0x21B) // HAX!
                 len += 6
-            else if (ctype == SHEET_ASCII_VARW) // HAX!
+            else if (ctype == SHEET_ASCII_VARW || ctype == SHEET_EXTA_VARW)
                 len += asciiWidths[chr.toInt()]!!
             else if (zeroWidthSheets.contains(ctype))
                 len += 0
@@ -385,15 +373,11 @@ open class GameFontBase : Font {
                 val sheetX: Int
                 val sheetY: Int
                 when (prevInstance) {
-                    SHEET_EXTA_EF    -> {
-                        sheetX = extAEFindexX(ch)
-                        sheetY = extAEFindexY(ch)
-                    }
                     SHEET_RUNIC      -> {
                         sheetX = runicIndexX(ch)
                         sheetY = runicIndexY(ch)
                     }
-                    SHEET_EXTA_EM    -> {
+                    SHEET_EXTA_VARW    -> {
                         sheetX = extAindexX(ch)
                         sheetY = extAindexY(ch)
                     }
@@ -492,16 +476,14 @@ open class GameFontBase : Font {
 
     private fun getSheetType(c: Char): Int {
         // EFs
-        if (isExtAEF(c))
-            return SHEET_EXTA_EF
-        else if (isCyrilicEF(c))
+        if (isCyrilicEF(c))
             return SHEET_CYRILIC_EF
         else if (isGreekEF(c))
             return SHEET_GREEK_EF
         else if (isRomanianEF(c))
             return SHEET_EXTB_ROMANIAN_EF
         else if (isThaiEF(c))
-            return SHEET_EXTA_EF // will use fourth glyph in EXTA_EF
+            return SHEET_EXTA_VARW // will use fourth glyph in EXTA_EF
         else if (isRunic(c))
             return SHEET_RUNIC
         else if (isHangul(c))
@@ -513,7 +495,7 @@ open class GameFontBase : Font {
         else if (isAscii(c))
             return SHEET_ASCII_VARW
         else if (isExtA(c))
-            return SHEET_EXTA_EM
+            return SHEET_EXTA_VARW
         else if (isCyrilic(c))
             return SHEET_CYRILIC_EM
         else if (isUniPunct(c))
@@ -576,12 +558,10 @@ open class GameFontBase : Font {
      * Assumes spritesheet to has 16x16 cells
      */
     fun buildAsciiWidthTable() {
-        val binaryCodeOffset = 16
+        val binaryCodeOffset = 15
 
-        val cellW = asciiSheet.getSubImage(0, 0).width  // should be 16
-        val cellH = asciiSheet.getSubImage(0, 0).height // should be 20
-
-        asciiWidths = HashMap()
+        val cellW = asciiSheet.getSubImage(0, 0).width + 1  // should be 16
+        val cellH = asciiSheet.getSubImage(0, 0).height + 1 // should be 20
 
         // control chars
         for (ccode in 0..255) {
@@ -594,13 +574,38 @@ open class GameFontBase : Font {
             var glyphWidth = 0
             for (downCtr in 0..3) {
                 // if alpha is not zero, assume it's 1
-                if (asciiSheet.texture.getPixel(codeStartX, codeStartY + downCtr)[3] != 0) {
+                if (asciiSheet.texture.getPixel(codeStartX, codeStartY + downCtr)[3] == 255) {
                     glyphWidth = glyphWidth or (1 shl downCtr)
                 }
             }
 
-            println("Char $ccode, width: $glyphWidth")
             asciiWidths[ccode] = glyphWidth
+        }
+    }
+
+    fun buildLatinExtAWidthTable() {
+        val binaryCodeOffset = 15
+
+        val cellW = extASheet.getSubImage(0, 0).width + 1  // should be 16
+        val cellH = extASheet.getSubImage(0, 0).height + 1 // should be 20
+
+        // control chars
+        for (ccode in 0..127) {
+            val glyphX = ccode % 16
+            val glyphY = ccode / 16
+
+            val codeStartX = (glyphX * cellW) + binaryCodeOffset
+            val codeStartY = (glyphY * cellH)
+
+            var glyphWidth = 0
+            for (downCtr in 0..3) {
+                // if alpha is not zero, assume it's 1
+                if (extASheet.texture.getPixel(codeStartX, codeStartY + downCtr)[3] == 255) {
+                    glyphWidth = glyphWidth or (1 shl downCtr)
+                }
+            }
+
+            asciiWidths[0x100 + ccode] = glyphWidth
         }
     }
 
@@ -609,11 +614,10 @@ open class GameFontBase : Font {
         lateinit internal var hangulSheet: SpriteSheet
         lateinit internal var asciiSheet: SpriteSheet
 
-        lateinit internal var asciiWidths: HashMap<Int, Int>
+        internal val asciiWidths: HashMap<Int, Int> = HashMap()
 
         lateinit internal var runicSheet: SpriteSheet
         lateinit internal var extASheet: SpriteSheet
-        lateinit internal var extASheetEF: SpriteSheet
         lateinit internal var kanaSheet: SpriteSheet
         lateinit internal var cjkPunct: SpriteSheet
         // static SpriteSheet uniHan;
@@ -649,45 +653,30 @@ open class GameFontBase : Font {
         internal val SIZE_KEYCAP = 18
 
         internal val SHEET_ASCII_VARW = 0
-        internal val SHEET_HANGUL = 2
-        internal val SHEET_RUNIC = 3
-        internal val SHEET_EXTA_EM = 4
-        internal val SHEET_EXTA_EF = 5
-        internal val SHEET_KANA = 6
-        internal val SHEET_CJK_PUNCT = 7
-        internal val SHEET_UNIHAN = 8
-        internal val SHEET_CYRILIC_EM = 9
-        internal val SHEET_CYRILIC_EF = 10
-        internal val SHEET_FW_UNI = 11
-        internal val SHEET_UNI_PUNCT = 12
-        internal val SHEET_WENQUANYI_1 = 13
-        internal val SHEET_WENQUANYI_2 = 14
-        internal val SHEET_GREEK_EM = 15
-        internal val SHEET_GREEK_EF = 16
-        internal val SHEET_EXTB_ROMANIAN_EM = 17
-        internal val SHEET_EXTB_ROMANIAN_EF = 18
-        internal val SHEET_THAI_EM = 19
-        internal val SHEET_THAI_EF = 20
-        internal val SHEET_KEYCAP = 21
+        internal val SHEET_HANGUL = 1
+        internal val SHEET_RUNIC = 2
+        internal val SHEET_EXTA_VARW = 3
+        internal val SHEET_KANA = 4
+        internal val SHEET_CJK_PUNCT = 5
+        internal val SHEET_UNIHAN = 6
+        internal val SHEET_CYRILIC_EM = 7
+        internal val SHEET_CYRILIC_EF = 8
+        internal val SHEET_FW_UNI = 9
+        internal val SHEET_UNI_PUNCT = 10
+        internal val SHEET_WENQUANYI_1 = 11
+        internal val SHEET_WENQUANYI_2 = 12
+        internal val SHEET_GREEK_EM = 13
+        internal val SHEET_GREEK_EF = 14
+        internal val SHEET_EXTB_ROMANIAN_EM = 15
+        internal val SHEET_EXTB_ROMANIAN_EF = 16
+        internal val SHEET_THAI_EM = 17
+        internal val SHEET_THAI_EF = 18
+        internal val SHEET_KEYCAP = 19
 
         internal val SHEET_UNKNOWN = 254
         internal val SHEET_COLOURCODE = 255
 
         lateinit internal var sheetKey: Array<SpriteSheet?>
-        internal val asciiEFList = arrayOf(' ', '!', '"', '\'', '(', ')', ',', '.', ':', ';', 'I', '[', ']', '`', 'f', 'i', 'j', 'l', 't', '{', '|', '}', 0xA1.toChar(), 'Ì', 'Í', 'Î', 'Ï', 'ì', 'í', 'î', 'ï', '·')
-        internal val extAEFList = arrayOf(
-                0x12E.toChar(),
-                0x12F.toChar(),
-                0x130.toChar(),
-                0x131.toChar(),
-                0x135.toChar(),
-                0x13A.toChar(),
-                0x13C.toChar(),
-                0x142.toChar(),
-                0x163.toChar(),
-                0x167.toChar(),
-                0x17F.toChar()
-        )
         internal val cyrilecEFList = arrayOf(
                 0x406.toChar(),
                 0x407.toChar(),

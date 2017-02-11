@@ -67,6 +67,7 @@ nopqrstuvwxyz
         //g.font = Terrarum.fontSmallNumbers
         //g.font = segfont
         //g.font = mtfont
+        g.background = Color(0x282828)
         g.font = Terrarum.fontGame
 
         val line = "    **** TERRAN BASIC V0.5 ****    "
@@ -82,7 +83,7 @@ nopqrstuvwxyz
 
         g.drawString("Syö salmiakkia perkele", 480f, 10f)
 
-        val text = arrayOf(
+        /*val text = arrayOf(
                 "Kedok Ketawa (The Laughing Mask) is a 1940 action film from the Dutch East Indies, in",
                 "present-day Indonesia. After a young couple falls in love, the title character, a",
                 "vigilante, helps them fight off criminals who have been sent to kidnap the woman by a",
@@ -95,41 +96,47 @@ nopqrstuvwxyz
                 "reviews, particularly for its cinematography. Following the success of the film, Union",
                 "produced another six before being shut down in early 1942 during the Japanese",
                 "occupation. Screened until at least August 1944, the film may be lost."
+        )*/
+
+        val text = arrayOf(
+                "The Olympic marmot (Marmota olympus) is a rodent in the squirrel family, Sciuridae.",
+                "It lives only in the U.S. state of Washington, at middle elevations on the Olympic Peninsula.",
+                "About the size of a domestic cat, an adult weighs around 8 kg (18 lb) in summer.",
+                "",
+                "Brná je část statutárního a krajského města Ústí nad Labem v České republice, spadající",
+                "pod městský obvod Ústí nad Labem-Střekov. Nachází se asi pět kilometrů jižně od centra",
+                "města v Českém středohoří na pravém břehu řeky Labe.",
+                "",
+                "Malaysia er en forholdsvis ung stat. Sin endelige udstrækning fik den først i 1965 efter,",
+                "at Singapore trak sig ud. Staten blev grundlagt ved en sammenslutning af flere tidligere",
+                "britiske besiddelser, foreløbigt i 1957 og endeligt i 1963.",
+                "",
+                "διαφυλάξτε γενικά τη ζωή σας από βαθειά ψυχικά τραύματα",
+                "Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства.",
+                "Příliš žluťoučký kůň úpěl ďábelské ódy.    Árvíztűrő tükörfúrógép ",
+                "Põdur Zagrebi tšellomängija-följetonist Ciqo külmetas kehvas garaažis ",
+                "Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich",
+                "Pijamalı hasta yağız şoföre çabucak güvendi.    Kŕdeľ ďatľov učí koňa žrať kôru.",
+                "Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwi",
+                "",
+                "Discografia Siei se compune din șase albume de studio, șase albume live, treizeci și",
+                "patru discuri single (inclusiv unsprezece ca și artist secundar), și cincisprezece",
+                "videoclipuri. Până în octombrie 2014, a vândut 25 de milioane de cântece în întreaga lume.",
+                "",
+                "Málið snerist um ofbeldi lögregluþjóna gegn fjölskyldu blökkumanna, en afar sjaldgæft var",
+                "á þessum árum að slík mál kæmu fyrir æðstu dómstig. Fordæmið tryggði framgang sambærilegra",
+                "mála sem einkenndust af því að opinberir aðilar virtu ekki stjórnarskrárvarin réttindi einstaklingsins.",
+                "",
+                "Also supports:",
+                "키스의 고유조건은 입술끼리 만나야 하고 특별한 기술은 필요치 않다.",
+                "とりなくこゑす ゆめさませ みよあけわたる ひんかしを そらいろはえて おきつへに ほふねむれゐぬ もやのうち",
+                "鳥啼く声す 夢覚ませ 見よ明け渡る 東を 空色栄えて 沖つ辺に 帆船群れゐぬ 靄の中 (using WenQuanYi)",
+                ""
         )
 
         text.forEachIndexed { i, s ->
             g.drawString(s, 10f, 70f + 20 * i)
         }
-
-        /*g.drawString("The Olympic marmot (Marmota olympus) is a rodent in the squirrel family, Sciuridae.", 10f, 70f)
-        g.drawString("It lives only in the U.S. state of Washington, at middle elevations on the Olympic Peninsula.", 10f, 90f)
-        g.drawString("About the size of a domestic cat, an adult weighs around 8 kg (18 lb) in summer.", 10f, 110f)
-
-        g.drawString("Brná je část statutárního a krajského města Ústí nad Labem v České republice, spadající", 10f, 150f)
-        g.drawString("pod městský obvod Ústí nad Labem-Střekov. Nachází se asi pět kilometrů jižně od centra", 10f, 170f)
-        g.drawString("města v Českém středohoří na pravém břehu řeky Labe.", 10f, 190f)
-
-        g.drawString("Malaysia er en forholdsvis ung stat. Sin endelige udstrækning fik den først i 1965 efter,", 10f, 230f)
-        g.drawString("at Singapore trak sig ud. Staten blev grundlagt ved en sammenslutning af flere tidligere", 10f, 250f)
-        g.drawString("britiske besiddelser, foreløbigt i 1957 og endeligt i 1963.", 10f, 270f)
-
-        g.drawString("Ο Αρθούρος Ρεμπώ ήταν Γάλλος ποιητής. Θεωρείται ένας από τους μείζονες εκπροσώπους του", 10f, 310f)
-        g.drawString("συμβολισμού, με σημαντική επίδραση στη μοντέρνα ποίηση, παρά το γεγονός πως εγκατέλειψε", 10f, 330f)
-        g.drawString("οριστικά τη λογοτεχνία στην ηλικία των είκοσι ετών.", 10f, 350f)
-
-        g.drawString("Discografia Siei se compune din șase albume de studio, șase albume live, treizeci și", 10f, 390f)
-        g.drawString("patru discuri single (inclusiv unsprezece ca și artist secundar), și cincisprezece", 10f, 410f)
-        g.drawString("videoclipuri. Până în octombrie 2014, a vândut 25 de milioane de cântece în întreaga lume.", 10f, 430f)
-
-        g.drawString("Квинт Серторий — римский политический деятель и военачальник, известный в первую очередь", 10f, 470f)
-        g.drawString("как руководитель мятежа против сулланского режима в Испании в 80—72 годах до н. э. Квинт", 10f, 490f)
-        g.drawString("Серторий принадлежал к италийской муниципальной аристократии.", 10f, 510f)
-
-        g.drawString("Málið snerist um ofbeldi lögregluþjóna gegn fjölskyldu blökkumanna, en afar sjaldgæft var", 10f, 550f)
-        g.drawString("á þessum árum að slík mál kæmu fyrir æðstu dómstig. Fordæmið tryggði framgang sambærilegra", 10f, 570f)
-        g.drawString("mála sem einkenndust af því að opinberir aðilar virtu ekki stjórnarskrárvarin réttindi einstaklingsins.", 10f, 590f)
-        */
-
 
 
     }
