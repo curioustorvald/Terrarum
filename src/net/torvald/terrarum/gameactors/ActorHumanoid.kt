@@ -79,6 +79,9 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         @Transient internal const val WALK_ACCEL_BASE: Double = 0.67
 
         @Transient const val BASE_HEIGHT = 40
+
+        @Transient const val SPRITE_ROW_IDLE = 0
+        @Transient const val SPRITE_ROW_WALK = 1
     }
 
     ////////////////////////////////
@@ -499,12 +502,19 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     fun Float.abs() = FastMath.abs(this)
 
     private fun updateSprite(delta: Int) {
-        sprite!!.update(delta)
-        if (spriteGlow != null) {
-            spriteGlow!!.update(delta)
-        }
+        if (sprite != null) sprite!!.update(delta)
+        if (spriteGlow != null) spriteGlow!!.update(delta)
+
+        println("$this\tsprite current frame: ${sprite!!.currentFrame}")
 
         if (grounded) {
+            // set anim row
+            if (moveDelta.x != 0.0) {
+                if (sprite != null) sprite!!.switchRow(SPRITE_ROW_WALK)
+                if (spriteGlow != null) spriteGlow!!.switchRow(SPRITE_ROW_WALK)
+            }
+
+            // flipping the sprite
             if (walkHeading == LEFT) {
                 sprite!!.flip(true, false)
                 if (spriteGlow != null) {
@@ -517,6 +527,10 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                     spriteGlow!!.flip(false, false)
                 }
             }
+        }
+        else {
+            if (sprite != null) sprite!!.switchRow(SPRITE_ROW_IDLE)
+            if (spriteGlow != null) spriteGlow!!.switchRow(SPRITE_ROW_IDLE)
         }
     }
 }

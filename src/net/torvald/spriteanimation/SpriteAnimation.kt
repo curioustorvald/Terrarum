@@ -14,13 +14,15 @@ import org.newdawn.slick.SpriteSheet
 class SpriteAnimation(val parentActor: ActorWithSprite, val cellWidth: Int, val cellHeight: Int) {
 
     private var spriteImage: SpriteSheet? = null
-    private var currentFrame = 1 // one-based!
-    private var currentRow = 1   // one-based!
-    private var nFrames: Int = 1
-    private var nRows: Int = 1
-    private var delay = 200
+    var currentFrame = 0
+    var currentRow = 0
+    var nFrames: Int = 1
+        private set
+    var nRows: Int = 1
+        private set
+    var delay = 200
     private var delta = 0
-    private val looping = true
+    val looping = true
     private var animationRunning = true
     private var flipHorizontal = false
     private var flipVertical = false
@@ -49,23 +51,15 @@ class SpriteAnimation(val parentActor: ActorWithSprite, val cellWidth: Int, val 
     }
 
     /**
-     * Sets animation delay. Will default to 200 if not called.
-     * @param delay in milliseconds
-     */
-    fun setDelay(delay: Int) {
-        this.delay = delay
-    }
-
-    /**
      * Sets sheet rows and animation frames. Will default to
      * 1, 1 (still image of top left from the sheet) if not called.
-     * @param rows
+     * @param nRows
      * *
-     * @param frames
+     * @param nFrames
      */
-    fun setRowsAndFrames(rows: Int, frames: Int) {
-        nRows = rows
-        nFrames = frames
+    fun setRowsAndFrames(nRows: Int, nFrames: Int) {
+        this.nRows = nRows
+        this.nFrames = nFrames
     }
 
     fun update(delta: Int) {
@@ -81,7 +75,7 @@ class SpriteAnimation(val parentActor: ActorWithSprite, val cellWidth: Int, val 
                 }
 
                 //advance one frame, then reset delta counter
-                this.currentFrame = this.currentFrame % this.nFrames + 1
+                this.currentFrame = this.currentFrame % this.nFrames
                 this.delta = 0
             }
         }
@@ -125,8 +119,8 @@ class SpriteAnimation(val parentActor: ActorWithSprite, val cellWidth: Int, val 
         }
     }
 
-    fun switchSprite(newRow: Int) {
-        currentRow = newRow
+    fun switchRow(newRow: Int) {
+        currentRow = newRow % nRows
 
         //if beyond the frame index then reset
         if (currentFrame > nFrames) {
@@ -134,39 +128,12 @@ class SpriteAnimation(val parentActor: ActorWithSprite, val cellWidth: Int, val 
         }
     }
 
-    fun switchSprite(newRow: Int, newMax: Int) {
-        if (newMax > 0) {
-            nFrames = newMax
-        }
-
-        currentRow = newRow
-
-        //if beyond the frame index then reset
-        if (currentFrame > nFrames) {
-            reset()
-        }
-    }
-
-    fun switchSpriteDelay(newDelay: Int) {
+    fun setSpriteDelay(newDelay: Int) {
         if (newDelay > 0) {
             delay = newDelay
         }
-    }
-
-    fun switchSprite(newRow: Int, newMax: Int, newDelay: Int) {
-        if (newMax > 0) {
-            nFrames = newMax
-        }
-
-        if (newDelay > 0) {
-            delay = newDelay
-        }
-
-        currentRow = newRow
-
-        //if beyond the frame index then reset
-        if (currentFrame > nFrames) {
-            reset()
+        else {
+            throw IllegalArgumentException("Delay equal or less than zero")
         }
     }
 
@@ -211,7 +178,7 @@ class SpriteAnimation(val parentActor: ActorWithSprite, val cellWidth: Int, val 
     }
 
     private fun getScaledSprite(scale: Float): Image {
-        val selectedImage = spriteImage!!.getSprite(currentFrame - 1, currentRow - 1)
+        val selectedImage = spriteImage!!.getSprite(currentFrame, currentRow)
         selectedImage.filter = Image.FILTER_NEAREST
         return selectedImage.getScaledCopy(scale)
     }

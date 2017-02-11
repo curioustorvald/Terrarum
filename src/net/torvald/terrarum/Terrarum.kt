@@ -11,6 +11,7 @@ import net.torvald.terrarum.gameworld.toUint
 import org.lwjgl.input.Controllers
 import org.lwjgl.opengl.*
 import org.newdawn.slick.*
+import org.newdawn.slick.opengl.Texture
 import org.newdawn.slick.state.StateBasedGame
 import java.io.File
 import java.io.IOException
@@ -127,9 +128,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         //addState(StateVTTest())
         //addState(StateTestingLightning())
-        addState(StateSplash())
+        //addState(StateSplash())
         //addState(StateMonitorCheck())
-        //addState(StateFontTester())
+        addState(StateFontTester())
         //addState(StateNoiseTexGen())
         //addState(StateBlurTest())
         //addState(StateShaderTest())
@@ -302,7 +303,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             }
             catch (ex: SlickException) {
                 val logger = Logger.getLogger(Terrarum::class.java.name)
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss")
                 val calendar = Calendar.getInstance()
                 val filepath = "$defaultDir/crashlog-${dateFormat.format(calendar.time)}.txt"
                 val fileHandler = FileHandler(filepath)
@@ -312,7 +313,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
                 fileHandler.formatter = formatter
 
                 //logger.info()
-                println("The game has been crashed!")
+                println("The game has crashed!")
                 println("Crash log were saved to $filepath.")
                 println("================================================================================")
                 logger.log(Level.SEVERE, null, ex)
@@ -517,33 +518,35 @@ enum class RunningEnvironment {
 }
 
 /** @return Intarray(R, G, B, A) */
-fun Image.getPixel(x: Int, y: Int): IntArray {
-    val textureWidth = this.texture.textureWidth
-    val hasAlpha = this.texture.hasAlpha()
+fun Texture.getPixel(x: Int, y: Int): IntArray {
+    val textureWidth = this.textureWidth
+    val hasAlpha = this.hasAlpha()
 
     val offset = (if (hasAlpha) 4 else 3) * (textureWidth * y + x) // 4: # of channels (RGBA)
 
     if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) {
         return intArrayOf(
-                this.texture.textureData[offset].toUint(),
-                this.texture.textureData[offset + 1].toUint(),
-                this.texture.textureData[offset + 2].toUint(),
+                this.textureData[offset].toUint(),
+                this.textureData[offset + 1].toUint(),
+                this.textureData[offset + 2].toUint(),
                 if (hasAlpha)
-                    this.texture.textureData[offset + 3].toUint()
+                    this.textureData[offset + 3].toUint()
                 else 255
         )
     }
     else {
         return intArrayOf(
-                this.texture.textureData[offset + 2].toUint(),
-                this.texture.textureData[offset + 1].toUint(),
-                this.texture.textureData[offset].toUint(),
+                this.textureData[offset + 2].toUint(),
+                this.textureData[offset + 1].toUint(),
+                this.textureData[offset].toUint(),
                 if (hasAlpha)
-                    this.texture.textureData[offset + 3].toUint()
+                    this.textureData[offset + 3].toUint()
                 else 255
         )
     }
 }
+/** @return Intarray(R, G, B, A) */
+fun Image.getPixel(x: Int, y: Int) = this.texture.getPixel(x, y)
 
 fun Color.toInt() = redByte.shl(16) or greenByte.shl(8) or blueByte
 fun Color.to10bit() = redByte.shl(20) or greenByte.shl(10) or blueByte
