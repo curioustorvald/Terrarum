@@ -78,7 +78,7 @@ nopqrstuvwxyz
         g.drawString("abcdefghijklmno", 160f, 10f)
         g.drawString("pqrstuvwxyzßæœ", 160f, 30f)
 
-        g.drawString("1234567890", 320f, 10f)
+        g.drawString("1234567890?!", 320f, 10f)
         g.drawString("minimum kerning keming Narnu Namu", 320f, 30f)
 
         g.drawString("Syö salmiakkia perkele", 480f, 10f)
@@ -96,24 +96,21 @@ nopqrstuvwxyz
                 "at Singapore trak sig ud. Staten blev grundlagt ved en sammenslutning af flere tidligere",
                 "britiske besiddelser, foreløbigt i 1957 og endeligt i 1963.",
                 "",
+                "Το θάλλιο συνοδεύει κυρίως θειούχα ορυκτά βασικών μετάλλων, όπως ο σφαλερίτης, ο σιδηροπυρίτης",
+                "και ο γαληνίτης ενώ αναφέρονται και εμφανίσεις του σε κονδύλους μαγγανίου στους βυθούς των ωκεανών.",
                 "διαφυλάξτε γενικά τη ζωή σας από βαθειά ψυχικά τραύματα",
                 "ΔΙΑΦΥΛΆΞΤΕ ΓΕΝΙΚΆ ΤΗ ΖΩΉ ΣΑΣ ΑΠΌ ΒΑΘΕΙΆ ΨΥΧΙΚΆ ΤΡΑΎΜΑΤΑ",
                 "Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства.",
-                "Příliš žluťoučký kůň úpěl ďábelské ódy.    Árvíztűrő tükörfúrógép ",
-                "Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich",
+                "Příliš žluťoučký kůň úpěl ďábelské ódy.    Árvíztűrő tükörfúrógép.",
+                "Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.",
                 "Pijamalı hasta yağız şoföre çabucak güvendi.    Kŕdeľ ďatľov učí koňa žrať kôru.",
-                "Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwi",
+                "Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwi.",
+                "Înjurând pițigăiat, zoofobul comandă vexat whisky și tequila.",
                 "",
-                "Discografia Siei se compune din șase albume de studio, șase albume live, treizeci și",
-                "patru discuri single (inclusiv unsprezece ca și artist secundar), și cincisprezece",
-                "videoclipuri. Până în octombrie 2014, a vândut 25 de milioane de cântece în întreaga lume.",
-                "",
-                "Málið snerist um ofbeldi lögregluþjóna gegn fjölskyldu blökkumanna, en afar sjaldgæft var",
-                "á þessum árum að slík mál kæmu fyrir æðstu dómstig. Fordæmið tryggði framgang sambærilegra",
-                "mála sem einkenndust af því að opinberir aðilar virtu ekki stjórnarskrárvarin réttindi einstaklingsins.",
+                "sjaldgæft    ekki stjórnarskrárvarin",
                 "",
                 "Also supports:",
-                "키스의 고유조건은 입술끼리 만나야 하고 특별한 기술은 필요치 않다. 대한민국 머한민국 (대구) {머구} 명작 띵작 유식 윾싀",
+                "키스의 고유조건은 입술끼리 만나야 하고 특별한 기술은 필요치 않다. 대한민국! 머한민국? (대구) {머구} 명작, 띵작. 유식 윾싀",
                 "とりなくこゑす ゆめさませ みよあけわたる ひんかしを そらいろはえて おきつへに ほふねむれゐぬ もやのうち",
                 "鳥啼く声す 夢覚ませ 見よ明け渡る 東を 空色栄えて 沖つ辺に 帆船群れゐぬ 靄の中 (using WenQuanYi)",
                 ""
