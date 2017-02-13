@@ -1,0 +1,1 @@
+Kind people of /r/typography for amazing feedbacks on the game's font
