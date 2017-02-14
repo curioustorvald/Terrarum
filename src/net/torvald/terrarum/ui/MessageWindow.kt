@@ -1,6 +1,6 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.imagefont.GameFontWhite
+import net.torvald.imagefont.GameFontImpl
 import com.jme3.math.FastMath
 import net.torvald.terrarum.blendDisable
 import net.torvald.terrarum.blendNormal
@@ -40,7 +40,7 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
             segmentRight = Image("./assets/graphics/gui/message_black_right.tga")
             segmentBody = Image("./assets/graphics/gui/message_black_body.tga")
         }
-        uiFont = GameFontWhite()
+        uiFont = GameFontImpl()
         height = segmentLeft!!.height
         messageWindowRadius = segmentLeft!!.width
         messagesList = arrayOf("", "")

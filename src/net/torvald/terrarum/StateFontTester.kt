@@ -1,6 +1,6 @@
 package net.torvald.terrarum
 
-import net.torvald.imagefont.GameFontWhite
+import net.torvald.imagefont.GameFontImpl
 import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.*
 import org.newdawn.slick.state.BasicGameState
@@ -110,9 +110,10 @@ nopqrstuvwxyz
                 "sjaldgæft    ekki stjórnarskrárvarin",
                 "",
                 "Also supports:",
-                "키스의 고유조건은 입술끼리 만나야 하고 특별한 기술은 필요치 않다. 대한민국! 머한민국? (대구) {머구} 명작, 띵작. 유식 윾싀",
+                "‛Unicode’ „quotation marks“—dashes…‼",
+                "으웽~. 얘! 위에 이 애 우유의 양 외워와! 아오~ 왜요? 어여! 예...  웬 초콜릿? 제가 원했던 건 뻥튀기 쬐끔과 의류예요. 얘야, 왜 또 불평?  퀡퇣풿횂",
                 "とりなくこゑす ゆめさませ みよあけわたる ひんかしを そらいろはえて おきつへに ほふねむれゐぬ もやのうち",
-                "鳥啼く声す 夢覚ませ 見よ明け渡る 東を 空色栄えて 沖つ辺に 帆船群れゐぬ 靄の中 (using WenQuanYi)",
+                "鳥啼く声す 夢覚ませ 見よ明け渡る 東を 空色栄えて 沖つ辺に 帆船群れゐぬ 靄の中",
                 ""
         )
 

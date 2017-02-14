@@ -52,7 +52,6 @@ open class GameFontBase : Font {
             8
         else
             9
-
     }
 
     private fun isHangul(c: Char) = c.toInt() >= 0xAC00 && c.toInt() < 0xD7A4
@@ -68,13 +67,12 @@ open class GameFontBase : Font {
     private fun isWenQuanYi1(c: Char) = c.toInt() >= 0x33F3 && c.toInt() <= 0x69FC
     private fun isWenQuanYi2(c: Char) = c.toInt() >= 0x69FD && c.toInt() <= 0x9FDC
     private fun isGreek(c: Char) = c.toInt() >= 0x370 && c.toInt() <= 0x3CE
-    private fun isGreekEF(c: Char) = greekEFList.contains(c)
     private fun isRomanian(c: Char) = c.toInt() >= 0x218 && c.toInt() <= 0x21A
-    private fun isRomanianEF(c: Char) = c.toInt() == 0x21B
+    private fun isRomanianNarrow(c: Char) = c.toInt() == 0x21B
     private fun isThai(c: Char) = c.toInt() >= 0xE00 && c.toInt() <= 0xE7F
     private fun isThaiDiacritics(c: Char) = (c.toInt() >= 0xE34 && c.toInt() <= 0xE3A)
-            || (c.toInt() >= 0xE47 && c.toInt() <= 0xE4E)
-            || (c.toInt() == 0xE31)
+                                            || (c.toInt() >= 0xE47 && c.toInt() <= 0xE4E)
+                                            || (c.toInt() == 0xE31)
     private fun isThaiEF(c: Char) = c.toInt() == 0xE40
     private fun isKeycap(c: Char) = c.toInt() >= 0xE000 && c.toInt() <= 0xE07F
 
@@ -118,14 +116,14 @@ open class GameFontBase : Font {
     private fun thaiIndexX(c: Char) = (c.toInt() - 0xE00) % 16
     private fun thaiIndexY(c: Char) = (c.toInt() - 0xE00) / 16
 
-    private fun thaiEFIndexX(c: Char) = 3
-    private fun thaiEFIndexY(c: Char) = 0
+    private fun thaiNarrowIndexX(c: Char) = 3
+    private fun thaiNarrowIndexY(c: Char) = 0
 
     private fun keycapIndexX(c: Char) = (c.toInt() - 0xE000) % 16
     private fun keycapIndexY(c: Char) = (c.toInt() - 0xE000) / 16
 
     private val narrowWidthSheets = arrayOf(
-            SHEET_EXTB_ROMANIAN_EF
+            SHEET_EXTB_ROMANIAN_NARROW
     )
     private val unihanWidthSheets = arrayOf(
             SHEET_UNIHAN,
@@ -350,35 +348,35 @@ open class GameFontBase : Font {
                         sheetX = cyrilicIndexX(ch)
                         sheetY = cyrilicIndexY(ch)
                     }
-                    SHEET_FW_UNI     -> {
+                    SHEET_FW_UNI             -> {
                         sheetX = fullwidthUniIndexX(ch)
                         sheetY = fullwidthUniIndexY(ch)
                     }
-                    SHEET_UNI_PUNCT  -> {
+                    SHEET_UNI_PUNCT            -> {
                         sheetX = uniPunctIndexX(ch)
                         sheetY = uniPunctIndexY(ch)
                     }
-                    SHEET_GREEK_VARW   -> {
+                    SHEET_GREEK_VARW           -> {
                         sheetX = greekIndexX(ch)
                         sheetY = greekIndexY(ch)
                     }
-                    SHEET_EXTB_ROMANIAN_EM -> {
+                    SHEET_EXTB_ROMANIAN_WIDE   -> {
                         sheetX = romanianIndexX(ch)
                         sheetY = romanianIndexY(ch)
                     }
-                    SHEET_EXTB_ROMANIAN_EF -> {
+                    SHEET_EXTB_ROMANIAN_NARROW -> {
                         sheetX = 0
                         sheetY = 0
                     }
-                    SHEET_THAI_EM    -> {
+                    SHEET_THAI_WIDE            -> {
                         sheetX = thaiIndexX(ch)
                         sheetY = thaiIndexY(ch)
                     }
-                    SHEET_KEYCAP -> {
+                    SHEET_KEYCAP               -> {
                         sheetX = keycapIndexX(ch)
                         sheetY = keycapIndexY(ch)
                     }
-                    else             -> {
+                    else                       -> {
                         sheetX = ch.toInt() % 16
                         sheetY = ch.toInt() / 16
                     }
@@ -417,8 +415,8 @@ open class GameFontBase : Font {
 
     private fun getSheetType(c: Char): Int {
         // EFs
-        if (isRomanianEF(c))
-            return SHEET_EXTB_ROMANIAN_EF
+        if (isRomanianNarrow(c))
+            return SHEET_EXTB_ROMANIAN_NARROW
         else if (isThaiEF(c))
             return SHEET_EXTA_VARW // will use fourth glyph in EXTA_EF
         else if (isRunic(c))
@@ -444,9 +442,9 @@ open class GameFontBase : Font {
         else if (isGreek(c))
             return SHEET_GREEK_VARW
         else if (isRomanian(c))
-            return SHEET_EXTB_ROMANIAN_EM
+            return SHEET_EXTB_ROMANIAN_WIDE
         else if (isThai(c))
-            return SHEET_THAI_EM
+            return SHEET_THAI_WIDE
         else if (c.isColourCode())
             return SHEET_COLOURCODE
         else if (isKeycap(c))
@@ -536,7 +534,7 @@ open class GameFontBase : Font {
         lateinit internal var wenQuanYi_2: SpriteSheet
         lateinit internal var greekSheet: SpriteSheet
         lateinit internal var romanianSheet: SpriteSheet
-        lateinit internal var romanianSheetEF: SpriteSheet
+        lateinit internal var romanianSheetNarrow: SpriteSheet
         lateinit internal var thaiSheet: SpriteSheet
         lateinit internal var keycapSheet: SpriteSheet
 
@@ -570,24 +568,16 @@ open class GameFontBase : Font {
         internal val SHEET_WENQUANYI_1 = 10
         internal val SHEET_WENQUANYI_2 = 11
         internal val SHEET_GREEK_VARW = 12
-        internal val SHEET_EXTB_ROMANIAN_EM = 13
-        internal val SHEET_EXTB_ROMANIAN_EF = 14
-        internal val SHEET_THAI_EM = 15
-        internal val SHEET_THAI_EF = 16
+        internal val SHEET_EXTB_ROMANIAN_WIDE = 13
+        internal val SHEET_EXTB_ROMANIAN_NARROW = 14
+        internal val SHEET_THAI_WIDE = 15
+        internal val SHEET_THAI_NARROW = 16
         internal val SHEET_KEYCAP = 17
 
         internal val SHEET_UNKNOWN = 254
         internal val SHEET_COLOURCODE = 255
 
         lateinit internal var sheetKey: Array<SpriteSheet?>
-        internal val greekEFList = arrayOf(
-                0x390.toChar(),
-                0x399.toChar(),
-                0x3AA.toChar(),
-                0x3AF.toChar(),
-                0x3B9.toChar(),
-                0x3CA.toChar()
-        )
 
         /**
          * Runic letters list used for game. The set is
@@ -627,7 +617,7 @@ open class GameFontBase : Font {
                 Pair(0x19.toChar(), Color(0x008000)), //v iridian
                 Pair(0x1A.toChar(), Color(0x805030)), //x (khaki)
                 Pair(0x1B.toChar(), Color(0x808080))  //*k
-                                                      //* marked: commonly used
+                //* marked: commonly used
         )
         val colToCode = hashMapOf(
                 Pair("w", 0x10.toChar()),

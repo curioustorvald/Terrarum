@@ -5,7 +5,7 @@ import org.newdawn.slick.*
 /**
  * Created by minjaesong on 16-01-20.
  */
-class GameFontWhite : GameFontBase() {
+class GameFontImpl : GameFontBase() {
 
     init {
 
@@ -41,11 +41,11 @@ class GameFontWhite : GameFontBase() {
         GameFontBase.greekSheet = SpriteSheet(
                 "./assets/graphics/fonts/greek_variable.tga", 15, 19, 1)
         GameFontBase.romanianSheet = SpriteSheet(
-                "./assets/graphics/fonts/romana_fullwidth.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
-        GameFontBase.romanianSheetEF = SpriteSheet(
-                "./assets/graphics/fonts/romana_ef.tga", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
+                "./assets/graphics/fonts/romana_wide.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
+        GameFontBase.romanianSheetNarrow = SpriteSheet(
+                "./assets/graphics/fonts/romana_narrow.tga", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
         GameFontBase.thaiSheet = SpriteSheet(
-                "./assets/graphics/fonts/thai_fullwidth.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
+                "./assets/graphics/fonts/thai_wide.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.keycapSheet = SpriteSheet(
                 "./assets/graphics/fonts/puae000-e07f.tga", GameFontBase.SIZE_KEYCAP, GameFontBase.SIZE_KEYCAP)
 
@@ -64,7 +64,7 @@ class GameFontWhite : GameFontBase() {
                 GameFontBase.wenQuanYi_2,
                 GameFontBase.greekSheet,
                 GameFontBase.romanianSheet,
-                GameFontBase.romanianSheetEF,
+                GameFontBase.romanianSheetNarrow,
                 GameFontBase.thaiSheet,
                 null, // Thai EF, filler because not being used right now
                 GameFontBase.keycapSheet
