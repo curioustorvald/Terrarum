@@ -1,12 +1,7 @@
 package net.torvald.terrarum.langpack
 
-import net.torvald.CSVFetcher
 import net.torvald.JsonFetcher
-import net.torvald.imagefont.GameFontWhite
 import net.torvald.terrarum.Terrarum
-import org.apache.commons.csv.CSVRecord
-import org.newdawn.slick.SlickException
-
 import java.io.*
 import java.util.*
 

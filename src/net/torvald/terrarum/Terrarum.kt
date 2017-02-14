@@ -3,7 +3,7 @@ package net.torvald.terrarum
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import net.torvald.imagefont.GameFontWhite
+import net.torvald.imagefont.GameFontImpl
 import net.torvald.JsonFetcher
 import net.torvald.JsonWriter
 import net.torvald.imagefont.TinyAlphNum
@@ -94,7 +94,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
     override fun initStatesList(gc: GameContainer) {
         gc.input.enableKeyRepeat()
 
-        fontGame = GameFontWhite()
+        fontGame = GameFontImpl()
         fontSmallNumbers = TinyAlphNum()
 
         // search for real controller
@@ -130,14 +130,14 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         //addState(StateTestingLightning())
         //addState(StateSplash())
         //addState(StateMonitorCheck())
-        addState(StateFontTester())
+        //addState(StateFontTester())
         //addState(StateNoiseTexGen())
         //addState(StateBlurTest())
         //addState(StateShaderTest())
         //addState(StateNoiseTester())
 
-        //ingame = StateInGame()
-        //addState(ingame)
+        ingame = StateInGame()
+        addState(ingame)
 
 
         // foolproof
