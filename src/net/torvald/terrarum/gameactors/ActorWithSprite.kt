@@ -1028,59 +1028,35 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
         if (isVisible && spriteGlow != null) {
             blendLightenOnly()
 
-            if (!sprite!!.flippedHorizontal()) {
-                val offsetX = hitboxTranslateX * scale
+            val offsetX = if (!spriteGlow!!.flippedHorizontal())
+                hitboxTranslateX * scale
+            else
+                spriteGlow!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale)
 
-                if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
-                    // camera center neg, actor center pos
-                    spriteGlow!!.render(g,
-                            (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
-                else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
-                    // camera center pos, actor center neg
-                    spriteGlow!!.render(g,
-                            (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
-                else {
-                    sprite!!.render(g,
-                            (hitbox.posX - offsetX).toFloat(),
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
+            val offsetY = spriteGlow!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 2
+
+            if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
+                // camera center neg, actor center pos
+                spriteGlow!!.render(g,
+                        (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
+                        (hitbox.posY - offsetY).toFloat(),
+                        (scale).toFloat()
+                )
+            }
+            else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
+                // camera center pos, actor center neg
+                spriteGlow!!.render(g,
+                        (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
+                        (hitbox.posY - offsetY).toFloat(),
+                        (scale).toFloat()
+                )
             }
             else {
-                val offsetX = spriteGlow!!.cellWidth - (hitbox.width + hitboxTranslateX * scale)
-
-                if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
-                    // camera center neg, actor center pos
-                    spriteGlow!!.render(g,
-                            (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
-                else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
-                    // camera center pos, actor center neg
-                    spriteGlow!!.render(g,
-                            (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
-                else {
-                    spriteGlow!!.render(g,
-                            (hitbox.posX - offsetX).toFloat(),
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
+                spriteGlow!!.render(g,
+                        (hitbox.posX - offsetX).toFloat(),
+                        (hitbox.posY - offsetY).toFloat(),
+                        (scale).toFloat()
+                )
             }
         }
     }
@@ -1097,60 +1073,37 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 BLEND_SCREEN   -> blendScreen()
             }
 
-            if (!sprite!!.flippedHorizontal()) {
-                val offsetX = hitboxTranslateX * scale
+            val offsetX = if (!sprite!!.flippedHorizontal())
+                hitboxTranslateX * scale
+            else
+                sprite!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale)
 
-                if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
-                    // camera center neg, actor center pos
-                    sprite!!.render(g,
-                            (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
-                else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
-                    // camera center pos, actor center neg
-                    sprite!!.render(g,
-                            (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
-                else {
-                    sprite!!.render(g,
-                            (hitbox.posX - offsetX).toFloat(),
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
+            val offsetY = sprite!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 2
+
+            if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
+                // camera center neg, actor center pos
+                sprite!!.render(g,
+                        (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
+                        (hitbox.posY - offsetY).toFloat(),
+                        (scale).toFloat()
+                )
+            }
+            else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
+                // camera center pos, actor center neg
+                sprite!!.render(g,
+                        (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
+                        (hitbox.posY - offsetY).toFloat(),
+                        (scale).toFloat()
+                )
             }
             else {
-                val offsetX = sprite!!.cellWidth - (hitbox.width + hitboxTranslateX * scale)
-
-                if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
-                    // camera center neg, actor center pos
-                    sprite!!.render(g,
-                            (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
-                else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
-                    // camera center pos, actor center neg
-                    sprite!!.render(g,
-                            (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
-                else {
-                    sprite!!.render(g,
-                            (hitbox.posX - offsetX).toFloat(),
-                            (hitbox.posY + hitboxTranslateY * scale).toFloat(),
-                            (scale).toFloat()
-                    )
-                }
+                sprite!!.render(g,
+                        (hitbox.posX - offsetX).toFloat(),
+                        (hitbox.posY - offsetY).toFloat(),
+                        (scale).toFloat()
+                )
             }
+
         }
     }
 
