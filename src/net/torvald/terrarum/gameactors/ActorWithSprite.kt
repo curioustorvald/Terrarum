@@ -1028,11 +1028,13 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
         if (isVisible && spriteGlow != null) {
             blendLightenOnly()
 
-            if (!spriteGlow!!.flippedHorizontal()) {
+            if (!sprite!!.flippedHorizontal()) {
+                val offsetX = hitboxTranslateX * scale
+
                 if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                     // camera center neg, actor center pos
                     spriteGlow!!.render(g,
-                            (hitbox.posX - hitboxTranslateX * scale).toFloat() + world.width * TILE_SIZE,
+                            (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
@@ -1040,24 +1042,26 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                     // camera center pos, actor center neg
                     spriteGlow!!.render(g,
-                            (hitbox.posX - hitboxTranslateX * scale).toFloat() - world.width * TILE_SIZE,
+                            (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
                 }
                 else {
-                    spriteGlow!!.render(g,
-                            (hitbox.posX - hitboxTranslateX * scale).toFloat(),
+                    sprite!!.render(g,
+                            (hitbox.posX - offsetX).toFloat(),
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
                 }
             }
             else {
+                val offsetX = spriteGlow!!.cellWidth - (hitbox.width + hitboxTranslateX * scale)
+
                 if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                     // camera center neg, actor center pos
                     spriteGlow!!.render(g,
-                            (hitbox.posX - scale).toFloat() + world.width * TILE_SIZE,
+                            (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
@@ -1065,14 +1069,14 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                     // camera center pos, actor center neg
                     spriteGlow!!.render(g,
-                            (hitbox.posX - scale).toFloat() - world.width * TILE_SIZE,
+                            (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
                 }
                 else {
                     spriteGlow!!.render(g,
-                            (hitbox.posX - scale).toFloat(),
+                            (hitbox.posX - offsetX).toFloat(),
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
@@ -1094,10 +1098,12 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
             }
 
             if (!sprite!!.flippedHorizontal()) {
+                val offsetX = hitboxTranslateX * scale
+
                 if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                     // camera center neg, actor center pos
                     sprite!!.render(g,
-                            (hitbox.posX - hitboxTranslateX * scale).toFloat() + world.width * TILE_SIZE,
+                            (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
@@ -1105,24 +1111,26 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                     // camera center pos, actor center neg
                     sprite!!.render(g,
-                            (hitbox.posX - hitboxTranslateX * scale).toFloat() - world.width * TILE_SIZE,
+                            (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
                 }
                 else {
                     sprite!!.render(g,
-                            (hitbox.posX - hitboxTranslateX * scale).toFloat(),
+                            (hitbox.posX - offsetX).toFloat(),
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
                 }
             }
             else {
+                val offsetX = sprite!!.cellWidth - (hitbox.width + hitboxTranslateX * scale)
+
                 if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                     // camera center neg, actor center pos
                     sprite!!.render(g,
-                            (hitbox.posX - scale).toFloat() + world.width * TILE_SIZE,
+                            (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
@@ -1130,14 +1138,14 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                     // camera center pos, actor center neg
                     sprite!!.render(g,
-                            (hitbox.posX - scale).toFloat() - world.width * TILE_SIZE,
+                            (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
                 }
                 else {
                     sprite!!.render(g,
-                            (hitbox.posX - scale).toFloat(),
+                            (hitbox.posX - offsetX).toFloat(),
                             (hitbox.posY + hitboxTranslateY * scale).toFloat(),
                             (scale).toFloat()
                     )
