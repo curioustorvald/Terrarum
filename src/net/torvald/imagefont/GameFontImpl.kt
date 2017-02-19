@@ -1,5 +1,6 @@
 package net.torvald.imagefont
 
+import net.torvald.terrarum.Terrarum
 import org.newdawn.slick.*
 
 /**
@@ -29,7 +30,11 @@ class GameFontImpl : GameFontBase() {
                 , W_UNIHAN, H_UNIHAN
         );*/
         GameFontBase.cyrilic = SpriteSheet(
-                "./assets/graphics/fonts/cyrilic_variable.tga", 15, 19, 1)
+                when (Terrarum.gameLocale.substring(0..1)) {
+                    "bg" -> "./assets/graphics/fonts/cyrilic_bulgarian_variable.tga"
+                    "sr" -> "./assets/graphics/fonts/cyrilic_serbian_variable.tga"
+                    else -> "./assets/graphics/fonts/cyrilic_variable.tga"
+                }, 15, 19, 1)
         GameFontBase.fullwidthForms = SpriteSheet(
                 "./assets/graphics/fonts/fullwidth_forms.tga", GameFontBase.W_UNIHAN, GameFontBase.H_UNIHAN)
         GameFontBase.uniPunct = SpriteSheet(
@@ -76,5 +81,14 @@ class GameFontImpl : GameFontBase() {
         buildWidthTable(extASheet, 0x100, 0..0x7F)
         buildWidthTable(cyrilic, 0x400, 0..0x5F)
         buildWidthTable(greekSheet, 0x370, 0..0x5F)
+    }
+
+    fun reload() {
+        GameFontBase.cyrilic = SpriteSheet(
+                when (Terrarum.gameLocale.substring(0..1)) {
+                    "bg" -> "./assets/graphics/fonts/cyrilic_bulgarian_variable.tga"
+                    "sr" -> "./assets/graphics/fonts/cyrilic_serbian_variable.tga"
+                    else -> "./assets/graphics/fonts/cyrilic_variable.tga"
+                }, 15, 19, 1)
     }
 }
