@@ -53,7 +53,7 @@ import static com.sudoplay.joise.noise.Util.clamp;
 import com.sudoplay.joise.ModuleInstanceMap;
 import com.sudoplay.joise.ModuleMap;
 import com.sudoplay.joise.ModulePropertyMap;
-import com.sudoplay.joise.generator.LCG;
+import com.sudoplay.joise.generator.Xorshift128plus;
 import com.sudoplay.util.Checked;
 
 public class ModuleAutoCorrect extends SourcedModule {
@@ -125,7 +125,7 @@ public class ModuleAutoCorrect extends SourcedModule {
     if (!source.isModule() || locked) return;
 
     double mn, mx;
-    LCG lcg = new LCG();
+    Xorshift128plus lcg = new Xorshift128plus();
 
     // Calculate 2D
     mn = 10000.0;
