@@ -29,8 +29,6 @@ nopqrstuvwxyz
     override fun init(gc: GameContainer, game: StateBasedGame) {
         canvas = Graphics(1024, 1024)
 
-        Terrarum.gameLocale = "fiFI"
-
         /*segfont = SpriteSheetFont(
                 SpriteSheet("./assets/graphics/fonts/24-seg_red.tga", 22, 31),
                 ' '
@@ -121,6 +119,15 @@ nopqrstuvwxyz
             g.drawString(s, 10f, 70f + 20 * i)
         }
 
+        /*val text = arrayOf(
+                "ru: Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства",
+                "bg: Под южно дърво, цъфтящо в синьо, бягаше малко пухкаво зайче",
+                "sr: Ајшо, лепото и чежњо, за љубав срца мога дођи у Хаџиће на кафу"
+        )
+
+        (0..2).forEach {
+            g.drawString(text[it], 10f, 70f + 20 * it)
+        }*/
 
     }
 

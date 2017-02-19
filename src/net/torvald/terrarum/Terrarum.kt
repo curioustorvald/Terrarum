@@ -67,17 +67,6 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         val readFromDisk = readConfigJson()
         if (!readFromDisk) readConfigJson()
 
-        // get locale from config
-        val gameLocaleFromConfig = gameConfig.getAsString("language") ?: sysLang
-
-        // if bad game locale were set, use system locale
-        if (gameLocaleFromConfig.length < 2)
-            gameLocale = sysLang
-        else
-            gameLocale = gameLocaleFromConfig
-
-        println("[Terrarum] Locale: " + gameLocale)
-
         try {
             Controllers.getController(0)
             environment = if (getConfigString("pcgamepadenv") == "console")
@@ -94,8 +83,23 @@ constructor(gamename: String) : StateBasedGame(gamename) {
     override fun initStatesList(gc: GameContainer) {
         gc.input.enableKeyRepeat()
 
+
+        // get locale from config
+        val gameLocaleFromConfig = gameConfig.getAsString("language") ?: sysLang
+
+        // if bad game locale were set, use system locale
+        if (gameLocaleFromConfig.length < 2)
+            gameLocale = sysLang
+        else
+            gameLocale = gameLocaleFromConfig
+
+        println("[Terrarum] Locale: " + gameLocale)
+
+
         fontGame = GameFontImpl()
         fontSmallNumbers = TinyAlphNum()
+
+
 
         // search for real controller
         // exclude controllers with name "Mouse", "keyboard"
@@ -212,9 +216,11 @@ constructor(gamename: String) : StateBasedGame(gamename) {
                     field = value.substring(0..1)
                 else
                     field = value
+
+                if (fontGame != null) (fontGame as GameFontImpl).reload()
             }
 
-        lateinit var fontGame: Font
+        var fontGame: Font? = null
             private set
         lateinit var fontSmallNumbers: Font
             private set
@@ -282,6 +288,9 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         const val NAME = "Terrarum"
 
         fun main(args: Array<String>) {
+            System.setProperty("java.library.path", "lib")
+            System.setProperty("org.lwjgl.librarypath", File("lib").absolutePath)
+
             try {
                 appgc = AppGameContainer(Terrarum(NAME))
                 appgc.setDisplayMode(WIDTH, HEIGHT, false)
@@ -301,7 +310,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
                 appgc.start()
             }
-            catch (ex: SlickException) {
+            catch (ex: Exception) {
                 val logger = Logger.getLogger(Terrarum::class.java.name)
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss")
                 val calendar = Calendar.getInstance()

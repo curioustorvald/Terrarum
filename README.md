@@ -76,6 +76,9 @@ Note: Right-to-left languages (arabic, hebrew, etc.) are not supported.
         4. Export the image as TGA
         5. Include the converted PNG to the project
 
+### Game font ###
+
+The font for the game is managed on [this GitHub repository](https://github.com/minjaesong/Terrarum-sans-bitmap). Make your contribution there and file a pull request on this project.
 
 
 
