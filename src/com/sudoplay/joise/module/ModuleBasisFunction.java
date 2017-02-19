@@ -51,7 +51,7 @@ package com.sudoplay.joise.module;
 import com.sudoplay.joise.ModuleInstanceMap;
 import com.sudoplay.joise.ModuleMap;
 import com.sudoplay.joise.ModulePropertyMap;
-import com.sudoplay.joise.generator.LCG;
+import com.sudoplay.joise.generator.Xorshift128plus;
 import com.sudoplay.joise.noise.Interpolator;
 import com.sudoplay.joise.noise.Noise;
 
@@ -192,8 +192,8 @@ public class ModuleBasisFunction extends SeedableModule {
   @Override
   public void setSeed(long seed) {
     super.setSeed(seed);
-    
-    LCG lcg = new LCG();
+
+    Xorshift128plus lcg = new Xorshift128plus();
     lcg.setSeed(seed);
 
     double ax, ay, az;
