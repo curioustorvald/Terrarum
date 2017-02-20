@@ -18,6 +18,8 @@ class GameFontImpl : GameFontBase() {
                 "./assets/graphics/fonts/futhark.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.extASheet = SpriteSheet(
                 "./assets/graphics/fonts/LatinExtA_variable.tga", 15, 19, 1)
+        GameFontBase.extBSheet = SpriteSheet(
+                "./assets/graphics/fonts/LatinExtB_variable.tga", 15, 19, 1)
         GameFontBase.kanaSheet = SpriteSheet(
                 "./assets/graphics/fonts/kana.tga", GameFontBase.W_KANA, GameFontBase.H_KANA)
         GameFontBase.cjkPunct = SpriteSheet(
@@ -45,10 +47,6 @@ class GameFontImpl : GameFontBase() {
                 "./assets/graphics/fonts/wenquanyi_11pt_part2.tga", 16, 18, 2)
         GameFontBase.greekSheet = SpriteSheet(
                 "./assets/graphics/fonts/greek_variable.tga", 15, 19, 1)
-        GameFontBase.romanianSheet = SpriteSheet(
-                "./assets/graphics/fonts/romana_wide.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
-        GameFontBase.romanianSheetNarrow = SpriteSheet(
-                "./assets/graphics/fonts/romana_narrow.tga", GameFontBase.W_LATIN_NARROW, GameFontBase.H)
         GameFontBase.thaiSheet = SpriteSheet(
                 "./assets/graphics/fonts/thai_wide.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.keycapSheet = SpriteSheet(
@@ -59,6 +57,7 @@ class GameFontImpl : GameFontBase() {
                 GameFontBase.hangulSheet,
                 GameFontBase.runicSheet,
                 GameFontBase.extASheet,
+                GameFontBase.extBSheet,
                 GameFontBase.kanaSheet,
                 GameFontBase.cjkPunct,
                 null, // Full unihan, filler because we're using WenQuanYi
@@ -68,8 +67,6 @@ class GameFontImpl : GameFontBase() {
                 GameFontBase.wenQuanYi_1,
                 GameFontBase.wenQuanYi_2,
                 GameFontBase.greekSheet,
-                GameFontBase.romanianSheet,
-                GameFontBase.romanianSheetNarrow,
                 GameFontBase.thaiSheet,
                 null, // Thai EF, filler because not being used right now
                 GameFontBase.keycapSheet
@@ -77,9 +74,10 @@ class GameFontImpl : GameFontBase() {
         GameFontBase.sheetKey = shk
 
 
-        buildWidthTable(asciiSheet, 0, 0..0xFF)
-        buildWidthTable(extASheet, 0x100, 0..0x7F)
-        buildWidthTable(cyrilic, 0x400, 0..0x5F)
+        buildWidthTable(asciiSheet, 0,     0..0xFF)
+        buildWidthTable(extASheet,  0x100, 0..0x7F)
+        buildWidthTable(extBSheet,  0x180, 0..0xCF)
+        buildWidthTable(cyrilic,    0x400, 0..0x5F)
         buildWidthTable(greekSheet, 0x370, 0..0x5F)
     }
 
