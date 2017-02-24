@@ -11,11 +11,11 @@ import org.luaj.vm2.LuaValue
  *
  * Created by minjaesong on 16-09-27.
  */
-internal class PeripheralPSG(val globals: Globals, val host: BaseTerrarumComputer)
-: Peripheral(globals, "psg") {
+internal class PeripheralPSG(val host: BaseTerrarumComputer)
+: Peripheral("psg") {
 
-    override fun loadLib() {
-        super.loadLib()
+    override fun loadLib(globals: Globals) {
+        globals["psg"] = LuaTable()
     }
 
 }

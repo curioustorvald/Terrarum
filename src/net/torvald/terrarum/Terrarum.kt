@@ -131,10 +131,11 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
         //addState(StateVTTest())
+        addState(StateGraphicComputerTest())
         //addState(StateTestingLightning())
         //addState(StateSplash())
         //addState(StateMonitorCheck())
-        addState(StateFontTester())
+        //addState(StateFontTester())
         //addState(StateNoiseTexGen())
         //addState(StateBlurTest())
         //addState(StateShaderTest())
@@ -467,7 +468,14 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         }
 
         val currentSaveDir: File
-            get() = File(defaultSaveDir + "/test") // TODO TEST CODE
+            get() {
+                val file = File(defaultSaveDir + "/test")
+
+                // failsafe?
+                if (!file.exists()) file.mkdir()
+
+                return file // TODO TEST CODE
+            }
     }
 }
 

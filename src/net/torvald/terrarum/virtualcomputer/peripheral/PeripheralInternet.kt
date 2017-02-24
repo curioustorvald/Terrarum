@@ -2,6 +2,7 @@ package net.torvald.terrarum.virtualcomputer.peripheral
 
 import org.luaj.vm2.Globals
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import java.io.BufferedReader
@@ -13,11 +14,11 @@ import java.net.URL
  *
  * Created by minjaesong on 16-09-24.
  */
-internal class PeripheralInternet(val globals: Globals, val host: BaseTerrarumComputer)
-: Peripheral(globals, "internet"){
+internal class PeripheralInternet(val host: BaseTerrarumComputer)
+: Peripheral("internet"){
 
-    override fun loadLib() {
-        super.loadLib()
+    override fun loadLib(globals: Globals) {
+        globals["internet"] = LuaTable()
         globals["internet"]["fetch"] = FetchWebPage()
     }
 

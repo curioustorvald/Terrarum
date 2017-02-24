@@ -10,13 +10,15 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
+import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
 import java.util.*
 
 /**
  * Created by SKYHi14 on 2017-02-08.
  */
-class PeripheralVideoCard(val globals: Globals, val termW: Int = 40, val termH: Int = 25) : Peripheral(globals, "ppu") {
+class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
+        Peripheral("ppu") {
     companion object {
         val blockW = 8
         val blockH = 8
@@ -43,53 +45,121 @@ class PeripheralVideoCard(val globals: Globals, val termW: Int = 40, val termH: 
     val height = termH *  blockH
 
     val vram = VRAM(width, height, 64)
+    val frameBuffer = Image(width, height)
+    val frameBufferG = frameBuffer.graphics
 
-    var fontRom = SpriteSheet("./assets/graphics/fonts/milky.tga", blockW, blockH)
+    // hard-coded 8x8
+    var fontRom = Array<IntArray>(256, { Array<Int>(blockH, { 0 }).toIntArray() })
 
-    val CLUT = vram.CLUT
+    init {
+        // build it for first time
+        resetTextRom()
+    }
+
+    val CLUT = VRAM.CLUT
     val coloursCount = CLUT.size
 
-    override fun loadLib() {
-        super.loadLib()
-        globals["ppu"]["setColor"] = SetColor(this)
-        globals["ppu"]["getColor"] = GetColor(this)
-        globals["ppu"]["emitChar"] = EmitChar(this)
+    fun buildFontRom(ref: String) {
+        // load font rom out of TGA
+        val imageRef = Image(ref)
+        val image = imageRef.texture.textureData
+        val imageWidth = imageRef.width
+
+        for (i in 0..255) {
+            for (y in 0..blockH - 1) {
+                // letter mirrored horizontally!
+                var scanline = 0
+                for (x in 0..blockW - 1) {
+                    val subX = i % 16
+                    val subY = i / 16
+                    val bit = image[4 * ((subY * blockH + y) * imageWidth + blockW * subX + x) + 3] != 0.toByte()
+                    if (bit) scanline = scanline or (1 shl x)
+                }
+
+                fontRom[i][y] = scanline
+            }
+        }
     }
+
+    override fun loadLib(globals: Globals) {
+        globals["ppu"] = LuaTable()
+        globals["ppu"]["setForeColor"] = SetForeColor(this)
+        globals["ppu"]["getForeColor"] = GetForeColor(this)
+        globals["ppu"]["setBackColor"] = SetBackColor(this)
+        globals["ppu"]["getBackColor"] = GetBackColor(this)
+        globals["ppu"]["emitChar"] = EmitChar(this)
+        globals["ppu"]["clearAll"] = ClearAll(this)
+        globals["ppu"]["clearBack"] = ClearBackground(this)
+        globals["ppu"]["clearFore"] = ClearForeground(this)
+    }
+
+    private val spriteBuffer = ImageBuffer(VSprite.width, VSprite.height)
 
     fun render(g: Graphics) {
-        g.drawImage(vram.background.image, 0f, 0f)
+        fun VSprite.render() {
+            val h = VSprite.height
+            val w = VSprite.width
+            if (rotation and 1 == 0) { // deg 0, 180
+                (if (rotation == 0 && !vFlip || rotation == 2 && vFlip) 0..h-1 else h-1 downTo 0).forEachIndexed { ordY, y ->
+                    (if (rotation == 0 && !hFlip || rotation == 2 && hFlip) 0..w-1 else w-1 downTo 0).forEachIndexed { ordX, x ->
+                        val pixelData = data[y].ushr(2 * x).and(0b11)
+                        val col = getColourFromPalette(pixelData)
+                        spriteBuffer.setRGBA(ordX, ordY, col.red, col.green, col.blue, col.alpha)
+                    }
+                }
+            }
+            else { // deg 90, 270
+                (if (rotation == 3 && !hFlip || rotation == 1 && hFlip) 0..w-1 else w-1 downTo 0).forEachIndexed { ordY, y ->
+                    (if (rotation == 3 && !vFlip || rotation == 1 && vFlip) h-1 downTo 0 else 0..h-1).forEachIndexed { ordX, x ->
+                        val pixelData = data[y].ushr(2 * x).and(0b11)
+                        val col = getColourFromPalette(pixelData)
+                        spriteBuffer.setRGBA(ordY, ordX, col.red, col.green, col.blue, col.alpha)
+                    }
+                }
+            }
+        }
+
+        frameBuffer.filter = Image.FILTER_NEAREST
+        frameBufferG.clear()
+
+        frameBufferG.drawImage(vram.background.image, 0f, 0f)
         vram.sprites.forEach {
             if (it.isBackground) {
-                val spriteImage = it.data.image.getFlippedCopy(it.hFlip, it.vFlip)
-                spriteImage.rotate(90f * it.rotation)
-                g.drawImage(spriteImage, it.xpos.toFloat(), it.ypos.toFloat())
+                it.render()
+                frameBufferG.drawImage(spriteBuffer.image, it.posX.toFloat(), it.posY.toFloat())
             }
         }
-        g.drawImage(vram.foreground.image, 0f, 0f)
+        frameBufferG.drawImage(vram.foreground.image, 0f, 0f)
         vram.sprites.forEach {
             if (!it.isBackground) {
-                val spriteImage = it.data.image.getFlippedCopy(it.hFlip, it.vFlip)
-                spriteImage.rotate(90f * it.rotation)
-                g.drawImage(spriteImage, it.xpos.toFloat(), it.ypos.toFloat())
+                it.render()
+                frameBufferG.drawImage(spriteBuffer.image, it.posX.toFloat(), it.posY.toFloat())
             }
         }
+
+        frameBufferG.flush()
+
+        g.drawImage(frameBuffer.getScaledCopy(2f), 0f, 0f)
     }
 
-    private var currentColour = 49 // white
-    fun getColor() = currentColour
-    fun setColor(value: Int) { currentColour = value }
+    private var foreColor = 49 // white
+    private var backColor = 64 // transparent
 
-    fun drawChar(c: Char, x: Int, y: Int, col: Int = currentColour) {
-        val glyph = fontRom.getSubImage(c.toInt() % 16, c.toInt() / 16)
-        val color = CLUT[col]
+    fun drawChar(c: Char, x: Int, y: Int, colFore: Int = foreColor, colBack: Int = backColor) {
+        val glyph = fontRom[c.toInt()]
+        val fore = CLUT[colFore]
+        val back = CLUT[colBack]
 
         // software render
-        for (gy in 0..blockH) {
-            for (gx in 0..blockW) {
-                val glyAlpha = glyph.getPixel(gx, gy)[3]
+        for (gy in 0..blockH - 1) {
+            for (gx in 0..blockW - 1) {
+                val glyAlpha = glyph[gy].ushr(gx).and(1)
 
-                if (glyAlpha > 0) {
-                    vram.foreground.setRGBA(x * blockW + gx, y * blockH + gy, color.red, color.green, color.blue, 255)
+                if (glyAlpha != 0) {
+                    vram.foreground.setRGBA(x * blockW + gx, y * blockH + gy, fore.red, fore.green, fore.blue, fore.alpha)
+                }
+                else {
+                    vram.foreground.setRGBA(x * blockW + gx, y * blockH + gy, back.red, back.green, back.blue, back.alpha)
                 }
             }
         }
@@ -104,45 +174,99 @@ class PeripheralVideoCard(val globals: Globals, val termW: Int = 40, val termH: 
 
     fun clearForeground() {
         for (i in 0..width * height - 1) {
-            vram.foreground.rgba[i] = if (i % 4 == 3) 0xFF.toByte() else 0x00.toByte()
+            vram.foreground.rgba[i] = 0x00.toByte()
         }
     }
 
     fun clearAll() {
         for (i in 0..width * height - 1) {
             vram.background.rgba[i] = if (i % 4 == 3) 0xFF.toByte() else 0x00.toByte()
-            vram.foreground.rgba[i] = if (i % 4 == 3) 0xFF.toByte() else 0x00.toByte()
+            vram.foreground.rgba[i] = 0x00.toByte()
         }
     }
 
     fun getSprite(index: Int) = vram.sprites[index]
 
 
-
-    fun setTextRom(data: Array<BitSet>) {
-        TODO("Not implemented")
+    /**
+     * Array be like, in binary; notice that glyphs are flipped horizontally:
+     * ...
+     * 00011000
+     * 00011100
+     * 00011000
+     * 00011000
+     * 00011000
+     * 00011000
+     * 01111111
+     * 00000000
+     * 00111110
+     * 01100011
+     * 01100000
+     * 00111111
+     * 00000011
+     * 00000011
+     * 01111111
+     * 00000000
+     * ...
+     */
+    fun setTextRom(data: Array<Int>) {
+        for (i in 0..255) {
+            for (y in 0..blockH - 1) {
+                // letter mirrored horizontally!
+                fontRom[i][y] = data[blockH * i + y]
+            }
+        }
     }
 
     fun resetTextRom() {
-        fontRom = SpriteSheet("./assets/graphics/fonts/milky.tga", blockW, blockH)
+        buildFontRom("./assets/graphics/fonts/milky.tga")
     }
 
 
-    class SetColor(val videoCard: PeripheralVideoCard) : OneArgFunction() {
+    class SetForeColor(val videoCard: PeripheralVideoCard) : OneArgFunction() {
         override fun call(arg: LuaValue): LuaValue {
-            videoCard.setColor(arg.checkint())
+            videoCard.foreColor = arg.checkint()
             return LuaValue.NONE
         }
     }
-    class GetColor(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
+    class GetForeColor(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
         override fun call(): LuaValue {
-            return videoCard.getColor().toLua()
+            return videoCard.foreColor.toLua()
+        }
+    }
+    class SetBackColor(val videoCard: PeripheralVideoCard) : OneArgFunction() {
+        override fun call(arg: LuaValue): LuaValue {
+            videoCard.backColor = arg.checkint()
+            return LuaValue.NONE
+        }
+    }
+    class GetBackColor(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return videoCard.backColor.toLua()
         }
     }
     class EmitChar(val videoCard: PeripheralVideoCard) : ThreeArgFunction() {
         /** emitChar(char, x, y) */
         override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue): LuaValue {
             videoCard.drawChar(arg1.checkint().toChar(), arg2.checkint(), arg3.checkint())
+            return LuaValue.NONE
+        }
+    }
+    class ClearAll(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            videoCard.clearAll()
+            return LuaValue.NONE
+        }
+    }
+    class ClearBackground(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            videoCard.clearBackground()
+            return LuaValue.NONE
+        }
+    }
+    class ClearForeground(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            videoCard.clearForeground()
             return LuaValue.NONE
         }
     }
@@ -211,9 +335,9 @@ class VRAM(pxlWidth: Int, pxlHeight: Int, nSprites: Int) {
     val background = ImageBuffer(pxlWidth, pxlHeight)
     val foreground = ImageBuffer(pxlWidth, pxlHeight) // text mode glyphs rendered here
 
-    var transparentKey: Int = 15 // black
-
-    val CLUT = DecodeTapestry.colourIndices64
+    companion object {
+        val CLUT = DecodeTapestry.colourIndices64 + Color(0, 0, 0, 0)
+    }
 
 
     fun setBackgroundPixel(x: Int, y: Int, color: Int) {
@@ -223,26 +347,26 @@ class VRAM(pxlWidth: Int, pxlHeight: Int, nSprites: Int) {
 
     fun setForegroundPixel(x: Int, y: Int, color: Int) {
         val col = CLUT[color]
-        background.setRGBA(x, y, col.red, col.green, col.blue, if (color == transparentKey) 0 else 255)
+        background.setRGBA(x, y, col.red, col.green, col.blue, col.alpha)
     }
 }
 
 class VSprite {
-    private val width = 8
-    private val height = 8
+    companion object {
+        val width = 8
+        val height = 8
+    }
 
-    val CLUT = DecodeTapestry.colourIndices64
-    val data = ImageBuffer(width, height)
+    internal val CLUT = VRAM.CLUT
+    internal val data = IntArray(height)
 
-    var pal0 = 15 // black
+    var pal0 = 64 // transparent
     var pal1 = 56 // light cyan
     var pal2 = 19 // magenta
     var pal3 = 49 // white
 
-    var transparentKey = 15 // black
-
-    var xpos = 0
-    var ypos = 0
+    var posX = 0
+    var posY = 0
 
     var hFlip = false
     var vFlip = false
@@ -270,18 +394,18 @@ class VSprite {
     }
 
     fun setPixel(x: Int, y: Int, color: Int) {
-        val col = getColourFromPalette(color)
-        data.setRGBA(x, y, col.red, col.green, col.blue, if (color == transparentKey) 0 else 255)
+        data[y] = data[y] xor data[y].and(3 shl (2 * x)) // mask off desired area to 0b00
+        data[y] = data[y] or (color shl (2 * x))
     }
 
     fun setLine(y: Int, rowData: IntArray) {
-        for (i in 0..width) {
+        for (i in 0..width - 1) {
             setPixel(i, y, rowData[i])
         }
     }
 
     fun setAll(data: IntArray) {
-        for (i in 0..width * height) {
+        for (i in 0..width * height - 1) {
             setPixel(i % width, i / width, data[i])
         }
     }

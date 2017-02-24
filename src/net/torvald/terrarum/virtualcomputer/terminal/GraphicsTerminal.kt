@@ -1,6 +1,7 @@
 package net.torvald.terrarum.virtualcomputer.terminal
 
 import net.torvald.terrarum.blendMul
+import net.torvald.terrarum.gameactors.DecodeTapestry
 import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
 import net.torvald.terrarum.virtualcomputer.peripheral.PeripheralVideoCard
 import org.newdawn.slick.Color
@@ -9,32 +10,45 @@ import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
 
 /**
+ * Printing text using Term API triggers 'compatibility' mode, where you are limited to 16 colours.
+ * Use PPU API for full 64 colours!
+ *
  * Created by SKYHi14 on 2017-02-08.
  */
-class GraphicsTerminal(
-        private val host: BaseTerrarumComputer, val videoCard: PeripheralVideoCard
-) : Terminal {
-    override val width = videoCard.termW
-    override val height = videoCard.termH
-    override val coloursCount = videoCard.coloursCount
+class GraphicsTerminal(private val host: BaseTerrarumComputer) : Terminal {
+    lateinit var videoCard: PeripheralVideoCard
+
+    override val width: Int; get() = videoCard.termW
+    override val height: Int; get() = videoCard.termH
+    override val coloursCount: Int; get() = videoCard.coloursCount
     override var cursorX = 0
     override var cursorY = 0
     override var cursorBlink = true
 
-    override var backColour = 15 // black
-    override var foreColour = 48 // bright grey
+    val backDefault = 0 // black
+    val foreDefault = 1 // white
+
+    override var backColour = backDefault
+    override var foreColour = foreDefault
+
+    private val colourKey: Int
+        get() = backColour.shl(4) or (foreColour).and(0xFF)
 
     override var lastInputByte = -1
 
     override fun getColor(index: Int) = videoCard.CLUT[index]
 
-    override val displayW = videoCard.width //+ 2 * borderSize
-    override val displayH = videoCard.height //+ 2 * borderSize
+    override val displayW: Int; get() = videoCard.width //+ 2 * borderSize
+    override val displayH: Int; get() = videoCard.height //+ 2 * borderSize
 
-    private val videoScreen = Image(videoCard.width, videoCard.height)
+    private lateinit var videoScreen: Image
+
+    var TABSIZE = 4
+
+    val errorColour = 6
 
     override fun printChars(s: String) {
-        TODO("not implemented")
+        printString(s, cursorX, cursorY)
     }
 
     override fun update(gc: GameContainer, delta: Int) {
@@ -60,16 +74,15 @@ class GraphicsTerminal(
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        videoCard.render(videoScreen.graphics)
-        g.drawImage(videoScreen.getScaledCopy(2f), 0f, 0f)
+        videoCard.render(g)
     }
 
     override fun keyPressed(key: Int, c: Char) {
-        TODO("not implemented")
+        //TODO("not implemented")
     }
 
     override fun writeChars(s: String) {
-        TODO("not implemented")
+        writeString(s, cursorX, cursorY)
     }
 
     /** Unlike lua function, this one in Zero-based. */
@@ -79,42 +92,78 @@ class GraphicsTerminal(
     }
 
     override fun openInput(echo: Boolean) {
-        TODO("not implemented")
+        //TODO("not implemented")
     }
 
     override fun emitChar(bufferChar: Int, x: Int, y: Int) {
-        TODO("not implemented")
+        videoCard.drawChar(
+                bufferChar.and(0xFF).toChar(), x, y,
+                CLUT16_TO_64[bufferChar.ushr(8).and(0xF)],
+                CLUT16_TO_64[bufferChar.ushr(12).and(0xF)]
+        )
     }
 
     override fun closeInputKey(keyFromUI: Int): Int {
-        TODO("not implemented")
+        //TODO("not implemented")
+        return 0
     }
 
     override fun closeInputString(): String {
-        TODO("not implemented")
+        //TODO("not implemented")
+        return " "
     }
 
     override var lastStreamInput: String? = null
     override var lastKeyPress: Int? = null
 
     override fun emitChar(c: Char, x: Int, y: Int) {
-        TODO("not implemented")
+        videoCard.drawChar(c, x, y, CLUT16_TO_64[foreColour])
     }
 
     override fun printChar(c: Char) {
-        TODO("not implemented")
+        wrap()
+        if (c >= ' ' && c.toInt() != 127) {
+            emitChar(c)
+            cursorX += 1
+        }
+        else {
+            when (c) {
+                ASCII_BEL -> bell(".")
+                ASCII_BS  -> { cursorX -= 1; wrap() }
+                ASCII_TAB -> { cursorX = (cursorX).div(TABSIZE).times(TABSIZE) + TABSIZE }
+                ASCII_LF  -> newLine()
+                ASCII_FF  -> clear()
+                ASCII_CR  -> { cursorX = 0 }
+                ASCII_DEL -> { cursorX -= 1; wrap(); emitChar(colourKey.shl(8)) }
+                ASCII_DC1, ASCII_DC2, ASCII_DC3, ASCII_DC4 -> { foreColour = c - ASCII_DC1 }
+                ASCII_DLE -> { foreColour = errorColour }
+            }
+        }
     }
 
     override fun emitString(s: String, x: Int, y: Int) {
-        TODO("not implemented")
+        setCursor(x, y)
+
+        for (i in 0..s.length - 1) {
+            printChar(s[i])
+            wrap()
+        }
+
+        setCursor(x, y)
     }
 
     override fun printString(s: String, x: Int, y: Int) {
-        TODO("not implemented")
+        writeString(s, x, y)
+        newLine()
     }
 
     override fun writeString(s: String, x: Int, y: Int) {
-        TODO("not implemented")
+        setCursor(x, y)
+
+        for (i in 0..s.length - 1) {
+            printChar(s[i])
+            wrap()
+        }
     }
 
     override fun clear() {
@@ -122,23 +171,31 @@ class GraphicsTerminal(
     }
 
     override fun clearLine() {
-        TODO("not implemented")
+        //TODO("not implemented")
     }
 
     override fun newLine() {
-        TODO("not implemented")
+        //TODO("not implemented")
     }
 
     override fun scroll(amount: Int) {
-        TODO("not implemented")
+        //TODO("not implemented")
     }
 
+    /**
+     * does not changes color setting in PPU
+     */
     override fun setColour(back: Int, fore: Int) {
-        TODO("not implemented")
+        foreColour = fore
+        backColour = back
     }
 
+    /**
+     * does not changes color setting in PPU
+     */
     override fun resetColour() {
-        TODO("not implemented")
+        foreColour = foreDefault
+        backColour = backDefault
     }
 
     /**    // copied from SimpleTextTerminal
@@ -174,6 +231,53 @@ class GraphicsTerminal(
     }
 
     override fun getKeyPress(): Int? {
-        TODO("not implemented")
+        //TODO("not implemented")
+        return null
+    }
+
+    companion object {
+        private val WHITE7500 = Color(0xe4eaff)
+
+        val ASCII_NUL = 0.toChar()
+        val ASCII_BEL = 7.toChar()   // *BEEP!*
+        val ASCII_BS = 8.toChar()    // x = x - 1
+        val ASCII_TAB = 9.toChar()   // move cursor to next (TABSIZE * yy) pos (5 -> 8, 3- > 4, 4 -> 8)
+        val ASCII_LF = 10.toChar()   // new line
+        val ASCII_FF = 12.toChar()   // new page
+        val ASCII_CR = 13.toChar()   // x <- 0
+        val ASCII_DEL = 127.toChar() // backspace and delete char
+        val ASCII_DC1 = 17.toChar()  // foreground colour 0
+        val ASCII_DC2 = 18.toChar()  // foreground colour 1
+        val ASCII_DC3 = 19.toChar()  // foreground colour 2
+        val ASCII_DC4 = 20.toChar()  // foreground colour 3
+        val ASCII_DLE = 16.toChar()  // error message colour
+
+        val asciiControlInUse = charArrayOf(
+                ASCII_NUL,
+                ASCII_BEL,
+                ASCII_BS,
+                ASCII_TAB,
+                ASCII_LF,
+                ASCII_FF,
+                ASCII_CR,
+                ASCII_DEL,
+                ASCII_DC1,
+                ASCII_DC2,
+                ASCII_DC3,
+                ASCII_DC4,
+                ASCII_DLE
+        )
+
+        val CLUT = DecodeTapestry.colourIndices64
+        val CLUT16_TO_64 = intArrayOf(
+                15, 49, 16, 48, 44, 29, 33, 18,
+                 5, 22, 39, 26, 25, 10, 31, 13
+        )
+    }
+
+    fun attachVideoCard(videocard: PeripheralVideoCard) {
+        this.videoCard = videocard
+
+        videoScreen = Image(videoCard.width, videoCard.height)
     }
 }
