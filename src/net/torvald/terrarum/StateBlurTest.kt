@@ -1,5 +1,6 @@
 package net.torvald.terrarum
 
+import com.jme3.math.FastMath
 import net.torvald.terrarum.gameactors.floor
 import net.torvald.terrarum.gameactors.floorInt
 import net.torvald.terrarum.gameworld.toUint
@@ -17,39 +18,45 @@ import java.nio.ByteOrder
 class StateBlurTest : BasicGameState() {
 
     /** Warning: the image must have a bit depth of 32! (use 32-bit PNG or TGA) */
-    private val testImage = Image("./assets/testimage_resized.tga")
+    private val testImage = Image("./assets/test_texture.tga")
     private val bluredImage = ImageBuffer(testImage.width, testImage.height)
 
     override fun init(gc: GameContainer, sbg: StateBasedGame) {
-        testImage.flushPixelData()
-
-        /*System.arraycopy(
-                testImage.texture.textureData, 0,
-                bluredImage.rgba, 0, testImage.texture.textureData.size
-        )
-        kotlin.repeat(3, { fastBoxBlur(bluredImage, 3) })*/
-    }
-
-    override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
-        Terrarum.appgc.setTitle("${Terrarum.NAME} — F: ${Terrarum.appgc.fps}")
+        /*testImage.flushPixelData()
 
         System.arraycopy(
                 testImage.texture.textureData, 0,
                 bluredImage.rgba, 0, testImage.texture.textureData.size
-        )
-        fastBoxBlur(testImage, bluredImage, 3)
-        //fastBoxBlur(bluredImage, 3)
-        //fastBoxBlur(bluredImage, 3)
+        )*/
+        //kotlin.repeat(3) { fastBoxBlur(bluredImage, 3) }
+    }
+
+
+
+    override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
+        Terrarum.appgc.setTitle("${Terrarum.NAME} — F: ${Terrarum.appgc.fps}")
+
+        theta += delta / 500f
+        if (theta > FastMath.TWO_PI)
+            theta -= FastMath.TWO_PI
     }
 
     override fun getID() = Terrarum.STATE_ID_TEST_BLUR
 
+    var theta = 0f
+
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
+        System.arraycopy(
+                testImage.texture.textureData, 0,
+                bluredImage.rgba, 0, testImage.texture.textureData.size
+        )
+        kotlin.repeat(3) { fastBoxBlur(bluredImage, 3) }
+
         g.background = Color(0x404040)
         val image = bluredImage.image
         g.drawImage(image,
-                Terrarum.WIDTH.minus(testImage.width).div(2f).floor(),
-                Terrarum.HEIGHT.minus(testImage.height).div(2f).floor()
+                Terrarum.WIDTH.minus(testImage.width).div(2f).floor() + FastMath.cos(theta) * 120,
+                Terrarum.HEIGHT.minus(testImage.height).div(2f).floor() + FastMath.sin(theta) * 40
         )
         g.flush()
 

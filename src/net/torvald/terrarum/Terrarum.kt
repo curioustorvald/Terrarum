@@ -141,7 +141,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         //addState(StateMonitorCheck())
         //addState(StateFontTester())
         //addState(StateNoiseTexGen())
-        //addState(StateBlurTest())
+        addState(StateBlurTest())
         //addState(StateShaderTest())
         //addState(StateNoiseTester())
 
