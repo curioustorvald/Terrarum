@@ -10,7 +10,7 @@ import org.newdawn.slick.Image
 /**
  * Created by minjaesong on 2017-01-07.
  */
-class TapestryObject(val image: Image, val artName: String, val artAuthor: String) : FixtureBase(physics = false) {
+class TapestryObject(image: Image, val artName: String, val artAuthor: String) : FixtureBase(physics = false) {
 
     // physics = false only speeds up for ~2 frames with 50 tapestries
 
@@ -19,6 +19,7 @@ class TapestryObject(val image: Image, val artName: String, val artAuthor: Strin
         makeNewSprite(image.width, image.height, image)
         setHitboxDimension(image.width, image.height, 0, 0)
         setPosition(Terrarum.appgc.mouseX, Terrarum.appgc.mouseY)
+        // you CAN'T destroy the image
     }
 
     override fun update(gc: GameContainer, delta: Int) {
