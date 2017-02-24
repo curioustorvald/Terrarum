@@ -23,21 +23,21 @@ class StateBlurTest : BasicGameState() {
     override fun init(gc: GameContainer, sbg: StateBasedGame) {
         testImage.flushPixelData()
 
-        System.arraycopy(
+        /*System.arraycopy(
                 testImage.texture.textureData, 0,
                 bluredImage.rgba, 0, testImage.texture.textureData.size
         )
-        kotlin.repeat(3, { fastBoxBlur(bluredImage, 3) })
+        kotlin.repeat(3, { fastBoxBlur(bluredImage, 3) })*/
     }
 
     override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
         Terrarum.appgc.setTitle("${Terrarum.NAME} — F: ${Terrarum.appgc.fps}")
 
-        /*System.arraycopy(
+        System.arraycopy(
                 testImage.texture.textureData, 0,
                 bluredImage.rgba, 0, testImage.texture.textureData.size
-        )*/
-        //fastBoxBlur(testImage, bluredImage, 3)
+        )
+        fastBoxBlur(testImage, bluredImage, 3)
         //fastBoxBlur(bluredImage, 3)
         //fastBoxBlur(bluredImage, 3)
     }
@@ -46,11 +46,14 @@ class StateBlurTest : BasicGameState() {
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, g: Graphics) {
         g.background = Color(0x404040)
-        g.drawImage(bluredImage.image,
+        val image = bluredImage.image
+        g.drawImage(image,
                 Terrarum.WIDTH.minus(testImage.width).div(2f).floor(),
                 Terrarum.HEIGHT.minus(testImage.height).div(2f).floor()
         )
         g.flush()
+
+        image.destroy()
     }
 
     private val isLE: Boolean

@@ -155,10 +155,13 @@ class StateNoiseTexGen : BasicGameState() {
         g.drawString("CPUs: ${Terrarum.THREADS}", Terrarum.WIDTH - 90f, 8f)
 
         g.background = Color.cyan
-        g.drawImage(noiseImageBuffer.image,//noiseImage,
+        val img = noiseImageBuffer.image
+        g.drawImage(img,//noiseImage,
                 Terrarum.WIDTH.minus(imagesize).div(2).toFloat(),
                 Terrarum.HEIGHT.minus(imagesize).div(2).toFloat()
         )
+
+        img.destroy()
     }
 
     override fun keyPressed(key: Int, c: Char) {

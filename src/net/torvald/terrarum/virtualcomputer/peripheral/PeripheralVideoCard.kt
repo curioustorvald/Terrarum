@@ -45,8 +45,8 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
     val height = termH *  blockH
 
     val vram = VRAM(width, height, 64)
-    val frameBuffer = Image(width, height)
-    val frameBufferG = frameBuffer.graphics
+    val frameBuffer = ImageBuffer(width, height)
+    val frameBufferImage = frameBuffer.image
 
     // hard-coded 8x8
     var fontRom = Array<IntArray>(256, { Array<Int>(blockH, { 0 }).toIntArray() })
@@ -54,6 +54,8 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
     init {
         // build it for first time
         resetTextRom()
+
+        frameBufferImage.filter = Image.FILTER_NEAREST
     }
 
     val CLUT = VRAM.CLUT
@@ -119,27 +121,45 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
             }
         }
 
-        frameBuffer.filter = Image.FILTER_NEAREST
-        frameBufferG.clear()
 
-        frameBufferG.drawImage(vram.background.image, 0f, 0f)
+        System.arraycopy(vram.background.rgba, 0, frameBuffer.rgba, 0, vram.background.rgba.size)
         vram.sprites.forEach {
             if (it.isBackground) {
                 it.render()
-                frameBufferG.drawImage(spriteBuffer.image, it.posX.toFloat(), it.posY.toFloat())
+                frameBuffer.softwareRender(spriteBuffer, it.posX, it.posY)
             }
         }
-        frameBufferG.drawImage(vram.foreground.image, 0f, 0f)
+        frameBuffer.softwareRender(vram.foreground, 0, 0)
         vram.sprites.forEach {
             if (!it.isBackground) {
                 it.render()
-                frameBufferG.drawImage(spriteBuffer.image, it.posX.toFloat(), it.posY.toFloat())
+                frameBuffer.softwareRender(spriteBuffer, it.posX, it.posY)
             }
         }
 
-        frameBufferG.flush()
 
-        g.drawImage(frameBuffer.getScaledCopy(2f), 0f, 0f)
+        val img = frameBuffer.image
+        img.filter = Image.FILTER_NEAREST
+        g.drawImage(img.getScaledCopy(2f), 0f, 0f)
+
+        img.destroy()
+    }
+
+    fun ImageBuffer.softwareRender(other: ImageBuffer, posX: Int, posY: Int) {
+        for (y in 0..other.height - 1) {
+            for (x in 0..other.width - 1) {
+                val ix = posX + x
+                val iy = posY + y
+                if (ix >= 0 && iy >= 0 && ix < this.width && iy < this.height) {
+                    if (other.rgba[4 * (y * other.width + x) + 3] != 0.toByte()) { // if not transparent
+                        this.rgba[4 * (iy * this.texWidth + ix) + 0] = other.rgba[4 * (y * other.texWidth + x) + 0]
+                        this.rgba[4 * (iy * this.texWidth + ix) + 1] = other.rgba[4 * (y * other.texWidth + x) + 1]
+                        this.rgba[4 * (iy * this.texWidth + ix) + 2] = other.rgba[4 * (y * other.texWidth + x) + 2]
+                        this.rgba[4 * (iy * this.texWidth + ix) + 3] = other.rgba[4 * (y * other.texWidth + x) + 3]
+                    }
+                }
+            }
+        }
     }
 
     private var foreColor = 49 // white

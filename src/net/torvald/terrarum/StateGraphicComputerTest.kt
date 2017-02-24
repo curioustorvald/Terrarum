@@ -49,20 +49,26 @@ class StateGraphicComputerTest : BasicGameState() {
         monitor.update(container, delta)
         computer.update(container, delta)
 
-        val sprite = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram.sprites[0]
+        val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard)
+        val sprite = vcard.vram.sprites[0]
 
         angle += delta / 500.0
 
         sprite.posX = (Math.cos(angle) * 80 + 100).roundInt()
         sprite.posY = (Math.sin(angle) * 80 + 100).roundInt()
 
-        sprite.pal0 = (sprite.pal0 + 1) % 65
-        sprite.pal1 = (sprite.pal1 + 1) % 65
-        sprite.pal2 = (sprite.pal2 + 1) % 65
-        sprite.pal3 = (sprite.pal3 + 1) % 65
+        //sprite.pal0 = (sprite.pal0 + 1) % 65
+        //sprite.pal1 = (sprite.pal1 + 1) % 65
+        //sprite.pal2 = (sprite.pal2 + 1) % 65
+        //sprite.pal3 = (sprite.pal3 + 1) % 65
 
         sprite.rotation = (angle * 2 / Math.PI).roundInt() % 4
 
+
+        //vcard.vram.setBackgroundPixel(Random().nextInt(320), Random().nextInt(200), Random().nextInt(64))
+        //kotlin.repeat(64) {
+        //    vcard.vram.setBackgroundPixel(Random().nextInt(320), Random().nextInt(200), 0)
+        //}
     }
 
     override fun getID() = Terrarum.STATE_ID_TEST_TTY

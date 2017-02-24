@@ -44,6 +44,10 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         // just in case
         println("[Terrarum] os.arch = $systemArch")
 
+        if (is32Bit) {
+            println("Java is running in 32 Bit")
+        }
+
         gameConfig = GameConfig()
 
         joypadLabelStart = when (getConfigString("joypadlabelstyle")) {
@@ -131,7 +135,7 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
         //addState(StateVTTest())
-        addState(StateGraphicComputerTest())
+        //addState(StateGraphicComputerTest())
         //addState(StateTestingLightning())
         //addState(StateSplash())
         //addState(StateMonitorCheck())
