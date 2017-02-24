@@ -7,14 +7,9 @@ import org.luaj.vm2.LuaValue
 /**
  * Created by minjaesong on 16-09-29.
  */
-open class Peripheral(val luaG: Globals, val tableName: String) {
+abstract class Peripheral(val tableName: String) {
 
-    open fun loadLib() {
-        luaG[tableName] = LuaTable()
-    }
-    open fun unloadLib() {
-        luaG[tableName] = LuaValue.NIL
-    }
+    abstract fun loadLib(globals: Globals)
 
-    override fun toString(): String = tableName
+    override fun toString(): String = "Peripheral:$tableName"
 }

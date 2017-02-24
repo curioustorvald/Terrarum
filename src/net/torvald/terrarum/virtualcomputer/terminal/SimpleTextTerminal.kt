@@ -47,7 +47,7 @@ open class SimpleTextTerminal(
     override var backColour = backDefault
     override var foreColour = foreDefault
     private val colourKey: Int
-        get() = backColour.shl(4).plus(foreColour).and(0xFF)
+        get() = backColour.shl(4) or (foreColour).and(0xFF)
 
     override var cursorX = 0
     override var cursorY = 0

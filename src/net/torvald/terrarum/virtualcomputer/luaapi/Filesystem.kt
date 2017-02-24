@@ -74,9 +74,12 @@ internal class Filesystem(globals: Globals, computer: BaseTerrarumComputer) {
                 lowerCase.delete()
 
                 isCaseInsensitive = insensitive
+
+                println("[Filesystem] Case insensitivity: $isCaseInsensitive")
             }
             catch (e: IOException) {
-                println("[Filesystem] Couldn't determine if file system is case sensitive, falling back to insensitive.")
+                System.err.println("[Filesystem] Couldn't determine if the file system is case sensitive, falling back to insensitive.")
+                e.printStackTrace(System.out)
                 isCaseInsensitive = true
             }
         }

@@ -39,3 +39,8 @@ Connect two or more tracker head to play the array of trackers play simultaneous
 
 - Include a valid way of obtaining Aimhack (possessed weapon shit?)
 - Implement it on ```<item>.primaryUse(gc, delta)```
+
+
+## Computers ##
+
+Instead of single box with bunch of parts, make computers occupy several blocks -- processor unit, core memory unit, storage unit (RAMAC!), I/O unit, etc., like old PDPs. Powerful computer == more space. Plus portable units like TRS-80 Model 100.

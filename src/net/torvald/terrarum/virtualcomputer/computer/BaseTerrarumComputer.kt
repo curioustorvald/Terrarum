@@ -107,10 +107,18 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         computerValue["boot"] = computerValue.getAsString("hda")!!
     }
 
+    fun getPeripheral(tableName: String): Peripheral? {
+        peripheralTable.forEach {
+            if (it.tableName == tableName)
+                return it
+        }
+        return null
+    }
+
     fun attachPeripheral(peri: Peripheral) {
         if (peripheralTable.size < maxPeripherals) {
             peripheralTable.add(peri)
-            peri.loadLib()
+            peri.loadLib(luaJ_globals)
             println("[BaseTerrarumComputer] loading peripheral $peri")
         }
         else {
@@ -121,7 +129,6 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
     fun detachPeripheral(peri: Peripheral) {
         if (peripheralTable.contains(peri)) {
             peripheralTable.remove(peri)
-            peri.unloadLib()
             println("[BaseTerrarumComputer] unloading peripheral $peri")
         }
         else {
@@ -153,7 +160,6 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         Filesystem(luaJ_globals, this)
         HostAccessProvider(luaJ_globals, this)
         Input(luaJ_globals, this)
-        PeripheralInternet(luaJ_globals, this)
         PcSpeakerDriver(luaJ_globals, this)
         WorldInformationProvider(luaJ_globals)
 
@@ -179,8 +185,8 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         // load every peripheral if we're in DEBUG
         if (DEBUG) {
             maxPeripherals = 32
-            attachPeripheral(PeripheralInternet(luaJ_globals, this))
-            attachPeripheral(PeripheralPSG(luaJ_globals, this))
+            attachPeripheral(PeripheralInternet(this))
+            attachPeripheral(PeripheralPSG(this))
             // ...
         }
     }
@@ -281,8 +287,8 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
                 chunk.call()
             }
             catch (e: LuaError) {
-                lua.STDERR.println("${SimpleTextTerminal.ASCII_DLE}${e.message}${SimpleTextTerminal.ASCII_DC4}")
                 e.printStackTrace(System.err)
+                lua.STDERR.println("${SimpleTextTerminal.ASCII_DLE}${e.message}${SimpleTextTerminal.ASCII_DC4}")
             }
         }
     }
