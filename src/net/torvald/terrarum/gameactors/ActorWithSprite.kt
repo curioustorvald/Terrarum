@@ -91,6 +91,8 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
         protected set(value) {
             controllerMoveDelta!!.y = value
         }
+    // not sure we need this...
+    //var jumpable = true // this is kind of like "semaphore"
 
     /**
      * Physical properties.
@@ -587,12 +589,22 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
      * prevents sticking to the ceiling
      */
     private fun hitAndForciblyReflectY() {
+        println("hitAndForciblyReflectY")
         // TODO HARK! I have changed veloX/Y to moveDelta.x/y
         if (moveDelta.y < 0) {
-            if (moveDelta.y.abs() * CEILING_HIT_ELASTICITY > A_PIXEL)
+            walkY = 0.0
+            if (moveDelta.y * CEILING_HIT_ELASTICITY < -A_PIXEL) {
                 moveDelta.y = -moveDelta.y * CEILING_HIT_ELASTICITY
-            else
-                moveDelta.y = moveDelta.y.sign() * -A_PIXEL
+            }
+            else {
+                moveDelta.y = A_PIXEL
+            }
+
+            // for more of a "bounce", you can assign zero if you don't like it
+            externalForce.y = moveDelta.y * CEILING_HIT_ELASTICITY
+            //externalForce.y = 0.0
+
+            nextHitbox.translatePosY(0.5)
         }
         else {
             throw Error("Check this out bitch (moveDelta.y = ${moveDelta.y})")
