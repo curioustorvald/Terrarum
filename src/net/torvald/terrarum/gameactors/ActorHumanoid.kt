@@ -464,7 +464,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             return timedJumpCharge
         }
 
-        if (jumping) {
+        if (jumping) {// && jumpable) {
             // increment jump counter
             if (jumpCounter < len) jumpCounter += 1
 
@@ -472,8 +472,13 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
             jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
 
-            applyForce(Vector2(0.0, -jumpAcc))
+            walkY -= jumpAcc
         }
+        // not sure we need this...
+        /*else if (!jumpable) {
+            jumpable = true  // this is kind of like "semaphore", we toggle it now
+            grounded = false // just in case...
+        }*/
 
         // release "jump key" of AIs
         if (jumpCounter >= len && !isGamer) {
