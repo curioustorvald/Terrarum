@@ -44,7 +44,9 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
     val width = termW * blockW
     val height = termH *  blockH
 
-    val vram = VRAM(width, height, 64)
+    val spritesCount = 64
+
+    val vram = VRAM(width, height, spritesCount)
     val frameBuffer = ImageBuffer(width, height)
     val frameBufferImage = frameBuffer.image
 
@@ -60,6 +62,28 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
 
     val CLUT = VRAM.CLUT
     val coloursCount = CLUT.size
+
+    val luaSpriteTable = LuaTable()
+
+    init {
+        fun composeSpriteObject(spriteIndex: Int) : LuaValue {
+            val sprite = vram.sprites[spriteIndex]
+            val t = LuaTable()
+
+            t["getColFromPal"] = SpriteGetColFromPal(sprite)
+            t["setPixel"] = SpriteSetPixel(sprite)
+            t["setPalSet"] = SpriteSetPaletteSet(sprite)
+            t["setLine"] = SpriteSetLine(sprite)
+            t["setAll"] = SpriteSetAll(sprite)
+            t["setRotation"] = SpriteSetRotation(sprite)
+            t["setFlipH"] = SpriteSetFlipH(sprite)
+            t["setFlipV"] = SpriteSetFlipV(sprite)
+
+            return t
+        }
+
+        (0..spritesCount - 1).forEach { luaSpriteTable[it + 1] = composeSpriteObject(it) }
+    }
 
     fun buildFontRom(ref: String) {
         // load font rom out of TGA
@@ -93,6 +117,8 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
         globals["ppu"]["clearAll"] = ClearAll(this)
         globals["ppu"]["clearBack"] = ClearBackground(this)
         globals["ppu"]["clearFore"] = ClearForeground(this)
+
+        globals["ppu"]["getSpritesCount"] = GetSpritesCount(this)
     }
 
     private val spriteBuffer = ImageBuffer(VSprite.width, VSprite.height)
@@ -219,7 +245,7 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
      * 00011000
      * 01111111
      * 00000000
-     * 00111110
+     * 00111111
      * 01100011
      * 01100000
      * 00111111
@@ -290,23 +316,20 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
             return LuaValue.NONE
         }
     }
+    class GetSpritesCount(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return videoCard.spritesCount.toLua()
+        }
+    }
+    class GetSprite(val videoCard: PeripheralVideoCard) : OneArgFunction() {
+        override fun call(arg: LuaValue): LuaValue {
+            return videoCard.luaSpriteTable[arg.checkint() - 1]
+        }
+    }
 
     /////////////
     // Sprites //
     /////////////
-
-    fun composeSpriteObject(spriteIndex: Int) : LuaValue {
-        val sprite = vram.sprites[spriteIndex]
-        val t = LuaTable()
-
-        t["getColFromPal"] = SpriteGetColFromPal(sprite)
-        t["setPixel"] = SpriteSetPixel(sprite)
-        t["setPalSet"] = SpriteSetPaletteSet(sprite)
-        t["setLine"] = SpriteSetLine(sprite)
-        t["setAll"] = SpriteSetAll(sprite)
-
-        return t
-    }
 
     private class SpriteGetColFromPal(val sprite: VSprite) : OneArgFunction() {
         override fun call(arg: LuaValue): LuaValue {
@@ -319,31 +342,45 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
             }
         }
     }
-
     private class SpriteSetPixel(val sprite: VSprite) : ThreeArgFunction() {
         override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue): LuaValue {
             sprite.setPixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
             return LuaValue.NONE
         }
     }
-
     private class SpriteSetPaletteSet(val sprite: VSprite) : OneArgFunction() {
         override fun call(arg: LuaValue): LuaValue {
             sprite.setPaletteSet(arg(1).checkint(), arg(2).checkint(), arg(3).checkint(), arg(4).checkint())
             return LuaValue.NONE
         }
     }
-
     private class SpriteSetLine(val sprite: VSprite) : TwoArgFunction() {
         override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
             sprite.setLine(arg1.checkint(), arg2.checktable().toIntArray())
             return LuaValue.NONE
         }
     }
-
     private class SpriteSetAll(val sprite: VSprite) : OneArgFunction() {
         override fun call(arg: LuaValue): LuaValue {
             sprite.setAll(arg.checktable().toIntArray())
+            return LuaValue.NONE
+        }
+    }
+    private class SpriteSetRotation(val sprite: VSprite) : OneArgFunction() {
+        override fun call(arg: LuaValue): LuaValue {
+            sprite.rotation = arg.checkint()
+            return LuaValue.NONE
+        }
+    }
+    private class SpriteSetFlipH(val sprite: VSprite) : OneArgFunction() {
+        override fun call(arg: LuaValue): LuaValue {
+            sprite.hFlip = arg.checkboolean()
+            return LuaValue.NONE
+        }
+    }
+    private class SpriteSetFlipV(val sprite: VSprite) : OneArgFunction() {
+        override fun call(arg: LuaValue): LuaValue {
+            sprite.vFlip = arg.checkboolean()
             return LuaValue.NONE
         }
     }
@@ -391,6 +428,7 @@ class VSprite {
     var hFlip = false
     var vFlip = false
     var rotation = 0
+        set(value) { field = value % 4 }
 
     var isBackground = false
     var isVisible = false
