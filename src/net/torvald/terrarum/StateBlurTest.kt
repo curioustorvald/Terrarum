@@ -53,14 +53,15 @@ class StateBlurTest : BasicGameState() {
         kotlin.repeat(3) { fastBoxBlur(bluredImage, 3) }
 
         g.background = Color(0x404040)
-        val image = bluredImage.image
+        val image = bluredImage.image // ImageBuffer.getImage() always HARDCOPIES texture data by
+        // allocating new ByteBuffer. We need variable so that we can destroy() it manually
         g.drawImage(image,
                 Terrarum.WIDTH.minus(testImage.width).div(2f).floor() + FastMath.cos(theta) * 120,
                 Terrarum.HEIGHT.minus(testImage.height).div(2f).floor() + FastMath.sin(theta) * 40
         )
         g.flush()
 
-        image.destroy()
+        image.destroy() // You are done and you will be terminated, for the perkeleen memory's sake
     }
 
     private val isLE: Boolean

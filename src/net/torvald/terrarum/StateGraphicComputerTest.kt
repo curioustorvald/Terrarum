@@ -28,17 +28,50 @@ class StateGraphicComputerTest : BasicGameState() {
     }
 
     override fun init(container: GameContainer?, game: StateBasedGame?) {
-        val sprite = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram.sprites[0]
+        val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram
 
-        sprite.setLine(0, intArrayOf(1,1,0,0,0,0,3,3))
-        sprite.setLine(1, intArrayOf(1,1,0,0,0,0,3,3))
-        sprite.setLine(2, intArrayOf(1,1,0,0,0,0,1,1))
-        sprite.setLine(3, intArrayOf(1,1,1,1,1,1,1,1))
-        sprite.setLine(4, intArrayOf(1,1,1,1,1,1,1,1))
-        sprite.setLine(5, intArrayOf(0,0,0,0,0,0,1,1))
-        sprite.setLine(6, intArrayOf(2,2,0,0,0,0,1,1))
-        sprite.setLine(7, intArrayOf(2,2,0,0,0,0,1,1))
+        (0..3).forEach { vcard.sprites[it].setPaletteSet(64,33,12,62) }
 
+        vcard.sprites[0].setAll(intArrayOf(
+                0,0,0,0,0,1,1,1,
+                0,0,0,0,1,1,1,1,
+                0,0,0,0,2,2,2,3,
+                0,0,0,2,3,2,3,3,
+                0,0,0,2,3,2,2,3,
+                0,0,0,2,2,3,3,3,
+                0,0,0,0,0,3,3,3,
+                0,0,0,0,2,2,1,2
+        ))
+        vcard.sprites[1].setAll(intArrayOf(
+                1,1,0,0,0,0,0,0,
+                1,1,1,1,1,0,0,0,
+                3,2,3,0,0,0,0,0,
+                3,2,3,3,3,0,0,0,
+                3,3,2,3,3,3,0,0,
+                3,2,2,2,2,0,0,0,
+                3,3,3,3,0,0,0,0,
+                2,2,0,0,0,0,0,0
+        ))
+        vcard.sprites[2].setAll(intArrayOf(
+                0,0,0,2,2,2,1,2,
+                0,0,2,2,2,2,1,1,
+                0,0,3,3,2,1,3,1,
+                0,0,3,3,3,1,1,1,
+                0,0,3,3,1,1,1,1,
+                0,0,0,0,1,1,1,0,
+                0,0,0,2,2,2,0,0,
+                0,0,2,2,2,2,0,0
+        ))
+        vcard.sprites[3].setAll(intArrayOf(
+                2,1,2,2,2,0,0,0,
+                1,1,2,2,2,2,0,0,
+                1,3,1,2,3,3,0,0,
+                1,1,1,3,3,3,0,0,
+                1,1,1,1,3,3,0,0,
+                0,1,1,1,0,0,0,0,
+                0,0,2,2,2,0,0,0,
+                0,0,2,2,2,2,0,0
+        ))
     }
 
     var angle = 0.0
@@ -50,24 +83,33 @@ class StateGraphicComputerTest : BasicGameState() {
         computer.update(container, delta)
 
         val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard)
-        val sprite = vcard.vram.sprites[0]
+        val sprites = vcard.vram.sprites
 
-        angle += delta / 500.0
+        angle += delta / 1000.0
 
-        sprite.posX = (Math.cos(angle) * 80 + 100).roundInt()
-        sprite.posY = (Math.sin(angle) * 80 + 100).roundInt()
+        (0..3).forEach { vcard.vram.sprites[it].setPaletteSet(64,26,12,62) }
+
+        sprites[0].posX = (Math.cos(angle) * 80 + 100).roundInt() - 8
+        sprites[0].posY = (Math.sin(angle) * 0  + 100).roundInt() - 8
+
+        sprites[1].posX = (Math.cos(angle) * 80 + 100).roundInt()
+        sprites[1].posY = (Math.sin(angle) * 0  + 100).roundInt() - 8
+
+        sprites[2].posX = (Math.cos(angle) * 80 + 100).roundInt() - 8
+        sprites[2].posY = (Math.sin(angle) * 0  + 100).roundInt()
+
+        sprites[3].posX = (Math.cos(angle) * 80 + 100).roundInt()
+        sprites[3].posY = (Math.sin(angle) * 0  + 100).roundInt()
 
         //sprite.pal0 = (sprite.pal0 + 1) % 65
         //sprite.pal1 = (sprite.pal1 + 1) % 65
         //sprite.pal2 = (sprite.pal2 + 1) % 65
         //sprite.pal3 = (sprite.pal3 + 1) % 65
 
-        sprite.rotation = (angle * 2 / Math.PI).roundInt() % 4
 
-
-        //vcard.vram.setBackgroundPixel(Random().nextInt(320), Random().nextInt(200), Random().nextInt(64))
-        //kotlin.repeat(64) {
-        //    vcard.vram.setBackgroundPixel(Random().nextInt(320), Random().nextInt(200), 0)
+        //kotlin.repeat(256) {
+            //vcard.vram.setBackgroundPixel(Random().nextInt(320), Random().nextInt(200), Random().nextInt(64))
+            //vcard.vram.setBackgroundPixel(Random().nextInt(320), Random().nextInt(200), 15)
         //}
     }
 
