@@ -6,7 +6,7 @@
 -- ALIASES --
 -------------
 
-_G.io = {} -- we make our own sandbox'd system
+--_G.io = {} -- we make our own sandbox'd system
 
 --[[fs.dofile = function(p, ...)
     local f = fs.open(p, "r")
@@ -51,7 +51,7 @@ _G.__scanforline__ = function(echo) -- pass '1' to not echo; pass nothing to ech
     _G.__scanMode__ = "line"
     local s
     repeat -- we can do this ONLY IF lua execution process is SEPARATE THREAD
-        s = machine.getLastStreamInput()
+        s = machine.__readFromStdin()
     until s
     -- input is closed when RETURN is hit. See above comments.
     return s
@@ -75,16 +75,16 @@ end]] -- DELETED: use _G.input.isKeyDown(keycode)
 ---                 ---
 
 
-input.readLine = _G.__scanforline__
+--input.readLine = _G.__scanforline__
 
-io.__openfile__ = "stdin"
+--[[io.__openfile__ = "stdin"
 io.stdin = "stdin"
 io.stdout = "stdout"
 io.stderr = "stderr"
 
-io.open = fs.open
+io.open = fs.open]]
 
-io.input = function(luafile)
+--[[io.input = function(luafile)
     io.__openfile__ = luafile
 end
 
@@ -105,13 +105,18 @@ io.read = function(option)
     options["*n"] = function() error("Read number is not supported, yet!") end--_readNumber
     options["*a"] = _readAll
     options["*l"] = _readLine
+end]]
+
+io.read = function()
+    return string.char(machine.__readFromStdin())
 end
 
 -----------------
 -- PRINTSTREAM --
 -----------------
 
-io.write = function(...)
+-- only useful when IO is "opening" stdin
+--[[io.write = function(...)
     local args = {...}
     for _, v in ipairs(args) do
         local s
@@ -122,10 +127,10 @@ io.write = function(...)
         end
         term.write(s)
     end
-end
+end]]
 -- for some reason, inputstream above kills 'print' function.
 -- So we rewrite it.
-_G.print = function(...)
+--[[_G.print = function(...) -- dependent on above io.write reimpl
     local args = {...}
 
     io.write(args[1])
@@ -138,7 +143,7 @@ _G.print = function(...)
     end
 
     io.write("\n")
-end
+end]]
 
 
 ---------------

@@ -2,7 +2,9 @@ package net.torvald.terrarum.virtualcomputer.terminal
 
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.gameactors.DecodeTapestry
-import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.gameactors.abs
+import net.torvald.terrarum.gamecontroller.Key
+import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import net.torvald.terrarum.virtualcomputer.peripheral.PeripheralVideoCard
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -15,12 +17,12 @@ import org.newdawn.slick.Image
  *
  * Created by SKYHi14 on 2017-02-08.
  */
-class GraphicsTerminal(private val host: BaseTerrarumComputer) : Terminal {
+class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
     lateinit var videoCard: PeripheralVideoCard
 
     override val width: Int; get() = videoCard.termW
     override val height: Int; get() = videoCard.termH
-    override val coloursCount: Int; get() = videoCard.coloursCount
+    override val coloursCount: Int; get() = videoCard.colorsCount
     override var cursorX = 0
     override var cursorY = 0
     override var cursorBlink = true
@@ -78,7 +80,7 @@ class GraphicsTerminal(private val host: BaseTerrarumComputer) : Terminal {
     }
 
     override fun keyPressed(key: Int, c: Char) {
-        //TODO("not implemented")
+        host.keyPressed(key, c)
     }
 
     override fun writeChars(s: String) {
@@ -97,7 +99,9 @@ class GraphicsTerminal(private val host: BaseTerrarumComputer) : Terminal {
 
     override fun emitChar(bufferChar: Int, x: Int, y: Int) {
         videoCard.drawChar(
-                bufferChar.and(0xFF).toChar(), x, y,
+                bufferChar.and(0xFF).toChar(),
+                x * PeripheralVideoCard.blockW,
+                y * PeripheralVideoCard.blockH,
                 CLUT16_TO_64[bufferChar.ushr(8).and(0xF)],
                 CLUT16_TO_64[bufferChar.ushr(12).and(0xF)]
         )
@@ -117,7 +121,12 @@ class GraphicsTerminal(private val host: BaseTerrarumComputer) : Terminal {
     override var lastKeyPress: Int? = null
 
     override fun emitChar(c: Char, x: Int, y: Int) {
-        videoCard.drawChar(c, x, y, CLUT16_TO_64[foreColour])
+        videoCard.drawChar(
+                c,
+                x * PeripheralVideoCard.blockW,
+                y * PeripheralVideoCard.blockH,
+                CLUT16_TO_64[foreColour]
+        )
     }
 
     override fun printChar(c: Char) {
@@ -167,7 +176,7 @@ class GraphicsTerminal(private val host: BaseTerrarumComputer) : Terminal {
     }
 
     override fun clear() {
-        videoCard.clearAll()
+        videoCard.clearForeground()
     }
 
     override fun clearLine() {
@@ -175,11 +184,28 @@ class GraphicsTerminal(private val host: BaseTerrarumComputer) : Terminal {
     }
 
     override fun newLine() {
-        //TODO("not implemented")
+        cursorX = 0; cursorY += 1; wrap()
     }
 
     override fun scroll(amount: Int) {
-        //TODO("not implemented")
+        val rgba = videoCard.vram.foreground.rgba
+        val displacement = amount.abs() * PeripheralVideoCard.blockH * videoCard.vram.foreground.texWidth * 4
+        if (amount >= 0) {
+            System.arraycopy(
+                    rgba, displacement,
+                    rgba, 0,
+                    rgba.size - displacement
+            )
+            (rgba.size - 1 downTo rgba.size - displacement + 1).forEach { rgba[it] = 0.toByte() }
+        }
+        else {
+            System.arraycopy(
+                    rgba, 0,
+                    rgba, displacement,
+                    rgba.size - displacement
+            )
+            (0..displacement - 1).forEach { rgba[it] = 0.toByte() }
+        }
     }
 
     /**

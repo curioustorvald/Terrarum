@@ -354,9 +354,9 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 isNoSubjectToFluidResistance = isPlayerNoClip
             }
 
-            /**
-             * Actual physics thing (altering velocity) starts from here
-             */
+            ////////////////////////////////////////////////////////////////
+            // Codes that modifies velocity (moveDelta and externalForce) //
+            ////////////////////////////////////////////////////////////////
 
             // Combine velo and walk
             applyMovementVelocity()
@@ -376,6 +376,10 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 // Set 'next' position (hitbox) from canonical and walking velocity
                 setNewNextHitbox()
 
+                ///////////////////////////////////////////////////////
+                // Codes that (SHOULD) displaces nextHitbox directly //
+                ///////////////////////////////////////////////////////
+
                 /**
                  * solveCollision()?
                  * If and only if:
@@ -386,6 +390,10 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                     applyNormalForce()
                 }
 
+                //////////////////////////////////////////////////////////////
+                // Codes that modifies velocity (after hitbox displacement) //
+                //////////////////////////////////////////////////////////////
+
                 if (!immobileBody) { // TODO test no friction on immobileBody
                     setHorizontalFriction()
                 }
@@ -394,6 +402,10 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
                 if (isPlayerNoClip) { // TODO also hanging on the rope, etc.
                     setVerticalFriction()
                 }
+
+
+                // some spacing //
+
 
                 // apply our compensation to actual hitbox
                 updateHitbox()

@@ -5,7 +5,7 @@ import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
-import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import org.luaj.vm2.LuaFunction
 import org.luaj.vm2.lib.OneArgFunction
 
@@ -16,7 +16,7 @@ import org.luaj.vm2.lib.OneArgFunction
  *
  * Created by minjaesong on 16-09-27.
  */
-class PcSpeakerDriver(val globals: Globals, host: BaseTerrarumComputer) {
+class PcSpeakerDriver(val globals: Globals, host: TerrarumComputer) {
 
     init {
         globals["speaker"] = LuaTable()
@@ -67,7 +67,7 @@ class PcSpeakerDriver(val globals: Globals, host: BaseTerrarumComputer) {
         }
     }
 
-    class EnqueueTone(val host: BaseTerrarumComputer) : TwoArgFunction() {
+    class EnqueueTone(val host: TerrarumComputer) : TwoArgFunction() {
         /**
          * @param freq: number (hertz) or string (A-4, A4, B#2, ...)
          */
@@ -84,7 +84,7 @@ class PcSpeakerDriver(val globals: Globals, host: BaseTerrarumComputer) {
         }
     }
 
-    class ClearQueue(val host: BaseTerrarumComputer) : ZeroArgFunction() {
+    class ClearQueue(val host: TerrarumComputer) : ZeroArgFunction() {
         override fun call(): LuaValue {
             host.clearBeepQueue()
             return LuaValue.NONE

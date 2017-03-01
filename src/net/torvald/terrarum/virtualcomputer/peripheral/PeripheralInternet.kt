@@ -1,7 +1,7 @@
 package net.torvald.terrarum.virtualcomputer.peripheral
 
 import org.luaj.vm2.Globals
-import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
@@ -14,7 +14,7 @@ import java.net.URL
  *
  * Created by minjaesong on 16-09-24.
  */
-internal class PeripheralInternet(val host: BaseTerrarumComputer)
+internal class PeripheralInternet(val host: TerrarumComputer)
 : Peripheral("internet"){
 
     override fun loadLib(globals: Globals) {

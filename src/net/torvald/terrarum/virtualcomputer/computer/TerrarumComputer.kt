@@ -30,7 +30,7 @@ import java.util.*
  * @param term : terminal that is connected to the computer fixtures, null if not connected any.
  * Created by minjaesong on 16-09-10.
  */
-class BaseTerrarumComputer(peripheralSlots: Int) {
+class TerrarumComputer(peripheralSlots: Int) {
 
     var maxPeripherals: Int = peripheralSlots
         private set
@@ -42,11 +42,11 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
     lateinit var luaJ_globals: Globals
         private set
 
-    var termOut: PrintStream? = null
+    var stdout: PrintStream? = null
         private set
-    var termErr: PrintStream? = null
+    var stderr: PrintStream? = null
         private set
-    var termIn: InputStream? = null
+    var stdin: InputStream? = null
         private set
 
     val processorCycle: Int // number of Lua statement to process per tick (1/100 s)
@@ -75,6 +75,10 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         private set
 
     val peripheralTable = ArrayList<Peripheral>()
+
+    var stdinInput: Int = -1
+        private set
+
 
     // os-related functions. These are called "machine" library-wise.
     private val startupTimestamp: Long = System.currentTimeMillis()
@@ -119,7 +123,7 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         if (peripheralTable.size < maxPeripherals) {
             peripheralTable.add(peri)
             peri.loadLib(luaJ_globals)
-            println("[BaseTerrarumComputer] loading peripheral $peri")
+            println("[TerrarumComputer] loading peripheral $peri")
         }
         else {
             throw Error("No vacant peripheral slot")
@@ -129,7 +133,7 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
     fun detachPeripheral(peri: Peripheral) {
         if (peripheralTable.contains(peri)) {
             peripheralTable.remove(peri)
-            println("[BaseTerrarumComputer] unloading peripheral $peri")
+            println("[TerrarumComputer] unloading peripheral $peri")
         }
         else {
             throw IllegalArgumentException("Peripheral not exists: $peri")
@@ -144,13 +148,13 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
     fun initSandbox(term: Teletype) {
         luaJ_globals = JsePlatform.debugGlobals()
 
-        termOut = TerminalPrintStream(term)
-        termErr = TerminalPrintStream(term)
-        termIn = TerminalInputStream(term)
+        stdout = TerminalPrintStream(this)
+        stderr = TerminalPrintStream(this)
+        stdin = TerminalInputStream(this)
 
-        luaJ_globals.STDOUT = termOut
-        luaJ_globals.STDERR = termErr
-        luaJ_globals.STDIN = termIn
+        luaJ_globals.STDOUT = stdout
+        luaJ_globals.STDERR = stderr
+        luaJ_globals.STDIN = stdin
 
         luaJ_globals["bit"] = luaJ_globals["bit32"]
 
@@ -191,73 +195,80 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         }
     }
 
-    var threadTimer = 0
-    val threadMaxTime = 2000
-
     fun update(gc: GameContainer, delta: Int) {
         input = gc.input
 
-        if (currentExecutionThread.state == Thread.State.TERMINATED)
-            unsetThreadRun()
-
-
-
-        // time the execution time of the thread
-        if (threadRun) {
-            threadTimer += delta
-
-            // if too long, halt
-            if (threadTimer > threadMaxTime) {
-                //luaJ_globals.STDERR.println("Interrupted: Too long without yielding.")
-                //currentExecutionThread.interrupt()
-                unsetThreadRun()
-            }
-
+        if (currentExecutionThread.state == Thread.State.TERMINATED) {
+            threadRun = false
         }
+
+
 
 
         if (!isHalted) {
             driveBeepQueueManager(delta)
         }
-        else {
-            currentExecutionThread.interrupt()
-        }
     }
 
     fun keyPressed(key: Int, c: Char) {
+        stdinInput = c.toInt()
 
+
+        System.err.println("TerrarumComputer.keyPressed got input: $stdinInput")
+
+
+        // wake thread
+        runnableRunCommand.resume()
+
+
+        synchronized(stdin!!) {
+            (stdin as java.lang.Object).notifyAll()
+        }
     }
 
-    var currentExecutionThread = Thread()
-    var threadRun = false
+    fun openStdin() {
+        System.err.println("TerrarumComputer.openStdin")
+
+
+        stdinInput = -1
+        // sleep the thread
+        runnableRunCommand.pause()
+    }
+
+    lateinit var currentExecutionThread: Thread
+        private set
+    lateinit var runnableRunCommand: ThreadRunCommand
+        private set
+    private var threadRun = false
 
     fun runCommand(line: String, env: String) {
-        if (!threadRun && !isHalted) {
-            currentExecutionThread = Thread(ThreadRunCommand(luaJ_globals, line, env))
+        if (!threadRun) {
+            runnableRunCommand = ThreadRunCommand(luaJ_globals, line, env)
+            currentExecutionThread = Thread(null, runnableRunCommand, "LuaJ Separated")
             currentExecutionThread.start()
             threadRun = true
         }
     }
 
     fun runCommand(reader: Reader, filename: String) {
-        if (!threadRun && !isHalted) {
-            currentExecutionThread = Thread(ThreadRunCommand(luaJ_globals, reader, filename))
+        if (!threadRun) {
+            runnableRunCommand = ThreadRunCommand(luaJ_globals, reader, filename)
+            currentExecutionThread = Thread(null, runnableRunCommand, "LuaJ Separated")
             currentExecutionThread.start()
             threadRun = true
         }
     }
 
-    private fun unsetThreadRun() {
-        threadRun = false
-        threadTimer = 0
-    }
-
     class ThreadRunCommand : Runnable {
 
-        val mode: Int
-        val arg1: Any
-        val arg2: String
-        val lua: Globals
+        private val mode: Int
+        private val arg1: Any
+        private val arg2: String
+        private val lua: Globals
+
+        @Volatile private var running = true
+        @Volatile private var paused = false
+        private val pauseLock = java.lang.Object()
 
         constructor(luaInstance: Globals, line: String, env: String) {
             mode = 0
@@ -274,6 +285,32 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
         }
 
         override fun run() {
+            synchronized(pauseLock) {
+                if (!running) { // may have changed while waiting to
+                    // synchronize on pauseLock
+                    return
+                }
+                if (paused) {
+                    try {
+                        pauseLock.wait() // will cause this Thread to block until
+                        // another thread calls pauseLock.notifyAll()
+                        // Note that calling wait() will
+                        // relinquish the synchronized lock that this
+                        // thread holds on pauseLock so another thread
+                        // can acquire the lock to call notifyAll()
+                        // (link with explanation below this code)
+                    }
+                    catch (ex: InterruptedException) {
+                        return
+                    }
+
+                    if (!running) { // running might have changed since we paused
+                        return
+                    }
+                }
+            }
+
+
             try {
                 val chunk: LuaValue
                 if (mode == 0)
@@ -291,15 +328,35 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
                 lua.STDERR.println("${SimpleTextTerminal.ASCII_DLE}${e.message}${SimpleTextTerminal.ASCII_DC4}")
             }
         }
+
+        fun stop() {
+            running = false
+            // you might also want to do this:
+            //interrupt()
+        }
+
+        fun pause() {
+            // you may want to throw an IllegalStateException if !running
+            paused = true
+        }
+
+        fun resume() {
+            synchronized(pauseLock) {
+                paused = false
+                pauseLock.notifyAll() // Unblocks thread
+
+                System.err.println("ThreadRunCommand resume()")
+            }
+        }
     }
 
-    class LuaFunGetTotalMem(val computer: BaseTerrarumComputer) : ZeroArgFunction() {
+    class LuaFunGetTotalMem(val computer: TerrarumComputer) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(computer.memSize)
         }
     }
 
-    class ComputerEmitTone(val computer: BaseTerrarumComputer) : TwoArgFunction() {
+    class ComputerEmitTone(val computer: TerrarumComputer) : TwoArgFunction() {
         override fun call(millisec: LuaValue, freq: LuaValue): LuaValue {
             computer.playTone(millisec.checkint(), freq.checkdouble())
             return LuaValue.NONE
@@ -357,7 +414,7 @@ class BaseTerrarumComputer(peripheralSlots: Int) {
 
         //AL.destroy()
 
-        if (DEBUG) println("[BaseTerrarumComputer] !! Beep queue clear")
+        if (DEBUG) println("[TerrarumComputer] !! Beep queue clear")
     }
 
     fun enqueueBeep(duration: Int, freq: Double) {

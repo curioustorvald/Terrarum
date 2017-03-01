@@ -2,17 +2,10 @@ package net.torvald.terrarum.virtualcomputer.peripheral
 
 import net.torvald.terrarum.gameactors.DecodeTapestry
 import net.torvald.terrarum.gameactors.ai.toLua
-import net.torvald.terrarum.getPixel
-import org.luaj.vm2.Globals
-import org.luaj.vm2.LuaTable
-import org.luaj.vm2.LuaValue
-import org.luaj.vm2.lib.OneArgFunction
+import org.luaj.vm2.*
+import org.luaj.vm2.lib.*
 import org.luaj.vm2.lib.ThreeArgFunction
-import org.luaj.vm2.lib.TwoArgFunction
-import org.luaj.vm2.lib.ZeroArgFunction
-import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
-import java.util.*
 
 /**
  * Created by SKYHi14 on 2017-02-08.
@@ -20,8 +13,8 @@ import java.util.*
 class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
         Peripheral("ppu") {
     companion object {
-        val blockW = 8
-        val blockH = 8
+        val blockW = 8 // MUST BE 8
+        val blockH = 8 // MUST BE 8
 
         /**
          * Converts consecutive lua table indexed from 1 as IntArray.
@@ -51,7 +44,7 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
     val frameBufferImage = frameBuffer.image
 
     // hard-coded 8x8
-    var fontRom = Array<IntArray>(256, { Array<Int>(blockH, { 0 }).toIntArray() })
+    var fontRom = Array<IntArray>(256, { IntArray(blockH) })
 
     init {
         // build it for first time
@@ -61,9 +54,19 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
     }
 
     val CLUT = VRAM.CLUT
-    val coloursCount = CLUT.size
+    val colorsCount = CLUT.size
 
     val luaSpriteTable = LuaTable()
+
+    var color = 15 // black
+        set(value) {
+            if (value >= colorsCount || value < 0) {
+                throw IllegalArgumentException("Unknown colour: $value")
+            }
+            else {
+                field = value
+            }
+        }
 
     init {
         fun composeSpriteObject(spriteIndex: Int) : LuaValue {
@@ -109,16 +112,29 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
 
     override fun loadLib(globals: Globals) {
         globals["ppu"] = LuaTable()
-        globals["ppu"]["setForeColor"] = SetForeColor(this)
-        globals["ppu"]["getForeColor"] = GetForeColor(this)
-        globals["ppu"]["setBackColor"] = SetBackColor(this)
-        globals["ppu"]["getBackColor"] = GetBackColor(this)
+        globals["ppu"]["setTextForeColor"] = SetTextForeColor(this)
+        globals["ppu"]["getTextForeColor"] = GetTextForeColor(this)
+        globals["ppu"]["setTextBackColor"] = SetTextBackColor(this)
+        globals["ppu"]["getTextBackColor"] = GetTextBackColor(this)
+        globals["ppu"]["setColor"] = SetDrawColor(this)
+        globals["ppu"]["getColor"] = GetDrawColor(this)
         globals["ppu"]["emitChar"] = EmitChar(this)
         globals["ppu"]["clearAll"] = ClearAll(this)
         globals["ppu"]["clearBack"] = ClearBackground(this)
         globals["ppu"]["clearFore"] = ClearForeground(this)
 
         globals["ppu"]["getSpritesCount"] = GetSpritesCount(this)
+        globals["ppu"]["getWidth"] = GetWidth(this)
+        globals["ppu"]["getHeight"] = GetHeight(this)
+
+
+        globals["ppu"]["getSprite"] = GetSprite(this)
+
+        globals["ppu"]["drawRectBack"] = DrawRectBack(this)
+        globals["ppu"]["drawRectFore"] = DrawRectFore(this)
+        globals["ppu"]["fillRectBack"] = FillRectBack(this)
+        globals["ppu"]["fillRectFore"] = FillRectFore(this)
+        globals["ppu"]["drawString"] = DrawString(this)
     }
 
     private val spriteBuffer = ImageBuffer(VSprite.width, VSprite.height)
@@ -171,44 +187,23 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
         img.destroy()
     }
 
-    fun ImageBuffer.softwareRender(other: ImageBuffer, posX: Int, posY: Int) {
-        for (y in 0..other.height - 1) {
-            for (x in 0..other.width - 1) {
-                val ix = posX + x
-                val iy = posY + y
-                if (ix >= 0 && iy >= 0 && ix < this.width && iy < this.height) {
-                    if (other.rgba[4 * (y * other.width + x) + 3] != 0.toByte()) { // if not transparent
-                        this.rgba[4 * (iy * this.texWidth + ix) + 0] = other.rgba[4 * (y * other.texWidth + x) + 0]
-                        this.rgba[4 * (iy * this.texWidth + ix) + 1] = other.rgba[4 * (y * other.texWidth + x) + 1]
-                        this.rgba[4 * (iy * this.texWidth + ix) + 2] = other.rgba[4 * (y * other.texWidth + x) + 2]
-                        this.rgba[4 * (iy * this.texWidth + ix) + 3] = other.rgba[4 * (y * other.texWidth + x) + 3]
-                    }
-                }
-            }
-        }
-    }
+    private var textColorFore = 49 // white
+    private var textColorBack = 64 // transparent
 
-    private var foreColor = 49 // white
-    private var backColor = 64 // transparent
-
-    fun drawChar(c: Char, x: Int, y: Int, colFore: Int = foreColor, colBack: Int = backColor) {
+    fun drawChar(c: Char, x: Int, y: Int, colFore: Int = textColorFore, colBack: Int = textColorBack) {
         val glyph = fontRom[c.toInt()]
-        val fore = CLUT[colFore]
-        val back = CLUT[colBack]
 
         // software render
-        for (gy in 0..blockH - 1) {
-            for (gx in 0..blockW - 1) {
-                val glyAlpha = glyph[gy].ushr(gx).and(1)
+        for (gy in 0..blockH - 1) { for (gx in 0..blockW - 1) {
+            val glyAlpha = glyph[gy] and (1 shl gx)
 
-                if (glyAlpha != 0) {
-                    vram.foreground.setRGBA(x * blockW + gx, y * blockH + gy, fore.red, fore.green, fore.blue, fore.alpha)
-                }
-                else {
-                    vram.foreground.setRGBA(x * blockW + gx, y * blockH + gy, back.red, back.green, back.blue, back.alpha)
-                }
+            if (glyAlpha != 0) {
+                vram.setForegroundPixel(x + gx, y + gy, colFore)
             }
-        }
+            else {
+                vram.setForegroundPixel(x + gx, y + gy, colBack)
+            }
+        }}
     }
 
 
@@ -231,8 +226,60 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
         }
     }
 
+    fun drawRectBack(x: Int, y: Int, w: Int, h: Int, c: Int = color) {
+        (0..w - 1).forEach {
+            vram.setBackgroundPixel(x + it, y, c)
+            vram.setBackgroundPixel(x + it, y + h - 1, c)
+        }
+        (1..h - 2).forEach {
+            vram.setBackgroundPixel(x, y + it, c)
+            vram.setBackgroundPixel(x + w - 1, y + it, c)
+        }
+    }
+
+    fun fillRectBack(x: Int, y: Int, w: Int, h: Int, c: Int = color) {
+        for (py in 0..h - 1) { for (px in 0..w - 1) {
+            vram.setBackgroundPixel(x + px, y + py, c)
+        }}
+    }
+
+    fun drawRectFore(x: Int, y: Int, w: Int, h: Int, c: Int = color) {
+        (0..w - 1).forEach {
+            vram.setForegroundPixel(x + it, y, c)
+            vram.setForegroundPixel(x + it, y + h - 1, c)
+        }
+        (1..h - 2).forEach {
+            vram.setForegroundPixel(x, y + it, c)
+            vram.setForegroundPixel(x + w - 1, y + it, c)
+        }
+    }
+
+    fun fillRectFore(x: Int, y: Int, w: Int, h: Int, c: Int = color) {
+        for (py in 0..h - 1) { for (px in 0..w - 1) {
+            vram.setForegroundPixel(x + px, y + py, c)
+        }}
+    }
+
+
     fun getSprite(index: Int) = vram.sprites[index]
 
+
+    private fun ImageBuffer.softwareRender(other: ImageBuffer, posX: Int, posY: Int) {
+        for (y in 0..other.height - 1) {
+            for (x in 0..other.width - 1) {
+                val ix = posX + x
+                val iy = posY + y
+                if (ix >= 0 && iy >= 0 && ix < this.width && iy < this.height) {
+                    if (other.rgba[4 * (y * other.texWidth + x) + 3] != 0.toByte()) { // if not transparent
+                        this.rgba[4 * (iy * this.texWidth + ix) + 0] = other.rgba[4 * (y * other.texWidth + x) + 0]
+                        this.rgba[4 * (iy * this.texWidth + ix) + 1] = other.rgba[4 * (y * other.texWidth + x) + 1]
+                        this.rgba[4 * (iy * this.texWidth + ix) + 2] = other.rgba[4 * (y * other.texWidth + x) + 2]
+                        this.rgba[4 * (iy * this.texWidth + ix) + 3] = other.rgba[4 * (y * other.texWidth + x) + 3]
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Array be like, in binary; notice that glyphs are flipped horizontally:
@@ -268,27 +315,51 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
         buildFontRom("./assets/graphics/fonts/milky.tga")
     }
 
+    ///////////////////
+    // Lua functions //
+    ///////////////////
 
-    class SetForeColor(val videoCard: PeripheralVideoCard) : OneArgFunction() {
+    class SetTextForeColor(val videoCard: PeripheralVideoCard) : OneArgFunction() {
         override fun call(arg: LuaValue): LuaValue {
-            videoCard.foreColor = arg.checkint()
+            videoCard.textColorFore = arg.checkint()
             return LuaValue.NONE
         }
     }
-    class GetForeColor(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
+    class GetTextForeColor(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
         override fun call(): LuaValue {
-            return videoCard.foreColor.toLua()
+            return videoCard.textColorFore.toLua()
         }
     }
-    class SetBackColor(val videoCard: PeripheralVideoCard) : OneArgFunction() {
+    class SetTextBackColor(val videoCard: PeripheralVideoCard) : OneArgFunction() {
         override fun call(arg: LuaValue): LuaValue {
-            videoCard.backColor = arg.checkint()
+            videoCard.textColorBack = arg.checkint()
             return LuaValue.NONE
         }
     }
-    class GetBackColor(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
+    class GetTextBackColor(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
         override fun call(): LuaValue {
-            return videoCard.backColor.toLua()
+            return videoCard.textColorBack.toLua()
+        }
+    }
+    class SetDrawColor(val videoCard: PeripheralVideoCard) : OneArgFunction() {
+        override fun call(arg: LuaValue): LuaValue {
+            videoCard.color = arg.checkint()
+            return LuaValue.NONE
+        }
+    }
+    class GetDrawColor(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return videoCard.color.toLua()
+        }
+    }
+    class GetWidth(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return videoCard.width.toLua()
+        }
+    }
+    class GetHeight(val videoCard: PeripheralVideoCard) : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            return videoCard.height.toLua()
         }
     }
     class EmitChar(val videoCard: PeripheralVideoCard) : ThreeArgFunction() {
@@ -324,6 +395,41 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
     class GetSprite(val videoCard: PeripheralVideoCard) : OneArgFunction() {
         override fun call(arg: LuaValue): LuaValue {
             return videoCard.luaSpriteTable[arg.checkint() - 1]
+        }
+    }
+    class DrawRectBack(val videoCard: PeripheralVideoCard) : FourArgFunction() {
+        override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue, arg4: LuaValue): LuaValue {
+            videoCard.drawRectBack(arg1.checkint(), arg2.checkint(), arg3.checkint(), arg4.checkint())
+            return LuaValue.NONE
+        }
+    }
+    class FillRectBack(val videoCard: PeripheralVideoCard) : FourArgFunction() {
+        override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue, arg4: LuaValue): LuaValue {
+            videoCard.fillRectBack(arg1.checkint(), arg2.checkint(), arg3.checkint(), arg4.checkint())
+            return LuaValue.NONE
+        }
+    }
+    class DrawRectFore(val videoCard: PeripheralVideoCard) : FourArgFunction() {
+        override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue, arg4: LuaValue): LuaValue {
+            videoCard.drawRectFore(arg1.checkint(), arg2.checkint(), arg3.checkint(), arg4.checkint())
+            return LuaValue.NONE
+        }
+    }
+    class FillRectFore(val videoCard: PeripheralVideoCard) : FourArgFunction() {
+        override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue, arg4: LuaValue): LuaValue {
+            videoCard.fillRectFore(arg1.checkint(), arg2.checkint(), arg3.checkint(), arg4.checkint())
+            return LuaValue.NONE
+        }
+    }
+    class DrawString(val videoCard: PeripheralVideoCard) : ThreeArgFunction() {
+        override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue): LuaValue {
+            val str = arg1.checkjstring()
+            val x = arg2.checkint()
+            val y = arg3.checkint()
+            str.forEachIndexed { i, c ->
+                videoCard.drawChar(c, x + blockW * i, y)
+            }
+            return LuaValue.NONE
         }
     }
 
@@ -404,7 +510,7 @@ class VRAM(pxlWidth: Int, pxlHeight: Int, nSprites: Int) {
 
     fun setForegroundPixel(x: Int, y: Int, color: Int) {
         val col = CLUT[color]
-        background.setRGBA(x, y, col.red, col.green, col.blue, col.alpha)
+        foreground.setRGBA(x, y, col.red, col.green, col.blue, col.alpha)
     }
 }
 
@@ -467,4 +573,27 @@ class VSprite {
             setPixel(i % width, i / width, data[i])
         }
     }
+}
+
+
+abstract class FourArgFunction : LibFunction() {
+
+    abstract override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue, arg4: LuaValue): LuaValue
+
+    override fun call(): LuaValue {
+        return call(LuaValue.NIL, LuaValue.NIL, LuaValue.NIL, LuaValue.NIL)
+    }
+
+    override fun call(arg: LuaValue): LuaValue {
+        return call(arg, LuaValue.NIL, LuaValue.NIL, LuaValue.NIL)
+    }
+
+    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+        return call(arg1, arg2, LuaValue.NIL, LuaValue.NIL)
+    }
+
+    override fun invoke(varargs: Varargs): Varargs {
+        return call(varargs.arg1(), varargs.arg(2), varargs.arg(3), varargs.arg(4))
+    }
+
 }

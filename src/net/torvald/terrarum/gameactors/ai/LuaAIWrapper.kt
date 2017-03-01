@@ -47,10 +47,10 @@ class LuaAIWrapper(private val scriptPath: String) : ActorAI {
 
     override fun update(delta: Int) {
         // run "update()" function in the script
-        luag.get("update").call(delta.toLuaValue())
+        luag.get("update").call(delta.toLua())
     }
 
-    var currentExecutionThread = Thread()
+    lateinit var currentExecutionThread: Thread
     var threadRun = false
 
     fun runCommand(reader: Reader, filename: String) {
@@ -109,5 +109,5 @@ class LuaAIWrapper(private val scriptPath: String) : ActorAI {
         }
     }
 
-    fun Int.toLuaValue(): LuaValue = LuaInteger.valueOf(this)
+    fun Int.toLua(): LuaValue = LuaInteger.valueOf(this)
 }

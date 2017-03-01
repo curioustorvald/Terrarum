@@ -2,7 +2,7 @@ package net.torvald.terrarum.virtualcomputer.worldobject
 
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.FixtureBase
-import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
 import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 import net.torvald.terrarum.virtualcomputer.worldobject.ui.UITextTerminal
@@ -14,7 +14,7 @@ import java.util.*
  */
 class FixtureBasicTerminal(phosphor: Color) : FixtureBase() {
 
-    val computer = BaseTerrarumComputer(8)
+    val computer = TerrarumComputer(8)
     val vt: Terminal = SimpleTextTerminal(phosphor, 80, 25, computer)
     val ui = UITextTerminal(vt)
 

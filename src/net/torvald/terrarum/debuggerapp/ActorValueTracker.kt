@@ -1,16 +1,13 @@
 package net.torvald.terrarum.debuggerapp
 
+import net.torvald.terrarum.ActorValue
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.SetAV
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.gameactors.ActorWithSprite
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import java.awt.BorderLayout
-import java.awt.Color
-import java.awt.Dimension
 import java.awt.GridLayout
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener

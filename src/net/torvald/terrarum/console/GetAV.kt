@@ -55,7 +55,7 @@ internal object GetAV : ConsoleCommand {
 
                     Echo("$ccW== ActorValue list for $ccY$actor $ccW==")
                     println("[GetAV] == ActorValue list for '$actor' ==")
-                    if (keyset.size == 0) {
+                    if (keyset.isEmpty()) {
                         Echo("$ccK(nothing)")
                         println("[GetAV] (nothing)")
                     }
@@ -114,7 +114,7 @@ internal object GetAV : ConsoleCommand {
 
     override fun printUsage() {
         Echo("${ccW}Get desired ActorValue of specific target.")
-        Echo("${ccW}Usage: ${ccY}getav ${ccG}(id) <av>")
+        Echo("${ccW}Usage: ${ccY}getav $ccG(id) <av>")
         Echo("${ccW}blank ID for player")
     }
 }

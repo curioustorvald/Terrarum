@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.ActorValue
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.itemproperties.ItemCodex
 import org.newdawn.slick.GameContainer
