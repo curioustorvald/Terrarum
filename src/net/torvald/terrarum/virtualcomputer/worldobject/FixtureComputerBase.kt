@@ -1,7 +1,7 @@
 package net.torvald.terrarum.virtualcomputer.worldobject
 
 import net.torvald.terrarum.gameactors.FixtureBase
-import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
 import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 import org.newdawn.slick.GameContainer
@@ -17,7 +17,7 @@ open class FixtureComputerBase() : FixtureBase() {
     /** Connected terminal */
     var terminal: FixtureBasicTerminal? = null
 
-    var computerInside: BaseTerrarumComputer? = null
+    var computerInside: TerrarumComputer? = null
 
     init {
         // UUID of the "brain"
@@ -33,7 +33,7 @@ open class FixtureComputerBase() : FixtureBase() {
 
     fun attachTerminal(uuid: String) {
         val fetchedTerminal = getTerminalByUUID(uuid)
-        computerInside = BaseTerrarumComputer(8)
+        computerInside = TerrarumComputer(8)
         computerInside!!.attachTerminal(fetchedTerminal!!)
         actorValue["computerid"] = computerInside!!.UUID
     }

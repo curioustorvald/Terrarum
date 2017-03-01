@@ -1,6 +1,6 @@
 package net.torvald.terrarum.virtualcomputer.peripheral
 
-import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -11,7 +11,7 @@ import org.luaj.vm2.LuaValue
  *
  * Created by minjaesong on 16-09-27.
  */
-internal class PeripheralPSG(val host: BaseTerrarumComputer)
+internal class PeripheralPSG(val host: TerrarumComputer)
 : Peripheral("psg") {
 
     override fun loadLib(globals: Globals) {

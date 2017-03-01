@@ -1,8 +1,9 @@
 package net.torvald.terrarum.virtualcomputer.luaapi
 
+import net.torvald.terrarum.gameactors.ai.toLua
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
-import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import net.torvald.terrarum.virtualcomputer.luaapi.Term.Companion.checkIBM437
 import net.torvald.terrarum.virtualcomputer.terminal.Teletype
 import org.luaj.vm2.*
@@ -14,22 +15,19 @@ import org.luaj.vm2.*
  *
  * Created by minjaesong on 16-09-19.
  */
-internal class HostAccessProvider(globals: Globals, computer: BaseTerrarumComputer) {
+internal class HostAccessProvider(globals: Globals, computer: TerrarumComputer) {
 
     init {
         globals["machine"] = LuaTable()
         globals["machine"]["println"] = PrintLn()
         globals["machine"]["isHalted"] = IsHalted(computer)
 
-        globals["machine"]["closeInputString"] = NativeCloseInputString(computer.term)
-        globals["machine"]["closeInputKey"] = NativeCloseInputKey(computer.term)
-        globals["machine"]["openInput"] = NativeOpenInput(computer.term)
-        globals["machine"]["getLastStreamInput"] = NativeGetLastStreamInput(computer.term)
-        globals["machine"]["getLastKeyPress"] = NativeGetLastKeyPress(computer.term)
+
+        globals["machine"]["__readFromStdin"] = NativeReadStdin(computer)
 
         globals["machine"]["milliTime"] = NativeGetMilliTime(computer)
 
-        globals["machine"]["sleep"] = NativeBusySleep(computer)
+        globals["machine"]["sleep"] = NativeThreadSleep(computer)
 
         globals["__haltsystemexplicit__"] = HaltComputer(computer)
     }
@@ -44,53 +42,19 @@ internal class HostAccessProvider(globals: Globals, computer: BaseTerrarumComput
         }
     }
 
-    class IsHalted(val computer: BaseTerrarumComputer): ZeroArgFunction() {
+    class IsHalted(val computer: TerrarumComputer): ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(computer.isHalted)
         }
     }
 
-    class NativeCloseInputString(val term: Teletype) : ZeroArgFunction() {
+    class NativeReadStdin(val computer: TerrarumComputer) : ZeroArgFunction() {
         override fun call(): LuaValue {
-            term.closeInputString()
-            return LuaValue.NONE
+            return computer.stdin!!.read().toLua()
         }
     }
 
-    class NativeCloseInputKey(val term: Teletype) : ZeroArgFunction() {
-        override fun call(): LuaValue {
-            //term.closeInputKey()
-            return LuaValue.NONE
-        }
-    }
-
-    class NativeOpenInput(val term: Teletype) : LuaFunction() {
-        override fun call(): LuaValue {
-            term.openInput(true)
-            return LuaValue.NONE
-        }
-
-        override fun call(echo: LuaValue): LuaValue {
-            term.openInput(if (echo.checkint() == 1) false else true)
-            return LuaValue.NONE
-        }
-    }
-
-    class NativeGetLastStreamInput(val term: Teletype) : ZeroArgFunction() {
-        override fun call(): LuaValue {
-            return if (term.lastStreamInput == null) LuaValue.NIL
-            else                                     LuaValue.valueOf(term.lastStreamInput)
-        }
-    }
-
-    class NativeGetLastKeyPress(val term: Teletype) : ZeroArgFunction() {
-        override fun call(): LuaValue {
-            return if (term.lastKeyPress == null) LuaValue.NIL
-            else                                  LuaValue.valueOf(term.lastKeyPress!!)
-        }
-    }
-
-    class HaltComputer(val computer: BaseTerrarumComputer) : ZeroArgFunction() {
+    class HaltComputer(val computer: TerrarumComputer) : ZeroArgFunction() {
         override fun call() : LuaValue {
             computer.isHalted = true
             computer.luaJ_globals.load("""print(DC4.."system halted")""").call()
@@ -99,18 +63,15 @@ internal class HostAccessProvider(globals: Globals, computer: BaseTerrarumComput
     }
 
     /** Time elapsed since the power is on. */
-    class NativeGetMilliTime(val computer: BaseTerrarumComputer) : ZeroArgFunction() {
+    class NativeGetMilliTime(val computer: TerrarumComputer) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(computer.milliTime)
         }
     }
 
-    class NativeBusySleep(val computer: BaseTerrarumComputer) : OneArgFunction() {
+    class NativeThreadSleep(val computer: TerrarumComputer) : OneArgFunction() {
         override fun call(mills: LuaValue): LuaValue {
-            val starttime = computer.milliTime
-            val sleeptime = mills.checkint()
-            if (sleeptime > 1000) throw LuaError("Cannot busy-sleep more than a second.")
-            while (computer.milliTime - starttime < sleeptime) { }
+            computer.currentExecutionThread.join(mills.checklong())
             return LuaValue.NONE
         }
     }

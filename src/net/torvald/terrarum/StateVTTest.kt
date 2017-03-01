@@ -1,7 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.terrarum.gamecontroller.Key
-import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
 import net.torvald.terrarum.virtualcomputer.terminal.Teletype
 import net.torvald.terrarum.virtualcomputer.terminal.TeletypeTerminal
@@ -20,7 +20,7 @@ import org.newdawn.slick.state.StateBasedGame
 class StateVTTest : BasicGameState() {
 
     // HiRes: 100x64, LoRes: 80x25
-    val computerInside = BaseTerrarumComputer(8)
+    val computerInside = TerrarumComputer(8)
     val vt = SimpleTextTerminal(SimpleTextTerminal.AMETHYST_NOVELTY, 80, 25,
             computerInside, colour = false, hires = false)
 

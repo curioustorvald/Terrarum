@@ -4,6 +4,7 @@ import net.torvald.JsonFetcher
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.spriteanimation.SpriteAnimation
 import com.google.gson.JsonObject
+import net.torvald.terrarum.ActorValue
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.gameitem.EquipPosition

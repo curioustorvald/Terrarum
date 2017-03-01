@@ -4,16 +4,15 @@ import com.google.gson.JsonPrimitive
 import java.util.*
 import java.util.function.Consumer
 
+typealias ActorValue = KVHashMap
+typealias GameConfig = KVHashMap
+
 /**
  * Created by minjaesong on 15-12-30.
  */
-open class KVHashMap {
+class KVHashMap {
 
-    private val hashMap: HashMap<String, Any>
-
-    init {
-        hashMap = HashMap<String, Any>()
-    }
+    private val hashMap = HashMap<String, Any>()
 
     /**
      * Add key-value pair to the configuration table.
@@ -104,7 +103,8 @@ open class KVHashMap {
         get() = hashMap.keys
 
     fun remove(key: String) {
-        hashMap.remove(key, hashMap[key])
+        if (hashMap[key] != null)
+            hashMap.remove(key, hashMap[key]!!)
     }
 
 }

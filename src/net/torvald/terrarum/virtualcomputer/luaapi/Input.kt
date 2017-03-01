@@ -5,12 +5,12 @@ import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import net.torvald.terrarum.gamecontroller.Key
-import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 
 /**
  * Created by minjaesong on 16-09-25.
  */
-class Input(globals: Globals, computer: BaseTerrarumComputer) {
+class Input(globals: Globals, computer: TerrarumComputer) {
 
     init {
         globals["input"] = LuaTable()
@@ -23,7 +23,7 @@ class Input(globals: Globals, computer: BaseTerrarumComputer) {
         val keys_caps = intArrayOf(Key.CAPS_LOCK, Key.BACKSPACE, Key.L_CONTROL)
     }
 
-    class IsKeyDown(val host: BaseTerrarumComputer) : OneArgFunction() {
+    class IsKeyDown(val host: TerrarumComputer) : OneArgFunction() {
         override fun call(keyCode: LuaValue): LuaValue {
             val key = keyCode.checkint()
 

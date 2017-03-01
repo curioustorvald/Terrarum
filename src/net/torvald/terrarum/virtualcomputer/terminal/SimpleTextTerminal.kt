@@ -1,12 +1,11 @@
 package net.torvald.terrarum.virtualcomputer.terminal
 
 import net.torvald.aa.AAFrame
-import net.torvald.aa.ColouredFastFont
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.DecodeTapestry
 import net.torvald.terrarum.gameactors.abs
 import net.torvald.terrarum.gamecontroller.Key
-import net.torvald.terrarum.virtualcomputer.computer.BaseTerrarumComputer
+import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import org.lwjgl.BufferUtils
 import org.lwjgl.openal.AL
 import org.lwjgl.openal.AL10
@@ -21,7 +20,7 @@ import java.util.*
  * Created by minjaesong on 16-09-07.
  */
 open class SimpleTextTerminal(
-        phosphorColour: Color, override val width: Int, override val height: Int, private val host: BaseTerrarumComputer,
+        phosphorColour: Color, override val width: Int, override val height: Int, private val host: TerrarumComputer,
         colour: Boolean = false, hires: Boolean = false
 ) : Terminal {
 
@@ -64,7 +63,7 @@ open class SimpleTextTerminal(
     open protected val fontImg = Image(fontRef)
     open val fontW = fontImg.width / 16
     open val fontH = fontImg.height / 16
-    open protected val font = ColouredFastFont(this, fontRef, fontW, fontH)
+    open protected val font = SpriteSheetFont(SpriteSheet(fontRef, fontW, fontH), 0.toChar())
 
     val borderSize = 20
     override val displayW = fontW * width + 2 * borderSize

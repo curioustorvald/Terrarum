@@ -1045,7 +1045,7 @@ require("ROMLIB")
 speaker.enqueue(80, computer.bellpitch) -- term.bell sometimes get squelched
 
 -- load bios, if any
---if fs.exists(computer.bootloader) then fs.dofile(computer.bootloader) end
+if fs.exists(computer.bootloader) then fs.dofile(computer.bootloader) end
 
 -- halt/run luaprompt upon the termination of bios.
 -- Valid BIOS should load OS and modify 'shell.status' to 'shell.halt' before terminating itself.
