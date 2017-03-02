@@ -206,6 +206,8 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
             )
             (0..displacement - 1).forEach { rgba[it] = 0.toByte() }
         }
+
+        cursorY += -amount
     }
 
     /**

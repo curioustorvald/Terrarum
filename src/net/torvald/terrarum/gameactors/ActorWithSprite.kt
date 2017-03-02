@@ -235,7 +235,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
     protected val gameContainer: GameContainer
         get() = Terrarum.appgc
     protected val updateDelta: Int
-        get() = Terrarum.ingame.UPDATE_DELTA
+        get() = Terrarum.UPDATE_DELTA
 
     /**
      * true: This actor had just made collision

@@ -1,16 +1,22 @@
 package net.torvald.terrarum.virtualcomputer.peripheral
 
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.DecodeTapestry
 import net.torvald.terrarum.gameactors.ai.toLua
+import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
+import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 import org.luaj.vm2.*
 import org.luaj.vm2.lib.*
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.newdawn.slick.*
+import java.util.*
 
 /**
+ * Resolution: 640 x 200, non-square pixels
+ *
  * Created by SKYHi14 on 2017-02-08.
  */
-class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
+class PeripheralVideoCard(val host: TerrarumComputer, val termW: Int = 80, val termH: Int = 25) :
         Peripheral("ppu") {
     companion object {
         val blockW = 8 // MUST BE 8
@@ -46,6 +52,12 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
     // hard-coded 8x8
     var fontRom = Array<IntArray>(256, { IntArray(blockH) })
 
+    var showCursor = true
+
+    private var cursorBlinkOn = true
+    private var cursorBlinkTimer = 0
+    private val cursorBlinkTime = 250
+
     init {
         // build it for first time
         resetTextRom()
@@ -68,7 +80,13 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
             }
         }
 
+    val cursorSprite = ImageBuffer(blockW, blockH * 2)
+    val cursorImage: Image
+
     init {
+        Arrays.fill(cursorSprite.rgba, 0xFF.toByte())
+        cursorImage = cursorSprite.image
+
         fun composeSpriteObject(spriteIndex: Int) : LuaValue {
             val sprite = vram.sprites[spriteIndex]
             val t = LuaTable()
@@ -124,8 +142,8 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
         globals["ppu"]["clearFore"] = ClearForeground(this)
 
         globals["ppu"]["getSpritesCount"] = GetSpritesCount(this)
-        globals["ppu"]["getWidth"] = GetWidth(this)
-        globals["ppu"]["getHeight"] = GetHeight(this)
+        globals["ppu"]["width"] = GetWidth(this)
+        globals["ppu"]["height"] = GetHeight(this)
 
 
         globals["ppu"]["getSprite"] = GetSprite(this)
@@ -137,27 +155,49 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
         globals["ppu"]["drawString"] = DrawString(this)
     }
 
-    private val spriteBuffer = ImageBuffer(VSprite.width, VSprite.height)
+    private val spriteBuffer = ImageBuffer(VSprite.width * 2, VSprite.height)
 
     fun render(g: Graphics) {
+        cursorBlinkTimer += Terrarum.UPDATE_DELTA
+        if (cursorBlinkTimer > cursorBlinkTime) {
+            cursorBlinkTimer -= cursorBlinkTime
+            cursorBlinkOn = !cursorBlinkOn
+        }
+
         fun VSprite.render() {
-            val h = VSprite.height
-            val w = VSprite.width
-            if (rotation and 1 == 0) { // deg 0, 180
-                (if (rotation == 0 && !vFlip || rotation == 2 && vFlip) 0..h-1 else h-1 downTo 0).forEachIndexed { ordY, y ->
-                    (if (rotation == 0 && !hFlip || rotation == 2 && hFlip) 0..w-1 else w-1 downTo 0).forEachIndexed { ordX, x ->
-                        val pixelData = data[y].ushr(2 * x).and(0b11)
-                        val col = getColourFromPalette(pixelData)
-                        spriteBuffer.setRGBA(ordX, ordY, col.red, col.green, col.blue, col.alpha)
+            if (this.isVisible) {
+                val h = VSprite.height
+                val w = VSprite.width
+                if (rotation and 1 == 0) { // deg 0, 180
+                    (if (rotation == 0 && !vFlip || rotation == 2 && vFlip) 0..h - 1 else h - 1 downTo 0).forEachIndexed { ordY, y ->
+                        (if (rotation == 0 && !hFlip || rotation == 2 && hFlip) 0..w - 1 else w - 1 downTo 0).forEachIndexed { ordX, x ->
+                            val pixelData = data[y].ushr(2 * x).and(0b11)
+                            val col = getColourFromPalette(pixelData)
+
+                            if (this.drawWide) {
+                                spriteBuffer.setRGBA(ordX * 2, ordY, col.red, col.green, col.blue, col.alpha)
+                                spriteBuffer.setRGBA(ordX * 2 + 1, ordY, col.red, col.green, col.blue, col.alpha)
+                            }
+                            else {
+                                spriteBuffer.setRGBA(ordX, ordY, col.red, col.green, col.blue, col.alpha)
+                            }
+                        }
                     }
                 }
-            }
-            else { // deg 90, 270
-                (if (rotation == 3 && !hFlip || rotation == 1 && hFlip) 0..w-1 else w-1 downTo 0).forEachIndexed { ordY, y ->
-                    (if (rotation == 3 && !vFlip || rotation == 1 && vFlip) h-1 downTo 0 else 0..h-1).forEachIndexed { ordX, x ->
-                        val pixelData = data[y].ushr(2 * x).and(0b11)
-                        val col = getColourFromPalette(pixelData)
-                        spriteBuffer.setRGBA(ordY, ordX, col.red, col.green, col.blue, col.alpha)
+                else { // deg 90, 270
+                    (if (rotation == 3 && !hFlip || rotation == 1 && hFlip) 0..w - 1 else w - 1 downTo 0).forEachIndexed { ordY, y ->
+                        (if (rotation == 3 && !vFlip || rotation == 1 && vFlip) h - 1 downTo 0 else 0..h - 1).forEachIndexed { ordX, x ->
+                            val pixelData = data[y].ushr(2 * x).and(0b11)
+                            val col = getColourFromPalette(pixelData)
+
+                            if (this.drawWide) {
+                                spriteBuffer.setRGBA(ordY * 2, ordX, col.red, col.green, col.blue, col.alpha)
+                                spriteBuffer.setRGBA(ordY * 2 + 1, ordX, col.red, col.green, col.blue, col.alpha)
+                            }
+                            else {
+                                spriteBuffer.setRGBA(ordY, ordX, col.red, col.green, col.blue, col.alpha)
+                            }
+                        }
                     }
                 }
             }
@@ -182,7 +222,24 @@ class PeripheralVideoCard(val termW: Int = 40, val termH: Int = 25) :
 
         val img = frameBuffer.image
         img.filter = Image.FILTER_NEAREST
-        g.drawImage(img.getScaledCopy(2f), 0f, 0f)
+        g.drawImage(img.getScaledCopy(blockW * termW, blockH * termH * 2), 0f, 0f)
+
+
+        if (cursorBlinkOn && showCursor) {
+            g.drawImage(
+                    cursorImage,
+                    host.term.cursorX * blockW.toFloat(),
+                    (host.term as Terminal).cursorY * blockH * 2f
+            )
+        }
+
+
+        // scanlines
+        g.color = Color(0, 0, 0, 40)
+        g.lineWidth = 1f
+        for (i in 1..blockH * termH * 2 step 2) {
+            g.drawLine(0f, i.toFloat(), blockW * termW - 1f, i.toFloat())
+        }
 
         img.destroy()
     }
@@ -538,6 +595,7 @@ class VSprite {
 
     var isBackground = false
     var isVisible = false
+    var drawWide = false
 
     fun setPaletteSet(col0: Int, col1: Int, col2: Int, col3: Int) {
         pal0 = col0
@@ -555,6 +613,11 @@ class VSprite {
             else -> throw IndexOutOfBoundsException("Palette size: 4, input: $swatchNumber")
         }
         return CLUT[clutIndex]
+    }
+
+    fun setPos(x: Int, y: Int) {
+        posX = x
+        posY = y
     }
 
     fun setPixel(x: Int, y: Int, color: Int) {

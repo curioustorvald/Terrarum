@@ -1,6 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.Terrarum.UPDATE_DELTA
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import net.torvald.terrarum.virtualcomputer.peripheral.PeripheralVideoCard
@@ -20,7 +21,7 @@ class StateGraphicComputerTest : BasicGameState() {
     val monitor = GraphicsTerminal(computer)
 
     init {
-        val videocard = PeripheralVideoCard()
+        val videocard = PeripheralVideoCard(computer)
         monitor.attachVideoCard(videocard)
 
         computer.attachTerminal(monitor)
@@ -31,7 +32,11 @@ class StateGraphicComputerTest : BasicGameState() {
         val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram
 
         // it's a-me, Mario!
-        /*(0..3).forEach { vcard.sprites[it].setPaletteSet(64,33,12,62) }
+        /*(0..3).forEach {
+            vcard.sprites[it].setPaletteSet(64,33,12,62)
+            vcard.sprites[it].isVisible = true
+            vcard.sprites[it].drawWide = true
+        }
 
         vcard.sprites[0].setAll(intArrayOf(
                 0,0,0,0,0,1,1,1,
@@ -76,6 +81,8 @@ class StateGraphicComputerTest : BasicGameState() {
     }
 
     override fun update(container: GameContainer, game: StateBasedGame?, delta: Int) {
+        UPDATE_DELTA = delta
+
         Terrarum.appgc.setTitle("VT — F: ${container.fps}" +
                                 " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M" +
                                 " ${Random().nextInt(100)}")
@@ -83,7 +90,11 @@ class StateGraphicComputerTest : BasicGameState() {
         computer.update(container, delta)
 
 
-
+        /*val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram
+        vcard.sprites[0].setPos(20, 20)
+        vcard.sprites[1].setPos(36, 20)
+        vcard.sprites[2].setPos(20, 28)
+        vcard.sprites[3].setPos(36, 28)*/
     }
 
     override fun getID() = Terrarum.STATE_ID_TEST_TTY

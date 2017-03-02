@@ -2,7 +2,7 @@ package net.torvald.terrarum
 
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
-import net.torvald.terrarum.Terrarum.Companion.STATE_ID_TOOL_NOISEGEN
+import net.torvald.terrarum.Terrarum.STATE_ID_TOOL_NOISEGEN
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.roundInt
 import org.newdawn.slick.*

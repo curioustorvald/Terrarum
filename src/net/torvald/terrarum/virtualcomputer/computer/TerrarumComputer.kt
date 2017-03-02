@@ -213,13 +213,8 @@ class TerrarumComputer(peripheralSlots: Int) {
     fun keyPressed(key: Int, c: Char) {
         stdinInput = c.toInt()
 
-
-        System.err.println("TerrarumComputer.keyPressed got input: $stdinInput")
-
-
         // wake thread
         runnableRunCommand.resume()
-
 
         synchronized(stdin!!) {
             (stdin as java.lang.Object).notifyAll()
@@ -227,9 +222,6 @@ class TerrarumComputer(peripheralSlots: Int) {
     }
 
     fun openStdin() {
-        System.err.println("TerrarumComputer.openStdin")
-
-
         stdinInput = -1
         // sleep the thread
         runnableRunCommand.pause()
@@ -344,8 +336,6 @@ class TerrarumComputer(peripheralSlots: Int) {
             synchronized(pauseLock) {
                 paused = false
                 pauseLock.notifyAll() // Unblocks thread
-
-                System.err.println("ThreadRunCommand resume()")
             }
         }
     }
