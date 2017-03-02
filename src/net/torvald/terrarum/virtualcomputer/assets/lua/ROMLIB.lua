@@ -75,40 +75,48 @@ end]] -- DELETED: use _G.input.isKeyDown(keycode)
 ---                 ---
 
 
---input.readLine = _G.__scanforline__
-
---[[io.__openfile__ = "stdin"
+io.__openfile__ = "stdin"
 io.stdin = "stdin"
 io.stdout = "stdout"
 io.stderr = "stderr"
 
-io.open = fs.open]]
+io.open = fs.open
 
---[[io.input = function(luafile)
+io.input = function(luafile)
     io.__openfile__ = luafile
 end
 
 io.read = function(option)
     if io.__openfile__ == "stdin" then
-        return _G.__scanforline__()
+        local input = ""
+        local inkey = null -- local variable init REQUIRED!
+
+        -- RETURN not hit
+        while inkey ~= 13 do
+            inkey = machine.__readFromStdin()
+            if inkey >= 32 then
+                io.write(string.char(inkey))
+                input = input..string.char(inkey)
+            end
+        end
+        -- RETURN finally hit
+        io.write("\n")
+
+        return input
     end
 
     function _readAll()
-        return io.__openfile__.readAll()
+        return io.open(io.__openfile__).readAll()
     end
 
     function _readLine()
-        return io.__openfile__.readLine()
+        return io.open(io.__openfile__).readLine()
     end
 
     options = {}
     options["*n"] = function() error("Read number is not supported, yet!") end--_readNumber
     options["*a"] = _readAll
     options["*l"] = _readLine
-end]]
-
-io.read = function()
-    return string.char(machine.__readFromStdin())
 end
 
 -----------------

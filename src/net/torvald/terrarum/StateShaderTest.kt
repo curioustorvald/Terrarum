@@ -1,6 +1,5 @@
 package net.torvald.terrarum
 
-import net.torvald.terrarum.Terrarum.Companion.STATE_ID_TEST_SHADER
 import org.lwjgl.opengl.*
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -13,6 +12,7 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.ARBShaderObjects
 import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil.close
 import jdk.nashorn.internal.runtime.ScriptingFunctions.readLine
+import net.torvald.terrarum.Terrarum.STATE_ID_TEST_SHADER
 import net.torvald.terrarum.gameworld.fmod
 import org.newdawn.slick.Color
 import org.newdawn.slick.opengl.TextureImpl

@@ -2,6 +2,7 @@ package net.torvald.terrarum
 
 import net.torvald.imagefont.GameFontBase
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.Terrarum.UPDATE_DELTA
 import net.torvald.terrarum.audio.AudioResourceLibrary
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.console.*
@@ -90,8 +91,6 @@ class StateInGame : BasicGameState() {
 
     val KEY_LIGHTMAP_RENDER = Key.F7
     val KEY_LIGHTMAP_SMOOTH = Key.F8
-
-    var UPDATE_DELTA: Int = 0
 
     // UI aliases
     val uiAliases = HashMap<String, UIHandler>()

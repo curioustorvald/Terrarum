@@ -24,11 +24,150 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.logging.SimpleFormatter
 
+const val GAME_NAME = "Terrarum"
+
 /**
  * Created by minjaesong on 15-12-30.
  */
-class Terrarum @Throws(SlickException::class)
-constructor(gamename: String) : StateBasedGame(gamename) {
+object Terrarum : StateBasedGame(GAME_NAME) {
+
+
+    val sysLang: String
+        get() {
+            val lan = System.getProperty("user.language")
+            val country = System.getProperty("user.country")
+            return lan + country
+        }
+
+    /**
+     * To be used with physics simulator
+     */
+    val TARGET_FPS = 50
+
+    /**
+     * To be used with render, to achieve smooth frame drawing
+
+     * TARGET_INTERNAL_FPS > TARGET_FPS for smooth frame drawing
+
+     * Must choose a value so that (1000 / VAL) is still integer
+     */
+    val TARGET_INTERNAL_FPS = 100
+
+    lateinit var appgc: AppGameContainer
+
+    var WIDTH = 1072
+    var HEIGHT = 742 // IMAX ratio
+    var VSYNC = true
+    val VSYNC_TRIGGER_THRESHOLD = 56
+    val HALFW: Int
+        get() = WIDTH.ushr(1)
+    val HALFH: Int
+        get() = HEIGHT.ushr(1)
+
+    var gameStarted = false
+
+    lateinit var ingame: StateInGame
+    lateinit var gameConfig: GameConfig
+
+    val OSName = System.getProperty("os.name")
+    val OSVersion = System.getProperty("os.version")
+    lateinit var OperationSystem: String // all caps "WINDOWS, "OSX", "LINUX", "SOLARIS", "UNKNOWN"
+        private set
+    val isWin81: Boolean
+        get() = OperationSystem == "WINDOWS" && OSVersion.toDouble() >= 8.1
+    lateinit var defaultDir: String
+        private set
+    lateinit var defaultSaveDir: String
+        private set
+
+    val memInUse: Long
+        get() = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) shr 20
+    val memTotal: Long
+        get() = Runtime.getRuntime().totalMemory() shr 20
+    val memXmx: Long
+        get() = Runtime.getRuntime().maxMemory() shr 20
+
+    lateinit var environment: RunningEnvironment
+
+    private val localeSimple = arrayOf("de", "en", "es", "it")
+    var gameLocale = "####" // lateinit placeholder
+        set(value) {
+            if (localeSimple.contains(value.substring(0..1)))
+                field = value.substring(0..1)
+            else
+                field = value
+
+            if (fontGame != null) (fontGame as GameFontImpl).reload()
+        }
+
+    var fontGame: Font? = null
+        private set
+    lateinit var fontSmallNumbers: Font
+        private set
+
+    var joypadLabelStart: Char = 0xE000.toChar() // lateinit
+    var joypadLableSelect: Char = 0xE000.toChar() // lateinit
+    var joypadLabelNinA: Char = 0xE000.toChar() // lateinit TODO
+    var joypadLabelNinB: Char = 0xE000.toChar() // lateinit TODO
+    var joypadLabelNinX: Char = 0xE000.toChar() // lateinit TODO
+    var joypadLabelNinY: Char = 0xE000.toChar() // lateinit TODO
+    var joypadLabelNinL: Char = 0xE000.toChar() // lateinit TODO
+    var joypadLabelNinR: Char = 0xE000.toChar() // lateinit TODO
+    var joypadLabelNinZL: Char = 0xE000.toChar() // lateinit TODO
+    var joypadLabelNinZR: Char = 0xE000.toChar() // lateinit TODO
+    val joypadLabelLEFT = 0xE068.toChar()
+    val joypadLabelDOWN = 0xE069.toChar()
+    val joypadLabelUP = 0xE06A.toChar()
+    val joypadLabelRIGHT = 0xE06B.toChar()
+
+    // 0x0 - 0xF: Game-related
+    // 0x10 - 0x1F: Config
+    // 0x100 and onward: unit tests for dev
+    val STATE_ID_SPLASH = 0x0
+    val STATE_ID_HOME = 0x1
+    val STATE_ID_GAME = 0x3
+    val STATE_ID_CONFIG_CALIBRATE = 0x11
+
+    val STATE_ID_TEST_FONT = 0x100
+    val STATE_ID_TEST_LIGHTNING_GFX = 0x101
+    val STATE_ID_TEST_TTY = 0x102
+    val STATE_ID_TEST_BLUR = 0x103
+    val STATE_ID_TEST_SHADER = 0x104
+
+    val STATE_ID_TOOL_NOISEGEN = 0x200
+
+    var controller: org.lwjgl.input.Controller? = null
+        private set
+    val CONTROLLER_DEADZONE = 0.1f
+
+    /** Available CPU threads */
+    val THREADS = Runtime.getRuntime().availableProcessors()
+
+    /**
+     * If the game is multithreading.
+     * True if:
+     *
+     *     THREADS >= 2 and config "multithread" is true
+     */
+    val MULTITHREAD: Boolean
+        get() = THREADS >= 2 && getConfigBoolean("multithread")
+
+    private lateinit var configDir: String
+
+    /**
+     * 0xAA_BB_XXXX
+     * AA: Major version
+     * BB: Minor version
+     * XXXX: Revision (Repository commits)
+     *
+     * e.g. 0x02010034 can be translated as 2.1.52
+     */
+    const val VERSION_RAW = 0x000200E1
+    const val VERSION_STRING: String =
+            "${VERSION_RAW.ushr(24)}.${VERSION_RAW.and(0xFF0000).ushr(16)}.${VERSION_RAW.and(0xFFFF)}"
+    const val NAME = "Terrarum"
+
+    var UPDATE_DELTA: Int = 0
 
     // these properties goes into the GameContainer
 
@@ -83,6 +222,158 @@ constructor(gamename: String) : StateBasedGame(gamename) {
         }
     }
 
+    private fun getDefaultDirectory() {
+        val OS = System.getProperty("os.name").toUpperCase()
+        if (OS.contains("WIN")) {
+            OperationSystem = "WINDOWS"
+            defaultDir = System.getenv("APPDATA") + "/terrarum"
+        }
+        else if (OS.contains("OS X")) {
+            OperationSystem = "OSX"
+            defaultDir = System.getProperty("user.home") + "/Library/Application Support/terrarum"
+        }
+        else if (OS.contains("NUX") || OS.contains("NIX")) {
+            OperationSystem = "LINUX"
+            defaultDir = System.getProperty("user.home") + "/.terrarum"
+        }
+        else if (OS.contains("SUNOS")) {
+            OperationSystem = "SOLARIS"
+            defaultDir = System.getProperty("user.home") + "/.terrarum"
+        }
+        else {
+            OperationSystem = "UNKNOWN"
+            defaultDir = System.getProperty("user.home") + "/.terrarum"
+        }
+
+        defaultSaveDir = defaultDir + "/Saves"
+        configDir = defaultDir + "/config.json"
+
+        println("[Terrarum] os.name = $OSName")
+        println("[Terrarum] os.version = $OSVersion")
+    }
+
+    private fun createDirs() {
+        val dirs = arrayOf(File(defaultSaveDir))
+        dirs.forEach { if (!it.exists()) it.mkdirs() }
+    }
+
+    @Throws(IOException::class)
+    private fun createConfigJson() {
+        val configFile = File(configDir)
+
+        if (!configFile.exists() || configFile.length() == 0L) {
+            JsonWriter.writeToFile(DefaultConfig.fetch(), configDir)
+        }
+    }
+
+    private fun readConfigJson(): Boolean {
+        try {
+            // read from disk and build config from it
+            val jsonObject = JsonFetcher(configDir)
+
+            // make config
+            jsonObject.entrySet().forEach { entry -> gameConfig[entry.key] = entry.value }
+
+            return true
+        }
+        catch (e: IOException) {
+            // write default config to game dir. Call this method again to read config from it.
+            try {
+                createConfigJson()
+            }
+            catch (e1: IOException) {
+                e.printStackTrace()
+            }
+
+            return false
+        }
+
+    }
+
+    /**
+     * Return config from config set. If the config does not exist, default value will be returned.
+     * @param key
+     * *
+     * @return Config from config set or default config if it does not exist.
+     * *
+     * @throws NullPointerException if the specified config simply does not exist.
+     */
+    fun getConfigInt(key: String): Int {
+        val cfg = getConfigMaster(key)
+        if (cfg is JsonPrimitive)
+            return cfg.asInt
+        else
+            return cfg as Int
+    }
+
+    /**
+     * Return config from config set. If the config does not exist, default value will be returned.
+     * @param key
+     * *
+     * @return Config from config set or default config if it does not exist.
+     * *
+     * @throws NullPointerException if the specified config simply does not exist.
+     */
+    fun getConfigString(key: String): String {
+        val cfg = getConfigMaster(key)
+        if (cfg is JsonPrimitive)
+            return cfg.asString
+        else
+            return cfg as String
+    }
+
+    /**
+     * Return config from config set. If the config does not exist, default value will be returned.
+     * @param key
+     * *
+     * @return Config from config set or default config if it does not exist.
+     * *
+     * @throws NullPointerException if the specified config simply does not exist.
+     */
+    fun getConfigBoolean(key: String): Boolean {
+        val cfg = getConfigMaster(key)
+        if (cfg is JsonPrimitive)
+            return cfg.asBoolean
+        else
+            return cfg as Boolean
+    }
+
+    fun getConfigIntArray(key: String): IntArray {
+        val cfg = getConfigMaster(key)
+        if (cfg is JsonArray) {
+            val jsonArray = cfg.asJsonArray
+            return IntArray(jsonArray.size(), { i -> jsonArray[i].asInt })
+        }
+        else
+            return cfg as IntArray
+    }
+
+    private fun getConfigMaster(key: String): Any {
+        var cfg: Any? = null
+        try {
+            cfg = gameConfig[key.toLowerCase()]!!
+        }
+        catch (e: NullPointerException) {
+            try {
+                cfg = DefaultConfig.fetch()[key.toLowerCase()]
+            }
+            catch (e1: NullPointerException) {
+                e.printStackTrace()
+            }
+        }
+        return cfg!!
+    }
+
+    val currentSaveDir: File
+        get() {
+            val file = File(defaultSaveDir + "/test")
+
+            // failsafe?
+            if (!file.exists()) file.mkdir()
+
+            return file // TODO TEST CODE
+        }
+
     @Throws(SlickException::class)
     override fun initStatesList(gc: GameContainer) {
         gc.input.enableKeyRepeat()
@@ -102,7 +393,6 @@ constructor(gamename: String) : StateBasedGame(gamename) {
 
         fontGame = GameFontImpl()
         fontSmallNumbers = TinyAlphNum()
-
 
 
         // search for real controller
@@ -154,337 +444,48 @@ constructor(gamename: String) : StateBasedGame(gamename) {
             throw Error("Please add or un-comment addState statements")
         }
     }
-
-    companion object {
-
-        val sysLang: String
-            get() {
-                val lan = System.getProperty("user.language")
-                val country = System.getProperty("user.country")
-                return lan + country
-            }
-
-        /**
-         * To be used with physics simulator
-         */
-        val TARGET_FPS = 50
-
-        /**
-         * To be used with render, to achieve smooth frame drawing
-
-         * TARGET_INTERNAL_FPS > TARGET_FPS for smooth frame drawing
-
-         * Must choose a value so that (1000 / VAL) is still integer
-         */
-        val TARGET_INTERNAL_FPS = 100
-
-        lateinit var appgc: AppGameContainer
-
-        var WIDTH =  1072
-        var HEIGHT = 742 // IMAX ratio
-        var VSYNC = true
-        val VSYNC_TRIGGER_THRESHOLD = 56
-        val HALFW: Int
-            get() = WIDTH.ushr(1)
-        val HALFH: Int
-            get() = HEIGHT.ushr(1)
-
-        var gameStarted = false
-
-        lateinit var ingame: StateInGame
-        lateinit var gameConfig: GameConfig
-
-        val OSName = System.getProperty("os.name")
-        val OSVersion = System.getProperty("os.version")
-        lateinit var OperationSystem: String // all caps "WINDOWS, "OSX", "LINUX", "SOLARIS", "UNKNOWN"
-            private set
-        val isWin81: Boolean
-            get() = OperationSystem == "WINDOWS" && OSVersion.toDouble() >= 8.1
-        lateinit var defaultDir: String
-            private set
-        lateinit var defaultSaveDir: String
-            private set
-
-        val memInUse: Long
-            get() = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) shr 20
-        val memTotal: Long
-            get() = Runtime.getRuntime().totalMemory() shr 20
-        val memXmx: Long
-            get() = Runtime.getRuntime().maxMemory() shr 20
-
-        lateinit var environment: RunningEnvironment
-
-        private val localeSimple = arrayOf("de", "en", "es", "it")
-        var gameLocale = "####" // lateinit placeholder
-            set(value) {
-                if (localeSimple.contains(value.substring(0..1)))
-                    field = value.substring(0..1)
-                else
-                    field = value
-
-                if (fontGame != null) (fontGame as GameFontImpl).reload()
-            }
-
-        var fontGame: Font? = null
-            private set
-        lateinit var fontSmallNumbers: Font
-            private set
-
-        var joypadLabelStart: Char = 0xE000.toChar() // lateinit
-        var joypadLableSelect:Char = 0xE000.toChar() // lateinit
-        var joypadLabelNinA:  Char = 0xE000.toChar() // lateinit TODO
-        var joypadLabelNinB:  Char = 0xE000.toChar() // lateinit TODO
-        var joypadLabelNinX:  Char = 0xE000.toChar() // lateinit TODO
-        var joypadLabelNinY:  Char = 0xE000.toChar() // lateinit TODO
-        var joypadLabelNinL:  Char = 0xE000.toChar() // lateinit TODO
-        var joypadLabelNinR:  Char = 0xE000.toChar() // lateinit TODO
-        var joypadLabelNinZL: Char = 0xE000.toChar() // lateinit TODO
-        var joypadLabelNinZR: Char = 0xE000.toChar() // lateinit TODO
-        val joypadLabelLEFT  = 0xE068.toChar()
-        val joypadLabelDOWN  = 0xE069.toChar()
-        val joypadLabelUP    = 0xE06A.toChar()
-        val joypadLabelRIGHT = 0xE06B.toChar()
-
-        // 0x0 - 0xF: Game-related
-        // 0x10 - 0x1F: Config
-        // 0x100 and onward: unit tests for dev
-        val STATE_ID_SPLASH = 0x0
-        val STATE_ID_HOME = 0x1
-        val STATE_ID_GAME = 0x3
-        val STATE_ID_CONFIG_CALIBRATE = 0x11
-
-        val STATE_ID_TEST_FONT = 0x100
-        val STATE_ID_TEST_LIGHTNING_GFX = 0x101
-        val STATE_ID_TEST_TTY = 0x102
-        val STATE_ID_TEST_BLUR = 0x103
-        val STATE_ID_TEST_SHADER = 0x104
-
-        val STATE_ID_TOOL_NOISEGEN = 0x200
-
-        var controller: org.lwjgl.input.Controller? = null
-            private set
-        val CONTROLLER_DEADZONE = 0.1f
-
-        /** Available CPU threads */
-        val THREADS = Runtime.getRuntime().availableProcessors()
-
-        /**
-         * If the game is multithreading.
-         * True if:
-         *
-         *     THREADS >= 2 and config "multithread" is true
-         */
-        val MULTITHREAD: Boolean
-            get() = THREADS >= 2 && getConfigBoolean("multithread")
-
-        private lateinit var configDir: String
-
-        /**
-         * 0xAA_BB_XXXX
-         * AA: Major version
-         * BB: Minor version
-         * XXXX: Revision (Repository commits)
-         *
-         * e.g. 0x02010034 can be translated as 2.1.52
-         */
-        const val VERSION_RAW = 0x000200E1
-        const val VERSION_STRING: String =
-                "${VERSION_RAW.ushr(24)}.${VERSION_RAW.and(0xFF0000).ushr(16)}.${VERSION_RAW.and(0xFFFF)}"
-        const val NAME = "Terrarum"
-
-        fun main(args: Array<String>) {
-            System.setProperty("java.library.path", "lib")
-            System.setProperty("org.lwjgl.librarypath", File("lib").absolutePath)
-
-            try {
-                appgc = AppGameContainer(Terrarum(NAME))
-                appgc.setDisplayMode(WIDTH, HEIGHT, false)
-
-                appgc.setTargetFrameRate(TARGET_INTERNAL_FPS)
-                appgc.setVSync(VSYNC)
-                appgc.setMaximumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS) // 10 ms
-                appgc.setMinimumLogicUpdateInterval(1000 / TARGET_INTERNAL_FPS - 1) // 9 ms
-
-                appgc.setMultiSample(0)
-
-                appgc.setShowFPS(false)
-
-                // game will run normally even if it is not focused
-                appgc.setUpdateOnlyWhenVisible(false)
-                appgc.alwaysRender = true
-
-                appgc.start()
-            }
-            catch (ex: Exception) {
-                val logger = Logger.getLogger(Terrarum::class.java.name)
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss")
-                val calendar = Calendar.getInstance()
-                val filepath = "$defaultDir/crashlog-${dateFormat.format(calendar.time)}.txt"
-                val fileHandler = FileHandler(filepath)
-                logger.addHandler(fileHandler)
-
-                val formatter = SimpleFormatter()
-                fileHandler.formatter = formatter
-
-                //logger.info()
-                println("The game has crashed!")
-                println("Crash log were saved to $filepath.")
-                println("================================================================================")
-                logger.log(Level.SEVERE, null, ex)
-            }
-
-        }
-
-        private fun getDefaultDirectory() {
-            val OS = System.getProperty("os.name").toUpperCase()
-            if (OS.contains("WIN")) {
-                OperationSystem = "WINDOWS"
-                defaultDir = System.getenv("APPDATA") + "/terrarum"
-            }
-            else if (OS.contains("OS X")) {
-                OperationSystem = "OSX"
-                defaultDir = System.getProperty("user.home") + "/Library/Application Support/terrarum"
-            }
-            else if (OS.contains("NUX") || OS.contains("NIX")) {
-                OperationSystem = "LINUX"
-                defaultDir = System.getProperty("user.home") + "/.terrarum"
-            }
-            else if (OS.contains("SUNOS")) {
-                OperationSystem = "SOLARIS"
-                defaultDir = System.getProperty("user.home") + "/.terrarum"
-            }
-            else {
-                OperationSystem = "UNKNOWN"
-                defaultDir = System.getProperty("user.home") + "/.terrarum"
-            }
-
-            defaultSaveDir = defaultDir + "/Saves"
-            configDir = defaultDir + "/config.json"
-
-            println("[Terrarum] os.name = $OSName")
-            println("[Terrarum] os.version = $OSVersion")
-        }
-
-        private fun createDirs() {
-            val dirs = arrayOf(File(defaultSaveDir))
-            dirs.forEach { if (!it.exists()) it.mkdirs() }
-        }
-
-        @Throws(IOException::class)
-        private fun createConfigJson() {
-            val configFile = File(configDir)
-
-            if (!configFile.exists() || configFile.length() == 0L) {
-                JsonWriter.writeToFile(DefaultConfig.fetch(), configDir)
-            }
-        }
-
-        private fun readConfigJson(): Boolean {
-            try {
-                // read from disk and build config from it
-                val jsonObject = JsonFetcher(configDir)
-
-                // make config
-                jsonObject.entrySet().forEach { entry -> gameConfig[entry.key] = entry.value }
-
-                return true
-            }
-            catch (e: IOException) {
-                // write default config to game dir. Call this method again to read config from it.
-                try {
-                    createConfigJson()
-                }
-                catch (e1: IOException) {
-                    e.printStackTrace()
-                }
-
-                return false
-            }
-
-        }
-
-        /**
-         * Return config from config set. If the config does not exist, default value will be returned.
-         * @param key
-         * *
-         * @return Config from config set or default config if it does not exist.
-         * *
-         * @throws NullPointerException if the specified config simply does not exist.
-         */
-        fun getConfigInt(key: String): Int {
-            val cfg = getConfigMaster(key)
-            if (cfg is JsonPrimitive)
-                return cfg.asInt
-            else
-                return cfg as Int
-        }
-
-        /**
-         * Return config from config set. If the config does not exist, default value will be returned.
-         * @param key
-         * *
-         * @return Config from config set or default config if it does not exist.
-         * *
-         * @throws NullPointerException if the specified config simply does not exist.
-         */
-        fun getConfigString(key: String): String {
-            val cfg = getConfigMaster(key)
-            if (cfg is JsonPrimitive)
-                return cfg.asString
-            else
-                return cfg as String
-        }
-
-        /**
-         * Return config from config set. If the config does not exist, default value will be returned.
-         * @param key
-         * *
-         * @return Config from config set or default config if it does not exist.
-         * *
-         * @throws NullPointerException if the specified config simply does not exist.
-         */
-        fun getConfigBoolean(key: String): Boolean {
-            val cfg = getConfigMaster(key)
-            if (cfg is JsonPrimitive)
-                return cfg.asBoolean
-            else
-                return cfg as Boolean
-        }
-
-        fun getConfigIntArray(key: String): IntArray {
-            val cfg = getConfigMaster(key)
-            if (cfg is JsonArray) {
-                val jsonArray = cfg.asJsonArray
-                return IntArray(jsonArray.size(), { i -> jsonArray[i].asInt })
-            }
-            else
-                return cfg as IntArray
-        }
-
-        private fun getConfigMaster(key: String): Any {
-            var cfg: Any? = null
-            try { cfg = gameConfig[key.toLowerCase()]!! }
-            catch (e: NullPointerException) {
-                try { cfg = DefaultConfig.fetch()[key.toLowerCase()] }
-                catch (e1: NullPointerException) { e.printStackTrace() }
-            }
-            return cfg!!
-        }
-
-        val currentSaveDir: File
-            get() {
-                val file = File(defaultSaveDir + "/test")
-
-                // failsafe?
-                if (!file.exists()) file.mkdir()
-
-                return file // TODO TEST CODE
-            }
-    }
 }
 
 fun main(args: Array<String>) {
-    Terrarum.main(args)
+    System.setProperty("java.library.path", "lib")
+    System.setProperty("org.lwjgl.librarypath", File("lib").absolutePath)
+
+    try {
+        Terrarum.appgc = AppGameContainer(Terrarum)
+        Terrarum.appgc.setDisplayMode(Terrarum.WIDTH, Terrarum.HEIGHT, false)
+
+        Terrarum.appgc.setTargetFrameRate(Terrarum.TARGET_INTERNAL_FPS)
+        Terrarum.appgc.setVSync(Terrarum.VSYNC)
+        Terrarum.appgc.setMaximumLogicUpdateInterval(1000 / Terrarum.TARGET_INTERNAL_FPS) // 10 ms
+        Terrarum.appgc.setMinimumLogicUpdateInterval(1000 / Terrarum.TARGET_INTERNAL_FPS - 1) // 9 ms
+
+        Terrarum.appgc.setMultiSample(0)
+
+        Terrarum.appgc.setShowFPS(false)
+
+        // game will run normally even if it is not focused
+        Terrarum.appgc.setUpdateOnlyWhenVisible(false)
+        Terrarum.appgc.alwaysRender = true
+
+        Terrarum.appgc.start()
+    }
+    catch (ex: Exception) {
+        val logger = Logger.getLogger(Terrarum::class.java.name)
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss")
+        val calendar = Calendar.getInstance()
+        val filepath = "${Terrarum.defaultDir}/crashlog-${dateFormat.format(calendar.time)}.txt"
+        val fileHandler = FileHandler(filepath)
+        logger.addHandler(fileHandler)
+
+        val formatter = SimpleFormatter()
+        fileHandler.formatter = formatter
+
+        //logger.info()
+        println("The game has crashed!")
+        println("Crash log were saved to $filepath.")
+        println("================================================================================")
+        logger.log(Level.SEVERE, null, ex)
+    }
 }
 
 ///////////////////////////////////
@@ -566,6 +567,7 @@ fun Texture.getPixel(x: Int, y: Int): IntArray {
         )
     }
 }
+
 /** @return Intarray(R, G, B, A) */
 fun Image.getPixel(x: Int, y: Int) = this.texture.getPixel(x, y)
 
