@@ -343,37 +343,6 @@ open class SimpleTextTerminal(
     var sb: StringBuilder = StringBuilder()
     private var inputOpen = false
     private var keyPressVisible = false
-    /**
-     * @param echo if true, keypresses are echoed to the terminal.
-     */
-    override fun openInput(echo: Boolean) {
-        lastStreamInput = null
-        lastKeyPress = null
-        inputOpen = true
-        keyPressVisible = echo
-        if (DEBUG) println("[SimpleTextTerminal] openInput()")
-    }
-
-    override fun closeInputKey(keyFromUI: Int): Int {
-        inputOpen = false
-        lastKeyPress = keyFromUI
-
-        if (DEBUG) println("[SimpleTextTerminal] closeInputKey(), $keyFromUI")
-        return keyFromUI
-    }
-
-    override var lastStreamInput: String? = null
-    override var lastKeyPress: Int? = null
-
-    override fun closeInputString(): String {
-        inputOpen = false
-        lastStreamInput = sb.toString()
-        sb = StringBuilder()
-
-        if (DEBUG)
-            println("[SimpleTextTerminal] closeInputString(), ${if (keyPressVisible) lastStreamInput else "<keypress hidden>"}")
-        return lastStreamInput!!
-    }
 
     override fun keyPressed(key: Int, c: Char) {
         lastInputByte = c.toInt()

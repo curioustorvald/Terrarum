@@ -94,7 +94,7 @@ io.read = function(option)
         -- RETURN not hit
         while inkey ~= 13 do
             inkey = machine.__readFromStdin()
-            if inkey >= 32 then
+            if inkey > 0 then
                 io.write(string.char(inkey))
                 input = input..string.char(inkey)
             end

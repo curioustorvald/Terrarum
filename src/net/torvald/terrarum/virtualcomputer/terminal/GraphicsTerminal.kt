@@ -10,6 +10,7 @@ import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
+import java.util.*
 
 /**
  * Printing text using Term API triggers 'compatibility' mode, where you are limited to 16 colours.
@@ -93,10 +94,6 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
         cursorY = y
     }
 
-    override fun openInput(echo: Boolean) {
-        //TODO("not implemented")
-    }
-
     override fun emitChar(bufferChar: Int, x: Int, y: Int) {
         videoCard.drawChar(
                 bufferChar.and(0xFF).toChar(),
@@ -107,20 +104,32 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
         )
     }
 
-    override fun closeInputKey(keyFromUI: Int): Int {
-        //TODO("not implemented")
-        return 0
-    }
+    override fun emitChar(c: Char, xx: Int, yy: Int) {
+        wrap() // needed
+        var x = xx
+        var y = yy
+        // wrap argument cursor
+        if (xx < 0 && yy <= 0) {
+            x = 0
+            y = 0
+        }
+        else if (cursorX >= width) {
+            println("arstenioarstoneirastneo")
+            x = 0
+            y += 1
+        }
+        else if (cursorX < 0) {
+            x = width - 1
+            y -= 1
+        }
+        // auto scroll up
+        if (cursorY >= height) {
+            scroll()
+            y -= 1
+        }
 
-    override fun closeInputString(): String {
-        //TODO("not implemented")
-        return " "
-    }
+        println("xx: $xx, yy: $yy")
 
-    override var lastStreamInput: String? = null
-    override var lastKeyPress: Int? = null
-
-    override fun emitChar(c: Char, x: Int, y: Int) {
         videoCard.drawChar(
                 c,
                 x * PeripheralVideoCard.blockW,
@@ -130,22 +139,27 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
     }
 
     override fun printChar(c: Char) {
-        wrap()
         if (c >= ' ' && c.toInt() != 127) {
-            emitChar(c)
+            emitChar(c, cursorX, cursorY)
             cursorX += 1
         }
         else {
-            when (c) {
-                ASCII_BEL -> bell(".")
-                ASCII_BS  -> { cursorX -= 1; wrap() }
-                ASCII_TAB -> { cursorX = (cursorX).div(TABSIZE).times(TABSIZE) + TABSIZE }
-                ASCII_LF  -> newLine()
-                ASCII_FF  -> clear()
-                ASCII_CR  -> { cursorX = 0 }
-                ASCII_DEL -> { cursorX -= 1; wrap(); emitChar(colourKey.shl(8)) }
-                ASCII_DC1, ASCII_DC2, ASCII_DC3, ASCII_DC4 -> { foreColour = c - ASCII_DC1 }
-                ASCII_DLE -> { foreColour = errorColour }
+            if (BACKSPACE.contains(c)) {
+                cursorX -= 1
+                //wrap()
+                emitChar(0.toChar(), cursorX, cursorY)
+            }
+            else {
+                when (c) {
+                    ASCII_BEL -> bell(".")
+                    ASCII_TAB -> { cursorX = (cursorX).div(TABSIZE).times(TABSIZE) + TABSIZE }
+                    ASCII_LF  -> { newLine(); System.err.println("LF ${Random().nextInt(100)}") }
+                    ASCII_FF  -> clear()
+                    ASCII_CR  -> { cursorX = 0 }
+                    ASCII_DC1, ASCII_DC2, ASCII_DC3,
+                    ASCII_DC4 -> { foreColour = c - ASCII_DC1 }
+                    ASCII_DLE -> { foreColour = errorColour }
+                }
             }
         }
     }
@@ -155,7 +169,6 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
 
         for (i in 0..s.length - 1) {
             printChar(s[i])
-            wrap()
         }
 
         setCursor(x, y)
@@ -171,7 +184,6 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
 
         for (i in 0..s.length - 1) {
             printChar(s[i])
-            wrap()
         }
     }
 
@@ -184,7 +196,8 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
     }
 
     override fun newLine() {
-        cursorX = 0; cursorY += 1; wrap()
+        cursorX = 0; cursorY += 1
+        //wrap()
     }
 
     override fun scroll(amount: Int) {
@@ -268,12 +281,11 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
 
         val ASCII_NUL = 0.toChar()
         val ASCII_BEL = 7.toChar()   // *BEEP!*
-        val ASCII_BS = 8.toChar()    // x = x - 1
         val ASCII_TAB = 9.toChar()   // move cursor to next (TABSIZE * yy) pos (5 -> 8, 3- > 4, 4 -> 8)
         val ASCII_LF = 10.toChar()   // new line
         val ASCII_FF = 12.toChar()   // new page
         val ASCII_CR = 13.toChar()   // x <- 0
-        val ASCII_DEL = 127.toChar() // backspace and delete char
+        val BACKSPACE = arrayOf(127.toChar(), 8.toChar()) // backspace and delete char (8 for WIN, 127 for OSX)
         val ASCII_DC1 = 17.toChar()  // foreground colour 0
         val ASCII_DC2 = 18.toChar()  // foreground colour 1
         val ASCII_DC3 = 19.toChar()  // foreground colour 2
@@ -283,12 +295,12 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
         val asciiControlInUse = charArrayOf(
                 ASCII_NUL,
                 ASCII_BEL,
-                ASCII_BS,
+                8.toChar(),
                 ASCII_TAB,
                 ASCII_LF,
                 ASCII_FF,
                 ASCII_CR,
-                ASCII_DEL,
+                127.toChar(),
                 ASCII_DC1,
                 ASCII_DC2,
                 ASCII_DC3,

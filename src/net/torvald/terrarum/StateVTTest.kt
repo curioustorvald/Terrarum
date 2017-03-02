@@ -59,16 +59,6 @@ class StateVTTest : BasicGameState() {
     }
 
     override fun keyPressed(key: Int, c: Char) {
-        super.keyPressed(key, c)
         vt.keyPressed(key, c)
-
-        if (!computerInside.isHalted) {
-            if (key == Key.RETURN && computerInside.luaJ_globals["__scanMode__"].checkjstring() == "line") {
-                vt.closeInputString() // cut input by pressing Key.RETURN
-            }
-            else if (computerInside.luaJ_globals["__scanMode__"].checkjstring() == "a_key") {
-                vt.closeInputKey(key) // cut input by pressing any key
-            }
-        }
     }
 }
