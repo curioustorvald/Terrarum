@@ -34,15 +34,5 @@ interface Teletype {
     fun newLine()
     fun scroll(amount: Int = 1)
 
-    /**
-     * @param echo if true, keypresses are echoed to the terminal.
-     */
-    fun openInput(echo: Boolean = true)
-    fun closeInputKey(keyFromUI: Int): Int
-    fun closeInputString(): String
-
     fun bell(pattern: String = ".")
-
-    var lastStreamInput: String?
-    var lastKeyPress: Int?
 }

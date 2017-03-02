@@ -131,36 +131,6 @@ class TeletypeTerminal : Teletype {
     private var inputOpen = false
     val DEBUG = true
 
-    /**
-     * @param echo if true, keypresses are echoed to the terminal.
-     */
-    override fun openInput(echo: Boolean) {
-        lastStreamInput = null
-        lastKeyPress = null
-        inputOpen = true
-        if (DEBUG) println("[TeletypeTerminal] openInput()")
-    }
-
-    override fun closeInputKey(keyFromUI: Int): Int {
-        inputOpen = false
-        lastKeyPress = keyFromUI
-
-        if (DEBUG) println("[TeletypeTerminal] closeInputKey(), $keyFromUI")
-        return keyFromUI
-    }
-
-    override var lastStreamInput: String? = null
-    override var lastKeyPress: Int? = null
-
-    override fun closeInputString(): String {
-        inputOpen = false
-        lastStreamInput = sb.toString()
-        sb = StringBuilder()
-
-        if (DEBUG) println("[TeletypeTerminal] closeInputString(), $lastStreamInput")
-        return lastStreamInput!!
-    }
-
     override fun keyPressed(key: Int, c: Char) {
         if (inputOpen) {
             if (c == SimpleTextTerminal.ASCII_CR)
