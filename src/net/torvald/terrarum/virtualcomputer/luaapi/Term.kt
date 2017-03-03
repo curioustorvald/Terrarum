@@ -71,7 +71,7 @@ internal class Term(globals: Globals, term: Teletype) {
     class WriteString(val tty: Teletype) : LuaFunction() {
         override fun call(p0: LuaValue): LuaValue {
             if (tty is Terminal)
-                tty.writeString(p0.checkIBM437())
+                tty.writeString(p0.checkIBM437(), tty.cursorX, tty.cursorY)
             else
                 tty.writeChars(p0.checkIBM437())
             return LuaValue.NONE
@@ -89,7 +89,7 @@ internal class Term(globals: Globals, term: Teletype) {
     class PrintString(val tty: Teletype) : LuaFunction() {
         override fun call(p0: LuaValue): LuaValue {
             if (tty is Terminal)
-                tty.printString(p0.checkIBM437())
+                tty.printString(p0.checkIBM437(), tty.cursorX, tty.cursorY)
             else
                 tty.printChars(p0.checkIBM437())
             return LuaValue.NONE

@@ -222,6 +222,77 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         }
     }
 
+    @Throws(SlickException::class)
+    override fun initStatesList(gc: GameContainer) {
+        gc.input.enableKeyRepeat()
+
+
+        // get locale from config
+        val gameLocaleFromConfig = gameConfig.getAsString("language") ?: sysLang
+
+        // if bad game locale were set, use system locale
+        if (gameLocaleFromConfig.length < 2)
+            gameLocale = sysLang
+        else
+            gameLocale = gameLocaleFromConfig
+
+        println("[Terrarum] Locale: " + gameLocale)
+
+
+        fontGame = GameFontImpl()
+        fontSmallNumbers = TinyAlphNum()
+
+
+        // search for real controller
+        // exclude controllers with name "Mouse", "keyboard"
+        val notControllerRegex = Regex("mouse|keyboard")
+        try {
+            // gc.input.controllerCount is unreliable
+            for (i in 0..255) {
+                val controllerInQuo = Controllers.getController(i)
+
+                println("Controller $i: ${controllerInQuo.name}")
+
+                // check the name
+                if (!controllerInQuo.name.toLowerCase().contains(notControllerRegex)) {
+                    controller = controllerInQuo
+                    println("Controller $i selected: ${controller!!.name}")
+                    break
+                }
+            }
+        }
+        catch (e: IndexOutOfBoundsException) {
+        }
+
+        if (controller != null) {
+            for (c in 0..controller!!.axisCount - 1) {
+                controller!!.setDeadZone(c, CONTROLLER_DEADZONE)
+            }
+        }
+
+        gc.graphics.clear() // clean up any 'dust' in the buffer
+
+        //addState(StateVTTest())
+        //addState(StateGraphicComputerTest())
+        //addState(StateTestingLightning())
+        //addState(StateSplash())
+        //addState(StateMonitorCheck())
+        //addState(StateFontTester())
+        //addState(StateNoiseTexGen())
+        //addState(StateBlurTest())
+        //addState(StateShaderTest())
+        //addState(StateNoiseTester())
+
+        ingame = StateInGame()
+        addState(ingame)
+
+
+        // foolproof
+        if (stateCount < 1) {
+            throw Error("Please add or un-comment addState statements")
+        }
+    }
+
     private fun getDefaultDirectory() {
         val OS = System.getProperty("os.name").toUpperCase()
         if (OS.contains("WIN")) {
@@ -373,77 +444,6 @@ object Terrarum : StateBasedGame(GAME_NAME) {
 
             return file // TODO TEST CODE
         }
-
-    @Throws(SlickException::class)
-    override fun initStatesList(gc: GameContainer) {
-        gc.input.enableKeyRepeat()
-
-
-        // get locale from config
-        val gameLocaleFromConfig = gameConfig.getAsString("language") ?: sysLang
-
-        // if bad game locale were set, use system locale
-        if (gameLocaleFromConfig.length < 2)
-            gameLocale = sysLang
-        else
-            gameLocale = gameLocaleFromConfig
-
-        println("[Terrarum] Locale: " + gameLocale)
-
-
-        fontGame = GameFontImpl()
-        fontSmallNumbers = TinyAlphNum()
-
-
-        // search for real controller
-        // exclude controllers with name "Mouse", "keyboard"
-        val notControllerRegex = Regex("mouse|keyboard")
-        try {
-            // gc.input.controllerCount is unreliable
-            for (i in 0..255) {
-                val controllerInQuo = Controllers.getController(i)
-
-                println("Controller $i: ${controllerInQuo.name}")
-
-                // check the name
-                if (!controllerInQuo.name.toLowerCase().contains(notControllerRegex)) {
-                    controller = controllerInQuo
-                    println("Controller $i selected: ${controller!!.name}")
-                    break
-                }
-            }
-        }
-        catch (e: IndexOutOfBoundsException) {
-        }
-
-        if (controller != null) {
-            for (c in 0..controller!!.axisCount - 1) {
-                controller!!.setDeadZone(c, CONTROLLER_DEADZONE)
-            }
-        }
-
-        gc.graphics.clear() // clean up any 'dust' in the buffer
-
-        //addState(StateVTTest())
-        addState(StateGraphicComputerTest())
-        //addState(StateTestingLightning())
-        //addState(StateSplash())
-        //addState(StateMonitorCheck())
-        //addState(StateFontTester())
-        //addState(StateNoiseTexGen())
-        //addState(StateBlurTest())
-        //addState(StateShaderTest())
-        //addState(StateNoiseTester())
-
-        ingame = StateInGame()
-        addState(ingame)
-
-
-        // foolproof
-        if (stateCount < 1) {
-            throw Error("Please add or un-comment addState statements")
-        }
-    }
 }
 
 fun main(args: Array<String>) {
