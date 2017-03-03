@@ -106,34 +106,35 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
 
     override fun emitChar(c: Char, xx: Int, yy: Int) {
         wrap() // needed
-        var x = xx
-        var y = yy
+        var nx = xx
+        var ny = yy
         // wrap argument cursor
         if (xx < 0 && yy <= 0) {
-            x = 0
-            y = 0
+            nx = 0
+            ny = 0
         }
         else if (cursorX >= width) {
             println("arstenioarstoneirastneo")
-            x = 0
-            y += 1
+            nx = 0
+            ny += 1
         }
         else if (cursorX < 0) {
-            x = width - 1
-            y -= 1
+            nx = width - 1
+            ny -= 1
         }
         // auto scroll up
         if (cursorY >= height) {
             scroll()
-            y -= 1
+            ny -= 1
         }
 
         println("xx: $xx, yy: $yy")
+        println("nx: $nx, ny: $ny")
 
         videoCard.drawChar(
                 c,
-                x * PeripheralVideoCard.blockW,
-                y * PeripheralVideoCard.blockH,
+                nx * PeripheralVideoCard.blockW,
+                ny * PeripheralVideoCard.blockH,
                 CLUT16_TO_64[foreColour]
         )
     }

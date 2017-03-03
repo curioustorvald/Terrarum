@@ -195,7 +195,7 @@ open class SimpleTextTerminal(
     override fun printChar(c: Char) {
         wrap()
         if (c >= ' ' && c.toInt() != 127) {
-            emitChar(c)
+            emitChar(c, cursorX, cursorY)
             cursorX += 1
         }
         else {
@@ -206,7 +206,7 @@ open class SimpleTextTerminal(
                 ASCII_LF  -> newLine()
                 ASCII_FF  -> clear()
                 ASCII_CR  -> { cursorX = 0 }
-                ASCII_DEL -> { cursorX -= 1; wrap(); emitChar(colourKey.shl(8)) }
+                ASCII_DEL -> { cursorX -= 1; wrap(); emitChar(colourKey.shl(8), cursorX, cursorY) }
                 ASCII_DC1, ASCII_DC2, ASCII_DC3, ASCII_DC4 -> { foreColour = c - ASCII_DC1 }
                 ASCII_DLE -> { foreColour = errorColour }
             }
