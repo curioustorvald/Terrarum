@@ -133,8 +133,8 @@ constructor(val UI: UICanvas) {
     }
 
     fun setAsAlwaysVisible() {
-        alwaysVisible = true
         isVisible = true
+        alwaysVisible = true
         isOpened = true
         isOpening = false
         isClosing = false

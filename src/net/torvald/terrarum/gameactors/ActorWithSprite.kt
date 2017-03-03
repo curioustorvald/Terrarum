@@ -44,10 +44,14 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
 
     @Transient private val world: GameWorld = Terrarum.ingame.world
 
-    protected var hitboxTranslateX: Double = 0.0// relative to spritePosX
-    protected var hitboxTranslateY: Double = 0.0// relative to spritePosY
-    protected var baseHitboxW: Int = 0
-    protected var baseHitboxH: Int = 0
+    var hitboxTranslateX: Double = 0.0// relative to spritePosX
+        protected set
+    var hitboxTranslateY: Double = 0.0// relative to spritePosY
+        protected set
+    var baseHitboxW: Int = 0
+        protected set
+    var baseHitboxH: Int = 0
+        protected set
     /**
      * * Position: top-left point
      * * Unit: pixel
