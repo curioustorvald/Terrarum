@@ -581,7 +581,7 @@ infix fun Color.screen(other: Color) = Color(
         1f - (1f - this.a) * (1f - other.a)
 )
 
-infix fun Color.mul(other: Color) = Color(
+operator fun Color.times(other: Color) = Color(
         this.r * other.r,
         this.g * other.g,
         this.b * other.b,

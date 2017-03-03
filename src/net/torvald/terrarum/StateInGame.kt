@@ -175,6 +175,14 @@ class StateInGame : BasicGameState() {
 
         // audio test
         //AudioResourceLibrary.ambientsWoods[0].play()
+
+
+
+        val vitalmetre = UIHandler(UIVitalMetre(player, { 100f }, { 100f }, Color(255, 182, 0)))
+        //vitalmetre.setAsAlwaysVisible()
+        vitalmetre.isVisible = true
+        vitalmetre.UI.handler = vitalmetre
+        uiContainer.add(vitalmetre)
     }
 
     var particlesActive = 0

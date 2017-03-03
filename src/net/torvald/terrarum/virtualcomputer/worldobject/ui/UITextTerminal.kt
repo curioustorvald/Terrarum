@@ -1,6 +1,7 @@
 package net.torvald.terrarum.virtualcomputer.worldobject.ui
 
 import net.torvald.terrarum.ui.*
+import net.torvald.terrarum.ui.UICanvas.Companion.OPENCLOSE_GENERIC
 import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics

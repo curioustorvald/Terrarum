@@ -82,22 +82,22 @@ class UIPieMenu : UICanvas {
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {
-        handler!!.opacity = handler!!.openCloseCounter.toFloat() / openCloseTime
+        UICanvas.doOpeningFade(handler, openCloseTime)
         handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
     }
 
     override fun doClosing(gc: GameContainer, delta: Int) {
-        handler!!.opacity = (openCloseTime - handler!!.openCloseCounter.toFloat()) / openCloseTime
+        UICanvas.doClosingFade(handler, openCloseTime)
         handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
     }
 
     override fun endOpening(gc: GameContainer, delta: Int) {
-        handler!!.opacity = 1f
+        UICanvas.endOpeningFade(handler)
         handler!!.scale = 1f
     }
 
     override fun endClosing(gc: GameContainer, delta: Int) {
-        handler!!.opacity = 0f
+        UICanvas.endClosingFade(handler)
         handler!!.scale = 1f
     }
 }

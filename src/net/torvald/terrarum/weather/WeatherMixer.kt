@@ -133,7 +133,7 @@ object WeatherMixer {
 
     fun Float.clampOne() = if (this > 1) 1f else this
 
-    operator fun Color.times(other: Color) = Color(this.r * other.r, this.g * other.g, this.b * other.b, 1f)
+    private operator fun Color.times(other: Color) = Color(this.r * other.r, this.g * other.g, this.b * other.b, 1f)
 
     /**
      * Get a GL of specific time

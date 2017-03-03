@@ -49,6 +49,28 @@ interface UICanvas {
      * Do not modify handler!!.openCloseCounter here.
      */
     fun endClosing(gc: GameContainer, delta: Int)
-}
 
-const val OPENCLOSE_GENERIC = 200
+    companion object {
+        const val OPENCLOSE_GENERIC = 200
+
+        fun doOpeningFade(handler: UIHandler?, openCloseTime: Int) {
+            handler!!.opacity = handler!!.openCloseCounter.toFloat() / openCloseTime
+        }
+
+        fun doClosingFade(handler: UIHandler?, openCloseTime: Int) {
+            handler!!.opacity = (openCloseTime - handler!!.openCloseCounter.toFloat()) / openCloseTime
+        }
+
+        fun endOpeningFade(handler: UIHandler?) {
+            handler!!.opacity = 1f
+        }
+
+        fun endClosingFade(handler: UIHandler?) {
+            handler!!.opacity = 0f
+        }
+
+        // TODO add drawer slide in/out (quadratic)
+
+        // TODO add blackboard take in/out (sinusoidal)
+    }
+}
