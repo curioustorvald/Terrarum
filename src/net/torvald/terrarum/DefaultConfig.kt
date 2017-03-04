@@ -33,10 +33,10 @@ object DefaultConfig {
         jsonObject.addProperty("joypadldown", 6)
         jsonObject.addProperty("joypadrdown", 7) // logitech indices
 
-        jsonObject.addProperty("joypadlstickx", 3)
-        jsonObject.addProperty("joypadlsticky", 2)
-        jsonObject.addProperty("joypadrstickx", 1)
-        jsonObject.addProperty("joypadrsticky", 0) // logitech indices
+        jsonObject.addProperty("joypadlstickx", 0)
+        jsonObject.addProperty("joypadlsticky", 1)
+        jsonObject.addProperty("joypadrstickx", 2)
+        jsonObject.addProperty("joypadrsticky", 3) // 0-1-2-3 but sometimes 3-2-1-0 ?! what the actual fuck?
 
         jsonObject.addProperty("joypadlabelstyle", "generic") // "nwii", "logitech", "sonyps", "msxb360", "generic"
 
