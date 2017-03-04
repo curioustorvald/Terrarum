@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.floorInt
@@ -18,11 +19,14 @@ class UIVitalMetre(
         val vitalGetterVal: () -> Float,
         val vitalGetterMax: () -> Float,
         val color: Color,
-        val order: Int = 0
+        val order: Int
 ) : UICanvas {
 
-    override var width: Int = 84
-    override var height: Int = player.baseHitboxH * 3 + 2
+    private val margin = 25
+    private val gap = 4f
+
+    override var width: Int = 80 + 2 * margin
+    override var height: Int = player.baseHitboxH * 3 + margin
     override var handler: UIHandler? = null
     override var openCloseTime: Int = 50
 
@@ -33,6 +37,9 @@ class UIVitalMetre(
     private val theta = 33f
     private val halfTheta = theta / 2f
 
+    private val backColor = color.darkerLab(0.3f)
+
+
     override fun update(gc: GameContainer, delta: Int) {
         handler!!.setPosition(
                 (Terrarum.HALFW - relativePX).roundInt(),
@@ -41,31 +48,25 @@ class UIVitalMetre(
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        g.lineWidth = 1.8f
-        val saturation = 2f
+        g.lineWidth = 2f
 
         // background
-        g.color = Color(
-                (color.r * saturation) - (saturation - 1),
-                (color.g * saturation) - (saturation - 1),
-                (color.b * saturation) - (saturation - 1),
-                0.9f
-        )
+        g.color = backColor
         g.drawArc(
-                relativePX - circleRadius,
-                -circleRadius,
-                circleRadius * 2f,
-                circleRadius * 2f,
+                relativePX - circleRadius - order * gap,
+                -circleRadius             - order * gap,
+                circleRadius * 2f         + order * gap * 2,
+                circleRadius * 2f         + order * gap * 2,
                 90f - halfTheta,
-                90f + halfTheta
+                90f + halfTheta - theta * (vitalGetterVal() / vitalGetterMax())
         )
 
         g.color = color
         g.drawArc(
-                relativePX - circleRadius,
-                -circleRadius,
-                circleRadius * 2f,
-                circleRadius * 2f,
+                relativePX - circleRadius - order * gap,
+                -circleRadius             - order * gap,
+                circleRadius * 2f         + order * gap * 2,
+                circleRadius * 2f         + order * gap * 2,
                 90f + halfTheta - theta * (vitalGetterVal() / vitalGetterMax()),
                 90f + halfTheta
         )
