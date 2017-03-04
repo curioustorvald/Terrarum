@@ -178,11 +178,17 @@ class StateInGame : BasicGameState() {
 
 
 
-        val vitalmetre = UIHandler(UIVitalMetre(player, { 100f }, { 100f }, Color(255, 182, 0)))
+        val vitalmetre = UIHandler(UIVitalMetre(player, { 88f }, { 100f }, Color(255, 182, 0), 0))
         //vitalmetre.setAsAlwaysVisible()
         vitalmetre.isVisible = true
         vitalmetre.UI.handler = vitalmetre
         uiContainer.add(vitalmetre)
+
+        val vitalmetre2 = UIHandler(UIVitalMetre(player, { 72f }, { 100f }, Color(180, 255, 0), 1))
+        //vitalmetre.setAsAlwaysVisible()
+        vitalmetre2.isVisible = true
+        vitalmetre2.UI.handler = vitalmetre2
+        uiContainer.add(vitalmetre2)
     }
 
     var particlesActive = 0
