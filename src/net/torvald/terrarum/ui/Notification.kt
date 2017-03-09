@@ -10,8 +10,7 @@ import org.newdawn.slick.SlickException
 /**
  * Created by minjaesong on 16-01-23.
  */
-class Notification @Throws(SlickException::class)
-constructor() : UICanvas {
+class Notification : UICanvas {
 
     private val SHOWUP_MAX = 15000
 
@@ -26,7 +25,7 @@ constructor() : UICanvas {
     )
     private var displayTimer = 0
 
-    internal var message: Array<String> = Array(MessageWindow.MESSAGES_DISPLAY, { i -> ""})
+    internal var message: Array<String> = Array(MessageWindow.MESSAGES_DISPLAY, { "" })
 
     override var openCloseTime: Int = MessageWindow.OPEN_CLOSE_TIME
 
@@ -39,8 +38,10 @@ constructor() : UICanvas {
         if (handler!!.isOpened)
             displayTimer += delta
 
-        if (displayTimer >= visibleTime)
+        if (displayTimer >= visibleTime) {
             handler!!.setAsClose()
+            displayTimer = 0
+        }
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
@@ -48,23 +49,19 @@ constructor() : UICanvas {
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {
-        handler!!.opacity = FastMath.interpolateLinear(handler!!.openCloseCounter.toFloat() / openCloseTime.toFloat(),
-                0f, 1f
-        )
+        UICanvas.doOpeningFade(handler, openCloseTime)
     }
 
     override fun doClosing(gc: GameContainer, delta: Int) {
-        handler!!.opacity = FastMath.interpolateLinear(handler!!.openCloseCounter.toFloat() / openCloseTime.toFloat(),
-                1f, 0f
-        )
+        UICanvas.doClosingFade(handler, openCloseTime)
     }
 
     override fun endOpening(gc: GameContainer, delta: Int) {
-        handler!!.opacity = 1f
+        UICanvas.endOpeningFade(handler)
     }
 
     override fun endClosing(gc: GameContainer, delta: Int) {
-        handler!!.opacity = 0f
+        UICanvas.endClosingFade(handler)
     }
 
     override fun processInput(gc: GameContainer, delta: Int, input: Input) {
