@@ -16,28 +16,28 @@ import org.newdawn.slick.Input
  */
 class UIVitalMetre(
         var player: ActorHumanoid,
-        val vitalGetterVal: () -> Float,
-        val vitalGetterMax: () -> Float,
-        val color: Color,
+        var vitalGetterVal: () -> Float?,
+        var vitalGetterMax: () -> Float?,
+        var color: Color?,
         val order: Int
 ) : UICanvas {
 
     private val margin = 25
     private val gap = 4f
 
-    override var width: Int = 80 + 2 * margin
-    override var height: Int = player.baseHitboxH * 3 + margin
+    override var width: Int = 80 + 2 * margin; set(value) { throw Error("operation not permitted") }
+    override var height: Int; get() = player.baseHitboxH * 3 + margin; set(value) { throw Error("operation not permitted") }
     override var handler: UIHandler? = null
     override var openCloseTime: Int = 50
 
     private val relativePX = width / 2f
-    private val relativePY = player.baseHitboxH * 1.5f
-    private val circleRadius = player.baseHitboxH * 3f
+    private val relativePY: Float; get() =  player.baseHitboxH * 1.5f
+    private val circleRadius: Float; get() = player.baseHitboxH * 3f
 
     private val theta = 33f
     private val halfTheta = theta / 2f
 
-    private val backColor = color.darkerLab(0.3f)
+    private val backColor: Color; get() = color?.darkerLab(0.3f) ?: Color.black
 
 
     override fun update(gc: GameContainer, delta: Int) {
@@ -48,28 +48,31 @@ class UIVitalMetre(
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        g.lineWidth = 2f
+        if (vitalGetterVal() != null && vitalGetterMax() != null) {
 
-        // background
-        g.color = backColor
-        g.drawArc(
-                relativePX - circleRadius - order * gap,
-                -circleRadius             - order * gap,
-                circleRadius * 2f         + order * gap * 2,
-                circleRadius * 2f         + order * gap * 2,
-                90f - halfTheta,
-                90f + halfTheta - theta * (vitalGetterVal() / vitalGetterMax())
-        )
+            g.lineWidth = 2f
 
-        g.color = color
-        g.drawArc(
-                relativePX - circleRadius - order * gap,
-                -circleRadius             - order * gap,
-                circleRadius * 2f         + order * gap * 2,
-                circleRadius * 2f         + order * gap * 2,
-                90f + halfTheta - theta * (vitalGetterVal() / vitalGetterMax()),
-                90f + halfTheta
-        )
+            // background
+            g.color = backColor
+            g.drawArc(
+                    relativePX - circleRadius - order * gap,
+                    -circleRadius - order * gap,
+                    circleRadius * 2f + order * gap * 2,
+                    circleRadius * 2f + order * gap * 2,
+                    90f - halfTheta,
+                    90f + halfTheta - theta * (vitalGetterVal()!! / vitalGetterMax()!!)
+            )
+
+            g.color = color
+            g.drawArc(
+                    relativePX - circleRadius - order * gap,
+                    -circleRadius - order * gap,
+                    circleRadius * 2f + order * gap * 2,
+                    circleRadius * 2f + order * gap * 2,
+                    90f + halfTheta - theta * (vitalGetterVal()!! / vitalGetterMax()!!),
+                    90f + halfTheta
+            )
+        }
     }
 
     override fun processInput(gc: GameContainer, delta: Int, input: Input) {
