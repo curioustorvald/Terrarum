@@ -98,6 +98,9 @@ class StateInGame : BasicGameState() {
     private val UI_QUICK_BAR = "uiQuickBar"
     private val UI_INVENTORY_PLAYER = "uiInventoryPlayer"
     private val UI_INVENTORY_ANON = "uiInventoryAnon"
+    private val UI_VITAL1 = "uiVital1"
+    private val UI_VITAL2 = "uiVital2"
+    private val UI_VITAL3 = "uiVital3"
 
     var paused: Boolean = false
         get() = consoleHandler.isOpened
@@ -156,6 +159,8 @@ class StateInGame : BasicGameState() {
         // set smooth lighting as in config
         KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, Terrarum.getConfigBoolean("smoothlighting"))
 
+
+
         // queue up game UIs
         //  lesser UIs
         // quick bar
@@ -164,6 +169,7 @@ class StateInGame : BasicGameState() {
         uiAliases[UI_QUICK_BAR]!!.setPosition(0, 0)
         uiAliases[UI_QUICK_BAR]!!.UI.handler = uiAliases[UI_QUICK_BAR]
         uiContainer.add(uiAliases[UI_QUICK_BAR]!!)
+
         // pie menu
         uiAliases[UI_PIE_MENU] = UIHandler(UIPieMenu())
         uiAliases[UI_PIE_MENU]!!.setPosition(
@@ -173,22 +179,22 @@ class StateInGame : BasicGameState() {
         uiAliases[UI_PIE_MENU]!!.UI.handler = uiAliases[UI_PIE_MENU]
         uiContainer.add(uiAliases[UI_PIE_MENU]!!)
 
+        // vital metre
+        // fill in getter functions by
+        //      (uiAliases[UI_QUICK_BAR]!!.UI as UIVitalMetre).vitalGetterMax = { some_function }
+        uiAliases[UI_VITAL1] = UIHandler(UIVitalMetre(player, { null }, { null }, null, 0))
+        uiAliases[UI_VITAL1]!!.setAsAlwaysVisible()
+        uiAliases[UI_VITAL2] = UIHandler(UIVitalMetre(player, { null }, { null }, null, 1))
+        uiAliases[UI_VITAL2]!!.setAsAlwaysVisible()
+        uiAliases[UI_VITAL3] = UIHandler(UIVitalMetre(player, { null }, { null }, null, 2))
+        uiAliases[UI_VITAL3]!!.setAsAlwaysVisible()
+
+
+
+
+
         // audio test
         //AudioResourceLibrary.ambientsWoods[0].play()
-
-
-
-        val vitalmetre = UIHandler(UIVitalMetre(player, { 88f }, { 100f }, Color(255, 182, 0), 0))
-        //vitalmetre.setAsAlwaysVisible()
-        vitalmetre.isVisible = true
-        vitalmetre.UI.handler = vitalmetre
-        uiContainer.add(vitalmetre)
-
-        val vitalmetre2 = UIHandler(UIVitalMetre(player, { 72f }, { 100f }, Color(180, 255, 0), 1))
-        //vitalmetre.setAsAlwaysVisible()
-        vitalmetre2.isVisible = true
-        vitalmetre2.UI.handler = vitalmetre2
-        uiContainer.add(vitalmetre2)
     }
 
     var particlesActive = 0
