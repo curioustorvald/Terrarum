@@ -38,7 +38,7 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
         else {
             segmentLeft = Image("./assets/graphics/gui/message_black_left.tga")
             segmentRight = Image("./assets/graphics/gui/message_black_right.tga")
-            segmentBody = Image("./assets/graphics/gui/message_black_body.tga")
+            segmentBody = Image("./assets/graphics/gui/message_black_body.tga") // keep width=2 or greater; no width 1 !!
         }
         uiFont = GameFontImpl()
         height = segmentLeft!!.height
