@@ -167,8 +167,6 @@ class StateInGame : BasicGameState() {
         uiAliases[UI_QUICK_BAR] = UIHandler(UIQuickBar())
         uiAliases[UI_QUICK_BAR]!!.isVisible = true
         uiAliases[UI_QUICK_BAR]!!.setPosition(0, 0)
-        uiAliases[UI_QUICK_BAR]!!.UI.handler = uiAliases[UI_QUICK_BAR]
-        uiContainer.add(uiAliases[UI_QUICK_BAR]!!)
 
         // pie menu
         uiAliases[UI_PIE_MENU] = UIHandler(UIPieMenu())
@@ -176,18 +174,23 @@ class StateInGame : BasicGameState() {
                 (Terrarum.WIDTH - uiAliases[UI_PIE_MENU]!!.UI.width) / 2,
                 (Terrarum.HEIGHT - uiAliases[UI_PIE_MENU]!!.UI.height) / 2
         )
-        uiAliases[UI_PIE_MENU]!!.UI.handler = uiAliases[UI_PIE_MENU]
-        uiContainer.add(uiAliases[UI_PIE_MENU]!!)
 
         // vital metre
         // fill in getter functions by
         //      (uiAliases[UI_QUICK_BAR]!!.UI as UIVitalMetre).vitalGetterMax = { some_function }
-        uiAliases[UI_VITAL1] = UIHandler(UIVitalMetre(player, { null }, { null }, null, 0))
+        uiAliases[UI_VITAL1] = UIHandler(UIVitalMetre(player, { 80f }, { 100f }, Color.green, 0))
         uiAliases[UI_VITAL1]!!.setAsAlwaysVisible()
         uiAliases[UI_VITAL2] = UIHandler(UIVitalMetre(player, { null }, { null }, null, 1))
         uiAliases[UI_VITAL2]!!.setAsAlwaysVisible()
         uiAliases[UI_VITAL3] = UIHandler(UIVitalMetre(player, { null }, { null }, null, 2))
         uiAliases[UI_VITAL3]!!.setAsAlwaysVisible()
+
+
+        // batch-process uiAliases
+        uiAliases.forEach { _, uiHandler ->
+            uiHandler.UI.handler = uiHandler // attach UIHandlers
+            uiContainer.add(uiHandler)       // put them all to the UIContainer
+        }
 
 
 
