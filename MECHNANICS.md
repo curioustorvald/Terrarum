@@ -32,6 +32,13 @@ Crafted tool/weapon size is dependent to the baseRaceMass.
 
 Topaz -> R·G·B -> Diamond·Amethyst
 
+Gemstones go elemental?! (pretty generic but otherwise there are no motivations to willingly collect them...)
+
+- Ruby: grants fire resist
+- Sapphire: grants cold resist
+- Amethyst or **Topaz**: grants shock resist
+- *two left boy!*
+
 
 ##  Colouring  ##
 
