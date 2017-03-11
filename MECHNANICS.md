@@ -130,6 +130,15 @@ see SAVE_FORMAT.md
 * Works like Ampere in electronics.
     - Health: Regen per time
     - Magic: Out power per time
+    - "I somewhat doubt this now..." --Torvald, 2017-03-12
+
+
+## Resource management ##
+
+* Tools/Weapons have durability
+    - And NOTHING IS INDESTRUCTIBLE (just cooldown time if they are "endgame" items, but not the weapon with highest damage -- see how Master Sword works in Zelda BotW)
+        - Hookshots are the exception!
+    - I was against it, but now I think it would make the game more playable --Torvald, 2017-03-12
 
 
 ## Civilisation ##
