@@ -36,14 +36,15 @@ class MDLInterpreterState {
         // properties
         ELDR, IS, STORMR, HREYFING, LAEKNING, GLEYPI, TJON,
         //fire, ice, storm, kinesis,    heal, absorb, harm
+
         // reserved words
         LAEKNINGHRADI, HREYFINGHRADI, LAEKNINGAUKI, HREYFINGAUKI, STOEKKAUKI, HEILSASTIG,
         //  heal rate,movement speed, healratemult,movespeedmult, jump boost, health point
         // adjectives (power)
 
         // operators
-        ITA, POP, PLUS, MINUS, SINNUM, DEILING, LEIFASTOFN, AFRIT, TALASKIPTI, HENDA
-        // push, pop, +,    -,      *,       /,          %,   dup,       swap,  drop
+        ITA, TOGA, PLUS, MINUS, SINNUM, DEILING, LEIFASTOFN, AFRIT, STAFLISKIPTI, HENNA, NA
+        // push, pop, +,     -,      *,       /,          %,   dup,         swap,  drop, fetch
     }
 
     class MagicArrayStack {
