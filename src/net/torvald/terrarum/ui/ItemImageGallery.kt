@@ -10,13 +10,15 @@ import java.util.*
  * Image gallery. Images will be equally spaced, counted from top-left to bottom-right.
  * Created by minjaesong on 16-08-08.
  */
-class ItemImageGallery(
+class UIItemImageGallery(
+        parentUI: UICanvas,
         override var posX: Int,
         override var posY: Int,
-        val width: Int,
-        val height: Int,
+        override val width: Int,
+        override val height: Int,
         val imageList: ArrayList<Image>,
-        val column: Int = 1) : UIItem {
+        val column: Int = 1
+) : UIItem(parentUI) {
 
     override fun update(gc: GameContainer, delta: Int) {
     }

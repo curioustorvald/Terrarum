@@ -12,7 +12,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
  */
 internal object Inventory : ConsoleCommand {
 
-    private var target: Pocketed = Terrarum.ingame.player
+    private var target: Pocketed = Terrarum.ingame!!.player
 
     override fun execute(args: Array<String>) {
         if (args.size == 1) {
@@ -45,7 +45,7 @@ internal object Inventory : ConsoleCommand {
     }
 
     private fun setTarget(actorRefId: Int = Player.PLAYER_REF_ID) {
-        val actor = Terrarum.ingame.getActorByID(actorRefId)
+        val actor = Terrarum.ingame!!.getActorByID(actorRefId)
         if (actor !is Pocketed) {
             EchoError("Cannot edit inventory of incompatible actor: $actor")
         }

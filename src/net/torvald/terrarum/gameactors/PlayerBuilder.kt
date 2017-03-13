@@ -12,7 +12,7 @@ object PlayerBuilder {
     private val jsonString = String()
 
     operator fun invoke(): Actor {
-        val p: Actor = Player(Terrarum.ingame.world.time.currentTimeAsGameDate)
+        val p: Actor = Player(Terrarum.ingame!!.world.time.currentTimeAsGameDate)
         InjectCreatureRaw(p.actorValue, "CreatureHuman.json")
 
         // attach sprite

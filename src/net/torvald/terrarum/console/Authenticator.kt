@@ -39,7 +39,7 @@ internal object Authenticator : ConsoleCommand {
                 Echo(msg)
                 println("[Authenticator] " + msg)
                 a = !a
-                (Terrarum.ingame.consoleHandler.UI as ConsoleWindow).reset()
+                (Terrarum.ingame!!.consoleHandler.UI as ConsoleWindow).reset()
             }
             else {
                 printUsage() // thou shalt not pass!

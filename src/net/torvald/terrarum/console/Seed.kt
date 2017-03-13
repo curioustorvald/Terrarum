@@ -12,8 +12,8 @@ internal object Seed : ConsoleCommand {
     val ccY = GameFontBase.colToCode["y"]
 
     override fun execute(args: Array<String>) {
-        Echo("Map$ccW: $ccG${Terrarum.ingame.world.generatorSeed}")
-        println("[seed] Map$ccW: $ccG${Terrarum.ingame.world.generatorSeed}")
+        Echo("Map$ccW: $ccG${Terrarum.ingame!!.world.generatorSeed}")
+        println("[seed] Map$ccW: $ccG${Terrarum.ingame!!.world.generatorSeed}")
         // TODO display randomiser seed
     }
 

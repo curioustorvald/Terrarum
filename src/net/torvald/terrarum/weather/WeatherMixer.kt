@@ -40,7 +40,7 @@ object WeatherMixer {
     lateinit var mixedWeather: BaseModularWeather
 
     val globalLightNow = Color(0)
-    private val world = Terrarum.ingame.world
+    private val world = Terrarum.ingame!!.world
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
@@ -83,13 +83,13 @@ object WeatherMixer {
 
         // test rain toggled by F2
         if (KeyToggler.isOn(Key.F2)) {
-            val playerPos = Terrarum.ingame.player.centrePosPoint
+            val playerPos = Terrarum.ingame!!.player.centrePosPoint
             kotlin.repeat(4) { // 4 seems good
                 val rainParticle = ParticleTestRain(
                         playerPos.x + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
                         playerPos.y - Terrarum.HALFH
                 )
-                Terrarum.ingame.addParticle(rainParticle)
+                Terrarum.ingame!!.addParticle(rainParticle)
             }
             globalLightNow.set(getGlobalLightOfTime(world.time.elapsedSeconds).darker(0.3f))
         }
@@ -105,7 +105,7 @@ object WeatherMixer {
     fun render(g: Graphics) {
 
         // we will not care for nextSkybox for now
-        val timeNow = Terrarum.ingame.world.time.elapsedSeconds
+        val timeNow = Terrarum.ingame!!.world.time.elapsedSeconds
         val skyboxColourMap = currentWeather.skyboxGradColourMap
         val lightColourMap = currentWeather.globalLightColourMap
 
@@ -119,15 +119,15 @@ object WeatherMixer {
         val skyColourFill = GradientFill(
                 0f, 0f,
                 getGradientColour(skyboxColourMap, 0, timeNow),
-                0f, Terrarum.HEIGHT.toFloat(),// / Terrarum.ingame.screenZoom,
+                0f, Terrarum.HEIGHT.toFloat(),// / Terrarum.ingame!!.screenZoom,
                 getGradientColour(skyboxColourMap, 1, timeNow)
         )
 
         blendNormal()
         g.fill(Rectangle(
                 0f, 0f,
-                Terrarum.WIDTH.toFloat(),// / Terrarum.ingame.screenZoom,
-                Terrarum.HEIGHT.toFloat()// / Terrarum.ingame.screenZoom
+                Terrarum.WIDTH.toFloat(),// / Terrarum.ingame!!.screenZoom,
+                Terrarum.HEIGHT.toFloat()// / Terrarum.ingame!!.screenZoom
         ), skyColourFill)
     }
 

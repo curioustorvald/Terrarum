@@ -43,7 +43,7 @@ open class ParticleBase(renderOrder: ActorOrder, maxLifeTime: Int? = null) : Run
             lifetimeCounter += delta
             if (velocity.isZero || lifetimeCounter >= lifetimeMax ||
                 // simple stuck check
-                TileCodex[Terrarum.ingame.world.getTileFromTerrain(
+                TileCodex[Terrarum.ingame!!.world.getTileFromTerrain(
                         hitbox.pointedX.div(TILE_SIZE).floorInt(),
                         hitbox.pointedY.div(TILE_SIZE).floorInt()
                 ) ?: Tile.STONE].isSolid) {
@@ -52,7 +52,7 @@ open class ParticleBase(renderOrder: ActorOrder, maxLifeTime: Int? = null) : Run
 
             // gravity, winds, etc. (external forces)
             if (!isNoSubjectToGrav) {
-                velocity += Terrarum.ingame.world.gravitation / dragCoefficient * SI_TO_GAME_ACC
+                velocity += Terrarum.ingame!!.world.gravitation / dragCoefficient * SI_TO_GAME_ACC
             }
 
 

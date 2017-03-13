@@ -13,7 +13,7 @@ object SpawnTikiTorch : ConsoleCommand {
         val torch = FixtureTikiTorch()
         torch.setPosition(Terrarum.appgc.mouseX, Terrarum.appgc.mouseY)
 
-        Terrarum.ingame.addNewActor(torch)
+        Terrarum.ingame!!.addNewActor(torch)
     }
 
     override fun printUsage() {

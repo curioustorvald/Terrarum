@@ -31,13 +31,13 @@ class PhysTestBall : ActorWithSprite(ActorOrder.MIDDLE, immobileBody = true) {
                 hitbox.height.toFloat())
 
         g.fillOval(
-                hitbox.posX.toFloat() + Terrarum.ingame.world.width * TILE_SIZE,
+                hitbox.posX.toFloat() + Terrarum.ingame!!.world.width * TILE_SIZE,
                 hitbox.posY.toFloat(),
                 hitbox.width.toFloat(),
                 hitbox.height.toFloat())
 
         g.fillOval(
-                hitbox.posX.toFloat() - Terrarum.ingame.world.width * TILE_SIZE,
+                hitbox.posX.toFloat() - Terrarum.ingame!!.world.width * TILE_SIZE,
                 hitbox.posY.toFloat(),
                 hitbox.width.toFloat(),
                 hitbox.height.toFloat())

@@ -27,8 +27,8 @@ object TileStats {
 
         // Get stats on no-zoomed screen area. In other words, will behave as if screen zoom were 1.0
         // no matter how the screen is zoomed.
-        val map = Terrarum.ingame.world
-        val player = Terrarum.ingame.player
+        val map = Terrarum.ingame!!.world
+        val player = Terrarum.ingame!!.player
 
         val renderWidth = FastMath.ceil(Terrarum.WIDTH.toFloat())
         val renderHeight = FastMath.ceil(Terrarum.HEIGHT.toFloat())

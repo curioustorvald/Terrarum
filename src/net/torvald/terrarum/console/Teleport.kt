@@ -24,7 +24,7 @@ internal object Teleport : ConsoleCommand {
                 return
             }
 
-            Terrarum.ingame.player.setPosition(x.toDouble(), y.toDouble())
+            Terrarum.ingame!!.player.setPosition(x.toDouble(), y.toDouble())
         }
         else if (args.size == 4) {
             if (args[2].toLowerCase() != "to") {
@@ -36,20 +36,20 @@ internal object Teleport : ConsoleCommand {
             try {
                 val fromActorID = args[1].toInt()
                 val targetActorID = if (args[3].toLowerCase() == "player")
-                    Terrarum.ingame.player.referenceID
+                    Terrarum.ingame!!.player.referenceID
                 else
                     args[3].toInt()
 
                 // if from == target, ignore the action
                 if (fromActorID == targetActorID) return
 
-                if (Terrarum.ingame.getActorByID(fromActorID) !is ActorWithSprite ||
-                    Terrarum.ingame.getActorByID(targetActorID) !is ActorWithSprite) {
+                if (Terrarum.ingame!!.getActorByID(fromActorID) !is ActorWithSprite ||
+                    Terrarum.ingame!!.getActorByID(targetActorID) !is ActorWithSprite) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    fromActor = Terrarum.ingame.getActorByID(fromActorID) as ActorWithSprite
-                    targetActor = Terrarum.ingame.getActorByID(targetActorID) as ActorWithSprite
+                    fromActor = Terrarum.ingame!!.getActorByID(fromActorID) as ActorWithSprite
+                    targetActor = Terrarum.ingame!!.getActorByID(targetActorID) as ActorWithSprite
                 }
             }
             catch (e: NumberFormatException) {
@@ -80,11 +80,11 @@ internal object Teleport : ConsoleCommand {
                 y = args[4].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
                 val actorID = args[1].toInt()
 
-                if (Terrarum.ingame.getActorByID(actorID) !is ActorWithSprite) {
+                if (Terrarum.ingame!!.getActorByID(actorID) !is ActorWithSprite) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    actor = Terrarum.ingame.getActorByID(actorID) as ActorWithSprite
+                    actor = Terrarum.ingame!!.getActorByID(actorID) as ActorWithSprite
                 }
             }
             catch (e: NumberFormatException) {

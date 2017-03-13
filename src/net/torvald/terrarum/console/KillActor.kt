@@ -11,7 +11,7 @@ object KillActor : ConsoleCommand {
         if (args.size == 2) {
             try {
                 val actorid = args[1].toInt()
-                Terrarum.ingame.removeActor(actorid)
+                Terrarum.ingame!!.removeActor(actorid)
             }
             catch (e: NumberFormatException) {
                 EchoError("Wrong number input.")

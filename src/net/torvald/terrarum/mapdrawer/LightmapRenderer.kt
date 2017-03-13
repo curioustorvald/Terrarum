@@ -23,21 +23,21 @@ import java.util.concurrent.locks.ReentrantLock
  */
 
 object LightmapRenderer {
-    private val world: GameWorld = Terrarum.ingame.world
+    private val world: GameWorld = Terrarum.ingame!!.world
 
     val overscan_open: Int = Math.min(32, 256f.div(TileCodex[Tile.AIR].opacity and 0xFF).ceil())
     val overscan_opaque: Int = Math.min(8, 256f.div(TileCodex[Tile.STONE].opacity and 0xFF).ceil())
 
-    private val LIGHTMAP_WIDTH = Terrarum.ingame.ZOOM_MIN.inv().times(Terrarum.WIDTH)
+    private val LIGHTMAP_WIDTH = Terrarum.ingame!!.ZOOM_MIN.inv().times(Terrarum.WIDTH)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
-    private val LIGHTMAP_HEIGHT = Terrarum.ingame.ZOOM_MIN.inv().times(Terrarum.HEIGHT)
+    private val LIGHTMAP_HEIGHT = Terrarum.ingame!!.ZOOM_MIN.inv().times(Terrarum.HEIGHT)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
 
     /**
      * 8-Bit RGB values
      */
     private val lightmap: Array<IntArray> = Array(LIGHTMAP_HEIGHT) { IntArray(LIGHTMAP_WIDTH) }
-    private val lanternMap = ArrayList<Lantern>(Terrarum.ingame.ACTORCONTAINER_INITIAL_SIZE * 4)
+    private val lanternMap = ArrayList<Lantern>(Terrarum.ingame!!.ACTORCONTAINER_INITIAL_SIZE * 4)
 
     private val AIR = Tile.AIR
 
@@ -159,7 +159,7 @@ object LightmapRenderer {
         // build noop map
         for (i in 0..rect_size) {
             val point = edgeToMaskNum(i)
-            val tile = Terrarum.ingame.world.getTileFromTerrain(point.first, point.second) ?: Tile.NULL
+            val tile = Terrarum.ingame!!.world.getTileFromTerrain(point.first, point.second) ?: Tile.NULL
             val isSolid = TileCodex[tile].isSolid
 
             noop_mask.set(i, isSolid)
@@ -216,7 +216,7 @@ object LightmapRenderer {
 
     private fun buildLanternmap() {
         lanternMap.clear()
-        Terrarum.ingame.actorContainer.forEach { it ->
+        Terrarum.ingame!!.actorContainer.forEach { it ->
             if (it is Luminous && it is ActorWithSprite) {
                 // put lanterns to the area the luminantBox is occupying
                 for (lightBox in it.lightBoxList) {
@@ -246,11 +246,11 @@ object LightmapRenderer {
         // TODO devise multithreading on this
 
         var lightLevelThis: Int = 0
-        val thisTerrain = Terrarum.ingame.world.getTileFromTerrain(x, y)
-        val thisWall = Terrarum.ingame.world.getTileFromWall(x, y)
+        val thisTerrain = Terrarum.ingame!!.world.getTileFromTerrain(x, y)
+        val thisWall = Terrarum.ingame!!.world.getTileFromWall(x, y)
         val thisTileLuminosity = TileCodex[thisTerrain].luminosity
         val thisTileOpacity = TileCodex[thisTerrain].opacity
-        val sunLight = Terrarum.ingame.world.globalLight
+        val sunLight = Terrarum.ingame!!.world.globalLight
 
         // MIX TILE
         // open air
@@ -313,8 +313,8 @@ object LightmapRenderer {
                 while (x < this_x_end) {
                     // smoothing enabled and zoom is 0.75 or greater
                     // (zoom of 0.5 should not smoothed, for performance)
-                    if (Terrarum.gameConfig.getAsBoolean("smoothlighting") ?: false &&
-                        Terrarum.ingame.screenZoom >= 0.75) {
+                    if (Terrarum.getConfigBoolean("smoothlighting") ?: false &&
+                        Terrarum.ingame!!.screenZoom >= 0.75) {
 
                         val thisLightLevel = getLight(x, y) ?: 0
 

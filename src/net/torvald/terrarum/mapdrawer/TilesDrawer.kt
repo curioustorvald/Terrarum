@@ -24,7 +24,7 @@ import java.util.*
  * Created by minjaesong on 16-01-19.
  */
 object TilesDrawer {
-    private val world: GameWorld = Terrarum.ingame.world
+    private val world: GameWorld = Terrarum.ingame!!.world
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
@@ -225,7 +225,7 @@ object TilesDrawer {
     )
 
     fun update() {
-        val player = Terrarum.ingame.player
+        val player = Terrarum.ingame!!.player
     }
 
     val wallOverlayColour = Color(2f/3f, 2f/3f, 2f/3f, 1f)

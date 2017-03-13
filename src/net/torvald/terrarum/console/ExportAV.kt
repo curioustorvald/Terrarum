@@ -13,7 +13,7 @@ internal object ExportAV : ConsoleCommand {
         if (args.size == 2) {
             try {
                 JsonWriter.writeToFile(
-                        Terrarum.ingame.player.actorValue,
+                        Terrarum.ingame!!.player.actorValue,
                         Terrarum.defaultDir + "/Exports/" + args[1] + ".json")
 
                 Echo("ExportAV: exported to " + args[1] + ".json")

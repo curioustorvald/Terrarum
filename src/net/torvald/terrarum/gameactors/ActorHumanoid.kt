@@ -132,14 +132,14 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     protected var isRightDown = false
     protected var isJumpDown = false
     protected val isGamer: Boolean
-        get() = this == Terrarum.ingame.player
+        get() = this == Terrarum.ingame!!.player
 
 
     private val nullItem = object : InventoryItem() {
         override val id: Int = 0
-        override var scale: Double = 1.0
         override var baseMass: Double = 0.0
         override var baseToolSize: Double? = null
+        override var category = "should_not_be_seen"
     }
 
     override fun update(gc: GameContainer, delta: Int) {

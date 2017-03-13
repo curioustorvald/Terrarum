@@ -5,7 +5,8 @@ import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.DrawUtil
-import net.torvald.terrarum.ui.ItemImageGallery
+import net.torvald.terrarum.ui.NullUI
+import net.torvald.terrarum.ui.UIItemImageGallery
 import net.torvald.terrarum.ui.Typography
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -46,7 +47,7 @@ class StateSplash : BasicGameState() {
 
     var init = false
 
-    lateinit var imageGallery: ItemImageGallery
+    lateinit var imageGallery: UIItemImageGallery
 
     override fun init(container: GameContainer?, game: StateBasedGame?) {
         // pre-load lang
@@ -62,7 +63,9 @@ class StateSplash : BasicGameState() {
         imageBoardHeight = Terrarum.HEIGHT - thisG.font.lineHeight.times(6)
         imageBoardOffset = thisG.font.lineHeight.times(3)
 
-        imageGallery = ItemImageGallery(0, imageBoardOffset, Terrarum.WIDTH, imageBoardHeight, pictogramCollection)
+        imageGallery = UIItemImageGallery(
+                NullUI(), 0, imageBoardOffset, Terrarum.WIDTH, imageBoardHeight, pictogramCollection
+        )
     }
 
     override fun update(container: GameContainer, game: StateBasedGame, delta: Int) {

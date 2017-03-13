@@ -14,7 +14,7 @@ internal object EchoError : ConsoleCommand {
     }
 
     fun execute(single_line: String) {
-        (Terrarum.ingame.consoleHandler.UI as ConsoleWindow).sendMessage("${GameFontBase.colToCode["r"]}$single_line")
+        (Terrarum.ingame!!.consoleHandler.UI as ConsoleWindow).sendMessage("${GameFontBase.colToCode["r"]}$single_line")
     }
 
     operator fun invoke(args: Array<String>) = execute(args)

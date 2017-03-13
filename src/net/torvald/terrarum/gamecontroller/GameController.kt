@@ -25,10 +25,10 @@ object GameController {
 
     /** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise) */
     internal val mouseX: Float
-        get() = (MapCamera.x + Terrarum.appgc.input.mouseX / Terrarum.ingame.screenZoom)
+        get() = (MapCamera.x + Terrarum.appgc.input.mouseX / (Terrarum.ingame?.screenZoom ?: 1f))
     /** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise)*/
     internal val mouseY: Float
-        get() = (MapCamera.y + Terrarum.appgc.input.mouseY / Terrarum.ingame.screenZoom)
+        get() = (MapCamera.y + Terrarum.appgc.input.mouseY / (Terrarum.ingame?.screenZoom ?: 1f))
     /** currently pointing tile coordinate */
     internal val mouseTileX: Int
         get() = (mouseX / FeaturesDrawer.TILE_SIZE).floorInt()
@@ -40,62 +40,68 @@ object GameController {
 
         KeyToggler.update(input)
 
+        if (Terrarum.ingame != null) {
+            val ingame = Terrarum.ingame!!
 
-        if (!Terrarum.ingame.consoleHandler.isTakingControl) {
-            if (Terrarum.ingame.player is Player && (Terrarum.ingame.player as Player).vehicleRiding != null) {
-                (Terrarum.ingame.player as Player).vehicleRiding!!.processInput(gc, delta, input)
+
+            if (!ingame.consoleHandler.isTakingControl) {
+                if (ingame.player is Player && (ingame.player as Player).vehicleRiding != null) {
+                    (ingame.player as Player).vehicleRiding!!.processInput(gc, delta, input)
+                }
+
+                ingame.actorContainer.forEach {
+                    if (it is Controllable) it.processInput(gc, delta, input)
+                }
+
+                ingame.uiContainer.forEach {
+                    it.processInput(gc, delta, input)
+                }
+            }
+            else {
+                ingame.consoleHandler.processInput(gc, delta, input)
             }
 
-            Terrarum.ingame.actorContainer.forEach {
-                if (it is Controllable) it.processInput(gc, delta, input)
-            }
 
-            Terrarum.ingame.uiContainer.forEach {
-                it.processInput(gc, delta, input)
-            }
+            ///////////////////
+            // MOUSE CONTROL //
+            ///////////////////
+            // PRIMARY/SECONDARY IS FIXED TO LEFT/RIGHT BUTTON //
+
+
+            /////////////////////
+            // GAMEPAD CONTROL //
+            /////////////////////
         }
-        else {
-            Terrarum.ingame.consoleHandler.processInput(gc, delta, input)
-        }
-
-
-        ///////////////////
-        // MOUSE CONTROL //
-        ///////////////////
-        // PRIMARY/SECONDARY IS FIXED TO LEFT/RIGHT BUTTON //
-
-
-
-
-
-
-        /////////////////////
-        // GAMEPAD CONTROL //
-        /////////////////////
     }
 
     fun keyPressed(key: Int, c: Char) {
-        if (keyPressedByCode(key, EnumKeyFunc.UI_CONSOLE)) {
-            Terrarum.ingame.consoleHandler.toggleOpening()
-        }
-        else if (keyPressedByCode(key, EnumKeyFunc.UI_BASIC_INFO)) {
-            Terrarum.ingame.debugWindow.toggleOpening()
-        }
+        if (Terrarum.ingame != null) {
+            val ingame = Terrarum.ingame!!
 
 
 
-        if (!Terrarum.ingame.consoleHandler.isTakingControl) {
-            if (Terrarum.ingame.player is Player && (Terrarum.ingame.player as Player).vehicleRiding != null) {
-                (Terrarum.ingame.player as Player).vehicleRiding!!.keyPressed(key, c)
+            if (keyPressedByCode(key, EnumKeyFunc.UI_CONSOLE)) {
+                ingame.consoleHandler.toggleOpening()
+            }
+            else if (keyPressedByCode(key, EnumKeyFunc.UI_BASIC_INFO)) {
+                ingame.debugWindow.toggleOpening()
             }
 
-            Terrarum.ingame.player.keyPressed(key, c)
-        }
-        else {
-            Terrarum.ingame.consoleHandler.keyPressed(key, c)
-        }
 
-        //System.out.println(String.valueOf(key) + ", " + String.valueOf(c));
+
+            if (!ingame.consoleHandler.isTakingControl) {
+                if (ingame.player is Player && (ingame.player as Player).vehicleRiding != null) {
+                    (ingame.player as Player).vehicleRiding!!.keyPressed(key, c)
+                }
+
+                ingame.player.keyPressed(key, c)
+            }
+            else {
+                ingame.consoleHandler.keyPressed(key, c)
+            }
+
+            //System.out.println(String.valueOf(key) + ", " + String.valueOf(c));
+        }
     }
 
     fun keyReleased(key: Int, c: Char) {
@@ -113,9 +119,9 @@ object GameController {
     fun mousePressed(button: Int, x: Int, y: Int) {
         // bullet test
         /*if (button == 0) {
-            Terrarum.ingame.addActor(ProjectileSimple(
+            Terrarum.ingame!!.addActor(ProjectileSimple(
                     0,
-                    Terrarum.ingame.player.centrePosVector,
+                    Terrarum.ingame!!.player.centrePosVector,
                     Vector2(mouseX.toDouble(), mouseY.toDouble())
             ))
         }*/

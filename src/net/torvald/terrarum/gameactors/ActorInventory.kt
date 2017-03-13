@@ -55,8 +55,9 @@ class ActorInventory() {
     fun add(item: InventoryItem, count: Int = 1) {
         if (item.id == Player.PLAYER_REF_ID)
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
-        if (Terrarum.ingame.playableActorDelegate != null &&
-                item.id == Terrarum.ingame.player.referenceID)
+        if (Terrarum.ingame != null &&
+            Terrarum.ingame!!.playableActorDelegate != null &&
+            item.id == Terrarum.ingame!!.player.referenceID)
             throw IllegalArgumentException("Attempted to put active player into the inventory.")
 
         // If we already have the item, increment the amount

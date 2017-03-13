@@ -14,11 +14,11 @@ internal object SetTimeDelta : ConsoleCommand {
             if (args[1].toInt() > HARD_LIMIT)
                 EchoError("Delta too large -- acceptable delta is 0-60.")
 
-            Terrarum.ingame.world.time.setTimeDelta(args[1].toInt())
-            if (Terrarum.ingame.world.time.timeDelta == 0)
+            Terrarum.ingame!!.world.time.setTimeDelta(args[1].toInt())
+            if (Terrarum.ingame!!.world.time.timeDelta == 0)
                 Echo("時間よ止まれ！ザ・ワルド！！")
             else
-                Echo("Set time delta to ${Terrarum.ingame.world.time.timeDelta}")
+                Echo("Set time delta to ${Terrarum.ingame!!.world.time.timeDelta}")
         }
         else {
             printUsage()

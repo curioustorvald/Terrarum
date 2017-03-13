@@ -94,11 +94,11 @@ class ActorValueTracker constructor() : JFrame() {
             override fun mouseExited(e: MouseEvent?) { }
             override fun mousePressed(e: MouseEvent?) {
                 if (actorIDField.text.toLowerCase() == "player") {
-                    actor = Terrarum.ingame.player
+                    actor = Terrarum.ingame!!.player
                     actorValue = actor!!.actorValue
                 }
                 else if (actorIDField.text.isNotBlank()) {
-                    actor = Terrarum.ingame.getActorByID(actorIDField.text.toInt()) as ActorWithSprite
+                    actor = Terrarum.ingame!!.getActorByID(actorIDField.text.toInt()) as ActorWithSprite
                     actorValue = actor!!.actorValue
                 }
             }
