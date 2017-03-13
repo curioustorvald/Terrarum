@@ -60,10 +60,10 @@ internal object ExportMap : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
 
-            var mapData = ByteArray(Terrarum.ingame.world.width * Terrarum.ingame.world.height * 3)
+            var mapData = ByteArray(Terrarum.ingame!!.world.width * Terrarum.ingame!!.world.height * 3)
             var mapDataPointer = 0
 
-            for (tile in Terrarum.ingame.world.terrainIterator()) {
+            for (tile in Terrarum.ingame!!.world.terrainIterator()) {
                 val colArray = (colorTable as Map<Int, Col4096>)
                         .getOrElse(tile, { Col4096(0xFFF) }).toByteArray()
 
@@ -82,7 +82,7 @@ internal object ExportMap : ConsoleCommand {
 
             try {
                 RasterWriter.writePNG_RGB(
-                        Terrarum.ingame.world.width, Terrarum.ingame.world.height, mapData, dir + args[1] + ".png")
+                        Terrarum.ingame!!.world.width, Terrarum.ingame!!.world.height, mapData, dir + args[1] + ".png")
                 Echo("ExportMap: exported to " + args[1] + ".png")
 
             }

@@ -52,7 +52,7 @@ object FeaturesDrawer {
         val colTemp_cold = colTempLinearFunc(onscreen_cold_tiles / onscreen_tiles_cap)
         val colTemp_warm = colTempLinearFunc(-(onscreen_warm_tiles / onscreen_tiles_cap))
         colTemp = colTemp_warm + colTemp_cold - ENV_COLTEMP_NOON
-        val zoom = Terrarum.ingame.screenZoom
+        val zoom = Terrarum.ingame!!.screenZoom
 
         blendMul()
 

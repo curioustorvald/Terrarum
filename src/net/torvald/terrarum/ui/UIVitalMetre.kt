@@ -5,7 +5,6 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.floorInt
 import net.torvald.terrarum.gameactors.roundInt
-import net.torvald.terrarum.times
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics

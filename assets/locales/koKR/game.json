@@ -6,6 +6,11 @@
   "APP_ADJUST_YOUR_MONITOR": "본 게임은 적절히 조정된 모니터에서 최상으로 즐길 수 있습니다. 조정하지 않았다면 플레이하기 전에 조정해 주십시오.",
 
   "APP_WARNING_HEALTH_AND_SAFETY": "경고—건강과 안전을 위하여",
-  "MENU_LABEL_PRESS_START_SYMBOL": ">을 누르세요"
+  "MENU_LABEL_PRESS_START_SYMBOL": ">을 누르세요",
 
+  "GAME_INVENTORY_INGREDIENTS" : "재료",
+  "GAME_INVENTORY_POTIONS" : "물약",
+  "GAME_INVENTORY_BLOCKS" : "블록",
+  "GAME_INVENTORY_WALLPAPERS" : "벽지",
+  "CONTEXT_ITEM_EQUIPMENT_PLURAL" : "장비"
 }

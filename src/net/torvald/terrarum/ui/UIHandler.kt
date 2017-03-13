@@ -12,24 +12,15 @@ import org.newdawn.slick.state.StateBasedGame
  * to the coordinate of displayed cartesian coords, and update and render the UI.
  * It also process game inputs and send control events to the UI so that the UI can handle them.
  *
+ * Newly created UI is invisible by default.
+ *
  * Created by minjaesong on 15-12-31.
  */
-class UIHandler
-/**
- * Construct new UIHandler with given UI attached.
- * Invisible in default.
- * @param UI
- * *
- * @throws SlickException
- */
-@Throws(SlickException::class)
-constructor(val UI: UICanvas) {
+class UIHandler(val UI: UICanvas) {
 
     // X/Y Position to the game window.
     var posX: Int = 0
-        private set
     var posY: Int = 0
-        private set
 
     private var alwaysVisible = false
 
@@ -61,10 +52,11 @@ constructor(val UI: UICanvas) {
     var openCloseCounter: Int = 0
 
     init {
+        UI.handler = this
+
         println("[UIHandler] Creating framebuffer for UI '${UI.javaClass.simpleName}'")
 
         UIDrawnCanvas = Image(UI.width, UI.height)
-
         UIGraphicInstance = UIDrawnCanvas.graphics
     }
 

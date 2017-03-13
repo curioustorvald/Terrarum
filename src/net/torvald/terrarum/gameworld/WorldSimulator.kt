@@ -38,7 +38,7 @@ object WorldSimulator {
     val colourNone = Color(0x808080)
     val colourWater = Color(0x66BBFF)
 
-    private val world = Terrarum.ingame.world
+    private val world = Terrarum.ingame!!.world
 
     // TODO future Kotlin feature -- typealias AnyPlayer: HistoricalFigure
     operator fun invoke(p: HistoricalFigure, delta: Int) {

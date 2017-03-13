@@ -6,5 +6,11 @@
   "APP_ADJUST_YOUR_MONITOR": "Paras pelikokemus saavutetaan on oikealla säädetty näytöllä. Jos et ole ollut, säädä ennen pelaamista.",
 
   "APP_WARNING_HEALTH_AND_SAFETY": "VAROITUS-TERVEYS JA TURVALLISUUS",
-  "MENU_LABEL_PRESS_START_SYMBOL": "Paina >"
+  "MENU_LABEL_PRESS_START_SYMBOL": "Paina >",
+
+  "GAME_INVENTORY_INGREDIENTS" : "Ainekset",
+  "GAME_INVENTORY_POTIONS" : "Juomat",
+  "GAME_INVENTORY_BLOCKS" : "Lohkareet",
+  "GAME_INVENTORY_WALLPAPERS" : "Tapetit",
+  "CONTEXT_ITEM_EQUIPMENT_PLURAL" : "Varusteet"
 }

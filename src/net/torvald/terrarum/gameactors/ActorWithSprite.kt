@@ -7,15 +7,10 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.tileproperties.TileCodex
 import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.terrarum.gamecontroller.Key
-import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileProp
-import org.dyn4j.Epsilon
 import org.dyn4j.geometry.Vector2
-import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
@@ -42,7 +37,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
 
     var drawMode = BLEND_NORMAL
 
-    @Transient private val world: GameWorld = Terrarum.ingame.world
+    @Transient private val world: GameWorld = Terrarum.ingame!!.world
 
     var hitboxTranslateX: Double = 0.0// relative to spritePosX
         protected set
@@ -1273,8 +1268,8 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
                 return 0
-            else if (x >= Terrarum.ingame.world.width shl 4)
-                return Terrarum.ingame.world.width - 1
+            else if (x >= Terrarum.ingame!!.world.width shl 4)
+                return Terrarum.ingame!!.world.width - 1
             else
                 return x and 0x7FFFFFFF shr 4
         }
@@ -1282,8 +1277,8 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
         private fun div16TruncateToMapHeight(y: Int): Int {
             if (y < 0)
                 return 0
-            else if (y >= Terrarum.ingame.world.height shl 4)
-                return Terrarum.ingame.world.height - 1
+            else if (y >= Terrarum.ingame!!.world.height shl 4)
+                return Terrarum.ingame!!.world.height - 1
             else
                 return y and 0x7FFFFFFF shr 4
         }

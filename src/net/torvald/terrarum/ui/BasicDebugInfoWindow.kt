@@ -44,7 +44,7 @@ class BasicDebugInfoWindow : UICanvas {
     }
 
     override fun update(gc: GameContainer, delta: Int) {
-        val player = Terrarum.ingame.player
+        val player = Terrarum.ingame!!.player
         val hitbox = player.hitbox
 
         xdelta = hitbox.pointedX - prevPlayerX
@@ -59,10 +59,10 @@ class BasicDebugInfoWindow : UICanvas {
         fun Int.rawG() = this % LightmapRenderer.MUL_2 / LightmapRenderer.MUL
         fun Int.rawB() = this % LightmapRenderer.MUL
 
-        val player = Terrarum.ingame.player
+        val player = Terrarum.ingame!!.player
 
-        val mouseTileX = ((MapCamera.x + gc.input.mouseX / Terrarum.ingame.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
-        val mouseTileY = ((MapCamera.y + gc.input.mouseY / Terrarum.ingame.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
+        val mouseTileX = ((MapCamera.x + gc.input.mouseX / Terrarum.ingame!!.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
+        val mouseTileY = ((MapCamera.y + gc.input.mouseY / Terrarum.ingame!!.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
 
         g.font = Terrarum.fontSmallNumbers
         g.color = GameFontBase.codeToCol["y"]
@@ -114,7 +114,7 @@ class BasicDebugInfoWindow : UICanvas {
         printLine(g, 8, "light@cursor $ccG$lightVal")
 
         val tileNo: String
-        val tileNumRaw = Terrarum.ingame.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
+        val tileNumRaw = Terrarum.ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
         val tilenum = tileNumRaw / PairedMapLayer.RANGE
         val tiledmg = tileNumRaw % PairedMapLayer.RANGE
         tileNo = if (tileNumRaw == -1) "—" else "$tilenum:$tiledmg"
@@ -127,8 +127,8 @@ class BasicDebugInfoWindow : UICanvas {
 
         printLineColumn(g, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
         printLineColumn(g, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
-        printLineColumn(g, 2, 5, "Time $ccG${Terrarum.ingame.world.time.elapsedSeconds}" +
-                                 " (${Terrarum.ingame.world.time.getFormattedTime()})")
+        printLineColumn(g, 2, 5, "Time $ccG${Terrarum.ingame!!.world.time.elapsedSeconds}" +
+                                 " (${Terrarum.ingame!!.world.time.getFormattedTime()})")
         printLineColumn(g, 2, 6, "Mass $ccG${player.mass}")
 
         printLineColumn(g, 2, 7, "p_WalkX $ccG${player.walkX}")
@@ -171,13 +171,13 @@ class BasicDebugInfoWindow : UICanvas {
          * Bottom left
          */
 
-        g.drawString("${ccY}Actors total $ccG${Terrarum.ingame.actorContainer.size + Terrarum.ingame.actorContainerInactive.size}",
+        g.drawString("${ccY}Actors total $ccG${Terrarum.ingame!!.actorContainer.size + Terrarum.ingame!!.actorContainerInactive.size}",
                 2f, Terrarum.HEIGHT - 10f)
-        g.drawString("${ccY}Active $ccG${Terrarum.ingame.actorContainer.size}",
+        g.drawString("${ccY}Active $ccG${Terrarum.ingame!!.actorContainer.size}",
                 (2 + 17*8).toFloat(), Terrarum.HEIGHT - 10f)
-        g.drawString("${ccY}Dormant $ccG${Terrarum.ingame.actorContainerInactive.size}",
+        g.drawString("${ccY}Dormant $ccG${Terrarum.ingame!!.actorContainerInactive.size}",
                 (2 + 28*8).toFloat(), Terrarum.HEIGHT - 10f)
-        g.drawString("${ccM}Particles $ccG${Terrarum.ingame.particlesActive}",
+        g.drawString("${ccM}Particles $ccG${Terrarum.ingame!!.particlesActive}",
                 (2 + 41*8).toFloat(), Terrarum.HEIGHT - 10f)
     }
 

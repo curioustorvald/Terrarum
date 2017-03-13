@@ -31,7 +31,7 @@ internal object SpawnPhysTestBall : ConsoleCommand {
             ball.elasticity = elasticity
             ball.applyForce(Vector2(xvel, yvel))
 
-            Terrarum.ingame.addNewActor(ball)
+            Terrarum.ingame!!.addNewActor(ball)
         }
         else if (args.size == 2) {
             val elasticity = args[1].toDouble()
@@ -43,7 +43,7 @@ internal object SpawnPhysTestBall : ConsoleCommand {
             )
             ball.elasticity = elasticity
 
-            Terrarum.ingame.addNewActor(ball)
+            Terrarum.ingame!!.addNewActor(ball)
         }
         else {
             printUsage()

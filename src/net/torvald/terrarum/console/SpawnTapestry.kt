@@ -16,7 +16,7 @@ object SpawnTapestry : ConsoleCommand {
         }
 
         val tapestry = DecodeTapestry(File(args[1]))
-        Terrarum.ingame.addNewActor(tapestry)
+        Terrarum.ingame!!.addNewActor(tapestry)
     }
 
     override fun printUsage() {

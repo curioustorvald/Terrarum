@@ -66,8 +66,8 @@ object Terrarum : StateBasedGame(GAME_NAME) {
 
     var gameStarted = false
 
-    lateinit var ingame: StateInGame
-    lateinit var gameConfig: GameConfig
+    var ingame: StateInGame? = null
+    private val gameConfig = GameConfig()
 
     val OSName = System.getProperty("os.name")
     val OSVersion = System.getProperty("os.version")
@@ -133,6 +133,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
     val STATE_ID_TEST_TTY = 0x102
     val STATE_ID_TEST_BLUR = 0x103
     val STATE_ID_TEST_SHADER = 0x104
+    val STATE_ID_TEST_UI = 0x105
 
     val STATE_ID_TOOL_NOISEGEN = 0x200
 
@@ -186,8 +187,6 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         if (is32Bit) {
             println("Java is running in 32 Bit")
         }
-
-        gameConfig = GameConfig()
 
         joypadLabelStart = when (getConfigString("joypadlabelstyle")) {
             "nwii"     -> 0xE04B.toChar() // + mark
@@ -282,9 +281,10 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         //addState(StateBlurTest())
         //addState(StateShaderTest())
         //addState(StateNoiseTester())
+        addState(StateUITest())
 
-        ingame = StateInGame()
-        addState(ingame)
+        //ingame = StateInGame()
+        //addState(ingame)
 
 
         // foolproof
@@ -433,6 +433,10 @@ object Terrarum : StateBasedGame(GAME_NAME) {
             }
         }
         return cfg!!
+    }
+
+    fun setConfig(key: String, value: Any) {
+        gameConfig[key] = value
     }
 
     val currentSaveDir: File

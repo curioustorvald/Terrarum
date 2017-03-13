@@ -239,7 +239,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
                     luatable[y - feetTilePos[1]] = LuaTable()
 
                     for (x in feetTilePos[0] - radius..feetTilePos[0] + radius) {
-                        val tile = TileCodex[Terrarum.ingame.world.getTileFromTerrain(x, y) ?: 4096]
+                        val tile = TileCodex[Terrarum.ingame!!.world.getTileFromTerrain(x, y) ?: 4096]
                         val solidity = tile.isSolid.toInt()
                         val liquidity = tile.isFluid.toInt()
                         val gravity = tile.isFallable.toInt()
@@ -283,7 +283,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
                     // search down
                     var searchDownCounter = 0
                     while (true) {
-                        val tile = Terrarum.ingame.world.getTileFromTerrain(x, feetTilePos[1] + searchDownCounter) ?: Tile.STONE
+                        val tile = Terrarum.ingame!!.world.getTileFromTerrain(x, feetTilePos[1] + searchDownCounter) ?: Tile.STONE
                         if (TileCodex[tile].isSolid || searchDownCounter >= searchDownLimit) {
                             luatable[x - feetTilePos[0]] = searchDownCounter
                             break
@@ -326,7 +326,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
                     // search up
                     var searchUpCounter = 0
                     while (true) {
-                        val tile = Terrarum.ingame.world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Tile.STONE
+                        val tile = Terrarum.ingame!!.world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Tile.STONE
                         if (TileCodex[tile].isSolid || searchUpCounter >= searchUpLimit) {
                             luatable[x - feetTilePos[0]] = searchUpCounter
                             break
@@ -368,7 +368,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
                     // search up
                     var searchUpCounter = 0
                     while (true) {
-                        val tile = Terrarum.ingame.world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Tile.STONE
+                        val tile = Terrarum.ingame!!.world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Tile.STONE
                         if (!TileCodex[tile].isSolid || searchUpCounter >= searchUpLimit) {
                             luatable[x - feetTilePos[0]] = searchUpCounter
                             break

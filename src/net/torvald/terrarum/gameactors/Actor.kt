@@ -41,7 +41,7 @@ abstract class Actor(val renderOrder: ActorOrder) : Comparable<Actor>, Runnable 
      */
     fun generateUniqueReferenceID(): Int {
         fun checkForCollision(value: Int) =
-                Terrarum.ingame.theGameHasActor(value) ||
+                Terrarum.ingame!!.theGameHasActor(value) ||
                 value < ItemCodex.ITEM_COUNT_MAX ||
                 value < when (renderOrder) {
                     ActorOrder.BEHIND -> ItemCodex.ITEM_COUNT_MAX

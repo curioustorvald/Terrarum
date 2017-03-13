@@ -75,7 +75,7 @@ open class ProjectileSimple(
         lifetimeCounter += delta
         if (ccdCollided || grounded || lifetimeCounter >= lifetimeMax ||
             // stuck check
-            TileCodex[Terrarum.ingame.world.getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Tile.STONE].isSolid
+            TileCodex[Terrarum.ingame!!.world.getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Tile.STONE].isSolid
                 ) {
             flagDespawn()
         }
@@ -90,13 +90,13 @@ open class ProjectileSimple(
         colourTail.a = 0.16f
 
         // draw trail of solid colour (Terraria style maybe?)
-        g.lineWidth = 2f * Terrarum.ingame.screenZoom
+        g.lineWidth = 2f * Terrarum.ingame!!.screenZoom
         g.drawGradientLine(
-                hitbox.centeredX.toFloat() * Terrarum.ingame.screenZoom,
-                hitbox.centeredY.toFloat() * Terrarum.ingame.screenZoom,
+                hitbox.centeredX.toFloat() * Terrarum.ingame!!.screenZoom,
+                hitbox.centeredY.toFloat() * Terrarum.ingame!!.screenZoom,
                 displayColour,
-                posPre.x.toFloat() * Terrarum.ingame.screenZoom,
-                posPre.y.toFloat() * Terrarum.ingame.screenZoom,
+                posPre.x.toFloat() * Terrarum.ingame!!.screenZoom,
+                posPre.y.toFloat() * Terrarum.ingame!!.screenZoom,
                 colourTail
         )
     }

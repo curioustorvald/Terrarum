@@ -66,7 +66,7 @@ internal object SetAV : ConsoleCommand {
                 return
             }
 
-            Terrarum.ingame.player.actorValue[args[1]] = newValue
+            Terrarum.ingame!!.player.actorValue[args[1]] = newValue
             Echo("${ccW}Set $ccM${args[1]} ${ccW}for ${ccY}player ${ccW}to $ccG$newValue")
             println("[SetAV] set ActorValue '${args[1]}' for player to '$newValue'.")
         }
@@ -74,7 +74,7 @@ internal object SetAV : ConsoleCommand {
             try {
                 val id = args[1].toInt()
                 val newValue = parseAVInput(args[3])
-                val actor = Terrarum.ingame.getActorByID(id)
+                val actor = Terrarum.ingame!!.getActorByID(id)
 
                 // check if av is number
                 if (args[2].isNum()) {

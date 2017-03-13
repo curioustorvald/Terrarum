@@ -178,17 +178,16 @@ class StateInGame : BasicGameState() {
         // vital metre
         // fill in getter functions by
         //      (uiAliases[UI_QUICK_BAR]!!.UI as UIVitalMetre).vitalGetterMax = { some_function }
-        uiAliases[UI_VITAL1] = UIHandler(UIVitalMetre(player, { 80f }, { 100f }, Color.green, 0))
+        uiAliases[UI_VITAL1] = UIHandler(UIVitalMetre(player, { 80f }, { 100f }, Color.red, 0))
         uiAliases[UI_VITAL1]!!.setAsAlwaysVisible()
-        uiAliases[UI_VITAL2] = UIHandler(UIVitalMetre(player, { null }, { null }, null, 1))
+        uiAliases[UI_VITAL2] = UIHandler(UIVitalMetre(player, { 73f }, { 100f }, Color(0x00dfff), 1))
         uiAliases[UI_VITAL2]!!.setAsAlwaysVisible()
-        uiAliases[UI_VITAL3] = UIHandler(UIVitalMetre(player, { null }, { null }, null, 2))
+        uiAliases[UI_VITAL3] = UIHandler(UIVitalMetre(player, { 32f }, { 100f }, Color(0xffcc00), 2))
         uiAliases[UI_VITAL3]!!.setAsAlwaysVisible()
 
 
         // batch-process uiAliases
         uiAliases.forEach { _, uiHandler ->
-            uiHandler.UI.handler = uiHandler // attach UIHandlers
             uiContainer.add(uiHandler)       // put them all to the UIContainer
         }
 
@@ -281,7 +280,7 @@ class StateInGame : BasicGameState() {
         }
 
         // determine if lightmap blending should be done
-        Terrarum.gameConfig["smoothlighting"] = KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH)
+        Terrarum.setConfig("smoothlighting", KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH))
     }
 
     private fun repossessActor() {
@@ -644,8 +643,8 @@ class StateInGame : BasicGameState() {
     /** whether the actor is within screen */
     private fun ActorVisible.inScreen() =
             distToCameraSqr(this) <=
-            (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr() +
-             Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.ingame.screenZoom).sqr())
+            (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.ingame!!.screenZoom).sqr() +
+             Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.ingame!!.screenZoom).sqr())
 
 
     /** whether the actor is within update range */

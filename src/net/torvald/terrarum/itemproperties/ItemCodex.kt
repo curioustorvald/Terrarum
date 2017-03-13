@@ -39,10 +39,9 @@ object ItemCodex {
             itemCodex[i] = object : InventoryItem() {
                 override val id: Int = i
                 override var baseMass: Double = TileCodex[i].density / 1000.0
-                override var scale: Double = 1.0 // no need to set setter as scale would not change
                 override var baseToolSize: Double? = null
                 override var equipPosition = EquipPosition.HAND_GRIP
-
+                override var category = "block"
 
                 override fun primaryUse(gc: GameContainer, delta: Int) {
                     // TODO base punch attack
@@ -51,12 +50,12 @@ object ItemCodex {
                 override fun secondaryUse(gc: GameContainer, delta: Int) {
                     val mousePoint = Point2d(gc.mouseTileX.toDouble(), gc.mouseTileY.toDouble())
                     // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
-                    Terrarum.ingame.actorContainer.forEach {
+                    Terrarum.ingame!!.actorContainer.forEach {
                         if (it is ActorWithSprite && it.tilewiseHitbox.intersects(mousePoint))
                             return
                     }
                     // filter passed, do the job
-                    Terrarum.ingame.world.setTileTerrain(
+                    Terrarum.ingame!!.world.setTileTerrain(
                             gc.mouseTileX,
                             gc.mouseTileY,
                             i
@@ -77,7 +76,7 @@ object ItemCodex {
             TODO("read from dynamicitem description (JSON)")
         }
         else {
-            val a = Terrarum.ingame.getActorByID(code) // actor item
+            val a = Terrarum.ingame!!.getActorByID(code) // actor item
             if (a is CanBeAnItem) return a.itemData
 
             throw IllegalArgumentException("Attempted to get item data of actor that cannot be an item. ($a)")

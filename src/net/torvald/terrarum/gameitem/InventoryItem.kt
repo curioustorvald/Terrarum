@@ -20,6 +20,8 @@ abstract class InventoryItem {
 
     abstract var baseToolSize: Double?
 
+    abstract var category: String // "weapon", "tool", "armor", etc. (all smallcaps)
+
     /**
      * Where to equip the item
      */
@@ -55,7 +57,7 @@ abstract class InventoryItem {
      * For static item, it must be 1.0. If you tinkered the item to be bigger,
      * it must be re-assigned as Dynamic Item
      */
-    abstract var scale: Double
+    open var scale: Double = 1.0
 
     /**
      * Effects applied continuously while in pocket

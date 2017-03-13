@@ -8,7 +8,7 @@ import net.torvald.terrarum.Terrarum
 internal object GetTime : ConsoleCommand {
     override fun execute(args: Array<String>) {
 
-        val worldTime = Terrarum.ingame.world.time
+        val worldTime = Terrarum.ingame!!.world.time
         Echo(worldTime.getFormattedTime())
     }
 

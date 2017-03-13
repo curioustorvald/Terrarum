@@ -11,10 +11,10 @@ internal object SetTime : ConsoleCommand {
         if (args.size == 2) {
             val timeToSet = WorldTime.parseTime(args[1])
 
-            Terrarum.ingame.world.time.setTime(timeToSet)
+            Terrarum.ingame!!.world.time.setTime(timeToSet)
 
-            Echo("Set time to ${Terrarum.ingame.world.time.elapsedSeconds} " +
-                           "(${Terrarum.ingame.world.time.hours}h${formatMin(Terrarum.ingame.world.time.minutes)})")
+            Echo("Set time to ${Terrarum.ingame!!.world.time.elapsedSeconds} " +
+                           "(${Terrarum.ingame!!.world.time.hours}h${formatMin(Terrarum.ingame!!.world.time.minutes)})")
         }
         else {
             printUsage()

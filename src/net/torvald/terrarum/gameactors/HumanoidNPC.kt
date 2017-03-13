@@ -52,6 +52,7 @@ open class HumanoidNPC(
             set(value) {
                 actorValue[AVKey.SCALE] = value
             }
+        override var category = "npc"
 
         override fun secondaryUse(gc: GameContainer, delta: Int) {
             // TODO place this Actor to the world

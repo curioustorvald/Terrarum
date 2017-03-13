@@ -12,8 +12,8 @@ object ActorsList : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         jPanelInstances.add(ActorsLister(
-                Terrarum.ingame.actorContainer,
-                Terrarum.ingame.actorContainerInactive)
+                Terrarum.ingame!!.actorContainer,
+                Terrarum.ingame!!.actorContainerInactive)
         )
     }
 

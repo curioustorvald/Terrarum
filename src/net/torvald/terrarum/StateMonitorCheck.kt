@@ -44,7 +44,7 @@ class StateMonitorCheck : BasicGameState() {
         private val colourLUT = IntArray(32, { 255.times(it + 1).div(32) })
 
         val pictograms = ArrayList<Image>()
-        lateinit var imageGallery: ItemImageGallery
+        val imageGallery: UIItemImageGallery
 
         val instructionY = Terrarum.HEIGHT / 2//Terrarum.HEIGHT * 9 / 16
         val anykeyY = Terrarum.HEIGHT * 15 / 16
@@ -58,7 +58,9 @@ class StateMonitorCheck : BasicGameState() {
                 pictograms.add(Image("./assets/graphics/gui/monitor_good.tga"))
             pictograms.add(Image("./assets/graphics/gui/monitor_bad.tga"))
 
-            imageGallery = ItemImageGallery(0, instructionY, Terrarum.WIDTH, anykeyY - instructionY, pictograms)
+            imageGallery = UIItemImageGallery(
+                    this, 0, instructionY, Terrarum.WIDTH, anykeyY - instructionY, pictograms
+            )
         }
 
         override fun update(gc: GameContainer, delta: Int) {
