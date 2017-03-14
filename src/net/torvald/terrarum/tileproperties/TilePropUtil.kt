@@ -2,6 +2,7 @@ package net.torvald.terrarum.tileproperties
 
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.Millisec
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
@@ -13,17 +14,17 @@ import org.newdawn.slick.Color
  * Created by minjaesong on 16-06-16.
  */
 object TilePropUtil {
-    var flickerFuncX = 0 // in milliseconds; saves current status (time) of func
-    val flickerFuncDomain = 100 // time between two noise sample, in milliseconds
+    var flickerFuncX: Millisec = 0 // in milliseconds; saves current status (time) of func
+    val flickerFuncDomain: Millisec = 100 // time between two noise sample, in milliseconds
     val flickerFuncRange = 0.012f // intensity [0, 1]
 
     var breathFuncX = 0
     val breathRange = 0.02f
-    val breathCycleDuration = 2000 // in milliseconds
+    val breathCycleDuration: Millisec = 2000 // in milliseconds
 
     var pulsateFuncX = 0
     val pulsateRange = 0.034f
-    val pulsateCycleDuration = 500 // in milliseconds
+    val pulsateCycleDuration: Millisec = 500 // in milliseconds
 
     val random = HQRNG()
 

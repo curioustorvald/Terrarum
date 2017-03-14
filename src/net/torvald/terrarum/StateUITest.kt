@@ -81,13 +81,16 @@ private class SimpleUI : UICanvas {
                     "CONTEXT_ITEM_MAGIC",
                     "GAME_INVENTORY_BLOCKS",
                     "GAME_INVENTORY_WALLS",
+                    "GAME_INVENTORY_FAVORITES",
                     "MENU_LABEL_ALL"
             ),
             width = (width / 3 / 100) * 100, // chop to hundreds unit (100, 200, 300, ...) with the black magic of integer division
             height = height,
             readFromLang = true,
             highlightBackCol = Color(0x202020),
-            highlightBackBlendMode = BlendMode.NORMAL
+            highlightBackBlendMode = BlendMode.NORMAL,
+            backgroundCol = Color(0x383838),
+            kinematic = true
     )
 
     override fun update(gc: GameContainer, delta: Int) {
@@ -99,10 +102,6 @@ private class SimpleUI : UICanvas {
     override fun render(gc: GameContainer, g: Graphics) {
         g.color = Color(0x202020)
         g.fillRect(0f, 0f, width.toFloat(), height.toFloat())
-
-        g.color = Color(0x383838)
-        g.fillRect(0f, 0f, buttons.width.toFloat(), height.toFloat())
-
 
         buttons.render(gc, g)
     }

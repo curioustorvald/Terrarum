@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.jme3.math.FastMath
+import net.torvald.terrarum.Millisec
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import org.dyn4j.geometry.Vector2
@@ -26,7 +27,7 @@ class UIPieMenu : UICanvas {
     /**
      * In milliseconds
      */
-    override var openCloseTime: Int = 160
+    override var openCloseTime: Millisec = 160
 
     private val smallenSize = 0.93f
 

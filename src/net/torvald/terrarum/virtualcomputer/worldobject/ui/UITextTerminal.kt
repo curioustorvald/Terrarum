@@ -1,5 +1,6 @@
 package net.torvald.terrarum.virtualcomputer.worldobject.ui
 
+import net.torvald.terrarum.Millisec
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.ui.UICanvas.Companion.OPENCLOSE_GENERIC
 import net.torvald.terrarum.virtualcomputer.terminal.Terminal
@@ -52,7 +53,7 @@ class UITextTerminal(val terminal: Terminal) : UICanvas, KeyboardControlled, Mou
      *
      * Timer itself is implemented in the handler.
      */
-    override var openCloseTime: Int = OPENCLOSE_GENERIC
+    override var openCloseTime: Millisec = OPENCLOSE_GENERIC
 
     override fun update(gc: GameContainer, delta: Int) {
         terminal.update(gc, delta)
