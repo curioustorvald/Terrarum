@@ -539,6 +539,23 @@ fun blendDisable() {
     GL11.glDisable(GL11.GL_BLEND)
 }
 
+object BlendMode {
+    const val SCREEN   = "GL_BLEND screen"
+    const val MULTIPLY = "GL_BLEND multiply"
+    const val NORMAL   = "GL_BLEND normal"
+    const val MAX      = "GL_MAX"
+
+    fun resolve(mode: String) {
+        when (mode) {
+            SCREEN   -> blendScreen()
+            MULTIPLY -> blendMul()
+            NORMAL   -> blendNormal()
+            MAX      -> blendLightenOnly()
+            else     -> throw Error("Unknown blend mode: $mode")
+        }
+    }
+}
+
 enum class RunningEnvironment {
     PC, CONSOLE, MOBILE
 }

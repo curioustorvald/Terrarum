@@ -52,6 +52,21 @@ Magical/Surreal: Use 24 Bits
     - MULTIPLY blend chosen colour with white texture
 
 
+### Colour keys ###
+
+Things are colour-keyed so that players would get the idea by just a glance.
+
+- Amber: Inactivated, TBA??
+- Cyan-blue: Activated, Energy weapon?
+- Purple: Magic
+    - Application: spell tomes/scrolls written with Magic Description Language
+- Phosphor Green: 
+- Cherry red (#F04): Health (using this to help with deuterans)
+
+
+NOTE: cyan is a tricky colour for deuterans; will be inextinguishable between greys!
+
+
 ##  Roguelike identity  ##
 
 * Randomised things

@@ -25,6 +25,7 @@ class StateUITest : BasicGameState() {
 
     init {
         ui.posX = 50
+        ui.posY = 30
         ui.isVisible = true
 
 
@@ -64,8 +65,8 @@ class StateUITest : BasicGameState() {
 
 
 private class SimpleUI : UICanvas {
-    override var width = 400
-    override var height = 600
+    override var width = 700
+    override var height = 440 // multiple of 40 (2 * font.lineHeight)
     override var handler: UIHandler? = null
     override var openCloseTime: Int = UICanvas.OPENCLOSE_GENERIC
 
@@ -77,12 +78,16 @@ private class SimpleUI : UICanvas {
                     "CONTEXT_ITEM_ARMOR",
                     "GAME_INVENTORY_INGREDIENTS",
                     "GAME_INVENTORY_POTIONS",
+                    "CONTEXT_ITEM_MAGIC",
                     "GAME_INVENTORY_BLOCKS",
-                    "GAME_INVENTORY_WALLPAPERS",
+                    "GAME_INVENTORY_WALLS",
                     "MENU_LABEL_ALL"
             ),
-            300, height,
-            readFromLang = true
+            width = (width / 3 / 100) * 100, // chop to hundreds unit (100, 200, 300, ...) with the black magic of integer division
+            height = height,
+            readFromLang = true,
+            highlightBackCol = Color(0x202020),
+            highlightBackBlendMode = BlendMode.NORMAL
     )
 
     override fun update(gc: GameContainer, delta: Int) {
@@ -92,8 +97,11 @@ private class SimpleUI : UICanvas {
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        g.color = Color(0x282828)
-        g.fillRect(0f, 0f, 300f, 600f)
+        g.color = Color(0x202020)
+        g.fillRect(0f, 0f, width.toFloat(), height.toFloat())
+
+        g.color = Color(0x383838)
+        g.fillRect(0f, 0f, buttons.width.toFloat(), height.toFloat())
 
 
         buttons.render(gc, g)

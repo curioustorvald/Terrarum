@@ -9,6 +9,7 @@ import net.torvald.terrarum.virtualcomputer.terminal.GraphicsTerminal
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
+import org.newdawn.slick.Image
 import org.newdawn.slick.state.BasicGameState
 import org.newdawn.slick.state.StateBasedGame
 import java.util.*
@@ -20,19 +21,25 @@ class StateGraphicComputerTest : BasicGameState() {
     val computer = TerrarumComputer(8)
     val monitor = GraphicsTerminal(computer)
 
+    val monitorUI: Image
+    val monitorUIG: Graphics
+
     init {
         val videocard = PeripheralVideoCard(computer)
         monitor.attachVideoCard(videocard)
 
         computer.attachTerminal(monitor)
         computer.attachPeripheral(videocard)
+
+        monitorUI = Image(videocard.width, videocard.height * 2)
+        monitorUIG = monitorUI.graphics
     }
 
     override fun init(container: GameContainer?, game: StateBasedGame?) {
         val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram
 
         // it's a-me, Mario!
-        /*(0..3).forEach {
+        (0..3).forEach {
             vcard.sprites[it].setPaletteSet(64,33,12,62)
             vcard.sprites[it].isVisible = true
             vcard.sprites[it].drawWide = true
@@ -77,8 +84,10 @@ class StateGraphicComputerTest : BasicGameState() {
                 0,1,1,1,0,0,0,0,
                 0,0,2,2,2,0,0,0,
                 0,0,2,2,2,2,0,0
-        ))*/
+        ))
     }
+
+    var angle = 0.0
 
     override fun update(container: GameContainer, game: StateBasedGame?, delta: Int) {
         UPDATE_DELTA = delta
@@ -90,17 +99,30 @@ class StateGraphicComputerTest : BasicGameState() {
         computer.update(container, delta)
 
 
-        /*val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram
-        vcard.sprites[0].setPos(20, 20)
-        vcard.sprites[1].setPos(36, 20)
-        vcard.sprites[2].setPos(20, 28)
-        vcard.sprites[3].setPos(36, 28)*/
+        val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram
+        val sprites = vcard.sprites
+        angle += delta / 1000.0
+
+
+        sprites[0].posX = (Math.cos(angle) * 80 + 100).roundInt() - 16
+        sprites[0].posY = (Math.sin(angle) * 0  + 100).roundInt() - 8
+
+        sprites[1].posX = (Math.cos(angle) * 80 + 100).roundInt()
+        sprites[1].posY = (Math.sin(angle) * 0  + 100).roundInt() - 8
+
+        sprites[2].posX = (Math.cos(angle) * 80 + 100).roundInt() - 16
+        sprites[2].posY = (Math.sin(angle) * 0  + 100).roundInt()
+
+        sprites[3].posX = (Math.cos(angle) * 80 + 100).roundInt()
+        sprites[3].posY = (Math.sin(angle) * 0  + 100).roundInt()
     }
 
     override fun getID() = Terrarum.STATE_ID_TEST_TTY
 
+
     override fun render(container: GameContainer, game: StateBasedGame?, g: Graphics) {
-        monitor.render(container, g)
+        monitor.render(container, monitorUIG)
+        g.drawImage(monitorUI, 30f, 30f)
     }
 
     override fun keyPressed(key: Int, c: Char) {

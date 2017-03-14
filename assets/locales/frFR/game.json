@@ -6,5 +6,11 @@
   "APP_ADJUST_YOUR_MONITOR": "Meilleur l'expérience du joueur peut être obtenue avec un écran correctement réglé. Si vous ne l'avez pas, faites-le avant de jouer.",
 
   "APP_WARNING_HEALTH_AND_SAFETY": "ATTENTION-SANTÉ ET SÉCURITÉ",
-  "MENU_LABEL_PRESS_START_SYMBOL": "Appuyez sur >"
+  "MENU_LABEL_PRESS_START_SYMBOL": "Appuyez sur >",
+
+  "GAME_INVENTORY_INGREDIENTS" : "Ingrédients",
+  "GAME_INVENTORY_POTIONS" : "Potions",
+  "GAME_INVENTORY_BLOCKS" : "Blocs",
+  "GAME_INVENTORY_WALLS" : "Murs",
+  "CONTEXT_ITEM_EQUIPMENT_PLURAL" : "Équipements"
 }
