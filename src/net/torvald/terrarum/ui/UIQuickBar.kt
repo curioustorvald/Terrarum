@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import net.torvald.terrarum.Millisec
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import org.newdawn.slick.GameContainer
@@ -16,7 +17,7 @@ class UIQuickBar : UICanvas, MouseControlled {
     /**
      * In milliseconds
      */
-    override var openCloseTime: Int = 160
+    override var openCloseTime: Millisec = 160
 
     private val startPointX = ItemSlotImageBuilder.slotLarge.width / 2
     private val startPointY = ItemSlotImageBuilder.slotLarge.height / 2

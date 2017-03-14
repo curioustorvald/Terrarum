@@ -26,6 +26,8 @@ import java.util.logging.SimpleFormatter
 
 const val GAME_NAME = "Terrarum"
 
+typealias Millisec = Int
+
 /**
  * Created by minjaesong on 15-12-30.
  */

@@ -8,6 +8,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.KVHashMap
+import net.torvald.terrarum.Millisec
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.virtualcomputer.luaapi.*
 import net.torvald.terrarum.virtualcomputer.peripheral.*
@@ -361,7 +362,7 @@ class TerrarumComputer(peripheralSlots: Int) {
     // let's regard it as a tracker...
     private val beepQueue = ArrayList<Pair<Int, Double>>()
     private var beepCursor = -1
-    private var beepQueueLineExecTimer = 0 // millisec
+    private var beepQueueLineExecTimer: Millisec = 0
     private var beepQueueFired = false
 
     private fun driveBeepQueueManager(delta: Int) {
@@ -432,7 +433,7 @@ class TerrarumComputer(peripheralSlots: Int) {
      *
      *     ,---. (true, true) ,---- (true, false) ----. (false, true) ----- (false, false)
      */
-    private fun makeAudioData(duration: Int, freq: Double,
+    private fun makeAudioData(duration: Millisec, freq: Double,
                               rampUp: Boolean = true, rampDown: Boolean = true): ByteBuffer {
         val audioData = BufferUtils.createByteBuffer(duration.times(sampleRate).div(1000))
 

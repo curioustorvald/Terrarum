@@ -202,7 +202,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
     /**
      * Post-hit invincibility, in milliseconds
      */
-    @Transient val INVINCIBILITY_TIME: Int = 500
+    @Transient val INVINCIBILITY_TIME: Millisec = 500
 
     @Transient internal val BASE_FRICTION = 0.3
 

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.virtualcomputer.terminal
 
+import net.torvald.terrarum.Millisec
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -61,7 +62,7 @@ interface Terminal : Teletype {
      * @param duration: milliseconds
      * @param freg: Frequency (float)
      */
-    fun emitTone(duration: Int, freq: Double)
+    fun emitTone(duration: Millisec, freq: Double)
 
     override fun bell(pattern: String)
     /** Requires keyPressed() event to be processed.
