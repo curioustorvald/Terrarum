@@ -28,8 +28,9 @@ class UIInventory : UICanvas {
             "CONTEXT_ITEM_ARMOR",
             "GAME_INVENTORY_INGREDIENTS",
             "GAME_INVENTORY_POTIONS",
+            "CONTEXT_ITEM_MAGIC",
             "GAME_INVENTORY_BLOCKS",
-            "GAME_INVENTORY_WALLPAPERS",
+            "GAME_INVENTORY_WALLS",
             "MENU_LABEL_ALL"
     )
 

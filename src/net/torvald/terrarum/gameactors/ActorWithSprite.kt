@@ -35,7 +35,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
     @Transient internal var sprite: SpriteAnimation? = null
     @Transient internal var spriteGlow: SpriteAnimation? = null
 
-    var drawMode = BLEND_NORMAL
+    var drawMode = BlendMode.NORMAL
 
     @Transient private val world: GameWorld = Terrarum.ingame!!.world
 
@@ -1090,11 +1090,7 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
     override fun drawBody(g: Graphics) {
         if (isVisible && sprite != null) {
 
-            when (drawMode) {
-                BLEND_NORMAL   -> blendNormal()
-                BLEND_MULTIPLY -> blendMul()
-                BLEND_SCREEN   -> blendScreen()
-            }
+            BlendMode.resolve(drawMode)
 
             val offsetX = if (!sprite!!.flippedHorizontal())
                 hitboxTranslateX * scale
@@ -1259,9 +1255,6 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
         @Transient const val COLLISION_STATIC = 3
         @Transient const val COLLISION_KNOCKBACK_GIVER = 4 // mobs
         @Transient const val COLLISION_KNOCKBACK_TAKER = 5 // benevolent NPCs
-        @Transient const val BLEND_NORMAL = 4
-        @Transient const val BLEND_SCREEN = 5
-        @Transient const val BLEND_MULTIPLY = 6
 
         @Transient private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
 

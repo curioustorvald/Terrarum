@@ -1,7 +1,9 @@
 package net.torvald.terrarum.ui
 
+import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.langpack.Lang
+import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 
@@ -13,17 +15,33 @@ class UIItemTextButtonList(
         labelsList: Array<String>,
         override val width: Int,
         override val height: Int,
-        val readFromLang: Boolean = false
+        val readFromLang: Boolean = false,
+
+        // copied directly from UIItemTextButton
+        activeCol: Color = Color.white,
+        activeBackCol: Color = Color(0xd0d0d0),
+        activeBackBlendMode: String = BlendMode.MULTIPLY,
+        highlightCol: Color = Color(0x00f8ff),
+        highlightBackCol: Color = Color(0xb0b0b0),
+        highlightBackBlendMode: String = BlendMode.MULTIPLY,
+        inactiveCol: Color = Color(0xc8c8c8)
 ) : UIItem(parentUI) {
 
     val buttons = labelsList.mapIndexed { index, s ->
         val height = this.height - UIItemTextButton.height
         UIItemTextButton(
                 parentUI, s,
-                0,
-                (height / labelsList.size.minus(1).toFloat() * index).roundInt(),
-                width,
-                readFromLang = true
+                posX = 0,
+                posY = (height / labelsList.size.minus(1).toFloat() * index).roundInt(),
+                width = width,
+                readFromLang = true,
+                activeCol = activeCol,
+                activeBackCol = activeBackCol,
+                activeBackBlendMode = activeBackBlendMode,
+                highlightCol = highlightCol,
+                highlightBackCol = highlightBackCol,
+                highlightBackBlendMode = highlightBackBlendMode,
+                inactiveCol = inactiveCol
         )
     }
 

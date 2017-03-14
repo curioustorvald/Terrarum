@@ -1,6 +1,6 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -19,8 +19,12 @@ class UIItemTextButton(
         override val width: Int,
         val readFromLang: Boolean = false,
         val activeCol: Color = Color.white,
+        val activeBackCol: Color = Color(0xd0d0d0),
+        val activeBackBlendMode: String = BlendMode.MULTIPLY,
         val highlightCol: Color = Color(0x00f8ff),
-        val inactiveCol: Color = Color(0xc0c0c0)
+        val highlightBackCol: Color = Color(0xb0b0b0),
+        val highlightBackBlendMode: String = BlendMode.MULTIPLY,
+        val inactiveCol: Color = Color(0xc8c8c8)
 ) : UIItem(parentUI) {
 
     companion object {
@@ -43,6 +47,21 @@ class UIItemTextButton(
 
     override fun render(gc: GameContainer, g: Graphics) {
         val textW = font.getWidth(label)
+
+
+        if (highlighted) {
+            BlendMode.resolve(highlightBackBlendMode)
+            g.color = highlightBackCol
+            g.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+        }
+        else if (mouseOver) {
+            BlendMode.resolve(activeBackBlendMode)
+            g.color = activeBackCol
+            g.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+        }
+
+
+        blendNormal()
 
         g.font = font
         mouseOver = mouseUp
