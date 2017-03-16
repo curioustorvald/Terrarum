@@ -138,6 +138,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
     val STATE_ID_TEST_UI = 0x105
 
     val STATE_ID_TOOL_NOISEGEN = 0x200
+    val STATE_ID_TOOL_RUMBLE_DIAGNOSIS = 0x201
 
     var controller: org.lwjgl.input.Controller? = null
         private set
@@ -284,9 +285,9 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         //addState(StateShaderTest())
         //addState(StateNoiseTester())
         addState(StateUITest())
+        //addState(StateControllerRumbleTest())
 
-        //ingame = StateInGame()
-        //addState(ingame)
+        //ingame = StateInGame(); addState(ingame)
 
 
         // foolproof

@@ -4,6 +4,8 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import java.util.*
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
 
 /**
  * Created by minjaesong on 16-03-15.
@@ -22,9 +24,9 @@ class ActorInventory() {
     private var capacityMode: Int
 
     /**
-     * HashMap<ReferenceID, Amounts>
+     * Sorted by referenceID.
      */
-    private val itemList: HashMap<InventoryItem, Int> = HashMap()
+    private val itemList = ArrayList<InventoryPair>()
 
     /**
      * Default constructor with no encumbrance.
@@ -62,32 +64,42 @@ class ActorInventory() {
 
         // If we already have the item, increment the amount
         // If not, add item with specified amount
-        itemList.put(item, itemList[item] ?: 0 + count)
+        val existingItem = getByID(item.id)
+        if (existingItem != null) { // if the item already exists
+            val newCount = getByID(item.id)!!.amount + count
+            itemList.remove(existingItem)
+            itemList.add(InventoryPair(existingItem.item, newCount))
+        }
+        else {
+            itemList.add(InventoryPair(item, count))
+        }
+        insertionSortLastElem(itemList)
     }
 
     fun remove(itemID: Int, count: Int = 1) = remove(ItemCodex[itemID], count)
     fun remove(item: InventoryItem, count: Int = 1) {
-        // check if the item does NOT exist
-        if (itemList[item] == null) {
-            return
+        val existingItem = getByID(item.id)
+        if (existingItem != null) { // if the item already exists
+            val newCount = getByID(item.id)!!.amount - count
+            if (newCount < 0) {
+                throw Error("Tried to remove $count of $item, but the inventory only contains ${getByID(item.id)!!.amount} of them.")
+            }
+            else if (newCount > 0) {
+                add(item, -count)
+            }
+            else {
+                itemList.remove(existingItem)
+            }
         }
         else {
-            // remove the existence of the item if count <= 0
-            if (itemList[item]!! - count <= 0) {
-                itemList.remove(item)
-            }
-            // else, decrement the item count
-            else {
-                itemList.put(item, itemList[item]!! - count)
-            }
+            throw Error("Tried to remove $item, but the inventory does not have it.")
         }
     }
 
-
-    fun contains(item: InventoryItem) = itemList.containsKey(item)
-    fun contains(itemID: Int) = itemList.containsKey(ItemCodex[itemID])
-
-    fun forEach(consumer: (InventoryItem, Int) -> Unit) = itemList.forEach(consumer)
+    /**
+     * HashMap<InventoryItem, Amounts>
+     */
+    fun forEach(consumer: (InventoryPair) -> Unit) = itemList.forEach(consumer)
 
     /**
      * Get capacity of inventory
@@ -109,26 +121,9 @@ class ActorInventory() {
         return capacityMode
     }
 
-    /**
-     * Get reference to the itemList
-     * @return
-     */
-    fun getItemList(): Map<InventoryItem, Int>? {
-        return itemList
-    }
-
-    /**
-     * Get clone of the itemList
-     * @return
-     */
-    @Suppress("UNCHECKED_CAST")
-    fun getCopyOfItemList(): Map<InventoryItem, Int>? {
-        return itemList.clone() as Map<InventoryItem, Int>
-    }
-
     fun getTotalWeight(): Double {
         var weight = 0.0
-        itemList.forEach { item, i -> weight += item.mass * i }
+        itemList.forEach { weight += it.item.mass * it.amount }
 
         return weight
     }
@@ -138,7 +133,7 @@ class ActorInventory() {
      */
     fun getTotalCount(): Int {
         var count = 0
-        itemList.forEach { item, i -> count += i }
+        itemList.forEach { count += it.amount }
 
         return count
     }
@@ -158,10 +153,72 @@ class ActorInventory() {
         if (getCapacityMode() == CAPACITY_MODE_WEIGHT) {
             return capacityByWeight < getTotalWeight()
         } else if (getCapacityMode() == CAPACITY_MODE_COUNT) {
-            return capacityByCount < getTotalWeight()
+            return capacityByCount < getTotalCount()
         } else {
             return false
         }
     }
 
+
+
+
+
+
+    fun hasItem(item: InventoryItem) = hasItem(item.id)
+    fun hasItem(id: Int) =
+            if (itemList.size == 0)
+                false
+            else
+                itemList.binarySearch(id) >= 0
+    fun getByID(id: Int): InventoryPair? {
+        if (itemList.size == 0)
+            return null
+
+        val index = itemList.binarySearch(id)
+        if (index < 0)
+            return null
+        else
+            return itemList[index]
+    }
+    private fun insertionSortLastElem(arr: ArrayList<InventoryPair>) {
+        lock(ReentrantLock()) {
+            var j = arr.lastIndex - 1
+            val x = arr.last()
+            while (j >= 0 && arr[j].item > x.item) {
+                arr[j + 1] = arr[j]
+                j -= 1
+            }
+            arr[j + 1] = x
+        }
+    }
+    private fun ArrayList<InventoryPair>.binarySearch(ID: Int): Int {
+        // code from collections/Collections.kt
+        var low = 0
+        var high = this.size - 1
+
+        while (low <= high) {
+            val mid = (low + high).ushr(1) // safe from overflows
+
+            val midVal = get(mid).item
+
+            if (ID > midVal.id)
+                low = mid + 1
+            else if (ID < midVal.id)
+                high = mid - 1
+            else
+                return mid // key found
+        }
+        return -(low + 1)  // key not found
+    }
+    inline fun lock(lock: Lock, body: () -> Unit) {
+        lock.lock()
+        try {
+            body()
+        }
+        finally {
+            lock.unlock()
+        }
+    }
 }
+
+data class InventoryPair(val item: InventoryItem, val amount: Int)

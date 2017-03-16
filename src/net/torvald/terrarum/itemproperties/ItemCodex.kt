@@ -42,6 +42,7 @@ object ItemCodex {
                 override var baseToolSize: Double? = null
                 override var equipPosition = EquipPosition.HAND_GRIP
                 override var category = "block"
+                override val originalName = TileCodex[i].nameKey
 
                 override fun primaryUse(gc: GameContainer, delta: Int) {
                     // TODO base punch attack

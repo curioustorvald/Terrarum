@@ -1,12 +1,14 @@
 package net.torvald.terrarum.gameitem
 
 import net.torvald.terrarum.itemproperties.Material
+import net.torvald.terrarum.langpack.Lang
+import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 
 /**
  * Created by minjaesong on 16-01-16.
  */
-abstract class InventoryItem {
+abstract class InventoryItem : Comparable<InventoryItem> {
     /**
      * Internal ID of an Item, Long
      * 0-4095: Tiles
@@ -15,6 +17,21 @@ abstract class InventoryItem {
      * >= 16777216: Actor RefID
      */
     abstract val id: Int
+
+    abstract protected val originalName: String
+
+    private var newName: String = "SET THE NAME!!"
+
+    var name: String
+        set(value) {
+            newName = value
+            isCustomName = true
+        }
+        get() = if (isCustomName) newName else Lang[originalName]
+    open var isCustomName = false // true: reads from lang
+
+    var nameColour = Color.white
+
 
     abstract var baseMass: Double
 
@@ -58,6 +75,12 @@ abstract class InventoryItem {
      * it must be re-assigned as Dynamic Item
      */
     open var scale: Double = 1.0
+
+    /**
+     * Set to zero if durability not applicable
+     */
+    open var maxDurability: Double = 0.0
+    open var durability: Double = maxDurability
 
     /**
      * Effects applied continuously while in pocket
@@ -107,6 +130,16 @@ abstract class InventoryItem {
         if (other == null) return false
         return id == (other as InventoryItem).id
     }
+
+    fun unsetCustomName() {
+        name = originalName
+        isCustomName = false
+        nameColour = Color.white
+    }
+
+    override fun compareTo(other: InventoryItem): Int = (this.id - other.id).sign()
+
+    fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else 0
 }
 
 object EquipPosition {
