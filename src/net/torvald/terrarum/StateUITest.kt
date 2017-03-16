@@ -1,16 +1,14 @@
 package net.torvald.terrarum
 
 import net.torvald.terrarum.gameactors.ActorInventory
+import net.torvald.terrarum.gameactors.InventoryPair
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIHandler
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.ui.UIItemTextButtonList
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Input
+import org.newdawn.slick.*
 import org.newdawn.slick.state.BasicGameState
 import org.newdawn.slick.state.StateBasedGame
 
@@ -19,11 +17,13 @@ import org.newdawn.slick.state.StateBasedGame
  */
 class StateUITest : BasicGameState() {
 
-    val ui = UIHandler(SimpleUI())
+    val ui: UIHandler
 
     val inventory = ActorInventory()
 
     init {
+        ui = UIHandler(SimpleUI(inventory))
+
         ui.posX = 50
         ui.posY = 30
         ui.isVisible = true
@@ -31,13 +31,18 @@ class StateUITest : BasicGameState() {
 
         inventory.add(object : InventoryItem() {
             override val id: Int = 5656
+            override var originalName: String = "Test tool"
             override var baseMass: Double = 12.0
             override var baseToolSize: Double? = 8.0
             override var category: String = "tool"
+            override var maxDurability: Double = 10.0
+            override var durability: Double = 10.0
         })
+        inventory.getByID(5656)!!.item.name = "Test tool"
 
         inventory.add(object : InventoryItem() {
             override val id: Int = 4633
+            override var originalName: String = "CONTEXT_ITEM_QUEST_NOUN"
             override var baseMass: Double = 1.4
             override var baseToolSize: Double? = null
             override var category: String = "bulk"
@@ -64,11 +69,13 @@ class StateUITest : BasicGameState() {
 
 
 
-private class SimpleUI : UICanvas {
+private class SimpleUI(val inventory: ActorInventory) : UICanvas {
     override var width = 700
-    override var height = 440 // multiple of 40 (2 * font.lineHeight)
+    override var height = 480 // multiple of 40 (2 * font.lineHeight)
     override var handler: UIHandler? = null
     override var openCloseTime: Int = UICanvas.OPENCLOSE_GENERIC
+
+    val itemImage = Image("./assets/item_kari_24.tga")
 
     val buttons = UIItemTextButtonList(
             this,
@@ -93,10 +100,48 @@ private class SimpleUI : UICanvas {
             kinematic = true
     )
 
+    val itemStripGutterV = 4
+    val itemStripGutterH = 48
+
+    val itemsStripWidth = width - buttons.width - 2 * itemStripGutterH
+    val items = Array(height / (UIItemInventoryElem.height + itemStripGutterV), { UIItemInventoryElem(
+            parentUI = this,
+            posX = buttons.width + itemStripGutterH,
+            posY = it * (UIItemInventoryElem.height + itemStripGutterV),
+            width = itemsStripWidth,
+            item = null,
+            amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
+            itemImage = null,
+            backCol = Color(255, 255, 255, 0x30)
+    ) })
+    val itemsScrollOffset = 0
+
+    var inventorySortList = ArrayList<InventoryPair>()
+    var rebuildList = true
+
     override fun update(gc: GameContainer, delta: Int) {
-        Terrarum.gameLocale = "fiFI" // hot swap this to test
+        Terrarum.gameLocale = "en" // hot swap this to test
 
         buttons.update(gc, delta)
+
+
+        // test fill: just copy the inventory, fuck sorting
+        if (rebuildList) {
+            inventorySortList = ArrayList<InventoryPair>()
+            inventory.forEach { inventorySortList.add(it) }
+            rebuildList = false
+
+            // sort if needed //
+
+            inventorySortList.forEachIndexed { index, pair ->
+                if (index - itemsScrollOffset >= 0 && index < items.size + itemsScrollOffset) {
+                    items[index - itemsScrollOffset].item = pair.item
+                    items[index - itemsScrollOffset].amount = pair.amount
+                    items[index - itemsScrollOffset].itemImage = itemImage
+                }
+            }
+        }
+
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
@@ -104,6 +149,11 @@ private class SimpleUI : UICanvas {
         g.fillRect(0f, 0f, width.toFloat(), height.toFloat())
 
         buttons.render(gc, g)
+
+
+        items.forEach {
+            it.render(gc, g)
+        }
     }
 
     override fun processInput(gc: GameContainer, delta: Int, input: Input) {
@@ -121,7 +171,7 @@ private class SimpleUI : UICanvas {
         UICanvas.endOpeningFade(handler)
     }
 
-    override fun endClosing(gc: GameContainer, delta: Int) {
+    override fun endClosing(gc: GameContainer, delta: Int) {7
         UICanvas.endClosingFade(handler)
     }
 }

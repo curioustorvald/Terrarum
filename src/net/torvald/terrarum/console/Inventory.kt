@@ -35,11 +35,11 @@ internal object Inventory : ConsoleCommand {
             Echo("(inventory empty)")
         }
         else {
-            target.inventory.forEach { refId, amount ->
-                if (amount == 0) {
-                    EchoError("Unexpected zero-amounted item: ID $refId")
+            target.inventory.forEach {
+                if (it.amount == 0) {
+                    EchoError("Unexpected zero-amounted item: ID ${it.item.id}")
                 }
-                Echo("ID $refId${if (amount > 1) " ($amount)" else ""}")
+                Echo("ID ${it.item.id}${if (it.amount > 1) " ($it.second)" else ""}")
             }
         }
     }
@@ -62,7 +62,7 @@ internal object Inventory : ConsoleCommand {
         val item = ItemCodex[refId]
 
         // if the item does not exist, add it first
-        if (!target.inventory.contains(item)) {
+        if (!target.inventory.hasItem(item)) {
             target.inventory.add(item)
         }
 

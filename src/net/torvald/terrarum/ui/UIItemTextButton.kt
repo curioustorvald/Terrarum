@@ -24,12 +24,13 @@ class UIItemTextButton(
         val highlightCol: Color = Color(0x00f8ff),
         val highlightBackCol: Color = Color(0xb0b0b0),
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
-        val inactiveCol: Color = Color(0xc8c8c8)
+        val inactiveCol: Color = UIItemTextButton.defaultInactiveCol
 ) : UIItem(parentUI) {
 
     companion object {
         val font = Terrarum.fontGame!!
         val height = font.lineHeight * 2
+        val defaultInactiveCol: Color = Color(0xc8c8c8)
     }
 
     private val label: String

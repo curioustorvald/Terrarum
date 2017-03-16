@@ -140,6 +140,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         override var baseMass: Double = 0.0
         override var baseToolSize: Double? = null
         override var category = "should_not_be_seen"
+        override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "(no name)"
     }
 
     override fun update(gc: GameContainer, delta: Int) {
@@ -168,12 +169,12 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         }
 
         // update inventory items
-        inventory.forEach { item, amount ->
-            if (!itemEquipped.contains(item)) { // unequipped
-                item.effectWhileInPocket(gc, delta)
+        inventory.forEach {
+            if (!itemEquipped.contains(it.item)) { // unequipped
+                it.item.effectWhileInPocket(gc, delta)
             }
             else { // equipped
-                item.effectWhenEquipped(gc, delta)
+                it.item.effectWhenEquipped(gc, delta)
             }
         }
     }
