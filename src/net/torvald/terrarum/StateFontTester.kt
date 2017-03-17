@@ -45,30 +45,10 @@ nopqrstuvwxyz
     }
 
     override fun render(gc: GameContainer, game: StateBasedGame, g: Graphics) {
-        //g.font = Terrarum.fontGame
 
-        /*val text = arrayOf(
-                Lang["APP_WARNING_HEALTH_AND_SAFETY"],
-                "",
-                "90’ 10’ 20” 50 cm",
-                "",
-                "",
-                Lang["MENU_LABEL_PRESS_ANYKEY_CONTINUE"],
-                "DGB금융지주의 자회사. 대구광역시에서 쓰는 교통카드인 원패스와 탑패스 그리고 만악의 근원 대경교통카드를 판매 및 정산하고 있다. 본사는",
-                "Atlantic Records, it features production from Nick Hexum of 311, Tony Kanal of No Doubt, and Sublime producer Paul Leary."
-        )
-
-        for (i in 0..text.size - 1) {
-            g.drawString(text[i], 10f, 10f + (g.font.lineHeight * i))
-        }*/
-
-        //g.font = Terrarum.fontSmallNumbers
-        //g.font = segfont
-        //g.font = mtfont
         g.background = Color(0x282828)
         g.font = Terrarum.fontGame
 
-        val line = "    **** TERRAN BASIC V0.5 ****    "
 
         g.drawString("ABCDEFGHIJKLMN", 10f, 10f)
         g.drawString("OPQRSTÜVWXYZÆŒ", 10f, 30f)
@@ -77,41 +57,44 @@ nopqrstuvwxyz
         g.drawString("pqrstuvwxyzßæœ", 160f, 30f)
 
         g.drawString("1234567890?!", 320f, 10f)
-        g.drawString("minimum kerning keming Narnu Namu", 320f, 30f)
+        //g.drawString("minimum kerning keming Narnu Namu", 320f, 30f)
 
-        g.drawString("Syö salmiakkia perkele", 480f, 10f)
+        //g.drawString("Syö salmiakkia perkele", 480f, 10f)
 
         val text = arrayOf(
-                "The Olympic marmot (Marmota olympus) is a rodent in the squirrel family, Sciuridae.",
-                "It lives only in the U.S. state of Washington, at middle elevations on the Olympic Peninsula.",
-                "About the size of a domestic cat, an adult weighs around 8 kg (18 lb) in summer.",
+                "The bitmap font for game developers who seek good font that has real multilingual support,",
+                "for free (as in freedom AND without cost).",
                 "",
-                "Brná je část statutárního a krajského města Ústí nad Labem v České republice, spadající",
-                "pod městský obvod Ústí nad Labem-Střekov. Nachází se asi pět kilometrů jižně od centra",
-                "města v Českém středohoří na pravém břehu řeky Labe.",
+                "There are many bitmap fonts on the internet. You care for the multilingual support, but alas!",
+                "most of them does not support your language, vector fonts takes too much time to be loaded,",
+                "even then their legibility suffers because fuck built-in antialias.",
+                "You somehow found a good font, and it makes your game look like a linux terminal, and you say:",
+                "\"what the fuck? Is this a game or should I rm -rf this shit‽\"",
+                "You speak Japanese, and you wish to support it, but then このクソなfontは only good for Japanese,",
+                "and it is not multilingual, and you don't have a time for this shenanigan.",
+                "Eventually you give up, saying \"fuck it!\" and just use the fonts that do not match well.",
                 "",
-                "Malaysia er en forholdsvis ung stat. Sin endelige udstrækning fik den først i 1965 efter,",
-                "at Singapore trak sig ud. Staten blev grundlagt ved en sammenslutning af flere tidligere",
-                "britiske besiddelser, foreløbigt i 1957 og endeligt i 1963.",
+                "No more suffering. This font has everything you need.",
                 "",
-                "Το θάλλιο συνοδεύει κυρίως θειούχα ορυκτά βασικών μετάλλων, όπως ο σφαλερίτης, ο σιδηροπυρίτης",
-                "και ο γαληνίτης ενώ αναφέρονται και εμφανίσεις του σε κονδύλους μαγγανίου στους βυθούς των ωκεανών.",
+                "while (isVisible(BadFonts)) { ripAndTear(BadFonts).scope(Guts); }",
+                "How multilingual? Real multilingual!",
+                "",
+                "Příliš žluťoučký kůň úpěl ďábelské ódy",
+                "Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich",
                 "διαφυλάξτε γενικά τη ζωή σας από βαθειά ψυχικά τραύματα",
                 "ΔΙΑΦΥΛΆΞΤΕ ΓΕΝΙΚΆ ΤΗ ΖΩΉ ΣΑΣ ΑΠΌ ΒΑΘΕΙΆ ΨΥΧΙΚΆ ΤΡΑΎΜΑΤΑ",
-                "Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства.",
-                "Příliš žluťoučký kůň úpěl ďábelské ódy.    Árvíztűrő tükörfúrógép.",
-                "Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.",
-                "Pijamalı hasta yağız şoföre çabucak güvendi.    Kŕdeľ ďatľov učí koňa žrať kôru.",
-                "Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwi.",
-                "Înjurând pițigăiat, zoofobul comandă vexat whisky și tequila.",
-                "",
-                "sjaldgæft    ekki stjórnarskrárvarin",
-                "",
-                "Also supports:",
-                "‛Unicode’ „quotation marks“—dashes…‼",
-                "으웽~. 얘! 위에 이 애 우유의 양 외워와! 아오~ 왜요? 어여! 예...  웬 초콜릿? 제가 원했던 건 뻥튀기 쬐끔과 의류예요. 얘야, 왜 또 불평?  퀡뙔풿횂",
+                "Pack my box with five dozen liquor jugs",
+                "Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwi",
+                "정 참판 양반댁 규수 큰 교자 타고 혼례 치른 날    뚫훍뚫훍뚫(읗) 뚫훍뚫훍뚫(읗) 뚫훍뚫훍뚫 따다다",
+                "Kæmi ný öxi hér, ykist þjófum nú bæði víl og ádrepa",
+                "Árvíztűrő tükörfúrógép    Kŕdeľ ďatľov učí koňa žrať kôru",
                 "とりなくこゑす ゆめさませ みよあけわたる ひんかしを そらいろはえて おきつへに ほふねむれゐぬ もやのうち",
                 "鳥啼く声す 夢覚ませ 見よ明け渡る 東を 空色栄えて 沖つ辺に 帆船群れゐぬ 靄の中",
+                "Înjurând pițigăiat, zoofobul comandă vexat whisky și tequila",
+                "Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства",
+                "Pijamalı hasta yağız şoföre çabucak güvendi",
+                "Also supports: ‛Unicode’ „quotation marks“—dashes…「括弧」‼",
+                "ASCII  Latin-1  Latin_Ext-A  Latin_Ext-B  Greek  Cyrillic  CJK-Ideo  Kana  Hangul_Syllables  (More coming!)",
                 ""
         )
 
@@ -119,13 +102,25 @@ nopqrstuvwxyz
             g.drawString(s, 10f, 70f + 20 * i)
         }
 
+
+
+
         /*val text = arrayOf(
                 "ru: Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства",
                 "bg: Под южно дърво, цъфтящо в синьо, бягаше малко пухкаво зайче",
                 "sr: Ајшо, лепото и чежњо, за љубав срца мога дођи у Хаџиће на кафу"
-        )
+        )*/
+        /*val text = arrayOf(
+                "……退魔の剣に選ばれし ハイラルの勇者よ",
+                "その たゆまぬ努力と 結実せに剣技を認め……",
+                "女神ハイリアの名において祝福を授けん……",
+                "空を舞い 時を回り 黄昏に染まろうとも……",
+                "結ばれし剣は 勇者の魂と共に……",
+                "さらなる力が そなたと そして退魔の剣に宿らんことを……"
+        )*/
 
-        (0..2).forEach {
+
+        /*(0..text.size - 1).forEach {
             g.drawString(text[it], 10f, 70f + 20 * it)
         }*/
 
