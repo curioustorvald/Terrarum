@@ -207,7 +207,7 @@ class TerrarumComputer(peripheralSlots: Int) {
 
 
         if (!isHalted) {
-            driveBeepQueueManager(delta)
+            runBeepQueueManager(delta)
         }
     }
 
@@ -365,7 +365,7 @@ class TerrarumComputer(peripheralSlots: Int) {
     private var beepQueueLineExecTimer: Millisec = 0
     private var beepQueueFired = false
 
-    private fun driveBeepQueueManager(delta: Int) {
+    private fun runBeepQueueManager(delta: Int) {
         // start emitTone queue
         if (beepQueue.size > 0 && beepCursor == -1) {
             beepCursor = 0

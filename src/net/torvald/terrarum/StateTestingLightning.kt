@@ -48,7 +48,7 @@ class StateTestingLightning : BasicGameState() {
         }*/
     }
 
-    override fun getID() = Terrarum.STATE_ID_TEST_LIGHTNING_GFX
+    override fun getID() = Terrarum.STATE_ID_TEST_GFX
 
 
     private var timer = 0

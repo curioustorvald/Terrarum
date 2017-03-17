@@ -131,11 +131,13 @@ object Terrarum : StateBasedGame(GAME_NAME) {
     val STATE_ID_CONFIG_CALIBRATE = 0x11
 
     val STATE_ID_TEST_FONT = 0x100
-    val STATE_ID_TEST_LIGHTNING_GFX = 0x101
+    val STATE_ID_TEST_GFX = 0x101
     val STATE_ID_TEST_TTY = 0x102
     val STATE_ID_TEST_BLUR = 0x103
     val STATE_ID_TEST_SHADER = 0x104
-    val STATE_ID_TEST_UI = 0x105
+    val STATE_ID_TEST_INPUT = 0x106
+
+    val STATE_ID_TEST_UI1 = 0x110
 
     val STATE_ID_TOOL_NOISEGEN = 0x200
     val STATE_ID_TOOL_RUMBLE_DIAGNOSIS = 0x201
@@ -279,13 +281,14 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         //addState(StateTestingLightning())
         //addState(StateSplash())
         //addState(StateMonitorCheck())
-        addState(StateFontTester())
+        //addState(StateFontTester())
         //addState(StateNoiseTexGen())
         //addState(StateBlurTest())
         //addState(StateShaderTest())
         //addState(StateNoiseTester())
         //addState(StateUITest())
         //addState(StateControllerRumbleTest())
+        addState(StateMidiInputTest())
 
         //ingame = StateInGame(); addState(ingame)
 
