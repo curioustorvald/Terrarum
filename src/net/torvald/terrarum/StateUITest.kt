@@ -56,7 +56,7 @@ class StateUITest : BasicGameState() {
         ui.update(container, delta)
     }
 
-    override fun getID() = Terrarum.STATE_ID_TEST_UI
+    override fun getID() = Terrarum.STATE_ID_TEST_UI1
 
     override fun render(container: GameContainer, game: StateBasedGame, g: Graphics) {
         ui.render(container, game, g)
