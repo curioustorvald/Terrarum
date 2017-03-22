@@ -7,7 +7,6 @@ import com.google.gson.JsonObject
 import net.torvald.terrarum.ActorValue
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
-import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.to10bit

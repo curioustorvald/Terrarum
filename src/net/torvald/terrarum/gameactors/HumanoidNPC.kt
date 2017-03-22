@@ -4,7 +4,6 @@ import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.ai.AILuaAPI
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
-import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
 import org.luaj.vm2.*
 import org.luaj.vm2.compiler.LuaC
@@ -42,7 +41,7 @@ open class HumanoidNPC(
     // we're having InventoryItem data so that this class could be somewhat universal
     override var itemData: InventoryItem = object : InventoryItem() {
         override var id = referenceID
-
+        override val isUnique: Boolean = true
         override var baseMass: Double
             get() = actorValue.getAsDouble(AVKey.BASEMASS)!!
             set(value) { actorValue[AVKey.BASEMASS] = value }

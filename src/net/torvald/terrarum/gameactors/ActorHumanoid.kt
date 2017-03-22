@@ -5,7 +5,6 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
-import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.realestate.RealEstateUtility
 import org.dyn4j.geometry.Vector2
@@ -26,7 +25,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory = ActorInventory()
 
-    override val itemEquipped = Array<InventoryItem?>(EquipPosition.INDEX_MAX + 1, { null })
+    override val itemEquipped = Array<InventoryItem?>(InventoryItem.EquipPosition.INDEX_MAX + 1, { null })
 
     /** Must be set by PlayerFactory */
     override var faction: HashSet<Faction> = HashSet()
@@ -137,6 +136,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     private val nullItem = object : InventoryItem() {
         override val id: Int = 0
+        override val isUnique: Boolean = false
         override var baseMass: Double = 0.0
         override var baseToolSize: Double? = null
         override var category = "should_not_be_seen"
@@ -236,12 +236,12 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
          */
         // Left mouse
         if (isGamer && isFuncDown(input, EnumKeyFunc.HAND_PRIMARY)) {
-            (itemEquipped[EquipPosition.HAND_GRIP] ?: nullItem).primaryUse(gc, delta)
+            (itemEquipped[InventoryItem.EquipPosition.HAND_GRIP] ?: nullItem).primaryUse(gc, delta)
         }
 
         // Right mouse
         if (isGamer && isFuncDown(input, EnumKeyFunc.HAND_SECONDARY)) {
-            (itemEquipped[EquipPosition.HAND_GRIP] ?: nullItem).secondaryUse(gc, delta)
+            (itemEquipped[InventoryItem.EquipPosition.HAND_GRIP] ?: nullItem).secondaryUse(gc, delta)
         }
 
         /**

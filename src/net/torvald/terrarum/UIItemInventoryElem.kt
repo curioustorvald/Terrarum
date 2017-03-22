@@ -1,5 +1,6 @@
 package net.torvald.terrarum
 
+import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
@@ -9,9 +10,7 @@ import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
 
-/**
- * @param amount: set to -1 (UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT) for unique item (does not show item count)
- *
+/***
  * Note that the UI will not render if either item or itemImage is null.
  *
  * Created by SKYHi14 on 2017-03-16.
@@ -39,6 +38,12 @@ class UIItemInventoryElem(
         get() = (this.height - itemImage!!.height).div(2).toFloat() // to snap to the pixel grid
     private val textOffsetX = 52f
 
+
+    private val durabilityCol = Color(0x22ff11)
+    private val durabilityBack: Color; get() = durabilityCol.darkerLab(0.4f)
+
+
+
     override fun update(gc: GameContainer, delta: Int) {
         if (item != null) {
 
@@ -63,11 +68,22 @@ class UIItemInventoryElem(
 
             // if mouse is over, text lights up
             g.color = item!!.nameColour * if (mouseUp) Color(0xffffff) else UIItemTextButton.defaultInactiveCol
-            g.drawString(item!!.name, posX + textOffsetX, posY + 0f)
+            g.drawString(
+                    item!!.name + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "")
+                    , posX + textOffsetX
+                    , posY + 8f
+            )
 
 
+            // durability metre
             if (item!!.maxDurability > 0.0) {
-                // TODO durability gauge
+                g.color = durabilityBack
+                g.lineWidth = 3f
+                val fullLen = (width - 20f) - textOffsetX
+                val barOffset = posX + textOffsetX
+                g.drawLine(barOffset, posY + 35f, barOffset + fullLen, posY + 35f)
+                g.color = durabilityCol
+                g.drawLine(barOffset, posY + 35f, barOffset + fullLen * (item!!.durability / item!!.maxDurability).toFloat(), posY + 35f)
             }
         }
     }

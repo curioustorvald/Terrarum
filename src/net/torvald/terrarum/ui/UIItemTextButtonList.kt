@@ -4,9 +4,11 @@ import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.Millisec
+import net.torvald.terrarum.Terrarum
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
+import org.newdawn.slick.SpriteSheet
 
 /**
  * Created by SKYHi14 on 2017-03-13.
@@ -17,6 +19,12 @@ class UIItemTextButtonList(
         override val width: Int,
         override val height: Int,
         val readFromLang: Boolean = false,
+        val defaultSelection: Int = 0,
+
+        // icons
+        val textAreaWidth: Int,
+        val iconSpriteSheet: SpriteSheet? = null,
+        val iconSpriteSheetIndices: IntArray? = null,
 
         // copied directly from UIItemTextButton
         val activeCol: Color = Color.white,
@@ -31,6 +39,15 @@ class UIItemTextButtonList(
         val kinematic: Boolean = false // more "kinetic" movement of selector
 ) : UIItem(parentUI) {
 
+    val iconToTextGap = 20
+    val iconCellWidth = (iconSpriteSheet?.width ?: -iconToTextGap) / (iconSpriteSheet?.horizontalCount ?: 1)
+    val iconCellHeight = (iconSpriteSheet?.height ?: 0) / (iconSpriteSheet?.verticalCount ?: 1)
+
+    // zero if iconSpriteSheet is null
+    val iconsWithGap: Int = iconToTextGap + iconCellWidth
+    val pregap = (width - textAreaWidth - iconsWithGap) / 2 + iconsWithGap
+    val postgap = (width - textAreaWidth - iconsWithGap) / 2
+
     val buttons = labelsList.mapIndexed { index, s ->
         val height = this.height - UIItemTextButton.height
         if (!kinematic) {
@@ -39,14 +56,16 @@ class UIItemTextButtonList(
                     posX = 0,
                     posY = (height / labelsList.size.minus(1).toFloat() * index).roundInt(),
                     width = width,
-                    readFromLang = true,
+                    readFromLang = readFromLang,
                     activeCol = activeCol,
                     activeBackCol = activeBackCol,
                     activeBackBlendMode = activeBackBlendMode,
                     highlightCol = highlightCol,
                     highlightBackCol = highlightBackCol,
                     highlightBackBlendMode = highlightBackBlendMode,
-                    inactiveCol = inactiveCol
+                    inactiveCol = inactiveCol,
+                    preGapX = pregap,
+                    postGapX = postgap
             )
         }
         else {
@@ -55,10 +74,12 @@ class UIItemTextButtonList(
                     posX = 0,
                     posY = (height / labelsList.size.minus(1).toFloat() * index).roundInt(),
                     width = width,
-                    readFromLang = true,
+                    readFromLang = readFromLang,
                     activeBackCol = Color(0,0,0,0),
                     activeBackBlendMode = BlendMode.NORMAL,
-                    highlightBackCol = Color(0,0,0,0)
+                    highlightBackCol = Color(0,0,0,0),
+                    preGapX = pregap,
+                    postGapX = postgap
             )
         }
     }
@@ -66,8 +87,10 @@ class UIItemTextButtonList(
     override var posX = 0
     override var posY = 0
 
-    var selected = labelsList.size - 1 // default to "All"
-    private var highlightY = buttons[selected].posY.toDouble()
+    var selectedIndex = defaultSelection
+    val selectedButton: UIItemTextButton
+        get() = buttons[selectedIndex]
+    private var highlightY = buttons[selectedIndex].posY.toDouble()
     private val highlighterMoveDuration: Millisec = 100
     private var highlighterMoveTimer: Millisec = 0
     private var highlighterMoving = false
@@ -97,19 +120,19 @@ class UIItemTextButtonList(
             btn.update(gc, delta)
 
 
-            if (btn.mousePushed && index != selected) {
+            if (btn.mousePushed && index != selectedIndex) {
                 if (kinematic) {
-                    highlighterYStart = buttons[selected].posY.toDouble()
-                    selected = index
+                    highlighterYStart = buttons[selectedIndex].posY.toDouble()
+                    selectedIndex = index
                     highlighterMoving = true
-                    highlighterYEnd = buttons[selected].posY.toDouble()
+                    highlighterYEnd = buttons[selectedIndex].posY.toDouble()
                 }
                 else {
-                    selected = index
-                    highlightY = buttons[selected].posY.toDouble()
+                    selectedIndex = index
+                    highlightY = buttons[selectedIndex].posY.toDouble()
                 }
             }
-            btn.highlighted = (index == selected) // forcibly highlight if this.highlighted != null
+            btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
 
         }
     }
@@ -123,6 +146,17 @@ class UIItemTextButtonList(
         g.fillRect(posX.toFloat(), highlightY.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
 
         buttons.forEach { it.render(gc, g) }
+
+        if (iconSpriteSheet != null) {
+            val iconY = (buttons[1].height - iconCellHeight) / 2
+            iconSpriteSheetIndices!!.forEachIndexed { counter, imageIndex ->
+                iconSpriteSheet.getSubImage(imageIndex, 0).draw(
+                        32f,
+                        buttons[counter].posY + iconY.toFloat()
+                )
+            }
+        }
+
     }
 
     override fun keyPressed(key: Int, c: Char) {

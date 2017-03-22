@@ -102,9 +102,23 @@ object Terrarum : StateBasedGame(GAME_NAME) {
             if (fontGame != null) (fontGame as GameFontImpl).reload()
         }
 
-    var fontGame: Font? = null
+    var fontGame: Font = object : Font {
+        override fun getHeight(str: String?) = 0
+        override fun drawString(x: Float, y: Float, text: String?) {}
+        override fun drawString(x: Float, y: Float, text: String?, col: Color?) {}
+        override fun drawString(x: Float, y: Float, text: String?, col: Color?, startIndex: Int, endIndex: Int) {}
+        override fun getWidth(str: String?) = 0
+        override fun getLineHeight() = 0
+    } // null font
         private set
-    lateinit var fontSmallNumbers: Font
+    var fontSmallNumbers: Font = object : Font {
+        override fun getHeight(str: String?) = 0
+        override fun drawString(x: Float, y: Float, text: String?) {}
+        override fun drawString(x: Float, y: Float, text: String?, col: Color?) {}
+        override fun drawString(x: Float, y: Float, text: String?, col: Color?, startIndex: Int, endIndex: Int) {}
+        override fun getWidth(str: String?) = 0
+        override fun getLineHeight() = 0
+    } // null font
         private set
 
     var joypadLabelStart: Char = 0xE000.toChar() // lateinit
@@ -228,6 +242,10 @@ object Terrarum : StateBasedGame(GAME_NAME) {
 
     @Throws(SlickException::class)
     override fun initStatesList(gc: GameContainer) {
+        fontGame = GameFontImpl()
+        fontSmallNumbers = TinyAlphNum()
+
+
         gc.input.enableKeyRepeat()
 
 
@@ -242,9 +260,6 @@ object Terrarum : StateBasedGame(GAME_NAME) {
 
         println("[Terrarum] Locale: " + gameLocale)
 
-
-        fontGame = GameFontImpl()
-        fontSmallNumbers = TinyAlphNum()
 
 
         // search for real controller
@@ -286,9 +301,9 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         //addState(StateBlurTest())
         //addState(StateShaderTest())
         //addState(StateNoiseTester())
-        //addState(StateUITest())
+        addState(StateUITest())
         //addState(StateControllerRumbleTest())
-        addState(StateMidiInputTest())
+        //addState(StateMidiInputTest())
 
         //ingame = StateInGame(); addState(ingame)
 

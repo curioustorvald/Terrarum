@@ -4,7 +4,6 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorInventory
 import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.gameactors.Pocketed
-import net.torvald.terrarum.gameitem.EquipPosition
 import net.torvald.terrarum.itemproperties.ItemCodex
 
 /**
