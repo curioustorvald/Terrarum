@@ -1,6 +1,8 @@
 package net.torvald.terrarum.ui
 
+import net.torvald.point.Point2d
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -24,16 +26,18 @@ class UIItemTextButton(
         val highlightCol: Color = Color(0x00f8ff),
         val highlightBackCol: Color = Color(0xb0b0b0),
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
-        val inactiveCol: Color = UIItemTextButton.defaultInactiveCol
+        val inactiveCol: Color = UIItemTextButton.defaultInactiveCol,
+        val preGapX:  Int = 0,
+        val postGapX: Int = 0
 ) : UIItem(parentUI) {
 
     companion object {
-        val font = Terrarum.fontGame!!
+        val font = Terrarum.fontGame
         val height = font.lineHeight * 2
         val defaultInactiveCol: Color = Color(0xc8c8c8)
     }
 
-    private val label: String
+    val label: String
         get() = if (readFromLang) Lang[labelText] else labelText
 
 
@@ -70,7 +74,11 @@ class UIItemTextButton(
                   else if (mouseOver)           activeCol
                   else                       inactiveCol
 
-        g.drawString(label, posX.toFloat() + (width.minus(textW).div(2)), posY.toFloat() + height / 4)
+        g.drawString(
+                label,
+                posX.toFloat() + width.minus(textW).div(2) + (preGapX - postGapX).div(2),
+                posY.toFloat() + height / 4
+        )
     }
 
     override fun keyPressed(key: Int, c: Char) {

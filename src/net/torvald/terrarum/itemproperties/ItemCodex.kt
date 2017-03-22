@@ -8,7 +8,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithSprite
 import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
-import net.torvald.terrarum.gameitem.EquipPosition
+import net.torvald.terrarum.gameitem.IVKey
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.tileproperties.TileCodex
 import org.newdawn.slick.GameContainer
@@ -34,15 +34,20 @@ object ItemCodex {
     val ITEM_STATIC_MIN = ITEM_TILE_MAX + 1 // 4096
 
     init {
-        // tile items
+        // tile items (blocks and walls are the same thing basically)
         for (i in 0..ITEM_TILE_MAX) {
             itemCodex[i] = object : InventoryItem() {
                 override val id: Int = i
+                override val isUnique: Boolean = false
                 override var baseMass: Double = TileCodex[i].density / 1000.0
                 override var baseToolSize: Double? = null
                 override var equipPosition = EquipPosition.HAND_GRIP
                 override var category = "block"
                 override val originalName = TileCodex[i].nameKey
+
+                init {
+                    itemProperties[IVKey.ITEMTYPE] = IVKey.ItemType.BLOCK
+                }
 
                 override fun primaryUse(gc: GameContainer, delta: Int) {
                     // TODO base punch attack

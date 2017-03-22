@@ -5,6 +5,7 @@ import java.util.*
 import java.util.function.Consumer
 
 typealias ActorValue = KVHashMap
+typealias ItemValue = KVHashMap
 typealias GameConfig = KVHashMap
 
 /**

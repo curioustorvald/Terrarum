@@ -12,9 +12,10 @@ import org.newdawn.slick.GameContainer
  *
  * Created by minjaesong on 16-09-08.
  */
+@Deprecated("Use InventoryItem's ItemProp")
 open abstract class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: Double? = null)
     : InventoryItem() {
-
+    /*
     /**
      * Internal ID of an Item, Long
      * 0-4096: Tiles
@@ -69,5 +70,5 @@ open abstract class DynamicItem(val baseItemID: Int?, newMass: Double? = null, n
         else {
             scale = newScale ?: ItemCodex[baseItemID].scale
         }
-    }
+    }*/
 }

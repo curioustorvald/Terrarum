@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameitem
 
+import net.torvald.terrarum.ItemValue
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.Color
@@ -10,17 +11,25 @@ import org.newdawn.slick.GameContainer
  */
 abstract class InventoryItem : Comparable<InventoryItem> {
     /**
-     * Internal ID of an Item, Long
+     * Internal ID of an Item,
      * 0-4095: Tiles
-     * 4096-32767: Static items
-     * 32768-16777215: Dynamic items
+     * 4096-32767: Unique items (isUnique = true), brand-new tools
+     * 32768-16777215: Dynamic items (e.g. tools with damage)
      * >= 16777216: Actor RefID
      */
     abstract val id: Int
 
+    /**
+     * e.g. Key Items (in a Pokémon sense), floppies
+     */
+    abstract val isUnique: Boolean
+    
+    /**
+     * OriginalName is always read from Language files.
+     */
     abstract protected val originalName: String
 
-    private var newName: String = "SET THE NAME!!"
+    private var newName: String = "I AM VITTUN PLACEHOLDER"
 
     var name: String
         set(value) {
@@ -38,6 +47,8 @@ abstract class InventoryItem : Comparable<InventoryItem> {
     abstract var baseToolSize: Double?
 
     abstract var category: String // "weapon", "tool", "armor", etc. (all smallcaps)
+
+    var itemProperties = ItemValue()
 
     /**
      * Where to equip the item
@@ -140,31 +151,43 @@ abstract class InventoryItem : Comparable<InventoryItem> {
     override fun compareTo(other: InventoryItem): Int = (this.id - other.id).sign()
 
     fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else 0
-}
 
-object EquipPosition {
-    const val NULL = -1
+    object EquipPosition {
+        const val NULL = -1
 
-    const val ARMOUR = 0
-    // you can add alias to address something like LEGGINGS, BREASTPLATE, RINGS, NECKLACES, etc.
-    const val BODY_BACK = 1 // wings, jetpacks, etc.
-    const val BODY_BUFF2 = 2
-    const val BODY_BUFF3 = 3
-    const val BODY_BUFF4 = 4
-    const val BODY_BUFF5 = 5
-    const val BODY_BUFF6 = 6
-    const val BODY_BUFF7 = 7
-    const val BODY_BUFF8 = 8
+        const val ARMOUR = 0
+        // you can add alias to address something like LEGGINGS, BREASTPLATE, RINGS, NECKLACES, etc.
+        const val BODY_BACK = 1 // wings, jetpacks, etc.
+        const val BODY_BUFF2 = 2
+        const val BODY_BUFF3 = 3
+        const val BODY_BUFF4 = 4
+        const val BODY_BUFF5 = 5
+        const val BODY_BUFF6 = 6
+        const val BODY_BUFF7 = 7
+        const val BODY_BUFF8 = 8
 
-    const val HAND_GRIP = 9
-    const val HAND_GAUNTLET = 10
-    const val HAND_BUFF2 = 11
-    const val HAND_BUFF3 = 12
-    const val HAND_BUFF4 = 13
+        const val HAND_GRIP = 9
+        const val HAND_GAUNTLET = 10
+        const val HAND_BUFF2 = 11
+        const val HAND_BUFF3 = 12
+        const val HAND_BUFF4 = 13
 
-    const val FOOTWEAR = 14
+        const val FOOTWEAR = 14
 
-    const val HEADGEAR = 15
+        const val HEADGEAR = 15
 
-    const val INDEX_MAX = 15
+        const val INDEX_MAX = 15
+    }
+
+    object Category {
+        const val WEAPON = "weapon"
+        const val TOOL = "tool"
+        const val ARMOUR = "armour"
+        const val GENERIC = "generic"
+        const val POTION = "potion"
+        const val MAGIC = "magic"
+        const val BLOCK = "block"
+        const val WALL = "wall"
+        const val MISC = "misc"
+    }
 }

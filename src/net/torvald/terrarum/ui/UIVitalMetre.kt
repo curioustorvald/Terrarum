@@ -36,7 +36,7 @@ class UIVitalMetre(
     private val theta = 33f
     private val halfTheta = theta / 2f
 
-    private val backColor: Color; get() = color?.darkerLab(0.3f) ?: Color.black
+    private val backColor: Color; get() = color?.darkerLab(0.4f) ?: Color.black
 
 
     override fun update(gc: GameContainer, delta: Int) {
