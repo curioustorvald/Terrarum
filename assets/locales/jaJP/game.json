@@ -2,10 +2,17 @@
   "MENU_LABEL_NEW_WORLD": "新しい世界",
   "MENU_MONITOR_CALI_TITLE": "モニターチェック",
 
-  "COPYRIGHT_ALL_RIGHTS_RESERVED": "全著作権所有。",
+  "COPYRIGHT_ALL_RIGHTS_RESERVED": "全著作権所有",
+  "COPYRIGHT_GNU_GPL_3": "GNU GPL 3で配布",
   "APP_ADJUST_YOUR_MONITOR": "このゲームは、適切に調整したモニターから最高のプレイができます。調整していなかったら、プレイする前に調整してください。",
 
   "APP_WARNING_HEALTH_AND_SAFETY": "警告ー健康と安全のために",
-  "MENU_LABEL_PRESS_START_SYMBOL": "> ボタンを押す"
+  "MENU_LABEL_PRESS_START_SYMBOL": "> ボタンを押す",
 
+  "GAME_INVENTORY_INGREDIENTS" : "材料",
+  "GAME_INVENTORY_POTIONS" : "水薬",
+  "GAME_INVENTORY_BLOCKS" : "ブロック",
+  "GAME_INVENTORY_WALLS" : "壁",
+  "CONTEXT_ITEM_EQUIPMENT_PLURAL" : "装備",
+  "GAME_INVENTORY_FAVORITES" : "登録"
 }
