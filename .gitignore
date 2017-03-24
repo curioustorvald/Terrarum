@@ -1,4 +1,5 @@
 out/*
 bin/*
 hs_err_pid*
-.idea/workspace.xml
+Thumbs.db
+.DS_Store
