@@ -11,7 +11,7 @@ class NewRunes : Font {
     private val runeSize = 12
 
     private val encPlane = IntArray(128, {
-        if (it < 0x10)
+        if (it < 0x20)
             0x20 + it
         else if (it < 0x30)
             0x3000 + (it - 0x20)

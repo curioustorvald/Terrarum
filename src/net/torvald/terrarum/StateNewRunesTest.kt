@@ -30,7 +30,8 @@ class StateNewRunesTest : BasicGameState() {
 
         val text = arrayOf(
                 "ㅎㅏㅣㄹㅏㄹㅍㅏㄴㅌㅏㅈㅣ",
-                "ㅈㅔㄹㄷㅏㅢㅈㅓㄴㅅㅓㄹ." // <<insert troll_face here>>
+                "ㅈㅔㄹㄷㅏㅢㅈㅓㄴㅅㅓㄹ.", // <<insert troll_face here>>
+                ".22884646ㄴㄱ."
         )
 
         text.forEachIndexed { index, s ->
