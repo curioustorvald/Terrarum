@@ -62,7 +62,7 @@ The new runes are based on Hangul writing system. The runes had two main goals:
  - Implement the principle of its design (specifically, how this letter is altered from its base shape)
     - {KIYEOK, KHIEUKH}, {TIKEUT, THIEUTH, NIEUN}, {PIEUP, PHIEUPH, MIEUM}, {CIEUC, CHIEUCH, SIOS} sets
         are similar in shape
-    - Aspirated sounds keep similar shape to their base and have two distinctive dots
+    - Aspirated sounds keep similar shape to their base
     - Vowels are not random; they have rules
     - In non-assembled writing, IEUNG only appears as "-ng" phoneme, so the shape is based on
         old Hangul YESIEUNG, which actually had "-ng" sound
