@@ -54,3 +54,25 @@ class NewRunes : Font {
 
     override fun getLineHeight() = (runeSize + linegap) * scale
 }
+
+/*
+How runes are made:
+
+The new runes are based on Hangul writing system. The runes had two main goals:
+ - Implement the principle of its design (specifically, how this letter is altered from its base shape)
+    - {KIYEOK, KHIEUKH}, {TIKEUT, THIEUTH, NIEUN}, {PIEUP, PHIEUPH, MIEUM}, {CIEUC, CHIEUCH, SIOS} sets
+        are similar in shape
+    - Aspirated sounds keep similar shape to their base and have two distinctive dots
+    - Vowels are not random; they have rules
+    - In non-assembled writing, IEUNG only appears as "-ng" phoneme, so the shape is based on
+        old Hangul YESIEUNG, which actually had "-ng" sound
+ - "Doensori" are realised by prepending SIOS, much like older Korean orthography
+ - Good enough obfuscation
+
+
+Notes:
+ - In some letters (e.g. NIEUN-HIEUH), ligatures may applied
+ - EU appear as non-assembled shape; U-shape instead of dash
+
+
+ */
