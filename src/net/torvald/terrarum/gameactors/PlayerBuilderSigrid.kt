@@ -60,7 +60,7 @@ object PlayerBuilderSigrid {
 
         p.actorValue[AVKey.BASEDEFENCE] = 141
 
-        p.actorValue[AVKey.__PLAYER_QUICKBARSEL] = 0
+        p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0
         //p.actorValue["__selectedtile"] = 147 // test code; replace with <tile_item>.primaryUse(gc, delta)
         p.actorValue["__aimhelper"] = true // TODO when you'll gonna implement it?
 

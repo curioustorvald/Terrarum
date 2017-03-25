@@ -6,6 +6,12 @@
   "APP_ADJUST_YOUR_MONITOR": "",
 
   "APP_WARNING_HEALTH_AND_SAFETY": "ПРЕДУПРЕЖДЕНИЕ-ЗДОРОВЬЕ И БЕЗОПАСНОСТЬ",
-  "MENU_LABEL_PRESS_START_SYMBOL": "Нажмите >"
+  "MENU_LABEL_PRESS_START_SYMBOL": "Нажмите >",
 
+  "GAME_INVENTORY_INGREDIENTS" : "Ингредиенты",
+  "GAME_INVENTORY_POTIONS" : "Зелья",
+  "GAME_INVENTORY_BLOCKS" : "Блоки",
+  "GAME_INVENTORY_WALLS" : "Стены",
+  "CONTEXT_ITEM_TOOL_PLURAL" : "Инструменты",
+  "GAME_INVENTORY_FAVORITES" : "Избранное"
 }

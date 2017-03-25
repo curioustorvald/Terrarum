@@ -295,7 +295,7 @@
             },
             {
                 "n": "CONTEXT_ITEM_COND_MAGICAL",
-                "s": "Fjölkunnugur"
+                "s": "Galdrafullur"
             },
             {
                 "n": "CONTEXT_ITEM_COND_RUSTY",
@@ -371,7 +371,7 @@
             },
             {
                 "n": "CONTEXT_ITEM_MAGIC",
-                "s": "Magic"
+                "s": "Galdur"
             },
             {
                 "n": "CONTEXT_ITEM_PISTOL",
@@ -1271,7 +1271,7 @@
             },
             {
                 "n": "GAME_GENRE_MISC",
-                "s": "Misc."
+                "s": "Ýmislegt"
             },
             {
                 "n": "GAME_GENRE_MULTIPLAYER",
@@ -1403,11 +1403,11 @@
             },
             {
                 "n": "GAME_INVENTORY_WEAPON",
-                "s": "Weapon"
+                "s": "Vopn"
             },
             {
                 "n": "GAME_INVENTORY_WEAPONS",
-                "s": "Weapons"
+                "s": "Vopn"
             },
             {
                 "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",
@@ -1939,7 +1939,7 @@
             },
             {
                 "n": "MENU_LABEL_ALL",
-                "s": "All"
+                "s": "Allur"
             },
             {
                 "n": "MENU_LABEL_ARE_YOU_REALLY_SURE",

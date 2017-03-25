@@ -12,6 +12,6 @@
   "GAME_INVENTORY_POTIONS" : "Tränke",
   "GAME_INVENTORY_BLOCKS" : "Blöcke",
   "GAME_INVENTORY_WALLS" : "Wände",
-  "CONTEXT_ITEM_EQUIPMENT_PLURAL" : "Ausrüstungen",
+  "CONTEXT_ITEM_TOOL_PLURAL" : "Werkzeuge",
   "GAME_INVENTORY_FAVORITES" : "Favoriten"
 }

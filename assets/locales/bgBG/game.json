@@ -6,5 +6,12 @@
   "APP_ADJUST_YOUR_MONITOR": "",
 
   "APP_WARNING_HEALTH_AND_SAFETY": "ВНИМАНИЕ-ЗДРАВЕ И БЕЗОПАСНОСТ",
-  "MENU_LABEL_PRESS_START_SYMBOL": "атисни >"
+  "MENU_LABEL_PRESS_START_SYMBOL": "атисни >",
+
+  "GAME_INVENTORY_INGREDIENTS" : "Съставки",
+  "GAME_INVENTORY_POTIONS" : "Отвари",
+  "GAME_INVENTORY_BLOCKS" : "Блокове",
+  "GAME_INVENTORY_WALLS" : "Стени",
+  "CONTEXT_ITEM_TOOL_PLURAL" : "Инструменти",
+  "GAME_INVENTORY_FAVORITES" : "Любими"
 }

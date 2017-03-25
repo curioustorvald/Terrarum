@@ -24,7 +24,9 @@ class UIItemInventoryElem(
         var amount: Int,
         var itemImage: Image?,
         val backCol: Color = Color(0,0,0,0),
-        val backColBlendMode: String = BlendMode.NORMAL
+        val backColBlendMode: String = BlendMode.NORMAL,
+        var quickslot: Int? = null,
+        var equippedSlot: Int? = null
 ) : UIItem(parentUI) {
 
     companion object {
@@ -37,10 +39,12 @@ class UIItemInventoryElem(
     private val imgOffset: Float
         get() = (this.height - itemImage!!.height).div(2).toFloat() // to snap to the pixel grid
     private val textOffsetX = 52f
+    private val textOffsetY = 8f
 
 
     private val durabilityCol = Color(0x22ff11)
     private val durabilityBack: Color; get() = durabilityCol.darkerLab(0.4f)
+    private val durabilityBarOffY = 35f
 
 
 
@@ -71,20 +75,30 @@ class UIItemInventoryElem(
             g.drawString(
                     item!!.name + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "")
                     , posX + textOffsetX
-                    , posY + 8f
+                    , posY + textOffsetY
             )
 
 
             // durability metre
+            val barFullLen = (width - 20f) - textOffsetX
+            val barOffset = posX + textOffsetX
             if (item!!.maxDurability > 0.0) {
                 g.color = durabilityBack
                 g.lineWidth = 3f
-                val fullLen = (width - 20f) - textOffsetX
-                val barOffset = posX + textOffsetX
-                g.drawLine(barOffset, posY + 35f, barOffset + fullLen, posY + 35f)
+                g.drawLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen, posY + durabilityBarOffY)
                 g.color = durabilityCol
-                g.drawLine(barOffset, posY + 35f, barOffset + fullLen * (item!!.durability / item!!.maxDurability).toFloat(), posY + 35f)
+                g.drawLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen * (item!!.durability / item!!.maxDurability).toFloat(), posY + durabilityBarOffY)
             }
+
+
+            // quickslot marker (TEMPORARY UNTIL WE GET BETTER DESIGN)
+            if (quickslot != null) {
+                val label = quickslot!!.plus(0xE010).toChar()
+                val labelW = g.font.getWidth("$label")
+                g.color = Color.white
+                g.drawString("$label", barOffset + barFullLen - labelW, posY + textOffsetY)
+            }
+
         }
     }
 

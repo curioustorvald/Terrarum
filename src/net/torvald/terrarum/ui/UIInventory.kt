@@ -24,7 +24,7 @@ class UIInventory : UICanvas {
 
     private val categories = arrayOf(
             "GAME_INVENTORY_WEAPONS", // weapons and tools
-            "CONTEXT_ITEM_EQUIPMENT_PLURAL",
+            "CONTEXT_ITEM_TOOL_PLURAL",
             "CONTEXT_ITEM_ARMOR",
             "GAME_INVENTORY_INGREDIENTS",
             "GAME_INVENTORY_POTIONS",

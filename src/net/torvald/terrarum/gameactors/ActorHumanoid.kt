@@ -7,8 +7,6 @@ import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.realestate.RealEstateUtility
-import org.dyn4j.geometry.Vector2
-import org.lwjgl.input.Controller
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
 import java.util.*
@@ -24,8 +22,8 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory = ActorInventory()
-
     override val itemEquipped = Array<InventoryItem?>(InventoryItem.EquipPosition.INDEX_MAX + 1, { null })
+
 
     /** Must be set by PlayerFactory */
     override var faction: HashSet<Faction> = HashSet()

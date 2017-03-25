@@ -12,7 +12,7 @@ object PlayerBuilderTestSubject1 {
         InjectCreatureRaw(p.actorValue, "CreatureHuman.json")
 
 
-        p.actorValue[AVKey.__PLAYER_QUICKBARSEL] = 0
+        p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0
         p.actorValue[AVKey.NAME] = "Test Subject 1"
 
 

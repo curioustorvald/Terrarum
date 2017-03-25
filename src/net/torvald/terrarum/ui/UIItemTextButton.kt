@@ -65,7 +65,6 @@ class UIItemTextButton(
             g.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
 
-
         blendNormal()
 
         g.font = font
