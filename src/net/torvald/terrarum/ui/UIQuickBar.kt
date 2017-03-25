@@ -25,8 +25,8 @@ class UIQuickBar : UICanvas, MouseControlled {
     override var handler: UIHandler? = null
 
     private var selection: Int
-        get() = Terrarum.ingame!!.player.actorValue.getAsInt(AVKey.__PLAYER_QUICKBARSEL) ?: 0
-        set(value) { Terrarum.ingame!!.player.actorValue[AVKey.__PLAYER_QUICKBARSEL] = value }
+        get() = Terrarum.ingame!!.player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
+        set(value) { Terrarum.ingame!!.player.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = value }
 
     override fun update(gc: GameContainer, delta: Int) {
     }

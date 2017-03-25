@@ -279,8 +279,13 @@ object Terrarum : StateBasedGame(GAME_NAME) {
                     break
                 }
             }
+
+
+            // test acquired controller
+            controller!!.getAxisValue(0)
         }
-        catch (e: IndexOutOfBoundsException) {
+        catch (controllerDoesNotHaveAnyAxesException: java.lang.ArrayIndexOutOfBoundsException) {
+            controller = null
         }
 
         if (controller != null) {
@@ -304,6 +309,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         addState(StateUITest())
         //addState(StateControllerRumbleTest())
         //addState(StateMidiInputTest())
+        //addState(StateNewRunesTest())
 
         //ingame = StateInGame(); addState(ingame)
 

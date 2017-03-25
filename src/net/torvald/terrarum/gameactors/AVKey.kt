@@ -87,5 +87,7 @@ object AVKey {
 
 
 
-    const val __PLAYER_QUICKBARSEL = "__quickbarselection"
+    const val __PLAYER_QUICKSLOTSEL = "__quickslotselection"
+    /** Item ID; they are supposed to be unique */
+    const val __PLAYER_QSPREFIX = "__qsitem" // __qsitem1 .. __qsitem10
 }

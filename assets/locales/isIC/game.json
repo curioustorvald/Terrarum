@@ -7,6 +7,12 @@
   "APP_ADJUST_YOUR_MONITOR": "Best leikmaður reynsla er getur náðist með rétt kvarðaður skjárinn. Ef þú ekki gerðir, gerðu svo vel að kvarða áður en þú leikur.",
 
   "APP_WARNING_HEALTH_AND_SAFETY": "VIÐVÖRUN-HEILSA OG ÖRYGGI",
-  "MENU_LABEL_PRESS_START_SYMBOL": "Ýttu >"
+  "MENU_LABEL_PRESS_START_SYMBOL": "Ýttu >",
 
+  "GAME_INVENTORY_INGREDIENTS" : "Innihaldsefni",
+  "GAME_INVENTORY_POTIONS" : "Drykkir",
+  "GAME_INVENTORY_BLOCKS" : "Blokkir",
+  "GAME_INVENTORY_WALLS" : "Veggir",
+  "CONTEXT_ITEM_TOOL_PLURAL" : "Verkfærar",
+  "GAME_INVENTORY_FAVORITES" : "Uppáhalds"
 }

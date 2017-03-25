@@ -10,19 +10,16 @@ import org.newdawn.slick.SpriteSheet
 class NewRunes : Font {
     private val runeSize = 12
 
-    private val encPlane = IntArray(128, {
-        if (it < 0x20)
-            0x20 + it
-        else if (it < 0x30)
-            0x3000 + (it - 0x20)
+    // hard-coded encode map
+    private fun codeToEnc(code: Int): Int? = if (code in 0x21..0x3f)
+            code - 0x20
+        else if (code in 0x3001..0x300f)
+            code - 0x3000 + 0x20
+        else if (code in 0x3131..0x3163)
+            code - 0x3130 + 0x30
         else
-            0x3130 + (it - 0x30)
-    })
+            null
 
-    private fun codeToEnc(c: Char): Int? {
-        val result =  encPlane.binarySearch(c.toInt())
-        return if (result >= 0) result else null
-    }
 
     private val runes = SpriteSheet("./assets/graphics/fonts/newrunes.tga", runeSize, runeSize)
 
@@ -36,7 +33,7 @@ class NewRunes : Font {
 
     override fun drawString(x: Float, y: Float, text: String, col: Color) {
         text.forEachIndexed { index, c ->
-            val encodePoint = codeToEnc(c)
+            val encodePoint = codeToEnc(c.toInt())
 
             if (encodePoint != null) {
                 runes.getSubImage(encodePoint % 16, encodePoint / 16).draw(

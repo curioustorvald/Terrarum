@@ -257,7 +257,7 @@
             },
             {
                 "n": "CONTEXT_ITEM_ARMOR",
-                "s": "鎧"
+                "s": "よろい"
             },
             {
                 "n": "CONTEXT_ITEM_ARROW",
@@ -1277,7 +1277,7 @@
             },
             {
                 "n": "GAME_GENRE_MISC",
-                "s": "その他"
+                "s": "そのほか"
             },
             {
                 "n": "GAME_GENRE_MULTIPLAYER",
@@ -1409,11 +1409,11 @@
             },
             {
                 "n": "GAME_INVENTORY_WEAPON",
-                "s": "武器"
+                "s": "ぶき"
             },
             {
                 "n": "GAME_INVENTORY_WEAPONS",
-                "s": "武器"
+                "s": "ぶき"
             },
             {
                 "n": "GAME_INVENTORY_YOU_CANNOT_CARRY",

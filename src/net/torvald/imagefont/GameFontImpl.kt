@@ -11,7 +11,7 @@ class GameFontImpl : GameFontBase() {
     init {
 
         GameFontBase.hangulSheet = SpriteSheet(
-                "./assets/graphics/fonts/hangul_johab.tga", GameFontBase.W_HANGUL, GameFontBase.H_HANGUL)
+                "./assets/graphics/fonts/hangul_johab.tga", GameFontBase.W_HANGUL, GameFontBase.H)
         GameFontBase.asciiSheet = SpriteSheet(
                 "./assets/graphics/fonts/ascii_variable.tga", 15, 19, 1)
         GameFontBase.runicSheet = SpriteSheet(
@@ -21,9 +21,9 @@ class GameFontImpl : GameFontBase() {
         GameFontBase.extBSheet = SpriteSheet(
                 "./assets/graphics/fonts/LatinExtB_variable.tga", 15, 19, 1)
         GameFontBase.kanaSheet = SpriteSheet(
-                "./assets/graphics/fonts/kana.tga", GameFontBase.W_KANA, GameFontBase.H_KANA)
+                "./assets/graphics/fonts/kana.tga", GameFontBase.W_KANA, GameFontBase.H)
         GameFontBase.cjkPunct = SpriteSheet(
-                "./assets/graphics/fonts/cjkpunct.tga", GameFontBase.W_ASIAN_PUNCT, GameFontBase.H_KANA)
+                "./assets/graphics/fonts/cjkpunct.tga", GameFontBase.W_ASIAN_PUNCT, GameFontBase.H)
         /*uniHan = new SpriteSheet(
                 "./assets/graphics/fonts/unifont_unihan"
                         + ((!terrarum.gameLocale.contains("zh"))
@@ -82,6 +82,7 @@ class GameFontImpl : GameFontBase() {
     }
 
     fun reload() {
+        GameFontBase.cyrilic.destroy()
         GameFontBase.cyrilic = SpriteSheet(
                 when (Terrarum.gameLocale.substring(0..1)) {
                     "bg" -> "./assets/graphics/fonts/cyrilic_bulgarian_variable.tga"

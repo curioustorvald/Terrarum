@@ -35,7 +35,7 @@ class UIPieMenu : UICanvas {
 
     override fun update(gc: GameContainer, delta: Int) {
         if (selection >= 0)
-            Terrarum.ingame!!.player.actorValue[AVKey.__PLAYER_QUICKBARSEL] =
+            Terrarum.ingame!!.player.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
                     selection % slotCount
 
 

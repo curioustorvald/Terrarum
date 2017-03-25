@@ -13,6 +13,7 @@ import net.torvald.terrarum.ui.UIItemTextButtonList
 import org.newdawn.slick.*
 import org.newdawn.slick.state.BasicGameState
 import org.newdawn.slick.state.StateBasedGame
+import java.util.*
 
 /**
  * Created by SKYHi14 on 2017-03-13.
@@ -68,6 +69,8 @@ class StateUITest : BasicGameState() {
     }
 
     override fun update(container: GameContainer, game: StateBasedGame, delta: Int) {
+        Terrarum.appgc.setTitle("${Terrarum.NAME} — F: ${Terrarum.appgc.fps}")
+
         ui.update(container, delta)
     }
 
@@ -92,7 +95,7 @@ private class SimpleUI(val inventory: ActorInventory) : UICanvas {
 
     init {
         catButtonsToCatIdent.put("GAME_INVENTORY_WEAPONS", InventoryItem.Category.WEAPON)
-        catButtonsToCatIdent.put("CONTEXT_ITEM_EQUIPMENT_PLURAL", InventoryItem.Category.TOOL)
+        catButtonsToCatIdent.put("CONTEXT_ITEM_TOOL_PLURAL", InventoryItem.Category.TOOL)
         catButtonsToCatIdent.put("CONTEXT_ITEM_ARMOR", InventoryItem.Category.ARMOUR)
         catButtonsToCatIdent.put("GAME_INVENTORY_INGREDIENTS", InventoryItem.Category.GENERIC)
         catButtonsToCatIdent.put("GAME_INVENTORY_POTIONS", InventoryItem.Category.POTION)
@@ -111,7 +114,7 @@ private class SimpleUI(val inventory: ActorInventory) : UICanvas {
             arrayOf(
                     "MENU_LABEL_ALL",
                     "GAME_INVENTORY_WEAPONS", // weapons and tools
-                    "CONTEXT_ITEM_EQUIPMENT_PLURAL",
+                    "CONTEXT_ITEM_TOOL_PLURAL",
                     "CONTEXT_ITEM_ARMOR",
                     "GAME_INVENTORY_INGREDIENTS",
                     "GAME_INVENTORY_POTIONS",
@@ -156,7 +159,7 @@ private class SimpleUI(val inventory: ActorInventory) : UICanvas {
     private var oldCatSelect = -1
 
     override fun update(gc: GameContainer, delta: Int) {
-        Terrarum.gameLocale = "en" // hot swap this to test
+        Terrarum.gameLocale = "fiFI" // hot swap this to test
 
         buttons.update(gc, delta)
 
@@ -191,11 +194,14 @@ private class SimpleUI(val inventory: ActorInventory) : UICanvas {
                     items[k].item = sortListItem.item
                     items[k].amount = sortListItem.amount
                     items[k].itemImage = itemImagePlaceholder
+
+                    items[k].quickslot = Random().nextInt(10) // TODO test
                 }
                 catch (e: IndexOutOfBoundsException) {
                     items[k].item = null
                     items[k].amount = 0
                     items[k].itemImage = null
+                    items[k].quickslot = null
                 }
             }
         }

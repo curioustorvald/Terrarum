@@ -94,7 +94,7 @@ nopqrstuvwxyz
                 "Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства",
                 "Pijamalı hasta yağız şoföre çabucak güvendi",
                 "Also supports: ‛Unicode’ „quotation marks“—dashes…「括弧」‼",
-                "ASCII  Latin-1  Latin_Ext-A  Latin_Ext-B  Greek  Cyrillic  CJK-Ideo  Kana  Hangul_Syllables  (More coming!)",
+                "ASCII  Latin-1  Latin_Ext-A  Latin_Ext-B  Greek  Cyrillic  CJK-Ideo  Kana  Hangul_Syllables",
                 ""
         )
 
