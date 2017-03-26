@@ -635,3 +635,10 @@ operator fun Color.times(other: Color) = Color(
         this.b * other.b,
         this.a * other.a
 )
+
+operator fun Color.minus(other: Color) = Color(
+    this.r - other.r,
+    this.g - other.g,
+    this.b - other.b,
+    this.a - other.a
+)
