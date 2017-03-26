@@ -18,6 +18,7 @@ class UIItemTextButtonList(
         labelsList: Array<String>,
         override val width: Int,
         override val height: Int,
+        val verticalGutter: Int = 0,
         val readFromLang: Boolean = false,
         val defaultSelection: Int = 0,
 
@@ -27,13 +28,13 @@ class UIItemTextButtonList(
         val iconSpriteSheetIndices: IntArray? = null,
 
         // copied directly from UIItemTextButton
-        val activeCol: Color = Color.white,
+        val activeCol: Color = Color(0xffffff),
         val activeBackCol: Color = Color(0,0,0,0),
         val activeBackBlendMode: String = BlendMode.NORMAL,
         val highlightCol: Color = Color(0x00f8ff),
         val highlightBackCol: Color = Color(0xb0b0b0),
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
-        val inactiveCol: Color = Color(0xc8c8c8),
+        val inactiveCol: Color = Color(0xc0c0c0),
         val backgroundCol: Color = Color(0,0,0,0),
         val backgroundBlendMode: String = BlendMode.NORMAL,
         val kinematic: Boolean = false // more "kinetic" movement of selector
@@ -54,7 +55,7 @@ class UIItemTextButtonList(
             UIItemTextButton(
                     parentUI, s,
                     posX = 0,
-                    posY = (height / labelsList.size.minus(1).toFloat() * index).roundInt(),
+                    posY = verticalGutter + ((height - 2 * verticalGutter) / labelsList.size.minus(1).toFloat() * index).roundInt(),
                     width = width,
                     readFromLang = readFromLang,
                     activeCol = activeCol,
@@ -72,12 +73,16 @@ class UIItemTextButtonList(
             UIItemTextButton(
                     parentUI, s,
                     posX = 0,
-                    posY = (height / labelsList.size.minus(1).toFloat() * index).roundInt(),
+                    posY = verticalGutter + ((height - 2 * verticalGutter) / labelsList.size.minus(1).toFloat() * index).roundInt(),
                     width = width,
                     readFromLang = readFromLang,
-                    activeBackCol = Color(0,0,0,0),
-                    activeBackBlendMode = BlendMode.NORMAL,
-                    highlightBackCol = Color(0,0,0,0),
+                    activeCol = activeCol,
+                    activeBackCol = activeBackCol,
+                    activeBackBlendMode = activeBackBlendMode,
+                    highlightCol = highlightCol,
+                    highlightBackCol = activeBackCol, // we are using custom highlighter
+                    highlightBackBlendMode = activeBackBlendMode, // we are using custom highlighter
+                    inactiveCol = inactiveCol,
                     preGapX = pregap,
                     postGapX = postgap
             )
@@ -156,6 +161,8 @@ class UIItemTextButtonList(
                 )
             }
         }
+
+        g.color = backgroundCol
 
     }
 

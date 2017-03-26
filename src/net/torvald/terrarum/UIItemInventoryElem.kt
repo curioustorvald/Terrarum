@@ -23,10 +23,13 @@ class UIItemInventoryElem(
         var item: InventoryItem?,
         var amount: Int,
         var itemImage: Image?,
+        val mouseoverBackCol: Color = Color(0,0,0,0),
+        val mouseoverBackBlendMode: String = BlendMode.NORMAL,
         val backCol: Color = Color(0,0,0,0),
-        val backColBlendMode: String = BlendMode.NORMAL,
+        val backBlendMode: String = BlendMode.NORMAL,
         var quickslot: Int? = null,
-        var equippedSlot: Int? = null
+        var equippedSlot: Int? = null,
+        val drawBackOnNull: Boolean = true
 ) : UIItem(parentUI) {
 
     companion object {
@@ -38,7 +41,7 @@ class UIItemInventoryElem(
 
     private val imgOffset: Float
         get() = (this.height - itemImage!!.height).div(2).toFloat() // to snap to the pixel grid
-    private val textOffsetX = 52f
+    private val textOffsetX = 50f
     private val textOffsetY = 8f
 
 
@@ -55,17 +58,23 @@ class UIItemInventoryElem(
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        if (item != null && itemImage != null) {
-            g.font = Terrarum.fontGame
 
+        g.font = Terrarum.fontGame
 
+        if (item != null || drawBackOnNull) {
             if (mouseUp) {
-                BlendMode.resolve(backColBlendMode)
-                g.color = backCol
-                g.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+                BlendMode.resolve(mouseoverBackBlendMode)
+                g.color = mouseoverBackCol
             }
+            else {
+                BlendMode.resolve(backBlendMode)
+                g.color = backCol
+            }
+            g.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+        }
 
 
+        if (item != null && itemImage != null) {
             blendNormal()
 
             g.drawImage(itemImage!!, posX + imgOffset, posY + imgOffset)
@@ -80,7 +89,7 @@ class UIItemInventoryElem(
 
 
             // durability metre
-            val barFullLen = (width - 20f) - textOffsetX
+            val barFullLen = (width - 8f) - textOffsetX
             val barOffset = posX + textOffsetX
             if (item!!.maxDurability > 0.0) {
                 g.color = durabilityBack

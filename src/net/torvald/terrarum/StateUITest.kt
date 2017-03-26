@@ -25,10 +25,10 @@ class StateUITest : BasicGameState() {
     val inventory = ActorInventory()
 
     init {
-        ui = UIHandler(SimpleUI(inventory))
+        ui = UIHandler(SimpleUI(inventory, 800, Terrarum.HEIGHT - 160))
 
-        ui.posX = 50
-        ui.posY = 30
+        ui.posX = 0
+        ui.posY = 60
         ui.isVisible = true
 
 
@@ -83,15 +83,19 @@ class StateUITest : BasicGameState() {
 
 
 
-private class SimpleUI(val inventory: ActorInventory) : UICanvas {
-    override var width = 700
-    override var height = 480 // multiple of 40 (2 * font.lineHeight)
+private class SimpleUI(
+        val inventory: ActorInventory,
+        override var width: Int,
+        override var height: Int
+) : UICanvas {
     override var handler: UIHandler? = null
     override var openCloseTime: Int = UICanvas.OPENCLOSE_GENERIC
 
     val itemImagePlaceholder = Image("./assets/item_kari_24.tga")
 
     val catButtonsToCatIdent = HashMap<String, String>()
+
+    val backgroundColour = Color(0x1c1c1c)
 
     init {
         catButtonsToCatIdent.put("GAME_INVENTORY_WEAPONS", InventoryItem.Category.WEAPON)
@@ -109,7 +113,11 @@ private class SimpleUI(val inventory: ActorInventory) : UICanvas {
 
     }
 
-    val buttons = UIItemTextButtonList(
+    val itemStripGutterV = 6
+    val itemStripGutterH = 8
+    val itemInterColGutter = 8
+
+    val catButtons = UIItemTextButtonList(
             this,
             arrayOf(
                     "MENU_LABEL_ALL",
@@ -126,31 +134,35 @@ private class SimpleUI(val inventory: ActorInventory) : UICanvas {
             ),
             width = (width / 3 / 100) * 100, // chop to hundreds unit (100, 200, 300, ...) with the black magic of integer division
             height = height,
+            verticalGutter = itemStripGutterH,
             readFromLang = true,
             textAreaWidth = 100,
             defaultSelection = 0,
             iconSpriteSheet = SpriteSheet("./assets/graphics/gui/inventory/category.tga", 20, 20),
             iconSpriteSheetIndices = intArrayOf(9,0,1,2,3,4,5,6,7,8),
-            highlightBackCol = Color(0x202020),
+            highlightBackCol = backgroundColour screen Color(0x0c0c0c),
             highlightBackBlendMode = BlendMode.NORMAL,
             backgroundCol = Color(0x383838),
             kinematic = true
     )
 
-    val itemStripGutterV = 10
-    val itemStripGutterH = 48
-
-    val itemsStripWidth = width - buttons.width - 2 * itemStripGutterH
-    val items = Array(height / (UIItemInventoryElem.height + itemStripGutterV), { UIItemInventoryElem(
-            parentUI = this,
-            posX = buttons.width + itemStripGutterH,
-            posY = it * (UIItemInventoryElem.height + itemStripGutterV),
-            width = itemsStripWidth,
-            item = null,
-            amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
-            itemImage = null,
-            backCol = Color(255, 255, 255, 0x30)
-    ) })
+    val itemsStripWidth = ((width - catButtons.width) - (2 * itemStripGutterH + itemInterColGutter)) / 2
+    val items = Array(
+            2 + height / (UIItemInventoryElem.height + itemStripGutterV) * 2, {
+        UIItemInventoryElem(
+                parentUI = this,
+                posX = catButtons.width + if (it % 2 == 0) itemStripGutterH else (itemStripGutterH + itemsStripWidth + itemInterColGutter),
+                posY = itemStripGutterH + it / 2 * (UIItemInventoryElem.height + itemStripGutterV),
+                width = itemsStripWidth,
+                item = null,
+                amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
+                itemImage = null,
+                mouseoverBackCol = Color(0x282828),
+                mouseoverBackBlendMode = BlendMode.SCREEN,
+                drawBackOnNull = false
+                //backCol = Color(0x101010),
+                //backBlendMode = BlendMode.SCREEN
+        ) })
     val itemsScrollOffset = 0
 
     var inventorySortList = ArrayList<InventoryPair>()
@@ -159,19 +171,19 @@ private class SimpleUI(val inventory: ActorInventory) : UICanvas {
     private var oldCatSelect = -1
 
     override fun update(gc: GameContainer, delta: Int) {
-        Terrarum.gameLocale = "fiFI" // hot swap this to test
+        Terrarum.gameLocale = "koKR" // hot swap this to test
 
-        buttons.update(gc, delta)
+        catButtons.update(gc, delta)
 
 
         // monitor and check if category selection has been changed
-        if (oldCatSelect != buttons.selectedIndex) {
+        if (oldCatSelect != catButtons.selectedIndex) {
             rebuildList = true
         }
 
 
         if (rebuildList) {
-            val filter = catButtonsToCatIdent[buttons.selectedButton.labelText]
+            val filter = catButtonsToCatIdent[catButtons.selectedButton.labelText]
 
             inventorySortList = ArrayList<InventoryPair>()
 
@@ -207,14 +219,14 @@ private class SimpleUI(val inventory: ActorInventory) : UICanvas {
         }
 
 
-        oldCatSelect = buttons.selectedIndex
+        oldCatSelect = catButtons.selectedIndex
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        g.color = Color(0x202020)
+        g.color = backgroundColour
         g.fillRect(0f, 0f, width.toFloat(), height.toFloat())
 
-        buttons.render(gc, g)
+        catButtons.render(gc, g)
 
 
         items.forEach {
