@@ -10,7 +10,7 @@ import org.newdawn.slick.Graphics
 /**
  * Created by minjaesong on 16-03-05.
  */
-class PhysTestBall : ActorWithSprite(ActorOrder.MIDDLE, immobileBody = true) {
+class PhysTestBall : ActorWithSprite(Actor.RenderOrder.MIDDLE, immobileBody = true) {
 
     private var color = Color.orange
 

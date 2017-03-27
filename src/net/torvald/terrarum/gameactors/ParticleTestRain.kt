@@ -6,7 +6,7 @@ import org.newdawn.slick.Image
 /**
  * Created by minjaesong on 2017-01-20.
  */
-class ParticleTestRain(posX: Double, posY: Double) : ParticleBase(ActorOrder.BEHIND, 6000) {
+class ParticleTestRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOrder.BEHIND, 6000) {
 
     init {
         body = Image("./assets/graphics/weathers/raindrop.tga")

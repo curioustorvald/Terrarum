@@ -28,7 +28,7 @@ class UIItemTextButtonList(
         val iconSpriteSheetIndices: IntArray? = null,
 
         // copied directly from UIItemTextButton
-        val activeCol: Color = Color(0xffffff),
+        val activeCol: Color = Color(0xfff066),
         val activeBackCol: Color = Color(0,0,0,0),
         val activeBackBlendMode: String = BlendMode.NORMAL,
         val highlightCol: Color = Color(0x00f8ff),

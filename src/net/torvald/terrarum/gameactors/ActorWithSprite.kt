@@ -26,11 +26,10 @@ import java.util.*
  *
  * Created by minjaesong on 16-01-13.
  */
-open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = false, physics: Boolean = true) : ActorVisible(renderOrder) {
+open class ActorWithSprite(renderOrder: RenderOrder, val immobileBody: Boolean = false, physics: Boolean = true) : ActorVisible(renderOrder) {
 
     /** !! ActorValue macros are on the very bottom of the source !! **/
 
-    override var actorValue: ActorValue = ActorValue()
 
     @Transient internal var sprite: SpriteAnimation? = null
     @Transient internal var spriteGlow: SpriteAnimation? = null
@@ -162,7 +161,6 @@ open class ActorWithSprite(renderOrder: ActorOrder, val immobileBody: Boolean = 
 
 
     @Volatile var grounded = false
-    override @Volatile var flagDespawn = false
     /** Default to 'true'  */
     var isVisible = true
     /** Default to 'true'  */

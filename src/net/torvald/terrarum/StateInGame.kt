@@ -689,19 +689,19 @@ class StateInGame : BasicGameState() {
             // which means we don't need to check if i >= 0 again
             if (actor is ActorVisible) {
                 when (actor.renderOrder) {
-                    ActorOrder.BEHIND -> {
+                    Actor.RenderOrder.BEHIND -> {
                         val i = actorsRenderBehind.binarySearch(actor.referenceID)
                         actorsRenderBehind.removeAt(i)
                     }
-                    ActorOrder.MIDDLE -> {
+                    Actor.RenderOrder.MIDDLE -> {
                         val i = actorsRenderMiddle.binarySearch(actor.referenceID)
                         actorsRenderMiddle.removeAt(i)
                     }
-                    ActorOrder.MIDTOP -> {
+                    Actor.RenderOrder.MIDTOP -> {
                         val i = actorsRenderMidTop.binarySearch(actor.referenceID)
                         actorsRenderMidTop.removeAt(i)
                     }
-                    ActorOrder.FRONT  -> {
+                    Actor.RenderOrder.FRONT  -> {
                         val i = actorsRenderFront.binarySearch(actor.referenceID)
                         actorsRenderFront.removeAt(i)
                     }
@@ -723,16 +723,16 @@ class StateInGame : BasicGameState() {
 
             if (actor is ActorVisible) {
                 when (actor.renderOrder) {
-                    ActorOrder.BEHIND -> {
+                    Actor.RenderOrder.BEHIND -> {
                         actorsRenderBehind.add(actor); insertionSortLastElemAV(actorsRenderBehind)
                     }
-                    ActorOrder.MIDDLE -> {
+                    Actor.RenderOrder.MIDDLE -> {
                         actorsRenderMiddle.add(actor); insertionSortLastElemAV(actorsRenderMiddle)
                     }
-                    ActorOrder.MIDTOP -> {
+                    Actor.RenderOrder.MIDTOP -> {
                         actorsRenderMidTop.add(actor); insertionSortLastElemAV(actorsRenderMidTop)
                     }
-                    ActorOrder.FRONT  -> {
+                    Actor.RenderOrder.FRONT  -> {
                         actorsRenderFront.add(actor); insertionSortLastElemAV(actorsRenderFront)
                     }
                 }
@@ -754,16 +754,16 @@ class StateInGame : BasicGameState() {
 
             if (actor is ActorVisible) {
                 when (actor.renderOrder) {
-                    ActorOrder.BEHIND -> {
+                    Actor.RenderOrder.BEHIND -> {
                         actorsRenderBehind.add(actor); insertionSortLastElemAV(actorsRenderBehind)
                     }
-                    ActorOrder.MIDDLE -> {
+                    Actor.RenderOrder.MIDDLE -> {
                         actorsRenderMiddle.add(actor); insertionSortLastElemAV(actorsRenderMiddle)
                     }
-                    ActorOrder.MIDTOP -> {
+                    Actor.RenderOrder.MIDTOP -> {
                         actorsRenderMidTop.add(actor); insertionSortLastElemAV(actorsRenderMidTop)
                     }
-                    ActorOrder.FRONT  -> {
+                    Actor.RenderOrder.FRONT  -> {
                         actorsRenderFront.add(actor); insertionSortLastElemAV(actorsRenderFront)
                     }
                 }
