@@ -33,13 +33,10 @@ typealias Millisec = Int
  */
 object Terrarum : StateBasedGame(GAME_NAME) {
 
-
-    val sysLang: String
-        get() {
-            val lan = System.getProperty("user.language")
-            val country = System.getProperty("user.country")
-            return lan + country
-        }
+    //////////////////////////////
+    // GLOBAL IMMUTABLE CONFIGS //
+    //////////////////////////////
+    val QUICKSLOT_MAX = 10
 
     /**
      * To be used with physics simulator
@@ -54,6 +51,19 @@ object Terrarum : StateBasedGame(GAME_NAME) {
      * Must choose a value so that (1000 / VAL) is still integer
      */
     val TARGET_INTERNAL_FPS = 100
+
+
+
+
+
+
+    val sysLang: String
+        get() {
+            val lan = System.getProperty("user.language")
+            val country = System.getProperty("user.country")
+            return lan + country
+        }
+
 
     lateinit var appgc: AppGameContainer
 
@@ -89,7 +99,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
     val memXmx: Long
         get() = Runtime.getRuntime().maxMemory() shr 20
 
-    lateinit var environment: RunningEnvironment
+    val environment: RunningEnvironment
 
     private val localeSimple = arrayOf("de", "en", "es", "it")
     var gameLocale = "####" // lateinit placeholder
@@ -228,15 +238,15 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         val readFromDisk = readConfigJson()
         if (!readFromDisk) readConfigJson()
 
-        try {
+        environment = try {
             Controllers.getController(0)
-            environment = if (getConfigString("pcgamepadenv") == "console")
+            if (getConfigString("pcgamepadenv") == "console")
                 RunningEnvironment.CONSOLE
             else
                 RunningEnvironment.PC
         }
         catch (e: IndexOutOfBoundsException) {
-            environment = RunningEnvironment.PC
+            RunningEnvironment.PC
         }
     }
 

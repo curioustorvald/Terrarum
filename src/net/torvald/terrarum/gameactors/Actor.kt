@@ -7,11 +7,18 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import org.newdawn.slick.GameContainer
 
 /**
- * @param renderOrder invisible/technical -> ActorOrder.MIDDLE
+ * @param renderOrder invisible/technical must use "Actor.RenderOrder.MIDDLE"
  *
  * Created by minjaesong on 15-12-31.
  */
-abstract class Actor(val renderOrder: ActorOrder) : Comparable<Actor>, Runnable {
+abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable {
+
+    enum class RenderOrder {
+        BEHIND, // tapestries, some particles (obstructed by terrain)
+        MIDDLE, // actors
+        MIDTOP, // bullets, thrown items
+        FRONT   // fake tiles
+    }
 
     abstract fun update(gc: GameContainer, delta: Int)
 
@@ -20,8 +27,8 @@ abstract class Actor(val renderOrder: ActorOrder) : Comparable<Actor>, Runnable 
      * @return Reference ID. (16777216-0x7FFF_FFFF)
      */
     open var referenceID: Int = generateUniqueReferenceID()
-    abstract var actorValue: ActorValue
-    abstract var flagDespawn: Boolean
+    var actorValue = ActorValue()
+    @Volatile var flagDespawn = false
 
     override fun equals(other: Any?) = referenceID == (other as Actor).referenceID
     override fun hashCode() = referenceID
@@ -40,34 +47,32 @@ abstract class Actor(val renderOrder: ActorOrder) : Comparable<Actor>, Runnable 
      * override var referenceID: Int = generateUniqueReferenceID()
      */
     fun generateUniqueReferenceID(): Int {
-        fun checkForCollision(value: Int) =
-                Terrarum.ingame!!.theGameHasActor(value) ||
-                value < ItemCodex.ITEM_COUNT_MAX ||
-                value < when (renderOrder) {
-                    ActorOrder.BEHIND -> ItemCodex.ITEM_COUNT_MAX
-                    ActorOrder.MIDDLE -> 0x10000000
-                    ActorOrder.MIDTOP -> 0x60000000
-                    ActorOrder.FRONT  -> 0x70000000
-                } ||
-                value > when (renderOrder) {
-                    ActorOrder.BEHIND -> 0x0FFFFFFF
-                    ActorOrder.MIDDLE -> 0x5FFFFFFF
-                    ActorOrder.MIDTOP -> 0x6FFFFFFF
-                    ActorOrder.FRONT  -> 0x7FFFFFFF
+        fun hasCollision(value: Int) =
+                try {
+                    Terrarum.ingame!!.theGameHasActor(value) ||
+                    value < ItemCodex.ITEM_COUNT_MAX ||
+                    value < when (renderOrder) {
+                        RenderOrder.BEHIND -> ItemCodex.ITEM_COUNT_MAX
+                        RenderOrder.MIDDLE -> 0x10000000
+                        RenderOrder.MIDTOP -> 0x60000000
+                        RenderOrder.FRONT  -> 0x70000000
+                    } ||
+                    value > when (renderOrder) {
+                        RenderOrder.BEHIND -> 0x0FFFFFFF
+                        RenderOrder.MIDDLE -> 0x5FFFFFFF
+                        RenderOrder.MIDTOP -> 0x6FFFFFFF
+                        RenderOrder.FRONT  -> 0x7FFFFFFF
+                    }
+                }
+                catch (gameNotInitialisedException: KotlinNullPointerException) {
+                    false
                 }
 
         var ret: Int
         do {
             ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
-        } while (checkForCollision(ret)) // check for collision
+        } while (hasCollision(ret)) // check for collision
         return ret
     }
 
-}
-
-enum class ActorOrder {
-    BEHIND, // tapestries, some particles (obstructed by terrain)
-    MIDDLE, // actors
-    MIDTOP, // bullets, thrown items
-    FRONT   // fake tiles
 }

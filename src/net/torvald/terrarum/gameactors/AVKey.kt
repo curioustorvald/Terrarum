@@ -88,6 +88,7 @@ object AVKey {
 
 
     const val __PLAYER_QUICKSLOTSEL = "__quickslotselection"
-    /** Item ID; they are supposed to be unique */
-    const val __PLAYER_QSPREFIX = "__qsitem" // __qsitem1 .. __qsitem10
+    /**  SYNOPSIS: __qsitem1 .. __qsitem10
+     * contains tem ID; they are supposed to be unique. Indices must be ONE-BASED! */
+    const val __PLAYER_QSPREFIX = "__qsitem" // __qsitem1 .. __qsitem10 (NOT ZERO BASED!)
 }

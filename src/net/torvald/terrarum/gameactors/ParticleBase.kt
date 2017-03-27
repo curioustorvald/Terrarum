@@ -15,7 +15,7 @@ import org.newdawn.slick.Image
  *
  * Created by minjaesong on 2017-01-20.
  */
-open class ParticleBase(renderOrder: ActorOrder, maxLifeTime: Int? = null) : Runnable {
+open class ParticleBase(renderOrder: Actor.RenderOrder, maxLifeTime: Int? = null) : Runnable {
 
     /** Will NOT actually delete from the CircularArray */
     @Volatile var flagDespawn = false

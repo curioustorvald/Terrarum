@@ -23,6 +23,7 @@ class UIItemInventoryElem(
         var item: InventoryItem?,
         var amount: Int,
         var itemImage: Image?,
+        val mouseOverTextCol: Color = Color(0xfff066),
         val mouseoverBackCol: Color = Color(0,0,0,0),
         val mouseoverBackBlendMode: String = BlendMode.NORMAL,
         val backCol: Color = Color(0,0,0,0),
@@ -80,7 +81,7 @@ class UIItemInventoryElem(
             g.drawImage(itemImage!!, posX + imgOffset, posY + imgOffset)
 
             // if mouse is over, text lights up
-            g.color = item!!.nameColour * if (mouseUp) Color(0xffffff) else UIItemTextButton.defaultInactiveCol
+            g.color = item!!.nameColour * if (mouseUp) mouseOverTextCol else UIItemTextButton.defaultInactiveCol
             g.drawString(
                     item!!.name + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "")
                     , posX + textOffsetX
