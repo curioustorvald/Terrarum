@@ -88,21 +88,25 @@ end
 
 io.read = function(option)
     if io.__openfile__ == "stdin" then
-        local input = ""
-        local inkey = null -- local variable init REQUIRED!
+        local input = {}
 
         -- RETURN not hit
-        while inkey ~= 13 do
-            inkey = machine.__readFromStdin()
-            if inkey > 0 then
+        while true do
+            local inkey = machine.__readFromStdin()
+            if inkey == 13 or inkey == 10 then
+                break
+            elseif inkey == 8 or inkey == 127 then
                 io.write(string.char(inkey))
-                input = input..string.char(inkey)
+                table.remove(input)
+            elseif inkey > 0 then
+                io.write(string.char(inkey))
+                table.insert(input, string.char(inkey))
             end
         end
         -- RETURN finally hit
         io.write("\n")
 
-        return input
+        return table.concat(input)
     end
 
     function _readAll()
