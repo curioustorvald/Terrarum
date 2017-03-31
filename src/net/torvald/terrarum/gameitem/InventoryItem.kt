@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameitem
 
 import net.torvald.terrarum.ItemValue
+import net.torvald.terrarum.gameactors.Pocketed
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.Color
@@ -91,7 +92,8 @@ abstract class InventoryItem : Comparable<InventoryItem> {
      * Set to zero if durability not applicable
      */
     open var maxDurability: Double = 0.0
-    open var durability: Double = maxDurability
+
+    open var durability: Double = 0.0
 
     /**
      * Effects applied continuously while in pocket
@@ -151,6 +153,17 @@ abstract class InventoryItem : Comparable<InventoryItem> {
     override fun compareTo(other: InventoryItem): Int = (this.id - other.id).sign()
 
     fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else 0
+
+    infix fun equipTo(actor: Pocketed) {
+        if (equipPosition == EquipPosition.NULL)
+            throw IllegalArgumentException("Item is not supposed to be equipped (equipPosition is NULL")
+
+        if (!actor.inventory.hasItem(this.id)) {
+            actor.inventory.add(this)
+        }
+
+        actor.itemEquipped[this.equipPosition] = this
+    }
 
     object EquipPosition {
         const val NULL = -1

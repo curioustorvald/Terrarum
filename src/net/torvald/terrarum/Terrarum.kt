@@ -36,6 +36,17 @@ object Terrarum : StateBasedGame(GAME_NAME) {
     //////////////////////////////
     // GLOBAL IMMUTABLE CONFIGS //
     //////////////////////////////
+    var WIDTH = 1072
+    var HEIGHT = 742 // IMAX ratio
+
+    var VSYNC = true
+    val VSYNC_TRIGGER_THRESHOLD = 56
+
+    val HALFW: Int
+        get() = WIDTH.ushr(1)
+    val HALFH: Int
+        get() = HEIGHT.ushr(1)
+
     val QUICKSLOT_MAX = 10
 
     /**
@@ -67,15 +78,6 @@ object Terrarum : StateBasedGame(GAME_NAME) {
 
     lateinit var appgc: AppGameContainer
 
-    var WIDTH = 1072
-    var HEIGHT = 742 // IMAX ratio
-    var VSYNC = true
-    val VSYNC_TRIGGER_THRESHOLD = 56
-    val HALFW: Int
-        get() = WIDTH.ushr(1)
-    val HALFH: Int
-        get() = HEIGHT.ushr(1)
-
     var gameStarted = false
 
     var ingame: StateInGame? = null
@@ -102,33 +104,28 @@ object Terrarum : StateBasedGame(GAME_NAME) {
     val environment: RunningEnvironment
 
     private val localeSimple = arrayOf("de", "en", "es", "it")
-    var gameLocale = "####" // lateinit placeholder
+    var gameLocale = "lateinit"
         set(value) {
             if (localeSimple.contains(value.substring(0..1)))
                 field = value.substring(0..1)
             else
                 field = value
 
-            if (fontGame != null) (fontGame as GameFontImpl).reload()
+            (fontGame as GameFontImpl).reload()
         }
 
-    var fontGame: Font = object : Font {
+    private val nullFont = object : Font {
         override fun getHeight(str: String?) = 0
         override fun drawString(x: Float, y: Float, text: String?) {}
         override fun drawString(x: Float, y: Float, text: String?, col: Color?) {}
         override fun drawString(x: Float, y: Float, text: String?, col: Color?, startIndex: Int, endIndex: Int) {}
         override fun getWidth(str: String?) = 0
         override fun getLineHeight() = 0
-    } // null font
+    }
+
+    var fontGame: Font = nullFont
         private set
-    var fontSmallNumbers: Font = object : Font {
-        override fun getHeight(str: String?) = 0
-        override fun drawString(x: Float, y: Float, text: String?) {}
-        override fun drawString(x: Float, y: Float, text: String?, col: Color?) {}
-        override fun drawString(x: Float, y: Float, text: String?, col: Color?, startIndex: Int, endIndex: Int) {}
-        override fun getWidth(str: String?) = 0
-        override fun getLineHeight() = 0
-    } // null font
+    var fontSmallNumbers: Font = nullFont
         private set
 
     var joypadLabelStart: Char = 0xE000.toChar() // lateinit
@@ -306,7 +303,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
 
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
-        //addState(StateVTTest())
+        addState(StateVTTest())
         //addState(StateGraphicComputerTest())
         //addState(StateTestingLightning())
         //addState(StateSplash())
@@ -316,7 +313,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         //addState(StateBlurTest())
         //addState(StateShaderTest())
         //addState(StateNoiseTester())
-        addState(StateUITest())
+        //addState(StateUITest())
         //addState(StateControllerRumbleTest())
         //addState(StateMidiInputTest())
         //addState(StateNewRunesTest())
@@ -652,3 +649,5 @@ operator fun Color.minus(other: Color) = Color(
     this.b - other.b,
     this.a - other.a
 )
+
+fun Int.toHex() = Integer.toHexString(this)
