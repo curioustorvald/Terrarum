@@ -83,7 +83,8 @@ class UIItemInventoryElem(
             // if mouse is over, text lights up
             g.color = item!!.nameColour * if (mouseUp) mouseOverTextCol else UIItemTextButton.defaultInactiveCol
             g.drawString(
-                    item!!.name + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "")
+                    item!!.name + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "") +
+                    (if (equippedSlot != null) "  <eq $equippedSlot>" else "")
                     , posX + textOffsetX
                     , posY + textOffsetY
             )

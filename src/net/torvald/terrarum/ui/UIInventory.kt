@@ -142,12 +142,23 @@ class UIInventory(
 
                     // set quickslot number
                     for (qs in 1..QUICKSLOT_MAX) {
-                        if (sortListItem.item.id == actorValue.getAsInt(AVKey.__PLAYER_QSPREFIX + qs)) {
+                        if (-sortListItem.item.id == actorValue.getAsInt(AVKey.__PLAYER_QSPREFIX + qs)) {
                             items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                             break
                         }
                         else
                             items[k].quickslot = null
+                    }
+
+                    for (eq in 0..actor.itemEquipped.size - 1) {
+                        if (eq < actor.itemEquipped.size) {
+                            if (actor.itemEquipped[eq] == items[k].item) {
+                                items[k].equippedSlot = eq
+                                break
+                            }
+                            else
+                                items[k].equippedSlot = null
+                        }
                     }
                 }
                 catch (e: IndexOutOfBoundsException) {
