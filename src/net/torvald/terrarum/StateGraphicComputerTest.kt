@@ -36,7 +36,7 @@ class StateGraphicComputerTest : BasicGameState() {
     }
 
     override fun init(container: GameContainer?, game: StateBasedGame?) {
-        val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram
+        /*val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram
 
         // it's a-me, Mario!
         (0..3).forEach {
@@ -84,7 +84,7 @@ class StateGraphicComputerTest : BasicGameState() {
                 0,1,1,1,0,0,0,0,
                 0,0,2,2,2,0,0,0,
                 0,0,2,2,2,2,0,0
-        ))
+        ))*/
     }
 
     var angle = 0.0
@@ -99,7 +99,7 @@ class StateGraphicComputerTest : BasicGameState() {
         computer.update(container, delta)
 
 
-        val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram
+        /*val vcard = (computer.getPeripheral("ppu") as PeripheralVideoCard).vram
         val sprites = vcard.sprites
         angle += delta / 1000.0
 
@@ -114,7 +114,7 @@ class StateGraphicComputerTest : BasicGameState() {
         sprites[2].posY = (Math.sin(angle) * 0  + 100).roundInt()
 
         sprites[3].posX = (Math.cos(angle) * 80 + 100).roundInt()
-        sprites[3].posY = (Math.sin(angle) * 0  + 100).roundInt()
+        sprites[3].posY = (Math.sin(angle) * 0  + 100).roundInt()*/
     }
 
     override fun getID() = Terrarum.STATE_ID_TEST_TTY

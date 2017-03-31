@@ -20,8 +20,8 @@ import org.newdawn.slick.state.StateBasedGame
 class StateVTTest : BasicGameState() {
 
     // HiRes: 100x64, LoRes: 80x25
-    val computerInside = TerrarumComputer(8)
-    val vt = SimpleTextTerminal(SimpleTextTerminal.AMETHYST_NOVELTY, 80, 25,
+    val computerInside = TerrarumComputer(peripheralSlots = 8)
+    val vt = SimpleTextTerminal(SimpleTextTerminal.AMBER, 80, 25,
             computerInside, colour = false, hires = false)
 
 

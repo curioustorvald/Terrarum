@@ -25,8 +25,6 @@ interface Terminal : Teletype {
     var backColour: Int
     var foreColour: Int
 
-    var lastInputByte: Int
-
     // to be used in UI
     override val displayW: Int
     val displayH: Int
@@ -65,17 +63,4 @@ interface Terminal : Teletype {
     fun emitTone(duration: Millisec, freq: Double)
 
     override fun bell(pattern: String)
-    /** Requires keyPressed() event to be processed.
-     *
-     *  null indicates the input stream is waiting for an input
-     *
-     *  implementation:
-     *
-     *  private var lastInputByte: Int? = null
-     *  override fun keyPressed(key: Int, c: Char) {
-            lastInputByte = c.toInt()
-            lastInputByte = null
-        }
-     */
-    fun getKeyPress(): Int?
 }

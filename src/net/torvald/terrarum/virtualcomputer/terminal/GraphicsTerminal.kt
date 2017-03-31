@@ -37,8 +37,6 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
     private val colourKey: Int
         get() = backColour.shl(4) or (foreColour).and(0xFF)
 
-    override var lastInputByte = -1
-
     override fun getColor(index: Int) = videoCard.CLUT[index]
 
     override val displayW: Int; get() = videoCard.width //+ 2 * borderSize
@@ -270,11 +268,6 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
                 else -> throw IllegalArgumentException("Unacceptable pattern: $c (from '$pattern')")
             }
         }
-    }
-
-    override fun getKeyPress(): Int? {
-        //TODO("not implemented")
-        return null
     }
 
     companion object {
