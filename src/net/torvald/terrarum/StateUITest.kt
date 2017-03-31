@@ -72,6 +72,8 @@ class StateUITest : BasicGameState() {
         })
 
         actor.inventory.add(ItemCodex[16], 543)
+
+        actor.inventory.getByID(Tile.STONE)!!.item equipTo actor
     }
 
     override fun init(container: GameContainer?, game: StateBasedGame?) {

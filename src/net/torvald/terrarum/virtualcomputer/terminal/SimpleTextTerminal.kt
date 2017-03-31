@@ -30,7 +30,7 @@ open class SimpleTextTerminal(
      * Terminals must support AT LEAST 4 colours.
      * Color index 0 must be default background, index 3 must be default foreground
      */
-    open protected val colours = if (colour) CLUT else CLUT.copyOfRange(0, 3)
+    open protected val colours = if (colour) CLUT else CLUT.copyOfRange(0, 4)
 
     val phosphor = if (colour) WHITE7500 else phosphorColour
     open val colourScreen = if (colour) Color(8, 8, 8) else Color(19, 19, 19)
@@ -339,25 +339,9 @@ open class SimpleTextTerminal(
         }
     }
 
-    override var lastInputByte: Int = -1
-    var sb: StringBuilder = StringBuilder()
-    private var inputOpen = false
-    private var keyPressVisible = false
-
     override fun keyPressed(key: Int, c: Char) {
-        lastInputByte = c.toInt()
-
-        if (inputOpen) {
-            if (c == ASCII_CR)
-                printChar(ASCII_LF)
-            else if (keyPressVisible)
-                printChar(c)
-            if (!asciiControlInUse.contains(c)) sb.append(c)
-            else if (key == Key.BACKSPACE && sb.isNotEmpty()) sb.deleteCharAt(sb.length - 1)
-        }
+        host.keyPressed(key, c)
     }
-
-    override fun getKeyPress(): Int? = lastInputByte
 
     private fun isOOB(x: Int, y: Int) =
             (x < 0 || y < 0 || x >= width || y >= height)

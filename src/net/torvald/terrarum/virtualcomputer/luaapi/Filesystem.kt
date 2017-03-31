@@ -5,6 +5,7 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.toHex
 import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import net.torvald.terrarum.virtualcomputer.luaapi.Term.Companion.checkIBM437
 import java.io.*
@@ -87,7 +88,7 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
         // Worst-case: we're on Windows or using a FAT32 partition mounted in *nix.
         // Note: we allow / as the path separator and expect all \s to be converted
         // accordingly before the path is passed to the file system.
-        private val invalidChars = Regex("""[\\:*?"<>|]""") // original OC uses Set(); we use regex
+        private val invalidChars = Regex("""[<>:"|?*\u0000-\u001F]""") // original OC uses Set(); we use regex
 
         fun isValidFilename(name: String) = !name.contains(invalidChars)
 
@@ -117,15 +118,23 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
             // remove first '/' in path
             var path = luapath.checkIBM437().validatePath()
             if (path.startsWith('/')) path = path.substring(1)
-            
+
+            val finalPath: String
+
             if (path.startsWith("media/")) {
                 val device = path.substring(6, 9)
                 val subPath = path.substring(9)
-                return computerDir + this.computerValue.getAsString("device") + subPath
+                finalPath = computerDir + this.computerValue.getAsString("device") + subPath
             }
             else {
-                return computerDir + this.computerValue.getAsString("boot") + "/" + path
+                finalPath = computerDir + this.computerValue.getAsString("boot") + "/" + path
             }
+
+            // remove trailing slash
+            return if (finalPath.endsWith("\\") || finalPath.endsWith("/"))
+                finalPath.substring(0, finalPath.length - 1)
+            else
+                finalPath
         }
 
         fun combinePath(base: String, local: String) : String {
@@ -166,7 +175,7 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
     class IsDirectory(val computer: TerrarumComputer) : OneArgFunction() {
         override fun call(path: LuaValue) : LuaValue {
             Filesystem.ensurePathSanity(path)
-
+            
             val isDir = Files.isDirectory(Paths.get(computer.getRealPath(path)).toAbsolutePath())
             val exists = Files.exists(Paths.get(computer.getRealPath(path)).toAbsolutePath())
 
