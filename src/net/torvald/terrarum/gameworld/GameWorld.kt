@@ -50,7 +50,11 @@ constructor(//properties
         terrainDamage = PairedMapLayer(width, height)
         wallDamage = PairedMapLayer(width, height)
 
-        time = WorldTime()
+        time = WorldTime(
+                71 * WorldTime.DAY_LENGTH +
+                7 * WorldTime.HOUR_SEC +
+                30L * WorldTime.MINUTE_SEC
+        )
     }
 
     /**

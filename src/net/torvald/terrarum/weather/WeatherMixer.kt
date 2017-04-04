@@ -91,7 +91,7 @@ object WeatherMixer {
                 )
                 Terrarum.ingame!!.addParticle(rainParticle)
             }
-            globalLightNow.set(getGlobalLightOfTime(world.time.elapsedSeconds).darker(0.3f))
+            globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).darker(0.3f))
         }
     }
 
@@ -105,7 +105,7 @@ object WeatherMixer {
     fun render(g: Graphics) {
 
         // we will not care for nextSkybox for now
-        val timeNow = Terrarum.ingame!!.world.time.elapsedSeconds
+        val timeNow = Terrarum.ingame!!.world.time.todaySeconds
         val skyboxColourMap = currentWeather.skyboxGradColourMap
         val lightColourMap = currentWeather.globalLightColourMap
 
