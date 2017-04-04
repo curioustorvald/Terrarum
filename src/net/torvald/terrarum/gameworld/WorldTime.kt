@@ -3,7 +3,8 @@ package net.torvald.terrarum.gameworld
 import net.torvald.terrarum.gameactors.GameDate
 
 /**
- * The World Calendar implementation of Dwarven Calendar (we're talking about DF!)
+ * The World Calendar implementation of Dwarven Calendar (we're talking about DF!),
+ *   except the year begins with Mondag instead of Sundag
  *
  * Please see:
  *      https://en.wikipedia.org/wiki/World_Calendar
@@ -12,35 +13,89 @@ import net.torvald.terrarum.gameactors.GameDate
  * Normal format for day is
  *      Tysdag 12th Granite
  *
- * And there is no AM/PM concept, 22-hour clock is forced.
+ * And there is no AM/PM concept, 22-hour clock is forced; no leap years.
+ *
+ *
+ *  Calendar
+ *
+ * |Mo|Ty|Mi|To|Fr|La|Su|Ve|
+ * |--|--|--|--|--|--|--|--|
+ * | 1| 2| 3| 4| 5| 6| 7|  |
+ * | 8| 9|10|11|12|13|14|  |
+ * |15|16|17|18|19|20|21|  |
+ * |22|23|24|25|26|27|28|  |
+ * |29|30|31| 1| 2| 3| 4|  |
+ * | 5| 6| 7| 8| 9|10|11|  |
+ * |12|13|14|15|16|17|18|  |
+ * |19|20|21|22|23|24|25|  |
+ * |26|27|28|29|30| 1| 2|  |
+ * | 3| 4| 5| 6| 7| 8| 9|  |
+ * |10|11|12|13|14|15|16|  |
+ * |17|18|19|20|21|22|23|  |
+ * |24|25|26|27|28|29|30|31|
+ *
+ *
+ *
  *
  * Created by minjaesong on 16-01-24.
  */
-class WorldTime {
-    internal var TIME_T = 0L // TODO use it! Epoch: Year 125, 1st Granite, 0h00:00
+class WorldTime(initTime: Long = 0L) {
+    var TIME_T = 0L // Epoch: Year 125, 1st Opal, 0h00:00 (Mondag) // 125-01-01
+        private set
 
-    internal var seconds: Int // 0 - 59
-    internal var minutes: Int // 0 - 59
-    internal var hours: Int // 0 - 21
+    init {
+        TIME_T = initTime
+    }
 
-    // days on the year
-    internal var yearlyDays: Int //NOT a calendar day
+    val seconds: Int // 0 - 59
+        get() = TIME_T.toPositiveInt() % MINUTE_SEC
+    val minutes: Int // 0 - 59
+        get() = TIME_T.div(MINUTE_SEC).abs().toInt() % HOUR_MIN
+    val hours: Int // 0 - 21
+        get() = TIME_T.div(HOUR_SEC).abs().toInt() % HOURS_PER_DAY
 
-    internal var days: Int // 1 - 31
-    internal var months: Int // 1 - 12
-    internal var years: Int // 1+
+    val yearlyDays: Int // 0 - 364
+        get() = (TIME_T.toPositiveInt().div(DAY_LENGTH) % YEAR_DAYS)
 
-    internal var dayOfWeek: Int //0: Mondag-The first day of weekday (0 - 7)
+    val days: Int // 1 - 31
+        get() = quarterlyDays + 1 -
+                if (quarterlyMonthOffset == 0)      0
+                else if (quarterlyMonthOffset == 1) 31
+                else                                61
+    val months: Int // 1 - 12
+        get() = if (yearlyDays == YEAR_DAYS - 1) 12 else
+            quarter * 3 + 1 +
+            if (quarterlyDays < 31)      0
+            else if (quarterlyDays < 61) 1
+            else                         2
+    val years: Int
+        get() = TIME_T.div(YEAR_DAYS * DAY_LENGTH).abs().toInt() + EPOCH_YEAR
 
-    internal var timeDelta = 1
+    val quarter: Int // 0 - 3
+        get() = if (yearlyDays == YEAR_DAYS - 1) 3 else yearlyDays / QUARTER_LENGTH
+    val quarterlyDays: Int // 0 - 90(91)
+        get() = if (yearlyDays == YEAR_DAYS - 1) 91 else (yearlyDays % QUARTER_LENGTH)
+    val quarterlyMonthOffset: Int // 0 - 2
+        get() = months.minus(1) % 3
 
-    @Transient private var realMillisec: Int
+    val dayOfWeek: Int //0: Mondag-The first day of weekday (0 - 7)
+        get() = if (yearlyDays == YEAR_DAYS - 1) 7 else yearlyDays % 7
+
+    var timeDelta: Int = 1
+        set(value) {
+            field = if (value < 0) 0 else value
+        }
+
+    @Transient private var realMillisec: Double = 0.0
+    @Transient private val REAL_SEC_TO_GAME_SECS = 60
 
     val DAY_NAMES = arrayOf(//daynames are taken from Nynorsk (å -> o)
             "Mondag", "Tysdag", "Midvikdag" //From Islenska Miðvikudagur
-            , "Torsdag", "Fredag", "Laurdag", "Sundag", "Verdag" //From Norsk word 'verd'
+            , "Torsdag", "Fredag", "Laurdag", "Sundag", "Verddag" //From Norsk word 'verd'
     )
     val DAY_NAMES_SHORT = arrayOf("Mon", "Tys", "Mid", "Tor", "Fre", "Lau", "Sun", "Ver")
+
+    // FIXME   Next to Granite is Felsite
 
     val MONTH_NAMES = arrayOf(
             "Opal", "Obsidian", "Granite", "Slate", "Felsite", "Hematite",
@@ -52,8 +107,6 @@ class WorldTime {
     val currentTimeAsGameDate: GameDate
         get() = GameDate(years, yearlyDays)
 
-    @Transient val REAL_SEC_IN_MILLI = 1000
-
     companion object {
         /** Each day is 22-hour long */
         val DAY_LENGTH = 79200 //must be the multiple of 3600
@@ -62,8 +115,12 @@ class WorldTime {
         val MINUTE_SEC: Int = 60
         val HOUR_MIN: Int = 60
         val GAME_MIN_TO_REAL_SEC: Float = 60f
+        val HOURS_PER_DAY = DAY_LENGTH / HOUR_SEC
 
         val YEAR_DAYS: Int = 365
+        val QUARTER_LENGTH = 91 // as per The World Calendar
+
+        val EPOCH_YEAR = 125
 
         fun parseTime(s: String): Int =
                 if (s.length >= 4 && s.contains('h')) {
@@ -78,111 +135,37 @@ class WorldTime {
                 }
     }
 
-    init {
-        seconds = 0
-        minutes = 30
-        hours = 8
-        yearlyDays = 73
-        days = 12
-        months = 3
-        years = 125
-        dayOfWeek = 1 // Tysdag
-        realMillisec = 0
-    }
-
     fun update(delta: Int) {
-        val oldsec = seconds
-
         //time
-        realMillisec += delta * timeDelta
-        val newsec = Math.round(GAME_MIN_TO_REAL_SEC.toFloat() / REAL_SEC_IN_MILLI.toFloat() * realMillisec.toFloat())
-        seconds = newsec
-
-        if (realMillisec >= REAL_SEC_IN_MILLI)
-            realMillisec -= REAL_SEC_IN_MILLI
-
-        kickVariables()
+        realMillisec += delta
+        if (realMillisec >= 1000.0 / REAL_SEC_TO_GAME_SECS) {
+            realMillisec -= 1000.0 / REAL_SEC_TO_GAME_SECS
+            TIME_T += timeDelta
+        }
     }
 
-    /**
-     * How much time has passed today, in seconds.
-     * 0 == 6 AM
-     * @return
-     */
-    val elapsedSeconds: Int
-        get() = (HOUR_SEC * hours + MINUTE_SEC * minutes + seconds) % DAY_LENGTH
 
-    /** Sets time of this day. */
-    fun setTime(t: Int) {
-        days += t / DAY_LENGTH
-        hours = t / HOUR_SEC
-        minutes = (t - HOUR_SEC * hours) / MINUTE_SEC
-        seconds = t - minutes * MINUTE_SEC
-        yearlyDays += t / DAY_LENGTH
+    val todaySeconds: Int
+        get() = TIME_T.toPositiveInt() % DAY_LENGTH
+
+    fun setTimeOfToday(t: Int) {
+        TIME_T = TIME_T - todaySeconds + t
     }
 
     fun addTime(t: Int) {
-        setTime(elapsedSeconds + t)
-    }
-
-    fun setTimeDelta(d: Int) {
-        timeDelta = if (d < 0) 0 else d
+        TIME_T += t
     }
 
     val dayName: String
         get() = DAY_NAMES[dayOfWeek]
 
-    private fun kickVariables() {
-        if (seconds >= MINUTE_SEC) {
-            seconds = 0
-            minutes += 1
-        }
-
-        if (minutes >= HOUR_MIN) {
-            minutes = 0
-            hours += 1
-        }
-
-        if (hours >= DAY_LENGTH / HOUR_SEC) {
-            hours = 0
-            days += 1
-            yearlyDays += 1
-            dayOfWeek += 1
-        }
-
-        //calendar (the world calendar)
-        if (dayOfWeek == 7) {
-            dayOfWeek = 0
-        }
-        if (months == 12 && days == 31) {
-            dayOfWeek = 7
-        }
-
-        if (months == 12 && days == 32) {
-            days = 1
-            months = 1
-            years++
-        }
-        else if ((months == 1 || months == 4 || months == 7 || months == 10) && days > 31) {
-            days = 1
-            months++
-        }
-        else if (days > 30) {
-            days = 1
-            months++
-        }
-
-        if (months > 12) {
-            months = 1
-            years++
-            yearlyDays = 1
-        }
-    }
+    private fun Long.toPositiveInt() = this.and(0x7FFFFFFF).toInt()
+    private fun Long.abs() = Math.abs(this)
 
     /** Format: "%A %d %B %Y %X" */
-    fun getFormattedTime() = "${getDayNameFull()} " +
+    fun getFormattedTime() = "${getDayNameShort()} " +
                              "$days " +
-                             "${getMonthNameFull()} " +
+                             "${getMonthNameShort()} " +
                              "$years " +
                              "${String.format("%02d", hours)}:" +
                              "${String.format("%02d", minutes)}:" +
@@ -192,4 +175,6 @@ class WorldTime {
     fun getDayNameShort() = DAY_NAMES_SHORT[dayOfWeek]
     fun getMonthNameFull() = MONTH_NAMES[months - 1]
     fun getMonthNameShort() = MONTH_NAMES_SHORT[months - 1]
+
+    override fun toString() = getFormattedTime()
 }

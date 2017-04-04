@@ -1,26 +1,12 @@
 <component name="libraryTable">
   <library name="lib">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/commons-codec-1.10.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/commons-csv-1.2.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/gson-2.5.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/ibxm.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/jinput.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/jnlp.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/jogg-0.0.7.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/jorbis-0.0.15.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/kotlin-reflect.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/kotlin-runtime.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/lwjgl.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/lwjgl_util.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/slick.jar!/" />
       <root url="file://$PROJECT_DIR$/lib" />
     </CLASSES>
     <JAVADOC>
       <root url="http://slick.ninjacave.com/javadoc/" />
       <root url="file://$PROJECT_DIR$/lib/javadoc" />
       <root url="file://$PROJECT_DIR$/lib/apidocs" />
-      <root url="https://commons.apache.org/proper/commons-csv/archives/1.1/apidocs/index.html" />
     </JAVADOC>
     <NATIVE>
       <root url="file://$PROJECT_DIR$/lib" />

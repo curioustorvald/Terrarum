@@ -127,7 +127,7 @@ class BasicDebugInfoWindow : UICanvas {
 
         printLineColumn(g, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
         printLineColumn(g, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
-        printLineColumn(g, 2, 5, "Time $ccG${Terrarum.ingame!!.world.time.elapsedSeconds}" +
+        printLineColumn(g, 2, 5, "Time $ccG${Terrarum.ingame!!.world.time.todaySeconds.toString().padStart(5, '0')}" +
                                  " (${Terrarum.ingame!!.world.time.getFormattedTime()})")
         printLineColumn(g, 2, 6, "Mass $ccG${player.mass}")
 
