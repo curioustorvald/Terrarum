@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameactors.ActorWithSprite
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import java.awt.BorderLayout
 import java.awt.GridLayout
+import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import javax.swing.*
@@ -58,11 +59,7 @@ class ActorValueTracker constructor() : JFrame() {
         }
 
         // button listener for buttons
-        buttonAddAV.addMouseListener(object : MouseListener {
-            override fun mouseEntered(e: MouseEvent?) { }
-            override fun mouseClicked(e: MouseEvent?) { }
-            override fun mouseReleased(e: MouseEvent?) { }
-            override fun mouseExited(e: MouseEvent?) { }
+        buttonAddAV.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 if (actor != null && modavInputKey.text.isNotBlank() && modavInputValue.text.isNotBlank()) {
                     SetAV.execute((
@@ -74,11 +71,7 @@ class ActorValueTracker constructor() : JFrame() {
                 }
             }
         })
-        buttonDelAV.addMouseListener(object : MouseListener {
-            override fun mouseEntered(e: MouseEvent?) { }
-            override fun mouseClicked(e: MouseEvent?) { }
-            override fun mouseReleased(e: MouseEvent?) { }
-            override fun mouseExited(e: MouseEvent?) { }
+        buttonDelAV.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 if (actorValue != null && modavInputKey.text.isNotBlank()) {
                     actorValue!!.remove(modavInputKey.text)
@@ -87,11 +80,7 @@ class ActorValueTracker constructor() : JFrame() {
                 }
             }
         })
-        buttonChangeActor.addMouseListener(object : MouseListener {
-            override fun mouseEntered(e: MouseEvent?) { }
-            override fun mouseClicked(e: MouseEvent?) { }
-            override fun mouseReleased(e: MouseEvent?) { }
-            override fun mouseExited(e: MouseEvent?) { }
+        buttonChangeActor.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 if (actorIDField.text.toLowerCase() == "player") {
                     actor = Terrarum.ingame!!.player

@@ -9,10 +9,13 @@ import org.luaj.vm2.lib.ZeroArgFunction
 import org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.Millisec
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.virtualcomputer.luaapi.*
 import net.torvald.terrarum.virtualcomputer.peripheral.*
 import net.torvald.terrarum.virtualcomputer.terminal.*
+import net.torvald.terrarum.virtualcomputer.tvd.VDUtil
+import net.torvald.terrarum.virtualcomputer.tvd.VirtualDisk
 import net.torvald.terrarum.virtualcomputer.worldobject.ComputerPartsCodex
 import org.lwjgl.BufferUtils
 import org.lwjgl.openal.AL
@@ -22,6 +25,8 @@ import org.newdawn.slick.Input
 import java.io.*
 import java.nio.ByteBuffer
 import java.util.*
+import java.util.logging.Level
+import kotlin.collections.HashMap
 
 /**
  * A part that makes "computer fixture" actually work
@@ -87,6 +92,26 @@ class TerrarumComputer(peripheralSlots: Int) {
     val milliTime: Int
         get() = (System.currentTimeMillis() - startupTimestamp).toInt()
 
+    /** String:
+     *    if it's UUID, formatted UUID as string, always 36 chars
+     *    if not (test purpose only!), just String
+     */
+    val diskRack = HashMap<String, VirtualDisk>()
+
+    fun attachDisk(slot: String, filename: String) {
+        computerValue[slot] = filename
+
+        // put disk in diskRack
+        if (filename.isNotEmpty() && filename.isNotBlank()) {
+            diskRack[slot] = VDUtil.readDiskArchive(
+                    File(Terrarum.currentSaveDir.path + "/computers/$filename").absoluteFile,
+                    Level.WARNING,
+                    { },
+                    Filesystem.sysCharset
+            )
+        }
+    }
+
     init {
         computerValue["memslot0"] = 4864 // -1 indicates mem slot is empty
         computerValue["memslot1"] = -1 // put index of item here
@@ -96,20 +121,20 @@ class TerrarumComputer(peripheralSlots: Int) {
         computerValue["processor"] = -1 // do.
 
         // as in "dev/hda"; refers hard disk drive (and no partitioning)
-        computerValue["hda"] = "uuid_testhda" // 'UUID rendered as String' or "none"
-        computerValue["hdb"] = "uuid_testhdb"
-        computerValue["hdc"] = "none"
-        computerValue["hdd"] = "none"
+        attachDisk("hda", "uuid_testhda")
+        attachDisk("hdb", "")
+        attachDisk("hdc", "")
+        attachDisk("hdd", "")
         // as in "dev/fd1"; refers floppy disk drive
-        computerValue["fd1"] = "uuid_testfd1"
-        computerValue["fd2"] = "none"
-        computerValue["fd3"] = "none"
-        computerValue["fd4"] = "none"
+        attachDisk("fd1", "")
+        attachDisk("fd2", "")
+        attachDisk("fd3", "")
+        attachDisk("fd4", "")
         // SCSI connected optical drive
-        computerValue["sda"] = "none"
+        attachDisk("sda", "")
 
         // boot device
-        computerValue["boot"] = computerValue.getAsString("hda")!!
+        computerValue["boot"] = "hda"
     }
 
     fun getPeripheral(tableName: String): Peripheral? {
@@ -167,7 +192,6 @@ class TerrarumComputer(peripheralSlots: Int) {
         Input(luaJ_globals, this)
         PcSpeakerDriver(luaJ_globals, this)
         WorldInformationProvider(luaJ_globals)
-
 
         // secure the sandbox
         //luaJ_globals["io"] = LuaValue.NIL

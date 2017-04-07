@@ -1015,8 +1015,6 @@ sandbox._G = sandbox
 -- path for any ingame libraries
 package.path = "/net/torvald/terrarum/virtualcomputer/assets/lua/?.lua;" .. package.path
 
-_G.__scanMode__ = "UNINIT" -- part of inputstream implementation
-
 local screenbufferdim = term.width() * term.height()
 local screencolours = 4
 if term.isCol() then screencolours = 8
@@ -1027,7 +1025,7 @@ if not computer.prompt then computer.prompt = DC3.."> "..DC4 end
 if not computer.verbose then computer.verbose = true end -- print debug info
 if not computer.loadedCLayer then computer.loadedCLayer = {} end -- list of loaded compatibility layers
 -- if no bootloader is pre-defined via EFI, use default one
-if not computer.bootloader then computer.bootloader = "/boot/efi" end
+if not computer.bootloader then computer.bootloader = "boot/efi" end
 if not computer.OEM then computer.OEM = "" end
 machine.totalMemory = _G.totalMemory
 if not computer.bellpitch then computer.bellpitch = 950 end

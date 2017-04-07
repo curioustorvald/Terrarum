@@ -54,8 +54,9 @@ internal class Term(globals: Globals, term: Teletype) {
     companion object {
         fun LuaValue.checkIBM437(): String {
             if (this is LuaString)
-                return m_bytes.copyOfRange(m_offset, m_length).toString(Charset.forName("ISO-8859-1"))
+                return m_bytes.copyOfRange(m_offset, m_offset + m_length).toString(Charset.forName("CP437"))
                 // it only works if Charset is ISO-8859, despite of the name "IBM437"
+                // --> then would "CP437" work? -- Torvald at 2017-04-05
             else
                 throw LuaError("bad argument (string expected, got ${this.typename()})")
         }

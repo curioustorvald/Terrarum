@@ -189,7 +189,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
      *
      * e.g. 0x02010034 can be translated as 2.1.52
      */
-    const val VERSION_RAW = 0x000200E1
+    const val VERSION_RAW = 0x0002018E
     const val VERSION_STRING: String =
             "${VERSION_RAW.ushr(24)}.${VERSION_RAW.and(0xFF0000).ushr(16)}.${VERSION_RAW.and(0xFFFF)}"
     const val NAME = "Terrarum"
@@ -303,7 +303,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
 
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
-        addState(StateVTTest())
+        //addState(StateVTTest())
         //addState(StateGraphicComputerTest())
         //addState(StateTestingLightning())
         //addState(StateSplash())
@@ -318,7 +318,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         //addState(StateMidiInputTest())
         //addState(StateNewRunesTest())
 
-        //ingame = StateInGame(); addState(ingame)
+        ingame = StateInGame(); addState(ingame)
 
 
         // foolproof
@@ -650,4 +650,6 @@ operator fun Color.minus(other: Color) = Color(
     this.a - other.a
 )
 
-fun Int.toHex() = Integer.toHexString(this)
+fun Int.toHex() = this.toString(16)
+
+
