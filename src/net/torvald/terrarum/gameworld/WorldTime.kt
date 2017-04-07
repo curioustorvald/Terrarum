@@ -3,17 +3,17 @@ package net.torvald.terrarum.gameworld
 import net.torvald.terrarum.gameactors.GameDate
 
 /**
- * The World Calendar implementation of Dwarven Calendar (we're talking about DF!),
- *   except the year begins with Mondag instead of Sundag
+ * The World Calendar implementation of Dwarven Calendar, except:
+ *      - the year begins with Mondag instead of Sundag (which is ISO standard)
+ *      - the first month is Opal instead of Granite    (to reduce confusion)
  *
- * Please see:
+ *
+ * Please also see:
  *      https://en.wikipedia.org/wiki/World_Calendar
  *      http://dwarffortresswiki.org/index.php/DF2014:Calendar
  *
- * Normal format for day is
- *      Tysdag 12th Granite
- *
  * And there is no AM/PM concept, 22-hour clock is forced; no leap years.
+ * (AM 12 is still 00h in this system, again, to reduce confusion)
  *
  *
  *  Calendar
@@ -34,7 +34,10 @@ import net.torvald.terrarum.gameactors.GameDate
  * |17|18|19|20|21|22|23|  |
  * |24|25|26|27|28|29|30|31|
  *
+ * Verddag only appears on the last day of the year (31st Moonstone)
  *
+ * (Check please:)
+ * - Equinox/Solstice always occur on 21st day of the month
  *
  *
  * Created by minjaesong on 16-01-24.
@@ -90,7 +93,7 @@ class WorldTime(initTime: Long = 0L) {
     @Transient private val REAL_SEC_TO_GAME_SECS = 60
 
     val DAY_NAMES = arrayOf(//daynames are taken from Nynorsk (å -> o)
-            "Mondag", "Tysdag", "Midvikdag" //From Islenska Miðvikudagur
+            "Mondag", "Tysdag", "Midtveke" //middle-week
             , "Torsdag", "Fredag", "Laurdag", "Sundag", "Verddag" //From Norsk word 'verd'
     )
     val DAY_NAMES_SHORT = arrayOf("Mon", "Tys", "Mid", "Tor", "Fre", "Lau", "Sun", "Ver")
