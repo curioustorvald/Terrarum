@@ -121,29 +121,17 @@ class ActorInventory() {
         return capacityMode
     }
 
-    fun getTotalWeight(): Double {
-        var weight = 0.0
-        itemList.forEach { weight += it.item.mass * it.amount }
-
-        return weight
-    }
+    fun getTotalWeight(): Double = itemList.map { it.item.mass * it.amount }.sum()
 
     /**
      * Real amount
      */
-    fun getTotalCount(): Int {
-        var count = 0
-        itemList.forEach { count += it.amount }
-
-        return count
-    }
+    fun getTotalCount(): Int = itemList.map { it.amount }.sum()
 
     /**
      * Unique amount, multiple items are calculated as one
      */
-    fun getTotalUniqueCount(): Int {
-        return itemList.size
-    }
+    fun getTotalUniqueCount(): Int = itemList.size
 
     /**
      * Check whether the itemList contains too many items

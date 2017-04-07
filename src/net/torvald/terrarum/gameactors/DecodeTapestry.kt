@@ -111,19 +111,15 @@ object DecodeTapestry {
     val FORMAT_64 = 2
 
     operator fun invoke(fileObj: File): TapestryObject {
-        fun magicMismatch(magic: ByteArray): Boolean {
-            MAGIC.forEachIndexed { i, byte ->
-                if (byte != magic[i])
-                    return true
-            }
-            return false
+        fun magicMismatch(magic: ByteArray, array: ByteArray): Boolean {
+            return !Arrays.equals(array.sliceArray(0..magic.lastIndex), magic)
         }
 
         val file = fileObj.readBytes()
 
         val magic = file.copyOfRange(0, 4)
 
-        if (magicMismatch(magic))
+        if (magicMismatch(MAGIC, magic))
             throw RuntimeException("Invalid file --  type mismatch: expected header " +
                                    "${MAGIC[0]} ${MAGIC[1]} ${MAGIC[2]} ${MAGIC[3]}; got " +
                                    "${magic[0]} ${magic[1]} ${magic[2]} ${magic[3]}")
@@ -156,8 +152,8 @@ object DecodeTapestry {
 
 
 
-        val artName = kotlin.text.String(artNameBytes.toByteArray(), charset = Charset.forName("UTF-8"))
-        val authorName = kotlin.text.String(authorNameBytes.toByteArray(), charset = Charset.forName("UTF-8"))
+        val artName = String(artNameBytes.toByteArray(), charset = Charset.forName("UTF-8"))
+        val authorName = String(authorNameBytes.toByteArray(), charset = Charset.forName("UTF-8"))
 
         val imageDataSize = file.size - readCounter
         val height = imageDataSize / width
