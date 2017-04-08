@@ -32,10 +32,10 @@ import java.util.*
  * Created by minjaesong on 16-07-11.
  */
 object WeatherMixer {
-    lateinit var weatherList: HashMap<String, ArrayList<BaseModularWeather>>
+    var weatherList: HashMap<String, ArrayList<BaseModularWeather>>
 
-    lateinit var currentWeather: BaseModularWeather
-    lateinit var nextWeather: BaseModularWeather
+    var currentWeather: BaseModularWeather
+    var nextWeather: BaseModularWeather
 
     lateinit var mixedWeather: BaseModularWeather
 

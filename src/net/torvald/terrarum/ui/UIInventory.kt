@@ -11,18 +11,18 @@ import java.util.*
  * Created by SKYHi14 on 2017-03-13.
  */
 class UIInventory(
-        val actor: Pocketed,
+        var actor: Pocketed?,
         override var width: Int,
         override var height: Int
 ) : UICanvas {
 
-    val inventory: ActorInventory
-        get() = actor.inventory
+    val inventory: ActorInventory?
+        get() = actor?.inventory
     val actorValue: ActorValue
         get() = (actor as Actor).actorValue
 
     override var handler: UIHandler? = null
-    override var openCloseTime: Int = UICanvas.OPENCLOSE_GENERIC
+    override var openCloseTime: Int = 120
 
     val itemImagePlaceholder = Image("./assets/item_kari_24.tga")
 
@@ -104,68 +104,68 @@ class UIInventory(
     private var oldCatSelect = -1
 
     override fun update(gc: GameContainer, delta: Int) {
-        Terrarum.gameLocale = "koKR" // hot swap this to test
-
         catButtons.update(gc, delta)
 
 
-        // monitor and check if category selection has been changed
-        if (oldCatSelect != catButtons.selectedIndex) {
-            rebuildList = true
-        }
-
-
-        if (rebuildList) {
-            val filter = catButtonsToCatIdent[catButtons.selectedButton.labelText]
-
-            inventorySortList = ArrayList<InventoryPair>()
-
-            // filter items
-            inventory.forEach {
-                if (it.item.category == filter || filter == "__all__")
-                    inventorySortList.add(it)
+        if (actor != null && inventory != null) {
+            // monitor and check if category selection has been changed
+            if (oldCatSelect != catButtons.selectedIndex) {
+                rebuildList = true
             }
 
-            rebuildList = false
 
-            // sort if needed
-            // test sort by name
-            inventorySortList.sortBy { it.item.name }
+            if (rebuildList) {
+                val filter = catButtonsToCatIdent[catButtons.selectedButton.labelText]
 
-            // map sortList to item list
-            for (k in 0..items.size - 1) {
-                try {
-                    val sortListItem = inventorySortList[k + itemsScrollOffset]
-                    items[k].item = sortListItem.item
-                    items[k].amount = sortListItem.amount
-                    items[k].itemImage = itemImagePlaceholder
+                inventorySortList = ArrayList<InventoryPair>()
 
-                    // set quickslot number
-                    for (qs in 1..QUICKSLOT_MAX) {
-                        if (-sortListItem.item.id == actorValue.getAsInt(AVKey.__PLAYER_QSPREFIX + qs)) {
-                            items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
-                            break
-                        }
-                        else
-                            items[k].quickslot = null
-                    }
+                // filter items
+                inventory?.forEach {
+                    if (it.item.category == filter || filter == "__all__")
+                        inventorySortList.add(it)
+                }
 
-                    for (eq in 0..actor.itemEquipped.size - 1) {
-                        if (eq < actor.itemEquipped.size) {
-                            if (actor.itemEquipped[eq] == items[k].item) {
-                                items[k].equippedSlot = eq
+                rebuildList = false
+
+                // sort if needed
+                // test sort by name
+                inventorySortList.sortBy { it.item.name }
+
+                // map sortList to item list
+                for (k in 0..items.size - 1) {
+                    try {
+                        val sortListItem = inventorySortList[k + itemsScrollOffset]
+                        items[k].item = sortListItem.item
+                        items[k].amount = sortListItem.amount
+                        items[k].itemImage = itemImagePlaceholder
+
+                        // set quickslot number
+                        for (qs in 1..QUICKSLOT_MAX) {
+                            if (-sortListItem.item.id == actorValue.getAsInt(AVKey.__PLAYER_QSPREFIX + qs)) {
+                                items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                                 break
                             }
                             else
-                                items[k].equippedSlot = null
+                                items[k].quickslot = null
+                        }
+
+                        for (eq in 0..actor!!.itemEquipped.size - 1) {
+                            if (eq < actor!!.itemEquipped.size) {
+                                if (actor!!.itemEquipped[eq] == items[k].item) {
+                                    items[k].equippedSlot = eq
+                                    break
+                                }
+                                else
+                                    items[k].equippedSlot = null
+                            }
                         }
                     }
-                }
-                catch (e: IndexOutOfBoundsException) {
-                    items[k].item = null
-                    items[k].amount = 0
-                    items[k].itemImage = null
-                    items[k].quickslot = null
+                    catch (e: IndexOutOfBoundsException) {
+                        items[k].item = null
+                        items[k].amount = 0
+                        items[k].itemImage = null
+                        items[k].quickslot = null
+                    }
                 }
             }
         }
@@ -190,18 +190,26 @@ class UIInventory(
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {
-        UICanvas.doOpeningFade(handler, openCloseTime)
+        handler!!.posX = Movement.fastPullOut(
+                handler!!.openCloseCounter.toFloat() / openCloseTime,
+                -width.toFloat(),
+                0f
+        ).roundInt()
     }
 
     override fun doClosing(gc: GameContainer, delta: Int) {
-        UICanvas.doClosingFade(handler, openCloseTime)
+        handler!!.posX = Movement.fastPullOut(
+                handler!!.openCloseCounter.toFloat() / openCloseTime,
+                0f,
+                -width.toFloat()
+        ).roundInt()
     }
 
     override fun endOpening(gc: GameContainer, delta: Int) {
-        UICanvas.endOpeningFade(handler)
+        handler!!.posX = 0
     }
 
     override fun endClosing(gc: GameContainer, delta: Int) {
-        UICanvas.endClosingFade(handler)
+        handler!!.posX = -width
     }
 }

@@ -11,7 +11,6 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.gamecontroller.Key
-import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
@@ -40,6 +39,7 @@ import java.lang.management.ManagementFactory
 import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.collections.HashMap
 
 /**
  * Created by minjaesong on 15-12-30.
@@ -70,9 +70,9 @@ class StateInGame : BasicGameState() {
     lateinit var debugWindow: UIHandler
     lateinit var notifier: UIHandler
 
-    internal var playableActorDelegate: PlayableActorDelegate? = null
+    private lateinit var playableActorDelegate: PlayableActorDelegate // player is necessity in this engine, even if the player is just a camera
     internal val player: ActorHumanoid // currently POSSESSED actor :)
-        get() = playableActorDelegate!!.actor
+        get() = playableActorDelegate.actor
 
     var screenZoom = 1.0f
     val ZOOM_MAX = 2.0f
@@ -92,24 +92,32 @@ class StateInGame : BasicGameState() {
     val KEY_LIGHTMAP_RENDER = Key.F7
     val KEY_LIGHTMAP_SMOOTH = Key.F8
 
-    // UI aliases
+    // UI aliases (no pause)
     val uiAliases = HashMap<String, UIHandler>()
     private val UI_PIE_MENU = "uiPieMenu"
     private val UI_QUICK_BAR = "uiQuickBar"
     private val UI_INVENTORY_PLAYER = "uiInventoryPlayer"
-    private val UI_INVENTORY_ANON = "uiInventoryAnon"
+    private val UI_INVENTORY_CONTAINER = "uiInventoryContainer"
     private val UI_VITAL1 = "uiVital1"
     private val UI_VITAL2 = "uiVital2"
     private val UI_VITAL3 = "uiVital3"
+    private val UI_CONSOLE = "uiConsole"
+
+    // UI aliases (pause)
+    val uiAlasesPausing = HashMap<String, UIHandler>()
 
     var paused: Boolean = false
-        get() = consoleHandler.isOpened
+        get() = uiAlasesPausing.map { if (it.value.isOpened) 1 else 0 }.sum() > 0
+    /**
+     * Set to false if UI is opened; set to true  if UI is closed.
+     */
+    var canPlayerMove: Boolean = false
+        get() = !paused // FIXME temporary behab (block movement if the game is paused or paused by UIs)
 
     @Throws(SlickException::class)
     override fun init(gameContainer: GameContainer, stateBasedGame: StateBasedGame) {
         // state init code. Executed before the game goes into any "state" in states in StateBasedGame.java
 
-        Terrarum.gameStarted = true
     }
 
     override fun enter(gc: GameContainer, sbg: StateBasedGame) {
@@ -145,6 +153,8 @@ class StateInGame : BasicGameState() {
         // init console window
         consoleHandler = UIHandler(ConsoleWindow())
         consoleHandler.setPosition(0, 0)
+        uiAlasesPausing[UI_CONSOLE] = consoleHandler
+
 
         // init debug window
         debugWindow = UIHandler(BasicDebugInfoWindow())
@@ -161,8 +171,18 @@ class StateInGame : BasicGameState() {
 
 
 
-        // queue up game UIs
-        //  lesser UIs
+        // >- queue up game UIs that should pause the world -<
+        // inventory
+        uiAlasesPausing[UI_INVENTORY_PLAYER] = UIHandler(
+                UIInventory(player, 800, Terrarum.HEIGHT - 160),
+                toggleKey = Terrarum.getConfigInt("keyinventory")
+        )
+        uiAlasesPausing[UI_INVENTORY_PLAYER]!!.setPosition(
+                -uiAlasesPausing[UI_INVENTORY_PLAYER]!!.UI.width,
+                70
+        )
+
+        // >- lesser UIs -<
         // quick bar
         uiAliases[UI_QUICK_BAR] = UIHandler(UIQuickBar())
         uiAliases[UI_QUICK_BAR]!!.isVisible = true
@@ -187,6 +207,9 @@ class StateInGame : BasicGameState() {
 
 
         // batch-process uiAliases
+        uiAlasesPausing.forEach { _, uiHandler ->
+            uiContainer.add(uiHandler)       // put them all to the UIContainer
+        }
         uiAliases.forEach { _, uiHandler ->
             uiContainer.add(uiHandler)       // put them all to the UIContainer
         }
@@ -206,6 +229,10 @@ class StateInGame : BasicGameState() {
         particlesActive = 0
         UPDATE_DELTA = delta
         setAppTitle()
+
+
+        KeyToggler.update(gc.input)
+        GameController.processInput(gc, delta, gc.input)
 
 
         if (!paused) {
@@ -229,7 +256,6 @@ class StateInGame : BasicGameState() {
             ///////////////////////////
             // input-related updates //
             ///////////////////////////
-            GameController.processInput(gc, delta, gc.input)
             uiContainer.forEach { it.processInput(gc, delta, gc.input) }
 
 
@@ -261,7 +287,6 @@ class StateInGame : BasicGameState() {
         // ui-related updates //
         ////////////////////////
         uiContainer.forEach { it.update(gc, delta) }
-        consoleHandler.update(gc, delta)
         debugWindow.update(gc, delta)
         notifier.update(gc, delta)
 
@@ -270,6 +295,7 @@ class StateInGame : BasicGameState() {
             AVTracker.update()
             ActorsList.update()
         }
+
 
 
         /////////////////////////
@@ -311,10 +337,10 @@ class StateInGame : BasicGameState() {
         }
 
         // take care of old delegate
-        playableActorDelegate!!.actor.collisionType = HumanoidNPC.DEFAULT_COLLISION_TYPE
+        playableActorDelegate.actor.collisionType = HumanoidNPC.DEFAULT_COLLISION_TYPE
         // accept new delegate
         playableActorDelegate = PlayableActorDelegate(getActorByID(refid) as ActorHumanoid)
-        playableActorDelegate!!.actor.collisionType = ActorWithSprite.COLLISION_KINEMATIC
+        playableActorDelegate.actor.collisionType = ActorWithSprite.COLLISION_KINEMATIC
         WorldSimulator(player, UPDATE_DELTA)
     }
 
@@ -327,6 +353,8 @@ class StateInGame : BasicGameState() {
     }
 
     override fun render(gc: GameContainer, sbg: StateBasedGame, gwin: Graphics) {
+        Terrarum.GLOBAL_RENDER_TIMER += 1
+
         // clean the shit beforehand
         worldG.clear()
         uiG.clear()
@@ -447,8 +475,9 @@ class StateInGame : BasicGameState() {
         //////////////
         // draw UIs //
         //////////////
-        uiContainer.forEach { it.render(gc, sbg, uiG) }
+        uiContainer.forEach { if (it != consoleHandler) it.render(gc, sbg, uiG) }
         debugWindow.render(gc, sbg, uiG)
+        // make sure console draws on top of other UIs
         consoleHandler.render(gc, sbg, uiG)
         notifier.render(gc, sbg, uiG)
 
@@ -468,7 +497,18 @@ class StateInGame : BasicGameState() {
     }
 
     override fun keyPressed(key: Int, c: Char) {
+        if (key == Key.GRAVE) {
+            consoleHandler.toggleOpening()
+        }
+        else if (key == Key.F3) {
+            debugWindow.toggleOpening()
+        }
+
         GameController.keyPressed(key, c)
+
+        if (canPlayerMove) {
+            player.keyPressed(key, c)
+        }
 
         if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
             || key == Terrarum.getConfigInt("keyquicksel")) {
@@ -653,7 +693,7 @@ class StateInGame : BasicGameState() {
     /**
      * actorContainer extensions
      */
-    fun theGameHasActor(actor: Actor) = theGameHasActor(actor.referenceID)
+    fun theGameHasActor(actor: Actor?) = if (actor == null) false else theGameHasActor(actor.referenceID)
 
     fun theGameHasActor(ID: Int): Boolean =
             isActive(ID) || isInactive(ID)

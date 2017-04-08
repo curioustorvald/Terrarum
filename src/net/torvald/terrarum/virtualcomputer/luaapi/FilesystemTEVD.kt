@@ -75,7 +75,7 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
          * return value is there for chaining only.
          */
         fun VDPath.dropMount(): VDPath {
-            if (this.hierarchy.size >= 2 && this[0].toCanonicalString() == "media") {
+            if (this.hierarchy.size >= 2 && this[0].toCanonicalString(sysCharset) == "media") {
                 this.hierarchy.removeAt(0) // drop "media"
                 this.hierarchy.removeAt(0) // drop whatever mount symbol
             }
@@ -105,7 +105,7 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
         fun TerrarumComputer.getTargetDisk(path: VDPath) : VirtualDisk? {
             if (path.hierarchy.size >= 2 &&
                     Arrays.equals(path[0], "media".toEntryName(DiskEntry.NAME_LENGTH, sysCharset))) {
-                val diskName = path[1].toCanonicalString()
+                val diskName = path[1].toCanonicalString(sysCharset)
                 val disk = this.diskRack[diskName]
 
                 return disk
@@ -149,8 +149,9 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
             val table = LuaTable()
             try {
                 val directoryContents = computer.getDirectoryEntries(path)!!
+                println("[Filesystem] directoryContents size: ${directoryContents.size}")
                 directoryContents.forEachIndexed { index, diskEntry ->
-                    table.insert(index + 1, LuaValue.valueOf(diskEntry.filename.toCanonicalString()))
+                    table.insert(index + 1, LuaValue.valueOf(diskEntry.filename.toCanonicalString(sysCharset)))
                 }
             }
             catch (e: KotlinNullPointerException) {}
@@ -219,8 +220,22 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
             return tryBool {
                 val path = VDPath(path.checkPath(), sysCharset)
                 val disk = computer.getTargetDisk(path)!!
+                val dirList = computer.getDirectoryEntries(path.getParent())
+                var makeNew = true
 
-                VDUtil.addDir(disk, path.getParent(), path.last())
+                // check dupes
+                if (dirList != null) {
+                    for (entry in dirList) {
+                        if (Arrays.equals(path.last(), entry.filename)) {
+                            makeNew = false
+                            break
+                        }
+                    }
+                }
+
+                if (makeNew) {
+                    VDUtil.addDir(disk, path.getParent(), path.last())
+                }
             }
         }
     }
@@ -496,18 +511,4 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
                    else LuaValue.NIL
         }
     }
-}
-
-/**
- * drops appended NULs and return resulting ByteArray as String
- */
-private fun ByteArray.toCanonicalString(): String {
-    var lastIndexOfRealStr = 0
-    for (i in this.lastIndex downTo 0) {
-        if (this[i] != 0.toByte()) {
-            lastIndexOfRealStr = i
-            break
-        }
-    }
-    return String(this.sliceArray(0..lastIndexOfRealStr))
 }

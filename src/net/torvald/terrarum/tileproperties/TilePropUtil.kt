@@ -57,6 +57,9 @@ object TilePropUtil {
         return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
     }
 
+    /**
+     * Using our own timer so that they flickers for same duration regardless of game's FPS
+     */
     internal fun dynamicLumFuncTickClock() {
         // FPS-time compensation
         if (Terrarum.appgc.fps > 0) {

@@ -56,12 +56,12 @@ object VDUtil {
         override fun toString(): String {
             val sb = StringBuilder()
             if (hierarchy.size > 0) {
-                sb.append(hierarchy[0].toCanonicalString())
+                sb.append(hierarchy[0].toCanonicalString(Charsets.UTF_8))
             }
             if (hierarchy.size > 1) {
                 (1..hierarchy.lastIndex).forEach {
                     sb.append('/')
-                    sb.append(hierarchy[it].toCanonicalString())
+                    sb.append(hierarchy[it].toCanonicalString(Charsets.UTF_8))
                 }
             }
 
@@ -209,12 +209,12 @@ object VDUtil {
     /**
      * Get list of entries of directory.
      */
-    fun getDirectoryEntries(disk: VirtualDisk, entry: DiskEntry): Array<DiskEntry> {
-        if (entry.contents !is EntryDirectory)
+    fun getDirectoryEntries(disk: VirtualDisk, dirToSearch: DiskEntry): Array<DiskEntry> {
+        if (dirToSearch.contents !is EntryDirectory)
             throw IllegalArgumentException("The entry is not directory")
 
         val entriesList = ArrayList<DiskEntry>()
-        entry.contents.entries.forEach {
+        dirToSearch.contents.entries.forEach {
             val entry = disk.entries[it]
             if (entry != null) entriesList.add(entry)
         }
@@ -697,7 +697,7 @@ fun String.toEntryName(length: Int, charset: Charset): ByteArray {
     buffer.put(stringByteArray.sliceArray(0..minOf(length, stringByteArray.size) - 1))
     return buffer.array
 }
-fun ByteArray.toCanonicalString(): String {
+fun ByteArray.toCanonicalString(charset: Charset): String {
     var lastIndexOfRealStr = 0
     for (i in this.lastIndex downTo 0) {
         if (this[i] != 0.toByte()) {
@@ -705,7 +705,7 @@ fun ByteArray.toCanonicalString(): String {
             break
         }
     }
-    return String(this.sliceArray(0..lastIndexOfRealStr))
+    return String(this.sliceArray(0..lastIndexOfRealStr), charset)
 }
 
 /**

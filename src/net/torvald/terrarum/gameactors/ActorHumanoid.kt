@@ -4,7 +4,6 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
-import net.torvald.terrarum.gamecontroller.KeyMap
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.realestate.RealEstateUtility
 import org.newdawn.slick.GameContainer
@@ -19,6 +18,9 @@ import java.util.*
  */
 open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     : HistoricalFigure(birth, death), Controllable, Pocketed, Factionable, Luminous, LandHolder {
+
+    var vehicleRiding: Controllable? = null // usually player only
+
 
     /** Must be set by PlayerFactory */
     override var inventory: ActorInventory = ActorInventory()
@@ -144,6 +146,13 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     override fun update(gc: GameContainer, delta: Int) {
         super.update(gc, delta)
 
+        if (vehicleRiding is Player)
+            throw Error("Attempted to 'ride' player object. ($vehicleRiding)")
+        if (vehicleRiding != null && (vehicleRiding == this))
+            throw Error("Attempted to 'ride' itself. ($vehicleRiding)")
+
+
+
         // don't put this into keyPressed; execution order is important!
         updateGamerControlBox(gc.input)
 
@@ -196,11 +205,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     private fun updateGamerControlBox(input: Input) {
         if (isGamer) {
-            isUpDown = isFuncDown(input, EnumKeyFunc.MOVE_UP)
-            isLeftDown = isFuncDown(input, EnumKeyFunc.MOVE_LEFT)
-            isDownDown = isFuncDown(input, EnumKeyFunc.MOVE_DOWN)
-            isRightDown = isFuncDown(input, EnumKeyFunc.MOVE_RIGHT)
-            isJumpDown = isFuncDown(input, EnumKeyFunc.JUMP)
+            isUpDown = input.isKeyDown(Terrarum.getConfigInt("keyup"))
+            isLeftDown = input.isKeyDown(Terrarum.getConfigInt("keyleft"))
+            isDownDown = input.isKeyDown(Terrarum.getConfigInt("keydown"))
+            isRightDown = input.isKeyDown(Terrarum.getConfigInt("keyright"))
+            isJumpDown = input.isKeyDown(Terrarum.getConfigInt("keyjump"))
 
             if (Terrarum.controller != null) {
                 axisX =  Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadlstickx"))
@@ -214,7 +223,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                 if (Math.abs(axisRX) < Terrarum.CONTROLLER_DEADZONE) axisRX = 0f
                 if (Math.abs(axisRY) < Terrarum.CONTROLLER_DEADZONE) axisRY = 0f
 
-                isJumpDown = isFuncDown(input, EnumKeyFunc.JUMP) ||
+                isJumpDown = input.isKeyDown(Terrarum.getConfigInt("keyjump")) ||
                              Terrarum.controller!!.isButtonPressed(GAMEPAD_JUMP)
             }
         }
@@ -233,12 +242,12 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
          * Primary Use
          */
         // Left mouse
-        if (isGamer && isFuncDown(input, EnumKeyFunc.HAND_PRIMARY)) {
+        if (isGamer && input.isKeyDown(Terrarum.getConfigInt("mouseprimary"))) {
             (itemEquipped[InventoryItem.EquipPosition.HAND_GRIP] ?: nullItem).primaryUse(gc, delta)
         }
 
         // Right mouse
-        if (isGamer && isFuncDown(input, EnumKeyFunc.HAND_SECONDARY)) {
+        if (isGamer && input.isKeyDown(Terrarum.getConfigInt("mouseprimary"))) {
             (itemEquipped[InventoryItem.EquipPosition.HAND_GRIP] ?: nullItem).secondaryUse(gc, delta)
         }
 
@@ -282,11 +291,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         // ↑F, ↓S
         if (isRightDown && !isLeftDown) {
             walkHorizontal(false, AXIS_KEYBOARD)
-            prevHMoveKey = KeyMap[EnumKeyFunc.MOVE_RIGHT]
+            prevHMoveKey = Terrarum.getConfigInt("keyright")
         } // ↓F, ↑S
         else if (isLeftDown && !isRightDown) {
             walkHorizontal(true, AXIS_KEYBOARD)
-            prevHMoveKey = KeyMap[EnumKeyFunc.MOVE_LEFT]
+            prevHMoveKey = Terrarum.getConfigInt("keyleft")
         } // ↓F, ↓S
         /*else if (isLeftDown && isRightDown) {
                if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
@@ -310,11 +319,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             // ↑E, ↓D
             if (isDownDown && !isUpDown) {
                 walkVertical(false, AXIS_KEYBOARD)
-                prevVMoveKey = KeyMap[EnumKeyFunc.MOVE_DOWN]
+                prevVMoveKey = Terrarum.getConfigInt("keydown")
             } // ↓E, ↑D
             else if (isUpDown && !isDownDown) {
                 walkVertical(true, AXIS_KEYBOARD)
-                prevVMoveKey = KeyMap[EnumKeyFunc.MOVE_UP]
+                prevVMoveKey = Terrarum.getConfigInt("keyup")
             } // ↓E, ↓D
             /*else if (isUpDown && isDownDown) {
                 if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
@@ -486,13 +495,6 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             jumpCounter = 0
             jumpAcc = 0.0
         }
-    }
-
-    private fun isFuncDown(input: Input, fn: EnumKeyFunc): Boolean {
-        return if (fn == EnumKeyFunc.HAND_PRIMARY || fn == EnumKeyFunc.HAND_SECONDARY)
-            input.isMouseButtonDown(KeyMap[fn])
-        else
-            input.isKeyDown(KeyMap[fn])
     }
 
     fun isNoClip(): Boolean {

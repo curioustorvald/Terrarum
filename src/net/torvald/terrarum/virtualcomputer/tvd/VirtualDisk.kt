@@ -102,7 +102,7 @@ class DiskEntry(
         // content
         val contents: DiskEntryContent
 ) {
-    fun getFilenameString(charset: Charset) = if (entryID == 0) ROOTNAME else String(filename, charset)
+    fun getFilenameString(charset: Charset) = if (entryID == 0) ROOTNAME else filename.toCanonicalString(charset)
 
     val serialisedSize: Int
         get() = contents.getSizeEntry() + HEADER_SIZE
