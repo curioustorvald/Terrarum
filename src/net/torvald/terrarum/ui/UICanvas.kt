@@ -55,11 +55,11 @@ interface UICanvas {
         const val OPENCLOSE_GENERIC = 200
 
         fun doOpeningFade(handler: UIHandler?, openCloseTime: Int) {
-            handler!!.opacity = handler!!.openCloseCounter.toFloat() / openCloseTime
+            handler!!.opacity = handler.openCloseCounter.toFloat() / openCloseTime
         }
 
         fun doClosingFade(handler: UIHandler?, openCloseTime: Int) {
-            handler!!.opacity = (openCloseTime - handler!!.openCloseCounter.toFloat()) / openCloseTime
+            handler!!.opacity = (openCloseTime - handler.openCloseCounter.toFloat()) / openCloseTime
         }
 
         fun endOpeningFade(handler: UIHandler?) {

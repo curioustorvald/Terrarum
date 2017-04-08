@@ -41,11 +41,13 @@ object WorldSimulator {
     private val world = Terrarum.ingame!!.world
 
     // TODO future Kotlin feature -- typealias AnyPlayer: HistoricalFigure
-    operator fun invoke(p: HistoricalFigure, delta: Int) {
-        updateXFrom = p.hitbox.centeredX.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
-        updateYFrom = p.hitbox.centeredY.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
-        updateXTo = updateXFrom + DOUBLE_RADIUS
-        updateYTo = updateYFrom + DOUBLE_RADIUS
+    operator fun invoke(p: HistoricalFigure?, delta: Int) {
+        if (p != null) {
+            updateXFrom = p.hitbox.centeredX.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
+            updateYFrom = p.hitbox.centeredY.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
+            updateXTo = updateXFrom + DOUBLE_RADIUS
+            updateYTo = updateYFrom + DOUBLE_RADIUS
+        }
 
         moveFluids(delta)
         displaceFallables(delta)

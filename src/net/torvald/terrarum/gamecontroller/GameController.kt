@@ -1,12 +1,9 @@
 package net.torvald.terrarum.gamecontroller
 
-import net.torvald.terrarum.gameactors.Controllable
-import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ProjectileSimple
-import net.torvald.terrarum.gameactors.floorInt
+import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex
@@ -24,37 +21,42 @@ object GameController {
     // e.g.  gc.mouseTileX
 
     /** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise) */
-    internal val mouseX: Float
+    val mouseX: Float
         get() = (MapCamera.x + Terrarum.appgc.input.mouseX / (Terrarum.ingame?.screenZoom ?: 1f))
     /** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise)*/
-    internal val mouseY: Float
+    val mouseY: Float
         get() = (MapCamera.y + Terrarum.appgc.input.mouseY / (Terrarum.ingame?.screenZoom ?: 1f))
     /** currently pointing tile coordinate */
-    internal val mouseTileX: Int
+    val mouseTileX: Int
         get() = (mouseX / FeaturesDrawer.TILE_SIZE).floorInt()
     /** currently pointing tile coordinate */
-    internal val mouseTileY: Int
+    val mouseTileY: Int
         get() = (mouseY / FeaturesDrawer.TILE_SIZE).floorInt()
 
     fun processInput(gc: GameContainer, delta: Int, input: Input) {
-
-        KeyToggler.update(input)
 
         if (Terrarum.ingame != null) {
             val ingame = Terrarum.ingame!!
 
 
             if (!ingame.consoleHandler.isTakingControl) {
-                if (ingame.player is Player && (ingame.player as Player).vehicleRiding != null) {
-                    (ingame.player as Player).vehicleRiding!!.processInput(gc, delta, input)
+                if (ingame.canPlayerMove) {
+                    ingame.actorContainer.forEach {
+                        if (it is Controllable) {
+                            // disable control of actor if the actor is riding something?
+                            if ((it as ActorHumanoid).vehicleRiding != null) {
+                                it.vehicleRiding!!.processInput(gc, delta, input)
+                            }
+                            else {
+                                it.processInput(gc, delta, input)
+                            }
+                        }
+                    }
                 }
-
-                ingame.actorContainer.forEach {
-                    if (it is Controllable) it.processInput(gc, delta, input)
-                }
-
-                ingame.uiContainer.forEach {
-                    it.processInput(gc, delta, input)
+                else {
+                    ingame.uiContainer.forEach {
+                        it.processInput(gc, delta, input)
+                    }
                 }
             }
             else {
@@ -75,33 +77,7 @@ object GameController {
     }
 
     fun keyPressed(key: Int, c: Char) {
-        if (Terrarum.ingame != null) {
-            val ingame = Terrarum.ingame!!
 
-
-
-            if (keyPressedByCode(key, EnumKeyFunc.UI_CONSOLE)) {
-                ingame.consoleHandler.toggleOpening()
-            }
-            else if (keyPressedByCode(key, EnumKeyFunc.UI_BASIC_INFO)) {
-                ingame.debugWindow.toggleOpening()
-            }
-
-
-
-            if (!ingame.consoleHandler.isTakingControl) {
-                if (ingame.player is Player && (ingame.player as Player).vehicleRiding != null) {
-                    (ingame.player as Player).vehicleRiding!!.keyPressed(key, c)
-                }
-
-                ingame.player.keyPressed(key, c)
-            }
-            else {
-                ingame.consoleHandler.keyPressed(key, c)
-            }
-
-            //System.out.println(String.valueOf(key) + ", " + String.valueOf(c));
-        }
     }
 
     fun keyReleased(key: Int, c: Char) {
@@ -117,14 +93,7 @@ object GameController {
     }
 
     fun mousePressed(button: Int, x: Int, y: Int) {
-        // bullet test
-        /*if (button == 0) {
-            Terrarum.ingame!!.addActor(ProjectileSimple(
-                    0,
-                    Terrarum.ingame!!.player.centrePosVector,
-                    Vector2(mouseX.toDouble(), mouseY.toDouble())
-            ))
-        }*/
+
     }
 
     fun mouseReleased(button: Int, x: Int, y: Int) {
@@ -141,10 +110,6 @@ object GameController {
 
     fun controllerButtonReleased(controller: Int, button: Int) {
 
-    }
-
-    private fun keyPressedByCode(key: Int, fn: EnumKeyFunc): Boolean {
-        return KeyMap[fn] == key
     }
 }
 

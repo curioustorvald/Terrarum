@@ -63,6 +63,11 @@ object Terrarum : StateBasedGame(GAME_NAME) {
      */
     val TARGET_INTERNAL_FPS = 100
 
+    /**
+     * For the events depends on rendering frame (e.g. flicker on post-hit invincibility)
+     */
+    var GLOBAL_RENDER_TIMER = Random().nextInt(1020) + 1
+
 
 
 
@@ -77,8 +82,6 @@ object Terrarum : StateBasedGame(GAME_NAME) {
 
 
     lateinit var appgc: AppGameContainer
-
-    var gameStarted = false
 
     var ingame: StateInGame? = null
     private val gameConfig = GameConfig()
@@ -650,6 +653,6 @@ operator fun Color.minus(other: Color) = Color(
     this.a - other.a
 )
 
-fun Int.toHex() = this.toString(16)
+fun Int.toHex() = this.toLong().and(0xFFFFFFFF).toString(16).padStart(8, '0').toUpperCase()
 
 

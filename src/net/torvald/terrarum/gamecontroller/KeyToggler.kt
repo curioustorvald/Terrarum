@@ -15,27 +15,20 @@ object KeyToggler {
     }
 
     fun update(input: Input) {
-        for (i in 0..255) {
-            if (input.isKeyDown(i)) {
-                isPressed[i] = true
-            }
-            else {
-                isPressed[i] = false
-            }
-        }
+        (0..255).forEach {
+            isPressed[it] = input.isKeyDown(it)
 
-        for (i in 0..255) {
-            if (isPressed[i] && !currentState[i] && !isToggled[i]) {
-                currentState[i] = true
-                isToggled[i] = true
+            if (isPressed[it] && !currentState[it] && !isToggled[it]) {
+                currentState[it] = true
+                isToggled[it] = true
             }
-            else if (isPressed[i] && currentState[i] && !isToggled[i]) {
-                currentState[i] = false
-                isToggled[i] = true
+            else if (isPressed[it] && currentState[it] && !isToggled[it]) {
+                currentState[it] = false
+                isToggled[it] = true
             }
 
-            if (!isPressed[i] && isToggled[i]) {
-                isToggled[i] = false
+            if (!isPressed[it] && isToggled[it]) {
+                isToggled[it] = false
             }
         }
     }

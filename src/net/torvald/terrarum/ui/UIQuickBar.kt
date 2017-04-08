@@ -13,7 +13,7 @@ import org.newdawn.slick.Input
 class UIQuickBar : UICanvas, MouseControlled {
     private val gutter = 8
     override var width: Int = (ItemSlotImageBuilder.slotImageSize + gutter) * SLOT_COUNT
-    override var height: Int = ItemSlotImageBuilder.slotImageSize + 4 + Terrarum.fontGame!!.lineHeight
+    override var height: Int = ItemSlotImageBuilder.slotImageSize + 4 + Terrarum.fontGame.lineHeight
     /**
      * In milliseconds
      */
@@ -84,7 +84,7 @@ class UIQuickBar : UICanvas, MouseControlled {
     }
 
     override fun mouseWheelMoved(change: Int) {
-        selection = selection.plus(if (change > 1) 1 else if (change < -1) -1 else 0).mod(SLOT_COUNT)
+        selection = selection.plus(if (change > 1) 1 else if (change < -1) -1 else 0).rem(SLOT_COUNT)
         if (selection < 0) selection += SLOT_COUNT
     }
 

@@ -58,7 +58,6 @@ class ActorInventory() {
         if (item.id == Player.PLAYER_REF_ID)
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
         if (Terrarum.ingame != null &&
-            Terrarum.ingame!!.playableActorDelegate != null &&
             item.id == Terrarum.ingame!!.player.referenceID)
             throw IllegalArgumentException("Attempted to put active player into the inventory.")
 

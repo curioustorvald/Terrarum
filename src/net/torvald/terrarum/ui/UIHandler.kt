@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.Terrarum
 import com.jme3.math.FastMath
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
 import org.newdawn.slick.state.StateBasedGame
@@ -16,7 +17,9 @@ import org.newdawn.slick.state.StateBasedGame
  *
  * Created by minjaesong on 15-12-31.
  */
-class UIHandler(val UI: UICanvas) {
+class UIHandler(val UI: UICanvas,
+                val toggleKey: Int? = null, val toggleButton: Int? = null
+) {
 
     // X/Y Position to the game window.
     var posX: Int = 0
@@ -62,6 +65,18 @@ class UIHandler(val UI: UICanvas) {
 
 
     fun update(gc: GameContainer, delta: Int) {
+        // open/close UI by key pressed
+        if (toggleKey != null) {
+            if (KeyToggler.isOn(toggleKey)) {
+                setAsOpen()
+            }
+            else {
+                setAsClose()
+            }
+        }
+
+
+
         if (isVisible || alwaysVisible) {
             UI.update(gc, delta)
         }

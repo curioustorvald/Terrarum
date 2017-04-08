@@ -24,7 +24,7 @@ class WorldInformationProvider(globals: Globals) {
     companion object {
         fun getWorldTimeInLuaFormat() : LuaTable {
             val t = LuaTable()
-            val time = if (Terrarum.gameStarted) Terrarum.ingame!!.world.time else WorldTime()
+            val time = if (Terrarum.ingame != null) Terrarum.ingame!!.world.time else WorldTime()
 
             // int Terrarum World Time format
             t["hour"] = time.hours
@@ -43,7 +43,7 @@ class WorldInformationProvider(globals: Globals) {
 
         /** evaluate single C date format */
         fun String.evalAsDate(): String {
-            val time = if (Terrarum.gameStarted) Terrarum.ingame!!.world.time else WorldTime()
+            val time = if (Terrarum.ingame != null) Terrarum.ingame!!.world.time else WorldTime()
             return when (this) {
                 "%a" -> time.getDayNameShort()
                 "%A" -> time.getDayNameFull()
