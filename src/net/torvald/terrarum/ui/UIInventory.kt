@@ -105,10 +105,11 @@ class UIInventory(
     override fun update(gc: GameContainer, delta: Int) {
         catButtons.update(gc, delta)
 
-
         if (actor != null && inventory != null) {
             // monitor and check if category selection has been changed
-            if (oldCatSelect != catButtons.selectedIndex) {
+            // OR UI is being opened from closed state
+            if (oldCatSelect != catButtons.selectedIndex ||
+                    !rebuildList && handler!!.openFired) {
                 rebuildList = true
             }
 

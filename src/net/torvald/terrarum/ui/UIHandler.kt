@@ -20,7 +20,8 @@ import org.newdawn.slick.state.StateBasedGame
 class UIHandler(val UI: UICanvas,
                 val toggleKey: Int? = null, val toggleButton: Int? = null,
                 // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
-                var customPositioning: Boolean = false
+                var customPositioning: Boolean = false,
+                val doNotWarnConstant: Boolean = false
 ) {
 
     // X/Y Position relative to the game window.
@@ -48,6 +49,12 @@ class UIHandler(val UI: UICanvas,
             }
         }
 
+    /**
+     * being TRUE for only one frame when the UI is told to open
+     */
+    var openFired = false
+    var closeFired = false
+
     var opacity = 1f
     var scale = 1f
 
@@ -69,6 +76,9 @@ class UIHandler(val UI: UICanvas,
             }
         }
 
+
+        if (openFired && openCloseCounter > 9) openFired = false
+        if (closeFired && openCloseCounter > 9) closeFired = false
 
 
         if (isVisible || alwaysVisible) {
@@ -142,7 +152,7 @@ class UIHandler(val UI: UICanvas,
      * Send OPEN signal to the attached UI.
      */
     fun setAsOpen() {
-        if (alwaysVisible) {
+        if (alwaysVisible && !doNotWarnConstant) {
             throw RuntimeException("[UIHandler] Tried to 'open' constant UI")
         }
         if (!isOpened && !isOpening) {
@@ -150,6 +160,8 @@ class UIHandler(val UI: UICanvas,
             isOpening = true
             isClosing = false
             isVisible = true
+
+            openFired = true
         }
     }
 
@@ -157,13 +169,15 @@ class UIHandler(val UI: UICanvas,
      * Send CLOSE signal to the attached UI.
      */
     fun setAsClose() {
-        if (alwaysVisible) {
+        if (alwaysVisible && !doNotWarnConstant) {
             throw RuntimeException("[UIHandler] Tried to 'close' constant UI")
         }
         if ((isOpening || isOpened) && !isClosing && isVisible) {
             isOpened = false
             isClosing = true
             isOpening = false
+
+            closeFired = true
         }
     }
 
@@ -171,7 +185,7 @@ class UIHandler(val UI: UICanvas,
         get() = !isOpened && !isClosing && !isOpening
 
     fun toggleOpening() {
-        if (alwaysVisible) {
+        if (alwaysVisible && !doNotWarnConstant) {
             throw RuntimeException("[UIHandler] Tried to 'toggle opening of' constant UI")
         }
         if (isVisible) {

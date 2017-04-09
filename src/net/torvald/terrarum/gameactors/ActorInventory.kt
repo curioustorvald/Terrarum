@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.ui.UIInventory
 import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock

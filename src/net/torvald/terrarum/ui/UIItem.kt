@@ -2,8 +2,8 @@ package net.torvald.terrarum.ui
 
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.roundInt
-import net.torvald.terrarum.gamecontroller.mouseX
-import net.torvald.terrarum.gamecontroller.mouseY
+import net.torvald.terrarum.gamecontroller.mouseScreenX
+import net.torvald.terrarum.gamecontroller.mouseScreenY
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 
@@ -19,9 +19,9 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     abstract val height: Int
 
     protected val relativeMouseX: Int
-        get() = (Terrarum.appgc.mouseX - (parentUI.handler?.posX ?: 0) - this.posX).roundInt()
+        get() = (Terrarum.appgc.mouseScreenX - (parentUI.handler?.posX ?: 0) - this.posX)
     protected val relativeMouseY: Int
-        get() = (Terrarum.appgc.mouseY - (parentUI.handler?.posY ?: 0) - this.posY).roundInt()
+        get() = (Terrarum.appgc.mouseScreenY - (parentUI.handler?.posY ?: 0) - this.posY)
 
     open val mouseUp: Boolean
         get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
