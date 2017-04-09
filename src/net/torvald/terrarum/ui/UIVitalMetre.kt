@@ -5,6 +5,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.floorInt
 import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.mapdrawer.MapCamera
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -27,10 +28,17 @@ class UIVitalMetre(
     override var width: Int = 80 + 2 * margin; set(value) { throw Error("operation not permitted") }
     override var height: Int; get() = player?.baseHitboxH ?: 0 * 3 + margin; set(value) { throw Error("operation not permitted") }
     override var handler: UIHandler? = null
+        set(value) {
+            // override customPositioning to be true
+            if (value != null) {
+                value.customPositioning = true
+            }
+            field = value
+        }
     override var openCloseTime: Int = 50
 
-    private val relativePX = width / 2f
-    private val relativePY: Float; get() =  (player?.baseHitboxH ?: 0) * 1.5f
+    //private val relativePX = width / 2f
+    private val offsetY: Float; get() = (player?.baseHitboxH ?: 0) * 1.5f
     private val circleRadius: Float; get() = (player?.baseHitboxH ?: 0) * 3f
 
     private val theta = 33f
@@ -41,21 +49,35 @@ class UIVitalMetre(
 
     override fun update(gc: GameContainer, delta: Int) {
         handler!!.setPosition(
-                (Terrarum.HALFW - relativePX).roundInt(),
-                (Terrarum.HALFH - relativePY).floorInt()
+                Terrarum.HALFW,
+                Terrarum.HALFH
         )
+
+        handler!!.customPositioning = true
     }
 
+    /**
+     * g must be same as World Graphics!
+     */
     override fun render(gc: GameContainer, g: Graphics) {
-        if (vitalGetterVal() != null && vitalGetterMax() != null) {
+        if (vitalGetterVal() != null && vitalGetterMax() != null && player != null) {
+
+            // FIXME does not work well with screen zoom, because of my custom g.translate
+
+            g.translate(
+                    -MapCamera.x + player!!.centrePosPoint.x.toFloat(),
+                    -MapCamera.y + player!!.centrePosPoint.y.toFloat()
+            )
+
+
 
             g.lineWidth = 2f
 
             // background
             g.color = backColor
             g.drawArc(
-                    relativePX - circleRadius - order * gap,
                     -circleRadius - order * gap,
+                    -circleRadius - order * gap - offsetY,
                     circleRadius * 2f + order * gap * 2,
                     circleRadius * 2f + order * gap * 2,
                     90f - halfTheta,
@@ -64,13 +86,17 @@ class UIVitalMetre(
 
             g.color = color
             g.drawArc(
-                    relativePX - circleRadius - order * gap,
                     -circleRadius - order * gap,
+                    -circleRadius - order * gap - offsetY,
                     circleRadius * 2f + order * gap * 2,
                     circleRadius * 2f + order * gap * 2,
                     90f + halfTheta - theta * (vitalGetterVal()!! / vitalGetterMax()!!),
                     90f + halfTheta
             )
+
+
+
+            g.flush()
         }
     }
 
@@ -96,10 +122,10 @@ class UIVitalMetre(
 
 /*
 
-X-------------+ (84)
++-------------+ (84)
 |             |
 |             |
-|      @      |
+|      X      |
 |      @      |
 |,           ,|
 | ''-------'' |

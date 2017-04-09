@@ -16,7 +16,7 @@ import org.newdawn.slick.Input
  */
 class ConsoleWindow : UICanvas, KeyboardControlled {
 
-    internal var UIColour = Color(0xCC000000.toInt())
+    internal var UIColour = Color(0x80404080.toInt())
 
     private var inputCursorPos: Int = 0
     private val MESSAGES_MAX = 5000

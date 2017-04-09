@@ -18,17 +18,16 @@ import org.newdawn.slick.state.StateBasedGame
  * Created by minjaesong on 15-12-31.
  */
 class UIHandler(val UI: UICanvas,
-                val toggleKey: Int? = null, val toggleButton: Int? = null
+                val toggleKey: Int? = null, val toggleButton: Int? = null,
+                // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
+                var customPositioning: Boolean = false
 ) {
 
-    // X/Y Position to the game window.
+    // X/Y Position relative to the game window.
     var posX: Int = 0
     var posY: Int = 0
 
     private var alwaysVisible = false
-
-    private val UIGraphicInstance: Graphics
-    private val UIDrawnCanvas: Image
 
     var isOpening = false
     var isClosing = false
@@ -56,11 +55,6 @@ class UIHandler(val UI: UICanvas,
 
     init {
         UI.handler = this
-
-        println("[UIHandler] Creating framebuffer for UI '${UI.javaClass.simpleName}'")
-
-        UIDrawnCanvas = Image(UI.width, UI.height)
-        UIGraphicInstance = UIDrawnCanvas.graphics
     }
 
 
@@ -123,14 +117,11 @@ class UIHandler(val UI: UICanvas,
 
     fun render(gc: GameContainer, sbg: StateBasedGame, ingameGraphics: Graphics) {
         if (isVisible || alwaysVisible) {
-            UIGraphicInstance.clear()
-            UIGraphicInstance.font = Terrarum.fontGame
+            ingameGraphics.font = Terrarum.fontGame // default font. Re-assign in the UI to change
 
-            UI.render(gc, UIGraphicInstance)
-
-            ingameGraphics.drawImage(
-                    UIDrawnCanvas, posX.toFloat(), posY.toFloat(), Color(1f, 1f, 1f, opacity)
-            )
+            if (!customPositioning) ingameGraphics.translate(posX.toFloat(), posY.toFloat())
+            UI.render(gc, ingameGraphics)
+            ingameGraphics.flush()
         }
     }
 

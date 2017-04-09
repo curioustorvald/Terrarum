@@ -88,6 +88,12 @@ class StateUITest : BasicGameState() {
     override fun getID() = Terrarum.STATE_ID_TEST_UI1
 
     override fun render(container: GameContainer, game: StateBasedGame, g: Graphics) {
+        blendNormal()
+        g.color = Color.green
+        g.fillRect(0f, 0f, 2048f, 2048f)
+
+
+
         ui.render(container, game, g)
     }
 }
