@@ -125,3 +125,7 @@ val GameContainer.mouseTileX: Int
 /** currently pointing tile coordinate */
 val GameContainer.mouseTileY: Int
     get() = GameController.mouseTileY
+val GameContainer.mouseScreenX: Int
+    get() = Terrarum.appgc.input.mouseX
+val GameContainer.mouseScreenY: Int
+    get() = Terrarum.appgc.input.mouseY

@@ -52,8 +52,6 @@ class UIVitalMetre(
                 Terrarum.HALFW,
                 Terrarum.HALFH
         )
-
-        handler!!.customPositioning = true
     }
 
     /**
