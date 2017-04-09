@@ -48,7 +48,7 @@ class UIPieMenu : UICanvas {
         for (i in 0..slotCount - 1) {
             // set position
             val angle = Math.PI * 2.0 * (i.toDouble() / slotCount) + Math.PI // 180 deg monitor-wise
-            val slotCentrePoint = Vector2(0.0, slotDistanceFromCentre.toDouble()).setDirection(angle) + centrePoint
+            val slotCentrePoint = Vector2(0.0, slotDistanceFromCentre).setDirection(angle) + centrePoint
 
             // draw cells
             val color = if (i == selection)

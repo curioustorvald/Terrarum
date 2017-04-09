@@ -80,8 +80,8 @@ class StateInGame : BasicGameState() {
 
     val worldDrawFrameBuffer = Image(Terrarum.WIDTH.div(ZOOM_MIN).ceilInt(), Terrarum.HEIGHT.div(ZOOM_MIN).ceilInt())
     val worldG = worldDrawFrameBuffer.graphics
-    val uisDrawFrameBuffer = Image(Terrarum.WIDTH, Terrarum.HEIGHT)
-    val uiG = uisDrawFrameBuffer.graphics
+    val backDrawFrameBuffer = Image(Terrarum.WIDTH, Terrarum.HEIGHT)
+    val backG = backDrawFrameBuffer.graphics
 
     //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
     //private lateinit var shaderBlur: Shader
@@ -198,11 +198,11 @@ class StateInGame : BasicGameState() {
         // vital metre
         // fill in getter functions by
         //      (uiAliases[UI_QUICK_BAR]!!.UI as UIVitalMetre).vitalGetterMax = { some_function }
-        uiAliases[UI_VITAL1] = UIHandler(UIVitalMetre(player, { 80f }, { 100f }, Color.red, 0))
+        uiAliases[UI_VITAL1] = UIHandler(UIVitalMetre(player, { 80f }, { 100f }, Color.red, 0), customPositioning = true)
         uiAliases[UI_VITAL1]!!.setAsAlwaysVisible()
-        uiAliases[UI_VITAL2] = UIHandler(UIVitalMetre(player, { 73f }, { 100f }, Color(0x00dfff), 1))
+        uiAliases[UI_VITAL2] = UIHandler(UIVitalMetre(player, { 73f }, { 100f }, Color(0x00dfff), 1), customPositioning = true)
         uiAliases[UI_VITAL2]!!.setAsAlwaysVisible()
-        uiAliases[UI_VITAL3] = UIHandler(UIVitalMetre(player, { 32f }, { 100f }, Color(0xffcc00), 2))
+        uiAliases[UI_VITAL3] = UIHandler(UIVitalMetre(player, { 32f }, { 100f }, Color(0xffcc00), 2), customPositioning = true)
         uiAliases[UI_VITAL3]!!.setAsAlwaysVisible()
 
 
@@ -357,17 +357,16 @@ class StateInGame : BasicGameState() {
 
         // clean the shit beforehand
         worldG.clear()
-        uiG.clear()
+        backG.clear()
 
         blendNormal()
 
 
-        drawSkybox(gwin) // drawing to gwin so that any lights from lamp wont "leak" to the skybox
+        drawSkybox(backG) // drawing to gwin so that any lights from lamp wont "leak" to the skybox
                          // e.g. Bright blue light on sunset
 
 
-        // make camara work //
-        // compensate for zoom. UIs must be treated specially! (see UIHandler)
+        // make camara work
         worldG.translate(-MapCamera.x.toFloat(), -MapCamera.y.toFloat())
 
 
@@ -472,21 +471,31 @@ class StateInGame : BasicGameState() {
             WorldSimulator.drawFluidMapDebug(worldG)
 
 
-        //////////////
-        // draw UIs //
-        //////////////
-        uiContainer.forEach { if (it != consoleHandler) it.render(gc, sbg, uiG) }
-        debugWindow.render(gc, sbg, uiG)
+
+
+        /////////////////
+        // GUI Predraw //
+        /////////////////
+        worldG.flush()
+        backG.drawImage(worldDrawFrameBuffer.getScaledCopy(screenZoom), 0f, 0f)
+        backG.flush()
+
+
+        /////////////////////
+        // draw UIs  ONLY! //
+        /////////////////////
+        uiContainer.forEach { if (it != consoleHandler) it.render(gc, sbg, backG) }
+        debugWindow.render(gc, sbg, backG)
         // make sure console draws on top of other UIs
-        consoleHandler.render(gc, sbg, uiG)
-        notifier.render(gc, sbg, uiG)
+        consoleHandler.render(gc, sbg, backG)
+        notifier.render(gc, sbg, backG)
 
 
-        /////////////////
-        // draw layers //
-        /////////////////
-        gwin.drawImage(worldDrawFrameBuffer.getScaledCopy(screenZoom), 0f, 0f)
-        gwin.drawImage(uisDrawFrameBuffer, 0f, 0f)
+        //////////////////
+        // GUI Postdraw //
+        //////////////////
+        backG.flush()
+        gwin.drawImage(backDrawFrameBuffer, 0f, 0f)
 
 
         // centre marker

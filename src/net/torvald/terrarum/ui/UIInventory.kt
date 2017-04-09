@@ -28,7 +28,7 @@ class UIInventory(
 
     val catButtonsToCatIdent = HashMap<String, String>()
 
-    val backgroundColour = Color(0x1c1c1c)
+    val backgroundColour = Color(0xA0282828.toInt())
 
     init {
         catButtonsToCatIdent.put("GAME_INVENTORY_WEAPONS", InventoryItem.Category.WEAPON)
@@ -73,9 +73,10 @@ class UIInventory(
             defaultSelection = 0,
             iconSpriteSheet = SpriteSheet("./assets/graphics/gui/inventory/category.tga", 20, 20),
             iconSpriteSheetIndices = intArrayOf(9,0,1,2,3,4,5,6,7,8),
-            highlightBackCol = backgroundColour screen Color(0x0c0c0c),
-            highlightBackBlendMode = BlendMode.NORMAL,
+            highlightBackCol = Color(0x0c0c0c),
+            highlightBackBlendMode = BlendMode.SCREEN,
             backgroundCol = Color(0x383838),
+            backgroundBlendMode = BlendMode.MULTIPLY,
             kinematic = true
     )
 
@@ -93,8 +94,6 @@ class UIInventory(
                 mouseoverBackCol = Color(0x282828),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
                 drawBackOnNull = false
-                //backCol = Color(0x101010),
-                //backBlendMode = BlendMode.SCREEN
         ) })
     val itemsScrollOffset = 0
 
@@ -175,6 +174,8 @@ class UIInventory(
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
+        //blendMul()
+        blendNormal()
         g.color = backgroundColour
         g.fillRect(0f, 0f, width.toFloat(), height.toFloat())
 

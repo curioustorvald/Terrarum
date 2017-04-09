@@ -193,7 +193,7 @@ class BasicDebugInfoWindow : UICanvas {
     val histogramH = 200
 
     private fun drawHistogram(g: Graphics, histogram: LightmapRenderer.Histogram, x: Int, y: Int) {
-        val uiColour = Color(0xAA000000.toInt())
+        val uiColour = Color(0x80000000.toInt())
         val barR = Color(0xDD0000)
         val barG = Color(0x00DD00)
         val barB = Color(0x0000DD)
