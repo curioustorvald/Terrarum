@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIInventory
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemTextButton
 import org.newdawn.slick.Color
@@ -16,7 +17,7 @@ import org.newdawn.slick.Image
  * Created by SKYHi14 on 2017-03-16.
  */
 class UIItemInventoryElem(
-        parentUI: UICanvas,
+        parentUI: UIInventory,
         override var posX: Int,
         override var posY: Int,
         override val width: Int,
@@ -37,6 +38,8 @@ class UIItemInventoryElem(
         val height = 48
         val UNIQUE_ITEM_HAS_NO_AMOUNT = -1
     }
+
+    private val inventoryUI = parentUI
 
     override val height = UIItemInventoryElem.height
 
@@ -59,9 +62,9 @@ class UIItemInventoryElem(
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-
         g.font = Terrarum.fontGame
 
+        // mouseover background
         if (item != null || drawBackOnNull) {
             if (mouseUp) {
                 BlendMode.resolve(mouseoverBackBlendMode)
@@ -78,15 +81,17 @@ class UIItemInventoryElem(
         if (item != null && itemImage != null) {
             blendNormal()
 
+            // item image
             g.drawImage(itemImage!!, posX + imgOffset, posY + imgOffset)
 
             // if mouse is over, text lights up
-            g.color = item!!.nameColour * if (mouseUp) mouseOverTextCol else UIItemTextButton.defaultInactiveCol
+            // this one-liner sets color
+            g.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else UIItemTextButton.defaultInactiveCol
             g.drawString(
                     item!!.name + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "") +
-                    (if (equippedSlot != null) "  <eq $equippedSlot>" else "")
-                    , posX + textOffsetX
-                    , posY + textOffsetY
+                    (if (equippedSlot != null) "  ${0xE081.toChar()}\$$equippedSlot" else ""),
+                    posX + textOffsetX,
+                    posY + textOffsetY
             )
 
 
@@ -126,6 +131,20 @@ class UIItemInventoryElem(
     }
 
     override fun mousePressed(button: Int, x: Int, y: Int) {
+        if (item != null && Terrarum.ingame != null) {
+            // equip da shit
+            val itemEquipSlot = item!!.equipPosition
+            val player = Terrarum.ingame!!.player
+
+            if (item != player.itemEquipped[itemEquipSlot]) { // if this item is unequipped, equip it
+                player.itemEquipped[itemEquipSlot] = item
+            }
+            else { // if not, unequip it
+                player.itemEquipped[itemEquipSlot] = null
+            }
+        }
+
+        inventoryUI.rebuildList()
     }
 
     override fun mouseReleased(button: Int, x: Int, y: Int) {

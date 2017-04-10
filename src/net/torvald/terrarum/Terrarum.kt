@@ -208,6 +208,9 @@ object Terrarum : StateBasedGame(GAME_NAME) {
     private val thirtyTwoBitArchs = arrayOf("i386", "i686", "ppc", "x86", "x86_32") // I know I should Write Once, Run Everywhere; but just in case :)
     val is32Bit = thirtyTwoBitArchs.contains(systemArch)
 
+    lateinit var textureWhite: Image
+    lateinit var textureBlack: Image
+
     init {
 
         // just in case
@@ -252,6 +255,10 @@ object Terrarum : StateBasedGame(GAME_NAME) {
 
     @Throws(SlickException::class)
     override fun initStatesList(gc: GameContainer) {
+        textureWhite = Image("./assets/graphics/background_white.png")
+        textureBlack = Image("./assets/graphics/background_black.png")
+
+
         fontGame = GameFontImpl()
         fontSmallNumbers = TinyAlphNum()
 
@@ -638,15 +645,13 @@ infix fun Color.screen(other: Color) = Color(
         1f - (1f - this.b) * (1f - other.b),
         1f - (1f - this.a) * (1f - other.a)
 )
-
-operator fun Color.times(other: Color) = Color(
+infix fun Color.mul(other: Color) = Color( // don't turn into an operator!
         this.r * other.r,
         this.g * other.g,
         this.b * other.b,
         this.a * other.a
 )
-
-operator fun Color.minus(other: Color) = Color(
+infix fun Color.minus(other: Color) = Color( // don't turn into an operator!
     this.r - other.r,
     this.g - other.g,
     this.b - other.b,
@@ -654,5 +659,11 @@ operator fun Color.minus(other: Color) = Color(
 )
 
 fun Int.toHex() = this.toLong().and(0xFFFFFFFF).toString(16).padStart(8, '0').toUpperCase()
+fun Long.toHex() = {
+    val sb = StringBuilder()
+    (0..16).forEach {
+
+    }
+}
 
 

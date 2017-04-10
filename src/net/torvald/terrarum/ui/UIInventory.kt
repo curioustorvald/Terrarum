@@ -2,8 +2,11 @@ package net.torvald.terrarum.ui
 
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.QUICKSLOT_MAX
+import net.torvald.terrarum.Terrarum.joypadLabelNinA
+import net.torvald.terrarum.Terrarum.joypadLabelNinY
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.*
 import java.util.*
 
@@ -13,8 +16,9 @@ import java.util.*
 class UIInventory(
         var actor: Pocketed?,
         override var width: Int,
-        override var height: Int
-) : UICanvas {
+        override var height: Int,
+        var categoryWidth: Int
+) : UICanvas, MouseControlled, KeyControlled {
 
     val inventory: ActorInventory?
         get() = actor?.inventory
@@ -28,7 +32,7 @@ class UIInventory(
 
     val catButtonsToCatIdent = HashMap<String, String>()
 
-    val backgroundColour = Color(0xA0282828.toInt())
+    val backgroundColour = Color(0xA0242424.toInt())
 
     init {
         catButtonsToCatIdent.put("GAME_INVENTORY_WEAPONS", InventoryItem.Category.WEAPON)
@@ -50,39 +54,41 @@ class UIInventory(
     val itemStripGutterH = 8
     val itemInterColGutter = 8
 
+    val controlHelpHeight = Terrarum.fontGame.lineHeight
+
     val catButtons = UIItemTextButtonList(
             this,
             arrayOf(
                     "MENU_LABEL_ALL",
+                    "GAME_INVENTORY_BLOCKS",
+                    "GAME_INVENTORY_WALLS",
                     "GAME_INVENTORY_WEAPONS", // weapons and tools
                     "CONTEXT_ITEM_TOOL_PLURAL",
                     "CONTEXT_ITEM_ARMOR",
                     "GAME_INVENTORY_INGREDIENTS",
                     "GAME_INVENTORY_POTIONS",
                     "CONTEXT_ITEM_MAGIC",
-                    "GAME_INVENTORY_BLOCKS",
-                    "GAME_INVENTORY_WALLS",
                     "GAME_GENRE_MISC"
                     //"GAME_INVENTORY_FAVORITES",
             ),
-            width = (width / 3 / 100) * 100, // chop to hundreds unit (100, 200, 300, ...) with the black magic of integer division
-            height = height,
+            width = categoryWidth,
+            height = height - controlHelpHeight,
             verticalGutter = itemStripGutterH,
             readFromLang = true,
             textAreaWidth = 100,
             defaultSelection = 0,
             iconSpriteSheet = SpriteSheet("./assets/graphics/gui/inventory/category.tga", 20, 20),
-            iconSpriteSheetIndices = intArrayOf(9,0,1,2,3,4,5,6,7,8),
-            highlightBackCol = Color(0x0c0c0c),
-            highlightBackBlendMode = BlendMode.SCREEN,
-            backgroundCol = Color(0x383838),
-            backgroundBlendMode = BlendMode.MULTIPLY,
+            iconSpriteSheetIndices = intArrayOf(9,6,7,0,1,2,3,4,5,8),
+            highlightBackCol = Color(0xb8b8b8),
+            highlightBackBlendMode = BlendMode.MULTIPLY,
+            backgroundCol = Color(0,0,0,0), // will use custom background colour!
+            backgroundBlendMode = BlendMode.NORMAL,
             kinematic = true
     )
 
     val itemsStripWidth = ((width - catButtons.width) - (2 * itemStripGutterH + itemInterColGutter)) / 2
     val items = Array(
-            2 + height / (UIItemInventoryElem.height + itemStripGutterV) * 2, {
+            2 + height / (UIItemInventoryElem.height + itemStripGutterV - controlHelpHeight) * 2, {
         UIItemInventoryElem(
                 parentUI = this,
                 posX = catButtons.width + if (it % 2 == 0) itemStripGutterH else (itemStripGutterH + itemsStripWidth + itemInterColGutter),
@@ -98,7 +104,23 @@ class UIInventory(
     val itemsScrollOffset = 0
 
     var inventorySortList = ArrayList<InventoryPair>()
-    var rebuildList = true
+    private var rebuildList = true
+
+    private val SP = "${0x3000.toChar()}${0x3000.toChar()}${0x3000.toChar()}"
+    val listControlHelp: String
+        get() = if (Terrarum.environment == RunningEnvironment.PC)
+            "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP" +
+            "${0xe011.toChar()}..${0xe019.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
+            "${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
+    else
+            "$joypadLabelNinY ${Lang["GAME_INVENTORY_USE"]}$SP" +
+            "${0xe011.toChar()}${0xe019.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
+            "$joypadLabelNinA ${Lang["GAME_INVENTORY_DROP"]}"
+    val listControlClose: String
+        get() = if (Terrarum.environment == RunningEnvironment.PC)
+            "${0xe037.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
+    else
+            "${0xe069.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
 
     private var oldCatSelect = -1
 
@@ -133,6 +155,7 @@ class UIInventory(
 
                 // map sortList to item list
                 for (k in 0..items.size - 1) {
+                    // we have an item
                     try {
                         val sortListItem = inventorySortList[k + itemsScrollOffset]
                         items[k].item = sortListItem.item
@@ -149,6 +172,7 @@ class UIInventory(
                                 items[k].quickslot = null
                         }
 
+                        // set equippedslot number
                         for (eq in 0..actor!!.itemEquipped.size - 1) {
                             if (eq < actor!!.itemEquipped.size) {
                                 if (actor!!.itemEquipped[eq] == items[k].item) {
@@ -160,6 +184,7 @@ class UIInventory(
                             }
                         }
                     }
+                    // we do not have an item, empty the slot
                     catch (e: IndexOutOfBoundsException) {
                         items[k].item = null
                         items[k].amount = 0
@@ -175,10 +200,17 @@ class UIInventory(
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        //blendMul()
+        // background
         blendNormal()
         g.color = backgroundColour
         g.fillRect(0f, 0f, width.toFloat(), height.toFloat())
+
+
+        // cat bar background
+        blendMul()
+        g.color = Color(0xcccccc)
+        g.fillRect(0f, 0f, catButtons.width.toFloat(), height.toFloat())
+
 
         catButtons.render(gc, g)
 
@@ -186,7 +218,26 @@ class UIInventory(
         items.forEach {
             it.render(gc, g)
         }
+
+        // texts
+        blendNormal()
+        g.color = Color(0xdddddd)
+        Typography.printCentered(g, listControlHelp, catButtons.width, height - controlHelpHeight, width - catButtons.width)
+        Typography.printCentered(g, listControlClose, 0, height - controlHelpHeight, catButtons.width)
     }
+
+
+    /** Persuade the UI to rebuild its item list */
+    fun rebuildList() {
+        rebuildList = true
+    }
+
+
+
+
+    ////////////
+    // Inputs //
+    ////////////
 
     override fun processInput(gc: GameContainer, delta: Int, input: Input) {
     }
@@ -213,5 +264,35 @@ class UIInventory(
 
     override fun endClosing(gc: GameContainer, delta: Int) {
         handler!!.posX = -width
+    }
+
+    override fun keyPressed(key: Int, c: Char) {
+        items.forEach { it.keyPressed(key, c) }
+    }
+
+    override fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    }
+
+    override fun keyReleased(key: Int, c: Char) {
+    }
+
+    override fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    }
+
+    override fun controllerButtonPressed(controller: Int, button: Int) {
+    }
+
+    override fun mousePressed(button: Int, x: Int, y: Int) {
+        items.forEach { if (it.mouseUp) it.mousePressed(button, x, y) }
+    }
+
+    override fun controllerButtonReleased(controller: Int, button: Int) {
+    }
+
+    override fun mouseReleased(button: Int, x: Int, y: Int) {
+        items.forEach { if (it.mouseUp) it.mouseReleased(button, x, y) }
+    }
+
+    override fun mouseWheelMoved(change: Int) {
     }
 }

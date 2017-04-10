@@ -174,7 +174,11 @@ class StateInGame : BasicGameState() {
         // >- queue up game UIs that should pause the world -<
         // inventory
         uiAlasesPausing[UI_INVENTORY_PLAYER] = UIHandler(
-                UIInventory(player, 800, Terrarum.HEIGHT - 160),
+                UIInventory(player,
+                        width = 840,
+                        height = Terrarum.HEIGHT - 160,
+                        categoryWidth = 210
+                ),
                 toggleKey = Terrarum.getConfigInt("keyinventory")
         )
         uiAlasesPausing[UI_INVENTORY_PLAYER]!!.setPosition(

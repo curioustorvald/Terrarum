@@ -14,7 +14,7 @@ import org.newdawn.slick.Input
 /**
  * Created by minjaesong on 15-12-31.
  */
-class ConsoleWindow : UICanvas, KeyboardControlled {
+class ConsoleWindow : UICanvas, KeyControlled {
 
     internal var UIColour = Color(0x80404080.toInt())
 
@@ -205,5 +205,11 @@ class ConsoleWindow : UICanvas, KeyboardControlled {
     override fun endClosing(gc: GameContainer, delta: Int) {
         drawOffY = -height.toFloat()
         openingTimeCounter = 0
+    }
+
+    override fun controllerButtonPressed(controller: Int, button: Int) {
+    }
+
+    override fun controllerButtonReleased(controller: Int, button: Int) {
     }
 }

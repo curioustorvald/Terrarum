@@ -13,4 +13,10 @@ object Typography {
 
         g.drawString(string, targetW.minus(stringW).ushr(1).toFloat(), screenPosY.toFloat())
     }
+
+    fun printCentered(g: Graphics, string: String, posX: Int, posY: Int, frameWidth: Int) {
+        val stringW = g.font.getWidth(string)
+
+        g.drawString(string, frameWidth.minus(stringW).ushr(1).toFloat() + posX, posY.toFloat())
+    }
 }

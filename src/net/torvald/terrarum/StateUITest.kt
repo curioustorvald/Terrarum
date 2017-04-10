@@ -31,7 +31,7 @@ class StateUITest : BasicGameState() {
     }
 
     init {
-        ui = UIHandler(UIInventory(actor, 800, Terrarum.HEIGHT - 160))
+        ui = UIHandler(UIInventory(actor, 900, Terrarum.HEIGHT - 160, 220))
 
         ui.posX = 0
         ui.posY = 60

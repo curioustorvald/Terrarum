@@ -50,7 +50,7 @@ class GameFontImpl : GameFontBase() {
         GameFontBase.thaiSheet = SpriteSheet(
                 "./assets/graphics/fonts/thai_wide.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.keycapSheet = SpriteSheet(
-                "./assets/graphics/fonts/puae000-e07f.tga", GameFontBase.SIZE_KEYCAP, GameFontBase.SIZE_KEYCAP)
+                "./assets/graphics/fonts/puae000-e0ff.tga", GameFontBase.SIZE_KEYCAP, GameFontBase.SIZE_KEYCAP)
 
         val shk = arrayOf(
                 GameFontBase.asciiSheet,

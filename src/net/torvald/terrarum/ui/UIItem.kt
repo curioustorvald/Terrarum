@@ -23,8 +23,10 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     protected val relativeMouseY: Int
         get() = (Terrarum.appgc.mouseScreenY - (parentUI.handler?.posY ?: 0) - this.posY)
 
+    /** If mouse is hovering over it */
     open val mouseUp: Boolean
         get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
+    /** If mouse is hovering over it and mouse is down */
     open val mousePushed: Boolean
         get() = mouseUp && Terrarum.appgc.input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary")!!)
 
