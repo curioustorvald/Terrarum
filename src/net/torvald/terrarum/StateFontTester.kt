@@ -61,7 +61,7 @@ nopqrstuvwxyz
 
         //g.drawString("Syö salmiakkia perkele", 480f, 10f)
 
-        val text = arrayOf(
+        /*val text = arrayOf(
                 "The bitmap font for game developers who seek good font that has real multilingual support,",
                 "for free (as in freedom AND without cost).",
                 "",
@@ -96,6 +96,11 @@ nopqrstuvwxyz
                 "Also supports: ‛Unicode’ „quotation marks“—dashes…「括弧」‼",
                 "ASCII  Latin-1  Latin_Ext-A  Latin_Ext-B  Greek  Cyrillic  CJK-Ideo  Kana  Hangul_Syllables",
                 ""
+        )*/
+        val SP = "${0x3000.toChar()}${0x3000.toChar()}"
+
+        val text = arrayOf(
+                "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP${0xe011.toChar()}..${0xe019.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
         )
 
         text.forEachIndexed { i, s ->

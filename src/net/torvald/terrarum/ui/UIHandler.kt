@@ -207,13 +207,13 @@ class UIHandler(val UI: UICanvas,
     }
 
     fun keyPressed(key: Int, c: Char) {
-        if (isVisible && UI is KeyboardControlled) {
+        if (isVisible && UI is KeyControlled) {
             UI.keyPressed(key, c)
         }
     }
 
     fun keyReleased(key: Int, c: Char) {
-        if (isVisible && UI is KeyboardControlled) {
+        if (isVisible && UI is KeyControlled) {
             UI.keyReleased(key, c)
         }
     }
@@ -249,13 +249,13 @@ class UIHandler(val UI: UICanvas,
     }
 
     fun controllerButtonPressed(controller: Int, button: Int) {
-        if (isVisible && UI is GamepadControlled) {
+        if (isVisible && UI is KeyControlled) {
             UI.controllerButtonPressed(controller, button)
         }
     }
 
     fun controllerButtonReleased(controller: Int, button: Int) {
-        if (isVisible && UI is GamepadControlled) {
+        if (isVisible && UI is KeyControlled) {
             UI.controllerButtonReleased(controller, button)
         }
     }

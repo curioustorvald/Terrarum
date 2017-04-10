@@ -1,30 +1,35 @@
 ##  Format  ##
 
+Contain everything on [TEVD](github.com/minjaesong/TerranVirtualDisk)
+
 *  Save meta
-    - GZip'd binary (for more security)
+    - binary
     - Filename : world (with no extension)
 
-    |Type        |Mnemonic    |Description                            |
-    |------------|------------|---------------------------------------|
-    |Byte[4]     |TESV        |Magic                                  |
-    |Byte[n]     |name        |Savegame name, UTF-8                   |
-    |Byte        |NULL        |String terminator                      |
-    |Byte[8]     |terraseed   |Terrain seed                           |
-    |Byte[8]     |rogueseed   |Randomiser seed                        |
-    |Byte[32]    |hash1       |SHA-256 hash of worldinfo1 being stored (when not zipped)|
-    |Byte[32]    |hash2       |SHA-256 hash of worldinfo2 being stored (when not zipped)|
-    |Byte[32]    |hash3       |SHA-256 hash of worldinfo3 being stored (when not zipped)|
-    |Byte[32]    |hash4       |SHA-256 hash of worldinfo4 being stored (when not zipped)|
+    |Type      |Mnemonic   |Description                  |
+    |----------|-----------|-----------------------------|
+    |Byte[4]   |TESV       |Magic                        |
+    |Byte[n]   |name       |Savegame name, UTF-8         |
+    |Byte      |NULL       |String terminator            |
+    |Byte[8]   |terraseed  |Terrain seed                 |
+    |Byte[8]   |rogueseed  |Randomiser seed              |
+    |Byte[4]   |crc1       |CRC-32 of worldinfo1 entry   |
+    |Byte[4]   |crc2       |CRC-32 of worldinfo2 entry   |
+    |Byte[4]   |crc3       |CRC-32 of worldinfo3 entry   |
+    |Byte[4]   |crc4       |CRC-32 of worldinfo4 entry   |
+    |Byte[32]  |hash4321   |SHA-256 of crc4..crc3..crc2..crc1|
     
     Endianness: Big
+    
+    each entry on the disk contains CRC of its data, we can compare CRC saved in meta && CRC of entry header && CRC of actual content
 
 *  Actor/Faction data
-    - GZip'd GSON
+    - GSON
     - Filename : (refid) (with no extension)
 
 
 *  Prop data
-    - GZip'd CSV
+    - CSV
     - Filename : (with no extension)
     worldinfo2 -- tileprop
     worldinfo3 -- itemprop
@@ -43,14 +48,18 @@
 
 Directory:
 
-    +--- <save1>
-     --- 2a93bc5fd...f823   Actor/DynamicItem/Faction/etc. data (JSON)
-     --- 423bdc838...93bd   Actor/DynamicItem/Faction/etc. data (JSON)
+    +--- <save1.tevd>
+     --- 2a93bc5f (item ID) Actor/DynamicItem/Faction/etc. data (JSON)
+     --- 423bdc83 (item ID) Actor/DynamicItem/Faction/etc. data (JSON)
      --- Items_list.txt     Human-readable
      --- Materials_list.txt Human-readable
      --- Tiles_list.txt     Human-readable
-     --- world              save meta (binary, GZip)
-     --- worldinfo1         TEMD (binary, GZip)
-     --- worldinfo2         tileprop (GZip)
-     --- worldinfo3         itemprop (GZip)
-     --- worldinfo4         materialprop (GZip)
+     --- world              save meta (binary)
+     --- worldinfo1         TEMD (binary)
+     --- worldinfo2         tileprop (CSV)
+     --- worldinfo3         itemprop (CSV)
+     --- worldinfo4         materialprop (CSV)
+     +--- computers
+      --- (UUID)            virtual disk
+     +--- tapestries
+      --- (random Int)      tapestry

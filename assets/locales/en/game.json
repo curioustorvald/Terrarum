@@ -13,5 +13,7 @@
   "GAME_INVENTORY_BLOCKS" : "Blocks",
   "GAME_INVENTORY_WALLS" : "Walls",
   "CONTEXT_ITEM_TOOL_PLURAL" : "Tools",
-  "GAME_INVENTORY_FAVORITES" : "Favorites"
+  "GAME_INVENTORY_FAVORITES" : "Favorites",
+
+  "GAME_INVENTORY_REGISTER" : "Register"
 }

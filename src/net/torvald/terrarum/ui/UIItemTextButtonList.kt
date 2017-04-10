@@ -148,6 +148,7 @@ class UIItemTextButtonList(
         g.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
 
         g.color = highlightBackCol
+        BlendMode.resolve(highlightBackBlendMode)
         g.fillRect(posX.toFloat(), highlightY.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
 
         buttons.forEach { it.render(gc, g) }

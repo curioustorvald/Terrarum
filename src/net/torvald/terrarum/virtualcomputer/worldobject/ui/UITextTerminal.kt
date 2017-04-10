@@ -12,7 +12,7 @@ import org.newdawn.slick.Input
 /**
  * Created by minjaesong on 16-09-08.
  */
-class UITextTerminal(val terminal: Terminal) : UICanvas, KeyboardControlled, MouseControlled {
+class UITextTerminal(val terminal: Terminal) : UICanvas, KeyControlled, MouseControlled {
     override fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -27,6 +27,12 @@ class UITextTerminal(val terminal: Terminal) : UICanvas, KeyboardControlled, Mou
 
     override fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
         throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun controllerButtonPressed(controller: Int, button: Int) {
+    }
+
+    override fun controllerButtonReleased(controller: Int, button: Int) {
     }
 
     override var width: Int = terminal.displayW// + some
