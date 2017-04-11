@@ -109,16 +109,18 @@ abstract class InventoryItem : Comparable<InventoryItem> {
     open fun effectWhenPickedUp(gc: GameContainer, delta: Int) { }
 
     /**
-     * Effects applied (continuously or not) while primary button (usually left mouse button) is down
+     * Apply effects (continuously or not) while primary button (usually left mouse button) is down.
+     * The item will NOT be consumed, so you will want to consume it yourself by inventory.consumeItem(item)
      *
-     * @return true when use successfully, false otherwise
+     * @return true when used successfully, false otherwise
      */
     open fun primaryUse(gc: GameContainer, delta: Int): Boolean = false
 
     /**
-     * Effects applied (continuously or not) while secondary button (usually right mouse button) is down
+     * Apply effects (continuously or not) while secondary button (usually right mouse button) is down
+     * The item will NOT be consumed, so you will want to consume it yourself by inventory.consumeItem(item)
      *
-     * @return true when use successfully, false otherwise
+     * @return true when used successfully, false otherwise
      */
     open fun secondaryUse(gc: GameContainer, delta: Int): Boolean = false
 
