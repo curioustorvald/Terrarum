@@ -34,11 +34,11 @@ class UIPieMenu : UICanvas {
     var selection: Int = -1
 
     override fun update(gc: GameContainer, delta: Int) {
-        if (selection >= 0)
-            Terrarum.ingame!!.player.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
-                    selection % slotCount
-
-
+        if (Terrarum.ingame!!.player != null) {
+            if (selection >= 0)
+                Terrarum.ingame!!.player!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
+                        selection % slotCount
+        }
     }
 
     override fun render(gc: GameContainer, g: Graphics) {

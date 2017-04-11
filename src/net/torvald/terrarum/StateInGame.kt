@@ -71,9 +71,10 @@ class StateInGame : BasicGameState() {
     lateinit var debugWindow: UIHandler
     lateinit var notifier: UIHandler
 
-    private lateinit var playableActorDelegate: PlayableActorDelegate // player is necessity in this engine, even if the player is just a camera
-    internal val player: ActorHumanoid // currently POSSESSED actor :)
-        get() = playableActorDelegate.actor
+
+    private var playableActorDelegate: PlayableActorDelegate? = null // DO NOT LATEINIT!
+    internal val player: ActorHumanoid? // currently POSSESSED actor :)
+        get() = playableActorDelegate?.actor
 
     var screenZoom = 1.0f
     val ZOOM_MAX = 2.0f
@@ -141,9 +142,9 @@ class StateInGame : BasicGameState() {
 
 
         // add new player and put it to actorContainer
-        //playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
-        playableActorDelegate = PlayableActorDelegate(PlayerBuilderTestSubject1())
-        addNewActor(player)
+        playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
+        //playableActorDelegate = PlayableActorDelegate(PlayerBuilderTestSubject1())
+        addNewActor(player!!)
 
 
         // test actor
@@ -342,10 +343,10 @@ class StateInGame : BasicGameState() {
         }
 
         // take care of old delegate
-        playableActorDelegate.actor.collisionType = HumanoidNPC.DEFAULT_COLLISION_TYPE
+        playableActorDelegate!!.actor.collisionType = HumanoidNPC.DEFAULT_COLLISION_TYPE
         // accept new delegate
         playableActorDelegate = PlayableActorDelegate(getActorByID(refid) as ActorHumanoid)
-        playableActorDelegate.actor.collisionType = ActorWithSprite.COLLISION_KINEMATIC
+        playableActorDelegate!!.actor.collisionType = ActorWithSprite.COLLISION_KINEMATIC
         WorldSimulator(player, UPDATE_DELTA)
     }
 
@@ -392,7 +393,7 @@ class StateInGame : BasicGameState() {
         /////////////////
         actorsRenderMiddle.forEach { it.drawBody(worldG) }
         actorsRenderMidTop.forEach { it.drawBody(worldG) }
-        player.drawBody(worldG)
+        player?.drawBody(worldG)
         actorsRenderFront.forEach { it.drawBody(worldG) }
         // --> Change of blend mode <-- introduced by ActorVisible //
 
@@ -419,7 +420,7 @@ class StateInGame : BasicGameState() {
         //////////////////////
         actorsRenderMiddle.forEach { it.drawGlow(worldG) }
         actorsRenderMidTop.forEach { it.drawGlow(worldG) }
-        player.drawGlow(worldG)
+        player?.drawGlow(worldG)
         actorsRenderFront.forEach { it.drawGlow(worldG) }
         // --> blendLightenOnly() <-- introduced by ActorVisible //
 
@@ -521,7 +522,7 @@ class StateInGame : BasicGameState() {
         GameController.keyPressed(key, c)
 
         if (canPlayerMove) {
-            player.keyPressed(key, c)
+            player?.keyPressed(key, c)
         }
 
         if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
@@ -747,7 +748,8 @@ class StateInGame : BasicGameState() {
      * This is how remove function of [java.util.ArrayList] is defined.
      */
     fun removeActor(actor: Actor) {
-        if (actor.referenceID == player.referenceID) throw RuntimeException("Attempted to remove player.")
+        if (actor.referenceID == player?.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
+            throw RuntimeException("Attempted to remove player.")
         val indexToDelete = actorContainer.binarySearch(actor.referenceID)
         if (indexToDelete >= 0) {
             actorContainer.removeAt(indexToDelete)

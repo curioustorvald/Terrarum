@@ -75,7 +75,7 @@ object PlayerBuilderSigrid {
 
 
         // Test fill up inventory
-        p.inventory.add(16)
+        p.inventory.add(16, 512)
         p.equipItem(ItemCodex[16])
 
 

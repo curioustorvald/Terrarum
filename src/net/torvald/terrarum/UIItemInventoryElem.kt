@@ -138,11 +138,11 @@ class UIItemInventoryElem(
             val itemEquipSlot = item!!.equipPosition
             val player = Terrarum.ingame!!.player
 
-            if (item != player.inventory.itemEquipped[itemEquipSlot]) { // if this item is unequipped, equip it
-                player.equipItem(item!!)
+            if (item != player?.inventory?.itemEquipped?.get(itemEquipSlot)) { // if this item is unequipped, equip it
+                player?.equipItem(item!!)
             }
             else { // if not, unequip it
-                player.unequipItem(item!!)
+                player?.unequipItem(item!!)
             }
         }
 

@@ -19,7 +19,7 @@ import javax.swing.*
  */
 class ActorValueTracker constructor() : JFrame() {
 
-    constructor(actor: Actor) : this() {
+    constructor(actor: Actor?) : this() {
         setTrackingActor(actor)
     }
 
@@ -146,8 +146,8 @@ class ActorValueTracker constructor() : JFrame() {
         this.isVisible = true
     }
 
-    fun setTrackingActor(actor: Actor) {
-        this.actorValue = actor.actorValue
+    fun setTrackingActor(actor: Actor?) {
+        this.actorValue = actor?.actorValue
 
         this.title = "AVTracker — $actor"
 

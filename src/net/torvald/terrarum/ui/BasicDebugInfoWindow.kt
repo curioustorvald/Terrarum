@@ -45,13 +45,13 @@ class BasicDebugInfoWindow : UICanvas {
 
     override fun update(gc: GameContainer, delta: Int) {
         val player = Terrarum.ingame!!.player
-        val hitbox = player.hitbox
+        val hitbox = player?.hitbox
 
-        xdelta = hitbox.pointedX - prevPlayerX
-        ydelta = hitbox.pointedY - prevPlayerY
+        xdelta = hitbox?.pointedX ?: 0 - prevPlayerX
+        ydelta = hitbox?.pointedY ?: 0 - prevPlayerY
 
-        prevPlayerX = hitbox.pointedX
-        prevPlayerY = hitbox.pointedY
+        prevPlayerX = hitbox?.pointedX ?: 0.0
+        prevPlayerY = hitbox?.pointedY ?: 0.0
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
@@ -67,8 +67,8 @@ class BasicDebugInfoWindow : UICanvas {
         g.font = Terrarum.fontSmallNumbers
         g.color = GameFontBase.codeToCol["y"]
 
-        val hitbox = player.hitbox
-        val nextHitbox = player.nextHitbox
+        val hitbox = player?.hitbox
+        val nextHitbox = player?.nextHitbox
 
         /**
          * First column
@@ -76,25 +76,25 @@ class BasicDebugInfoWindow : UICanvas {
 
         printLine(g, 1, "posX "
                 + ccG
-                + "${hitbox.pointedX}"
+                + "${hitbox?.pointedX}"
                 + " ("
-                + "${(hitbox.pointedX / FeaturesDrawer.TILE_SIZE).toInt()}"
+                + "${(hitbox?.pointedX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
                 + ")")
         printLine(g, 2, "posY "
                 + ccG
-                + hitbox.pointedY.toString()
+                + hitbox?.pointedY.toString()
                 + " ("
-                + (hitbox.pointedY / FeaturesDrawer.TILE_SIZE).toInt().toString()
+                + (hitbox?.pointedY?.div(FeaturesDrawer.TILE_SIZE))?.toInt().toString()
                 + ")")
 
-        printLine(g, 3, "veloX reported $ccG${player.moveDelta.x}")
-        printLine(g, 4, "veloY reported $ccG${player.moveDelta.y}")
+        printLine(g, 3, "veloX reported $ccG${player?.moveDelta?.x}")
+        printLine(g, 4, "veloY reported $ccG${player?.moveDelta?.y}")
 
         printLineColumn(g, 2, 3, "veloX measured $ccG${xdelta}")
         printLineColumn(g, 2, 4, "veloY measured $ccG${ydelta}")
 
-        printLine(g, 5, "grounded $ccG${player.grounded}")
-        printLine(g, 6, "noClip $ccG${player.noClip}")
+        printLine(g, 5, "grounded $ccG${player?.grounded}")
+        printLine(g, 6, "noClip $ccG${player?.noClip}")
 
         //printLine(g, 7, "jump $ccG${player.jumpAcc}")
 
@@ -129,10 +129,10 @@ class BasicDebugInfoWindow : UICanvas {
         printLineColumn(g, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
         printLineColumn(g, 2, 5, "Time $ccG${Terrarum.ingame!!.world.time.todaySeconds.toString().padStart(5, '0')}" +
                                  " (${Terrarum.ingame!!.world.time.getFormattedTime()})")
-        printLineColumn(g, 2, 6, "Mass $ccG${player.mass}")
+        printLineColumn(g, 2, 6, "Mass $ccG${player?.mass}")
 
-        printLineColumn(g, 2, 7, "p_WalkX $ccG${player.walkX}")
-        printLineColumn(g, 2, 8, "p_WalkY $ccG${player.walkY}")
+        printLineColumn(g, 2, 7, "p_WalkX $ccG${player?.walkX}")
+        printLineColumn(g, 2, 8, "p_WalkY $ccG${player?.walkY}")
 
 
         drawHistogram(g, LightmapRenderer.histogram,

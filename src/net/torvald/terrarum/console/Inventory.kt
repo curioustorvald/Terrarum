@@ -11,7 +11,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
  */
 internal object Inventory : ConsoleCommand {
 
-    private var target: Pocketed = Terrarum.ingame!!.player
+    private var target: Pocketed? = Terrarum.ingame!!.player
 
     override fun execute(args: Array<String>) {
         if (args.size == 1) {
@@ -30,15 +30,17 @@ internal object Inventory : ConsoleCommand {
     }
 
     private fun listInventory() {
-        if (target.inventory.getTotalUniqueCount() == 0) {
-            Echo("(inventory empty)")
-        }
-        else {
-            target.inventory.forEach {
-                if (it.amount == 0) {
-                    EchoError("Unexpected zero-amounted item: ID ${it.item.id}")
+        if (target != null) {
+            if (target!!.inventory.getTotalUniqueCount() == 0) {
+                Echo("(inventory empty)")
+            }
+            else {
+                target!!.inventory.forEach {
+                    if (it.amount == 0) {
+                        EchoError("Unexpected zero-amounted item: ID ${it.item.id}")
+                    }
+                    Echo("ID ${it.item.id}${if (it.amount > 1) " ($it.second)" else ""}")
                 }
-                Echo("ID ${it.item.id}${if (it.amount > 1) " ($it.second)" else ""}")
             }
         }
     }
@@ -54,18 +56,22 @@ internal object Inventory : ConsoleCommand {
     }
 
     private fun addItem(refId: Int, amount: Int = 1) {
-        target.inventory.add(ItemCodex[refId], amount)
+        if (target != null) {
+            target!!.inventory.add(ItemCodex[refId], amount)
+        }
     }
 
     private fun equipItem(refId: Int) {
-        val item = ItemCodex[refId]
+        if (target != null) {
+            val item = ItemCodex[refId]
 
-        // if the item does not exist, add it first
-        if (!target.inventory.hasItem(item)) {
-            target.inventory.add(item)
+            // if the item does not exist, add it first
+            if (!target!!.inventory.hasItem(item)) {
+                target!!.inventory.add(item)
+            }
+
+            target!!.inventory.itemEquipped[item.equipPosition] = item
         }
-
-        target.inventory.itemEquipped[item.equipPosition] = item
     }
 
     override fun printUsage() {
