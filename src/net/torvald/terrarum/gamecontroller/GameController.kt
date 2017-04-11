@@ -41,7 +41,7 @@ object GameController {
 
             // actor process input
             if (!ingame.consoleHandler.isTakingControl) {
-                if (ingame.canPlayerMove) {
+                if (ingame.canPlayerControl) {
                     ingame.actorContainer.forEach {
                         if (it is Controllable) {
                             // disable control of actor if the actor is riding something?
@@ -70,7 +70,7 @@ object GameController {
             ///////////////////
 
             // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
-            if (ingame.player != null) {
+            if (ingame.player != null && ingame.canPlayerControl) {
                 if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary")) || input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
                     val itemOnGrip = ingame.player!!.inventory.itemEquipped[InventoryItem.EquipPosition.HAND_GRIP]
 
