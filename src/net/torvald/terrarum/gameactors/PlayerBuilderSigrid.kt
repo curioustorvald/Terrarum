@@ -66,7 +66,7 @@ object PlayerBuilderSigrid {
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 11, 0) // FIXME offsetY of -2: Have no idea about the error; it's just supposed to be zero
 
-        p.inventory = ActorInventory(0x7FFFFFFF, true)
+        p.inventory = ActorInventory(p, 0, ActorInventory.CAPACITY_MODE_NO_ENCUMBER)
 
         p.setPosition((4096 * FeaturesDrawer.TILE_SIZE).toDouble(), (300 * 16).toDouble())
 

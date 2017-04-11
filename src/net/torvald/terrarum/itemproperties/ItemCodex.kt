@@ -10,8 +10,10 @@ import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.gameitem.IVKey
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.tileproperties.TileCodex
 import org.newdawn.slick.GameContainer
+import org.newdawn.slick.Image
 import java.util.*
 
 /**
@@ -33,6 +35,9 @@ object ItemCodex {
     val ITEM_DYNAMIC_MIN = ITEM_STATIC_MAX + 1
     val ITEM_STATIC_MIN = ITEM_TILE_MAX + 1 // 4096
 
+    private val itemImagePlaceholder = Image("./assets/item_kari_24.tga")
+
+
     init {
         // tile items (blocks and walls are the same thing basically)
         for (i in 0..ITEM_TILE_MAX) {
@@ -44,28 +49,38 @@ object ItemCodex {
                 override var equipPosition = EquipPosition.HAND_GRIP
                 override var category = "block"
                 override val originalName = TileCodex[i].nameKey
+                override var consumable = true
 
                 init {
                     itemProperties[IVKey.ITEMTYPE] = IVKey.ItemType.BLOCK
                 }
 
-                override fun primaryUse(gc: GameContainer, delta: Int) {
+                override fun primaryUse(gc: GameContainer, delta: Int): Boolean {
+                    return false
                     // TODO base punch attack
                 }
 
-                override fun secondaryUse(gc: GameContainer, delta: Int) {
+                override fun secondaryUse(gc: GameContainer, delta: Int): Boolean {
                     val mousePoint = Point2d(gc.mouseTileX.toDouble(), gc.mouseTileY.toDouble())
                     // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
                     Terrarum.ingame!!.actorContainer.forEach {
                         if (it is ActorWithSprite && it.tilewiseHitbox.intersects(mousePoint))
-                            return
+                            return false
                     }
+
+                    // return false if the tile is already there
+                    if (this.id == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY))
+                        return false
+
                     // filter passed, do the job
+                    // FIXME this is only useful for Player
                     Terrarum.ingame!!.world.setTileTerrain(
                             gc.mouseTileX,
                             gc.mouseTileY,
                             i
                     )
+
+                    return true
                 }
             }
         }
@@ -87,6 +102,13 @@ object ItemCodex {
 
             throw IllegalArgumentException("Attempted to get item data of actor that cannot be an item. ($a)")
         }
+    }
+
+    fun getItemImage(code: Int): Image {
+        if (code <= ITEM_TILE_MAX)
+            return TilesDrawer.tilesTerrain.getSubImage((code % 16) * 16, code / 16)
+        else
+            return itemImagePlaceholder
     }
 
     fun hasItem(itemID: Int): Boolean = dynamicItemDescription.containsKey(itemID)

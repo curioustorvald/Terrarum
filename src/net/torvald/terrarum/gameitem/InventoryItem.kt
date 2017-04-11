@@ -51,6 +51,9 @@ abstract class InventoryItem : Comparable<InventoryItem> {
 
     var itemProperties = ItemValue()
 
+    /** Single-use then destroyed (e.g. Tiles) */
+    abstract var consumable: Boolean
+
     /**
      * Where to equip the item
      */
@@ -107,13 +110,17 @@ abstract class InventoryItem : Comparable<InventoryItem> {
 
     /**
      * Effects applied (continuously or not) while primary button (usually left mouse button) is down
+     *
+     * @return true when use successfully, false otherwise
      */
-    open fun primaryUse(gc: GameContainer, delta: Int) { }
+    open fun primaryUse(gc: GameContainer, delta: Int): Boolean = false
 
     /**
      * Effects applied (continuously or not) while secondary button (usually right mouse button) is down
+     *
+     * @return true when use successfully, false otherwise
      */
-    open fun secondaryUse(gc: GameContainer, delta: Int) { }
+    open fun secondaryUse(gc: GameContainer, delta: Int): Boolean = false
 
     /**
      * Effects applied immediately only once if thrown from pocket
@@ -128,7 +135,7 @@ abstract class InventoryItem : Comparable<InventoryItem> {
     /**
      * Effects applied only once when unequipped
      */
-    open fun effectWhenUnEquipped(gc: GameContainer, delta: Int) { }
+    open fun effectOnUnequip(gc: GameContainer, delta: Int) { }
 
     
     override fun toString(): String {
@@ -158,11 +165,7 @@ abstract class InventoryItem : Comparable<InventoryItem> {
         if (equipPosition == EquipPosition.NULL)
             throw IllegalArgumentException("Item is not supposed to be equipped (equipPosition is NULL")
 
-        if (!actor.inventory.hasItem(this.id)) {
-            actor.inventory.add(this)
-        }
-
-        actor.itemEquipped[this.equipPosition] = this
+        actor.equipItem(this)
     }
 
     object EquipPosition {

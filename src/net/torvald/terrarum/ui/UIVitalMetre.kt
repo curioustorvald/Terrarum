@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.jme3.math.FastMath
 import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorHumanoid
@@ -59,12 +60,9 @@ class UIVitalMetre(
      */
     override fun render(gc: GameContainer, g: Graphics) {
         if (vitalGetterVal() != null && vitalGetterMax() != null && player != null) {
-
-            // FIXME does not work well with screen zoom, because of my custom g.translate
-
             g.translate(
-                    -MapCamera.x + player!!.centrePosPoint.x.toFloat(),
-                    -MapCamera.y + player!!.centrePosPoint.y.toFloat()
+                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.x.toFloat() - (MapCamera.x)),
+                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.y.toFloat() - (MapCamera.y))
             )
 
 
@@ -117,6 +115,8 @@ class UIVitalMetre(
         UICanvas.endClosingFade(handler)
     }
 }
+
+fun Float.abs() = FastMath.abs(this)
 
 /*
 

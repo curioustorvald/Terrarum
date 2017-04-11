@@ -12,6 +12,7 @@ import net.torvald.terrarum.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.gameworld.WorldTime
@@ -578,6 +579,8 @@ class StateInGame : BasicGameState() {
         GameController.controllerButtonPressed(controller, button)
 
         uiContainer.forEach { it.controllerButtonPressed(controller, button) } // for GamepadControlled UIcanvases
+
+        // TODO use item on Player
     }
 
     override fun controllerButtonReleased(controller: Int, button: Int) {
@@ -663,7 +666,18 @@ class StateInGame : BasicGameState() {
             ThreadParallel.startAll()
         }
         else {
-            actorContainer.forEach { it.update(gc, delta) }
+            actorContainer.forEach {
+                it.update(gc, delta)
+
+                if (it is Pocketed) {
+                    it.inventory.forEach { inventoryEntry ->
+                        inventoryEntry.item.effectWhileInPocket(gc, delta)
+                        if (it.isEquipped(inventoryEntry.item)) {
+                            inventoryEntry.item.effectWhenEquipped(gc, delta)
+                        }
+                    }
+                }
+            }
         }
     }
 

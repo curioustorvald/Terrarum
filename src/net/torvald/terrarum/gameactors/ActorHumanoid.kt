@@ -23,8 +23,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
 
     /** Must be set by PlayerFactory */
-    override var inventory: ActorInventory = ActorInventory()
-    override val itemEquipped = Array<InventoryItem?>(InventoryItem.EquipPosition.INDEX_MAX + 1, { null })
+    override var inventory: ActorInventory = ActorInventory(this, 2000, ActorInventory.CAPACITY_MODE_WEIGHT) // default constructor
 
 
     /** Must be set by PlayerFactory */
@@ -141,6 +140,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         override var baseToolSize: Double? = null
         override var category = "should_not_be_seen"
         override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "(no name)"
+        override var consumable = false
     }
 
     override fun update(gc: GameContainer, delta: Int) {
@@ -177,29 +177,12 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
         // update inventory items
         inventory.forEach {
-            if (!itemEquipped.contains(it.item)) { // unequipped
+            if (!inventory.itemEquipped.contains(it.item)) { // unequipped
                 it.item.effectWhileInPocket(gc, delta)
             }
             else { // equipped
                 it.item.effectWhenEquipped(gc, delta)
             }
-        }
-    }
-
-    fun unequipItem(item: InventoryItem) {
-        for (i in 0..itemEquipped.size - 1) {
-            val it = itemEquipped[i]
-            if (item == it) {
-                it.effectWhenUnEquipped(gameContainer, updateDelta)
-                itemEquipped[i] = null // remove from the array by nulling it
-                break
-            }
-        }
-    }
-
-    fun equipItem(item: InventoryItem) {
-        if (item.equipPosition >= 0) {
-            itemEquipped[item.equipPosition] = item
         }
     }
 
@@ -234,22 +217,6 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                 else true
     
     override fun processInput(gc: GameContainer, delta: Int, input: Input) {
-        ///////////////////
-        // MOUSE CONTROL //
-        ///////////////////
-
-        /**
-         * Primary Use
-         */
-        // Left mouse
-        if (isGamer && input.isKeyDown(Terrarum.getConfigInt("mouseprimary"))) {
-            (itemEquipped[InventoryItem.EquipPosition.HAND_GRIP] ?: nullItem).primaryUse(gc, delta)
-        }
-
-        // Right mouse
-        if (isGamer && input.isKeyDown(Terrarum.getConfigInt("mouseprimary"))) {
-            (itemEquipped[InventoryItem.EquipPosition.HAND_GRIP] ?: nullItem).secondaryUse(gc, delta)
-        }
 
         /**
          * L-R stop
@@ -511,7 +478,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         if (sprite != null) sprite!!.update(delta)
         if (spriteGlow != null) spriteGlow!!.update(delta)
 
-        println("$this\tsprite current frame: ${sprite!!.currentFrame}")
+        //println("$this\tsprite current frame: ${sprite!!.currentFrame}")
 
         if (grounded) {
             // set anim row

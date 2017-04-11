@@ -4,6 +4,7 @@ import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex
@@ -34,11 +35,11 @@ object GameController {
         get() = (mouseY / FeaturesDrawer.TILE_SIZE).floorInt()
 
     fun processInput(gc: GameContainer, delta: Int, input: Input) {
-
         if (Terrarum.ingame != null) {
             val ingame = Terrarum.ingame!!
 
 
+            // actor process input
             if (!ingame.consoleHandler.isTakingControl) {
                 if (ingame.canPlayerMove) {
                     ingame.actorContainer.forEach {
@@ -67,7 +68,20 @@ object GameController {
             ///////////////////
             // MOUSE CONTROL //
             ///////////////////
-            // PRIMARY/SECONDARY IS FIXED TO LEFT/RIGHT BUTTON //
+
+            // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
+            if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary")) || input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
+                val itemOnGrip = ingame.player.inventory.itemEquipped[InventoryItem.EquipPosition.HAND_GRIP]
+
+                if (itemOnGrip != null) {
+                    if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary"))) {
+                        ingame.player.consumePrimary(itemOnGrip)
+                    }
+                    else if (input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
+                        ingame.player.consumeSecondary(itemOnGrip)
+                    }
+                }
+            }
 
 
             /////////////////////

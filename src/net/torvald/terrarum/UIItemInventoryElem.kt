@@ -66,10 +66,12 @@ class UIItemInventoryElem(
 
         // mouseover background
         if (item != null || drawBackOnNull) {
-            if (mouseUp) {
+            // do not highlight even if drawBackOnNull is true
+            if (mouseUp && item != null) {
                 BlendMode.resolve(mouseoverBackBlendMode)
                 g.color = mouseoverBackCol
             }
+            // if drawBackOnNull, just draw background
             else {
                 BlendMode.resolve(backBlendMode)
                 g.color = backCol
@@ -136,11 +138,11 @@ class UIItemInventoryElem(
             val itemEquipSlot = item!!.equipPosition
             val player = Terrarum.ingame!!.player
 
-            if (item != player.itemEquipped[itemEquipSlot]) { // if this item is unequipped, equip it
-                player.itemEquipped[itemEquipSlot] = item
+            if (item != player.inventory.itemEquipped[itemEquipSlot]) { // if this item is unequipped, equip it
+                player.equipItem(item!!)
             }
             else { // if not, unequip it
-                player.itemEquipped[itemEquipSlot] = null
+                player.unequipItem(item!!)
             }
         }
 

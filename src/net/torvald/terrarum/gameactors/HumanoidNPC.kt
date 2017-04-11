@@ -41,7 +41,7 @@ open class HumanoidNPC(
     // we're having InventoryItem data so that this class could be somewhat universal
     override var itemData: InventoryItem = object : InventoryItem() {
         override var id = referenceID
-        override val isUnique: Boolean = true
+        override val isUnique = true
         override var baseMass: Double
             get() = actorValue.getAsDouble(AVKey.BASEMASS)!!
             set(value) { actorValue[AVKey.BASEMASS] = value }
@@ -53,8 +53,10 @@ open class HumanoidNPC(
             }
         override var category = "npc"
         override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "NPC"
+        override var consumable = false
 
-        override fun secondaryUse(gc: GameContainer, delta: Int) {
+        override fun secondaryUse(gc: GameContainer, delta: Int): Boolean {
+            return false
             // TODO place this Actor to the world
         }
     }

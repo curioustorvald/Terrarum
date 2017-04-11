@@ -6,6 +6,7 @@ import net.torvald.terrarum.Terrarum.joypadLabelNinA
 import net.torvald.terrarum.Terrarum.joypadLabelNinY
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.*
 import java.util.*
@@ -28,11 +29,9 @@ class UIInventory(
     override var handler: UIHandler? = null
     override var openCloseTime: Int = 120
 
-    val itemImagePlaceholder = Image("./assets/item_kari_24.tga")
-
     val catButtonsToCatIdent = HashMap<String, String>()
 
-    val backgroundColour = Color(0xA0242424.toInt())
+    val backgroundColour = Color(0x80242424.toInt())
 
     init {
         catButtonsToCatIdent.put("GAME_INVENTORY_WEAPONS", InventoryItem.Category.WEAPON)
@@ -88,7 +87,7 @@ class UIInventory(
 
     val itemsStripWidth = ((width - catButtons.width) - (2 * itemStripGutterH + itemInterColGutter)) / 2
     val items = Array(
-            2 + height / (UIItemInventoryElem.height + itemStripGutterV - controlHelpHeight) * 2, {
+            ((height - controlHelpHeight) / (UIItemInventoryElem.height + itemStripGutterV)) * 2, {
         UIItemInventoryElem(
                 parentUI = this,
                 posX = catButtons.width + if (it % 2 == 0) itemStripGutterH else (itemStripGutterH + itemsStripWidth + itemInterColGutter),
@@ -99,7 +98,9 @@ class UIInventory(
                 itemImage = null,
                 mouseoverBackCol = Color(0x282828),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                drawBackOnNull = false
+                backCol = Color(0xd4d4d4),
+                backBlendMode = BlendMode.MULTIPLY,
+                drawBackOnNull = true
         ) })
     val itemsScrollOffset = 0
 
@@ -160,7 +161,7 @@ class UIInventory(
                         val sortListItem = inventorySortList[k + itemsScrollOffset]
                         items[k].item = sortListItem.item
                         items[k].amount = sortListItem.amount
-                        items[k].itemImage = itemImagePlaceholder
+                        items[k].itemImage = ItemCodex.getItemImage(sortListItem.item.id)
 
                         // set quickslot number
                         for (qs in 1..QUICKSLOT_MAX) {
@@ -173,9 +174,9 @@ class UIInventory(
                         }
 
                         // set equippedslot number
-                        for (eq in 0..actor!!.itemEquipped.size - 1) {
-                            if (eq < actor!!.itemEquipped.size) {
-                                if (actor!!.itemEquipped[eq] == items[k].item) {
+                        for (eq in 0..actor!!.inventory.itemEquipped.size - 1) {
+                            if (eq < actor!!.inventory.itemEquipped.size) {
+                                if (actor!!.inventory.itemEquipped[eq] == items[k].item) {
                                     items[k].equippedSlot = eq
                                     break
                                 }
@@ -199,6 +200,8 @@ class UIInventory(
         oldCatSelect = catButtons.selectedIndex
     }
 
+    private val weightBarWidth = 60f
+
     override fun render(gc: GameContainer, g: Graphics) {
         // background
         blendNormal()
@@ -221,9 +224,42 @@ class UIInventory(
 
         // texts
         blendNormal()
-        g.color = Color(0xdddddd)
-        Typography.printCentered(g, listControlHelp, catButtons.width, height - controlHelpHeight, width - catButtons.width)
-        Typography.printCentered(g, listControlClose, 0, height - controlHelpHeight, catButtons.width)
+        g.color = Color(0xe8e8e8)
+        // W - close
+        g.drawString(listControlClose, 4f, height - controlHelpHeight.toFloat())
+        // MouseL - Use ; 1.9 - Register ; T - Drop
+        g.drawString(listControlHelp, catButtons.width + 4f, height - controlHelpHeight.toFloat())
+        // encumbrance
+        if (inventory != null) {
+            val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
+
+            g.drawString(
+                    encumbranceText,
+                    width - 9 - g.font.getWidth(encumbranceText) - weightBarWidth,
+                    height - controlHelpHeight.toFloat()
+            )
+
+            // encumbrance bar background
+            blendMul()
+            g.color = Color(0xa0a0a0)
+            g.fillRect(
+                    width - 3 - weightBarWidth,
+                    height - controlHelpHeight + 3f,
+                    weightBarWidth,
+                    controlHelpHeight - 6f
+            )
+            // encumbrance bar
+            blendNormal()
+            val encumbPerc = inventory!!.capacity.toFloat() / inventory!!.maxCapacity
+            g.color = if (inventory!!.isEncumbered) Color(0xccff0000.toInt()) else Color(0xcc00ff00.toInt())
+            g.fillRect(
+                    width - 3 - weightBarWidth,
+                    height - controlHelpHeight + 3f,
+                    minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbPerc)), // make sure 1px is always be seen
+                    controlHelpHeight - 5f
+            )
+        }
+
     }
 
 
