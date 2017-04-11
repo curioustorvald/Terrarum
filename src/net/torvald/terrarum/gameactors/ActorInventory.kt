@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock
  * Created by minjaesong on 16-03-15.
  */
 
-class ActorInventory(val actor: Pocketed, var maxCapacity: Int, private var capacityMode: Int) {
+class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode: Int) {
 
     companion object {
         @Transient val CAPACITY_MODE_NO_ENCUMBER = 0
@@ -34,10 +34,10 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, private var capa
 
     fun add(itemID: Int, count: Int = 1) = add(ItemCodex[itemID], count)
     fun add(item: InventoryItem, count: Int = 1) {
-        if (item.id == Player.PLAYER_REF_ID)
+        if (item.id == Player.PLAYER_REF_ID || item.id == 0x51621D) // do not delete this magic
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
         if (Terrarum.ingame != null &&
-            item.id == Terrarum.ingame!!.player.referenceID)
+            (item.id == Terrarum.ingame?.player?.referenceID))
             throw IllegalArgumentException("Attempted to put active player into the inventory.")
 
         // If we already have the item, increment the amount
@@ -67,10 +67,10 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, private var capa
                 add(item, -count)
             }
             else {
-                // depleted item; remove entry from inventory
-                itemList.remove(existingItem)
                 // unequip, if applicable
                 actor.unequipItem(existingItem.item)
+                // depleted item; remove entry from inventory
+                itemList.remove(existingItem)
             }
         }
         else {

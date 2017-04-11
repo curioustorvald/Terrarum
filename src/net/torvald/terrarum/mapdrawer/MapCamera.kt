@@ -34,9 +34,9 @@ object MapCamera {
 
             // position - (WH / 2)
             x = Math.round(// X only: ROUNDWORLD implementation
-                    player.hitbox.centeredX.toFloat() - width / 2)
+                    (player?.hitbox?.centeredX?.toFloat() ?: 0f) - width / 2)
             y = Math.round(FastMath.clamp(
-                    player.hitbox.centeredY.toFloat() - height / 2,
+                    (player?.hitbox?.centeredY?.toFloat() ?: 0f) - height / 2,
                     TILE_SIZE.toFloat(),
                     world!!.height * TILE_SIZE - height - TILE_SIZE.toFloat()
             ))

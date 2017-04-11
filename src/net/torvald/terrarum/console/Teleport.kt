@@ -24,7 +24,7 @@ internal object Teleport : ConsoleCommand {
                 return
             }
 
-            Terrarum.ingame!!.player.setPosition(x.toDouble(), y.toDouble())
+            Terrarum.ingame!!.player!!.setPosition(x.toDouble(), y.toDouble())
         }
         else if (args.size == 4) {
             if (args[2].toLowerCase() != "to") {
@@ -36,7 +36,7 @@ internal object Teleport : ConsoleCommand {
             try {
                 val fromActorID = args[1].toInt()
                 val targetActorID = if (args[3].toLowerCase() == "player")
-                    Terrarum.ingame!!.player.referenceID
+                    Terrarum.ingame!!.player!!.referenceID
                 else
                     args[3].toInt()
 

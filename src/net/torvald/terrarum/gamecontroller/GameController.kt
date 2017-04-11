@@ -70,15 +70,17 @@ object GameController {
             ///////////////////
 
             // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
-            if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary")) || input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
-                val itemOnGrip = ingame.player.inventory.itemEquipped[InventoryItem.EquipPosition.HAND_GRIP]
+            if (ingame.player != null) {
+                if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary")) || input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
+                    val itemOnGrip = ingame.player!!.inventory.itemEquipped[InventoryItem.EquipPosition.HAND_GRIP]
 
-                if (itemOnGrip != null) {
-                    if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary"))) {
-                        ingame.player.consumePrimary(itemOnGrip)
-                    }
-                    else if (input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
-                        ingame.player.consumeSecondary(itemOnGrip)
+                    if (itemOnGrip != null) {
+                        if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary"))) {
+                            ingame.player!!.consumePrimary(itemOnGrip)
+                        }
+                        else if (input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
+                            ingame.player!!.consumeSecondary(itemOnGrip)
+                        }
                     }
                 }
             }

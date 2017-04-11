@@ -5,6 +5,7 @@ import net.torvald.terrarum.Terrarum.QUICKSLOT_MAX
 import net.torvald.terrarum.Terrarum.joypadLabelNinA
 import net.torvald.terrarum.Terrarum.joypadLabelNinY
 import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.langpack.Lang
@@ -125,6 +126,9 @@ class UIInventory(
 
     private var oldCatSelect = -1
 
+    private var encumbrancePerc = 0f
+    private var isEncumbered = false
+
     override fun update(gc: GameContainer, delta: Int) {
         catButtons.update(gc, delta)
 
@@ -139,6 +143,12 @@ class UIInventory(
 
             if (rebuildList) {
                 val filter = catButtonsToCatIdent[catButtons.selectedButton.labelText]
+
+                // encumbrance
+                encumbrancePerc = inventory!!.capacity.toFloat() / inventory!!.maxCapacity
+                isEncumbered = inventory!!.isEncumbered
+
+
 
                 inventorySortList = ArrayList<InventoryPair>()
 
@@ -250,12 +260,14 @@ class UIInventory(
             )
             // encumbrance bar
             blendNormal()
-            val encumbPerc = inventory!!.capacity.toFloat() / inventory!!.maxCapacity
-            g.color = if (inventory!!.isEncumbered) Color(0xccff0000.toInt()) else Color(0xcc00ff00.toInt())
+            g.color = if (isEncumbered) Color(0xccff0000.toInt()) else Color(0xcc00ff00.toInt())
             g.fillRect(
                     width - 3 - weightBarWidth,
                     height - controlHelpHeight + 3f,
-                    minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbPerc)), // make sure 1px is always be seen
+                    if (actor?.inventory?.capacityMode == CAPACITY_MODE_NO_ENCUMBER)
+                        1f
+                    else // make sure 1px is always be seen
+                        minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
                     controlHelpHeight - 5f
             )
         }

@@ -81,17 +81,20 @@ object WeatherMixer {
         currentWeather = weatherList[WEATHER_GENERIC]!![0]
 
 
-        // test rain toggled by F2
-        if (KeyToggler.isOn(Key.F2)) {
-            val playerPos = Terrarum.ingame!!.player.centrePosPoint
-            kotlin.repeat(4) { // 4 seems good
-                val rainParticle = ParticleTestRain(
-                        playerPos.x + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
-                        playerPos.y - Terrarum.HALFH
-                )
-                Terrarum.ingame!!.addParticle(rainParticle)
+        if (Terrarum.ingame!!.player != null) {
+            // test rain toggled by F2
+            if (KeyToggler.isOn(Key.F2)) {
+                val playerPos = Terrarum.ingame!!.player!!.centrePosPoint
+                kotlin.repeat(4) {
+                    // 4 seems good
+                    val rainParticle = ParticleTestRain(
+                            playerPos.x + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
+                            playerPos.y - Terrarum.HALFH
+                    )
+                    Terrarum.ingame!!.addParticle(rainParticle)
+                }
+                globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).darker(0.3f))
             }
-            globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).darker(0.3f))
         }
     }
 

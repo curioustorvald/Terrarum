@@ -113,6 +113,8 @@ abstract class InventoryItem : Comparable<InventoryItem> {
      * The item will NOT be consumed, so you will want to consume it yourself by inventory.consumeItem(item)
      *
      * @return true when used successfully, false otherwise
+     *
+     * note: DO NOT super(gc, g) this!
      */
     open fun primaryUse(gc: GameContainer, delta: Int): Boolean = false
 
@@ -121,6 +123,8 @@ abstract class InventoryItem : Comparable<InventoryItem> {
      * The item will NOT be consumed, so you will want to consume it yourself by inventory.consumeItem(item)
      *
      * @return true when used successfully, false otherwise
+     *
+     * note: DO NOT super(gc, g) this!
      */
     open fun secondaryUse(gc: GameContainer, delta: Int): Boolean = false
 
