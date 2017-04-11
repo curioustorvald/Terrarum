@@ -65,7 +65,7 @@ internal object Inventory : ConsoleCommand {
             target.inventory.add(item)
         }
 
-        target.itemEquipped[item.equipPosition] = item
+        target.inventory.itemEquipped[item.equipPosition] = item
     }
 
     override fun printUsage() {

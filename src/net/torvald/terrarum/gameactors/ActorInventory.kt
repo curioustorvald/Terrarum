@@ -12,46 +12,24 @@ import java.util.concurrent.locks.ReentrantLock
  * Created by minjaesong on 16-03-15.
  */
 
-class ActorInventory() {
+class ActorInventory(val actor: Pocketed, var maxCapacity: Int, private var capacityMode: Int) {
 
-    @Transient val CAPACITY_MAX = 0x7FFFFFFF
-    @Transient val CAPACITY_MODE_NO_ENCUMBER = 0
-    @Transient val CAPACITY_MODE_COUNT = 1
-    @Transient val CAPACITY_MODE_WEIGHT = 2
+    companion object {
+        @Transient val CAPACITY_MODE_NO_ENCUMBER = 0
+        @Transient val CAPACITY_MODE_COUNT = 1
+        @Transient val CAPACITY_MODE_WEIGHT = 2
+    }
 
-
-    private var capacityByCount: Int
-    private var capacityByWeight: Int
-    private var capacityMode: Int
+    /**
+     * List of all equipped items (tools, armours, rings, necklaces, etc.)
+     */
+    val itemEquipped = Array<InventoryItem?>(InventoryItem.EquipPosition.INDEX_MAX, { null })
 
     /**
      * Sorted by referenceID.
      */
     private val itemList = ArrayList<InventoryPair>()
-
-    /**
-     * Default constructor with no encumbrance.
-     */
     init {
-        capacityMode = CAPACITY_MODE_NO_ENCUMBER
-        capacityByCount = 0
-        capacityByWeight = 0
-    }
-
-    /**
-     * Construct new inventory with specified capacity.
-     * @param capacity if is_weight is true, killogramme value is required, counts of items otherwise.
-     * *
-     * @param is_weight whether encumbrance should be calculated upon the weight of the inventory. False to use item counts.
-     */
-    constructor(capacity: Int, is_weight: Boolean) : this() {
-        if (is_weight) {
-            capacityByWeight = capacity
-            capacityMode = CAPACITY_MODE_WEIGHT
-        } else {
-            capacityByCount = capacity
-            capacityMode = CAPACITY_MODE_COUNT
-        }
     }
 
     fun add(itemID: Int, count: Int = 1) = add(ItemCodex[itemID], count)
@@ -85,10 +63,14 @@ class ActorInventory() {
                 throw Error("Tried to remove $count of $item, but the inventory only contains ${getByID(item.id)!!.amount} of them.")
             }
             else if (newCount > 0) {
+                // decrement count
                 add(item, -count)
             }
             else {
+                // depleted item; remove entry from inventory
                 itemList.remove(existingItem)
+                // unequip, if applicable
+                actor.unequipItem(existingItem.item)
             }
         }
         else {
@@ -105,21 +87,13 @@ class ActorInventory() {
      * Get capacity of inventory
      * @return
      */
-    fun getCapacity(): Int {
-        if (capacityMode == CAPACITY_MODE_NO_ENCUMBER) {
-            return CAPACITY_MAX
-        }
-        else if (capacityMode == CAPACITY_MODE_WEIGHT) {
-            return capacityByWeight
-        }
-        else {
-            return capacityByCount
-        }
-    }
-
-    fun getCapacityMode(): Int {
-        return capacityMode
-    }
+    val capacity: Double
+        get() = if (capacityMode == CAPACITY_MODE_NO_ENCUMBER)
+            maxCapacity.toDouble()
+        else if (capacityMode == CAPACITY_MODE_WEIGHT)
+            getTotalWeight()
+        else
+            getTotalCount().toDouble()
 
     fun getTotalWeight(): Double = itemList.map { it.item.mass * it.amount }.sum()
 
@@ -137,15 +111,24 @@ class ActorInventory() {
      * Check whether the itemList contains too many items
      * @return
      */
-    fun isEncumbered(): Boolean {
-        if (getCapacityMode() == CAPACITY_MODE_WEIGHT) {
-            return capacityByWeight < getTotalWeight()
-        } else if (getCapacityMode() == CAPACITY_MODE_COUNT) {
-            return capacityByCount < getTotalCount()
-        } else {
-            return false
+    val isEncumbered: Boolean
+        get() = if (capacityMode == CAPACITY_MODE_NO_ENCUMBER)
+            false
+        else if (capacityMode == CAPACITY_MODE_WEIGHT)
+            maxCapacity < capacity
+        else
+            false
+
+
+    fun consumeItem(item: InventoryItem) {
+        if (item.consumable) {
+            remove(item, 1)
+        }
+        else {
+            // TODO decrement durability
         }
     }
+
 
 
 

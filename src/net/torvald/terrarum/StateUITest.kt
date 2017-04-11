@@ -26,8 +26,7 @@ class StateUITest : BasicGameState() {
             TODO("not implemented")
         }
 
-        override var inventory: ActorInventory = ActorInventory()
-        override val itemEquipped = Array<InventoryItem?>(InventoryItem.EquipPosition.INDEX_MAX + 1, { null })
+        override var inventory: ActorInventory = ActorInventory(this, 100, ActorInventory.CAPACITY_MODE_WEIGHT)
     }
 
     init {
@@ -56,6 +55,7 @@ class StateUITest : BasicGameState() {
             override var category: String = InventoryItem.Category.TOOL
             override var maxDurability: Double = 10.0
             override var durability: Double = 6.43
+            override var consumable = false
         })
         actor.inventory.getByID(5656)!!.item.name = "Test tool"
 
@@ -69,6 +69,7 @@ class StateUITest : BasicGameState() {
             override var baseMass: Double = 1.4
             override var baseToolSize: Double? = null
             override var category: String = InventoryItem.Category.MISC
+            override var consumable = false
         })
 
         actor.inventory.add(ItemCodex[16], 543)
