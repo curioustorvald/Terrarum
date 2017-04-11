@@ -113,7 +113,7 @@ class StateInGame : BasicGameState() {
     /**
      * Set to false if UI is opened; set to true  if UI is closed.
      */
-    var canPlayerMove: Boolean = false
+    var canPlayerControl: Boolean = false
         get() = !paused // FIXME temporary behab (block movement if the game is paused or paused by UIs)
 
     @Throws(SlickException::class)
@@ -521,7 +521,7 @@ class StateInGame : BasicGameState() {
 
         GameController.keyPressed(key, c)
 
-        if (canPlayerMove) {
+        if (canPlayerControl) {
             player?.keyPressed(key, c)
         }
 
