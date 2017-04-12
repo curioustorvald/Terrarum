@@ -199,7 +199,7 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
             val file = computer.getFile(path)
             try {
                 if (file!!.contents is EntryFile)
-                    return LuaValue.valueOf(file.contents.getSizePure())
+                    return LuaValue.valueOf(file.contents.getSizePure().toInt())
                 else if (file.contents is EntryDirectory)
                     return LuaValue.valueOf(file.contents.entries.size)
             }
@@ -364,7 +364,7 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
             when (mode) {
                 "r"  -> {
                     try {
-                        val fr = StringReader(String(file.bytes, sysCharset))//FileReader(file)
+                        val fr = StringReader(String(file.bytes.toByteArray(), sysCharset))//FileReader(file)
                         luaClass["close"] = FileClassClose(fr)
                         luaClass["readLine"] = FileClassReadLine(fr)
                         luaClass["readAll"] = FileClassReadAll(file)
@@ -381,7 +381,7 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
                 }
                 "rb" -> {
                     try {
-                        val fis = ByteArrayInputStream(file.bytes)
+                        val fis = ByteArrayInputStream(file.bytes.toByteArray())
                         luaClass["close"] = FileClassClose(fis)
                         luaClass["read"] = FileClassReadByte(fis)
                         luaClass["readAll"] = FileClassReadAll(file)
@@ -492,13 +492,13 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
 
     private class FileClassReadAllBytes(val file: EntryFile) : ZeroArgFunction() {
         override fun call() : LuaValue {
-            return LuaValue.valueOf(String(file.bytes, sysCharset))
+            return LuaValue.valueOf(String(file.bytes.toByteArray(), sysCharset))
         }
     }
 
     private class FileClassReadAll(val file: EntryFile) : ZeroArgFunction() {
         override fun call() : LuaValue {
-            return LuaValue.valueOf(String(file.bytes, sysCharset))
+            return LuaValue.valueOf(String(file.bytes.toByteArray(), sysCharset))
         }
     }
 

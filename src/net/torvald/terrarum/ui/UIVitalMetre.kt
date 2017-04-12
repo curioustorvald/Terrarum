@@ -23,6 +23,11 @@ class UIVitalMetre(
         val order: Int
 ) : UICanvas {
 
+    init {
+        // semitransparent
+        color?.a = 0.91f
+    }
+
     private val margin = 25
     private val gap = 4f
 
@@ -45,7 +50,12 @@ class UIVitalMetre(
     private val theta = 33f
     private val halfTheta = theta / 2f
 
-    private val backColor: Color; get() = color?.darkerLab(0.4f) ?: Color.black
+    private val backColor: Color
+        get(): Color {
+            val c = (color?.darkerLab(0.33f) ?: Color.black)
+            c.a = 0.7f
+            return c
+        }
 
 
     override fun update(gc: GameContainer, delta: Int) {
@@ -66,8 +76,10 @@ class UIVitalMetre(
             )
 
 
-
             g.lineWidth = 2f
+
+
+            val ratio = minOf(1f, vitalGetterVal()!! / vitalGetterMax()!!)
 
             // background
             g.color = backColor
@@ -77,7 +89,7 @@ class UIVitalMetre(
                     circleRadius * 2f + order * gap * 2,
                     circleRadius * 2f + order * gap * 2,
                     90f - halfTheta,
-                    90f + halfTheta - theta * (vitalGetterVal()!! / vitalGetterMax()!!)
+                    90f + halfTheta - theta * ratio
             )
 
             g.color = color
@@ -86,7 +98,7 @@ class UIVitalMetre(
                     -circleRadius - order * gap - offsetY,
                     circleRadius * 2f + order * gap * 2,
                     circleRadius * 2f + order * gap * 2,
-                    90f + halfTheta - theta * (vitalGetterVal()!! / vitalGetterMax()!!),
+                    90f + halfTheta - theta * ratio,
                     90f + halfTheta
             )
 

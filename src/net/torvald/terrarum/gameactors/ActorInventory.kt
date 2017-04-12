@@ -29,6 +29,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
      * Sorted by referenceID.
      */
     private val itemList = ArrayList<InventoryPair>()
+
     init {
     }
 
@@ -135,8 +136,8 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
 
 
 
-    fun hasItem(item: InventoryItem) = hasItem(item.id)
-    fun hasItem(id: Int) =
+    fun contains(item: InventoryItem) = contains(item.id)
+    fun contains(id: Int) =
             if (itemList.size == 0)
                 false
             else

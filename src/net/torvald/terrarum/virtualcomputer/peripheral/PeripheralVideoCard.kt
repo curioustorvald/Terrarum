@@ -43,7 +43,7 @@ class PeripheralVideoCard(val host: TerrarumComputer, val termW: Int = 80, val t
     val width = termW * blockW
     val height = termH *  blockH
 
-    val spritesCount = 64
+    val spritesCount = 256
 
     val vram = VRAM(width, height, spritesCount)
     val frameBuffer = ImageBuffer(width, height)

@@ -57,20 +57,14 @@ internal object Inventory : ConsoleCommand {
 
     private fun addItem(refId: Int, amount: Int = 1) {
         if (target != null) {
-            target!!.inventory.add(ItemCodex[refId], amount)
+            target!!.addItem(ItemCodex[refId], amount)
         }
     }
 
     private fun equipItem(refId: Int) {
         if (target != null) {
             val item = ItemCodex[refId]
-
-            // if the item does not exist, add it first
-            if (!target!!.inventory.hasItem(item)) {
-                target!!.inventory.add(item)
-            }
-
-            target!!.inventory.itemEquipped[item.equipPosition] = item
+            target!!.equipItem(item)
         }
     }
 

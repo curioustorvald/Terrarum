@@ -96,14 +96,14 @@ class StateInGame : BasicGameState() {
 
     // UI aliases (no pause)
     val uiAliases = HashMap<String, UIHandler>()
-    private val UI_PIE_MENU = "uiPieMenu"
-    private val UI_QUICK_BAR = "uiQuickBar"
-    private val UI_INVENTORY_PLAYER = "uiInventoryPlayer"
-    private val UI_INVENTORY_CONTAINER = "uiInventoryContainer"
-    private val UI_VITAL1 = "uiVital1"
-    private val UI_VITAL2 = "uiVital2"
-    private val UI_VITAL3 = "uiVital3"
-    private val UI_CONSOLE = "uiConsole"
+    val UI_PIE_MENU = "uiPieMenu"
+    val UI_QUICK_BAR = "uiQuickBar"
+    val UI_INVENTORY_PLAYER = "uiInventoryPlayer"
+    val UI_INVENTORY_CONTAINER = "uiInventoryContainer"
+    val UI_VITAL_PRIMARY = "uiVital1"
+    val UI_VITAL_SECONDARY = "uiVital2"
+    val UI_VITAL_ITEM = "uiVital3" // itemcount/durability of held block or active ammo of held gun. As for the block, max value is 500.
+    val UI_CONSOLE = "uiConsole"
 
     // UI aliases (pause)
     val uiAlasesPausing = HashMap<String, UIHandler>()
@@ -204,12 +204,12 @@ class StateInGame : BasicGameState() {
         // vital metre
         // fill in getter functions by
         //      (uiAliases[UI_QUICK_BAR]!!.UI as UIVitalMetre).vitalGetterMax = { some_function }
-        uiAliases[UI_VITAL1] = UIHandler(UIVitalMetre(player, { 80f }, { 100f }, Color.red, 0), customPositioning = true)
-        uiAliases[UI_VITAL1]!!.setAsAlwaysVisible()
-        uiAliases[UI_VITAL2] = UIHandler(UIVitalMetre(player, { 73f }, { 100f }, Color(0x00dfff), 1), customPositioning = true)
-        uiAliases[UI_VITAL2]!!.setAsAlwaysVisible()
-        uiAliases[UI_VITAL3] = UIHandler(UIVitalMetre(player, { 32f }, { 100f }, Color(0xffcc00), 2), customPositioning = true)
-        uiAliases[UI_VITAL3]!!.setAsAlwaysVisible()
+        uiAliases[UI_VITAL_PRIMARY] = UIHandler(UIVitalMetre(player, { 80f }, { 100f }, Color.red, 0), customPositioning = true)
+        uiAliases[UI_VITAL_PRIMARY]!!.setAsAlwaysVisible()
+        uiAliases[UI_VITAL_SECONDARY] = UIHandler(UIVitalMetre(player, { 73f }, { 100f }, Color(0x00dfff), 1), customPositioning = true)
+        uiAliases[UI_VITAL_SECONDARY]!!.setAsAlwaysVisible()
+        uiAliases[UI_VITAL_ITEM] = UIHandler(UIVitalMetre(player, { 32f }, { 100f }, Color(0xffcc00), 2), customPositioning = true)
+        uiAliases[UI_VITAL_ITEM]!!.setAsAlwaysVisible()
 
 
         // batch-process uiAliases
@@ -673,7 +673,7 @@ class StateInGame : BasicGameState() {
                 if (it is Pocketed) {
                     it.inventory.forEach { inventoryEntry ->
                         inventoryEntry.item.effectWhileInPocket(gc, delta)
-                        if (it.isEquipped(inventoryEntry.item)) {
+                        if (it.equipped(inventoryEntry.item)) {
                             inventoryEntry.item.effectWhenEquipped(gc, delta)
                         }
                     }

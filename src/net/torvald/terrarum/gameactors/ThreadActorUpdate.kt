@@ -16,7 +16,7 @@ class ThreadActorUpdate(val startIndex: Int, val endIndex: Int,
             if (it is Pocketed) {
                 it.inventory.forEach { inventoryEntry ->
                     inventoryEntry.item.effectWhileInPocket(gc, delta)
-                    if (it.isEquipped(inventoryEntry.item)) {
+                    if (it.equipped(inventoryEntry.item)) {
                         inventoryEntry.item.effectWhenEquipped(gc, delta)
                     }
                 }
