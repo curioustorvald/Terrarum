@@ -26,18 +26,19 @@ class UIItemTextButtonList(
         val textAreaWidth: Int,
         val iconSpriteSheet: SpriteSheet? = null,
         val iconSpriteSheetIndices: IntArray? = null,
+        val iconCol: Color = UIItemTextButton.defaultInactiveCol,
 
         // copied directly from UIItemTextButton
         val activeCol: Color = Color(0xfff066),
-        val activeBackCol: Color = Color(0,0,0,0),
+        val activeBackCol: Color = Color(0, 0, 0, 0),
         val activeBackBlendMode: String = BlendMode.NORMAL,
         val highlightCol: Color = Color(0x00f8ff),
         val highlightBackCol: Color = Color(0xb0b0b0),
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
         val inactiveCol: Color = Color(0xc0c0c0),
-        val backgroundCol: Color = Color(0,0,0,0),
+        val backgroundCol: Color = Color(0, 0, 0, 0),
         val backgroundBlendMode: String = BlendMode.NORMAL,
-        val kinematic: Boolean = false // more "kinetic" movement of selector
+        val kinematic: Boolean = false
 ) : UIItem(parentUI) {
 
     val iconToTextGap = 20
@@ -158,7 +159,8 @@ class UIItemTextButtonList(
             iconSpriteSheetIndices!!.forEachIndexed { counter, imageIndex ->
                 iconSpriteSheet.getSubImage(imageIndex, 0).draw(
                         32f,
-                        buttons[counter].posY + iconY.toFloat()
+                        buttons[counter].posY + iconY.toFloat(),
+                        iconCol
                 )
             }
         }

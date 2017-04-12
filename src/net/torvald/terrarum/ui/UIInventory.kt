@@ -33,6 +33,7 @@ class UIInventory(
     val catButtonsToCatIdent = HashMap<String, String>()
 
     val backgroundColour = Color(0x80242424.toInt())
+    val defaultTextColour = Color(0xeaeaea)
 
     init {
         catButtonsToCatIdent.put("GAME_INVENTORY_WEAPONS", InventoryItem.Category.WEAPON)
@@ -79,11 +80,13 @@ class UIInventory(
             defaultSelection = 0,
             iconSpriteSheet = SpriteSheet("./assets/graphics/gui/inventory/category.tga", 20, 20),
             iconSpriteSheetIndices = intArrayOf(9,6,7,0,1,2,3,4,5,8),
+            iconCol = defaultTextColour,
             highlightBackCol = Color(0xb8b8b8),
             highlightBackBlendMode = BlendMode.MULTIPLY,
             backgroundCol = Color(0,0,0,0), // will use custom background colour!
             backgroundBlendMode = BlendMode.NORMAL,
-            kinematic = true
+            kinematic = true,
+            inactiveCol = defaultTextColour
     )
 
     val itemsStripWidth = ((width - catButtons.width) - (2 * itemStripGutterH + itemInterColGutter)) / 2
@@ -101,7 +104,8 @@ class UIInventory(
                 mouseoverBackBlendMode = BlendMode.SCREEN,
                 backCol = Color(0xd4d4d4),
                 backBlendMode = BlendMode.MULTIPLY,
-                drawBackOnNull = true
+                drawBackOnNull = true,
+                inactiveTextCol = defaultTextColour
         ) })
     val itemsScrollOffset = 0
 
@@ -234,7 +238,7 @@ class UIInventory(
 
         // texts
         blendNormal()
-        g.color = Color(0xe8e8e8)
+        g.color = defaultTextColour
         // W - close
         g.drawString(listControlClose, 4f, height - controlHelpHeight.toFloat())
         // MouseL - Use ; 1.9 - Register ; T - Drop

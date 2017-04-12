@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
+import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.to10bit
 import net.torvald.terrarum.toInt
 import org.newdawn.slick.Color
@@ -75,8 +76,15 @@ object PlayerBuilderSigrid {
 
 
         // Test fill up inventory
-        p.inventory.add(16, 512)
-        p.equipItem(ItemCodex[16])
+        val tiles = arrayOf(
+                Tile.AIR, Tile.DIRT, Tile.GLASS_CRUDE,
+                Tile.GRASS, Tile.GRAVEL, Tile.ICE_MAGICAL, Tile.LANTERN,
+                Tile.PLANK_BIRCH, Tile.PLANK_BLOODROSE, Tile.PLANK_EBONY, Tile.PLANK_NORMAL,
+                Tile.SANDSTONE, Tile.SANDSTONE_BLACK, Tile.SANDSTONE_GREEN,
+                Tile.SANDSTONE_RED, Tile.STONE, Tile.STONE_BRICKS,
+                Tile.STONE_QUARRIED, Tile.STONE_TILE_WHITE, Tile.TORCH
+        )
+        tiles.forEach { p.inventory.add(it, 999) }
 
 
 

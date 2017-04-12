@@ -27,6 +27,7 @@ class UIItemInventoryElem(
         val mouseOverTextCol: Color = Color(0xfff066),
         val mouseoverBackCol: Color = Color(0,0,0,0),
         val mouseoverBackBlendMode: String = BlendMode.NORMAL,
+        val inactiveTextCol: Color = UIItemTextButton.defaultInactiveCol,
         val backCol: Color = Color(0,0,0,0),
         val backBlendMode: String = BlendMode.NORMAL,
         var quickslot: Int? = null,
@@ -88,7 +89,7 @@ class UIItemInventoryElem(
 
             // if mouse is over, text lights up
             // this one-liner sets color
-            g.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else UIItemTextButton.defaultInactiveCol
+            g.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
             g.drawString(
                     item!!.name + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "") +
                     (if (equippedSlot != null) "  ${0xE081.toChar()}\$$equippedSlot" else ""),

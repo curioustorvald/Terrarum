@@ -29,7 +29,7 @@ open abstract class DynamicItem(val baseItemID: Int?, newMass: Double? = null, n
         var ret: Int
         do {
             ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
-        } while (ItemCodex.hasItem(ret) || ret < ItemCodex.ITEM_DYNAMIC_MIN || ret > ItemCodex.ITEM_DYNAMIC_MAX) // check for collision
+        } while (ItemCodex.contains(ret) || ret < ItemCodex.ITEM_DYNAMIC_MIN || ret > ItemCodex.ITEM_DYNAMIC_MAX) // check for collision
         return ret
     }
 
