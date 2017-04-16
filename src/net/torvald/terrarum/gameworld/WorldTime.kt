@@ -98,8 +98,6 @@ class WorldTime(initTime: Long = 0L) {
     )
     val DAY_NAMES_SHORT = arrayOf("Mon", "Tys", "Mid", "Tor", "Fre", "Lau", "Sun", "Ver")
 
-    // FIXME   Next to Granite is Felsite
-
     val MONTH_NAMES = arrayOf(
             "Opal", "Obsidian", "Granite", "Slate", "Felsite", "Hematite",
             "Malachite", "Galena", "Limestone", "Sandstone", "Timber", "Moonstone"

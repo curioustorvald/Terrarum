@@ -239,7 +239,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
                     luatable[y - feetTilePos[1]] = LuaTable()
 
                     for (x in feetTilePos[0] - radius..feetTilePos[0] + radius) {
-                        val tile = TileCodex[Terrarum.ingame!!.world.getTileFromTerrain(x, y) ?: 4096]
+                        val tile = TileCodex[Terrarum.ingame!!.world.getTileFromTerrain(x, y) ?: Tile.NULL]
                         val solidity = tile.isSolid.toInt()
                         val liquidity = tile.isFluid.toInt()
                         val gravity = tile.isFallable.toInt()

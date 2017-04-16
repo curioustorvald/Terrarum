@@ -150,5 +150,5 @@ object Tile {
     val LAVA_15 = TileCodex.idDamageToIndex(254, 14)
     val LAVA =    TileCodex.idDamageToIndex(254, 15)
 
-    val NULL = 4096
+    val NULL = -1
 }

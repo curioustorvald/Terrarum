@@ -52,9 +52,9 @@ class StateUITest : BasicGameState() {
             override var originalName: String = "Test tool"
             override var baseMass: Double = 12.0
             override var baseToolSize: Double? = 8.0
-            override var category: String = InventoryItem.Category.TOOL
-            override var maxDurability: Double = 10.0
-            override var durability: Double = 6.43
+            override var inventoryCategory: String = InventoryItem.Category.TOOL
+            override var maxDurability: Int = 143
+            override var durability: Float = 64f
             override var consumable = false
         })
         actor.inventory.getByID(5656)!!.item.name = "Test tool"
@@ -68,7 +68,7 @@ class StateUITest : BasicGameState() {
             override var originalName: String = "CONTEXT_ITEM_QUEST_NOUN"
             override var baseMass: Double = 1.4
             override var baseToolSize: Double? = null
-            override var category: String = InventoryItem.Category.MISC
+            override var inventoryCategory: String = InventoryItem.Category.MISC
             override var consumable = false
         })
 

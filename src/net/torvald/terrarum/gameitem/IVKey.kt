@@ -7,6 +7,9 @@ object IVKey {
     const val ITEMTYPE = "itemtype" // "sword1h", "sword2h", "pick", "hammer", "tile", "wall", etc
     const val UUID = "uuid" // some items need UUID to be stored
 
+    const val BASE_WEAPON_POWER = "baseweaponpower"
+    const val BASE_PICK_POWER = "basepickpower"
+
 
     object ItemType {
         const val BLOCK = "tile"

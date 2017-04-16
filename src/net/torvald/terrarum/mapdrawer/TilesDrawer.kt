@@ -401,10 +401,10 @@ object TilesDrawer {
      */
     fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
         val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: Tile.NULL
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: Tile.NULL
         nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFrom(mode, x    , y - 1) ?: 4906
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(mode, x    , y + 1) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(mode, x    , y + 1) ?: Tile.NULL
 
         // try for
         var ret = 0
@@ -419,10 +419,10 @@ object TilesDrawer {
 
     fun getNearbyTilesInfoNonSolid(x: Int, y: Int, mode: Int): Int {
         val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: Tile.NULL
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: Tile.NULL
         nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFrom(mode, x    , y - 1) ?: 4906
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(mode, x    , y + 1) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(mode, x    , y + 1) ?: Tile.NULL
 
         // try for
         var ret = 0
@@ -443,10 +443,10 @@ object TilesDrawer {
     fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
         val nearbyTiles = IntArray(4)
         val NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(TERRAIN, x - 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(TERRAIN, x    , y + 1) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_BACK] = world.getTileFrom(WALL,    x    , y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(TERRAIN, x - 1, y) ?: Tile.NULL
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y) ?: Tile.NULL
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(TERRAIN, x    , y + 1) ?: Tile.NULL
+        nearbyTiles[NEARBY_TILE_KEY_BACK] = world.getTileFrom(WALL,    x    , y) ?: Tile.NULL
 
         try {
             if (TileCodex[nearbyTiles[NEARBY_TILE_KEY_DOWN]].isSolid)
@@ -476,8 +476,8 @@ object TilesDrawer {
 
     fun getNearbyTilesInfoPlatform(x: Int, y: Int): Int {
         val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  world.getTileFrom(TERRAIN, x - 1, y) ?: 4096
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y) ?: 4096
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  world.getTileFrom(TERRAIN, x - 1, y) ?: Tile.NULL
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y) ?: Tile.NULL
 
         if ((TileCodex[nearbyTiles[NEARBY_TILE_KEY_LEFT]].isSolid &&
             TileCodex[nearbyTiles[NEARBY_TILE_KEY_RIGHT]].isSolid) ||

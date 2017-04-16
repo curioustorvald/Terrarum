@@ -106,7 +106,7 @@ class UIItemInventoryElem(
                 g.lineWidth = 3f
                 g.drawLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen, posY + durabilityBarOffY)
                 g.color = durabilityCol
-                g.drawLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen * (item!!.durability / item!!.maxDurability).toFloat(), posY + durabilityBarOffY)
+                g.drawLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen * (item!!.durability / item!!.maxDurability), posY + durabilityBarOffY)
             }
 
 

@@ -18,8 +18,10 @@ object TileCodex {
 
     const val TILE_UNIQUE_MAX = MapLayer.RANGE * PairedMapLayer.RANGE
 
+    private val nullProp = TileProp()
+
     init {
-        tileProps = Array<TileProp>(TILE_UNIQUE_MAX + 1, { i -> TileProp() })
+        tileProps = Array<TileProp>(TILE_UNIQUE_MAX * 2, { i -> TileProp() })
 
         for (i in tileProps.indices) {
             tileProps[i] = TileProp()
@@ -31,8 +33,15 @@ object TileCodex {
 
             println("[TileCodex] Building tile properties table")
 
-            records.forEach { setProp(
-                    tileProps[idDamageToIndex(intVal(it, "id"), intVal(it, "dmg"))], it)
+            records.forEach {
+                if (intVal(it, "dmg") == -1) {
+                    setProp(nullProp, it)
+                }
+                else {
+                    setProp(
+                            tileProps[idDamageToIndex(intVal(it, "id"), intVal(it, "dmg"))], it
+                    )
+                }
             }
         }
         catch (e: IOException) {
@@ -53,14 +62,16 @@ object TileCodex {
     }
 
     operator fun get(rawIndex: Int?): TileProp {
+        if (rawIndex == null || rawIndex == Tile.NULL) {
+            return nullProp
+        }
+
         try {
-            tileProps[rawIndex ?: Tile.NULL].id
+            return tileProps[rawIndex]
         }
         catch (e: NullPointerException) {
             throw NullPointerException("Tile prop with raw id $rawIndex does not exist.")
         }
-
-        return tileProps[rawIndex ?: Tile.NULL]
     }
 
     private fun setProp(prop: TileProp, record: CSVRecord) {

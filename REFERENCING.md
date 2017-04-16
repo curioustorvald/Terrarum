@@ -1,7 +1,9 @@
 |Range|Description|
 |-----|-----------|
 |0..4095|Tiles|
-|4096..32767|Items (static)|
+|4096..8191|Walls|
+|8192..8447|Wires|
+|8448..32767|Items (static)|
 |32768..1048575|Items (dynamic\*)|
 |1048576..0x7FFF_FFFF|Actors|
 |0x8000_0000..0xFFFF_FFFF (all negative numbers)|Faction|

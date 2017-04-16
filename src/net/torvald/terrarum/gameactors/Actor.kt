@@ -50,9 +50,9 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
         fun hasCollision(value: Int) =
                 try {
                     Terrarum.ingame!!.theGameHasActor(value) ||
-                    value < ItemCodex.ITEM_COUNT_MAX ||
+                    value < ItemCodex.ACTOR_ID_MIN ||
                     value < when (renderOrder) {
-                        RenderOrder.BEHIND -> ItemCodex.ITEM_COUNT_MAX
+                        RenderOrder.BEHIND -> ItemCodex.ACTOR_ID_MIN
                         RenderOrder.MIDDLE -> 0x10000000
                         RenderOrder.MIDTOP -> 0x60000000
                         RenderOrder.FRONT  -> 0x70000000

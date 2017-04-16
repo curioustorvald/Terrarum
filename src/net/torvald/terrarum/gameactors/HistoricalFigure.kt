@@ -3,6 +3,8 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.gameworld.WorldTime
 import org.newdawn.slick.Input
 
+typealias AnyPlayer = HistoricalFigure
+
 /**
  * An actor (NPC) which has life and death,
  * though death might not exist if it has achieved immortality :)

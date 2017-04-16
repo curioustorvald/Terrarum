@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import com.google.gson.JsonPrimitive
 import java.util.*
 import java.util.function.Consumer
+import kotlin.collections.HashMap
 
 typealias ActorValue = KVHashMap
 typealias ItemValue = KVHashMap
@@ -13,7 +14,15 @@ typealias GameConfig = KVHashMap
  */
 class KVHashMap {
 
-    private val hashMap = HashMap<String, Any>()
+    constructor() {
+        hashMap = HashMap<String, Any>()
+    }
+
+    private constructor(newMap: HashMap<String, Any>) {
+        hashMap = newMap
+    }
+
+    private val hashMap: HashMap<String, Any>
 
     /**
      * Add key-value pair to the configuration table.
@@ -106,6 +115,11 @@ class KVHashMap {
     fun remove(key: String) {
         if (hashMap[key] != null)
             hashMap.remove(key, hashMap[key]!!)
+    }
+
+    fun clone(): KVHashMap {
+        val cloneOfMap = hashMap.clone() as HashMap<String, Any>
+        return KVHashMap(cloneOfMap)
     }
 
 }

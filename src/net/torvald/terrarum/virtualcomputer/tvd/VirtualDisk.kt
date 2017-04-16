@@ -1,5 +1,6 @@
 package net.torvald.terrarum.virtualcomputer.tvd
 
+import java.io.IOException
 import java.nio.charset.Charset
 import java.util.*
 import java.util.function.Consumer
@@ -182,10 +183,30 @@ class EntryFile(var bytes: ByteArray64) : DiskEntryContent {
         return buffer
     }
 }
-class EntryDirectory(val entries: ArrayList<EntryID> = ArrayList<EntryID>()) : DiskEntryContent {
+class EntryDirectory(private val entries: ArrayList<EntryID> = ArrayList<EntryID>()) : DiskEntryContent {
 
     override fun getSizePure() = entries.size * 4L
     override fun getSizeEntry() = getSizePure() + 2
+    private fun checkCapacity(toAdd: Int = 1) {
+        if (entries.size + toAdd > 65535)
+            throw IOException("Directory entries limit exceeded.")
+    }
+
+    fun add(entryID: EntryID) {
+        checkCapacity()
+        entries.add(entryID)
+    }
+
+    fun remove(entryID: EntryID) {
+        entries.removeAt(entryID)
+    }
+
+    fun contains(entryID: EntryID) = entries.contains(entryID)
+
+    fun forEach(consumer: (EntryID) -> Unit) = entries.forEach(consumer)
+
+    val entryCount: Int
+        get() = entries.size
 
     override fun serialize(): AppendableByteBuffer {
         val buffer = AppendableByteBuffer(getSizeEntry())

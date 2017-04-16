@@ -106,7 +106,7 @@ object Lang {
     }
 
     operator fun get(key: String): String {
-        fun fallback(): String = langpack["${key}_$FALLBACK_LANG_CODE"] ?: "ERRNULL:$key"
+        fun fallback(): String = langpack["${key}_$FALLBACK_LANG_CODE"] ?: "$$key"
 
 
         val ret = langpack["${key}_${Terrarum.gameLocale}"]

@@ -138,7 +138,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         override val isUnique: Boolean = false
         override var baseMass: Double = 0.0
         override var baseToolSize: Double? = null
-        override var category = "should_not_be_seen"
+        override var inventoryCategory = "should_not_be_seen"
         override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "(no name)"
         override var consumable = false
     }

@@ -15,8 +15,6 @@ import java.security.SecureRandom
  */
 object InjectCreatureRaw {
 
-    // FIXME strength not injected properly?
-
     const val JSONPATH = "./assets/raw/creatures/"
     private const val JSONMULT = "mult" // one appears in JSON files
 
