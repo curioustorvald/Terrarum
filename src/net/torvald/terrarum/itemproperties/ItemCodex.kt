@@ -125,8 +125,8 @@ object ItemCodex {
                         return false
                 }
 
-                // return false if the tile is already there
-                if (this.id == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY))
+                // return false if there's no tile
+                if (Tile.AIR == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY))
                     return false
 
                 // filter passed, do the job
