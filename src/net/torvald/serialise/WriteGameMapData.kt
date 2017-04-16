@@ -43,9 +43,9 @@ object WriteGameMapData {
                 { b -> Files.write(tempPath, byteArrayOf(b)) })
         map.layerWall.forEach(
                 { b -> Files.write(tempPath, byteArrayOf(b)) })
-        map.terrainDamage.forEach(
+        map.layerTerrainLowBits.forEach(
                 { b -> Files.write(tempPath, byteArrayOf(b)) })
-        map.wallDamage.forEach(
+        map.layerWallLowBits.forEach(
                 { b -> Files.write(tempPath, byteArrayOf(b)) })
         map.layerWire.forEach(
                 { b -> Files.write(tempPath, byteArrayOf(b)) })

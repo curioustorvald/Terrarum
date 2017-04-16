@@ -158,7 +158,7 @@ class UIInventory(
 
                 // filter items
                 inventory?.forEach {
-                    if (it.item.category == filter || filter == "__all__")
+                    if (it.item.inventoryCategory == filter || filter == "__all__")
                         inventorySortList.add(it)
                 }
 
@@ -295,27 +295,20 @@ class UIInventory(
     }
 
     override fun doOpening(gc: GameContainer, delta: Int) {
-        handler!!.posX = Movement.fastPullOut(
-                handler!!.openCloseCounter.toFloat() / openCloseTime,
-                -width.toFloat(),
-                0f
-        ).roundInt()
+        UICanvas.doOpeningPopOut(handler, openCloseTime, UICanvas.Companion.Position.LEFT)
     }
 
     override fun doClosing(gc: GameContainer, delta: Int) {
-        handler!!.posX = Movement.fastPullOut(
-                handler!!.openCloseCounter.toFloat() / openCloseTime,
-                0f,
-                -width.toFloat()
-        ).roundInt()
+        UICanvas.doClosingPopOut(handler, openCloseTime, UICanvas.Companion.Position.LEFT)
+
     }
 
     override fun endOpening(gc: GameContainer, delta: Int) {
-        handler!!.posX = 0
+        UICanvas.endOpeningPopOut(handler, UICanvas.Companion.Position.LEFT)
     }
 
     override fun endClosing(gc: GameContainer, delta: Int) {
-        handler!!.posX = -width
+        UICanvas.endClosingPopOut(handler, UICanvas.Companion.Position.LEFT)
     }
 
     override fun keyPressed(key: Int, c: Char) {

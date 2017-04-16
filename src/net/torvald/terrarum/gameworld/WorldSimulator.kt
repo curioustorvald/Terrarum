@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameworld
 
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.AnyPlayer
 import net.torvald.terrarum.gameactors.HistoricalFigure
 import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.gameactors.roundInt
@@ -40,8 +41,7 @@ object WorldSimulator {
 
     private val world = Terrarum.ingame!!.world
 
-    // TODO future Kotlin feature -- typealias AnyPlayer: HistoricalFigure
-    operator fun invoke(p: HistoricalFigure?, delta: Int) {
+    operator fun invoke(p: AnyPlayer?, delta: Int) {
         if (p != null) {
             updateXFrom = p.hitbox.centeredX.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
             updateYFrom = p.hitbox.centeredY.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()

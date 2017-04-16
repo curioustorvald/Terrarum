@@ -126,7 +126,9 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             remove(item, 1)
         }
         else {
-            // TODO decrement durability
+            item.durability -= 1f
+            if (item.durability <= 0)
+                remove(item, 1)
         }
     }
 

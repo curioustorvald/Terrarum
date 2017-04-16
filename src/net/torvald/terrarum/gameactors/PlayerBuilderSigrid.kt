@@ -58,6 +58,7 @@ object PlayerBuilderSigrid {
         p.actorValue[AVKey.INTELLIGENT] = true
 
         p.actorValue[AVKey.LUMINOSITY] = Color(0x434aff).to10bit()
+        //p.actorValue[AVKey.LUMINOSITY] = 214127943 // bright purple
 
         p.actorValue[AVKey.BASEDEFENCE] = 141
 
@@ -65,7 +66,7 @@ object PlayerBuilderSigrid {
         //p.actorValue["__selectedtile"] = 147 // test code; replace with <tile_item>.primaryUse(gc, delta)
         p.actorValue["__aimhelper"] = true // TODO when you'll gonna implement it?
 
-        p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 11, 0) // FIXME offsetY of -2: Have no idea about the error; it's just supposed to be zero
+        p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 11, 0)
 
         p.inventory = ActorInventory(p, 0, ActorInventory.CAPACITY_MODE_NO_ENCUMBER)
 
@@ -85,6 +86,7 @@ object PlayerBuilderSigrid {
                 Tile.STONE_QUARRIED, Tile.STONE_TILE_WHITE, Tile.TORCH
         )
         tiles.forEach { p.inventory.add(it, 999) }
+        p.inventory.add(ItemCodex.ITEM_STATIC.first)
 
 
 

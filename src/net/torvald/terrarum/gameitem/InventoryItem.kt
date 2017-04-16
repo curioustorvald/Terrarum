@@ -10,17 +10,12 @@ import org.newdawn.slick.GameContainer
 /**
  * Created by minjaesong on 16-01-16.
  */
-abstract class InventoryItem : Comparable<InventoryItem> {
-    /**
-     * Internal ID of an Item,
-     * 0-4095: Tiles
-     * 4096-32767: Unique items (isUnique = true), brand-new tools
-     * 32768-16777215: Dynamic items (e.g. tools with damage)
-     * >= 16777216: Actor RefID
-     */
+abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
+
     abstract val id: Int
 
     /**
+     *
      * e.g. Key Items (in a Pokémon sense), floppies
      */
     abstract val isUnique: Boolean
@@ -47,11 +42,11 @@ abstract class InventoryItem : Comparable<InventoryItem> {
 
     abstract var baseToolSize: Double?
 
-    abstract var category: String // "weapon", "tool", "armor", etc. (all smallcaps)
+    abstract var inventoryCategory: String // "weapon", "tool", "armor", etc. (all smallcaps)
 
     var itemProperties = ItemValue()
 
-    /** Single-use then destroyed (e.g. Tiles) */
+    /** Single-use then destroyed (e.g. Tiles), aka negation of "stackable" */
     abstract var consumable: Boolean
 
     /**
@@ -94,9 +89,12 @@ abstract class InventoryItem : Comparable<InventoryItem> {
     /**
      * Set to zero if durability not applicable
      */
-    open var maxDurability: Double = 0.0
+    open var maxDurability: Int = 0
 
-    open var durability: Double = 0.0
+    /**
+     * Float. NOT A MISTAKE
+     */
+    open var durability: Float = 0f
 
     /**
      * Effects applied continuously while in pocket
@@ -115,6 +113,9 @@ abstract class InventoryItem : Comparable<InventoryItem> {
      * @return true when used successfully, false otherwise
      *
      * note: DO NOT super(gc, g) this!
+     *
+     * Consumption function is executed in net.torvald.terrarum.gamecontroller.GameController,
+     * in which the function itself is defined in net.torvald.terrarum.gameactors.ActorInventory
      */
     open fun primaryUse(gc: GameContainer, delta: Int): Boolean = false
 
@@ -211,5 +212,13 @@ abstract class InventoryItem : Comparable<InventoryItem> {
         const val BLOCK = "block"
         const val WALL = "wall"
         const val MISC = "misc"
+    }
+
+    override public fun clone(): InventoryItem {
+        val clonedItem = super.clone()
+        // properly clone ItemValue
+        (clonedItem as InventoryItem).itemProperties = this.itemProperties.clone()
+
+        return clonedItem
     }
 }

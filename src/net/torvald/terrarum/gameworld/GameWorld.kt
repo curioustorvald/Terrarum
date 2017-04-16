@@ -1,34 +1,29 @@
 
 package net.torvald.terrarum.gameworld
 
+import net.torvald.terrarum.realestate.RealEstateUtility
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.SlickException
 
-class GameWorld
-/**
- * @param width
- * *
- * @param height
- * *
- * @throws SlickException
- */
-@Throws(SlickException::class)
-constructor(//properties
-        val width: Int, val height: Int) {
+typealias TileAddress = Long
+typealias TileDamage = Int
+
+class GameWorld(val width: Int, val height: Int) {
+
 
     //layers
     val layerWall: MapLayer
-    /**
-     * Get MapLayer object of terrain
-
-     * @return MapLayer terrain layer
-     */
     val layerTerrain: MapLayer
     val layerWire: MapLayer
-    val wallDamage: PairedMapLayer
-    val terrainDamage: PairedMapLayer
+
+    val layerWallLowBits: PairedMapLayer
+    val layerTerrainLowBits: PairedMapLayer
+
     val spawnX: Int
     val spawnY: Int
+
+    val wallDamages = HashMap<TileAddress, TileDamage>()
+    val terrainDamages = HashMap<TileAddress, TileDamage>()
 
     //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
     //physics
@@ -47,8 +42,8 @@ constructor(//properties
         layerTerrain = MapLayer(width, height)
         layerWall = MapLayer(width, height)
         layerWire = MapLayer(width, height)
-        terrainDamage = PairedMapLayer(width, height)
-        wallDamage = PairedMapLayer(width, height)
+        layerTerrainLowBits = PairedMapLayer(width, height)
+        layerWallLowBits = PairedMapLayer(width, height)
 
         time = WorldTime(
                 71 * WorldTime.DAY_LENGTH +
@@ -87,11 +82,11 @@ constructor(//properties
      * @return byte[][] damage code pair
      */
     val damageDataArray: Array<ByteArray>
-        get() = terrainDamage.dataPair
+        get() = layerTerrainLowBits.dataPair
 
     fun getTileFromWall(x: Int, y: Int): Int? {
         val wall: Int? = layerWall.getTile(x fmod width, y)
-        val wallDamage: Int? = getWallDamage(x fmod width, y)
+        val wallDamage: Int? = getWallLowBits(x fmod width, y)
         return if (wall == null || wallDamage == null)
             null
         else
@@ -100,7 +95,7 @@ constructor(//properties
 
     fun getTileFromTerrain(x: Int, y: Int): Int? {
         val terrain: Int? = layerTerrain.getTile(x fmod width, y)
-        val terrainDamage: Int? = getTerrainDamage(x fmod width, y)
+        val terrainDamage: Int? = getTerrainLowBits(x fmod width, y)
         return if (terrain == null || terrainDamage == null)
             null
         else
@@ -111,12 +106,12 @@ constructor(//properties
         return layerWire.getTile(x fmod width, y)
     }
 
-    fun getWallDamage(x: Int, y: Int): Int? {
-        return wallDamage.getData(x fmod width, y)
+    fun getWallLowBits(x: Int, y: Int): Int? {
+        return layerWallLowBits.getData(x fmod width, y)
     }
 
-    fun getTerrainDamage(x: Int, y: Int): Int? {
-        return terrainDamage.getData(x fmod width, y)
+    fun getTerrainLowBits(x: Int, y: Int): Int? {
+        return layerTerrainLowBits.getData(x fmod width, y)
     }
 
     /**
@@ -145,12 +140,12 @@ constructor(//properties
 
     fun setTileWall(x: Int, y: Int, tile: Byte, damage: Int) {
         layerWall.setTile(x fmod width, y, tile)
-        wallDamage.setData(x fmod width, y, damage)
+        layerWallLowBits.setData(x fmod width, y, damage)
     }
 
     fun setTileTerrain(x: Int, y: Int, tile: Byte, damage: Int) {
         layerTerrain.setTile(x fmod width, y, tile)
-        terrainDamage.setData(x fmod width, y, damage)
+        layerTerrainLowBits.setData(x fmod width, y, damage)
     }
 
     fun setTileWire(x: Int, y: Int, tile: Byte) {
@@ -216,6 +211,32 @@ constructor(//properties
         }
     }
 
+    fun inflctTerrainDamage(x: Int, y: Int, damage: Int) {
+        val addr = RealEstateUtility.getAbsoluteTileNumber(x, y)
+
+        if (terrainDamages[addr] == null) {
+            terrainDamages[addr] = damage
+        }
+        else {
+            terrainDamages[addr] = terrainDamages[addr]!! + damage
+        }
+    }
+    fun getTerrainDamage(x: Int, y: Int) =
+            terrainDamages[RealEstateUtility.getAbsoluteTileNumber(x, y)] ?: 0
+
+    fun inflctWallDamage(x: Int, y: Int, damage: Int) {
+        val addr = RealEstateUtility.getAbsoluteTileNumber(x, y)
+
+        if (wallDamages[addr] == null) {
+            wallDamages[addr] = damage
+        }
+        else {
+            wallDamages[addr] = wallDamages[addr]!! + damage
+        }
+    }
+    fun getWallDamage(x: Int, y: Int) =
+            wallDamages[RealEstateUtility.getAbsoluteTileNumber(x, y)] ?: 0
+
     companion object {
 
         @Transient val WALL = 0
@@ -224,7 +245,7 @@ constructor(//properties
 
         @Transient val TILES_SUPPORTED = MapLayer.RANGE * PairedMapLayer.RANGE
         @Transient val SIZEOF: Byte = MapLayer.SIZEOF
-        @Transient val LAYERS: Byte = 4 // terrain, wall (terrainDamage + wallDamage), wire
+        @Transient val LAYERS: Byte = 4 // terrain, wall (layerTerrainLowBits + layerWallLowBits), wire
     }
 }
 

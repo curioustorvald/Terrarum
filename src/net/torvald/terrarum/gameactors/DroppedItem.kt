@@ -12,7 +12,7 @@ import org.newdawn.slick.Graphics
 class DroppedItem(private val item: InventoryItem) : ActorWithSprite(Actor.RenderOrder.MIDTOP) {
 
     init {
-        if (item.id >= ItemCodex.ITEM_COUNT_MAX)
+        if (item.id >= ItemCodex.ACTOR_ID_MIN)
             throw RuntimeException("Attempted to create DroppedItem actor of a real actor; the real actor must be dropped instead.")
 
         isVisible = true

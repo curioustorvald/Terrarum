@@ -3,7 +3,6 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameitem.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
-import java.util.*
 
 /**
  * Created by minjaesong on 16-01-15.
@@ -17,10 +16,13 @@ interface Pocketed {
      */
     fun unequipItem(item: InventoryItem) {
         if (item.equipPosition == InventoryItem.EquipPosition.NULL)
-            throw Error("Unequipping the item that cannot be equipped")
+            throw Error("Unequipping the item that cannot be equipped in the first place")
 
-        if (!inventory.contains(item))
-            throw Error("Unequipping the item that does not exist in inventory")
+        if (!inventory.contains(item)) {
+            //throw Error("Unequipping the item that does not exist in inventory")
+            System.err.println("[Pocketed] Warning -- Unequipping the item that does not exist in inventory")
+            return // just do nothing
+        }
 
         inventory.itemEquipped[item.equipPosition] = null
         item.effectOnUnequip(Terrarum.appgc, Terrarum.UPDATE_DELTA)

@@ -94,7 +94,7 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
 
             path.dropMount()
 
-            return VDUtil.getFile(disk, path)?.file
+            return VDUtil.getFile(disk, path)
         }
 
         /**
@@ -201,7 +201,7 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
                 if (file!!.contents is EntryFile)
                     return LuaValue.valueOf(file.contents.getSizePure().toInt())
                 else if (file.contents is EntryDirectory)
-                    return LuaValue.valueOf(file.contents.entries.size)
+                    return LuaValue.valueOf(file.contents.entryCount)
             }
             catch (e: KotlinNullPointerException) {
             }
@@ -279,12 +279,12 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
 
                 val file = VDUtil.getFile(disk1, pathFrom)!!
                 try {
-                    VDUtil.addFile(disk2, pathTo.getParent(), file.file)
+                    VDUtil.addFile(disk2, pathTo.getParent(), file)
                 }
                 catch (e: FileNotFoundException) {
                     // roll back delete on disk2
                     if (oldFile != null) {
-                        VDUtil.addFile(disk2, oldFile.parent.entryID, oldFile.file)
+                        VDUtil.addFile(disk2, oldFile.parentEntryID, oldFile)
                         throw FileNotFoundException("No such destination")
                     }
                 }

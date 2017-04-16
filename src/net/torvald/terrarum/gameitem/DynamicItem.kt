@@ -16,13 +16,6 @@ import org.newdawn.slick.GameContainer
 open abstract class DynamicItem(val baseItemID: Int?, newMass: Double? = null, newScale: Double? = null)
     : InventoryItem() {
     /*
-    /**
-     * Internal ID of an Item, Long
-     * 0-4096: Tiles
-     * 4097-32767: Static items
-     * 32768-16777215: Dynamic items
-     * >= 16777216: Actor RefID
-     */
     override val id: Int = generateUniqueDynamicItemID()
 
     private fun generateUniqueDynamicItemID(): Int {

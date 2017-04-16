@@ -1,9 +1,12 @@
 package net.torvald.terrarum.gameactors
 
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.ai.AILuaAPI
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
+import net.torvald.terrarum.gamecontroller.mouseX
+import net.torvald.terrarum.gamecontroller.mouseY
 import net.torvald.terrarum.gameitem.InventoryItem
 import org.luaj.vm2.*
 import org.luaj.vm2.compiler.LuaC
@@ -51,13 +54,22 @@ open class HumanoidNPC(
             set(value) {
                 actorValue[AVKey.SCALE] = value
             }
-        override var category = "npc"
+        override var inventoryCategory = "npc"
         override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "NPC"
-        override var consumable = false
+        override var consumable = true
 
         override fun secondaryUse(gc: GameContainer, delta: Int): Boolean {
-            return false
-            // TODO place this Actor to the world
+            try {
+                // place the actor to the world
+                this@HumanoidNPC.setPosition(gc.mouseX, gc.mouseY)
+                Terrarum.ingame!!.addNewActor(this@HumanoidNPC)
+                // successful
+                return true
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+                return false
+            }
         }
     }
 

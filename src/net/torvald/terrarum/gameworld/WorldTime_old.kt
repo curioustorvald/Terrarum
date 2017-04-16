@@ -16,8 +16,8 @@ import net.torvald.terrarum.gameactors.GameDate
  *
  * Created by minjaesong on 16-01-24.
  */
+@Deprecated("Are you even reading the name?")
 class YeOldeWorldTime {
-    internal var TIME_T = 0L // TODO use it! Epoch: Year 125, 1st Granite, 0h00:00
 
     internal var seconds: Int // 0 - 59
     internal var minutes: Int // 0 - 59
