@@ -2,7 +2,7 @@ package net.torvald.serialise
 
 import net.torvald.CSVFetcher
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.itemproperties.MaterialPropCodex
+import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.tileproperties.TileCodex
 import java.io.IOException
@@ -22,7 +22,7 @@ object WriteCSV {
     fun write(saveDirectoryName: String): Boolean {
         //val tileCSV = CSVFetcher.readCSVasString(TileCodex.CSV_PATH)
         //val itemCSV = CSVFetcher.readCSVasString(ItemCodex.CSV_PATH)
-        //val matCSV = CSVFetcher.readCSVasString(MaterialPropCodex.CSV_PATH)
+        //val matCSV = CSVFetcher.readCSVasString(MaterialCodex.CSV_PATH)
 
         val pathTile = Paths.get("${Terrarum.defaultSaveDir}" +
                                        "/$saveDirectoryName/${META_FILENAME_TILE}")

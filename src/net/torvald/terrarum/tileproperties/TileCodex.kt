@@ -34,12 +34,12 @@ object TileCodex {
             println("[TileCodex] Building tile properties table")
 
             records.forEach {
-                if (intVal(it, "dmg") == -1) {
+                if (intVal(it, "sid") == -1) {
                     setProp(nullProp, it)
                 }
                 else {
                     setProp(
-                            tileProps[idDamageToIndex(intVal(it, "id"), intVal(it, "dmg"))], it
+                            tileProps[idDamageToIndex(intVal(it, "id"), intVal(it, "sid"))], it
                     )
                 }
             }
@@ -77,7 +77,7 @@ object TileCodex {
     private fun setProp(prop: TileProp, record: CSVRecord) {
         prop.nameKey = record.get("name")
 
-        prop.id = idDamageToIndex(intVal(record, "id"), intVal(record, "dmg"))
+        prop.id = idDamageToIndex(intVal(record, "id"), intVal(record, "sid"))
 
         prop.opacity = intVal(record, "opacity")
         prop.strength = intVal(record, "strength")
@@ -96,7 +96,7 @@ object TileCodex {
 
         prop.dynamicLuminosityFunction = intVal(record, "dlfn")
 
-        print(formatNum3(intVal(record, "id")) + ":" + formatNum2(intVal(record, "dmg")))
+        print(formatNum3(intVal(record, "id")) + ":" + formatNum2(intVal(record, "sid")))
         println("\t" + prop.nameKey)
     }
 
