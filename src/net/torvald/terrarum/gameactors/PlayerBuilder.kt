@@ -13,7 +13,7 @@ object PlayerBuilder {
 
     operator fun invoke(): Actor {
         val p: Actor = Player(Terrarum.ingame!!.world.time.currentTimeAsGameDate)
-        InjectCreatureRaw(p.actorValue, "CreatureHuman.json")
+        InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
         // attach sprite
 

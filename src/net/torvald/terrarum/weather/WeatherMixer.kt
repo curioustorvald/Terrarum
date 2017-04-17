@@ -4,14 +4,11 @@ import com.jme3.math.FastMath
 import net.torvald.JsonFetcher
 import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blendMul
-import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ParticleTestRain
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.WorldTime
-import net.torvald.terrarum.getPixel
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -47,14 +44,12 @@ object WeatherMixer {
     const val WEATHER_GENERIC_RAIN = "genericrain"
     // TODO add weather classification indices manually
 
-    const val RAW_DIR = "./assets/raw/weathers"
-
     init {
         weatherList = HashMap<String, ArrayList<BaseModularWeather>>()
 
         // read weather descriptions from assets/weather (modular weather)
         val weatherRawValidList = ArrayList<File>()
-        val weatherRaws = File(RAW_DIR).listFiles()
+        val weatherRaws = ModuleManager.getFiles("basegame", "weathers")
         weatherRaws.forEach {
             if (!it.isDirectory && it.name.endsWith(".json"))
                 weatherRawValidList.add(it)
@@ -191,7 +186,7 @@ object WeatherMixer {
   ]
 }
          */
-        val pathToImage = "./assets/graphics/weathers"
+        val pathToImage = "weathers"
 
         val JSON = JsonFetcher(path)
 
@@ -212,7 +207,7 @@ object WeatherMixer {
 
         // parse globalLight
         if (globalLightInJson.isString)
-            globalLight = Image("$pathToImage/${globalLightInJson.asString}")
+            globalLight = Image(ModuleManager.getPath("basegame", "$pathToImage/${globalLightInJson.asString}"))
         else if (globalLightInJson.isNumber) {
             // make 1x1 image with specified colour
             globalLight = Image(1, 1)
@@ -224,7 +219,7 @@ object WeatherMixer {
 
         // parse skyboxGradColourMap
         if (skyboxInJson.isString)
-            skybox = Image("$pathToImage/${skyboxInJson.asString}")
+            skybox = Image(ModuleManager.getPath("basegame", "$pathToImage/${skyboxInJson.asString}"))
         else if (globalLightInJson.isNumber) {
             // make 1x2 image with specified colour
             skybox = Image(1, 2)
@@ -236,7 +231,7 @@ object WeatherMixer {
 
         // get extra images
         for (i in extraImagesPath)
-            extraImages.add(Image("$pathToImage/${i.asString}"))
+            extraImages.add(Image(ModuleManager.getPath("basegame", "$pathToImage/${i.asString}")))
 
         // get mix from
 

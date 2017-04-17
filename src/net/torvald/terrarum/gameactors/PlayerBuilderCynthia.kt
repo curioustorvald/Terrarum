@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.terrarum.ModuleManager
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
@@ -15,14 +16,14 @@ object PlayerBuilderCynthia {
         val p: HumanoidNPC = HumanoidNPC(
                 LuaAIWrapper("/net/torvald/terrarum/gameactors/ai/scripts/PokemonNPCAI.lua"),
                 GameDate(100, 143)) // random value thrown
-        InjectCreatureRaw(p.actorValue, "CreatureHuman.json")
+        InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
 
         p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0
         p.actorValue[AVKey.NAME] = "Cynthia"
 
 
-        p.makeNewSprite(26, 42, "assets/graphics/sprites/test_player_2.tga")
+        p.makeNewSprite(26, 42, ModuleManager.getPath("basegame", "sprites/test_player_2.tga"))
         p.sprite!!.delay = 200
         p.sprite!!.setRowsAndFrames(1, 1)
 

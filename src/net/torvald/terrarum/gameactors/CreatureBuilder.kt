@@ -18,9 +18,9 @@ object CreatureBuilder {
      * @Param jsonFileName with extension
      */
     @Throws(IOException::class, SlickException::class)
-    operator fun invoke(jsonFileName: String): ActorWithSprite {
+    operator fun invoke(module: String, jsonFileName: String): ActorWithSprite {
         val actor = ActorWithSprite(Actor.RenderOrder.MIDDLE)
-        InjectCreatureRaw(actor.actorValue, jsonFileName)
+        InjectCreatureRaw(actor.actorValue, module, jsonFileName)
 
         return actor
     }
