@@ -10,7 +10,7 @@
 
 * Writing text
 	- You will need to fiddle with .json files in ./res/locales/<Language code>
-	- Do not use double-dash (```--```), use proper em-dash. Em-dashes must not prepend and append any spaces.
+	- Do not use double-dash (```--```), use proper em-dash(```—```). Em-dashes must not prepend and append any spaces.
 	- Languages with ligatures: please do use them. (e.g. coeur -> cœur)
 	- Japanese: please refrain from using double-hypen (```゠```), use middle dot (```・```)
 * Languagus with apparent grammatical gender
@@ -23,7 +23,7 @@ Note: Right-to-left languages (arabic, hebrew, etc.) are not supported.
 
 * RGB we mean is always sRGB, _pure white_ we say is always D65 (6 500 K daylight). If you have a monitor calibration device, this is our desired target. (calibration software must be _DisplayCal 3_)
 * Master file for the picture (e.g. psd) can be either RGB/8 or Lab/16.
-* Every exported audio must be in OGG/Vorbis, with quality ```10```.
+* Every exported audio must be in OGG/Vorbis, with quality option ```-q 10```.
 * When exporting the image, if the image contains semitransparent colours, export it as TGA; if not, export it as PNG.
 
         Instruction for exporting the image as TGA
