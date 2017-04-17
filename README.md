@@ -43,7 +43,7 @@ Because of this, we just couldn't use solutions out there. For example, Tiled is
 
 ## Contribution guidelines ##
 
-Please refer to [```CONTRIBUTING.md```]().
+Please refer to [```CONTRIBUTING.md```](CONTRIBUTING.md).
 
 ## Who do I talk to? ##
 
