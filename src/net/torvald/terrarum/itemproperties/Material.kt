@@ -30,7 +30,7 @@ data class Material (
     var thermalConductivity: Int, // pascal (N/m^2); if the item (e.g. sword) receives a force that exceeds this value, the item will be destroyed
 
 
-    // must be a item properties
-    var weapSharpnessMod: Double, // multiplier
+
+    var forceMod: Int, // arbitrary unit. See Pickaxe_Power.xlsx
     var armourMod: Double // multiplier
 )

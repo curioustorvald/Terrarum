@@ -4,7 +4,7 @@ import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.mapdrawer.MapCamera
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex
@@ -78,7 +78,7 @@ object GameController {
                         if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary"))) {
                             ingame.player!!.consumePrimary(itemOnGrip)
                         }
-                        else if (input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
+                        if (input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
                             ingame.player!!.consumeSecondary(itemOnGrip)
                         }
                     }
@@ -113,7 +113,21 @@ object GameController {
     }
 
     fun mouseReleased(button: Int, x: Int, y: Int) {
+        if (Terrarum.ingame != null) {
+            val ingame = Terrarum.ingame!!
+            if (ingame.player != null && ingame.canPlayerControl) {
+                val itemOnGrip = ingame.player!!.inventory.itemEquipped[InventoryItem.EquipPosition.HAND_GRIP]
 
+                if (itemOnGrip != null) {
+                    if (button == Terrarum.getConfigInt("mousePrimary")) {
+                        itemOnGrip.endPrimaryUse(Terrarum.appgc, Terrarum.UPDATE_DELTA)
+                    }
+                    if (button == Terrarum.getConfigInt("mouseSecondary")) {
+                        itemOnGrip.endSecondaryUse(Terrarum.appgc, Terrarum.UPDATE_DELTA)
+                    }
+                }
+            }
+        }
     }
 
     fun mouseWheelMoved(change: Int) {

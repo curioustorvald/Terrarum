@@ -1,4 +1,4 @@
-package net.torvald.terrarum.gameitem
+package net.torvald.terrarum.itemproperties
 
 /**
  * Created by minjaesong on 16-09-09.

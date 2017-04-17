@@ -2,11 +2,12 @@
 package net.torvald.terrarum.gameworld
 
 import net.torvald.terrarum.realestate.RealEstateUtility
+import net.torvald.terrarum.tileproperties.TileCodex
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.SlickException
 
 typealias TileAddress = Long
-typealias TileDamage = Int
+typealias TileDamage = Float
 
 class GameWorld(val width: Int, val height: Int) {
 
@@ -211,31 +212,61 @@ class GameWorld(val width: Int, val height: Int) {
         }
     }
 
-    fun inflctTerrainDamage(x: Int, y: Int, damage: Int) {
+    /**
+     * @return true if block is broken
+     */
+    fun inflctTerrainDamage(x: Int, y: Int, damage: Float): Boolean {
         val addr = RealEstateUtility.getAbsoluteTileNumber(x, y)
 
-        if (terrainDamages[addr] == null) {
+        if (terrainDamages[addr] == null) { // add new
             terrainDamages[addr] = damage
         }
-        else {
+        else if (terrainDamages[addr]!! + damage <= 0) { // tile is (somehow) fully healed
+            terrainDamages.remove(addr)
+        }
+        else { // normal situation
             terrainDamages[addr] = terrainDamages[addr]!! + damage
         }
-    }
-    fun getTerrainDamage(x: Int, y: Int) =
-            terrainDamages[RealEstateUtility.getAbsoluteTileNumber(x, y)] ?: 0
 
-    fun inflctWallDamage(x: Int, y: Int, damage: Int) {
+        //println("[GameWorld] accumulated damage: ${terrainDamages[addr]}")
+
+        // remove tile from the world
+        if (terrainDamages[addr]!! >= TileCodex[getTileFromTerrain(x, y)].strength) {
+            setTileTerrain(x, y, 0)
+            return true
+        }
+
+        return false
+    }
+    fun getTerrainDamage(x: Int, y: Int): Float =
+            terrainDamages[RealEstateUtility.getAbsoluteTileNumber(x, y)] ?: 0f
+
+    /**
+     * @return true if block is broken
+     */
+    fun inflctWallDamage(x: Int, y: Int, damage: Float): Boolean {
         val addr = RealEstateUtility.getAbsoluteTileNumber(x, y)
 
-        if (wallDamages[addr] == null) {
+        if (wallDamages[addr] == null) { // add new
             wallDamages[addr] = damage
         }
-        else {
+        else if (wallDamages[addr]!! + damage <= 0) { // tile is (somehow) fully healed
+            wallDamages.remove(addr)
+        }
+        else { // normal situation
             wallDamages[addr] = wallDamages[addr]!! + damage
         }
+
+        // remove tile from the world
+        if (wallDamages[addr]!! >= TileCodex[getTileFromWall(x, y)].strength) {
+            setTileWall(x, y, 0)
+            return true
+        }
+
+        return false
     }
-    fun getWallDamage(x: Int, y: Int) =
-            wallDamages[RealEstateUtility.getAbsoluteTileNumber(x, y)] ?: 0
+    fun getWallDamage(x: Int, y: Int): Float =
+            wallDamages[RealEstateUtility.getAbsoluteTileNumber(x, y)] ?: 0f
 
     companion object {
 

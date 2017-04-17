@@ -1,6 +1,7 @@
 package net.torvald.terrarum.tileproperties
 
 import net.torvald.CSVFetcher
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import org.apache.commons.csv.CSVRecord
@@ -14,14 +15,12 @@ object TileCodex {
 
     private var tileProps: Array<TileProp>
 
-    val CSV_PATH = "/net/torvald/terrarum/tileproperties/tileprop.csv"
-
     const val TILE_UNIQUE_MAX = MapLayer.RANGE * PairedMapLayer.RANGE
 
     private val nullProp = TileProp()
 
     init {
-        tileProps = Array<TileProp>(TILE_UNIQUE_MAX * 2, { i -> TileProp() })
+        tileProps = Array<TileProp>(TILE_UNIQUE_MAX * 2, { TileProp() })
 
         for (i in tileProps.indices) {
             tileProps[i] = TileProp()
@@ -29,7 +28,7 @@ object TileCodex {
 
         try {
             // todo verify CSV using pre-calculated SHA256 hash
-            val records = CSVFetcher.readFromString(TilePropCSV())
+            val records = CSVFetcher.readFromModule("basegame", "tiles/tileprop.csv")
 
             println("[TileCodex] Building tile properties table")
 
@@ -50,15 +49,15 @@ object TileCodex {
 
     }
 
-    fun get(index: Int, damage: Int): TileProp {
+    fun get(index: Int, subID: Int): TileProp {
         try {
-            tileProps[idDamageToIndex(index, damage)].id
+            tileProps[idDamageToIndex(index, subID)].id
         }
         catch (e: NullPointerException) {
-            throw NullPointerException("Tile prop with id $index and damage $damage does not exist.")
+            throw NullPointerException("Tile prop with id $index and subID $subID does not exist.")
         }
 
-        return tileProps[idDamageToIndex(index, damage)]
+        return tileProps[idDamageToIndex(index, subID)]
     }
 
     operator fun get(rawIndex: Int?): TileProp {

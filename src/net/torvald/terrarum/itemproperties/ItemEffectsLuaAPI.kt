@@ -47,13 +47,13 @@ class ItemEffectsLuaAPI(g: Globals) {
 
     class StrikeEarth : ThreeArgFunction() {
         override fun call(x: LuaValue, y: LuaValue, power: LuaValue): LuaValue {
-            Terrarum.ingame!!.world.inflctTerrainDamage(x.checkint(), y.checkint(), power.checkint())
+            Terrarum.ingame!!.world.inflctTerrainDamage(x.checkint(), y.checkint(), power.checkdouble().toFloat())
             return LuaValue.NONE
         }
     }
     class StrikeWall : ThreeArgFunction() {
         override fun call(x: LuaValue, y: LuaValue, power: LuaValue): LuaValue {
-            Terrarum.ingame!!.world.inflctWallDamage(x.checkint(), y.checkint(), power.checkint())
+            Terrarum.ingame!!.world.inflctWallDamage(x.checkint(), y.checkint(), power.checkdouble().toFloat())
             return LuaValue.NONE
         }
     }

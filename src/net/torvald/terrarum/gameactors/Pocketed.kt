@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 
 /**

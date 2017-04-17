@@ -7,7 +7,7 @@ import net.torvald.terrarum.Terrarum
  */
 object Tile {
 
-    val AIR = 0
+    val AIR = 0 // hard coded; this is the standard
 
     val STONE = TileCodex.idDamageToIndex(1, 0)
     val STONE_QUARRIED = TileCodex.idDamageToIndex(1, 1)

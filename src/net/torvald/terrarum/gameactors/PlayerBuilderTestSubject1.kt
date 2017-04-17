@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.ModuleManager
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 
@@ -14,10 +14,12 @@ object PlayerBuilderTestSubject1 {
 
 
         p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0
+        p.actorValue[AVKey.__ACTION_TIMER] = 0.0
+        p.actorValue[AVKey.ACTION_INTERVAL] = ActorHumanoid.BASE_ACTION_INTERVAL
         p.actorValue[AVKey.NAME] = "Test Subject 1"
 
 
-        p.makeNewSprite(48, 52, ModuleManager.getPath("basegame", "sprites/npc_template_anim_prototype.tga"))
+        p.makeNewSprite(48, 52, ModMgr.getPath("basegame", "sprites/npc_template_anim_prototype.tga"))
         p.sprite!!.delay = 200
         p.sprite!!.setRowsAndFrames(2, 4)
 

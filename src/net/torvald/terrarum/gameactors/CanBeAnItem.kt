@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.InventoryItem
 
 /**
  * Created by minjaesong on 16-01-31.

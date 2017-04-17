@@ -1,7 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.colourutil.CIELabUtil.darkerLab
-import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIInventory
 import net.torvald.terrarum.ui.UIItem

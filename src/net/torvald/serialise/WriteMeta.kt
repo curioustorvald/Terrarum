@@ -5,7 +5,6 @@ import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.MaterialCodex
-import net.torvald.terrarum.tileproperties.TilePropCSV
 import net.torvald.terrarum.tileproperties.TileCodex
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.FileInputStream
@@ -36,7 +35,7 @@ object WriteMeta {
      * @param savegameName -- Nullable. If the value is not specified, saveDirectoryName will be used instead.
      */
     fun write(saveDirectoryName: String, savegameName: String?): Boolean {
-        val hashArray: ArrayList<ByteArray> = ArrayList()
+        /*val hashArray: ArrayList<ByteArray> = ArrayList()
         val savenameAsByteArray: ByteArray =
                 (savegameName ?: saveDirectoryName).toByteArray(Charsets.UTF_8)
 
@@ -75,20 +74,7 @@ object WriteMeta {
         }
         catch (e: IOException) {
             e.printStackTrace()
-        }
+        }*/
         return false
-    }
-
-    fun toByteArray(long: Long): ByteArray {
-        return byteArrayOf(
-                (long.ushr(0x38) and 0xFF).toByte(),
-                (long.ushr(0x30) and 0xFF).toByte(),
-                (long.ushr(0x28) and 0xFF).toByte(),
-                (long.ushr(0x20) and 0xFF).toByte(),
-                (long.ushr(0x18) and 0xFF).toByte(),
-                (long.ushr(0x10) and 0xFF).toByte(),
-                (long.ushr(0x08) and 0xFF).toByte(),
-                (long            and 0xFF).toByte()
-        )
     }
 }

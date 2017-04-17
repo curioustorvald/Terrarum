@@ -12,7 +12,7 @@ import net.torvald.terrarum.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
 import net.torvald.terrarum.gameworld.WorldTime

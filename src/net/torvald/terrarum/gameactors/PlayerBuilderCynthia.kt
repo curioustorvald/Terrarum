@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.terrarum.ModuleManager
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
@@ -20,10 +20,12 @@ object PlayerBuilderCynthia {
 
 
         p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0
+        p.actorValue[AVKey.__ACTION_TIMER] = 0.0
+        p.actorValue[AVKey.ACTION_INTERVAL] = ActorHumanoid.BASE_ACTION_INTERVAL
         p.actorValue[AVKey.NAME] = "Cynthia"
 
 
-        p.makeNewSprite(26, 42, ModuleManager.getPath("basegame", "sprites/test_player_2.tga"))
+        p.makeNewSprite(26, 42, ModMgr.getPath("basegame", "sprites/test_player_2.tga"))
         p.sprite!!.delay = 200
         p.sprite!!.setRowsAndFrames(1, 1)
 

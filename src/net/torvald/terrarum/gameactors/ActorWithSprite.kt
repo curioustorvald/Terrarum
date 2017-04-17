@@ -1329,6 +1329,7 @@ fun Float.roundInt(): Int = Math.round(this)
 fun Double.abs() = Math.abs(this)
 fun Double.sqr() = this * this
 fun Double.sqrt() = Math.sqrt(this)
+fun Float.sqrt() = FastMath.sqrt(this)
 fun Int.abs() = if (this < 0) -this else this
 fun Double.bipolarClamp(limit: Double) =
         if (this > 0 && this > limit) limit

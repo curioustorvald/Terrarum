@@ -11,7 +11,7 @@ import java.nio.file.FileSystems
  *
  * Created by SKYHi14 on 2017-04-17.
  */
-object ModuleManager {
+object ModMgr {
 
     data class ModuleMetadata(val order: Int, val isDir: Boolean, val desc: String, val libraries: Array<String>) {
         override fun toString() =
@@ -35,7 +35,7 @@ object ModuleManager {
 
         loadOrder.forEachIndexed { index, it ->
             val moduleName = it[0]
-            println("[ModuleManager] Loading module $moduleName")
+            println("[ModMgr] Loading module $moduleName")
 
             val description = it[1]
             val libs = it[2].split(';').toTypedArray()

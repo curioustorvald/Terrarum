@@ -1,4 +1,4 @@
- "id";"dmg";"name"                     ;  "opacity";"strength";"dsty";"mate";"fluid";"solid";"wall";  "lumcolor";"drop";"ddmg";"fall";"dlfn";"vscs";"fv";"friction"
+ "id";"sid";"name"                     ;  "opacity";"strength";"dsty";"mate";"fluid";"solid";"wall";  "lumcolor";"drop";"ddmg";"fall";"dlfn";"vscs";"fv";"friction"
   "0";  "0";"TILE_AIR"                 ;  "8396808";       "1";   "1";"null";    "0";    "0";   "0";         "0";   "0";   "0";   "0";   "0"; "N/A"; "0";"4"
   "1";  "0";"TILE_STONE"               ; "33587232";      "48";"2400";"rock";    "0";    "1";   "1";         "0";   "1";   "0";   "0";   "0"; "N/A"; "0";"16"
   "1";  "1";"TILE_STONE_QUARRIED"      ; "33587232";      "48";"2400";"rock";    "0";    "1";   "1";         "0";   "1";   "1";   "0";   "0"; "N/A"; "0";"16"

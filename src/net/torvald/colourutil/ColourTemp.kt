@@ -5,14 +5,14 @@ import net.torvald.terrarum.weather.toColor
 import org.newdawn.slick.Color
 import org.newdawn.slick.Image
 import net.torvald.colourutil.CIEXYZUtil.toColor
-import net.torvald.terrarum.ModuleManager
+import net.torvald.terrarum.ModMgr
 
 /**
  * RGB-modeled CCT calculator
  * Created by minjaesong on 16-07-26.
  */
 object ColourTemp {
-    private var envOverlayColourmap = Image(ModuleManager.getPath("basegame", "colourmap/black_body_col_1000_40000_K.tga"))
+    private var envOverlayColourmap = Image(ModMgr.getPath("basegame", "colourmap/black_body_col_1000_40000_K.tga"))
 
     private fun colTempToImagePos(K: Int): Int {
         if (K < 1000 || K >= 40000) throw IllegalArgumentException("K: out of range. ($K)")

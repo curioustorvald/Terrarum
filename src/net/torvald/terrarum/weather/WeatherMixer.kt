@@ -49,7 +49,7 @@ object WeatherMixer {
 
         // read weather descriptions from assets/weather (modular weather)
         val weatherRawValidList = ArrayList<File>()
-        val weatherRaws = ModuleManager.getFiles("basegame", "weathers")
+        val weatherRaws = ModMgr.getFiles("basegame", "weathers")
         weatherRaws.forEach {
             if (!it.isDirectory && it.name.endsWith(".json"))
                 weatherRawValidList.add(it)
@@ -207,7 +207,7 @@ object WeatherMixer {
 
         // parse globalLight
         if (globalLightInJson.isString)
-            globalLight = Image(ModuleManager.getPath("basegame", "$pathToImage/${globalLightInJson.asString}"))
+            globalLight = Image(ModMgr.getPath("basegame", "$pathToImage/${globalLightInJson.asString}"))
         else if (globalLightInJson.isNumber) {
             // make 1x1 image with specified colour
             globalLight = Image(1, 1)
@@ -219,7 +219,7 @@ object WeatherMixer {
 
         // parse skyboxGradColourMap
         if (skyboxInJson.isString)
-            skybox = Image(ModuleManager.getPath("basegame", "$pathToImage/${skyboxInJson.asString}"))
+            skybox = Image(ModMgr.getPath("basegame", "$pathToImage/${skyboxInJson.asString}"))
         else if (globalLightInJson.isNumber) {
             // make 1x2 image with specified colour
             skybox = Image(1, 2)
@@ -231,7 +231,7 @@ object WeatherMixer {
 
         // get extra images
         for (i in extraImagesPath)
-            extraImages.add(Image(ModuleManager.getPath("basegame", "$pathToImage/${i.asString}")))
+            extraImages.add(Image(ModMgr.getPath("basegame", "$pathToImage/${i.asString}")))
 
         // get mix from
 
