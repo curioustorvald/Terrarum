@@ -3,12 +3,13 @@ package net.torvald.terrarum.itemproperties
 import net.torvald.point.Point2d
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.CanBeAnItem
-import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithSprite
 import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
-import net.torvald.terrarum.gameitem.IVKey
+import net.torvald.terrarum.itemproperties.IVKey
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.mapdrawer.TilesDrawer.wallOverlayColour
@@ -108,17 +109,27 @@ object ItemCodex {
             override var baseMass = 10.0
             override var baseToolSize: Double? = 10.0
             override var consumable = false
-            override var maxDurability = 200 // this much tiles before breaking
+            override var maxDurability = 606 // this much tiles before breaking
             override var durability = maxDurability.toFloat()
             override var equipPosition = EquipPosition.HAND_GRIP
             override var inventoryCategory = Category.TOOL
 
+            private val testmaterial = Material(
+                    0,0,0,0,0,0,0,0,14,0.0 // quick test material Steel
+            )
+
             init {
                 itemProperties[IVKey.ITEMTYPE] = IVKey.ItemType.PICK
+                name = "Steel pickaxe"
             }
 
             override fun primaryUse(gc: GameContainer, delta: Int): Boolean {
                 val mousePoint = Point2d(gc.mouseTileX.toDouble(), gc.mouseTileY.toDouble())
+                val actorvalue = Terrarum.ingame!!.player!!.actorValue
+
+
+                using = true
+
                 // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
                 Terrarum.ingame!!.actorContainer.forEach {
                     if (it is ActorWithSprite && it.tilewiseHitbox.intersects(mousePoint))
@@ -129,19 +140,21 @@ object ItemCodex {
                 if (Tile.AIR == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY))
                     return false
 
+
                 // filter passed, do the job
-                Terrarum.ingame!!.world.setTileTerrain(
+                val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+
+                return Terrarum.ingame!!.world.inflctTerrainDamage(
                         gc.mouseTileX,
                         gc.mouseTileY,
-                        Tile.AIR
+                        Calculate.pickaxePower(testmaterial) * swingDmgToFrameDmg.toFloat()
                 )
-                /*Terrarum.ingame!!.world.inflctTerrainDamage(
-                        gc.mouseTileX,
-                        gc.mouseTileY,
-                        <power calculation using ForceMod (ref. Pickaxe Power.xlsx) and other shits>
-                )*/
+            }
 
-
+            override fun endPrimaryUse(gc: GameContainer, delta: Int): Boolean {
+                using = false
+                // reset action timer to zero
+                Terrarum.ingame!!.player!!.actorValue[AVKey.__ACTION_TIMER] = 0.0
                 return true
             }
         }

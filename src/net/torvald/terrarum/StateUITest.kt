@@ -1,8 +1,8 @@
 package net.torvald.terrarum
 
 import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.gameitem.IVKey
-import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.IVKey
+import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.ui.*

@@ -5,7 +5,7 @@ import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.spriteanimation.SpriteAnimation
 import com.google.gson.JsonObject
 import net.torvald.terrarum.ActorValue
-import net.torvald.terrarum.ModuleManager
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -28,11 +28,11 @@ object PlayerBuilderSigrid {
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
 
-        p.makeNewSprite(28, 51, ModuleManager.getPath("basegame", "sprites/test_player.tga"))
+        p.makeNewSprite(28, 51, ModMgr.getPath("basegame", "sprites/test_player.tga"))
         p.sprite!!.delay = 200
         p.sprite!!.setRowsAndFrames(1, 1)
 
-        p.makeNewSpriteGlow(28, 51, ModuleManager.getPath("basegame", "sprites/test_player_glow.tga"))
+        p.makeNewSpriteGlow(28, 51, ModMgr.getPath("basegame", "sprites/test_player_glow.tga"))
         p.spriteGlow!!.delay = 200
         p.spriteGlow!!.setRowsAndFrames(1, 1)
 
@@ -64,7 +64,8 @@ object PlayerBuilderSigrid {
         p.actorValue[AVKey.BASEDEFENCE] = 141
 
         p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0
-        //p.actorValue["__selectedtile"] = 147 // test code; replace with <tile_item>.primaryUse(gc, delta)
+        p.actorValue[AVKey.__ACTION_TIMER] = 0.0
+        p.actorValue[AVKey.ACTION_INTERVAL] = ActorHumanoid.BASE_ACTION_INTERVAL
         p.actorValue["__aimhelper"] = true // TODO when you'll gonna implement it?
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT)!!, 11, 0)

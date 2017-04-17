@@ -1,10 +1,11 @@
 package net.torvald.terrarum.gameactors
 
 import com.jme3.math.FastMath
+import net.torvald.terrarum.Millisec
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
-import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.realestate.RealEstateUtility
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
@@ -20,6 +21,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     : HistoricalFigure(birth, death), Controllable, Pocketed, Factionable, Luminous, LandHolder {
 
     var vehicleRiding: Controllable? = null // usually player only
+
 
 
     /** Must be set by PlayerFactory */
@@ -77,6 +79,8 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         @Transient internal const val WALK_ACCEL_BASE: Double = 0.67
 
         @Transient const val BASE_HEIGHT = 40
+        // 333.33 miliseconds
+        @Transient const val BASE_ACTION_INTERVAL = 1000.0 / 3.0
 
         @Transient const val SPRITE_ROW_IDLE = 0
         @Transient const val SPRITE_ROW_WALK = 1

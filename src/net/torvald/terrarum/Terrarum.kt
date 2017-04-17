@@ -313,7 +313,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
 
 
         // load modules
-        ModuleManager
+        ModMgr
 
 
         gc.graphics.clear() // clean up any 'dust' in the buffer

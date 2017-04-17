@@ -3,7 +3,7 @@ package net.torvald.terrarum.tileproperties
 /**
  * Created by minjaesong on 16-09-11.
  */
-object TilePropCSV {
+object TilePropCSVFUfufufufufufffnufuuufufu {
     operator fun invoke() = """
  "id";"sid";"name"                     ;  "opacity";"strength";"dsty";"mate";"fluid";"solid";"wall";  "lumcolor";"drop";"ddmg";"fall";"dlfn";"vscs";"fv";"friction"
   "0";  "0";"TILE_AIR"                 ;  "8396808";       "1";   "1";"null";    "0";    "0";   "0";         "0";   "0";   "0";   "0";   "0"; "N/A"; "0";"4"

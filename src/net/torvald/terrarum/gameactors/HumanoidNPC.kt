@@ -7,7 +7,7 @@ import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
 import net.torvald.terrarum.gamecontroller.mouseX
 import net.torvald.terrarum.gamecontroller.mouseY
-import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.InventoryItem
 import org.luaj.vm2.*
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.*

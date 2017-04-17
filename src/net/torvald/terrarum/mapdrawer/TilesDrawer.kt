@@ -7,12 +7,14 @@ import net.torvald.terrarum.tileproperties.TileCodex
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.concurrent.ThreadParallel
+import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.mapdrawer.LightmapRenderer.normaliseToColour
 import net.torvald.terrarum.mapdrawer.MapCamera.x
 import net.torvald.terrarum.mapdrawer.MapCamera.y
 import net.torvald.terrarum.mapdrawer.MapCamera.height
 import net.torvald.terrarum.mapdrawer.MapCamera.width
+import net.torvald.terrarum.realestate.RealEstateUtility
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
 import java.util.*
@@ -25,10 +27,11 @@ object TilesDrawer {
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
-    var tilesTerrain: SpriteSheet = SpriteSheet(ModuleManager.getPath("basegame", "tiles/terrain.tga"), TILE_SIZE, TILE_SIZE)
-        private set // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
-    var tilesWire: SpriteSheet = SpriteSheet(ModuleManager.getPath("basegame", "tiles/wire.tga"), TILE_SIZE, TILE_SIZE)
-        private set
+    val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "tiles/terrain.tga"), TILE_SIZE, TILE_SIZE)
+    // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
+    val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "tiles/wire.tga"), TILE_SIZE, TILE_SIZE)
+
+    val breakAnimSteps = 10
 
     val WALL = GameWorld.WALL
     val TERRAIN = GameWorld.TERRAIN
@@ -49,7 +52,7 @@ object TilesDrawer {
      * It holds different shading rule to discriminate with group 02, index 0 is single tile.
      * These are the tiles that only connects to itself, will not connect to colour variants
      */
-    var TILES_CONNECT_SELF = arrayOf(
+    val TILES_CONNECT_SELF = arrayListOf(
             Tile.ICE_MAGICAL,
             Tile.GLASS_CRUDE,
             Tile.GLASS_CLEAN,
@@ -98,7 +101,7 @@ object TilesDrawer {
      * Connectivity group 02 : natural tiles
      * It holds different shading rule to discriminate with group 01, index 0 is middle tile.
      */
-    var TILES_CONNECT_MUTUAL = arrayOf(
+    val TILES_CONNECT_MUTUAL = arrayListOf(
             Tile.STONE,
             Tile.STONE_QUARRIED,
             Tile.STONE_TILE_WHITE,
@@ -163,7 +166,7 @@ object TilesDrawer {
     /**
      * Torches, levers, switches, ...
      */
-    var TILES_WALL_STICKER = arrayOf(
+    val TILES_WALL_STICKER = arrayListOf(
             Tile.TORCH,
             Tile.TORCH_FROST,
             Tile.TORCH_OFF,
@@ -173,7 +176,7 @@ object TilesDrawer {
     /**
      * platforms, ...
      */
-    var TILES_WALL_STICKER_CONNECT_SELF = arrayOf(
+    val TILES_WALL_STICKER_CONNECT_SELF = arrayListOf(
             Tile.PLATFORM_BIRCH,
             Tile.PLATFORM_BLOODROSE,
             Tile.PLATFORM_EBONY,
@@ -186,7 +189,7 @@ object TilesDrawer {
      * will blend colour using colour multiplication
      * i.e. red hues get lost if you dive into the water
      */
-    var TILES_BLEND_MUL = arrayOf(
+    val TILES_BLEND_MUL = arrayListOf(
             Tile.WATER,
             Tile.WATER_1,
             Tile.WATER_2,
@@ -304,7 +307,7 @@ object TilesDrawer {
 
                 val noDamageLayer = mode % 3 == WIRE
 
-                // draw
+                // draw a tile, but only when illuminated
                 try {
                     if ((mode == WALL || mode == TERRAIN) &&  // not an air tile
                         (thisTile ?: 0) != Tile.AIR) {
@@ -318,54 +321,70 @@ object TilesDrawer {
                              LightmapRenderer.getHighestRGB(x + 1, y + 1) ?: 0 >= tileDrawLightThreshold ||
                              LightmapRenderer.getHighestRGB(x + 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
                              LightmapRenderer.getHighestRGB(x - 1, y + 1) ?: 0 >= tileDrawLightThreshold) {
-                                // blackness
-                                if (zeroTileCounter > 0) {
-                                    /* unable to do anything */
+                            // blackness
+                            if (zeroTileCounter > 0) {
+                                /* unable to do anything */
 
-                                    zeroTileCounter = 0
-                                }
-
-
-                                val nearbyTilesInfo: Int
-                                if (isPlatform(thisTile)) {
-                                    nearbyTilesInfo = getNearbyTilesInfoPlatform(x, y)
-                                }
-                                else if (isWallSticker(thisTile)) {
-                                    nearbyTilesInfo = getNearbyTilesInfoWallSticker(x, y)
-                                }
-                                else if (isConnectMutual(thisTile)) {
-                                    nearbyTilesInfo = getNearbyTilesInfoNonSolid(x, y, mode)
-                                }
-                                else if (isConnectSelf(thisTile)) {
-                                    nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile)
-                                }
-                                else {
-                                    nearbyTilesInfo = 0
-                                }
+                                zeroTileCounter = 0
+                            }
 
 
-                                val thisTileX: Int
-                                if (!noDamageLayer)
-                                    thisTileX = PairedMapLayer.RANGE * ((thisTile ?: 0) % PairedMapLayer.RANGE) + nearbyTilesInfo
-                                else
-                                    thisTileX = nearbyTilesInfo
+                            val nearbyTilesInfo: Int
+                            if (isPlatform(thisTile)) {
+                                nearbyTilesInfo = getNearbyTilesInfoPlatform(x, y)
+                            }
+                            else if (isWallSticker(thisTile)) {
+                                nearbyTilesInfo = getNearbyTilesInfoWallSticker(x, y)
+                            }
+                            else if (isConnectMutual(thisTile)) {
+                                nearbyTilesInfo = getNearbyTilesInfoNonSolid(x, y, mode)
+                            }
+                            else if (isConnectSelf(thisTile)) {
+                                nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile)
+                            }
+                            else {
+                                nearbyTilesInfo = 0
+                            }
 
-                                val thisTileY = (thisTile ?: 0) / PairedMapLayer.RANGE
 
-                                if (drawModeTilesBlendMul) {
-                                    if (TilesDrawer.isBlendMul(thisTile)) {
-                                        drawTile(mode, x, y, thisTileX, thisTileY)
-                                    }
-                                }
-                                else {
-                                    // do NOT add "if (!isBlendMul(thisTile))"!
-                                    // or else they will not look like they should be when backed with wall
+                            val thisTileX = if (!noDamageLayer)
+                                PairedMapLayer.RANGE * ((thisTile ?: 0) % PairedMapLayer.RANGE) + nearbyTilesInfo
+                            else
+                                nearbyTilesInfo
+
+                            val thisTileY = (thisTile ?: 0) / PairedMapLayer.RANGE
+
+
+                            // draw a tile
+                            if (drawModeTilesBlendMul) {
+                                if (TilesDrawer.isBlendMul(thisTile)) {
                                     drawTile(mode, x, y, thisTileX, thisTileY)
                                 }
+                            }
+                            else {
+                                // do NOT add "if (!isBlendMul(thisTile))"!
+                                // or else they will not look like they should be when backed with wall
+                                drawTile(mode, x, y, thisTileX, thisTileY)
+                            }
+
+                            // draw a breakage
+                            if (mode == TERRAIN || mode == WALL) {
+                                val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
+                                val maxHealth = TileCodex[world.getTileFromTerrain(x, y)].strength
+                                val stage = (breakage / maxHealth).times(breakAnimSteps).roundInt()
+                                // actual drawing
+                                if (stage > 0) {
+                                    // alpha blending works, but no GL blend func...
+                                    drawTile(mode, x, y, 5 + stage, 0)
+                                }
+                            }
+
+
                         } // end if (is illuminated)
+                        // draw black patch
                         else {
-                            zeroTileCounter++
-                            //drawTile(mode, x, y, 1, 0) // black patch
+                            zeroTileCounter++ // unused for now
+
                             GL11.glColor4f(0f, 0f, 0f, 1f)
 
                             GL11.glTexCoord2f(0f, 0f)

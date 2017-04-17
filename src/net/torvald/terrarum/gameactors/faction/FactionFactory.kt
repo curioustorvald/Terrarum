@@ -2,7 +2,7 @@ package net.torvald.terrarum.gameactors.faction
 
 import net.torvald.JsonFetcher
 import com.google.gson.JsonObject
-import net.torvald.terrarum.ModuleManager
+import net.torvald.terrarum.ModMgr
 
 import java.io.IOException
 
@@ -16,7 +16,7 @@ object FactionFactory {
      */
     @Throws(IOException::class)
     fun create(module: String, path: String): Faction {
-        val jsonObj = JsonFetcher(ModuleManager.getPath(module, path))
+        val jsonObj = JsonFetcher(ModMgr.getPath(module, path))
         val factionObj = Faction(jsonObj.get("factionname").asString)
 
         jsonObj.get("factionamicable").asJsonArray.forEach { factionObj.addFactionAmicable(it.asString) }

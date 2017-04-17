@@ -22,6 +22,9 @@ object CreatureBuilder {
         val actor = ActorWithSprite(Actor.RenderOrder.MIDDLE)
         InjectCreatureRaw(actor.actorValue, module, jsonFileName)
 
+
+        actor.actorValue[AVKey.__ACTION_TIMER] = 0.0
+
         return actor
     }
 }

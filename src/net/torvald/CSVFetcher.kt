@@ -1,5 +1,6 @@
 package net.torvald
 
+import net.torvald.terrarum.ModMgr
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVRecord
@@ -16,8 +17,7 @@ object CSVFetcher {
 
     private var csvString: StringBuffer? = null
 
-    @Throws(IOException::class)
-    operator fun invoke(csvFilePath: String): List<CSVRecord> {
+    fun readFromFile(csvFilePath: String): List<CSVRecord> {
         csvString = StringBuffer() // reset buffer every time it called
         readCSVasString(csvFilePath)
 
@@ -39,6 +39,8 @@ object CSVFetcher {
 
         return csvRecordList
     }
+
+    fun readFromModule(module: String, path: String) = readFromFile(ModMgr.getPath(module, path))
 
     fun readFromString(csv: String): List<CSVRecord> {
         val csvParser = CSVParser.parse(

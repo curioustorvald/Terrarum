@@ -1,4 +1,4 @@
-package net.torvald.terrarum.gameitem
+package net.torvald.terrarum.itemproperties
 
 import net.torvald.terrarum.ItemValue
 import net.torvald.terrarum.gameactors.Pocketed
@@ -96,6 +96,8 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
      */
     open var durability: Float = 0f
 
+    var using = false
+
     /**
      * Effects applied continuously while in pocket
      */
@@ -128,6 +130,9 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
      * note: DO NOT super(gc, g) this!
      */
     open fun secondaryUse(gc: GameContainer, delta: Int): Boolean = false
+
+    open fun endPrimaryUse(gc: GameContainer, delta: Int): Boolean = false
+    open fun endSecondaryUse(gc: GameContainer, delta: Int): Boolean = false
 
     /**
      * Effects applied immediately only once if thrown from pocket

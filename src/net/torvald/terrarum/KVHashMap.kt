@@ -51,60 +51,47 @@ class KVHashMap {
     fun getAsInt(key: String): Int? {
         val value = get(key)
 
+        if (value == null) return null
+
         if (value is JsonPrimitive)
             return value.asInt
 
-        try {
-            return value as Int
-        }
-        catch (e: ClassCastException) {
-            return null
-        }
+        return value as Int
     }
 
     fun getAsDouble(key: String): Double? {
         val value = get(key)
+
+        if (value == null) return null
 
         if (value is Int)
             return value.toDouble()
         else if (value is JsonPrimitive)
             return value.asDouble
 
-        try {
-            return value as Double
-        }
-        catch (e: ClassCastException) {
-            return null
-
-        }
+        return value as Double
     }
 
     fun getAsString(key: String): String? {
         val value = get(key)
 
+        if (value == null) return null
+
         if (value is JsonPrimitive)
             return value.asString
 
-        try {
-            return value as String
-        }
-        catch (e: ClassCastException) {
-            return null
-        }
+        return value as String
     }
 
     fun getAsBoolean(key: String): Boolean? {
         val value = get(key)
 
+        if (value == null) return null
+
         if (value is JsonPrimitive)
             return value.asBoolean
 
-        try {
-            return value as Boolean
-        }
-        catch (e: ClassCastException) {
-            return null
-        }
+        return value as Boolean
     }
 
     fun hasKey(key: String) = hashMap.containsKey(key)

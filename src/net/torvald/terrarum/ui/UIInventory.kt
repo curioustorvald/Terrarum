@@ -6,7 +6,7 @@ import net.torvald.terrarum.Terrarum.joypadLabelNinA
 import net.torvald.terrarum.Terrarum.joypadLabelNinY
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
-import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.*

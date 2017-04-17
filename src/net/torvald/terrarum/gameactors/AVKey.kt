@@ -79,6 +79,11 @@ object AVKey {
     const val MAGICREGENRATE = "magicregenrate"
     const val MAGICREGENRATEBUFF = "$MAGICREGENRATE$BUFF"
 
+    /** Double
+     *
+     */
+    const val ACTION_INTERVAL = "actioninterval"
+
 
     /** String
      * UUID for certain fixtures
@@ -91,4 +96,9 @@ object AVKey {
     /**  SYNOPSIS: __qsitem1 .. __qsitem10
      * contains tem ID; they are supposed to be unique. Indices must be ONE-BASED! */
     const val __PLAYER_QSPREFIX = "__qsitem" // __qsitem1 .. __qsitem10 (NOT ZERO BASED!)
+    /** Double
+     * When using tool/arm/etc. how long action button is held, in milliseconds (Int)
+     * Or for NPCs, how long it has been waiting for next move
+     */
+    const val __ACTION_TIMER = "__actiontimer"
 }

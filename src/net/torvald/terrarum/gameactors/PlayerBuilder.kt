@@ -19,6 +19,8 @@ object PlayerBuilder {
 
         // do etc.
         p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0
+        p.actorValue[AVKey.__ACTION_TIMER] = 0.0
+        p.actorValue[AVKey.ACTION_INTERVAL] = ActorHumanoid.BASE_ACTION_INTERVAL
 
         return p
     }

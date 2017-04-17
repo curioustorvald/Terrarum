@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.gameitem.InventoryItem
+import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.tileproperties.TileCodex
 import org.newdawn.slick.GameContainer
