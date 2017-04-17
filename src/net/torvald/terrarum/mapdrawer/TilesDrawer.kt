@@ -2,14 +2,11 @@ package net.torvald.terrarum.mapdrawer
 
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.PairedMapLayer
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex
 import com.jme3.math.FastMath
-import net.torvald.terrarum.blendAlphaMap
+import net.torvald.terrarum.*
 import net.torvald.terrarum.concurrent.ThreadParallel
-import net.torvald.terrarum.blendMul
-import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.mapdrawer.LightmapRenderer.normaliseToColour
 import net.torvald.terrarum.mapdrawer.MapCamera.x
@@ -28,9 +25,9 @@ object TilesDrawer {
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
-    var tilesTerrain: SpriteSheet = SpriteSheet("./assets/graphics/terrain/terrain.tga", TILE_SIZE, TILE_SIZE)
+    var tilesTerrain: SpriteSheet = SpriteSheet(ModuleManager.getPath("basegame", "tiles/terrain.tga"), TILE_SIZE, TILE_SIZE)
         private set // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
-    var tilesWire: SpriteSheet = SpriteSheet("./assets/graphics/terrain/wire.tga", TILE_SIZE, TILE_SIZE)
+    var tilesWire: SpriteSheet = SpriteSheet(ModuleManager.getPath("basegame", "tiles/wire.tga"), TILE_SIZE, TILE_SIZE)
         private set
 
     val WALL = GameWorld.WALL
@@ -52,7 +49,7 @@ object TilesDrawer {
      * It holds different shading rule to discriminate with group 02, index 0 is single tile.
      * These are the tiles that only connects to itself, will not connect to colour variants
      */
-    val TILES_CONNECT_SELF = arrayOf(
+    var TILES_CONNECT_SELF = arrayOf(
             Tile.ICE_MAGICAL,
             Tile.GLASS_CRUDE,
             Tile.GLASS_CLEAN,
@@ -101,7 +98,7 @@ object TilesDrawer {
      * Connectivity group 02 : natural tiles
      * It holds different shading rule to discriminate with group 01, index 0 is middle tile.
      */
-    val TILES_CONNECT_MUTUAL = arrayOf(
+    var TILES_CONNECT_MUTUAL = arrayOf(
             Tile.STONE,
             Tile.STONE_QUARRIED,
             Tile.STONE_TILE_WHITE,
@@ -166,7 +163,7 @@ object TilesDrawer {
     /**
      * Torches, levers, switches, ...
      */
-    val TILES_WALL_STICKER = arrayOf(
+    var TILES_WALL_STICKER = arrayOf(
             Tile.TORCH,
             Tile.TORCH_FROST,
             Tile.TORCH_OFF,
@@ -176,7 +173,7 @@ object TilesDrawer {
     /**
      * platforms, ...
      */
-    val TILES_WALL_STICKER_CONNECT_SELF = arrayOf(
+    var TILES_WALL_STICKER_CONNECT_SELF = arrayOf(
             Tile.PLATFORM_BIRCH,
             Tile.PLATFORM_BLOODROSE,
             Tile.PLATFORM_EBONY,
@@ -189,7 +186,7 @@ object TilesDrawer {
      * will blend colour using colour multiplication
      * i.e. red hues get lost if you dive into the water
      */
-    val TILES_BLEND_MUL = arrayOf(
+    var TILES_BLEND_MUL = arrayOf(
             Tile.WATER,
             Tile.WATER_1,
             Tile.WATER_2,

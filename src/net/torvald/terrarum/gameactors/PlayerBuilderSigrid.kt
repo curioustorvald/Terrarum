@@ -5,6 +5,7 @@ import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.spriteanimation.SpriteAnimation
 import com.google.gson.JsonObject
 import net.torvald.terrarum.ActorValue
+import net.torvald.terrarum.ModuleManager
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -27,11 +28,11 @@ object PlayerBuilderSigrid {
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
 
-        p.makeNewSprite(28, 51, "assets/graphics/sprites/test_player.tga")
+        p.makeNewSprite(28, 51, ModuleManager.getPath("basegame", "sprites/test_player.tga"))
         p.sprite!!.delay = 200
         p.sprite!!.setRowsAndFrames(1, 1)
 
-        p.makeNewSpriteGlow(28, 51, "assets/graphics/sprites/test_player_glow.tga")
+        p.makeNewSpriteGlow(28, 51, ModuleManager.getPath("basegame", "sprites/test_player_glow.tga"))
         p.spriteGlow!!.delay = 200
         p.spriteGlow!!.setRowsAndFrames(1, 1)
 
@@ -72,7 +73,7 @@ object PlayerBuilderSigrid {
 
         p.setPosition((4096 * FeaturesDrawer.TILE_SIZE).toDouble(), (300 * 16).toDouble())
 
-        p.faction.add(FactionFactory.create("FactionSigrid.json"))
+        p.faction.add(FactionFactory.create("basegame", "factions/FactionSigrid.json"))
 
 
 

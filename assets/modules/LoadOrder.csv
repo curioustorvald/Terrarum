@@ -1,0 +1,9 @@
+# Load order
+# Modules are loaded from top to bottom.
+# And yes, you can disable basegame, but we don't recommend.
+# Acceptable formats:
+#   module_name,description_in_English_no_comma,
+#   module_name,description_in_English_no_comma,(external Jar 1);(external Jar 2); ...
+
+basegame,The base game,
+dwarventech,Logic gates and machines,

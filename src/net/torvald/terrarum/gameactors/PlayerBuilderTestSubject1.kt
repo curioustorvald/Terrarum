@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameactors
 
+import net.torvald.terrarum.ModuleManager
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 
@@ -9,14 +10,14 @@ import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 object PlayerBuilderTestSubject1 {
     operator fun invoke(): Player {
         val p: Player = Player(GameDate(100, 143)) // random value thrown
-        InjectCreatureRaw(p.actorValue, "CreatureHuman.json")
+        InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
 
         p.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = 0
         p.actorValue[AVKey.NAME] = "Test Subject 1"
 
 
-        p.makeNewSprite(48, 52, "assets/graphics/sprites/npc_template_anim_prototype.tga")
+        p.makeNewSprite(48, 52, ModuleManager.getPath("basegame", "sprites/npc_template_anim_prototype.tga"))
         p.sprite!!.delay = 200
         p.sprite!!.setRowsAndFrames(2, 4)
 

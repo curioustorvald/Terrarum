@@ -311,6 +311,11 @@ object Terrarum : StateBasedGame(GAME_NAME) {
             }
         }
 
+
+        // load modules
+        ModuleManager
+
+
         gc.graphics.clear() // clean up any 'dust' in the buffer
 
         //addState(StateVTTest())

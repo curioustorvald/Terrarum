@@ -5,6 +5,7 @@ import net.torvald.random.Fudge3
 import net.torvald.terrarum.langpack.Lang
 import com.google.gson.JsonObject
 import net.torvald.terrarum.ActorValue
+import net.torvald.terrarum.ModuleManager
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import org.newdawn.slick.SlickException
 import java.io.IOException
@@ -15,7 +16,6 @@ import java.security.SecureRandom
  */
 object InjectCreatureRaw {
 
-    const val JSONPATH = "./assets/raw/creatures/"
     private const val JSONMULT = "mult" // one appears in JSON files
 
     /**
@@ -24,8 +24,8 @@ object InjectCreatureRaw {
      * @param actorValueRef ActorValue object to be injected.
      * @param jsonFileName with extension
      */
-    operator fun invoke(actorValueRef: ActorValue, jsonFileName: String) {
-        val jsonObj = JsonFetcher(JSONPATH + jsonFileName)
+    operator fun invoke(actorValueRef: ActorValue, module: String, jsonFileName: String) {
+        val jsonObj = JsonFetcher(ModuleManager.getPath(module, "creatures/$jsonFileName"))
 
         val elementsInt = arrayOf(AVKey.BASEHEIGHT, AVKey.TOOLSIZE, AVKey.ENCUMBRANCE)
         val elementsString = arrayOf(AVKey.RACENAME, AVKey.RACENAMEPLURAL)
