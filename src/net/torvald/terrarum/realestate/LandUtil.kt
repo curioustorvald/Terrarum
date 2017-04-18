@@ -7,8 +7,8 @@ import net.torvald.terrarum.gameworld.TileAddress
 /**
  * Created by minjaesong on 16-03-27.
  */
-object RealEstateUtility {
-    fun getAbsoluteTileNumber(x: Int, y: Int): TileAddress =
+object LandUtil {
+    fun getTileAddr(x: Int, y: Int): TileAddress =
             (Terrarum.ingame!!.world.width * y).toLong() + x
 
     fun resolveAbsoluteTileNumber(t: TileAddress): Pair<Int, Int> =

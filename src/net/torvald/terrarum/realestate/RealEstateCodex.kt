@@ -15,13 +15,13 @@ object RealEstateCodex {
     private var ownershipRegistry: HashMap<Long, Int> = HashMap()
 
     fun setOwner(tileX: Int, tileY: Int, refID: Int) {
-        ownershipRegistry[RealEstateUtility.getAbsoluteTileNumber(tileX, tileY)] = refID
+        ownershipRegistry[LandUtil.getTileAddr(tileX, tileY)] = refID
     }
 
     fun removeOwner(tileX: Int, tileY: Int) {
-        ownershipRegistry.remove(RealEstateUtility.getAbsoluteTileNumber(tileX, tileY))
+        ownershipRegistry.remove(LandUtil.getTileAddr(tileX, tileY))
     }
 
     fun getOwner(tileX: Int, tileY: Int): Int? =
-            ownershipRegistry[RealEstateUtility.getAbsoluteTileNumber(tileX, tileY)]
+            ownershipRegistry[LandUtil.getTileAddr(tileX, tileY)]
 }
