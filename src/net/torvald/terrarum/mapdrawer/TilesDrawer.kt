@@ -14,7 +14,7 @@ import net.torvald.terrarum.mapdrawer.MapCamera.x
 import net.torvald.terrarum.mapdrawer.MapCamera.y
 import net.torvald.terrarum.mapdrawer.MapCamera.height
 import net.torvald.terrarum.mapdrawer.MapCamera.width
-import net.torvald.terrarum.realestate.RealEstateUtility
+import net.torvald.terrarum.realestate.LandUtil
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
 import java.util.*

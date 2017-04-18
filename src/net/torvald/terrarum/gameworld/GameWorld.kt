@@ -1,7 +1,7 @@
 
 package net.torvald.terrarum.gameworld
 
-import net.torvald.terrarum.realestate.RealEstateUtility
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.tileproperties.TileCodex
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.SlickException
@@ -142,11 +142,13 @@ class GameWorld(val width: Int, val height: Int) {
     fun setTileWall(x: Int, y: Int, tile: Byte, damage: Int) {
         layerWall.setTile(x fmod width, y, tile)
         layerWallLowBits.setData(x fmod width, y, damage)
+        wallDamages.remove(LandUtil.getTileAddr(x, y))
     }
 
     fun setTileTerrain(x: Int, y: Int, tile: Byte, damage: Int) {
         layerTerrain.setTile(x fmod width, y, tile)
         layerTerrainLowBits.setData(x fmod width, y, damage)
+        terrainDamages.remove(LandUtil.getTileAddr(x, y))
     }
 
     fun setTileWire(x: Int, y: Int, tile: Byte) {
@@ -216,7 +218,7 @@ class GameWorld(val width: Int, val height: Int) {
      * @return true if block is broken
      */
     fun inflctTerrainDamage(x: Int, y: Int, damage: Float): Boolean {
-        val addr = RealEstateUtility.getAbsoluteTileNumber(x, y)
+        val addr = LandUtil.getTileAddr(x, y)
 
         if (terrainDamages[addr] == null) { // add new
             terrainDamages[addr] = damage
@@ -239,13 +241,13 @@ class GameWorld(val width: Int, val height: Int) {
         return false
     }
     fun getTerrainDamage(x: Int, y: Int): Float =
-            terrainDamages[RealEstateUtility.getAbsoluteTileNumber(x, y)] ?: 0f
+            terrainDamages[LandUtil.getTileAddr(x, y)] ?: 0f
 
     /**
      * @return true if block is broken
      */
     fun inflctWallDamage(x: Int, y: Int, damage: Float): Boolean {
-        val addr = RealEstateUtility.getAbsoluteTileNumber(x, y)
+        val addr = LandUtil.getTileAddr(x, y)
 
         if (wallDamages[addr] == null) { // add new
             wallDamages[addr] = damage
@@ -266,7 +268,7 @@ class GameWorld(val width: Int, val height: Int) {
         return false
     }
     fun getWallDamage(x: Int, y: Int): Float =
-            wallDamages[RealEstateUtility.getAbsoluteTileNumber(x, y)] ?: 0f
+            wallDamages[LandUtil.getTileAddr(x, y)] ?: 0f
 
     companion object {
 

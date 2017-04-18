@@ -6,7 +6,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.itemproperties.InventoryItem
-import net.torvald.terrarum.realestate.RealEstateUtility
+import net.torvald.terrarum.realestate.LandUtil
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
 import java.util.*
@@ -37,11 +37,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     override var houseDesignation: ArrayList<Long>? = ArrayList()
 
     override fun addHouseTile(x: Int, y: Int) {
-        if (houseDesignation != null) houseDesignation!!.add(RealEstateUtility.getAbsoluteTileNumber(x, y))
+        if (houseDesignation != null) houseDesignation!!.add(LandUtil.getTileAddr(x, y))
     }
 
     override fun removeHouseTile(x: Int, y: Int) {
-        if (houseDesignation != null) houseDesignation!!.remove(RealEstateUtility.getAbsoluteTileNumber(x, y))
+        if (houseDesignation != null) houseDesignation!!.remove(LandUtil.getTileAddr(x, y))
     }
 
     override fun clearHouseDesignation() {
