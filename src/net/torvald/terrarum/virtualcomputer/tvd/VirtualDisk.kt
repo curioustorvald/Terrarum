@@ -198,7 +198,7 @@ class EntryDirectory(private val entries: ArrayList<EntryID> = ArrayList<EntryID
     }
 
     fun remove(entryID: EntryID) {
-        entries.removeAt(entryID)
+        entries.remove(entryID)
     }
 
     fun contains(entryID: EntryID) = entries.contains(entryID)

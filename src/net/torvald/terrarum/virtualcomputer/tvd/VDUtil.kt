@@ -468,15 +468,19 @@ object VDUtil {
     }
     /**
      * Add subdirectory to the specified directory.
+     *
+     * @return EntryID of newly created directory
      */
-    fun addDir(disk: VirtualDisk, parentPath: VDPath, name: ByteArray) {
+    fun addDir(disk: VirtualDisk, parentPath: VDPath, name: ByteArray): EntryID {
         val parentID = getFile(disk, parentPath)!!.entryID
         return addDir(disk, parentID, name)
     }
     /**
      * Add file to the specified directory.
+     *
+     * @return EntryID of newly created directory
      */
-    fun addDir(disk: VirtualDisk, directoryID: EntryID, name: ByteArray) {
+    fun addDir(disk: VirtualDisk, parentDir: EntryID, name: ByteArray): EntryID {
         disk.checkReadOnly()
         disk.checkCapacity(EntryDirectory.NEW_ENTRY_SIZE)
 
@@ -484,16 +488,18 @@ object VDUtil {
 
         try {
             // add record to the directory
-            getAsDirectory(disk, directoryID).add(newID)
+            getAsDirectory(disk, parentDir).add(newID)
             // add entry on the disk
             disk.entries[newID] = DiskEntry(
                     newID,
-                    directoryID,
+                    parentDir,
                     name,
                     currentUnixtime,
                     currentUnixtime,
                     EntryDirectory()
             )
+
+            return newID
         }
         catch (e: KotlinNullPointerException) {
             throw FileNotFoundException("No such directory")
@@ -519,6 +525,8 @@ object VDUtil {
             }
         }
 
+
+
         val entry = disk.entries[directoryID]
         if (entry != null && entry.contents is EntryDirectory) {
             entry.contents.forEach {
@@ -543,26 +551,82 @@ object VDUtil {
     /**
      * Imports external file and returns corresponding DiskEntry.
      */
-    fun importFile(file: File, id: EntryID): DiskEntry {
+    fun importFile(file: File, newID: EntryID, charset: Charset): DiskEntry {
         if (file.isDirectory) {
             throw IOException("The file is a directory")
         }
 
         return DiskEntry(
-                entryID = id,
+                entryID = newID,
                 parentEntryID = 0, // placeholder
-                filename = file.name.toByteArray(),
+                filename = file.name.toEntryName(DiskEntry.NAME_LENGTH, charset),
                 creationDate = currentUnixtime,
                 modificationDate = currentUnixtime,
                 contents = EntryFile(file.readBytes64())
         )
     }
+
+    fun importDirRecurse(disk: VirtualDisk, dir: File, path: VDPath, charset: Charset) =
+            importDirRecurse(disk, dir, getFile(disk, path)!!.entryID, charset)
+
+    fun importDirRecurse(disk: VirtualDisk, dir: File, superNode: EntryID, charset: Charset, newName: String? = null) {
+        fun recurse1(file: File, node: EntryID) {
+            // return conditions
+            if (!file.isDirectory) {
+                // if not a directory, add to node
+                val importedFile = importFile(file, disk.generateUniqueID(), charset)
+                addFile(disk, node, importedFile)
+                return
+            }
+            // recurse
+            else {
+                // mkdir
+                val newDir = addDir(disk, node, file.name.toEntryName(DiskEntry.NAME_LENGTH, charset))
+                // for entries in this fileDirectory...
+                file.listFiles().forEach { recurse1(it, newDir) }
+            }
+        }
+
+
+        // mkdir to superNode
+        val newDir = addDir(disk, superNode, (newName ?: dir.name).toEntryName(DiskEntry.NAME_LENGTH, charset))
+        // for entries in this fileDirectory...
+        dir.listFiles().forEach { recurse1(it, newDir) }
+    }
+
     /**
      * Export file on the virtual disk into real disk.
      */
     fun exportFile(entryFile: EntryFile, outfile: File) {
         outfile.createNewFile()
         outfile.writeBytes64(entryFile.bytes)
+    }
+
+    fun exportDirRecurse(disk: VirtualDisk, parentDir: EntryID, outfile: File, charset: Charset) {
+        fun recurse1(file: DiskEntry, dir: File) {
+            // return conditions
+            if (file.contents is EntryFile) {
+                // if not a directory, write as file
+                val newFile = File(dir, file.getFilenameString(charset))
+                newFile.writeBytes64(file.contents.bytes)
+                return
+            }
+            // recurse
+            else if (file.contents is EntryDirectory) {
+                // mkdir
+                val newDir = File(dir, file.getFilenameString(charset))
+                newDir.mkdir()
+                // for entries in this fileDirectory...
+                file.contents.forEach { recurse1(disk.entries[it]!!, newDir) }
+            }
+        }
+
+
+        // mkdir to superNode
+        val newDir = File(outfile, disk.entries[parentDir]!!.getFilenameString(charset))
+        newDir.mkdir()
+        // for entries in this fileDirectory...
+        getDirectoryEntries(disk, parentDir).forEach { recurse1(it, newDir) }
     }
 
     /**
@@ -765,7 +829,8 @@ object VDUtil {
             }
         }
         catch (e: Exception) {
-            throw InternalError("Aw, snap! Here's what it says:\n$e")
+            e.printStackTrace()
+            throw InternalError("Aw, snap!")
         }
     }
 
@@ -779,7 +844,8 @@ object VDUtil {
             }
         }
         catch (e: Exception) {
-            throw InternalError("Aw, snap! Here's what it says:\n$e")
+            e.printStackTrace()
+            throw InternalError("Aw, snap!")
         }
     }
 }

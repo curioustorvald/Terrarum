@@ -1,4 +1,0 @@
-\contentsline {chapter}{\chapternumberline {1}Main Applications}{5}{chapter.1}
-\contentsline {section}{\numberline {1.1}DSH}{6}{section.1.1}
-\contentsline {section}{\numberline {1.2}MSH}{6}{section.1.2}
-\contentsline {chapter}{\chapternumberline {2}References}{7}{chapter.2}
