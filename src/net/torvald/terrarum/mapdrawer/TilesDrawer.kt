@@ -15,15 +15,9 @@ import net.torvald.terrarum.mapdrawer.MapCamera.x
 import net.torvald.terrarum.mapdrawer.MapCamera.y
 import net.torvald.terrarum.mapdrawer.MapCamera.height
 import net.torvald.terrarum.mapdrawer.MapCamera.width
-import net.torvald.terrarum.realestate.LandUtil
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
-import org.newdawn.slick.opengl.*
-import java.io.FileInputStream
-import java.nio.ByteBuffer
-import java.util.*
-import java.util.zip.GZIPInputStream
-import java.util.zip.InflaterInputStream
+
 
 /**
  * Created by minjaesong on 16-01-19.
@@ -35,7 +29,9 @@ object TilesDrawer {
 
     val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "tiles/terrain.tga.gz"), TILE_SIZE, TILE_SIZE)
     // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
-    val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "tiles/wire.tga"), TILE_SIZE, TILE_SIZE)
+    // -> PNG transparency issue seems to be fixed (look at my customised ImageDataFactory), but
+    //    tga.gz is smaller than png, so I'd rather keep it
+    val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "tiles/wire.tga.gz"), TILE_SIZE, TILE_SIZE)
 
 
     val breakAnimSteps = 10

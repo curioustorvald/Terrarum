@@ -21,7 +21,7 @@ public class ImageDataFactory {
     /** True if we're going to use the native PNG loader - cached so it doesn't have
      *  the security check repeatedly
      */
-    private static boolean usePngLoader = true;
+    private static final boolean usePngLoader = false;
     /** True if the PNG loader property has been checked */
     private static boolean pngLoaderPropertyChecked = false;
 
@@ -41,7 +41,7 @@ public class ImageDataFactory {
                     public Object run() {
                         String val = System.getProperty(PNG_LOADER);
                         if ("false".equalsIgnoreCase(val)) {
-                            usePngLoader = false;
+                            //usePngLoader = false;
                         }
 
                         Log.info("Use Java PNG Loader = " + usePngLoader);
