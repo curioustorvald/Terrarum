@@ -8,6 +8,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.gameworld.toUint
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.mapdrawer.LightmapRenderer.normaliseToColour
 import net.torvald.terrarum.mapdrawer.MapCamera.x
@@ -17,7 +18,12 @@ import net.torvald.terrarum.mapdrawer.MapCamera.width
 import net.torvald.terrarum.realestate.LandUtil
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
+import org.newdawn.slick.opengl.*
+import java.io.FileInputStream
+import java.nio.ByteBuffer
 import java.util.*
+import java.util.zip.GZIPInputStream
+import java.util.zip.InflaterInputStream
 
 /**
  * Created by minjaesong on 16-01-19.
@@ -27,9 +33,40 @@ object TilesDrawer {
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
-    val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "tiles/terrain.tga"), TILE_SIZE, TILE_SIZE)
+    //val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "tiles/terrain.tga"), TILE_SIZE, TILE_SIZE)
     // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
     val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "tiles/wire.tga"), TILE_SIZE, TILE_SIZE)
+
+    val tilesTerrain: SpriteSheet
+
+    init {
+        // read DEFLATEd terrain.tar
+        val tgaLoader = TGAImageData()
+        val terrainImageData = tgaLoader.loadImage(
+                GZIPInputStream(
+                        FileInputStream(ModMgr.getFile("basegame", "tiles/terrain.tga.gz")),
+                        8192
+                ), false, null)
+        terrainImageData.rewind()
+        /*val terrainTex = InternalTextureLoader.get().getTexture(object : ImageData {
+            override fun getHeight(): Int = tgaLoader.height
+            override fun getTexWidth(): Int = tgaLoader.texWidth
+            override fun getDepth(): Int = tgaLoader.depth
+            override fun getImageBufferData(): ByteBuffer = terrainImageData
+            override fun getWidth(): Int = tgaLoader.width
+            override fun getTexHeight(): Int = tgaLoader.texHeight
+        }, Image.FILTER_NEAREST)*/
+
+        //// method 1
+        //val terrainImage = Image(terrainTex)
+        //tilesTerrain = SpriteSheet(terrainImage, TILE_SIZE, TILE_SIZE)
+
+        //// method 2
+        val terrainImgBuffer = ImageBuffer(tgaLoader.width, tgaLoader.height)
+        terrainImageData.get(terrainImgBuffer.rgba)
+        tilesTerrain = SpriteSheet(terrainImgBuffer.image, TILE_SIZE, TILE_SIZE)
+    }
+
 
     val breakAnimSteps = 10
 
