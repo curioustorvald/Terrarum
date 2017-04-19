@@ -33,39 +33,9 @@ object TilesDrawer {
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
-    //val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "tiles/terrain.tga"), TILE_SIZE, TILE_SIZE)
+    val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "tiles/terrain.tga.gz"), TILE_SIZE, TILE_SIZE)
     // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
     val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "tiles/wire.tga"), TILE_SIZE, TILE_SIZE)
-
-    val tilesTerrain: SpriteSheet
-
-    init {
-        // read DEFLATEd terrain.tar
-        val tgaLoader = TGAImageData()
-        val terrainImageData = tgaLoader.loadImage(
-                GZIPInputStream(
-                        FileInputStream(ModMgr.getFile("basegame", "tiles/terrain.tga.gz")),
-                        8192
-                ), false, null)
-        terrainImageData.rewind()
-        /*val terrainTex = InternalTextureLoader.get().getTexture(object : ImageData {
-            override fun getHeight(): Int = tgaLoader.height
-            override fun getTexWidth(): Int = tgaLoader.texWidth
-            override fun getDepth(): Int = tgaLoader.depth
-            override fun getImageBufferData(): ByteBuffer = terrainImageData
-            override fun getWidth(): Int = tgaLoader.width
-            override fun getTexHeight(): Int = tgaLoader.texHeight
-        }, Image.FILTER_NEAREST)*/
-
-        //// method 1
-        //val terrainImage = Image(terrainTex)
-        //tilesTerrain = SpriteSheet(terrainImage, TILE_SIZE, TILE_SIZE)
-
-        //// method 2
-        val terrainImgBuffer = ImageBuffer(tgaLoader.width, tgaLoader.height)
-        terrainImageData.get(terrainImgBuffer.rgba)
-        tilesTerrain = SpriteSheet(terrainImgBuffer.image, TILE_SIZE, TILE_SIZE)
-    }
 
 
     val breakAnimSteps = 10
