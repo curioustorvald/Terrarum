@@ -87,7 +87,7 @@ internal object ExportMap : ConsoleCommand {
 
             }
             catch (e: IOException) {
-                Echo("ExportMap: IOException raised.")
+                EchoError("ExportMap: IOException raised.")
                 e.printStackTrace()
             }
 

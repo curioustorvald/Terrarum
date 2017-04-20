@@ -6,7 +6,7 @@ import org.newdawn.slick.*
 /**
  * Created by minjaesong on 16-01-20.
  */
-class GameFontImpl : GameFontBase() {
+class GameFontImpl(noShadow: Boolean = false) : GameFontBase(noShadow = noShadow) {
 
     init {
 
@@ -41,10 +41,8 @@ class GameFontImpl : GameFontBase() {
                 "./assets/graphics/fonts/fullwidth_forms.tga", GameFontBase.W_UNIHAN, GameFontBase.H_UNIHAN)
         GameFontBase.uniPunct = SpriteSheet(
                 "./assets/graphics/fonts/unipunct.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
-        GameFontBase.wenQuanYi_1 = SpriteSheet(
-                "./assets/graphics/fonts/wenquanyi_11pt_part1.tga", 16, 18, 2)
-        GameFontBase.wenQuanYi_2 = SpriteSheet(
-                "./assets/graphics/fonts/wenquanyi_11pt_part2.tga", 16, 18, 2)
+        GameFontBase.wenQuanYi = SpriteSheet(
+                "./assets/graphics/fonts/wenquanyi.tga.gz", 16, 16)
         GameFontBase.greekSheet = SpriteSheet(
                 "./assets/graphics/fonts/greek_variable.tga", 15, 19, 1)
         GameFontBase.thaiSheet = SpriteSheet(
@@ -64,8 +62,7 @@ class GameFontImpl : GameFontBase() {
                 GameFontBase.cyrilic,
                 GameFontBase.fullwidthForms,
                 GameFontBase.uniPunct,
-                GameFontBase.wenQuanYi_1,
-                GameFontBase.wenQuanYi_2,
+                GameFontBase.wenQuanYi,
                 GameFontBase.greekSheet,
                 GameFontBase.thaiSheet,
                 null, // Thai EF, filler because not being used right now
