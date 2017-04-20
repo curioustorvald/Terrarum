@@ -62,7 +62,7 @@ class TinyAlphNum : Font {
             }
 
             fontSheet.getSubImage(index % 16, index / 16).drawWithShadow(
-                    x + textPosOffset, y, thisCol
+                    x + textPosOffset, y, thisCol, false
             )
 
             textPosOffset += W
