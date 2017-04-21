@@ -5,13 +5,13 @@
 package net.torvald.spriteanimation
 
 import com.jme3.math.FastMath
-import net.torvald.terrarum.gameactors.ActorWithSprite
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Image
 import org.newdawn.slick.SlickException
 import org.newdawn.slick.SpriteSheet
 
-class SpriteAnimation(val parentActor: ActorWithSprite, val cellWidth: Int, val cellHeight: Int) {
+class SpriteAnimation(val parentActor: ActorWithPhysics, val cellWidth: Int, val cellHeight: Int) {
 
     private var spriteImage: SpriteSheet? = null
     var currentFrame = 0

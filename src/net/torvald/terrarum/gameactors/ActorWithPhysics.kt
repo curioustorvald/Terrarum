@@ -26,7 +26,7 @@ import java.util.*
  *
  * Created by minjaesong on 16-01-13.
  */
-open class ActorWithSprite(renderOrder: RenderOrder, val immobileBody: Boolean = false, physics: Boolean = true) : ActorVisible(renderOrder) {
+open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean = false, physics: Boolean = true) : ActorVisible(renderOrder) {
 
     /** !! ActorValue macros are on the very bottom of the source !! **/
 
@@ -113,7 +113,7 @@ open class ActorWithSprite(renderOrder: RenderOrder, val immobileBody: Boolean =
             if (value <= 0)
                 throw IllegalArgumentException("mass cannot be less than or equal to zero.")
             else if (value < MASS_LOWEST) {
-                println("[ActorWithSprite] input too small; using $MASS_LOWEST instead.")
+                println("[ActorWithPhysics] input too small; using $MASS_LOWEST instead.")
                 actorValue[AVKey.BASEMASS] = MASS_LOWEST
             }
 
@@ -126,7 +126,7 @@ open class ActorWithSprite(renderOrder: RenderOrder, val immobileBody: Boolean =
             if (value < 0)
                 throw IllegalArgumentException("invalid elasticity value $value; valid elasticity value is [0, 1].")
             else if (value >= ELASTICITY_MAX) {
-                println("[ActorWithSprite] Elasticity were capped to $ELASTICITY_MAX.")
+                println("[ActorWithPhysics] Elasticity were capped to $ELASTICITY_MAX.")
                 field = ELASTICITY_MAX
             }
             else
@@ -150,7 +150,7 @@ open class ActorWithSprite(renderOrder: RenderOrder, val immobileBody: Boolean =
     var density = 1000.0
         set(value) {
             if (value < 0)
-                throw IllegalArgumentException("[ActorWithSprite] $value: density cannot be negative.")
+                throw IllegalArgumentException("[ActorWithPhysics] $value: density cannot be negative.")
 
             field = value
         }
@@ -190,7 +190,7 @@ open class ActorWithSprite(renderOrder: RenderOrder, val immobileBody: Boolean =
         get() = actorValue.getAsDouble(AVKey.DRAGCOEFF) ?: DRAG_COEFF_DEFAULT
         set(value) {
             if (value < 0)
-                throw IllegalArgumentException("[ActorWithSprite] drag coefficient cannot be negative.")
+                throw IllegalArgumentException("[ActorWithPhysics] drag coefficient cannot be negative.")
             actorValue[AVKey.DRAGCOEFF] = value
         }
 
@@ -272,8 +272,8 @@ open class ActorWithSprite(renderOrder: RenderOrder, val immobileBody: Boolean =
      * @param h
      * @param tx positive: translate sprite to LEFT.
      * @param ty positive: translate sprite to DOWN.
-     * @see ActorWithSprite.drawBody
-     * @see ActorWithSprite.drawGlow
+     * @see ActorWithPhysics.drawBody
+     * @see ActorWithPhysics.drawGlow
      */
     fun setHitboxDimension(w: Int, h: Int, tx: Int, ty: Int) {
         baseHitboxH = h
@@ -1166,9 +1166,9 @@ open class ActorWithSprite(renderOrder: RenderOrder, val immobileBody: Boolean =
 
         // warnings
         if (sprite == null && isVisible)
-            println("[ActorWithSprite] Caution: actor ${this.javaClass.simpleName} is echo but the sprite was not set.")
+            println("[ActorWithPhysics] Caution: actor ${this.javaClass.simpleName} is echo but the sprite was not set.")
         else if (sprite != null && !isVisible)
-            println("[ActorWithSprite] Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
+            println("[ActorWithPhysics] Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
 
         assertPrinted = true
     }

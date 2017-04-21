@@ -2,7 +2,7 @@ package net.torvald.terrarum.gameactors.physicssolver
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorWithSprite
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import java.util.*
 
 /**
@@ -20,9 +20,9 @@ object CollisionSolver {
     private val collListX = ArrayList<CollisionMarkings>(COLL_LIST_SIZE)
     private val collListY = ArrayList<CollisionMarkings>(COLL_LIST_SIZE)
 
-    private val collCandidateX = ArrayList<Pair<ActorWithSprite, ActorWithSprite>>(COLL_CANDIDATES_SIZE)
-    private val collCandidateY = ArrayList<Pair<ActorWithSprite, ActorWithSprite>>(COLL_CANDIDATES_SIZE)
-    private var collCandidates = ArrayList<Pair<ActorWithSprite, ActorWithSprite>>(COLL_FINAL_CANDIDATES_SIZE)
+    private val collCandidateX = ArrayList<Pair<ActorWithPhysics, ActorWithPhysics>>(COLL_CANDIDATES_SIZE)
+    private val collCandidateY = ArrayList<Pair<ActorWithPhysics, ActorWithPhysics>>(COLL_CANDIDATES_SIZE)
+    private var collCandidates = ArrayList<Pair<ActorWithPhysics, ActorWithPhysics>>(COLL_FINAL_CANDIDATES_SIZE)
 
     private val collCandidateStack = Stack<CollisionMarkings>()
 
@@ -40,7 +40,7 @@ object CollisionSolver {
 
         // mark list x
         Terrarum.ingame!!.actorContainer.forEach { it ->
-            if (it is ActorWithSprite) {
+            if (it is ActorWithPhysics) {
                 collListX.add(CollisionMarkings(it.hitbox.hitboxStart.x, STARTPOINT, it))
                 collListX.add(CollisionMarkings(it.hitbox.hitboxEnd.x, ENDPOINT, it))
             }
@@ -73,7 +73,7 @@ object CollisionSolver {
 
         // mark list y
         Terrarum.ingame!!.actorContainer.forEach { it ->
-            if (it is ActorWithSprite) {
+            if (it is ActorWithPhysics) {
                 collListY.add(CollisionMarkings(it.hitbox.hitboxStart.y, STARTPOINT, it))
                 collListY.add(CollisionMarkings(it.hitbox.hitboxEnd.y, ENDPOINT, it))
             }
@@ -89,7 +89,7 @@ object CollisionSolver {
             else if (it.kind == ENDPOINT) {
                 val mark_this = it
                 val mark_other = collCandidateStack.pop()
-                val collCandidate: Pair<ActorWithSprite, ActorWithSprite>
+                val collCandidate: Pair<ActorWithPhysics, ActorWithPhysics>
                 // make sure actor with lower ID comes first
                 if (mark_this.actor < mark_other.actor)
                     collCandidate = Pair(mark_this.actor, mark_other.actor)
@@ -137,7 +137,7 @@ object CollisionSolver {
         return indexOfEqFn(this, other) >= 0
     }
 
-    private fun solveCollision(a: ActorWithSprite, b: ActorWithSprite) {
+    private fun solveCollision(a: ActorWithPhysics, b: ActorWithPhysics) {
         // some of the Pair(a, b) are either duplicates or erroneously reported.
         // e.g. (A, B), (B, C) and then (A, C);
         //      in some situation (A, C) will not making any contact with each other
@@ -170,11 +170,11 @@ object CollisionSolver {
         }
     }
 
-    private infix fun ActorWithSprite.makesCollisionWith(other: ActorWithSprite) =
-            this.collisionType != ActorWithSprite.COLLISION_NOCOLLIDE &&
-            other.collisionType != ActorWithSprite.COLLISION_NOCOLLIDE
+    private infix fun ActorWithPhysics.makesCollisionWith(other: ActorWithPhysics) =
+            this.collisionType != ActorWithPhysics.COLLISION_NOCOLLIDE &&
+            other.collisionType != ActorWithPhysics.COLLISION_NOCOLLIDE
 
-    private infix fun ActorWithSprite.isCollidingWith(other: ActorWithSprite): Boolean {
+    private infix fun ActorWithPhysics.isCollidingWith(other: ActorWithPhysics): Boolean {
         val ax = this.hitbox.centeredX
         val ay = this.hitbox.centeredY
         val bx = other.hitbox.centeredX
@@ -205,7 +205,7 @@ object CollisionSolver {
     data class CollisionMarkings(
             val pos: Double,
             val kind: Int,
-            val actor: ActorWithSprite
+            val actor: ActorWithPhysics
     )
 
     /**

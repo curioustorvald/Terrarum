@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorWithSprite
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 
 /**
  * Created by minjaesong on 2017-01-20.
@@ -15,8 +15,8 @@ object SetScale : ConsoleCommand {
 
                 val target = Terrarum.ingame!!.getActorByID(targetID)
 
-                if (target !is ActorWithSprite) {
-                    EchoError("Target is not ActorWithSprite")
+                if (target !is ActorWithPhysics) {
+                    EchoError("Target is not ActorWithPhysics")
                 }
                 else {
                     target.scale = scale

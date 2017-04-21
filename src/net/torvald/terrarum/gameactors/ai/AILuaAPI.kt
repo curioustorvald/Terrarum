@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors.ai
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameactors.ActorWithSprite
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.mapdrawer.LightmapRenderer
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex
@@ -14,7 +14,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
 /**
  * Created by minjaesong on 16-10-24.
  */
-internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
+internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
 
     // FIXME when actor jumps, the actor releases left/right stick
 
@@ -51,9 +51,9 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
 
     companion object {
         /**
-         * Reads arbitrary ActorWithSprite and returns its information as Lua table
+         * Reads arbitrary ActorWithPhysics and returns its information as Lua table
          */
-        fun composeActorObject(actor: ActorWithSprite): LuaTable {
+        fun composeActorObject(actor: ActorWithPhysics): LuaTable {
             val t: LuaTable = LuaTable()
 
             t["name"] = actor.actorValue.getAsString(AVKey.NAME).toLua()
@@ -87,7 +87,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
         operator fun LuaTable.set(index: Int, value: Int) { this[index] = value.toLua() }
     }
 
-    class GetSelfActorInfo(val actor: ActorWithSprite) : ZeroArgFunction() {
+    class GetSelfActorInfo(val actor: ActorWithPhysics) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return composeActorObject(actor)
         }
@@ -123,13 +123,13 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
         }
     }
 
-    class GetX(val actor: ActorWithSprite) : ZeroArgFunction() {
+    class GetX(val actor: ActorWithPhysics) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(actor.hitbox.centeredX)
         }
     }
 
-    class GetY(val actor: ActorWithSprite) : ZeroArgFunction() {
+    class GetY(val actor: ActorWithPhysics) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(actor.hitbox.centeredY)
         }
@@ -212,7 +212,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
         }
     }
 
-    class GetNearbyTiles(val actor: ActorWithSprite) : OneArgFunction() {
+    class GetNearbyTiles(val actor: ActorWithPhysics) : OneArgFunction() {
         /** @param radius
          *
          *  3 will return 7x7 array, 0 will return 1x1, 1 will return 3x3
@@ -254,7 +254,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
         }
     }
 
-    class GetFloorsHeight(val actor: ActorWithSprite) : OneArgFunction() {
+    class GetFloorsHeight(val actor: ActorWithPhysics) : OneArgFunction() {
         /** @param radius
          *
          *  3 will return len:7 array, 0 will return len:1, 1 will return len:3
@@ -297,7 +297,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
         }
     }
 
-    class GetCeilingsHeight(val actor: ActorWithSprite) : OneArgFunction() {
+    class GetCeilingsHeight(val actor: ActorWithPhysics) : OneArgFunction() {
         /** @param arg radius
          *
          *  3 will return 7x7 array, 0 will return 1x1, 1 will return 3x3
@@ -340,7 +340,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithSprite) {
         }
     }
 
-    class GetLedgesHeight(val actor: ActorWithSprite) : OneArgFunction() {
+    class GetLedgesHeight(val actor: ActorWithPhysics) : OneArgFunction() {
         /** @param arg radius
          * ==
          *    <- (non-solid found)

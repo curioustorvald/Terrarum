@@ -24,13 +24,6 @@ class GameFontImpl(noShadow: Boolean = false) : GameFontBase(noShadow = noShadow
                 "./assets/graphics/fonts/kana.tga", GameFontBase.W_KANA, GameFontBase.H)
         GameFontBase.cjkPunct = SpriteSheet(
                 "./assets/graphics/fonts/cjkpunct.tga", GameFontBase.W_ASIAN_PUNCT, GameFontBase.H)
-        /*uniHan = new SpriteSheet(
-                "./assets/graphics/fonts/unifont_unihan"
-                        + ((!terrarum.gameLocale.contains("zh"))
-                        ? "_ja" : "")
-                        +".tga"
-                , W_UNIHAN, H_UNIHAN
-        );*/
         GameFontBase.cyrilic = SpriteSheet(
                 when (Terrarum.gameLocale.substring(0..1)) {
                     "bg" -> "./assets/graphics/fonts/cyrilic_bulgarian_variable.tga"
@@ -41,7 +34,7 @@ class GameFontImpl(noShadow: Boolean = false) : GameFontBase(noShadow = noShadow
                 "./assets/graphics/fonts/fullwidth_forms.tga", GameFontBase.W_UNIHAN, GameFontBase.H_UNIHAN)
         GameFontBase.uniPunct = SpriteSheet(
                 "./assets/graphics/fonts/unipunct.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
-        GameFontBase.wenQuanYi = SpriteSheet(
+        GameFontBase.uniHan = SpriteSheet(
                 "./assets/graphics/fonts/wenquanyi.tga.gz", 16, 16)
         GameFontBase.greekSheet = SpriteSheet(
                 "./assets/graphics/fonts/greek_variable.tga", 15, 19, 1)
@@ -58,11 +51,10 @@ class GameFontImpl(noShadow: Boolean = false) : GameFontBase(noShadow = noShadow
                 GameFontBase.extBSheet,
                 GameFontBase.kanaSheet,
                 GameFontBase.cjkPunct,
-                null, // Full unihan, filler because we're using WenQuanYi
+                GameFontBase.uniHan,
                 GameFontBase.cyrilic,
                 GameFontBase.fullwidthForms,
                 GameFontBase.uniPunct,
-                GameFontBase.wenQuanYi,
                 GameFontBase.greekSheet,
                 GameFontBase.thaiSheet,
                 null, // Thai EF, filler because not being used right now

@@ -34,7 +34,7 @@ open class HumanoidNPC(
     }
 
     companion object {
-        val DEFAULT_COLLISION_TYPE = ActorWithSprite.COLLISION_DYNAMIC
+        val DEFAULT_COLLISION_TYPE = ActorWithPhysics.COLLISION_DYNAMIC
     }
 
     init {

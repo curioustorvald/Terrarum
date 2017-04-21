@@ -6,7 +6,7 @@ import net.torvald.terrarum.gameactors.CanBeAnItem
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.gameactors.ActorWithSprite
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.itemproperties.IVKey
@@ -71,7 +71,7 @@ object ItemCodex {
                     val mousePoint = Point2d(gc.mouseTileX.toDouble(), gc.mouseTileY.toDouble())
                     // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
                     Terrarum.ingame!!.actorContainer.forEach {
-                        if (it is ActorWithSprite && it.tilewiseHitbox.intersects(mousePoint))
+                        if (it is ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
                             return false
                     }
 
@@ -109,7 +109,7 @@ object ItemCodex {
             override var baseMass = 10.0
             override var baseToolSize: Double? = 10.0
             override var consumable = false
-            override var maxDurability = 606 // this much tiles before breaking
+            override var maxDurability = 147//606 // this much tiles before breaking
             override var durability = maxDurability.toFloat()
             override var equipPosition = EquipPosition.HAND_GRIP
             override var inventoryCategory = Category.TOOL
@@ -132,7 +132,7 @@ object ItemCodex {
 
                 // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
                 Terrarum.ingame!!.actorContainer.forEach {
-                    if (it is ActorWithSprite && it.tilewiseHitbox.intersects(mousePoint))
+                    if (it is ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
                         return false
                 }
 

@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors.ai
 
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorWithSprite
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaInteger
@@ -25,14 +25,14 @@ class LuaAIWrapper(private val scriptPath: String) : ActorAI {
 
     private lateinit var aiLuaAPI: AILuaAPI
 
-    private lateinit var targetActor: ActorWithSprite
+    private lateinit var targetActor: ActorWithPhysics
 
     /**
      * The initialiser
      *
      * Use ```(p.ai as LuaAIWrapper).attachActor(p)```
      */
-    fun attachActor(actor: ActorWithSprite) {
+    fun attachActor(actor: ActorWithPhysics) {
         targetActor = actor
 
         luag["io"] = LuaValue.NIL
