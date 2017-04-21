@@ -5,7 +5,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.SetAV
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorWithSprite
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer
 import java.awt.BorderLayout
 import java.awt.GridLayout
@@ -28,7 +28,7 @@ class ActorValueTracker constructor() : JFrame() {
     private val avPosArea = JTextArea()
     private val avPosScroller = JScrollPane(avPosArea)
 
-    private var actor: ActorWithSprite? = null
+    private var actor: ActorWithPhysics? = null
     private var actorValue: ActorValue? = null
 
     private val modavInputKey = JTextField()
@@ -87,7 +87,7 @@ class ActorValueTracker constructor() : JFrame() {
                     actorValue = actor!!.actorValue
                 }
                 else if (actorIDField.text.isNotBlank()) {
-                    actor = Terrarum.ingame!!.getActorByID(actorIDField.text.toInt()) as ActorWithSprite
+                    actor = Terrarum.ingame!!.getActorByID(actorIDField.text.toInt()) as ActorWithPhysics
                     actorValue = actor!!.actorValue
                 }
             }
@@ -151,7 +151,7 @@ class ActorValueTracker constructor() : JFrame() {
 
         this.title = "AVTracker — $actor"
 
-        if (actor is ActorWithSprite) {
+        if (actor is ActorWithPhysics) {
             this.actor = actor
         }
 

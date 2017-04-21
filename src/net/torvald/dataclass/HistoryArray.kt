@@ -1,4 +1,4 @@
-package net.torvald.gadgets
+package net.torvald.dataclass
 
 import java.util.*
 import java.util.function.Consumer

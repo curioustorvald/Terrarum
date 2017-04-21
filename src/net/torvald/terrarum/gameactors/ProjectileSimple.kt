@@ -23,7 +23,7 @@ open class ProjectileSimple(
         private val type: Int,
         fromPoint: Vector2, // projected coord
         toPoint: Vector2    // arriving coord
-        ) : ActorWithSprite(Actor.RenderOrder.MIDTOP), Luminous, Projectile {
+        ) : ActorWithPhysics(Actor.RenderOrder.MIDTOP), Luminous, Projectile {
 
     val damage: Int
     val displayColour: Color

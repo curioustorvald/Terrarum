@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorWithSprite.Companion.SI_TO_GAME_ACC
+import net.torvald.terrarum.gameactors.ActorWithPhysics.Companion.SI_TO_GAME_ACC
 import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.tileproperties.TileCodex

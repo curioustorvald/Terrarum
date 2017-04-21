@@ -7,7 +7,7 @@ import com.jme3.math.FastMath
 import net.torvald.colourutil.RGB
 import net.torvald.colourutil.CIELuvUtil.additiveLuv
 import net.torvald.terrarum.concurrent.ThreadParallel
-import net.torvald.terrarum.gameactors.ActorWithSprite
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameactors.abs
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.gameworld.GameWorld
@@ -217,7 +217,7 @@ object LightmapRenderer {
     private fun buildLanternmap() {
         lanternMap.clear()
         Terrarum.ingame!!.actorContainer.forEach { it ->
-            if (it is Luminous && it is ActorWithSprite) {
+            if (it is Luminous && it is ActorWithPhysics) {
                 // put lanterns to the area the luminantBox is occupying
                 for (lightBox in it.lightBoxList) {
                     val lightBoxX = it.hitbox.posX + lightBox.posX

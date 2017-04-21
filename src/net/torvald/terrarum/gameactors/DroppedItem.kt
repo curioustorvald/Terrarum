@@ -9,7 +9,7 @@ import org.newdawn.slick.Graphics
 /**
  * Created by minjaesong on 16-03-15.
  */
-class DroppedItem(private val item: InventoryItem) : ActorWithSprite(Actor.RenderOrder.MIDTOP) {
+class DroppedItem(private val item: InventoryItem) : ActorWithPhysics(Actor.RenderOrder.MIDTOP) {
 
     init {
         if (item.id >= ItemCodex.ACTOR_ID_MIN)

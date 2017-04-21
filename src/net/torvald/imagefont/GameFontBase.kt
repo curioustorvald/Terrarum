@@ -65,7 +65,6 @@ open class GameFontBase(val noShadow: Boolean) : Font {
     private fun isCyrilic(c: Char) = c.toInt() in 0x400..0x45F
     private fun isFullwidthUni(c: Char) = c.toInt() in 0xFF00..0xFF1F
     private fun isUniPunct(c: Char) = c.toInt() in 0x2000..0x206F
-    private fun isWenQuanYi(c: Char) = c.toInt() in 0x3400..0x9FFF
     private fun isGreek(c: Char) = c.toInt() in 0x370..0x3CE
     private fun isThai(c: Char) = c.toInt() in 0xE00..0xE7F
     private fun isThaiDiacritics(c: Char) = c.toInt() in 0xE34..0xE3A
@@ -91,9 +90,6 @@ open class GameFontBase(val noShadow: Boolean) : Font {
     private fun cjkPunctIndexX(c: Char) = (c.toInt() - 0x3000) % 16
     private fun cjkPunctIndexY(c: Char) = (c.toInt() - 0x3000) / 16
 
-    private fun uniHanIndexX(c: Char) = (c.toInt() - 0x3400) % 256
-    private fun uniHanIndexY(c: Char) = (c.toInt() - 0x3400) / 256
-
     private fun cyrilicIndexX(c: Char) = (c.toInt() - 0x400) % 16
     private fun cyrilicIndexY(c: Char) = (c.toInt() - 0x400) / 16
 
@@ -103,8 +99,8 @@ open class GameFontBase(val noShadow: Boolean) : Font {
     private fun uniPunctIndexX(c: Char) = (c.toInt() - 0x2000) % 16
     private fun uniPunctIndexY(c: Char) = (c.toInt() - 0x2000) / 16
 
-    private fun wenQuanYiIndexX(c: Char) = (c.toInt() - 0x3400) % 256
-    private fun wenQuanYiIndexY(c: Char) = (c.toInt() - 0x3400) / 256
+    private fun unihanIndexX(c: Char) = (c.toInt() - 0x3400) % 256
+    private fun unihanIndexY(c: Char) = (c.toInt() - 0x3400) / 256
 
     private fun greekIndexX(c: Char) = (c.toInt() - 0x370) % 16
     private fun greekIndexY(c: Char) = (c.toInt() - 0x370) / 16
@@ -121,7 +117,7 @@ open class GameFontBase(val noShadow: Boolean) : Font {
     private val unihanWidthSheets = arrayOf(
             SHEET_UNIHAN,
             SHEET_FW_UNI,
-            SHEET_WENQUANYI
+            SHEET_UNIHAN
     )
     private val zeroWidthSheets = arrayOf(
             SHEET_COLOURCODE
@@ -231,28 +227,8 @@ open class GameFontBase(val noShadow: Boolean) : Font {
         }
         //hangulSheet.endUse()
 
-        // unihan fonts
-        /*uniHan.startUse();
-        for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
-
-            if (isUniHan(ch)) {
-                int glyphW = getWidth("" + ch);
-                uniHan.renderInUse(
-                        Math.round(x
-                                + getWidthSubstr(s, i + 1) - glyphW
-                        )
-                        , Math.round((H - H_UNIHAN) / 2 + y)
-                        , uniHanIndexX(ch)
-                        , uniHanIndexY(ch)
-                );
-            }
-        }
-
-        uniHan.endUse();*/
-
-        // WenQuanYi 1
-        //wenQuanYi_1.startUse()
+        // WenQuanYi
+        //uniHan.startUse()
 
         for (i in 0..s.length - 1) {
             val ch = s[i]
@@ -262,9 +238,9 @@ open class GameFontBase(val noShadow: Boolean) : Font {
                 continue
             }
 
-            if (isWenQuanYi(ch)) {
+            if (isUniHan(ch)) {
                 val glyphW = getWidth("" + ch)
-                wenQuanYi.getSubImage(wenQuanYiIndexX(ch), wenQuanYiIndexY(ch)).drawWithShadow(
+                uniHan.getSubImage(unihanIndexX(ch), unihanIndexY(ch)).drawWithShadow(
                         Math.round(x + getWidthSubstr(s, i + 1) - glyphW).toFloat(),
                         Math.round((H - H_UNIHAN) / 2 + y).toFloat(),
                         scale.toFloat(), thisCol, noShadow
@@ -272,7 +248,7 @@ open class GameFontBase(val noShadow: Boolean) : Font {
             }
         }
 
-        //wenQuanYi_1.endUse()
+        //uniHan.endUse()
 
         // regular fonts
         var prevInstance = -1
@@ -405,8 +381,6 @@ open class GameFontBase(val noShadow: Boolean) : Font {
             return SHEET_GREEK_VARW
         else if (isThai(c))
             return SHEET_THAI_WIDE
-        else if (isWenQuanYi(c))
-            return SHEET_WENQUANYI
         else if (c.isColourCode())
             return SHEET_COLOURCODE
         else if (isKeycap(c))
@@ -479,11 +453,10 @@ open class GameFontBase(val noShadow: Boolean) : Font {
         lateinit internal var extBSheet: SpriteSheet
         lateinit internal var kanaSheet: SpriteSheet
         lateinit internal var cjkPunct: SpriteSheet
-        // static SpriteSheet uniHan;
+        lateinit internal var uniHan: SpriteSheet
         lateinit internal var cyrilic: SpriteSheet
         lateinit internal var fullwidthForms: SpriteSheet
         lateinit internal var uniPunct: SpriteSheet
-        lateinit internal var wenQuanYi: SpriteSheet
         lateinit internal var greekSheet: SpriteSheet
         lateinit internal var thaiSheet: SpriteSheet
         lateinit internal var keycapSheet: SpriteSheet
@@ -513,11 +486,10 @@ open class GameFontBase(val noShadow: Boolean) : Font {
         internal val SHEET_CYRILIC_VARW = 8
         internal val SHEET_FW_UNI = 9
         internal val SHEET_UNI_PUNCT = 10
-        internal val SHEET_WENQUANYI = 11
-        internal val SHEET_GREEK_VARW = 12
-        internal val SHEET_THAI_WIDE = 13
-        internal val SHEET_THAI_NARROW = 14
-        internal val SHEET_KEYCAP = 15
+        internal val SHEET_GREEK_VARW = 11
+        internal val SHEET_THAI_WIDE = 12
+        internal val SHEET_THAI_NARROW = 13
+        internal val SHEET_KEYCAP = 14
 
         internal val SHEET_UNKNOWN = 254
         internal val SHEET_COLOURCODE = 255

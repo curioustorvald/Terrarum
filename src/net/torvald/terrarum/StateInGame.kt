@@ -72,7 +72,8 @@ class StateInGame : BasicGameState() {
     lateinit var notifier: UIHandler
 
 
-    private var playableActorDelegate: PlayableActorDelegate? = null // DO NOT LATEINIT!
+    var playableActorDelegate: PlayableActorDelegate? = null // DO NOT LATEINIT!
+        private set
     internal val player: ActorHumanoid? // currently POSSESSED actor :)
         get() = playableActorDelegate?.actor
 
@@ -95,21 +96,20 @@ class StateInGame : BasicGameState() {
     val KEY_LIGHTMAP_SMOOTH = Key.F8
 
     // UI aliases (no pause)
-    val uiAliases = HashMap<String, UIHandler>()
-    val UI_PIE_MENU = "uiPieMenu"
-    val UI_QUICK_BAR = "uiQuickBar"
-    val UI_INVENTORY_PLAYER = "uiInventoryPlayer"
-    val UI_INVENTORY_CONTAINER = "uiInventoryContainer"
-    val UI_VITAL_PRIMARY = "uiVital1"
-    val UI_VITAL_SECONDARY = "uiVital2"
-    val UI_VITAL_ITEM = "uiVital3" // itemcount/durability of held block or active ammo of held gun. As for the block, max value is 500.
-    val UI_CONSOLE = "uiConsole"
+    lateinit var uiPieMenu: UIHandler
+    lateinit var uiQuickBar: UIHandler
+    lateinit var uiInventoryPlayer: UIHandler
+    lateinit var uiInventoryContainer: UIHandler
+    lateinit var uiVitalPrimary: UIHandler
+    lateinit var uiVitalSecondary: UIHandler
+    lateinit var uiVitalItem: UIHandler // itemcount/durability of held block or active ammo of held gun. As for the block, max value is 500.
+    lateinit var uiAliases: Array<UIHandler>
 
     // UI aliases (pause)
-    val uiAlasesPausing = HashMap<String, UIHandler>()
+    val uiAlasesPausing = ArrayList<UIHandler>()
 
     var paused: Boolean = false
-        get() = uiAlasesPausing.map { if (it.value.isOpened) 1 else 0 }.sum() > 0
+        get() = uiAlasesPausing.map { if (it.isOpened) 1 else 0 }.sum() > 0
     /**
      * Set to false if UI is opened; set to true  if UI is closed.
      */
@@ -155,7 +155,6 @@ class StateInGame : BasicGameState() {
         // init console window
         consoleHandler = UIHandler(ConsoleWindow())
         consoleHandler.setPosition(0, 0)
-        uiAlasesPausing[UI_CONSOLE] = consoleHandler
 
 
         // init debug window
@@ -175,7 +174,7 @@ class StateInGame : BasicGameState() {
 
         // >- queue up game UIs that should pause the world -<
         // inventory
-        uiAlasesPausing[UI_INVENTORY_PLAYER] = UIHandler(
+        uiInventoryPlayer = UIHandler(
                 UIInventory(player,
                         width = 840,
                         height = Terrarum.HEIGHT - 160,
@@ -183,42 +182,48 @@ class StateInGame : BasicGameState() {
                 ),
                 toggleKey = Terrarum.getConfigInt("keyinventory")
         )
-        uiAlasesPausing[UI_INVENTORY_PLAYER]!!.setPosition(
-                -uiAlasesPausing[UI_INVENTORY_PLAYER]!!.UI.width,
+        uiInventoryPlayer.setPosition(
+                -uiInventoryPlayer.UI.width,
                 70
         )
 
         // >- lesser UIs -<
         // quick bar
-        uiAliases[UI_QUICK_BAR] = UIHandler(UIQuickBar())
-        uiAliases[UI_QUICK_BAR]!!.isVisible = true
-        uiAliases[UI_QUICK_BAR]!!.setPosition(0, 0)
+        uiQuickBar = UIHandler(UIQuickBar())
+        uiQuickBar.isVisible = true
+        uiQuickBar.setPosition(0, 0)
 
         // pie menu
-        uiAliases[UI_PIE_MENU] = UIHandler(UIPieMenu())
-        uiAliases[UI_PIE_MENU]!!.setPosition(
-                (Terrarum.WIDTH - uiAliases[UI_PIE_MENU]!!.UI.width) / 2,
-                (Terrarum.HEIGHT - uiAliases[UI_PIE_MENU]!!.UI.height) / 2
+        uiPieMenu = UIHandler(UIPieMenu())
+        uiPieMenu.setPosition(
+                (Terrarum.WIDTH -  uiPieMenu.UI.width) / 2,
+                (Terrarum.HEIGHT - uiPieMenu.UI.height) / 2
         )
 
         // vital metre
         // fill in getter functions by
         //      (uiAliases[UI_QUICK_BAR]!!.UI as UIVitalMetre).vitalGetterMax = { some_function }
-        uiAliases[UI_VITAL_PRIMARY] = UIHandler(UIVitalMetre(player, { 80f }, { 100f }, Color.red, 0), customPositioning = true)
-        uiAliases[UI_VITAL_PRIMARY]!!.setAsAlwaysVisible()
-        uiAliases[UI_VITAL_SECONDARY] = UIHandler(UIVitalMetre(player, { 73f }, { 100f }, Color(0x00dfff), 1), customPositioning = true)
-        uiAliases[UI_VITAL_SECONDARY]!!.setAsAlwaysVisible()
-        uiAliases[UI_VITAL_ITEM] = UIHandler(UIVitalMetre(player, { 32f }, { 100f }, Color(0xffcc00), 2), customPositioning = true)
-        uiAliases[UI_VITAL_ITEM]!!.setAsAlwaysVisible()
+        uiVitalPrimary = UIHandler(UIVitalMetre(player, { 80f }, { 100f }, Color.red, 2), customPositioning = true)
+        uiVitalPrimary.setAsAlwaysVisible()
+        uiVitalSecondary = UIHandler(UIVitalMetre(player, { 73f }, { 100f }, Color(0x00dfff), 1), customPositioning = true)
+        uiVitalSecondary.setAsAlwaysVisible()
+        uiVitalItem = UIHandler(UIVitalMetre(player, { null }, { null }, Color(0xffcc00), 0), customPositioning = true)
+        uiVitalItem.setAsAlwaysVisible()
 
 
         // batch-process uiAliases
-        uiAlasesPausing.forEach { _, uiHandler ->
-            uiContainer.add(uiHandler)       // put them all to the UIContainer
-        }
-        uiAliases.forEach { _, uiHandler ->
-            uiContainer.add(uiHandler)       // put them all to the UIContainer
-        }
+        uiAliases = arrayOf(
+                uiPieMenu,
+                uiQuickBar,
+                uiInventoryPlayer,
+                //uiInventoryContainer,
+                uiVitalPrimary,
+                uiVitalSecondary,
+                uiVitalItem
+        )
+        uiAlasesPausing.forEach { uiContainer.add(it) } // put them all to the UIContainer
+        uiAliases.forEach { uiContainer.add(it) } // put them all to the UIContainer
+
 
 
 
@@ -346,7 +351,7 @@ class StateInGame : BasicGameState() {
         playableActorDelegate!!.actor.collisionType = HumanoidNPC.DEFAULT_COLLISION_TYPE
         // accept new delegate
         playableActorDelegate = PlayableActorDelegate(getActorByID(refid) as ActorHumanoid)
-        playableActorDelegate!!.actor.collisionType = ActorWithSprite.COLLISION_KINEMATIC
+        playableActorDelegate!!.actor.collisionType = ActorWithPhysics.COLLISION_KINEMATIC
         WorldSimulator(player, UPDATE_DELTA)
     }
 
@@ -446,7 +451,7 @@ class StateInGame : BasicGameState() {
         // debug physics
         if (KeyToggler.isOn(Key.F11)) {
             actorContainer.forEachIndexed { i, actor ->
-                if (actor is ActorWithSprite) {
+                if (actor is ActorWithPhysics) {
                     worldG.color = Color(1f, 0f, 1f, 1f)
                     worldG.font = Terrarum.fontSmallNumbers
                     worldG.lineWidth = 1f
@@ -527,8 +532,8 @@ class StateInGame : BasicGameState() {
 
         if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
             || key == Terrarum.getConfigInt("keyquicksel")) {
-            uiAliases[UI_PIE_MENU]!!.setAsOpen()
-            uiAliases[UI_QUICK_BAR]!!.setAsClose()
+            uiPieMenu.setAsOpen()
+            uiQuickBar.setAsClose()
         }
 
         uiContainer.forEach { it.keyPressed(key, c) } // for KeyboardControlled UIcanvases
@@ -539,8 +544,8 @@ class StateInGame : BasicGameState() {
 
         if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
             || key == Terrarum.getConfigInt("keyquicksel")) {
-            uiAliases[UI_PIE_MENU]!!.setAsClose()
-            uiAliases[UI_QUICK_BAR]!!.setAsOpen()
+            uiPieMenu.setAsClose()
+            uiQuickBar.setAsOpen()
         }
 
         uiContainer.forEach { it.keyReleased(key, c) } // for KeyboardControlled UIcanvases
@@ -679,6 +684,7 @@ class StateInGame : BasicGameState() {
                     }
                 }
             }
+            AmmoMeterProxy(player!!, uiVitalItem.UI as UIVitalMetre)
         }
     }
 

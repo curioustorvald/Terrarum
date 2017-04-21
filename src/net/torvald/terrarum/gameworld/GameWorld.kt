@@ -20,6 +20,8 @@ class GameWorld(val width: Int, val height: Int) {
     val layerWallLowBits: PairedMapLayer
     val layerTerrainLowBits: PairedMapLayer
 
+    val layerThermal: MapLayerFloat // in Kelvins
+
     val spawnX: Int
     val spawnY: Int
 
@@ -45,6 +47,9 @@ class GameWorld(val width: Int, val height: Int) {
         layerWire = MapLayer(width, height)
         layerTerrainLowBits = PairedMapLayer(width, height)
         layerWallLowBits = PairedMapLayer(width, height)
+
+        layerThermal = MapLayerFloat(width / 2, height / 2)
+
 
         time = WorldTime(
                 71 * WorldTime.DAY_LENGTH +

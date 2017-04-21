@@ -1,6 +1,6 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.gadgets.HistoryArray
+import net.torvald.dataclass.HistoryArray
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.Authenticator

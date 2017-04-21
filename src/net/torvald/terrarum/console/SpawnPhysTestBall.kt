@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorWithSprite
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameactors.PhysTestBall
 import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.Terrarum

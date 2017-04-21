@@ -115,6 +115,7 @@ object GameController {
     fun mouseReleased(button: Int, x: Int, y: Int) {
         if (Terrarum.ingame != null) {
             val ingame = Terrarum.ingame!!
+            // don't separate Player from this! Physics will break, esp. airborne manoeuvre
             if (ingame.player != null && ingame.canPlayerControl) {
                 val itemOnGrip = ingame.player!!.inventory.itemEquipped[InventoryItem.EquipPosition.HAND_GRIP]
 

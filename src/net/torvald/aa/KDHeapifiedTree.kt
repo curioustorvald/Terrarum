@@ -2,7 +2,7 @@ package net.torvald.aa
 
 import net.torvald.point.Point2d
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorWithSprite
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameactors.sqr
 import java.util.*
 
@@ -23,7 +23,7 @@ class KDHeapifiedTree() {
 
     private val dimension = 2
     private val initialSize = 128
-    private val nodes = Array<ActorWithSprite?>(initialSize, { null })
+    private val nodes = Array<ActorWithPhysics?>(initialSize, { null })
 
     private val root: Int = 0
 
@@ -34,13 +34,13 @@ class KDHeapifiedTree() {
     private fun Int.getActor() = nodes[this]
     private fun Int.getLeft() = this * 2 + 1
     private fun Int.getRight() = this * 2 + 2
-    private fun Int.set(value: ActorWithSprite?) { nodes[this] = value }
-    private fun Int.setLeftChild(value: ActorWithSprite?) { nodes[this.getLeft()] = value }
-    private fun Int.setRightChild(value: ActorWithSprite?) { nodes[this.getRight()] = value }
+    private fun Int.set(value: ActorWithPhysics?) { nodes[this] = value }
+    private fun Int.setLeftChild(value: ActorWithPhysics?) { nodes[this.getLeft()] = value }
+    private fun Int.setRightChild(value: ActorWithPhysics?) { nodes[this.getRight()] = value }
 
     private val zeroPoint = Point2d(0.0, 0.0)
 
-    private fun create(points: List<ActorWithSprite?>, depth: Int, index: Int): ActorWithSprite? {
+    private fun create(points: List<ActorWithPhysics?>, depth: Int, index: Int): ActorWithPhysics? {
         if (points.isEmpty()) {
             index.set(null)
 
@@ -91,7 +91,7 @@ class KDHeapifiedTree() {
 
     private fun expandArray() {
         val prevNodes = nodes.copyOf()
-        Array<ActorWithSprite?>(prevNodes.size * 2, { null })
+        Array<ActorWithPhysics?>(prevNodes.size * 2, { null })
         create(prevNodes.toList(), 0, 0)
     }
 

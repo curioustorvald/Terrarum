@@ -11,7 +11,7 @@ import net.torvald.terrarum.mapdrawer.FeaturesDrawer
  */
 object PlayerBuilderCynthia {
 
-    operator fun invoke(): ActorWithSprite {
+    operator fun invoke(): ActorWithPhysics {
         //val p: Player = Player(GameDate(100, 143)) // random value thrown
         val p: HumanoidNPC = HumanoidNPC(
                 LuaAIWrapper("/net/torvald/terrarum/gameactors/ai/scripts/PokemonNPCAI.lua"),
