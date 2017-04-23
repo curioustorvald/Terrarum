@@ -17,7 +17,7 @@ class DroppedItem(private val item: InventoryItem) : ActorWithPhysics(Actor.Rend
 
         isVisible = true
 
-        mass = if (item.id < TileCodex.TILE_UNIQUE_MAX)
+        avBaseMass = if (item.id < TileCodex.TILE_UNIQUE_MAX)
             TileCodex[item.id].density / 1000.0
         else
             ItemCodex[item.id].mass

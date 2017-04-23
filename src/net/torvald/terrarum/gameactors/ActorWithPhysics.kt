@@ -107,9 +107,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
     @Transient val MASS_LOWEST = 0.1 // Kilograms
     /** Apparent mass. Use "avBaseMass" for base mass */
-    var mass: Double
+    val mass: Double
         get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT * Math.pow(scale, 3.0)
-        set(value) {
+        /*set(value) { // use "var avBaseMass: Double"
             if (value <= 0)
                 throw IllegalArgumentException("mass cannot be less than or equal to zero.")
             else if (value < MASS_LOWEST) {
@@ -118,7 +118,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             }
 
             actorValue[AVKey.BASEMASS] = value / Math.pow(scale, 3.0)
-        }
+        }*/
     @Transient private val MASS_DEFAULT: Double = 60.0
     /** Valid range: [0, 1]  */
     var elasticity: Double = 0.0
@@ -232,7 +232,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     protected val gameContainer: GameContainer
         get() = Terrarum.appgc
     protected val updateDelta: Int
-        get() = Terrarum.UPDATE_DELTA
+        get() = Terrarum.delta
 
     /**
      * true: This actor had just made collision
@@ -1286,15 +1286,12 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         set(value) {
             actorValue[AVKey.SCALE] = value
         }
-    /** Apparent strength */
-    var avStrength: Double
-        get() = (actorValue.getAsDouble(AVKey.STRENGTH) ?: 0.0) *
-                (actorValue.getAsDouble(AVKey.STRENGTHBUFF) ?: 0.0) * scale
-        set(value) {
-            actorValue[AVKey.STRENGTH] =
-                    value /
-                    ((actorValue.getAsDouble(AVKey.STRENGTHBUFF) ?: 1.0) * (avBaseStrength ?: 1.0))
-        }
+    /**
+     * Apparent strength. 1 000 is default value
+     */
+    val avStrength: Double
+        get() = (actorValue.getAsDouble(AVKey.STRENGTH) ?: 1000.0) *
+                (actorValue.getAsDouble(AVKey.STRENGTHBUFF) ?: 1.0) * scale
     var avBaseStrength: Double?
         get() = actorValue.getAsDouble(AVKey.STRENGTH)
         set(value) {

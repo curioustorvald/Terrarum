@@ -8,11 +8,11 @@ import net.torvald.colourutil.CIEXYZUtil.toColor
 import net.torvald.terrarum.ModMgr
 
 /**
- * RGB-modeled CCT calculator
+ * RGB- and CIE-Modeled CCT calculator
  * Created by minjaesong on 16-07-26.
  */
 object ColourTemp {
-    private var envOverlayColourmap = Image(ModMgr.getPath("basegame", "colourmap/black_body_col_1000_40000_K.tga"))
+    private var clut = Image(ModMgr.getPath("basegame", "colourmap/black_body_col_1000_40000_K.tga"))
 
     private fun colTempToImagePos(K: Int): Int {
         if (K < 1000 || K >= 40000) throw IllegalArgumentException("K: out of range. ($K)")
@@ -21,7 +21,7 @@ object ColourTemp {
 
     /** returns sRGB-normalised colour */
     operator fun invoke(temp: Int): Color =
-            envOverlayColourmap.getPixel(colTempToImagePos(temp), 0).toColor()
+            clut.getPixel(colTempToImagePos(temp), 0).toColor()
 
     /** returns CIExyY-based colour converted to slick.color
      * @param CIE_Y 0.0 - 1.0+ */

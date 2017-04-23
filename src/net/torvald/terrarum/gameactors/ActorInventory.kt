@@ -44,12 +44,18 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
         // If we already have the item, increment the amount
         // If not, add item with specified amount
         val existingItem = getByID(item.id)
+
         if (existingItem != null) { // if the item already exists
             val newCount = getByID(item.id)!!.amount + count
             itemList.remove(existingItem)
             itemList.add(InventoryPair(existingItem.item, newCount))
         }
-        else {
+        else { // new item
+            if (item.isDynamic) {
+                // assign new ID
+                item.originalID = item.id
+                item.id = InventoryItem.generateNewDynamicID(this)
+            }
             itemList.add(InventoryPair(item, count))
         }
         insertionSortLastElem(itemList)
@@ -121,12 +127,18 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             false
 
 
-    fun consumeItem(item: InventoryItem) {
+    fun consumeItem(actor: Actor, item: InventoryItem) {
         if (item.consumable) {
             remove(item, 1)
         }
         else {
-            item.durability -= 1f
+            val baseDamagePerSwing = if (actor is ActorHumanoid)
+                actor.avStrength / 1000.0
+            else
+                1.0 // TODO variable: scale, strength
+            val swingDmgToFrameDmg = Terrarum.delta.toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+
+            item.durability -= (baseDamagePerSwing * swingDmgToFrameDmg).toFloat()
             if (item.durability <= 0)
                 remove(item, 1)
         }

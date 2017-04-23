@@ -42,13 +42,12 @@ Gemstones go elemental?! (pretty generic but otherwise there are no motivations 
 
 ##  Colouring  ##
 
-Natural: Use 4096
-Magical/Surreal: Use 24 Bits
+Artificial: Use 4096
 
 * Colouring of potion
     - Randomised, roguelike fashion
-    - Choose Col(R40, G40, B40) from set of finite cards:
-        39, 39, 19, 19, 0, 0
+    - Choose Col(RGB) from set of finite cards:
+        255, 255, 128, 128, 0, 0
     - MULTIPLY blend chosen colour with white texture
 
 
@@ -146,14 +145,8 @@ see SAVE_FORMAT.md
     - Health: Regen per time
     - Magic: Out power per time
     - "I somewhat doubt this now..." --Torvald, 2017-03-12
+    - "It won't work." --Torvald, 2017-04-22
 
-
-## Resource management ##
-
-* Tools/Weapons have durability
-    - And NOTHING IS INDESTRUCTIBLE (just cooldown time if they are "endgame" items, but not the weapon with highest damage -- see how Master Sword works in Zelda BotW)
-        - Hookshots are the exception!
-    - I was against it, but now I think it would make the game more playable --Torvald, 2017-03-12
 
 
 ## Civilisation ##

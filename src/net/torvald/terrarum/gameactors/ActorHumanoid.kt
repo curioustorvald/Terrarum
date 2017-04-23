@@ -138,7 +138,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
 
     private val nullItem = object : InventoryItem() {
-        override val id: Int = 0
+        override var id: Int = 0
         override val isUnique: Boolean = false
         override var baseMass: Double = 0.0
         override var baseToolSize: Double? = null

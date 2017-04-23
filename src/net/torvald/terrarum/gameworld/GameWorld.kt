@@ -225,6 +225,8 @@ class GameWorld(val width: Int, val height: Int) {
     fun inflctTerrainDamage(x: Int, y: Int, damage: Float): Boolean {
         val addr = LandUtil.getTileAddr(x, y)
 
+        //println("[GameWorld] ($x, $y) Damage: $damage")
+
         if (terrainDamages[addr] == null) { // add new
             terrainDamages[addr] = damage
         }
@@ -238,7 +240,7 @@ class GameWorld(val width: Int, val height: Int) {
         //println("[GameWorld] accumulated damage: ${terrainDamages[addr]}")
 
         // remove tile from the world
-        if (terrainDamages[addr]!! >= TileCodex[getTileFromTerrain(x, y)].strength) {
+        if (terrainDamages[addr] ?: 0f >= TileCodex[getTileFromTerrain(x, y)].strength) {
             setTileTerrain(x, y, 0)
             return true
         }

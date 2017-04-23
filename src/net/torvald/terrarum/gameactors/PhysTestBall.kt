@@ -16,7 +16,7 @@ class PhysTestBall : ActorWithPhysics(Actor.RenderOrder.MIDDLE, immobileBody = t
 
     init {
         setHitboxDimension(16, 16, 0, 0)
-        mass = 10.0
+        avBaseMass = 10.0
         density = 200.0
 
         color = RoguelikeRandomiser.composeColourFrom(RoguelikeRandomiser.POTION_PRIMARY_COLSET)

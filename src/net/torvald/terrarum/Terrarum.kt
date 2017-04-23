@@ -159,6 +159,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
     val STATE_ID_TEST_TTY = 0x102
     val STATE_ID_TEST_BLUR = 0x103
     val STATE_ID_TEST_SHADER = 0x104
+    val STATE_ID_TEST_REFRESHRATE = 0x105
     val STATE_ID_TEST_INPUT = 0x106
 
     val STATE_ID_TEST_UI1 = 0x110
@@ -197,7 +198,7 @@ object Terrarum : StateBasedGame(GAME_NAME) {
             "${VERSION_RAW.ushr(24)}.${VERSION_RAW.and(0xFF0000).ushr(16)}.${VERSION_RAW.and(0xFFFF)}"
     const val NAME = "Terrarum"
 
-    var UPDATE_DELTA: Int = 0
+    var delta: Int = 0
 
     // these properties goes into the GameContainer
 
@@ -332,6 +333,8 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         //addState(StateControllerRumbleTest())
         //addState(StateMidiInputTest())
         //addState(StateNewRunesTest())
+        //addState(StateStutterTest())
+
 
         ingame = StateInGame(); addState(ingame)
 

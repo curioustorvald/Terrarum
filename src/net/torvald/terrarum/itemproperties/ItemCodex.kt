@@ -46,7 +46,7 @@ object ItemCodex {
         // tile items (blocks and walls are the same thing basically)
         for (i in ITEM_TILES + ITEM_WALLS) {
             itemCodex[i] = object : InventoryItem() {
-                override val id: Int = i
+                override var id: Int = i
                 override val isUnique: Boolean = false
                 override var baseMass: Double = TileCodex[i].density / 1000.0
                 override var baseToolSize: Double? = null
@@ -54,6 +54,7 @@ object ItemCodex {
                 override val originalName = TileCodex[i % ITEM_WALLS.first].nameKey
                 override var consumable = true
                 override var inventoryCategory = Category.BLOCK
+                override var isDynamic = true
 
                 init {
                     itemProperties[IVKey.ITEMTYPE] = if (i in ITEM_TILES)
@@ -103,19 +104,19 @@ object ItemCodex {
 
         // test copper pickaxe
         itemCodex[ITEM_STATIC.first] = object : InventoryItem() {
-            override val id = ITEM_STATIC.first
+            override var id = ITEM_STATIC.first
             override val isUnique = false
             override val originalName = "Test Pick"
             override var baseMass = 10.0
             override var baseToolSize: Double? = 10.0
             override var consumable = false
-            override var maxDurability = 147//606 // this much tiles before breaking
+            override var maxDurability = 64//606 // this much tiles before breaking
             override var durability = maxDurability.toFloat()
             override var equipPosition = EquipPosition.HAND_GRIP
             override var inventoryCategory = Category.TOOL
 
             private val testmaterial = Material(
-                    0,0,0,0,0,0,0,0,14,0.0 // quick test material Steel
+                    0,0,0,0,0,0,0,0,1,0.0 // quick test material Stone
             )
 
             init {
@@ -131,6 +132,7 @@ object ItemCodex {
                 using = true
 
                 // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
+                // return false if hitting actors
                 Terrarum.ingame!!.actorContainer.forEach {
                     if (it is ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
                         return false
@@ -144,11 +146,12 @@ object ItemCodex {
                 // filter passed, do the job
                 val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
-                return Terrarum.ingame!!.world.inflctTerrainDamage(
+                Terrarum.ingame!!.world.inflctTerrainDamage(
                         gc.mouseTileX,
                         gc.mouseTileY,
-                        Calculate.pickaxePower(testmaterial) * swingDmgToFrameDmg.toFloat()
+                        Calculate.pickaxePower(Terrarum.ingame!!.player!!, testmaterial) * swingDmgToFrameDmg.toFloat()
                 )
+                return true
             }
 
             override fun endPrimaryUse(gc: GameContainer, delta: Int): Boolean {
@@ -164,6 +167,9 @@ object ItemCodex {
         // read from save (if applicable) and fill dynamicItemDescription
     }
 
+    /**
+     * Returns clone of the item in the Codex
+     */
     operator fun get(code: Int): InventoryItem {
         if (code <= ITEM_STATIC.endInclusive) // generic item
             return itemCodex[code]!!.clone() // from CSV

@@ -1,10 +1,15 @@
-"idst";"forcemod";"comments"
-"rock";       "1";
-"cupr";       "2";
-"egls";       "4";"elven glass"
-"iron";       "5";
-"argn";       "9";"argentum"
-"stal";      "14";"steel"
-"eaur";      "21";"elven aurichalcum"
-"tial";      "33";"titanium alloy"
-"admt";      "71";"adamant metal"
+"idst";"forcemod";"endurance";"comments"
+"rock";       "1";     "0.42";
+"cupr";       "2";     "1.00";"copper"
+"egls";       "4";     "0.82";"elven glass"
+"iron";       "5";     "1.42";
+"argn";       "9";     "0.91";"argentum/silver"
+"stal";      "14";     "1.73";"steel"
+"eaur";      "21";     "1.36";"elven aurichalcum"
+"tial";      "33";     "2.16";"titanium alloy"
+"admt";      "71";     "3.42";"adamant"
+
+# forcemod: related to attack points
+#   Attack points = `4 * forcemod.sqrt()` for each strike
+
+# endurance: multiplier, using copper as reference; determines durability of tools/weapons/armours/etc.
