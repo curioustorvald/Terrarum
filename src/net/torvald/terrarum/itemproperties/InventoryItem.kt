@@ -14,7 +14,9 @@ import org.newdawn.slick.GameContainer
  */
 abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
 
-    abstract var id: Int
+    abstract var dynamicID: Int
+    abstract val originalID: Int // WUT?! using init does not work!!
+
 
     /**
      *
@@ -60,7 +62,7 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
      *
      *         The opposite of this is called STATIC and their example is a Block.
      */
-    open val isDynamic = false
+    abstract val isDynamic: Boolean
 
     /**
      * Where to equip the item
@@ -90,7 +92,6 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
             else
                 throw NullPointerException("null input; nullify baseToolSize instead :p")
         }
-    var originalID = id
 
     /**
      * Scale of the item.
@@ -165,16 +166,16 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
 
     
     override fun toString(): String {
-        return id.toString()
+        return dynamicID.toString()
     }
 
     override fun hashCode(): Int {
-        return id
+        return dynamicID
     }
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
-        return id == (other as InventoryItem).id
+        return dynamicID == (other as InventoryItem).dynamicID
     }
 
     fun unsetCustomName() {
@@ -183,7 +184,7 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
         nameColour = Color.white
     }
 
-    override fun compareTo(other: InventoryItem): Int = (this.id - other.id).sign()
+    override fun compareTo(other: InventoryItem): Int = (this.dynamicID - other.dynamicID).sign()
 
     fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else 0
 

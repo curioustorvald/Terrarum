@@ -87,7 +87,7 @@ object PlayerBuilderSigrid {
                 Tile.SANDSTONE_RED, Tile.STONE, Tile.STONE_BRICKS,
                 Tile.STONE_QUARRIED, Tile.STONE_TILE_WHITE, Tile.TORCH
         )
-        tiles.forEach { p.inventory.add(it, 999) }
+        tiles.forEach { p.addItem(it, 999) }
         p.inventory.add(ItemCodex.ITEM_STATIC.first)
 
 

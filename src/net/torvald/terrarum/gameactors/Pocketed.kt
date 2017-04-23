@@ -50,7 +50,7 @@ interface Pocketed {
     fun removeItem(itemID: Int, count: Int = 1) = inventory.remove(ItemCodex[itemID], count)
     fun removeItem(item: InventoryItem, count: Int = 1) = inventory.remove(item, count)
 
-    fun hasItem(item: InventoryItem) = inventory.contains(item.id)
+    fun hasItem(item: InventoryItem) = inventory.contains(item.dynamicID)
     fun hasItem(id: Int) = inventory.contains(id)
 
 

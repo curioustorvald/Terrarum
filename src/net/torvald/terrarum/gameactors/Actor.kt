@@ -6,6 +6,8 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.itemproperties.ItemCodex
 import org.newdawn.slick.GameContainer
 
+typealias ActorID = Int
+
 /**
  * @param renderOrder invisible/technical must use "Actor.RenderOrder.MIDDLE"
  *
@@ -26,7 +28,7 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
      * Valid RefID is equal to or greater than 16777216.
      * @return Reference ID. (16777216-0x7FFF_FFFF)
      */
-    open var referenceID: Int = generateUniqueReferenceID()
+    open var referenceID: ActorID = generateUniqueReferenceID()
     var actorValue = ActorValue()
     @Volatile var flagDespawn = false
 
@@ -46,8 +48,8 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
      *
      * override var referenceID: Int = generateUniqueReferenceID()
      */
-    fun generateUniqueReferenceID(): Int {
-        fun hasCollision(value: Int) =
+    fun generateUniqueReferenceID(): ActorID {
+        fun hasCollision(value: ActorID) =
                 try {
                     Terrarum.ingame!!.theGameHasActor(value) ||
                     value < ItemCodex.ACTOR_ID_MIN ||

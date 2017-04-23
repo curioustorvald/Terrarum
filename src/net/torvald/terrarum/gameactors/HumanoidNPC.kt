@@ -43,7 +43,8 @@ open class HumanoidNPC(
 
     // we're having InventoryItem data so that this class could be somewhat universal
     override var itemData: InventoryItem = object : InventoryItem() {
-        override var id = referenceID
+        override var dynamicID = referenceID
+        override val originalID = dynamicID
         override val isUnique = true
         override var baseMass: Double
             get() = actorValue.getAsDouble(AVKey.BASEMASS)!!
@@ -57,6 +58,7 @@ open class HumanoidNPC(
         override var inventoryCategory = "npc"
         override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "NPC"
         override var consumable = true
+        override val isDynamic = false
 
         override fun secondaryUse(gc: GameContainer, delta: Int): Boolean {
             try {

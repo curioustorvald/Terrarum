@@ -35,26 +35,33 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
 
     fun add(itemID: Int, count: Int = 1) = add(ItemCodex[itemID], count)
     fun add(item: InventoryItem, count: Int = 1) {
-        if (item.id == Player.PLAYER_REF_ID || item.id == 0x51621D) // do not delete this magic
+
+        if (item.dynamicID == Player.PLAYER_REF_ID || item.dynamicID == 0x51621D) // do not delete this magic
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
         if (Terrarum.ingame != null &&
-            (item.id == Terrarum.ingame?.player?.referenceID))
+            (item.dynamicID == Terrarum.ingame?.player?.referenceID))
             throw IllegalArgumentException("Attempted to put active player into the inventory.")
+
+
 
         // If we already have the item, increment the amount
         // If not, add item with specified amount
-        val existingItem = getByID(item.id)
+        val existingItem = getByDynamicID(item.dynamicID)
 
-        if (existingItem != null) { // if the item already exists
-            val newCount = getByID(item.id)!!.amount + count
+        // if the item already exists
+        if (existingItem != null) {
+            val newCount = getByDynamicID(item.dynamicID)!!.amount + count
             itemList.remove(existingItem)
             itemList.add(InventoryPair(existingItem.item, newCount))
         }
-        else { // new item
+        // new item
+        else {
             if (item.isDynamic) {
                 // assign new ID
-                item.originalID = item.id
-                item.id = InventoryItem.generateNewDynamicID(this)
+
+                println("[ActorInventory] new dynamic item detected: ${item.originalID}")
+
+                item.dynamicID = InventoryItem.generateNewDynamicID(this)
             }
             itemList.add(InventoryPair(item, count))
         }
@@ -63,11 +70,11 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
 
     fun remove(itemID: Int, count: Int = 1) = remove(ItemCodex[itemID], count)
     fun remove(item: InventoryItem, count: Int = 1) {
-        val existingItem = getByID(item.id)
+        val existingItem = getByDynamicID(item.dynamicID)
         if (existingItem != null) { // if the item already exists
-            val newCount = getByID(item.id)!!.amount - count
+            val newCount = getByDynamicID(item.dynamicID)!!.amount - count
             if (newCount < 0) {
-                throw Error("Tried to remove $count of $item, but the inventory only contains ${getByID(item.id)!!.amount} of them.")
+                throw Error("Tried to remove $count of $item, but the inventory only contains ${getByDynamicID(item.dynamicID)!!.amount} of them.")
             }
             else if (newCount > 0) {
                 // decrement count
@@ -141,6 +148,8 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             item.durability -= (baseDamagePerSwing * swingDmgToFrameDmg).toFloat()
             if (item.durability <= 0)
                 remove(item, 1)
+
+            println("[ActorInventory] consumed; ${item.durability}")
         }
     }
 
@@ -150,13 +159,13 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
 
 
 
-    fun contains(item: InventoryItem) = contains(item.id)
+    fun contains(item: InventoryItem) = contains(item.dynamicID)
     fun contains(id: Int) =
             if (itemList.size == 0)
                 false
             else
                 itemList.binarySearch(id) >= 0
-    fun getByID(id: Int): InventoryPair? {
+    fun getByDynamicID(id: Int): InventoryPair? {
         if (itemList.size == 0)
             return null
 
@@ -187,9 +196,9 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
 
             val midVal = get(mid).item
 
-            if (ID > midVal.id)
+            if (ID > midVal.dynamicID)
                 low = mid + 1
-            else if (ID < midVal.id)
+            else if (ID < midVal.dynamicID)
                 high = mid - 1
             else
                 return mid // key found

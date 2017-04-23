@@ -47,7 +47,8 @@ class StateUITest : BasicGameState() {
             init {
                 itemProperties[IVKey.ITEMTYPE] = IVKey.ItemType.HAMMER
             }
-            override var id: Int = 5656
+            override var dynamicID: Int = 5656
+            override val originalID = dynamicID
             override val isUnique: Boolean = true
             override var originalName: String = "Test tool"
             override var baseMass: Double = 12.0
@@ -56,25 +57,28 @@ class StateUITest : BasicGameState() {
             override var maxDurability: Int = 143
             override var durability: Float = 64f
             override var consumable = false
+            override val isDynamic = true
         })
-        actor.inventory.getByID(5656)!!.item.name = "Test tool"
+        actor.inventory.getByDynamicID(5656)!!.item.name = "Test tool"
 
         actor.inventory.add(object : InventoryItem() {
             init {
                 itemProperties[IVKey.ITEMTYPE] = IVKey.ItemType.ARTEFACT
             }
-            override var id: Int = 4633
+            override var dynamicID: Int = 4633
+            override val originalID = dynamicID
             override val isUnique: Boolean = true
             override var originalName: String = "CONTEXT_ITEM_QUEST_NOUN"
             override var baseMass: Double = 1.4
             override var baseToolSize: Double? = null
             override var inventoryCategory: String = InventoryItem.Category.MISC
             override var consumable = false
+            override val isDynamic = false
         })
 
         actor.inventory.add(ItemCodex[16], 543)
 
-        actor.inventory.getByID(Tile.STONE)!!.item equipTo actor
+        actor.inventory.getByDynamicID(Tile.STONE)!!.item equipTo actor
     }
 
     override fun init(container: GameContainer?, game: StateBasedGame?) {

@@ -175,11 +175,11 @@ class UIInventory(
                         val sortListItem = inventorySortList[k + itemsScrollOffset]
                         items[k].item = sortListItem.item
                         items[k].amount = sortListItem.amount
-                        items[k].itemImage = ItemCodex.getItemImage(sortListItem.item.id)
+                        items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
 
                         // set quickslot number
                         for (qs in 1..QUICKSLOT_MAX) {
-                            if (-sortListItem.item.id == actorValue.getAsInt(AVKey.__PLAYER_QSPREFIX + qs)) {
+                            if (-sortListItem.item.dynamicID == actorValue.getAsInt(AVKey.__PLAYER_QSPREFIX + qs)) {
                                 items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                                 break
                             }

@@ -7,6 +7,9 @@ import java.util.HashSet
 /**
  * Created by minjaesong on 16-02-15.
  */
+
+typealias FactionID = Int
+
 class Faction(name: String) : Comparable<Faction> {
 
     var factionName: String = name
@@ -14,7 +17,7 @@ class Faction(name: String) : Comparable<Faction> {
     lateinit var factionNeutral: HashSet<String>
     lateinit var factionHostile: HashSet<String>
     lateinit var factionFearful: HashSet<String>
-    var referenceID: Long = generateUniqueID()
+    var referenceID: FactionID = generateUniqueID()
 
     init {
         factionAmicable = HashSet<String>()
@@ -59,10 +62,11 @@ class Faction(name: String) : Comparable<Faction> {
         factionFearful.remove(faction)
     }
 
-    private fun generateUniqueID(): Long {
-        var ret: Long
+    /** Valid range: -2147483648..-1 (all the negative number) */
+    private fun generateUniqueID(): Int {
+        var ret: Int
         do {
-            ret = HQRNG().nextLong().or(0x80000000L).and(0xFFFFFFFFL) // guaranteed to be 2147483648..4294967295
+            ret = HQRNG().nextInt(2147483647).plus(1).unaryMinus()
         } while (FactionCodex.hasFaction(ret)) // check for collision
         return ret
     }

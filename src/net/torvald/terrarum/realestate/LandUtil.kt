@@ -17,9 +17,9 @@ object LandUtil {
     /**
      * Get owner ID as an Actor/Faction
      */
-    fun resolveOwner(id: TileAddress): Any =
-            if (id < 0x80000000L)
-                Terrarum.ingame!!.getActorByID(id.toInt())
+    fun resolveOwner(id: Int): Any =
+            if (id >= 0)
+                Terrarum.ingame!!.getActorByID(id)
             else
                 FactionCodex.getFactionByID(id)
 }
