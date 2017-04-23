@@ -47,7 +47,7 @@ class StateUITest : BasicGameState() {
             init {
                 itemProperties[IVKey.ITEMTYPE] = IVKey.ItemType.HAMMER
             }
-            override val id: Int = 5656
+            override var id: Int = 5656
             override val isUnique: Boolean = true
             override var originalName: String = "Test tool"
             override var baseMass: Double = 12.0
@@ -63,7 +63,7 @@ class StateUITest : BasicGameState() {
             init {
                 itemProperties[IVKey.ITEMTYPE] = IVKey.ItemType.ARTEFACT
             }
-            override val id: Int = 4633
+            override var id: Int = 4633
             override val isUnique: Boolean = true
             override var originalName: String = "CONTEXT_ITEM_QUEST_NOUN"
             override var baseMass: Double = 1.4

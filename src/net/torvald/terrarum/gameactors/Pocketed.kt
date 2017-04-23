@@ -25,7 +25,7 @@ interface Pocketed {
         }
 
         inventory.itemEquipped[item.equipPosition] = null
-        item.effectOnUnequip(Terrarum.appgc, Terrarum.UPDATE_DELTA)
+        item.effectOnUnequip(Terrarum.appgc, Terrarum.delta)
     }
 
     /**
@@ -37,7 +37,7 @@ interface Pocketed {
 
         if (item.equipPosition >= 0) {
             inventory.itemEquipped[item.equipPosition] = item
-            item.effectWhenEquipped(Terrarum.appgc, Terrarum.UPDATE_DELTA)
+            item.effectWhenEquipped(Terrarum.appgc, Terrarum.delta)
         }
     }
 
@@ -55,12 +55,13 @@ interface Pocketed {
 
 
     fun consumePrimary(item: InventoryItem) {
-        if (item.primaryUse(Terrarum.appgc, Terrarum.UPDATE_DELTA))
-            inventory.consumeItem(item) // consume on successful
+        if (item.primaryUse(Terrarum.appgc, Terrarum.delta)) {
+            inventory.consumeItem(this as Actor, item) // consume on successful
+        }
     }
 
     fun consumeSecondary(item: InventoryItem) {
-        if (item.secondaryUse(Terrarum.appgc, Terrarum.UPDATE_DELTA))
-            inventory.consumeItem(item) // consume on successful
+        if (item.secondaryUse(Terrarum.appgc, Terrarum.delta))
+            inventory.consumeItem(this as Actor, item) // consume on successful
     }
 }

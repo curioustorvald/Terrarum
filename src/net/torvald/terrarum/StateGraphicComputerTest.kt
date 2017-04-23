@@ -1,7 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.Terrarum.UPDATE_DELTA
+import net.torvald.terrarum.Terrarum.delta
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import net.torvald.terrarum.virtualcomputer.peripheral.PeripheralVideoCard
@@ -90,7 +90,7 @@ class StateGraphicComputerTest : BasicGameState() {
     var angle = 0.0
 
     override fun update(container: GameContainer, game: StateBasedGame?, delta: Int) {
-        UPDATE_DELTA = delta
+        Terrarum.delta = delta
 
         Terrarum.appgc.setTitle("VT — F: ${container.fps}" +
                                 " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M" +

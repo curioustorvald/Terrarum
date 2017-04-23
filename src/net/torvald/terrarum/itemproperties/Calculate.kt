@@ -1,7 +1,6 @@
 package net.torvald.terrarum.itemproperties
 
-import net.torvald.terrarum.gameactors.roundInt
-import net.torvald.terrarum.gameactors.sqrt
+import net.torvald.terrarum.gameactors.*
 
 /**
  * Created by SKYHi14 on 2017-04-17.
@@ -16,8 +15,8 @@ object Calculate {
      *
      * TODO Newtons as unit?
      */
-    fun pickaxePower(material: Material): Float {
-        return 4f * material.forceMod.toFloat().sqrt()
+    fun pickaxePower(actor: ActorHumanoid, material: Material): Float {
+        return (4.0 * material.forceMod.toDouble().sqrt() * (actor.avStrength / 1000.0)).toFloat()
     }
 
 

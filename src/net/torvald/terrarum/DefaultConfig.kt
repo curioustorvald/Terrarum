@@ -75,6 +75,10 @@ object DefaultConfig {
         jsonObject.addProperty("safetywarning", true)
 
 
+        jsonObject.addProperty("maxparticles", 768)
+
+
+
         return jsonObject
     }
 }

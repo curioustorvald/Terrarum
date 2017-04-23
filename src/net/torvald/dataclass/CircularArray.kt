@@ -1,4 +1,4 @@
-package net.torvald.terrarum
+package net.torvald.dataclass
 
 
 /**

@@ -9,7 +9,7 @@ import org.newdawn.slick.Image
 class ParticleTestRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOrder.BEHIND, 6000) {
 
     init {
-        body = Image("./assets/graphics/weathers/raindrop.tga")
+        body = Image("./assets/modules/basegame/weathers/raindrop.tga")
         val w = body.width.toDouble()
         val h = body.height.toDouble()
         hitbox.setFromWidthHeight(

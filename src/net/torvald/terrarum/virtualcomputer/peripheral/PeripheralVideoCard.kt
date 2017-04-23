@@ -158,7 +158,7 @@ class PeripheralVideoCard(val host: TerrarumComputer, val termW: Int = 80, val t
     private val spriteBuffer = ImageBuffer(VSprite.width * 2, VSprite.height)
 
     fun render(g: Graphics) {
-        cursorBlinkTimer += Terrarum.UPDATE_DELTA
+        cursorBlinkTimer += Terrarum.delta
         if (cursorBlinkTimer > cursorBlinkTime) {
             cursorBlinkTimer -= cursorBlinkTime
             cursorBlinkOn = !cursorBlinkOn

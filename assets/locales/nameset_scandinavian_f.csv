@@ -1,6 +1,11 @@
 # Nameset - Scandinavian
 # Data taken from www.behindthename.com
-# Translator note: this nameset does not contain name that has [ɹ](american english 'r') sound (except '-er'). i.e. for Korean, 'Carl' should be '카를', 'Aleksander' should be '알렉산더'.
+
+# Each column stands for the writing system:
+#   LatinAlph - Latin Alphabet; HangulKoKR - Hangul, Korean; CyrilRuRU - Cyrillic, Russian; etc.
+
+# Translator note: this nameset does not contain name that has [ɹ](american english 'r') sound
+#   (except '-er'). i.e. for Korean, 'Carl' should be '카를', 'Aleksander' should be '알렉산더'.
 
 "HEADER";"LatinAlph";"HangulKoKR";"KanaJaJP";"CyrilRuRU";"AlphElGR";"HanziZhCN";"HanziZhTW";"AksonThTH";"AlefbetHeIL"
 "NAMESET_SCAN_F_001";"Agnes";"아그네스";

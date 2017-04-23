@@ -1,8 +1,9 @@
 package net.torvald.terrarum
 
+import net.torvald.dataclass.CircularArray
 import net.torvald.imagefont.GameFontBase
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.Terrarum.UPDATE_DELTA
+import net.torvald.terrarum.Terrarum.delta
 import net.torvald.terrarum.audio.AudioResourceLibrary
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.console.*
@@ -40,6 +41,7 @@ import java.lang.management.ManagementFactory
 import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
+import javax.swing.JOptionPane
 import kotlin.collections.HashMap
 
 /**
@@ -48,15 +50,13 @@ import kotlin.collections.HashMap
 class StateInGame : BasicGameState() {
     private val ACTOR_UPDATE_RANGE = 4096
 
-    internal var game_mode = 0
-
     lateinit var world: GameWorld
 
     /**
      * list of Actors that is sorted by Actors' referenceID
      */
-    val ACTORCONTAINER_INITIAL_SIZE = 128
-    val PARTICLES_MAX = 768
+    val ACTORCONTAINER_INITIAL_SIZE = 64
+    val PARTICLES_MAX = Terrarum.getConfigInt("maxparticles")
     val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX)
@@ -66,11 +66,6 @@ class StateInGame : BasicGameState() {
     private val actorsRenderMiddle = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
     private val actorsRenderMidTop = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
     private val actorsRenderFront  = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
-
-    lateinit var consoleHandler: UIHandler
-    lateinit var debugWindow: UIHandler
-    lateinit var notifier: UIHandler
-
 
     var playableActorDelegate: PlayableActorDelegate? = null // DO NOT LATEINIT!
         private set
@@ -95,7 +90,12 @@ class StateInGame : BasicGameState() {
     val KEY_LIGHTMAP_RENDER = Key.F7
     val KEY_LIGHTMAP_SMOOTH = Key.F8
 
-    // UI aliases (no pause)
+
+
+    lateinit var consoleHandler: UIHandler
+    lateinit var debugWindow: UIHandler
+    lateinit var notifier: UIHandler
+
     lateinit var uiPieMenu: UIHandler
     lateinit var uiQuickBar: UIHandler
     lateinit var uiInventoryPlayer: UIHandler
@@ -103,10 +103,12 @@ class StateInGame : BasicGameState() {
     lateinit var uiVitalPrimary: UIHandler
     lateinit var uiVitalSecondary: UIHandler
     lateinit var uiVitalItem: UIHandler // itemcount/durability of held block or active ammo of held gun. As for the block, max value is 500.
-    lateinit var uiAliases: Array<UIHandler>
 
-    // UI aliases (pause)
-    val uiAlasesPausing = ArrayList<UIHandler>()
+    // UI aliases
+    lateinit var uiAliases: ArrayList<UIHandler>
+        private set
+    lateinit var uiAlasesPausing: ArrayList<UIHandler>
+        private set
 
     var paused: Boolean = false
         get() = uiAlasesPausing.map { if (it.isOpened) 1 else 0 }.sum() > 0
@@ -212,7 +214,7 @@ class StateInGame : BasicGameState() {
 
 
         // batch-process uiAliases
-        uiAliases = arrayOf(
+        uiAliases = arrayListOf(
                 uiPieMenu,
                 uiQuickBar,
                 uiInventoryPlayer,
@@ -220,6 +222,9 @@ class StateInGame : BasicGameState() {
                 uiVitalPrimary,
                 uiVitalSecondary,
                 uiVitalItem
+        )
+        uiAlasesPausing = arrayListOf(
+                consoleHandler
         )
         uiAlasesPausing.forEach { uiContainer.add(it) } // put them all to the UIContainer
         uiAliases.forEach { uiContainer.add(it) } // put them all to the UIContainer
@@ -238,7 +243,7 @@ class StateInGame : BasicGameState() {
 
     override fun update(gc: GameContainer, sbg: StateBasedGame, delta: Int) {
         particlesActive = 0
-        UPDATE_DELTA = delta
+        Terrarum.delta = delta
         setAppTitle()
 
 
@@ -337,7 +342,7 @@ class StateInGame : BasicGameState() {
         }
 
         playableActorDelegate = newActor
-        WorldSimulator(player, UPDATE_DELTA)
+        WorldSimulator(player, delta)
     }
 
     private fun changePossession(refid: Int) {
@@ -352,7 +357,7 @@ class StateInGame : BasicGameState() {
         // accept new delegate
         playableActorDelegate = PlayableActorDelegate(getActorByID(refid) as ActorHumanoid)
         playableActorDelegate!!.actor.collisionType = ActorWithPhysics.COLLISION_KINEMATIC
-        WorldSimulator(player, UPDATE_DELTA)
+        WorldSimulator(player, delta)
     }
 
     private fun setAppTitle() {
@@ -525,75 +530,15 @@ class StateInGame : BasicGameState() {
         }
 
         GameController.keyPressed(key, c)
-
-        if (canPlayerControl) {
-            player?.keyPressed(key, c)
-        }
-
-        if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
-            || key == Terrarum.getConfigInt("keyquicksel")) {
-            uiPieMenu.setAsOpen()
-            uiQuickBar.setAsClose()
-        }
-
-        uiContainer.forEach { it.keyPressed(key, c) } // for KeyboardControlled UIcanvases
     }
-
-    override fun keyReleased(key: Int, c: Char) {
-        GameController.keyReleased(key, c)
-
-        if (Terrarum.getConfigIntArray("keyquickselalt").contains(key)
-            || key == Terrarum.getConfigInt("keyquicksel")) {
-            uiPieMenu.setAsClose()
-            uiQuickBar.setAsOpen()
-        }
-
-        uiContainer.forEach { it.keyReleased(key, c) } // for KeyboardControlled UIcanvases
-    }
-
-    override fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        GameController.mouseMoved(oldx, oldy, newx, newy)
-
-        uiContainer.forEach { it.mouseMoved(oldx, oldy, newx, newy) } // for MouseControlled UIcanvases
-    }
-
-    override fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        GameController.mouseDragged(oldx, oldy, newx, newy)
-
-        uiContainer.forEach { it.mouseDragged(oldx, oldy, newx, newy) } // for MouseControlled UIcanvases
-    }
-
-    override fun mousePressed(button: Int, x: Int, y: Int) {
-        GameController.mousePressed(button, x, y)
-
-        uiContainer.forEach { it.mousePressed(button, x, y) } // for MouseControlled UIcanvases
-    }
-
-    override fun mouseReleased(button: Int, x: Int, y: Int) {
-        GameController.mouseReleased(button, x, y)
-
-        uiContainer.forEach { it.mouseReleased(button, x, y) } // for MouseControlled UIcanvases
-    }
-
-    override fun mouseWheelMoved(change: Int) {
-        GameController.mouseWheelMoved(change)
-
-        uiContainer.forEach { it.mouseWheelMoved(change) } // for MouseControlled UIcanvases
-    }
-
-    override fun controllerButtonPressed(controller: Int, button: Int) {
-        GameController.controllerButtonPressed(controller, button)
-
-        uiContainer.forEach { it.controllerButtonPressed(controller, button) } // for GamepadControlled UIcanvases
-
-        // TODO use item on Player
-    }
-
-    override fun controllerButtonReleased(controller: Int, button: Int) {
-        GameController.controllerButtonReleased(controller, button)
-
-        uiContainer.forEach { it.controllerButtonReleased(controller, button) } // for GamepadControlled UIcanvases
-    }
+    override fun keyReleased(key: Int, c: Char) { GameController.keyReleased(key, c) }
+    override fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) { GameController.mouseMoved(oldx, oldy, newx, newy) }
+    override fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) { GameController.mouseDragged(oldx, oldy, newx, newy) }
+    override fun mousePressed(button: Int, x: Int, y: Int) { GameController.mousePressed(button, x, y) }
+    override fun mouseReleased(button: Int, x: Int, y: Int) { GameController.mouseReleased(button, x, y) }
+    override fun mouseWheelMoved(change: Int) { GameController.mouseWheelMoved(change) }
+    override fun controllerButtonPressed(controller: Int, button: Int) { GameController.controllerButtonPressed(controller, button) }
+    override fun controllerButtonReleased(controller: Int, button: Int) { GameController.controllerButtonReleased(controller, button) }
 
     override fun getID(): Int = Terrarum.STATE_ID_GAME
 
@@ -858,8 +803,10 @@ class StateInGame : BasicGameState() {
         if (index < 0) {
             index = actorContainerInactive.binarySearch(ID)
 
-            if (index < 0)
+            if (index < 0) {
+                JOptionPane.showMessageDialog(null, "Actor with ID $ID does not exist.", null, JOptionPane.ERROR_MESSAGE)
                 throw IllegalArgumentException("Actor with ID $ID does not exist.")
+            }
             else
                 return actorContainerInactive[index]
         }

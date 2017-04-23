@@ -20,7 +20,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, maxLifeTime: Int? = null
     /** Will NOT actually delete from the CircularArray */
     @Volatile var flagDespawn = false
 
-    override fun run() = update(Terrarum.appgc, Terrarum.UPDATE_DELTA)
+    override fun run() = update(Terrarum.appgc, Terrarum.delta)
 
     var isNoSubjectToGrav = false
     var dragCoefficient = 3.0

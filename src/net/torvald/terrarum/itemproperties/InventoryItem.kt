@@ -1,6 +1,8 @@
 package net.torvald.terrarum.itemproperties
 
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.ItemValue
+import net.torvald.terrarum.gameactors.ActorInventory
 import net.torvald.terrarum.gameactors.Pocketed
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.langpack.Lang
@@ -12,7 +14,7 @@ import org.newdawn.slick.GameContainer
  */
 abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
 
-    abstract val id: Int
+    abstract var id: Int
 
     /**
      *
@@ -50,11 +52,22 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
     abstract var consumable: Boolean
 
     /**
+     * DYNAMIC means the item ID should be generated on the fly whenever the item is created.
+     *         This is to be used with weapons/armours/etc where multiple instances can exist, and
+     *         each of them should be treated as different item.
+     *
+     *         ID Range: 32768..1048575 (ItemCodex.ITEM_DYNAMIC)
+     *
+     *         The opposite of this is called STATIC and their example is a Block.
+     */
+    open val isDynamic = false
+
+    /**
      * Where to equip the item
      */
-    open var equipPosition: Int = EquipPosition.NULL
+    open val equipPosition: Int = EquipPosition.NULL
 
-    open var material: Material? = null
+    open val material: Material? = null
 
     /**
      * Apparent mass of the item. (basemass * scale^3)
@@ -77,6 +90,7 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
             else
                 throw NullPointerException("null input; nullify baseToolSize instead :p")
         }
+    var originalID = id
 
     /**
      * Scale of the item.
@@ -225,5 +239,15 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
         (clonedItem as InventoryItem).itemProperties = this.itemProperties.clone()
 
         return clonedItem
+    }
+
+    companion object {
+        fun generateNewDynamicID(inventory: ActorInventory): Int {
+            var ret: Int
+            do {
+                ret = HQRNG().nextInt(ItemCodex.ITEM_DYNAMIC.endInclusive + 1 - ItemCodex.ITEM_DYNAMIC.first) + ItemCodex.ITEM_DYNAMIC.first
+            } while (inventory.contains(ret))
+            return ret
+        }
     }
 }
