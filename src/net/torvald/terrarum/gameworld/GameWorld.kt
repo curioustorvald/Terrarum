@@ -34,9 +34,17 @@ class GameWorld(val width: Int, val height: Int) {
     var gravitation: Vector2 = Vector2(0.0, 9.8)
     /** RGB in Integer */
     var globalLight: Int = 0
+
+
+
     val time: WorldTime
+    val economy = GameEconomy()
+
+
 
     var generatorSeed: Long = 0
+
+
 
     init {
         this.spawnX = width / 2

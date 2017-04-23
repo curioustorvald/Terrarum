@@ -9,7 +9,7 @@ import java.util.*
 object FactionCodex {
     val factionContainer = ArrayList<Faction>()
 
-    fun hasFaction(ID: Long): Boolean =
+    fun hasFaction(ID: FactionID): Boolean =
             if (factionContainer.size == 0)
                 false
             else
@@ -22,7 +22,7 @@ object FactionCodex {
         insertionSortLastElem(factionContainer) // we can do this as we are only adding single actor
     }
 
-    fun getFactionByID(ID: Long): Faction {
+    fun getFactionByID(ID: FactionID): Faction {
         if (factionContainer.size == 0) throw IllegalArgumentException("Faction with ID $ID does not exist.")
 
         val index = factionContainer.binarySearch(ID)
@@ -45,7 +45,7 @@ object FactionCodex {
         arr[j + 1] = x
     }
 
-    private fun ArrayList<Faction>.binarySearch(ID: Long): Int {
+    private fun ArrayList<Faction>.binarySearch(ID: FactionID): Int {
         // code from collections/Collections.kt
         var low = 0
         var high = factionContainer.size - 1

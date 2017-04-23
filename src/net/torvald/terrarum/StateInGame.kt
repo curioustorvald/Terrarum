@@ -217,17 +217,17 @@ class StateInGame : BasicGameState() {
         uiAliases = arrayListOf(
                 uiPieMenu,
                 uiQuickBar,
-                uiInventoryPlayer,
-                //uiInventoryContainer,
                 uiVitalPrimary,
                 uiVitalSecondary,
                 uiVitalItem
         )
         uiAlasesPausing = arrayListOf(
+                uiInventoryPlayer,
+                //uiInventoryContainer,
                 consoleHandler
         )
-        uiAlasesPausing.forEach { uiContainer.add(it) } // put them all to the UIContainer
-        uiAliases.forEach { uiContainer.add(it) } // put them all to the UIContainer
+        uiAlasesPausing.forEach { addUI(it) } // put them all to the UIContainer
+        uiAliases.forEach { addUI(it) } // put them all to the UIContainer
 
 
 
@@ -793,6 +793,15 @@ class StateInGame : BasicGameState() {
 
     fun addParticle(particle: ParticleBase) {
         particlesContainer.add(particle)
+    }
+
+    fun addUI(ui: UIHandler) {
+        // check for exact duplicates
+        if (uiContainer.contains(ui)) {
+            throw IllegalArgumentException("Exact copy of the UI already exists: The instance of ${ui.UI.javaClass.simpleName}")
+        }
+
+        uiContainer.add(ui)
     }
 
     fun getActorByID(ID: Int): Actor {

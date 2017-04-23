@@ -91,7 +91,8 @@ class UIItemInventoryElem(
             // this one-liner sets color
             g.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
             g.drawString(
-                    item!!.name + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "") +
+                    "${item!!.dynamicID}/${item!!.originalID}" + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "") +
+                    //item!!.name + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "") +
                     (if (equippedSlot != null) "  ${0xE081.toChar()}\$$equippedSlot" else ""),
                     posX + textOffsetX,
                     posY + textOffsetY
@@ -135,6 +136,7 @@ class UIItemInventoryElem(
 
     override fun mousePressed(button: Int, x: Int, y: Int) {
         if (item != null && Terrarum.ingame != null) {
+
             // equip da shit
             val itemEquipSlot = item!!.equipPosition
             val player = Terrarum.ingame!!.player

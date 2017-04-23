@@ -46,7 +46,8 @@ object ItemCodex {
         // tile items (blocks and walls are the same thing basically)
         for (i in ITEM_TILES + ITEM_WALLS) {
             itemCodex[i] = object : InventoryItem() {
-                override var id: Int = i
+                override var dynamicID: Int = i
+                override val originalID = dynamicID
                 override val isUnique: Boolean = false
                 override var baseMass: Double = TileCodex[i].density / 1000.0
                 override var baseToolSize: Double? = null
@@ -54,7 +55,7 @@ object ItemCodex {
                 override val originalName = TileCodex[i % ITEM_WALLS.first].nameKey
                 override var consumable = true
                 override var inventoryCategory = Category.BLOCK
-                override var isDynamic = true
+                override var isDynamic = false
 
                 init {
                     itemProperties[IVKey.ITEMTYPE] = if (i in ITEM_TILES)
@@ -77,7 +78,7 @@ object ItemCodex {
                     }
 
                     // return false if the tile is already there
-                    if (this.id == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY))
+                    if (this.dynamicID == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY))
                         return false
 
                     // filter passed, do the job
@@ -104,16 +105,19 @@ object ItemCodex {
 
         // test copper pickaxe
         itemCodex[ITEM_STATIC.first] = object : InventoryItem() {
-            override var id = ITEM_STATIC.first
+            override var dynamicID = ITEM_STATIC.first
+            override val originalID = dynamicID
             override val isUnique = false
-            override val originalName = "Test Pick"
+            override val originalName = ""
             override var baseMass = 10.0
             override var baseToolSize: Double? = 10.0
             override var consumable = false
-            override var maxDurability = 64//606 // this much tiles before breaking
+            override var maxDurability = 147//606 // this much tiles before breaking
             override var durability = maxDurability.toFloat()
             override var equipPosition = EquipPosition.HAND_GRIP
             override var inventoryCategory = Category.TOOL
+            override val isDynamic = true
+
 
             private val testmaterial = Material(
                     0,0,0,0,0,0,0,0,1,0.0 // quick test material Stone
@@ -121,7 +125,7 @@ object ItemCodex {
 
             init {
                 itemProperties[IVKey.ITEMTYPE] = IVKey.ItemType.PICK
-                name = "Steel pickaxe"
+                name = "Stone pickaxe"
             }
 
             override fun primaryUse(gc: GameContainer, delta: Int): Boolean {
@@ -184,16 +188,21 @@ object ItemCodex {
         }
     }
 
-    fun getItemImage(code: Int): Image {
-        if (code <= ITEM_TILES.endInclusive)
-            return TilesDrawer.tilesTerrain.getSubImage((code % 16) * 16, code / 16)
-        else if (code <= ITEM_WALLS.endInclusive) {
-            val img = TilesDrawer.tilesTerrain.getSubImage((code % 16) * 16, code / 16)
+    fun getItemImage(item: InventoryItem): Image {
+        // terrain
+        if (item.originalID in ITEM_TILES) {
+            return TilesDrawer.tilesTerrain.getSubImage((item.dynamicID % 16) * 16, item.originalID / 16)
+        }
+        // wall
+        else if (item.originalID in ITEM_WALLS) {
+            val img = TilesDrawer.tilesTerrain.getSubImage((item.originalID % 16) * 16, item.originalID / 16)
             img.setImageColor(wallOverlayColour.r, wallOverlayColour.g, wallOverlayColour.b)
             return img
         }
-        else if (code <= ITEM_WIRES.endInclusive)
-            return TilesDrawer.tilesWire.getSubImage((code % 16) * 16, code / 16)
+        // wire
+        else if (item.originalID in ITEM_WIRES) {
+            return TilesDrawer.tilesWire.getSubImage((item.originalID % 16) * 16, item.originalID / 16)
+        }
         else
             return itemImagePlaceholder
     }
