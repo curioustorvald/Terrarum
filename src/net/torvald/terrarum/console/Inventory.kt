@@ -39,7 +39,7 @@ internal object Inventory : ConsoleCommand {
                     if (it.amount == 0) {
                         EchoError("Unexpected zero-amounted item: ID ${it.item.dynamicID}")
                     }
-                    Echo("ID ${it.item.dynamicID}${if (it.amount > 1) " ($it.second)" else ""}")
+                    Echo("ID ${it.item}${if (it.amount > 1) " (${it.amount})" else ""}")
                 }
             }
         }

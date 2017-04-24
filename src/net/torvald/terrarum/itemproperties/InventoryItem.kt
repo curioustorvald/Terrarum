@@ -4,6 +4,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.ItemValue
 import net.torvald.terrarum.gameactors.ActorInventory
 import net.torvald.terrarum.gameactors.Pocketed
+import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.Color
@@ -111,7 +112,7 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
      */
     open var durability: Float = 0f
 
-    var using = false
+    @Transient var using = false // Always false when loaded from savegame
 
     /**
      * Effects applied continuously while in pocket
@@ -166,7 +167,7 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
 
     
     override fun toString(): String {
-        return dynamicID.toString()
+        return "$dynamicID/$originalID"
     }
 
     override fun hashCode(): Int {
@@ -242,13 +243,23 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
         return clonedItem
     }
 
+
+    fun generateUniqueDynamicID(inventory: ActorInventory): InventoryItem {
+        dynamicID = InventoryItem.generateUniqueDynamicID(inventory)
+        return this
+    }
+
     companion object {
-        fun generateNewDynamicID(inventory: ActorInventory): Int {
+        fun generateUniqueDynamicID(inventory: ActorInventory): Int {
             var ret: Int
             do {
-                ret = HQRNG().nextInt(ItemCodex.ITEM_DYNAMIC.endInclusive + 1 - ItemCodex.ITEM_DYNAMIC.first) + ItemCodex.ITEM_DYNAMIC.first
+                ret = ITEM_DYNAMIC.pickRandom()
             } while (inventory.contains(ret))
             return ret
         }
     }
 }
+
+fun IntRange.pickRandom() = HQRNG().nextInt(this.endInclusive - this.start + 1) + this.start // count() on 200 million entries? Se on vitun hyvää idea
+fun IntArray.pickRandom(): Int = this[HQRNG().nextInt(this.size)]
+fun DoubleArray.pickRandom(): Double = this[HQRNG().nextInt(this.size)]

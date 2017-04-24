@@ -4,6 +4,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.ActorValue
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.itemproperties.ItemCodex.ACTORID_MIN
 import org.newdawn.slick.GameContainer
 
 typealias ActorID = Int
@@ -20,6 +21,13 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
         MIDDLE, // actors
         MIDTOP, // bullets, thrown items
         FRONT   // fake tiles
+    }
+
+    companion object {
+        val RANGE_BEHIND = ACTORID_MIN..0x1FFF_FFFF
+        val RANGE_MIDDLE = 0x2000_0000..0x5FFF_FFFF
+        val RANGE_MIDTOP = 0x6000_0000..0x6FFF_FFFF
+        val RANGE_FRONT  = 0x7000_0000..0x7FFF_FFFF
     }
 
     abstract fun update(gc: GameContainer, delta: Int)
@@ -52,18 +60,12 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
         fun hasCollision(value: ActorID) =
                 try {
                     Terrarum.ingame!!.theGameHasActor(value) ||
-                    value < ItemCodex.ACTOR_ID_MIN ||
-                    value < when (renderOrder) {
-                        RenderOrder.BEHIND -> ItemCodex.ACTOR_ID_MIN
-                        RenderOrder.MIDDLE -> 0x10000000
-                        RenderOrder.MIDTOP -> 0x60000000
-                        RenderOrder.FRONT  -> 0x70000000
-                    } ||
-                    value > when (renderOrder) {
-                        RenderOrder.BEHIND -> 0x0FFFFFFF
-                        RenderOrder.MIDDLE -> 0x5FFFFFFF
-                        RenderOrder.MIDTOP -> 0x6FFFFFFF
-                        RenderOrder.FRONT  -> 0x7FFFFFFF
+                    value < ItemCodex.ACTORID_MIN ||
+                    value !in when (renderOrder) {
+                        RenderOrder.BEHIND -> RANGE_BEHIND
+                        RenderOrder.MIDDLE -> RANGE_MIDDLE
+                        RenderOrder.MIDTOP -> RANGE_MIDTOP
+                        RenderOrder.FRONT  -> RANGE_FRONT
                     }
                 }
                 catch (gameNotInitialisedException: KotlinNullPointerException) {

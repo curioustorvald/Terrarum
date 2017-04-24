@@ -57,18 +57,22 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
         // new item
         else {
             if (item.isDynamic) {
-                // assign new ID
-
-                println("[ActorInventory] new dynamic item detected: ${item.originalID}")
-
-                item.dynamicID = InventoryItem.generateNewDynamicID(this)
+                // assign new ID for each
+                repeat(count) {
+                    val newItem = item.clone().generateUniqueDynamicID(this)
+                    itemList.add(InventoryPair(newItem, 1))
+                }
             }
-            itemList.add(InventoryPair(item, count))
+            else {
+                itemList.add(InventoryPair(item, count))
+            }
         }
         insertionSortLastElem(itemList)
     }
 
-    fun remove(itemID: Int, count: Int = 1) = remove(ItemCodex[itemID], count)
+    fun remove(itemID: Int, count: Int) = remove(ItemCodex[itemID], count)
+    /** Will check existence of the item using its Dynamic ID; careful with command order!
+     *      e.g. re-assign after this operation */
     fun remove(item: InventoryItem, count: Int = 1) {
         val existingItem = getByDynamicID(item.dynamicID)
         if (existingItem != null) { // if the item already exists
@@ -139,12 +143,23 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             remove(item, 1)
         }
         else {
+            // unpack newly-made dynamic item (e.g. any weapon, floppy disk)
+            /*if (item.isDynamic && item.originalID == item.dynamicID) {
+                remove(item.originalID, 1)
+                item.generateUniqueDynamicID(this)
+                add(item)
+            }*/
+
+
+
+            // calculate damage value
             val baseDamagePerSwing = if (actor is ActorHumanoid)
                 actor.avStrength / 1000.0
             else
                 1.0 // TODO variable: scale, strength
             val swingDmgToFrameDmg = Terrarum.delta.toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
+            // damage the item
             item.durability -= (baseDamagePerSwing * swingDmgToFrameDmg).toFloat()
             if (item.durability <= 0)
                 remove(item, 1)
@@ -194,11 +209,11 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
         while (low <= high) {
             val mid = (low + high).ushr(1) // safe from overflows
 
-            val midVal = get(mid).item
+            val midVal = get(mid).item.dynamicID
 
-            if (ID > midVal.dynamicID)
+            if (ID > midVal)
                 low = mid + 1
-            else if (ID < midVal.dynamicID)
+            else if (ID < midVal)
                 high = mid - 1
             else
                 return mid // key found
