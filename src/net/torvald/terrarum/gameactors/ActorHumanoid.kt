@@ -145,7 +145,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         override var baseToolSize: Double? = null
         override var inventoryCategory = "should_not_be_seen"
         override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "(no name)"
-        override var consumable = false
+        override var stackable = false
         override val isDynamic = false
     }
 

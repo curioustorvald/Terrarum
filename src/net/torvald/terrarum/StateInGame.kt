@@ -73,7 +73,7 @@ class StateInGame : BasicGameState() {
         get() = playableActorDelegate?.actor
 
     var screenZoom = 1.0f
-    val ZOOM_MAX = 2.0f
+    val ZOOM_MAX = 4.0f
     val ZOOM_MIN = 0.5f
 
     val worldDrawFrameBuffer = Image(Terrarum.WIDTH.div(ZOOM_MIN).ceilInt(), Terrarum.HEIGHT.div(ZOOM_MIN).ceilInt())
@@ -317,9 +317,6 @@ class StateInGame : BasicGameState() {
         /////////////////////////
         // app-related updates //
         /////////////////////////
-        if (!Terrarum.isWin81) {
-            Terrarum.appgc.setVSync(Terrarum.appgc.fps >= Terrarum.VSYNC_TRIGGER_THRESHOLD) // windows 10 has some trouble with this...
-        }
 
         // determine if lightmap blending should be done
         Terrarum.setConfig("smoothlighting", KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH))

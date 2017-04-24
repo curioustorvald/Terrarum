@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
 import net.torvald.terrarum.ui.UIInventory
 import java.util.*
 import java.util.concurrent.locks.Lock
@@ -36,11 +37,21 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     fun add(itemID: Int, count: Int = 1) = add(ItemCodex[itemID], count)
     fun add(item: InventoryItem, count: Int = 1) {
 
-        if (item.dynamicID == Player.PLAYER_REF_ID || item.dynamicID == 0x51621D) // do not delete this magic
+        println("[ActorInventory] add $item, $count")
+
+
+        if (count == 0)
+            throw IllegalArgumentException("Item count is zero.")
+        if (count < 0)
+            throw IllegalArgumentException("Item count is negative number. If you intended removing items, use remove()" +
+                                           "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
+        if (item.originalID == Player.PLAYER_REF_ID || item.originalID == 0x51621D) // do not delete this magic
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
         if (Terrarum.ingame != null &&
-            (item.dynamicID == Terrarum.ingame?.player?.referenceID))
+            (item.originalID == Terrarum.ingame?.player?.referenceID))
             throw IllegalArgumentException("Attempted to put active player into the inventory.")
+        if ((!item.stackable || item.dynamicID in ITEM_DYNAMIC) && count > 1)
+            throw IllegalArgumentException("Attempting to adding stack of item but the item is not stackable; item: $item, count: $count")
 
 
 
@@ -56,16 +67,16 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
         }
         // new item
         else {
-            if (item.isDynamic) {
+            /*if (item.isDynamic) {
                 // assign new ID for each
                 repeat(count) {
                     val newItem = item.clone().generateUniqueDynamicID(this)
                     itemList.add(InventoryPair(newItem, 1))
                 }
             }
-            else {
+            else {*/
                 itemList.add(InventoryPair(item, count))
-            }
+            //}
         }
         insertionSortLastElem(itemList)
     }
@@ -74,6 +85,17 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     /** Will check existence of the item using its Dynamic ID; careful with command order!
      *      e.g. re-assign after this operation */
     fun remove(item: InventoryItem, count: Int = 1) {
+
+        println("[ActorInventory] remove $item, $count")
+
+        if (count == 0)
+            throw IllegalArgumentException("Item count is zero.")
+        if (count < 0)
+            throw IllegalArgumentException("Item count is negative number. If you intended adding items, use add()" +
+                                           "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
+
+
+
         val existingItem = getByDynamicID(item.dynamicID)
         if (existingItem != null) { // if the item already exists
             val newCount = getByDynamicID(item.dynamicID)!!.amount - count
@@ -82,7 +104,9 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             }
             else if (newCount > 0) {
                 // decrement count
-                add(item, -count)
+                val newCount = getByDynamicID(item.dynamicID)!!.amount - count
+                itemList.remove(existingItem)
+                itemList.add(InventoryPair(existingItem.item, newCount))
             }
             else {
                 // unequip, if applicable
@@ -139,16 +163,30 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
 
 
     fun consumeItem(actor: Actor, item: InventoryItem) {
-        if (item.consumable) {
+        if (item.stackable && !item.isDynamic) {
             remove(item, 1)
         }
         else {
+            val newItem: InventoryItem
+
             // unpack newly-made dynamic item (e.g. any weapon, floppy disk)
-            /*if (item.isDynamic && item.originalID == item.dynamicID) {
-                remove(item.originalID, 1)
-                item.generateUniqueDynamicID(this)
-                add(item)
-            }*/
+            if (item.isDynamic && item.originalID == item.dynamicID) {
+                itemEquipped[item.equipPosition] = null
+                remove(item, 1)
+
+
+                newItem = item.clone()
+                newItem.generateUniqueDynamicID(this)
+
+                newItem.stackable = false
+                add(newItem)
+                itemEquipped[newItem.equipPosition] = getByDynamicID(newItem.dynamicID)!!.item // will test if some sketchy code is written. Test fail: kotlinNullpointerException
+
+                // FIXME now damage meter (vital) is broken
+            }
+            else {
+                newItem = item
+            }
 
 
 
@@ -160,11 +198,11 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             val swingDmgToFrameDmg = Terrarum.delta.toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
             // damage the item
-            item.durability -= (baseDamagePerSwing * swingDmgToFrameDmg).toFloat()
-            if (item.durability <= 0)
-                remove(item, 1)
+            newItem.durability -= (baseDamagePerSwing * swingDmgToFrameDmg).toFloat()
+            if (newItem.durability <= 0)
+                remove(newItem, 1)
 
-            println("[ActorInventory] consumed; ${item.durability}")
+            //println("[ActorInventory] consumed; ${item.durability}")
         }
     }
 
@@ -179,12 +217,22 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             if (itemList.size == 0)
                 false
             else
-                itemList.binarySearch(id) >= 0
+                itemList.binarySearch(id, DYNAMIC_ID) >= 0
     fun getByDynamicID(id: Int): InventoryPair? {
         if (itemList.size == 0)
             return null
 
-        val index = itemList.binarySearch(id)
+        val index = itemList.binarySearch(id, DYNAMIC_ID)
+        if (index < 0)
+            return null
+        else
+            return itemList[index]
+    }
+    private fun getByStaticID(id: Int): InventoryPair? {
+        if (itemList.size == 0)
+            return null
+
+        val index = itemList.binarySearch(id, STATIC_ID)
         if (index < 0)
             return null
         else
@@ -201,7 +249,9 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             arr[j + 1] = x
         }
     }
-    private fun ArrayList<InventoryPair>.binarySearch(ID: Int): Int {
+    private val STATIC_ID = 41324534
+    private val DYNAMIC_ID = 181643953
+    private fun ArrayList<InventoryPair>.binarySearch(ID: Int, searchBy: Int): Int {
         // code from collections/Collections.kt
         var low = 0
         var high = this.size - 1
@@ -209,7 +259,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
         while (low <= high) {
             val mid = (low + high).ushr(1) // safe from overflows
 
-            val midVal = get(mid).item.dynamicID
+            val midVal = if (searchBy == STATIC_ID) this.get(mid).item.originalID else this.get(mid).item.dynamicID
 
             if (ID > midVal)
                 low = mid + 1

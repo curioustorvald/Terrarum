@@ -57,7 +57,7 @@ open class HumanoidNPC(
             }
         override var inventoryCategory = "npc"
         override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "NPC"
-        override var consumable = true
+        override var stackable = true
         override val isDynamic = false
 
         override fun secondaryUse(gc: GameContainer, delta: Int): Boolean {

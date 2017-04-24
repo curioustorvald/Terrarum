@@ -32,13 +32,16 @@ interface Pocketed {
      * Equips an item. If the item is not in the inventory, adds the item first.
      */
     fun equipItem(item: InventoryItem) {
-        if (!inventory.contains(item))
+        if (!inventory.contains(item)) {
+            println("[Pocketed] Item does not exist; adding one before equipped")
             inventory.add(item)
+        }
 
         if (item.equipPosition >= 0) {
             inventory.itemEquipped[item.equipPosition] = item
             item.effectWhenEquipped(Terrarum.appgc, Terrarum.delta)
         }
+        // else do nothing
     }
 
     fun equipped(item: InventoryItem): Boolean {

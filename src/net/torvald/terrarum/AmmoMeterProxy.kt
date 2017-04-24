@@ -19,14 +19,14 @@ object AmmoMeterProxy {
         }
         else {
             meter.vitalGetterVal = {
-                if (ItemCodex[currentItem.originalID].consumable)
+                if (ItemCodex[currentItem.originalID].stackable)
                     actor.inventory.getByDynamicID(currentItem.dynamicID)!!.amount.toFloat()
                 else
                     currentItem.durability
             }
 
             meter.vitalGetterMax = {
-                if (ItemCodex[currentItem.originalID].consumable)
+                if (ItemCodex[currentItem.originalID].stackable)
                     500f
                 else
                     currentItem.maxDurability.toFloat()

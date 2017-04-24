@@ -93,7 +93,7 @@ class UIItemInventoryElem(
             // this one-liner sets color
             g.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
             g.drawString(
-                    "$item" + (if (amount > 0 && !item!!.isUnique) "$fwsp($amount)" else "") +
+                    "$item" + (if (amount > 0 && item!!.stackable) "$fwsp($amount)" else if (amount != 1) "$fwsp!!$amount!!" else "") +
                     //item!!.name + (if (amount > 0 && !item!!.isUnique) "$fwsp($amount)" else "") +
                     (if (equippedSlot != null) "  ${0xE081.toChar()}\$$equippedSlot" else ""),
                     posX + textOffsetX,

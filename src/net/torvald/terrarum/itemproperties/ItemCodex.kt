@@ -46,14 +46,14 @@ object ItemCodex {
         // tile items (blocks and walls are the same thing basically)
         for (i in ITEM_TILES + ITEM_WALLS) {
             itemCodex[i] = object : InventoryItem() {
-                override var dynamicID: Int = i
-                override val originalID = dynamicID
+                override val originalID = i
+                override var dynamicID = i
                 override val isUnique: Boolean = false
                 override var baseMass: Double = TileCodex[i].density / 1000.0
                 override var baseToolSize: Double? = null
                 override var equipPosition = EquipPosition.HAND_GRIP
                 override val originalName = TileCodex[i % ITEM_WALLS.first].nameKey
-                override var consumable = true
+                override var stackable = true
                 override var inventoryCategory = Category.BLOCK
                 override var isDynamic = false
 
@@ -105,14 +105,14 @@ object ItemCodex {
 
         // test copper pickaxe
         itemCodex[ITEM_STATIC.first] = object : InventoryItem() {
-            override var dynamicID = ITEM_STATIC.first
-            override val originalID = dynamicID
+            override val originalID = ITEM_STATIC.first
+            override var dynamicID = originalID
             override val isUnique = false
             override val originalName = ""
             override var baseMass = 10.0
             override var baseToolSize: Double? = 10.0
-            override var consumable = false
-            override var maxDurability = 147//606 // this much tiles before breaking
+            override var stackable = true
+            override var maxDurability = 147//606
             override var durability = maxDurability.toFloat()
             override var equipPosition = EquipPosition.HAND_GRIP
             override var inventoryCategory = Category.TOOL
