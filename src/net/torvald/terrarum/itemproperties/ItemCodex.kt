@@ -26,7 +26,7 @@ object ItemCodex {
 
     /**
      * <ItemID or RefID for Actor, TheItem>
-     * Will return corresponding Actor if ID >= 16777216
+     * Will return corresponding Actor if ID >= ACTORID_MIN
      */
     private val itemCodex = HashMap<Int, InventoryItem>()
     private val dynamicItemDescription = HashMap<Int, KVHashMap>()
@@ -35,8 +35,8 @@ object ItemCodex {
     val ITEM_WALLS = GameWorld.TILES_SUPPORTED..GameWorld.TILES_SUPPORTED * 2 - 1
     val ITEM_WIRES = GameWorld.TILES_SUPPORTED * 2..GameWorld.TILES_SUPPORTED * 2 + 255
     val ITEM_STATIC = ITEM_WIRES.endInclusive + 1..32767
-    val ITEM_DYNAMIC = 32768..1048575
-    val ACTOR_ID_MIN = ITEM_DYNAMIC.endInclusive + 1
+    val ITEM_DYNAMIC = 32768..0x0FFF_FFFF
+    val ACTORID_MIN = ITEM_DYNAMIC.endInclusive + 1
 
 
     private val itemImagePlaceholder = Image("./assets/item_kari_24.tga")

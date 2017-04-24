@@ -62,6 +62,8 @@ class UIItemInventoryElem(
         }
     }
 
+    private val fwsp = 0x3000.toChar()
+
     override fun render(gc: GameContainer, g: Graphics) {
         g.font = Terrarum.fontGame
 
@@ -91,8 +93,8 @@ class UIItemInventoryElem(
             // this one-liner sets color
             g.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
             g.drawString(
-                    "${item!!.dynamicID}/${item!!.originalID}" + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "") +
-                    //item!!.name + (if (amount > 0 && !item!!.isUnique) "${0x3000.toChar()}($amount)" else "") +
+                    "$item" + (if (amount > 0 && !item!!.isUnique) "$fwsp($amount)" else "") +
+                    //item!!.name + (if (amount > 0 && !item!!.isUnique) "$fwsp($amount)" else "") +
                     (if (equippedSlot != null) "  ${0xE081.toChar()}\$$equippedSlot" else ""),
                     posX + textOffsetX,
                     posY + textOffsetY

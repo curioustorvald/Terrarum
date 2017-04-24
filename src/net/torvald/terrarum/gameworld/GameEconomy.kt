@@ -3,8 +3,11 @@ package net.torvald.terrarum.gameworld
 import net.torvald.terrarum.gameactors.ActorID
 
 /**
- * This world is economically isolated system. Economy will be important to make player keep playing,
+ * The whole world is economically isolated system. Economy will be important to make player keep playing,
  * when all the necessary contents are set and implemented to the production.
+ *
+ * Design goal: keep the inflation rate low, but not negative (Single market)
+ * OR, give each faction (establishment) its own economy and watch them prosper/doomed (DF style)
  *
  * Created by SKYHi14 on 2017-04-23.
  */
