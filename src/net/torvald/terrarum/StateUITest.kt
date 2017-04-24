@@ -56,7 +56,7 @@ class StateUITest : BasicGameState() {
             override var inventoryCategory: String = InventoryItem.Category.TOOL
             override var maxDurability: Int = 143
             override var durability: Float = 64f
-            override var consumable = false
+            override var stackable = false
             override val isDynamic = true
         })
         actor.inventory.getByDynamicID(5656)!!.item.name = "Test tool"
@@ -72,7 +72,7 @@ class StateUITest : BasicGameState() {
             override var baseMass: Double = 1.4
             override var baseToolSize: Double? = null
             override var inventoryCategory: String = InventoryItem.Category.MISC
-            override var consumable = false
+            override var stackable = false
             override val isDynamic = false
         })
 

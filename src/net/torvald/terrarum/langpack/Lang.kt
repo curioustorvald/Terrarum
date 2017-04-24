@@ -114,9 +114,9 @@ object Lang {
 
         // special treatment
         if (key.startsWith("MENU_LABEL_PRESS_START_SYMBOL"))
-            return ret2.replace('>', Terrarum.joypadLabelStart)
+            return ret2.replace('>', Terrarum.joypadLabelStart).capitalize()
 
-        return ret2
+        return ret2.capitalize()
     }
 
     fun pluraliseLang(key: String, count: Int): String {

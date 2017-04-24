@@ -63,8 +63,8 @@ class UIInventory(
                     "MENU_LABEL_ALL",
                     "GAME_INVENTORY_BLOCKS",
                     "GAME_INVENTORY_WALLS",
-                    "GAME_INVENTORY_WEAPONS", // weapons and tools
                     "CONTEXT_ITEM_TOOL_PLURAL",
+                    "GAME_INVENTORY_WEAPONS",
                     "CONTEXT_ITEM_ARMOR",
                     "GAME_INVENTORY_INGREDIENTS",
                     "GAME_INVENTORY_POTIONS",
@@ -79,7 +79,7 @@ class UIInventory(
             textAreaWidth = 100,
             defaultSelection = 0,
             iconSpriteSheet = SpriteSheet("./assets/graphics/gui/inventory/category.tga", 20, 20),
-            iconSpriteSheetIndices = intArrayOf(9,6,7,0,1,2,3,4,5,8),
+            iconSpriteSheetIndices = intArrayOf(9,6,7,1,0,2,3,4,5,8),
             iconCol = defaultTextColour,
             highlightBackCol = Color(0xb8b8b8),
             highlightBackBlendMode = BlendMode.MULTIPLY,

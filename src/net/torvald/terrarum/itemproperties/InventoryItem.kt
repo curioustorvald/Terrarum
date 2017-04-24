@@ -16,12 +16,15 @@ import org.newdawn.slick.GameContainer
 abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
 
     abstract var dynamicID: Int
+    /**
+     * if the ID is a Actor range, it's an actor contained in a pocket.
+     */
     abstract val originalID: Int // WUT?! using init does not work!!
 
 
     /**
      *
-     * e.g. Key Items (in a Pokémon sense), floppies
+     * e.g. Key Items (in a Pokémon sense); only the single instance of the item can exist in the pocket
      */
     abstract val isUnique: Boolean
     
@@ -51,13 +54,15 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
 
     var itemProperties = ItemValue()
 
-    /** Single-use then destroyed (e.g. Tiles), aka negation of "stackable" */
-    abstract var consumable: Boolean
+    /** Single-use then destroyed (e.g. Tiles), same as "consumable" */
+    abstract var stackable: Boolean
+
 
     /**
      * DYNAMIC means the item ID should be generated on the fly whenever the item is created.
      *         This is to be used with weapons/armours/etc where multiple instances can exist, and
-     *         each of them should be treated as different item.
+     *         each of them should be treated as different item. Because of this, new
+     *         derivative instances (dynamically created items, e.g. used pickaxe) are not stackable.
      *
      *         ID Range: 32768..1048575 (ItemCodex.ITEM_DYNAMIC)
      *
