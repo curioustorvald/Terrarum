@@ -19,8 +19,10 @@ object AmmoMeterProxy {
         }
         else {
             meter.vitalGetterVal = {
-                if (ItemCodex[currentItem.originalID].stackable)
+                if (ItemCodex[currentItem.originalID].stackable) {
+                    //println("[AmmoMeterProxy] currentItem: $currentItem")
                     actor.inventory.getByDynamicID(currentItem.dynamicID)!!.amount.toFloat()
+                }
                 else
                     currentItem.durability
             }
