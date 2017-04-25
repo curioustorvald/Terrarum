@@ -108,7 +108,7 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
     open var scale: Double = 1.0
 
     /**
-     * Set to zero if durability not applicable
+     * Set to zero (InventoryItem.DURABILITY_NA) if durability not applicable
      */
     open var maxDurability: Int = 0
 
@@ -255,6 +255,9 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
     }
 
     companion object {
+
+        val DURABILITY_NA = 0
+
         fun generateUniqueDynamicID(inventory: ActorInventory): Int {
             var ret: Int
             do {
