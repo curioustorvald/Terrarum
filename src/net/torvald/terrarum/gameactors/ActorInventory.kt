@@ -61,22 +61,12 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
 
         // if the item already exists
         if (existingItem != null) {
-            val newCount = getByDynamicID(item.dynamicID)!!.amount + count
-            itemList.remove(existingItem)
-            itemList.add(InventoryPair(existingItem.item, newCount))
+            // increment count
+            existingItem.amount += count
         }
         // new item
         else {
-            /*if (item.isDynamic) {
-                // assign new ID for each
-                repeat(count) {
-                    val newItem = item.clone().generateUniqueDynamicID(this)
-                    itemList.add(InventoryPair(newItem, 1))
-                }
-            }
-            else {*/
-                itemList.add(InventoryPair(item, count))
-            //}
+            itemList.add(InventoryPair(item, count))
         }
         insertionSortLastElem(itemList)
     }
@@ -98,15 +88,14 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
 
         val existingItem = getByDynamicID(item.dynamicID)
         if (existingItem != null) { // if the item already exists
-            val newCount = getByDynamicID(item.dynamicID)!!.amount - count
+            val newCount = existingItem.amount - count
+
             if (newCount < 0) {
-                throw Error("Tried to remove $count of $item, but the inventory only contains ${getByDynamicID(item.dynamicID)!!.amount} of them.")
+                throw Error("Tried to remove $count of $item, but the inventory only contains ${existingItem.amount} of them.")
             }
             else if (newCount > 0) {
                 // decrement count
-                val newCount = getByDynamicID(item.dynamicID)!!.amount - count
-                itemList.remove(existingItem)
-                itemList.add(InventoryPair(existingItem.item, newCount))
+                existingItem.amount = newCount
             }
             else {
                 // unequip, if applicable
@@ -281,4 +270,4 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     }
 }
 
-data class InventoryPair(val item: InventoryItem, val amount: Int)
+data class InventoryPair(val item: InventoryItem, var amount: Int)
