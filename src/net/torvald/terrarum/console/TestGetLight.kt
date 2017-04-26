@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.mapdrawer.LightmapRenderer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
 
 /**
  * Created by minjaesong on 16-09-07.

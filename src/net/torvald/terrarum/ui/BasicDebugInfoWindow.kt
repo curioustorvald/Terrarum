@@ -3,13 +3,12 @@ package net.torvald.terrarum.ui
 import com.jme3.math.FastMath
 import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.gameworld.PairedMapLayer
-import net.torvald.terrarum.mapdrawer.LightmapRenderer
-import net.torvald.terrarum.mapdrawer.TilesDrawer
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blendScreen
-import net.torvald.terrarum.mapdrawer.MapCamera
+import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -61,8 +60,8 @@ class BasicDebugInfoWindow : UICanvas {
 
         val player = Terrarum.ingame!!.player
 
-        val mouseTileX = ((MapCamera.x + gc.input.mouseX / Terrarum.ingame!!.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
-        val mouseTileY = ((MapCamera.y + gc.input.mouseY / Terrarum.ingame!!.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
+        val mouseTileX = ((WorldCamera.x + gc.input.mouseX / Terrarum.ingame!!.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
+        val mouseTileY = ((WorldCamera.y + gc.input.mouseY / Terrarum.ingame!!.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
 
         g.font = Terrarum.fontSmallNumbers
         g.color = GameFontBase.codeToCol["y"]

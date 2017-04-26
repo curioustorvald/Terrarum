@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import net.torvald.CSVFetcher
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.blockproperties.BlockCodex
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import java.io.File
@@ -25,6 +26,10 @@ import javax.script.Invocable
  * Created by SKYHi14 on 2017-04-17.
  */
 object ModMgr {
+
+    val groovyEngine = ScriptEngineManager().getEngineByExtension("groovy")!!
+    val groovyInvocable = groovyEngine as Invocable
+
 
     data class ModuleMetadata(
             val order: Int,
@@ -80,6 +85,7 @@ object ModMgr {
         }
 
 
+        // lists available engines
         /*val manager = ScriptEngineManager()
         val factories = manager.engineFactories
         for (f in factories) {
@@ -131,24 +137,27 @@ object ModMgr {
 
 
 
-    object GameItemLoader {
+    object GameBlockLoader {
+        val blockPath = "blocks/"
 
+        @JvmStatic operator fun invoke(module: String) {
+            BlockCodex(module, blockPath + "blocks.csv")
+        }
+    }
+
+    object GameItemLoader {
         val itemPath = "items/"
 
         @JvmStatic operator fun invoke(module: String) {
-            val engine = ScriptEngineManager().getEngineByExtension("groovy")!!
-            val invocable = engine as Invocable
-
             val csv = CSVFetcher.readFromModule(module, itemPath + "itemid.csv")
             csv.forEach {
                 val filename = it["filename"].toString()
                 val script = getFile(module, itemPath + filename).readText()
                 val itemID = it["id"].toInt()
 
-                engine.eval(script)
-                ItemCodex[itemID] = invocable.invokeFunction("invoke", itemID) as InventoryItem
+                groovyEngine.eval(script)
+                ItemCodex[itemID] = groovyInvocable.invokeFunction("invoke", itemID) as InventoryItem
             }
         }
-
     }
 }

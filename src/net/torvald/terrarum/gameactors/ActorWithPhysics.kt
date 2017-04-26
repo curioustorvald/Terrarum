@@ -4,12 +4,12 @@ import com.jme3.math.FastMath
 import net.torvald.point.Point2d
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer
-import net.torvald.terrarum.tileproperties.TileCodex
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.spriteanimation.SpriteAnimation
-import net.torvald.terrarum.mapdrawer.MapCamera
-import net.torvald.terrarum.tileproperties.Tile
-import net.torvald.terrarum.tileproperties.TileProp
+import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockProp
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -763,7 +763,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
                 val tile = world.getTileFromTerrain(x, y)
-                if (TileCodex[tile].isSolid)
+                if (BlockCodex[tile].isSolid)
                     return true
             }
         }
@@ -805,7 +805,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             }
 
             // evaluate
-            if (TileCodex[world.getTileFromTerrain(tileX, tileY)].isFluid) {
+            if (BlockCodex[world.getTileFromTerrain(tileX, tileY)].isFluid) {
                 contactAreaCounter += 1
             }
         }
@@ -814,17 +814,17 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     }
 
     private fun getTileFriction(tile: Int) =
-            if (immobileBody && tile == Tile.AIR)
-                TileCodex[Tile.AIR].friction.frictionToMult().div(1000)
+            if (immobileBody && tile == Block.AIR)
+                BlockCodex[Block.AIR].friction.frictionToMult().div(1000)
                         .times(if (!grounded) elasticity else 1.0)
             else
-                TileCodex[tile].friction.frictionToMult()
+                BlockCodex[tile].friction.frictionToMult()
 
     /** about stopping
      * for about get moving, see updateMovementControl */
     private fun setHorizontalFriction() {
         val friction = if (isPlayerNoClip)
-            BASE_FRICTION * TileCodex[Tile.STONE].friction.frictionToMult()
+            BASE_FRICTION * BlockCodex[Block.STONE].friction.frictionToMult()
         else {
             // TODO status quo if !submerged else linearBlend(feetFriction, bodyFriction, submergedRatio)
             BASE_FRICTION * if (grounded) feetFriction else bodyFriction
@@ -853,7 +853,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     private fun setVerticalFriction() {
         val friction = if (isPlayerNoClip)
-            BASE_FRICTION * TileCodex[Tile.STONE].friction.frictionToMult()
+            BASE_FRICTION * BlockCodex[Block.STONE].friction.frictionToMult()
         else
             BASE_FRICTION * bodyFriction
 
@@ -913,8 +913,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             var friction = 0.0
             forEachOccupyingTileNum {
                 // get max friction
-                if (getTileFriction(it ?: Tile.AIR) > friction)
-                    friction = getTileFriction(it ?: Tile.AIR)
+                if (getTileFriction(it ?: Block.AIR) > friction)
+                    friction = getTileFriction(it ?: Block.AIR)
             }
 
             return friction
@@ -924,8 +924,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             var friction = 0.0
             forEachFeetTileNum {
                 // get max friction
-                if (getTileFriction(it ?: Tile.AIR) > friction)
-                    friction = getTileFriction(it ?: Tile.AIR)
+                if (getTileFriction(it ?: Block.AIR) > friction)
+                    friction = getTileFriction(it ?: Block.AIR)
             }
 
             return friction
@@ -1056,7 +1056,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             val offsetY = spriteGlow!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 2
 
-            if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
+            if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                 // camera center neg, actor center pos
                 spriteGlow!!.render(g,
                         (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
@@ -1064,7 +1064,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                         (scale).toFloat()
                 )
             }
-            else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
+            else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                 // camera center pos, actor center neg
                 spriteGlow!!.render(g,
                         (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
@@ -1082,8 +1082,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
     }
 
-    val leftsidePadding = world.width.times(TILE_SIZE) - MapCamera.width.ushr(1)
-    val rightsidePadding = MapCamera.width.ushr(1)
+    val leftsidePadding = world.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
+    val rightsidePadding = WorldCamera.width.ushr(1)
 
     override fun drawBody(g: Graphics) {
         if (isVisible && sprite != null) {
@@ -1097,7 +1097,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             val offsetY = sprite!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 2
 
-            if (MapCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
+            if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                 // camera center neg, actor center pos
                 sprite!!.render(g,
                         (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
@@ -1105,7 +1105,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                         (scale).toFloat()
                 )
             }
-            else if (MapCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
+            else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                 // camera center pos, actor center neg
                 sprite!!.render(g,
                         (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
@@ -1188,11 +1188,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         return tiles.forEach(consumer)
     }
 
-    private fun forEachOccupyingTile(consumer: (TileProp?) -> Unit) {
-        val tileProps = ArrayList<TileProp?>()
+    private fun forEachOccupyingTile(consumer: (BlockProp?) -> Unit) {
+        val tileProps = ArrayList<BlockProp?>()
         for (y in tilewiseHitbox.posY.toInt()..tilewiseHitbox.endPointY.toInt()) {
             for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endPointX.toInt()) {
-                tileProps.add(TileCodex[world.getTileFromTerrain(x, y)])
+                tileProps.add(BlockCodex[world.getTileFromTerrain(x, y)])
             }
         }
 
@@ -1212,14 +1212,14 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         return tiles.forEach(consumer)
     }
 
-    private fun forEachFeetTile(consumer: (TileProp?) -> Unit) {
-        val tileProps = ArrayList<TileProp?>()
+    private fun forEachFeetTile(consumer: (BlockProp?) -> Unit) {
+        val tileProps = ArrayList<BlockProp?>()
 
         // offset 1 pixel to the down so that friction would work
         val y = nextHitbox.endPointY.plus(1.0).div(TILE_SIZE).floorInt()
 
         for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endPointX.toInt()) {
-            tileProps.add(TileCodex[world.getTileFromTerrain(x, y)])
+            tileProps.add(BlockCodex[world.getTileFromTerrain(x, y)])
         }
 
         return tileProps.forEach(consumer)

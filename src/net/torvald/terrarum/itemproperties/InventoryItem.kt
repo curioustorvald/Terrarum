@@ -202,42 +202,42 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
     }
 
     object EquipPosition {
-        const val NULL = -1
+        @JvmStatic val NULL = -1
 
-        const val ARMOUR = 0
+        @JvmStatic val ARMOUR = 0
         // you can add alias to address something like LEGGINGS, BREASTPLATE, RINGS, NECKLACES, etc.
-        const val BODY_BACK = 1 // wings, jetpacks, etc.
-        const val BODY_BUFF2 = 2
-        const val BODY_BUFF3 = 3
-        const val BODY_BUFF4 = 4
-        const val BODY_BUFF5 = 5
-        const val BODY_BUFF6 = 6
-        const val BODY_BUFF7 = 7
-        const val BODY_BUFF8 = 8
+        @JvmStatic val BODY_BACK = 1 // wings, jetpacks, etc.
+        @JvmStatic val BODY_BUFF2 = 2
+        @JvmStatic val BODY_BUFF3 = 3
+        @JvmStatic val BODY_BUFF4 = 4
+        @JvmStatic val BODY_BUFF5 = 5
+        @JvmStatic val BODY_BUFF6 = 6
+        @JvmStatic val BODY_BUFF7 = 7
+        @JvmStatic val BODY_BUFF8 = 8
 
-        const val HAND_GRIP = 9
-        const val HAND_GAUNTLET = 10
-        const val HAND_BUFF2 = 11
-        const val HAND_BUFF3 = 12
-        const val HAND_BUFF4 = 13
+        @JvmStatic val HAND_GRIP = 9
+        @JvmStatic val HAND_GAUNTLET = 10
+        @JvmStatic val HAND_BUFF2 = 11
+        @JvmStatic val HAND_BUFF3 = 12
+        @JvmStatic val HAND_BUFF4 = 13
 
-        const val FOOTWEAR = 14
+        @JvmStatic val FOOTWEAR = 14
 
-        const val HEADGEAR = 15
+        @JvmStatic val HEADGEAR = 15
 
-        const val INDEX_MAX = 15
+        @JvmStatic val INDEX_MAX = 15
     }
 
     object Category {
-        const val WEAPON = "weapon"
-        const val TOOL = "tool"
-        const val ARMOUR = "armour"
-        const val GENERIC = "generic"
-        const val POTION = "potion"
-        const val MAGIC = "magic"
-        const val BLOCK = "block"
-        const val WALL = "wall"
-        const val MISC = "misc"
+        @JvmStatic val WEAPON = "weapon"
+        @JvmStatic val TOOL = "tool"
+        @JvmStatic val ARMOUR = "armour"
+        @JvmStatic val GENERIC = "generic"
+        @JvmStatic val POTION = "potion"
+        @JvmStatic val MAGIC = "magic"
+        @JvmStatic val BLOCK = "block"
+        @JvmStatic val WALL = "wall"
+        @JvmStatic val MISC = "misc"
     }
 
     override public fun clone(): InventoryItem {

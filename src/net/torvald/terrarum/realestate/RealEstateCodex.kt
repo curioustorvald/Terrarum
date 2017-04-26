@@ -1,6 +1,5 @@
 package net.torvald.terrarum.realestate
 
-import java.io.Serializable
 import java.util.*
 
 /**
@@ -8,20 +7,20 @@ import java.util.*
  */
 object RealEstateCodex {
     /**
-     * HashMap<Absolute tile number, Actor/Faction ID>
+     * HashMap<Absolute block number, Actor/Faction ID>
      *
-     * Note that a tile can have only ONE owner (as an Actor or Faction ID)
+     * Note that a block can have only ONE owner (as an Actor or Faction ID)
      */
     private var ownershipRegistry: HashMap<Long, Int> = HashMap()
 
     fun setOwner(tileX: Int, tileY: Int, refID: Int) {
-        ownershipRegistry[LandUtil.getTileAddr(tileX, tileY)] = refID
+        ownershipRegistry[LandUtil.getBlockAddr(tileX, tileY)] = refID
     }
 
     fun removeOwner(tileX: Int, tileY: Int) {
-        ownershipRegistry.remove(LandUtil.getTileAddr(tileX, tileY))
+        ownershipRegistry.remove(LandUtil.getBlockAddr(tileX, tileY))
     }
 
     fun getOwner(tileX: Int, tileY: Int): Int? =
-            ownershipRegistry[LandUtil.getTileAddr(tileX, tileY)]
+            ownershipRegistry[LandUtil.getBlockAddr(tileX, tileY)]
 }

@@ -1,8 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 
 /**
  * Created by SKYHi14 on 2017-02-10.

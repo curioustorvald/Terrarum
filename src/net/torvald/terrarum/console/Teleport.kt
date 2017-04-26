@@ -1,7 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.StateInGame
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 

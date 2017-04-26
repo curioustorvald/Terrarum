@@ -8,10 +8,12 @@ import net.torvald.point.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithPhysics
-import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.Material
-import net.torvald.terrarum.tileproperties.Tile
+import net.torvald.terrarum.blockproperties.Block
+// following two are NOT UNUSED!
+import net.torvald.terrarum.itemproperties.InventoryItem.EquipPosition
+import net.torvald.terrarum.itemproperties.InventoryItem.Category
 import org.jetbrains.annotations.NotNull
 import org.newdawn.slick.GameContainer
 
@@ -32,8 +34,8 @@ class TestPick extends InventoryItem {
     boolean stackable = true
     int maxDurability = 147
     float durability = maxDurability
-    int equipPosition = 9 //EquipPosition.HAND_GRIP
-    String inventoryCategory = "tool" //Category.TOOL
+    int equipPosition = EquipPosition.HAND_GRIP
+    String inventoryCategory = Category.TOOL
 
     // !! TEST MATERIAL !!
     Material material = new Material(0,0,0,0,0,0,0,0,1,0.0)
@@ -72,7 +74,7 @@ class TestPick extends InventoryItem {
         })
 
         // return false if here's no tile
-        if (Tile.AIR == Terrarum.ingame.world.getTileFromTerrain(mouseTileX, mouseTileY))
+        if (Block.AIR == Terrarum.ingame.world.getTileFromTerrain(mouseTileX, mouseTileY))
             return false
 
         // filter passed, do the job

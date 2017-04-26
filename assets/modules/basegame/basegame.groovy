@@ -5,5 +5,6 @@ import net.torvald.terrarum.ModMgr
  */
 
 static void invoke(String module) {
+    ModMgr.GameBlockLoader.invoke(module)
     ModMgr.GameItemLoader.invoke(module)
 }

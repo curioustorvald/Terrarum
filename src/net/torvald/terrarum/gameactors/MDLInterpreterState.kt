@@ -1,6 +1,5 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
 import java.util.*
 
 /**

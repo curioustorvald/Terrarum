@@ -2,9 +2,9 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithPhysics.Companion.SI_TO_GAME_ACC
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
-import net.torvald.terrarum.tileproperties.Tile
-import net.torvald.terrarum.tileproperties.TileCodex
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
+import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockCodex
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -43,10 +43,10 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, maxLifeTime: Int? = null
             lifetimeCounter += delta
             if (velocity.isZero || lifetimeCounter >= lifetimeMax ||
                 // simple stuck check
-                TileCodex[Terrarum.ingame!!.world.getTileFromTerrain(
+                BlockCodex[Terrarum.ingame!!.world.getTileFromTerrain(
                         hitbox.pointedX.div(TILE_SIZE).floorInt(),
                         hitbox.pointedY.div(TILE_SIZE).floorInt()
-                ) ?: Tile.STONE].isSolid) {
+                ) ?: Block.STONE].isSolid) {
                 flagDespawn = true
             }
 
