@@ -4,15 +4,13 @@ import net.torvald.point.Point2d
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.CanBeAnItem
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.mapdrawer.TilesDrawer
-import net.torvald.terrarum.mapdrawer.TilesDrawer.wallOverlayColour
-import net.torvald.terrarum.tileproperties.Tile
-import net.torvald.terrarum.tileproperties.TileCodex
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarum.worlddrawer.BlocksDrawer.wallOverlayColour
+import net.torvald.terrarum.blockproperties.BlockCodex
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Image
 import java.util.*
@@ -41,16 +39,17 @@ object ItemCodex {
 
 
     init {
-        // tile items (blocks and walls are the same thing basically)
+        // blocks.csvs are loaded by ModMgr beforehand
+        // block items (blocks and walls are the same thing basically)
         for (i in ITEM_TILES + ITEM_WALLS) {
             itemCodex[i] = object : InventoryItem() {
                 override val originalID = i
                 override var dynamicID = i
                 override val isUnique: Boolean = false
-                override var baseMass: Double = TileCodex[i].density / 1000.0
+                override var baseMass: Double = BlockCodex[i].density / 1000.0
                 override var baseToolSize: Double? = null
                 override var equipPosition = EquipPosition.HAND_GRIP
-                override val originalName = TileCodex[i % ITEM_WALLS.first].nameKey
+                override val originalName = BlockCodex[i % ITEM_WALLS.first].nameKey
                 override var stackable = true
                 override var inventoryCategory = Category.BLOCK
                 override var isDynamic = false
@@ -138,7 +137,7 @@ object ItemCodex {
                 }
 
                 // return false if there's no tile
-                if (Tile.AIR == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY))
+                if (Block.AIR == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY))
                     return false
 
 
@@ -192,17 +191,17 @@ object ItemCodex {
     fun getItemImage(item: InventoryItem): Image {
         // terrain
         if (item.originalID in ITEM_TILES) {
-            return TilesDrawer.tilesTerrain.getSubImage((item.dynamicID % 16) * 16, item.originalID / 16)
+            return BlocksDrawer.tilesTerrain.getSubImage((item.dynamicID % 16) * 16, item.originalID / 16)
         }
         // wall
         else if (item.originalID in ITEM_WALLS) {
-            val img = TilesDrawer.tilesTerrain.getSubImage((item.originalID % 16) * 16, item.originalID / 16)
+            val img = BlocksDrawer.tilesTerrain.getSubImage((item.originalID % 16) * 16, item.originalID / 16)
             img.setImageColor(wallOverlayColour.r, wallOverlayColour.g, wallOverlayColour.b)
             return img
         }
         // wire
         else if (item.originalID in ITEM_WIRES) {
-            return TilesDrawer.tilesWire.getSubImage((item.originalID % 16) * 16, item.originalID / 16)
+            return BlocksDrawer.tilesWire.getSubImage((item.originalID % 16) * 16, item.originalID / 16)
         }
         else
             return itemImagePlaceholder

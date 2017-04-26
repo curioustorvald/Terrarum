@@ -1,18 +1,8 @@
 package net.torvald.serialise
 
-import net.torvald.terrarum.mapgenerator.WorldGenerator
-import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.itemproperties.MaterialCodex
-import net.torvald.terrarum.tileproperties.TileCodex
-import org.apache.commons.codec.digest.DigestUtils
-import java.io.FileInputStream
-import java.io.File
-import java.io.IOException
+import net.torvald.terrarum.worldgenerator.WorldGenerator
+import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
 import java.nio.charset.Charset
-import java.nio.file.*
-import java.util.*
 
 /**
  * Created by minjaesong on 16-03-15.

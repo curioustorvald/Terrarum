@@ -4,7 +4,6 @@ import net.torvald.dataclass.CircularArray
 import net.torvald.imagefont.GameFontBase
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum.delta
-import net.torvald.terrarum.audio.AudioResourceLibrary
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.console.*
 import net.torvald.terrarum.gameactors.ActorHumanoid
@@ -13,36 +12,27 @@ import net.torvald.terrarum.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
-import net.torvald.terrarum.gameworld.WorldTime
-import net.torvald.terrarum.mapdrawer.LightmapRenderer
-import net.torvald.terrarum.mapdrawer.LightmapRenderer.constructRGBFromInt
-import net.torvald.terrarum.mapdrawer.TilesDrawer
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer.TILE_SIZE
-import net.torvald.terrarum.mapdrawer.MapCamera
-import net.torvald.terrarum.mapgenerator.WorldGenerator
-import net.torvald.terrarum.mapgenerator.RoguelikeRandomiser
-import net.torvald.terrarum.tileproperties.TileCodex
-import net.torvald.terrarum.tileproperties.TilePropUtil
-import net.torvald.terrarum.tilestats.TileStats
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer.constructRGBFromInt
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
+import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.terrarum.worldgenerator.WorldGenerator
+import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
+import net.torvald.terrarum.blockproperties.BlockPropUtil
+import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.weather.WeatherMixer
-import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
-import org.newdawn.slick.fills.GradientFill
-import org.newdawn.slick.geom.Rectangle
 import org.newdawn.slick.state.BasicGameState
 import org.newdawn.slick.state.StateBasedGame
-import shader.Shader
-import java.lang.management.ManagementFactory
 import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import javax.swing.JOptionPane
-import kotlin.collections.HashMap
 
 /**
  * Created by minjaesong on 15-12-30.
@@ -256,11 +246,11 @@ class StateInGame : BasicGameState() {
             ///////////////////////////
             // world-related updates //
             ///////////////////////////
-            TilePropUtil.dynamicLumFuncTickClock()
+            BlockPropUtil.dynamicLumFuncTickClock()
             world.updateWorldTime(delta)
             //WorldSimulator(player, delta)
             WeatherMixer.update(gc, delta)
-            TileStats.update()
+            BlockStats.update()
             if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
                 world.globalLight = constructRGBFromInt(
                         WeatherMixer.globalLightNow.redByte,
@@ -279,8 +269,8 @@ class StateInGame : BasicGameState() {
             // camera-related updates //
             ////////////////////////////
             FeaturesDrawer.update(gc, delta)
-            MapCamera.update()
-            TilesDrawer.update()
+            WorldCamera.update()
+            BlocksDrawer.update()
 
 
             ///////////////////////////
@@ -380,7 +370,7 @@ class StateInGame : BasicGameState() {
 
 
         // make camara work
-        worldG.translate(-MapCamera.x.toFloat(), -MapCamera.y.toFloat())
+        worldG.translate(-WorldCamera.x.toFloat(), -WorldCamera.y.toFloat())
 
 
         blendNormal()
@@ -388,12 +378,12 @@ class StateInGame : BasicGameState() {
         /////////////////////////////
         // draw map related stuffs //
         /////////////////////////////
-        TilesDrawer.renderWall(worldG)
+        BlocksDrawer.renderWall(worldG)
         actorsRenderBehind.forEach { it.drawBody(worldG) }
         actorsRenderBehind.forEach { it.drawGlow(worldG) }
         particlesContainer.forEach { it.drawBody(worldG) }
         particlesContainer.forEach { it.drawGlow(worldG) }
-        TilesDrawer.renderTerrain(worldG)
+        BlocksDrawer.renderTerrain(worldG)
 
         /////////////////
         // draw actors //
@@ -410,8 +400,8 @@ class StateInGame : BasicGameState() {
         /////////////////////////////
         LightmapRenderer.renderLightMap()
 
-        TilesDrawer.renderFront(worldG, false)
-        // --> blendNormal() <-- by TilesDrawer.renderFront
+        BlocksDrawer.renderFront(worldG, false)
+        // --> blendNormal() <-- by BlocksDrawer.renderFront
         FeaturesDrawer.render(gc, worldG)
 
 
@@ -648,12 +638,12 @@ class StateInGame : BasicGameState() {
             )
     private fun distToCameraSqr(a: ActorVisible) =
             min(
-                    (a.hitbox.posX - MapCamera.x).sqr() +
-                    (a.hitbox.posY - MapCamera.y).sqr(),
-                    (a.hitbox.posX - MapCamera.x + world.width * TILE_SIZE).sqr() +
-                    (a.hitbox.posY - MapCamera.y).sqr(),
-                    (a.hitbox.posX - MapCamera.x - world.width * TILE_SIZE).sqr() +
-                    (a.hitbox.posY - MapCamera.y).sqr()
+                    (a.hitbox.posX - WorldCamera.x).sqr() +
+                    (a.hitbox.posY - WorldCamera.y).sqr(),
+                    (a.hitbox.posX - WorldCamera.x + world.width * TILE_SIZE).sqr() +
+                    (a.hitbox.posY - WorldCamera.y).sqr(),
+                    (a.hitbox.posX - WorldCamera.x - world.width * TILE_SIZE).sqr() +
+                    (a.hitbox.posY - WorldCamera.y).sqr()
             )
 
     /** whether the actor is within screen */

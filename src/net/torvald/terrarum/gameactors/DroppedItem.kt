@@ -2,7 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.tileproperties.TileCodex
+import net.torvald.terrarum.blockproperties.BlockCodex
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 
@@ -17,8 +17,8 @@ class DroppedItem(private val item: InventoryItem) : ActorWithPhysics(Actor.Rend
 
         isVisible = true
 
-        avBaseMass = if (item.dynamicID < TileCodex.TILE_UNIQUE_MAX)
-            TileCodex[item.dynamicID].density / 1000.0
+        avBaseMass = if (item.dynamicID < BlockCodex.TILE_UNIQUE_MAX)
+            BlockCodex[item.dynamicID].density / 1000.0
         else
             ItemCodex[item.dynamicID].mass
 

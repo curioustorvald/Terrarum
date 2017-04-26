@@ -1,10 +1,7 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.Terrarum
-import com.jme3.math.FastMath
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
 import org.newdawn.slick.state.StateBasedGame
 

@@ -4,9 +4,7 @@ import com.jme3.math.FastMath
 import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorHumanoid
-import net.torvald.terrarum.gameactors.floorInt
-import net.torvald.terrarum.gameactors.roundInt
-import net.torvald.terrarum.mapdrawer.MapCamera
+import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -71,8 +69,8 @@ class UIVitalMetre(
     override fun render(gc: GameContainer, g: Graphics) {
         if (vitalGetterVal() != null && vitalGetterMax() != null && player != null) {
             g.translate(
-                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.x.toFloat() - (MapCamera.x)),
-                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.y.toFloat() - (MapCamera.y))
+                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.x.toFloat() - (WorldCamera.x)),
+                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.y.toFloat() - (WorldCamera.y))
             )
 
 

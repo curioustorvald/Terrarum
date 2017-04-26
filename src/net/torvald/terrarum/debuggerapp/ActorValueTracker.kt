@@ -6,12 +6,11 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.SetAV
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithPhysics
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import java.awt.BorderLayout
 import java.awt.GridLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.awt.event.MouseListener
 import javax.swing.*
 
 /**

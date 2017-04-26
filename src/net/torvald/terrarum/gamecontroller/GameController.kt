@@ -1,15 +1,10 @@
 package net.torvald.terrarum.gamecontroller
 
-import net.torvald.terrarum.mapdrawer.TilesDrawer
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.itemproperties.InventoryItem
-import net.torvald.terrarum.mapdrawer.MapCamera
-import net.torvald.terrarum.tileproperties.Tile
-import net.torvald.terrarum.tileproperties.TileCodex
-import net.torvald.terrarum.ui.UIHandler
-import org.dyn4j.geometry.Vector2
+import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
 
@@ -25,10 +20,10 @@ object GameController {
 
     /** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise) */
     val mouseX: Float
-        get() = (MapCamera.x + Terrarum.appgc.input.mouseX / (ingame.screenZoom ?: 1f))
+        get() = (WorldCamera.x + Terrarum.appgc.input.mouseX / (ingame.screenZoom ?: 1f))
     /** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise)*/
     val mouseY: Float
-        get() = (MapCamera.y + Terrarum.appgc.input.mouseY / (ingame.screenZoom ?: 1f))
+        get() = (WorldCamera.y + Terrarum.appgc.input.mouseY / (ingame.screenZoom ?: 1f))
     /** currently pointing tile coordinate */
     val mouseTileX: Int
         get() = (mouseX / FeaturesDrawer.TILE_SIZE).floorInt()

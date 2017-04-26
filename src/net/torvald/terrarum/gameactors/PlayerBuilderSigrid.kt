@@ -1,21 +1,13 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.JsonFetcher
-import net.torvald.terrarum.gameactors.faction.Faction
-import net.torvald.spriteanimation.SpriteAnimation
-import com.google.gson.JsonObject
 import net.torvald.terrarum.ActorValue
 import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer
-import net.torvald.terrarum.tileproperties.Tile
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.to10bit
-import net.torvald.terrarum.toInt
 import org.newdawn.slick.Color
-import org.newdawn.slick.SlickException
-import java.io.IOException
 
 /**
  * Created by minjaesong on 16-02-03.
@@ -80,12 +72,12 @@ object PlayerBuilderSigrid {
 
         // Test fill up inventory
         val tiles = arrayOf(
-                Tile.AIR, Tile.DIRT, Tile.GLASS_CRUDE,
-                Tile.GRASS, Tile.GRAVEL, Tile.ICE_MAGICAL, Tile.LANTERN,
-                Tile.PLANK_BIRCH, Tile.PLANK_BLOODROSE, Tile.PLANK_EBONY, Tile.PLANK_NORMAL,
-                Tile.SANDSTONE, Tile.SANDSTONE_BLACK, Tile.SANDSTONE_GREEN,
-                Tile.SANDSTONE_RED, Tile.STONE, Tile.STONE_BRICKS,
-                Tile.STONE_QUARRIED, Tile.STONE_TILE_WHITE, Tile.TORCH
+                Block.AIR, Block.DIRT, Block.GLASS_CRUDE,
+                Block.GRASS, Block.GRAVEL, Block.ICE_MAGICAL, Block.LANTERN,
+                Block.PLANK_BIRCH, Block.PLANK_BLOODROSE, Block.PLANK_EBONY, Block.PLANK_NORMAL,
+                Block.SANDSTONE, Block.SANDSTONE_BLACK, Block.SANDSTONE_GREEN,
+                Block.SANDSTONE_RED, Block.STONE, Block.STONE_BRICKS,
+                Block.STONE_QUARRIED, Block.STONE_TILE_WHITE, Block.TORCH
         )
         tiles.forEach { p.addItem(it, 999) }
         p.inventory.add(ItemCodex.ITEM_STATIC.first)

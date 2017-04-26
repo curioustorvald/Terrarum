@@ -1,11 +1,9 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.point.Point2d
-import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.tileproperties.Tile
-import net.torvald.terrarum.tileproperties.TileCodex
+import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockCodex
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -75,7 +73,7 @@ open class ProjectileSimple(
         lifetimeCounter += delta
         if (ccdCollided || grounded || lifetimeCounter >= lifetimeMax ||
             // stuck check
-            TileCodex[Terrarum.ingame!!.world.getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Tile.STONE].isSolid
+            BlockCodex[Terrarum.ingame!!.world.getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Block.STONE].isSolid
                 ) {
             flagDespawn()
         }

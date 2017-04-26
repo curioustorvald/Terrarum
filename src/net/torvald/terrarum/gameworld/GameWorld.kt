@@ -2,12 +2,11 @@
 package net.torvald.terrarum.gameworld
 
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.tileproperties.TileCodex
+import net.torvald.terrarum.blockproperties.BlockCodex
 import org.dyn4j.geometry.Vector2
-import org.newdawn.slick.SlickException
 
-typealias TileAddress = Long
-typealias TileDamage = Float
+typealias BlockAddress = Long
+typealias BlockDamage = Float
 
 class GameWorld(val width: Int, val height: Int) {
 
@@ -25,8 +24,8 @@ class GameWorld(val width: Int, val height: Int) {
     val spawnX: Int
     val spawnY: Int
 
-    val wallDamages = HashMap<TileAddress, TileDamage>()
-    val terrainDamages = HashMap<TileAddress, TileDamage>()
+    val wallDamages = HashMap<BlockAddress, BlockDamage>()
+    val terrainDamages = HashMap<BlockAddress, BlockDamage>()
 
     //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
     //physics
@@ -155,13 +154,13 @@ class GameWorld(val width: Int, val height: Int) {
     fun setTileWall(x: Int, y: Int, tile: Byte, damage: Int) {
         layerWall.setTile(x fmod width, y, tile)
         layerWallLowBits.setData(x fmod width, y, damage)
-        wallDamages.remove(LandUtil.getTileAddr(x, y))
+        wallDamages.remove(LandUtil.getBlockAddr(x, y))
     }
 
     fun setTileTerrain(x: Int, y: Int, tile: Byte, damage: Int) {
         layerTerrain.setTile(x fmod width, y, tile)
         layerTerrainLowBits.setData(x fmod width, y, damage)
-        terrainDamages.remove(LandUtil.getTileAddr(x, y))
+        terrainDamages.remove(LandUtil.getBlockAddr(x, y))
     }
 
     fun setTileWire(x: Int, y: Int, tile: Byte) {
@@ -232,7 +231,7 @@ class GameWorld(val width: Int, val height: Int) {
      */
     fun inflictTerrainDamage(x: Int, y: Int, damage: Double): Boolean {
         val damage = damage.toFloat()
-        val addr = LandUtil.getTileAddr(x, y)
+        val addr = LandUtil.getBlockAddr(x, y)
 
         //println("[GameWorld] ($x, $y) Damage: $damage")
 
@@ -249,7 +248,7 @@ class GameWorld(val width: Int, val height: Int) {
         //println("[GameWorld] accumulated damage: ${terrainDamages[addr]}")
 
         // remove tile from the world
-        if (terrainDamages[addr] ?: 0f >= TileCodex[getTileFromTerrain(x, y)].strength) {
+        if (terrainDamages[addr] ?: 0f >= BlockCodex[getTileFromTerrain(x, y)].strength) {
             setTileTerrain(x, y, 0)
             return true
         }
@@ -257,14 +256,14 @@ class GameWorld(val width: Int, val height: Int) {
         return false
     }
     fun getTerrainDamage(x: Int, y: Int): Float =
-            terrainDamages[LandUtil.getTileAddr(x, y)] ?: 0f
+            terrainDamages[LandUtil.getBlockAddr(x, y)] ?: 0f
 
     /**
      * @return true if block is broken
      */
     fun inflictWallDamage(x: Int, y: Int, damage: Double): Boolean {
         val damage = damage.toFloat()
-        val addr = LandUtil.getTileAddr(x, y)
+        val addr = LandUtil.getBlockAddr(x, y)
 
         if (wallDamages[addr] == null) { // add new
             wallDamages[addr] = damage
@@ -277,7 +276,7 @@ class GameWorld(val width: Int, val height: Int) {
         }
 
         // remove tile from the world
-        if (wallDamages[addr]!! >= TileCodex[getTileFromWall(x, y)].strength) {
+        if (wallDamages[addr]!! >= BlockCodex[getTileFromWall(x, y)].strength) {
             setTileWall(x, y, 0)
             return true
         }
@@ -285,7 +284,7 @@ class GameWorld(val width: Int, val height: Int) {
         return false
     }
     fun getWallDamage(x: Int, y: Int): Float =
-            wallDamages[LandUtil.getTileAddr(x, y)] ?: 0f
+            wallDamages[LandUtil.getBlockAddr(x, y)] ?: 0f
 
     companion object {
 

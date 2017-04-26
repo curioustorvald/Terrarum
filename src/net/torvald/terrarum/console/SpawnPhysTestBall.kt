@@ -1,11 +1,8 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameactors.PhysTestBall
-import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.mapdrawer.MapCamera
+import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -25,8 +22,8 @@ internal object SpawnPhysTestBall : ConsoleCommand {
 
             val ball = PhysTestBall()
             ball.setPosition(
-                    (mouseX + MapCamera.x).toDouble(),
-                    (mouseY + MapCamera.y).toDouble()
+                    (mouseX + WorldCamera.x).toDouble(),
+                    (mouseY + WorldCamera.y).toDouble()
             )
             ball.elasticity = elasticity
             ball.applyForce(Vector2(xvel, yvel))
@@ -38,8 +35,8 @@ internal object SpawnPhysTestBall : ConsoleCommand {
 
             val ball = PhysTestBall()
             ball.setPosition(
-                    (mouseX + MapCamera.x).toDouble(),
-                    (mouseY + MapCamera.y).toDouble()
+                    (mouseX + WorldCamera.x).toDouble(),
+                    (mouseY + WorldCamera.y).toDouble()
             )
             ball.elasticity = elasticity
 

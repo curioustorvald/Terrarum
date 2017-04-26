@@ -1,16 +1,12 @@
 package net.torvald.terrarum.gameworld
 
-import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AnyPlayer
-import net.torvald.terrarum.gameactors.HistoricalFigure
-import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarum.gameactors.roundInt
-import net.torvald.terrarum.gameworld.WorldSimulator.isSolid
-import net.torvald.terrarum.mapdrawer.TilesDrawer
-import net.torvald.terrarum.mapdrawer.FeaturesDrawer
-import net.torvald.terrarum.tileproperties.Tile
-import net.torvald.terrarum.tileproperties.TileCodex
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockCodex
 import org.newdawn.slick.Color
 import org.newdawn.slick.Graphics
 
@@ -74,10 +70,10 @@ object WorldSimulator {
         /////////////////////////////////////////////////////////////
         for (y in updateYFrom..updateYTo) {
             for (x in updateXFrom..updateXTo) {
-                val tile = world.getTileFromTerrain(x, y) ?: Tile.STONE
-                val tileBottom = world.getTileFromTerrain(x, y + 1) ?: Tile.STONE
-                val tileLeft = world.getTileFromTerrain(x - 1, y) ?: Tile.STONE
-                val tileRight = world.getTileFromTerrain(x + 1, y) ?: Tile.STONE
+                val tile = world.getTileFromTerrain(x, y) ?: Block.STONE
+                val tileBottom = world.getTileFromTerrain(x, y + 1) ?: Block.STONE
+                val tileLeft = world.getTileFromTerrain(x - 1, y) ?: Block.STONE
+                val tileRight = world.getTileFromTerrain(x + 1, y) ?: Block.STONE
                 if (tile.isFluid()) {
 
                     // move down if not obstructed
@@ -137,21 +133,21 @@ object WorldSimulator {
     fun displaceFallables(delta: Int) {
         for (y in updateYFrom..updateYTo) {
             for (x in updateXFrom..updateXTo) {
-                val tile = world.getTileFromTerrain(x, y) ?: Tile.STONE
-                val tileBelow = world.getTileFromTerrain(x, y + 1) ?: Tile.STONE
+                val tile = world.getTileFromTerrain(x, y) ?: Block.STONE
+                val tileBelow = world.getTileFromTerrain(x, y + 1) ?: Block.STONE
 
                 if (tile.isFallable()) {
                     // displace fluid. This statement must precede isSolid()
                     if (tileBelow.isFluid()) {
                         // remove tileThis to create air pocket
-                        world.setTileTerrain(x, y, Tile.AIR)
+                        world.setTileTerrain(x, y, Block.AIR)
 
                         pour(x, y, drain(x, y, tileBelow.fluidLevel().toInt()))
                         // place our tile
                         world.setTileTerrain(x, y + 1, tile)
                     }
                     else if (!tileBelow.isSolid()) {
-                        world.setTileTerrain(x, y, Tile.AIR)
+                        world.setTileTerrain(x, y, Block.AIR)
                         world.setTileTerrain(x, y + 1, tile)
                     }
                 }
@@ -166,7 +162,7 @@ object WorldSimulator {
         for (y in 0..fluidMap.size - 1) {
             for (x in 0..fluidMap[0].size - 1) {
                 val data = fluidMap[y][x]
-                if (TilesDrawer.tileInCamera(x + updateXFrom, y + updateYFrom)) {
+                if (BlocksDrawer.tileInCamera(x + updateXFrom, y + updateYFrom)) {
                     if (data == 0.toByte())
                         g.color = colourNone
                     else
@@ -197,7 +193,7 @@ object WorldSimulator {
     private fun worldToFluidMap(world: GameWorld) {
         for (y in updateYFrom..updateYTo) {
             for (x in updateXFrom..updateXTo) {
-                val tile = world.getTileFromTerrain(x, y) ?: Tile.STONE
+                val tile = world.getTileFromTerrain(x, y) ?: Block.STONE
                 if (tile.isFluid()) {
                     fluidMap[y - updateYFrom][x - updateXFrom] = tile.fluidLevel().toByte()
                     fluidTypeMap[y - updateYFrom][x - updateXFrom] = tile.fluidType().toByte()
@@ -217,13 +213,13 @@ object WorldSimulator {
         }
     }
 
-    fun Int.isFluid() = TileCodex[this].isFluid
-    fun Int.isSolid() = this.fluidLevel() == FLUID_MAX || TileCodex[this].isSolid
-    //fun Int.viscosity() = TileCodex[this].
+    fun Int.isFluid() = BlockCodex[this].isFluid
+    fun Int.isSolid() = this.fluidLevel() == FLUID_MAX || BlockCodex[this].isSolid
+    //fun Int.viscosity() = BlockCodex[this].
     fun Int.fluidLevel() = if (!this.isFluid()) 0 else (this % FLUID_MAX).plus(1)
     fun Int.fluidType() = (this / 16) // 0 - 255, 255 being water, 254 being lava
     fun Int.isEven() = (this and 0x01) == 0
-    fun Int.isFallable() = TileCodex[this].isFallable
+    fun Int.isFallable() = BlockCodex[this].isFallable
 
     private fun placeFluid(world: GameWorld, x: Int, y: Int, fluidType: Byte, amount: Int) {
         if (world.layerTerrain.isInBound(x, y)) {
@@ -231,7 +227,7 @@ object WorldSimulator {
                 world.setTileTerrain(x, y, fluidType, amount - 1)
             }
             else if (amount == 0 && world.getTileFromTerrain(x, y)!!.isFluid()) {
-                world.setTileTerrain(x, y, Tile.AIR)
+                world.setTileTerrain(x, y, Block.AIR)
             }
         }
     }
