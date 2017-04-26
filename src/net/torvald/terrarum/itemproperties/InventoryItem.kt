@@ -75,7 +75,7 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
      */
     open val equipPosition: Int = EquipPosition.NULL
 
-    open val material: Material? = null
+    abstract val material: Material
 
     /**
      * Apparent mass of the item. (basemass * scale^3)

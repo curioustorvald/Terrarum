@@ -17,7 +17,7 @@ constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
     private var segmentRight: Image? = null
     private var segmentBody: Image? = null
 
-    private lateinit var messagesList: Array<String>
+     var messagesList: Array<String>
     override var height: Int = 0
     private val messageWindowRadius: Int
 

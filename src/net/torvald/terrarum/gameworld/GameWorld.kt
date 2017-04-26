@@ -230,7 +230,8 @@ class GameWorld(val width: Int, val height: Int) {
     /**
      * @return true if block is broken
      */
-    fun inflctTerrainDamage(x: Int, y: Int, damage: Float): Boolean {
+    fun inflictTerrainDamage(x: Int, y: Int, damage: Double): Boolean {
+        val damage = damage.toFloat()
         val addr = LandUtil.getTileAddr(x, y)
 
         //println("[GameWorld] ($x, $y) Damage: $damage")
@@ -261,7 +262,8 @@ class GameWorld(val width: Int, val height: Int) {
     /**
      * @return true if block is broken
      */
-    fun inflctWallDamage(x: Int, y: Int, damage: Float): Boolean {
+    fun inflictWallDamage(x: Int, y: Int, damage: Double): Boolean {
+        val damage = damage.toFloat()
         val addr = LandUtil.getTileAddr(x, y)
 
         if (wallDamages[addr] == null) { // add new

@@ -3,13 +3,11 @@ package net.torvald.terrarum.itemproperties
 import net.torvald.point.Point2d
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.CanBeAnItem
-import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
-import net.torvald.terrarum.itemproperties.IVKey
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.mapdrawer.TilesDrawer
 import net.torvald.terrarum.mapdrawer.TilesDrawer.wallOverlayColour
@@ -56,6 +54,7 @@ object ItemCodex {
                 override var stackable = true
                 override var inventoryCategory = Category.BLOCK
                 override var isDynamic = false
+                override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
 
                 init {
                     itemProperties[IVKey.ITEMTYPE] = if (i in ITEM_TILES)
@@ -104,7 +103,7 @@ object ItemCodex {
         }
 
         // test copper pickaxe
-        itemCodex[ITEM_STATIC.first] = object : InventoryItem() {
+        /*itemCodex[ITEM_STATIC.first] = object : InventoryItem() {
             override val originalID = ITEM_STATIC.first
             override var dynamicID = originalID
             override val isUnique = false
@@ -117,11 +116,7 @@ object ItemCodex {
             override var equipPosition = EquipPosition.HAND_GRIP
             override var inventoryCategory = Category.TOOL
             override val isDynamic = true
-
-
-            private val testmaterial = Material(
-                    0,0,0,0,0,0,0,0,1,0.0 // quick test material Stone
-            )
+            override val material = Material(0,0,0,0,0,0,0,0,1,0.0)
 
             init {
                 itemProperties[IVKey.ITEMTYPE] = IVKey.ItemType.PICK
@@ -150,10 +145,10 @@ object ItemCodex {
                 // filter passed, do the job
                 val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
-                Terrarum.ingame!!.world.inflctTerrainDamage(
+                Terrarum.ingame!!.world.inflictTerrainDamage(
                         gc.mouseTileX,
                         gc.mouseTileY,
-                        Calculate.pickaxePower(Terrarum.ingame!!.player!!, testmaterial) * swingDmgToFrameDmg.toFloat()
+                        Calculate.pickaxePower(Terrarum.ingame!!.player!!, material) * swingDmgToFrameDmg
                 )
                 return true
             }
@@ -164,9 +159,8 @@ object ItemCodex {
                 Terrarum.ingame!!.player!!.actorValue[AVKey.__ACTION_TIMER] = 0.0
                 return true
             }
-        }
+        }*/
 
-        // TODO read prop in Lua and fill itemCodex
 
         // read from save (if applicable) and fill dynamicItemDescription
     }
@@ -186,6 +180,13 @@ object ItemCodex {
 
             throw IllegalArgumentException("Attempted to get item data of actor that cannot be an item. ($a)")
         }
+    }
+
+    /**
+     * Mainly used by GameItemLoader
+     */
+    operator fun set(code: Int, item: InventoryItem) {
+        itemCodex[code] = item
     }
 
     fun getItemImage(item: InventoryItem): Image {

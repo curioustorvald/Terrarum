@@ -6,6 +6,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.EnumKeyFunc
 import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
@@ -147,6 +148,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "(no name)"
         override var stackable = false
         override val isDynamic = false
+        override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
     }
 
     override fun update(gc: GameContainer, delta: Int) {

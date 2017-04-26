@@ -1,4 +1,4 @@
-package net.torvald
+package net.torvald.dataclass
 
 import java.util.*
 

@@ -1,9 +1,10 @@
-# Load order
+# Load Order
 # Modules are loaded from top to bottom.
-# And yes, you can disable basegame, but we don't recommend.
 # Acceptable formats:
-#   module_name,description_in_English_no_comma,
-#   module_name,description_in_English_no_comma,(external Jar 1);(external Jar 2); ...
+#   module_name,description_in_English_no_comma,(entry_point.kts),(external Jars sep'd by semicolon)...
+#     If entry_point is not given, the program will try to run <modulename>.kts.
+#     if even that does not exist, an the program will quit with error.
+# and yes, you can disable basegame, but we don't recommend.
 
-basegame,The base game,
-dwarventech,Dwarven technicians are emerged,
+basegame,The base game,basegame.groovy,
+dwarventech,Dwarven technicians are emerged from their hiding,,

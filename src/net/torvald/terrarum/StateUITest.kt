@@ -4,6 +4,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.itemproperties.IVKey
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.tileproperties.Tile
 import net.torvald.terrarum.ui.*
 import org.newdawn.slick.*
@@ -58,6 +59,7 @@ class StateUITest : BasicGameState() {
             override var durability: Float = 64f
             override var stackable = false
             override val isDynamic = true
+            override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
         })
         actor.inventory.getByDynamicID(5656)!!.item.name = "Test tool"
 
@@ -74,6 +76,7 @@ class StateUITest : BasicGameState() {
             override var inventoryCategory: String = InventoryItem.Category.MISC
             override var stackable = false
             override val isDynamic = false
+            override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
         })
 
         actor.inventory.add(ItemCodex[16], 543)
