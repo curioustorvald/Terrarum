@@ -2,7 +2,6 @@ package net.torvald.terrarum
 
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.itemproperties.InventoryItem
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.ui.UIVitalMetre
 
 /**

@@ -7,6 +7,8 @@ import net.torvald.imagefont.GameFontImpl
 import net.torvald.JsonFetcher
 import net.torvald.JsonWriter
 import net.torvald.imagefont.TinyAlphNum
+import net.torvald.terrarum.gamecontroller.mouseTileX
+import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.gameworld.toUint
 import org.lwjgl.input.Controllers
 import org.lwjgl.opengl.*
@@ -500,6 +502,12 @@ object Terrarum : StateBasedGame(GAME_NAME) {
 
             return file // TODO TEST CODE
         }
+
+
+
+    // for external scripts (e.g. Groovy)
+    @JvmStatic fun getMouseTileX(): Int = appgc.mouseTileX
+    @JvmStatic fun getMouseTileY(): Int = appgc.mouseTileY
 }
 
 fun main(args: Array<String>) {

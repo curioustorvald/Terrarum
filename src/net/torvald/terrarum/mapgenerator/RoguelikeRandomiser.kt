@@ -1,6 +1,6 @@
 package net.torvald.terrarum.mapgenerator
 
-import net.torvald.IntArrayStack
+import net.torvald.dataclass.IntArrayStack
 import net.torvald.colourutil.Col4096
 import net.torvald.random.HQRNG
 import org.newdawn.slick.Color

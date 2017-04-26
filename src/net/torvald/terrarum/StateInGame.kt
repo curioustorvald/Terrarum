@@ -69,7 +69,7 @@ class StateInGame : BasicGameState() {
 
     var playableActorDelegate: PlayableActorDelegate? = null // DO NOT LATEINIT!
         private set
-    internal val player: ActorHumanoid? // currently POSSESSED actor :)
+    val player: ActorHumanoid? // currently POSSESSED actor :)
         get() = playableActorDelegate?.actor
 
     var screenZoom = 1.0f

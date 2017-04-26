@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
 import net.torvald.terrarum.gamecontroller.mouseX
 import net.torvald.terrarum.gamecontroller.mouseY
 import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.Material
 import org.luaj.vm2.*
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.*
@@ -59,6 +60,7 @@ open class HumanoidNPC(
         override val originalName: String = actorValue.getAsString(AVKey.NAME) ?: "NPC"
         override var stackable = true
         override val isDynamic = false
+        override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
 
         override fun secondaryUse(gc: GameContainer, delta: Int): Boolean {
             try {

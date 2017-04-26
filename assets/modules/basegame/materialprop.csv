@@ -6,10 +6,14 @@
 "argn";       "9";     "0.91";"argentum/silver"
 "stal";      "14";     "1.73";"steel"
 "eaur";      "21";     "1.36";"elven aurichalcum"
-"tial";      "33";     "2.16";"titanium alloy"
+"tial";      "33";     "2.16";"titanium alloy (Ti6Al4V)"
 "admt";      "71";     "3.42";"adamant"
+
+# idst: ID_STRING
 
 # forcemod: related to attack points
 #   Attack points = `4 * forcemod.sqrt()` for each strike
 
 # endurance: multiplier, using copper as reference; determines durability of tools/weapons/armours/etc.
+
+# Comments: do nothing; do not parse
