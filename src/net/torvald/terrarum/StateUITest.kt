@@ -42,7 +42,6 @@ class StateUITest : BasicGameState() {
         // these are the test codes.
         // Item properties must be pre-composed using CSV/JSON, and read and made into the item instance
         // using factory/builder pattern. @see ItemCodex
-        actor.actorValue[AVKey.__PLAYER_QSPREFIX + "3"] = Block.STONE
 
         actor.inventory.add(object : InventoryItem() {
             init {

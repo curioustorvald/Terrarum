@@ -93,9 +93,7 @@ object AVKey {
 
 
     const val __PLAYER_QUICKSLOTSEL = "__quickslotselection"
-    /**  SYNOPSIS: __qsitem1 .. __qsitem10
-     * contains tem ID; they are supposed to be unique. Indices must be ONE-BASED! */
-    const val __PLAYER_QSPREFIX = "__qsitem" // __qsitem1 .. __qsitem10 (NOT ZERO BASED!)
+
     /** Double
      * When using tool/arm/etc. how long action button is held, in milliseconds (Int)
      * Or for NPCs, how long it has been waiting for next move
