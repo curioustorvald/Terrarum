@@ -10,16 +10,18 @@ import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 
+typealias ItemID = Int
+
 /**
  * Created by minjaesong on 16-01-16.
  */
 abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
 
-    abstract var dynamicID: Int
+    abstract var dynamicID: ItemID
     /**
      * if the ID is a Actor range, it's an actor contained in a pocket.
      */
-    abstract val originalID: Int // WUT?! using init does not work!!
+    abstract val originalID: ItemID // WUT?! using init does not work!!
 
 
     /**
@@ -237,6 +239,7 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
         @JvmStatic val MAGIC = "magic"
         @JvmStatic val BLOCK = "block"
         @JvmStatic val WALL = "wall"
+        @JvmStatic val WIRE = "wire"
         @JvmStatic val MISC = "misc"
     }
 

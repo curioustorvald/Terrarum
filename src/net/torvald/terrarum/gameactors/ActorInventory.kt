@@ -1,9 +1,12 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
+import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_WALLS
+import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.ui.UIInventory
 import java.util.*
 import java.util.concurrent.locks.Lock
@@ -30,16 +33,25 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
      * Sorted by referenceID.
      */
     private val itemList = ArrayList<InventoryPair>()
+    private val quickBar = Array<ItemID?>(10, { null })
 
     init {
     }
 
-    fun add(itemID: Int, count: Int = 1) = add(ItemCodex[itemID], count)
+    fun add(itemID: ItemID, count: Int = 1) = add(ItemCodex[itemID], count)
     fun add(item: InventoryItem, count: Int = 1) {
 
         println("[ActorInventory] add $item, $count")
 
 
+        // not wall-able walls
+        if (item.inventoryCategory == InventoryItem.Category.WALL &&
+            !BlockCodex[item.dynamicID - ITEM_WALLS.start].isWallable) {
+            throw IllegalArgumentException("Wall ID ${item.dynamicID - ITEM_WALLS.start} is not wall-able.")
+        }
+
+
+        // other invalid values
         if (count == 0)
             throw IllegalArgumentException("Item count is zero.")
         if (count < 0)
@@ -71,7 +83,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
         insertionSortLastElem(itemList)
     }
 
-    fun remove(itemID: Int, count: Int) = remove(ItemCodex[itemID], count)
+    fun remove(itemID: ItemID, count: Int) = remove(ItemCodex[itemID], count)
     /** Will check existence of the item using its Dynamic ID; careful with command order!
      *      e.g. re-assign after this operation */
     fun remove(item: InventoryItem, count: Int = 1) {
@@ -108,6 +120,12 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             throw Error("Tried to remove $item, but the inventory does not have it.")
         }
     }
+
+    fun setQuickBar(slot: Int, dynamicID: ItemID?) {
+        quickBar[slot] = dynamicID
+    }
+
+    fun getQuickBar(slot: Int): InventoryPair? = getByDynamicID(quickBar[slot])
 
     /**
      * HashMap<InventoryItem, Amounts>
@@ -202,13 +220,13 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
 
 
     fun contains(item: InventoryItem) = contains(item.dynamicID)
-    fun contains(id: Int) =
+    fun contains(id: ItemID) =
             if (itemList.size == 0)
                 false
             else
                 itemList.binarySearch(id, DYNAMIC_ID) >= 0
-    fun getByDynamicID(id: Int): InventoryPair? {
-        if (itemList.size == 0)
+    fun getByDynamicID(id: ItemID?): InventoryPair? {
+        if (itemList.size == 0 || id == null)
             return null
 
         val index = itemList.binarySearch(id, DYNAMIC_ID)
@@ -217,7 +235,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
         else
             return itemList[index]
     }
-    private fun getByStaticID(id: Int): InventoryPair? {
+    private fun getByStaticID(id: ItemID): InventoryPair? {
         if (itemList.size == 0)
             return null
 
@@ -240,7 +258,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     }
     private val STATIC_ID = 41324534
     private val DYNAMIC_ID = 181643953
-    private fun ArrayList<InventoryPair>.binarySearch(ID: Int, searchBy: Int): Int {
+    private fun ArrayList<InventoryPair>.binarySearch(ID: ItemID, searchBy: Int): Int {
         // code from collections/Collections.kt
         var low = 0
         var high = this.size - 1

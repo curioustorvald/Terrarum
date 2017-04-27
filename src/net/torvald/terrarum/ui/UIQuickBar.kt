@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import net.torvald.terrarum.Millisec
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.itemproperties.ItemCodex
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -41,18 +42,37 @@ class UIQuickBar : UICanvas, MouseControlled {
             else
                 ItemSlotImageBuilder.COLOR_BLACK
 
+            val image = if (i == selection)
+                ItemSlotImageBuilder.produceLarge(color, i + 1)
+            else
+                ItemSlotImageBuilder.produce(color, i + 1)
+
+            val slotX = startPointX + (CELL_SIZE + gutter).times(i).toFloat()
+            val slotY = startPointY.toFloat()
+
             // draw slots
             g.drawImage(
-                    if (i == selection)
-                        ItemSlotImageBuilder.produceLarge(color, i + 1)
-                    else
-                        ItemSlotImageBuilder.produce(color, i + 1),
-                    startPointX + (CELL_SIZE + gutter).times(i).toFloat(),
-                    startPointY.toFloat(),
-                    Color(1f, 1f, 1f, handler!!.opacity * 0.8f)
+                    image,
+                    slotX,
+                    slotY,
+                    Color(1f, 1f, 1f, handler!!.opacity * finalOpacity)
             )
-            // draw items
 
+            // draw item
+            val itemPair = Terrarum.ingame!!.player!!.inventory.getQuickBar(i)
+
+            if (itemPair != null) {
+                val itemImage = ItemCodex.getItemImage(itemPair.item)
+                val itemW = itemImage.width
+                val itemH = itemImage.height
+
+                g.drawImage(
+                        itemImage, // using fixed CELL_SIZE for reasons
+                        slotX + (CELL_SIZE - itemW) / 2f,
+                        slotY + (CELL_SIZE - itemH) / 2f,
+                        Color(1f, 1f, 1f, handler!!.opacity * UIQuickBar.finalOpacity)
+                )
+            }
         }
     }
 

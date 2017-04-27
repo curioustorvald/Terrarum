@@ -71,7 +71,7 @@ object PlayerBuilderSigrid {
 
 
         // Test fill up inventory
-        val tiles = arrayOf(
+        val blocks = arrayOf(
                 Block.AIR, Block.DIRT, Block.GLASS_CRUDE,
                 Block.GRASS, Block.GRAVEL, Block.ICE_MAGICAL, Block.LANTERN,
                 Block.PLANK_BIRCH, Block.PLANK_BLOODROSE, Block.PLANK_EBONY, Block.PLANK_NORMAL,
@@ -79,7 +79,16 @@ object PlayerBuilderSigrid {
                 Block.SANDSTONE_RED, Block.STONE, Block.STONE_BRICKS,
                 Block.STONE_QUARRIED, Block.STONE_TILE_WHITE, Block.TORCH
         )
-        tiles.forEach { p.addItem(it, 999) }
+        val walls = arrayOf(
+                Block.AIR, Block.DIRT, Block.GLASS_CRUDE,
+                Block.GRASSWALL, Block.ICE_MAGICAL,
+                Block.PLANK_BIRCH, Block.PLANK_BLOODROSE, Block.PLANK_EBONY, Block.PLANK_NORMAL,
+                Block.SANDSTONE, Block.SANDSTONE_BLACK, Block.SANDSTONE_GREEN,
+                Block.SANDSTONE_RED, Block.STONE, Block.STONE_BRICKS,
+                Block.STONE_QUARRIED, Block.STONE_TILE_WHITE
+        )
+        blocks.forEach { p.addItem(it, 999) }
+        walls.forEach { p.addItem(it + 4096, 999) }
         p.inventory.add(ItemCodex.ITEM_STATIC.first)
 
 

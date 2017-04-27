@@ -4,6 +4,7 @@ package net.torvald.terrarum.itemproperties
  * Created by minjaesong on 16-09-09.
  */
 object IVKey {
+    /** Weapon types or Armour types. Does not affect inventory categorising */
     const val ITEMTYPE = "itemtype" // "sword1h", "sword2h", "pick", "hammer", "tile", "wall", etc
     const val UUID = "uuid" // some items need UUID to be stored
 
@@ -12,8 +13,6 @@ object IVKey {
 
 
     object ItemType {
-        const val BLOCK = "tile"
-        const val WALL  = "wall"
         // tools
         const val PICK  = "pick"
         const val HAMMER= "hammer"

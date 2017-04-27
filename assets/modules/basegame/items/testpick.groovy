@@ -8,6 +8,7 @@ import net.torvald.point.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithPhysics
+import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.blockproperties.Block
