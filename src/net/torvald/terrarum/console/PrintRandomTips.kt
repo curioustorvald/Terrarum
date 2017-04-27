@@ -8,7 +8,8 @@ import java.util.*
  */
 internal object PrintRandomTips : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        Echo(Lang["GAME_TIPS_${Random().nextInt(Lang.TIPS_COUNT) + 1}"])
+        Echo("Nope.")
+        //Echo(Lang["GAME_TIPS_${Random().nextInt(Lang.TIPS_COUNT) + 1}"])
     }
 
     override fun printUsage() {

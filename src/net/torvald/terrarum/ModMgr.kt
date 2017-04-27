@@ -4,6 +4,7 @@ import net.torvald.CSVFetcher
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.langpack.Lang
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import java.io.File
@@ -158,6 +159,15 @@ object ModMgr {
                 groovyEngine.eval(script)
                 ItemCodex[itemID] = groovyInvocable.invokeFunction("invoke", itemID) as InventoryItem
             }
+        }
+    }
+
+    object GameLanguageLoader {
+        val langPath = "locales/"
+
+        @JvmStatic operator fun invoke(module: String) {
+            println("arstneitars")
+            Lang.load(getPath(module, langPath))
         }
     }
 }
