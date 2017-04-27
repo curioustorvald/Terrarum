@@ -18,7 +18,8 @@ class UIPieMenu : UICanvas {
 
     private val slotCount = UIQuickBar.SLOT_COUNT
 
-    private val slotDistanceFromCentre = cellSize * 2.7
+    private val slotDistanceFromCentre: Double
+            get() = cellSize * 2.7 * handler!!.scale
     override var width: Int = cellSize * 7
     override var height: Int = width
 
@@ -42,13 +43,11 @@ class UIPieMenu : UICanvas {
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
-        val centrePoint = Vector2(width / 2.0, height / 2.0)
-
         // draw radial thingies
         for (i in 0..slotCount - 1) {
             // set position
             val angle = Math.PI * 2.0 * (i.toDouble() / slotCount) + Math.PI // 180 deg monitor-wise
-            val slotCentrePoint = Vector2(0.0, slotDistanceFromCentre).setDirection(angle) + centrePoint
+            val slotCentrePoint = Vector2(0.0, slotDistanceFromCentre).setDirection(-angle)// + centrePoint
 
             // draw cells
             val color = if (i == selection)
@@ -56,13 +55,16 @@ class UIPieMenu : UICanvas {
             else
                 ItemSlotImageBuilder.COLOR_BLACK
 
+            val image = if (i == selection)
+                ItemSlotImageBuilder.produceLarge(color, i + 1)
+            else
+                ItemSlotImageBuilder.produce(color, i + 1)
+
             g.drawImage(
-                    if (i == selection)
-                        ItemSlotImageBuilder.produceLarge(color, i + 1)
-                    else
-                        ItemSlotImageBuilder.produce(color, i + 1),
-                    slotCentrePoint.x.toFloat() - (cellSize / 2f),
-                    slotCentrePoint.y.toFloat() - (cellSize / 2f)
+                    image,
+                    slotCentrePoint.x.toFloat() - (image.width / 2) + Terrarum.HALFW,
+                    slotCentrePoint.y.toFloat() - (image.width / 2) + Terrarum.HALFH,
+                    Color(1f, 1f, 1f, handler!!.opacity * UIQuickBar.finalOpacity)
             )
 
             // TODO draw item
@@ -72,8 +74,8 @@ class UIPieMenu : UICanvas {
     override fun processInput(gc: GameContainer, delta: Int, input: Input) {
         if (handler!!.isOpened || handler!!.isOpening) {
             val cursorPos = Vector2(input.mouseX.toDouble(), input.mouseY.toDouble())
-            val centre = Vector2(Terrarum.WIDTH / 2.0, Terrarum.HEIGHT / 2.0)
-            val deg = (centre - cursorPos).direction.toFloat()
+            val centre = Vector2(Terrarum.HALFW.toDouble(), Terrarum.HALFH.toDouble())
+            val deg = -(centre - cursorPos).direction.toFloat()
 
             selection = Math.round(deg * slotCount / FastMath.TWO_PI)
             if (selection < 0) selection += 10

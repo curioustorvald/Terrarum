@@ -3,6 +3,8 @@ package net.torvald.terrarum
 import net.torvald.dataclass.CircularArray
 import net.torvald.imagefont.GameFontBase
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.Terrarum.HALFH
+import net.torvald.terrarum.Terrarum.HALFW
 import net.torvald.terrarum.Terrarum.delta
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.console.*
@@ -187,10 +189,7 @@ class StateInGame : BasicGameState() {
 
         // pie menu
         uiPieMenu = UIHandler(UIPieMenu())
-        uiPieMenu.setPosition(
-                (Terrarum.WIDTH -  uiPieMenu.UI.width) / 2,
-                (Terrarum.HEIGHT - uiPieMenu.UI.height) / 2
-        )
+        uiPieMenu.setPosition(HALFW, HALFH)
 
         // vital metre
         // fill in getter functions by
