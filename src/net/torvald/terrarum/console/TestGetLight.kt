@@ -15,7 +15,7 @@ internal object TestGetLight : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val x = args[1].toInt()
         val y = args[2].toInt()
-        val l = LightmapRenderer.getLightRawPos(16, 16)
+        val l = LightmapRenderer.getLightRawPos(x, y)
         EchoConsole.execute(l.toString())
     }
 

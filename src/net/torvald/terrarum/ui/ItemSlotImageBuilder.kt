@@ -16,8 +16,8 @@ object ItemSlotImageBuilder {
     const val COLOR_BLACK = 1
     const val COLOR_WHITE = 2
 
-    private val colourBlack = Color(0x40, 0x40, 0x40, 0xEE)
-    private val colourWhite = Color(0xC0, 0xC0, 0xC0, 0xEE)
+    private val colourBlack = Color(0x40, 0x40, 0x40)
+    private val colourWhite = Color(0xC0, 0xC0, 0xC0)
 
     private val numberFont = SpriteSheetFont(
             SpriteSheet("./assets/graphics/fonts/numeric_small.tga", 5, 8),

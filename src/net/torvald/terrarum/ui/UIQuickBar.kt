@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import net.torvald.terrarum.Millisec
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
+import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Input
@@ -28,10 +29,12 @@ class UIQuickBar : UICanvas, MouseControlled {
         get() = Terrarum.ingame!!.player?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
         set(value) { Terrarum.ingame!!.player?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, value) }
 
+
     override fun update(gc: GameContainer, delta: Int) {
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
+
         for (i in 0..SLOT_COUNT - 1) {
             val color = if (i == selection)
                 ItemSlotImageBuilder.COLOR_WHITE
@@ -45,7 +48,8 @@ class UIQuickBar : UICanvas, MouseControlled {
                     else
                         ItemSlotImageBuilder.produce(color, i + 1),
                     startPointX + (CELL_SIZE + gutter).times(i).toFloat(),
-                    startPointY.toFloat()
+                    startPointY.toFloat(),
+                    Color(1f, 1f, 1f, handler!!.opacity * 0.8f)
             )
             // draw items
 
@@ -89,6 +93,8 @@ class UIQuickBar : UICanvas, MouseControlled {
     }
 
     companion object {
+        val finalOpacity = 0.8f
+
         const val SLOT_COUNT = 10
         const val CELL_SIZE = 32
     }
