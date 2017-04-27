@@ -7,12 +7,14 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
 import net.torvald.terrarum.worlddrawer.WorldCamera.x
 import net.torvald.terrarum.worlddrawer.WorldCamera.y
 import net.torvald.terrarum.worlddrawer.WorldCamera.height
 import net.torvald.terrarum.worlddrawer.WorldCamera.width
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
+import org.newdawn.slick.imageout.ImageOut
 
 
 /**
@@ -31,6 +33,11 @@ object BlocksDrawer {
     val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "blocks/wire.tga.gz"), TILE_SIZE, TILE_SIZE)
 
 
+    val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16)
+
+
+    val wallOverlayColour = Color(2f/3f, 2f/3f, 2f/3f, 1f)
+
     val breakAnimSteps = 10
 
     val WALL = GameWorld.WALL
@@ -46,6 +53,30 @@ object BlocksDrawer {
     private val NEARBY_TILE_CODE_RIGHT = 2
     private val NEARBY_TILE_CODE_DOWN = 4
     private val NEARBY_TILE_CODE_LEFT = 8
+
+
+    init {
+        val tg = tileItemWall.graphics
+
+        // initialise item_wall images
+        (ITEM_TILES).forEach {
+            tg.drawImage(
+                    tilesTerrain.getSubImage(
+                            (it % 16) * 16,
+                            (it / 16)
+                    ),
+                    (it % 16) * TILE_SIZE.toFloat(),
+                    (it / 16) * TILE_SIZE.toFloat(),
+                    wallOverlayColour
+            )
+        }
+
+        //tg.flush()
+        //ImageOut.write(tileItemWall, "./tileitemwalltest.png")
+
+        tg.destroy()
+    }
+
 
     /**
      * Connectivity group 01 : artificial tiles
@@ -227,8 +258,6 @@ object BlocksDrawer {
     fun update() {
         val player = Terrarum.ingame!!.player
     }
-
-    val wallOverlayColour = Color(2f/3f, 2f/3f, 2f/3f, 1f)
 
     fun renderWall(g: Graphics) {
         /**

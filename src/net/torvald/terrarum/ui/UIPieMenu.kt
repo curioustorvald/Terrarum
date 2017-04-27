@@ -4,6 +4,8 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.Millisec
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.ui.UIQuickBar.Companion.CELL_SIZE
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -60,14 +62,34 @@ class UIPieMenu : UICanvas {
             else
                 ItemSlotImageBuilder.produce(color, i + 1)
 
+            val slotSize = image.width
+
+            val slotX = slotCentrePoint.x.toFloat() - (slotSize / 2) + Terrarum.HALFW
+            val slotY = slotCentrePoint.y.toFloat() - (slotSize / 2) + Terrarum.HALFH
+
             g.drawImage(
                     image,
-                    slotCentrePoint.x.toFloat() - (image.width / 2) + Terrarum.HALFW,
-                    slotCentrePoint.y.toFloat() - (image.width / 2) + Terrarum.HALFH,
+                    slotX,
+                    slotY,
                     Color(1f, 1f, 1f, handler!!.opacity * UIQuickBar.finalOpacity)
             )
 
-            // TODO draw item
+
+            // draw item
+            val itemPair = Terrarum.ingame!!.player!!.inventory.getQuickBar(i)
+
+            if (itemPair != null) {
+                val itemImage = ItemCodex.getItemImage(itemPair.item)
+                val itemW = itemImage.width
+                val itemH = itemImage.height
+
+                g.drawImage(
+                        itemImage, // using fixed CELL_SIZE for reasons
+                        slotX + (CELL_SIZE - itemW) / 2f,
+                        slotY + (CELL_SIZE - itemH) / 2f,
+                        Color(1f, 1f, 1f, handler!!.opacity * UIQuickBar.finalOpacity)
+                )
+            }
         }
     }
 

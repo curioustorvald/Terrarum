@@ -14,6 +14,7 @@ object Block {
 
     val DIRT = BlockCodex.idDamageToIndex(2, 0)
     val GRASS = BlockCodex.idDamageToIndex(2, 1)
+    val GRASSWALL = BlockCodex.idDamageToIndex(2, 2)
 
     val PLANK_NORMAL = BlockCodex.idDamageToIndex(3, 0)
     val PLANK_EBONY = BlockCodex.idDamageToIndex(3, 1)

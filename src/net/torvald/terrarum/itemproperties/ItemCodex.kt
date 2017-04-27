@@ -9,8 +9,8 @@ import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import net.torvald.terrarum.worlddrawer.BlocksDrawer.wallOverlayColour
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Image
 import java.util.*
@@ -24,8 +24,8 @@ object ItemCodex {
      * <ItemID or RefID for Actor, TheItem>
      * Will return corresponding Actor if ID >= ACTORID_MIN
      */
-    private val itemCodex = HashMap<Int, InventoryItem>()
-    private val dynamicItemDescription = HashMap<Int, KVHashMap>()
+    private val itemCodex = HashMap<ItemID, InventoryItem>()
+    private val dynamicItemDescription = HashMap<ItemID, KVHashMap>()
 
     val ITEM_TILES = 0..GameWorld.TILES_SUPPORTED - 1
     val ITEM_WALLS = GameWorld.TILES_SUPPORTED..GameWorld.TILES_SUPPORTED * 2 - 1
@@ -51,15 +51,12 @@ object ItemCodex {
                 override var equipPosition = EquipPosition.HAND_GRIP
                 override val originalName = BlockCodex[i % ITEM_WALLS.first].nameKey
                 override var stackable = true
-                override var inventoryCategory = Category.BLOCK
+                override var inventoryCategory = if (i in ITEM_TILES) Category.BLOCK else Category.WALL
                 override var isDynamic = false
                 override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
 
                 init {
-                    itemProperties[IVKey.ITEMTYPE] = if (i in ITEM_TILES)
-                        IVKey.ItemType.BLOCK
-                    else
-                        IVKey.ItemType.WALL
+
                 }
 
                 override fun primaryUse(gc: GameContainer, delta: Int): Boolean {
@@ -69,14 +66,23 @@ object ItemCodex {
 
                 override fun secondaryUse(gc: GameContainer, delta: Int): Boolean {
                     val mousePoint = Point2d(gc.mouseTileX.toDouble(), gc.mouseTileY.toDouble())
-                    // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
-                    Terrarum.ingame!!.actorContainer.forEach {
-                        if (it is ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
-                            return false
+
+                    // check for collision with actors (BLOCK only)
+                    if (this.inventoryCategory == Category.BLOCK) {
+                        Terrarum.ingame!!.actorContainer.forEach {
+                            if (it is ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
+                                return false
+                        }
                     }
 
                     // return false if the tile is already there
-                    if (this.dynamicID == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY))
+                    if (this.inventoryCategory == Category.BLOCK &&
+                        this.dynamicID == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY) ||
+                        this.inventoryCategory == Category.WALL &&
+                        this.dynamicID - ITEM_WALLS.start == Terrarum.ingame!!.world.getTileFromWall(gc.mouseTileX, gc.mouseTileY) ||
+                        this.inventoryCategory == Category.WIRE &&
+                        this.dynamicID - ITEM_WIRES.start == Terrarum.ingame!!.world.getTileFromWire(gc.mouseTileX, gc.mouseTileY)
+                            )
                         return false
 
                     // filter passed, do the job
@@ -167,7 +173,7 @@ object ItemCodex {
     /**
      * Returns clone of the item in the Codex
      */
-    operator fun get(code: Int): InventoryItem {
+    operator fun get(code: ItemID): InventoryItem {
         if (code <= ITEM_STATIC.endInclusive) // generic item
             return itemCodex[code]!!.clone() // from CSV
         else if (code <= ITEM_DYNAMIC.endInclusive) {
@@ -184,25 +190,31 @@ object ItemCodex {
     /**
      * Mainly used by GameItemLoader
      */
-    operator fun set(code: Int, item: InventoryItem) {
+    operator fun set(code: ItemID, item: InventoryItem) {
         itemCodex[code] = item
     }
 
     fun getItemImage(item: InventoryItem): Image {
         // terrain
         if (item.originalID in ITEM_TILES) {
-            return BlocksDrawer.tilesTerrain.getSubImage((item.dynamicID % 16) * 16, item.originalID / 16)
+            return BlocksDrawer.tilesTerrain.getSubImage(
+                    (item.originalID % 16) * 16,
+                    item.originalID / 16
+            )
         }
         // wall
         else if (item.originalID in ITEM_WALLS) {
-            val img = BlocksDrawer.tilesTerrain.getSubImage((item.originalID % 16) * 16, item.originalID / 16)
-            img.setImageColor(wallOverlayColour.r, wallOverlayColour.g, wallOverlayColour.b)
-            return img
+            return BlocksDrawer.tileItemWall.getSubImage(
+                    (item.originalID.minus(ITEM_WALLS.first) % 16) * TILE_SIZE,
+                    (item.originalID.minus(ITEM_WALLS.first) / 16) * TILE_SIZE,
+                    TILE_SIZE, TILE_SIZE
+            )
         }
         // wire
         else if (item.originalID in ITEM_WIRES) {
             return BlocksDrawer.tilesWire.getSubImage((item.originalID % 16) * 16, item.originalID / 16)
         }
+        // TODO get it real, using originalID...?
         else
             return itemImagePlaceholder
     }
