@@ -10,6 +10,7 @@ import net.torvald.imagefont.TinyAlphNum
 import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.gameworld.toUint
+import net.torvald.terrarum.langpack.Lang
 import org.lwjgl.input.Controllers
 import org.lwjgl.opengl.*
 import org.newdawn.slick.*
@@ -314,7 +315,8 @@ object Terrarum : StateBasedGame(GAME_NAME) {
             }
         }
 
-
+        // load languages
+        Lang
         // load modules
         ModMgr
 

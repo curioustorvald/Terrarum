@@ -15,15 +15,13 @@ object Lang {
      *
      * HashMap<"$key_$language", Value>
      */
-    var langpack: HashMap<String, String>
-        private set
+    val langpack = HashMap<String, String>()
     private val FALLBACK_LANG_CODE = "en"
 
     private val HANGUL_SYL_START = 0xAC00
 
-    val languageList: List<String>
+    val languageList = HashSet<String>()
 
-    private val PATH_TO_LANG = "./assets/locales/"
     val POLYGLOT_VERSION = "100"
     private val PREFIX_POLYGLOT = "Polyglot-${POLYGLOT_VERSION}_"
     private val PREFIX_NAMESET = "nameset_"
@@ -37,71 +35,72 @@ object Lang {
 
     private val FRENCH_WORD_NORMAL_PLURAL = arrayOf("bal", "banal", "fatal", "final")
 
-    var TIPS_COUNT = 0
-        private set
-
     init {
-        langpack = HashMap<String, String>()
-        val localesDir = File(PATH_TO_LANG)
+        // load base langs
+        load("./assets/locales/")
+    }
+
+    fun load(localesDir: String) {
+        println("[Lang] Loading languages from $localesDir")
+
+        val localesDir = File(localesDir)
 
         // get all of the languages installed
-        languageList = localesDir.listFiles().filter { it.isDirectory }.map { it.name }
+        localesDir.listFiles().filter { it.isDirectory }.forEach { languageList.add(it.name) }
 
         for (lang in languageList) {
-            // load polyglot first
-            val polyglotFile = File("$PATH_TO_LANG$lang/$PREFIX_POLYGLOT$lang.json")
-            val json = JsonFetcher(polyglotFile)
-            /*
-             * Polyglot JSON structure is:
-             *
-             * (root object)
-             *      "resources": object
-             *          "polyglot": object
-             *              (polyglot meta)
-             *          "data": array
-             *             [0]: object
-             *                  n = "CONTEXT_CHARACTER_CLASS"
-             *                  s = "Class"
-             *             [1]: object
-             *                  n = "CONTEXT_CHARACTER_DELETE"
-             *                  s = "Delecte Character"
-             *             (the array continues)
-             *
-             */
-            json.getAsJsonObject("resources").getAsJsonArray("data").forEach {
-                langpack.put(
-                        "${it.asJsonObject["n"].asString}_$lang",
-                        it.asJsonObject["s"].asString
-                )
-            }
-
-            // and then the rest of the lang file
-            val langFileList = ArrayList<File>()
-
-            // --> filter out files to retrieve a list of valid lang files
-            val langFileListFiles = File("$PATH_TO_LANG$lang/").listFiles()
+            val langFileListFiles = File("$localesDir/$lang/").listFiles()
             langFileListFiles.forEach {
-                if (!it.name.startsWith("Polyglot") && it.name.endsWith(".json"))
-                    langFileList.add(it)
-            }
-
-            // --> put json entries in langpack
-            for (langFile in langFileList) {
-                val json = JsonFetcher(langFile)
-                /*
-                 * Terrarum langpack JSON structure is:
-                 *
-                 * (root object)
-                 *      "<<STRING ID>>" = "<<LOCALISED TEXT>>"
-                 */
-                //println(json.entrySet())
-                json.entrySet().forEach {
-                    langpack.put("${it.key}_$lang", it.value.asString)
-
-                    // count up TIPS_COUNT
-                    if (lang == "en" && it.key.startsWith("GAME_TIPS_")) TIPS_COUNT++
+                // not a polyglot
+                if (!it.name.startsWith("Polyglot") && it.name.endsWith(".json")) {
+                    processRegularLangfile(it, lang)
+                }
+                else {
+                    processPolyglotLangFile(it, lang)
                 }
             }
+
+        }
+    }
+
+    private fun processRegularLangfile(file: File, lang: String) {
+        val json = JsonFetcher(file)
+        /*
+         * Terrarum langpack JSON structure is:
+         *
+         * (root object)
+         *      "<<STRING ID>>" = "<<LOCALISED TEXT>>"
+         */
+        //println(json.entrySet())
+        json.entrySet().forEach {
+            langpack.put("${it.key}_$lang", it.value.asString)
+        }
+    }
+
+    private fun processPolyglotLangFile(file: File, lang: String) {
+        val json = JsonFetcher(file)
+        /*
+         * Polyglot JSON structure is:
+         *
+         * (root object)
+         *      "resources": object
+         *          "polyglot": object
+         *              (polyglot meta)
+         *          "data": array
+         *             [0]: object
+         *                  n = "CONTEXT_CHARACTER_CLASS"
+         *                  s = "Class"
+         *             [1]: object
+         *                  n = "CONTEXT_CHARACTER_DELETE"
+         *                  s = "Delecte Character"
+         *             (the array continues)
+         *
+         */
+        json.getAsJsonObject("resources").getAsJsonArray("data").forEach {
+            langpack.put(
+                    "${it.asJsonObject["n"].asString}_$lang",
+                    it.asJsonObject["s"].asString
+            )
         }
     }
 

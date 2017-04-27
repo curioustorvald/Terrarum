@@ -83,7 +83,7 @@ object BlocksDrawer {
      * It holds different shading rule to discriminate with group 02, index 0 is single tile.
      * These are the tiles that only connects to itself, will not connect to colour variants
      */
-    val TILES_CONNECT_SELF = arrayListOf(
+    private val TILES_CONNECT_SELF = hashSetOf(
             Block.ICE_MAGICAL,
             Block.GLASS_CRUDE,
             Block.GLASS_CLEAN,
@@ -129,16 +129,24 @@ object BlocksDrawer {
     )
 
     /**
+     * To interact with external modules
+     */
+    @JvmStatic fun addConnectSelf(blockID: Int): Boolean {
+        return TILES_CONNECT_SELF.add(blockID)
+    }
+
+    /**
      * Connectivity group 02 : natural tiles
      * It holds different shading rule to discriminate with group 01, index 0 is middle tile.
      */
-    val TILES_CONNECT_MUTUAL = arrayListOf(
+    private val TILES_CONNECT_MUTUAL = hashSetOf(
             Block.STONE,
             Block.STONE_QUARRIED,
             Block.STONE_TILE_WHITE,
             Block.STONE_BRICKS,
             Block.DIRT,
             Block.GRASS,
+            Block.GRASSWALL,
             Block.PLANK_BIRCH,
             Block.PLANK_BLOODROSE,
             Block.PLANK_EBONY,
@@ -195,9 +203,16 @@ object BlocksDrawer {
     )
 
     /**
+     * To interact with external modules
+     */
+    @JvmStatic fun addConnectMutual(blockID: Int): Boolean {
+        return TILES_CONNECT_MUTUAL.add(blockID)
+    }
+
+    /**
      * Torches, levers, switches, ...
      */
-    val TILES_WALL_STICKER = arrayListOf(
+    private val TILES_WALL_STICKER = hashSetOf(
             Block.TORCH,
             Block.TORCH_FROST,
             Block.TORCH_OFF,
@@ -205,9 +220,16 @@ object BlocksDrawer {
     )
 
     /**
+     * To interact with external modules
+     */
+    @JvmStatic fun addWallSticker(blockID: Int): Boolean {
+        return TILES_WALL_STICKER.add(blockID)
+    }
+
+    /**
      * platforms, ...
      */
-    val TILES_WALL_STICKER_CONNECT_SELF = arrayListOf(
+    private val TILES_WALL_STICKER_CONNECT_SELF = hashSetOf(
             Block.PLATFORM_BIRCH,
             Block.PLATFORM_BLOODROSE,
             Block.PLATFORM_EBONY,
@@ -216,11 +238,18 @@ object BlocksDrawer {
     )
 
     /**
+     * To interact with external modules
+     */
+    @JvmStatic fun addWallStickerConnectSelf(blockID: Int): Boolean {
+        return TILES_WALL_STICKER_CONNECT_SELF.add(blockID)
+    }
+
+    /**
      * Tiles that half-transparent and has hue
      * will blend colour using colour multiplication
      * i.e. red hues get lost if you dive into the water
      */
-    val TILES_BLEND_MUL = arrayListOf(
+    private val TILES_BLEND_MUL = hashSetOf(
             Block.WATER,
             Block.WATER_1,
             Block.WATER_2,
@@ -254,6 +283,13 @@ object BlocksDrawer {
             Block.LAVA_14,
             Block.LAVA_15
     )
+
+    /**
+     * To interact with external modules
+     */
+    @JvmStatic fun addBlendMul(blockID: Int): Boolean {
+        return TILES_BLEND_MUL.add(blockID)
+    }
 
     fun update() {
         val player = Terrarum.ingame!!.player

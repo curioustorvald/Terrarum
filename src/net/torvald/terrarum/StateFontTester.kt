@@ -29,15 +29,6 @@ nopqrstuvwxyz
     override fun init(gc: GameContainer, game: StateBasedGame) {
         canvas = Graphics(1024, 1024)
 
-        /*segfont = SpriteSheetFont(
-                SpriteSheet("./assets/graphics/fonts/24-seg_red.tga", 22, 31),
-                ' '
-        )*/
-
-        mtfont = SpriteSheetFont(
-                SpriteSheet("./assets/graphics/fonts/mt-32.tga", 12, 16),
-                0.toChar()
-        )
     }
 
     override fun update(gc: GameContainer, game: StateBasedGame, delta: Int) {
@@ -61,18 +52,18 @@ nopqrstuvwxyz
 
         //g.drawString("Syö salmiakkia perkele", 480f, 10f)
 
-        /*val text = arrayOf(
+        val text = arrayOf(
                 "The bitmap font for game developers who seek good font that has real multilingual support,",
                 "for free (as in freedom AND without cost).",
                 "",
                 "There are many bitmap fonts on the internet. You care for the multilingual support, but alas!",
-                "most of them does not support your language, vector fonts takes too much time to be loaded,",
-                "even then their legibility suffers because fuck built-in antialias.",
-                "You somehow found a good font, and it makes your game look like a linux terminal, and you say:",
-                "“what the fuck? Is this a game or should I rm -rf this shit‽”",
+                "most of them do not support your language, vector fonts take too much time to load, and even",
+                "then their legibility suffers because fuck built-in antialias.",
+                "You somehow found a fine one, and it makes your game look like a linux terminal, and you say:",
+                "“Well, better than nothing *sigh*; No, it’s ugly.”",
                 "You speak Japanese, and you wish to support it, but then このクソなfontは only good for Japanese,",
-                "and it is not multilingual, and you don't have a time for this shenanigan.",
-                "Eventually you give up, saying “fuck it!” and just use the fonts that do not match well.",
+                "it is not even multilingual, and their English look ugly and inconsistent anyway.",
+                "Eventually you just use different fonts together, and the result was always mildly infuriating.",
                 "",
                 "No more suffering. This font has everything you need.",
                 "",
@@ -85,23 +76,23 @@ nopqrstuvwxyz
                 "ΔΙΑΦΥΛΆΞΤΕ ΓΕΝΙΚΆ ΤΗ ΖΩΉ ΣΑΣ ΑΠΌ ΒΑΘΕΙΆ ΨΥΧΙΚΆ ΤΡΑΎΜΑΤΑ",
                 "Pack my box with five dozen liquor jugs",
                 "Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwi",
-                "정 참판 양반댁 규수 큰 교자 타고 혼례 치른 날    뚫훍뚫훍뚫(읗) 뚫훍뚫훍뚫(읗) 뚫훍뚫훍뚫 따다다",
+                "정 참판 양반댁 규수 큰 교자 타고 혼례 치른 날    하얬다  도럄직한  퀡봹퉪헰",
                 "Kæmi ný öxi hér, ykist þjófum nú bæði víl og ádrepa",
                 "Árvíztűrő tükörfúrógép    Kŕdeľ ďatľov učí koňa žrať kôru",
                 "とりなくこゑす ゆめさませ みよあけわたる ひんかしを そらいろはえて おきつへに ほふねむれゐぬ もやのうち",
-                "鳥啼く声す 夢覚ませ 見よ明け渡る 東を 空色栄えて 沖つ辺に 帆船群れゐぬ 靄の中",
+                "鳥啼ク声ス 夢覚マセ 見ヨ明ク渡ル 東ヲ 空色栄エテ 沖ツ辺ニ 帆船群レヰヌ 靄ノ中",
                 "Înjurând pițigăiat, zoofobul comandă vexat whisky și tequila",
                 "Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства",
                 "Pijamalı hasta yağız şoföre çabucak güvendi",
                 "Also supports: ‛Unicode’ „quotation marks“—dashes…「括弧」‼",
                 "ASCII  Latin-1  Latin_Ext-A  Latin_Ext-B  Greek  Cyrillic  CJK-Ideo  Kana  Hangul_Syllables",
                 ""
-        )*/
+        )
         val SP = "${0x3000.toChar()}${0x3000.toChar()}"
 
-        val text = arrayOf(
-                "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP${0xe011.toChar()}..${0xe019.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
-        )
+        /*val text = arrayOf(
+                "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"p]}$SP${0xe011.toChar()}..${0xe019.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
+        )*/
 
         text.forEachIndexed { i, s ->
             g.drawString(s, 10f, 70f + 20 * i)
