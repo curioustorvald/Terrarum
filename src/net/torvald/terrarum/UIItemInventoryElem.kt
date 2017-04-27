@@ -1,6 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.colourutil.CIELabUtil.darkerLab
+import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIInventory
@@ -125,6 +126,28 @@ class UIItemInventoryElem(
     }
 
     override fun keyPressed(key: Int, c: Char) {
+        if (item != null && Terrarum.ingame != null && key in Key.NUM_1..Key.NUM_0) {
+            val inventory = Terrarum.ingame!!.player?.inventory
+            val slot = key - Key.NUM_1
+            val currentSlotItem = inventory?.getQuickBar(slot)
+
+
+            inventory?.setQuickBar(
+                    slot,
+                    if (currentSlotItem?.item != item)
+                        item?.dynamicID // register
+                    else
+                        null // drop registration
+            )
+
+            // search for duplicates in the quickbar, except mine
+            // if there is, unregister the other
+            (0..9).minus(slot).forEach {
+                if (inventory?.getQuickBar(it)?.item == item) {
+                    inventory?.setQuickBar(it, null)
+                }
+            }
+        }
     }
 
     override fun keyReleased(key: Int, c: Char) {

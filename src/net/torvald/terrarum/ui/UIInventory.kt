@@ -24,8 +24,8 @@ class UIInventory(
 
     val inventory: ActorInventory?
         get() = actor?.inventory
-    val actorValue: ActorValue
-        get() = (actor as Actor).actorValue
+    //val actorValue: ActorValue
+    //    get() = (actor as Actor).actorValue
 
     override var handler: UIHandler? = null
     override var openCloseTime: Int = 120
@@ -146,67 +146,7 @@ class UIInventory(
 
 
             if (rebuildList) {
-                val filter = catButtonsToCatIdent[catButtons.selectedButton.labelText]
-
-                // encumbrance
-                encumbrancePerc = inventory!!.capacity.toFloat() / inventory!!.maxCapacity
-                isEncumbered = inventory!!.isEncumbered
-
-
-
-                inventorySortList = ArrayList<InventoryPair>()
-
-                // filter items
-                inventory?.forEach {
-                    if (it.item.inventoryCategory == filter || filter == "__all__")
-                        inventorySortList.add(it)
-                }
-
-                rebuildList = false
-
-                // sort if needed
-                // test sort by name
-                inventorySortList.sortBy { it.item.name }
-
-                // map sortList to item list
-                for (k in 0..items.size - 1) {
-                    // we have an item
-                    try {
-                        val sortListItem = inventorySortList[k + itemsScrollOffset]
-                        items[k].item = sortListItem.item
-                        items[k].amount = sortListItem.amount
-                        items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
-
-                        // set quickslot number
-                        for (qs in 1..QUICKSLOT_MAX) {
-                            if (-sortListItem.item.dynamicID == actorValue.getAsInt(AVKey.__PLAYER_QSPREFIX + qs)) {
-                                items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
-                                break
-                            }
-                            else
-                                items[k].quickslot = null
-                        }
-
-                        // set equippedslot number
-                        for (eq in 0..actor!!.inventory.itemEquipped.size - 1) {
-                            if (eq < actor!!.inventory.itemEquipped.size) {
-                                if (actor!!.inventory.itemEquipped[eq] == items[k].item) {
-                                    items[k].equippedSlot = eq
-                                    break
-                                }
-                                else
-                                    items[k].equippedSlot = null
-                            }
-                        }
-                    }
-                    // we do not have an item, empty the slot
-                    catch (e: IndexOutOfBoundsException) {
-                        items[k].item = null
-                        items[k].amount = 0
-                        items[k].itemImage = null
-                        items[k].quickslot = null
-                    }
-                }
+                shutUpAndRebuild()
             }
         }
 
@@ -278,12 +218,75 @@ class UIInventory(
 
     }
 
-
     /** Persuade the UI to rebuild its item list */
     fun rebuildList() {
         rebuildList = true
     }
 
+
+    fun shutUpAndRebuild() {
+        val filter = catButtonsToCatIdent[catButtons.selectedButton.labelText]
+
+        // encumbrance
+        encumbrancePerc = inventory!!.capacity.toFloat() / inventory!!.maxCapacity
+        isEncumbered = inventory!!.isEncumbered
+
+
+
+        inventorySortList = ArrayList<InventoryPair>()
+
+        // filter items
+        inventory?.forEach {
+            if (it.item.inventoryCategory == filter || filter == "__all__")
+                inventorySortList.add(it)
+        }
+
+        rebuildList = false
+
+        // sort if needed
+        // test sort by name
+        inventorySortList.sortBy { it.item.name }
+
+        // map sortList to item list
+        for (k in 0..items.size - 1) {
+            // we have an item
+            try {
+                val sortListItem = inventorySortList[k + itemsScrollOffset]
+                items[k].item = sortListItem.item
+                items[k].amount = sortListItem.amount
+                items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
+
+                // set quickslot number
+                for (qs in 1..QUICKSLOT_MAX) {
+                    if (sortListItem.item == actor?.inventory?.getQuickBar(qs - 1)?.item) {
+                        items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
+                        break
+                    }
+                    else
+                        items[k].quickslot = null
+                }
+
+                // set equippedslot number
+                for (eq in 0..actor!!.inventory.itemEquipped.size - 1) {
+                    if (eq < actor!!.inventory.itemEquipped.size) {
+                        if (actor!!.inventory.itemEquipped[eq] == items[k].item) {
+                            items[k].equippedSlot = eq
+                            break
+                        }
+                        else
+                            items[k].equippedSlot = null
+                    }
+                }
+            }
+            // we do not have an item, empty the slot
+            catch (e: IndexOutOfBoundsException) {
+                items[k].item = null
+                items[k].amount = 0
+                items[k].itemImage = null
+                items[k].quickslot = null
+            }
+        }
+    }
 
 
 
@@ -312,19 +315,24 @@ class UIInventory(
     }
 
     override fun keyPressed(key: Int, c: Char) {
-        items.forEach { it.keyPressed(key, c) }
+        items.forEach { if (it.mouseUp) it.keyPressed(key, c) }
+        shutUpAndRebuild()
     }
 
     override fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
     }
 
     override fun keyReleased(key: Int, c: Char) {
+        items.forEach { if (it.mouseUp) it.keyReleased(key, c) }
+        shutUpAndRebuild()
     }
 
     override fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
     }
 
     override fun controllerButtonPressed(controller: Int, button: Int) {
+        items.forEach { if (it.mouseUp) it.controllerButtonPressed(controller, button) }
+        shutUpAndRebuild()
     }
 
     override fun mousePressed(button: Int, x: Int, y: Int) {
@@ -332,6 +340,8 @@ class UIInventory(
     }
 
     override fun controllerButtonReleased(controller: Int, button: Int) {
+        items.forEach { if (it.mouseUp) it.controllerButtonReleased(controller, button) }
+        shutUpAndRebuild()
     }
 
     override fun mouseReleased(button: Int, x: Int, y: Int) {

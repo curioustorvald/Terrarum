@@ -33,7 +33,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
      * Sorted by referenceID.
      */
     private val itemList = ArrayList<InventoryPair>()
-    private val quickBar = Array<ItemID?>(10, { null })
+    private val quickBar = Array<ItemID?>(10, { null }) // 0: Slot 1, 9: Slot 10
 
     init {
     }

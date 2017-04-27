@@ -70,7 +70,7 @@ class UIQuickBar : UICanvas, MouseControlled {
                         itemImage, // using fixed CELL_SIZE for reasons
                         slotX + (CELL_SIZE - itemW) / 2f,
                         slotY + (CELL_SIZE - itemH) / 2f,
-                        Color(1f, 1f, 1f, handler!!.opacity * UIQuickBar.finalOpacity)
+                        Color(1f, 1f, 1f, handler!!.opacity)
                 )
             }
         }

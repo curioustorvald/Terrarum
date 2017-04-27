@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameactors
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.Faction
+import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
@@ -333,7 +334,9 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     }
 
     override fun keyPressed(key: Int, c: Char) {
-
+        if (key in Key.NUM_1..Key.NUM_0) {
+            actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = key - Key.NUM_1
+        }
     }
 
     /**
