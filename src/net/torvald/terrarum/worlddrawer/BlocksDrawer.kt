@@ -81,7 +81,6 @@ object BlocksDrawer {
      * These are the tiles that only connects to itself, will not connect to colour variants
      */
     private val TILES_CONNECT_SELF = hashSetOf(
-            Block.ICE_MAGICAL,
             Block.GLASS_CRUDE,
             Block.GLASS_CLEAN,
             Block.ILLUMINATOR_BLACK,
@@ -116,12 +115,6 @@ object BlocksDrawer {
             Block.ILLUMINATOR_TAN_OFF,
             Block.ILLUMINATOR_WHITE_OFF,
             Block.ILLUMINATOR_YELLOW,
-            Block.SANDSTONE,
-            Block.SANDSTONE_BLACK,
-            Block.SANDSTONE_DESERT,
-            Block.SANDSTONE_RED,
-            Block.SANDSTONE_WHITE,
-            Block.SANDSTONE_GREEN,
             Block.DAYLIGHT_CAPACITOR
     )
 
@@ -158,12 +151,20 @@ object BlocksDrawer {
             Block.GRAVEL_GREY,
             Block.SNOW,
             Block.ICE_NATURAL,
+            Block.ICE_MAGICAL,
             Block.ORE_COPPER,
             Block.ORE_IRON,
             Block.ORE_GOLD,
             Block.ORE_SILVER,
             Block.ORE_ILMENITE,
             Block.ORE_AURICHALCUM,
+
+            Block.SANDSTONE,
+            Block.SANDSTONE_BLACK,
+            Block.SANDSTONE_DESERT,
+            Block.SANDSTONE_RED,
+            Block.SANDSTONE_WHITE,
+            Block.SANDSTONE_GREEN,
 
             Block.WATER,
             Block.WATER_1,
