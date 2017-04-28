@@ -4,7 +4,7 @@ import net.torvald.JsonFetcher
 import net.torvald.random.Fudge3
 import net.torvald.terrarum.langpack.Lang
 import com.google.gson.JsonObject
-import net.torvald.terrarum.ActorValue
+import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import org.newdawn.slick.SlickException

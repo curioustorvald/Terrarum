@@ -1,28 +1,28 @@
 package net.torvald.terrarum
 
 import com.google.gson.JsonPrimitive
+import net.torvald.terrarum.gameactors.Actor
 import java.util.*
 import java.util.function.Consumer
 import kotlin.collections.HashMap
 
-typealias ActorValue = KVHashMap
 typealias ItemValue = KVHashMap
 typealias GameConfig = KVHashMap
 
 /**
  * Created by minjaesong on 15-12-30.
  */
-class KVHashMap {
+open class KVHashMap {
 
     constructor() {
         hashMap = HashMap<String, Any>()
     }
 
-    private constructor(newMap: HashMap<String, Any>) {
+    protected constructor(newMap: HashMap<String, Any>) {
         hashMap = newMap
     }
 
-    private val hashMap: HashMap<String, Any>
+    protected var hashMap: HashMap<String, Any>
 
     /**
      * Add key-value pair to the configuration table.
@@ -33,7 +33,7 @@ class KVHashMap {
      * *
      * @param value
      */
-    operator fun set(key: String, value: Any) {
+    open operator fun set(key: String, value: Any) {
         hashMap.put(key.toLowerCase(), value)
     }
 
@@ -99,12 +99,13 @@ class KVHashMap {
     val keySet: Set<Any>
         get() = hashMap.keys
 
-    fun remove(key: String) {
-        if (hashMap[key] != null)
+    open fun remove(key: String) {
+        if (hashMap[key] != null) {
             hashMap.remove(key, hashMap[key]!!)
+        }
     }
 
-    fun clone(): KVHashMap {
+    open fun clone(): KVHashMap {
         val cloneOfMap = hashMap.clone() as HashMap<String, Any>
         return KVHashMap(cloneOfMap)
     }

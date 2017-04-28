@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.ActorValue
+import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -28,7 +28,6 @@ object PlayerBuilderSigrid {
         p.spriteGlow!!.delay = 200
         p.spriteGlow!!.setRowsAndFrames(1, 1)
 
-        p.actorValue = ActorValue()
         p.actorValue[AVKey.SCALE] = 1.0
         p.actorValue[AVKey.SPEED] = 4.0
         p.actorValue[AVKey.SPEEDBUFF] = 1.0

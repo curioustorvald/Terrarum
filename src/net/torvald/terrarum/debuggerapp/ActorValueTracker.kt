@@ -1,6 +1,6 @@
 package net.torvald.terrarum.debuggerapp
 
-import net.torvald.terrarum.ActorValue
+import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.SetAV

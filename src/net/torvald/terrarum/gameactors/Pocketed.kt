@@ -14,7 +14,9 @@ interface Pocketed {
     /**
      * Equips an item. If the item is not in the inventory, an error will be thrown.
      */
-    fun unequipItem(item: InventoryItem) {
+    fun unequipItem(item: InventoryItem?) {
+        if (item == null) return
+
         if (item.equipPosition == InventoryItem.EquipPosition.NULL)
             throw Error("Unequipping the item that cannot be equipped in the first place")
 
@@ -26,6 +28,14 @@ interface Pocketed {
 
         inventory.itemEquipped[item.equipPosition] = null
         item.effectOnUnequip(Terrarum.appgc, Terrarum.delta)
+    }
+
+    // no need for equipSlot(Int)
+    fun unequipSlot(slot: Int) {
+        if (slot < 0 || slot > InventoryItem.EquipPosition.INDEX_MAX)
+            throw IllegalArgumentException("Slot index out of range: $slot")
+
+        unequipItem(inventory.itemEquipped[slot])
     }
 
     /**

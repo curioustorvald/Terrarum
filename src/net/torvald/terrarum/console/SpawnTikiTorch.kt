@@ -8,7 +8,7 @@ import net.torvald.terrarum.gamecontroller.mouseY
 /**
  * Created by minjaesong on 2016-12-17.
  */
-object SpawnTikiTorch : ConsoleCommand {
+internal object SpawnTikiTorch : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val torch = FixtureTikiTorch()
         torch.setPosition(Terrarum.appgc.mouseX, Terrarum.appgc.mouseY)

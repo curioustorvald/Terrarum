@@ -8,7 +8,7 @@ import javax.swing.JFrame
  * Created by SKYHi14 on 2017-02-05.
  */
 
-object JavaIMTest : ConsoleCommand {
+internal object JavaIMTest : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         IMStringReader(

@@ -7,7 +7,7 @@ import java.util.*
 /**
  * Created by minjaesong on 16-06-17.
  */
-class FixtureTikiTorch : FixtureBase(), Luminous {
+internal class FixtureTikiTorch : FixtureBase(), Luminous {
 
     override var luminosity: Int
         get() = BlockCodex[Block.TORCH].luminosity

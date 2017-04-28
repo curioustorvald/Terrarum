@@ -7,7 +7,7 @@ import java.util.*
 /**
  * Created by minjaesong on 2016-12-29.
  */
-object ActorsList : ConsoleCommand {
+internal object ActorsList : ConsoleCommand {
     private val jPanelInstances = ArrayList<ActorsLister>()
 
     override fun execute(args: Array<String>) {

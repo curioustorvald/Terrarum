@@ -8,7 +8,7 @@ import java.io.FileInputStream
 /**
  * Created by minjaesong on 2017-01-14.
  */
-object SpawnTapestry : ConsoleCommand {
+internal object SpawnTapestry : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size < 2) {
             printUsage()

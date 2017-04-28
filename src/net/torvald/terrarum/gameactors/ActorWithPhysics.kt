@@ -1124,6 +1124,13 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
     }
 
+    override fun actorValueChanged(key: String, value: Any?) {
+        // do nothing
+    }
+
+
+
+
     private fun clampW(x: Double): Double =
             if (x < TILE_SIZE + nextHitbox.width / 2) {
                 TILE_SIZE + nextHitbox.width / 2

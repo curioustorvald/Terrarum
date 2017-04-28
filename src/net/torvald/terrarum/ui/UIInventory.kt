@@ -1,7 +1,6 @@
 package net.torvald.terrarum.ui
 
 import net.torvald.terrarum.*
-import net.torvald.terrarum.Terrarum.QUICKSLOT_MAX
 import net.torvald.terrarum.Terrarum.joypadLabelNinA
 import net.torvald.terrarum.Terrarum.joypadLabelNinY
 import net.torvald.terrarum.gameactors.*
@@ -257,7 +256,7 @@ class UIInventory(
                 items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
 
                 // set quickslot number
-                for (qs in 1..QUICKSLOT_MAX) {
+                for (qs in 1..UIQuickBar.SLOT_COUNT) {
                     if (sortListItem.item == actor?.inventory?.getQuickBar(qs - 1)?.item) {
                         items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                         break

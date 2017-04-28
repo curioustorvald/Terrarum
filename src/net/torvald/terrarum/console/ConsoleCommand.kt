@@ -11,7 +11,6 @@ interface ConsoleCommand {
      *
      * e.g. in ```setav mass 74```, zeroth args will be ```setav```.
      */
-    @Throws(Exception::class)
     fun execute(args: Array<String>)
 
     fun printUsage()

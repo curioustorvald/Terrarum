@@ -6,7 +6,7 @@ import net.torvald.terrarum.langpack.Lang
 /**
  * Created by SKYHi14 on 2017-01-31.
  */
-object KillActor : ConsoleCommand {
+internal object KillActor : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             try {
