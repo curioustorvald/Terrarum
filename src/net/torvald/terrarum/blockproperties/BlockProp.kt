@@ -33,7 +33,6 @@ class BlockProp {
         get() = BlockPropUtil.getDynamicLumFunc(field, dynamicLuminosityFunction)
 
     var drop: Int = 0
-    var dropDamage: Int = 0
 
     var isFallable: Boolean = false
 

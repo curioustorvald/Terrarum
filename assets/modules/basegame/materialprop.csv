@@ -1,13 +1,13 @@
-"idst";"forcemod";"endurance";"comments"
-"rock";       "1";     "0.42";
-"cupr";       "2";     "1.00";"copper"
-"egls";       "4";     "0.82";"elven glass"
-"iron";       "5";     "1.42";
-"argn";       "9";     "0.91";"argentum/silver"
-"stal";      "14";     "1.73";"steel"
-"eaur";      "21";     "1.36";"elven aurichalcum"
-"tial";      "33";     "2.16";"titanium alloy (Ti6Al4V)"
-"admt";      "71";     "3.42";"adamant"
+"idst";"dsty";"forcemod";"endurance";"comments"
+"rock";"2400";       "1";     "0.42";
+"cupr";"1000";       "2";     "1.00";"copper"
+"egls";"2500";       "4";     "0.82";"elven glass"
+"iron";"1000";       "5";     "1.42";
+"argn";"1000";       "9";     "0.91";"argentum/silver"
+"stal";"1000";      "14";     "1.73";"steel"
+"eaur";"1000";      "21";     "1.36";"elven aurichalcum"
+"tial";"1000";      "33";     "2.16";"titanium alloy (Ti6Al4V)"
+"admt";"1000";      "71";     "3.42";"adamant"
 
 # idst: ID_STRING
 

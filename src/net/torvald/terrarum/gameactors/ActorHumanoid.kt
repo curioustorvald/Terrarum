@@ -7,6 +7,7 @@ import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.itemproperties.InventoryItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.ui.UIInventory
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
 import java.util.*
@@ -479,12 +480,15 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             // ONLY FOR HAND_GRIPs!!
             val quickBarItem = inventory.getQuickBar(actorValue.getAsInt(key)!!)?.item
 
-            if (quickBarItem == null) {
-                unequipSlot(InventoryItem.EquipPosition.HAND_GRIP)
-            }
-            else if (quickBarItem.equipPosition == InventoryItem.EquipPosition.HAND_GRIP) {
+            if (quickBarItem != null && quickBarItem.equipPosition == InventoryItem.EquipPosition.HAND_GRIP) {
                 equipItem(quickBarItem)
             }
+
+            // force update inventory UI
+            try {
+                (Terrarum.ingame!!.uiInventoryPlayer.UI as UIInventory).shutUpAndRebuild()
+            }
+            catch (LateInitMyArse: kotlin.UninitializedPropertyAccessException) { }
         }
     }
 

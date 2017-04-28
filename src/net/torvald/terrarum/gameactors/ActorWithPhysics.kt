@@ -26,7 +26,7 @@ import java.util.*
  *
  * Created by minjaesong on 16-01-13.
  */
-open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean = false, physics: Boolean = true) : ActorVisible(renderOrder) {
+open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean = false, physics: Boolean = true) : ActorWithBody(renderOrder) {
 
     /** !! ActorValue macros are on the very bottom of the source !! **/
 

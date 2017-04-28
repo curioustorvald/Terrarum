@@ -115,11 +115,11 @@ class UIInventory(
     val listControlHelp: String
         get() = if (Terrarum.environment == RunningEnvironment.PC)
             "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP" +
-            "${0xe011.toChar()}..${0xe019.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
+            "${0xe011.toChar()}..${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
     else
             "$joypadLabelNinY ${Lang["GAME_INVENTORY_USE"]}$SP" +
-            "${0xe011.toChar()}${0xe019.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
+            "${0xe011.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "$joypadLabelNinA ${Lang["GAME_INVENTORY_DROP"]}"
     val listControlClose: String
         get() = if (Terrarum.environment == RunningEnvironment.PC)

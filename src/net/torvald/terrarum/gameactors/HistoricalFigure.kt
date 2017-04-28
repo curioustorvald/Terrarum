@@ -13,7 +13,11 @@ typealias AnyPlayer = HistoricalFigure
  *
  * Created by minjaesong on 16-10-10.
  */
-open class HistoricalFigure(val born: GameDate, val dead: GameDate? = null, realAirFriction: Boolean = false) : ActorWithPhysics(Actor.RenderOrder.MIDDLE, realAirFriction) {
+open class HistoricalFigure(
+        val born: GameDate,
+        val dead: GameDate? = null,
+        realAirFriction: Boolean = false
+) : ActorWithPhysics(Actor.RenderOrder.MIDDLE, realAirFriction) {
 
     init {
         this.actorValue["_bornyear"] = born.year
