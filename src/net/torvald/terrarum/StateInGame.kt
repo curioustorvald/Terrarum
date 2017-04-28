@@ -54,10 +54,10 @@ class StateInGame : BasicGameState() {
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX)
     val uiContainer = ArrayList<UIHandler>()
 
-    private val actorsRenderBehind = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderMiddle = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderMidTop = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
-    private val actorsRenderFront  = ArrayList<ActorVisible>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderBehind = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderMiddle = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderMidTop = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderFront  = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
 
     var playableActorDelegate: PlayableActorDelegate? = null // DO NOT LATEINIT!
         private set
@@ -204,11 +204,13 @@ class StateInGame : BasicGameState() {
 
         // batch-process uiAliases
         uiAliases = arrayListOf(
-                uiPieMenu,
-                uiQuickBar,
+                // drawn first
                 uiVitalPrimary,
                 uiVitalSecondary,
-                uiVitalItem
+                uiVitalItem,
+                uiPieMenu,
+                uiQuickBar
+                // drawn last
         )
         uiAlasesPausing = arrayListOf(
                 uiInventoryPlayer,
@@ -391,7 +393,7 @@ class StateInGame : BasicGameState() {
         actorsRenderMidTop.forEach { it.drawBody(worldG) }
         player?.drawBody(worldG)
         actorsRenderFront.forEach { it.drawBody(worldG) }
-        // --> Change of blend mode <-- introduced by ActorVisible //
+        // --> Change of blend mode <-- introduced by childs of ActorWithBody //
 
 
         /////////////////////////////
@@ -418,7 +420,7 @@ class StateInGame : BasicGameState() {
         actorsRenderMidTop.forEach { it.drawGlow(worldG) }
         player?.drawGlow(worldG)
         actorsRenderFront.forEach { it.drawGlow(worldG) }
-        // --> blendLightenOnly() <-- introduced by ActorVisible //
+        // --> blendLightenOnly() <-- introduced by childs of ActorWithBody //
 
 
         ////////////////////////
@@ -428,7 +430,7 @@ class StateInGame : BasicGameState() {
         // draw reference ID if debugWindow is open
         if (debugWindow.isVisible) {
             actorContainer.forEachIndexed { i, actor ->
-                if (actor is ActorVisible) {
+                if (actor is ActorWithBody) {
                     worldG.color = Color.white
                     worldG.font = Terrarum.fontSmallNumbers
                     worldG.drawString(
@@ -540,7 +542,7 @@ class StateInGame : BasicGameState() {
         var i = 0
         while (i < actorContainerSize) { // loop through actorContainerInactive
             val actor = actorContainerInactive[i]
-            if (actor is ActorVisible && actor.inUpdateRange()) {
+            if (actor is ActorWithBody && actor.inUpdateRange()) {
                 activateDormantActor(actor) // duplicates are checked here
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1
@@ -567,7 +569,7 @@ class StateInGame : BasicGameState() {
                 i-- // array removed 1 elem, so we also decrement counter by 1
             }
             // inactivate distant actors
-            else if (actor is ActorVisible && !actor.inUpdateRange()) {
+            else if (actor is ActorWithBody && !actor.inUpdateRange()) {
                 if (actor !is Projectile) { // if it's a projectile, don't inactivate it; just kill it.
                     actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
                 }
@@ -626,7 +628,7 @@ class StateInGame : BasicGameState() {
         d.forEach { if (it < ret) ret = it }
         return ret
     }
-    private fun distToActorSqr(a: ActorVisible, p: ActorVisible) =
+    private fun distToActorSqr(a: ActorWithBody, p: ActorWithBody) =
             min(// take min of normal position and wrapped (x < 0) position
                     (a.hitbox.centeredX - p.hitbox.centeredX).sqr() +
                     (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
@@ -635,7 +637,7 @@ class StateInGame : BasicGameState() {
                     (a.hitbox.centeredX - p.hitbox.centeredX - world.width * TILE_SIZE).sqr() +
                     (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
             )
-    private fun distToCameraSqr(a: ActorVisible) =
+    private fun distToCameraSqr(a: ActorWithBody) =
             min(
                     (a.hitbox.posX - WorldCamera.x).sqr() +
                     (a.hitbox.posY - WorldCamera.y).sqr(),
@@ -646,14 +648,14 @@ class StateInGame : BasicGameState() {
             )
 
     /** whether the actor is within screen */
-    private fun ActorVisible.inScreen() =
+    private fun ActorWithBody.inScreen() =
             distToCameraSqr(this) <=
             (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).times(1 / Terrarum.ingame!!.screenZoom).sqr() +
              Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / Terrarum.ingame!!.screenZoom).sqr())
 
 
     /** whether the actor is within update range */
-    private fun ActorVisible.inUpdateRange() = distToCameraSqr(this) <= ACTOR_UPDATE_RANGE.sqr()
+    private fun ActorWithBody.inUpdateRange() = distToCameraSqr(this) <= ACTOR_UPDATE_RANGE.sqr()
 
     /**
      * actorContainer extensions
@@ -693,7 +695,7 @@ class StateInGame : BasicGameState() {
 
             // indexToDelete >= 0 means that the actor certainly exists in the game
             // which means we don't need to check if i >= 0 again
-            if (actor is ActorVisible) {
+            if (actor is ActorWithBody) {
                 when (actor.renderOrder) {
                     Actor.RenderOrder.BEHIND -> {
                         val i = actorsRenderBehind.binarySearch(actor.referenceID)
@@ -727,7 +729,7 @@ class StateInGame : BasicGameState() {
             actorContainer.add(actor)
             insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
 
-            if (actor is ActorVisible) {
+            if (actor is ActorWithBody) {
                 when (actor.renderOrder) {
                     Actor.RenderOrder.BEHIND -> {
                         actorsRenderBehind.add(actor); insertionSortLastElemAV(actorsRenderBehind)
@@ -758,7 +760,7 @@ class StateInGame : BasicGameState() {
             actorContainer.add(actor)
             insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
 
-            if (actor is ActorVisible) {
+            if (actor is ActorWithBody) {
                 when (actor.renderOrder) {
                     Actor.RenderOrder.BEHIND -> {
                         actorsRenderBehind.add(actor); insertionSortLastElemAV(actorsRenderBehind)
@@ -820,7 +822,7 @@ class StateInGame : BasicGameState() {
             arr[j + 1] = x
         }
     }
-    private fun insertionSortLastElemAV(arr: ArrayList<ActorVisible>) { // out-projection doesn't work, duh
+    private fun insertionSortLastElemAV(arr: ArrayList<ActorWithBody>) { // out-projection doesn't work, duh
         lock(ReentrantLock()) {
             var j = arr.lastIndex - 1
             val x = arr.last()
