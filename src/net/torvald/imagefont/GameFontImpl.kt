@@ -35,7 +35,7 @@ class GameFontImpl(noShadow: Boolean = false) : GameFontBase(noShadow = noShadow
         GameFontBase.uniPunct = SpriteSheet(
                 "./assets/graphics/fonts/unipunct.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
         GameFontBase.uniHan = SpriteSheet(
-                "./assets/graphics/fonts/wenquanyi.tga.gz", 16, 16)
+                "./assets/graphics/fonts/wenquanyi.tga.gz", 16, 16) // ~32 MB
         GameFontBase.greekSheet = SpriteSheet(
                 "./assets/graphics/fonts/greek_variable.tga", 15, 19, 1)
         GameFontBase.thaiSheet = SpriteSheet(

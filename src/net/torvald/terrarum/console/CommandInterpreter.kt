@@ -13,7 +13,7 @@ import java.util.regex.Pattern
 /**
  * Created by minjaesong on 16-01-15.
  */
-object CommandInterpreter {
+internal object CommandInterpreter {
 
     private val commandsNoAuth = arrayOf(
             "auth",
@@ -31,7 +31,7 @@ object CommandInterpreter {
     private val ccY = GameFontBase.colToCode["y"]
     private val ccR = GameFontBase.colToCode["r"]
 
-    fun execute(command: String) {
+    internal fun execute(command: String) {
         val cmd: Array<CommandInput?> = parse(command)
 
         val error = Error()

@@ -1,7 +1,5 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.Terrarum
-
 import java.util.HashMap
 
 /**
@@ -9,7 +7,7 @@ import java.util.HashMap
  */
 object CommandDict {
 
-    internal var dict: HashMap<String, ConsoleCommand> = hashMapOf(
+    internal val dict: HashMap<String, ConsoleCommand> = hashMapOf(
             Pair("echo", Echo),
             Pair("error", EchoError),
             Pair("setav", SetAV),
@@ -59,5 +57,9 @@ object CommandDict {
 
     operator fun get(commandName: String): ConsoleCommand {
         return dict[commandName]!!
+    }
+
+    fun add(name: String, obj: ConsoleCommand) {
+        dict[name] = obj
     }
 }

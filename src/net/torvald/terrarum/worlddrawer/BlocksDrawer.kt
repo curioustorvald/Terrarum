@@ -26,14 +26,11 @@ object BlocksDrawer {
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
     // TODO modular
-    val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "blocks/terrain.tga.gz"), TILE_SIZE, TILE_SIZE)
-    // Slick has some weird quirks with PNG's transparency. I'm using 32-bit targa here.
-    // -> PNG transparency issue seems to be fixed (look at my customised ImageDataFactory), but
-    //    tga.gz is smaller than png, so I'd rather keep it
-    val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "blocks/wire.tga.gz"), TILE_SIZE, TILE_SIZE)
+    val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "blocks/terrain.tga.gz"), TILE_SIZE, TILE_SIZE) // 64 MB
+    val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "blocks/wire.tga.gz"), TILE_SIZE, TILE_SIZE) // 4 MB
 
 
-    val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16)
+    val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
 
 
     val wallOverlayColour = Color(2f/3f, 2f/3f, 2f/3f, 1f)
@@ -291,9 +288,8 @@ object BlocksDrawer {
         return TILES_BLEND_MUL.add(blockID)
     }
 
-    fun update() {
-        val player = Terrarum.ingame!!.player
-    }
+
+
 
     fun renderWall(g: Graphics) {
         /**

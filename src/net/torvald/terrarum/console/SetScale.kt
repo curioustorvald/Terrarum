@@ -6,7 +6,7 @@ import net.torvald.terrarum.gameactors.ActorWithPhysics
 /**
  * Created by minjaesong on 2017-01-20.
  */
-object SetScale : ConsoleCommand {
+internal object SetScale : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2 || args.size == 3) {
             try {

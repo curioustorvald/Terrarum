@@ -1,6 +1,5 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.ui.UIQuickBar
 import org.newdawn.slick.GameContainer
 
 /**

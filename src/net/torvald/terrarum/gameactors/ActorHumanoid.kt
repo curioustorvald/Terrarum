@@ -473,6 +473,21 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         }
     }
 
+    override fun actorValueChanged(key: String, value: Any?) {
+        // quickslot implementation
+        if (key == AVKey.__PLAYER_QUICKSLOTSEL && value != null) {
+            // ONLY FOR HAND_GRIPs!!
+            val quickBarItem = inventory.getQuickBar(actorValue.getAsInt(key)!!)?.item
+
+            if (quickBarItem == null) {
+                unequipSlot(InventoryItem.EquipPosition.HAND_GRIP)
+            }
+            else if (quickBarItem.equipPosition == InventoryItem.EquipPosition.HAND_GRIP) {
+                equipItem(quickBarItem)
+            }
+        }
+    }
+
     fun isNoClip(): Boolean {
         return noClip
     }

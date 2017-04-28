@@ -27,6 +27,9 @@ class StateUITest : BasicGameState() {
             TODO("not implemented")
         }
 
+        override fun actorValueChanged(key: String, value: Any?) {
+        }
+
         override var inventory: ActorInventory = ActorInventory(this, 100, ActorInventory.CAPACITY_MODE_WEIGHT)
     }
 

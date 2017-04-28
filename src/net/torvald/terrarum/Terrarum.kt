@@ -50,8 +50,6 @@ object Terrarum : StateBasedGame(GAME_NAME) {
     val HALFH: Int
         get() = HEIGHT.ushr(1)
 
-    val QUICKSLOT_MAX = 10
-
     /**
      * To be used with physics simulator
      */

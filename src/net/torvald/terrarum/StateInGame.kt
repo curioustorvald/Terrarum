@@ -269,7 +269,7 @@ class StateInGame : BasicGameState() {
             ////////////////////////////
             FeaturesDrawer.update(gc, delta)
             WorldCamera.update()
-            BlocksDrawer.update()
+
 
 
             ///////////////////////////

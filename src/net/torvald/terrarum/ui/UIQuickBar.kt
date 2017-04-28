@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import net.torvald.terrarum.Millisec
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -28,7 +29,7 @@ class UIQuickBar : UICanvas, MouseControlled {
 
     private var selection: Int
         get() = Terrarum.ingame!!.player?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
-        set(value) { Terrarum.ingame!!.player?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, value) }
+        set(value) { Terrarum.ingame!!.player?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
 
 
     override fun update(gc: GameContainer, delta: Int) {
@@ -108,8 +109,7 @@ class UIQuickBar : UICanvas, MouseControlled {
     }
 
     override fun mouseWheelMoved(change: Int) {
-        selection = selection.plus(if (change > 1) 1 else if (change < -1) -1 else 0).rem(SLOT_COUNT)
-        if (selection < 0) selection += SLOT_COUNT
+        selection = selection.plus(if (change > 1) 1 else if (change < -1) -1 else 0).fmod(SLOT_COUNT)
     }
 
     companion object {
