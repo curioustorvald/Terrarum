@@ -2,8 +2,7 @@ package net.torvald.terrarum
 
 import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.terrarum.gamecontroller.Key
-import net.torvald.terrarum.itemproperties.InventoryItem
-import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.ui.UIInventory
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemTextButton
@@ -22,7 +21,7 @@ class UIItemInventoryElem(
         override var posX: Int,
         override var posY: Int,
         override val width: Int,
-        var item: InventoryItem?,
+        var item: GameItem?,
         var amount: Int,
         var itemImage: Image?,
         val mouseOverTextCol: Color = Color(0xfff066),

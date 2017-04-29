@@ -24,7 +24,7 @@ object ItemCodex {
      * <ItemID or RefID for Actor, TheItem>
      * Will return corresponding Actor if ID >= ACTORID_MIN
      */
-    private val itemCodex = HashMap<ItemID, InventoryItem>()
+    private val itemCodex = HashMap<ItemID, GameItem>()
     private val dynamicItemDescription = HashMap<ItemID, KVHashMap>()
 
     val ITEM_TILES = 0..GameWorld.TILES_SUPPORTED - 1
@@ -42,7 +42,7 @@ object ItemCodex {
         // blocks.csvs are loaded by ModMgr beforehand
         // block items (blocks and walls are the same thing basically)
         for (i in ITEM_TILES + ITEM_WALLS) {
-            itemCodex[i] = object : InventoryItem() {
+            itemCodex[i] = object : GameItem() {
                 override val originalID = i
                 override var dynamicID = i
                 override val isUnique: Boolean = false
@@ -108,7 +108,7 @@ object ItemCodex {
         }
 
         // test copper pickaxe
-        /*itemCodex[ITEM_STATIC.first] = object : InventoryItem() {
+        /*itemCodex[ITEM_STATIC.first] = object : GameItem() {
             override val originalID = ITEM_STATIC.first
             override var dynamicID = originalID
             override val isUnique = false
@@ -173,7 +173,7 @@ object ItemCodex {
     /**
      * Returns clone of the item in the Codex
      */
-    operator fun get(code: ItemID): InventoryItem {
+    operator fun get(code: ItemID): GameItem {
         if (code <= ITEM_STATIC.endInclusive) // generic item
             return itemCodex[code]!!.clone() // from CSV
         else if (code <= ITEM_DYNAMIC.endInclusive) {
@@ -190,11 +190,11 @@ object ItemCodex {
     /**
      * Mainly used by GameItemLoader
      */
-    operator fun set(code: ItemID, item: InventoryItem) {
+    operator fun set(code: ItemID, item: GameItem) {
         itemCodex[code] = item
     }
 
-    fun getItemImage(item: InventoryItem): Image {
+    fun getItemImage(item: GameItem): Image {
         // terrain
         if (item.originalID in ITEM_TILES) {
             return BlocksDrawer.tilesTerrain.getSubImage(

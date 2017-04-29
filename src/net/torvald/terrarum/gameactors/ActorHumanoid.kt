@@ -4,7 +4,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gamecontroller.Key
-import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.ui.UIInventory
@@ -138,7 +138,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         get() = this == Terrarum.ingame!!.player
 
 
-    private val nullItem = object : InventoryItem() {
+    private val nullItem = object : GameItem() {
         override var dynamicID: Int = 0
         override val originalID = dynamicID
         override val isUnique: Boolean = false
@@ -480,7 +480,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             // ONLY FOR HAND_GRIPs!!
             val quickBarItem = inventory.getQuickBar(actorValue.getAsInt(key)!!)?.item
 
-            if (quickBarItem != null && quickBarItem.equipPosition == InventoryItem.EquipPosition.HAND_GRIP) {
+            if (quickBarItem != null && quickBarItem.equipPosition == GameItem.EquipPosition.HAND_GRIP) {
                 equipItem(quickBarItem)
             }
 

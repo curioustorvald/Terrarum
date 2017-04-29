@@ -2,7 +2,7 @@ package net.torvald.terrarum
 
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.itemproperties.IVKey
-import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.blockproperties.Block
@@ -46,7 +46,7 @@ class StateUITest : BasicGameState() {
         // Item properties must be pre-composed using CSV/JSON, and read and made into the item instance
         // using factory/builder pattern. @see ItemCodex
 
-        actor.inventory.add(object : InventoryItem() {
+        actor.inventory.add(object : GameItem() {
             init {
                 itemProperties[IVKey.ITEMTYPE] = IVKey.ItemType.HAMMER
             }
@@ -56,7 +56,7 @@ class StateUITest : BasicGameState() {
             override var originalName: String = "Test tool"
             override var baseMass: Double = 12.0
             override var baseToolSize: Double? = 8.0
-            override var inventoryCategory: String = InventoryItem.Category.TOOL
+            override var inventoryCategory: String = GameItem.Category.TOOL
             override var maxDurability: Int = 143
             override var durability: Float = 64f
             override var stackable = false
@@ -65,7 +65,7 @@ class StateUITest : BasicGameState() {
         })
         actor.inventory.getByDynamicID(5656)!!.item.name = "Test tool"
 
-        actor.inventory.add(object : InventoryItem() {
+        actor.inventory.add(object : GameItem() {
             init {
                 itemProperties[IVKey.ITEMTYPE] = IVKey.ItemType.ARTEFACT
             }
@@ -75,7 +75,7 @@ class StateUITest : BasicGameState() {
             override var originalName: String = "CONTEXT_ITEM_QUEST_NOUN"
             override var baseMass: Double = 1.4
             override var baseToolSize: Double? = null
-            override var inventoryCategory: String = InventoryItem.Category.MISC
+            override var inventoryCategory: String = GameItem.Category.MISC
             override var stackable = false
             override val isDynamic = false
             override val material = Material(0,0,0,0,0,0,0,0,0,0.0)

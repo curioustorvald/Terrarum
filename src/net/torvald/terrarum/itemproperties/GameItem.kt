@@ -5,7 +5,6 @@ import net.torvald.terrarum.ItemValue
 import net.torvald.terrarum.gameactors.ActorInventory
 import net.torvald.terrarum.gameactors.Pocketed
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
-import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -15,7 +14,7 @@ typealias ItemID = Int
 /**
  * Created by minjaesong on 16-01-16.
  */
-abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
+abstract class GameItem : Comparable<GameItem>, Cloneable {
 
     abstract var dynamicID: ItemID
     /**
@@ -110,7 +109,7 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
     open var scale: Double = 1.0
 
     /**
-     * Set to zero (InventoryItem.DURABILITY_NA) if durability not applicable
+     * Set to zero (GameItem.DURABILITY_NA) if durability not applicable
      */
     open var maxDurability: Int = 0
 
@@ -183,7 +182,7 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
-        return dynamicID == (other as InventoryItem).dynamicID
+        return dynamicID == (other as GameItem).dynamicID
     }
 
     fun unsetCustomName() {
@@ -192,7 +191,7 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
         nameColour = Color.white
     }
 
-    override fun compareTo(other: InventoryItem): Int = (this.dynamicID - other.dynamicID).sign()
+    override fun compareTo(other: GameItem): Int = (this.dynamicID - other.dynamicID).sign()
 
     fun Int.sign(): Int = if (this > 0) 1 else if (this < 0) -1 else 0
 
@@ -243,17 +242,17 @@ abstract class InventoryItem : Comparable<InventoryItem>, Cloneable {
         @JvmStatic val MISC = "misc"
     }
 
-    override public fun clone(): InventoryItem {
+    override public fun clone(): GameItem {
         val clonedItem = super.clone()
         // properly clone ItemValue
-        (clonedItem as InventoryItem).itemProperties = this.itemProperties.clone()
+        (clonedItem as GameItem).itemProperties = this.itemProperties.clone()
 
         return clonedItem
     }
 
 
-    fun generateUniqueDynamicID(inventory: ActorInventory): InventoryItem {
-        dynamicID = InventoryItem.generateUniqueDynamicID(inventory)
+    fun generateUniqueDynamicID(inventory: ActorInventory): GameItem {
+        dynamicID = GameItem.generateUniqueDynamicID(inventory)
         return this
     }
 

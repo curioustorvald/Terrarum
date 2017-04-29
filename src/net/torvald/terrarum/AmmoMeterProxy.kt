@@ -1,7 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.terrarum.gameactors.ActorHumanoid
-import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.ui.UIVitalMetre
 
 /**
@@ -10,7 +10,7 @@ import net.torvald.terrarum.ui.UIVitalMetre
 object AmmoMeterProxy {
 
     operator fun invoke(actor: ActorHumanoid, meter: UIVitalMetre) {
-        val currentItem = actor.inventory.itemEquipped[InventoryItem.EquipPosition.HAND_GRIP]
+        val currentItem = actor.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
         if (currentItem == null) {
             meter.vitalGetterMax = { null }
@@ -18,7 +18,7 @@ object AmmoMeterProxy {
         }
         else {
             meter.vitalGetterVal = {
-                if (currentItem.stackable && currentItem.maxDurability == InventoryItem.DURABILITY_NA) {
+                if (currentItem.stackable && currentItem.maxDurability == GameItem.DURABILITY_NA) {
                     actor.inventory.getByDynamicID(currentItem.dynamicID)!!.amount.toFloat()
                 }
                 else
@@ -26,7 +26,7 @@ object AmmoMeterProxy {
             }
 
             meter.vitalGetterMax = {
-                if (currentItem.stackable && currentItem.maxDurability == InventoryItem.DURABILITY_NA)
+                if (currentItem.stackable && currentItem.maxDurability == GameItem.DURABILITY_NA)
                     500f
                 else
                     currentItem.maxDurability.toFloat()

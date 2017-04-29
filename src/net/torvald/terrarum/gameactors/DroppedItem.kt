@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
 import org.newdawn.slick.GameContainer
@@ -9,7 +9,7 @@ import org.newdawn.slick.Graphics
 /**
  * Created by minjaesong on 16-03-15.
  */
-class DroppedItem(private val item: InventoryItem) : ActorWithPhysics(Actor.RenderOrder.MIDTOP) {
+class DroppedItem(private val item: GameItem) : ActorWithPhysics(Actor.RenderOrder.MIDTOP) {
 
     init {
         if (item.dynamicID >= ItemCodex.ACTORID_MIN)
