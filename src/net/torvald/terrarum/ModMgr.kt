@@ -1,7 +1,7 @@
 package net.torvald.terrarum
 
 import net.torvald.CSVFetcher
-import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.langpack.Lang
@@ -103,7 +103,7 @@ object ModMgr {
 
         /*val engine = ScriptEngineManager().getEngineByExtension("groovy")!!
         engine.eval(FileReader(getFile("basegame", "/items/testpick.groovy")))
-        val newPick = (engine as Invocable).invokeFunction("invoke", 8449) as InventoryItem
+        val newPick = (engine as Invocable).invokeFunction("invoke", 8449) as GameItem
         ItemCodex[8449] = newPick*/
     }
 
@@ -157,7 +157,7 @@ object ModMgr {
                 val itemID = it["id"].toInt()
 
                 groovyEngine.eval(script)
-                ItemCodex[itemID] = groovyInvocable.invokeFunction("invoke", itemID) as InventoryItem
+                ItemCodex[itemID] = groovyInvocable.invokeFunction("invoke", itemID) as GameItem
             }
         }
     }

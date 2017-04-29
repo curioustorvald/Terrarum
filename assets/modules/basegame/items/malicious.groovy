@@ -1,4 +1,4 @@
-import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
@@ -7,9 +7,9 @@ import org.jetbrains.annotations.Nullable
  * Created by SKYHi14 on 2017-04-28.
  */
 
-static InventoryItem invoke(int id) {
+static GameItem invoke(int id) {
 
-    return new InventoryItem() {
+    return new GameItem() {
         @Override
         int getDynamicID() {
             return 0

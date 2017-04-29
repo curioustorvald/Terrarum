@@ -2,12 +2,11 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_WALLS
 import net.torvald.terrarum.itemproperties.ItemID
-import net.torvald.terrarum.ui.UIInventory
 import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
@@ -27,7 +26,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     /**
      * List of all equipped items (tools, armours, rings, necklaces, etc.)
      */
-    val itemEquipped = Array<InventoryItem?>(InventoryItem.EquipPosition.INDEX_MAX, { null })
+    val itemEquipped = Array<GameItem?>(GameItem.EquipPosition.INDEX_MAX, { null })
 
     /**
      * Sorted by referenceID.
@@ -39,13 +38,13 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     }
 
     fun add(itemID: ItemID, count: Int = 1) = add(ItemCodex[itemID], count)
-    fun add(item: InventoryItem, count: Int = 1) {
+    fun add(item: GameItem, count: Int = 1) {
 
         println("[ActorInventory] add $item, $count")
 
 
         // not wall-able walls
-        if (item.inventoryCategory == InventoryItem.Category.WALL &&
+        if (item.inventoryCategory == GameItem.Category.WALL &&
             !BlockCodex[item.dynamicID - ITEM_WALLS.start].isWallable) {
             throw IllegalArgumentException("Wall ID ${item.dynamicID - ITEM_WALLS.start} is not wall-able.")
         }
@@ -86,7 +85,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     fun remove(itemID: ItemID, count: Int) = remove(ItemCodex[itemID], count)
     /** Will check existence of the item using its Dynamic ID; careful with command order!
      *      e.g. re-assign after this operation */
-    fun remove(item: InventoryItem, count: Int = 1) {
+    fun remove(item: GameItem, count: Int = 1) {
 
         println("[ActorInventory] remove $item, $count")
 
@@ -128,7 +127,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     fun getQuickBar(slot: Int): InventoryPair? = getByDynamicID(quickBar[slot])
 
     /**
-     * HashMap<InventoryItem, Amounts>
+     * HashMap<GameItem, Amounts>
      */
     fun forEach(consumer: (InventoryPair) -> Unit) = itemList.forEach(consumer)
 
@@ -169,12 +168,12 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             false
 
 
-    fun consumeItem(actor: Actor, item: InventoryItem) {
+    fun consumeItem(actor: Actor, item: GameItem) {
         if (item.stackable && !item.isDynamic) {
             remove(item, 1)
         }
         else {
-            val newItem: InventoryItem
+            val newItem: GameItem
 
             // unpack newly-made dynamic item (e.g. any weapon, floppy disk)
             if (item.isDynamic && item.originalID == item.dynamicID) {
@@ -219,7 +218,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
 
 
 
-    fun contains(item: InventoryItem) = contains(item.dynamicID)
+    fun contains(item: GameItem) = contains(item.dynamicID)
     fun contains(id: ItemID) =
             if (itemList.size == 0)
                 false
@@ -288,4 +287,4 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     }
 }
 
-data class InventoryPair(val item: InventoryItem, var amount: Int)
+data class InventoryPair(val item: GameItem, var amount: Int)

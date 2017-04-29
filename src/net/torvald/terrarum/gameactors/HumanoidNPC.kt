@@ -1,24 +1,13 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorHumanoid
-import net.torvald.terrarum.gameactors.ai.AILuaAPI
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
 import net.torvald.terrarum.gamecontroller.mouseX
 import net.torvald.terrarum.gamecontroller.mouseY
-import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
-import org.luaj.vm2.*
-import org.luaj.vm2.compiler.LuaC
-import org.luaj.vm2.lib.*
-import org.luaj.vm2.lib.jse.JseBaseLib
-import org.luaj.vm2.lib.jse.JseMathLib
-import org.luaj.vm2.lib.jse.JsePlatform
 import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Input
-import java.io.InputStreamReader
-import java.io.Reader
 
 /**
  * @param ai AI class. Use LuaAIWrapper for Lua script
@@ -42,8 +31,8 @@ open class HumanoidNPC(
         collisionType = DEFAULT_COLLISION_TYPE
     }
 
-    // we're having InventoryItem data so that this class could be somewhat universal
-    override var itemData: InventoryItem = object : InventoryItem() {
+    // we're having GameItem data so that this class could be somewhat universal
+    override var itemData: GameItem = object : GameItem() {
         override var dynamicID = referenceID
         override val originalID = dynamicID
         override val isUnique = true

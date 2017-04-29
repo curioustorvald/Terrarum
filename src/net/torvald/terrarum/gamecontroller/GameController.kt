@@ -3,7 +3,7 @@ package net.torvald.terrarum.gamecontroller
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
@@ -65,7 +65,7 @@ object GameController {
         // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
         if (ingame.player != null && ingame.canPlayerControl) {
             if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary")) || input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
-                val itemOnGrip = ingame.player!!.inventory.itemEquipped[InventoryItem.EquipPosition.HAND_GRIP]
+                val itemOnGrip = ingame.player!!.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
                 if (itemOnGrip != null) {
                     if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary"))) {
@@ -130,7 +130,7 @@ object GameController {
             val ingame = Terrarum.ingame!!
             // don't separate Player from this! Physics will break, esp. airborne manoeuvre
             if (ingame.player != null && ingame.canPlayerControl) {
-                val itemOnGrip = ingame.player!!.inventory.itemEquipped[InventoryItem.EquipPosition.HAND_GRIP]
+                val itemOnGrip = ingame.player!!.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
                 if (itemOnGrip != null) {
                     if (button == Terrarum.getConfigInt("mousePrimary")) {

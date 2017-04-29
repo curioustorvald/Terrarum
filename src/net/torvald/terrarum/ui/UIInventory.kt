@@ -5,7 +5,7 @@ import net.torvald.terrarum.Terrarum.joypadLabelNinA
 import net.torvald.terrarum.Terrarum.joypadLabelNinY
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
-import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.langpack.Lang
 import org.newdawn.slick.*
@@ -35,15 +35,15 @@ class UIInventory(
     val defaultTextColour = Color(0xeaeaea)
 
     init {
-        catButtonsToCatIdent.put("GAME_INVENTORY_WEAPONS", InventoryItem.Category.WEAPON)
-        catButtonsToCatIdent.put("CONTEXT_ITEM_TOOL_PLURAL", InventoryItem.Category.TOOL)
-        catButtonsToCatIdent.put("CONTEXT_ITEM_ARMOR", InventoryItem.Category.ARMOUR)
-        catButtonsToCatIdent.put("GAME_INVENTORY_INGREDIENTS", InventoryItem.Category.GENERIC)
-        catButtonsToCatIdent.put("GAME_INVENTORY_POTIONS", InventoryItem.Category.POTION)
-        catButtonsToCatIdent.put("CONTEXT_ITEM_MAGIC", InventoryItem.Category.MAGIC)
-        catButtonsToCatIdent.put("GAME_INVENTORY_BLOCKS", InventoryItem.Category.BLOCK)
-        catButtonsToCatIdent.put("GAME_INVENTORY_WALLS", InventoryItem.Category.WALL)
-        catButtonsToCatIdent.put("GAME_GENRE_MISC", InventoryItem.Category.MISC)
+        catButtonsToCatIdent.put("GAME_INVENTORY_WEAPONS", GameItem.Category.WEAPON)
+        catButtonsToCatIdent.put("CONTEXT_ITEM_TOOL_PLURAL", GameItem.Category.TOOL)
+        catButtonsToCatIdent.put("CONTEXT_ITEM_ARMOR", GameItem.Category.ARMOUR)
+        catButtonsToCatIdent.put("GAME_INVENTORY_INGREDIENTS", GameItem.Category.GENERIC)
+        catButtonsToCatIdent.put("GAME_INVENTORY_POTIONS", GameItem.Category.POTION)
+        catButtonsToCatIdent.put("CONTEXT_ITEM_MAGIC", GameItem.Category.MAGIC)
+        catButtonsToCatIdent.put("GAME_INVENTORY_BLOCKS", GameItem.Category.BLOCK)
+        catButtonsToCatIdent.put("GAME_INVENTORY_WALLS", GameItem.Category.WALL)
+        catButtonsToCatIdent.put("GAME_GENRE_MISC", GameItem.Category.MISC)
 
         // special filter
         catButtonsToCatIdent.put("MENU_LABEL_ALL", "__all__")

@@ -9,23 +9,21 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.itemproperties.Calculate
-import net.torvald.terrarum.itemproperties.InventoryItem
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.blockproperties.Block
 // following two are NOT UNUSED!
-import net.torvald.terrarum.itemproperties.InventoryItem.EquipPosition
-import net.torvald.terrarum.itemproperties.InventoryItem.Category
 import org.jetbrains.annotations.NotNull
 import org.newdawn.slick.GameContainer
 
 
 
-static InventoryItem invoke(int id) {
+static GameItem invoke(int id) {
     return new TestPick(id)
 }
 
 
-class TestPick extends InventoryItem {
+class TestPick extends GameItem {
 
     int originalID
     int dynamicID
