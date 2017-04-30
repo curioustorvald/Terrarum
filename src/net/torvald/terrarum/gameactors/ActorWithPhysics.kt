@@ -534,7 +534,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /**
      * nextHitbox must NOT be altered before this method is called!
      */
-    private fun displaceByCCD() {
+    @Deprecated("It's stupid anyway.") private fun displaceByCCD() {
         ccdCollided = false
 
         if (!isNoCollideWorld) {
@@ -560,6 +560,17 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             //println("ccdCollided: $ccdCollided")
         }
     }
+
+    /**
+     * nextHitbox must NOT be altered before this method is called!
+     */
+    private fun resolveWorldCollision() {
+        // First of all: Rules
+        //  1. If two sides are touching each other (they share exactly same coord along one axis),
+        //     they are not colliding (just touching)
+        //  2. If two sides are embedded into each other, they are colliding.
+    }
+
 
     private fun hitAndReflectX() {
         // when it sticks, externalForce.x goes back and forth
