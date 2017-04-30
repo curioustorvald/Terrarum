@@ -25,11 +25,6 @@ class BFVM(
         val stdout: OutputStream = System.out,
         val stdin: InputStream = System.`in`
 ) {
-    annotation class Unsigned
-
-    private val DEBUG = true
-
-
     private val ZERO = 0.toByte()
 
     private val INP = '>'.toByte()
@@ -40,15 +35,7 @@ class BFVM(
     private val RDI = ','.toByte()
     private val JPZ = '['.toByte()
     private val JPN = ']'.toByte()
-
     private val CYA = 0xFF.toByte()
-
-    private val LDZ = '0'.toByte()
-    private val ADM = 'M'.toByte()
-    private val ADP = 'P'.toByte()
-    private val SBM = 'm'.toByte()
-    private val SBP = 'p'.toByte()
-
 
     private val bfOpcodes = hashSetOf<Byte>(43,44,45,46,60,62,91,93)
 
@@ -60,16 +47,9 @@ class BFVM(
             Pair(PRN, { PRN() }),
             Pair(RDI, { RDI() }),
             Pair(JPZ, { JPZ() }),
-            Pair(JPN, { JPN() }),
-            Pair(LDZ, { LDZ() })
+            Pair(JPN, { JPN() })
     )
 
-    private val instOneArg = hashMapOf<@Unsigned Byte, (Int) -> Unit>(
-            Pair(ADM, { i -> ADM(i) }),
-            Pair(ADP, { i -> ADP(i) }),
-            Pair(SBM, { i -> SBM(i) }),
-            Pair(SBP, { i -> SBP(i) })
-    )
 
     private var r1: Byte = ZERO // Register One (Data register)
     private var r2 = 0 // Register Two (Scratchpad); theoretically I can use R1 but it limits bracket depth to 254
@@ -98,14 +78,6 @@ class BFVM(
 
     [ Internal operations ]
     CYA  0xFF   Marks end of the input program
-
-    [ Optimise operations ]
-    LDZ  0      Set memory to zero
-    ADM  M      Add immediate to memory          (RLEing +)
-    ADP  P      Add immediate to memory pointer  (RLEing >)
-    SBM  m      Subtract immediate to memory          (RLEing -)
-    SBP  p      Subtract immediate to memory pointer  (RLEing <)
-
      */
 
     // NOTE: INC_PC is implied
@@ -126,7 +98,7 @@ class BFVM(
         mem[mp] = r1
     }
     private fun PRN() {
-        stdout.write(mem[mp].toUint())
+        stdout.write(mem[mp].toInt())
     }
     private fun RDI() {
         r1 = stdin.read().toByte()
@@ -139,7 +111,7 @@ class BFVM(
             r2 = 0
 
             while (r2 != -1) {
-                ir++
+                INC_IR()
                 if (JPZ == mem[ir]) {
                     r2++
                 }
@@ -158,7 +130,7 @@ class BFVM(
             r2 = 0
 
             while (r2 != -1) {
-                ir--
+                DEC_IR()
                 if (JPN == mem[ir]) {
                     r2++
                 }
@@ -170,67 +142,22 @@ class BFVM(
             pc = ir
         }
     }
-    // non-standard
-    private fun LDZ() {
-        mem[mp] = 0
-    }
-    private fun ADM(i: Int) {
-        mem[mp] = (mem[mp] + i).toByte()
-    }
-    private fun SBM(i: Int) {
-        mem[mp] = (mem[mp] - i).toByte()
-    }
-    private fun ADP(i: Int) {
-        mp = (mp + i) mod memSize
-    }
-    private fun SBP(i: Int) {
-        mp = (mp - i) mod memSize
-    }
     // END OF NOTE (INC_PC is implied)
 
 
     fun execute() {
-        dbgp("Now run...")
         while (mem[pc] != CYA) {
-            //dbgp("pc = $pc, mp = $mp, inst = ${mem[pc].toChar()}  ${mem[pc+1]}, mem = ${mem[mp]}")
-
-            r1 = mem[pc]
-
-            if (r1 in instSet) {
-                instSet[r1]!!.invoke() // fetch-decode-execute in one line
-            }
-            else if (r1 in instOneArg) {
-                INC_PC()
-                r2 = mem[pc].toUint()
-
-                instOneArg[r1]?.invoke(r2)
-            }
-            else {
-                dbgp("invalid: $r1")
-            }
-
+            //println("pc = $pc, mp = $mp, inst = ${mem[pc].toChar()}, mem = ${mem[mp]}")
+            instSet[mem[pc]]?.invoke() // fetch-decode-execute in one line
             INC_PC()
         }
     }
 
-    fun loadProgram(program: String, optimizeLevel: Int = NO_OPTIMISE) {
-        dbgp("Now load...")
-
-        fun putOp(op: Byte) {
-
-            //dbgp("${op.toChar()}    ${op.toUint()}")
-
-            mem[mp] = op
-            INC_MP()
-        }
-
+    fun loadProgram(program: String) {
         val program = program.toByteArray(charset = Charsets.US_ASCII)
 
-        r1 = 0 // currently reading operation
         pc = 0 // FOR NOW it's PC for input program
         mp = 0 // where to dump input bytes
-        r2 = 0 // scratchpad
-        ir = 0 // lookahead pointer
 
         while (pc < program.size) {
             if (pc >= memSize - 1) {
@@ -240,90 +167,27 @@ class BFVM(
             r1 = program[pc]
 
             if (r1 in bfOpcodes) {
-                if (optimizeLevel >= 1) {
-                    // [-]
-                    if (r1 == JPZ) {
-                        if (program[pc + 1] == DEC && program[pc + 2] == JPN) {
-                            pc += 3
-                            putOp(LDZ)
-                            continue
-                        }
-                    }
-                    // RLEing +
-                    else if (INC == r1 && program[pc + 1] == r1) {
-                        ir = 2
-                        while (INC == program[pc + ir] && ir < 255) ir++
-
-                        pc += ir
-                        putOp(ADM)
-                        putOp(ir.toByte())
-                        continue
-                    }
-                    // RLEing -
-                    else if (DEC == r1 && program[pc + 1] == r1) {
-                        ir = 2
-                        while (DEC == program[pc + ir] && ir < 255) ir++
-
-                        pc += ir
-                        putOp(SBM)
-                        putOp(ir.toByte())
-                        continue
-                    }
-                    // RLEing >
-                    else if (INP == r1 && program[pc + 1] == r1) {
-                        ir = 2
-                        while (INP == program[pc + ir] && ir < 255) ir++
-
-                        pc += ir
-                        putOp(ADP)
-                        putOp(ir.toByte())
-                        continue
-                    }
-                    // RLEing <
-                    else if (DEP == r1 && program[pc + 1] == r1) {
-                        ir = 2
-                        while (DEP == program[pc + ir] && ir < 255) ir++
-
-                        pc += ir
-                        putOp(SBP)
-                        putOp(ir.toByte())
-                        continue
-                    }
-                }
-
-                putOp(r1)
+                mem[mp] = r1
+                INC_MP()
             }
 
-            pc += 1
+            INC_PC()
         }
 
 
-        mem[mp] = CYA
-
-        dbgp("Prg size: $mp")
-
-        INC_MP()
+        mem[program.size] = CYA
+        mp = (program.size + 1) mod memSize
         pc = 0
         ir = 0
     }
 
 
     private fun INC_PC() { pc = (pc + 1) mod memSize }
+    private fun INC_IR() { ir = (ir + 1) mod memSize }
+    private fun DEC_IR() { ir = (ir - 1) mod memSize }
     private fun INC_MP() { mp = (mp + 1) mod memSize }
     private fun DEC_MP() { mp = (mp - 1) mod memSize }
     private infix fun Int.mod(other: Int) = Math.floorMod(this, other)
-    private fun Byte.toUint() = java.lang.Byte.toUnsignedInt(this)
-
-    private fun dbgp(s: Any) {
-        if (DEBUG) println(s)
-    }
-
-    val NO_OPTIMISE = 0
-
-    /*
-    Optimise level
-    1   RLE, Set cell to zero
-     */
 }
 
 
@@ -343,6 +207,5 @@ val factorials = """
 [-]]<<[>>+>+<<<-]>>>[<<<+>>>-]<<[<+>-]>[<+>-]<<<-]
 """
 
-vm.loadProgram(factorials, optimizeLevel = 1)
+vm.loadProgram(factorials)
 vm.execute()
-
