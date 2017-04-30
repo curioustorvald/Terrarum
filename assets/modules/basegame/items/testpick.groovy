@@ -33,8 +33,8 @@ class TestPick extends GameItem {
     boolean stackable = true
     int maxDurability = 147
     float durability = maxDurability
-    int equipPosition = EquipPosition.HAND_GRIP
-    String inventoryCategory = Category.TOOL
+    int equipPosition = 9 //EquipPosition.HAND_GRIP
+    String inventoryCategory = "tool" //Category.TOOL
 
     // !! TEST MATERIAL !!
     Material material = new Material(0,0,0,0,0,0,0,0,1,0.0)

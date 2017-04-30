@@ -834,9 +834,9 @@ class StateInGame : BasicGameState() {
         }
     }
 
-    private fun ArrayList<out Actor>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID)
+    private fun ArrayList<*>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID)
 
-    private fun ArrayList<out Actor>.binarySearch(ID: Int): Int {
+    private fun ArrayList<*>.binarySearch(ID: Int): Int {
         // code from collections/Collections.kt
         var low = 0
         var high = this.size - 1
@@ -844,11 +844,11 @@ class StateInGame : BasicGameState() {
         while (low <= high) {
             val mid = (low + high).ushr(1) // safe from overflows
 
-            val midVal = get(mid)
+            val midVal = get(mid)!!
 
-            if (ID > midVal.referenceID)
+            if (ID > midVal.hashCode())
                 low = mid + 1
-            else if (ID < midVal.referenceID)
+            else if (ID < midVal.hashCode())
                 high = mid - 1
             else
                 return mid // key found
