@@ -1,4 +1,4 @@
-package net.torvald
+package net.torvald.terrarum.utils
 
 import net.torvald.terrarum.ModMgr
 import org.apache.commons.csv.CSVFormat
@@ -17,15 +17,15 @@ object CSVFetcher {
 
     private var csvString: StringBuffer? = null
 
-    fun readFromFile(csvFilePath: String): List<CSVRecord> {
-        csvString = StringBuffer() // reset buffer every time it called
-        readCSVasString(csvFilePath)
+    fun readFromFile(csvFilePath: String): List<org.apache.commons.csv.CSVRecord> {
+        net.torvald.terrarum.utils.CSVFetcher.csvString = StringBuffer() // reset buffer every time it called
+        net.torvald.terrarum.utils.CSVFetcher.readCSVasString(csvFilePath)
 
         println("[CSVFetcher] Reading CSV $csvFilePath")
 
-        val csvParser = CSVParser.parse(
-                csvString!!.toString(),
-                CSVFormat.DEFAULT.withIgnoreSurroundingSpaces()
+        val csvParser = org.apache.commons.csv.CSVParser.parse(
+                net.torvald.terrarum.utils.CSVFetcher.csvString!!.toString(),
+                org.apache.commons.csv.CSVFormat.DEFAULT.withIgnoreSurroundingSpaces()
                         .withHeader()
                         .withIgnoreEmptyLines()
                         .withDelimiter(';')
@@ -40,12 +40,12 @@ object CSVFetcher {
         return csvRecordList
     }
 
-    fun readFromModule(module: String, path: String) = readFromFile(ModMgr.getPath(module, path))
+    fun readFromModule(module: String, path: String) = net.torvald.terrarum.utils.CSVFetcher.readFromFile(ModMgr.getPath(module, path))
 
-    fun readFromString(csv: String): List<CSVRecord> {
-        val csvParser = CSVParser.parse(
+    fun readFromString(csv: String): List<org.apache.commons.csv.CSVRecord> {
+        val csvParser = org.apache.commons.csv.CSVParser.parse(
                 csv,
-                CSVFormat.DEFAULT.withIgnoreSurroundingSpaces()
+                org.apache.commons.csv.CSVFormat.DEFAULT.withIgnoreSurroundingSpaces()
                         .withHeader()
                         .withIgnoreEmptyLines()
                         .withDelimiter(';')
@@ -60,12 +60,12 @@ object CSVFetcher {
         return csvRecordList
     }
 
-    @Throws(IOException::class)
+    @Throws(java.io.IOException::class)
     fun readCSVasString(path: String): String {
-        csvString = StringBuffer()
-        Files.lines(FileSystems.getDefault().getPath(path)).forEach(
-                { s -> csvString!!.append("$s\n") }
+        net.torvald.terrarum.utils.CSVFetcher.csvString = StringBuffer()
+        java.nio.file.Files.lines(java.nio.file.FileSystems.getDefault().getPath(path)).forEach(
+                { s -> net.torvald.terrarum.utils.CSVFetcher.csvString!!.append("$s\n") }
         )
-        return csvString!!.toString()
+        return net.torvald.terrarum.utils.CSVFetcher.csvString!!.toString()
     }
 }

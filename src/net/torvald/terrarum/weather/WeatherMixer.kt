@@ -1,7 +1,6 @@
 package net.torvald.terrarum.weather
 
-import com.jme3.math.FastMath
-import net.torvald.JsonFetcher
+import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*

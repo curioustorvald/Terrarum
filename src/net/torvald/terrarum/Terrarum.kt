@@ -1,11 +1,10 @@
 package net.torvald.terrarum
 
 import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import net.torvald.imagefont.GameFontImpl
-import net.torvald.JsonFetcher
-import net.torvald.JsonWriter
+import net.torvald.terrarum.utils.JsonFetcher
+import net.torvald.terrarum.utils.JsonWriter
 import net.torvald.imagefont.TinyAlphNum
 import net.torvald.terrarum.gamecontroller.mouseTileX
 import net.torvald.terrarum.gamecontroller.mouseTileY
@@ -18,7 +17,6 @@ import org.newdawn.slick.opengl.Texture
 import org.newdawn.slick.state.StateBasedGame
 import java.io.File
 import java.io.IOException
-import java.lang.management.ManagementFactory
 import java.nio.ByteOrder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -351,23 +349,23 @@ object Terrarum : StateBasedGame(GAME_NAME) {
         val OS = System.getProperty("os.name").toUpperCase()
         if (OS.contains("WIN")) {
             OperationSystem = "WINDOWS"
-            defaultDir = System.getenv("APPDATA") + "/terrarum"
+            defaultDir = System.getenv("APPDATA") + "/Terrarum"
         }
         else if (OS.contains("OS X")) {
             OperationSystem = "OSX"
-            defaultDir = System.getProperty("user.home") + "/Library/Application Support/terrarum"
+            defaultDir = System.getProperty("user.home") + "/Library/Application Support/Terrarum"
         }
         else if (OS.contains("NUX") || OS.contains("NIX")) {
             OperationSystem = "LINUX"
-            defaultDir = System.getProperty("user.home") + "/.terrarum"
+            defaultDir = System.getProperty("user.home") + "/.Terrarum"
         }
         else if (OS.contains("SUNOS")) {
             OperationSystem = "SOLARIS"
-            defaultDir = System.getProperty("user.home") + "/.terrarum"
+            defaultDir = System.getProperty("user.home") + "/.Terrarum"
         }
         else {
             OperationSystem = "UNKNOWN"
-            defaultDir = System.getProperty("user.home") + "/.terrarum"
+            defaultDir = System.getProperty("user.home") + "/.Terrarum"
         }
 
         defaultSaveDir = defaultDir + "/Saves"

@@ -1,7 +1,6 @@
 package net.torvald.terrarum.gameactors.faction
 
-import net.torvald.JsonFetcher
-import com.google.gson.JsonObject
+import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.ModMgr
 
 import java.io.IOException

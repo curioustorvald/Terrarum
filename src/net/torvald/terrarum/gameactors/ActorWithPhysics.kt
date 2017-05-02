@@ -1135,7 +1135,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
     }
 
-    override fun actorValueChanged(key: String, value: Any?) {
+    override fun onActorValueChange(key: String, value: Any?) {
         // do nothing
     }
 

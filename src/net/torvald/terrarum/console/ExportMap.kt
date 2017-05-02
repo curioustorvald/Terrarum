@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.colourutil.Col4096
-import net.torvald.RasterWriter
+import net.torvald.terrarum.utils.RasterWriter
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 

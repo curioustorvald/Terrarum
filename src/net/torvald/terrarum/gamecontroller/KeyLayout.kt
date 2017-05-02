@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gamecontroller
 
-import net.torvald.JsonFetcher
+import net.torvald.terrarum.utils.JsonFetcher
 import java.util.*
 
 /**
