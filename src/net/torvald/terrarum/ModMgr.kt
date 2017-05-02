@@ -1,6 +1,6 @@
 package net.torvald.terrarum
 
-import net.torvald.CSVFetcher
+import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -99,12 +99,6 @@ object ModMgr {
             println("extension:" + f.extensions)
             println("-----------------------------------------------")
         }*/
-
-
-        /*val engine = ScriptEngineManager().getEngineByExtension("groovy")!!
-        engine.eval(FileReader(getFile("basegame", "/items/testpick.groovy")))
-        val newPick = (engine as Invocable).invokeFunction("invoke", 8449) as GameItem
-        ItemCodex[8449] = newPick*/
     }
 
     private fun checkExistence(module: String) {

@@ -13,13 +13,13 @@ class ActorValue(val actor: Actor) : KVHashMap() {
 
     override fun set(key: String, value: Any) {
         super.set(key, value)
-        actor.actorValueChanged(key, value) // fire the event handler
+        actor.onActorValueChange(key, value) // fire the event handler
     }
 
     override fun remove(key: String) {
         if (hashMap[key] != null) {
             hashMap.remove(key, hashMap[key]!!)
-            actor.actorValueChanged(key, null)
+            actor.onActorValueChange(key, null)
         }
     }
 

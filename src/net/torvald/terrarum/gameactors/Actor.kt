@@ -84,5 +84,7 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
      *
      * @param value null if the key is deleted
      */
-    abstract fun actorValueChanged(key: String, value: Any?)
+    abstract @Event fun onActorValueChange(key: String, value: Any?)
 }
+
+annotation class Event

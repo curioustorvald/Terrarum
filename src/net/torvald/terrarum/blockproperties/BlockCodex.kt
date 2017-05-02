@@ -1,6 +1,6 @@
 package net.torvald.terrarum.blockproperties
 
-import net.torvald.CSVFetcher
+import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import org.apache.commons.csv.CSVRecord

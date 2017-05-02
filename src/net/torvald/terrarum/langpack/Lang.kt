@@ -1,6 +1,6 @@
 package net.torvald.terrarum.langpack
 
-import net.torvald.JsonFetcher
+import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.Terrarum
 import java.io.*
 import java.util.*

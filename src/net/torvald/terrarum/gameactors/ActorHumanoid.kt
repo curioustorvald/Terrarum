@@ -335,8 +335,10 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     }
 
     override fun keyPressed(key: Int, c: Char) {
-        if (key in Key.NUM_1..Key.NUM_0) {
-            actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = key - Key.NUM_1
+        // quickslot (quickbar)
+        val quickbarKeys = Terrarum.getConfigIntArray("keyquickbars")
+        if (key in quickbarKeys) {
+            actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = quickbarKeys.indexOf(key)
         }
     }
 
@@ -474,7 +476,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         }
     }
 
-    override fun actorValueChanged(key: String, value: Any?) {
+    override fun onActorValueChange(key: String, value: Any?) {
         // quickslot implementation
         if (key == AVKey.__PLAYER_QUICKSLOTSEL && value != null) {
             // ONLY FOR HAND_GRIPs!!

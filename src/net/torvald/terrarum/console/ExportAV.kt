@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.JsonWriter
+import net.torvald.terrarum.utils.JsonWriter
 import net.torvald.terrarum.Terrarum
 
 import java.io.IOException

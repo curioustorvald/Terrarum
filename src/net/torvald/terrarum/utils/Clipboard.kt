@@ -1,4 +1,4 @@
-package net.torvald
+package net.torvald.terrarum.utils
 
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor

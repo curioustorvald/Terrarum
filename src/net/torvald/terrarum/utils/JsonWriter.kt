@@ -1,4 +1,4 @@
-package net.torvald
+package net.torvald.terrarum.utils
 
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -18,11 +18,11 @@ object JsonWriter {
      * @param c: a class
      * @param path: path to write a file
      */
-    @Throws(IOException::class)
+    @Throws(java.io.IOException::class)
     fun writeToFile(c: Any, path: String) {
-        val classElem = Gson().toJsonTree(c)
+        val classElem = com.google.gson.Gson().toJsonTree(c)
         val jsonString = classElem.toString()
-        val writer = FileWriter(path)
+        val writer = java.io.FileWriter(path)
         writer.write(jsonString)
         writer.close()
     }
@@ -33,9 +33,9 @@ object JsonWriter {
      * @param jsonObject
      * @param path: path to write a file
      */
-    @Throws(IOException::class)
-    fun writeToFile(jsonObject: JsonObject, path: String) {
-        val writer = FileWriter(path)
+    @Throws(java.io.IOException::class)
+    fun writeToFile(jsonObject: com.google.gson.JsonObject, path: String) {
+        val writer = java.io.FileWriter(path)
         writer.write(jsonObject.toString())
         writer.close()
     }
