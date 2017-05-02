@@ -111,6 +111,8 @@ object PasswordBase32 {
     }
 
     /**
+     * @param input password input from the user. Will be automatically converted to uppercase and
+     * will correct common mistakes.
      * @param outByteLength expected length of your decoded password. It is always a good idea to
      * suspect user inputs and sanitise them.
      */
