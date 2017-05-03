@@ -355,24 +355,24 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             // Codes that modifies velocity (moveDelta and externalForce) //
             ////////////////////////////////////////////////////////////////
 
-            // Combine velo and walk
-            applyMovementVelocity()
-
-            // applyBuoyancy()
-
+            // --> Apply more forces <-- //
             if (!isChronostasis) {
                 // Actors are subject to the gravity and the buoyancy if they are not levitating
+
                 if (!isNoSubjectToGrav) {
                     applyGravitation()
                 }
 
-                // hard limit velocity
-                externalForce.x = externalForce.x.bipolarClamp(VELO_HARD_LIMIT)
-                externalForce.y = externalForce.y.bipolarClamp(VELO_HARD_LIMIT)
+                //applyBuoyancy()
+            }
 
-                // Set 'next' position (hitbox) from canonical and walking velocity
-                setNewNextHitbox()
+            // --> Combine all the force (velo) and walk <-- //
+            combineVeloToMoveDelta()
+            // hard limit velocity
+            moveDelta.x = moveDelta.x.bipolarClamp(VELO_HARD_LIMIT) // displaceHitbox SHOULD use moveDelta
+            moveDelta.y = moveDelta.y.bipolarClamp(VELO_HARD_LIMIT)
 
+            if (!isChronostasis) {
                 ///////////////////////////////////////////////////////
                 // Codes that (SHOULD) displaces nextHitbox directly //
                 ///////////////////////////////////////////////////////
@@ -383,6 +383,31 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                  *     This body is NON-STATIC and the other body is STATIC
                  */
                 if (!isPlayerNoClip) {
+                    // // HOW IT SHOULD WORK // //
+                    // ////////////////////////
+                    // combineVeloToMoveDelta now
+                    // displace hitbox (!! force--moveDelta--still exist, do not touch the force !!)
+                    //      make sure "touching" is perfectly useable
+                    //      16-step ccd applies here
+                    // ((nextHitbox <- hitbox))
+                    // resolve forces (use up the force && deform the vector):
+                    //      // "touching" should work at this point if displaceHitbox is successful
+                    //      [Collision]:
+                    //          if touching (test for both axes):
+                    //              re-direct force vector by mul w/ elasticity
+                    //          if not touching:
+                    //              do nothing
+                    //      [Friction]:
+                    //          deform vector "externalForce"
+                    //          if isControllable:
+                    //              also alter walkX/Y
+                    // translate ((nextHitbox)) hitbox by moveDelta (forces), this consumes force
+                    //      DO NOT set whatever delta to zero
+                    // ((hitbox <- nextHitbox))
+                    //
+                    // ((comments))  [Label]
+
+
                     displaceByCCD()
                     applyNormalForce()
                 }
@@ -391,11 +416,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 // Codes that modifies velocity (after hitbox displacement) //
                 //////////////////////////////////////////////////////////////
 
-                if (!immobileBody) { // TODO test no friction on immobileBody
-                    setHorizontalFriction()
-                }
-                //if (immobileBody || isPlayerNoClip) { // TODO also hanging on the rope, etc.
-                // TODO test no friction on immobileBody
+                setHorizontalFriction() // friction SHOULD use and alter externalForce
                 if (isPlayerNoClip) { // TODO also hanging on the rope, etc.
                     setVerticalFriction()
                 }
@@ -431,7 +452,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      *  F 1     velo + walk + velo + walk
      * as a result, the speed will keep increase without it
      */
-    private fun applyMovementVelocity() {
+    private fun combineVeloToMoveDelta() {
         if (this is Controllable) {
             // decide whether to ignore walkX
             if (!(isCollidingSide(hitbox, COLLIDING_LEFT) && walkX < 0)
@@ -469,7 +490,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * Apply only if not grounded; normal force is precessed separately.
      */
     private fun applyGravitation() {
-        if (!isTouchingSide(hitbox, COLLIDING_BOTTOM)) {
+        if (!isNoSubjectToGrav) {
+            //if (!isTouchingSide(hitbox, COLLIDING_BOTTOM)) {
             /**
              * weight; gravitational force in action
              * W = mass * G (9.8 [m/s^2])
@@ -488,35 +510,49 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             val V: Vector2 = (W - D) / Terrarum.TARGET_FPS.toDouble() * SI_TO_GAME_ACC
 
             applyForce(V)
+            //}
         }
     }
 
     private fun applyNormalForce() {
         if (!isNoCollideWorld) {
             // axis Y. Using operand >= and hitting the ceiling will lock the player to the position
-            if (moveDelta.y > 0.0) { // was moving downward?
-                if (isColliding(nextHitbox, COLLIDING_TOP)) { // hit the ceiling
-                    hitAndReflectY() //hitAndForciblyReflectY()
-                    grounded = false
+
+            // was moving downward?
+            if (moveDelta.y > 0.0) {
+                if (moveDelta.y > 0.587777) { // dampening
+                    if (isColliding(nextHitbox, COLLIDING_TOP)) { // hit the ceiling
+                        hitAndReflectY() //hitAndForciblyReflectY()
+                        grounded = false
+                    }
+                    else if (isColliding(nextHitbox)) {
+                        hitAndReflectY()
+                        grounded = true
+                    }
+                    else if (isTouchingSide(nextHitbox, COLLIDING_BOTTOM) && !isColliding(nextHitbox)) { // actor hit something on its bottom
+                        hitAndReflectY()
+                        grounded = true
+                    }
+                    else { // the actor is not grounded at all
+                        grounded = false
+                    }
                 }
-                else if (isColliding(nextHitbox)) {
-                    hitAndReflectY()
+                else { // dampening
                     grounded = true
-                }
-                else if (isTouchingSide(nextHitbox, COLLIDING_BOTTOM) && !isColliding(nextHitbox)) { // actor hit something on its bottom
-                    hitAndReflectY()
-                    grounded = true
-                }
-                else { // the actor is not grounded at all
-                    grounded = false
                 }
             }
-            else if (moveDelta.y < 0.0) { // or was moving upward?
-                grounded = false
-                if (isTouchingSide(nextHitbox, COLLIDING_TOP)) { // actor hit something on its top
-                    hitAndForciblyReflectY() // prevents sticking to the ceiling
+            // or was moving upward?
+            else if (moveDelta.y < 0.0) {
+                if (moveDelta.y < -0.587777) { // dampening
+                    grounded = false
+                    if (isTouchingSide(nextHitbox, COLLIDING_TOP)) { // actor hit something on its top
+                        hitAndForciblyReflectY() // prevents sticking to the ceiling
+                    }
+                    else { // the actor is not grounded at all
+                    }
                 }
-                else { // the actor is not grounded at all
+                else { // dampening
+                    grounded = true // force grounded
                 }
             }
             // axis X
@@ -564,11 +600,23 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /**
      * nextHitbox must NOT be altered before this method is called!
      */
-    private fun resolveWorldCollision() {
+    private fun displaceHitbox() {
+        // I kinda need these notes when my brain is stress-throttled
+        //
         // First of all: Rules
         //  1. If two sides are touching each other (they share exactly same coord along one axis),
         //     they are not colliding (just touching)
         //  2. If two sides are embedded into each other, they are colliding.
+        // [Objective]
+        //  - Displace `hitbox` directly
+        //  - Make sure "isTouching" is perfectly useable, it depends on it
+        // [Procedure]
+        //  backtrack (16) steps to determine it is embedded to the wall, or passed through it
+        //  if (above procedure returns true):
+        //      displace "hitbox" using linear interpolation
+        // [END OF SUBROUTINE]
+
+        
     }
 
 
@@ -612,7 +660,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         println("hitAndForciblyReflectY")
         // TODO HARK! I have changed veloX/Y to moveDelta.x/y
         if (moveDelta.y < 0) {
-            walkY = 0.0
+            // kills movement if it is Controllable
+            if (controllerMoveDelta != null) {
+                walkY = 0.0
+            }
+
             if (moveDelta.y * CEILING_HIT_ELASTICITY < -A_PIXEL) {
                 moveDelta.y = -moveDelta.y * CEILING_HIT_ELASTICITY
             }
@@ -762,10 +814,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.div(TILE_SIZE).roundInt()
-        val txEnd = x2.div(TILE_SIZE).roundInt()
-        val tyStart = y1.div(TILE_SIZE).roundInt()
-        val tyEnd = y2.div(TILE_SIZE).roundInt()
+        val txStart = x1.div(TILE_SIZE).floorInt()
+        val txEnd = x2.div(TILE_SIZE).floorInt()
+        val tyStart = y1.div(TILE_SIZE).floorInt()
+        val tyEnd = y2.div(TILE_SIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
@@ -780,9 +832,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
 
         return false
-
-        // test code
-        //return if (tyEnd < 348) false else true
     }
 
     private fun getContactingAreaFluid(side: Int, translateX: Int = 0, translateY: Int = 0): Int {
@@ -826,7 +875,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     private fun getTileFriction(tile: Int) =
             if (immobileBody && tile == Block.AIR)
-                BlockCodex[Block.AIR].friction.frictionToMult().div(1000)
+                BlockCodex[Block.AIR].friction.frictionToMult().div(500)
                         .times(if (!grounded) elasticity else 1.0)
             else
                 BlockCodex[tile].friction.frictionToMult()
