@@ -40,5 +40,8 @@ class PhysTestBall : ActorWithPhysics(Actor.RenderOrder.MIDDLE, immobileBody = t
                 hitbox.posY.toFloat(),
                 hitbox.width.toFloat(),
                 hitbox.height.toFloat())
+
+
+        //println(moveDelta)
     }
 }

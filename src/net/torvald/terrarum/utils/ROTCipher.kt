@@ -64,14 +64,14 @@ object ROTCipher {
     }
 
     /**
-     * Note; range starts with zero
+     * Note; domain starts from zero
      * @param number to rotate
      * @param rotation
-     * @param range size of the rotation table. 4 means (0,1,2,3)
+     * @param domain size of the rotation table (or domain of the function). 4 means (0,1,2,3)
      */
-    fun rotN(number: Int, rotation: Int, range: Int): Int {
-        return if (number < range - rotation + 1) number + rotation
-        else      number - (range - rotation + 1)
+    private fun rotN(number: Int, rotation: Int, domain: Int): Int {
+        return if (number < domain - rotation + 1) number + rotation
+        else      number - (domain - rotation + 1)
     }
 
     fun rot13(c: Char): Char {

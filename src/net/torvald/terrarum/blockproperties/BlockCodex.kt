@@ -42,14 +42,18 @@ object BlockCodex {
         }
     }
 
-    fun get(index: Int): BlockProp {
+    /*fun get(index: Int): BlockProp {
         try {
             return blockProps[index]
         }
         catch (e: NullPointerException) {
             throw NullPointerException("Blockprop with id $index does not exist.")
         }
-    }
+        catch (e1: ArrayIndexOutOfBoundsException) {
+            if (index == -1) return nullProp
+            else throw e1
+        }
+    }*/
 
     operator fun get(rawIndex: Int?): BlockProp {
         if (rawIndex == null || rawIndex == Block.NULL) {
