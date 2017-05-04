@@ -10,6 +10,7 @@ import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
+import net.torvald.terrarum.gameactors.ai.toInt
 import org.dyn4j.geometry.Vector2
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
@@ -52,14 +53,14 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * !! external class should not hitbox.set(); use setHitboxDimension() and setPosition()
      */
     override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)       // Hitbox is implemented using Double;
-    @Transient val nextHitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // 52 mantissas ought to be enough for anybody...
+    //@Transient val nextHitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // 52 mantissas ought to be enough for anybody...
 
     val tilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
-                nextHitbox.posX.div(TILE_SIZE).floor(),
-                nextHitbox.posY.div(TILE_SIZE).floor(),
-                nextHitbox.endPointX.div(TILE_SIZE).floor(),
-                nextHitbox.endPointY.div(TILE_SIZE).floor()
+                hitbox.posX.div(TILE_SIZE).floor(),
+                hitbox.posY.div(TILE_SIZE).floor(),
+                hitbox.endPointX.div(TILE_SIZE).floor(),
+                hitbox.endPointY.div(TILE_SIZE).floor()
         )
 
     /**
@@ -298,11 +299,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 baseHitboxW * scale,
                 baseHitboxH * scale)
 
-        nextHitbox.setFromWidthHeight(
+        /*nextHitbox.setFromWidthHeight(
                 x - (baseHitboxW / 2 - hitboxTranslateX) * scale,
                 y - (baseHitboxH - hitboxTranslateY) * scale,
                 baseHitboxW * scale,
-                baseHitboxH * scale)
+                baseHitboxH * scale)*/
     }
 
     private fun translatePosition(dx: Double, dy: Double) {
@@ -408,7 +409,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                     // ((comments))  [Label]
 
 
-                    displaceByCCD()
+                    displaceHitbox()
                     applyNormalForce()
                 }
 
@@ -600,8 +601,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /**
      * nextHitbox must NOT be altered before this method is called!
      */
+    private val backtrackSteps = 16 // max allowed velocity = backtrackSteps * TILE_SIZE
+
     private fun displaceHitbox() {
-        // I kinda need these notes when my brain is stress-throttled
+        // I kinda need these notes when I'm not caffeinated
         //
         // First of all: Rules
         //  1. If two sides are touching each other (they share exactly same coord along one axis),
@@ -614,9 +617,234 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         //  backtrack (16) steps to determine it is embedded to the wall, or passed through it
         //  if (above procedure returns true):
         //      displace "hitbox" using linear interpolation
+        //  else:
+        //      hitbox = hitbox moved by the vector
         // [END OF SUBROUTINE]
 
-        
+
+        fun getBacktrackDelta(counter: Double): Vector2 =
+                moveDelta * (counter) / backtrackSteps.toDouble()
+
+        var embeddedToTerrainCounter = 0.0 //0..16: embedding detected (detected at this-th try)
+
+        // it's rather a _simulator_ rather than _backtracker_, though
+        var simulationHitbox = hitbox.clone()
+        for (i in 0..backtrackSteps - 1) {
+            // check collision
+            if (isColliding(simulationHitbox)) {
+                break
+            }
+
+            val backtrackSize = getBacktrackDelta(i.toDouble()) //to avoid fp precision error derived from the Integration
+            simulationHitbox = hitbox.translate(backtrackSize) // make new hitbox every turn to avoid fp precision error
+            embeddedToTerrainCounter += 1.0
+        }
+
+        // collision detected
+        if (embeddedToTerrainCounter < backtrackSteps) {
+            // linear interpolation kicks in
+            // or block-wise binary search for the collision point
+            // do this along X- and Y-axis and take the lowest
+
+            val HB_START = 1; val HB_END = -1
+            val xDestInTileCoord: Int // may contain placeholder value
+            val yDestInTileCoord: Int // may contain placeholder value
+            val xDestMode: Int? // null means NO OPERATION
+            val yDestMode: Int? // null means NO OPERATION
+
+            // doing whatever for X-axis
+            //  determine if we should use LEFT or RIGHT side
+            if (moveDelta.x > 0) { // going RIGHT, use RIGHT side
+                var embedLow = embeddedToTerrainCounter
+                var embedHigh = embeddedToTerrainCounter + 1.0
+                var low = (hitbox.endPointX + getBacktrackDelta(embedLow).x).div(TILE_SIZE).floorInt()
+                var lowY = hitbox.posY + getBacktrackDelta(embedLow).y
+                var high = (hitbox.endPointX + getBacktrackDelta(embedHigh).x).div(TILE_SIZE).floorInt()
+                var highY = hitbox.posY + getBacktrackDelta(embedHigh).y
+
+                while (low <= high) {
+                    val mid = (low + high).ushr(1)
+                    val midY = (lowY / 2) + (highY / 2) // to eliminate precision loss (which is negligible anyway...)
+                    // y pos : middle of (low, high) hbxs
+                    val yStart = midY.div(TILE_SIZE).floorInt()
+                    val yEnd   = (midY + hitbox.height).div(TILE_SIZE).floorInt()
+
+                    val isColliding = (yStart..yEnd).map {
+                        BlockCodex[world.getTileFromTerrain(mid, it) ?: Block.STONE].isSolid.toInt()
+                    }.sum() != 0
+
+                    if (isColliding) {
+                        high = mid - 1
+                        embedHigh = (embedLow / 2) + (embedHigh / 2)
+                        highY = hitbox.posY + getBacktrackDelta(embedHigh).y
+                    }
+                    else {
+                        low = mid + 1
+                        embedLow = (embedLow / 2) + (embedHigh / 2)
+                        lowY = hitbox.posY + getBacktrackDelta(embedLow).y
+                    }
+                }
+
+                xDestInTileCoord = minOf(low, high)
+                xDestMode = HB_END
+            }
+            else if (moveDelta.x < 0) { // going LEFT, use LEFT side
+                var embedLow = embeddedToTerrainCounter + 1.0
+                var embedHigh = embeddedToTerrainCounter
+                var low = (hitbox.posX + getBacktrackDelta(embedLow).x).div(TILE_SIZE).floorInt()
+                var lowY = hitbox.posY + getBacktrackDelta(embedLow).y
+                var high = (hitbox.posX + getBacktrackDelta(embedHigh).x).div(TILE_SIZE).floorInt()
+                var highY = hitbox.posY + getBacktrackDelta(embedHigh).y
+
+                while (low <= high) {
+                    val mid = (low + high).ushr(1)
+                    val midY = (lowY / 2) + (highY / 2) // to eliminate precision loss (which is negligible anyway...)
+                    // y pos : middle of (low, high) hbxs
+                    val yStart = midY.div(TILE_SIZE).floorInt()
+                    val yEnd   = (midY + hitbox.height).div(TILE_SIZE).floorInt()
+
+                    val isColliding = (yStart..yEnd).map {
+                        BlockCodex[world.getTileFromTerrain(mid, it) ?: Block.STONE].isSolid.toInt()
+                    }.sum() != 0
+
+                    if (!isColliding) {
+                        high = mid - 1
+                        embedHigh = (embedLow / 2) + (embedHigh / 2)
+                        highY = hitbox.posY + getBacktrackDelta(embedHigh).y
+                    }
+                    else {
+                        low = mid + 1
+                        embedLow = (embedLow / 2) + (embedHigh / 2)
+                        lowY = hitbox.posY + getBacktrackDelta(embedLow).y
+                    }
+                }
+
+                xDestInTileCoord = maxOf(low, high)
+                xDestMode = HB_START
+            }
+            else {
+                xDestInTileCoord = 0 // placeholder
+                xDestMode = null
+            }
+
+            // doing whatever for Y-axis
+            //  determine if we should use UP or DOWN side
+            if (moveDelta.y > 0) { // going DOWN, use DOWN side
+                var embedLow = embeddedToTerrainCounter
+                var embedHigh = embeddedToTerrainCounter + 1.0
+                var low = (hitbox.endPointY + getBacktrackDelta(embedLow).y).div(TILE_SIZE).floorInt()
+                var lowX = hitbox.posX + getBacktrackDelta(embedLow).x
+                var high = (hitbox.endPointY + getBacktrackDelta(embedHigh).y).div(TILE_SIZE).floorInt()
+                var highX = hitbox.posX + getBacktrackDelta(embedHigh).x
+
+                while (low <= high) {
+                    val mid = (low + high).ushr(1)
+                    val midX = (lowX / 2) + (highX / 2) // to eliminate precision loss (which is negligible anyway...)
+                    // x pos : middle of (low, high) hbxs
+                    val xStart = midX.div(TILE_SIZE).floorInt()
+                    val xEnd   = (midX + hitbox.width).div(TILE_SIZE).floorInt()
+
+                    val isColliding = (xStart..xEnd).map {
+                        BlockCodex[world.getTileFromTerrain(it, mid) ?: Block.STONE].isSolid.toInt()
+                    }.sum() != 0
+
+                    if (isColliding) {
+                        high = mid - 1
+                        embedHigh = (embedLow / 2) + (embedHigh / 2)
+                        highX = hitbox.posX + getBacktrackDelta(embedHigh).x
+                    }
+                    else {
+                        low = mid + 1
+                        embedLow = (embedLow / 2) + (embedHigh / 2)
+                        lowX = hitbox.posX + getBacktrackDelta(embedLow).x
+                    }
+                }
+
+                yDestInTileCoord = minOf(low, high)
+                yDestMode = HB_END
+            }
+            else if (moveDelta.y < 0) { // going UP, use UP side
+                var embedLow = embeddedToTerrainCounter + 1.0
+                var embedHigh = embeddedToTerrainCounter
+                var low = (hitbox.posY + getBacktrackDelta(embedLow).y).div(TILE_SIZE).floorInt()
+                var lowX = hitbox.posX + getBacktrackDelta(embedLow).x
+                var high = (hitbox.posY + getBacktrackDelta(embedHigh).y).div(TILE_SIZE).floorInt()
+                var highX = hitbox.posX + getBacktrackDelta(embedHigh).x
+
+                while (low <= high) {
+                    val mid = (low + high).ushr(1)
+                    val midX = (lowX / 2) + (highX / 2) // to eliminate precision loss (which is negligible anyway...)
+                    // x pos : middle of (low, high) hbxs
+                    val xStart = midX.div(TILE_SIZE).floorInt()
+                    val xEnd   = (midX + hitbox.width).div(TILE_SIZE).floorInt()
+
+                    val isColliding = (xStart..xEnd).map {
+                        BlockCodex[world.getTileFromTerrain(it, mid) ?: Block.STONE].isSolid.toInt()
+                    }.sum() != 0
+
+                    if (!isColliding) {
+                        high = mid - 1
+                        embedHigh = (embedLow / 2) + (embedHigh / 2)
+                        highX = hitbox.posX + getBacktrackDelta(embedHigh).x
+                    }
+                    else {
+                        low = mid + 1
+                        embedLow = (embedLow / 2) + (embedHigh / 2)
+                        lowX = hitbox.posX + getBacktrackDelta(embedLow).x
+                    }
+                }
+
+                yDestInTileCoord = maxOf(low, high)
+                yDestMode = HB_START
+            }
+            else {
+                yDestInTileCoord = 0 // placeholder
+                yDestMode = null
+            }
+
+
+            // displace for axes
+            if (xDestMode != null) {
+                if (xDestMode == HB_START) {
+                    hitbox.setFromTwoPoints(
+                            xDestInTileCoord.times(TILE_SIZE).toDouble(),
+                            hitbox.posY,
+                            xDestInTileCoord.times(TILE_SIZE) + hitbox.width,
+                            hitbox.endPointY
+                    )
+                }
+                else if (xDestMode == HB_END) {
+                    hitbox.setFromTwoPoints(
+                            xDestInTileCoord.times(TILE_SIZE) - hitbox.width,
+                            hitbox.posY,
+                            xDestInTileCoord.times(TILE_SIZE).toDouble(),
+                            hitbox.endPointY
+                    )
+                }
+            }
+            if (yDestMode != null) {
+                if (yDestMode == HB_START) {
+                    hitbox.setFromTwoPoints(
+                            hitbox.posX,
+                            yDestInTileCoord.times(TILE_SIZE).toDouble(),
+                            hitbox.endPointX,
+                            yDestInTileCoord.times(TILE_SIZE) + hitbox.height
+                    )
+                }
+                else if (yDestMode == HB_END) {
+                    hitbox.setFromTwoPoints(
+                            hitbox.posX,
+                            yDestInTileCoord.times(TILE_SIZE) - hitbox.height,
+                            hitbox.endPointX,
+                            yDestInTileCoord.times(TILE_SIZE).toDouble()
+                    )
+                }
+            }
+
+        } // END IF collision detected
+        else {
+            hitbox.translate(moveDelta)
+        }
     }
 
 
