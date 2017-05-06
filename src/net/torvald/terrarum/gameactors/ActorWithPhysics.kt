@@ -608,15 +608,25 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         var ccdTick: Int = ccdSteps // 0..15: collision detected, 16: not
 
         // do CCD first
-        for (i in 0..ccdSteps - 1) { // 0..15 because (i+1) is always implied by Binary Search
+        for (i in 0..ccdSteps) {
             simulationHitbox.reassign(hitbox)
             simulationHitbox.translate(getBacktrackDelta(i.toDouble() / ccdSteps))
+
+            println("ccd $i, endY = ${simulationHitbox.endPointY}")
 
             if (isColliding(simulationHitbox)) {
                 ccdTick = i
                 break
             }
         }
+
+        // FIXME CCD-ing is not right (not-so-crucial for most cases anyway...)
+        // DESCRIPTION:  0.999999999999 pixels off
+        // I think collision detection is one pixel off -- very fucking likely
+
+
+        println("ccdTick = $ccdTick, endY = ${simulationHitbox.endPointY}")
+
 
 
         /////////////////////////
@@ -639,41 +649,42 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             return
         }
 
+
+        println("embedding befure: ${simulationHitbox.endPointY}")
+
         // find no-collision point using binary search
         // trust me, X- and Y-axis must move simultaneously.
         //// binary search ////
-        var low = ccdTick.toDouble() / ccdSteps
-        var high = (ccdTick + 1).toDouble() / ccdSteps
-        //var mid = 0.5
-        //var midDelta = 0.5
-        var bmid = (low / 2.0) + (high / 2.0)
+        if (ccdTick > 1) {
+            var low = (ccdTick - 1).toDouble() / ccdSteps
+            var high = (ccdTick).toDouble() / ccdSteps
+            var bmid: Double
 
-        (2..binaryBranchingMax + 1).forEach {
+            (1..binaryBranchingMax).forEach { _ ->
 
-            //bmid = (low / 2.0) + (high / 2.0)
+                bmid = (low + high) / 2.0
 
-            simulationHitbox.reassign(hitbox)
-            //simulationHitbox.translate(getBacktrackDelta( ccdTick.plus(mid) / ccdSteps ))
-            simulationHitbox.translate(getBacktrackDelta(bmid))
+                simulationHitbox.reassign(hitbox)
+                simulationHitbox.translate(getBacktrackDelta(bmid))
 
-            // set new mid
-            if (isColliding(simulationHitbox, COLLIDING_ALLSIDE)) {
-                //midDelta /= 2
-                //mid -= midDelta
+                print("bmid = $bmid, new endY: ${simulationHitbox.endPointY}")
 
-                high = bmid
+                // set new mid
+                if (isColliding(simulationHitbox)) {
+                    print(", going back\n")
+                    high = bmid
+                }
+                else {
+                    print(", going forth\n")
+                    low = bmid
+                }
             }
-            else {
-                //midDelta /= 2
-                //mid += midDelta
 
-                low = bmid
-            }
+            println("binarySearch embedding: ${simulationHitbox.endPointY}")
         }
 
-
         // snap to closest tile
-        // binarySearch gives embedding of ~3 pixels, which is safe to round up/down.
+        // binarySearch gives embedding of ~3 pixels, which is safe to round up/down.               // binarySearch gives embedding: it shouldn't but it does :\
         // [Procedure]
         //  1. get touching area of four sides incl. edge points
         //  2. a side with most touching area is the "colliding side"
@@ -689,8 +700,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
         println("dx: $displacementSecondAxis, dy: $displacementMainAxis")
 
-        //println("moveDelta: $moveDelta, displacement: ${simulationHitbox - hitbox}, mid: $mid")
-        println("moveDelta: $moveDelta, displacement: ${simulationHitbox - hitbox}, mid: $bmid")
+        //println("moveDelta: $moveDelta, displacement: ${simulationHitbox - hitbox})
+        println("moveDelta: $moveDelta, displacement: ${simulationHitbox - hitbox}")
         //hitbox.translate(getBacktrackDelta(bmid))
         hitbox.reassign(simulationHitbox)
 
