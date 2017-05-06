@@ -67,23 +67,22 @@ class BasicDebugInfoWindow : UICanvas {
         g.color = GameFontBase.codeToCol["y"]
 
         val hitbox = player?.hitbox
-        val nextHitbox = player?.nextHitbox
 
         /**
          * First column
          */
 
-        printLine(g, 1, "posX "
+        printLine(g, 1, "pointedX "
                 + ccG
                 + "${hitbox?.pointedX}"
                 + " ("
                 + "${(hitbox?.pointedX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
                 + ")")
-        printLine(g, 2, "posY "
+        printLine(g, 2, "endY "
                 + ccG
-                + hitbox?.pointedY.toString()
+                + hitbox?.endPointY.toString()
                 + " ("
-                + (hitbox?.pointedY?.div(FeaturesDrawer.TILE_SIZE))?.toInt().toString()
+                + (hitbox?.endPointY?.div(FeaturesDrawer.TILE_SIZE))?.toInt().toString()
                 + ")")
 
         printLine(g, 3, "veloX reported $ccG${player?.moveDelta?.x}")
@@ -94,6 +93,14 @@ class BasicDebugInfoWindow : UICanvas {
 
         printLine(g, 5, "grounded $ccG${player?.grounded}")
         printLine(g, 6, "noClip $ccG${player?.noClip}")
+
+
+        if (player != null) {
+            printLine(g, 7,
+                    "walled ${if (player.walledLeft) "$ccR" else "$ccG"}L" +
+                    "${if (player.walledRight) "$ccR" else "$ccG"}R"
+            )
+        }
 
         //printLine(g, 7, "jump $ccG${player.jumpAcc}")
 
