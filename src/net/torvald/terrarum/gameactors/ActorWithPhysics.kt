@@ -212,6 +212,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     // just some trivial magic numbers
     @Transient private val A_PIXEL = 1.0
+    @Transient private val HALF_PIXEL = 0.5
     @Transient private val COLLIDING_TOP = 0
     @Transient private val COLLIDING_RIGHT = 1
     @Transient private val COLLIDING_BOTTOM = 2
@@ -571,7 +572,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /**
      * nextHitbox must NOT be altered before this method is called!
      */
-    private val ccdSteps = 16 // max allowed velocity = backtrackSteps * TILE_SIZE
+    private val ccdSteps = 32 // max allowed velocity = backtrackSteps * TILE_SIZE
     private val binaryBranchingMax = 54 // higher = more precise; theoretical max = 54 (# of mantissa + 2)
 
     private fun displaceHitbox() {
@@ -588,7 +589,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         //  find "edge" point using binary search
         // [END OF SUBROUTINE]
 
-        if (moveDelta.isZero) return
+        if (moveDelta.isZero) {
+            println("0")
+            return
+        }
 
 
         fun getBacktrackDelta(percentage: Double): Vector2 {
@@ -614,9 +618,24 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             }
         }
 
+
+        /////////////////////////
+        // FIXME THE EDGE CASE //
+        /////////////////////////
+        /*
+        no collision; endY = 7989.683178548076
+        no collision; endY = 7995.169755787131
+        no collision; endY = 8000.749058412345 <-- CCD did NOT caught collision (8000.0 be collision)
+        reflY
+        0
+        0
+        */
+
+
         // collision not found
         if (ccdTick == ccdSteps) {
             hitbox.translate(moveDelta)
+            println("no collision; endY = ${hitbox.endPointY}")
             return
         }
 
@@ -631,33 +650,51 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
         (2..binaryBranchingMax + 1).forEach {
 
-            bmid = (low / 2.0) + (high / 2.0)
+            //bmid = (low / 2.0) + (high / 2.0)
 
             simulationHitbox.reassign(hitbox)
-            //simulationHitbox.translate(getBacktrackDelta(mid))
+            //simulationHitbox.translate(getBacktrackDelta( ccdTick.plus(mid) / ccdSteps ))
             simulationHitbox.translate(getBacktrackDelta(bmid))
 
             // set new mid
-            if (isColliding(simulationHitbox)) {
+            if (isColliding(simulationHitbox, COLLIDING_ALLSIDE)) {
                 //midDelta /= 2
                 //mid -= midDelta
+
                 high = bmid
             }
             else {
                 //midDelta /= 2
                 //mid += midDelta
+
                 low = bmid
             }
         }
 
-        // unmove again (gah!)
-        TBA
 
-        //println("moveDelta: $moveDelta, displacement: ${getBacktrackDelta(mid)}, mid: $mid")
-        //hitbox.translate(getBacktrackDelta(mid- 0.0000000000004))
-        println("moveDelta: $moveDelta, displacement: ${getBacktrackDelta(bmid)}, mid: $bmid")
-        hitbox.translate(getBacktrackDelta(bmid))
+        // snap to closest tile
+        // binarySearch gives embedding of ~3 pixels, which is safe to round up/down.
+        // [Procedure]
+        //  1. get touching area of four sides incl. edge points
+        //  2. a side with most touching area is the "colliding side"
+        //  3. round the hitbox so that coord of "colliding" side be integer
+        //  3.1. there's two main cases: "main axis" being X; "main axis" being Y
+        //  3.2. edge cases: (TBA)
 
+        // test: assume hitting bottom
+        val roundedInteger = simulationHitbox.endPointY.div(TILE_SIZE).roundInt() * TILE_SIZE
+        val displacementMainAxis = roundedInteger - simulationHitbox.endPointY
+        val displacementSecondAxis = displacementMainAxis * moveDelta.x / moveDelta.y
+
+        simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
+        println("dx: $displacementSecondAxis, dy: $displacementMainAxis")
+
+        //println("moveDelta: $moveDelta, displacement: ${simulationHitbox - hitbox}, mid: $mid")
+        println("moveDelta: $moveDelta, displacement: ${simulationHitbox - hitbox}, mid: $bmid")
+        //hitbox.translate(getBacktrackDelta(bmid))
+        hitbox.reassign(simulationHitbox)
+
+        println("hitbox.endY = ${hitbox.endPointY}")
 
 
         /*var ccdStep = 0.0
@@ -705,6 +742,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     }
 
     private fun hitAndReflectY() {
+        println("reflY")
         externalForce.y *= -elasticity
         if (this is Controllable) walkY *= -elasticity
     }
@@ -762,7 +800,13 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             y2 = hitbox.posY - offsetX + offsetY + hitbox.height
         }
         else {
-            if (option == COLLIDING_LEFT) {
+            if (option == COLLIDING_ALLSIDE) {
+                x1 = hitbox.posX - A_PIXEL
+                x2 = hitbox.posX + A_PIXEL + hitbox.width
+                y1 = hitbox.posY - A_PIXEL
+                y2 = hitbox.posY + A_PIXEL + hitbox.height
+            }
+            else if (option == COLLIDING_LEFT) {
                 x1 = hitbox.posX - A_PIXEL
                 x2 = hitbox.posX - A_PIXEL + hitbox.width
                 y1 = hitbox.posY + A_PIXEL
@@ -794,10 +838,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             }
         }
 
-        val txStart = x1.plus(Epsilon.E) .div(TILE_SIZE).floorInt()
-        val txEnd =   x2.minus(Epsilon.E).div(TILE_SIZE).floorInt()
-        val tyStart = y1.plus(Epsilon.E) .div(TILE_SIZE).floorInt()
-        val tyEnd =   y2.minus(Epsilon.E).div(TILE_SIZE).floorInt()
+        val txStart = x1.div(TILE_SIZE).floorInt()
+        val txEnd =   x2.div(TILE_SIZE).floorInt()
+        val tyStart = y1.div(TILE_SIZE).floorInt()
+        val tyEnd =   y2.div(TILE_SIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
@@ -808,35 +852,35 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         val y1: Double
         val y2: Double
         if (option == COLLIDING_TOP) {
-            x1 = hitbox.posX
-            x2 = hitbox.endPointX
-            y1 = hitbox.posY - A_PIXEL
+            x1 = hitbox.posX + HALF_PIXEL
+            x2 = hitbox.endPointX - HALF_PIXEL
+            y1 = hitbox.posY - A_PIXEL - HALF_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_BOTTOM) {
-            x1 = hitbox.posX
-            x2 = hitbox.endPointX
-            y1 = hitbox.endPointY + A_PIXEL
+            x1 = hitbox.posX + HALF_PIXEL
+            x2 = hitbox.endPointX - HALF_PIXEL
+            y1 = hitbox.endPointY + A_PIXEL + HALF_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_LEFT) {
-            x1 = hitbox.posX - A_PIXEL
+            x1 = hitbox.posX - A_PIXEL - HALF_PIXEL
             x2 = x1
-            y1 = hitbox.posY
-            y2 = hitbox.endPointY
+            y1 = hitbox.posY + HALF_PIXEL
+            y2 = hitbox.endPointY - HALF_PIXEL
         }
         else if (option == COLLIDING_RIGHT) {
-            x1 = hitbox.endPointX + A_PIXEL
+            x1 = hitbox.endPointX + A_PIXEL + HALF_PIXEL
             x2 = x1
-            y1 = hitbox.posY
-            y2 = hitbox.endPointY
+            y1 = hitbox.posY + HALF_PIXEL
+            y2 = hitbox.endPointY - HALF_PIXEL
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.plus(Epsilon.E) .div(TILE_SIZE).floorInt()
-        val txEnd =   x2.minus(Epsilon.E).div(TILE_SIZE).floorInt()
-        val tyStart = y1.plus(Epsilon.E) .div(TILE_SIZE).floorInt()
-        val tyEnd =   y2.minus(Epsilon.E).div(TILE_SIZE).floorInt()
+        val txStart = x1.div(TILE_SIZE).floorInt()
+        val txEnd =   x2.div(TILE_SIZE).floorInt()
+        val tyStart = y1.div(TILE_SIZE).floorInt()
+        val tyEnd =   y2.div(TILE_SIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
@@ -873,10 +917,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.plus(Epsilon.E) .div(TILE_SIZE).floorInt()
-        val txEnd =   x2.minus(Epsilon.E).div(TILE_SIZE).floorInt()
-        val tyStart = y1.plus(Epsilon.E) .div(TILE_SIZE).floorInt()
-        val tyEnd =   y2.minus(Epsilon.E).div(TILE_SIZE).floorInt()
+        val txStart = x1.div(TILE_SIZE).floorInt()
+        val txEnd =   x2.div(TILE_SIZE).floorInt()
+        val tyStart = y1.div(TILE_SIZE).floorInt()
+        val tyEnd =   y2.div(TILE_SIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
