@@ -22,32 +22,30 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.dyn4j;
+/* Kotlin modified code (c) 2017 Torvald (minjaesong) */
+package org.dyn4j
 
 /**
  * Class containing an approximation of machine epsilon.
  * @author William Bittle
+ * *
  * @version 2.0.0
+ * *
  * @since 2.0.0
  */
-public final class Epsilon {
-    /** The double precision floating point machine epsilon approximation */
-    public static final double E = Epsilon.compute();
-
-    /**
-     * Hidden default constructor.
-     */
-    private Epsilon() {}
+object Epsilon {
+    /** The double precision floating point machine epsilon approximation  */
+    val E = Epsilon.compute()
 
     /**
      * Computes an approximation of machine epsilon.
      * @return double
      */
-    public static final double compute() {
-        double e = 0.5;
+    private fun compute(): Double {
+        var e = 0.5
         while (1.0 + e > 1.0) {
-            e *= 0.5;
+            e *= 0.5
         }
-        return e;
+        return e
     }
 }
