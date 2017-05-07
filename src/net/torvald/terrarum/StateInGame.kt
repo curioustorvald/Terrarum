@@ -142,7 +142,7 @@ class StateInGame : BasicGameState() {
 
 
         // test actor
-        addNewActor(PlayerBuilderCynthia())
+        //addNewActor(PlayerBuilderCynthia())
 
 
 

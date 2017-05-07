@@ -241,9 +241,9 @@ class BFVM(
 
             if (r1 in bfOpcodes) {
                 if (optimizeLevel >= 1) {
-                    // [-]
+                    // [-] or [+]
                     if (r1 == JPZ) {
-                        if (program[pc + 1] == DEC && program[pc + 2] == JPN) {
+                        if ((program[pc + 1] == DEC || program[pc + 1] == INC) && program[pc + 2] == JPN) {
                             pc += 3
                             putOp(LDZ)
                             continue

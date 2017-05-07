@@ -133,4 +133,8 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
         fun fromTwoPoints(x1: Double, y1: Double, x2: Double, y2: Double) =
                 Hitbox(x1, y1, x2 - x1, y2 - y1)
     }
+
+    operator fun minus(other: Hitbox): Vector2 {
+        return Vector2(other.centeredX - this.centeredX, other.centeredY - this.centeredY)
+    }
 }
