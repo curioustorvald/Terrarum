@@ -163,8 +163,8 @@ class WorldTime(initTime: Long = 0L) {
     private fun Long.toPositiveInt() = this.and(0x7FFFFFFF).toInt()
     private fun Long.abs() = Math.abs(this)
 
-    /** Format: "%A %d %B %Y %X" */
-    fun getFormattedTime() = "${getDayNameShort()} " +
+    /** Format: "%A, %d %B %Y %X" */
+    fun getFormattedTime() = "${getDayNameShort()}, " +
                              "$days " +
                              "${getMonthNameShort()} " +
                              "$years " +
