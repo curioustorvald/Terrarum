@@ -695,6 +695,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             println("binarySearch embedding: ${simulationHitbox.endPointY}")
         }
 
+
         // snap to closest tile
         // binarySearch gives embedding of ~3 pixels, which is safe to round up/down.               // binarySearch gives embedding: it shouldn't but it does :\
         // [Procedure]
@@ -714,27 +715,21 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
 
+        // manual compensation
+        //  standing on the floow
+        if (isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
+            simulationHitbox.translate(0.0, -1.0)
+        }
+
+
         //println("moveDelta: $moveDelta, displacement: ${simulationHitbox - hitbox})
         println("moveDelta: $moveDelta, displacement: ${simulationHitbox - hitbox}")
         //hitbox.translate(getBacktrackDelta(bmid))
         hitbox.reassign(simulationHitbox)
 
-        println("hitbox.endY = ${hitbox.endPointY}")
+        println("# final hitbox.endY = ${hitbox.endPointY}")
 
 
-        /*var ccdStep = 0.0
-        while (!isColliding(simulationHitbox) && ccdStep < 1.0) {
-            simulationHitbox.reassign(hitbox)
-            simulationHitbox.translate(getBacktrackDelta(ccdStep))
-            ccdStep += 1.0/256.0
-        }
-
-        hitbox.translate(getBacktrackDelta(ccdStep))
-
-        println("endY: ${hitbox.endPointY}\tccdStep: $ccdStep")*/
-
-
-        //println("pointedY: ${hitbox.pointedY}")
 
         // if collision not detected, just don't care; it's not your job to apply moveDelta
     }
@@ -836,29 +831,42 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         val x2: Double
         val y1: Double
         val y2: Double
+
+        /*
+        This structure:
+
+            ######## // TOP
+            |      |
+            |      |
+            |      |
+            ######## // BOTTOM
+
+        for hittng-the-block-edge case
+         */
+
         if (option == COLLIDING_TOP) {
-            x1 = hitbox.posX
-            x2 = hitbox.endPointX - A_PIXEL
-            y1 = hitbox.posY - A_PIXEL
+            x1 = hitbox.posX - A_PIXEL
+            x2 = hitbox.endPointX
+            y1 = hitbox.posY - A_PIXEL - A_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_BOTTOM) {
-            x1 = hitbox.posX
-            x2 = hitbox.endPointX - A_PIXEL
-            y1 = hitbox.endPointY
+            x1 = hitbox.posX - A_PIXEL
+            x2 = hitbox.endPointX
+            y1 = hitbox.endPointY + A_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_LEFT) {
             x1 = hitbox.posX - A_PIXEL
             x2 = x1
-            y1 = hitbox.posY
-            y2 = hitbox.endPointY - A_PIXEL
+            y1 = hitbox.posY - A_PIXEL
+            y2 = hitbox.endPointY
         }
         else if (option == COLLIDING_RIGHT) {
             x1 = hitbox.endPointX
             x2 = x1
-            y1 = hitbox.posY
-            y2 = hitbox.endPointY - A_PIXEL
+            y1 = hitbox.posY - A_PIXEL
+            y2 = hitbox.endPointY
         }
         else throw IllegalArgumentException()
 
