@@ -500,6 +500,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     fun setNoClip(b: Boolean) {
         noClip = b
+
+        if (b) {
+            moveDelta.zero()
+            controllerMoveDelta?.zero()
+        }
     }
 
     fun Float.abs() = FastMath.abs(this)
