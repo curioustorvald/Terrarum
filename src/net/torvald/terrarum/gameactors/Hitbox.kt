@@ -69,7 +69,7 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
     fun reassign(other: Hitbox) = setFromTwoPoints(other.posX, other.posY, other.endPointX, other.endPointY)
 
     fun translate(x: Double, y: Double) = setPosition(posX + x, posY + y)
-    fun translate(vec: Vector2) = translate(vec.x, vec.y)
+    fun translate(vec: Vector2?) = if (vec != null) translate(vec.x, vec.y) else this
 
     fun setPosition(x1: Double, y1: Double): Hitbox {
         hitboxStart = Point2d(x1, y1)
