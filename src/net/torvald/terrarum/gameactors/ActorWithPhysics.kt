@@ -719,7 +719,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 }
 
 
-                // snap to closest tile
+                // PUSH THE HITBOX INTO THE AIR for a pixel so IT WON'T BE COLLIDING
+                //
                 // naturally, binarySearch gives you a point like 7584.99999999 (barely not colliding) or
                 // 7585.000000000 (colliding as fuck), BUT what we want is 7584.00000000 .
                 // [Procedure]
@@ -729,14 +730,34 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 //  3.1. there's two main cases: "main axis" being X; "main axis" being Y
                 //  3.2. edge cases: (TBA)
 
-                // test: assume hitting bottom
                 val vectorSum = externalForce + controllerMoveDelta
+                // --> Y-Axis
                 if (vectorSum.y > 0.0 && isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
                     val displacementMainAxis = -1.0
                     val displacementSecondAxis = displacementMainAxis * externalForce.x / externalForce.y
                     simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
                     debug2("dx: $displacementSecondAxis, dy: $displacementMainAxis")
                 }
+                else if (vectorSum.y < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
+                    val displacementMainAxis = 1.0
+                    val displacementSecondAxis = displacementMainAxis * externalForce.x / externalForce.y
+                    simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
+                    debug2("dx: $displacementSecondAxis, dy: $displacementMainAxis")
+                }
+                // --> X-Axis
+                if (vectorSum.x > 0.0 && isTouchingSide(simulationHitbox, COLLIDING_RIGHT)) {
+                    val displacementMainAxis = -1.0
+                    val displacementSecondAxis = displacementMainAxis * externalForce.y / externalForce.x
+                    simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
+                    debug2("dx: $displacementMainAxis, dy: $displacementSecondAxis")
+                }
+                else if (vectorSum.x < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_LEFT)) {
+                    val displacementMainAxis = 1.0
+                    val displacementSecondAxis = displacementMainAxis * externalForce.y / externalForce.x
+                    simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
+                    debug2("dx: $displacementMainAxis, dy: $displacementSecondAxis")
+                }
+                // FIXME self-driven wall embed-ment is still a thing; block X movement when controllerMoveDelta hits the wall
 
 
 
@@ -866,11 +887,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         /*
         The structure:
 
-             ######  // TOP
-            |      |
-            |      |
-            |      |
-             ######  // BOTTOM
+             #######  // TOP
+            = CASIO =
+            =  sat  =
+            = 10:08 =
+             #######  // BOTTOM
          */
 
         // detectors are inside of the bounding box
