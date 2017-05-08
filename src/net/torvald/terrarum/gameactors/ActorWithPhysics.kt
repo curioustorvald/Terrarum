@@ -521,14 +521,14 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             if (moveDelta.y > 0.0) {
                 if (isTouchingSide(hitbox, COLLIDING_TOP)) { // hit the ceiling
                     hitAndReflectY() //hitAndForciblyReflectY()
-                    grounded = false
+                    //grounded = false
                 }
                 else if (isTouchingSide(hitbox, COLLIDING_BOTTOM)) { // actor hit something on its bottom
                     hitAndReflectY()
                     grounded = true
                 }
                 else { // the actor is not grounded at all
-                    grounded = false
+                    //grounded = false
                 }
             }
             // or was moving upward?
@@ -653,77 +653,89 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
             // collision not found
+            var collisionNotFound = false
             if (ccdTick == ccdSteps) {
                 hitbox.translate(externalForce)
                 println("no collision; endX = ${hitbox.endPointX}")
-                return
+                collisionNotFound = true
             }
 
+            if (!collisionNotFound) {
+                println("embedding befure: ${simulationHitbox.endPointX}")
 
-            println("embedding befure: ${simulationHitbox.endPointX}")
+                // find no-collision point using binary search
+                // trust me, X- and Y-axis must move simultaneously.
+                //// binary search ////
+                if (ccdTick >= 1) {
+                    var low = (ccdTick - 1).toDouble() / ccdSteps
+                    var high = (ccdTick).toDouble() / ccdSteps
+                    var bmid: Double
 
-            // find no-collision point using binary search
-            // trust me, X- and Y-axis must move simultaneously.
-            //// binary search ////
-            if (ccdTick >= 1) {
-                var low = (ccdTick - 1).toDouble() / ccdSteps
-                var high = (ccdTick).toDouble() / ccdSteps
-                var bmid: Double
+                    (1..binaryBranchingMax).forEach { _ ->
 
-                (1..binaryBranchingMax).forEach { _ ->
+                        bmid = (low + high) / 2.0
 
-                    bmid = (low + high) / 2.0
+                        simulationHitbox.reassign(hitbox)
+                        simulationHitbox.translate(getBacktrackDelta(bmid))
 
-                    simulationHitbox.reassign(hitbox)
-                    simulationHitbox.translate(getBacktrackDelta(bmid))
+                        print("bmid = $bmid, new endY: ${simulationHitbox.endPointY}")
 
-                    print("bmid = $bmid, new endY: ${simulationHitbox.endPointY}")
-
-                    // set new mid
-                    if (isColliding(simulationHitbox)) { //COLLIDING_EXTRA_SIZE: doing trick so that final pos would be x.99800000 instead of y.0000000
-                        print(", going back\n")
-                        high = bmid
+                        // set new mid
+                        if (isColliding(simulationHitbox)) { //COLLIDING_EXTRA_SIZE: doing trick so that final pos would be x.99800000 instead of y.0000000
+                            print(", going back\n")
+                            high = bmid
+                        }
+                        else {
+                            print(", going forth\n")
+                            low = bmid
+                        }
                     }
-                    else {
-                        print(", going forth\n")
-                        low = bmid
-                    }
+
+                    println("binarySearch embedding: ${simulationHitbox.endPointY}")
+
+
+                    // force set grounded-ness
+                    grounded = true
+                    // reset walkY
+                    walkY = 0.0
+                    println("!! grounded !!")
                 }
 
-                println("binarySearch embedding: ${simulationHitbox.endPointY}")
+
+                // snap to closest tile
+                // naturally, binarySearch gives you a point like 7584.99999999 (barely not colliding) or
+                // 7585.000000000 (colliding as fuck), BUT what we want is 7584.00000000 .
+                // [Procedure]
+                //  1. get touching area of four sides incl. edge points
+                //  2. a side with most touching area is the "colliding side"
+                //  3. round the hitbox so that coord of "colliding" side be integer
+                //  3.1. there's two main cases: "main axis" being X; "main axis" being Y
+                //  3.2. edge cases: (TBA)
+
+                // test: assume hitting bottom
+                //val roundedInteger = simulationHitbox.endPointY.div(TILE_SIZE).roundInt() * TILE_SIZE
+                val displacementMainAxis = -1.0// - simulationHitbox.endPointY
+                val displacementSecondAxis = displacementMainAxis * externalForce.x / externalForce.y
+
+                simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
+                println("dx: $displacementSecondAxis, dy: $displacementMainAxis")
+
+
+                println("externalForce: $externalForce, displacement: ${simulationHitbox - hitbox}")
+                //hitbox.translate(getBacktrackDelta(bmid))
+                hitbox.reassign(simulationHitbox)
             }
-
-
-            // snap to closest tile
-            // naturally, binarySearch gives you a point like 7584.99999999 (barely not colliding) or
-            // 7585.000000000 (colliding as fuck), BUT what we want is 7584.00000000 .
-            // [Procedure]
-            //  1. get touching area of four sides incl. edge points
-            //  2. a side with most touching area is the "colliding side"
-            //  3. round the hitbox so that coord of "colliding" side be integer
-            //  3.1. there's two main cases: "main axis" being X; "main axis" being Y
-            //  3.2. edge cases: (TBA)
-
-            // test: assume hitting bottom
-            val roundedInteger = simulationHitbox.endPointY.div(TILE_SIZE).roundInt() * TILE_SIZE
-            val displacementMainAxis = roundedInteger - simulationHitbox.endPointY
-            val displacementSecondAxis = displacementMainAxis * externalForce.x / externalForce.y
-
-            simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
-            println("dx: $displacementSecondAxis, dy: $displacementMainAxis")
-
-
-            println("externalForce: $externalForce, displacement: ${simulationHitbox - hitbox}")
-            //hitbox.translate(getBacktrackDelta(bmid))
-            hitbox.reassign(simulationHitbox)
         }
 
 
         // resolve controllerMoveDelta
+        if (controllerMoveDelta != null) {
+            hitbox.translate(controllerMoveDelta)
+        }
 
 
 
-        println("# final hitbox.endY = ${hitbox.endPointY}")
+        println("# final hitbox: $hitbox, wx: $walkX, wy: $walkY")
 
 
 
@@ -752,7 +764,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
          */
 
         externalForce.x *= -elasticity
-        if (this is Controllable) walkX *= -elasticity
+        //if (this is Controllable) walkX *= -elasticity
 
         //println("$this\t${externalForce.x}")
     }
@@ -760,7 +772,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     private fun hitAndReflectY() {
         println("** reflY **")
         externalForce.y *= -elasticity
-        if (this is Controllable) walkY *= -elasticity
+        //if (this is Controllable) walkY *= -elasticity
     }
 
     @Transient private val CEILING_HIT_ELASTICITY = 0.3
@@ -843,28 +855,28 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
          */
 
         if (option == COLLIDING_TOP) {
-            x1 = hitbox.posX - A_PIXEL
-            x2 = hitbox.endPointX
+            x1 = hitbox.posX
+            x2 = hitbox.endPointX - A_PIXEL
             y1 = hitbox.posY - A_PIXEL - A_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_BOTTOM) {
-            x1 = hitbox.posX - A_PIXEL
-            x2 = hitbox.endPointX
-            y1 = hitbox.endPointY + A_PIXEL
+            x1 = hitbox.posX
+            x2 = hitbox.endPointX - A_PIXEL
+            y1 = hitbox.endPointY
             y2 = y1
         }
         else if (option == COLLIDING_LEFT) {
             x1 = hitbox.posX - A_PIXEL
             x2 = x1
-            y1 = hitbox.posY - A_PIXEL
-            y2 = hitbox.endPointY
+            y1 = hitbox.posY
+            y2 = hitbox.endPointY - A_PIXEL
         }
         else if (option == COLLIDING_RIGHT) {
             x1 = hitbox.endPointX
             x2 = x1
-            y1 = hitbox.posY - A_PIXEL
-            y2 = hitbox.endPointY
+            y1 = hitbox.posY
+            y2 = hitbox.endPointY - A_PIXEL
         }
         else throw IllegalArgumentException()
 

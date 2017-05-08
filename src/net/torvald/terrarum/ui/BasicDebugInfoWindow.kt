@@ -8,6 +8,7 @@ import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blendScreen
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -43,14 +44,14 @@ class BasicDebugInfoWindow : UICanvas {
     }
 
     override fun update(gc: GameContainer, delta: Int) {
-        val player = Terrarum.ingame!!.player
-        val hitbox = player?.hitbox
+        val player = Terrarum.ingame!!.player!!
+        val hitbox = player.hitbox
 
-        xdelta = hitbox?.pointedX ?: 0 - prevPlayerX
-        ydelta = hitbox?.pointedY ?: 0 - prevPlayerY
+        xdelta = hitbox.pointedX - prevPlayerX
+        ydelta = hitbox.pointedY - prevPlayerY
 
-        prevPlayerX = hitbox?.pointedX ?: 0.0
-        prevPlayerY = hitbox?.pointedY ?: 0.0
+        prevPlayerX = hitbox.pointedX
+        prevPlayerY = hitbox.pointedY
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
@@ -85,8 +86,8 @@ class BasicDebugInfoWindow : UICanvas {
                 + (hitbox?.endPointY?.div(FeaturesDrawer.TILE_SIZE))?.toInt().toString()
                 + ")")
 
-        printLine(g, 3, "veloX reported $ccG${player?.moveDelta?.x}")
-        printLine(g, 4, "veloY reported $ccG${player?.moveDelta?.y}")
+        printLine(g, 3, "veloX reported $ccG${player?.externalForce?.x}  ${player?.controllerMoveDelta?.x}")
+        printLine(g, 4, "veloY reported $ccG${player?.externalForce?.y}  ${player?.controllerMoveDelta?.y}")
 
         printLineColumn(g, 2, 3, "veloX measured $ccG${xdelta}")
         printLineColumn(g, 2, 4, "veloY measured $ccG${ydelta}")
@@ -98,9 +99,13 @@ class BasicDebugInfoWindow : UICanvas {
         if (player != null) {
             printLine(g, 7,
                     "walled ${if (player.walledLeft) "$ccR" else "$ccG"}L" +
+                    "${if (player.walledTop) "$ccR" else "$ccG"}${0x1E.toChar()}" +
+                    "${if (player.walledBottom) "$ccR" else "$ccG"}${0x1F.toChar()}" +
                     "${if (player.walledRight) "$ccR" else "$ccG"}R"
             )
         }
+
+
 
         //printLine(g, 7, "jump $ccG${player.jumpAcc}")
 

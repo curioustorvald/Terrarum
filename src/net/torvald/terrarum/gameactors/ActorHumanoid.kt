@@ -459,7 +459,10 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
             jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
 
-            walkY -= jumpAcc
+            walkY -= jumpAcc // feed negative value to the vector
+            // do not think of resetting this to zero when counter hit the ceiling; that's HOW NOT
+            // newtonian physics work, stupid myself :(
+
         }
         // not sure we need this...
         /*else if (!jumpable) {
@@ -502,7 +505,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         noClip = b
 
         if (b) {
-            moveDelta.zero()
+            externalForce.zero()
             controllerMoveDelta?.zero()
         }
     }
@@ -517,7 +520,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
         if (grounded) {
             // set anim row
-            if (moveDelta.x != 0.0) {
+            if (controllerMoveDelta?.x != 0.0) {
                 if (sprite != null) sprite!!.switchRow(SPRITE_ROW_WALK)
                 if (spriteGlow != null) spriteGlow!!.switchRow(SPRITE_ROW_WALK)
             }
