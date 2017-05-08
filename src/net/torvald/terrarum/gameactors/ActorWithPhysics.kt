@@ -73,7 +73,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      */
     internal val externalForce = Vector2(0.0, 0.0)
 
-    val moveDelta = Vector2(0.0, 0.0) // moveDelta = velocity + controllerMoveDelta
+    //val moveDelta = Vector2(0.0, 0.0) // moveDelta = velocity + controllerMoveDelta
     @Transient private val VELO_HARD_LIMIT = 100.0
 
     /**
@@ -359,11 +359,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 //applyBuoyancy()
             }
 
-            // --> Combine all the force (velo) and walk <-- //
-            combineVeloToMoveDelta()
             // hard limit velocity
-            moveDelta.x = moveDelta.x.bipolarClamp(VELO_HARD_LIMIT) // displaceHitbox SHOULD use moveDelta
-            moveDelta.y = moveDelta.y.bipolarClamp(VELO_HARD_LIMIT)
+            externalForce.x = externalForce.x.bipolarClamp(VELO_HARD_LIMIT) // displaceHitbox SHOULD use moveDelta
+            externalForce.y = externalForce.y.bipolarClamp(VELO_HARD_LIMIT)
 
             if (!isChronostasis) {
                 ///////////////////////////////////////////////////
@@ -405,7 +403,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                     applyNormalForce()
                 }
                 else {
-                    hitbox.translate(moveDelta)
+                    hitbox.translate(externalForce)
+                    hitbox.translate(controllerMoveDelta)
                 }
 
                 //////////////////////////////////////////////////////////////
@@ -450,37 +449,37 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      *  F 1     velo + walk + velo + walk
      * as a result, the speed will keep increase without it
      */
-    private fun combineVeloToMoveDelta() {
+    /*private fun combineVeloToMoveDelta() {
         if (this is Controllable) {
             // decide whether to ignore walkX
-            if (!(isCollidingSide(hitbox, COLLIDING_LEFT) && walkX < 0)
-                || !(isCollidingSide(hitbox, COLLIDING_RIGHT) && walkX > 0)
+            if (!(isTouchingSide(hitbox, COLLIDING_LEFT) && walkX < 0)
+                || !(isTouchingSide(hitbox, COLLIDING_RIGHT) && walkX > 0)
                     ) {
                 moveDelta.x = externalForce.x + walkX
             }
 
             // decide whether to ignore walkY
-            if (!(isCollidingSide(hitbox, COLLIDING_TOP) && walkY < 0)
-                || !(isCollidingSide(hitbox, COLLIDING_BOTTOM) && walkY > 0)
+            if (!(isTouchingSide(hitbox, COLLIDING_TOP) && walkY < 0)
+                || !(isTouchingSide(hitbox, COLLIDING_BOTTOM) && walkY > 0)
                     ) {
                 moveDelta.y = externalForce.y + walkY
             }
         }
         else {
-            if (!isCollidingSide(hitbox, COLLIDING_LEFT)
-                || !isCollidingSide(hitbox, COLLIDING_RIGHT)
+            if (!isTouchingSide(hitbox, COLLIDING_LEFT)
+                || !isTouchingSide(hitbox, COLLIDING_RIGHT)
                     ) {
                 moveDelta.x = externalForce.x
             }
 
             // decide whether to ignore walkY
-            if (!isCollidingSide(hitbox, COLLIDING_TOP)
-                || !isCollidingSide(hitbox, COLLIDING_BOTTOM)
+            if (!isTouchingSide(hitbox, COLLIDING_TOP)
+                || !isTouchingSide(hitbox, COLLIDING_BOTTOM)
                     ) {
                 moveDelta.y = externalForce.y
             }
         }
-    }
+    }*/
 
     /**
      * Apply gravitation to the every falling body (unless not levitating)
@@ -488,7 +487,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * Apply only if not grounded; normal force is precessed separately.
      */
     private fun applyGravitation() {
-        if (!isNoSubjectToGrav && !isTouchingSide(hitbox, COLLIDING_BOTTOM)) {
+        if (!isNoSubjectToGrav) {
             //if (!isTouchingSide(hitbox, COLLIDING_BOTTOM)) {
             /**
              * weight; gravitational force in action
@@ -503,7 +502,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
              * Drag of atmosphere
              * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity sqr) * A (area)
              */
-            val D: Vector2 = Vector2(moveDelta.x.magnSqr(), moveDelta.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
+            val D: Vector2 = Vector2(externalForce.x.magnSqr(), externalForce.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
 
             val V: Vector2 = (W - D) / Terrarum.TARGET_FPS.toDouble() * SI_TO_GAME_ACC
 
@@ -514,6 +513,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     private fun applyNormalForce() {
         if (!isNoCollideWorld) {
+            val moveDelta = externalForce + controllerMoveDelta
+
             // axis Y. Using operand >= and hitting the ceiling will lock the player to the position
 
             // was moving downward?
@@ -552,7 +553,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /**
      * nextHitbox must NOT be altered before this method is called!
      */
-    @Deprecated("It's stupid anyway.") private fun displaceByCCD() {
+    /*@Deprecated("It's stupid anyway.") private fun displaceByCCD() {
         if (!isNoCollideWorld) {
             if (!isColliding(hitbox))
                 return
@@ -574,7 +575,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             //println("ccdCollided: $ccdCollided")
         }
-    }
+    }*/
 
     /**
      * nextHitbox must NOT be altered before this method is called!
@@ -596,136 +597,131 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         //  find "edge" point using binary search
         // [END OF SUBROUTINE]
 
-        if (moveDelta.isZero) {
-            println("0")
-            return
-        }
-
-
         fun getBacktrackDelta(percentage: Double): Vector2 {
             if (percentage < 0.0 || percentage > 1.0)
                 throw IllegalArgumentException("$percentage")
 
-            return moveDelta * percentage
+            return externalForce * percentage
         }
 
 
 
-        val simulationHitbox = hitbox.clone()
-        var ccdTick: Int = ccdSteps // 0..15: collision detected, 16: not
-
-        // do CCD first
-        for (i in 1..ccdSteps) { // start from 1: if you are grounded, CCD of 0 will report as COLLIDING and will not you jump
-            simulationHitbox.reassign(hitbox)
-            simulationHitbox.translate(getBacktrackDelta(i.toDouble() / ccdSteps))
-
-            println("ccd $i, endY = ${simulationHitbox.endPointY}")
-
-            if (isColliding(simulationHitbox)) { //COLLIDING_EXTRA_SIZE: doing trick so that final pos would be x.99800000 instead of y.0000000
-                ccdTick = i
-                break
-            }
+        if (externalForce.isZero) {
+            println("externalForce is zero")
         }
+        else {
+            val simulationHitbox = hitbox.clone()
+            var ccdTick: Int = ccdSteps // 0..15: collision detected, 16: not
 
-        // FIXME CCD-ing is not right (not-so-crucial for most cases anyway...)
-        // DESCRIPTION:  0.999999999999 ~ 1.0 pixels off
-        // I think collision detection is one pixel off -- very fucking likely
-
-
-        println("ccdTick = $ccdTick, endY = ${simulationHitbox.endPointY}")
-
-
-
-        /////////////////////////
-        // FIXME THE EDGE CASE //
-        /////////////////////////
-        /*
-        no collision; endY = 7989.683178548076
-        no collision; endY = 7995.169755787131
-        no collision; endY = 8000.749058412345 <-- CCD did NOT caught collision (8000.0 be collision)
-        reflY
-        0
-        0
-        */
-        // THIS is also the consequence of COLLISION DETECTION being 1 pixel off
-        //
-        // Fixed the issue by offsetting hitbox when doing collision detection,
-        // now it won't jump as if it's stuck in the ground (L/R stuck)
-        // "snap to closest tile" does not make any difference
-
-
-        // collision not found
-        if (ccdTick == ccdSteps) {
-            hitbox.translate(moveDelta)
-            println("no collision; endY = ${hitbox.endPointY}")
-            return
-        }
-
-
-        println("embedding befure: ${simulationHitbox.endPointY}")
-
-        // find no-collision point using binary search
-        // trust me, X- and Y-axis must move simultaneously.
-        //// binary search ////
-        if (ccdTick >= 1) {
-            var low = (ccdTick - 1).toDouble() / ccdSteps
-            var high = (ccdTick).toDouble() / ccdSteps
-            var bmid: Double
-
-            (1..binaryBranchingMax).forEach { _ ->
-
-                bmid = (low + high) / 2.0
-
+            // do CCD first
+            for (i in 1..ccdSteps) { // start from 1: if you are grounded, CCD of 0 will report as COLLIDING and will not you jump
                 simulationHitbox.reassign(hitbox)
-                simulationHitbox.translate(getBacktrackDelta(bmid))
+                simulationHitbox.translate(getBacktrackDelta(i.toDouble() / ccdSteps))
 
-                print("bmid = $bmid, new endY: ${simulationHitbox.endPointY}")
+                println("ccd $i, endY = ${simulationHitbox.endPointY}")
 
-                // set new mid
                 if (isColliding(simulationHitbox)) { //COLLIDING_EXTRA_SIZE: doing trick so that final pos would be x.99800000 instead of y.0000000
-                    print(", going back\n")
-                    high = bmid
-                }
-                else {
-                    print(", going forth\n")
-                    low = bmid
+                    ccdTick = i
+                    break
                 }
             }
 
-            println("binarySearch embedding: ${simulationHitbox.endPointY}")
+            // FIXME CCD-ing is not right (not-so-crucial for most cases anyway...)
+            // DESCRIPTION:  0.999999999999 ~ 1.0 pixels off
+            // I think collision detection is one pixel off -- very fucking likely
+
+
+            println("ccdTick = $ccdTick, endY = ${simulationHitbox.endPointY}")
+
+
+            /////////////////////////
+            // FIXME THE EDGE CASE //
+            /////////////////////////
+            /*
+              no collision; endY = 7989.683178548076
+              no collision; endY = 7995.169755787131
+              no collision; endY = 8000.749058412345 <-- CCD did NOT caught collision (8000.0 be collision)
+              reflY
+              0
+              0
+              */
+            // THIS is also the consequence of COLLISION DETECTION being 1 pixel off
+            //
+            // Fixed the issue by offsetting hitbox when doing collision detection,
+            // now it won't jump as if it's stuck in the ground (L/R stuck)
+            // "snap to closest tile" does not make any difference
+
+
+            // collision not found
+            if (ccdTick == ccdSteps) {
+                hitbox.translate(externalForce)
+                println("no collision; endX = ${hitbox.endPointX}")
+                return
+            }
+
+
+            println("embedding befure: ${simulationHitbox.endPointX}")
+
+            // find no-collision point using binary search
+            // trust me, X- and Y-axis must move simultaneously.
+            //// binary search ////
+            if (ccdTick >= 1) {
+                var low = (ccdTick - 1).toDouble() / ccdSteps
+                var high = (ccdTick).toDouble() / ccdSteps
+                var bmid: Double
+
+                (1..binaryBranchingMax).forEach { _ ->
+
+                    bmid = (low + high) / 2.0
+
+                    simulationHitbox.reassign(hitbox)
+                    simulationHitbox.translate(getBacktrackDelta(bmid))
+
+                    print("bmid = $bmid, new endY: ${simulationHitbox.endPointY}")
+
+                    // set new mid
+                    if (isColliding(simulationHitbox)) { //COLLIDING_EXTRA_SIZE: doing trick so that final pos would be x.99800000 instead of y.0000000
+                        print(", going back\n")
+                        high = bmid
+                    }
+                    else {
+                        print(", going forth\n")
+                        low = bmid
+                    }
+                }
+
+                println("binarySearch embedding: ${simulationHitbox.endPointY}")
+            }
+
+
+            // snap to closest tile
+            // naturally, binarySearch gives you a point like 7584.99999999 (barely not colliding) or
+            // 7585.000000000 (colliding as fuck), BUT what we want is 7584.00000000 .
+            // [Procedure]
+            //  1. get touching area of four sides incl. edge points
+            //  2. a side with most touching area is the "colliding side"
+            //  3. round the hitbox so that coord of "colliding" side be integer
+            //  3.1. there's two main cases: "main axis" being X; "main axis" being Y
+            //  3.2. edge cases: (TBA)
+
+            // test: assume hitting bottom
+            val roundedInteger = simulationHitbox.endPointY.div(TILE_SIZE).roundInt() * TILE_SIZE
+            val displacementMainAxis = roundedInteger - simulationHitbox.endPointY
+            val displacementSecondAxis = displacementMainAxis * externalForce.x / externalForce.y
+
+            simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
+            println("dx: $displacementSecondAxis, dy: $displacementMainAxis")
+
+
+            println("externalForce: $externalForce, displacement: ${simulationHitbox - hitbox}")
+            //hitbox.translate(getBacktrackDelta(bmid))
+            hitbox.reassign(simulationHitbox)
         }
 
 
-        // snap to closest tile
-        // binarySearch gives embedding of ~3 pixels, which is safe to round up/down.               // binarySearch gives embedding: it shouldn't but it does :\
-        // [Procedure]
-        //  1. get touching area of four sides incl. edge points
-        //  2. a side with most touching area is the "colliding side"
-        //  3. round the hitbox so that coord of "colliding" side be integer
-        //  3.1. there's two main cases: "main axis" being X; "main axis" being Y
-        //  3.2. edge cases: (TBA)
-
-        // test: assume hitting bottom
-        /*val roundedInteger = simulationHitbox.endPointY.div(TILE_SIZE).roundInt() * TILE_SIZE
-        val displacementMainAxis = roundedInteger - simulationHitbox.endPointY
-        val displacementSecondAxis = displacementMainAxis * moveDelta.x / moveDelta.y
-
-        simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
-        println("dx: $displacementSecondAxis, dy: $displacementMainAxis")*/
+        // resolve controllerMoveDelta
 
 
-
-        // manual compensation
-        //  standing on the floow
-        if (isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
-            simulationHitbox.translate(0.0, -1.0)
-        }
-
-
-        //println("moveDelta: $moveDelta, displacement: ${simulationHitbox - hitbox})
-        println("moveDelta: $moveDelta, displacement: ${simulationHitbox - hitbox}")
-        //hitbox.translate(getBacktrackDelta(bmid))
-        hitbox.reassign(simulationHitbox)
 
         println("# final hitbox.endY = ${hitbox.endPointY}")
 
@@ -775,6 +771,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      */
     private fun hitAndForciblyReflectY() {
         println("hitAndForciblyReflectY")
+        val moveDelta = externalForce + controllerMoveDelta
         // TODO HARK! I have changed veloX/Y to moveDelta.x/y
         if (moveDelta.y < 0) {
             // kills movement if it is Controllable
@@ -793,7 +790,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             externalForce.y = moveDelta.y * CEILING_HIT_ELASTICITY
             //externalForce.y = 0.0
 
-            hitbox.translatePosY(0.5)
+
+            //hitbox.translatePosY(0.5) // TODO why we need it?
         }
         else {
             throw Error("Check this out bitch (moveDelta.y = ${moveDelta.y})")
@@ -809,10 +807,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         if (isNoCollideWorld) return false
 
         // offsets will stretch and shrink detection box according to the argument
-        val x1 = hitbox.posX - A_PIXEL
-        val x2 = hitbox.posX + hitbox.width
-        val y1 = hitbox.posY - A_PIXEL
-        val y2 = hitbox.posY + hitbox.height
+        val x1 = hitbox.posX
+        val x2 = hitbox.endPointX - A_PIXEL
+        val y1 = hitbox.posY
+        val y2 = hitbox.endPointY - A_PIXEL
 
 
         val txStart = x1.div(TILE_SIZE).floorInt() // plus(1.0) : adjusting for yet another anomaly
@@ -866,46 +864,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             x1 = hitbox.endPointX
             x2 = x1
             y1 = hitbox.posY - A_PIXEL
-            y2 = hitbox.endPointY
-        }
-        else throw IllegalArgumentException()
-
-        val txStart = x1.div(TILE_SIZE).floorInt()
-        val txEnd =   x2.div(TILE_SIZE).floorInt()
-        val tyStart = y1.div(TILE_SIZE).floorInt()
-        val tyEnd =   y2.div(TILE_SIZE).floorInt()
-
-        return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
-    }
-
-
-    private fun isCollidingSide(hitbox: Hitbox, option: Int): Boolean {
-        val x1: Double
-        val x2: Double
-        val y1: Double
-        val y2: Double
-        if (option == COLLIDING_TOP) {
-            x1 = hitbox.posX
-            x2 = hitbox.endPointX
-            y1 = hitbox.posY
-            y2 = y1
-        }
-        else if (option == COLLIDING_BOTTOM) {
-            x1 = hitbox.posX
-            x2 = hitbox.endPointX
-            y1 = hitbox.endPointY
-            y2 = y1
-        }
-        else if (option == COLLIDING_LEFT) {
-            x1 = hitbox.posX
-            x2 = x1
-            y1 = hitbox.posY
-            y2 = hitbox.endPointY
-        }
-        else if (option == COLLIDING_RIGHT) {
-            x1 = hitbox.endPointX
-            x2 = x1
-            y1 = hitbox.posY
             y2 = hitbox.endPointY
         }
         else throw IllegalArgumentException()
