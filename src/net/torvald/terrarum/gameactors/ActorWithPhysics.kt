@@ -487,7 +487,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * Apply only if not grounded; normal force is precessed separately.
      */
     private fun applyGravitation() {
-        if (!isNoSubjectToGrav) {
+        if (!isNoSubjectToGrav && !isTouchingSide(hitbox, COLLIDING_BOTTOM)) {
             //if (!isTouchingSide(hitbox, COLLIDING_BOTTOM)) {
             /**
              * weight; gravitational force in action
@@ -584,6 +584,23 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     private val binaryBranchingMax = 54 // higher = more precise; theoretical max = 54 (# of mantissa + 2)
 
     private fun displaceHitbox() {
+        fun debug1(wut: Any?) {
+            //  vvvvv  set it true to make debug print work
+            if (true) println(wut)
+        }
+        fun debug2(wut: Any?) {
+            //  vvvvv  set it true to make debug print work
+            if (false) println(wut)
+        }
+        fun debug3(wut: Any?) {
+            //  vvvvv  set it true to make debug print work
+            if (false) println(wut)
+        }
+        fun debug4(wut: Any?) {
+            //  vvvvv  set it true to make debug print work
+            if (false) println(wut)
+        }
+
         // I kinda need these notes when I'm not caffeinated
         //
         // First of all: Rules
@@ -607,7 +624,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
         if (externalForce.isZero) {
-            println("externalForce is zero")
+            debug1("externalForce is zero")
         }
         else {
             val simulationHitbox = hitbox.clone()
@@ -618,7 +635,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 simulationHitbox.reassign(hitbox)
                 simulationHitbox.translate(getBacktrackDelta(i.toDouble() / ccdSteps))
 
-                println("ccd $i, endY = ${simulationHitbox.endPointY}")
+                debug2("ccd $i, endY = ${simulationHitbox.endPointY}")
 
                 if (isColliding(simulationHitbox)) { //COLLIDING_EXTRA_SIZE: doing trick so that final pos would be x.99800000 instead of y.0000000
                     ccdTick = i
@@ -631,7 +648,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             // I think collision detection is one pixel off -- very fucking likely
 
 
-            println("ccdTick = $ccdTick, endY = ${simulationHitbox.endPointY}")
+            debug2("ccdTick = $ccdTick, endY = ${simulationHitbox.endPointY}")
 
 
             /////////////////////////
@@ -656,12 +673,12 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             var collisionNotFound = false
             if (ccdTick == ccdSteps) {
                 hitbox.translate(externalForce)
-                println("no collision; endX = ${hitbox.endPointX}")
+                debug2("no collision; endX = ${hitbox.endPointX}")
                 collisionNotFound = true
             }
 
             if (!collisionNotFound) {
-                println("embedding befure: ${simulationHitbox.endPointX}")
+                debug2("embedding before: ${simulationHitbox.endPointX}")
 
                 // find no-collision point using binary search
                 // trust me, X- and Y-axis must move simultaneously.
@@ -678,27 +695,27 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                         simulationHitbox.reassign(hitbox)
                         simulationHitbox.translate(getBacktrackDelta(bmid))
 
-                        print("bmid = $bmid, new endY: ${simulationHitbox.endPointY}")
+                        debug2("bmid = $bmid, new endY: ${simulationHitbox.endPointY}")
 
                         // set new mid
                         if (isColliding(simulationHitbox)) { //COLLIDING_EXTRA_SIZE: doing trick so that final pos would be x.99800000 instead of y.0000000
-                            print(", going back\n")
+                            debug2(", going back\n")
                             high = bmid
                         }
                         else {
-                            print(", going forth\n")
+                            debug2(", going forth\n")
                             low = bmid
                         }
                     }
 
-                    println("binarySearch embedding: ${simulationHitbox.endPointY}")
+                    debug2("binarySearch embedding: ${simulationHitbox.endPointY}")
 
 
                     // force set grounded-ness
                     grounded = true
                     // reset walkY
                     walkY = 0.0
-                    println("!! grounded !!")
+                    debug1("!! grounded ${Random().nextInt(1000)}!!")
                 }
 
 
@@ -713,15 +730,19 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 //  3.2. edge cases: (TBA)
 
                 // test: assume hitting bottom
-                //val roundedInteger = simulationHitbox.endPointY.div(TILE_SIZE).roundInt() * TILE_SIZE
-                val displacementMainAxis = -1.0// - simulationHitbox.endPointY
-                val displacementSecondAxis = displacementMainAxis * externalForce.x / externalForce.y
+                val vectorSum = externalForce + controllerMoveDelta
+                if (vectorSum.y > 0.0 && isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
+                    val displacementMainAxis = -1.0
+                    val displacementSecondAxis = displacementMainAxis * externalForce.x / externalForce.y
+                    simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
+                    debug2("dx: $displacementSecondAxis, dy: $displacementMainAxis")
+                }
 
-                simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
-                println("dx: $displacementSecondAxis, dy: $displacementMainAxis")
 
 
-                println("externalForce: $externalForce, displacement: ${simulationHitbox - hitbox}")
+
+
+                debug2("externalForce: $externalForce, displacement: ${simulationHitbox - hitbox}")
                 //hitbox.translate(getBacktrackDelta(bmid))
                 hitbox.reassign(simulationHitbox)
             }
@@ -735,7 +756,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
 
-        println("# final hitbox: $hitbox, wx: $walkX, wy: $walkY")
+        //println("# final hitbox: $hitbox, wx: $walkX, wy: $walkY")
 
 
 
@@ -764,15 +785,15 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
          */
 
         externalForce.x *= -elasticity
-        //if (this is Controllable) walkX *= -elasticity
+        //if (this is Controllable) walkX *= -elasticity // commented; should be managed by displaceHitbox()
 
         //println("$this\t${externalForce.x}")
     }
 
     private fun hitAndReflectY() {
-        println("** reflY **")
+        //println("** reflY **")
         externalForce.y *= -elasticity
-        //if (this is Controllable) walkY *= -elasticity
+        //if (this is Controllable) walkY *= -elasticity // commented; should be managed by displaceHitbox()
     }
 
     @Transient private val CEILING_HIT_ELASTICITY = 0.3
@@ -818,7 +839,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     private fun isColliding(hitbox: Hitbox): Boolean {
         if (isNoCollideWorld) return false
 
-        // offsets will stretch and shrink detection box according to the argument
+        // detectors are inside of the bounding box
         val x1 = hitbox.posX
         val x2 = hitbox.endPointX - A_PIXEL
         val y1 = hitbox.posY
@@ -843,17 +864,16 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         val y2: Double
 
         /*
-        This structure:
+        The structure:
 
-            ######## // TOP
+             ######  // TOP
             |      |
             |      |
             |      |
-            ######## // BOTTOM
-
-        for hittng-the-block-edge case
+             ######  // BOTTOM
          */
 
+        // detectors are inside of the bounding box
         if (option == COLLIDING_TOP) {
             x1 = hitbox.posX
             x2 = hitbox.endPointX - A_PIXEL

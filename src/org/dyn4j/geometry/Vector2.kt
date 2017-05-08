@@ -366,8 +366,8 @@ class Vector2 {
      * *
      * @return [Vector2] this vector
      */
-    operator fun plus(vector: Vector2): Vector2 {
-        return Vector2(this.x + vector.x, this.y + vector.y)
+    operator fun plus(vector: Vector2?): Vector2 {
+        return Vector2(this.x + (vector?.x ?: 0.0), this.y + (vector?.y ?: 0.0))
     }
 
     operator fun plusAssign(vector: Vector2) {
