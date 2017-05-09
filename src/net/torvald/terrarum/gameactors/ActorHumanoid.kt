@@ -513,35 +513,31 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     fun Float.abs() = FastMath.abs(this)
 
     private fun updateSprite(delta: Int) {
-        if (sprite != null) sprite!!.update(delta)
-        if (spriteGlow != null) spriteGlow!!.update(delta)
+        sprite?.update(delta)
+        spriteGlow?.update(delta)
 
         //println("$this\tsprite current frame: ${sprite!!.currentFrame}")
 
         if (grounded) {
             // set anim row
             if (controllerMoveDelta?.x != 0.0) {
-                if (sprite != null) sprite!!.switchRow(SPRITE_ROW_WALK)
-                if (spriteGlow != null) spriteGlow!!.switchRow(SPRITE_ROW_WALK)
+                sprite?.switchRow(SPRITE_ROW_WALK)
+                spriteGlow?.switchRow(SPRITE_ROW_WALK)
             }
 
             // flipping the sprite
             if (walkHeading == LEFT) {
                 sprite!!.flip(true, false)
-                if (spriteGlow != null) {
-                    spriteGlow!!.flip(true, false)
-                }
+                spriteGlow?.flip(true, false)
             }
             else {
                 sprite!!.flip(false, false)
-                if (spriteGlow != null) {
-                    spriteGlow!!.flip(false, false)
-                }
+                spriteGlow?.flip(false, false)
             }
         }
         else {
-            if (sprite != null) sprite!!.switchRow(SPRITE_ROW_IDLE)
-            if (spriteGlow != null) spriteGlow!!.switchRow(SPRITE_ROW_IDLE)
+            sprite?.switchRow(SPRITE_ROW_IDLE)
+            spriteGlow?.switchRow(SPRITE_ROW_IDLE)
         }
     }
 }

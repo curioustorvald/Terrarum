@@ -590,7 +590,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
         fun debug2(wut: Any?) {
             //  vvvvv  set it true to make debug print work
-            if (false) println(wut)
+            if (true) println(wut)
         }
         fun debug3(wut: Any?) {
             //  vvvvv  set it true to make debug print work
@@ -695,15 +695,13 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                         simulationHitbox.reassign(hitbox)
                         simulationHitbox.translate(getBacktrackDelta(bmid))
 
-                        debug2("bmid = $bmid, new endY: ${simulationHitbox.endPointY}")
-
                         // set new mid
                         if (isColliding(simulationHitbox)) { //COLLIDING_EXTRA_SIZE: doing trick so that final pos would be x.99800000 instead of y.0000000
-                            debug2(", going back\n")
+                            debug2("bmid = $bmid, new endY: ${simulationHitbox.endPointY}, going back")
                             high = bmid
                         }
                         else {
-                            debug2(", going forth\n")
+                            debug2("bmid = $bmid, new endY: ${simulationHitbox.endPointY}, going forth")
                             low = bmid
                         }
                     }
@@ -734,28 +732,28 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 // --> Y-Axis
                 if (vectorSum.y > 0.0 && isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
                     val displacementMainAxis = -1.0
-                    val displacementSecondAxis = displacementMainAxis * externalForce.x / externalForce.y
+                    val displacementSecondAxis = displacementMainAxis * vectorSum.x / vectorSum.y // use controllerMoveDelta.x / controllerMoveDelta.y ?
                     simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
-                    debug2("dx: $displacementSecondAxis, dy: $displacementMainAxis")
+                    debug2("1 dx: $displacementSecondAxis, dy: $displacementMainAxis")
                 }
                 else if (vectorSum.y < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
                     val displacementMainAxis = 1.0
-                    val displacementSecondAxis = displacementMainAxis * externalForce.x / externalForce.y
+                    val displacementSecondAxis = displacementMainAxis * vectorSum.x / vectorSum.y
                     simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
-                    debug2("dx: $displacementSecondAxis, dy: $displacementMainAxis")
+                    debug2("2 dx: $displacementSecondAxis, dy: $displacementMainAxis")
                 }
                 // --> X-Axis
                 if (vectorSum.x > 0.0 && isTouchingSide(simulationHitbox, COLLIDING_RIGHT)) {
                     val displacementMainAxis = -1.0
-                    val displacementSecondAxis = displacementMainAxis * externalForce.y / externalForce.x
+                    val displacementSecondAxis = displacementMainAxis * vectorSum.y / vectorSum.x
                     simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
-                    debug2("dx: $displacementMainAxis, dy: $displacementSecondAxis")
+                    debug2("3 dx: $displacementMainAxis, dy: $displacementSecondAxis")
                 }
                 else if (vectorSum.x < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_LEFT)) {
                     val displacementMainAxis = 1.0
-                    val displacementSecondAxis = displacementMainAxis * externalForce.y / externalForce.x
+                    val displacementSecondAxis = displacementMainAxis * vectorSum.y / vectorSum.x
                     simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
-                    debug2("dx: $displacementMainAxis, dy: $displacementSecondAxis")
+                    debug2("4 dx: $displacementMainAxis, dy: $displacementSecondAxis")
                 }
                 // FIXME self-driven wall embed-ment is still a thing; block X movement when controllerMoveDelta hits the wall
 
@@ -829,9 +827,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         // TODO HARK! I have changed veloX/Y to moveDelta.x/y
         if (moveDelta.y < 0) {
             // kills movement if it is Controllable
-            if (controllerMoveDelta != null) {
-                walkY = 0.0
-            }
+            controllerMoveDelta?.let { it.y = 0.0 }
+
 
             if (moveDelta.y * CEILING_HIT_ELASTICITY < -A_PIXEL) {
                 moveDelta.y = -moveDelta.y * CEILING_HIT_ELASTICITY
@@ -888,9 +885,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         The structure:
 
              #######  // TOP
-            = CASIO =
-            =  sat  =
-            = 10:08 =
+            =+-----+=
+            =|     |=
+            =+-----+=
              #######  // BOTTOM
          */
 
