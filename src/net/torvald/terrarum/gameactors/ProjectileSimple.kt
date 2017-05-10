@@ -71,7 +71,7 @@ open class ProjectileSimple(
     override fun update(gc: GameContainer, delta: Int) {
         // hit something and despawn
         lifetimeCounter += delta
-        if (ccdCollided || grounded || lifetimeCounter >= lifetimeMax ||
+        if (grounded || lifetimeCounter >= lifetimeMax || // ccdCollided ||
             // stuck check
             BlockCodex[Terrarum.ingame!!.world.getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Block.STONE].isSolid
                 ) {

@@ -55,13 +55,14 @@ internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
          */
         fun composeActorObject(actor: ActorWithPhysics): LuaTable {
             val t: LuaTable = LuaTable()
+            val moveDelta = actor.externalForce + actor.controllerMoveDelta
 
             t["name"] = actor.actorValue.getAsString(AVKey.NAME).toLua()
             t["posX"] = actor.hitbox.centeredX.toLua()
             t["posY"] = actor.hitbox.centeredY.toLua()
 
-            t["veloX"] = actor.moveDelta.x.toLua()
-            t["veloY"] = actor.moveDelta.y.toLua()
+            t["veloX"] = moveDelta.x.toLua()
+            t["veloY"] = moveDelta.y.toLua()
 
             t["width"] = actor.hitbox.width.toLua()
             t["height"] = actor.hitbox.height.toLua()

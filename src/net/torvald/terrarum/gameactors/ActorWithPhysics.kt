@@ -71,7 +71,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      */
     internal val externalForce = Vector2(0.0, 0.0)
 
-    //val moveDelta = Vector2(0.0, 0.0) // moveDelta = velocity + controllerMoveDelta
     @Transient private val VELO_HARD_LIMIT = 100.0
 
     /**

@@ -80,7 +80,7 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
     fun setPositionX(x: Double) = setPosition(x, posY)
     fun setPositionY(y: Double) = setPosition(posX, y)
 
-    fun setPositionFromPoint(x1: Double, y1: Double): Hitbox {
+    fun setPositionFromPointed(x1: Double, y1: Double): Hitbox {
         hitboxStart = Point2d(x1 - width / 2, y1 - height)
         return this
     }
