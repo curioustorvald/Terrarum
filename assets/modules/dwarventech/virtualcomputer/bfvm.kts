@@ -39,7 +39,7 @@ class BFVM(
     private val PRN = '.'.toByte()
     private val RDI = ','.toByte()
     private val JPZ = '['.toByte()
-    private val JPN = ']'.toByte()
+    private val JNZ = ']'.toByte()
 
     private val CYA = 0xFF.toByte()
 
@@ -60,7 +60,7 @@ class BFVM(
             Pair(PRN, { PRN() }),
             Pair(RDI, { RDI() }),
             Pair(JPZ, { JPZ() }),
-            Pair(JPN, { JPN() }),
+            Pair(JNZ, { JPN() }),
             Pair(LDZ, { LDZ() })
     )
 
@@ -94,7 +94,7 @@ class BFVM(
     PRN  .      Print as text
     RDI  ,      Read from input
     JPZ  [      Jump past to matching ] when mem is zero
-    JPN  ]      Jump back to matching [ when mem is non-zero
+    JNZ  ]      Jump back to matching [ when mem is non-zero
 
     [ Internal operations ]
     CYA  0xFF   Marks end of the input program
@@ -143,7 +143,7 @@ class BFVM(
                 if (JPZ == mem[ir]) {
                     r2++
                 }
-                else if (JPN == mem[ir]) {
+                else if (JNZ == mem[ir]) {
                     r2--
                 }
             }
@@ -159,7 +159,7 @@ class BFVM(
 
             while (r2 != -1) {
                 ir--
-                if (JPN == mem[ir]) {
+                if (JNZ == mem[ir]) {
                     r2++
                 }
                 else if (JPZ == mem[ir]) {
@@ -243,7 +243,7 @@ class BFVM(
                 if (optimizeLevel >= 1) {
                     // [-] or [+]
                     if (r1 == JPZ) {
-                        if ((program[pc + 1] == DEC || program[pc + 1] == INC) && program[pc + 2] == JPN) {
+                        if ((program[pc + 1] == DEC || program[pc + 1] == INC) && program[pc + 2] == JNZ) {
                             pc += 3
                             putOp(LDZ)
                             continue

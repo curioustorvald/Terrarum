@@ -67,12 +67,12 @@ object GameController {
             if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary")) || input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
                 val itemOnGrip = ingame.player!!.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
-                if (itemOnGrip != null) {
+                itemOnGrip?.let {
                     if (input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary"))) {
-                        ingame.player!!.consumePrimary(itemOnGrip)
+                        ingame.player!!.consumePrimary(it)
                     }
                     if (input.isMouseButtonDown(Terrarum.getConfigInt("mousesecondary"))) {
-                        ingame.player!!.consumeSecondary(itemOnGrip)
+                        ingame.player!!.consumeSecondary(it)
                     }
                 }
             }
