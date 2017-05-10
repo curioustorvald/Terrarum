@@ -124,13 +124,9 @@ class BasicDebugInfoWindow : UICanvas {
                     rawB.toString() + ")"
         printLine(g, 8, "light@cursor $ccG$lightVal")
 
-        val tileNo: String
-        val tileNumRaw = Terrarum.ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
-        val tilenum = tileNumRaw / PairedMapLayer.RANGE
-        val tiledmg = tileNumRaw % PairedMapLayer.RANGE
-        tileNo = if (tileNumRaw == -1) "—" else "$tilenum:$tiledmg"
+        val tileNum = Terrarum.ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
 
-        printLine(g, 9, "tile@cursor $ccG$tileNo ($mtX, $mtY)")
+        printLine(g, 9, "tile@cursor $ccG$tileNum ($mtX, $mtY)")
 
         /**
          * Second column

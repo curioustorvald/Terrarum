@@ -23,6 +23,8 @@ class Float16() {
         bits = Float16.fromFloat(fval)
     }
 
+    // operators are stripped: you don't calculate from FP16; this is only for storing values //
+    
     companion object {
         fun toFloat(hbits: Short): Float {
             val hbits = hbits.toInt().and(0xFFFF)
