@@ -72,6 +72,9 @@ class UIHandler(val UI: UICanvas,
                 setAsClose()
             }
         }
+        if (toggleButton != null) {
+            /* */
+        }
 
 
         if (openFired && openCloseCounter > 9) openFired = false
