@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gamecontroller
 
+import net.torvald.terrarum.Terrarum
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Input
 import java.util.*
@@ -10,12 +11,23 @@ object KeyToggler {
     private val isPressed = BitSet(256)
     private val isToggled = BitSet(256)
 
+    /**
+     * Keys that won't be updated when console is opened
+     */
+    private val gameKeys = (16..27) + (30..40) + (43..53)
+
+
     fun isOn(key: Int): Boolean {
         return currentState[key]
     }
 
-    fun update(input: Input) {
-        (0..255).forEach {
+    fun update(input: Input, gameMode: Boolean = true) {
+        for (it in 0..255) {
+            if (gameMode && it in gameKeys &&
+                (Terrarum.ingame!!.consoleHandler.isOpening || Terrarum.ingame!!.consoleHandler.isOpened)) {
+                continue
+            }
+
             isPressed[it] = input.isKeyDown(it)
 
             if (isPressed[it] && !currentState[it] && !isToggled[it]) {
