@@ -458,12 +458,12 @@ class StateInGame : BasicGameState() {
                     // velocity
                     worldG.color = GameFontBase.codeToCol["g"]
                     worldG.drawString(
-                            "${0x7F.toChar()}X ${actor.moveDelta.x}",
+                            "${0x7F.toChar()}X ${actor.externalForce.x}",
                             actor.hitbox.posX.toFloat(),
                             actor.hitbox.pointedY.toFloat() + 4 + 8
                     )
                     worldG.drawString(
-                            "${0x7F.toChar()}Y ${actor.moveDelta.y}",
+                            "${0x7F.toChar()}Y ${actor.externalForce.y}",
                             actor.hitbox.posX.toFloat(),
                             actor.hitbox.pointedY.toFloat() + 4 + 8 * 2
                     )
@@ -510,7 +510,7 @@ class StateInGame : BasicGameState() {
     }
 
     override fun keyPressed(key: Int, c: Char) {
-        if (key == Key.GRAVE) {
+        if (key == Key.GRAVE || key == Key.ESCAPE) {
             consoleHandler.toggleOpening()
         }
         else if (key == Key.F3) {
