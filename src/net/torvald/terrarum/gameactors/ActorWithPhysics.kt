@@ -398,6 +398,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
                     displaceHitbox()
                     applyNormalForce()
+                    applyControllerMoveVelo() // TODO
                 }
                 else {
                     hitbox.translate(externalForce)
@@ -614,6 +615,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         // [Procedure]
         //  find "edge" point using binary search
         // [END OF SUBROUTINE]
+
+        // TODO IDEA: if hitbox of controllerMoveDelta is shrunken then you won't need "PUSH THE HITBOX INTO THE AIR" part
+
 
         fun getBacktrackDelta(percentage: Double): Vector2 {
             if (percentage < 0.0 || percentage > 1.0)
