@@ -398,7 +398,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
                     displaceHitbox()
                     applyNormalForce()
-                    applyControllerMoveVelo() // TODO
+                    //applyControllerMoveVelo() // TODO
                 }
                 else {
                     hitbox.translate(externalForce)
@@ -660,6 +660,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
                 debug2("ccd $i, endY = ${simulationHitbox.endPointY}")
 
+                // TODO use isTouching (larger box) instead of isColliding?
                 if (isColliding(simulationHitbox)) {
                     ccdTick = i
                     break
@@ -697,6 +698,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                         simulationHitbox.translate(getBacktrackDelta(bmid))
 
                         // set new mid
+                        // TODO use isTouching (larger box) instead of isColliding?
                         if (isColliding(simulationHitbox)) { //COLLIDING_EXTRA_SIZE: doing trick so that final pos would be x.99800000 instead of y.0000000
                             debug2("bmid = $bmid, new endY: ${simulationHitbox.endPointY}, going back")
                             high = bmid
@@ -735,6 +737,47 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             }
         } // must end with semi-final hitbox
 
+
+        // PUSH THE HITBOX INTO THE AIR for a pixel so IT WON'T BE COLLIDING
+        //
+        // naturally, binarySearch gives you a point like 7584.99999999 (barely not colliding) or
+        // 7585.000000000 (colliding as fuck), BUT what we want is 7584.00000000 .
+        // [Procedure]
+        //  1. get touching area of four sides incl. edge points
+        //  2. a side with most touching area is the "colliding side"
+        //  3. round the hitbox so that coord of "colliding" side be integer
+        //  3.1. there's two main cases: "main axis" being X; "main axis" being Y
+        //  3.2. edge cases: (TBA)
+
+        val vectorSum = externalForce + controllerMoveDelta
+        // --> Y-Axis
+        if (vectorSum.y > 0.0 && isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
+            val displacementMainAxis = -1.0
+            val displacementSecondAxis = displacementMainAxis * vectorSum.x / vectorSum.y // use controllerMoveDelta.x / controllerMoveDelta.y ?
+            simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
+            debug2("1 dx: $displacementSecondAxis, dy: $displacementMainAxis")
+        }
+        else if (vectorSum.y < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
+            val displacementMainAxis = 1.0
+            val displacementSecondAxis = displacementMainAxis * vectorSum.x / vectorSum.y
+            simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
+            debug2("2 dx: $displacementSecondAxis, dy: $displacementMainAxis")
+        }
+        // --> X-Axis
+        if (vectorSum.x > 0.0 && isTouchingSide(simulationHitbox, COLLIDING_RIGHT)) {
+            val displacementMainAxis = -1.0
+            val displacementSecondAxis = displacementMainAxis * vectorSum.y / vectorSum.x
+            simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
+            debug2("3 dx: $displacementMainAxis, dy: $displacementSecondAxis")
+        }
+        else if (vectorSum.x < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_LEFT)) {
+            val displacementMainAxis = 1.0
+            val displacementSecondAxis = displacementMainAxis * vectorSum.y / vectorSum.x
+            simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
+            debug2("4 dx: $displacementMainAxis, dy: $displacementSecondAxis")
+        }
+
+
         /////////////////////////////////
         // resolve controllerMoveDelta //
         /////////////////////////////////
@@ -768,6 +811,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                         debug3("x bmid = $bmid, new endX: ${simulationHitboxX.endPointX}, going forth")
                         low = bmid
                     }
+                }
+
+
+                if (isTouchingSide(simulationHitboxX, COLLIDING_LEFT) || isTouchingSide(simulationHitboxX, COLLIDING_RIGHT)) {
+                    //controllerMoveDelta!!.x *= elasticity
                 }
             }
 
@@ -812,45 +860,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
 
 
-        // PUSH THE HITBOX INTO THE AIR for a pixel so IT WON'T BE COLLIDING
-        //
-        // naturally, binarySearch gives you a point like 7584.99999999 (barely not colliding) or
-        // 7585.000000000 (colliding as fuck), BUT what we want is 7584.00000000 .
-        // [Procedure]
-        //  1. get touching area of four sides incl. edge points
-        //  2. a side with most touching area is the "colliding side"
-        //  3. round the hitbox so that coord of "colliding" side be integer
-        //  3.1. there's two main cases: "main axis" being X; "main axis" being Y
-        //  3.2. edge cases: (TBA)
-
-        val vectorSum = externalForce + controllerMoveDelta
-        // --> Y-Axis
-        if (vectorSum.y > 0.0 && isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
-            val displacementMainAxis = -1.0
-            val displacementSecondAxis = displacementMainAxis * vectorSum.x / vectorSum.y // use controllerMoveDelta.x / controllerMoveDelta.y ?
-            simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
-            debug2("1 dx: $displacementSecondAxis, dy: $displacementMainAxis")
-        }
-        else if (vectorSum.y < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
-            val displacementMainAxis = 1.0
-            val displacementSecondAxis = displacementMainAxis * vectorSum.x / vectorSum.y
-            simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
-            debug2("2 dx: $displacementSecondAxis, dy: $displacementMainAxis")
-        }
-        // --> X-Axis
-        if (vectorSum.x > 0.0 && isTouchingSide(simulationHitbox, COLLIDING_RIGHT)) {
-            val displacementMainAxis = -1.0
-            val displacementSecondAxis = displacementMainAxis * vectorSum.y / vectorSum.x
-            simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
-            debug2("3 dx: $displacementMainAxis, dy: $displacementSecondAxis")
-        }
-        else if (vectorSum.x < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_LEFT)) {
-            val displacementMainAxis = 1.0
-            val displacementSecondAxis = displacementMainAxis * vectorSum.y / vectorSum.x
-            simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
-            debug2("4 dx: $displacementMainAxis, dy: $displacementSecondAxis")
-        }
-        // FIXME self-driven wall embed-ment is still a thing; block X movement when controllerMoveDelta hits the wall
 
 
 
