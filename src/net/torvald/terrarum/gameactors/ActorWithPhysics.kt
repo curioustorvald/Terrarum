@@ -781,6 +781,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         /////////////////////////////////
         // resolve controllerMoveDelta //
         /////////////////////////////////
+
+        // TODO IDEA  just as CCD starts from 1, not 0, if moveDelta is engaged,
+        // TODO IDEA  FIRST JUST APPLY the force THEN resolve collision or whatever
+
         if (controllerMoveDelta != null) {
             debug3("== ControllerMoveDelta ==")
 
