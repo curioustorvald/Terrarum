@@ -12,9 +12,11 @@ import net.torvald.terrarum.worlddrawer.WorldCamera.x
 import net.torvald.terrarum.worlddrawer.WorldCamera.y
 import net.torvald.terrarum.worlddrawer.WorldCamera.height
 import net.torvald.terrarum.worlddrawer.WorldCamera.width
+import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL15
 import org.newdawn.slick.*
-import org.newdawn.slick.imageout.ImageOut
+import java.nio.FloatBuffer
 
 
 /**
@@ -27,7 +29,9 @@ object BlocksDrawer {
 
     // TODO modular
     val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "blocks/terrain.tga.gz"), TILE_SIZE, TILE_SIZE) // 64 MB
+    val terrainHorizontalTiles = tilesTerrain.horizontalCount
     val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "blocks/wire.tga.gz"), TILE_SIZE, TILE_SIZE) // 4 MB
+    val wireHorizontalTiles = tilesWire.horizontalCount
 
 
     val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
@@ -52,6 +56,35 @@ object BlocksDrawer {
     private val NEARBY_TILE_CODE_LEFT = 8
 
 
+
+    val VBO_WIDTH = Terrarum.ingame!!.ZOOM_MIN.inv().times(Terrarum.WIDTH).div(TILE_SIZE).ceil() + 2
+    val VBO_HEIGHT = Terrarum.ingame!!.ZOOM_MIN.inv().times(Terrarum.HEIGHT).div(TILE_SIZE).ceil() + 2
+    val cameraTileX: Int
+        get() = WorldCamera.x.div(TILE_SIZE)
+    val cameraTileY: Int
+        get() = WorldCamera.y.div(TILE_SIZE)
+    /**
+     * Stores which tile on the SpriteSheet should be drawn, to feed them into the VBO
+     * valid values: 0-65535
+     */
+    val regionBuffer = Array(VBO_HEIGHT) { IntArray(VBO_WIDTH) }
+    fun writeToRegionBuffer(tilewisePosX: Int, tilewisePosY: Int, sheetX: Int, sheetY: Int) {
+        regionBuffer[tilewisePosY - cameraTileY + 1][tilewisePosX - cameraTileX + 1] = sheetY * terrainHorizontalTiles + sheetX
+    }
+
+    val worldVBOTexture: FloatBuffer // stores texture offset
+    val worldVBOTextureID: Int
+    val worldVBOVertex: FloatBuffer // stores points that holds x-y positions
+    val worldVBOVertexID: Int
+
+    /* Have only 1 dynamic VBO and change its vertices every frame according to the visible tiles on screen.
+     * This method will safe overhead from binding / unbinding different VBO's. Uploading vertices in a batch is also pretty fast.
+     *
+     * For good performance always remember:
+     * batch batch batch batch batch.
+     */
+
+
     init {
         val tg = tileItemWall.graphics
 
@@ -72,6 +105,37 @@ object BlocksDrawer {
         //ImageOut.write(tileItemWall, "./tileitemwalltest.png")
 
         tg.destroy()
+
+
+        // generate VBO
+        worldVBOTexture = BufferUtils.createFloatBuffer(12 * VBO_WIDTH * VBO_HEIGHT)
+        worldVBOVertex = BufferUtils.createFloatBuffer(12 * VBO_WIDTH * VBO_HEIGHT)
+
+        for (y in 0..VBO_HEIGHT - 1) {
+            for (x in 0..VBO_WIDTH - 1) {
+                val x = x * TILE_SIZEF
+                val y = y * TILE_SIZEF
+                worldVBOVertex.put(floatArrayOf(
+                        x, y,
+                        x + TILE_SIZEF, y,
+                        x, y + TILE_SIZEF,
+                        x + TILE_SIZEF, y,
+                        x + TILE_SIZEF, y + TILE_SIZEF,
+                        x, y + TILE_SIZEF
+                ))
+            }
+        }
+        worldVBOVertex.rewind()
+
+        worldVBOVertexID = GL15.glGenBuffers()
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, worldVBOVertexID) //Bind buffer (also specifies type of buffer)
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, worldVBOVertex, GL15.GL_DYNAMIC_DRAW) //Send up the data and specify usage hint.
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0)
+
+        worldVBOTextureID = GL15.glGenBuffers()
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, worldVBOTextureID) //Bind buffer (also specifies type of buffer)
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, worldVBOTexture, GL15.GL_DYNAMIC_DRAW) //Send up the data and specify usage hint.
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0)
     }
 
 
@@ -298,9 +362,9 @@ object BlocksDrawer {
          */
         blendNormal()
 
-        tilesTerrain.startUse()
+        //tilesTerrain.startUse()
         drawTiles(g, WALL, false)
-        tilesTerrain.endUse()
+        //tilesTerrain.endUse()
 
         blendMul()
 
@@ -318,9 +382,9 @@ object BlocksDrawer {
          */
         blendNormal()
 
-        tilesTerrain.startUse()
+        //tilesTerrain.startUse()
         drawTiles(g, TERRAIN, false) // regular tiles
-        tilesTerrain.endUse()
+        //tilesTerrain.endUse()
     }
 
     fun renderFront(g: Graphics, drawWires: Boolean) {
@@ -329,14 +393,14 @@ object BlocksDrawer {
          */
         blendMul()
 
-        tilesTerrain.startUse()
+        //tilesTerrain.startUse()
         drawTiles(g, TERRAIN, true) // blendmul tiles
-        tilesTerrain.endUse()
+        //tilesTerrain.endUse()
 
         if (drawWires) {
-            tilesWire.startUse()
+            //tilesWire.startUse()
             drawTiles(g, WIRE, false)
-            tilesWire.endUse()
+            //tilesWire.endUse()
         }
 
         blendNormal()
@@ -353,7 +417,7 @@ object BlocksDrawer {
 
         var zeroTileCounter = 0
 
-        // loop
+        // draw - build VBO texture region table
         for (y in for_y_start..for_y_end) {
             for (x in for_x_start..for_x_end - 1) {
 
@@ -447,7 +511,7 @@ object BlocksDrawer {
                         else {
                             zeroTileCounter++ // unused for now
 
-                            GL11.glColor4f(0f, 0f, 0f, 1f)
+                            /*GL11.glColor4f(0f, 0f, 0f, 1f)
 
                             GL11.glTexCoord2f(0f, 0f)
                             GL11.glVertex3f(x * TILE_SIZE.toFloat(), y * TILE_SIZE.toFloat(), 0f)
@@ -458,7 +522,8 @@ object BlocksDrawer {
                             GL11.glTexCoord2f(0f + TILE_SIZE, 0f)
                             GL11.glVertex3f((x + 1) * TILE_SIZE.toFloat(), y * TILE_SIZE.toFloat(), 0f)
 
-                            GL11.glColor4f(1f, 1f, 1f, 1f)
+                            GL11.glColor4f(1f, 1f, 1f, 1f)*/
+                            drawTile(mode, x, y, 0, 0)
                         }
                     } // end if (not an air)
                 } catch (e: NullPointerException) {
@@ -467,14 +532,56 @@ object BlocksDrawer {
 
             }
         }
+
+        // draw - fill up the VBO buffer
+        for (y in 0..VBO_HEIGHT - 1) {
+            for (x in 0..VBO_WIDTH - 1) {
+                val tileID = regionBuffer[y][x]
+                val tileX = (tileID % terrainHorizontalTiles) * TILE_SIZEF
+                val tileY = (tileID / terrainHorizontalTiles) * TILE_SIZEF
+                worldVBOTexture.put(floatArrayOf( // feed GL_TRIANGLE data
+                        tileX, tileY,
+                        tileX + TILE_SIZEF, tileY,
+                        tileX, tileY + TILE_SIZEF,
+                        tileX + TILE_SIZEF, tileY,
+                        tileX + TILE_SIZEF, tileY + TILE_SIZEF,
+                        tileX, tileY + TILE_SIZEF
+                ))
+            }
+        }
+        worldVBOTexture.rewind()
+
+        // draw - render the VBO
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, when (mode) {
+            TERRAIN, WALL -> tilesTerrain
+            WIRE -> tilesWire
+            else -> throw Error("mode not TERRAIN/WALL/WIRE")
+        }.texture.textureID)
+
+        //inGLMatrixStack { // disabled for debugging: won't hotswap
+        GL11.glPushMatrix()
+
+            GL11.glTranslatef(WorldCamera.x.clampTileSize().toFloat() - TILE_SIZEF, WorldCamera.y.clampTileSize().toFloat(), 0f)
+            //GL11.glTranslatef(0f, 0f, 0f)
+            GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY)
+
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, worldVBOVertexID)
+            GL11.glVertexPointer(2, GL11.GL_FLOAT, 0, 0)
+
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, worldVBOTextureID)
+            GL11.glTexCoordPointer(2, GL11.GL_FLOAT, 0, 0)
+
+            GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 6 * VBO_WIDTH * VBO_HEIGHT)
+
+        GL11.glPopMatrix()
+        //}
     }
 
-    /**
+    private fun Int.clampTileSize() = this.div(TILE_SIZE).times(TILE_SIZE)
 
+    /**
      * @param x
-     * *
      * @param y
-     * *
      * @return binary [0-15] 1: up, 2: right, 4: down, 8: left
      */
     fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
@@ -593,18 +700,8 @@ object BlocksDrawer {
     }
 
     private fun drawTile(mode: Int, tilewisePosX: Int, tilewisePosY: Int, sheetX: Int, sheetY: Int) {
-        if (mode == TERRAIN || mode == WALL)
-            tilesTerrain.renderInUse(
-                    FastMath.floor((tilewisePosX * TILE_SIZE).toFloat()),
-                    FastMath.floor((tilewisePosY * TILE_SIZE).toFloat()),
-                    sheetX, sheetY
-            )
-        else if (mode == WIRE)
-            tilesWire.renderInUse(
-                    FastMath.floor((tilewisePosX * TILE_SIZE).toFloat()),
-                    FastMath.floor((tilewisePosY * TILE_SIZE).toFloat()),
-                    sheetX, sheetY
-            )
+        if (mode == TERRAIN || mode == WALL || mode == WIRE)
+            writeToRegionBuffer(tilewisePosX, tilewisePosY, sheetX, sheetY)
         else
             throw IllegalArgumentException()
     }
@@ -654,4 +751,15 @@ object BlocksDrawer {
     fun tileInCamera(x: Int, y: Int) =
             x >= WorldCamera.x.div(TILE_SIZE) && y >= WorldCamera.y.div(TILE_SIZE) &&
             x <= WorldCamera.x.plus(width).div(TILE_SIZE) && y <= WorldCamera.y.plus(width).div(TILE_SIZE)
+
+
+    private fun Float.inv() = 1f / this
+    fun Float.floor() = FastMath.floor(this)
+    fun Float.ceil() = FastMath.ceil(this)
+
+    fun inGLMatrixStack(action: () -> Unit) {
+        GL11.glPushMatrix()
+        action()
+        GL11.glPopMatrix()
+    }
 }
