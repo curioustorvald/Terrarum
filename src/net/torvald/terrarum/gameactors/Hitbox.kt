@@ -32,22 +32,20 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
     }
 
     /**
-     * Returns bottom-centered point of hitbox.
-     * @return pointX
+     * @return bottom-centered point of hitbox.
      */
-    val pointedX: Double
+    val canonicalX: Double
         get() = centeredX
 
     /**
-     * Returns bottom-centered point of hitbox.
-     * @return pointY
+     * @return bottom-centered point of hitbox.
      */
-    val pointedY: Double
+    val canonicalY: Double
         get() = hitboxEnd.y
 
-    val endPointX: Double
+    val endX: Double
         get() = hitboxEnd.x
-    val endPointY: Double
+    val endY: Double
         get() = hitboxEnd.y
 
     /**
@@ -66,7 +64,7 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
     fun setFromTwoPoints(x1: Double, y1: Double, x2: Double, y2: Double): Hitbox {
         return setFromWidthHeight(x1, y1, x2 - x1, y2 - y1)
     }
-    fun reassign(other: Hitbox) = setFromTwoPoints(other.posX, other.posY, other.endPointX, other.endPointY)
+    fun reassign(other: Hitbox) = setFromTwoPoints(other.posX, other.posY, other.endX, other.endY)
 
     fun translate(x: Double, y: Double) = setPosition(posX + x, posY + y)
     fun translate(vec: Vector2?) = if (vec != null) translate(vec.x, vec.y) else this
