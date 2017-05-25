@@ -219,7 +219,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     @Transient private val COLLIDING_UD = 4
     @Transient private val COLLIDING_LR = 5
     @Transient private val COLLIDING_ALLSIDE = 6
-    @Transient private val COLLIDING_EXTRA_SIZE = 7
+    @Transient private val COLLIDING_LEFT_EXTRA = 7
+    @Transient private val COLLIDING_RIGHT_EXTRA = 7
 
     /**
      * Temporary variables
@@ -639,6 +640,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             return Vector2(0.0, controllerMoveDelta!!.y * percentage)
         }
+        fun Double.modTile() = this.toInt().div(TILE_SIZE).times(TILE_SIZE)
+        fun Double.modTileDelta() = this - this.modTile()
 
 
 
@@ -832,8 +835,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         //  3.1. there's two main cases: "main axis" being X; "main axis" being Y
         //  3.2. edge cases: (TBA)
 
-        fun Double.modTile() = this.toInt().div(TILE_SIZE).times(TILE_SIZE)
-        fun Double.modTileDelta() = this - this.modTile()
+
+        //println("endX modDelta: ${simulationHitbox.endX.modTileDelta()}")
+        //println("touching_right_extra: ${isTouchingSide(simulationHitbox, COLLIDING_RIGHT_EXTRA)}")
+
 
         val vectorSum = externalForce + controllerMoveDelta
         // --> Y-Axis
@@ -852,21 +857,17 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             //debug2("2 dx: $displacementSecondAxis, dy: $displacementMainAxis")
             simulationHitbox.translate(0.0, 1.0)
         }*/
+
         // --> X-Axis
-        /*if (simulationHitbox.endX.modTileDelta() > 0 && isTouchingSide(simulationHitbox, COLLIDING_RIGHT)) {
-            //val displacementMainAxis = -1.00001
-            //val displacementSecondAxis = displacementMainAxis * vectorSum.y / vectorSum.x
-            //simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
-            //debug2("3 dx: $displacementMainAxis, dy: $displacementSecondAxis")
-            simulationHitbox.translate(-simulationHitbox.endX.modTileDelta(), 0.0)
+        if (simulationHitbox.endX.modTileDelta() >= 15.99999) {
+            val target = simulationHitbox.endX.div(TILE_SIZE).floorInt().plus(1).times(TILE_SIZE).toDouble()
+            val delta = target - simulationHitbox.endX
+            debug2("xR target: $target, delta: $delta")
+            simulationHitbox.translatePosX(delta)
         }
-        else if (vectorSum.x < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_LEFT)) {
-            //val displacementMainAxis = 1.0
-            //val displacementSecondAxis = displacementMainAxis * vectorSum.y / vectorSum.x
-            //simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
-            //debug2("4 dx: $displacementMainAxis, dy: $displacementSecondAxis")
-            simulationHitbox.translate(1.0, 0.0)
-        }*/
+
+
+
 
 
         if (isTouchingSide(simulationHitbox, COLLIDING_LR)) {
@@ -973,10 +974,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         val y2 = hitbox.endY - A_PIXEL
 
 
-        val txStart = x1.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
-        val txEnd =   x2.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
-        val tyStart = y1.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
-        val tyEnd =   y2.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
+        val txStart = x1.div(TILE_SIZE).floorInt()
+        val txEnd =   x2.div(TILE_SIZE).floorInt()
+        val tyStart = y1.div(TILE_SIZE).floorInt()
+        val tyEnd =   y2.div(TILE_SIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
@@ -1025,6 +1026,18 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             y1 = hitbox.startY
             y2 = hitbox.endY - A_PIXEL
         }
+        else if (option == COLLIDING_LEFT_EXTRA) {
+            x1 = hitbox.startX - A_PIXEL - A_PIXEL
+            x2 = x1 + A_PIXEL
+            y1 = hitbox.startY
+            y2 = hitbox.endY - A_PIXEL
+        }
+        else if (option == COLLIDING_RIGHT_EXTRA) {
+            x1 = hitbox.endX
+            x2 = x1 + A_PIXEL
+            y1 = hitbox.startY
+            y2 = hitbox.endY - A_PIXEL
+        }
         else if (option == COLLIDING_ALLSIDE) {
             return isTouchingSide(hitbox, COLLIDING_LEFT) || isTouchingSide(hitbox, COLLIDING_RIGHT) ||
                    isTouchingSide(hitbox, COLLIDING_BOTTOM) || isTouchingSide(hitbox, COLLIDING_TOP)
@@ -1038,10 +1051,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
-        val txEnd =   x2.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
-        val tyStart = y1.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
-        val tyEnd =   y2.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
+        val txStart = x1.div(TILE_SIZE).floorInt()
+        val txEnd =   x2.div(TILE_SIZE).floorInt()
+        val tyStart = y1.div(TILE_SIZE).floorInt()
+        val tyEnd =   y2.div(TILE_SIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
