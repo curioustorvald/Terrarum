@@ -64,9 +64,9 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
     fun setFromTwoPoints(x1: Double, y1: Double, x2: Double, y2: Double): Hitbox {
         return setFromWidthHeight(x1, y1, x2 - x1, y2 - y1)
     }
-    fun reassign(other: Hitbox) = setFromTwoPoints(other.posX, other.posY, other.endX, other.endY)
+    fun reassign(other: Hitbox) = setFromTwoPoints(other.startX, other.startY, other.endX, other.endY)
 
-    fun translate(x: Double, y: Double) = setPosition(posX + x, posY + y)
+    fun translate(x: Double, y: Double) = setPosition(startX + x, startY + y)
     fun translate(vec: Vector2?) = if (vec != null) translate(vec.x, vec.y) else this
 
     fun setPosition(x1: Double, y1: Double): Hitbox {
@@ -75,8 +75,8 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
     }
     fun setPosition(vector: Vector2) = setPosition(vector.x, vector.y)
 
-    fun setPositionX(x: Double) = setPosition(x, posY)
-    fun setPositionY(y: Double) = setPosition(posX, y)
+    fun setPositionX(x: Double) = setPosition(x, startY)
+    fun setPositionY(y: Double) = setPosition(startX, y)
 
     fun setPositionFromPointed(x1: Double, y1: Double): Hitbox {
         hitboxStart = Point2d(x1 - width / 2, y1 - height)
@@ -84,12 +84,12 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
     }
 
     fun translatePosX(d: Double): Hitbox {
-        setPositionX(posX + d)
+        setPositionX(startX + d)
         return this
     }
 
     fun translatePosY(d: Double): Hitbox {
-        setPositionY(posY + d)
+        setPositionY(startY + d)
         return this
     }
 
@@ -101,16 +101,16 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
 
     /**
      * Returns x value of start point
-     * @return top-left point posX
+     * @return top-left point startX
      */
-    val posX: Double
+    val startX: Double
         get() = hitboxStart.x
 
     /**
      * Returns y value of start point
-     * @return top-left point posY
+     * @return top-left point startY
      */
-    val posY: Double
+    val startY: Double
         get() = hitboxStart.y
 
     val centeredX: Double
@@ -120,12 +120,12 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
         get() = (hitboxStart.y + hitboxEnd.y) * 0.5
 
     fun intersects(position: Point2d) =
-            (position.x >= posX && position.x <= posX + width) &&
-            (position.y >= posY && position.y <= posY + height)
+            (position.x >= startX && position.x <= startX + width) &&
+            (position.y >= startY && position.y <= startY + height)
 
-    fun toVector(): Vector2 = Vector2(posX, posY)
+    fun toVector(): Vector2 = Vector2(startX, startY)
 
-    fun clone(): Hitbox = Hitbox(posX, posY, width, height)
+    fun clone(): Hitbox = Hitbox(startX, startY, width, height)
 
     companion object {
         fun fromTwoPoints(x1: Double, y1: Double, x2: Double, y2: Double) =
