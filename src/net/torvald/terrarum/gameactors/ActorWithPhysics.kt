@@ -55,8 +55,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     val tilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
-                hitbox.posX.div(TILE_SIZE).floor(),
-                hitbox.posY.div(TILE_SIZE).floor(),
+                hitbox.startX.div(TILE_SIZE).floor(),
+                hitbox.startY.div(TILE_SIZE).floor(),
                 hitbox.endX.div(TILE_SIZE).floor(),
                 hitbox.endY.div(TILE_SIZE).floor()
         )
@@ -157,9 +157,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * Flags and Properties
      */
 
-
     val grounded: Boolean
-        get() = isPlayerNoClip || isTouchingSide(hitbox, COLLIDING_BOTTOM)
+        get() = isPlayerNoClip ||
+                (world.gravitation.y > 0 && isTouchingSide(hitbox, COLLIDING_BOTTOM) ||
+                 world.gravitation.y < 0 && isTouchingSide(hitbox, COLLIDING_TOP))
     /** Default to 'true'  */
     var isVisible = true
     /** Default to 'true'  */
@@ -716,22 +717,17 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                     // apply Normal Force
                     // next step (resolve controllerMoveDelta) requires this to be pre-handled
                     if (isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
-                        //if (gravitation.y > 0.0) grounded = true
-                        // reset walkY
                         walkY *= elasticity
                         externalForce.y *= elasticity
                         debug1("!! grounded ${Random().nextInt(1000)}!!")
                     }
                     else if (isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
-                        //if (gravitation.y < 0.0) grounded = true
-                        // reset walkY
                         walkY *= elasticity
                         externalForce.y *= elasticity
                         debug1("!! headbutt ${Random().nextInt(1000)}!!")
                     }
 
                     if (isTouchingSide(simulationHitbox, COLLIDING_LR)) {
-                        // reset walkX
                         //walkX *= elasticity
                         externalForce.x *= elasticity
                         debug1("!! tackle ${Random().nextInt(1000)}!!")
@@ -783,8 +779,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 }
 
 
-                if (isTouchingSide(simulationHitboxX, COLLIDING_LEFT) || isTouchingSide(simulationHitboxX, COLLIDING_RIGHT)) {
-                    controllerMoveDelta!!.x *= elasticity
+                if (isTouchingSide(simulationHitboxX, COLLIDING_LR)) {
+                    //controllerMoveDelta!!.x *= elasticity // FIXME commented: "brake" applied when climbing down several steps
                 }
             }
 
@@ -811,7 +807,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
                     // set new mid
                     // TODO UD-touching or colliding?
-                    if (isTouchingSide(simulationHitboxY, COLLIDING_TOP) || isTouchingSide(simulationHitboxY, COLLIDING_BOTTOM)) {
+                    if (isTouchingSide(simulationHitboxY, COLLIDING_UD)) {
                         debug3("y bmid = $bmid, new endY: ${simulationHitboxY.endY}, going back")
                         high = bmid
                     }
@@ -828,7 +824,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             }
 
 
-            simulationHitbox.setPosition(simulationHitboxX.posX, simulationHitboxY.posY)
+            simulationHitbox.setPosition(simulationHitboxX.startX, simulationHitboxY.startY)
 
             debug3("== END ControllerMoveDelta ==")
         }
@@ -974,9 +970,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         if (isNoCollideWorld) return false
 
         // detectors are inside of the bounding box
-        val x1 = hitbox.posX
+        val x1 = hitbox.startX
         val x2 = hitbox.endX - A_PIXEL
-        val y1 = hitbox.posY
+        val y1 = hitbox.startY
         val y2 = hitbox.endY - A_PIXEL
 
 
@@ -1009,40 +1005,39 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
         // detectors are inside of the bounding box
         if (option == COLLIDING_TOP) {
-            x1 = hitbox.posX
+            x1 = hitbox.startX
             x2 = hitbox.endX - A_PIXEL
-            y1 = hitbox.posY - A_PIXEL - A_PIXEL
+            y1 = hitbox.startY - A_PIXEL - A_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_BOTTOM) {
-            x1 = hitbox.posX
+            x1 = hitbox.startX
             x2 = hitbox.endX - A_PIXEL
             y1 = hitbox.endY
             y2 = y1
         }
         else if (option == COLLIDING_LEFT) {
-            x1 = hitbox.posX - A_PIXEL
+            x1 = hitbox.startX - A_PIXEL
             x2 = x1
-            y1 = hitbox.posY
+            y1 = hitbox.startY
             y2 = hitbox.endY - A_PIXEL
         }
         else if (option == COLLIDING_RIGHT) {
             x1 = hitbox.endX
             x2 = x1
-            y1 = hitbox.posY
+            y1 = hitbox.startY
             y2 = hitbox.endY - A_PIXEL
         }
         else if (option == COLLIDING_ALLSIDE) {
-            x1 = hitbox.posX - A_PIXEL
-            x2 = hitbox.endX
-            y1 = hitbox.posY - A_PIXEL
-            y2 = hitbox.endY
+            return isTouchingSide(hitbox, COLLIDING_LEFT) || isTouchingSide(hitbox, COLLIDING_RIGHT) ||
+                   isTouchingSide(hitbox, COLLIDING_BOTTOM) || isTouchingSide(hitbox, COLLIDING_TOP)
+
         }
         else if (option == COLLIDING_LR) {
-            x1 = hitbox.posX - A_PIXEL
-            x2 = hitbox.endX
-            y1 = hitbox.posY
-            y2 = hitbox.endY - A_PIXEL
+            return isTouchingSide(hitbox, COLLIDING_LEFT) || isTouchingSide(hitbox, COLLIDING_RIGHT)
+        }
+        else if (option == COLLIDING_UD) {
+            return isTouchingSide(hitbox, COLLIDING_BOTTOM) || isTouchingSide(hitbox, COLLIDING_TOP)
         }
         else throw IllegalArgumentException()
 
@@ -1340,23 +1335,23 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                 // camera center neg, actor center pos
                 spriteGlow!!.render(g,
-                        (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.posY - offsetY).toFloat(),
+                        (hitbox.startX - offsetX).toFloat() + world.width * TILE_SIZE,
+                        (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
                 )
             }
             else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                 // camera center pos, actor center neg
                 spriteGlow!!.render(g,
-                        (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.posY - offsetY).toFloat(),
+                        (hitbox.startX - offsetX).toFloat() - world.width * TILE_SIZE,
+                        (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
                 )
             }
             else {
                 spriteGlow!!.render(g,
-                        (hitbox.posX - offsetX).toFloat(),
-                        (hitbox.posY - offsetY).toFloat(),
+                        (hitbox.startX - offsetX).toFloat(),
+                        (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
                 )
             }
@@ -1381,23 +1376,23 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                 // camera center neg, actor center pos
                 sprite!!.render(g,
-                        (hitbox.posX - offsetX).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.posY - offsetY).toFloat(),
+                        (hitbox.startX - offsetX).toFloat() + world.width * TILE_SIZE,
+                        (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
                 )
             }
             else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                 // camera center pos, actor center neg
                 sprite!!.render(g,
-                        (hitbox.posX - offsetX).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.posY - offsetY).toFloat(),
+                        (hitbox.startX - offsetX).toFloat() - world.width * TILE_SIZE,
+                        (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
                 )
             }
             else {
                 sprite!!.render(g,
-                        (hitbox.posX - offsetX).toFloat(),
-                        (hitbox.posY - offsetY).toFloat(),
+                        (hitbox.startX - offsetX).toFloat(),
+                        (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
                 )
             }
@@ -1467,8 +1462,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     private fun forEachOccupyingTileNum(consumer: (Int?) -> Unit) {
         val tiles = ArrayList<Int?>()
-        for (y in tilewiseHitbox.posY.toInt()..tilewiseHitbox.endY.toInt()) {
-            for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endX.toInt()) {
+        for (y in tilewiseHitbox.startY.toInt()..tilewiseHitbox.endY.toInt()) {
+            for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
                 tiles.add(world.getTileFromTerrain(x, y))
             }
         }
@@ -1478,8 +1473,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     private fun forEachOccupyingTile(consumer: (BlockProp?) -> Unit) {
         val tileProps = ArrayList<BlockProp?>()
-        for (y in tilewiseHitbox.posY.toInt()..tilewiseHitbox.endY.toInt()) {
-            for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endX.toInt()) {
+        for (y in tilewiseHitbox.startY.toInt()..tilewiseHitbox.endY.toInt()) {
+            for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
                 tileProps.add(BlockCodex[world.getTileFromTerrain(x, y)])
             }
         }
@@ -1493,7 +1488,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         // offset 1 pixel to the down so that friction would work
         val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorInt()
 
-        for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endX.toInt()) {
+        for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
             tiles.add(world.getTileFromTerrain(x, y))
         }
 
@@ -1506,7 +1501,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         // offset 1 pixel to the down so that friction would work
         val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorInt()
 
-        for (x in tilewiseHitbox.posX.toInt()..tilewiseHitbox.endX.toInt()) {
+        for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
             tileProps.add(BlockCodex[world.getTileFromTerrain(x, y)])
         }
 
