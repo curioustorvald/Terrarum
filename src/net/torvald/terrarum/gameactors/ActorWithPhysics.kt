@@ -777,11 +777,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                         low = bmid
                     }
                 }
-
-
-                if (isTouchingSide(simulationHitboxX, COLLIDING_LR)) {
-                    //controllerMoveDelta!!.x *= elasticity // FIXME commented: "brake" applied when climbing down several steps
-                }
             }
 
             // FIXME FIXME edge-to-edge collision
@@ -816,11 +811,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                         low = bmid
                     }
                 }
-
-
-                if (isTouchingSide(simulationHitboxX, COLLIDING_TOP)) {
-                    controllerMoveDelta!!.y *= elasticity
-                }
             }
 
 
@@ -854,16 +844,16 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             //debug2("1 dx: $displacementSecondAxis, dy: $displacementMainAxis")
             debug2("1 modeTileDelta = ${simulationHitbox.endY.modTileDelta()}")
             simulationHitbox.translate(0.0, -simulationHitbox.endY.modTileDelta())
-        }
-        else if (vectorSum.y < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
+        } // NO COMMENT OUT: another quirk
+        /*else if (vectorSum.y < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
             //val displacementMainAxis = 1.0
             //val displacementSecondAxis = displacementMainAxis * vectorSum.x / vectorSum.y
             //simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
             //debug2("2 dx: $displacementSecondAxis, dy: $displacementMainAxis")
             simulationHitbox.translate(0.0, 1.0)
-        }
+        }*/
         // --> X-Axis
-        if (simulationHitbox.endX.modTileDelta() > 0 && isTouchingSide(simulationHitbox, COLLIDING_RIGHT)) {
+        /*if (simulationHitbox.endX.modTileDelta() > 0 && isTouchingSide(simulationHitbox, COLLIDING_RIGHT)) {
             //val displacementMainAxis = -1.00001
             //val displacementSecondAxis = displacementMainAxis * vectorSum.y / vectorSum.x
             //simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
@@ -876,8 +866,15 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             //simulationHitbox.translate(displacementMainAxis, displacementSecondAxis)
             //debug2("4 dx: $displacementMainAxis, dy: $displacementSecondAxis")
             simulationHitbox.translate(1.0, 0.0)
-        }
+        }*/
 
+
+        if (isTouchingSide(simulationHitbox, COLLIDING_LR)) {
+            //controllerMoveDelta!!.x *= elasticity // FIXME commented: "brake" applied when climbing down several steps
+        }
+        if (isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
+            controllerMoveDelta!!.y *= elasticity
+        }
 
 
         debug4("final controller: $controllerMoveDelta, displacement: ${simulationHitbox - hitbox}")
@@ -976,10 +973,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         val y2 = hitbox.endY - A_PIXEL
 
 
-        val txStart = x1.div(TILE_SIZE).floorInt() // plus(1.0) : adjusting for yet another anomaly
-        val txEnd =   x2.div(TILE_SIZE).floorInt()
-        val tyStart = y1.div(TILE_SIZE).floorInt()
-        val tyEnd =   y2.div(TILE_SIZE).floorInt()
+        val txStart = x1.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
+        val txEnd =   x2.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
+        val tyStart = y1.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
+        val tyEnd =   y2.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
@@ -1041,10 +1038,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.div(TILE_SIZE).floorInt()
-        val txEnd =   x2.div(TILE_SIZE).floorInt()
-        val tyStart = y1.div(TILE_SIZE).floorInt()
-        val tyEnd =   y2.div(TILE_SIZE).floorInt()
+        val txStart = x1.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
+        val txEnd =   x2.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
+        val tyStart = y1.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
+        val tyEnd =   y2.plus(0.00001f).div(TILE_SIZE).floorInt() // fuck you x.99999999999999
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
