@@ -837,6 +837,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
         //println("endX modDelta: ${simulationHitbox.endX.modTileDelta()}")
+        //println("startX modDelta: ${simulationHitbox.startX.modTileDelta()}")
         //println("touching_right_extra: ${isTouchingSide(simulationHitbox, COLLIDING_RIGHT_EXTRA)}")
 
 
@@ -859,10 +860,16 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }*/
 
         // --> X-Axis
-        if (simulationHitbox.endX.modTileDelta() >= 15.99999) {
+        if (vectorSum.x > 0 && simulationHitbox.endX.modTileDelta() >= 15.99999) {
             val target = simulationHitbox.endX.div(TILE_SIZE).floorInt().plus(1).times(TILE_SIZE).toDouble()
             val delta = target - simulationHitbox.endX
             debug2("xR target: $target, delta: $delta")
+            simulationHitbox.translatePosX(delta)
+        }
+        else if (vectorSum.x < 0 && simulationHitbox.startX.modTileDelta() >= 0.99999 && simulationHitbox.startX.modTileDelta() < 1.0) {
+            val target = simulationHitbox.startX.div(TILE_SIZE).floorInt().times(TILE_SIZE).toDouble()
+            val delta = target - simulationHitbox.startX
+            debug2("xL target: $target, delta: $delta")
             simulationHitbox.translatePosX(delta)
         }
 
