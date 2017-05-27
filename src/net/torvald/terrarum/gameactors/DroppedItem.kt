@@ -9,7 +9,7 @@ import org.newdawn.slick.Graphics
 /**
  * Created by minjaesong on 16-03-15.
  */
-class DroppedItem(private val item: GameItem) : ActorWithPhysics(Actor.RenderOrder.MIDTOP) {
+open class DroppedItem(private val item: GameItem) : ActorWithPhysics(Actor.RenderOrder.MIDTOP) {
 
     init {
         if (item.dynamicID >= ItemCodex.ACTORID_MIN)
@@ -26,10 +26,13 @@ class DroppedItem(private val item: GameItem) : ActorWithPhysics(Actor.RenderOrd
     }
 
     override fun update(gc: GameContainer, delta: Int) {
-        item.effectWhenEquipped(gc, delta)
     }
 
     override fun drawBody(g: Graphics) {
+        super.drawBody(g)
+    }
 
+    override fun drawGlow(g: Graphics) {
+        super.drawGlow(g)
     }
 }
