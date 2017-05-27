@@ -162,8 +162,8 @@ class ActorValueTracker constructor() : JFrame() {
 
         if (actor != null) {
             sb.append("toString: ${actor!!}\n")
-            sb.append("X: ${actor!!.hitbox.pointedX} (${(actor!!.hitbox.pointedX / FeaturesDrawer.TILE_SIZE).toInt()})\n")
-            sb.append("Y: ${actor!!.hitbox.pointedY} (${(actor!!.hitbox.pointedY / FeaturesDrawer.TILE_SIZE).toInt()})")
+            sb.append("X: ${actor!!.hitbox.canonicalX} (${(actor!!.hitbox.canonicalX / FeaturesDrawer.TILE_SIZE).toInt()})\n")
+            sb.append("Y: ${actor!!.hitbox.canonicalY} (${(actor!!.hitbox.canonicalY / FeaturesDrawer.TILE_SIZE).toInt()})")
 
             avPosArea.text = "$sb"
             sb.setLength(0) // clear stringbuffer

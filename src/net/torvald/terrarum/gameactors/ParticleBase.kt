@@ -44,8 +44,8 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, maxLifeTime: Int? = null
             if (velocity.isZero || lifetimeCounter >= lifetimeMax ||
                 // simple stuck check
                 BlockCodex[Terrarum.ingame!!.world.getTileFromTerrain(
-                        hitbox.pointedX.div(TILE_SIZE).floorInt(),
-                        hitbox.pointedY.div(TILE_SIZE).floorInt()
+                        hitbox.canonicalX.div(TILE_SIZE).floorInt(),
+                        hitbox.canonicalY.div(TILE_SIZE).floorInt()
                 ) ?: Block.STONE].isSolid) {
                 flagDespawn = true
             }

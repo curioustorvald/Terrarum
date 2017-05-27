@@ -24,20 +24,20 @@ class PhysTestBall : ActorWithPhysics(Actor.RenderOrder.MIDDLE, immobileBody = t
     override fun drawBody(g: Graphics) {
         g.color = color
         g.fillOval(
-                hitbox.posX.toFloat(),
-                hitbox.posY.toFloat(),
+                hitbox.startX.toFloat() - 1f,
+                hitbox.startY.toFloat() - 1f,
                 hitbox.width.toFloat(),
                 hitbox.height.toFloat())
 
         g.fillOval(
-                hitbox.posX.toFloat() + Terrarum.ingame!!.world.width * TILE_SIZE,
-                hitbox.posY.toFloat(),
+                hitbox.startX.toFloat() + Terrarum.ingame!!.world.width * TILE_SIZE - 1f,
+                hitbox.startY.toFloat() - 1f,
                 hitbox.width.toFloat(),
                 hitbox.height.toFloat())
 
         g.fillOval(
-                hitbox.posX.toFloat() - Terrarum.ingame!!.world.width * TILE_SIZE,
-                hitbox.posY.toFloat(),
+                hitbox.startX.toFloat() - Terrarum.ingame!!.world.width * TILE_SIZE - 1f,
+                hitbox.startY.toFloat() - 1f,
                 hitbox.width.toFloat(),
                 hitbox.height.toFloat())
 

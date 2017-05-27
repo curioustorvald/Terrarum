@@ -435,8 +435,8 @@ class StateInGame : BasicGameState() {
                     worldG.font = Terrarum.fontSmallNumbers
                     worldG.drawString(
                             actor.referenceID.toString(),
-                            actor.hitbox.posX.toFloat(),
-                            actor.hitbox.pointedY.toFloat() + 4
+                            actor.hitbox.startX.toFloat(),
+                            actor.hitbox.canonicalY.toFloat() + 4
                     )
                 }
             }
@@ -449,8 +449,8 @@ class StateInGame : BasicGameState() {
                     worldG.font = Terrarum.fontSmallNumbers
                     worldG.lineWidth = 1f
                     worldG.drawRect(
-                            actor.hitbox.posX.toFloat(),
-                            actor.hitbox.posY.toFloat(),
+                            actor.hitbox.startX.toFloat(),
+                            actor.hitbox.startY.toFloat(),
                             actor.hitbox.width.toFloat(),
                             actor.hitbox.height.toFloat()
                     )
@@ -459,13 +459,13 @@ class StateInGame : BasicGameState() {
                     worldG.color = GameFontBase.codeToCol["g"]
                     worldG.drawString(
                             "${0x7F.toChar()}X ${actor.externalForce.x}",
-                            actor.hitbox.posX.toFloat(),
-                            actor.hitbox.pointedY.toFloat() + 4 + 8
+                            actor.hitbox.startX.toFloat(),
+                            actor.hitbox.canonicalY.toFloat() + 4 + 8
                     )
                     worldG.drawString(
                             "${0x7F.toChar()}Y ${actor.externalForce.y}",
-                            actor.hitbox.posX.toFloat(),
-                            actor.hitbox.pointedY.toFloat() + 4 + 8 * 2
+                            actor.hitbox.startX.toFloat(),
+                            actor.hitbox.canonicalY.toFloat() + 4 + 8 * 2
                     )
                 }
             }
@@ -500,7 +500,6 @@ class StateInGame : BasicGameState() {
         //////////////////
         backG.flush()
         gwin.drawImage(backDrawFrameBuffer, 0f, 0f)
-
 
         // centre marker
         /*gwin.color = Color(0x00FFFF)
@@ -639,12 +638,12 @@ class StateInGame : BasicGameState() {
             )
     private fun distToCameraSqr(a: ActorWithBody) =
             min(
-                    (a.hitbox.posX - WorldCamera.x).sqr() +
-                    (a.hitbox.posY - WorldCamera.y).sqr(),
-                    (a.hitbox.posX - WorldCamera.x + world.width * TILE_SIZE).sqr() +
-                    (a.hitbox.posY - WorldCamera.y).sqr(),
-                    (a.hitbox.posX - WorldCamera.x - world.width * TILE_SIZE).sqr() +
-                    (a.hitbox.posY - WorldCamera.y).sqr()
+                    (a.hitbox.startX - WorldCamera.x).sqr() +
+                    (a.hitbox.startY - WorldCamera.y).sqr(),
+                    (a.hitbox.startX - WorldCamera.x + world.width * TILE_SIZE).sqr() +
+                    (a.hitbox.startY - WorldCamera.y).sqr(),
+                    (a.hitbox.startX - WorldCamera.x - world.width * TILE_SIZE).sqr() +
+                    (a.hitbox.startY - WorldCamera.y).sqr()
             )
 
     /** whether the actor is within screen */

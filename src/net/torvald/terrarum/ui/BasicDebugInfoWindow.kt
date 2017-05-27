@@ -2,13 +2,11 @@ package net.torvald.terrarum.ui
 
 import com.jme3.math.FastMath
 import net.torvald.imagefont.GameFontBase
-import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blendScreen
-import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.newdawn.slick.Color
 import org.newdawn.slick.GameContainer
@@ -47,11 +45,11 @@ class BasicDebugInfoWindow : UICanvas {
         val player = Terrarum.ingame!!.player!!
         val hitbox = player.hitbox
 
-        xdelta = hitbox.pointedX - prevPlayerX
-        ydelta = hitbox.pointedY - prevPlayerY
+        xdelta = hitbox.canonicalX - prevPlayerX
+        ydelta = hitbox.canonicalY - prevPlayerY
 
-        prevPlayerX = hitbox.pointedX
-        prevPlayerY = hitbox.pointedY
+        prevPlayerX = hitbox.canonicalX
+        prevPlayerY = hitbox.canonicalY
     }
 
     override fun render(gc: GameContainer, g: Graphics) {
@@ -73,34 +71,46 @@ class BasicDebugInfoWindow : UICanvas {
          * First column
          */
 
-        printLine(g, 1, "pointedX "
-                + ccG
-                + "${hitbox?.pointedX}"
-                + " ("
-                + "${(hitbox?.pointedX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
-                + ")")
-        printLine(g, 2, "endY "
-                + ccG
-                + hitbox?.endPointY.toString()
-                + " ("
-                + (hitbox?.endPointY?.div(FeaturesDrawer.TILE_SIZE))?.toInt().toString()
-                + ")")
+        printLineColumn(g, 1, 1, "startX "
+                                 + ccG
+                                 + "${hitbox?.startX}"
+                                 + " ("
+                                 + "${(hitbox?.startX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                 + ")")
+        printLineColumn(g, 2, 1, "endX "
+                                 + ccG
+                                 + "${hitbox?.endX}"
+                                 + " ("
+                                 + "${(hitbox?.endX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                 + ")")
+        printLineColumn(g, 1, 2, "startY "
+                                 + ccG
+                                 + "${hitbox?.startY}"
+                                 + " ("
+                                 + "${(hitbox?.startY?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                 + ")")
+        printLineColumn(g, 2, 2, "endY "
+                                 + ccG
+                                 + "${hitbox?.endY}"
+                                 + " ("
+                                 + "${(hitbox?.endY?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                 + ")")
 
-        printLine(g, 3, "veloX reported $ccG${player?.externalForce?.x}  ${player?.controllerMoveDelta?.x}")
-        printLine(g, 4, "veloY reported $ccG${player?.externalForce?.y}  ${player?.controllerMoveDelta?.y}")
+        printLine(g, 3, "veloX reported $ccG${player?.externalForce?.x}")
+        printLine(g, 4, "veloY reported $ccG${player?.externalForce?.y}")
+
+        printLine(g, 5, "p_WalkX $ccG${player?.controllerMoveDelta?.x}")
+        printLine(g, 6, "p_WalkY $ccG${player?.controllerMoveDelta?.y}")
 
         printLineColumn(g, 2, 3, "veloX measured $ccG${xdelta}")
         printLineColumn(g, 2, 4, "veloY measured $ccG${ydelta}")
 
-        printLine(g, 5, "grounded $ccG${player?.grounded}")
-        printLine(g, 6, "noClip $ccG${player?.noClip}")
-
-
         if (player != null) {
-            printLine(g, 7,
-                    "walled ${if (player.walledLeft) "$ccR" else "$ccG"}L" +
-                    "${if (player.walledTop) "$ccR" else "$ccG"}${0x1E.toChar()}" +
+            printLineColumn(g, 1, 7,
+                    "walled " +
+                    "${if (player.walledLeft) "$ccR" else "$ccG"}L" +
                     "${if (player.walledBottom) "$ccR" else "$ccG"}${0x1F.toChar()}" +
+                    "${if (player.walledTop) "$ccR" else "$ccG"}${0x1E.toChar()}" +
                     "${if (player.walledRight) "$ccR" else "$ccG"}R"
             )
         }
@@ -132,14 +142,15 @@ class BasicDebugInfoWindow : UICanvas {
          * Second column
          */
 
-        printLineColumn(g, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
-        printLineColumn(g, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
+        //printLineColumn(g, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
+        //printLineColumn(g, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
+
         printLineColumn(g, 2, 5, "Time $ccG${Terrarum.ingame!!.world.time.todaySeconds.toString().padStart(5, '0')}" +
                                  " (${Terrarum.ingame!!.world.time.getFormattedTime()})")
         printLineColumn(g, 2, 6, "Mass $ccG${player?.mass}")
 
-        printLineColumn(g, 2, 7, "p_WalkX $ccG${player?.walkX}")
-        printLineColumn(g, 2, 8, "p_WalkY $ccG${player?.walkY}")
+        printLineColumn(g, 2, 7, "grounded $ccG${player?.grounded}")
+        printLineColumn(g, 2, 8, "noClip $ccG${player?.noClip}")
 
 
         drawHistogram(g, LightmapRenderer.histogram,

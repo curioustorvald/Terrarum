@@ -7,8 +7,6 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.gamecontroller.Key
-import net.torvald.terrarum.gamecontroller.KeyToggler
 import org.newdawn.slick.Color
 import org.newdawn.slick.Graphics
 import java.util.*
@@ -20,12 +18,15 @@ import java.util.*
 object LightmapRenderer {
     private val world: GameWorld = Terrarum.ingame!!.world
 
+
+    // TODO if (VBO works on BlocksDrawer) THEN overscan of 256, utilise same technique in here
+
     val overscan_open: Int = Math.min(32, 256f.div(BlockCodex[Block.AIR].opacity and 0xFF).ceil())
     val overscan_opaque: Int = Math.min(8, 256f.div(BlockCodex[Block.STONE].opacity and 0xFF).ceil())
 
-    private val LIGHTMAP_WIDTH = Terrarum.ingame!!.ZOOM_MIN.inv().times(Terrarum.WIDTH)
+    val LIGHTMAP_WIDTH = Terrarum.ingame!!.ZOOM_MIN.inv().times(Terrarum.WIDTH)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
-    private val LIGHTMAP_HEIGHT = Terrarum.ingame!!.ZOOM_MIN.inv().times(Terrarum.HEIGHT)
+    val LIGHTMAP_HEIGHT = Terrarum.ingame!!.ZOOM_MIN.inv().times(Terrarum.HEIGHT)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
 
     /**
@@ -215,8 +216,8 @@ object LightmapRenderer {
             if (it is Luminous && it is ActorWithPhysics) {
                 // put lanterns to the area the luminantBox is occupying
                 for (lightBox in it.lightBoxList) {
-                    val lightBoxX = it.hitbox.posX + lightBox.posX
-                    val lightBoxY = it.hitbox.posY + lightBox.posY
+                    val lightBoxX = it.hitbox.startX + lightBox.startX
+                    val lightBoxY = it.hitbox.startY + lightBox.startY
                     val lightBoxW = lightBox.width
                     val lightBoxH = lightBox.height
                     for (y in lightBoxY.div(TILE_SIZE).floorInt()
@@ -364,10 +365,7 @@ object LightmapRenderer {
 
                             for (iy in 0..1) {
                                 for (ix in 0..1) {
-                                    g.color = if (KeyToggler.isOn(Key.F9))
-                                        colourMapItoL[iy * 2 + ix].normaliseToColourHDR()
-                                    else
-                                        colourMapItoL[iy * 2 + ix].normaliseToColour()
+                                    g.color = colourMapItoL[iy * 2 + ix].normaliseToColourHDR()
 
 
                                     g.fillRect(
@@ -395,10 +393,7 @@ object LightmapRenderer {
                                 if (x + sameLevelCounter >= this_x_end) break
                             }
 
-                            g.color = if (KeyToggler.isOn(Key.F9))
-                                (getLight(x, y) ?: 0).normaliseToColourHDR()
-                            else
-                                (getLight(x, y) ?: 0).normaliseToColour()
+                            g.color = (getLight(x, y) ?: 0).normaliseToColourHDR()
 
                             g.fillRect(
                                     (x.toFloat() * TILE_SIZE).round().toFloat(),

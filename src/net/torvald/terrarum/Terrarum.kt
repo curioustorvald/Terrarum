@@ -34,13 +34,17 @@ typealias Millisec = Int
  */
 object Terrarum : StateBasedGame(GAME_NAME) {
 
+
+
     //////////////////////////////
     // GLOBAL IMMUTABLE CONFIGS //
     //////////////////////////////
     var WIDTH = 1072
     var HEIGHT = 742 // IMAX ratio
 
-    var VSYNC = true
+    val RENDER_FPS = getConfigInt("displayfps")
+    val USE_VSYNC = getConfigBoolean("usevsync")
+    var VSYNC = USE_VSYNC
     val VSYNC_TRIGGER_THRESHOLD = 56
 
     val HALFW: Int
@@ -516,8 +520,10 @@ fun main(args: Array<String>) {
         Terrarum.appgc = AppGameContainer(Terrarum)
         Terrarum.appgc.setDisplayMode(Terrarum.WIDTH, Terrarum.HEIGHT, false)
 
-        Terrarum.appgc.setTargetFrameRate(Terrarum.TARGET_INTERNAL_FPS)
-        Terrarum.appgc.setVSync(Terrarum.VSYNC)
+        if (Terrarum.RENDER_FPS > 0) {
+            Terrarum.appgc.setTargetFrameRate(Terrarum.RENDER_FPS)
+        }
+        //Terrarum.appgc.setVSync(Terrarum.VSYNC)
         Terrarum.appgc.setMaximumLogicUpdateInterval(1000 / Terrarum.TARGET_INTERNAL_FPS) // 10 ms
         Terrarum.appgc.setMinimumLogicUpdateInterval(1000 / Terrarum.TARGET_INTERNAL_FPS - 1) // 9 ms
 

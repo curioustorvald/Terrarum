@@ -38,11 +38,11 @@ import kotlin.collections.HashMap
  */
 class TerrarumComputer(peripheralSlots: Int) {
 
-    var maxPeripherals: Int = peripheralSlots
-        private set
-
     val DEBUG_UNLIMITED_MEM = false
     val DEBUG = true
+
+
+    val maxPeripherals: Int = if (DEBUG) 32 else peripheralSlots
 
 
     lateinit var luaJ_globals: Globals
@@ -80,7 +80,7 @@ class TerrarumComputer(peripheralSlots: Int) {
     lateinit var term: Teletype
         private set
 
-    val peripheralTable = ArrayList<Peripheral>()
+    val peripheralTable = Array<Peripheral?>(peripheralSlots, { null }) // index == slot number
 
     var stdinInput: Int = -1
         private set
@@ -139,26 +139,55 @@ class TerrarumComputer(peripheralSlots: Int) {
 
     fun getPeripheral(tableName: String): Peripheral? {
         peripheralTable.forEach {
-            if (it.tableName == tableName)
+            if (it?.tableName == tableName)
                 return it
         }
         return null
     }
 
-    fun attachPeripheral(peri: Peripheral) {
-        if (peripheralTable.size < maxPeripherals) {
-            peripheralTable.add(peri)
+    fun getPeripheralSlot(tableName: String): Int? {
+        peripheralTable.forEachIndexed { index, peri ->
+            if (peri?.tableName == tableName)
+                return index
+        }
+        return null
+    }
+
+    /** @return installed slot */
+    fun attachPeripheral(peri: Peripheral): Int {
+        (0..maxPeripherals - 1).forEach {
+            try {
+                attachPeripheralTo(peri, it)
+                return it
+            }
+            catch (tryNext: RuntimeException) {  }
+        }
+
+        throw RuntimeException("No vacant peripheral slot")
+    }
+
+    fun attachPeripheralTo(peri: Peripheral, slot: Int) {
+        if (peripheralTable[slot] == null) {
+            peripheralTable[slot] = peri
             peri.loadLib(luaJ_globals)
             println("[TerrarumComputer] loading peripheral $peri")
         }
         else {
-            throw Error("No vacant peripheral slot")
+            throw RuntimeException("Peripheral slot is already taken by: ${peripheralTable[slot]?.tableName}")
         }
     }
 
     fun detachPeripheral(peri: Peripheral) {
-        if (peripheralTable.contains(peri)) {
-            peripheralTable.remove(peri)
+        // search for the peripheral
+        var found = -1
+        for (i in 0..maxPeripherals - 1) {
+            if (peripheralTable[i] == peri) {
+                found = i
+                break
+            }
+        }
+        if (found >= 0) {
+            peripheralTable[found] = null
             println("[TerrarumComputer] unloading peripheral $peri")
         }
         else {
@@ -213,7 +242,6 @@ class TerrarumComputer(peripheralSlots: Int) {
 
         // load every peripheral if we're in DEBUG
         if (DEBUG) {
-            maxPeripherals = 32
             attachPeripheral(PeripheralInternet(this))
             attachPeripheral(PeripheralPSG(this))
             // ...
