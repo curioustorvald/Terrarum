@@ -39,7 +39,7 @@ class GameFontImpl(noShadow: Boolean = false) : GameFontBase(noShadow = noShadow
         GameFontBase.greekSheet = SpriteSheet(
                 "./assets/graphics/fonts/greek_variable.tga", 15, 19, 1)
         GameFontBase.thaiSheet = SpriteSheet(
-                "./assets/graphics/fonts/thai_wide.tga", GameFontBase.W_LATIN_WIDE, GameFontBase.H)
+                "./assets/graphics/fonts/thai_variable.tga",15, 19, 1)
         GameFontBase.keycapSheet = SpriteSheet(
                 "./assets/graphics/fonts/puae000-e0ff.tga", GameFontBase.SIZE_KEYCAP, GameFontBase.SIZE_KEYCAP)
 

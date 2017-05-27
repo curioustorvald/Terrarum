@@ -14,6 +14,10 @@ object DefaultConfig {
     fun fetch(): JsonObject {
         val jsonObject = JsonObject()
 
+        jsonObject.addProperty("displayfps", 60)
+        jsonObject.addProperty("usevsync", true)
+
+
         jsonObject.addProperty("smoothlighting", true)
         jsonObject.addProperty("imtooyoungtodie", false) // perma-death
         jsonObject.addProperty("language", Terrarum.sysLang)

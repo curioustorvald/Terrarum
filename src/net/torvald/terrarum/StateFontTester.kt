@@ -86,7 +86,8 @@ nopqrstuvwxyz
                 "Pijamalı hasta yağız şoföre çabucak güvendi",
                 "Also supports: ‛Unicode’ „quotation marks“—dashes…「括弧」‼",
                 "ASCII  Latin-1  Latin_Ext-A  Latin_Ext-B  Greek  Cyrillic  CJK-Ideo  Kana  Hangul_Syllables",
-                ""
+                "",
+                "…not seeing your language/writing system? Let me know on the Issue Tracker!"
         )
         val SP = "${0x3000.toChar()}${0x3000.toChar()}"
 

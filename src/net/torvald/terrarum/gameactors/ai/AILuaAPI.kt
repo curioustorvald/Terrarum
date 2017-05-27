@@ -58,8 +58,8 @@ internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
             val moveDelta = actor.externalForce + actor.controllerMoveDelta
 
             t["name"] = actor.actorValue.getAsString(AVKey.NAME).toLua()
-            t["posX"] = actor.hitbox.centeredX.toLua()
-            t["posY"] = actor.hitbox.centeredY.toLua()
+            t["startX"] = actor.hitbox.centeredX.toLua()
+            t["startY"] = actor.hitbox.centeredY.toLua()
 
             t["veloX"] = moveDelta.x.toLua()
             t["veloY"] = moveDelta.y.toLua()

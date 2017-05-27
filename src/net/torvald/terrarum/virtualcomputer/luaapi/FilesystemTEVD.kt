@@ -126,9 +126,9 @@ internal class Filesystem(globals: Globals, computer: TerrarumComputer) {
             return "$base$local".replace("//", "/")
         }
 
-        private fun tryBool(action: (Unit) -> Unit): LuaValue {
+        private fun tryBool(action: () -> Unit): LuaValue {
             try {
-                action(Unit)
+                action()
                 return LuaValue.valueOf(true)
             }
             catch (gottaCatchemAll: Exception) {

@@ -71,7 +71,8 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
      * (Use ArrayList for normal circumstances)
      */
     override val lightBoxList: List<Hitbox>
-        get() = arrayOf(Hitbox(0.0, 0.0, hitbox.width, hitbox.height)).toList() // use getter; dimension of the player may change by time.
+        get() = arrayOf(Hitbox(2.0, 2.0, hitbox.width - 3, hitbox.height - 3)).toList() // things are asymmetric!!
+        // use getter; dimension of the player may change by time.
 
     @Transient val BASE_DENSITY = 980.0
 
@@ -156,7 +157,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
         if (vehicleRiding is Player)
             throw Error("Attempted to 'ride' player object. ($vehicleRiding)")
-        if (vehicleRiding != null && (vehicleRiding == this))
+        if (vehicleRiding != null && vehicleRiding == this)
             throw Error("Attempted to 'ride' itself. ($vehicleRiding)")
 
 
@@ -167,7 +168,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         updateSprite(delta)
 
         if (noClip) {
-            grounded = true
+            //grounded = true
         }
 
         // reset control box of AI
@@ -370,9 +371,9 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                         avAcceleration * (if (left) -1f else 1f) * absAxisVal
 
             if (absAxisVal != AXIS_KEYBOARD)
-                walkX = walkX.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal)
+                controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal) }
             else
-                walkX = walkX.plus(readonly_totalX).bipolarClamp(avSpeedCap)
+                controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
 
             if (absAxisVal == AXIS_KEYBOARD) {
                 walkCounterX += 1
@@ -399,9 +400,9 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                     avAcceleration * (if (up) -1f else 1f) * absAxisVal
 
         if (absAxisVal != AXIS_KEYBOARD)
-            walkY = walkY.plus(readonly_totalY).bipolarClamp(avSpeedCap * absAxisVal)
+            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal) }
         else
-            walkY = walkY.plus(readonly_totalY).bipolarClamp(avSpeedCap)
+            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
 
         if (absAxisVal == AXIS_KEYBOARD) {
             walkCounterY += 1
@@ -459,7 +460,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
             jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
 
-            walkY -= jumpAcc // feed negative value to the vector
+            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y -= jumpAcc } // feed negative value to the vector
             // do not think of resetting this to zero when counter hit the ceiling; that's HOW NOT
             // newtonian physics work, stupid myself :(
 
