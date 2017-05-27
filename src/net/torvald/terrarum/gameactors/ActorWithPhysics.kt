@@ -77,16 +77,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * for "Controllable" actors
      */
     var controllerMoveDelta: Vector2? = if (this is Controllable) Vector2() else null
-    var walkX: Double
-        get() = controllerMoveDelta!!.x
-        protected set(value) {
-            controllerMoveDelta?.x = value
-        }
-    var walkY: Double
-        get() = controllerMoveDelta!!.y
-        protected set(value) {
-            controllerMoveDelta?.y = value
-        }
+
     // not sure we need this...
     //var jumpable = true // this is kind of like "semaphore"
 
@@ -219,8 +210,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     @Transient private val COLLIDING_UD = 4
     @Transient private val COLLIDING_LR = 5
     @Transient private val COLLIDING_ALLSIDE = 6
-    @Transient private val COLLIDING_LEFT_EXTRA = 7
-    @Transient private val COLLIDING_RIGHT_EXTRA = 7
+    //@Transient private val COLLIDING_LEFT_EXTRA = 7
+    //@Transient private val COLLIDING_RIGHT_EXTRA = 7
 
     /**
      * Temporary variables
@@ -593,7 +584,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
         fun debug2(wut: Any?) {
             //  vvvvv  set it true to make debug print work
-            if (true) println(wut)
+            if (false) println(wut)
         }
         fun debug3(wut: Any?) {
             //  vvvvv  set it true to make debug print work
@@ -601,7 +592,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
         fun debug4(wut: Any?) {
             //  vvvvv  set it true to make debug print work
-            if (false) println(wut)
+            if (true) println(wut)
         }
 
         //val moveDelta = externalForce + controllerMoveDelta
@@ -720,19 +711,19 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                     // apply Normal Force
                     // next step (resolve controllerMoveDelta) requires this to be pre-handled
                     if (isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
-                        walkY *= elasticity
+                        controllerMoveDelta?.y?.let { controllerMoveDelta!!.y *= -elasticity }
                         externalForce.y *= elasticity
                         debug1("!! grounded ${Random().nextInt(1000)}!!")
                     }
                     else if (isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
-                        walkY *= elasticity
-                        externalForce.y *= elasticity
+                        controllerMoveDelta?.y?.let { controllerMoveDelta!!.y *= -elasticity }
+                        externalForce.y *= -elasticity
                         debug1("!! headbutt ${Random().nextInt(1000)}!!")
                     }
 
                     if (isTouchingSide(simulationHitbox, COLLIDING_LR)) {
                         //walkX *= elasticity
-                        externalForce.x *= elasticity
+                        externalForce.x *= -elasticity
                         debug1("!! tackle ${Random().nextInt(1000)}!!")
                     }
                 }
@@ -842,15 +833,18 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
         val vectorSum = externalForce + controllerMoveDelta
-        // --> Y-Axis
+        // --> Y-Axis (bottom)
         if (simulationHitbox.endY.modTileDelta() > 0 && isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
             //val displacementMainAxis = -1.00001
             //val displacementSecondAxis = displacementMainAxis * vectorSum.x / vectorSum.y // use controllerMoveDelta.x / controllerMoveDelta.y ?
             //simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
             //debug2("1 dx: $displacementSecondAxis, dy: $displacementMainAxis")
-            debug2("1 modeTileDelta = ${simulationHitbox.endY.modTileDelta()}")
+            debug4("1 modeTileDelta = ${simulationHitbox.endY.modTileDelta()}")
             simulationHitbox.translate(0.0, -simulationHitbox.endY.modTileDelta())
-        } // NO COMMENT OUT: another quirk
+
+            hitAndReflectY()
+        }
+        // --> Y-Axis (top)
         /*else if (vectorSum.y < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
             //val displacementMainAxis = 1.0
             //val displacementSecondAxis = displacementMainAxis * vectorSum.x / vectorSum.y
@@ -859,18 +853,23 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             simulationHitbox.translate(0.0, 1.0)
         }*/
 
-        // --> X-Axis
+        // --> X-Axis (right side)
         if (vectorSum.x > 0 && simulationHitbox.endX.modTileDelta() >= 15.99999) {
             val target = simulationHitbox.endX.div(TILE_SIZE).floorInt().plus(1).times(TILE_SIZE).toDouble()
             val delta = target - simulationHitbox.endX
-            debug2("xR target: $target, delta: $delta")
+            debug4("xR: endX: ${simulationHitbox.endX}, target: $target, delta: $delta")
             simulationHitbox.translatePosX(delta)
+
+            hitAndReflectX()
         }
+        // --> X-Axis (left side)
         else if (vectorSum.x < 0 && simulationHitbox.startX.modTileDelta() >= 0.99999 && simulationHitbox.startX.modTileDelta() < 1.0) {
             val target = simulationHitbox.startX.div(TILE_SIZE).floorInt().times(TILE_SIZE).toDouble()
             val delta = target - simulationHitbox.startX
-            debug2("xL target: $target, delta: $delta")
+            debug4("xL: startX: ${simulationHitbox.startX}, target: $target, delta: $delta")
             simulationHitbox.translatePosX(delta)
+
+            hitAndReflectX()
         }
 
 
@@ -878,14 +877,14 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
         if (isTouchingSide(simulationHitbox, COLLIDING_LR)) {
-            //controllerMoveDelta!!.x *= elasticity // FIXME commented: "brake" applied when climbing down several steps
+            //controllerMoveDelta?.x?.let { controllerMoveDelta!!.x *= -elasticity } // FIXME commented: "brake" applied when climbing down several steps
         }
         if (isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
-            controllerMoveDelta!!.y *= elasticity
+            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y *= -elasticity }
         }
 
 
-        debug4("final controller: $controllerMoveDelta, displacement: ${simulationHitbox - hitbox}")
+        debug1("final controller: $controllerMoveDelta, displacement: ${simulationHitbox - hitbox}")
 
 
         hitbox.reassign(simulationHitbox)
@@ -902,34 +901,13 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
     private fun hitAndReflectX() {
-        // when it sticks, externalForce.x goes back and forth
-        /*
-1123921356 trying to reflectX
-1123921356	-1.3677473305837262
-1123921356 trying to reflectX
-1123921356	0.8150659571934893
-1123921356 trying to reflectX
-1123921356	-0.48545419966417575
-1123921356 trying to reflectX
-1123921356	0.28939570979162116
-1123921356 trying to reflectX
-1123921356	-0.17225986626214265
-1123921356 trying to reflectX
-1123921356	0.1027945259506898
-1123921356 trying to reflectX
-1123921356	-0.06108288092971576
-         */
-
         externalForce.x *= -elasticity
-        if (this is Controllable) walkX *= -elasticity // commented; should be managed by displaceHitbox()
-
-        //println("$this\t${externalForce.x}")
+        //controllerMoveDelta?.x?.let { controllerMoveDelta!!.x *= -elasticity }
     }
 
     private fun hitAndReflectY() {
-        println("** reflY **")
         externalForce.y *= -elasticity
-        if (this is Controllable) walkY *= -elasticity // commented; should be managed by displaceHitbox()
+        //controllerMoveDelta?.y?.let { controllerMoveDelta!!.x *= -elasticity }
     }
 
     @Transient private val CEILING_HIT_ELASTICITY = 0.3
@@ -975,9 +953,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         if (isNoCollideWorld) return false
 
         // detectors are inside of the bounding box
-        val x1 = hitbox.startX
+        val x1 = hitbox.startX - A_PIXEL // to compensate for asym, x1 is moved a pixel left
         val x2 = hitbox.endX - A_PIXEL
-        val y1 = hitbox.startY
+        val y1 = hitbox.startY - A_PIXEL // CONJECTURE: to compensate for asym, y1 is moved a pixel up
         val y2 = hitbox.endY - A_PIXEL
 
 
@@ -1006,10 +984,12 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             =|     |=
             =+-----+=
              #######  // BOTTOM
+
+        IMPORTANT AF NOTE: things are ASYMMETRIC!
          */
 
         // detectors are inside of the bounding box
-        if (option == COLLIDING_TOP) {
+        if (option == COLLIDING_TOP) {  // CONJECTURE: to compensate for asym, y1 is moved a pixel up
             x1 = hitbox.startX
             x2 = hitbox.endX - A_PIXEL
             y1 = hitbox.startY - A_PIXEL - A_PIXEL
@@ -1021,8 +1001,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             y1 = hitbox.endY
             y2 = y1
         }
-        else if (option == COLLIDING_LEFT) {
-            x1 = hitbox.startX - A_PIXEL
+        else if (option == COLLIDING_LEFT) { // to compensate for asym, x1 is moved a pixel left
+            x1 = hitbox.startX - 2 * A_PIXEL
             x2 = x1
             y1 = hitbox.startY
             y2 = hitbox.endY - A_PIXEL
@@ -1030,18 +1010,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         else if (option == COLLIDING_RIGHT) {
             x1 = hitbox.endX
             x2 = x1
-            y1 = hitbox.startY
-            y2 = hitbox.endY - A_PIXEL
-        }
-        else if (option == COLLIDING_LEFT_EXTRA) {
-            x1 = hitbox.startX - A_PIXEL - A_PIXEL
-            x2 = x1 + A_PIXEL
-            y1 = hitbox.startY
-            y2 = hitbox.endY - A_PIXEL
-        }
-        else if (option == COLLIDING_RIGHT_EXTRA) {
-            x1 = hitbox.endX
-            x2 = x1 + A_PIXEL
             y1 = hitbox.startY
             y2 = hitbox.endY - A_PIXEL
         }
@@ -1144,13 +1112,13 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
 
         if (this is Controllable) {
-            if (walkX < 0) {
-                walkX += friction
-                if (walkX > 0) walkX = 0.0
+            if (controllerMoveDelta!!.x < 0) {
+                controllerMoveDelta!!.x += friction
+                if (controllerMoveDelta!!.x > 0) controllerMoveDelta!!.x = 0.0
             }
-            else if (walkX > 0) {
-                walkX -= friction
-                if (walkX < 0) walkX = 0.0
+            else if (controllerMoveDelta!!.x > 0) {
+                controllerMoveDelta!!.x -= friction
+                if (controllerMoveDelta!!.x < 0) controllerMoveDelta!!.x = 0.0
             }
         }
     }
@@ -1171,13 +1139,13 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
 
         if (this is Controllable) {
-            if (walkY < 0) {
-                walkY += friction
-                if (walkY > 0) walkY = 0.0
+            if (controllerMoveDelta!!.y < 0) {
+                controllerMoveDelta!!.y += friction
+                if (controllerMoveDelta!!.y > 0) controllerMoveDelta!!.y = 0.0
             }
-            else if (walkY > 0) {
-                walkY -= friction
-                if (walkY < 0) walkY = 0.0
+            else if (controllerMoveDelta!!.y > 0) {
+                controllerMoveDelta!!.y -= friction
+                if (controllerMoveDelta!!.y < 0) controllerMoveDelta!!.y = 0.0
             }
         }
     }
@@ -1343,11 +1311,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             blendLightenOnly()
 
             val offsetX = if (!spriteGlow!!.flippedHorizontal())
-                hitboxTranslateX * scale
+                hitboxTranslateX * scale - 1
             else
-                spriteGlow!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale)
+                spriteGlow!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale) - 1
 
-            val offsetY = spriteGlow!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 2
+            val offsetY = spriteGlow!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
 
             if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                 // camera center neg, actor center pos
@@ -1384,11 +1352,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             BlendMode.resolve(drawMode)
 
             val offsetX = if (!sprite!!.flippedHorizontal())
-                hitboxTranslateX * scale
+                hitboxTranslateX * scale - 1
             else
-                sprite!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale)
+                sprite!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale) - 1
 
-            val offsetY = sprite!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 2
+            val offsetY = sprite!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
 
             if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                 // camera center neg, actor center pos
