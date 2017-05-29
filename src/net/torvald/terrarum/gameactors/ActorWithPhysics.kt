@@ -28,6 +28,9 @@ import java.util.*
  */
 open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean = false, physics: Boolean = true) : ActorWithBody(renderOrder) {
 
+
+    val COLLISION_TEST_MODE = true
+
     /** !! ActorValue macros are on the very bottom of the source !! **/
 
 
@@ -121,7 +124,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             else
                 field = value * ELASTICITY_MAX
         }
-    @Transient private val ELASTICITY_MAX = 0.993 // No perpetual motion!
+    @Transient private val ELASTICITY_MAX = 1.0//0.993 // No perpetual motion!
 
     /**
      * what pretty much every physics engine has, instead of my 'elasticity'
@@ -219,11 +222,12 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     @Transient private var assertPrinted = false
 
-    // to use with Controller (incl. player)
+    // debug only
     internal @Volatile var walledLeft = false
     internal @Volatile var walledRight = false
     internal @Volatile var walledTop = false    // UNUSED; only for BasicDebugInfoWindow
     internal @Volatile var walledBottom = false // UNUSED; only for BasicDebugInfoWindow
+    internal @Volatile var colliding = false
 
     protected val gameContainer: GameContainer
         get() = Terrarum.appgc
@@ -330,7 +334,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             // make NoClip work for player
             if (this is Player) {
-                isNoSubjectToGrav = isPlayerNoClip
+                isNoSubjectToGrav = isPlayerNoClip || COLLISION_TEST_MODE
                 isNoCollideWorld = isPlayerNoClip
                 isNoSubjectToFluidResistance = isPlayerNoClip
             }
@@ -409,10 +413,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
                 // TODO less friction for non-animating objects (make items glide far more on ice)
 
+                // FIXME asymmetry on friction
                 setHorizontalFriction() // friction SHOULD use and alter externalForce
-                if (isPlayerNoClip) { // TODO also hanging on the rope, etc.
+                //if (isPlayerNoClip) { // TODO also hanging on the rope, etc.
                     setVerticalFriction()
-                }
+                //}
 
 
                 // make sure if the actor tries to go out of the map, loop back instead
@@ -424,11 +429,13 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             walledRight = isTouchingSide(hitbox, COLLIDING_RIGHT)
             walledTop = isTouchingSide(hitbox, COLLIDING_TOP)
             walledBottom = isTouchingSide(hitbox, COLLIDING_BOTTOM)
+            colliding = isColliding(hitbox)
             if (isPlayerNoClip) {
                 walledLeft = false
                 walledRight = false
                 walledTop = false
                 walledBottom = false
+                colliding = false
             }
         }
     }
@@ -502,45 +509,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             applyForce(V)
             //}
-        }
-    }
-
-    private fun applyNormalForce() {
-        if (!isNoCollideWorld) {
-            val moveDelta = externalForce + controllerMoveDelta
-
-            // axis Y. Using operand >= and hitting the ceiling will lock the player to the position
-
-            // was moving downward?
-            if (moveDelta.y > 0.0) {
-                if (isTouchingSide(hitbox, COLLIDING_TOP)) { // hit the ceiling
-                    hitAndReflectY() //hitAndForciblyReflectY()
-                    //grounded = false
-                }
-                else if (isTouchingSide(hitbox, COLLIDING_BOTTOM)) { // actor hit something on its bottom
-                    hitAndReflectY()
-                    //grounded = true
-                }
-                else { // the actor is not grounded at all
-                    //grounded = false
-                }
-            }
-            // or was moving upward?
-            else if (moveDelta.y < 0.0) {
-                //grounded = false
-                if (isTouchingSide(hitbox, COLLIDING_TOP)) { // actor hit something on its top
-                    hitAndForciblyReflectY() // prevents sticking to the ceiling
-                }
-            }
-            // axis X
-            if (isTouchingSide(hitbox, COLLIDING_LEFT) || isTouchingSide(hitbox, COLLIDING_RIGHT)) { // check right and left
-                // the actor is hitting the wall
-
-                // FIXME balls are stuck in this
-                //if (referenceID != 321321321)
-                //    println("$this trying to reflectX")
-                hitAndReflectX()
-            }
         }
     }
 
@@ -724,7 +692,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                     if (isTouchingSide(simulationHitbox, COLLIDING_LR)) {
                         //walkX *= elasticity
                         externalForce.x *= -elasticity
-                        debug1("!! tackle ${Random().nextInt(1000)}!!")
+                        debug4("!! tackle ${Random().nextInt(1000)}!!")
                     }
                 }
 
@@ -762,7 +730,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
                     // set new mid
                     // TODO LR-touching or colliding?
-                    if (isTouchingSide(simulationHitboxX, COLLIDING_LEFT) || isTouchingSide(simulationHitboxX, COLLIDING_RIGHT)) {
+                    if (isColliding(simulationHitboxX)) {
                         debug3("x bmid = $bmid, new endX: ${simulationHitboxX.endX}, going back")
                         high = bmid
                     }
@@ -796,7 +764,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
                     // set new mid
                     // TODO UD-touching or colliding?
-                    if (isTouchingSide(simulationHitboxY, COLLIDING_UD)) {
+                    if (isColliding(simulationHitboxY)) {
                         debug3("y bmid = $bmid, new endY: ${simulationHitboxY.endY}, going back")
                         high = bmid
                     }
@@ -813,6 +781,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             debug3("== END ControllerMoveDelta ==")
         }
 
+        val vectorSum = externalForce + controllerMoveDelta
 
 
         // PUSH THE HITBOX INTO THE AIR for a pixel so IT WON'T BE COLLIDING
@@ -831,10 +800,14 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         //println("startX modDelta: ${simulationHitbox.startX.modTileDelta()}")
         //println("touching_right_extra: ${isTouchingSide(simulationHitbox, COLLIDING_RIGHT_EXTRA)}")
 
+        //println("startY modDelta: ${simulationHitbox.startY.modTileDelta()}")
+        //println("endY modDelta: ${simulationHitbox.endY.modTileDelta()}")
 
-        val vectorSum = externalForce + controllerMoveDelta
         // --> Y-Axis (bottom)
-        if (simulationHitbox.endY.modTileDelta() > 0 && isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
+
+        // FIXME y-axis pushers are all wrong
+
+        /*if (simulationHitbox.endY.modTileDelta() > 0 && isTouchingSide(simulationHitbox, COLLIDING_BOTTOM)) {
             //val displacementMainAxis = -1.00001
             //val displacementSecondAxis = displacementMainAxis * vectorSum.x / vectorSum.y // use controllerMoveDelta.x / controllerMoveDelta.y ?
             //simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
@@ -843,7 +816,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             simulationHitbox.translate(0.0, -simulationHitbox.endY.modTileDelta())
         }
         // --> Y-Axis (top)
-        /*else if (vectorSum.y < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
+        else if (vectorSum.y < 0.0 && isTouchingSide(simulationHitbox, COLLIDING_TOP)) {
             //val displacementMainAxis = 1.0
             //val displacementSecondAxis = displacementMainAxis * vectorSum.x / vectorSum.y
             //simulationHitbox.translate(displacementSecondAxis, displacementMainAxis)
@@ -851,30 +824,47 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             simulationHitbox.translate(0.0, 1.0)
         }*/
 
+        // TODO don't worry about isColliding marker behaving asymmetric: it's normal!  (lit when walled right, but not left)
+
+        // --> Y-Axis (bottom side)
+        if (vectorSum.y > 0 && simulationHitbox.endY.modTileDelta() >= 0.99999 && simulationHitbox.endY.modTileDelta() <= 1.0) {
+            val target = simulationHitbox.endY.div(TILE_SIZE).floorInt().times(TILE_SIZE).toDouble() // works!
+            val delta = target - simulationHitbox.endY
+            debug4("yB: endY: ${simulationHitbox.endY}, target: $target, delta: $delta")
+            simulationHitbox.translatePosY(delta)
+        }
+        // --> Y-Axis (top side)
+        /*else if (vectorSum.y < 0 && simulationHitbox.startY.modTileDelta() >= 0.99999 && simulationHitbox.startY.modTileDelta() < 1.0) {
+            val target = simulationHitbox.startY.div(TILE_SIZE).floorInt().times(TILE_SIZE).toDouble() + A_PIXEL
+            val delta = target - simulationHitbox.startY
+            debug4("yT: startY: ${simulationHitbox.startY}, target: $target, delta: $delta")
+            simulationHitbox.translatePosY(delta)
+        }*/
+
         // --> X-Axis (right side)
-        if (vectorSum.x > 0 && simulationHitbox.endX.modTileDelta() >= 15.99999) {
-            val target = simulationHitbox.endX.div(TILE_SIZE).floorInt().plus(1).times(TILE_SIZE).toDouble()
+        if (simulationHitbox.endX.modTileDelta() >= 15.99999) {
+            val target = simulationHitbox.endX.div(TILE_SIZE).floorInt().times(TILE_SIZE).toDouble() + TILE_SIZE // works!
             val delta = target - simulationHitbox.endX
             debug4("xR: endX: ${simulationHitbox.endX}, target: $target, delta: $delta")
             simulationHitbox.translatePosX(delta)
         }
         // --> X-Axis (left side)
-        else if (vectorSum.x < 0 && simulationHitbox.startX.modTileDelta() >= 0.99999 && simulationHitbox.startX.modTileDelta() < 1.0) {
-            val target = simulationHitbox.startX.div(TILE_SIZE).floorInt().times(TILE_SIZE).toDouble()
+        else if (simulationHitbox.startX.modTileDelta() >= 15.99999) {
+            val target = simulationHitbox.startX.div(TILE_SIZE).floorInt().times(TILE_SIZE).toDouble() + TILE_SIZE
             val delta = target - simulationHitbox.startX
             debug4("xL: startX: ${simulationHitbox.startX}, target: $target, delta: $delta")
             simulationHitbox.translatePosX(delta)
         }
 
 
-
-
-
-        if (isTouchingSide(simulationHitbox, COLLIDING_LR)) {
+        // apply normal force
+        if (isTouchingSide(simulationHitbox, COLLIDING_LEFT) && vectorSum.x < 0.0 ||
+            isTouchingSide(simulationHitbox, COLLIDING_RIGHT) && vectorSum.x > 0.0) {
             externalForce.x *= -elasticity
             controllerMoveDelta?.x?.let { controllerMoveDelta!!.x *= -elasticity } // FIXME commented: "brake" applied when climbing down several steps
         }
-        if (isTouchingSide(simulationHitbox, COLLIDING_UD)) {
+        if (isTouchingSide(simulationHitbox, COLLIDING_TOP) && vectorSum.y < 0.0 ||
+            isTouchingSide(simulationHitbox, COLLIDING_BOTTOM) && vectorSum.y > 0.0) {
             externalForce.y *= -elasticity
             controllerMoveDelta?.y?.let { controllerMoveDelta!!.y *= -elasticity }
         }
@@ -895,53 +885,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     }
 
 
-
-    private fun hitAndReflectX() {
-        externalForce.x *= -elasticity
-        //controllerMoveDelta?.x?.let { controllerMoveDelta!!.x *= -elasticity }
-    }
-
-    private fun hitAndReflectY() {
-        externalForce.y *= -elasticity
-        //controllerMoveDelta?.y?.let { controllerMoveDelta!!.x *= -elasticity }
-    }
-
-    @Transient private val CEILING_HIT_ELASTICITY = 0.3
-    @Transient private val MINIMUM_BOUNCE_THRESHOLD = 1.0
-
-    /**
-     * prevents sticking to the ceiling
-     */
-    private fun hitAndForciblyReflectY() {
-        println("hitAndForciblyReflectY")
-        val moveDelta = externalForce + controllerMoveDelta
-        // TODO HARK! I have changed veloX/Y to moveDelta.x/y
-        if (moveDelta.y < 0) {
-            // kills movement if it is Controllable
-            controllerMoveDelta?.let { it.y = 0.0 }
-
-
-            if (moveDelta.y * CEILING_HIT_ELASTICITY < -A_PIXEL) {
-                moveDelta.y = -moveDelta.y * CEILING_HIT_ELASTICITY
-            }
-            else {
-                moveDelta.y = A_PIXEL
-            }
-
-            // for more of a "bounce", you can assign zero if you don't like it
-            externalForce.y = moveDelta.y * CEILING_HIT_ELASTICITY
-            //externalForce.y = 0.0
-
-
-            //hitbox.translatePosY(0.5) // TODO why de we need it?
-        }
-        else {
-            throw Error("Check this out bitch (moveDelta.y = ${moveDelta.y})")
-        }
-    }
-
-    //private fun isColliding(hitbox: Hitbox) = isColliding(hitbox, 0)
-
     /**
      * @see /work_files/hitbox_collision_detection_compensation.jpg
      */
@@ -949,10 +892,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         if (isNoCollideWorld) return false
 
         // detectors are inside of the bounding box
-        val x1 = hitbox.startX - A_PIXEL // to compensate for asym, x1 is moved a pixel left
-        val x2 = hitbox.endX - A_PIXEL
-        val y1 = hitbox.startY - A_PIXEL // to compensate for asym, y1 is moved a pixel up
-        val y2 = hitbox.endY - A_PIXEL
+        val x1 = hitbox.startX
+        val x2 = hitbox.endX
+        val y1 = hitbox.startY - A_PIXEL
+        val y2 = hitbox.endY - A_PIXEL + A_PIXEL
 
 
         val txStart = x1.div(TILE_SIZE).floorInt()
@@ -984,30 +927,29 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         IMPORTANT AF NOTE: things are ASYMMETRIC!
          */
 
-        // detectors are inside of the bounding box
         if (option == COLLIDING_TOP) {  // to compensate for asym, y1 is moved a pixel up
             x1 = hitbox.startX - A_PIXEL
-            x2 = hitbox.endX - A_PIXEL
-            y1 = hitbox.startY - A_PIXEL - A_PIXEL
+            x2 = hitbox.endX - A_PIXEL + A_PIXEL
+            y1 = hitbox.startY - A_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_BOTTOM) {
-            x1 = hitbox.startX - A_PIXEL
-            x2 = hitbox.endX - A_PIXEL
-            y1 = hitbox.endY
+            x1 = hitbox.startX - A_PIXEL // FIXME reduce width
+            x2 = hitbox.endX - A_PIXEL + A_PIXEL
+            y1 = hitbox.endY - A_PIXEL + A_PIXEL
             y2 = y1
         }
         else if (option == COLLIDING_LEFT) { // to compensate for asym, x1 is moved a pixel left
-            x1 = hitbox.startX - 2 * A_PIXEL
+            x1 = hitbox.startX - A_PIXEL
             x2 = x1
-            y1 = hitbox.startY
-            y2 = hitbox.endY - A_PIXEL
+            y1 = hitbox.startY - A_PIXEL
+            y2 = hitbox.endY - A_PIXEL + A_PIXEL
         }
         else if (option == COLLIDING_RIGHT) {
             x1 = hitbox.endX
             x2 = x1
-            y1 = hitbox.startY
-            y2 = hitbox.endY - A_PIXEL
+            y1 = hitbox.startY - A_PIXEL
+            y2 = hitbox.endY - A_PIXEL + A_PIXEL
         }
         else if (option == COLLIDING_ALLSIDE) {
             return isTouchingSide(hitbox, COLLIDING_LEFT) || isTouchingSide(hitbox, COLLIDING_RIGHT) ||
