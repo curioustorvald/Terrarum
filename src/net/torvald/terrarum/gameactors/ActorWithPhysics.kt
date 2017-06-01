@@ -155,8 +155,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     val grounded: Boolean
         get() = isPlayerNoClip ||
-                (world.gravitation.y > 0 && isTouchingSide(hitbox, COLLIDING_BOTTOM) ||
-                 world.gravitation.y < 0 && isTouchingSide(hitbox, COLLIDING_TOP))
+                (world.gravitation.y > 0 && isWalled(hitbox, COLLIDING_BOTTOM) ||
+                 world.gravitation.y < 0 && isWalled(hitbox, COLLIDING_TOP))
     /** Default to 'true'  */
     var isVisible = true
     /** Default to 'true'  */
@@ -427,10 +427,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             }
 
             // cheap solution for sticking into the wall while Left or Right is held
-            walledLeft = isTouchingSide(hitbox, COLLIDING_LEFT)
-            walledRight = isTouchingSide(hitbox, COLLIDING_RIGHT)
-            walledTop = isTouchingSide(hitbox, COLLIDING_TOP)
-            walledBottom = isTouchingSide(hitbox, COLLIDING_BOTTOM)
+            walledLeft = isWalled(hitbox, COLLIDING_LEFT)
+            walledRight = isWalled(hitbox, COLLIDING_RIGHT)
+            walledTop = isWalled(hitbox, COLLIDING_TOP)
+            walledBottom = isWalled(hitbox, COLLIDING_BOTTOM)
             colliding = isColliding(hitbox)
             if (isPlayerNoClip) {
                 walledLeft = false
@@ -455,29 +455,29 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /*private fun combineVeloToMoveDelta() {
         if (this is Controllable) {
             // decide whether to ignore walkX
-            if (!(isTouchingSide(hitbox, COLLIDING_LEFT) && walkX < 0)
-                || !(isTouchingSide(hitbox, COLLIDING_RIGHT) && walkX > 0)
+            if (!(isWalled(hitbox, COLLIDING_LEFT) && walkX < 0)
+                || !(isWalled(hitbox, COLLIDING_RIGHT) && walkX > 0)
                     ) {
                 moveDelta.x = externalForce.x + walkX
             }
 
             // decide whether to ignore walkY
-            if (!(isTouchingSide(hitbox, COLLIDING_TOP) && walkY < 0)
-                || !(isTouchingSide(hitbox, COLLIDING_BOTTOM) && walkY > 0)
+            if (!(isWalled(hitbox, COLLIDING_TOP) && walkY < 0)
+                || !(isWalled(hitbox, COLLIDING_BOTTOM) && walkY > 0)
                     ) {
                 moveDelta.y = externalForce.y + walkY
             }
         }
         else {
-            if (!isTouchingSide(hitbox, COLLIDING_LEFT)
-                || !isTouchingSide(hitbox, COLLIDING_RIGHT)
+            if (!isWalled(hitbox, COLLIDING_LEFT)
+                || !isWalled(hitbox, COLLIDING_RIGHT)
                     ) {
                 moveDelta.x = externalForce.x
             }
 
             // decide whether to ignore walkY
-            if (!isTouchingSide(hitbox, COLLIDING_TOP)
-                || !isTouchingSide(hitbox, COLLIDING_BOTTOM)
+            if (!isWalled(hitbox, COLLIDING_TOP)
+                || !isWalled(hitbox, COLLIDING_BOTTOM)
                     ) {
                 moveDelta.y = externalForce.y
             }
@@ -490,8 +490,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * Apply only if not grounded; normal force is precessed separately.
      */
     private fun applyGravitation() {
-        if (!isNoSubjectToGrav && !isTouchingSide(hitbox, COLLIDING_BOTTOM)) {
-            //if (!isTouchingSide(hitbox, COLLIDING_BOTTOM)) {
+        if (!isNoSubjectToGrav && !isWalled(hitbox, COLLIDING_BOTTOM)) {
+            //if (!isWalled(hitbox, COLLIDING_BOTTOM)) {
             /**
              * weight; gravitational force in action
              * W = mass * G (9.8 [m/s^2])
@@ -580,7 +580,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         // 10 I detect being walled and displace myself
         // 11 There's 16 possible case so work all 16 (some can be merged obviously)
         // 12 Amount of displacement can be obtained with modTileDelta()
-        // 13 isTouchingSide() is confirmed to be working
+        // 13 isWalled() is confirmed to be working
         // 20 sixteenStep may be optional, I think, but it'd be good to have
 
         // ignore MOST of the codes below (it might be possible to recycle the structure??)
@@ -605,8 +605,52 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
 
 
+        val COLL_LEFTSIDE = 1
+        val COLL_BOTTOMSIDE = 2
+        val COLL_RIGHTSIDE = 4
+        val COLL_TOPSIDE = 8
 
-        val BLOCK_LEFTSIDE = 1
+        var bounceX = false
+        var bounceY = false
+        // collision NOT detected
+        if (collidingStep == null) {
+            hitbox.translate(vectorSum)
+            // grounded = false
+        }
+        // collision detected
+        else {
+            val newHitbox = hitbox.reassign(sixteenStep[collidingStep])
+
+            var selfCollisionStatus = 0
+            if (isWalled(newHitbox, COLLIDING_LEFT))   selfCollisionStatus += COLL_LEFTSIDE
+            if (isWalled(newHitbox, COLLIDING_RIGHT))  selfCollisionStatus += COLL_RIGHTSIDE
+            if (isWalled(newHitbox, COLLIDING_TOP))    selfCollisionStatus += COLL_TOPSIDE
+            if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE
+
+
+            when (selfCollisionStatus) {
+                0 -> { println("[ActorWithPhysics] Contradiction -- collision detected by CCD, but isWalled() says otherwise") }
+                // one-side collision
+                1, 11 -> { newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta ()) }
+                4, 14 -> { newHitbox.translatePosX(          - newHitbox.endX.modTileDelta ()) }
+                8, 13 -> { newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta ()) }
+                2, 7  -> { newHitbox.translatePosY(          - newHitbox.endY.modTileDelta ()) }
+                // two-side collision
+
+            }
+
+
+
+            hitbox.reassign(newHitbox)
+
+
+            // grounded = true
+        }// end of collision not detected
+
+
+        return
+
+        /*val BLOCK_LEFTSIDE = 1
         val BLOCK_BOTTOMSIDE = 2
         val BLOCK_RIGHTSIDE = 4
         val BLOCK_TOPSIDE = 8
@@ -653,7 +697,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         else {
             //debug1("Collision detected")
 
-            val newHitbox = hitbox.clone()
+            val newHitbox = hitbox.clone() // this line is wrong (must be hitbox.reassign(sixteenStep[collidingStep])) HOWEVER the following method is also wrong; think about the case where I am placed exactly in between two tiles)
             // see if four sides of hitbox CROSSES the tile
             // that information should be able to tell where the hitbox be pushed
             // blocks can have up to 4 status at once
@@ -710,7 +754,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             // grounded = true
 
-        }// end of collision not detected
+        }// end of collision not detected*/
 
 
 
@@ -728,9 +772,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         // detectors are inside of the bounding box
         // CONFIRMED
         val x1 = hitbox.startX
-        val x2 = hitbox.endX
+        val x2 = hitbox.endX - A_PIXEL
         val y1 = hitbox.startY
-        val y2 = hitbox.endY
+        val y2 = hitbox.endY - A_PIXEL
+        // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENDED!
 
 
         val txStart = x1.div(TILE_SIZE).floorInt()
@@ -744,7 +789,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /**
      * @see /work_files/hitbox_collision_detection_compensation.jpg
      */
-    private fun isTouchingSide(hitbox: Hitbox, option: Int): Boolean {
+    private fun isWalled(hitbox: Hitbox, option: Int): Boolean {
         val x1: Double
         val x2: Double
         val y1: Double
@@ -788,15 +833,15 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             y2 = hitbox.endY - A_PIXEL
         }
         else if (option == COLLIDING_ALLSIDE) {
-            return isTouchingSide(hitbox, COLLIDING_LEFT) || isTouchingSide(hitbox, COLLIDING_RIGHT) ||
-                   isTouchingSide(hitbox, COLLIDING_BOTTOM) || isTouchingSide(hitbox, COLLIDING_TOP)
+            return isWalled(hitbox, COLLIDING_LEFT) || isWalled(hitbox, COLLIDING_RIGHT) ||
+                   isWalled(hitbox, COLLIDING_BOTTOM) || isWalled(hitbox, COLLIDING_TOP)
 
         }
         else if (option == COLLIDING_LR) {
-            return isTouchingSide(hitbox, COLLIDING_LEFT) || isTouchingSide(hitbox, COLLIDING_RIGHT)
+            return isWalled(hitbox, COLLIDING_LEFT) || isWalled(hitbox, COLLIDING_RIGHT)
         }
         else if (option == COLLIDING_UD) {
-            return isTouchingSide(hitbox, COLLIDING_BOTTOM) || isTouchingSide(hitbox, COLLIDING_TOP)
+            return isWalled(hitbox, COLLIDING_BOTTOM) || isWalled(hitbox, COLLIDING_TOP)
         }
         else throw IllegalArgumentException()
 
