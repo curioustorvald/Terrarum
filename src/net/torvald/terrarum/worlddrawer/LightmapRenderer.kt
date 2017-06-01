@@ -294,6 +294,22 @@ object LightmapRenderer {
         }
     }
 
+    private fun getLightSpecial(x: Int, y: Int): Int? {
+        val l = getLight(x, y)
+        if (l == null) return null
+
+        if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) {
+            return constructRGBFromFloat(
+                    (l.r() * 1.25f).clampOne(),
+                    (l.g() * 1.25f).clampOne(),
+                    (l.b() * 1.25f).clampOne()
+            )
+        }
+        else {
+            return l
+        }
+    }
+
     fun draw(g: Graphics) {
         val this_x_start = for_x_start// + overscan_open
         val this_x_end = for_x_end// + overscan_open
@@ -312,14 +328,14 @@ object LightmapRenderer {
                     if (Terrarum.getConfigBoolean("smoothlighting") ?: false &&
                         Terrarum.ingame!!.screenZoom >= 0.75) {
 
-                        val thisLightLevel = getLight(x, y) ?: 0
+                        val thisLightLevel = getLightSpecial(x, y) ?: 0
 
                         if (x < this_x_end && thisLightLevel == 0
-                            && getLight(x, y - 1) == 0) {
+                            && getLightSpecial(x, y - 1) == 0) {
                             try {
                                 // coalesce zero intensity blocks to one
                                 var zeroLevelCounter = 1
-                                while (getLight(x + zeroLevelCounter, y) == 0) {
+                                while (getLightSpecial(x + zeroLevelCounter, y) == 0) {
                                     zeroLevelCounter += 1
 
                                     if (x + zeroLevelCounter >= this_x_end) break
@@ -349,10 +365,10 @@ object LightmapRenderer {
                              *   +-+-+
                              *     d
                              */
-                            val a = thisLightLevel maxBlend (getLight(x, y - 1) ?: thisLightLevel)
-                            val d = thisLightLevel maxBlend (getLight(x, y + 1) ?: thisLightLevel)
-                            val b = thisLightLevel maxBlend (getLight(x - 1, y) ?: thisLightLevel)
-                            val c = thisLightLevel maxBlend (getLight(x + 1, y) ?: thisLightLevel)
+                            val a = thisLightLevel maxBlend (getLightSpecial(x, y - 1) ?: thisLightLevel)
+                            val d = thisLightLevel maxBlend (getLightSpecial(x, y + 1) ?: thisLightLevel)
+                            val b = thisLightLevel maxBlend (getLightSpecial(x - 1, y) ?: thisLightLevel)
+                            val c = thisLightLevel maxBlend (getLightSpecial(x + 1, y) ?: thisLightLevel)
 
                             val colourMapItoL = IntArray(4)
                             val colMean = (a linMix d) linMix (b linMix c)
@@ -383,17 +399,17 @@ object LightmapRenderer {
                     // smoothing disabled
                     else {
                         try {
-                            val thisLightLevel = getLight(x, y)
+                            val thisLightLevel = getLightSpecial(x, y)
 
                             // coalesce identical intensity blocks to one
                             var sameLevelCounter = 1
-                            while (getLight(x + sameLevelCounter, y) == thisLightLevel) {
+                            while (getLightSpecial(x + sameLevelCounter, y) == thisLightLevel) {
                                 sameLevelCounter += 1
 
                                 if (x + sameLevelCounter >= this_x_end) break
                             }
 
-                            g.color = (getLight(x, y) ?: 0).normaliseToColourHDR()
+                            g.color = (getLightSpecial(x, y) ?: 0).normaliseToColourHDR()
 
                             g.fillRect(
                                     (x.toFloat() * TILE_SIZE).round().toFloat(),
