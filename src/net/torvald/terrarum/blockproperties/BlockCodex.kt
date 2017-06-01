@@ -68,6 +68,19 @@ object BlockCodex {
         }
     }
 
+    fun getOrNull(rawIndex: Int?): BlockProp? {
+        if (rawIndex == null || rawIndex == Block.NULL) {
+            return null
+        }
+
+        try {
+            return blockProps[rawIndex]
+        }
+        catch (e: NullPointerException) {
+            throw NullPointerException("Blockprop with raw id $rawIndex does not exist.")
+        }
+    }
+
     private fun setProp(prop: BlockProp, record: CSVRecord) {
         prop.nameKey = record.get("name")
 

@@ -11,7 +11,7 @@ object LandUtil {
     fun getBlockAddr(x: Int, y: Int): BlockAddress =
             (Terrarum.ingame!!.world.width * y).toLong() + x
 
-    fun resolveAbsoluteBlockNumber(t: BlockAddress): Pair<Int, Int> =
+    fun resolveBlockAddr(t: BlockAddress): Pair<Int, Int> =
             Pair((t % Terrarum.ingame!!.world.width).toInt(), (t / Terrarum.ingame!!.world.width).toInt())
 
     /**

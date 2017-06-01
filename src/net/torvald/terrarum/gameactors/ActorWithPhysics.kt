@@ -56,14 +56,14 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * * Unit: pixel
      * !! external class should not hitbox.set(); use setHitboxDimension() and setPosition()
      */
-    override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)       // Hitbox is implemented using Double;
+    override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // Hitbox is implemented using Double;
 
     val tilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
-                hitbox.endX.div(TILE_SIZE).floor(),
-                hitbox.endY.div(TILE_SIZE).floor()
+                hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
+                hitbox.endY.minus(0.00001).div(TILE_SIZE).floor()
         )
 
     /**
@@ -589,15 +589,20 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
         val affectingTiles = ArrayList<BlockAddress>()
         var collidingStep: Int? = null
+
         for (step in 1..ccdSteps) {
+
             val stepBox = sixteenStep[step]
+
             forEachOccupyingTilePos(stepBox) {
                 val tileCoord = LandUtil.resolveBlockAddr(it)
                 val tileProp = BlockCodex.getOrNull(world.getTileFromTerrain(tileCoord.first, tileCoord.second))
+
                 if (tileProp == null || tileProp.isSolid) {
                     affectingTiles.add(it)
                 }
             }
+
             if (affectingTiles.isNotEmpty()) {
                 collidingStep = step
                 break // collision found on this step, break and proceed to next step
@@ -612,6 +617,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
         var bounceX = false
         var bounceY = false
+        var zeroX = false
+        var zeroY = false
         // collision NOT detected
         if (collidingStep == null) {
             hitbox.translate(vectorSum)
@@ -619,6 +626,16 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
         // collision detected
         else {
+            println("Collision step: $collidingStep")
+
+
+            affectingTiles.forEach {
+                val tileCoord = LandUtil.resolveBlockAddr(it)
+                println("affectign tile: ${tileCoord.first}, ${tileCoord.second}")
+            }
+
+
+
             val newHitbox = hitbox.reassign(sixteenStep[collidingStep])
 
             var selfCollisionStatus = 0
@@ -627,38 +644,44 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             if (isWalled(newHitbox, COLLIDING_TOP))    selfCollisionStatus += COLL_TOPSIDE
             if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE
 
+            // fixme UP and RIGHT && LEFT and DOWN bug
 
             when (selfCollisionStatus) {
                 0 -> { println("[ActorWithPhysics] Contradiction -- collision detected by CCD, but isWalled() says otherwise") }
-                5 -> { bounceX = true }
-                10 -> { bounceY = true }
-                15 -> { newHitbox.reassign(sixteenStep[0]); bounceX = true; bounceY = true }
+                5 ->  { zeroX = true }
+                10 -> { zeroY = true }
+                15 -> { newHitbox.reassign(sixteenStep[0]); zeroX = true; zeroY = true }
                 // one-side collision
-                1, 11 -> { newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta ()); bounceX = true }
-                4, 14 -> { newHitbox.translatePosX(          - newHitbox.endX.modTileDelta ())  ; bounceX = true }
-                8, 13 -> { newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta ()); bounceY = true }
-                2, 7  -> { newHitbox.translatePosY(          - newHitbox.endY.modTileDelta ())  ; bounceY = true }
+                1, 11 -> { newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta()); bounceX = true }
+                4, 14 -> { newHitbox.translatePosX(          - newHitbox.endX.modTileDelta())  ; bounceX = true }
+                8, 13 -> { newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta()); bounceY = true }
+                2, 7  -> { newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())  ; bounceY = true }
                 // two-side collision
                 3 -> {
-                    newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta ())
-                    newHitbox.translatePosY(          - newHitbox.endY.modTileDelta ())
+                    newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta())
+                    newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())
                     bounceX = true; bounceY = true
                 }
                 6 -> {
-                    newHitbox.translatePosX(          - newHitbox.endX.modTileDelta ())
-                    newHitbox.translatePosY(          - newHitbox.endY.modTileDelta ())
+                    println(- newHitbox.endY.modTileDelta())
+                    newHitbox.translatePosX(          - newHitbox.endX.modTileDelta())
+                    newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())
                     bounceX = true; bounceY = true
                 }
                 9 -> {
-                    newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta ())
-                    newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta ())
+                    newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta())
+                    newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta())
                     bounceX = true; bounceY = true
                 }
                 12 -> {
-                    newHitbox.translatePosX(          - newHitbox.endX.modTileDelta ())
-                    newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta ())
+                    newHitbox.translatePosX(          - newHitbox.endX.modTileDelta())
+                    newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta())
                     bounceX = true; bounceY = true
                 }
+            }
+
+            if (selfCollisionStatus in listOf(3,6,9,12)) {
+                println("twoside collision $selfCollisionStatus")
             }
 
 
@@ -670,6 +693,14 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             if (bounceY) {
                 externalForce.y *= elasticity
                 controllerMoveDelta?.let { controllerMoveDelta!!.y *= elasticity }
+            }
+            if (zeroX) {
+                externalForce.x = 0.0
+                controllerMoveDelta?.let { controllerMoveDelta!!.x = 0.0 }
+            }
+            if (zeroY) {
+                externalForce.y = 0.0
+                controllerMoveDelta?.let { controllerMoveDelta!!.y = 0.0 }
             }
 
 
@@ -1296,6 +1327,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         flagDespawn = true
     }
 
+
+
     private fun forEachOccupyingTileNum(consumer: (Int?) -> Unit) {
         val tiles = ArrayList<Int?>()
         for (y in tilewiseHitbox.startY.toInt()..tilewiseHitbox.endY.toInt()) {
@@ -1322,8 +1355,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         val newTilewiseHitbox =  Hitbox.fromTwoPoints(
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
-                hitbox.endX.div(TILE_SIZE).floor(),
-                hitbox.endY.div(TILE_SIZE).floor()
+                hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
+                hitbox.endY.minus(0.00001).div(TILE_SIZE).floor()
         )
 
         val tilePosList = ArrayList<BlockAddress>()
@@ -1361,6 +1394,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
         return tileProps.forEach(consumer)
     }
+
+
 
     companion object {
 
