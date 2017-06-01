@@ -286,7 +286,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         /**
          * Up/Down movement
          */
-        if (noClip) {
+        if (noClip || COLLISION_TEST_MODE) {
             if (hasController) {
                 if (axisY != 0f) {
                     walkVertical(axisY < 0, axisY.abs())
@@ -363,24 +363,26 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
      * @author minjaesong
      */
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
-        if ((!walledLeft && left) || (!walledRight && !left)) {
-            readonly_totalX =
-                    if (absAxisVal == AXIS_KEYBOARD)
-                        avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f)
-                    else
-                        avAcceleration * (if (left) -1f else 1f) * absAxisVal
+        if (left && walledLeft || !left && walledRight) return
 
-            if (absAxisVal != AXIS_KEYBOARD)
-                controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal) }
-            else
-                controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
 
-            if (absAxisVal == AXIS_KEYBOARD) {
-                walkCounterX += 1
-            }
+        readonly_totalX =
+                if (absAxisVal == AXIS_KEYBOARD)
+                    avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f)
+                else
+                    avAcceleration * (if (left) -1f else 1f) * absAxisVal
 
-            isWalkingH = true
+        if (absAxisVal != AXIS_KEYBOARD)
+            controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal) }
+        else
+            controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
+
+        if (absAxisVal == AXIS_KEYBOARD) {
+            walkCounterX += 1
         }
+
+        isWalkingH = true
+
 
         // Heading flag
         walkHeading = if (left) LEFT else RIGHT
@@ -393,6 +395,9 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
      * @param absAxisVal (set AXIS_KEYBOARD if keyboard controlled)
      */
     private fun walkVertical(up: Boolean, absAxisVal: Float) {
+        if (up && walledTop || !up && walledBottom) return
+
+
         readonly_totalY =
                 if (absAxisVal == AXIS_KEYBOARD)
                     avAcceleration * applyVelo(walkCounterY) * (if (up) -1f else 1f)
@@ -400,13 +405,14 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                     avAcceleration * (if (up) -1f else 1f) * absAxisVal
 
         if (absAxisVal != AXIS_KEYBOARD)
-            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal) }
+            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap * absAxisVal) }
         else
-            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
+            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap) }
 
         if (absAxisVal == AXIS_KEYBOARD) {
             walkCounterY += 1
         }
+
 
         isWalkingV = true
     }
