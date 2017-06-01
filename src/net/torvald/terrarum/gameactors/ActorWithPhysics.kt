@@ -585,7 +585,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
         // ignore MOST of the codes below (it might be possible to recycle the structure??)
 
-        val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(vectorSum * (it / ccdSteps.toDouble())) } // zeroth step is unused
+        val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(vectorSum * (it / ccdSteps.toDouble())) } // zeroth step is for special condition
 
         val affectingTiles = ArrayList<BlockAddress>()
         var collidingStep: Int? = null
@@ -630,15 +630,47 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             when (selfCollisionStatus) {
                 0 -> { println("[ActorWithPhysics] Contradiction -- collision detected by CCD, but isWalled() says otherwise") }
+                5 -> { bounceX = true }
+                10 -> { bounceY = true }
+                15 -> { newHitbox.reassign(sixteenStep[0]); bounceX = true; bounceY = true }
                 // one-side collision
-                1, 11 -> { newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta ()) }
-                4, 14 -> { newHitbox.translatePosX(          - newHitbox.endX.modTileDelta ()) }
-                8, 13 -> { newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta ()) }
-                2, 7  -> { newHitbox.translatePosY(          - newHitbox.endY.modTileDelta ()) }
+                1, 11 -> { newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta ()); bounceX = true }
+                4, 14 -> { newHitbox.translatePosX(          - newHitbox.endX.modTileDelta ())  ; bounceX = true }
+                8, 13 -> { newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta ()); bounceY = true }
+                2, 7  -> { newHitbox.translatePosY(          - newHitbox.endY.modTileDelta ())  ; bounceY = true }
                 // two-side collision
-
+                3 -> {
+                    newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta ())
+                    newHitbox.translatePosY(          - newHitbox.endY.modTileDelta ())
+                    bounceX = true; bounceY = true
+                }
+                6 -> {
+                    newHitbox.translatePosX(          - newHitbox.endX.modTileDelta ())
+                    newHitbox.translatePosY(          - newHitbox.endY.modTileDelta ())
+                    bounceX = true; bounceY = true
+                }
+                9 -> {
+                    newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta ())
+                    newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta ())
+                    bounceX = true; bounceY = true
+                }
+                12 -> {
+                    newHitbox.translatePosX(          - newHitbox.endX.modTileDelta ())
+                    newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta ())
+                    bounceX = true; bounceY = true
+                }
             }
 
+
+            // bounce X/Y
+            if (bounceX) {
+                externalForce.x *= elasticity
+                controllerMoveDelta?.let { controllerMoveDelta!!.x *= elasticity }
+            }
+            if (bounceY) {
+                externalForce.y *= elasticity
+                controllerMoveDelta?.let { controllerMoveDelta!!.y *= elasticity }
+            }
 
 
             hitbox.reassign(newHitbox)
