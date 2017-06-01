@@ -585,11 +585,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
         // ignore MOST of the codes below (it might be possible to recycle the structure??)
 
-        val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(vectorSum * (it / ccdSteps.toDouble())) }
+        val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(vectorSum * (it / ccdSteps.toDouble())) } // zeroth step is unused
 
         val affectingTiles = ArrayList<BlockAddress>()
         var collidingStep: Int? = null
-        for (step in 0..ccdSteps) {
+        for (step in 1..ccdSteps) {
             val stepBox = sixteenStep[step]
             forEachOccupyingTilePos(stepBox) {
                 val tileCoord = LandUtil.resolveBlockAddr(it)
