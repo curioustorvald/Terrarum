@@ -171,7 +171,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * think of a grass cutting on the Zelda games. It would also make a great puzzle to solve.
      * --minjaesong)
      */
-    @Volatile var isChronostasis = false
+    var isChronostasis = false
 
     /**
      * Gravitational Constant G. Load from gameworld.
@@ -190,8 +190,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             actorValue[AVKey.DRAGCOEFF] = value
         }
 
-    @Transient private val UD_COMPENSATOR_MAX = TILE_SIZE
-    @Transient private val LR_COMPENSATOR_MAX = TILE_SIZE
 
     /**
      * Post-hit invincibility, in milliseconds
@@ -200,10 +198,15 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     @Transient internal val BASE_FRICTION = 0.3
 
+    @Transient internal val BASE_FALLDAMAGE_DAMPEN = 50.0
+    val fallDamageDampening: Double
+        get() = BASE_FALLDAMAGE_DAMPEN * (actorValue.getAsDouble(AVKey.FALLDAMPENMULT) ?: 1.0)
+
+
     var collisionType = COLLISION_DYNAMIC
 
-    @Transient private val CCD_TICK = 1.0 / 16.0
-    @Transient private val CCD_TRY_MAX = 12800
+    //@Transient private val CCD_TICK = 1.0 / 16.0
+    //@Transient private val CCD_TRY_MAX = 12800
 
     // just some trivial magic numbers
     @Transient private val A_PIXEL = 1.0
@@ -225,11 +228,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     @Transient private var assertPrinted = false
 
     // debug only
-    internal @Volatile var walledLeft = false
-    internal @Volatile var walledRight = false
-    internal @Volatile var walledTop = false    // UNUSED; only for BasicDebugInfoWindow
-    internal @Volatile var walledBottom = false // UNUSED; only for BasicDebugInfoWindow
-    internal @Volatile var colliding = false
+    internal var walledLeft = false
+    internal var walledRight = false
+    internal var walledTop = false    // UNUSED; only for BasicDebugInfoWindow
+    internal var walledBottom = false // UNUSED; only for BasicDebugInfoWindow
+    internal var colliding = false
 
     protected val gameContainer: GameContainer
         get() = Terrarum.appgc
@@ -490,7 +493,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * Apply only if not grounded; normal force is precessed separately.
      */
     private fun applyGravitation() {
-        if (!isNoSubjectToGrav && !isWalled(hitbox, COLLIDING_BOTTOM)) {
+        if (!isNoSubjectToGrav && !(gravitation.y > 0 && walledBottom || gravitation.y < 0 && walledTop)) {
             //if (!isWalled(hitbox, COLLIDING_BOTTOM)) {
             /**
              * weight; gravitational force in action
@@ -541,12 +544,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
     }*/
 
-    /**
-     * nextHitbox must NOT be altered before this method is called!
-     */
-    private val ccdSteps = 32 // max allowed velocity = backtrackSteps * TILE_SIZE
-    private val binaryBranchingMax = 54 // higher = more precise; theoretical max = 54 (# of mantissa + 2)
-
     private fun displaceHitbox() {
 
         fun debug1(wut: Any?) {
@@ -570,7 +567,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
         val vectorSum = externalForce + controllerMoveDelta
-        val ccdSteps = 16
+        val ccdSteps = minOf(16, (vectorSum.magnitudeSquared / TILE_SIZE.sqr()).floorInt() + 1) // adaptive
 
 
 
@@ -626,14 +623,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
         // collision detected
         else {
-            println("Collision step: $collidingStep")
-
-
-            affectingTiles.forEach {
-                val tileCoord = LandUtil.resolveBlockAddr(it)
-                println("affectign tile: ${tileCoord.first}, ${tileCoord.second}")
-            }
-
+            println("== Collision step: $collidingStep / $ccdSteps")
 
 
             val newHitbox = hitbox.reassign(sixteenStep[collidingStep])
@@ -645,6 +635,12 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE
 
             // fixme UP and RIGHT && LEFT and DOWN bug
+
+            println("Collision type: $selfCollisionStatus")
+            affectingTiles.forEach {
+                val tileCoord = LandUtil.resolveBlockAddr(it)
+                println("affectign tile: ${tileCoord.first}, ${tileCoord.second}")
+            }
 
             when (selfCollisionStatus) {
                 0 -> { println("[ActorWithPhysics] Contradiction -- collision detected by CCD, but isWalled() says otherwise") }
@@ -658,12 +654,13 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 2, 7  -> { newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())  ; bounceY = true }
                 // two-side collision
                 3 -> {
-                    newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta())
+                    println("translateX: ${(TILE_SIZE - newHitbox.startX.modTileDelta()).rem(TILE_SIZE)}")
+                    newHitbox.translatePosX((TILE_SIZE - newHitbox.startX.modTileDelta()).rem(TILE_SIZE))
                     newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())
                     bounceX = true; bounceY = true
                 }
                 6 -> {
-                    println(- newHitbox.endY.modTileDelta())
+                    println("translateX: ${(          - newHitbox.endX.modTileDelta())}")
                     newHitbox.translatePosX(          - newHitbox.endX.modTileDelta())
                     newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())
                     bounceX = true; bounceY = true
@@ -674,8 +671,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                     bounceX = true; bounceY = true
                 }
                 12 -> {
+                    println("translateY: ${(TILE_SIZE - newHitbox.startY.modTileDelta()).rem(TILE_SIZE)}")
                     newHitbox.translatePosX(          - newHitbox.endX.modTileDelta())
-                    newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta())
+                    newHitbox.translatePosY((TILE_SIZE - newHitbox.startY.modTileDelta()).rem(TILE_SIZE))
                     bounceX = true; bounceY = true
                 }
             }
@@ -705,6 +703,13 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
             hitbox.reassign(newHitbox)
+
+
+            // slam-into-whatever damage (such dirty; much hack; wow)
+            //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
+            val collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.TARGET_FPS).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
+            // kg * m / s^2 (mass * acceleration), acceleration -> (vectorMagn / (0.01)^2).gameToSI()
+            if (collisionDamage != 0.0) println("Collision damage: $collisionDamage N")
 
 
             // grounded = true
@@ -1193,9 +1198,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             blendLightenOnly()
 
             val offsetX = if (!spriteGlow!!.flippedHorizontal())
-                hitboxTranslateX * scale + 1
+                hitboxTranslateX * scale
             else
-                spriteGlow!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale) + 1
+                spriteGlow!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale)
 
             val offsetY = spriteGlow!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
 
@@ -1234,9 +1239,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             BlendMode.resolve(drawMode)
 
             val offsetX = if (!sprite!!.flippedHorizontal())
-                hitboxTranslateX * scale + 1
+                hitboxTranslateX * scale
             else
-                sprite!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale) + 1
+                sprite!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale)
 
             val offsetY = sprite!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
 
@@ -1407,11 +1412,17 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         /**
          * [m / s^2] * SI_TO_GAME_ACC -> [px / InternalFrame^2]
          */
-        @Transient val SI_TO_GAME_ACC = METER / (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS).toDouble()
+        @Transient val SI_TO_GAME_ACC = METER / (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS)
         /**
          * [m / s] * SI_TO_GAME_VEL -> [px / InternalFrame]
          */
         @Transient val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
+
+        /**
+         * [px / InternalFrame^2] * GAME_TO_SI_ACC -> [m / s^2]
+         */
+        @Transient val GAME_TO_SI_ACC = (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS) / METER
+
 
         /**
          *  Enumerations that exported to JSON
@@ -1486,6 +1497,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 scale.sqrt()
 }
 
+fun Int.sqr(): Int = this * this
 fun Double.floorInt() = Math.floor(this).toInt()
 fun Float.floorInt() = FastMath.floor(this)
 fun Float.floor() = FastMath.floor(this).toFloat()
