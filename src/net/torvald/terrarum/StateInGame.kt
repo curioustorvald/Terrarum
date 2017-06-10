@@ -96,6 +96,10 @@ class StateInGame : BasicGameState() {
     lateinit var uiVitalSecondary: UIHandler
     lateinit var uiVitalItem: UIHandler // itemcount/durability of held block or active ammo of held gun. As for the block, max value is 500.
 
+    lateinit var uiWatchBasic: UIHandler
+    lateinit var uiWatchTierOne: UIHandler
+
+
     // UI aliases
     lateinit var uiAliases: ArrayList<UIHandler>
         private set
@@ -103,7 +107,7 @@ class StateInGame : BasicGameState() {
         private set
 
     var paused: Boolean = false
-        get() = uiAlasesPausing.map { if (it.isOpened) 1 else 0 }.sum() > 0
+        get() = uiAlasesPausing.map { if (it.isOpened) return true else 0 }.isEmpty() // isEmply is always false, which we want
     /**
      * Set to false if UI is opened; set to true  if UI is closed.
      */
@@ -201,6 +205,15 @@ class StateInGame : BasicGameState() {
         uiVitalItem = UIHandler(UIVitalMetre(player, { null }, { null }, Color(0xffcc00), 0), customPositioning = true)
         uiVitalItem.setAsAlwaysVisible()
 
+        // basic watch-style notification bar (temperature, new mail)
+        uiWatchBasic = UIHandler(UIBasicNotifier(player))
+        uiWatchBasic.setAsAlwaysVisible()
+        uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.UI.width, 0)
+
+        uiWatchTierOne = UIHandler(UITierOneWatch(player))
+        uiWatchTierOne.setAsAlwaysVisible()
+        uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.UI.width, uiWatchBasic.UI.height - 2)
+
 
         // batch-process uiAliases
         uiAliases = arrayListOf(
@@ -209,7 +222,9 @@ class StateInGame : BasicGameState() {
                 uiVitalSecondary,
                 uiVitalItem,
                 uiPieMenu,
-                uiQuickBar
+                uiQuickBar,
+                uiWatchBasic,
+                uiWatchTierOne
                 // drawn last
         )
         uiAlasesPausing = arrayListOf(

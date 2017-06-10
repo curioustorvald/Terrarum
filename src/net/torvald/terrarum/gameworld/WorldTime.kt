@@ -89,6 +89,9 @@ class WorldTime(initTime: Long = 0L) {
             field = if (value < 0) 0 else value
         }
 
+    val moonPhase: Double
+        get() = (TIME_T % LUNAR_CYCLE).toDouble() / LUNAR_CYCLE
+
     @Transient private var realMillisec: Double = 0.0
     @Transient private val REAL_SEC_TO_GAME_SECS = 60
 
@@ -134,6 +137,9 @@ class WorldTime(initTime: Long = 0L) {
                 else {
                     s.toInt()
                 }
+
+
+        val LUNAR_CYCLE: Int = 2342643// 29 days, 12 hours, 44 minutes, and 3 seconds in-game calendar
     }
 
     fun update(delta: Int) {

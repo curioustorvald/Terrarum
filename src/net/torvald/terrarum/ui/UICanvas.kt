@@ -4,6 +4,8 @@ import net.torvald.point.Point2d
 import net.torvald.terrarum.Millisec
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.gamecontroller.mouseScreenX
+import net.torvald.terrarum.gamecontroller.mouseScreenY
 import org.newdawn.slick.GameContainer
 import org.newdawn.slick.Graphics
 import org.newdawn.slick.Input
@@ -27,6 +29,20 @@ interface UICanvas {
      * Timer itself is implemented in the handler.
      */
     var openCloseTime: Millisec
+
+
+    val relativeMouseX: Int
+        get() = (Terrarum.appgc.mouseScreenX - (handler?.posX ?: 0))
+    val relativeMouseY: Int
+        get() = (Terrarum.appgc.mouseScreenY - (handler?.posY ?: 0))
+
+    /** If mouse is hovering over it */
+    val mouseUp: Boolean
+        get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
+    /** If mouse is hovering over it and mouse is down */
+    val mousePushed: Boolean
+        get() = mouseUp && Terrarum.appgc.input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary")!!)
+
 
     fun update(gc: GameContainer, delta: Int)
 
