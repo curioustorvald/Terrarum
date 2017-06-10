@@ -41,6 +41,6 @@ Connect two or more tracker head to play the array of trackers play simultaneous
 - Implement it on ```<item>.primaryUse(gc, delta)```
 
 
-## Computers ##
+## Particles ##
 
-Instead of single box with bunch of parts, make computers occupy several blocks -- processor unit, core memory unit, storage unit (RAMAC!), I/O unit, etc., like old PDPs. Powerful computer == more space. Plus portable units like TRS-80 Model 100.
+- Pickaxe sparks: hard material makes more sparks
