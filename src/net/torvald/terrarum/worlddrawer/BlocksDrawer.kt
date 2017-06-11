@@ -28,7 +28,7 @@ object BlocksDrawer_NEW {
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
     // TODO modular
-    val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "blocks/test.tga.gz"), TILE_SIZE, TILE_SIZE) // 64 MB
+    val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "blocks/terrain.tga.gz"), TILE_SIZE, TILE_SIZE) // 64 MB
     val terrainHorizontalTiles = tilesTerrain.horizontalCount
     val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "blocks/wire.tga.gz"), TILE_SIZE, TILE_SIZE) // 4 MB
     val wireHorizontalTiles = tilesWire.horizontalCount

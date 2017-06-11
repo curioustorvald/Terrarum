@@ -12,4 +12,6 @@ abstract class Peripheral(val tableName: String) {
     abstract fun loadLib(globals: Globals)
 
     override fun toString(): String = "Peripheral:$tableName"
+
+    abstract val memSize: Int
 }

@@ -41,6 +41,7 @@ object AVKey {
      */
     const val LUMINOSITY = "luminosity"
     const val DRAGCOEFF = "dragcoeff"
+    const val FALLDAMPENMULT = "falldampenmult"
 
     /** String
      * e.g. Jarppi

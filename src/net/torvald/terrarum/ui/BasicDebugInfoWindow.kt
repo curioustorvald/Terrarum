@@ -111,7 +111,8 @@ class BasicDebugInfoWindow : UICanvas {
                     "${if (player.walledLeft) "$ccR" else "$ccG"}L" +
                     "${if (player.walledBottom) "$ccR" else "$ccG"}${0x1F.toChar()}" +
                     "${if (player.walledTop) "$ccR" else "$ccG"}${0x1E.toChar()}" +
-                    "${if (player.walledRight) "$ccR" else "$ccG"}R"
+                    "${if (player.walledRight) "$ccR" else "$ccG"}R" +
+                    "${if (player.colliding) "$ccR" else "$ccG"}${0x08.toChar()}"
             )
         }
 
