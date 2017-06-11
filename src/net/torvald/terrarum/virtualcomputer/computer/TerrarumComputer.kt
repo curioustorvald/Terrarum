@@ -537,7 +537,7 @@ class TerrarumComputer(peripheralSlots: Int) {
     }
 
     private fun playTone(leninmilli: Int, freq: Double) {
-        audioData = makeAudioData(leninmilli, freq)
+        /*audioData = makeAudioData(leninmilli, freq)
 
 
         if (!AL.isCreated()) AL.create()
@@ -577,7 +577,7 @@ class TerrarumComputer(peripheralSlots: Int) {
         }
         catch (e: ALException) {
             AL10.alDeleteSources(beepSource)
-        }
+        }*/
     }
 
     // Custom implementation of Util.checkALError() that uses our custom exception.

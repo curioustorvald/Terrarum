@@ -14,6 +14,8 @@ import org.luaj.vm2.LuaValue
 internal class PeripheralPSG(val host: TerrarumComputer)
 : Peripheral("psg") {
 
+    override val memSize = 1024
+
     override fun loadLib(globals: Globals) {
         globals["psg"] = LuaTable()
     }

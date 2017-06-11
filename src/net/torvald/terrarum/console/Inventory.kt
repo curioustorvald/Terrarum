@@ -35,11 +35,11 @@ internal object Inventory : ConsoleCommand {
                 Echo("(inventory empty)")
             }
             else {
-                target!!.inventory.forEach {
-                    if (it.amount == 0) {
-                        EchoError("Unexpected zero-amounted item: ID ${it.item.dynamicID}")
+                target!!.inventory.forEach { val (item, amount) = it
+                    if (amount == 0) {
+                        EchoError("Unexpected zero-amounted item: ID ${item.dynamicID}")
                     }
-                    Echo("ID ${it.item}${if (it.amount > 1) " (${it.amount})" else ""}")
+                    Echo("ID $item${if (amount > 1) " ($amount)" else ""}")
                 }
             }
         }

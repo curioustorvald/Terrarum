@@ -83,6 +83,11 @@ class PeripheralVideoCard(val host: TerrarumComputer, val termW: Int = 80, val t
     val cursorSprite = ImageBuffer(blockW, blockH * 2)
     val cursorImage: Image
 
+
+    override val memSize = 256 * 8 + (width * height * 2) + spritesCount * 16 * 7
+    // fontRom + framebuffers + sprites
+
+
     init {
         Arrays.fill(cursorSprite.rgba, 0xFF.toByte())
         cursorImage = cursorSprite.image

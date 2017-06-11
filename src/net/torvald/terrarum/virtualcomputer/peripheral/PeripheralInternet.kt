@@ -17,6 +17,8 @@ import java.net.URL
 internal class PeripheralInternet(val host: TerrarumComputer)
 : Peripheral("internet"){
 
+    override val memSize = 1024
+
     override fun loadLib(globals: Globals) {
         globals["internet"] = LuaTable()
         globals["internet"]["fetch"] = FetchWebPage()
