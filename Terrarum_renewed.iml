@@ -10,6 +10,7 @@
       <excludeFolder url="file://$MODULE_DIR$/core" />
       <excludeFolder url="file://$MODULE_DIR$/desktop" />
       <excludeFolder url="file://$MODULE_DIR$/gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/src/shader" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
