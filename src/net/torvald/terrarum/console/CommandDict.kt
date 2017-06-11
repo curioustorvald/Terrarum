@@ -47,7 +47,6 @@ object CommandDict {
             "gsontest" to GsonTest,
             "tips" to PrintRandomTips,
             "langtest" to LangTest,
-            "testgetlight" to TestGetLight,
             "spawnball" to SpawnPhysTestBall,
             "spawntorch" to SpawnTikiTorch,
             "musictest" to MusicTest,

@@ -50,38 +50,38 @@ class WorldTime(initTime: Long = 0L) {
         TIME_T = initTime
     }
 
-    val seconds: Int // 0 - 59
+    inline val seconds: Int // 0 - 59
         get() = TIME_T.toPositiveInt() % MINUTE_SEC
-    val minutes: Int // 0 - 59
+    inline val minutes: Int // 0 - 59
         get() = TIME_T.div(MINUTE_SEC).abs().toInt() % HOUR_MIN
-    val hours: Int // 0 - 21
+    inline val hours: Int // 0 - 21
         get() = TIME_T.div(HOUR_SEC).abs().toInt() % HOURS_PER_DAY
 
-    val yearlyDays: Int // 0 - 364
+    inline val yearlyDays: Int // 0 - 364
         get() = (TIME_T.toPositiveInt().div(DAY_LENGTH) % YEAR_DAYS)
 
-    val days: Int // 1 - 31
+    inline val days: Int // 1 - 31
         get() = quarterlyDays + 1 -
                 if (quarterlyMonthOffset == 0)      0
                 else if (quarterlyMonthOffset == 1) 31
                 else                                61
-    val months: Int // 1 - 12
+    inline val months: Int // 1 - 12
         get() = if (yearlyDays == YEAR_DAYS - 1) 12 else
             quarter * 3 + 1 +
             if (quarterlyDays < 31)      0
             else if (quarterlyDays < 61) 1
             else                         2
-    val years: Int
+    inline val years: Int
         get() = TIME_T.div(YEAR_DAYS * DAY_LENGTH).abs().toInt() + EPOCH_YEAR
 
-    val quarter: Int // 0 - 3
+    inline val quarter: Int // 0 - 3
         get() = if (yearlyDays == YEAR_DAYS - 1) 3 else yearlyDays / QUARTER_LENGTH
-    val quarterlyDays: Int // 0 - 90(91)
+    inline val quarterlyDays: Int // 0 - 90(91)
         get() = if (yearlyDays == YEAR_DAYS - 1) 91 else (yearlyDays % QUARTER_LENGTH)
-    val quarterlyMonthOffset: Int // 0 - 2
+    inline val quarterlyMonthOffset: Int // 0 - 2
         get() = months.minus(1) % 3
 
-    val dayOfWeek: Int //0: Mondag-The first day of weekday (0 - 7)
+    inline val dayOfWeek: Int //0: Mondag-The first day of weekday (0 - 7)
         get() = if (yearlyDays == YEAR_DAYS - 1) 7 else yearlyDays % 7
 
     var timeDelta: Int = 1
@@ -89,8 +89,8 @@ class WorldTime(initTime: Long = 0L) {
             field = if (value < 0) 0 else value
         }
 
-    val moonPhase: Double
-        get() = (TIME_T % LUNAR_CYCLE).toDouble() / LUNAR_CYCLE
+    inline val moonPhase: Double
+        get() = (TIME_T.plus(1700000L) % LUNAR_CYCLE).toDouble() / LUNAR_CYCLE
 
     @Transient private var realMillisec: Double = 0.0
     @Transient private val REAL_SEC_TO_GAME_SECS = 60
@@ -108,7 +108,7 @@ class WorldTime(initTime: Long = 0L) {
     val MONTH_NAMES_SHORT = arrayOf("Opal", "Obsi", "Gran", "Slat", "Fels", "Hema",
             "Mala", "Gale", "Lime", "Sand", "Timb", "Moon")
 
-    val currentTimeAsGameDate: GameDate
+    inline val currentTimeAsGameDate: GameDate
         get() = GameDate(years, yearlyDays)
 
     companion object {
@@ -166,8 +166,8 @@ class WorldTime(initTime: Long = 0L) {
     val dayName: String
         get() = DAY_NAMES[dayOfWeek]
 
-    private fun Long.toPositiveInt() = this.and(0x7FFFFFFF).toInt()
-    private fun Long.abs() = Math.abs(this)
+    inline fun Long.toPositiveInt() = this.and(0x7FFFFFFF).toInt()
+    inline fun Long.abs() = Math.abs(this)
 
     /** Format: "%A, %d %B %Y %X" */
     fun getFormattedTime() = "${getDayNameShort()}, " +

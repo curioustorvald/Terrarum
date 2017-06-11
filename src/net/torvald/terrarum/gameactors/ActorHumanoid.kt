@@ -135,7 +135,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     protected var isLeftDown = false
     protected var isRightDown = false
     protected var isJumpDown = false
-    protected val isGamer: Boolean
+    protected inline val isGamer: Boolean
         get() = this == Terrarum.ingame!!.player
 
 
@@ -221,7 +221,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         }
     }
 
-    private val hasController: Boolean
+    private inline val hasController: Boolean
         get() = if (isGamer) Terrarum.controller != null
                 else true
     
@@ -318,7 +318,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         if (isJumpDown) {
             if (!noClip) {
                 if (airJumpingAllowed ||
-                    (!airJumpingAllowed && grounded)) {
+                    (!airJumpingAllowed && walledBottom)) {
                     jumping = true
                 }
                 jump()
@@ -525,7 +525,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
         //println("$this\tsprite current frame: ${sprite!!.currentFrame}")
 
-        if (grounded) {
+        if (walledBottom) {
             // set anim row
             if (controllerMoveDelta?.x != 0.0) {
                 sprite?.switchRow(SPRITE_ROW_WALK)

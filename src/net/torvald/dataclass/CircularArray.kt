@@ -11,9 +11,9 @@ package net.torvald.dataclass
  */
 class CircularArray<T>(val size: Int) {
 
-    private val buffer: Array<T> = arrayOfNulls<Any>(size) as Array<T>
-    private var tail: Int = 0
-    private var head: Int = 0
+    val buffer: Array<T> = arrayOfNulls<Any>(size) as Array<T>
+    var tail: Int = 0
+    var head: Int = 0
 
     val elemCount: Int
         get() = if (tail >= head) tail - head else size
@@ -26,7 +26,7 @@ class CircularArray<T>(val size: Int) {
         }
     }
 
-    fun forEach(action: (T) -> Unit) {
+    inline fun forEach(action: (T) -> Unit) {
         /*if (tail >= head) { // queue not full
             (head..tail - 1).map { buffer[it] }.forEach { action(it) }
         }
@@ -45,11 +45,11 @@ class CircularArray<T>(val size: Int) {
         }
     }
 
-    fun forEachConcurrent(action: (T) -> Unit) {
+    inline fun forEachConcurrent(action: (T) -> Unit) {
         TODO()
     }
 
-    fun forEachConcurrentWaitFor(action: (T) -> Unit) {
+    inline fun forEachConcurrentWaitFor(action: (T) -> Unit) {
         TODO()
     }
 
