@@ -57,28 +57,23 @@ object LightmapRenderer {
     internal var for_y_end: Int = 0
 
 
-    fun getLightRawPos(x: Int, y: Int) = lightmap[y][x]
+    //inline fun getLightRawPos(x: Int, y: Int) = lightmap[y][x]
 
     fun getLight(x: Int, y: Int): Int? {
-        /*if (x !in 0..Terrarum.game.map.width - 1 || y !in 0..Terrarum.game.map.height - 1)
-                // if out of range then
-                null
-            else
-                lightmap[y][x]*/
-        try {
+        if (y - for_y_start + overscan_open in 0..lightmap.lastIndex &&
+            x - for_x_start + overscan_open in 0..lightmap[0].lastIndex) {
+
             return lightmap[y - for_y_start + overscan_open][x - for_x_start + overscan_open]
         }
-        catch (e: ArrayIndexOutOfBoundsException) {
-            return null
-        }
+
+        return null
     }
 
     fun setLight(x: Int, y: Int, colour: Int) {
-        //lightmap[y][x] = colour
-        try {
+        if (y - for_y_start + overscan_open in 0..lightmap.lastIndex &&
+            x - for_x_start + overscan_open in 0..lightmap[0].lastIndex) {
+
             lightmap[y - for_y_start + overscan_open][x - for_x_start + overscan_open] = colour
-        }
-        catch (e: ArrayIndexOutOfBoundsException) {
         }
     }
 
@@ -491,13 +486,13 @@ object LightmapRenderer {
      * @param darken (0-255)
      * @return
      */
-    fun darkenUniformInt(data: Int, darken: Int): Int {
+     fun darkenUniformInt(data: Int, darken: Int): Int {
         if (darken < 0 || darken > CHANNEL_MAX)
             throw IllegalArgumentException("darken: out of range ($darken)")
 
         val darkenColoured = constructRGBFromInt(darken, darken, darken)
         return darkenColoured(data, darkenColoured)
-    }
+     }
 
     /**
      * Darken or brighten colour by 'brighten' argument
@@ -516,19 +511,6 @@ object LightmapRenderer {
             darkenColoured(data, modifier)
         else
             brightenColoured(data, modifier)
-    }
-
-    /** Get each channel from two RGB values, return new RGB that has max value of each channel
-     * @param rgb
-     * @param rgb2
-     * @return
-     */
-    private infix fun Int.maxBlend(other: Int): Int {
-        val r1 = this.rawR(); val r2 = other.rawR(); val newR = if (r1 > r2) r1 else r2
-        val g1 = this.rawG(); val g2 = other.rawG(); val newG = if (g1 > g2) g1 else g2
-        val b1 = this.rawB(); val b2 = other.rawB(); val newB = if (b1 > b2) b1 else b2
-
-        return constructRGBFromInt(newR, newG, newB)
     }
 
     /**
@@ -559,26 +541,43 @@ object LightmapRenderer {
         return constructRGBFromFloat(newR, newG, newB)
     }
 
-    private infix fun Int.colSub(other: Int) = constructRGBFromInt(
-            (this.rawR() - other.rawR()).clampChannel() ,
-            (this.rawG() - other.rawG()).clampChannel() ,
-            (this.rawB() - other.rawB()).clampChannel()
-    )
+    /** Get each channel from two RGB values, return new RGB that has max value of each channel
+     * @param rgb
+     * @param rgb2
+     * @return
+     */
+    private inline infix fun Int.maxBlend(other: Int): Int {
+        return (if (this.rawR() > other.rawR()) this.rawR() else other.rawR()) * MUL_2 +
+               (if (this.rawG() > other.rawG()) this.rawG() else other.rawG()) * MUL +
+               (if (this.rawB() > other.rawB()) this.rawB() else other.rawB())
+    }
 
-    private infix fun Int.colAdd(other: Int) = constructRGBFromInt(
-            (this.rawR() + other.rawR()).clampChannel() ,
-            (this.rawG() + other.rawG()).clampChannel() ,
-            (this.rawB() + other.rawB()).clampChannel()
-    )
+    private inline infix fun Int.linMix(other: Int): Int {
+        return ((this.rawR() + other.rawR()) ushr 1) * MUL_2 +
+               ((this.rawG() + other.rawG()) ushr 1) * MUL +
+               ((this.rawB() + other.rawB()) ushr 1)
+    }
 
-    fun Int.rawR() = this / MUL_2
-    fun Int.rawG() = this % MUL_2 / MUL
-    fun Int.rawB() = this % MUL
+    private inline infix fun Int.colSub(other: Int): Int {
+        return ((this.rawR() - other.rawR()).clampChannel()) * MUL_2 +
+               ((this.rawG() - other.rawG()).clampChannel()) * MUL +
+               ((this.rawB() - other.rawB()).clampChannel())
+    }
+
+    private inline infix fun Int.colAdd(other: Int): Int {
+        return ((this.rawR() + other.rawR()).clampChannel()) * MUL_2 +
+               ((this.rawG() + other.rawG()).clampChannel()) * MUL +
+               ((this.rawB() + other.rawB()).clampChannel())
+    }
+
+    inline fun Int.rawR() = this / MUL_2
+    inline fun Int.rawG() = this % MUL_2 / MUL
+    inline fun Int.rawB() = this % MUL
 
     /** 0.0 - 1.0 for 0-1023 (0.0 - 0.25 for 0-255) */
-    fun Int.r(): Float = this.rawR() / CHANNEL_MAX_FLOAT
-    fun Int.g(): Float = this.rawG() / CHANNEL_MAX_FLOAT
-    fun Int.b(): Float = this.rawB() / CHANNEL_MAX_FLOAT
+    inline fun Int.r(): Float = this.rawR() / CHANNEL_MAX_FLOAT
+    inline fun Int.g(): Float = this.rawG() / CHANNEL_MAX_FLOAT
+    inline fun Int.b(): Float = this.rawB() / CHANNEL_MAX_FLOAT
 
     /**
 
@@ -601,43 +600,33 @@ object LightmapRenderer {
         return constructRGBFromInt(newR, newG, newB)
     }
 
-    fun constructRGBFromInt(r: Int, g: Int, b: Int): Int {
+    inline fun constructRGBFromInt(r: Int, g: Int, b: Int): Int {
         if (r !in 0..CHANNEL_MAX) throw IllegalArgumentException("Red: out of range ($r)")
         if (g !in 0..CHANNEL_MAX) throw IllegalArgumentException("Green: out of range ($g)")
         if (b !in 0..CHANNEL_MAX) throw IllegalArgumentException("Blue: out of range ($b)")
-        return r * MUL_2 + g * MUL + b
+
+        return r * MUL_2 +
+               g * MUL +
+               b
     }
 
-    fun constructRGBFromFloat(r: Float, g: Float, b: Float): Int {
+    inline fun constructRGBFromFloat(r: Float, g: Float, b: Float): Int {
         if (r < 0 || r > CHANNEL_MAX_DECIMAL) throw IllegalArgumentException("Red: out of range ($r)")
         if (g < 0 || g > CHANNEL_MAX_DECIMAL) throw IllegalArgumentException("Green: out of range ($g)")
         if (b < 0 || b > CHANNEL_MAX_DECIMAL) throw IllegalArgumentException("Blue: out of range ($b)")
 
-        val intR = (r * CHANNEL_MAX).round()
-        val intG = (g * CHANNEL_MAX).round()
-        val intB = (b * CHANNEL_MAX).round()
-
-        return constructRGBFromInt(intR, intG, intB)
+        return (r * CHANNEL_MAX).round() * MUL_2 +
+               (g * CHANNEL_MAX).round() * MUL +
+               (b * CHANNEL_MAX).round()
     }
 
-    private infix fun Int.linMix(other: Int): Int {
-        val r = (this.rawR() + other.rawR()) ushr 1
-        val g = (this.rawG() + other.rawG()) ushr 1
-        val b = (this.rawB() + other.rawB()) ushr 1
-        return constructRGBFromInt(r, g, b)
-    }
+    inline fun Int.clampZero() = if (this < 0) 0 else this
+    inline fun Float.clampZero() = if (this < 0) 0f else this
+    inline fun Int.clampChannel() = if (this < 0) 0 else if (this > CHANNEL_MAX) CHANNEL_MAX else this
+    inline fun Float.clampOne() = if (this < 0) 0f else if (this > 1) 1f else this
+    inline fun Float.clampChannel() = if (this > CHANNEL_MAX_DECIMAL) CHANNEL_MAX_DECIMAL else this
 
-    private fun Int.clampZero() = if (this < 0) 0 else this
-
-    private fun Float.clampZero() = if (this < 0) 0f else this
-
-    private fun Int.clampChannel() = if (this < 0) 0 else if (this > CHANNEL_MAX) CHANNEL_MAX else this
-
-    private fun Float.clampOne() = if (this < 0) 0f else if (this > 1) 1f else this
-
-    private fun Float.clampChannel() = if (this > CHANNEL_MAX_DECIMAL) CHANNEL_MAX_DECIMAL else this
-
-    fun getValueFromMap(x: Int, y: Int): Int? = getLight(x, y)
+    inline fun getValueFromMap(x: Int, y: Int): Int? = getLight(x, y)
     fun getHighestRGB(x: Int, y: Int): Int? {
         val value = getLight(x, y)
         if (value == null)
@@ -654,33 +643,23 @@ object LightmapRenderer {
         }
     }
 
-    private fun arithmeticAverage(vararg i: Int): Int {
-        var sum = 0
-        for (k in i.indices) {
-            sum += i[k]
-        }
-        return Math.round(sum / i.size.toFloat())
-    }
-
-    private fun Int.clamp256() = if (this > 255) 255 else this
-
-    infix fun Float.powerOf(f: Float) = FastMath.pow(this, f)
-    private fun Float.sqr() = this * this
-    private fun Float.sqrt() = FastMath.sqrt(this)
-    private fun Float.inv() = 1f / this
-    fun Float.floor() = FastMath.floor(this)
-    fun Double.floorInt() = Math.floor(this).toInt()
-    fun Float.round(): Int = Math.round(this)
-    fun Double.round(): Int = Math.round(this).toInt()
-    fun Float.ceil() = FastMath.ceil(this)
-    fun Int.even(): Boolean = this and 1 == 0
-    fun Int.odd(): Boolean = this and 1 == 1
-    fun Int.normaliseToColour(): Color = Color(
+    inline infix fun Float.powerOf(f: Float) = FastMath.pow(this, f)
+    private inline fun Float.sqr() = this * this
+    private inline fun Float.sqrt() = FastMath.sqrt(this)
+    private inline fun Float.inv() = 1f / this
+    inline fun Float.floor() = FastMath.floor(this)
+    inline fun Double.floorInt() = Math.floor(this).toInt()
+    inline fun Float.round(): Int = Math.round(this)
+    inline fun Double.round(): Int = Math.round(this).toInt()
+    inline fun Float.ceil() = FastMath.ceil(this)
+    inline fun Int.even(): Boolean = this and 1 == 0
+    inline fun Int.odd(): Boolean = this and 1 == 1
+    inline fun Int.normaliseToColour(): Color = Color(
             Math.min(this.rawR(), 256),
             Math.min(this.rawG(), 256),
             Math.min(this.rawB(), 256)
     )
-    private val RGB_HDR_LUT = floatArrayOf( // polymonial of 6.0  please refer to work_files/HDRcurveBezierLinIntp.kts
+    val RGB_HDR_LUT = floatArrayOf( // polymonial of 6.0  please refer to work_files/HDRcurveBezierLinIntp.kts
             0.0f,0.0f,0.0020097627f,0.0059880256f,0.009966114f,0.013944201f,0.01792211f,0.021899965f,0.025877733f,0.029855346f,0.033832956f,0.037810322f,0.041787688f,0.045764867f,0.04974198f,0.053718954f,
             0.05769581f,0.061672557f,0.065649144f,0.06962565f,0.07360197f,0.07757821f,0.08155425f,0.0855302f,0.08950596f,0.0934816f,0.097457066f,0.101432376f,0.10540755f,0.1093825f,0.11335737f,0.11733195f,
             0.12130644f,0.12528068f,0.12925476f,0.13322866f,0.1372023f,0.14117579f,0.14514904f,0.14912204f,0.1530949f,0.15706745f,0.16103975f,0.16501188f,0.1689837f,0.17295523f,0.17692655f,0.1808976f,
@@ -747,7 +726,7 @@ object LightmapRenderer {
             1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f
     )
     /** To eliminated visible edge on the gradient when 255/1023 is exceeded */
-    fun Int.normaliseToColourHDR() = Color(
+    inline fun Int.normaliseToColourHDR() = Color(
             RGB_HDR_LUT[this.rawR()],
             RGB_HDR_LUT[this.rawG()],
             RGB_HDR_LUT[this.rawB()]

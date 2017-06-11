@@ -31,8 +31,8 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     /**
      * Sorted by referenceID.
      */
-    private val itemList = ArrayList<InventoryPair>()
-    private val quickBar = Array<ItemID?>(10, { null }) // 0: Slot 1, 9: Slot 10
+    val itemList = ArrayList<InventoryPair>()
+    val quickBar = Array<ItemID?>(10, { null }) // 0: Slot 1, 9: Slot 10
 
     init {
     }
@@ -129,7 +129,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     /**
      * HashMap<GameItem, Amounts>
      */
-    fun forEach(consumer: (InventoryPair) -> Unit) = itemList.forEach(consumer)
+    inline fun forEach(consumer: (InventoryPair) -> Unit) = itemList.forEach(consumer)
 
     /**
      * Get capacity of inventory

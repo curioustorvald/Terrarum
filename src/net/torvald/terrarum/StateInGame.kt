@@ -61,7 +61,7 @@ class StateInGame : BasicGameState() {
 
     var playableActorDelegate: PlayableActorDelegate? = null // DO NOT LATEINIT!
         private set
-    val player: ActorHumanoid? // currently POSSESSED actor :)
+    inline val player: ActorHumanoid? // currently POSSESSED actor :)
         get() = playableActorDelegate?.actor
 
     var screenZoom = 1.0f
@@ -106,12 +106,12 @@ class StateInGame : BasicGameState() {
     lateinit var uiAlasesPausing: ArrayList<UIHandler>
         private set
 
-    var paused: Boolean = false
+    inline val paused: Boolean
         get() = uiAlasesPausing.map { if (it.isOpened) return true else 0 }.isEmpty() // isEmply is always false, which we want
     /**
      * Set to false if UI is opened; set to true  if UI is closed.
      */
-    var canPlayerControl: Boolean = false
+    inline val canPlayerControl: Boolean
         get() = !paused // FIXME temporary behab (block movement if the game is paused or paused by UIs)
 
     @Throws(SlickException::class)

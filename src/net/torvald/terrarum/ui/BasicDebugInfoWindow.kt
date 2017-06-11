@@ -150,8 +150,7 @@ class BasicDebugInfoWindow : UICanvas {
                                  " (${Terrarum.ingame!!.world.time.getFormattedTime()})")
         printLineColumn(g, 2, 6, "Mass $ccG${player?.mass}")
 
-        printLineColumn(g, 2, 7, "grounded $ccG${player?.grounded}")
-        printLineColumn(g, 2, 8, "noClip $ccG${player?.noClip}")
+        printLineColumn(g, 2, 7, "noClip $ccG${player?.noClip}")
 
 
         drawHistogram(g, LightmapRenderer.histogram,

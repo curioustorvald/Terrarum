@@ -17,7 +17,7 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas {
     override var openCloseTime: Millisec = 0
 
     private var ELuptimer = 9999 // to make the light turned off by default
-    private val ELuptime = 5000
+    private val ELuptime = 4000
     private var ELon = false
 
     private var atlas = SpriteSheet(ModMgr.getPath("basegame", "gui/basic_meter_atlas.tga"), width, height)
@@ -99,7 +99,7 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas {
 
             if (player != null) {
                 val playerPos = player.tilewiseHitbox
-                lightLevel = (LightmapRenderer.getLight(playerPos.canonicalX.toInt(), playerPos.canonicalY.toInt()) ?:
+                lightLevel = (LightmapRenderer.getLight(playerPos.centeredX.toInt(), playerPos.centeredY.toInt()) ?:
                                   Terrarum.ingame!!.world.globalLight
                                  ).normaliseToColour()
             }

@@ -58,7 +58,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      */
     override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // Hitbox is implemented using Double;
 
-    val tilewiseHitbox: Hitbox
+    inline val tilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
@@ -91,7 +91,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      */
     /** Apparent scale. Use "avBaseScale" for base scale */
     var scale: Double
-        get() = (actorValue.getAsDouble(AVKey.SCALE) ?: 1.0) *
+        inline get() = (actorValue.getAsDouble(AVKey.SCALE) ?: 1.0) *
                 (actorValue.getAsDouble(AVKey.SCALEBUFF) ?: 1.0)
         set(value) {
             val scaleDelta = value - scale
@@ -101,7 +101,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
     @Transient val MASS_LOWEST = 0.1 // Kilograms
     /** Apparent mass. Use "avBaseMass" for base mass */
-    val mass: Double
+    inline val mass: Double
         get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT * Math.pow(scale, 3.0)
         /*set(value) { // use "var avBaseMass: Double"
             if (value <= 0)
@@ -113,7 +113,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             actorValue[AVKey.BASEMASS] = value / Math.pow(scale, 3.0)
         }*/
-    @Transient private val MASS_DEFAULT: Double = 60.0
+    @Transient val MASS_DEFAULT: Double = 60.0
     /** Valid range: [0, 1]  */
     var elasticity: Double = 0.0
         set(value) {
@@ -139,7 +139,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         set(value) {
             elasticity = 1.0 - value
         }
-        get() = 1.0 - elasticity
+        inline get() = 1.0 - elasticity
 
     var density = 1000.0
         set(value) {
@@ -153,7 +153,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * Flags and Properties
      */
 
-    val grounded: Boolean
+    private inline val grounded: Boolean
         get() = isPlayerNoClip ||
                 (world.gravitation.y > 0 && isWalled(hitbox, COLLIDING_BOTTOM) ||
                  world.gravitation.y < 0 && isWalled(hitbox, COLLIDING_TOP))
@@ -182,7 +182,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     @Transient private val gravitation: Vector2 = world.gravitation
     @Transient val DRAG_COEFF_DEFAULT = 1.2
     /** Drag coefficient. Parachutes have much higher value than bare body (1.2) */
-    var dragCoefficient: Double
+    inline var dragCoefficient: Double
         get() = actorValue.getAsDouble(AVKey.DRAGCOEFF) ?: DRAG_COEFF_DEFAULT
         set(value) {
             if (value < 0)
@@ -234,9 +234,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     internal var walledBottom = false // UNUSED; only for BasicDebugInfoWindow
     internal var colliding = false
 
-    protected val gameContainer: GameContainer
+    protected inline val gameContainer: GameContainer
         get() = Terrarum.appgc
-    protected val updateDelta: Int
+    protected inline val updateDelta: Int
         get() = Terrarum.delta
 
 
@@ -303,15 +303,15 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         hitbox.translate(dx, dy)
     }
 
-    val centrePosVector: Vector2
+    inline val centrePosVector: Vector2
         get() = Vector2(hitbox.centeredX, hitbox.centeredY)
-    val centrePosPoint: Point2d
+    inline val centrePosPoint: Point2d
         get() = Point2d(hitbox.centeredX, hitbox.centeredY)
-    val feetPosVector: Vector2
+    inline val feetPosVector: Vector2
         get() = Vector2(hitbox.centeredX, hitbox.endY)
-    val feetPosPoint: Point2d
+    inline val feetPosPoint: Point2d
         get() = Point2d(hitbox.centeredX, hitbox.endY)
-    val feetPosTile: IntArray
+    inline val feetPosTile: IntArray
         get() = intArrayOf(tilewiseHitbox.centeredX.floorInt(), tilewiseHitbox.endY.floorInt())
 
     override fun run() = update(gameContainer, updateDelta)
@@ -1054,20 +1054,20 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
     }*/
 
-    private val submergedRatio: Double
+    private inline val submergedRatio: Double
         get() = submergedHeight / hitbox.height
 
-    private val submergedVolume: Double
+    private inline val submergedVolume: Double
         get() = submergedHeight * hitbox.width * hitbox.width
 
-    private val submergedHeight: Double
+    private inline val submergedHeight: Double
         get() = Math.max(
                 getContactingAreaFluid(COLLIDING_LEFT),
                 getContactingAreaFluid(COLLIDING_RIGHT)
         ).toDouble()
 
 
-    internal val bodyFriction: Double
+    internal inline val bodyFriction: Double
         get() {
             var friction = 0.0
             forEachOccupyingTileNum {
@@ -1078,7 +1078,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             return friction
         }
-    internal val feetFriction: Double
+    internal inline val feetFriction: Double
         get() {
             var friction = 0.0
             forEachFeetTileNum {
@@ -1092,7 +1092,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     fun Int.frictionToMult(): Double = this / 16.0
 
-    internal val bodyViscosity: Int
+    internal inline val bodyViscosity: Int
         get() {
             var viscosity = 0
             forEachOccupyingTile {
@@ -1103,7 +1103,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             return viscosity
         }
-    internal val feetViscosity: Int
+    internal inline val feetViscosity: Int
         get() {
             var viscosity = 0
             forEachFeetTile {
@@ -1117,7 +1117,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     fun Int.viscosityToMult(): Double = 16.0 / (16.0 + this)
 
-    internal val speedMultByTile: Double
+    internal inline val speedMultByTile: Double
         get() {
             val notSubmergedCap = if (grounded)
                 feetViscosity.viscosityToMult()
@@ -1129,7 +1129,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
     /** about get going
      * for about stopping, see setHorizontalFriction */
-    internal val accelMultMovement: Double
+    internal inline val accelMultMovement: Double
         get() {
             if (!isPlayerNoClip) {
                 val notSubmergedAccel = if (grounded)
@@ -1148,7 +1148,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /**
      * Get highest tile density from occupying tiles, fluid only
      */
-    private val tileDensityFluid: Int
+    private inline val tileDensityFluid: Int
         get() {
             var density = 0
             forEachOccupyingTile {
@@ -1165,7 +1165,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * Get highest density (specific gravity) value from tiles that the body occupies.
      * @return
      */
-    private val tileDensity: Int
+    private inline val tileDensity: Int
         get() {
             var density = 0
             forEachOccupyingTile {
@@ -1334,7 +1334,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
 
-    private fun forEachOccupyingTileNum(consumer: (Int?) -> Unit) {
+    private inline fun forEachOccupyingTileNum(consumer: (Int?) -> Unit) {
         val tiles = ArrayList<Int?>()
         for (y in tilewiseHitbox.startY.toInt()..tilewiseHitbox.endY.toInt()) {
             for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
@@ -1345,7 +1345,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         return tiles.forEach(consumer)
     }
 
-    private fun forEachOccupyingTile(consumer: (BlockProp?) -> Unit) {
+    private inline fun forEachOccupyingTile(consumer: (BlockProp?) -> Unit) {
         val tileProps = ArrayList<BlockProp?>()
         for (y in tilewiseHitbox.startY.toInt()..tilewiseHitbox.endY.toInt()) {
             for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
@@ -1356,7 +1356,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         return tileProps.forEach(consumer)
     }
 
-    private fun forEachOccupyingTilePos(hitbox: Hitbox, consumer: (BlockAddress) -> Unit) {
+    private inline fun forEachOccupyingTilePos(hitbox: Hitbox, consumer: (BlockAddress) -> Unit) {
         val newTilewiseHitbox =  Hitbox.fromTwoPoints(
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
@@ -1374,7 +1374,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         return tilePosList.forEach(consumer)
     }
 
-    private fun forEachFeetTileNum(consumer: (Int?) -> Unit) {
+    private inline fun forEachFeetTileNum(consumer: (Int?) -> Unit) {
         val tiles = ArrayList<Int?>()
 
         // offset 1 pixel to the down so that friction would work
@@ -1387,7 +1387,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         return tiles.forEach(consumer)
     }
 
-    private fun forEachFeetTile(consumer: (BlockProp?) -> Unit) {
+    private inline fun forEachFeetTile(consumer: (BlockProp?) -> Unit) {
         val tileProps = ArrayList<BlockProp?>()
 
         // offset 1 pixel to the down so that friction would work
@@ -1437,7 +1437,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         @Transient const val COLLISION_KNOCKBACK_GIVER = 4 // mobs
         @Transient const val COLLISION_KNOCKBACK_TAKER = 5 // benevolent NPCs
 
-        @Transient private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
+        @Transient val TILE_SIZE = FeaturesDrawer.TILE_SIZE
 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
@@ -1472,52 +1472,52 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /**
      * Apparent strength. 1 000 is default value
      */
-    val avStrength: Double
+    internal inline val avStrength: Double
         get() = (actorValue.getAsDouble(AVKey.STRENGTH) ?: 1000.0) *
                 (actorValue.getAsDouble(AVKey.STRENGTHBUFF) ?: 1.0) * scale
-    var avBaseStrength: Double?
+    internal inline var avBaseStrength: Double?
         get() = actorValue.getAsDouble(AVKey.STRENGTH)
         set(value) {
             actorValue[AVKey.STRENGTH] = value!!
         }
-    var avBaseMass: Double
+    internal inline var avBaseMass: Double
         get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT
         set(value) {
             actorValue[AVKey.BASEMASS] = value
         }
-    val avAcceleration: Double
+    internal inline val avAcceleration: Double
         get() = actorValue.getAsDouble(AVKey.ACCEL)!! *
                 actorValue.getAsDouble(AVKey.ACCELBUFF)!! *
                 accelMultMovement *
                 scale.sqrt()
-    val avSpeedCap: Double
+    internal inline val avSpeedCap: Double
         get() = actorValue.getAsDouble(AVKey.SPEED)!! *
                 actorValue.getAsDouble(AVKey.SPEEDBUFF)!! *
                 speedMultByTile *
                 scale.sqrt()
 }
 
-fun Int.sqr(): Int = this * this
-fun Double.floorInt() = Math.floor(this).toInt()
-fun Float.floorInt() = FastMath.floor(this)
-fun Float.floor() = FastMath.floor(this).toFloat()
-fun Float.ceilInt() = FastMath.ceil(this)
-fun Double.round() = Math.round(this).toDouble()
-fun Double.floor() = Math.floor(this)
-fun Double.ceil() = this.floor() + 1.0
-fun Double.roundInt(): Int = Math.round(this).toInt()
-fun Float.roundInt(): Int = Math.round(this)
-fun Double.abs() = Math.abs(this)
-fun Double.sqr() = this * this
-fun Double.sqrt() = Math.sqrt(this)
-fun Float.sqrt() = FastMath.sqrt(this)
-fun Int.abs() = if (this < 0) -this else this
-fun Double.bipolarClamp(limit: Double) =
+inline fun Int.sqr(): Int = this * this
+inline fun Double.floorInt() = Math.floor(this).toInt()
+inline fun Float.floorInt() = FastMath.floor(this)
+inline fun Float.floor() = FastMath.floor(this).toFloat()
+inline fun Float.ceilInt() = FastMath.ceil(this)
+inline fun Double.round() = Math.round(this).toDouble()
+inline fun Double.floor() = Math.floor(this)
+inline fun Double.ceil() = this.floor() + 1.0
+inline fun Double.roundInt(): Int = Math.round(this).toInt()
+inline fun Float.roundInt(): Int = Math.round(this)
+inline fun Double.abs() = Math.abs(this)
+inline fun Double.sqr() = this * this
+inline fun Double.sqrt() = Math.sqrt(this)
+inline fun Float.sqrt() = FastMath.sqrt(this)
+inline fun Int.abs() = if (this < 0) -this else this
+inline fun Double.bipolarClamp(limit: Double) =
         if (this > 0 && this > limit) limit
         else if (this < 0 && this < -limit) -limit
         else this
 
-fun absMax(left: Double, right: Double): Double {
+inline fun absMax(left: Double, right: Double): Double {
     if (left > 0 && right > 0)
         if (left > right) return left
         else return right
@@ -1532,8 +1532,8 @@ fun absMax(left: Double, right: Double): Double {
     }
 }
 
-fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
-fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0
+inline fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
+inline fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0
 
 fun interpolateLinear(scale: Double, startValue: Double, endValue: Double): Double {
     if (startValue == endValue) {

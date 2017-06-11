@@ -577,8 +577,7 @@ object BlocksDrawer_NEW {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT)
 
 
-        //inGLMatrixStack { // disabled for debugging: won't hotswap
-        GL11.glPushMatrix()
+        inGLMatrixStack { // disabled for debugging: won't hotswap TEST: what if we inline?
 
             GL11.glTranslatef(WorldCamera.x.clampTileSize().toFloat() - TILE_SIZEF, WorldCamera.y.clampTileSize().toFloat(), 0f)
 
@@ -594,8 +593,7 @@ object BlocksDrawer_NEW {
 
             GL11.glDrawArrays(GL11.GL_QUADS, 0, 4 * VBO_WIDTH * VBO_HEIGHT)
 
-        GL11.glPopMatrix()
-        //}
+        }
     }
 
     private fun Int.clampTileSize() = this.div(TILE_SIZE).times(TILE_SIZE)
@@ -778,7 +776,7 @@ object BlocksDrawer_NEW {
     fun Float.floor() = FastMath.floor(this)
     fun Float.ceil() = FastMath.ceil(this)
 
-    fun inGLMatrixStack(action: () -> Unit) {
+    inline fun inGLMatrixStack(action: () -> Unit) {
         GL11.glPushMatrix()
         action()
         GL11.glPopMatrix()
