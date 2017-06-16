@@ -1,12 +1,9 @@
 package net.torvald.terrarumsansbitmap.gdx
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.*
-import com.badlogic.gdx.utils.Array
-import net.torvald.spriteanimation.TextureRegionPack
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -74,14 +71,14 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
     }
 
     private fun isHangul(c: Char) = c.toInt() in 0xAC00..0xD7A3
-    private fun isAscii(c: Char) = c.toInt() in 0x20..0xFF
+    private fun isAscii(c: Char) = c.toInt() in 0..0xFF
     //private fun isRunic(c: Char) = runicList.contains(c)
     private fun isExtA(c: Char) = c.toInt() in 0x100..0x17F
     private fun isExtB(c: Char) = c.toInt() in 0x180..0x24F
     private fun isKana(c: Char) = c.toInt() in 0x3040..0x30FF
     private fun isCJKPunct(c: Char) = c.toInt() in 0x3000..0x303F
     private fun isUniHan(c: Char) = c.toInt() in 0x3400..0x9FFF
-    private fun isCyrilic(c: Char) = c.toInt() in 0x400..0x45F
+    private fun isCyrilic(c: Char) = c.toInt() in 0x400..0x4FF // 4FF: futureproof; currently only up to 45F is supported
     private fun isFullwidthUni(c: Char) = c.toInt() in 0xFF00..0xFF1F
     private fun isUniPunct(c: Char) = c.toInt() in 0x2000..0x206F
     private fun isGreek(c: Char) = c.toInt() in 0x370..0x3CE
@@ -131,15 +128,15 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
 
     private val unihanWidthSheets = arrayOf(
             SHEET_UNIHAN,
-            SHEET_FW_UNI,
-            SHEET_UNIHAN
+            SHEET_FW_UNI
     )
     private val variableWidthSheets = arrayOf(
             SHEET_ASCII_VARW,
-            SHEET_CYRILIC_VARW,
             SHEET_EXTA_VARW,
-            SHEET_GREEK_VARW,
             SHEET_EXTB_VARW,
+            SHEET_CYRILIC_VARW,
+            SHEET_UNI_PUNCT,
+            SHEET_GREEK_VARW,
             SHEET_THAI_VARW
     )
 
@@ -161,41 +158,41 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
     )
     private val codeRange = arrayOf( // MUST BE MATCHING WITH SHEET INDICES!!
             0..0xFF,
-            0xAC00..0xD7A4,
+            0xAC00..0xD7A3,
             0x100..0x17F,
             0x180..0x24F,
             0x3040..0x30FF,
             0x3000..0x303F,
             0x3400..0x9FFF,
-            0x400..0x45F,
+            0x400..0x4FF,
             0xFF00..0xFF1F,
             0x2000..0x206F,
             0x370..0x3CE,
             0xE00..0xE7F,
             0xE000..0xE0FF
     )
-    private val sheets = arrayOf( // MUST BE MATCHING WITH SHEET INDICES!!
-            asciiSheet,
-            hangulSheet,
-            extASheet,
-            extBSheet,
-            kanaSheet,
-            cjkPunct,
-            uniHan,
-            cyrilic,
-            fullwidthForms,
-            uniPunct,
-            greekSheet,
-            thaiSheet,
-            customSheet
-    )
+    private val glyphWidths: HashMap<Int, Int> = HashMap()
+    private val sheets: Array<TextureRegionPack>
 
 
     init {
+        val sheetsPack = ArrayList<TextureRegionPack>()
+
         // first we create pixmap to read pixels, then make texture using pixmap
         fileList.forEachIndexed { index, it ->
-            val isVariable = it.endsWith("_variable.tga")
+            val isVariable1 = it.endsWith("_variable.tga")
+            val isVariable2 = variableWidthSheets.contains(index)
+            val isVariable = isVariable1 && isVariable2
+
+            // idiocity check
+            if (isVariable1 && !isVariable2)
+                throw Error("[TerrarumSansBitmap] font is named as variable on the name but not enlisted as")
+            else if (!isVariable1 && isVariable2)
+                throw Error("[TerrarumSansBitmap] font is enlisted as variable on the name but not named as")
+
+
             val pixmap: Pixmap
+
 
             // unpack gz if applicable
             if (it.endsWith(".gz")) {
@@ -217,16 +214,23 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
 
 
             if (isVariable) {
-                buildWidthTable(pixmap, codeRange[index].first, codeRange[index])
+                println("[TerrarumSansBitmap] loading texture $it [VARIABLE]")
+                buildWidthTable(pixmap, codeRange[index], 16)
             }
-
+            else {
+                println("[TerrarumSansBitmap] loading texture $it")
+            }
 
             val texture = Texture(pixmap)
             val texRegPack = if (isVariable) {
                 TextureRegionPack(texture, W_VAR_INIT, H, HGAP_VAR, 0)
             }
-            else if (index == SHEET_UNIHAN || index == SHEET_FW_UNI) {
-                TextureRegionPack(texture, W_UNIHAN, H_UNIHAN)
+            else if (index == SHEET_UNIHAN) {
+                TextureRegionPack(texture, W_UNIHAN, H_UNIHAN) // the only exception that is height is 16
+            }
+            // below they all have height of 20 'H'
+            else if (index == SHEET_FW_UNI) {
+                TextureRegionPack(texture, W_UNIHAN, H)
             }
             else if (index == SHEET_CJK_PUNCT) {
                 TextureRegionPack(texture, W_ASIAN_PUNCT, H)
@@ -240,13 +244,15 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
             else if (index == SHEET_CUSTOM_SYM) {
                 TextureRegionPack(texture, SIZE_CUSTOM_SYM, SIZE_CUSTOM_SYM) // TODO variable
             }
-            else throw IllegalArgumentException("Unknown sheet index: $index")
+            else throw IllegalArgumentException("[TerrarumSansBitmap] Unknown sheet index: $index")
 
 
-            sheets[index] = texRegPack
+            sheetsPack.add(texRegPack)
 
             pixmap.dispose() // you are terminated
         }
+
+        sheets = sheetsPack.toTypedArray()
     }
 
 
@@ -259,7 +265,6 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
 
     override fun isFlipped() = false
 
-
     override fun setFixedWidthGlyphs(glyphs: CharSequence) {
         throw UnsupportedOperationException("Nope, no monospace, and figures are already fixed width, bruv.")
     }
@@ -270,15 +275,18 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
         setOwnsTexture(true)
     }
 
-    private var microBuffer: CharSequence = ""
-    private var microBWidth = intArrayOf() // absolute posX of glyphs from print-origin
+    private val offsetUnihan = (H - H_UNIHAN) / 2
+    private val offsetCustomSym = (H - SIZE_CUSTOM_SYM) / 2
+
+    private var textBuffer: CharSequence = ""
+    private var textBWidth = intArrayOf() // absolute posX of glyphs from print-origin
 
     override fun draw(batch: Batch, str: CharSequence, x: Float, y: Float): GlyphLayout? {
-        if (microBuffer != str) {
-            microBuffer = str
+        if (textBuffer != str) {
+            textBuffer = str
             val widths = getWidthOfCharSeq(str)
 
-            microBWidth = Array(str.length, { charIndex ->
+            textBWidth = Array(str.length, { charIndex ->
                 if (charIndex == 0)
                     0
                 else {
@@ -290,16 +298,43 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
         }
 
 
-        //print("[gamefontbase] widthTable for $microBuffer: ")
-        //microBWidth.forEach { print("$it ") }; println()
+        //print("[TerrarumSansBitmap] widthTable for $textBuffer: ")
+        //textBWidth.forEach { print("$it ") }; println()
 
-        microBuffer.forEachIndexed { index, c ->
+        textBuffer.forEachIndexed { index, c ->
             val sheetID = getSheetType(c)
             val sheetXY = getSheetwisePosition(c)
-            batch.draw(
-                    sheets[sheetID]!!.get(sheetXY[0], sheetXY[1]),
-                    x + microBWidth[index], y
-            )
+
+            //println("[TerrarumSansBitmap] sprite:  $sheetID:${sheetXY[0]}x${sheetXY[1]}")
+
+            if (sheetID != SHEET_HANGUL) {
+                batch.draw(
+                        sheets[sheetID].get(sheetXY[0], sheetXY[1]),
+                        x + textBWidth[index],
+                        y +
+                        if (sheetID == SHEET_UNIHAN) // evil exceptions
+                            offsetUnihan
+                        else if (sheetID == SHEET_CUSTOM_SYM)
+                            offsetCustomSym
+                        else 0
+                )
+            }
+            else { // JOHAB (assemble) HANGUL
+                val hangulSheet = sheets[1]
+                val hIndex = c.toInt() - 0xAC00
+
+                val indexCho = getHanChosung(hIndex)
+                val indexJung = getHanJungseong(hIndex)
+                val indexJong = getHanJongseong(hIndex)
+
+                val choRow = getHanInitialRow(hIndex)
+                val jungRow = getHanMedialRow(hIndex)
+                val jongRow = getHanFinalRow(hIndex)
+
+                batch.draw(hangulSheet.get(indexCho, choRow), x + textBWidth[index], y)
+                batch.draw(hangulSheet.get(indexJung, jungRow), x + textBWidth[index], y)
+                batch.draw(hangulSheet.get(indexJong, jongRow), x + textBWidth[index], y)
+            }
         }
 
         return null
@@ -309,7 +344,7 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
     override fun dispose() {
         super.dispose()
 
-        sheets.forEach { it!!.dispose() }
+        sheets.forEach { it.dispose() }
     }
 
     private fun getWidthOfCharSeq(s: CharSequence): IntArray {
@@ -323,7 +358,7 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
                     glyphWidths[chr.toInt()]!!
                 }
                 catch (e: kotlin.KotlinNullPointerException) {
-                    println("KotlinNullPointerException on glyph number ${Integer.toHexString(chr.toInt()).toUpperCase()}")
+                    println("[TerrarumSansBitmap] no width data for glyph number ${Integer.toHexString(chr.toInt()).toUpperCase()}")
                     //System.exit(1)
                     W_LATIN_WIDE // failsafe
                 }
@@ -378,7 +413,7 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
         else if (isCustomSym(c))
             return SHEET_CUSTOM_SYM
         else
-            return SHEET_UNKNOWN// fixed width punctuations
+            return SHEET_UNKNOWN
         // fixed width
         // fallback
     }
@@ -386,19 +421,23 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
     private fun getSheetwisePosition(ch: Char): IntArray {
         val sheetX: Int; val sheetY: Int
         when (getSheetType(ch)) {
-            SHEET_EXTA_VARW    -> {
+            SHEET_UNIHAN -> {
+                sheetX = unihanIndexX(ch)
+                sheetY = unihanIndexY(ch)
+            }
+            SHEET_EXTA_VARW -> {
                 sheetX = extAindexX(ch)
                 sheetY = extAindexY(ch)
             }
-            SHEET_EXTB_VARW    -> {
+            SHEET_EXTB_VARW -> {
                 sheetX = extBindexX(ch)
                 sheetY = extBindexY(ch)
             }
-            SHEET_KANA       -> {
+            SHEET_KANA -> {
                 sheetX = kanaIndexX(ch)
                 sheetY = kanaIndexY(ch)
             }
-            SHEET_CJK_PUNCT  -> {
+            SHEET_CJK_PUNCT -> {
                 sheetX = cjkPunctIndexX(ch)
                 sheetY = cjkPunctIndexY(ch)
             }
@@ -406,27 +445,27 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
                 sheetX = cyrilicIndexX(ch)
                 sheetY = cyrilicIndexY(ch)
             }
-            SHEET_FW_UNI             -> {
+            SHEET_FW_UNI -> {
                 sheetX = fullwidthUniIndexX(ch)
                 sheetY = fullwidthUniIndexY(ch)
             }
-            SHEET_UNI_PUNCT            -> {
+            SHEET_UNI_PUNCT -> {
                 sheetX = uniPunctIndexX(ch)
                 sheetY = uniPunctIndexY(ch)
             }
-            SHEET_GREEK_VARW           -> {
+            SHEET_GREEK_VARW -> {
                 sheetX = greekIndexX(ch)
                 sheetY = greekIndexY(ch)
             }
-            SHEET_THAI_VARW            -> {
+            SHEET_THAI_VARW -> {
                 sheetX = thaiIndexX(ch)
                 sheetY = thaiIndexY(ch)
             }
-            SHEET_CUSTOM_SYM               -> {
+            SHEET_CUSTOM_SYM -> {
                 sheetX = symbolIndexX(ch)
                 sheetY = symbolIndexY(ch)
             }
-            else                       -> {
+            else -> {
                 sheetX = ch.toInt() % 16
                 sheetY = ch.toInt() / 16
             }
@@ -435,19 +474,19 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
         return intArrayOf(sheetX, sheetY)
     }
 
-    fun buildWidthTable(pixmap: Pixmap, codeOffset: Int, codeRange: IntRange, rows: Int = 16) {
-        val binaryCodeOffset = 15
+    fun buildWidthTable(pixmap: Pixmap, codeRange: IntRange, cols: Int = 16) {
+        val binaryCodeOffset = W_VAR_INIT
 
-        val cellW = 16
-        val cellH = 20
+        val cellW = W_VAR_INIT + 1
+        val cellH = H
 
-        // control chars
-        for (ccode in codeRange) {
-            val glyphX = ccode % rows
-            val glyphY = ccode / rows
+        for (code in codeRange) {
 
-            val codeStartX = (glyphX * cellW) + binaryCodeOffset
-            val codeStartY = (glyphY * cellH)
+            val cellX = ((code - codeRange.start) % cols) * cellW
+            val cellY = ((code - codeRange.start) / cols) * cellH
+
+            val codeStartX = cellX + binaryCodeOffset
+            val codeStartY = cellY
 
             var glyphWidth = 0
             for (downCtr in 0..3) {
@@ -457,29 +496,12 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
                 }
             }
 
-            glyphWidths[codeOffset + ccode] = glyphWidth
+            glyphWidths[code] = glyphWidth
         }
     }
 
 
     companion object {
-
-        internal val glyphWidths: HashMap<Int, Int> = HashMap()
-
-        internal var hangulSheet: TextureRegionPack? = null
-        internal var asciiSheet: TextureRegionPack? = null
-        internal var runicSheet: TextureRegionPack? = null
-        internal var extASheet: TextureRegionPack? = null
-        internal var extBSheet: TextureRegionPack? = null
-        internal var kanaSheet: TextureRegionPack? = null
-        internal var cjkPunct: TextureRegionPack? = null
-        internal var uniHan: TextureRegionPack? = null
-        internal var cyrilic: TextureRegionPack? = null
-        internal var fullwidthForms: TextureRegionPack? = null
-        internal var uniPunct: TextureRegionPack? = null
-        internal var greekSheet: TextureRegionPack? = null
-        internal var thaiSheet: TextureRegionPack? = null
-        internal var customSheet: TextureRegionPack? = null
 
         internal val JUNG_COUNT = 21
         internal val JONG_COUNT = 28
