@@ -60,7 +60,11 @@ class TestTestTest : ApplicationAdapter() {
             "",
             "x86-64 е наименованието на наборът от 64-битови разширения към x86 процесорната архитектура. Като синоним",
             "на това наименование, се използват и съкращенията AMD64 (използвано от AMD), EM64T и IA-32e (използвани от",
-            "Intel) и x64 (използвано от Microsoft)."
+            "Intel) и x64 (използвано от Microsoft).",
+            "",
+            "เอกซ์86-64 (x86-64) เป็นชื่อของสถาปัตยกรรมคอมพิวเตอร์สำหรับไมโครโพรเซสเซอร์แบบ 64 บิต และชุดคำสั่งที่ใช้งานด้วยกัน x86-64",
+            "เป็นส่วนขยายของสถาปัตยกรรมแบบ x86 ออกแบบโดยบริษัท AMD และใช้ชื่อทางการค้าว่า AMD64 ในภายหลังบริษัทอินเทลได้นำสถาปัตยกร",
+            "รมนี้ไปใช้ใต้ชื่อการค้าว่า Intel 64 หรือ EM64T ซึ่งชื่อทั่วไปที่ใช้กันโดยไม่อิงกับชื่อการค้าคือ x86-64 หรือ x64"
     )
 
     override fun render() {
@@ -96,11 +100,11 @@ class TestTestTest : ApplicationAdapter() {
 
 fun main(args: Array<String>) { // LWJGL 3 won't work? java.lang.VerifyError
     val config = LwjglApplicationConfiguration()
-    config.useGL30 = true
+    //config.useGL30 = true
     config.vSyncEnabled = false
     config.resizable = false
     config.width = 1072
     config.height = 742
-    //config.foregroundFPS = 9999
+    config.foregroundFPS = 9999
     LwjglApplication(TestTestTest(), config)
 }
