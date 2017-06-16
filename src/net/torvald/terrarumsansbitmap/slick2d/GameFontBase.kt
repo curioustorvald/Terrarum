@@ -1,6 +1,5 @@
-package net.torvald.imagefont
+package net.torvald.terrarumsansbitmap.slick2d
 
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.getPixel
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.*
@@ -11,17 +10,8 @@ import java.util.*
  */
 open class GameFontBase(val noShadow: Boolean) : Font {
 
-    private fun getHan(hanIndex: Int): IntArray {
-        val han_x = hanIndex % JONG_COUNT
-        val han_y = hanIndex / JONG_COUNT
-        val ret = intArrayOf(han_x, han_y)
-        return ret
-    }
-
     private fun getHanChosung(hanIndex: Int) = hanIndex / (JUNG_COUNT * JONG_COUNT)
-
     private fun getHanJungseong(hanIndex: Int) = hanIndex / JONG_COUNT % JUNG_COUNT
-
     private fun getHanJongseong(hanIndex: Int) = hanIndex % JONG_COUNT
 
     private val jungseongWide = arrayOf(8, 12, 13, 17, 18, 21)
@@ -70,8 +60,7 @@ open class GameFontBase(val noShadow: Boolean) : Font {
     private fun isThaiDiacritics(c: Char) = c.toInt() in 0xE34..0xE3A
                                             || c.toInt() in 0xE47..0xE4E
                                             || c.toInt() == 0xE31
-    private fun isThaiEF(c: Char) = c.toInt() == 0xE40
-    private fun isKeycap(c: Char) = c.toInt() in 0xE000..0xE0FF
+    private fun isCustomSym(c: Char) = c.toInt() in 0xE000..0xE0FF
 
 
 
@@ -108,9 +97,6 @@ open class GameFontBase(val noShadow: Boolean) : Font {
     private fun thaiIndexX(c: Char) = (c.toInt() - 0xE00) % 16
     private fun thaiIndexY(c: Char) = (c.toInt() - 0xE00) / 16
 
-    private fun thaiNarrowIndexX(c: Char) = 3
-    private fun thaiNarrowIndexY(c: Char) = 0
-
     private fun keycapIndexX(c: Char) = (c.toInt() - 0xE000) % 16
     private fun keycapIndexY(c: Char) = (c.toInt() - 0xE000) / 16
 
@@ -119,15 +105,13 @@ open class GameFontBase(val noShadow: Boolean) : Font {
             SHEET_FW_UNI,
             SHEET_UNIHAN
     )
-    private val zeroWidthSheets = arrayOf(
-            SHEET_COLOURCODE
-    )
     private val variableWidthSheets = arrayOf(
             SHEET_ASCII_VARW,
             SHEET_CYRILIC_VARW,
             SHEET_EXTA_VARW,
             SHEET_GREEK_VARW,
-            SHEET_EXTB_VARW
+            SHEET_EXTB_VARW,
+            SHEET_THAI_VARW
     )
 
 
@@ -141,7 +125,7 @@ open class GameFontBase(val noShadow: Boolean) : Font {
 
             if (variableWidthSheets.contains(ctype)) {
                 len += try {
-                    asciiWidths[chr.toInt()]!!
+                    glyphWidths[chr.toInt()]!!
                 }
                 catch (e: kotlin.KotlinNullPointerException) {
                     println("KotlinNullPointerException on glyph number ${Integer.toHexString(chr.toInt()).toUpperCase()}")
@@ -149,8 +133,6 @@ open class GameFontBase(val noShadow: Boolean) : Font {
                     W_LATIN_WIDE // failsafe
                 }
             }
-            else if (zeroWidthSheets.contains(ctype))
-                len += 0
             else if (ctype == SHEET_CJK_PUNCT)
                 len += W_ASIAN_PUNCT
             else if (ctype == SHEET_HANGUL)
@@ -161,7 +143,7 @@ open class GameFontBase(val noShadow: Boolean) : Font {
                 len += W_UNIHAN
             else if (isThaiDiacritics(s[i]))
                 len += 0 // set width of the glyph as -W_LATIN_WIDE
-            else if (ctype == SHEET_KEYCAP)
+            else if (ctype == SHEET_CUSTOM_SYM)
                 len += SIZE_KEYCAP
             else
                 len += W_LATIN_WIDE
@@ -272,10 +254,6 @@ open class GameFontBase(val noShadow: Boolean) : Font {
                 val sheetX: Int
                 val sheetY: Int
                 when (prevInstance) {
-                    SHEET_RUNIC      -> {
-                        sheetX = runicIndexX(ch)
-                        sheetY = runicIndexY(ch)
-                    }
                     SHEET_EXTA_VARW    -> {
                         sheetX = extAindexX(ch)
                         sheetY = extAindexY(ch)
@@ -308,11 +286,11 @@ open class GameFontBase(val noShadow: Boolean) : Font {
                         sheetX = greekIndexX(ch)
                         sheetY = greekIndexY(ch)
                     }
-                    SHEET_THAI_WIDE            -> {
+                    SHEET_THAI_VARW            -> {
                         sheetX = thaiIndexX(ch)
                         sheetY = thaiIndexY(ch)
                     }
-                    SHEET_KEYCAP               -> {
+                    SHEET_CUSTOM_SYM               -> {
                         sheetX = keycapIndexX(ch)
                         sheetY = keycapIndexY(ch)
                     }
@@ -329,7 +307,7 @@ open class GameFontBase(val noShadow: Boolean) : Font {
 
                             // to deal with the height difference of the sheets
                             Math.round(y).toFloat() +
-                            (if (prevInstance == SHEET_KEYCAP) (H - SIZE_KEYCAP) / 2 // completely legit height adjustment
+                            (if (prevInstance == SHEET_CUSTOM_SYM) (H - SIZE_KEYCAP) / 2 // completely legit height adjustment
                             else 0).toFloat(),
 
                             scale.toFloat(), thisCol, noShadow
@@ -353,11 +331,7 @@ open class GameFontBase(val noShadow: Boolean) : Font {
     }
 
     private fun getSheetType(c: Char): Int {
-        if (isThaiEF(c))
-            return SHEET_EXTA_VARW // will use fourth glyph in EXTA_EF
-        else if (isRunic(c))
-            return SHEET_RUNIC
-        else if (isHangul(c))
+        if (isHangul(c))
             return SHEET_HANGUL
         else if (isKana(c))
             return SHEET_KANA
@@ -380,11 +354,9 @@ open class GameFontBase(val noShadow: Boolean) : Font {
         else if (isGreek(c))
             return SHEET_GREEK_VARW
         else if (isThai(c))
-            return SHEET_THAI_WIDE
-        else if (c.isColourCode())
-            return SHEET_COLOURCODE
-        else if (isKeycap(c))
-            return SHEET_KEYCAP
+            return SHEET_THAI_VARW
+        else if (isCustomSym(c))
+            return SHEET_CUSTOM_SYM
         else
             return SHEET_UNKNOWN// fixed width punctuations
         // fixed width
@@ -437,17 +409,16 @@ open class GameFontBase(val noShadow: Boolean) : Font {
                 }
             }
 
-            asciiWidths[codeOffset + ccode] = glyphWidth
+            glyphWidths[codeOffset + ccode] = glyphWidth
         }
     }
 
     companion object {
 
+        internal val glyphWidths: HashMap<Int, Int> = HashMap()
+
         lateinit internal var hangulSheet: SpriteSheet
         lateinit internal var asciiSheet: SpriteSheet
-
-        internal val asciiWidths: HashMap<Int, Int> = HashMap()
-
         lateinit internal var runicSheet: SpriteSheet
         lateinit internal var extASheet: SpriteSheet
         lateinit internal var extBSheet: SpriteSheet
@@ -459,7 +430,7 @@ open class GameFontBase(val noShadow: Boolean) : Font {
         lateinit internal var uniPunct: SpriteSheet
         lateinit internal var greekSheet: SpriteSheet
         lateinit internal var thaiSheet: SpriteSheet
-        lateinit internal var keycapSheet: SpriteSheet
+        lateinit internal var customSheet: SpriteSheet
 
         internal val JUNG_COUNT = 21
         internal val JONG_COUNT = 28
@@ -475,24 +446,21 @@ open class GameFontBase(val noShadow: Boolean) : Font {
 
         internal val SIZE_KEYCAP = 18
 
-        internal val SHEET_ASCII_VARW = 0
-        internal val SHEET_HANGUL = 1
-        internal val SHEET_RUNIC = 2
-        internal val SHEET_EXTA_VARW = 3
-        internal val SHEET_EXTB_VARW = 4
-        internal val SHEET_KANA = 5
-        internal val SHEET_CJK_PUNCT = 6
-        internal val SHEET_UNIHAN = 7
-        internal val SHEET_CYRILIC_VARW = 8
-        internal val SHEET_FW_UNI = 9
-        internal val SHEET_UNI_PUNCT = 10
-        internal val SHEET_GREEK_VARW = 11
-        internal val SHEET_THAI_WIDE = 12
-        internal val SHEET_THAI_NARROW = 13
-        internal val SHEET_KEYCAP = 14
+        internal val SHEET_ASCII_VARW =     0
+        internal val SHEET_HANGUL =         1
+        internal val SHEET_EXTA_VARW =      2
+        internal val SHEET_EXTB_VARW =      3
+        internal val SHEET_KANA =           4
+        internal val SHEET_CJK_PUNCT =      5
+        internal val SHEET_UNIHAN =         6
+        internal val SHEET_CYRILIC_VARW =   7
+        internal val SHEET_FW_UNI =         8
+        internal val SHEET_UNI_PUNCT =      9
+        internal val SHEET_GREEK_VARW =     10
+        internal val SHEET_THAI_VARW =      11
+        internal val SHEET_CUSTOM_SYM =     12
 
         internal val SHEET_UNKNOWN = 254
-        internal val SHEET_COLOURCODE = 255
 
         lateinit internal var sheetKey: Array<SpriteSheet?>
 
