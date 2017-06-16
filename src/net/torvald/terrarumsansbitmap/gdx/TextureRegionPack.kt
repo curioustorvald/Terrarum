@@ -22,7 +22,7 @@ class TextureRegionPack(
     private val verticalCount = (texture.height - 2 * vFrame + vGap) / (tileH + vGap)
 
     init {
-        println("texture: $texture, dim: ${texture.width} x ${texture.height}, grid: $horizontalCount x $verticalCount, cellDim: $tileW x $tileH")
+        //println("texture: $texture, dim: ${texture.width} x ${texture.height}, grid: $horizontalCount x $verticalCount, cellDim: $tileW x $tileH")
 
         regions = Array<TextureRegion>(horizontalCount * verticalCount, {
             val region = TextureRegion()

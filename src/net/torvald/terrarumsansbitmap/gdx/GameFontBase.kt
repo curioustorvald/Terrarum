@@ -156,6 +156,8 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
             "thai_variable.tga",
             "puae000-e0ff.tga"
     )
+    private val cyrilic_bg = "cyrilic_bulgarian_variable.tga"
+    private val cyrilic_sr = "cyrilic_serbian_variable.tga"
     private val codeRange = arrayOf( // MUST BE MATCHING WITH SHEET INDICES!!
             0..0xFF,
             0xAC00..0xD7A3,
@@ -256,6 +258,31 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
     }
 
 
+    fun reload(locale: String) {
+        if (locale.startsWith("ru")) {
+            val pixmap = Pixmap(Gdx.files.internal(fontParentDir + fileList[SHEET_CYRILIC_VARW]))
+            val texture = Texture(pixmap)
+            sheets[SHEET_CYRILIC_VARW].dispose()
+            sheets[SHEET_CYRILIC_VARW] = TextureRegionPack(texture, W_VAR_INIT, H, HGAP_VAR, 0)
+            pixmap.dispose()
+        }
+        else if (locale.startsWith("bg")) {
+            val pixmap = Pixmap(Gdx.files.internal(fontParentDir + cyrilic_bg))
+            val texture = Texture(pixmap)
+            sheets[SHEET_CYRILIC_VARW].dispose()
+            sheets[SHEET_CYRILIC_VARW] = TextureRegionPack(texture, W_VAR_INIT, H, HGAP_VAR, 0)
+            pixmap.dispose()
+        }
+        else if (locale.startsWith("sr")) {
+            val pixmap = Pixmap(Gdx.files.internal(fontParentDir + cyrilic_sr))
+            val texture = Texture(pixmap)
+            sheets[SHEET_CYRILIC_VARW].dispose()
+            sheets[SHEET_CYRILIC_VARW] = TextureRegionPack(texture, W_VAR_INIT, H, HGAP_VAR, 0)
+            pixmap.dispose()
+        }
+    }
+
+
     override fun getLineHeight(): Float = H.toFloat()
 
     override fun getXHeight() = lineHeight
@@ -320,7 +347,7 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
                 )
             }
             else { // JOHAB (assemble) HANGUL
-                val hangulSheet = sheets[1]
+                val hangulSheet = sheets[SHEET_HANGUL]
                 val hIndex = c.toInt() - 0xAC00
 
                 val indexCho = getHanChosung(hIndex)
