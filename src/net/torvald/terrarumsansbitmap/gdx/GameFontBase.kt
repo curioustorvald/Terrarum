@@ -34,7 +34,7 @@ import java.util.zip.GZIPInputStream
  *
  * Created by minjaesong on 2017-06-15.
  */
-class GameFontBase(val noShadow: Boolean) : BitmapFont() {
+class GameFontBase(val noShadow: Boolean = false) : BitmapFont() {
 
     private fun getHanChosung(hanIndex: Int) = hanIndex / (JUNG_COUNT * JONG_COUNT)
     private fun getHanJungseong(hanIndex: Int) = hanIndex / JONG_COUNT % JUNG_COUNT
@@ -328,6 +328,11 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
         //print("[TerrarumSansBitmap] widthTable for $textBuffer: ")
         //textBWidth.forEach { print("$it ") }; println()
 
+
+        val mainCol = this.color.cpy()
+        val shadowCol = this.color.cpy().mul(0.5f)
+
+
         textBuffer.forEachIndexed { index, c ->
             val sheetID = getSheetType(c)
             val sheetXY = getSheetwisePosition(c)
@@ -335,6 +340,43 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
             //println("[TerrarumSansBitmap] sprite:  $sheetID:${sheetXY[0]}x${sheetXY[1]}")
 
             if (sheetID != SHEET_HANGUL) {
+
+                if (!noShadow) {
+                    batch.color = shadowCol
+                    batch.draw(
+                            sheets[sheetID].get(sheetXY[0], sheetXY[1]),
+                            x + textBWidth[index] + 1,
+                            y +
+                            if (sheetID == SHEET_UNIHAN) // evil exceptions
+                                offsetUnihan
+                            else if (sheetID == SHEET_CUSTOM_SYM)
+                                offsetCustomSym
+                            else 0
+                    )
+                    batch.draw(
+                            sheets[sheetID].get(sheetXY[0], sheetXY[1]),
+                            x + textBWidth[index],
+                            y - 1 +
+                            if (sheetID == SHEET_UNIHAN) // evil exceptions
+                                offsetUnihan
+                            else if (sheetID == SHEET_CUSTOM_SYM)
+                                offsetCustomSym
+                            else 0
+                    )
+                    batch.draw(
+                            sheets[sheetID].get(sheetXY[0], sheetXY[1]),
+                            x + textBWidth[index] + 1,
+                            y - 1 +
+                            if (sheetID == SHEET_UNIHAN) // evil exceptions
+                                offsetUnihan
+                            else if (sheetID == SHEET_CUSTOM_SYM)
+                                offsetCustomSym
+                            else 0
+                    )
+                }
+
+
+                batch.color = mainCol
                 batch.draw(
                         sheets[sheetID].get(sheetXY[0], sheetXY[1]),
                         x + textBWidth[index],
@@ -358,11 +400,24 @@ class GameFontBase(val noShadow: Boolean) : BitmapFont() {
                 val jungRow = getHanMedialRow(hIndex)
                 val jongRow = getHanFinalRow(hIndex)
 
+
+                if (!noShadow) {
+                    batch.color = shadowCol
+
+                    batch.draw(hangulSheet.get(indexCho, choRow), x + textBWidth[index] + 1, y)
+                    batch.draw(hangulSheet.get(indexJung, jungRow), x + textBWidth[index], y - 1)
+                    batch.draw(hangulSheet.get(indexJong, jongRow), x + textBWidth[index] + 1, y - 1)
+                }
+
+
+                batch.color = mainCol
                 batch.draw(hangulSheet.get(indexCho, choRow), x + textBWidth[index], y)
                 batch.draw(hangulSheet.get(indexJung, jungRow), x + textBWidth[index], y)
                 batch.draw(hangulSheet.get(indexJong, jongRow), x + textBWidth[index], y)
             }
         }
+
+        this.color = mainCol
 
         return null
     }

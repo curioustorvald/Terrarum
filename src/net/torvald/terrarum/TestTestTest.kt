@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -73,6 +74,7 @@ class TestTestTest : ApplicationAdapter() {
         batch.inBatch {
 
             text.forEachIndexed { index, s ->
+                gameFont.color = Color(1f, 1f, 1f, 1f)
                 gameFont.draw(batch, s, 10f, 10 + (20 * text.size) - 20f * index)
             }
 
