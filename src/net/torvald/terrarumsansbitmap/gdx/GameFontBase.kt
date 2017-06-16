@@ -34,7 +34,7 @@ import java.util.zip.GZIPInputStream
  *
  * Created by minjaesong on 2017-06-15.
  */
-class GameFontBase(val noShadow: Boolean = false) : BitmapFont() {
+class GameFontBase(fontDir: String, val noShadow: Boolean = false) : BitmapFont() {
 
     private fun getHanChosung(hanIndex: Int) = hanIndex / (JUNG_COUNT * JONG_COUNT)
     private fun getHanJungseong(hanIndex: Int) = hanIndex / JONG_COUNT % JUNG_COUNT
@@ -140,7 +140,7 @@ class GameFontBase(val noShadow: Boolean = false) : BitmapFont() {
             SHEET_THAI_VARW
     )
 
-    private val fontParentDir = "assets/graphics/fonts/"
+    private val fontParentDir = if (fontDir.endsWith('/') || fontDir.endsWith('\\')) fontDir else "$fontDir/"
     private val fileList = arrayOf( // MUST BE MATCHING WITH SHEET INDICES!!
             "ascii_variable.tga",
             "hangul_johab.tga",

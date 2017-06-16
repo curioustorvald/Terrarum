@@ -26,7 +26,7 @@ class TestTestTest : ApplicationAdapter() {
         batch = SpriteBatch()
         img = Texture("assets/test_texture.tga")
 
-        gameFont = GameFontBase(false)
+        gameFont = GameFontBase("assets/graphics/fonts")
         //gameFont = BitmapFont()
 
     }
