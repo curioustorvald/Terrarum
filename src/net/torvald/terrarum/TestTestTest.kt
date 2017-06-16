@@ -27,6 +27,7 @@ class TestTestTest : ApplicationAdapter() {
 
         gameFont = GameFontBase(false)
         //gameFont = BitmapFont()
+
     }
 
     val text = arrayOf(
@@ -66,6 +67,8 @@ class TestTestTest : ApplicationAdapter() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         Gdx.graphics.setTitle("$GAME_NAME — F: ${Gdx.graphics.framesPerSecond}")
+
+        (gameFont as GameFontBase).reload("bg")
 
         batch.inBatch {
 
