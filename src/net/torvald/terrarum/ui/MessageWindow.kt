@@ -1,100 +1,78 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.imagefont.GameFontImpl
-import com.jme3.math.FastMath
-import net.torvald.terrarum.blendDisable
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.blendNormal
-import org.lwjgl.opengl.GL11
-import org.newdawn.slick.*
+import net.torvald.terrarum.gameactors.Second
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+
 
 /**
  * Created by minjaesong on 16-01-27.
  */
-class MessageWindow @Throws(SlickException::class)
-constructor(override var width: Int, isBlackVariant: Boolean) : UICanvas {
+class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas {
 
-    private var segmentLeft: Image? = null
-    private var segmentRight: Image? = null
-    private var segmentBody: Image? = null
+    private val segment = if (isBlackVariant) SEGMENT_BLACK else SEGMENT_WHITE
 
-     var messagesList: Array<String>
+    var messagesList = arrayOf("", "")
     override var height: Int = 0
-    private val messageWindowRadius: Int
 
-    private var uiFont: Font? = null
-    private var fontCol: Color = if (!isBlackVariant) Color.black else Color.white
-    private val GLYPH_HEIGHT = 20
+    private var fontCol: Color = if (!isBlackVariant) Color.BLACK else Color.WHITE
+    private val GLYPH_HEIGHT = TerrarumGDX.fontGame.lineHeight
 
-    override var openCloseTime: Int = OPEN_CLOSE_TIME
+    override var openCloseTime: Second = OPEN_CLOSE_TIME
 
     override var handler: UIHandler? = null
 
-    init {
-        if (!isBlackVariant) {
-            segmentLeft = Image("./assets/graphics/gui/message_twoline_white_left.tga")
-            segmentRight = Image("./assets/graphics/gui/message_twoline_white_right.tga")
-            segmentBody = Image("./assets/graphics/gui/message_twoline_white_body.tga")
-        }
-        else {
-            segmentLeft = Image("./assets/graphics/gui/message_black_left.tga")
-            segmentRight = Image("./assets/graphics/gui/message_black_right.tga")
-            segmentBody = Image("./assets/graphics/gui/message_black_body.tga") // keep width=2 or greater; no width 1 !!
-        }
-        uiFont = GameFontImpl()
-        height = segmentLeft!!.height
-        messageWindowRadius = segmentLeft!!.width
-        messagesList = arrayOf("", "")
-    }
+    private val LRmargin = 0f // there's "base value" of 8 px for LR (width of segment tile)
+
 
     fun setMessage(messagesList: Array<String>) {
         this.messagesList = messagesList
     }
 
-    override fun update(gc: GameContainer, delta: Int) {
-
+    override fun update(delta: Float) {
     }
 
-    override fun render(gc: GameContainer, g: Graphics) {
+    override fun render(batch: SpriteBatch) {
         blendNormal()
-        drawSegments(g)
 
-        g.font = uiFont
-        
-        for (i in 0..Math.min(messagesList.size, MESSAGES_DISPLAY) - 1) {
-            g.color = fontCol
-            g.drawString(messagesList[i], (messageWindowRadius + 4).toFloat(), (messageWindowRadius + GLYPH_HEIGHT * i).toFloat())
+        val textWidth = messagesList.map { TerrarumGDX.fontGame.getWidth(it) }.sorted()[1]
+
+        batch.color = Color.WHITE
+
+        batch.draw(segment.get(1, 0), segment.tileW.toFloat(), 0f, 2 * LRmargin + textWidth, segment.tileH.toFloat())
+        batch.draw(segment.get(0, 0), 0f, 0f)
+        batch.draw(segment.get(2, 0), 2 * LRmargin + textWidth, 0f)
+
+        messagesList.forEachIndexed { index, s ->
+            TerrarumGDX.fontGame.draw(batch, s, segment.tileW + LRmargin, (segment.tileH - TerrarumGDX.fontGame.lineHeight) / 2f)
         }
-
-        blendNormal()
     }
 
-    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
-
+    override fun processInput(delta: Float) {
     }
 
-    override fun doOpening(gc: GameContainer, delta: Int) {
+    override fun doOpening(delta: Float) {
     }
 
-    override fun doClosing(gc: GameContainer, delta: Int) {
+    override fun doClosing(delta: Float) {
     }
 
-    override fun endOpening(gc: GameContainer, delta: Int) {
+    override fun endOpening(delta: Float) {
     }
 
-    override fun endClosing(gc: GameContainer, delta: Int) {
-    }
-
-    private fun drawSegments(g: Graphics) {
-        g.drawImage(segmentLeft, 0f, 0f)
-        val scaledSegCentre = segmentBody!!.getScaledCopy(
-                width - (segmentRight!!.width + segmentLeft!!.width), segmentLeft!!.height)
-        g.drawImage(scaledSegCentre, segmentLeft!!.width.toFloat(), 0f)
-        g.drawImage(segmentRight, (width - segmentRight!!.width).toFloat(), 0f)
+    override fun endClosing(delta: Float) {
     }
 
     companion object {
         // private int messagesShowingIndex = 0;
         val MESSAGES_DISPLAY = 2
-        val OPEN_CLOSE_TIME = 160
+        val OPEN_CLOSE_TIME = 0.16f
+
+
+        val SEGMENT_BLACK = TextureRegionPack("assets/graphics/gui/message_black.tga", 8, 56)
+        val SEGMENT_WHITE = TextureRegionPack("assets/graphics/gui/message_white.tga", 8, 56)
     }
 }

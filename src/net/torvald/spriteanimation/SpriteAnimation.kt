@@ -4,50 +4,44 @@
 
 package net.torvald.spriteanimation
 
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.gameactors.ActorWithPhysics
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Image
-import org.newdawn.slick.SlickException
-import org.newdawn.slick.SpriteSheet
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
-class SpriteAnimation(val parentActor: ActorWithPhysics, val cellWidth: Int, val cellHeight: Int) {
+class SpriteAnimation(val parentActor: ActorWithPhysics) {
 
-    private var spriteImage: SpriteSheet? = null
+    private lateinit var textureRegion: TextureRegionPack
+
     var currentFrame = 0
     var currentRow = 0
     var nFrames: Int = 1
         private set
     var nRows: Int = 1
         private set
-    var delay = 200
-    private var delta = 0
+    var delay = 200f
+    private var delta = 0f
     val looping = true
     private var animationRunning = true
-    private var flipHorizontal = false
-    private var flipVertical = false
+    var flipHorizontal = false
+    var flipVertical = false
     private val visible: Boolean
         get() = parentActor.isVisible
 
     private val offsetX = 0
     private val offsetY = 0
 
-    private var prevScale = 1f
-    private var currentImage: Image? = null
+    var cellWidth: Int = 0
+    var cellHeight: Int = 0
 
-    /**
-     * Sets spritesheet.
-     * MUST be called AFTER setDimension.
-     * @param imagePath path to the sprite sheet image.
-     * *
-     * @throws SlickException
-     */
-    fun setSpriteImage(imagePath: String) {
-        spriteImage = SpriteSheet(imagePath, cellWidth, cellHeight)
-    }
+    var colorFilter = Color.WHITE
 
-    fun setSpriteImage(image: Image) {
-        spriteImage = SpriteSheet(image, cellWidth, cellHeight)
+    fun setSpriteImage(regionPack: TextureRegionPack) {
+        textureRegion = regionPack
+
+        cellWidth = regionPack.tileW
+        cellHeight = regionPack.tileH
     }
 
     /**
@@ -62,7 +56,7 @@ class SpriteAnimation(val parentActor: ActorWithPhysics, val cellWidth: Int, val
         this.nFrames = nFrames
     }
 
-    fun update(delta: Int) {
+    fun update(delta: Float) {
         if (animationRunning) {
             //skip this if animation is stopped
             this.delta += delta
@@ -76,7 +70,7 @@ class SpriteAnimation(val parentActor: ActorWithPhysics, val cellWidth: Int, val
 
                 //advance one frame, then reset delta counter
                 this.currentFrame = this.currentFrame % this.nFrames
-                this.delta = 0
+                this.delta = 0f
             }
         }
     }
@@ -92,25 +86,17 @@ class SpriteAnimation(val parentActor: ActorWithPhysics, val cellWidth: Int, val
      * *
      * @param scale
      */
-    @JvmOverloads fun render(g: Graphics, posX: Float, posY: Float, scale: Float = 1f) {
+    @JvmOverloads fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float = 1f) {
         if (cellWidth == 0 || cellHeight == 0) {
             throw Error("Sprite width or height is set to zero! ($cellWidth, $cellHeight); master: $parentActor")
         }
 
-        // Null checking
-        if (currentImage == null) {
-            currentImage = getScaledSprite(scale)
-        }
-
         if (visible) {
-            // re-scale image if scale has been changed
-            if (prevScale != scale) {
-                currentImage = getScaledSprite(scale)
-                prevScale = scale
-            }
+            val region = textureRegion.get(currentRow, currentFrame)
+            region.flip(flipHorizontal, !flipVertical)
+            batch.color = colorFilter
 
-            val flippedImage = currentImage!!.getFlippedCopy(flipHorizontal, flipVertical)
-            flippedImage.draw(
+            batch.draw(region,
                     Math.round(posX).toFloat(),
                     FastMath.floor(posY).toFloat(),
                     FastMath.floor(cellWidth * scale).toFloat(),
@@ -128,7 +114,7 @@ class SpriteAnimation(val parentActor: ActorWithPhysics, val cellWidth: Int, val
         }
     }
 
-    fun setSpriteDelay(newDelay: Int) {
+    fun setSpriteDelay(newDelay: Float) {
         if (newDelay > 0) {
             delay = newDelay
         }
@@ -169,17 +155,4 @@ class SpriteAnimation(val parentActor: ActorWithPhysics, val cellWidth: Int, val
         flipVertical = vertical
     }
 
-    fun flippedHorizontal(): Boolean {
-        return flipHorizontal
-    }
-
-    fun flippedVertical(): Boolean {
-        return flipVertical
-    }
-
-    private fun getScaledSprite(scale: Float): Image {
-        val selectedImage = spriteImage!!.getSprite(currentFrame, currentRow)
-        selectedImage.filter = Image.FILTER_NEAREST
-        return selectedImage.getScaledCopy(scale)
-    }
 }

@@ -1,7 +1,9 @@
 package net.torvald.terrarum.gameactors
 
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
 /**
@@ -24,8 +26,8 @@ internal class FixtureTikiTorch : FixtureBase(), Luminous {
         lightBoxList = ArrayList(1)
         lightBoxList.add(Hitbox(3.0, 0.0, 4.0, 3.0))
 
-        makeNewSprite(10, 27, "assets/graphics/sprites/fixtures/tiki_torch.tga")
-        sprite!!.delay = 200
+        makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 10, 27))
+        sprite!!.delay = 0.2f
         sprite!!.setRowsAndFrames(1, 1)
 
         actorValue[AVKey.BASEMASS] = 1.0

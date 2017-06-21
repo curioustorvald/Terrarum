@@ -15,7 +15,7 @@ object FactionFactory {
      */
     @Throws(IOException::class)
     fun create(module: String, path: String): Faction {
-        val jsonObj = JsonFetcher(ModMgr.getPath(module, path))
+        val jsonObj = JsonFetcher(ModMgr.getFile(module, path))
         val factionObj = Faction(jsonObj.get("factionname").asString)
 
         jsonObj.get("factionamicable").asJsonArray.forEach { factionObj.addFactionAmicable(it.asString) }

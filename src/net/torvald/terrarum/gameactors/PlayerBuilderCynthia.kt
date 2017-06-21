@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 16-03-25.
@@ -23,8 +24,8 @@ object PlayerBuilderCynthia {
         p.actorValue[AVKey.NAME] = "Cynthia"
 
 
-        p.makeNewSprite(26, 42, ModMgr.getPath("basegame", "sprites/test_player_2.tga"))
-        p.sprite!!.delay = 200
+        p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/test_player_2.tga"), 26, 42))
+        p.sprite!!.delay = 0.2f
         p.sprite!!.setRowsAndFrames(1, 1)
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 9, 0)

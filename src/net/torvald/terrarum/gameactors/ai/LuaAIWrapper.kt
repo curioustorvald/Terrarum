@@ -45,7 +45,7 @@ class LuaAIWrapper(private val scriptPath: String) : ActorAI {
         luaInstance.call()
     }
 
-    override fun update(delta: Int) {
+    override fun update(delta: Float) {
         // run "update()" function in the script
         luag.get("update").call(delta.toLua())
     }
@@ -109,5 +109,5 @@ class LuaAIWrapper(private val scriptPath: String) : ActorAI {
         }
     }
 
-    fun Int.toLua(): LuaValue = LuaInteger.valueOf(this)
+    fun Float.toLua(): LuaValue = LuaInteger.valueOf(this.toDouble())
 }

@@ -1,13 +1,10 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
-import net.torvald.terrarum.gamecontroller.mouseX
-import net.torvald.terrarum.gamecontroller.mouseY
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
-import org.newdawn.slick.GameContainer
 
 /**
  * @param ai AI class. Use LuaAIWrapper for Lua script
@@ -51,11 +48,11 @@ open class HumanoidNPC(
         override val isDynamic = false
         override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
 
-        override fun secondaryUse(gc: GameContainer, delta: Int): Boolean {
+        override fun secondaryUse(delta: Float): Boolean {
             try {
                 // place the actor to the world
-                this@HumanoidNPC.setPosition(gc.mouseX, gc.mouseY)
-                Terrarum.ingame!!.addNewActor(this@HumanoidNPC)
+                this@HumanoidNPC.setPosition(TerrarumGDX.mouseX, TerrarumGDX.mouseY)
+                TerrarumGDX.ingame!!.addNewActor(this@HumanoidNPC)
                 // successful
                 return true
             }
@@ -80,8 +77,8 @@ open class HumanoidNPC(
         isVisible = true
     }
 
-    override fun update(gc: GameContainer, delta: Int) {
-        super.update(gc, delta)
+    override fun update(delta: Float) {
+        super.update(delta)
         ai.update(delta)
     }
 

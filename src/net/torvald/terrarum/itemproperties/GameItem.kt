@@ -1,13 +1,12 @@
 package net.torvald.terrarum.itemproperties
 
+import com.badlogic.gdx.graphics.Color
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.ItemValue
 import net.torvald.terrarum.gameactors.ActorInventory
 import net.torvald.terrarum.gameactors.Pocketed
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
 import net.torvald.terrarum.langpack.Lang
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
 
 typealias ItemID = Int
 
@@ -44,7 +43,7 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
         get() = if (isCustomName) newName else Lang[originalName]
     open var isCustomName = false // true: reads from lang
 
-    var nameColour = Color.white
+    var nameColour = Color.WHITE
 
 
     abstract var baseMass: Double
@@ -123,12 +122,12 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
     /**
      * Effects applied continuously while in pocket
      */
-    open fun effectWhileInPocket(gc: GameContainer, delta: Int) { }
+    open fun effectWhileInPocket(delta: Float) { }
 
     /**
      * Effects applied immediately only once if picked up
      */
-    open fun effectWhenPickedUp(gc: GameContainer, delta: Int) { }
+    open fun effectWhenPickedUp(delta: Float) { }
 
     /**
      * Apply effects (continuously or not) while primary button (usually left mouse button) is down.
@@ -136,12 +135,12 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
      *
      * @return true when used successfully, false otherwise
      *
-     * note: DO NOT super(gc, g) this!
+     * note: DO NOT super() this!
      *
      * Consumption function is executed in net.torvald.terrarum.gamecontroller.GameController,
      * in which the function itself is defined in net.torvald.terrarum.gameactors.ActorInventory
      */
-    open fun primaryUse(gc: GameContainer, delta: Int): Boolean = false
+    open fun primaryUse(delta: Float): Boolean = false
 
     /**
      * Apply effects (continuously or not) while secondary button (usually right mouse button) is down
@@ -149,27 +148,27 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
      *
      * @return true when used successfully, false otherwise
      *
-     * note: DO NOT super(gc, g) this!
+     * note: DO NOT super() this!
      */
-    open fun secondaryUse(gc: GameContainer, delta: Int): Boolean = false
+    open fun secondaryUse(delta: Float): Boolean = false
 
-    open fun endPrimaryUse(gc: GameContainer, delta: Int): Boolean = false
-    open fun endSecondaryUse(gc: GameContainer, delta: Int): Boolean = false
+    open fun endPrimaryUse(delta: Float): Boolean = false
+    open fun endSecondaryUse(delta: Float): Boolean = false
 
     /**
      * Effects applied immediately only once if thrown from pocket
      */
-    open fun effectWhenThrown(gc: GameContainer, delta: Int) { }
+    open fun effectWhenThrown(delta: Float) { }
 
     /**
      * Effects applied (continuously or not) when equipped (drawn)
      */
-    open fun effectWhenEquipped(gc: GameContainer, delta: Int) { }
+    open fun effectWhenEquipped(delta: Float) { }
 
     /**
      * Effects applied only once when unequipped
      */
-    open fun effectOnUnequip(gc: GameContainer, delta: Int) { }
+    open fun effectOnUnequip(delta: Float) { }
 
     
     override fun toString(): String {
@@ -188,7 +187,7 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
     fun unsetCustomName() {
         name = originalName
         isCustomName = false
-        nameColour = Color.white
+        nameColour = Color.WHITE
     }
 
     override fun compareTo(other: GameItem): Int = (this.dynamicID - other.dynamicID).sign()

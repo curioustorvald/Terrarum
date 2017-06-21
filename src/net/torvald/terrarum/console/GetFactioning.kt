@@ -1,9 +1,7 @@
 package net.torvald.terrarum.console
 
-import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.Factionable
 import net.torvald.terrarum.gameactors.Player
 
@@ -11,12 +9,12 @@ import net.torvald.terrarum.gameactors.Player
  * Created by minjaesong on 16-02-17.
  */
 internal object GetFactioning : ConsoleCommand {
-    val ccW = GameFontBase.colToCode["w"]
-    val ccG = GameFontBase.colToCode["g"]
-    val ccY = GameFontBase.colToCode["y"]
-    val ccM = GameFontBase.colToCode["m"]
-    val ccK = GameFontBase.colToCode["k"]
-    val ccB = GameFontBase.colToCode["b"]
+    val ccW = 0.toChar()//GameFontBase.colToCode["w"]
+    val ccG = 0.toChar()//GameFontBase.colToCode["g"]
+    val ccY = 0.toChar()//GameFontBase.colToCode["y"]
+    val ccM = 0.toChar()//GameFontBase.colToCode["m"]
+    val ccK = 0.toChar()//GameFontBase.colToCode["k"]
+    val ccB = 0.toChar()//GameFontBase.colToCode["b"]
 
     private val PRINT_INDENTATION = "$ccK    --> $ccW"
 
@@ -25,7 +23,7 @@ internal object GetFactioning : ConsoleCommand {
         val error = Error()
 
         fun printOutFactioning(id: Int) {
-            val a = Terrarum.ingame!!.getActorByID(id)
+            val a = TerrarumGDX.ingame!!.getActorByID(id)
             if (a is Factionable) {
                 Echo("$ccW== Faction assignment for $ccY${if (id == Player.PLAYER_REF_ID) "player" else id.toString()} $ccW==")
                 println("[GetFactioning] == Faction assignment for '${if (id == Player.PLAYER_REF_ID) "player" else id.toString()}' ==")

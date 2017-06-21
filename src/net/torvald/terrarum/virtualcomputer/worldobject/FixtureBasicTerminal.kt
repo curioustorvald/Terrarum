@@ -1,12 +1,11 @@
 package net.torvald.terrarum.virtualcomputer.worldobject
 
+import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.FixtureBase
 import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
-import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
 import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 import net.torvald.terrarum.virtualcomputer.worldobject.ui.UITextTerminal
-import org.newdawn.slick.Color
 import java.util.*
 
 /**
@@ -14,7 +13,7 @@ import java.util.*
  */
 class FixtureBasicTerminal(phosphor: Color) : FixtureBase() {
 
-    val computer = TerrarumComputer(8)
+    /*val computer = TerrarumComputer(8)
     val vt: Terminal = SimpleTextTerminal(phosphor, 80, 25, computer)
     val ui = UITextTerminal(vt)
 
@@ -24,6 +23,6 @@ class FixtureBasicTerminal(phosphor: Color) : FixtureBase() {
         collisionFlag = COLLISION_PLATFORM
 
         actorValue[AVKey.UUID] = UUID.randomUUID().toString()
-    }
+    }*/
 
 }

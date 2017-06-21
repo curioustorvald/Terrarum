@@ -1,14 +1,9 @@
 package net.torvald.terrarum.gameactors
 
-import com.jme3.math.FastMath
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.terrarum.gameworld.toUint
-import org.newdawn.slick.Color
-import org.newdawn.slick.Image
-import org.newdawn.slick.ImageBuffer
-import org.newdawn.slick.opengl.ImageData
-import org.newdawn.slick.opengl.TextureImpl
 import java.io.File
-import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.util.*
 
@@ -101,9 +96,10 @@ object DecodeTapestry {
     )
 
     private fun Int.fourBitCol() = Color(
-            this.and(0xF00).shl(12) + this.and(0xF00).shl(8) +
-            this.and(0x0F0).shl(8) + this.and(0x0F0).shl(4) +
-            this.and(0x00F).shl(4) + this.and(0x00F)
+            this.and(0xF00).shl(20) or this.and(0xF00).shl(16) or
+            this.and(0x0F0).shl(16) or this.and(0x0F0).shl(12) or
+            this.and(0x00F).shl(12) or this.and(0x00F).shl(8)  or
+            0xFF
     )
 
     val MAGIC = "TEAF".toByteArray(charset = Charset.forName("US-ASCII"))
@@ -157,36 +153,24 @@ object DecodeTapestry {
 
         val imageDataSize = file.size - readCounter
         val height = imageDataSize / width
-        val outImageData = ImageBuffer(width, height)
+        val outImageData = Pixmap(width, height, Pixmap.Format.RGBA8888)
         val counterOffset = readCounter
         while (readCounter < file.size) {
             val ofs = readCounter - counterOffset
             val palIndex = file[readCounter].toUint()
 
             if (colourModel == FORMAT_16) {
-                outImageData.setRGBA(
-                        ofs % width,
-                        ofs / width,
-                        colourIndices16[palIndex].redByte,
-                        colourIndices16[palIndex].greenByte,
-                        colourIndices16[palIndex].blueByte,
-                        255
-                )
+                outImageData.setColor(colourIndices16[palIndex])
+                outImageData.drawPixel(ofs % width, ofs / width)
             }
             else {
-                outImageData.setRGBA(
-                        ofs % width,
-                        ofs / width,
-                        colourIndices64[palIndex].redByte,
-                        colourIndices64[palIndex].greenByte,
-                        colourIndices64[palIndex].blueByte,
-                        255
-                )
+                outImageData.setColor(colourIndices64[palIndex])
+                outImageData.drawPixel(ofs % width, ofs / width)
             }
 
             readCounter++
         }
 
-        return TapestryObject(outImageData.image.getScaledCopy(2f), artName, authorName)
+        return TapestryObject(outImageData, artName, authorName)
     }
 }

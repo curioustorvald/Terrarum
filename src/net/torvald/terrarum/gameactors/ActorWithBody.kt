@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors
 
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 
 /**
  * Actor with visible body
@@ -10,6 +10,7 @@ import org.newdawn.slick.Graphics
  */
 abstract class ActorWithBody(renderOrder: RenderOrder) : Actor(renderOrder) {
     open val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
-    abstract fun drawBody(g: Graphics)
-    abstract fun drawGlow(g: Graphics)
+    abstract fun drawBody(batch: SpriteBatch)
+    abstract fun drawGlow(batch: SpriteBatch)
+    open var tooltipText = ""
 }

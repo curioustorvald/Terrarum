@@ -1,29 +1,31 @@
 package net.torvald.terrarum.blockproperties
 
+import com.badlogic.gdx.Gdx
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.Millisec
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
-import net.torvald.terrarum.toInt
+import net.torvald.terrarum.toRGB10
 import net.torvald.terrarum.weather.WeatherMixer
+import net.torvald.terrarum.worlddrawer.RGB10
 
 /**
  * Created by minjaesong on 16-06-16.
  */
 object BlockPropUtil {
-    var flickerFuncX: Millisec = 0 // in milliseconds; saves current status (time) of func
-    val flickerFuncDomain: Millisec = 100 // time between two noise sample, in milliseconds
+    var flickerFuncX: Second = 0f // saves current status (time) of func
+    val flickerFuncDomain: Second = 0.1f // time between two noise sample
     val flickerFuncRange = 0.012f // intensity [0, 1]
 
-    var breathFuncX = 0
+    var breathFuncX = 0f
     val breathRange = 0.02f
-    val breathCycleDuration: Millisec = 2000 // in milliseconds
+    val breathCycleDuration: Second = 2f 
 
-    var pulsateFuncX = 0
+    var pulsateFuncX = 0f
     val pulsateRange = 0.034f
-    val pulsateCycleDuration: Millisec = 500 // in milliseconds
+    val pulsateCycleDuration: Second = 0.5f
 
     val random = HQRNG()
 
@@ -36,7 +38,7 @@ object BlockPropUtil {
 
     }
 
-    private fun getTorchFlicker(baseLum: Int): Int {
+    private fun getTorchFlicker(baseLum: Int): RGB10 {
         val funcY = FastMath.interpolateCatmullRom(0.0f, flickerFuncX.toFloat() / flickerFuncDomain,
                 flickerP0, flickerP1, flickerP2, flickerP3
         )
@@ -61,10 +63,10 @@ object BlockPropUtil {
      */
     internal fun dynamicLumFuncTickClock() {
         // FPS-time compensation
-        if (Terrarum.appgc.fps > 0) {
-            flickerFuncX += 1000 / Terrarum.appgc.fps
-            breathFuncX += 1000 / Terrarum.appgc.fps
-            pulsateFuncX += 1000 / Terrarum.appgc.fps
+        if (Gdx.graphics.framesPerSecond > 0) {
+            flickerFuncX += Gdx.graphics.framesPerSecond
+            breathFuncX += Gdx.graphics.framesPerSecond
+            pulsateFuncX += Gdx.graphics.framesPerSecond
         }
 
         // flicker-related vars
@@ -93,8 +95,8 @@ object BlockPropUtil {
     fun getDynamicLumFunc(baseLum: Int, type: Int): Int {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
-            2    -> Terrarum.ingame!!.world.globalLight // current global light
-            3    -> WeatherMixer.getGlobalLightOfTime(WorldTime.DAY_LENGTH / 2).toInt() // daylight at noon
+            2    -> TerrarumGDX.ingame!!.world.globalLight // current global light
+            3    -> WeatherMixer.getGlobalLightOfTime(WorldTime.DAY_LENGTH / 2).toRGB10() // daylight at noon
             4    -> getSlowBreath(baseLum)
             5    -> getPulsate(baseLum)
             else -> baseLum

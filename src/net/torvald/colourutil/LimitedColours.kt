@@ -1,17 +1,17 @@
 package net.torvald.colourutil
 
-import org.newdawn.slick.Color
+import com.badlogic.gdx.graphics.Color
 
 /**
  * Created by minjaesong on 16-02-11.
  */
 interface LimitedColours {
 
-    fun createSlickColor(raw: Int): Color
-    fun createSlickColor(r: Int, g: Int, b: Int): Color
+    fun createGdxColor(raw: Int): Color
+    fun createGdxColor(r: Int, g: Int, b: Int): Color
 
     fun create(raw: Int)
     fun create(r: Int, g: Int, b: Int)
 
-    fun toSlickColour(): Color
+    fun toGdxColour(): Color
 }

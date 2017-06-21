@@ -1,5 +1,10 @@
 package net.torvald.terrarum.weather
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
@@ -8,12 +13,6 @@ import net.torvald.terrarum.gameactors.ParticleTestRain
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.WorldTime
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Image
-import org.newdawn.slick.fills.GradientFill
-import org.newdawn.slick.geom.Rectangle
 import java.io.File
 import java.util.*
 
@@ -36,12 +35,14 @@ object WeatherMixer {
     lateinit var mixedWeather: BaseModularWeather
 
     val globalLightNow = Color(0)
-    private val world = Terrarum.ingame!!.world
+    private val world = TerrarumGDX.ingame!!.world
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
     const val WEATHER_GENERIC_RAIN = "genericrain"
     // TODO add weather classification indices manually
+
+    // TODO to save from GL overhead, store lightmap to array; use GdxColorMap
 
     init {
         weatherList = HashMap<String, ArrayList<BaseModularWeather>>()
@@ -71,23 +72,23 @@ object WeatherMixer {
         nextWeather = getRandomWeather(WEATHER_GENERIC)
     }
 
-    fun update(gc: GameContainer, delta: Int) {
+    fun update(delta: Float) {
         currentWeather = weatherList[WEATHER_GENERIC]!![0]
 
 
-        if (Terrarum.ingame!!.player != null) {
+        if (TerrarumGDX.ingame!!.player != null) {
             // test rain toggled by F2
             if (KeyToggler.isOn(Key.F2)) {
-                val playerPos = Terrarum.ingame!!.player!!.centrePosPoint
+                val playerPos = TerrarumGDX.ingame!!.player!!.centrePosPoint
                 kotlin.repeat(4) {
                     // 4 seems good
                     val rainParticle = ParticleTestRain(
-                            playerPos.x + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
-                            playerPos.y - Terrarum.HALFH
+                            playerPos.x + HQRNG().nextInt(Gdx.graphics.width) - TerrarumGDX.HALFW,
+                            playerPos.y - TerrarumGDX.HALFH
                     )
-                    Terrarum.ingame!!.addParticle(rainParticle)
+                    TerrarumGDX.ingame!!.addParticle(rainParticle)
                 }
-                globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).darker(0.3f))
+                globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 1f))
             }
         }
     }
@@ -99,33 +100,37 @@ object WeatherMixer {
         this.a = other.a
     }
 
-    fun render(g: Graphics) {
+    /**
+     * Warning! Ends and begins SpriteBatch
+     */
+    fun render(batch: SpriteBatch) {
 
         // we will not care for nextSkybox for now
-        val timeNow = Terrarum.ingame!!.world.time.todaySeconds
+        val timeNow = TerrarumGDX.ingame!!.world.time.todaySeconds
         val skyboxColourMap = currentWeather.skyboxGradColourMap
         val lightColourMap = currentWeather.globalLightColourMap
 
         // calculate global light
-        val gradCol = getGradientColour(lightColourMap, 0, timeNow)
-        globalLightNow.r = gradCol.r
-        globalLightNow.g = gradCol.g
-        globalLightNow.b = gradCol.b
+        val globalLight = getGradientColour(skyboxColourMap, 2, timeNow)
+        globalLightNow.r = globalLight.r
+        globalLightNow.g = globalLight.g
+        globalLightNow.b = globalLight.b
 
-        // draw skybox to provided (should be main) graphics instance
-        val skyColourFill = GradientFill(
-                0f, 0f,
-                getGradientColour(skyboxColourMap, 0, timeNow),
-                0f, Terrarum.HEIGHT.toFloat(),// / Terrarum.ingame!!.screenZoom,
-                getGradientColour(skyboxColourMap, 1, timeNow)
-        )
-
+        // draw skybox to provided graphics instance
+        batch.end()
         blendNormal()
-        g.fill(Rectangle(
-                0f, 0f,
-                Terrarum.WIDTH.toFloat(),// / Terrarum.ingame!!.screenZoom,
-                Terrarum.HEIGHT.toFloat()// / Terrarum.ingame!!.screenZoom
-        ), skyColourFill)
+        TerrarumGDX.inShapeRenderer {
+            it.rect(
+                    0f, 0f,
+                    Gdx.graphics.width.toFloat(),// / TerrarumGDX.ingame!!.screenZoom,
+                    Gdx.graphics.height.toFloat(),// / TerrarumGDX.ingame!!.screenZoom
+                    getGradientColour(skyboxColourMap, 0, timeNow),
+                    getGradientColour(skyboxColourMap, 0, timeNow),
+                    getGradientColour(skyboxColourMap, 1, timeNow),
+                    getGradientColour(skyboxColourMap, 1, timeNow)
+            )
+        }
+        batch.begin()
     }
 
     fun Float.clampOne() = if (this > 1) 1f else this
@@ -138,14 +143,15 @@ object WeatherMixer {
     fun getGlobalLightOfTime(timeInSec: Int): Color =
             getGradientColour(currentWeather.globalLightColourMap, 0, timeInSec)
 
-    fun getGradientColour(image: Image, row: Int, timeInSec: Int): Color {
-        val dataPointDistance = WorldTime.DAY_LENGTH / image.width
+    // TODO colour gradient load from image, store to array
+    fun getGradientColour(colorMap: GdxColorMap, row: Int, timeInSec: Int): Color {
+        val dataPointDistance = WorldTime.DAY_LENGTH / colorMap.width
 
         val phaseThis: Int = timeInSec / dataPointDistance // x-coord in gradmap
-        val phaseNext: Int = (phaseThis + 1) % image.width
+        val phaseNext: Int = (phaseThis + 1) % colorMap.width
 
-        val colourThis = image.getPixel(phaseThis, row).toColor()
-        val colourNext = image.getPixel(phaseNext, row).toColor()
+        val colourThis = colorMap.get(phaseThis, row)
+        val colourNext = colorMap.get(phaseNext, row)
 
         // interpolate R, G and B
         val scale = (timeInSec % dataPointDistance).toFloat() / dataPointDistance // [0.0, 1.0]
@@ -163,7 +169,7 @@ object WeatherMixer {
         return newCol
     }
 
-    fun Color.toStringRGB() = "RGB8(${this.red}, ${this.green}, ${this.blue})"
+    fun Color.toStringRGB() = "RGB8(${this.r}, ${this.g}, ${this.b})"
 
     fun getWeatherList(classification: String) = weatherList[classification]!!
     fun getRandomWeather(classification: String) =
@@ -193,50 +199,53 @@ object WeatherMixer {
         val skyboxInJson = JSON.get("skyboxGradColourMap").asJsonPrimitive
         val extraImagesPath = JSON.getAsJsonArray("extraImages")
 
-        val globalLight: Image
-        val skybox: Image
-        val extraImages = ArrayList<Image>()
+
+
+        val globalLight = if (globalLightInJson.isString)
+            GdxColorMap(ModMgr.getGdxFile("basegame", "$pathToImage/${globalLightInJson.asString}"))
+        else if (globalLightInJson.isNumber)
+            GdxColorMap(globalLightInJson.asNumber.toInt())
+        else
+            throw IllegalStateException("In weather descriptor $path -- globalLight seems malformed.")
+
+
+
+        val skybox = if (skyboxInJson.isString)
+            GdxColorMap(ModMgr.getGdxFile("basegame", "$pathToImage/${skyboxInJson.asString}"))
+        else if (globalLightInJson.isNumber)
+            GdxColorMap(skyboxInJson.asNumber.toInt())
+        else
+            throw IllegalStateException("In weather descriptor $path -- skyboxGradColourMap seems malformed.")
+
+
+
+        val extraImages = ArrayList<Texture>()
+        for (i in extraImagesPath)
+            extraImages.add(Texture(ModMgr.getGdxFile("basegame", "$pathToImage/${i.asString}")))
+
+
+
         val classification = JSON.get("classification").asJsonPrimitive.asString
+
+
+
         var mixFrom: String?
         try { mixFrom = JSON.get("mixFrom").asJsonPrimitive.asString }
         catch (e: NullPointerException) { mixFrom = null }
+
+
+
         var mixPercentage: Double?
         try { mixPercentage = JSON.get("mixPercentage").asJsonPrimitive.asDouble }
         catch (e: NullPointerException) { mixPercentage = null }
 
-        // parse globalLight
-        if (globalLightInJson.isString)
-            globalLight = Image(ModMgr.getPath("basegame", "$pathToImage/${globalLightInJson.asString}"))
-        else if (globalLightInJson.isNumber) {
-            // make 1x1 image with specified colour
-            globalLight = Image(1, 1)
-            globalLight.graphics.color = Color(globalLightInJson.asNumber.toInt())
-            globalLight.graphics.fillRect(0f, 0f, 1f, 1f)
-        }
-        else
-            throw IllegalStateException("In weather descriptor $path -- globalLight seems malformed.")
-
-        // parse skyboxGradColourMap
-        if (skyboxInJson.isString)
-            skybox = Image(ModMgr.getPath("basegame", "$pathToImage/${skyboxInJson.asString}"))
-        else if (globalLightInJson.isNumber) {
-            // make 1x2 image with specified colour
-            skybox = Image(1, 2)
-            skybox.graphics.color = Color(skyboxInJson.asNumber.toInt())
-            skybox.graphics.fillRect(0f, 0f, 1f, 2f)
-        }
-        else
-            throw IllegalStateException("In weather descriptor $path -- skyboxGradColourMap seems malformed.")
-
-        // get extra images
-        for (i in extraImagesPath)
-            extraImages.add(Image(ModMgr.getPath("basegame", "$pathToImage/${i.asString}")))
-
-        // get mix from
 
 
-        return BaseModularWeather(globalLight, skybox, classification, extraImages)
+        return BaseModularWeather(
+                globalLightColourMap = globalLight,
+                skyboxGradColourMap = skybox,
+                classification = classification,
+                extraImages = extraImages
+        )
     }
 }
-
-fun IntArray.toColor() = Color(this[0], this[1], this[2], this[3])

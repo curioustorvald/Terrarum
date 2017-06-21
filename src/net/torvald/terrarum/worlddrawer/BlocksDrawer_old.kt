@@ -1,10 +1,14 @@
 package net.torvald.terrarum.worlddrawer
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
-import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
@@ -12,25 +16,31 @@ import net.torvald.terrarum.worlddrawer.WorldCamera.x
 import net.torvald.terrarum.worlddrawer.WorldCamera.y
 import net.torvald.terrarum.worlddrawer.WorldCamera.height
 import net.torvald.terrarum.worlddrawer.WorldCamera.width
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.lwjgl.opengl.GL11
-import org.newdawn.slick.*
-import org.newdawn.slick.imageout.ImageOut
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.util.zip.GZIPInputStream
 
 
 /**
  * Created by minjaesong on 16-01-19.
  */
 object BlocksDrawer {
-    private val world: GameWorld = Terrarum.ingame!!.world
+    private val world: GameWorld = TerrarumGDX.ingame!!.world
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
     // TODO modular
-    val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "blocks/terrain.tga.gz"), TILE_SIZE, TILE_SIZE) // 64 MB
-    val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "blocks/wire.tga.gz"), TILE_SIZE, TILE_SIZE) // 4 MB
+    //val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "blocks/terrain.tga.gz"), TILE_SIZE, TILE_SIZE) // 64 MB
+    //val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "blocks/wire.tga.gz"), TILE_SIZE, TILE_SIZE) // 4 MB
 
+    val tilesTerrain: TextureRegionPack
+    val tilesWire: TextureRegionPack
+    val tileItemWall: TextureRegionPack
 
-    val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
+    //val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
 
 
     val wallOverlayColour = Color(2f/3f, 2f/3f, 2f/3f, 1f)
@@ -52,28 +62,70 @@ object BlocksDrawer {
     private val NEARBY_TILE_CODE_LEFT = 8
 
 
-    init {
-        val tg = tileItemWall.graphics
+    private val GZIP_READBUF_SIZE = 8192
 
-        // initialise item_wall images
-        (ITEM_TILES).forEach {
-            tg.drawImage(
-                    tilesTerrain.getSubImage(
-                            (it % 16) * 16,
-                            (it / 16)
-                    ),
-                    (it % 16) * TILE_SIZE.toFloat(),
-                    (it / 16) * TILE_SIZE.toFloat(),
-                    wallOverlayColour
-            )
+    init {
+        // hard-coded as tga.gz
+        val gzFileList = listOf("blocks/terrain.tga.gz", "blocks/wire.tga.gz")
+        val gzTmpFName = listOf("tmp_terrain.tga", "tmp_wire.tga")
+        // unzip GZIP temporarily
+        gzFileList.forEachIndexed { index, filename ->
+            val terrainTexFile = ModMgr.getGdxFile("basegame", filename)
+            val gzi = GZIPInputStream(terrainTexFile.read(GZIP_READBUF_SIZE))
+            val wholeFile = gzi.readBytes()
+            gzi.close()
+            val fos = BufferedOutputStream(FileOutputStream(gzTmpFName[index]))
+            fos.write(wholeFile)
+            fos.flush()
+            fos.close()
         }
 
-        //tg.flush()
-        //ImageOut.write(tileItemWall, "./tileitemwalltest.png")
+        val terrainPixMap = Pixmap(Gdx.files.internal(gzTmpFName[0]))
+        val wirePixMap = Pixmap(Gdx.files.internal(gzTmpFName[1]))
 
-        tg.destroy()
+        // delete temp files
+        gzTmpFName.forEach { File(it).delete() }
+
+        tilesTerrain = TextureRegionPack(Texture(terrainPixMap), TILE_SIZE, TILE_SIZE)
+        tilesWire = TextureRegionPack(Texture(wirePixMap), TILE_SIZE, TILE_SIZE)
+
+        // also dispose unused temp files
+        //terrainPixMap.dispose() // commented: tileItemWall needs it
+        wirePixMap.dispose()
+
+
+
+
+        // create item_wall images
+        // --> make pixmap
+        val tileItemImgPixMap = Pixmap(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16, Pixmap.Format.RGBA8888)
+        tileItemImgPixMap.pixels.rewind()
+
+        (ITEM_TILES).forEach { tileID ->
+
+            val tile = tilesTerrain.get((tileID % 16) * 16, (tileID / 16))
+
+            // slow memory copy :\  I'm afraid I can't random-access bytebuffer...
+            for (y in 0..TILE_SIZE - 1) {
+                for (x in 0..TILE_SIZE - 1) {
+                    tileItemImgPixMap.pixels.putInt(
+                        terrainPixMap.getPixel(
+                                tile.regionX + x,
+                                tile.regionY + y
+                        )
+                    )
+                }
+            }
+        }
+        tileItemImgPixMap.pixels.rewind()
+        // turn pixmap into texture
+        tileItemWall = TextureRegionPack(Texture(tileItemImgPixMap), TILE_SIZE, TILE_SIZE)
+
+
+
+        tileItemImgPixMap.dispose()
+        terrainPixMap.dispose() // finally
     }
-
 
     /**
      * Connectivity group 01 : artificial tiles
@@ -292,51 +344,37 @@ object BlocksDrawer {
 
 
 
-    fun renderWall(g: Graphics) {
+    fun renderWall(batch: SpriteBatch) {
         /**
          * render to camera
          */
         blendNormal()
 
-        tilesTerrain.startUse()
-        drawTiles(g, WALL, false)
-        tilesTerrain.endUse()
-
-        blendMul()
-
-        g.color = wallOverlayColour
-        g.fillRect(WorldCamera.x.toFloat(), WorldCamera.y.toFloat(),
-                WorldCamera.width.toFloat() + 1, WorldCamera.height.toFloat() + 1
-        )
-
-        blendNormal()
+        batch.color = wallOverlayColour
+        drawTiles(batch, WALL, false)
     }
 
-    fun renderTerrain(g: Graphics) {
+    fun renderTerrain(batch: SpriteBatch) {
         /**
          * render to camera
          */
         blendNormal()
 
-        tilesTerrain.startUse()
-        drawTiles(g, TERRAIN, false) // regular tiles
-        tilesTerrain.endUse()
+        batch.color = Color.WHITE
+        drawTiles(batch, TERRAIN, false) // regular tiles
     }
 
-    fun renderFront(g: Graphics, drawWires: Boolean) {
+    fun renderFront(batch: SpriteBatch, drawWires: Boolean) {
         /**
          * render to camera
          */
         blendMul()
 
-        tilesTerrain.startUse()
-        drawTiles(g, TERRAIN, true) // blendmul tiles
-        tilesTerrain.endUse()
+        batch.color = Color.WHITE
+        drawTiles(batch, TERRAIN, true) // blendmul tiles
 
         if (drawWires) {
-            tilesWire.startUse()
-            drawTiles(g, WIRE, false)
-            tilesWire.endUse()
+            drawTiles(batch, WIRE, false)
         }
 
         blendNormal()
@@ -344,7 +382,7 @@ object BlocksDrawer {
 
     private val tileDrawLightThreshold = 2
 
-    private fun drawTiles(g: Graphics, mode: Int, drawModeTilesBlendMul: Boolean) {
+    private fun drawTiles(batch: SpriteBatch, mode: Int, drawModeTilesBlendMul: Boolean) {
         val for_y_start = y / TILE_SIZE
         val for_y_end = BlocksDrawer.clampHTile(for_y_start + (height / TILE_SIZE) + 2)
 
@@ -420,13 +458,13 @@ object BlocksDrawer {
                             // draw a tile
                             if (drawModeTilesBlendMul) {
                                 if (BlocksDrawer.isBlendMul(thisTile)) {
-                                    drawTile(mode, x, y, thisTileX, thisTileY)
+                                    drawTile(batch, mode, x, y, thisTileX, thisTileY)
                                 }
                             }
                             else {
                                 // do NOT add "if (!isBlendMul(thisTile))"!
                                 // or else they will not look like they should be when backed with wall
-                                drawTile(mode, x, y, thisTileX, thisTileY)
+                                drawTile(batch, mode, x, y, thisTileX, thisTileY)
                             }
 
                             // draw a breakage
@@ -436,8 +474,7 @@ object BlocksDrawer {
                                 val stage = (breakage / maxHealth).times(breakAnimSteps).roundInt()
                                 // actual drawing
                                 if (stage > 0) {
-                                    // alpha blending works, but no GL blend func...
-                                    drawTile(mode, x, y, 5 + stage, 0)
+                                    drawTile(batch, mode, x, y, 5 + stage, 0)
                                 }
                             }
 
@@ -592,18 +629,18 @@ object BlocksDrawer {
             return 7
     }
 
-    private fun drawTile(mode: Int, tilewisePosX: Int, tilewisePosY: Int, sheetX: Int, sheetY: Int) {
+    private fun drawTile(batch: SpriteBatch, mode: Int, tilewisePosX: Int, tilewisePosY: Int, sheetX: Int, sheetY: Int) {
         if (mode == TERRAIN || mode == WALL)
-            tilesTerrain.renderInUse(
-                    FastMath.floor((tilewisePosX * TILE_SIZE).toFloat()),
-                    FastMath.floor((tilewisePosY * TILE_SIZE).toFloat()),
-                    sheetX, sheetY
+            batch.draw(
+                    tilesTerrain.get(sheetX, sheetY),
+                    (tilewisePosX * TILE_SIZE).toFloat(),
+                    (tilewisePosY * TILE_SIZE).toFloat()
             )
         else if (mode == WIRE)
-            tilesWire.renderInUse(
-                    FastMath.floor((tilewisePosX * TILE_SIZE).toFloat()),
-                    FastMath.floor((tilewisePosY * TILE_SIZE).toFloat()),
-                    sheetX, sheetY
+            batch.draw(
+                    tilesWire.get(sheetX, sheetY),
+                    (tilewisePosX * TILE_SIZE).toFloat(),
+                    (tilewisePosY * TILE_SIZE).toFloat()
             )
         else
             throw IllegalArgumentException()

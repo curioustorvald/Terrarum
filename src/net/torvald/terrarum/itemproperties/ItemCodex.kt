@@ -1,18 +1,16 @@
 package net.torvald.terrarum.itemproperties
 
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.point.Point2d
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.CanBeAnItem
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.ActorWithPhysics
-import net.torvald.terrarum.gamecontroller.mouseTileX
-import net.torvald.terrarum.gamecontroller.mouseTileY
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Image
 import java.util.*
 
 /**
@@ -35,7 +33,7 @@ object ItemCodex {
     val ACTORID_MIN = ITEM_DYNAMIC.endInclusive + 1
 
 
-    private val itemImagePlaceholder = Image("./assets/item_kari_24.tga")
+    private val itemImagePlaceholder = TextureRegion(Texture("./assets/item_kari_24.tga"))
 
 
     init {
@@ -59,17 +57,17 @@ object ItemCodex {
 
                 }
 
-                override fun primaryUse(gc: GameContainer, delta: Int): Boolean {
+                override fun primaryUse(delta: Float): Boolean {
                     return false
                     // TODO base punch attack
                 }
 
-                override fun secondaryUse(gc: GameContainer, delta: Int): Boolean {
-                    val mousePoint = Point2d(gc.mouseTileX.toDouble(), gc.mouseTileY.toDouble())
+                override fun secondaryUse(delta: Float): Boolean {
+                    val mousePoint = Point2d(TerrarumGDX.mouseTileX.toDouble(), TerrarumGDX.mouseTileY.toDouble())
 
                     // check for collision with actors (BLOCK only)
                     if (this.inventoryCategory == Category.BLOCK) {
-                        Terrarum.ingame!!.actorContainer.forEach {
+                        TerrarumGDX.ingame!!.actorContainer.forEach {
                             if (it is ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
                                 return false
                         }
@@ -77,27 +75,27 @@ object ItemCodex {
 
                     // return false if the tile is already there
                     if (this.inventoryCategory == Category.BLOCK &&
-                        this.dynamicID == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY) ||
+                        this.dynamicID == TerrarumGDX.ingame!!.world.getTileFromTerrain(TerrarumGDX.mouseTileX, TerrarumGDX.mouseTileY) ||
                         this.inventoryCategory == Category.WALL &&
-                        this.dynamicID - ITEM_WALLS.start == Terrarum.ingame!!.world.getTileFromWall(gc.mouseTileX, gc.mouseTileY) ||
+                        this.dynamicID - ITEM_WALLS.start == TerrarumGDX.ingame!!.world.getTileFromWall(TerrarumGDX.mouseTileX, TerrarumGDX.mouseTileY) ||
                         this.inventoryCategory == Category.WIRE &&
-                        this.dynamicID - ITEM_WIRES.start == Terrarum.ingame!!.world.getTileFromWire(gc.mouseTileX, gc.mouseTileY)
+                        this.dynamicID - ITEM_WIRES.start == TerrarumGDX.ingame!!.world.getTileFromWire(TerrarumGDX.mouseTileX, TerrarumGDX.mouseTileY)
                             )
                         return false
 
                     // filter passed, do the job
                     // FIXME this is only useful for Player
                     if (i in ITEM_TILES) {
-                        Terrarum.ingame!!.world.setTileTerrain(
-                                gc.mouseTileX,
-                                gc.mouseTileY,
+                        TerrarumGDX.ingame!!.world.setTileTerrain(
+                                TerrarumGDX.mouseTileX,
+                                TerrarumGDX.mouseTileY,
                                 i
                         )
                     }
                     else {
-                        Terrarum.ingame!!.world.setTileWall(
-                                gc.mouseTileX,
-                                gc.mouseTileY,
+                        TerrarumGDX.ingame!!.world.setTileWall(
+                                TerrarumGDX.mouseTileX,
+                                TerrarumGDX.mouseTileY,
                                 i
                         )
                     }
@@ -128,40 +126,40 @@ object ItemCodex {
                 name = "Stone pickaxe"
             }
 
-            override fun primaryUse(gc: GameContainer, delta: Int): Boolean {
-                val mousePoint = Point2d(gc.mouseTileX.toDouble(), gc.mouseTileY.toDouble())
-                val actorvalue = Terrarum.ingame!!.player!!.actorValue
+            override fun primaryUse(delta: Float): Boolean {
+                val mousePoint = Point2d(TerrarumGDX.mouseTileX.toDouble(), TerrarumGDX.mouseTileY.toDouble())
+                val actorvalue = TerrarumGDX.ingame!!.player!!.actorValue
 
 
                 using = true
 
                 // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
                 // return false if hitting actors
-                Terrarum.ingame!!.actorContainer.forEach {
+                TerrarumGDX.ingame!!.actorContainer.forEach {
                     if (it is ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
                         return false
                 }
 
                 // return false if there's no tile
-                if (Block.AIR == Terrarum.ingame!!.world.getTileFromTerrain(gc.mouseTileX, gc.mouseTileY))
+                if (Block.AIR == TerrarumGDX.ingame!!.world.getTileFromTerrain(TerrarumGDX.mouseTileX, TerrarumGDX.mouseTileY))
                     return false
 
 
                 // filter passed, do the job
                 val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
-                Terrarum.ingame!!.world.inflictTerrainDamage(
-                        gc.mouseTileX,
-                        gc.mouseTileY,
-                        Calculate.pickaxePower(Terrarum.ingame!!.player!!, material) * swingDmgToFrameDmg
+                TerrarumGDX.ingame!!.world.inflictTerrainDamage(
+                        TerrarumGDX.mouseTileX,
+                        TerrarumGDX.mouseTileY,
+                        Calculate.pickaxePower(TerrarumGDX.ingame!!.player!!, material) * swingDmgToFrameDmg
                 )
                 return true
             }
 
-            override fun endPrimaryUse(gc: GameContainer, delta: Int): Boolean {
+            override fun endPrimaryUse(delta: Float): Boolean {
                 using = false
                 // reset action timer to zero
-                Terrarum.ingame!!.player!!.actorValue[AVKey.__ACTION_TIMER] = 0.0
+                TerrarumGDX.ingame!!.player!!.actorValue[AVKey.__ACTION_TIMER] = 0.0
                 return true
             }
         }*/
@@ -180,7 +178,7 @@ object ItemCodex {
             TODO("read from dynamicitem description (JSON)")
         }
         else {
-            val a = Terrarum.ingame!!.getActorByID(code) // actor item
+            val a = TerrarumGDX.ingame!!.getActorByID(code) // actor item
             if (a is CanBeAnItem) return a.itemData
 
             throw IllegalArgumentException("Attempted to get item data of actor that cannot be an item. ($a)")
@@ -194,25 +192,24 @@ object ItemCodex {
         itemCodex[code] = item
     }
 
-    fun getItemImage(item: GameItem): Image {
+    fun getItemImage(item: GameItem): TextureRegion {
         // terrain
         if (item.originalID in ITEM_TILES) {
-            return BlocksDrawer.tilesTerrain.getSubImage(
+            return BlocksDrawer.tilesTerrain.get(
                     (item.originalID % 16) * 16,
                     item.originalID / 16
             )
         }
         // wall
         else if (item.originalID in ITEM_WALLS) {
-            return BlocksDrawer.tileItemWall.getSubImage(
+            return BlocksDrawer.tileItemWall.get(
                     (item.originalID.minus(ITEM_WALLS.first) % 16) * TILE_SIZE,
-                    (item.originalID.minus(ITEM_WALLS.first) / 16) * TILE_SIZE,
-                    TILE_SIZE, TILE_SIZE
+                    (item.originalID.minus(ITEM_WALLS.first) / 16) * TILE_SIZE
             )
         }
         // wire
         else if (item.originalID in ITEM_WIRES) {
-            return BlocksDrawer.tilesWire.getSubImage((item.originalID % 16) * 16, item.originalID / 16)
+            return BlocksDrawer.tilesWire.get((item.originalID % 16) * 16, item.originalID / 16)
         }
         // TODO get it real, using originalID...?
         else

@@ -1,17 +1,16 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
-import org.newdawn.slick.Color
-import org.newdawn.slick.Graphics
 
 /**
  * Created by minjaesong on 16-03-05.
  */
 class PhysTestBall : ActorWithPhysics(Actor.RenderOrder.MIDDLE, immobileBody = true) {
 
-    private var color = Color.orange
+    private var color = Color.GOLD
 
     init {
         setHitboxDimension(16, 16, 0, 0)
@@ -21,26 +20,27 @@ class PhysTestBall : ActorWithPhysics(Actor.RenderOrder.MIDDLE, immobileBody = t
         color = RoguelikeRandomiser.composeColourFrom(RoguelikeRandomiser.POTION_PRIMARY_COLSET)
     }
 
-    override fun drawBody(g: Graphics) {
-        g.color = color
-        g.fillOval(
-                hitbox.startX.toFloat() - 1f,
-                hitbox.startY.toFloat() - 1f,
-                hitbox.width.toFloat(),
-                hitbox.height.toFloat())
+    override fun drawBody(batch: SpriteBatch) {
+        TerrarumGDX.inShapeRenderer {
+            it.color = color
+            it.circle(
+                    hitbox.startX.toFloat() - 1f,
+                    hitbox.startY.toFloat() - 1f,
+                    hitbox.width.toFloat()
+            )
 
-        g.fillOval(
-                hitbox.startX.toFloat() + Terrarum.ingame!!.world.width * TILE_SIZE - 1f,
-                hitbox.startY.toFloat() - 1f,
-                hitbox.width.toFloat(),
-                hitbox.height.toFloat())
+            it.circle(
+                    hitbox.startX.toFloat() + TerrarumGDX.ingame!!.world.width * TILE_SIZE - 1f,
+                    hitbox.startY.toFloat() - 1f,
+                    hitbox.width.toFloat()
+            )
 
-        g.fillOval(
-                hitbox.startX.toFloat() - Terrarum.ingame!!.world.width * TILE_SIZE - 1f,
-                hitbox.startY.toFloat() - 1f,
-                hitbox.width.toFloat(),
-                hitbox.height.toFloat())
-
+            it.circle(
+                    hitbox.startX.toFloat() - TerrarumGDX.ingame!!.world.width * TILE_SIZE - 1f,
+                    hitbox.startY.toFloat() - 1f,
+                    hitbox.width.toFloat()
+            )
+        }
 
         //println(moveDelta)
     }

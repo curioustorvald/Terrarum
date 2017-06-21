@@ -1,5 +1,7 @@
 package net.torvald.terrarum.gameactors
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.point.Point2d
 import net.torvald.terrarum.*
@@ -12,11 +14,12 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Image
 import java.util.*
+
+
+typealias Second = Float
 
 /**
  * Base class for every actor that has animated sprites. This includes furnishings, paintings, gadgets, etc.
@@ -41,7 +44,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     var drawMode = BlendMode.NORMAL
 
-    @Transient private val world: GameWorld = Terrarum.ingame!!.world
+    @Transient private val world: GameWorld = TerrarumGDX.ingame!!.world
 
     var hitboxTranslateX: Double = 0.0// relative to spritePosX
         protected set
@@ -194,7 +197,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /**
      * Post-hit invincibility, in milliseconds
      */
-    @Transient val INVINCIBILITY_TIME: Millisec = 500
+    @Transient val INVINCIBILITY_TIME: Second = 0.5f
 
     @Transient internal val BASE_FRICTION = 0.3
 
@@ -233,11 +236,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     internal var walledTop = false    // UNUSED; only for BasicDebugInfoWindow
     internal var walledBottom = false // UNUSED; only for BasicDebugInfoWindow
     internal var colliding = false
-
-    protected inline val gameContainer: GameContainer
-        get() = Terrarum.appgc
-    protected inline val updateDelta: Int
-        get() = Terrarum.delta
+    
+    protected inline val updateDelta: Float
+        get() = Gdx.graphics.deltaTime
 
 
     var isWalkingH = false
@@ -247,24 +248,14 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         // some initialiser goes here...
     }
 
-    fun makeNewSprite(w: Int, h: Int, image: Image) {
-        sprite = SpriteAnimation(this, w, h)
-        sprite!!.setSpriteImage(image)
+    fun makeNewSprite(textureRegionPack: TextureRegionPack) {
+        sprite = SpriteAnimation(this)
+        sprite!!.setSpriteImage(textureRegionPack)
     }
 
-    fun makeNewSprite(w: Int, h: Int, imageref: String) {
-        sprite = SpriteAnimation(this, w, h)
-        sprite!!.setSpriteImage(imageref)
-    }
-
-    fun makeNewSpriteGlow(w: Int, h: Int, image: Image) {
-        spriteGlow = SpriteAnimation(this, w, h)
-        spriteGlow!!.setSpriteImage(image)
-    }
-
-    fun makeNewSpriteGlow(w: Int, h: Int, imageref: String) {
-        spriteGlow = SpriteAnimation(this, w, h)
-        spriteGlow!!.setSpriteImage(imageref)
+    fun makeNewSpriteGlow(textureRegionPack: TextureRegionPack) {
+        spriteGlow = SpriteAnimation(this)
+        spriteGlow!!.setSpriteImage(textureRegionPack)
     }
 
     /**
@@ -314,7 +305,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     inline val feetPosTile: IntArray
         get() = intArrayOf(tilewiseHitbox.centeredX.floorInt(), tilewiseHitbox.endY.floorInt())
 
-    override fun run() = update(gameContainer, updateDelta)
+    override fun run() = update(updateDelta)
 
     /**
      * Add vector value to the velocity, in the time unit of single frame.
@@ -329,7 +320,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     private val bounceDampenVelThreshold = 0.5
 
-    override fun update(gc: GameContainer, delta: Int) {
+    override fun update(delta: Float) {
         if (isUpdate && !flagDespawn) {
 
             if (!assertPrinted) assertInit()
@@ -499,7 +490,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
              * weight; gravitational force in action
              * W = mass * G (9.8 [m/s^2])
              */
-            val W: Vector2 = gravitation * Terrarum.TARGET_FPS.toDouble()
+            val W: Vector2 = gravitation * TerrarumGDX.TARGET_FPS.toDouble()
             /**
              * Area
              */
@@ -510,7 +501,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
              */
             val D: Vector2 = Vector2(externalForce.x.magnSqr(), externalForce.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
 
-            val V: Vector2 = (W - D) / Terrarum.TARGET_FPS.toDouble() * SI_TO_GAME_ACC
+            val V: Vector2 = (W - D) / TerrarumGDX.TARGET_FPS.toDouble() * SI_TO_GAME_ACC
 
             applyForce(V)
             //}
@@ -707,7 +698,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             // slam-into-whatever damage (such dirty; much hack; wow)
             //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
-            val collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.TARGET_FPS).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
+            val collisionDamage = mass * (vectorSum.magnitude / (10.0 / TerrarumGDX.TARGET_FPS).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
             // kg * m / s^2 (mass * acceleration), acceleration -> (vectorMagn / (0.01)^2).gameToSI()
             if (collisionDamage != 0.0) println("Collision damage: $collisionDamage N")
 
@@ -1193,20 +1184,16 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         )
     }
 
-    override fun drawGlow(g: Graphics) {
+    override fun drawGlow(batch: SpriteBatch) {
         if (isVisible && spriteGlow != null) {
             blendLightenOnly()
 
-            val offsetX = if (!spriteGlow!!.flippedHorizontal())
-                hitboxTranslateX * scale
-            else
-                spriteGlow!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale)
-
+            val offsetX = hitboxTranslateX * scale
             val offsetY = spriteGlow!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
 
             if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                 // camera center neg, actor center pos
-                spriteGlow!!.render(g,
+                spriteGlow!!.render(batch,
                         (hitbox.startX - offsetX).toFloat() + world.width * TILE_SIZE,
                         (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
@@ -1214,14 +1201,14 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             }
             else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                 // camera center pos, actor center neg
-                spriteGlow!!.render(g,
+                spriteGlow!!.render(batch,
                         (hitbox.startX - offsetX).toFloat() - world.width * TILE_SIZE,
                         (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
                 )
             }
             else {
-                spriteGlow!!.render(g,
+                spriteGlow!!.render(batch,
                         (hitbox.startX - offsetX).toFloat(),
                         (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
@@ -1233,21 +1220,17 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     val leftsidePadding = world.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
     val rightsidePadding = WorldCamera.width.ushr(1)
 
-    override fun drawBody(g: Graphics) {
+    override fun drawBody(batch: SpriteBatch) {
         if (isVisible && sprite != null) {
 
             BlendMode.resolve(drawMode)
 
-            val offsetX = if (!sprite!!.flippedHorizontal())
-                hitboxTranslateX * scale
-            else
-                sprite!!.cellWidth * scale - (hitbox.width + hitboxTranslateX * scale)
-
+            val offsetX = hitboxTranslateX * scale
             val offsetY = sprite!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
 
             if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
                 // camera center neg, actor center pos
-                sprite!!.render(g,
+                sprite!!.render(batch,
                         (hitbox.startX - offsetX).toFloat() + world.width * TILE_SIZE,
                         (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
@@ -1255,14 +1238,14 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             }
             else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
                 // camera center pos, actor center neg
-                sprite!!.render(g,
+                sprite!!.render(batch,
                         (hitbox.startX - offsetX).toFloat() - world.width * TILE_SIZE,
                         (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
                 )
             }
             else {
-                sprite!!.render(g,
+                sprite!!.render(batch,
                         (hitbox.startX - offsetX).toFloat(),
                         (hitbox.startY - offsetY).toFloat(),
                         (scale).toFloat()
@@ -1412,16 +1395,16 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         /**
          * [m / s^2] * SI_TO_GAME_ACC -> [px / InternalFrame^2]
          */
-        @Transient val SI_TO_GAME_ACC = METER / (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS)
+        @Transient val SI_TO_GAME_ACC = METER / (TerrarumGDX.TARGET_FPS * TerrarumGDX.TARGET_FPS)
         /**
          * [m / s] * SI_TO_GAME_VEL -> [px / InternalFrame]
          */
-        @Transient val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
+        @Transient val SI_TO_GAME_VEL = METER / TerrarumGDX.TARGET_FPS
 
         /**
          * [px / InternalFrame^2] * GAME_TO_SI_ACC -> [m / s^2]
          */
-        @Transient val GAME_TO_SI_ACC = (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS) / METER
+        @Transient val GAME_TO_SI_ACC = (TerrarumGDX.TARGET_FPS * TerrarumGDX.TARGET_FPS) / METER
 
 
         /**
@@ -1442,8 +1425,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
                 return 0
-            else if (x >= Terrarum.ingame!!.world.width shl 4)
-                return Terrarum.ingame!!.world.width - 1
+            else if (x >= TerrarumGDX.ingame!!.world.width shl 4)
+                return TerrarumGDX.ingame!!.world.width - 1
             else
                 return x and 0x7FFFFFFF shr 4
         }
@@ -1451,8 +1434,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         private fun div16TruncateToMapHeight(y: Int): Int {
             if (y < 0)
                 return 0
-            else if (y >= Terrarum.ingame!!.world.height shl 4)
-                return Terrarum.ingame!!.world.height - 1
+            else if (y >= TerrarumGDX.ingame!!.world.height shl 4)
+                return TerrarumGDX.ingame!!.world.height - 1
             else
                 return y and 0x7FFFFFFF shr 4
         }

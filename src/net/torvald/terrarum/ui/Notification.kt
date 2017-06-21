@@ -1,11 +1,8 @@
 package net.torvald.terrarum.ui
 
-import com.jme3.math.FastMath
-import net.torvald.terrarum.Terrarum
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Input
-import org.newdawn.slick.SlickException
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.gameactors.Second
 
 /**
  * Created by minjaesong on 16-01-23.
@@ -20,57 +17,54 @@ class Notification : UICanvas {
 
     override var height: Int = msgUI.height
     private val visibleTime = Math.min(
-            Terrarum.getConfigInt("notificationshowuptime"),
+            TerrarumGDX.getConfigInt("notificationshowuptime"),
             SHOWUP_MAX
     )
-    private var displayTimer = 0
+    private var displayTimer = 0f
 
     internal var message: Array<String> = Array(MessageWindow.MESSAGES_DISPLAY, { "" })
 
-    override var openCloseTime: Int = MessageWindow.OPEN_CLOSE_TIME
+    override var openCloseTime: Second = MessageWindow.OPEN_CLOSE_TIME
 
     override var handler: UIHandler? = null
 
-    init {
-    }
-
-    override fun update(gc: GameContainer, delta: Int) {
+    override fun update(delta: Float) {
         if (handler!!.isOpened)
             displayTimer += delta
 
         if (displayTimer >= visibleTime) {
             handler!!.setAsClose()
-            displayTimer = 0
+            displayTimer = 0f
         }
     }
 
-    override fun render(gc: GameContainer, g: Graphics) {
-        msgUI.render(gc, g)
+    override fun render(batch: SpriteBatch) {
+        msgUI.render(batch)
     }
 
-    override fun doOpening(gc: GameContainer, delta: Int) {
+    override fun processInput(delta: Float) {
+    }
+
+    override fun doOpening(delta: Float) {
         UICanvas.doOpeningFade(handler, openCloseTime)
     }
 
-    override fun doClosing(gc: GameContainer, delta: Int) {
+    override fun doClosing(delta: Float) {
         UICanvas.doClosingFade(handler, openCloseTime)
     }
 
-    override fun endOpening(gc: GameContainer, delta: Int) {
+    override fun endOpening(delta: Float) {
         UICanvas.endOpeningFade(handler)
     }
 
-    override fun endClosing(gc: GameContainer, delta: Int) {
+    override fun endClosing(delta: Float) {
         UICanvas.endClosingFade(handler)
     }
-
-    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
-    }
-
+    
     fun sendNotification(message: Array<String>) {
         this.message = message
         msgUI.setMessage(this.message)
-        handler!!.openCloseCounter = 0
+        handler!!.openCloseCounter = 0f
         handler!!.opacity = 0f
         handler!!.setAsOpen()
     }

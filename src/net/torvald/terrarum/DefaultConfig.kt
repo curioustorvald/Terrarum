@@ -1,7 +1,7 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.Input
 import com.google.gson.JsonArray
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import net.torvald.terrarum.gamecontroller.Key
 
@@ -20,7 +20,7 @@ object DefaultConfig {
 
         jsonObject.addProperty("smoothlighting", true)
         jsonObject.addProperty("imtooyoungtodie", false) // perma-death
-        jsonObject.addProperty("language", Terrarum.sysLang)
+        jsonObject.addProperty("language", TerrarumGDX.sysLang)
         jsonObject.addProperty("notificationshowuptime", 6500)
         jsonObject.addProperty("multithread", true) // experimental!
 
@@ -47,31 +47,31 @@ object DefaultConfig {
 
 
         // control-keyboard (Java key codes. This is what Minecraft also uses)
-        jsonObject.addProperty("keyup", Key.E)
-        jsonObject.addProperty("keyleft", Key.S)
-        jsonObject.addProperty("keydown", Key.D)
-        jsonObject.addProperty("keyright", Key.F)
+        jsonObject.addProperty("keyup", Input.Keys.E)
+        jsonObject.addProperty("keyleft", Input.Keys.S)
+        jsonObject.addProperty("keydown", Input.Keys.D)
+        jsonObject.addProperty("keyright", Input.Keys.F)
 
-        jsonObject.addProperty("keymovementaux", Key.A) // movement-auxiliary, or hookshot
-        jsonObject.addProperty("keyinventory", Key.W)
-        jsonObject.addProperty("keyinteract", Key.R)
-        jsonObject.addProperty("keyclose", Key.C)
+        jsonObject.addProperty("keymovementaux", Input.Keys.A) // movement-auxiliary, or hookshot
+        jsonObject.addProperty("keyinventory", Input.Keys.W)
+        jsonObject.addProperty("keyinteract", Input.Keys.R)
+        jsonObject.addProperty("keyclose", Input.Keys.C)
 
-        jsonObject.addProperty("keygamemenu", Key.TAB)
+        jsonObject.addProperty("keygamemenu", Input.Keys.TAB)
         jsonObject.addProperty("keyquicksel", Key.CAPS_LOCK) // pie menu
-        val keyquickselalt = JsonArray(); keyquickselalt.add(Key.BACKSPACE); keyquickselalt.add(Key.L_COMMAND); keyquickselalt.add(Key.L_CONTROL)
+        val keyquickselalt = JsonArray(); keyquickselalt.add(Input.Keys.BACKSPACE); keyquickselalt.add(Key.L_COMMAND); keyquickselalt.add(Input.Keys.CONTROL_LEFT)
         // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command
         // so these keys are treated as the same.
         // FOR ~~FUCKS~~ERGONOMICS' SAKE DON'T USE CTRL AND ALT AS A KEY!
         jsonObject.add("keyquickselalt", keyquickselalt)
 
-        jsonObject.addProperty("keyjump", Key.SPACE)
+        jsonObject.addProperty("keyjump", Input.Keys.SPACE)
 
         val keyquickbars = JsonArray(); for (i in 2..11) keyquickbars.add(i) // NUM_1 to NUM_0
         jsonObject.add("keyquickbars", keyquickbars)
 
-        jsonObject.addProperty("mouseprimary", 0) // left mouse
-        jsonObject.addProperty("mousesecondary", 1) // right mouse
+        jsonObject.addProperty("mouseprimary", Input.Buttons.LEFT) // left mouse
+        jsonObject.addProperty("mousesecondary", Input.Buttons.RIGHT) // right mouse
 
 
         jsonObject.addProperty("pcgamepadenv", "console")

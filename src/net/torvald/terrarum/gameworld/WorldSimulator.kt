@@ -1,14 +1,14 @@
 package net.torvald.terrarum.gameworld
 
-import net.torvald.terrarum.Terrarum
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.AnyPlayer
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
-import org.newdawn.slick.Color
-import org.newdawn.slick.Graphics
 
 /**
  * Created by minjaesong on 16-08-03.
@@ -32,12 +32,12 @@ object WorldSimulator {
     var updateYFrom = 0
     var updateYTo = 0
 
-    val colourNone = Color(0x808080)
-    val colourWater = Color(0x66BBFF)
+    val colourNone = Color(0x808080FF.toInt())
+    val colourWater = Color(0x66BBFFFF.toInt())
 
-    private val world = Terrarum.ingame!!.world
+    private val world = TerrarumGDX.ingame!!.world
 
-    operator fun invoke(p: AnyPlayer?, delta: Int) {
+    operator fun invoke(p: AnyPlayer?, delta: Float) {
         if (p != null) {
             updateXFrom = p.hitbox.centeredX.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
             updateYFrom = p.hitbox.centeredY.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
@@ -57,7 +57,7 @@ object WorldSimulator {
      * Procedure: CP world fluidmap -> sim on fluidmap -> CP fluidmap world
      * TODO multithread
      */
-    fun moveFluids(delta: Int) {
+    fun moveFluids(delta: Float) {
         ////////////////////
         // build fluidmap //
         ////////////////////
@@ -130,7 +130,7 @@ object WorldSimulator {
      * displace fallable tiles. It is scanned bottom-left first. To achieve the sens ofreal
      * falling, each tiles are displaced by ONLY ONE TILE below.
      */
-    fun displaceFallables(delta: Int) {
+    fun displaceFallables(delta: Float) {
         for (y in updateYFrom..updateYTo) {
             for (x in updateXFrom..updateXTo) {
                 val tile = world.getTileFromTerrain(x, y) ?: Block.STONE
@@ -155,20 +155,20 @@ object WorldSimulator {
         }
     }
 
-    fun drawFluidMapDebug(g: Graphics) {
-        g.font = Terrarum.fontSmallNumbers
-        g.color = colourWater
+    fun drawFluidMapDebug(batch: SpriteBatch) {
+        batch.color = colourWater
 
         for (y in 0..fluidMap.size - 1) {
             for (x in 0..fluidMap[0].size - 1) {
                 val data = fluidMap[y][x]
                 if (BlocksDrawer.tileInCamera(x + updateXFrom, y + updateYFrom)) {
                     if (data == 0.toByte())
-                        g.color = colourNone
+                        batch.color = colourNone
                     else
-                        g.color = colourWater
+                        batch.color = colourWater
 
-                    g.drawString(data.toString(),
+                    TerrarumGDX.fontSmallNumbers.draw(batch,
+                            data.toString(),
                             updateXFrom.plus(x).times(FeaturesDrawer.TILE_SIZE).toFloat()
                             + if (data < 10) 4f else 0f,
                             updateYFrom.plus(y).times(FeaturesDrawer.TILE_SIZE) + 4f

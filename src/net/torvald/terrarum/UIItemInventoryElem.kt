@@ -1,15 +1,15 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.ui.UIInventory
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemTextButton
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Image
 
 /***
  * Note that the UI will not render if either item or itemImage is null.
@@ -23,12 +23,12 @@ class UIItemInventoryElem(
         override val width: Int,
         var item: GameItem?,
         var amount: Int,
-        var itemImage: Image?,
-        val mouseOverTextCol: Color = Color(0xfff066),
-        val mouseoverBackCol: Color = Color(0,0,0,0),
+        var itemImage: TextureRegion?,
+        val mouseOverTextCol: Color = Color(0xfff066_ff.toInt()),
+        val mouseoverBackCol: Color = Color(0),
         val mouseoverBackBlendMode: String = BlendMode.NORMAL,
         val inactiveTextCol: Color = UIItemTextButton.defaultInactiveCol,
-        val backCol: Color = Color(0,0,0,0),
+        val backCol: Color = Color(0),
         val backBlendMode: String = BlendMode.NORMAL,
         var quickslot: Int? = null,
         var equippedSlot: Int? = null,
@@ -45,7 +45,7 @@ class UIItemInventoryElem(
     override val height = UIItemInventoryElem.height
 
     private val imgOffset: Float
-        get() = (this.height - itemImage!!.height).div(2).toFloat() // to snap to the pixel grid
+        get() = (this.height - itemImage!!.regionHeight).div(2).toFloat() // to snap to the pixel grid
     private val textOffsetX = 50f
     private val textOffsetY = 8f
 
@@ -56,7 +56,7 @@ class UIItemInventoryElem(
 
 
 
-    override fun update(gc: GameContainer, delta: Int) {
+    override fun update(delta: Float) {
         if (item != null) {
 
         }
@@ -64,22 +64,21 @@ class UIItemInventoryElem(
 
     private val fwsp = 0x3000.toChar()
 
-    override fun render(gc: GameContainer, g: Graphics) {
-        g.font = Terrarum.fontGame
+    override fun render(batch: SpriteBatch) {
 
         // mouseover background
         if (item != null || drawBackOnNull) {
             // do not highlight even if drawBackOnNull is true
             if (mouseUp && item != null) {
                 BlendMode.resolve(mouseoverBackBlendMode)
-                g.color = mouseoverBackCol
+                batch.color = mouseoverBackCol
             }
             // if drawBackOnNull, just draw background
             else {
                 BlendMode.resolve(backBlendMode)
-                g.color = backCol
+                batch.color = backCol
             }
-            g.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
 
 
@@ -87,12 +86,12 @@ class UIItemInventoryElem(
             blendNormal()
 
             // item image
-            g.drawImage(itemImage!!, posX + imgOffset, posY + imgOffset)
+            batch.draw(itemImage, posX + imgOffset, posY + imgOffset)
 
             // if mouse is over, text lights up
             // this one-liner sets color
-            g.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
-            g.drawString(
+            batch.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
+            TerrarumGDX.fontGame.draw(batch,
                     //"$item" + (if (amount > 0 && item!!.stackable) "$fwsp($amount)" else if (amount != 1) "$fwsp!!$amount!!" else "") +
                     item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amount)" else if (amount != 1) "$fwsp!!$amount!!" else "") +
                     (if (equippedSlot != null) "  ${0xE081.toChar()}\$$equippedSlot" else ""),
@@ -105,28 +104,27 @@ class UIItemInventoryElem(
             val barFullLen = (width - 8f) - textOffsetX
             val barOffset = posX + textOffsetX
             if (item!!.maxDurability > 0.0) {
-                g.color = durabilityBack
-                g.lineWidth = 3f
-                g.drawLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen, posY + durabilityBarOffY)
-                g.color = durabilityCol
-                g.drawLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen * (item!!.durability / item!!.maxDurability), posY + durabilityBarOffY)
+                batch.color = durabilityBack
+                batch.drawStraightLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen, 3f, false)
+                batch.color = durabilityCol
+                batch.drawStraightLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen * (item!!.durability / item!!.maxDurability), 3f, false)
             }
 
 
             // quickslot marker (TEMPORARY UNTIL WE GET BETTER DESIGN)
             if (quickslot != null) {
                 val label = quickslot!!.plus(0xE010).toChar()
-                val labelW = g.font.getWidth("$label")
-                g.color = Color.white
-                g.drawString("$label", barOffset + barFullLen - labelW, posY + textOffsetY)
+                val labelW = TerrarumGDX.fontGame.getWidth("$label")
+                batch.color = Color.WHITE
+                TerrarumGDX.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW, posY + textOffsetY)
             }
 
         }
     }
 
     override fun keyPressed(key: Int, c: Char) {
-        if (item != null && Terrarum.ingame != null && key in Key.NUM_1..Key.NUM_0) {
-            val inventory = Terrarum.ingame!!.player?.inventory
+        if (item != null && TerrarumGDX.ingame != null && key in Key.NUM_1..Key.NUM_0) {
+            val inventory = TerrarumGDX.ingame!!.player?.inventory
             val slot = key - Key.NUM_1
             val currentSlotItem = inventory?.getQuickBar(slot)
 
@@ -159,11 +157,11 @@ class UIItemInventoryElem(
     }
 
     override fun mousePressed(button: Int, x: Int, y: Int) {
-        if (item != null && Terrarum.ingame != null) {
+        if (item != null && TerrarumGDX.ingame != null) {
 
             // equip da shit
             val itemEquipSlot = item!!.equipPosition
-            val player = Terrarum.ingame!!.player
+            val player = TerrarumGDX.ingame!!.player
 
             if (item != player?.inventory?.itemEquipped?.get(itemEquipSlot)) { // if this item is unequipped, equip it
                 player?.equipItem(item!!)

@@ -1,7 +1,7 @@
 package net.torvald.colourutil
 
 import com.jme3.math.FastMath
-import org.newdawn.slick.Color
+import com.badlogic.gdx.graphics.Color
 
 /**
  * Created by minjaesong on 2017-01-12.

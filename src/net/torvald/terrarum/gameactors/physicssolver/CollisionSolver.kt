@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors.physicssolver
 
 import com.jme3.math.FastMath
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 import java.util.*
 
@@ -39,7 +39,7 @@ object CollisionSolver {
         collCandidateY.clear()
 
         // mark list x
-        Terrarum.ingame!!.actorContainer.forEach { it ->
+        TerrarumGDX.ingame!!.actorContainer.forEach { it ->
             if (it is ActorWithPhysics) {
                 collListX.add(CollisionMarkings(it.hitbox.hitboxStart.x, STARTPOINT, it))
                 collListX.add(CollisionMarkings(it.hitbox.hitboxEnd.x, ENDPOINT, it))
@@ -72,7 +72,7 @@ object CollisionSolver {
         collCandidateStack.clear()
 
         // mark list y
-        Terrarum.ingame!!.actorContainer.forEach { it ->
+        TerrarumGDX.ingame!!.actorContainer.forEach { it ->
             if (it is ActorWithPhysics) {
                 collListY.add(CollisionMarkings(it.hitbox.hitboxStart.y, STARTPOINT, it))
                 collListY.add(CollisionMarkings(it.hitbox.hitboxEnd.y, ENDPOINT, it))

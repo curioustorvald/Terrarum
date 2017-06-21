@@ -1,14 +1,13 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.colourutil.CIELabUtil.darkerLab
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.ActorHumanoid
+import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.worlddrawer.WorldCamera
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Input
 
 /**
  * Created by SKYHi14 on 2017-03-03.
@@ -39,7 +38,7 @@ class UIVitalMetre(
             }
             field = value
         }
-    override var openCloseTime: Int = 50
+    override var openCloseTime: Second = 0.05f
 
     //private val relativePX = width / 2f
     private val offsetY: Float; get() = (player?.baseHitboxH ?: 0) * 1.5f
@@ -50,27 +49,28 @@ class UIVitalMetre(
 
     private val backColor: Color
         get(): Color {
-            val c = (color?.darkerLab(0.33f) ?: Color.black)
+            val c = (color?.darkerLab(0.33f) ?: Color.BLACK)
             c.a = 0.7f
             return c
         }
 
-
-    override fun update(gc: GameContainer, delta: Int) {
+    override fun update(delta: Float) {
         handler!!.setPosition(
-                Terrarum.HALFW,
-                Terrarum.HALFH
+                TerrarumGDX.HALFW,
+                TerrarumGDX.HALFH
         )
     }
 
     /**
      * g must be same as World Graphics!
      */
-    override fun render(gc: GameContainer, g: Graphics) {
-        if (vitalGetterVal() != null && vitalGetterMax() != null && player != null) {
+    override fun render(batch: SpriteBatch) {
+        // TODO now that we just can't draw arcs, we need to re-think about this
+        
+        /*if (vitalGetterVal() != null && vitalGetterMax() != null && player != null) {
             g.translate(
-                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.x.toFloat() - (WorldCamera.x)),
-                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.y.toFloat() - (WorldCamera.y))
+                    TerrarumGDX.ingame!!.screenZoom * (player!!.centrePosPoint.x.toFloat() - (WorldCamera.x)),
+                    TerrarumGDX.ingame!!.screenZoom * (player!!.centrePosPoint.y.toFloat() - (WorldCamera.y))
             )
 
 
@@ -103,25 +103,25 @@ class UIVitalMetre(
 
 
             g.flush()
-        }
+        }*/
     }
 
-    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
+    override fun processInput(delta: Float) {
     }
 
-    override fun doOpening(gc: GameContainer, delta: Int) {
+    override fun doOpening(delta: Float) {
         UICanvas.doOpeningFade(handler, openCloseTime)
     }
 
-    override fun doClosing(gc: GameContainer, delta: Int) {
+    override fun doClosing(delta: Float) {
         UICanvas.doClosingFade(handler, openCloseTime)
     }
 
-    override fun endOpening(gc: GameContainer, delta: Int) {
+    override fun endOpening(delta: Float) {
         UICanvas.endOpeningFade(handler)
     }
 
-    override fun endClosing(gc: GameContainer, delta: Int) {
+    override fun endClosing(delta: Float) {
         UICanvas.endClosingFade(handler)
     }
 }

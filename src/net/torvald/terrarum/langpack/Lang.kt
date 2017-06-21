@@ -1,7 +1,7 @@
 package net.torvald.terrarum.langpack
 
 import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import java.io.*
 import java.util.*
 
@@ -108,12 +108,12 @@ object Lang {
         fun fallback(): String = langpack["${key}_$FALLBACK_LANG_CODE"] ?: "$$key"
 
 
-        val ret = langpack["${key}_${Terrarum.gameLocale}"]
+        val ret = langpack["${key}_${TerrarumGDX.gameLocale}"]
         val ret2 = if (ret.isNullOrEmpty()) fallback() else ret!!
 
         // special treatment
         if (key.startsWith("MENU_LABEL_PRESS_START_SYMBOL"))
-            return ret2.replace('>', Terrarum.joypadLabelStart).capitalize()
+            return ret2.replace('>', TerrarumGDX.joypadLabelStart).capitalize()
 
         return ret2.capitalize()
     }
@@ -125,7 +125,7 @@ object Lang {
     fun pluralise(word: String, count: Int): String {
         if (count < 2) return word
 
-        when (Terrarum.gameLocale) {
+        when (TerrarumGDX.gameLocale) {
             "fr" -> {
                 if (Arrays.binarySearch(FRENCH_WORD_NORMAL_PLURAL, word) >= 0) {
                     return word + "s"

@@ -1,16 +1,13 @@
 package net.torvald.aa
 
 import net.torvald.terrarum.gameworld.toUint
-import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
-import org.newdawn.slick.*
 
 /**
  * @param terminal: for sending redraw only
  *
  * Created by minjaesong on 16-08-10.
  */
-class AAFrame @Throws(SlickException::class)
-constructor(var width: Int, var height: Int, var terminal: SimpleTextTerminal) {
+/*class AAFrame(var width: Int, var height: Int, var terminal: SimpleTextTerminal) {
 
     /**
      * 0000_0000_00000000
@@ -94,4 +91,4 @@ constructor(var width: Int, var height: Int, var terminal: SimpleTextTerminal) {
     private fun checkOOB(x: Int, y: Int) = (x < 0 || y < 0 || x >= width || y >= height)
 
     fun getColourKey(x: Int, y: Int): Int = frameBuffer[y * width + x].toInt().ushr(8).and(0xFF)
-}
+}*/

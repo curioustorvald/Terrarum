@@ -1,10 +1,9 @@
 package net.torvald.terrarum.gameactors
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
 
 /**
  * Created by minjaesong on 16-03-15.
@@ -25,14 +24,15 @@ open class DroppedItem(private val item: GameItem) : ActorWithPhysics(Actor.Rend
         scale = ItemCodex[item.dynamicID].scale
     }
 
-    override fun update(gc: GameContainer, delta: Int) {
+    override fun update(delta: Float) {
+        super.update(delta)
     }
 
-    override fun drawBody(g: Graphics) {
-        super.drawBody(g)
+    override fun drawGlow(batch: SpriteBatch) {
+        super.drawGlow(batch)
     }
 
-    override fun drawGlow(g: Graphics) {
-        super.drawGlow(g)
+    override fun drawBody(batch: SpriteBatch) {
+        super.drawBody(batch)
     }
 }

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.weather
 
-import org.newdawn.slick.Image
+import com.badlogic.gdx.graphics.Texture
+import net.torvald.terrarum.GdxColorMap
 import java.util.*
 
 /**
@@ -11,10 +12,10 @@ import java.util.*
  * Created by minjaesong on 16-07-11.
  */
 data class BaseModularWeather(
-        val globalLightColourMap: Image,
-        var skyboxGradColourMap: Image,
+        val globalLightColourMap: GdxColorMap,
+        var skyboxGradColourMap: GdxColorMap,
         val classification: String,
-        var extraImages: ArrayList<Image>,
+        var extraImages: ArrayList<Texture>,
         val mixFrom: String? = null,
         val mixPercentage: Double? = null
 )

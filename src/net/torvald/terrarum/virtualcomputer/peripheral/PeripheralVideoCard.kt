@@ -1,6 +1,7 @@
 package net.torvald.terrarum.virtualcomputer.peripheral
 
-import net.torvald.terrarum.Terrarum
+import com.badlogic.gdx.graphics.Color
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.DecodeTapestry
 import net.torvald.terrarum.gameactors.ai.toLua
 import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
@@ -8,7 +9,6 @@ import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 import org.luaj.vm2.*
 import org.luaj.vm2.lib.*
 import org.luaj.vm2.lib.ThreeArgFunction
-import org.newdawn.slick.*
 import java.util.*
 
 /**
@@ -16,7 +16,7 @@ import java.util.*
  *
  * Created by SKYHi14 on 2017-02-08.
  */
-class PeripheralVideoCard(val host: TerrarumComputer, val termW: Int = 80, val termH: Int = 25) :
+/*class PeripheralVideoCard(val host: TerrarumComputer, val termW: Int = 80, val termH: Int = 25) :
         Peripheral("ppu") {
     companion object {
         val blockW = 8 // MUST BE 8
@@ -163,7 +163,7 @@ class PeripheralVideoCard(val host: TerrarumComputer, val termW: Int = 80, val t
     private val spriteBuffer = ImageBuffer(VSprite.width * 2, VSprite.height)
 
     fun render(g: Graphics) {
-        cursorBlinkTimer += Terrarum.delta
+        cursorBlinkTimer += Gdx.graphics.deltaTime
         if (cursorBlinkTimer > cursorBlinkTime) {
             cursorBlinkTimer -= cursorBlinkTime
             cursorBlinkOn = !cursorBlinkOn
@@ -641,7 +641,7 @@ class VSprite {
             setPixel(i % width, i / width, data[i])
         }
     }
-}
+}*/
 
 
 abstract class FourArgFunction : LibFunction() {

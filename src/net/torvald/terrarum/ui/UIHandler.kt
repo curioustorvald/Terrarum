@@ -1,9 +1,9 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.terrarum.Terrarum
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Matrix4
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import org.newdawn.slick.*
-import org.newdawn.slick.state.StateBasedGame
 
 /**
  * UIHandler is a handler for UICanvas. It opens/closes the attached UI, moves the "window" (or "canvas")
@@ -55,14 +55,14 @@ class UIHandler(val UI: UICanvas,
     var opacity = 1f
     var scale = 1f
 
-    var openCloseCounter: Int = 0
+    var openCloseCounter = 0f
 
     init {
         UI.handler = this
     }
 
 
-    fun update(gc: GameContainer, delta: Int) {
+    fun update(delta: Float) {
         // open/close UI by key pressed
         if (toggleKey != null) {
             if (KeyToggler.isOn(toggleKey)) {
@@ -82,7 +82,7 @@ class UIHandler(val UI: UICanvas,
 
 
         if (isVisible || alwaysVisible) {
-            UI.update(gc, delta)
+            UI.update(delta)
         }
 
         if (isOpening) {
@@ -93,15 +93,15 @@ class UIHandler(val UI: UICanvas,
             // println("-> timecounter $openCloseCounter / ${UI.openCloseTime} timetakes")
 
             if (openCloseCounter < UI.openCloseTime) {
-                UI.doOpening(gc, delta)
+                UI.doOpening(delta)
                 // println("UIHandler.opening ${UI.javaClass.simpleName}")
             }
             else {
-                UI.endOpening(gc, delta)
+                UI.endOpening(delta)
                 isOpening = false
                 isClosing = false
                 isOpened = true
-                openCloseCounter = 0
+                openCloseCounter = 0f
             }
         }
         else if (isClosing) {
@@ -111,27 +111,30 @@ class UIHandler(val UI: UICanvas,
             // println("-> timecounter $openCloseCounter / ${UI.openCloseTime} timetakes")
 
             if (openCloseCounter < UI.openCloseTime) {
-                UI.doClosing(gc, delta)
+                UI.doClosing(delta)
                 // println("UIHandler.closing ${UI.javaClass.simpleName}")
             }
             else {
-                UI.endClosing(gc, delta)
+                UI.endClosing(delta)
                 isClosing = false
                 isOpening = false
                 isOpened = false
                 isVisible = false
-                openCloseCounter = 0
+                openCloseCounter = 0f
             }
         }
     }
 
-    fun render(gc: GameContainer, sbg: StateBasedGame, ingameGraphics: Graphics) {
+    fun render(batch: SpriteBatch) {
         if (isVisible || alwaysVisible) {
-            ingameGraphics.font = Terrarum.fontGame // default font. Re-assign in the UI to change
 
-            if (!customPositioning) ingameGraphics.translate(posX.toFloat(), posY.toFloat())
-            UI.render(gc, ingameGraphics)
-            ingameGraphics.flush()
+            batch.projectionMatrix = Matrix4()
+
+            if (!customPositioning)
+                TerrarumGDX.ingame?.camera?.position?.set(posX.toFloat(), posY.toFloat(), 0f) // does it work?
+
+            UI.render(batch)
+            //ingameGraphics.flush()
         }
     }
 
@@ -200,9 +203,9 @@ class UIHandler(val UI: UICanvas,
         }
     }
 
-    fun processInput(gc: GameContainer, delta: Int, input: Input) {
+    fun processInput(delta: Float) {
         if (isVisible) {
-            UI.processInput(gc, delta, input)
+            UI.processInput(delta)
         }
     }
 

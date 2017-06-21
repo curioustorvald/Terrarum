@@ -1,9 +1,8 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.gameactors.roundInt
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Image
 import java.util.*
 
 /**
@@ -16,14 +15,14 @@ class UIItemImageGallery(
         override var posY: Int,
         override val width: Int,
         override val height: Int,
-        val imageList: ArrayList<Image>,
+        val imageList: ArrayList<Texture>,
         val column: Int = 1
 ) : UIItem(parentUI) {
 
-    override fun update(gc: GameContainer, delta: Int) {
+    override fun update(delta: Float) {
     }
 
-    override fun render(gc: GameContainer, g: Graphics) {
+    override fun render(batch: SpriteBatch) {
         fun column(i: Int) = i % column
         fun row(i: Int) = i / column
 
@@ -35,7 +34,7 @@ class UIItemImageGallery(
         }
 
         imageList.forEachIndexed { i, image ->
-            DrawUtil.drawCentered(g, image,
+            DrawUtil.drawCentered(batch, image,
                     imagePosY(i),
                     width.toFloat().div(column).times(column(i).plus(1)).roundInt(),
                     posX, posY

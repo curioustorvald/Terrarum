@@ -1,7 +1,6 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.gameworld.WorldTime
-import org.newdawn.slick.Input
 
 typealias AnyPlayer = HistoricalFigure
 

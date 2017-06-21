@@ -15,6 +15,17 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="lib" level="project" />
-    <orderEntry type="library" name="groovy-2.4.10" level="application" />
+    <orderEntry type="module-library">
+      <library name="KotlinJavaRuntime">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/kotlin-runtime.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/kotlin-reflect.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/kotlin-runtime-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>

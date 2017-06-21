@@ -2,7 +2,7 @@ package net.torvald.terrarum.console
 
 import net.torvald.colourutil.Col4096
 import net.torvald.terrarum.utils.RasterWriter
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.blockproperties.Block
 
 import java.io.*
@@ -60,10 +60,10 @@ internal object ExportMap : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
 
-            var mapData = ByteArray(Terrarum.ingame!!.world.width * Terrarum.ingame!!.world.height * 3)
+            var mapData = ByteArray(TerrarumGDX.ingame!!.world.width * TerrarumGDX.ingame!!.world.height * 3)
             var mapDataPointer = 0
 
-            for (tile in Terrarum.ingame!!.world.terrainIterator()) {
+            for (tile in TerrarumGDX.ingame!!.world.terrainIterator()) {
                 val colArray = (colorTable as Map<Int, Col4096>)
                         .getOrElse(tile, { Col4096(0xFFF) }).toByteArray()
 
@@ -74,7 +74,7 @@ internal object ExportMap : ConsoleCommand {
                 mapDataPointer += 3
             }
 
-            val dir = Terrarum.defaultDir + "/Exports/"
+            val dir = TerrarumGDX.defaultDir + "/Exports/"
             val dirAsFile = File(dir)
             if (!dirAsFile.exists()) {
                 dirAsFile.mkdir()
@@ -82,7 +82,7 @@ internal object ExportMap : ConsoleCommand {
 
             try {
                 RasterWriter.writePNG_RGB(
-                        Terrarum.ingame!!.world.width, Terrarum.ingame!!.world.height, mapData, dir + args[1] + ".png")
+                        TerrarumGDX.ingame!!.world.width, TerrarumGDX.ingame!!.world.height, mapData, dir + args[1] + ".png")
                 Echo("ExportMap: exported to " + args[1] + ".png")
 
             }

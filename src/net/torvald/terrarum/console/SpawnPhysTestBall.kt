@@ -1,7 +1,8 @@
 package net.torvald.terrarum.console
 
+import com.badlogic.gdx.Gdx
 import net.torvald.terrarum.gameactors.PhysTestBall
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.dyn4j.geometry.Vector2
 
@@ -11,8 +12,8 @@ import org.dyn4j.geometry.Vector2
 internal object SpawnPhysTestBall : ConsoleCommand {
     @Throws(Exception::class)
     override fun execute(args: Array<String>) {
-        val mouseX = Terrarum.appgc.input.mouseX
-        val mouseY = Terrarum.appgc.input.mouseY
+        val mouseX = TerrarumGDX.mouseX
+        val mouseY = TerrarumGDX.mouseY
 
         if (args.size >= 3) {
             val elasticity = args[1].toDouble()
@@ -28,7 +29,7 @@ internal object SpawnPhysTestBall : ConsoleCommand {
             ball.elasticity = elasticity
             ball.applyForce(Vector2(xvel, yvel))
 
-            Terrarum.ingame!!.addNewActor(ball)
+            TerrarumGDX.ingame!!.addNewActor(ball)
         }
         else if (args.size == 2) {
             val elasticity = args[1].toDouble()
@@ -40,7 +41,7 @@ internal object SpawnPhysTestBall : ConsoleCommand {
             )
             ball.elasticity = elasticity
 
-            Terrarum.ingame!!.addNewActor(ball)
+            TerrarumGDX.ingame!!.addNewActor(ball)
         }
         else {
             printUsage()

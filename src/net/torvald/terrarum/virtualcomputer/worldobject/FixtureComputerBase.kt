@@ -2,9 +2,7 @@ package net.torvald.terrarum.virtualcomputer.worldobject
 
 import net.torvald.terrarum.gameactors.FixtureBase
 import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
-import net.torvald.terrarum.virtualcomputer.terminal.SimpleTextTerminal
 import net.torvald.terrarum.virtualcomputer.terminal.Terminal
-import org.newdawn.slick.GameContainer
 import java.io.PrintStream
 import java.security.SecureRandom
 import java.util.*
@@ -52,15 +50,15 @@ open class FixtureComputerBase() : FixtureBase() {
     // game codes //
     ////////////////
 
-    override fun update(gc: GameContainer, delta: Int) {
-        super.update(gc, delta)
-        if (terminal != null) terminal!!.update(gc, delta)
+    override fun update(delta: Float) {
+        super.update(delta)
+        if (terminal != null) terminal!!.update(delta)
     }
 
     fun keyPressed(key: Int, c: Char) {
-        if (terminal != null) {
+        /*if (terminal != null) {
             terminal!!.vt.keyPressed(key, c)
             computerInside!!.keyPressed(key, c)
-        }
+        }*/
     }
 }

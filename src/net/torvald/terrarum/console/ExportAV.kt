@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.utils.JsonWriter
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 
 import java.io.IOException
 
@@ -13,8 +13,8 @@ internal object ExportAV : ConsoleCommand {
         if (args.size == 2) {
             try {
                 JsonWriter.writeToFile(
-                        Terrarum.ingame!!.player!!.actorValue,
-                        Terrarum.defaultDir + "/Exports/" + args[1] + ".json")
+                        TerrarumGDX.ingame!!.player!!.actorValue,
+                        TerrarumGDX.defaultDir + "/Exports/" + args[1] + ".json")
 
                 Echo("ExportAV: exported to " + args[1] + ".json")
             }

@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.debuggerapp.ActorsLister
 import java.util.*
 
@@ -12,8 +12,8 @@ internal object ActorsList : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         jPanelInstances.add(ActorsLister(
-                Terrarum.ingame!!.actorContainer,
-                Terrarum.ingame!!.actorContainerInactive)
+                TerrarumGDX.ingame!!.actorContainer,
+                TerrarumGDX.ingame!!.actorContainerInactive)
         )
     }
 

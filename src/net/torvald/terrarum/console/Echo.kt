@@ -1,10 +1,7 @@
 package net.torvald.terrarum.console
 
-import net.torvald.imagefont.GameFontBase
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.ui.ConsoleWindow
-
-import java.util.Arrays
 
 /**
  * Created by minjaesong on 16-01-16.
@@ -19,13 +16,13 @@ internal object Echo : ConsoleCommand {
         val sb = StringBuilder()
         for (ch in single_line) {
             if (ch == '\n') {
-                (Terrarum.ingame!!.consoleHandler.UI as ConsoleWindow).sendMessage(sb.toString())
+                (TerrarumGDX.ingame!!.consoleHandler.UI as ConsoleWindow).sendMessage(sb.toString())
                 sb.delete(0, sb.length - 1)
             }
             else
                 sb.append(ch)
         }
-        (Terrarum.ingame!!.consoleHandler.UI as ConsoleWindow).sendMessage(sb.toString())
+        (TerrarumGDX.ingame!!.consoleHandler.UI as ConsoleWindow).sendMessage(sb.toString())
     }
 
     operator fun invoke(args: Array<String>) = execute(args)

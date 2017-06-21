@@ -3,6 +3,7 @@ package net.torvald.terrarum.gamecontroller
 /**
  * Created by minjaesong on 16-01-15.
  */
+@Deprecated("Use Gdx.Input.Keys")
 object Key {
 
     val RETURN = 28

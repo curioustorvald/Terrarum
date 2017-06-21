@@ -1,7 +1,7 @@
 package net.torvald.colourutil
 
 import com.jme3.math.FastMath
-import org.newdawn.slick.Color
+import com.badlogic.gdx.graphics.Color
 
 /**
  * OBSOLETE; use CIELchUtil for natural-looking colour
@@ -17,9 +17,6 @@ object HSVUtil {
      * @param S 0-1 Saturation
      * *
      * @param V 0-1 Value
-     * *
-     * @return org.newdawn.slick.Color
-     * *
      * @link http://www.rapidtables.com/convert/color/hsv-to-rgb.htm
      */
     fun toRGB(H: Float, S: Float, V: Float, alpha: Float = 1f): Color {

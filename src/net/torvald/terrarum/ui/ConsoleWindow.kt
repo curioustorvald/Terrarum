@@ -1,22 +1,23 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.dataclass.HistoryArray
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandInterpreter
+import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.gamecontroller.Key
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Input
+
 
 /**
  * Created by minjaesong on 15-12-31.
  */
 class ConsoleWindow : UICanvas, KeyControlled {
 
-    internal var UIColour = Color(0x80404080.toInt())
+    internal var UIColour = Color(0x404080_80.toInt())
 
     private var inputCursorPos: Int = 0
     private val MESSAGES_MAX = 5000
@@ -31,14 +32,14 @@ class ConsoleWindow : UICanvas, KeyControlled {
     private val LINE_HEIGHT = 20
     private val MESSAGES_DISPLAY_COUNT = 11
 
-    override var width: Int = Terrarum.WIDTH
+    override var width: Int = Gdx.graphics.width
     override var height: Int = LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT + 1)
 
-    override var openCloseTime: Int = 0
+    override var openCloseTime = 0f
 
     private var drawOffX: Float = 0f
     private var drawOffY: Float = -height.toFloat()
-    private var openingTimeCounter = 0
+    private var openingTimeCounter = 0f
 
     override var handler: UIHandler? = null
 
@@ -48,34 +49,33 @@ class ConsoleWindow : UICanvas, KeyControlled {
         reset()
     }
 
-    override fun update(gc: GameContainer, delta: Int) {
-
+    override fun update(delta: Float) {
     }
 
-    override fun render(gc: GameContainer, g: Graphics) {
+    override fun render(batch: SpriteBatch) {
         // background
-        g.color = UIColour
-        g.fillRect(drawOffX, drawOffY, width.toFloat(), height.toFloat())
-        g.fillRect(drawOffX, drawOffY, width.toFloat(), LINE_HEIGHT.toFloat())
+        batch.color = UIColour
+        batch.fillRect(drawOffX, drawOffY, width.toFloat(), height.toFloat())
+        batch.fillRect(drawOffX, drawOffY, width.toFloat(), LINE_HEIGHT.toFloat())
 
         val input = commandInputPool!!.toString()
-        val inputDrawWidth = g.font.getWidth(input)
-        val inputDrawHeight = g.font.lineHeight
+        val inputDrawWidth = TerrarumGDX.fontGame.getWidth(input)
+        val inputDrawHeight = TerrarumGDX.fontGame.lineHeight
 
         // text and cursor
-        g.color = Color.white
-        g.drawString(input, 1f + drawOffX, drawOffY)
+        batch.color = Color.WHITE
+        TerrarumGDX.fontGame.draw(batch, input, 1f + drawOffX, drawOffY)
 
-        g.color = Color(0x7f7f7f)
-        g.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 2f, inputDrawHeight.toFloat())
-        g.color = Color.white
-        g.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 1f, inputDrawHeight.toFloat() - 1)
+        batch.color = Color(0x7f7f7f_ff)
+        batch.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 2f, inputDrawHeight)
+        batch.color = Color.WHITE
+        batch.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 1f, inputDrawHeight - 1)
 
 
         // messages
         for (i in 0..MESSAGES_DISPLAY_COUNT - 1) {
             val message = messages[messageDisplayPos + i]
-            g.drawString(message, 1f + drawOffX, (LINE_HEIGHT * (i + 1)).toFloat() + drawOffY)
+            TerrarumGDX.fontGame.draw(batch, message, 1f + drawOffX, (LINE_HEIGHT * (i + 1)).toFloat() + drawOffY)
         }
     }
 
@@ -133,9 +133,7 @@ class ConsoleWindow : UICanvas, KeyControlled {
 
     }
 
-    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
 
-    }
 
     private fun executeCommand() {
         CommandInterpreter.execute(commandInputPool!!.toString())
@@ -178,38 +176,41 @@ class ConsoleWindow : UICanvas, KeyControlled {
         commandInputPool = StringBuilder()
 
         if (Authenticator.b()) {
-            sendMessage("${Terrarum.NAME} ${Terrarum.VERSION_STRING}")
+            sendMessage("${TerrarumGDX.NAME} ${TerrarumGDX.VERSION_STRING}")
             sendMessage(Lang["DEV_MESSAGE_CONSOLE_CODEX"])
         }
     }
 
-    override fun doOpening(gc: GameContainer, delta: Int) {
+    override fun doOpening(delta: Float) {
         /*openingTimeCounter += delta
         drawOffY = MovementInterpolator.fastPullOut(openingTimeCounter.toFloat() / openCloseTime.toFloat(),
                 -height.toFloat(), 0f
         )*/
     }
 
-    override fun doClosing(gc: GameContainer, delta: Int) {
+    override fun doClosing(delta: Float) {
         /*openingTimeCounter += delta
         drawOffY = MovementInterpolator.fastPullOut(openingTimeCounter.toFloat() / openCloseTime.toFloat(),
                 0f, -height.toFloat()
         )*/
     }
 
-    override fun endOpening(gc: GameContainer, delta: Int) {
+    override fun endOpening(delta: Float) {
         drawOffY = 0f
-        openingTimeCounter = 0
+        openingTimeCounter = 0f
     }
 
-    override fun endClosing(gc: GameContainer, delta: Int) {
+    override fun endClosing(delta: Float) {
         drawOffY = -height.toFloat()
-        openingTimeCounter = 0
+        openingTimeCounter = 0f
     }
 
     override fun controllerButtonPressed(controller: Int, button: Int) {
     }
 
     override fun controllerButtonReleased(controller: Int, button: Int) {
+    }
+
+    override fun processInput(delta: Float) {
     }
 }

@@ -1,8 +1,7 @@
 package net.torvald.terrarum.gamecontroller
 
-import net.torvald.terrarum.Terrarum
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Input
+import com.badlogic.gdx.Gdx
+import net.torvald.terrarum.TerrarumGDX
 import java.util.*
 
 object KeyToggler {
@@ -21,14 +20,14 @@ object KeyToggler {
         return currentState[key]
     }
 
-    fun update(input: Input, gameMode: Boolean = true) {
+    fun update(gameMode: Boolean = true) {
         for (it in 0..255) {
             if (gameMode && it in gameKeys &&
-                (Terrarum.ingame!!.consoleHandler.isOpening || Terrarum.ingame!!.consoleHandler.isOpened)) {
+                (TerrarumGDX.ingame!!.consoleHandler.isOpening || TerrarumGDX.ingame!!.consoleHandler.isOpened)) {
                 continue
             }
 
-            isPressed[it] = input.isKeyDown(it)
+            isPressed[it] = Gdx.input.isKeyPressed(it)
 
             if (isPressed[it] && !currentState[it] && !isToggled[it]) {
                 currentState[it] = true

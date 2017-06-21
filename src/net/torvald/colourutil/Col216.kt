@@ -1,6 +1,6 @@
 package net.torvald.colourutil
 
-import org.newdawn.slick.Color
+import com.badlogic.gdx.graphics.Color
 
 /**
  * 6-Step RGB with builtin utils.
@@ -31,18 +31,18 @@ class Col216 : LimitedColours {
         create(r, g, b)
     }
 
-    override fun createSlickColor(raw: Int): Color {
+    override fun createGdxColor(raw: Int): Color {
         assertRaw(raw)
         val r = raw / MUL_2
         val g = raw % MUL_2 / MUL
         val b = raw % MUL
 
-        return createSlickColor(r, g, b)
+        return createGdxColor(r, g, b)
     }
 
-    override fun createSlickColor(r: Int, g: Int, b: Int): Color {
+    override fun createGdxColor(r: Int, g: Int, b: Int): Color {
         assertRGB(r, g, b)
-        return Color(LOOKUP[r], LOOKUP[g], LOOKUP[b])
+        return Color((LOOKUP[r] shl 24) + (LOOKUP[g] shl 16) + (LOOKUP[b] shl 8) + 255)
     }
 
     override fun create(raw: Int) {
@@ -55,7 +55,7 @@ class Col216 : LimitedColours {
         raw = (MUL_2 * r + MUL * g + b).toByte()
     }
 
-    override fun toSlickColour(): Color = createSlickColor(raw.toUint())
+    override fun toGdxColour(): Color = createGdxColor(raw.toUint())
 
     private fun assertRaw(i: Int) {
         if (i >= COLOUR_RANGE_SIZE || i < 0) {

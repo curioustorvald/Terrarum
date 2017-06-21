@@ -2,7 +2,7 @@ package net.torvald.terrarum.virtualcomputer.luaapi
 
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaFunction
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameworld.WorldTime
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -24,7 +24,7 @@ class WorldInformationProvider(globals: Globals) {
     companion object {
         fun getWorldTimeInLuaFormat() : LuaTable {
             val t = LuaTable()
-            val time = if (Terrarum.ingame != null) Terrarum.ingame!!.world.time else WorldTime()
+            val time = if (TerrarumGDX.ingame != null) TerrarumGDX.ingame!!.world.time else WorldTime()
 
             // int Terrarum World Time format
             t["hour"] = time.hours
@@ -43,7 +43,7 @@ class WorldInformationProvider(globals: Globals) {
 
         /** evaluate single C date format */
         fun String.evalAsDate(): String {
-            val time = if (Terrarum.ingame != null) Terrarum.ingame!!.world.time else WorldTime()
+            val time = if (TerrarumGDX.ingame != null) TerrarumGDX.ingame!!.world.time else WorldTime()
             return when (this) {
                 "%a" -> time.getDayNameShort()
                 "%A" -> time.getDayNameFull()

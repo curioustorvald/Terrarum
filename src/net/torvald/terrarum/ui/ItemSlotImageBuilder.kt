@@ -1,10 +1,12 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.terrarum.blendNormal
-import org.newdawn.slick.Color
-import org.newdawn.slick.Image
-import org.newdawn.slick.SpriteSheet
-import org.newdawn.slick.SpriteSheetFont
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+
 
 /**
  * Make item slot image with number on bottom-right
@@ -13,72 +15,88 @@ import org.newdawn.slick.SpriteSheetFont
  */
 object ItemSlotImageBuilder {
 
-    const val COLOR_BLACK = 1
-    const val COLOR_WHITE = 2
+    val colourBlack = Color(0x404040_FF)
+    val colourWhite = Color(0xC0C0C0_FF.toInt())
 
-    private val colourBlack = Color(0x40, 0x40, 0x40)
-    private val colourWhite = Color(0xC0, 0xC0, 0xC0)
-
-    private val numberFont = SpriteSheetFont(
-            SpriteSheet("./assets/graphics/fonts/numeric_small.tga", 5, 8),
-            '0'
+    private val numberFont = TextureRegionPack(
+            "./assets/graphics/fonts/numeric_small.tga", 5, 8
     )
-    val slotImage = Image("./assets/graphics/gui/quickbar/item_slot.tga") // must have same w/h as slotLarge
-    val slotLarge = Image("./assets/graphics/gui/quickbar/item_slot_large.tga")
-    private val canvas = Image(slotImage.width, slotImage.height)
-    private val canvasLarge = Image(slotLarge.width, slotLarge.height)
+    val slotImage = Pixmap(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slot.tga")) // must have same w/h as slotLarge
+    val slotLarge = Pixmap(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slot_large.tga"))
 
-    val slotImageSize = slotImage.width
 
-    fun produce(color: Int, number: Int = -1): Image {
-        canvas.graphics.clear()
+    private val imageDict = HashMap<ImageDesc, Texture>()
 
-        if (color == COLOR_BLACK)
-            canvas.graphics.drawImage(slotImage, 0f, 0f, colourBlack)
-        else if (color == COLOR_WHITE)
-            canvas.graphics.drawImage(slotImage, 0f, 0f, colourWhite)
 
-        if (number >= 0) {
-            canvas.graphics.font = numberFont
+    fun produce(isBlack: Boolean, number: Int = -1): Texture {
+        val pixmap = Pixmap(slotImage.width, slotImage.height, Pixmap.Format.RGBA8888)
+        val color = if (isBlack) colourBlack else colourWhite
 
-            if (color == COLOR_BLACK)
-                canvas.graphics.color = colourWhite
-            else if (color == COLOR_WHITE)
-                canvas.graphics.color = colourBlack
 
-            canvas.graphics.drawString(number.mod(UIQuickBar.SLOT_COUNT).toString(),
-                    slotImage.width - 10f,
-                    slotImage.height - 13f
+        val desc = ImageDesc(color, number, false)
+        if (imageDict.containsKey(desc))
+            return imageDict[desc]!!
+
+
+        pixmap.setColor(color)
+        pixmap.drawPixmap(slotImage, 0, 0)
+
+
+        /*if (number >= 0) {
+            if (isBlack)
+                pixmap.setColor(colourWhite)
+            else
+                pixmap.setColor(colourBlack)
+
+
+            pixmap.drawPixmap(fontPixmap,
+                    slotImage.width - 10,
+                    slotImage.height - 13
             )
-        }
+        }*/
 
 
-        return canvas
+        val retTex = Texture(pixmap)
+        pixmap.dispose()
+        imageDict.put(desc, retTex)
+        return retTex
     }
 
-    fun produceLarge(color: Int, number: Int = -1): Image {
-        canvasLarge.graphics.clear()
+    fun produceLarge(isBlack: Boolean, number: Int = -1): Texture {
+        val pixmap = Pixmap(slotLarge.width, slotLarge.height, Pixmap.Format.RGBA8888)
+        val color = if (isBlack) colourBlack else colourWhite
 
-        if (color == COLOR_BLACK)
-            canvasLarge.graphics.drawImage(slotLarge, 0f, 0f, colourBlack)
-        else if (color == COLOR_WHITE)
-            canvasLarge.graphics.drawImage(slotLarge, 0f, 0f, colourWhite)
 
-        if (number >= 0) {
-            canvasLarge.graphics.font = numberFont
+        val desc = ImageDesc(color, number, false)
+        if (imageDict.containsKey(desc))
+            return imageDict[desc]!!
 
-            if (color == COLOR_BLACK)
-                canvasLarge.graphics.color = colourWhite
-            else if (color == COLOR_WHITE)
-                canvasLarge.graphics.color = colourBlack
 
-            canvasLarge.graphics.drawString(number.mod(UIQuickBar.SLOT_COUNT).toString(),
-                    slotLarge.width - 10f,
-                    slotLarge.height - 13f
+        pixmap.setColor(color)
+        pixmap.drawPixmap(slotLarge, 0, 0)
+
+
+        /*if (number >= 0) {
+            if (isBlack)
+                pixmap.setColor(colourWhite)
+            else
+                pixmap.setColor(colourBlack)
+
+
+            pixmap.drawPixmap(fontPixmap,
+                    slotImage.width - 10,
+                    slotImage.height - 13
             )
-        }
+        }*/
 
-        return canvasLarge
+
+        val retTex = Texture(pixmap)
+        pixmap.dispose()
+        imageDict.put(desc, retTex)
+        return retTex
     }
+
+
+    private data class ImageDesc(val color: Color, val number: Int, val isLarge: Boolean)
 
 }

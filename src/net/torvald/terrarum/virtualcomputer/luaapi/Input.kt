@@ -1,5 +1,6 @@
 package net.torvald.terrarum.virtualcomputer.luaapi
 
+import com.badlogic.gdx.Gdx
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -30,7 +31,7 @@ class Input(globals: Globals, computer: TerrarumComputer) {
             // L_Alt and L_COMMAND are homogeneous
             if (keys_alt.contains(key)) {
                 for (k in keys_alt) {
-                    val down = host.input.isKeyDown(k)
+                    val down = Gdx.input.isKeyPressed(k)
                     if (down) return LuaValue.valueOf(true)
                 }
             }
@@ -38,12 +39,12 @@ class Input(globals: Globals, computer: TerrarumComputer) {
             // Caps, Backspace, L_Control, for Colemak and HHKB
             if (keys_caps.contains(key)) {
                 for (k in keys_caps) {
-                    val down = host.input.isKeyDown(k)
+                    val down = Gdx.input.isKeyPressed(k)
                     if (down) return LuaValue.valueOf(true)
                 }
             }
 
-            return LuaValue.valueOf(host.input.isKeyDown(keyCode.checkint()))
+            return LuaValue.valueOf(Gdx.input.isKeyPressed(keyCode.checkint()))
         }
     }
 }

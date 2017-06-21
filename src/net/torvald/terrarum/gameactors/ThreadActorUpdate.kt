@@ -1,23 +1,22 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.Terrarum
-import org.newdawn.slick.GameContainer
+import com.badlogic.gdx.Gdx
+import net.torvald.terrarum.TerrarumGDX
 
 /**
  * Created by minjaesong on 16-05-25.
  */
-class ThreadActorUpdate(val startIndex: Int, val endIndex: Int,
-                        val gc: GameContainer, val delta: Int) : Runnable {
+class ThreadActorUpdate(val startIndex: Int, val endIndex: Int) : Runnable {
     override fun run() {
         for (i in startIndex..endIndex) {
-            val it = Terrarum.ingame!!.actorContainer[i]
-            it.update(gc, delta)
+            val it = TerrarumGDX.ingame!!.actorContainer[i]
+            it.update(Gdx.graphics.deltaTime)
 
             if (it is Pocketed) {
                 it.inventory.forEach { inventoryEntry ->
-                    inventoryEntry.item.effectWhileInPocket(gc, delta)
+                    inventoryEntry.item.effectWhileInPocket(Gdx.graphics.deltaTime)
                     if (it.equipped(inventoryEntry.item)) {
-                        inventoryEntry.item.effectWhenEquipped(gc, delta)
+                        inventoryEntry.item.effectWhenEquipped(Gdx.graphics.deltaTime)
                     }
                 }
             }
