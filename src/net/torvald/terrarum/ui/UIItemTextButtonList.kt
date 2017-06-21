@@ -1,14 +1,14 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.BlendMode
+import net.torvald.terrarum.fillRect
+import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.gameactors.roundInt
-import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.Millisec
-import net.torvald.terrarum.Terrarum
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.SpriteSheet
+import net.torvald.terrarum.inUse
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by SKYHi14 on 2017-03-13.
@@ -24,26 +24,26 @@ class UIItemTextButtonList(
 
         // icons
         val textAreaWidth: Int,
-        val iconSpriteSheet: SpriteSheet? = null,
+        val iconSpriteSheet: TextureRegionPack? = null,
         val iconSpriteSheetIndices: IntArray? = null,
         val iconCol: Color = UIItemTextButton.defaultInactiveCol,
 
         // copied directly from UIItemTextButton
-        val activeCol: Color = Color(0xfff066),
-        val activeBackCol: Color = Color(0, 0, 0, 0),
+        val activeCol: Color = Color(0xfff066_ff.toInt()),
+        val activeBackCol: Color = Color(0),
         val activeBackBlendMode: String = BlendMode.NORMAL,
-        val highlightCol: Color = Color(0x00f8ff),
-        val highlightBackCol: Color = Color(0xb0b0b0),
+        val highlightCol: Color = Color(0x00f8ff_ff),
+        val highlightBackCol: Color = Color(0xb0b0b0_ff.toInt()),
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
         val inactiveCol: Color = Color(0xc0c0c0),
-        val backgroundCol: Color = Color(0, 0, 0, 0),
+        val backgroundCol: Color = Color(0),
         val backgroundBlendMode: String = BlendMode.NORMAL,
         val kinematic: Boolean = false
 ) : UIItem(parentUI) {
 
     val iconToTextGap = 20
-    val iconCellWidth = (iconSpriteSheet?.width ?: -iconToTextGap) / (iconSpriteSheet?.horizontalCount ?: 1)
-    val iconCellHeight = (iconSpriteSheet?.height ?: 0) / (iconSpriteSheet?.verticalCount ?: 1)
+    val iconCellWidth = (iconSpriteSheet?.tileW ?: -iconToTextGap) / (iconSpriteSheet?.horizontalCount ?: 1)
+    val iconCellHeight = (iconSpriteSheet?.tileH ?: 0) / (iconSpriteSheet?.verticalCount ?: 1)
 
     // zero if iconSpriteSheet is null
     val iconsWithGap: Int = iconToTextGap + iconCellWidth
@@ -97,14 +97,14 @@ class UIItemTextButtonList(
     val selectedButton: UIItemTextButton
         get() = buttons[selectedIndex]
     private var highlightY = buttons[selectedIndex].posY.toDouble()
-    private val highlighterMoveDuration: Millisec = 100
-    private var highlighterMoveTimer: Millisec = 0
+    private val highlighterMoveDuration: Second = 0.1f
+    private var highlighterMoveTimer: Second = 0f
     private var highlighterMoving = false
     private var highlighterYStart = highlightY
     private var highlighterYEnd = highlightY
 
 
-    override fun update(gc: GameContainer, delta: Int) {
+    override fun update(delta: Float) {
         if (highlighterMoving) {
             highlighterMoveTimer += delta
             highlightY = UIUtils.moveQuick(
@@ -115,7 +115,7 @@ class UIItemTextButtonList(
             )
 
             if (highlighterMoveTimer > highlighterMoveDuration) {
-                highlighterMoveTimer = 0
+                highlighterMoveTimer = 0f
                 highlighterYStart = highlighterYEnd
                 highlightY = highlighterYEnd
                 highlighterMoving = false
@@ -123,7 +123,7 @@ class UIItemTextButtonList(
         }
 
         buttons.forEachIndexed { index, btn ->
-            btn.update(gc, delta)
+            btn.update(delta)
 
 
             if (btn.mousePushed && index != selectedIndex) {
@@ -143,30 +143,30 @@ class UIItemTextButtonList(
         }
     }
 
-    override fun render(gc: GameContainer, g: Graphics) {
-        g.color = backgroundCol
+    override fun render(batch: SpriteBatch) {
+        batch.color = backgroundCol
         BlendMode.resolve(backgroundBlendMode)
-        g.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+        batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
 
-        g.color = highlightBackCol
+        batch.color = highlightBackCol
         BlendMode.resolve(highlightBackBlendMode)
-        g.fillRect(posX.toFloat(), highlightY.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
+        batch.fillRect(posX.toFloat(), highlightY.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
 
-        buttons.forEach { it.render(gc, g) }
+        buttons.forEach { it.render(batch) }
 
-        if (iconSpriteSheet != null) {
-            val iconY = (buttons[1].height - iconCellHeight) / 2
-            iconSpriteSheetIndices!!.forEachIndexed { counter, imageIndex ->
-                iconSpriteSheet.getSubImage(imageIndex, 0).draw(
-                        32f,
-                        buttons[counter].posY + iconY.toFloat(),
-                        iconCol
-                )
+
+        batch.inUse {
+            if (iconSpriteSheet != null) {
+                val iconY = (buttons[1].height - iconCellHeight) / 2
+                batch.color = iconCol
+
+                iconSpriteSheetIndices!!.forEachIndexed { counter, imageIndex ->
+                    batch.draw(iconSpriteSheet.get(imageIndex, 0), 32f, buttons[counter].posY + iconY.toFloat())
+                }
             }
+
+            batch.color = backgroundCol
         }
-
-        g.color = backgroundCol
-
     }
 
     override fun keyPressed(key: Int, c: Char) {

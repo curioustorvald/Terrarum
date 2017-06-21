@@ -1,7 +1,7 @@
 package net.torvald.colourutil
 
 import com.jme3.math.FastMath
-import org.newdawn.slick.Color
+import com.badlogic.gdx.graphics.Color
 import net.torvald.colourutil.CIELabUtil.toXYZ
 import net.torvald.colourutil.CIEXYZUtil.toColor
 import net.torvald.colourutil.CIEXYZUtil.toRGB

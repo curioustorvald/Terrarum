@@ -1,26 +1,24 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.terrarum.Millisec
-import net.torvald.terrarum.Terrarum
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Input
 
 /**
  * Created by minjaesong on 16-07-20.
  */
 class UIQuickBar : UICanvas, MouseControlled {
     private val gutter = 8
-    override var width: Int = (ItemSlotImageBuilder.slotImageSize + gutter) * SLOT_COUNT
-    override var height: Int = ItemSlotImageBuilder.slotImageSize + 4 + Terrarum.fontGame.lineHeight
+    override var width: Int = (ItemSlotImageBuilder.slotImage.width + gutter) * SLOT_COUNT
+    override var height: Int = ItemSlotImageBuilder.slotImage.height + 4 + TerrarumGDX.fontGame.lineHeight.toInt()
     /**
      * In milliseconds
      */
-    override var openCloseTime: Millisec = 160
+    override var openCloseTime: Second = 0.16f
 
     private val startPointX = ItemSlotImageBuilder.slotLarge.width / 2
     private val startPointY = ItemSlotImageBuilder.slotLarge.height / 2
@@ -28,71 +26,66 @@ class UIQuickBar : UICanvas, MouseControlled {
     override var handler: UIHandler? = null
 
     private var selection: Int
-        get() = Terrarum.ingame!!.player?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
-        set(value) { Terrarum.ingame!!.player?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
+        get() = TerrarumGDX.ingame!!.player?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
+        set(value) { TerrarumGDX.ingame!!.player?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
 
-
-    override fun update(gc: GameContainer, delta: Int) {
+    
+    override fun update(delta: Float) {
     }
 
-    override fun render(gc: GameContainer, g: Graphics) {
-
+    override fun render(batch: SpriteBatch) {
         for (i in 0..SLOT_COUNT - 1) {
-            val color = if (i == selection)
-                ItemSlotImageBuilder.COLOR_WHITE
-            else
-                ItemSlotImageBuilder.COLOR_BLACK
-
             val image = if (i == selection)
-                ItemSlotImageBuilder.produceLarge(color, i + 1)
+                ItemSlotImageBuilder.produceLarge(false, i + 1)
             else
-                ItemSlotImageBuilder.produce(color, i + 1)
+                ItemSlotImageBuilder.produce(true, i + 1)
 
             val slotX = startPointX + (CELL_SIZE + gutter).times(i).toFloat()
             val slotY = startPointY.toFloat()
 
             // draw slots
-            g.drawImage(
+            batch.color = Color(1f, 1f, 1f, handler!!.opacity * finalOpacity)
+            batch.draw(
                     image,
                     slotX,
-                    slotY,
-                    Color(1f, 1f, 1f, handler!!.opacity * finalOpacity)
+                    slotY
             )
 
             // draw item
-            val itemPair = Terrarum.ingame!!.player!!.inventory.getQuickBar(i)
+            val itemPair = TerrarumGDX.ingame!!.player!!.inventory.getQuickBar(i)
 
             if (itemPair != null) {
                 val itemImage = ItemCodex.getItemImage(itemPair.item)
-                val itemW = itemImage.width
-                val itemH = itemImage.height
+                val itemW = itemImage.regionWidth
+                val itemH = itemImage.regionHeight
 
-                g.drawImage(
+                batch.color = Color(1f, 1f, 1f, handler!!.opacity)
+                batch.draw(
                         itemImage, // using fixed CELL_SIZE for reasons
                         slotX + (CELL_SIZE - itemW) / 2f,
-                        slotY + (CELL_SIZE - itemH) / 2f,
-                        Color(1f, 1f, 1f, handler!!.opacity)
+                        slotY + (CELL_SIZE - itemH) / 2f
                 )
             }
         }
     }
 
-    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
+
+    override fun processInput(delta: Float) {
     }
 
-    override fun doOpening(gc: GameContainer, delta: Int) {
+    override fun doOpening(delta: Float) {
         handler!!.opacity = handler!!.openCloseCounter.toFloat() / openCloseTime
     }
 
-    override fun doClosing(gc: GameContainer, delta: Int) {
+    override fun doClosing(delta: Float) {
         handler!!.opacity = (openCloseTime - handler!!.openCloseCounter.toFloat()) / openCloseTime
     }
 
-    override fun endOpening(gc: GameContainer, delta: Int) {
+    override fun endOpening(delta: Float) {
         handler!!.opacity = 1f
     }
 
-    override fun endClosing(gc: GameContainer, delta: Int) {
+    override fun endClosing(delta: Float) {
         handler!!.opacity = 0f
     }
 

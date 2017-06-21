@@ -1,16 +1,14 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
-import net.torvald.terrarum.Millisec
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.ui.UIQuickBar.Companion.CELL_SIZE
 import org.dyn4j.geometry.Vector2
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Input
 
 /**
  * Created by minjaesong on 16-07-20.
@@ -30,21 +28,21 @@ class UIPieMenu : UICanvas {
     /**
      * In milliseconds
      */
-    override var openCloseTime: Millisec = 160
+    override var openCloseTime: Second = 0.16f
 
     private val smallenSize = 0.93f
 
     var selection: Int = -1
 
-    override fun update(gc: GameContainer, delta: Int) {
-        if (Terrarum.ingame!!.player != null) {
+    override fun update(delta: Float) {
+        if (TerrarumGDX.ingame!!.player != null) {
             if (selection >= 0)
-                Terrarum.ingame!!.player!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
+                TerrarumGDX.ingame!!.player!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
                         selection % slotCount
         }
     }
 
-    override fun render(gc: GameContainer, g: Graphics) {
+    override fun render(batch: SpriteBatch) {
         // draw radial thingies
         for (i in 0..slotCount - 1) {
             // set position
@@ -52,51 +50,46 @@ class UIPieMenu : UICanvas {
             val slotCentrePoint = Vector2(0.0, slotDistanceFromCentre).setDirection(-angle)// + centrePoint
 
             // draw cells
-            val color = if (i == selection)
-                ItemSlotImageBuilder.COLOR_WHITE
-            else
-                ItemSlotImageBuilder.COLOR_BLACK
-
             val image = if (i == selection)
-                ItemSlotImageBuilder.produceLarge(color, i + 1)
+                ItemSlotImageBuilder.produceLarge(false, i + 1)
             else
-                ItemSlotImageBuilder.produce(color, i + 1)
+                ItemSlotImageBuilder.produce(true, i + 1)
 
             val slotSize = image.width
 
-            val slotX = slotCentrePoint.x.toFloat() - (slotSize / 2) + Terrarum.HALFW
-            val slotY = slotCentrePoint.y.toFloat() - (slotSize / 2) + Terrarum.HALFH
+            val slotX = slotCentrePoint.x.toFloat() - (slotSize / 2) + TerrarumGDX.HALFW
+            val slotY = slotCentrePoint.y.toFloat() - (slotSize / 2) + TerrarumGDX.HALFH
 
-            g.drawImage(
+            batch.color = Color(1f, 1f, 1f, handler!!.opacity * UIQuickBar.finalOpacity)
+            batch.draw(
                     image,
                     slotX,
-                    slotY,
-                    Color(1f, 1f, 1f, handler!!.opacity * UIQuickBar.finalOpacity)
+                    slotY
             )
 
 
             // draw item
-            val itemPair = Terrarum.ingame!!.player!!.inventory.getQuickBar(i)
+            val itemPair = TerrarumGDX.ingame!!.player!!.inventory.getQuickBar(i)
 
             if (itemPair != null) {
                 val itemImage = ItemCodex.getItemImage(itemPair.item)
-                val itemW = itemImage.width
-                val itemH = itemImage.height
+                val itemW = itemImage.regionWidth
+                val itemH = itemImage.regionHeight
 
-                g.drawImage(
+                batch.color = Color(1f, 1f, 1f, handler!!.opacity)
+                batch.draw(
                         itemImage, // using fixed CELL_SIZE for reasons
                         slotX + (CELL_SIZE - itemW) / 2f,
-                        slotY + (CELL_SIZE - itemH) / 2f,
-                        Color(1f, 1f, 1f, handler!!.opacity)
+                        slotY + (CELL_SIZE - itemH) / 2f
                 )
             }
         }
     }
 
-    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
+    override fun processInput(delta: Float) {
         if (handler!!.isOpened || handler!!.isOpening) {
-            val cursorPos = Vector2(input.mouseX.toDouble(), input.mouseY.toDouble())
-            val centre = Vector2(Terrarum.HALFW.toDouble(), Terrarum.HALFH.toDouble())
+            val cursorPos = Vector2(TerrarumGDX.mouseX, TerrarumGDX.mouseY)
+            val centre = Vector2(TerrarumGDX.HALFW.toDouble(), TerrarumGDX.HALFH.toDouble())
             val deg = -(centre - cursorPos).direction.toFloat()
 
             selection = Math.round(deg * slotCount / FastMath.TWO_PI)
@@ -106,22 +99,22 @@ class UIPieMenu : UICanvas {
         }
     }
 
-    override fun doOpening(gc: GameContainer, delta: Int) {
+    override fun doOpening(delta: Float) {
         UICanvas.doOpeningFade(handler, openCloseTime)
         handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
     }
 
-    override fun doClosing(gc: GameContainer, delta: Int) {
+    override fun doClosing(delta: Float) {
         UICanvas.doClosingFade(handler, openCloseTime)
         handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
     }
 
-    override fun endOpening(gc: GameContainer, delta: Int) {
+    override fun endOpening(delta: Float) {
         UICanvas.endOpeningFade(handler)
         handler!!.scale = 1f
     }
 
-    override fun endClosing(gc: GameContainer, delta: Int) {
+    override fun endClosing(delta: Float) {
         UICanvas.endClosingFade(handler)
         handler!!.scale = 1f
     }

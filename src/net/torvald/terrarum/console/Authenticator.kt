@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.ui.ConsoleWindow
 import org.apache.commons.codec.digest.DigestUtils
 
@@ -11,12 +11,12 @@ import org.apache.commons.codec.digest.DigestUtils
  * For each releases new password should be set. The new password must:
  *      - start with next alphabet of previous password
  *          if previous password started with Z, the new password must start with A
- *      - be a name appear in the Legend of Zelda series which officially released by Nintendo
+ *      - be a name appear in the Legend of Zelda series which officially released by Nintendo (no CD-i)
  *      - be lowercase
  *      - BE CRACKABLE (crackstation.net)
  *
  * Example passwords would be:
- *  aryll -> biggoron -> ciela -> ... -> linebeck -> midna -> navi -> ...
+ *  aryll -> beedle -> ciela -> daruk -> ... -> linebeck -> mido -> navi -> ...
  *
  * Notes:
  *      do NOT put plaintext anywhere in the code (except for comments maybe)
@@ -39,7 +39,7 @@ internal object Authenticator : ConsoleCommand {
                 Echo(msg)
                 println("[Authenticator] " + msg)
                 a = !a
-                (Terrarum.ingame!!.consoleHandler.UI as ConsoleWindow).reset()
+                (TerrarumGDX.ingame!!.consoleHandler.UI as ConsoleWindow).reset()
             }
             else {
                 printUsage() // thou shalt not pass!

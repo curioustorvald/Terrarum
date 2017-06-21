@@ -6,17 +6,20 @@
     <JAVADOC>
       <root url="http://slick.ninjacave.com/javadoc/" />
       <root url="file://$PROJECT_DIR$/lib/javadoc" />
-      <root url="file://$PROJECT_DIR$/lib/apidocs" />
+      <root url="http://libgdx.badlogicgames.com/nightlies/docs/api/" />
     </JAVADOC>
     <NATIVE>
       <root url="file://$PROJECT_DIR$/lib" />
+      <root url="file://$PROJECT_DIR$/lib/x86" />
+      <root url="file://$PROJECT_DIR$/lib/x86_64" />
     </NATIVE>
     <SOURCES>
-      <root url="jar://$PROJECT_DIR$/lib/kotlin-runtime-sources.jar!/" />
-      <root url="file://$PROJECT_DIR$/lib" />
-      <root url="file://$PROJECT_DIR$/lib/slick-source" />
+      <root url="file://$PROJECT_DIR$/lib/source" />
+      <root url="jar://$PROJECT_DIR$/lib/Terrarum_Joise.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/source/gdx-backend-lwjgl-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/TerrarumSansBitmap.jar!/" />
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
-    <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" type="SOURCES" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/source" recursive="false" type="SOURCES" />
   </library>
 </component>

@@ -1,12 +1,10 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.point.Point2d
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.langpack.Lang
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
 /**
  * Text button. Height of hitbox is extended (double lineHeight, or 40 px) for better clicking
@@ -20,11 +18,11 @@ class UIItemTextButton(
         override var posY: Int,
         override val width: Int,
         val readFromLang: Boolean = false,
-        val activeCol: Color = Color.white,
-        val activeBackCol: Color = Color(0,0,0,0),
+        val activeCol: Color = Color.WHITE,
+        val activeBackCol: Color = Color(0),
         val activeBackBlendMode: String = BlendMode.NORMAL,
-        val highlightCol: Color = Color(0x00f8ff),
-        val highlightBackCol: Color = Color(0xb0b0b0),
+        val highlightCol: Color = Color(0x00f8ff_ff),
+        val highlightBackCol: Color = Color(0xb0b0b0_ff.toInt()),
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
         val inactiveCol: Color = UIItemTextButton.defaultInactiveCol,
         val preGapX:  Int = 0,
@@ -32,9 +30,9 @@ class UIItemTextButton(
 ) : UIItem(parentUI) {
 
     companion object {
-        val font = Terrarum.fontGame
-        val height = font.lineHeight * 2
-        val defaultInactiveCol: Color = Color(0xc8c8c8)
+        val font = TerrarumGDX.fontGame
+        val height = font.lineHeight.toInt() * 2
+        val defaultInactiveCol: Color = Color(0xc8c8c8_ff.toInt())
     }
 
     val label: String
@@ -47,37 +45,41 @@ class UIItemTextButton(
     var mouseOver = false
 
 
-    override fun update(gc: GameContainer, delta: Int) {
+    override fun update(delta: Float) {
     }
 
-    override fun render(gc: GameContainer, g: Graphics) {
+    private val glyphLayout = GlyphLayout()
+
+    override fun render(batch: SpriteBatch) {
         val textW = font.getWidth(label)
 
 
         if (highlighted) {
             BlendMode.resolve(highlightBackBlendMode)
-            g.color = highlightBackCol
-            g.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+            batch.color = highlightBackCol
+            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
         else if (mouseOver) {
             BlendMode.resolve(activeBackBlendMode)
-            g.color = activeBackCol
-            g.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+            batch.color = activeBackCol
+            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
 
         blendNormal()
 
-        g.font = font
-        mouseOver = mouseUp
-        g.color = if (highlighted) highlightCol
-                  else if (mouseOver)           activeCol
-                  else                       inactiveCol
 
-        g.drawString(
-                label,
-                posX.toFloat() + width.minus(textW).div(2) + (preGapX - postGapX).div(2),
-                posY.toFloat() + height / 4
-        )
+        batch.inUse {
+            mouseOver = mouseUp
+            batch.color = if (highlighted) highlightCol
+            else if (mouseOver) activeCol
+            else inactiveCol
+
+            font.draw(batch,
+                    label,
+                    posX.toFloat() + width.minus(textW).div(2) + (preGapX - postGapX).div(2),
+                    posY.toFloat() + height / 4
+            )
+        }
     }
 
     override fun keyPressed(key: Int, c: Char) {

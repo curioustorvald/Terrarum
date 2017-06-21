@@ -1,18 +1,14 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.Terrarum
-import org.newdawn.slick.SlickException
-import java.io.IOException
+import net.torvald.terrarum.TerrarumGDX
 
 /**
  * Created by minjaesong on 16-02-03.
  */
 object PlayerBuilder {
-    private val JSONPATH = "./assets/raw/"
-    private val jsonString = String()
 
     operator fun invoke(): Actor {
-        val p: Actor = Player(Terrarum.ingame!!.world.time.currentTimeAsGameDate)
+        val p: Actor = Player(TerrarumGDX.ingame!!.world.time.currentTimeAsGameDate)
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
         // attach sprite

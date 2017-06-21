@@ -1,9 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.Terrarum
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 import java.util.ArrayList
@@ -26,10 +23,10 @@ internal object CommandInterpreter {
             "tips"
     )
 
-    private val ccW = GameFontBase.colToCode["w"]
-    private val ccG = GameFontBase.colToCode["g"]
-    private val ccY = GameFontBase.colToCode["y"]
-    private val ccR = GameFontBase.colToCode["r"]
+    private val ccW = 0.toChar()//GameFontBase.colToCode["w"]
+    private val ccG = 0.toChar()//GameFontBase.colToCode["g"]
+    private val ccY = 0.toChar()//GameFontBase.colToCode["y"]
+    private val ccR = 0.toChar()//GameFontBase.colToCode["r"]
 
     internal fun execute(command: String) {
         val cmd: Array<CommandInput?> = parse(command)

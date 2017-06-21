@@ -1,12 +1,16 @@
 package net.torvald.terrarum.worlddrawer
 
-import net.torvald.terrarum.Terrarum
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockstats.BlockStats
 import com.jme3.math.FastMath
 import net.torvald.colourutil.ColourTemp
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.blendMul
-import org.newdawn.slick.*
+import net.torvald.terrarum.fillRect
+import net.torvald.terrarum.inUse
 
 /**
  * Created by minjaesong on 15-12-31.
@@ -32,18 +36,18 @@ object FeaturesDrawer {
               Block.SAND_DESERT
             , Block.SAND_RED)
 
-    fun update(gc: GameContainer, delta_t: Int) {
+    fun update(delta: Float) {
     }
 
-    fun render(gc: GameContainer, g: Graphics) {
+    fun render(batch: SpriteBatch) {
     }
 
     /**
      * A colour filter used to provide effect that makes whole screen look warmer/cooler,
      * usually targeted for the environmental temperature (desert/winterland), hence the name.
      */
-    fun drawEnvOverlay(g: Graphics) {
-        val onscreen_tiles_max = FastMath.ceil(Terrarum.HEIGHT * Terrarum.WIDTH / FastMath.sqr(TILE_SIZE.toFloat())) * 2
+    fun drawEnvOverlay(batch: SpriteBatch) {
+        val onscreen_tiles_max = FastMath.ceil(Gdx.graphics.height * Gdx.graphics.width / FastMath.sqr (TILE_SIZE.toFloat())) * 2
         val onscreen_tiles_cap = onscreen_tiles_max / 4f
         val onscreen_cold_tiles = BlockStats.getCount(*TILES_COLD).toFloat()
         val onscreen_warm_tiles = BlockStats.getCount(*TILES_WARM).toFloat()
@@ -51,16 +55,15 @@ object FeaturesDrawer {
         val colTemp_cold = colTempLinearFunc(onscreen_cold_tiles / onscreen_tiles_cap)
         val colTemp_warm = colTempLinearFunc(-(onscreen_warm_tiles / onscreen_tiles_cap))
         colTemp = colTemp_warm + colTemp_cold - ENV_COLTEMP_NOON
-        val zoom = Terrarum.ingame!!.screenZoom
+        val zoom = TerrarumGDX.ingame!!.screenZoom
 
         blendMul()
 
-        g.color = ColourTemp(colTemp)
-        g.fillRect(
-                WorldCamera.x * zoom,
+        batch.color = ColourTemp(colTemp)
+        batch.fillRect(WorldCamera.x * zoom,
                 WorldCamera.y * zoom,
-                Terrarum.WIDTH * if (zoom < 1) 1f / zoom else zoom,
-                Terrarum.HEIGHT * if (zoom < 1) 1f / zoom else zoom
+                Gdx.graphics.width * if (zoom < 1) 1f / zoom else zoom,
+                Gdx.graphics.height * if (zoom < 1) 1f / zoom else zoom
         )
     }
 

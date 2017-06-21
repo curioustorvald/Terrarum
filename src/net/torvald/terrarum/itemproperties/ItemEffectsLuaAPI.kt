@@ -1,11 +1,7 @@
 package net.torvald.terrarum.itemproperties
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.ai.toLua
-import net.torvald.terrarum.gamecontroller.mouseTileX
-import net.torvald.terrarum.gamecontroller.mouseTileY
-import net.torvald.terrarum.gamecontroller.mouseX
-import net.torvald.terrarum.gamecontroller.mouseY
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -36,24 +32,24 @@ class ItemEffectsLuaAPI(g: Globals) {
 
     class GetMouseTile : ZeroArgFunction() {
         override fun call(): LuaValue {
-            return LuaValue.tableOf(arrayOf(Terrarum.appgc.mouseTileX.toLua(), Terrarum.appgc.mouseTileY.toLua()))
+            return LuaValue.tableOf(arrayOf(TerrarumGDX.mouseTileX.toLua(), TerrarumGDX.mouseTileY.toLua()))
         }
     }
     class GetMousePos : ZeroArgFunction() {
         override fun call(): LuaValue {
-            return LuaValue.tableOf(arrayOf(Terrarum.appgc.mouseX.toLua(), Terrarum.appgc.mouseY.toLua()))
+            return LuaValue.tableOf(arrayOf(TerrarumGDX.mouseX.toLua(), TerrarumGDX.mouseY.toLua()))
         }
     }
 
     class StrikeEarth : ThreeArgFunction() {
         override fun call(x: LuaValue, y: LuaValue, power: LuaValue): LuaValue {
-            Terrarum.ingame!!.world.inflictTerrainDamage(x.checkint(), y.checkint(), power.checkdouble())
+            TerrarumGDX.ingame!!.world.inflictTerrainDamage(x.checkint(), y.checkint(), power.checkdouble())
             return LuaValue.NONE
         }
     }
     class StrikeWall : ThreeArgFunction() {
         override fun call(x: LuaValue, y: LuaValue, power: LuaValue): LuaValue {
-            Terrarum.ingame!!.world.inflictWallDamage(x.checkint(), y.checkint(), power.checkdouble())
+            TerrarumGDX.ingame!!.world.inflictWallDamage(x.checkint(), y.checkint(), power.checkdouble())
             return LuaValue.NONE
         }
     }

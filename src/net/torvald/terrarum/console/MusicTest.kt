@@ -1,8 +1,7 @@
 package net.torvald.terrarum.console
 
-import org.newdawn.slick.Music
-import org.newdawn.slick.openal.AudioLoader
-import java.io.File
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Music
 
 /**
  * Created by minjaesong on 16-08-02.
@@ -34,7 +33,7 @@ internal object MusicTest : ConsoleCommand {
                 File("./assets/sounds/test/${args[1]}").absoluteFile.toURI().toURL()
         ).playAsMusic(1f, 1f, false)*/
 
-        music = Music("./assets/sounds/test/${args[1]}")
+        music = Gdx.audio.newMusic(Gdx.files.internal("./assets/sounds/test/${args[1]}"))
         music!!.play()
     }
 

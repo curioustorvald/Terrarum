@@ -1,9 +1,7 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.FixtureTikiTorch
-import net.torvald.terrarum.gamecontroller.mouseX
-import net.torvald.terrarum.gamecontroller.mouseY
 
 /**
  * Created by minjaesong on 2016-12-17.
@@ -11,9 +9,9 @@ import net.torvald.terrarum.gamecontroller.mouseY
 internal object SpawnTikiTorch : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val torch = FixtureTikiTorch()
-        torch.setPosition(Terrarum.appgc.mouseX, Terrarum.appgc.mouseY)
+        torch.setPosition(TerrarumGDX.mouseX, TerrarumGDX.mouseY)
 
-        Terrarum.ingame!!.addNewActor(torch)
+        TerrarumGDX.ingame!!.addNewActor(torch)
     }
 
     override fun printUsage() {

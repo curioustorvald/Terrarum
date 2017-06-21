@@ -1,9 +1,9 @@
 package net.torvald.terrarum.worldgenerator
 
+import com.badlogic.gdx.graphics.Color
 import net.torvald.dataclass.IntArrayStack
 import net.torvald.colourutil.Col4096
 import net.torvald.random.HQRNG
-import org.newdawn.slick.Color
 import java.util.*
 
 /**
@@ -47,7 +47,7 @@ object RoguelikeRandomiser {
         return Col4096(colourStack.pop(),
                        colourStack.pop(),
                        colourStack.pop())
-                .toSlickColour()
+                .toGdxColour()
     }
 
 

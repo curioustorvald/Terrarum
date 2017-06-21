@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.gameworld.WorldTime
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 
 /**
  * Created by minjaesong on 16-03-20.
@@ -11,10 +11,10 @@ internal object SetTime : ConsoleCommand {
         if (args.size == 2) {
             val timeToSet = WorldTime.parseTime(args[1])
 
-            Terrarum.ingame!!.world.time.setTimeOfToday(timeToSet)
+            TerrarumGDX.ingame!!.world.time.setTimeOfToday(timeToSet)
 
-            Echo("Set time to ${Terrarum.ingame!!.world.time.todaySeconds} " +
-                 "(${Terrarum.ingame!!.world.time.hours}h${formatMin(Terrarum.ingame!!.world.time.minutes)})")
+            Echo("Set time to ${TerrarumGDX.ingame!!.world.time.todaySeconds} " +
+                 "(${TerrarumGDX.ingame!!.world.time.hours}h${formatMin(TerrarumGDX.ingame!!.world.time.minutes)})")
         }
         else {
             printUsage()

@@ -1,10 +1,8 @@
 package net.torvald.terrarum.virtualcomputer.terminal
 
-import net.torvald.terrarum.Millisec
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Input
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.gameactors.Second
 
 /**
  * A terminal
@@ -30,8 +28,8 @@ interface Terminal : Teletype {
     val displayH: Int
 
     fun getColor(index: Int): Color
-    override fun update(gc: GameContainer, delta: Int)
-    override fun render(gc: GameContainer, g: Graphics)
+    override fun update(delta: Float)
+    override fun render(batch: SpriteBatch)
     override fun keyPressed(key: Int, c: Char)
 
     // API calls
@@ -60,7 +58,7 @@ interface Terminal : Teletype {
      * @param duration: milliseconds
      * @param freg: Frequency (float)
      */
-    fun emitTone(duration: Millisec, freq: Double)
+    fun emitTone(duration: Second, freq: Double)
 
     override fun bell(pattern: String)
 }

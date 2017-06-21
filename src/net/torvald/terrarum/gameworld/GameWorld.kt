@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameworld
 
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.worlddrawer.RGB10
 import org.dyn4j.geometry.Vector2
 
 typealias BlockAddress = Long
@@ -32,7 +33,7 @@ class GameWorld(val width: Int, val height: Int) {
     /** Meter per second squared. Currently only the downward gravity is supported. No reverse gravity :p */
     var gravitation: Vector2 = Vector2(0.0, 9.8)
     /** RGB in Integer */
-    var globalLight: Int = 0
+    var globalLight: RGB10 = 0
 
 
 
@@ -181,7 +182,7 @@ class GameWorld(val width: Int, val height: Int) {
             throw IllegalArgumentException("illegal mode input: " + mode.toString())
     }
 
-    fun updateWorldTime(delta: Int) {
+    fun updateWorldTime(delta: Float) {
         time.update(delta)
     }
 

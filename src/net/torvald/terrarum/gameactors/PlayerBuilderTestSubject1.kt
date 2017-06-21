@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by SKYHi14 on 2017-02-10.
@@ -18,8 +19,8 @@ object PlayerBuilderTestSubject1 {
         p.actorValue[AVKey.NAME] = "Test Subject 1"
 
 
-        p.makeNewSprite(48, 52, ModMgr.getPath("basegame", "sprites/npc_template_anim_prototype.tga"))
-        p.sprite!!.delay = 200
+        p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/npc_template_anim_prototype.tga"), 48, 52))
+        p.sprite!!.delay = 0.2f
         p.sprite!!.setRowsAndFrames(2, 4)
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 21, 0)

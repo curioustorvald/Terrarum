@@ -1,19 +1,17 @@
 package net.torvald.terrarum.console
 
-import net.torvald.imagefont.GameFontBase
-import net.torvald.terrarum.StateInGame
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 
 /**
  * Created by minjaesong on 16-01-15.
  */
 internal object SetAV : ConsoleCommand {
 
-    val ccW = GameFontBase.colToCode["w"]
-    val ccG = GameFontBase.colToCode["g"]
-    val ccY = GameFontBase.colToCode["y"]
-    val ccR = GameFontBase.colToCode["r"]
-    val ccM = GameFontBase.colToCode["m"]
+    val ccW = 0.toChar()//GameFontBase.colToCode["w"]
+    val ccG = 0.toChar()//GameFontBase.colToCode["g"]
+    val ccY = 0.toChar()//GameFontBase.colToCode["y"]
+    val ccR = 0.toChar()//GameFontBase.colToCode["r"]
+    val ccM = 0.toChar()//GameFontBase.colToCode["m"]
 
     override fun printUsage() {
         Echo("${ccW}Set actor value of specific target to desired value.")
@@ -66,7 +64,7 @@ internal object SetAV : ConsoleCommand {
                 return
             }
 
-            Terrarum.ingame!!.player!!.actorValue[args[1]] = newValue
+            TerrarumGDX.ingame!!.player!!.actorValue[args[1]] = newValue
             Echo("${ccW}Set $ccM${args[1]} ${ccW}for ${ccY}player ${ccW}to $ccG$newValue")
             println("[SetAV] set ActorValue '${args[1]}' for player to '$newValue'.")
         }
@@ -74,7 +72,7 @@ internal object SetAV : ConsoleCommand {
             try {
                 val id = args[1].toInt()
                 val newValue = parseAVInput(args[3])
-                val actor = Terrarum.ingame!!.getActorByID(id)
+                val actor = TerrarumGDX.ingame!!.getActorByID(id)
 
                 // check if av is number
                 if (args[2].isNum()) {

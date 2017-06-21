@@ -1,8 +1,5 @@
 package net.torvald.terrarum.gameactors
 
-import org.dyn4j.geometry.Vector2
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Input
 
 /**
  * Actors that has movement controlled by Keyboard or AI
@@ -11,7 +8,7 @@ import org.newdawn.slick.Input
  */
 interface Controllable {
 
-    fun processInput(gc: GameContainer, delta: Int, input: Input)
+    fun processInput(delta: Float)
 
     fun keyPressed(key: Int, c: Char)
 

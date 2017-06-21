@@ -1,25 +1,24 @@
 package net.torvald.terrarum.console
 
-import net.torvald.imagefont.GameFontBase
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 
 /**
  * Created by minjaesong on 16-01-19.
  */
 internal object GetAV : ConsoleCommand {
 
-    val ccW = GameFontBase.colToCode["w"]
-    val ccG = GameFontBase.colToCode["g"]
-    val ccY = GameFontBase.colToCode["y"]
-    val ccM = GameFontBase.colToCode["m"]
-    val ccK = GameFontBase.colToCode["k"]
-    val ccO = GameFontBase.colToCode["o"]
+    val ccW = 0.toChar()//GameFontBase.colToCode["w"]
+    val ccG = 0.toChar()//GameFontBase.colToCode["g"]
+    val ccY = 0.toChar()//GameFontBase.colToCode["y"]
+    val ccM = 0.toChar()//GameFontBase.colToCode["m"]
+    val ccK = 0.toChar()//GameFontBase.colToCode["k"]
+    val ccO = 0.toChar()//GameFontBase.colToCode["o"]
 
     override fun execute(args: Array<String>) {
         try {
-            if (args.size == 1 && Terrarum.ingame!!.player != null) {
+            if (args.size == 1 && TerrarumGDX.ingame!!.player != null) {
                 // print all actorvalue of player
-                val av = Terrarum.ingame!!.player!!.actorValue
+                val av = TerrarumGDX.ingame!!.player!!.actorValue
                 val keyset = av.keySet
 
                 Echo("$ccW== ActorValue list for ${ccY}player $ccW==")
@@ -37,19 +36,19 @@ internal object GetAV : ConsoleCommand {
                 if (!args[1].isNum()) { // args[1] is ActorValue name
                     Echo("${ccW}player.$ccM${args[1]} $ccW= " +
                                  ccG +
-                                 Terrarum.ingame!!.player!!.actorValue[args[1]] +
+                                 TerrarumGDX.ingame!!.player!!.actorValue[args[1]] +
                                  " $ccO" +
-                                 Terrarum.ingame!!.player!!.actorValue[args[1]]!!.javaClass.simpleName
+                                 TerrarumGDX.ingame!!.player!!.actorValue[args[1]]!!.javaClass.simpleName
                     )
                     println("[GetAV] player.${args[1]} = " +
-                            Terrarum.ingame!!.player!!.actorValue[args[1]] +
+                            TerrarumGDX.ingame!!.player!!.actorValue[args[1]] +
                             " " +
-                            Terrarum.ingame!!.player!!.actorValue[args[1]]!!.javaClass.simpleName
+                            TerrarumGDX.ingame!!.player!!.actorValue[args[1]]!!.javaClass.simpleName
                     )
                 }
                 else {
                     // args[1] is actor ID
-                    val actor = Terrarum.ingame!!.getActorByID(args[1].toInt())
+                    val actor = TerrarumGDX.ingame!!.getActorByID(args[1].toInt())
                     val av = actor.actorValue
                     val keyset = av.keySet
 
@@ -71,14 +70,14 @@ internal object GetAV : ConsoleCommand {
                 val id = args[1].toInt()
                 val av = args[2]
                 Echo("$ccW$id.$ccM$av $ccW= $ccG" +
-                             Terrarum.ingame!!.getActorByID(id).actorValue[av] +
+                             TerrarumGDX.ingame!!.getActorByID(id).actorValue[av] +
                              " $ccO" +
-                             Terrarum.ingame!!.getActorByID(id).actorValue[av]!!.javaClass.simpleName
+                             TerrarumGDX.ingame!!.getActorByID(id).actorValue[av]!!.javaClass.simpleName
                 )
                 println("$id.$av = " +
-                        Terrarum.ingame!!.getActorByID(id).actorValue[av] +
+                        TerrarumGDX.ingame!!.getActorByID(id).actorValue[av] +
                         " " +
-                        Terrarum.ingame!!.getActorByID(id).actorValue[av]!!.javaClass.simpleName
+                        TerrarumGDX.ingame!!.getActorByID(id).actorValue[av]!!.javaClass.simpleName
                 )
             }
         }

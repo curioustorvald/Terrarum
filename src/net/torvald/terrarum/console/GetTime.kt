@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 
 /**
  * Created by minjaesong on 16-03-20.
@@ -8,7 +8,7 @@ import net.torvald.terrarum.Terrarum
 internal object GetTime : ConsoleCommand {
     override fun execute(args: Array<String>) {
 
-        val worldTime = Terrarum.ingame!!.world.time
+        val worldTime = TerrarumGDX.ingame!!.world.time
         Echo(worldTime.getFormattedTime())
     }
 

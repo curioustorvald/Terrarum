@@ -1,7 +1,6 @@
 package net.torvald.terrarum.virtualcomputer.terminal
 
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
 /**
  * Created by minjaesong on 16-09-14.
@@ -19,8 +18,8 @@ interface Teletype {
      */
     val coloursCount: Int
 
-    fun update(gc: GameContainer, delta: Int)
-    fun render(gc: GameContainer, g: Graphics)
+    fun update(delta: Float)
+    fun render(batch: SpriteBatch)
     fun keyPressed(key: Int, c: Char)
 
     /** Prints a char and move cursor accordingly */

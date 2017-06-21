@@ -1,13 +1,12 @@
 package net.torvald.terrarum.gameactors
 
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.point.Point2d
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import org.dyn4j.geometry.Vector2
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
 import java.util.*
 
 /**
@@ -42,7 +41,7 @@ open class ProjectileSimple(
     override val lightBoxList = ArrayList<Hitbox>()
 
     private val lifetimeMax = 2500
-    private var lifetimeCounter = 0
+    private var lifetimeCounter = 0f
 
     private val posPre: Point2d
 
@@ -68,38 +67,45 @@ open class ProjectileSimple(
         collisionType = COLLISION_KINEMATIC
     }
 
-    override fun update(gc: GameContainer, delta: Int) {
+    override fun update(delta: Float) {
         // hit something and despawn
         lifetimeCounter += delta
         if (walledTop || walledBottom || walledRight || walledLeft || lifetimeCounter >= lifetimeMax ||
             // stuck check
-            BlockCodex[Terrarum.ingame!!.world.getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Block.STONE].isSolid
+            BlockCodex[TerrarumGDX.ingame!!.world.getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Block.STONE].isSolid
                 ) {
             flagDespawn()
         }
 
         posPre.set(centrePosPoint)
 
-        super.update(gc, delta)
+        super.update(delta)
     }
 
-    override fun drawBody(g: Graphics) {
-        val colourTail = displayColour.darker(0f) // clone a colour
+    /**
+     * WARNING! ends and begins Batch
+     */
+    override fun drawBody(batch: SpriteBatch) {
+        val colourTail = displayColour.cpy() // clone a colour
         colourTail.a = 0.16f
 
-        // draw trail of solid colour (Terraria style maybe?)
-        g.lineWidth = 2f * Terrarum.ingame!!.screenZoom
-        g.drawGradientLine(
-                hitbox.centeredX.toFloat() * Terrarum.ingame!!.screenZoom,
-                hitbox.centeredY.toFloat() * Terrarum.ingame!!.screenZoom,
-                displayColour,
-                posPre.x.toFloat() * Terrarum.ingame!!.screenZoom,
-                posPre.y.toFloat() * Terrarum.ingame!!.screenZoom,
-                colourTail
-        )
+        /*batch.end()
+        TerrarumGDX.inShapeRenderer {
+            // draw trail of solid colour (Terraria style maybe?)
+            it.lineWidth = 2f * TerrarumGDX.ingame!!.screenZoom
+            g.drawGradientLine(
+                    hitbox.centeredX.toFloat() * TerrarumGDX.ingame!!.screenZoom,
+                    hitbox.centeredY.toFloat() * TerrarumGDX.ingame!!.screenZoom,
+                    displayColour,
+                    posPre.x.toFloat() * TerrarumGDX.ingame!!.screenZoom,
+                    posPre.y.toFloat() * TerrarumGDX.ingame!!.screenZoom,
+                    colourTail
+            )
+        }
+        batch.begin()*/
     }
 
-    override fun drawGlow(g: Graphics) = drawBody(g)
+    override fun drawGlow(batch: SpriteBatch) = drawBody(batch)
 
     companion object {
         val OFFSET_DAMAGE = 0

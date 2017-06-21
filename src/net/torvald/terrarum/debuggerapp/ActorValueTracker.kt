@@ -1,7 +1,7 @@
 package net.torvald.terrarum.debuggerapp
 
 import net.torvald.terrarum.gameactors.ActorValue
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.SetAV
 import net.torvald.terrarum.gameactors.Actor
@@ -82,11 +82,11 @@ class ActorValueTracker constructor() : JFrame() {
         buttonChangeActor.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 if (actorIDField.text.toLowerCase() == "player") {
-                    actor = Terrarum.ingame!!.player
+                    actor = TerrarumGDX.ingame!!.player
                     actorValue = actor!!.actorValue
                 }
                 else if (actorIDField.text.isNotBlank()) {
-                    actor = Terrarum.ingame!!.getActorByID(actorIDField.text.toInt()) as ActorWithPhysics
+                    actor = TerrarumGDX.ingame!!.getActorByID(actorIDField.text.toInt()) as ActorWithPhysics
                     actorValue = actor!!.actorValue
                 }
             }

@@ -1,15 +1,14 @@
 package net.torvald.terrarum.virtualcomputer.terminal
 
-import net.torvald.imagefont.GameFontBase
+import net.torvald.terrarumsansbitmap.slick2d.GameFontBase
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.blendNormal
-import org.newdawn.slick.*
 import java.util.*
 
 /**
  * Created by minjaesong on 16-09-15.
  */
-class TeletypeTerminal : Teletype {
+/*class TeletypeTerminal : Teletype {
     override val width = 40
     override val displayW: Int
         get() = width * font.W
@@ -203,4 +202,4 @@ class TeletypeTerminal : Teletype {
 
         private fun charToSpriteNum(ch: Int): Int? = mappingTable[ch]
     }
-}
+}*/

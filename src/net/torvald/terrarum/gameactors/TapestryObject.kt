@@ -1,32 +1,37 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gamecontroller.mouseX
-import net.torvald.terrarum.gamecontroller.mouseY
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Image
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2017-01-07.
  */
-class TapestryObject(image: Image, val artName: String, val artAuthor: String) : FixtureBase(physics = false) {
+class TapestryObject(pixmap: Pixmap, val artName: String, val artAuthor: String) : FixtureBase(physics = false) {
 
     // physics = false only speeds up for ~2 frames with 50 tapestries
 
     init {
-        image.filter = Image.FILTER_NEAREST
-        makeNewSprite(image.width, image.height, image)
-        setHitboxDimension(image.width, image.height, 0, 0)
-        setPosition(Terrarum.appgc.mouseX, Terrarum.appgc.mouseY)
+        val texture = Texture(pixmap)
+        pixmap.dispose()
+        texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        val texturePack = TextureRegionPack(texture, texture.width, texture.height)
+
+        makeNewSprite(texturePack)
+        setHitboxDimension(texture.width, texture.height, 0, 0)
+        setPosition(TerrarumGDX.mouseX, TerrarumGDX.mouseY)
         // you CAN'T destroy the image
     }
 
-    override fun update(gc: GameContainer, delta: Int) {
-        super.update(gc, delta)
+    override fun update(delta: Float) {
+        super.update(delta)
     }
 
-    override fun drawBody(g: Graphics) {
-        super.drawBody(g)
+    override fun drawBody(batch: SpriteBatch) {
+        super.drawBody(batch)
     }
+
+    override var tooltipText: String = "$artName\n$artAuthor"
 }

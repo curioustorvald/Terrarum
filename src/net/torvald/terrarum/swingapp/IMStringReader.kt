@@ -1,7 +1,7 @@
 package net.torvald.terrarum.swingapp
 
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.langpack.Lang
-import org.newdawn.slick.GameContainer
 import java.awt.BorderLayout
 import java.awt.FlowLayout
 import java.awt.event.*
@@ -24,7 +24,7 @@ import javax.swing.*
  *
  * Created by SKYHi14 on 2017-02-05.
  */
-class IMStringReader(gc: GameContainer, feedInput: (String) -> Unit, message: String? = null) : JFrame() {
+class IMStringReader(feedInput: (String) -> Unit, message: String? = null) : JFrame() {
 
     private val inputArea = JTextField()
     private val buttonOkay = JButton(Lang["MENU_LABEL_OK"])
@@ -41,7 +41,7 @@ class IMStringReader(gc: GameContainer, feedInput: (String) -> Unit, message: St
         this.title = labelTitle
         defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
 
-        gc.pause()
+        TerrarumGDX.pause()
 
         buttonOkay.addMouseListener(object : MouseListener {
             override fun mouseEntered(e: MouseEvent?) { }
@@ -51,7 +51,7 @@ class IMStringReader(gc: GameContainer, feedInput: (String) -> Unit, message: St
             override fun mousePressed(e: MouseEvent?) {
                 userInput = inputArea.text
                 isVisible = false
-                gc.isPaused = false
+                TerrarumGDX.resume()
 
                 feedInput(userInput)
 
@@ -67,7 +67,7 @@ class IMStringReader(gc: GameContainer, feedInput: (String) -> Unit, message: St
             override fun mousePressed(e: MouseEvent?) {
                 userInput = ""//null
                 isVisible = false
-                gc.isPaused = false
+                TerrarumGDX.resume()
 
                 dispose()
             }
@@ -79,7 +79,7 @@ class IMStringReader(gc: GameContainer, feedInput: (String) -> Unit, message: St
             override fun keyPressed(e: KeyEvent?) {
                 userInput = inputArea.text
                 isVisible = false
-                gc.isPaused = false
+                TerrarumGDX.resume()
 
                 feedInput(userInput)
 

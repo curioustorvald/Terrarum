@@ -1,6 +1,6 @@
 package net.torvald.colourutil
 
-import org.newdawn.slick.Color
+import com.badlogic.gdx.graphics.Color
 
 /**
  * 12-bit (16-step) RGB with builtin utils.
@@ -41,7 +41,7 @@ class Col4096 : LimitedColours {
      * *
      * @return
      */
-    override fun createSlickColor(raw: Int): Color {
+    override fun createGdxColor(raw: Int): Color {
         assertRaw(raw)
 
         val a: Int
@@ -57,22 +57,22 @@ class Col4096 : LimitedColours {
             a = raw and 0xF000 shr 12
 
             return Color(
-                    r.shl(4) or r, g.shl(4) or g, b.shl(4) or b, a.shl(4) or a)
+                    (r.shl(4) or r).shl(24) + (g.shl(4) or g).shl(16) + (b.shl(4) or b).shl(8) + (a.shl(4) or a))
         }
         else {
             return Color(
-                    r.shl(4) or r, g.shl(4) or g, b.shl(4) or b)
+                    (r.shl(4) or r).shl(24) + (g.shl(4) or g).shl(16) + (b.shl(4) or b).shl(8) + 255)
         }
     }
 
-    override fun createSlickColor(r: Int, g: Int, b: Int): Color {
+    override fun createGdxColor(r: Int, g: Int, b: Int): Color {
         assertARGB(0, r, g, b)
-        return createSlickColor(r.shl(8) or g.shl(4) or b)
+        return createGdxColor(r.shl(8) or g.shl(4) or b)
     }
 
     fun createSlickColor(a: Int, r: Int, g: Int, b: Int): Color {
         assertARGB(a, r, g, b)
-        return createSlickColor(a.shl(12) or r.shl(8) or g.shl(4) or b)
+        return createGdxColor(a.shl(12) or r.shl(8) or g.shl(4) or b)
     }
 
     override fun create(raw: Int) {
@@ -107,7 +107,7 @@ class Col4096 : LimitedColours {
         return ret
     }
 
-    override fun toSlickColour(): Color = createSlickColor(raw.toUint())
+    override fun toGdxColour(): Color = createGdxColor(raw.toUint())
 
     private fun assertRaw(i: Int) {
         if (i > 0xFFFF || i < 0) {

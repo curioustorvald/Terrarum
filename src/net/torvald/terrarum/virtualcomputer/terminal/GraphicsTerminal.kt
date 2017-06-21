@@ -5,11 +5,6 @@ import net.torvald.terrarum.gameactors.DecodeTapestry
 import net.torvald.terrarum.gameactors.abs
 import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
-import net.torvald.terrarum.virtualcomputer.peripheral.PeripheralVideoCard
-import org.newdawn.slick.Color
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Image
 import java.util.*
 
 /**
@@ -18,7 +13,7 @@ import java.util.*
  *
  * Created by SKYHi14 on 2017-02-08.
  */
-class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
+/*class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
     lateinit var videoCard: PeripheralVideoCard
 
     override val width: Int; get() = videoCard.termW
@@ -314,4 +309,4 @@ class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
 
         videoScreen = Image(videoCard.width, videoCard.height)
     }
-}
+}*/

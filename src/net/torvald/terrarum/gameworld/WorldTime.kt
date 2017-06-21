@@ -142,7 +142,7 @@ class WorldTime(initTime: Long = 0L) {
         val LUNAR_CYCLE: Int = 2342643// 29 days, 12 hours, 44 minutes, and 3 seconds in-game calendar
     }
 
-    fun update(delta: Int) {
+    fun update(delta: Float) {
         //time
         realMillisec += delta
         if (realMillisec >= 1000.0 / REAL_SEC_TO_GAME_SECS) {

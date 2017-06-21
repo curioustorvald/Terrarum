@@ -1,13 +1,11 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.to10bit
-import org.newdawn.slick.Color
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 16-02-03.
@@ -20,12 +18,13 @@ object PlayerBuilderSigrid {
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
 
-        p.makeNewSprite(28, 51, ModMgr.getPath("basegame", "sprites/test_player.tga"))
-        p.sprite!!.delay = 200
+
+        p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/test_player.tga"), 28, 51))
+        p.sprite!!.delay = 0.2f
         p.sprite!!.setRowsAndFrames(1, 1)
 
-        p.makeNewSpriteGlow(28, 51, ModMgr.getPath("basegame", "sprites/test_player_glow.tga"))
-        p.spriteGlow!!.delay = 200
+        p.makeNewSpriteGlow(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/test_player_glow.tga"), 28, 51))
+        p.spriteGlow!!.delay = 0.2f
         p.spriteGlow!!.setRowsAndFrames(1, 1)
 
         p.actorValue[AVKey.SCALE] = 1.0

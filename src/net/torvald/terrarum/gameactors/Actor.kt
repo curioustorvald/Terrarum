@@ -1,11 +1,9 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.gameactors.ActorValue
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.ItemCodex.ACTORID_MIN
-import org.newdawn.slick.GameContainer
 
 typealias ActorID = Int
 
@@ -30,7 +28,7 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
         val RANGE_FRONT  = 0x7000_0000..0x7FFF_FFFF
     }
 
-    abstract fun update(gc: GameContainer, delta: Int)
+    abstract fun update(delta: Float)
 
     /**
      * Valid RefID is equal to or greater than 16777216.
@@ -59,7 +57,7 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
     fun generateUniqueReferenceID(): ActorID {
         fun hasCollision(value: ActorID) =
                 try {
-                    Terrarum.ingame!!.theGameHasActor(value) ||
+                    TerrarumGDX.ingame!!.theGameHasActor(value) ||
                     value < ItemCodex.ACTORID_MIN ||
                     value !in when (renderOrder) {
                         RenderOrder.BEHIND -> RANGE_BEHIND

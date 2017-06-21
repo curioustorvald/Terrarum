@@ -1,6 +1,5 @@
 package net.torvald.terrarum.gameactors
 
-import org.newdawn.slick.GameContainer
 
 /**
  * Game player (YOU!)
@@ -27,8 +26,8 @@ class Player(born: GameDate) : ActorHumanoid(born) {
         collisionType = COLLISION_KINEMATIC
     }
 
-    override fun update(gc: GameContainer, delta: Int) {
-        super.update(gc, delta)
+    override fun update(delta: Float) {
+        super.update(delta)
     }
 
 }

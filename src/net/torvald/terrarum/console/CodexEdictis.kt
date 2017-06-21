@@ -1,6 +1,5 @@
 package net.torvald.terrarum.console
 
-import net.torvald.imagefont.GameFontBase
 import net.torvald.terrarum.langpack.Lang
 
 import java.util.Formatter
@@ -10,7 +9,7 @@ import java.util.Formatter
  */
 internal object CodexEdictis : ConsoleCommand {
 
-    val ccW = GameFontBase.colToCode["o"]
+    val ccW = 0.toChar()//GameFontBase.colToCode["o"]
 
     override fun execute(args: Array<String>) {
         if (args.size == 1) {

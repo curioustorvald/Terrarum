@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 
 /**
  * Created by minjaesong on 16-02-17.
@@ -20,7 +20,7 @@ internal object SetGlobalLightOverride : ConsoleCommand {
                 val GL = LightmapRenderer.constructRGBFromInt(r, g, b)
 
                 lightOverride = true
-                Terrarum.ingame!!.world.globalLight = GL
+                TerrarumGDX.ingame!!.world.globalLight = GL
             }
             catch (e: NumberFormatException) {
                 Echo("Wrong number input.")
@@ -38,7 +38,7 @@ internal object SetGlobalLightOverride : ConsoleCommand {
                     Echo("Range: 0-" + (LightmapRenderer.COLOUR_RANGE_SIZE - 1))
                 }
                 else {
-                    Terrarum.ingame!!.world.globalLight = GL
+                    TerrarumGDX.ingame!!.world.globalLight = GL
                 }
             }
             catch (e: NumberFormatException) {

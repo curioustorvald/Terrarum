@@ -1,11 +1,9 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.roundInt
-import net.torvald.terrarum.gamecontroller.mouseScreenX
-import net.torvald.terrarum.gamecontroller.mouseScreenY
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.TerrarumGDX
+
 
 /**
  * Created by minjaesong on 15-12-31.
@@ -19,19 +17,19 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     abstract val height: Int
 
     protected val relativeMouseX: Int
-        get() = (Terrarum.appgc.mouseScreenX - (parentUI.handler?.posX ?: 0) - this.posX)
+        get() = (TerrarumGDX.mouseScreenX - (parentUI.handler?.posX ?: 0) - this.posX)
     protected val relativeMouseY: Int
-        get() = (Terrarum.appgc.mouseScreenY - (parentUI.handler?.posY ?: 0) - this.posY)
+        get() = (TerrarumGDX.mouseScreenY - (parentUI.handler?.posY ?: 0) - this.posY)
 
     /** If mouse is hovering over it */
     open val mouseUp: Boolean
         get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
     /** If mouse is hovering over it and mouse is down */
     open val mousePushed: Boolean
-        get() = mouseUp && Terrarum.appgc.input.isMouseButtonDown(Terrarum.getConfigInt("mouseprimary")!!)
+        get() = mouseUp && Gdx.input.isButtonPressed(TerrarumGDX.getConfigInt("mouseprimary")!!)
 
-    abstract fun update(gc: GameContainer, delta: Int)
-    abstract fun render(gc: GameContainer, g: Graphics)
+    abstract fun update(delta: Float)
+    abstract fun render(batch: SpriteBatch)
 
     // keyboard controlled
     abstract fun keyPressed(key: Int, c: Char)

@@ -8,8 +8,9 @@ import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.KVHashMap
-import net.torvald.terrarum.Millisec
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.gameactors.Second
+import net.torvald.terrarum.gameactors.ceilInt
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.virtualcomputer.luaapi.*
 import net.torvald.terrarum.virtualcomputer.peripheral.*
@@ -20,8 +21,6 @@ import net.torvald.terrarum.virtualcomputer.worldobject.ComputerPartsCodex
 import org.lwjgl.BufferUtils
 import org.lwjgl.openal.AL
 import org.lwjgl.openal.AL10
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Input
 import java.io.*
 import java.nio.ByteBuffer
 import java.util.*
@@ -74,9 +73,6 @@ class TerrarumComputer(peripheralSlots: Int) {
 
     var isHalted = false
 
-    lateinit var input: Input
-        private set
-
     lateinit var term: Teletype
         private set
 
@@ -104,7 +100,7 @@ class TerrarumComputer(peripheralSlots: Int) {
         // put disk in diskRack
         if (filename.isNotEmpty() && filename.isNotBlank()) {
             diskRack[slot] = VDUtil.readDiskArchive(
-                    File(Terrarum.currentSaveDir.path + "/computers/$filename").absoluteFile,
+                    File(TerrarumGDX.currentSaveDir.path + "/computers/$filename").absoluteFile,
                     Level.WARNING,
                     { },
                     Filesystem.sysCharset
@@ -248,8 +244,7 @@ class TerrarumComputer(peripheralSlots: Int) {
         }
     }
 
-    fun update(gc: GameContainer, delta: Int) {
-        input = gc.input
+    fun update(delta: Float) {
 
         if (currentExecutionThread.state == Thread.State.TERMINATED) {
             threadRun = false
@@ -370,7 +365,7 @@ class TerrarumComputer(peripheralSlots: Int) {
             }
             catch (e: LuaError) {
                 e.printStackTrace(System.err)
-                lua.STDERR.println("${SimpleTextTerminal.ASCII_DLE}${e.message}${SimpleTextTerminal.ASCII_DC4}")
+                //lua.STDERR.println("${SimpleTextTerminal.ASCII_DLE}${e.message}${SimpleTextTerminal.ASCII_DC4}")
             }
         }
 
@@ -401,7 +396,7 @@ class TerrarumComputer(peripheralSlots: Int) {
 
     class ComputerEmitTone(val computer: TerrarumComputer) : TwoArgFunction() {
         override fun call(millisec: LuaValue, freq: LuaValue): LuaValue {
-            computer.playTone(millisec.checkint(), freq.checkdouble())
+            computer.playTone(millisec.checkdouble().toFloat(), freq.checkdouble())
             return LuaValue.NONE
         }
     }
@@ -410,14 +405,14 @@ class TerrarumComputer(peripheralSlots: Int) {
     // BEEPER DRIVER //
     ///////////////////
 
-    private val beepMaxLen = 10000
+    private val beepMaxLen = 10f
     // let's regard it as a tracker...
-    private val beepQueue = ArrayList<Pair<Int, Double>>()
+    private val beepQueue = ArrayList<Pair<Second, Double>>()
     private var beepCursor = -1
-    private var beepQueueLineExecTimer: Millisec = 0
+    private var beepQueueLineExecTimer: Second = 0f
     private var beepQueueFired = false
 
-    private fun runBeepQueueManager(delta: Int) {
+    private fun runBeepQueueManager(delta: Float) {
         // start emitTone queue
         if (beepQueue.size > 0 && beepCursor == -1) {
             beepCursor = 0
@@ -453,15 +448,15 @@ class TerrarumComputer(peripheralSlots: Int) {
     fun clearBeepQueue() {
         beepQueue.clear()
         beepCursor = -1
-        beepQueueLineExecTimer = 0
+        beepQueueLineExecTimer = 0f
 
         //AL.destroy()
 
         if (DEBUG) println("[TerrarumComputer] !! Beep queue clear")
     }
 
-    fun enqueueBeep(duration: Int, freq: Double) {
-        beepQueue.add(Pair(Math.min(duration, beepMaxLen), freq))
+    fun enqueueBeep(duration: Double, freq: Double) {
+        beepQueue.add(Pair(Math.min(duration.toFloat(), beepMaxLen), freq))
     }
 
     fun beepQueueGetLenOfPtn(ptnIndex: Int) = beepQueue[ptnIndex].first
@@ -485,11 +480,15 @@ class TerrarumComputer(peripheralSlots: Int) {
      *
      *     ,---. (true, true) ,---- (true, false) ----. (false, true) ----- (false, false)
      */
-    private fun makeAudioData(duration: Millisec, freq: Double,
+    private fun makeAudioData(duration: Second, freq: Double,
                               rampUp: Boolean = true, rampDown: Boolean = true): ByteBuffer {
-        val audioData = BufferUtils.createByteBuffer(duration.times(sampleRate).div(1000))
 
-        val realDuration = duration * sampleRate / 1000
+        TODO("with duration as Seconds")
+
+        val audioDataSize = duration.times(sampleRate).ceilInt()
+        val audioData = BufferUtils.createByteBuffer(audioDataSize)
+
+        /*val realDuration = duration * sampleRate / 1000
         val chopSize = freq / sampleRate
 
         val amp = Math.max(4600.0 / freq, 1.0)
@@ -505,13 +504,13 @@ class TerrarumComputer(peripheralSlots: Int) {
 
         // TODO volume ramping?
         if (freq == 0.0) {
-            for (x in 0..realDuration - 1) {
+            for (_ in 0..audioDataSize - 1) {
                 audioData.put(0x00.toByte())
             }
         }
         else if (freq < transitionThre) { // chopper generator (for low freq)
-            for (x in 0..realDuration - 1) {
-                var sine: Double = amp * Math.cos(Math.PI * 2 * x * chopSize)
+            for (tsart in 0..audioDataSize - 1) {
+                var sine: Double = amp * Math.cos(Math.PI * 2 * () * chopSize)
                 if (sine > 0.79) sine = 0.79
                 else if (sine < -0.79) sine = -0.79
                 audioData.put(
@@ -529,14 +528,14 @@ class TerrarumComputer(peripheralSlots: Int) {
                         (0.5 + 0.5 * sine).times(0xFF).roundInt().toByte()
                 )
             }
-        }
+        }*/
 
         audioData.rewind()
 
         return audioData
     }
 
-    private fun playTone(leninmilli: Int, freq: Double) {
+    private fun playTone(length: Second, freq: Double) {
         /*audioData = makeAudioData(leninmilli, freq)
 
 

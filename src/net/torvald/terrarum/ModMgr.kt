@@ -1,5 +1,7 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -114,6 +116,9 @@ object ModMgr {
     fun getPath(module: String, path: String): String {
         checkExistence(module)
         return "$modDir/$module/${path.sanitisePath()}"
+    }
+    fun getGdxFile(module: String, path: String): FileHandle {
+        return Gdx.files.internal(getPath(module, path))
     }
     fun getFile(module: String, path: String): File {
         checkExistence(module)

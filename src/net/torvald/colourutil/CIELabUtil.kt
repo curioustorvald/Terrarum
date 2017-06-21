@@ -6,7 +6,7 @@ import net.torvald.colourutil.CIEXYZUtil.toColor
 import net.torvald.colourutil.CIEXYZUtil.toRGB
 import net.torvald.colourutil.CIEXYZUtil.toXYZ
 import net.torvald.colourutil.CIELabUtil.toXYZ
-import org.newdawn.slick.Color
+import com.badlogic.gdx.graphics.Color
 
 /**
  * A modification of CIEXYZ that is useful for surface colours

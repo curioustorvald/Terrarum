@@ -1,14 +1,17 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
-import net.torvald.terrarum.Terrarum.joypadLabelNinA
-import net.torvald.terrarum.Terrarum.joypadLabelNinY
+import net.torvald.terrarum.TerrarumGDX.joypadLabelNinA
+import net.torvald.terrarum.TerrarumGDX.joypadLabelNinY
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.langpack.Lang
-import org.newdawn.slick.*
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
 /**
@@ -27,12 +30,12 @@ class UIInventory(
     //    get() = (actor as Actor).actorValue
 
     override var handler: UIHandler? = null
-    override var openCloseTime: Int = 120
+    override var openCloseTime: Second = 0.12f
 
     val catButtonsToCatIdent = HashMap<String, String>()
 
-    val backgroundColour = Color(0x80242424.toInt())
-    val defaultTextColour = Color(0xeaeaea)
+    val backgroundColour = Color(0x242424_80)
+    val defaultTextColour = Color(0xeaeaea_ff.toInt())
 
     init {
         catButtonsToCatIdent.put("GAME_INVENTORY_WEAPONS", GameItem.Category.WEAPON)
@@ -54,7 +57,7 @@ class UIInventory(
     val itemStripGutterH = 8
     val itemInterColGutter = 8
 
-    val controlHelpHeight = Terrarum.fontGame.lineHeight
+    val controlHelpHeight = TerrarumGDX.fontGame.lineHeight.toInt()
 
     val catButtons = UIItemTextButtonList(
             this,
@@ -77,12 +80,12 @@ class UIInventory(
             readFromLang = true,
             textAreaWidth = 100,
             defaultSelection = 0,
-            iconSpriteSheet = SpriteSheet("./assets/graphics/gui/inventory/category.tga", 20, 20),
+            iconSpriteSheet = TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20),
             iconSpriteSheetIndices = intArrayOf(9,6,7,1,0,2,3,4,5,8),
             iconCol = defaultTextColour,
             highlightBackCol = Color(0xb8b8b8),
             highlightBackBlendMode = BlendMode.MULTIPLY,
-            backgroundCol = Color(0,0,0,0), // will use custom background colour!
+            backgroundCol = Color(0), // will use custom background colour!
             backgroundBlendMode = BlendMode.NORMAL,
             kinematic = true,
             inactiveCol = defaultTextColour
@@ -113,7 +116,7 @@ class UIInventory(
 
     private val SP = "${0x3000.toChar()}${0x3000.toChar()}${0x3000.toChar()}"
     val listControlHelp: String
-        get() = if (Terrarum.environment == RunningEnvironment.PC)
+        get() = if (TerrarumGDX.environment == RunningEnvironment.PC)
             "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "${0xe011.toChar()}..${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
@@ -122,7 +125,7 @@ class UIInventory(
             "${0xe011.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "$joypadLabelNinA ${Lang["GAME_INVENTORY_DROP"]}"
     val listControlClose: String
-        get() = if (Terrarum.environment == RunningEnvironment.PC)
+        get() = if (TerrarumGDX.environment == RunningEnvironment.PC)
             "${0xe037.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
     else
             "${0xe069.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
@@ -132,8 +135,8 @@ class UIInventory(
     private var encumbrancePerc = 0f
     private var isEncumbered = false
 
-    override fun update(gc: GameContainer, delta: Int) {
-        catButtons.update(gc, delta)
+    override fun update(delta: Float) {
+        catButtons.update(delta)
 
         if (actor != null && inventory != null) {
             // monitor and check if category selection has been changed
@@ -155,47 +158,46 @@ class UIInventory(
 
     private val weightBarWidth = 60f
 
-    override fun render(gc: GameContainer, g: Graphics) {
+    override fun render(batch: SpriteBatch) {
         // background
         blendNormal()
-        g.color = backgroundColour
-        g.fillRect(0f, 0f, width.toFloat(), height.toFloat())
+        batch.color = backgroundColour
+        batch.fillRect(0f, 0f, width.toFloat(), height.toFloat())
 
 
         // cat bar background
         blendMul()
-        g.color = Color(0xcccccc)
-        g.fillRect(0f, 0f, catButtons.width.toFloat(), height.toFloat())
+        batch.color = Color(0xcccccc)
+        batch.fillRect(0f, 0f, catButtons.width.toFloat(), height.toFloat())
 
-
-        catButtons.render(gc, g)
+        catButtons.render(batch)
 
 
         items.forEach {
-            it.render(gc, g)
+            it.render(batch)
         }
 
         // texts
         blendNormal()
-        g.color = defaultTextColour
+        batch.color = defaultTextColour
         // W - close
-        g.drawString(listControlClose, 4f, height - controlHelpHeight.toFloat())
+        TerrarumGDX.fontGame.draw(batch, listControlClose, 4f, height - controlHelpHeight.toFloat())
         // MouseL - Use ; 1.9 - Register ; T - Drop
-        g.drawString(listControlHelp, catButtons.width + 4f, height - controlHelpHeight.toFloat())
+        TerrarumGDX.fontGame.draw(batch, listControlHelp, catButtons.width + 4f, height - controlHelpHeight.toFloat())
         // encumbrance
         if (inventory != null) {
             val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
 
-            g.drawString(
+            TerrarumGDX.fontGame.draw(batch,
                     encumbranceText,
-                    width - 9 - g.font.getWidth(encumbranceText) - weightBarWidth,
+                    width - 9 - TerrarumGDX.fontGame.getWidth(encumbranceText) - weightBarWidth,
                     height - controlHelpHeight.toFloat()
             )
 
             // encumbrance bar background
             blendMul()
-            g.color = Color(0xa0a0a0)
-            g.fillRect(
+            batch.color = Color(0xa0a0a0)
+            batch.fillRect(
                     width - 3 - weightBarWidth,
                     height - controlHelpHeight + 3f,
                     weightBarWidth,
@@ -203,8 +205,8 @@ class UIInventory(
             )
             // encumbrance bar
             blendNormal()
-            g.color = if (isEncumbered) Color(0xccff0000.toInt()) else Color(0xcc00ff00.toInt())
-            g.fillRect(
+            batch.color = if (isEncumbered) Color(0xccff0000.toInt()) else Color(0xcc00ff00.toInt())
+            batch.fillRect(
                     width - 3 - weightBarWidth,
                     height - controlHelpHeight + 3f,
                     if (actor?.inventory?.capacityMode == CAPACITY_MODE_NO_ENCUMBER)
@@ -293,23 +295,23 @@ class UIInventory(
     // Inputs //
     ////////////
 
-    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
+    override fun processInput(delta: Float) {
     }
 
-    override fun doOpening(gc: GameContainer, delta: Int) {
+    override fun doOpening(delta: Float) {
         UICanvas.doOpeningPopOut(handler, openCloseTime, UICanvas.Companion.Position.LEFT)
     }
 
-    override fun doClosing(gc: GameContainer, delta: Int) {
+    override fun doClosing(delta: Float) {
         UICanvas.doClosingPopOut(handler, openCloseTime, UICanvas.Companion.Position.LEFT)
 
     }
 
-    override fun endOpening(gc: GameContainer, delta: Int) {
+    override fun endOpening(delta: Float) {
         UICanvas.endOpeningPopOut(handler, UICanvas.Companion.Position.LEFT)
     }
 
-    override fun endClosing(gc: GameContainer, delta: Int) {
+    override fun endClosing(delta: Float) {
         UICanvas.endClosingPopOut(handler, UICanvas.Companion.Position.LEFT)
     }
 

@@ -71,11 +71,11 @@ class PcSpeakerDriver(val globals: Globals, host: TerrarumComputer) {
         /**
          * @param freq: number (hertz) or string (A-4, A4, B#2, ...)
          */
-        override fun call(millisec: LuaValue, freq: LuaValue): LuaValue {
+        override fun call(second: LuaValue, freq: LuaValue): LuaValue {
             if (freq.isnumber())
-                host.enqueueBeep(millisec.checkint(), freq.checkdouble())
+                host.enqueueBeep(second.checkdouble(), freq.checkdouble())
             else {
-                host.enqueueBeep(millisec.checkint(),
+                host.enqueueBeep(second.checkdouble(),
                         freq.checkjstring().toNoteIndex()
                                 .toFreq(host.luaJ_globals["speaker"]["__basefreq__"].checkdouble())
                 )

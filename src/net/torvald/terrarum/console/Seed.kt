@@ -1,19 +1,18 @@
 package net.torvald.terrarum.console
 
-import net.torvald.imagefont.GameFontBase
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumGDX
 
 /**
  * Created by minjaesong on 16-06-16.
  */
 internal object Seed : ConsoleCommand {
-    val ccG = GameFontBase.colToCode["g"]
-    val ccW = GameFontBase.colToCode["w"]
-    val ccY = GameFontBase.colToCode["y"]
+    val ccG = 0.toChar()//GameFontBase.colToCode["g"]
+    val ccW = 0.toChar()//GameFontBase.colToCode["w"]
+    val ccY = 0.toChar()//GameFontBase.colToCode["y"]
 
     override fun execute(args: Array<String>) {
-        Echo("Map$ccW: $ccG${Terrarum.ingame!!.world.generatorSeed}")
-        println("[seed] Map$ccW: $ccG${Terrarum.ingame!!.world.generatorSeed}")
+        Echo("Map$ccW: $ccG${TerrarumGDX.ingame!!.world.generatorSeed}")
+        println("[seed] Map$ccW: $ccG${TerrarumGDX.ingame!!.world.generatorSeed}")
         // TODO display randomiser seed
     }
 

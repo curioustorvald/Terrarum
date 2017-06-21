@@ -1,8 +1,6 @@
 package net.torvald.terrarum.ui
 
-import org.newdawn.slick.GameContainer
-import org.newdawn.slick.Graphics
-import org.newdawn.slick.Input
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
 /**
  * Created by SKYHi14 on 2017-03-13.
@@ -11,26 +9,26 @@ class NullUI : UICanvas {
     override var width: Int = 0
     override var height: Int = 0
     override var handler: UIHandler? = null
-    override var openCloseTime: Int = 0
+    override var openCloseTime = 0f
 
-    override fun update(gc: GameContainer, delta: Int) {
+    override fun update(delta: Float) {
     }
 
-    override fun render(gc: GameContainer, g: Graphics) {
+    override fun render(batch: SpriteBatch) {
     }
 
-    override fun processInput(gc: GameContainer, delta: Int, input: Input) {
+    override fun processInput(delta: Float) {
     }
 
-    override fun doOpening(gc: GameContainer, delta: Int) {
+    override fun doOpening(delta: Float) {
     }
 
-    override fun doClosing(gc: GameContainer, delta: Int) {
+    override fun doClosing(delta: Float) {
     }
 
-    override fun endOpening(gc: GameContainer, delta: Int) {
+    override fun endOpening(delta: Float) {
     }
 
-    override fun endClosing(gc: GameContainer, delta: Int) {
+    override fun endClosing(delta: Float) {
     }
 }
