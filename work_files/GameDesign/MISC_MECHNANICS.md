@@ -1,20 +1,4 @@
-
-##  Weapon tier  ##
-
-    Natural / Common  Stone -> Copper -> Iron -> Silver      ->        Titanium
-    Forging                                -------------->  Steel  --------^
-    Exotic ('elven')                 Glass                     Aurichalcum
-    Special (something 'adamant')                                              ??? (Use material spec of CNT, tensile strength 180 GPa)
-
-* Metal graphics
-    - Gold: Hue 43, low Saturation
-    - Aurichalcum: Hue 43, mid-high Saturation
-    - Copper: Hue 33,
-    - Copper rust: Hue 160
-    - Iron rust: Hue 21
-
-
-##  Size variation  ##
+## size variation of tools/weapons/etc.
 
 Race base weapon/tool size <- 10 [kg]
 Size tolerance <- (50% * str/1000), or say, 20%
@@ -26,18 +10,6 @@ Small weapons/tools gains no (dis)advantage
 When drawing: scale by (craftedWeaponSize / baseWeaponSize)
 
 Crafted tool/weapon size is dependent to the baseRaceMass.
-
-
-##  Gemstone tier  ##
-
-Topaz -> R·G·B -> Diamond·Amethyst
-
-Gemstones go elemental?! (pretty generic but otherwise there are no motivations to willingly collect them...)
-
-- Ruby: grants fire resist
-- Sapphire: grants cold resist
-- Amethyst or **Topaz**: grants shock resist
-- *two left boy!*
 
 
 ##  Colouring  ##
@@ -110,10 +82,6 @@ NOTE: cyan is a tricky colour for deuterans; will be inextinguishable between gr
 
 * Base mass: 60 kg
 
-
-##  Food/Potion dose  ##
-
-Scale ^ 3 ^ (3/4) == (ThisWgt / TargetWgt) ^ (3/4)
 
 
 ##  (De)serialisation  ##
