@@ -124,10 +124,10 @@ object WeatherMixer {
                     0f, 0f,
                     Gdx.graphics.width.toFloat(),// / TerrarumGDX.ingame!!.screenZoom,
                     Gdx.graphics.height.toFloat(),// / TerrarumGDX.ingame!!.screenZoom
-                    getGradientColour(skyboxColourMap, 0, timeNow),
-                    getGradientColour(skyboxColourMap, 0, timeNow),
                     getGradientColour(skyboxColourMap, 1, timeNow),
-                    getGradientColour(skyboxColourMap, 1, timeNow)
+                    getGradientColour(skyboxColourMap, 1, timeNow),
+                    getGradientColour(skyboxColourMap, 0, timeNow),
+                    getGradientColour(skyboxColourMap, 0, timeNow)
             )
         }
         batch.begin()
