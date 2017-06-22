@@ -40,10 +40,12 @@ fun main(args: Array<String>) {
     val config = LwjglApplicationConfiguration()
     config.foregroundFPS = TerrarumGDX.RENDER_FPS
     config.backgroundFPS = TerrarumGDX.RENDER_FPS
-    config.vSyncEnabled = true
+    //config.vSyncEnabled = true
     config.resizable = false
     config.width = 1072
     config.height = 742
+    config.backgroundFPS = 9999
+    config.foregroundFPS = 9999
     config.title = GAME_NAME
 
     LwjglApplication(TerrarumGDX, config)
