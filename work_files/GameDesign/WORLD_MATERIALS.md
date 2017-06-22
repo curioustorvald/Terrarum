@@ -22,6 +22,12 @@ Metals are used to make furnitures, tools, armour and weapons.
 |Tin|Advanced wood (makes furnitures and things)||
 |Gold|Bling-bling, advanced electronics (semiconductor)|
 
+TODO: if we can boil water, and can use it to produce electricity THEN add following
+
+|Name|Usage|Remarks|
+|----|-----|-------|
+|Uranium|To boil water efficiently than lava|Uranium ore (to be specific, uranium oxide) has yellow colour; the metal has silver-grey colour|
+
 
 
 ### Weapon Tier

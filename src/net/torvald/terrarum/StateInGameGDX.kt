@@ -385,28 +385,28 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
 
         /** RENDER CODE GOES HERE */
-        renderGame(batch, delta)
+        renderGame(batch)
     }
 
 
-    private fun renderGame(batch: SpriteBatch, delta: Float) {
+    private fun renderGame(batch: SpriteBatch) {
         Gdx.gl.glClearColor(.157f, .157f, .157f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        camera.position.set(-WorldCamera.x.toFloat(), -WorldCamera.y.toFloat(), 0f) // make camara work
-
-        batch.projectionMatrix = camera.combined
+        //camera.position.set(-WorldCamera.x.toFloat(), -WorldCamera.y.toFloat(), 0f) // make camara work
+        //camera.position.set(0f, 0f, 0f) // make camara work
+        //batch.projectionMatrix = camera.combined
 
         TerrarumGDX.GLOBAL_RENDER_TIMER += 1
 
 
         // clean the shit beforehand
         worldDrawFrameBuffer.inAction {
-            Gdx.gl.glClearColor(0f,0f,0f,1f)
+            Gdx.gl.glClearColor(0f,0f,0f,0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         }
         backDrawFrameBuffer.inAction {
-            Gdx.gl.glClearColor(0f,0f,0f,1f)
+            Gdx.gl.glClearColor(0f,0f,0f,0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         }
 
@@ -414,18 +414,26 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
 
         blendNormal()
-        backDrawFrameBuffer.inAction {
-            batch.inUse {
-                WeatherMixer.render(batch) // drawing to gwin so that any lights from lamp wont "leak" to the skybox
-                // e.g. Bright blue light on sunset
-            }
+        camera.position.set(0f, 0f, 0f) // make camara work
+        batch.projectionMatrix = camera.combined
+        batch.inUse {
+
+            WeatherMixer.render(batch) // drawing to gwin so that any lights from lamp wont "leak" to the skybox
+            // e.g. Bright blue light on sunset
         }
-        blendNormal()
+
+
+
 
         /////////////////////////////
         // draw map related stuffs //
         /////////////////////////////
         worldDrawFrameBuffer.inAction {
+            // FIXME wrong and flipped coord; one camera code does not concern other
+
+            camera.position.set(-WorldCamera.x.toFloat(), -WorldCamera.y.toFloat(), 0f) // make camara work
+            batch.projectionMatrix = camera.combined
+
             batch.inUse {
                 BlocksDrawer.renderWall(batch)
                 actorsRenderBehind.forEach { it.drawBody(batch) }
@@ -529,6 +537,10 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // GUI Predraw //
         /////////////////
         //worldG.flush()
+        batch.inUse {
+            val tex = backDrawFrameBuffer.colorBufferTexture // TODO zoom!
+            batch.draw(tex, 0f, 0f)
+        }
         //backG.drawImage(worldDrawFrameBuffer.getScaledCopy(screenZoom), 0f, 0f)
         //backG.flush()
 
@@ -536,13 +548,13 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         /////////////////////
         // draw UIs  ONLY! //
         /////////////////////
-        batch.inUse {
+        /*batch.inUse {
             uiContainer.forEach { if (it != consoleHandler) it.render(batch) }
             debugWindow.render(batch)
             // make sure console draws on top of other UIs
             consoleHandler.render(batch)
             notifier.render(batch)
-        }
+        }*/
 
 
         //////////////////
@@ -550,6 +562,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         //////////////////
         //backG.flush()
         //gwin.drawImage(backDrawFrameBuffer, 0f, 0f)
+
+
 
         // centre marker
         /*gwin.color = Color(0x00FFFF)
