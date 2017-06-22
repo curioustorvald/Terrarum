@@ -38,24 +38,9 @@
 * 24 pixels == 1 metre
 
 
-## Purpose of the game
+## Purpose of the game (given to the player, explicitly)
 
-* Boss
-    - Will be mentioned/shown as absolute _evil_.
-    - But actually is not.
-
-* Theme
-    - Is an evil really really is what we think?
-    - Is there a thing as 'absolute evil'?
-
-* Boss character
-    - From debugger character
-    - Name key: "Sigriðr hinn Dróttningin" (can be changed)
-    * Little setting
-        - A ruler, hated by people
-
-* Mechanics
-    - Beating boss does not ends the game, but grants an ability to
-      create new character as it.
-    
-...We need to re-think about it. —Torvald, 2017-04-30
+* Survival
+* Take care of/Kill the fuck out of people in the village (players will provide themselves a purpose)
+    - You can make your own settlement (DF fortress mode)
+* Go find/Exploit/Wipe out secrets of the world (players' choice)
