@@ -536,11 +536,13 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         /////////////////////
         // draw UIs  ONLY! //
         /////////////////////
-        uiContainer.forEach { if (it != consoleHandler) it.render(batch) }
-        debugWindow.render(batch)
-        // make sure console draws on top of other UIs
-        consoleHandler.render(batch)
-        notifier.render(batch)
+        batch.inUse {
+            uiContainer.forEach { if (it != consoleHandler) it.render(batch) }
+            debugWindow.render(batch)
+            // make sure console draws on top of other UIs
+            consoleHandler.render(batch)
+            notifier.render(batch)
+        }
 
 
         //////////////////
