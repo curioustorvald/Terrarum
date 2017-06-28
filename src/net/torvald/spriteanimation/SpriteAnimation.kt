@@ -93,7 +93,6 @@ class SpriteAnimation(val parentActor: ActorWithPhysics) {
 
         if (visible) {
             val region = textureRegion.get(currentRow, currentFrame)
-            region.flip(flipHorizontal, !flipVertical)
             batch.color = colorFilter
 
             batch.draw(region,

@@ -16,6 +16,10 @@ object WorldCamera {
         private set
     var y: Int = 0
         private set
+    var gdxCamX: Float = 0f
+        private set
+    var gdxCamY: Float = 0f
+        private set
     var width: Int = 0
         private set
     var height: Int = 0
@@ -42,6 +46,14 @@ object WorldCamera {
                     world!!.height * TILE_SIZE - height - TILE_SIZE.toFloat()
             ))
 
+
+            gdxCamX = Math.round(// X only: ROUNDWORLD implementation
+                    (player?.hitbox?.centeredX?.toFloat() ?: 0f)).toFloat()
+            gdxCamY = Math.round(FastMath.clamp(
+                    (player?.hitbox?.centeredY?.toFloat() ?: 0f),
+                    TILE_SIZE.toFloat(),
+                    world!!.height * TILE_SIZE - height - TILE_SIZE.toFloat()
+            )).toFloat()
         }
     }
 }
