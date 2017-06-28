@@ -1,6 +1,6 @@
 Savegame metadata
 
-* Endianness: big
+* Endianness: LITTLE
 * Filename: 'world'
 * Remarks: GZipped
 

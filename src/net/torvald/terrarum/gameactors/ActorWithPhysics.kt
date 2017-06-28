@@ -323,6 +323,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     override fun update(delta: Float) {
         if (isUpdate && !flagDespawn) {
 
+            hitbox.translate(0.0, 2.0)
+
+
+
             if (!assertPrinted) assertInit()
 
             if (sprite != null) sprite!!.update(delta)
@@ -1317,7 +1321,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
 
-    private inline fun forEachOccupyingTileNum(consumer: (Int?) -> Unit) {
+    private fun forEachOccupyingTileNum(consumer: (Int?) -> Unit) {
         val tiles = ArrayList<Int?>()
         for (y in tilewiseHitbox.startY.toInt()..tilewiseHitbox.endY.toInt()) {
             for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
@@ -1328,7 +1332,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         return tiles.forEach(consumer)
     }
 
-    private inline fun forEachOccupyingTile(consumer: (BlockProp?) -> Unit) {
+    private fun forEachOccupyingTile(consumer: (BlockProp?) -> Unit) {
         val tileProps = ArrayList<BlockProp?>()
         for (y in tilewiseHitbox.startY.toInt()..tilewiseHitbox.endY.toInt()) {
             for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
@@ -1339,7 +1343,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         return tileProps.forEach(consumer)
     }
 
-    private inline fun forEachOccupyingTilePos(hitbox: Hitbox, consumer: (BlockAddress) -> Unit) {
+    private fun forEachOccupyingTilePos(hitbox: Hitbox, consumer: (BlockAddress) -> Unit) {
         val newTilewiseHitbox =  Hitbox.fromTwoPoints(
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
@@ -1357,7 +1361,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         return tilePosList.forEach(consumer)
     }
 
-    private inline fun forEachFeetTileNum(consumer: (Int?) -> Unit) {
+    private fun forEachFeetTileNum(consumer: (Int?) -> Unit) {
         val tiles = ArrayList<Int?>()
 
         // offset 1 pixel to the down so that friction would work
@@ -1370,7 +1374,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         return tiles.forEach(consumer)
     }
 
-    private inline fun forEachFeetTile(consumer: (BlockProp?) -> Unit) {
+    private fun forEachFeetTile(consumer: (BlockProp?) -> Unit) {
         val tileProps = ArrayList<BlockProp?>()
 
         // offset 1 pixel to the down so that friction would work

@@ -1,16 +1,3 @@
-## size variation of tools/weapons/etc.
-
-Race base weapon/tool size <- 10 [kg]
-Size tolerance <- (50% * str/1000), or say, 20%
-
-If the size is bigger than tolerable, weapon speed severely slows down, tools become unusable
-    if use time >* 0.75 second, the weapon/tool cannot be equipped.
-Small weapons/tools gains no (dis)advantage
-
-When drawing: scale by (craftedWeaponSize / baseWeaponSize)
-
-Crafted tool/weapon size is dependent to the baseRaceMass.
-
 
 ##  Colouring  ##
 
@@ -36,18 +23,6 @@ Things are colour-keyed so that players would get the idea by just a glance.
 
 
 NOTE: cyan is a tricky colour for deuterans; will be inextinguishable between greys!
-
-
-##  Roguelike identity  ##
-
-* Randomised things
-    - E.g. potion
-        Lime-coloured potion
-        First play: "Potion (???)"
-        After drank: "Potion (Healing)" is revealed.
-
-        Second (new) play: "Potion (???)"
-        After drank: "Potion (Neurotoxin)" is revealed.
 
 
 ##  Making sprite  ##

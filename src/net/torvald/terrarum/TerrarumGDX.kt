@@ -599,12 +599,6 @@ infix fun Color.minus(other: Color) = Color( // don't turn into an operator!
 )
 
 fun Int.toHex() = this.toLong().and(0xFFFFFFFF).toString(16).padStart(8, '0').toUpperCase()
-fun Long.toHex() = {
-    val sb = StringBuilder()
-    (0..16).forEach {
-
-    }
-}
 
 
 

@@ -203,7 +203,7 @@ import java.util.*
                     rgba, 0,
                     rgba.size - displacement
             )
-            (rgba.size - 1 downTo rgba.size - displacement + 1).forEach { rgba[it] = 0.toByte() }
+            for (it in rgba.size - 1 downTo rgba.size - displacement + 1) { rgba[it] = 0.toByte() }
         }
         else {
             System.arraycopy(
@@ -211,7 +211,7 @@ import java.util.*
                     rgba, displacement,
                     rgba.size - displacement
             )
-            (0..displacement - 1).forEach { rgba[it] = 0.toByte() }
+            for (it in 0..displacement - 1) { rgba[it] = 0.toByte() }
         }
 
         cursorY += -amount

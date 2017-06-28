@@ -1,0 +1,51 @@
+Paper tape format header
+
+* Endianness: LITTLE
+
+'T '8 'p 't id en ti er     // Terrarum 8-Bit punched tape;
+<payloads>                  // identifier: unique 32-bit int used by app
+
+================================================================================
+Music tape format
+
+* 8 bytes make one tape row
+
+identifier: 0x41 AB 41 EC   // mabl_mek (marble machine)
+
+## Payloads:
+
+sp ed 00 00 00 00 00 00     // speed: ticks per minutes [1..65535]
+
+na me of th e- mu si c0     // name of the music
+mu st be th ir ty tw o-     // 32 bytes long, padded with null(s)
+by te s- lo ng pa dd ed
+by nu ll ch ar ac te r0
+
+na me of th e- au th or     // name of the author
+tw en ty fo ur by te s-     // 24 bytes long, padded with null(s)
+lo ng pa dd ed by nu ll
+
+## Music data:
+
+bb bb bb bb bb bb bb bb     // 64 bits make one tick
+
+^^ Bit 60       Bit 0 ^
+|Highest         Lowest
+|Note              Note
+|(C6)              (C1)
+3 bits are program notes, which are:
+- 000 : NOP
+- 001 : (unused)
+- 010 : Halve the speed (applied to next tick)
+- 011 : Double the speed (applied to next tick)
+- 100 : Quarter the speed (applied to next tick)
+- 101 : Quadruple the speed (applied to next tick)
+- 110 : (unused)
+- 111 : Play current tick and halt
+
+================================================================================
+Computer tape format
+
+identifier: 0x7E 12 2A C0
+
+## Payloads: bytes
