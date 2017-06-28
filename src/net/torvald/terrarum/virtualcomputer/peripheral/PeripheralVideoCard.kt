@@ -289,11 +289,11 @@ import java.util.*
     }
 
     fun drawRectBack(x: Int, y: Int, w: Int, h: Int, c: Int = color) {
-        (0..w - 1).forEach {
+        for (it in 0..w - 1) {
             vram.setBackgroundPixel(x + it, y, c)
             vram.setBackgroundPixel(x + it, y + h - 1, c)
         }
-        (1..h - 2).forEach {
+        for (it in 1..h - 2) {
             vram.setBackgroundPixel(x, y + it, c)
             vram.setBackgroundPixel(x + w - 1, y + it, c)
         }
@@ -306,11 +306,11 @@ import java.util.*
     }
 
     fun drawRectFore(x: Int, y: Int, w: Int, h: Int, c: Int = color) {
-        (0..w - 1).forEach {
+        for (it in 0..w - 1) {
             vram.setForegroundPixel(x + it, y, c)
             vram.setForegroundPixel(x + it, y + h - 1, c)
         }
-        (1..h - 2).forEach {
+        for (it in 1..h - 2) {
             vram.setForegroundPixel(x, y + it, c)
             vram.setForegroundPixel(x + w - 1, y + it, c)
         }

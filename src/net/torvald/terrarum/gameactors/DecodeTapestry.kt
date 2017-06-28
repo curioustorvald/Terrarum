@@ -125,7 +125,7 @@ object DecodeTapestry {
         if (colourModel != FORMAT_16 && colourModel != FORMAT_64)
             throw RuntimeException("Invalid colour model: $colourModel")
 
-        val width = file[6].toUint().shl(8) + file[7].toUint()
+        val width = file[7].toUint().shl(8) + file[6].toUint()
 
         val artNameBytes = ArrayList<Byte>()
         val authorNameBytes = ArrayList<Byte>()

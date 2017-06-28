@@ -1,6 +1,6 @@
 Terrarum User Art format
 
-* Endianness: big
+* Endianness: LITTLE
 
 * Palette colour is encoded as 0b0000RRRR 0bGGGGBBBB (yep, four bits are wasted)
 
@@ -21,8 +21,8 @@ Ord  Hex  Description
         - 256 colours (using user-defined)
      nn - Colour count (1-255)
 
-06        Width of the image (MSB)
-07        Width of the image (LSB)
+06        Width of the image (LSB)
+07        Width of the image (MSB)
 
 08        Name of the art in UTF-8
 ...  00   String terminator
@@ -30,12 +30,12 @@ Ord  Hex  Description
 ...       Name of the author in UTF-8
 ...  00   String terminator
 
-...       Palette colour 0, if any (MSB)
-...       Palette colour 0, if any (LSB)
-...       Palette colour 1, if any (MSB)
-...       Palette colour 1, if any (LSB)
-...       Palette colour 2, if any (MSB)
-...       Palette colour 2, if any (LSB)
+...       Palette colour 0, if any (0R)
+...       Palette colour 0, if any (GB)
+...       Palette colour 1, if any (0R)
+...       Palette colour 1, if any (GB)
+...       Palette colour 2, if any (0R)
+...       Palette colour 2, if any (GB)
 
 ...       Colour indices
 

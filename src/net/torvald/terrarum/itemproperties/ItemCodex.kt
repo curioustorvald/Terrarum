@@ -32,7 +32,6 @@ object ItemCodex {
     val ITEM_DYNAMIC = 32768..0x0FFF_FFFF
     val ACTORID_MIN = ITEM_DYNAMIC.endInclusive + 1
 
-
     private val itemImagePlaceholder = TextureRegion(Texture("./assets/item_kari_24.tga"))
 
 
