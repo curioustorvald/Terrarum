@@ -101,7 +101,7 @@ object BlocksDrawer {
         val tileItemImgPixMap = Pixmap(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16, Pixmap.Format.RGBA8888)
         tileItemImgPixMap.pixels.rewind()
 
-        (ITEM_TILES).forEach { tileID ->
+        for (tileID in ITEM_TILES) {
 
             val tile = tilesTerrain.get((tileID % 16) * 16, (tileID / 16))
 

@@ -158,10 +158,10 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         }
 
         // Create camera with the desired resolution
-        camera = OrthographicCamera(width, height)
+        //camera = OrthographicCamera(width, height)
 
         // Move camera center to push 0,0 into the corner
-        camera.translate(width / 2, height / 2)
+        //camera.translate(width / 2, height / 2)
 
         // Set Y to point downwards
         camera.setToOrtho(true, width, height)
@@ -181,6 +181,9 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
 
     fun enter() {
+        initViewPort(Gdx.graphics.width, Gdx.graphics.height, Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
+
+
         // load things when the game entered this "state"
         // load necessary shaders
         //shader12BitCol = Shader.makeShader("./assets/4096.vert", "./assets/4096.frag")
@@ -414,27 +417,47 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
 
         blendNormal()
-        camera.position.set(0f, 0f, 0f) // make camara work
-        batch.projectionMatrix = camera.combined
         batch.inUse {
+            camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
+            camera.update()
+            batch.projectionMatrix = camera.combined
 
             WeatherMixer.render(batch) // drawing to gwin so that any lights from lamp wont "leak" to the skybox
             // e.g. Bright blue light on sunset
+
+
+            LightmapRenderer.renderLightMap()
+
+            BlocksDrawer.renderWall(batch)
+            BlocksDrawer.renderTerrain(batch)
+
+
+            batch.color = Color.WHITE
+            player?.drawBody(batch)
         }
 
+
+        println("Player: (${player?.hitbox?.centeredX}, ${player?.hitbox?.centeredY})")
 
 
 
         /////////////////////////////
         // draw map related stuffs //
         /////////////////////////////
-        worldDrawFrameBuffer.inAction {
+        /*worldDrawFrameBuffer.inAction {
             // FIXME wrong and flipped coord; one camera code does not concern other
 
-            camera.position.set(-WorldCamera.x.toFloat(), -WorldCamera.y.toFloat(), 0f) // make camara work
-            batch.projectionMatrix = camera.combined
-
             batch.inUse {
+                camera.position.set(WorldCamera.x.toFloat(), WorldCamera.y.toFloat(), 0f) // make camara work
+                camera.update()
+                batch.projectionMatrix = camera.combined
+
+
+                batch.color = Color.WHITE
+                batch.fillRect(WorldCamera.x.toFloat(), WorldCamera.y.toFloat(), 16f, 16f)
+
+
+
                 BlocksDrawer.renderWall(batch)
                 actorsRenderBehind.forEach { it.drawBody(batch) }
                 actorsRenderBehind.forEach { it.drawGlow(batch) }
@@ -540,7 +563,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         batch.inUse {
             val tex = backDrawFrameBuffer.colorBufferTexture // TODO zoom!
             batch.draw(tex, 0f, 0f)
-        }
+        }*/
         //backG.drawImage(worldDrawFrameBuffer.getScaledCopy(screenZoom), 0f, 0f)
         //backG.flush()
 

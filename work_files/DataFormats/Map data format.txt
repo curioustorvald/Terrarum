@@ -1,6 +1,6 @@
 Terrarum Game Map Format
 
-* Endianness: big
+* Endianness: LITTLE
 
 Ord  Hex  Description
 00   54   T
