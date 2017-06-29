@@ -484,18 +484,11 @@ object BlocksDrawer {
                         else {
                             zeroTileCounter++ // unused for now
 
-                            GL11.glColor4f(0f, 0f, 0f, 1f)
+                            batch.color = Color.BLACK
 
-                            GL11.glTexCoord2f(0f, 0f)
-                            GL11.glVertex3f(x * TILE_SIZE.toFloat(), y * TILE_SIZE.toFloat(), 0f)
-                            GL11.glTexCoord2f(0f, 0f + TILE_SIZE)
-                            GL11.glVertex3f(x * TILE_SIZE.toFloat(), (y + 1) * TILE_SIZE.toFloat(), 0f)
-                            GL11.glTexCoord2f(0f + TILE_SIZE, 0f + TILE_SIZE)
-                            GL11.glVertex3f((x + 1) * TILE_SIZE.toFloat(), (y + 1) * TILE_SIZE.toFloat(), 0f)
-                            GL11.glTexCoord2f(0f + TILE_SIZE, 0f)
-                            GL11.glVertex3f((x + 1) * TILE_SIZE.toFloat(), y * TILE_SIZE.toFloat(), 0f)
+                            batch.fillRect(x.toFloat(), y.toFloat(), TILE_SIZEF, TILE_SIZEF)
 
-                            GL11.glColor4f(1f, 1f, 1f, 1f)
+                            batch.color = Color.WHITE
                         }
                     } // end if (not an air)
                 } catch (e: NullPointerException) {

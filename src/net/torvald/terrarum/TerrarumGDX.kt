@@ -46,6 +46,7 @@ fun main(args: Array<String>) {
     config.height = 742
     config.backgroundFPS = 9999
     config.foregroundFPS = 9999
+    //config.useGL30 = true
     config.title = GAME_NAME
 
     LwjglApplication(TerrarumGDX, config)
@@ -491,7 +492,7 @@ object TerrarumGDX : ApplicationAdapter() {
 
 }
 
-inline fun Batch.inUse(action: (Batch) -> Unit) {
+inline fun SpriteBatch.inUse(action: (SpriteBatch) -> Unit) {
     this.begin()
     action(this)
     this.end()

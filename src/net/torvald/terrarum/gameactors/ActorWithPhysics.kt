@@ -34,7 +34,7 @@ typealias Second = Float
 open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean = false, physics: Boolean = true) : ActorWithBody(renderOrder) {
 
 
-    val COLLISION_TEST_MODE = true
+    val COLLISION_TEST_MODE = false
 
     /** !! ActorValue macros are on the very bottom of the source !! **/
 
@@ -323,10 +323,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     override fun update(delta: Float) {
         if (isUpdate && !flagDespawn) {
 
-            hitbox.translate(0.0, 2.0)
-
-
-
             if (!assertPrinted) assertInit()
 
             if (sprite != null) sprite!!.update(delta)
@@ -338,6 +334,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 isNoCollideWorld = isPlayerNoClip
                 isNoSubjectToFluidResistance = isPlayerNoClip
             }
+
 
             ////////////////////////////////////////////////////////////////
             // Codes that modifies velocity (moveDelta and externalForce) //
@@ -488,6 +485,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      * Apply only if not grounded; normal force is precessed separately.
      */
     private fun applyGravitation() {
+
         if (!isNoSubjectToGrav && !(gravitation.y > 0 && walledBottom || gravitation.y < 0 && walledTop)) {
             //if (!isWalled(hitbox, COLLIDING_BOTTOM)) {
             /**
