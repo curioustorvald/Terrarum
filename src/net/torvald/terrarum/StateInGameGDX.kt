@@ -416,24 +416,85 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
 
 
+        worldDrawFrameBuffer.inAction {
+            batch.inUse {
+                camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
+                camera.update()
+                batch.projectionMatrix = camera.combined
+
+
+
+                blendNormal()
+
+
+
+                BlocksDrawer.renderWall(batch)
+                actorsRenderBehind.forEach { it.drawBody(batch) }
+                actorsRenderBehind.forEach { it.drawGlow(batch) }
+                particlesContainer.forEach { it.drawBody(batch) }
+                particlesContainer.forEach { it.drawGlow(batch) }
+                BlocksDrawer.renderTerrain(batch)
+
+                /////////////////
+                // draw actors //
+                /////////////////
+                actorsRenderMiddle.forEach { it.drawBody(batch) }
+                actorsRenderMidTop.forEach { it.drawBody(batch) }
+                player?.drawBody(batch)
+                actorsRenderFront.forEach { it.drawBody(batch) }
+                // --> Change of blend mode <-- introduced by childs of ActorWithBody //
+
+
+                /////////////////////////////
+                // draw map related stuffs //
+                /////////////////////////////
+                LightmapRenderer.renderLightMap()
+
+                //BlocksDrawer.renderFront(batch, false)
+                // --> blendNormal() <-- by BlocksDrawer.renderFront
+                //FeaturesDrawer.render(batch)
+
+
+                //FeaturesDrawer.drawEnvOverlay(batch)
+
+                //if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul()
+                //else blendNormal()
+                //blendMul()
+                //LightmapRenderer.draw(batch)
+
+
+
+                //////////////////////
+                // draw actor glows //
+                //////////////////////
+                // needs some new blending/shader for glow...
+
+                //actorsRenderMiddle.forEach { it.drawGlow(batch) }
+                //actorsRenderMidTop.forEach { it.drawGlow(batch) }
+                player?.drawGlow(batch)
+                //actorsRenderFront.forEach { it.drawGlow(batch) }
+                // --> blendLightenOnly() <-- introduced by childs of ActorWithBody //
+
+
+            }
+        }
+
+
+
+        /////////////////////////////////
+        // draw framebuffers to screen //
+        /////////////////////////////////
         blendNormal()
         batch.inUse {
-            camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
+            camera.position.set(TerrarumGDX.HALFW.toFloat(), TerrarumGDX.HALFH.toFloat(), 0f) // make camara work
             camera.update()
             batch.projectionMatrix = camera.combined
 
-            WeatherMixer.render(batch) // drawing to gwin so that any lights from lamp wont "leak" to the skybox
-            // e.g. Bright blue light on sunset
 
+            WeatherMixer.render(batch)
 
-            LightmapRenderer.renderLightMap()
-
-            BlocksDrawer.renderWall(batch)
-            BlocksDrawer.renderTerrain(batch)
-
-
-            batch.color = Color.WHITE
-            player?.drawBody(batch)
+            val tex = worldDrawFrameBuffer.colorBufferTexture // TODO zoom!
+            batch.draw(tex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         }
 
 
