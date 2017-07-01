@@ -9,7 +9,6 @@ package net.torvald.terrarum.gameactors
 interface Controllable {
 
     fun processInput(delta: Float)
-
-    fun keyPressed(key: Int, c: Char)
+    fun keyDown(keycode: Int): Boolean
 
 }

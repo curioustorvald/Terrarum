@@ -1,6 +1,7 @@
 package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -14,7 +15,6 @@ import net.torvald.terrarum.console.*
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.gamecontroller.GameController
-import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
@@ -31,7 +31,6 @@ import java.util.concurrent.locks.ReentrantLock
 import javax.swing.JOptionPane
 
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
@@ -82,8 +81,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     private val useShader: Boolean = false
     private val shaderProgram = 0
 
-    val KEY_LIGHTMAP_RENDER = Key.F7
-    val KEY_LIGHTMAP_SMOOTH = Key.F8
+    val KEY_LIGHTMAP_RENDER = Input.Keys.F7
+    val KEY_LIGHTMAP_SMOOTH = Input.Keys.F8
 
 
 
@@ -181,6 +180,9 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
 
     fun enter() {
+        Gdx.input.inputProcessor = GameController
+
+
         initViewPort(Gdx.graphics.width, Gdx.graphics.height, Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
 
 
@@ -496,9 +498,6 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             val tex = worldDrawFrameBuffer.colorBufferTexture // TODO zoom!
             batch.draw(tex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         }
-
-
-        println("Player: (${player?.hitbox?.centeredX}, ${player?.hitbox?.centeredY})")
 
 
 

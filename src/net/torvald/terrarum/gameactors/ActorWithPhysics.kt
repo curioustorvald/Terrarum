@@ -541,11 +541,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
         fun debug1(wut: Any?) {
             //  vvvvv  set it true to make debug print work
-            if (true) println(wut)
+            if (false) println(wut)
         }
         fun debug2(wut: Any?) {
             //  vvvvv  set it true to make debug print work
-            if (true) println(wut)
+            if (false) println(wut)
         }
         fun debug3(wut: Any?) {
             //  vvvvv  set it true to make debug print work
@@ -553,7 +553,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
         fun debug4(wut: Any?) {
             //  vvvvv  set it true to make debug print work
-            if (true) println(wut)
+            if (false) println(wut)
         }
         fun Double.modTile() = this.toInt().div(TILE_SIZE).times(TILE_SIZE)
         fun Double.modTileDelta() = this - this.modTile()
@@ -616,7 +616,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
         // collision detected
         else {
-            println("== Collision step: $collidingStep / $ccdSteps")
+            debug1("== Collision step: $collidingStep / $ccdSteps")
 
 
             val newHitbox = hitbox.reassign(sixteenStep[collidingStep])
@@ -629,14 +629,14 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             // fixme UP and RIGHT && LEFT and DOWN bug
 
-            println("Collision type: $selfCollisionStatus")
+            debug1("Collision type: $selfCollisionStatus")
             affectingTiles.forEach {
                 val tileCoord = LandUtil.resolveBlockAddr(it)
-                println("affectign tile: ${tileCoord.first}, ${tileCoord.second}")
+                debug1("affectign tile: ${tileCoord.first}, ${tileCoord.second}")
             }
 
             when (selfCollisionStatus) {
-                0 -> { println("[ActorWithPhysics] Contradiction -- collision detected by CCD, but isWalled() says otherwise") }
+                0 -> { debug1("[ActorWithPhysics] Contradiction -- collision detected by CCD, but isWalled() says otherwise") }
                 5 ->  { zeroX = true }
                 10 -> { zeroY = true }
                 15 -> { newHitbox.reassign(sixteenStep[0]); zeroX = true; zeroY = true }
@@ -647,13 +647,13 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 2, 7  -> { newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())  ; bounceY = true }
                 // two-side collision
                 3 -> {
-                    println("translateX: ${(TILE_SIZE - newHitbox.startX.modTileDelta()).rem(TILE_SIZE)}")
+                    debug1("translateX: ${(TILE_SIZE - newHitbox.startX.modTileDelta()).rem(TILE_SIZE)}")
                     newHitbox.translatePosX((TILE_SIZE - newHitbox.startX.modTileDelta()).rem(TILE_SIZE))
                     newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())
                     bounceX = true; bounceY = true
                 }
                 6 -> {
-                    println("translateX: ${(          - newHitbox.endX.modTileDelta())}")
+                    debug1("translateX: ${(          - newHitbox.endX.modTileDelta())}")
                     newHitbox.translatePosX(          - newHitbox.endX.modTileDelta())
                     newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())
                     bounceX = true; bounceY = true
@@ -664,7 +664,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                     bounceX = true; bounceY = true
                 }
                 12 -> {
-                    println("translateY: ${(TILE_SIZE - newHitbox.startY.modTileDelta()).rem(TILE_SIZE)}")
+                    debug1("translateY: ${(TILE_SIZE - newHitbox.startY.modTileDelta()).rem(TILE_SIZE)}")
                     newHitbox.translatePosX(          - newHitbox.endX.modTileDelta())
                     newHitbox.translatePosY((TILE_SIZE - newHitbox.startY.modTileDelta()).rem(TILE_SIZE))
                     bounceX = true; bounceY = true
@@ -672,7 +672,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             }
 
             if (selfCollisionStatus in listOf(3,6,9,12)) {
-                println("twoside collision $selfCollisionStatus")
+                debug1("twoside collision $selfCollisionStatus")
             }
 
 
@@ -702,7 +702,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
             val collisionDamage = mass * (vectorSum.magnitude / (10.0 / TerrarumGDX.TARGET_FPS).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
             // kg * m / s^2 (mass * acceleration), acceleration -> (vectorMagn / (0.01)^2).gameToSI()
-            if (collisionDamage != 0.0) println("Collision damage: $collisionDamage N")
+            if (collisionDamage != 0.0) debug1("Collision damage: $collisionDamage N")
+            // FIXME instead of 0.5mv^2, we can model after "change of velocity (aka accel)", just as in real-life; big change of accel on given unit time is what kills
 
 
             // grounded = true
