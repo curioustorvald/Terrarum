@@ -95,12 +95,38 @@ class SpriteAnimation(val parentActor: ActorWithPhysics) {
             val region = textureRegion.get(currentRow, currentFrame)
             batch.color = colorFilter
 
-            batch.draw(region,
-                    Math.round(posX).toFloat(),
-                    FastMath.floor(posY).toFloat(),
-                    FastMath.floor(cellWidth * scale).toFloat(),
-                    FastMath.floor(cellHeight * scale).toFloat()
-            )
+            if (flipHorizontal && flipVertical) {
+                batch.draw(region,
+                        Math.round(posX).toFloat() + (2f * parentActor.hitboxTranslateX * parentActor.scale.toFloat() + parentActor.hitbox.width.toFloat()),
+                        FastMath.floor(posY).toFloat() + (2f * parentActor.hitboxTranslateY * parentActor.scale.toFloat() + parentActor.hitbox.height.toFloat()),
+                        -FastMath.floor(cellWidth * scale).toFloat(),
+                        -FastMath.floor(cellHeight * scale).toFloat()
+                )
+            }
+            else if (flipHorizontal) {
+                batch.draw(region,
+                        Math.round(posX).toFloat() + (2f * parentActor.hitboxTranslateX * parentActor.scale.toFloat() + parentActor.hitbox.width.toFloat()),
+                        FastMath.floor(posY).toFloat(),
+                        -FastMath.floor(cellWidth * scale).toFloat(),
+                        FastMath.floor(cellHeight * scale).toFloat()
+                )
+            }
+            else if (flipVertical) {
+                batch.draw(region,
+                        Math.round(posX).toFloat(),
+                        FastMath.floor(posY).toFloat() + (2f * parentActor.hitboxTranslateY * parentActor.scale.toFloat() + parentActor.hitbox.height.toFloat()),
+                        FastMath.floor(cellWidth * scale).toFloat(),
+                        -FastMath.floor(cellHeight * scale).toFloat()
+                )
+            }
+            else {
+                batch.draw(region,
+                        Math.round(posX).toFloat(),
+                        FastMath.floor(posY).toFloat(),
+                        FastMath.floor(cellWidth * scale).toFloat(),
+                        FastMath.floor(cellHeight * scale).toFloat()
+                )
+            }
         }
     }
 
