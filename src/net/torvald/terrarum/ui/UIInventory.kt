@@ -315,40 +315,47 @@ class UIInventory(
         UICanvas.endClosingPopOut(handler, UICanvas.Companion.Position.LEFT)
     }
 
-    override fun keyPressed(key: Int, c: Char) {
-        items.forEach { if (it.mouseUp) it.keyPressed(key, c) }
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        items.forEach { if (it.mouseUp) it.keyDown(keycode) }
         shutUpAndRebuild()
+
+        return true
     }
 
-    override fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-    }
-
-    override fun keyReleased(key: Int, c: Char) {
-        items.forEach { if (it.mouseUp) it.keyReleased(key, c) }
+    override fun keyUp(keycode: Int): Boolean {
+        items.forEach { if (it.mouseUp) it.keyUp(keycode) }
         shutUpAndRebuild()
+
+        return true
     }
 
-    override fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    override fun keyTyped(character: Char): Boolean {
+        return false
     }
 
-    override fun controllerButtonPressed(controller: Int, button: Int) {
-        items.forEach { if (it.mouseUp) it.controllerButtonPressed(controller, button) }
-        shutUpAndRebuild()
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        return false
     }
 
-    override fun mousePressed(button: Int, x: Int, y: Int) {
-        items.forEach { if (it.mouseUp) it.mousePressed(button, x, y) }
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        items.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
+
+        return true
     }
 
-    override fun controllerButtonReleased(controller: Int, button: Int) {
-        items.forEach { if (it.mouseUp) it.controllerButtonReleased(controller, button) }
-        shutUpAndRebuild()
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        items.forEach { if (it.mouseUp) it.touchUp(screenX, screenY, pointer, button) }
+
+        return true
     }
 
-    override fun mouseReleased(button: Int, x: Int, y: Int) {
-        items.forEach { if (it.mouseUp) it.mouseReleased(button, x, y) }
+    override fun scrolled(amount: Int): Boolean {
+        return false
     }
 
-    override fun mouseWheelMoved(change: Int) {
-    }
+
 }

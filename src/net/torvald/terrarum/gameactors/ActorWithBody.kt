@@ -12,5 +12,5 @@ abstract class ActorWithBody(renderOrder: RenderOrder) : Actor(renderOrder) {
     open val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
     abstract fun drawBody(batch: SpriteBatch)
     abstract fun drawGlow(batch: SpriteBatch)
-    open var tooltipText = ""
+    open var tooltipText: String? = null // null: display nothing
 }

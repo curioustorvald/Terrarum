@@ -1,6 +1,7 @@
 package net.torvald.terrarum.weather
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -10,7 +11,6 @@ import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ParticleTestRain
-import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.WorldTime
 import java.io.File
@@ -78,7 +78,7 @@ object WeatherMixer {
 
         if (TerrarumGDX.ingame!!.player != null) {
             // test rain toggled by F2
-            if (KeyToggler.isOn(Key.F2)) {
+            if (KeyToggler.isOn(Input.Keys.F2)) {
                 val playerPos = TerrarumGDX.ingame!!.player!!.centrePosPoint
                 kotlin.repeat(4) {
                     // 4 seems good

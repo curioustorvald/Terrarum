@@ -333,13 +333,18 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     }
 
-    override fun keyPressed(key: Int, c: Char) {
+    override fun keyDown(keycode: Int): Boolean {
         // quickslot (quickbar)
         val quickbarKeys = TerrarumGDX.getConfigIntArray("keyquickbars")
-        if (key in quickbarKeys) {
-            actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = quickbarKeys.indexOf(key)
+        if (keycode in quickbarKeys) {
+            actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = quickbarKeys.indexOf(keycode)
         }
+
+
+        return true
     }
+
+
 
     /**
      * This code directly controls VELOCITY for walking, called walkX and walkY.

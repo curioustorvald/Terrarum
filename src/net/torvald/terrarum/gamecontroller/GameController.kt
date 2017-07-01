@@ -1,6 +1,9 @@
 package net.torvald.terrarum.gamecontroller
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.InputListener
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.*
@@ -10,7 +13,9 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 /**
  * Created by minjaesong on 15-12-31.
  */
-object GameController {
+object GameController : InputAdapter() {
+
+
 
     private val ingame = TerrarumGDX.ingame!!
     
@@ -83,48 +88,48 @@ object GameController {
         /////////////////////
     }
 
-    fun keyPressed(key: Int, c: Char) {
+    override fun keyDown(keycode: Int): Boolean {
 
-        
-        
-        
         if (ingame.canPlayerControl) {
-            ingame.player?.keyPressed(key, c)
+            ingame.player?.keyDown(keycode)
         }
 
-        if (TerrarumGDX.getConfigIntArray("keyquickselalt").contains(key)
-            || key == TerrarumGDX.getConfigInt("keyquicksel")) {
+        if (TerrarumGDX.getConfigIntArray("keyquickselalt").contains(keycode)
+            || keycode == TerrarumGDX.getConfigInt("keyquicksel")) {
             ingame.uiPieMenu.setAsOpen()
             ingame.uiQuickBar.setAsClose()
         }
 
-        ingame.uiContainer.forEach { it.keyPressed(key, c) } // for KeyboardControlled UIcanvases
+        ingame.uiContainer.forEach { it.keyDown(keycode) } // for KeyboardControlled UIcanvases
+
+
+        return true
     }
 
-    fun keyReleased(key: Int, c: Char) {
-
-        if (TerrarumGDX.getConfigIntArray("keyquickselalt").contains(key)
-            || key == TerrarumGDX.getConfigInt("keyquicksel")) {
+    override fun keyUp(keycode: Int): Boolean {
+        if (TerrarumGDX.getConfigIntArray("keyquickselalt").contains(keycode)
+            || keycode == TerrarumGDX.getConfigInt("keyquicksel")) {
             ingame.uiPieMenu.setAsClose()
             ingame.uiQuickBar.setAsOpen()
         }
 
-        ingame.uiContainer.forEach { it.keyReleased(key, c) } // for KeyboardControlled UIcanvases
+        ingame.uiContainer.forEach { it.keyUp(keycode) } // for KeyboardControlled UIcanvases
+
+
+        return true
     }
 
-    fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        ingame.uiContainer.forEach { it.mouseMoved(oldx, oldy, newx, newy) } // for MouseControlled UIcanvases
+    override fun keyTyped(character: Char): Boolean {
+        ingame.uiContainer.forEach { it.keyTyped(character) }
+        return true
     }
 
-    fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        ingame.uiContainer.forEach { it.mouseDragged(oldx, oldy, newx, newy) } // for MouseControlled UIcanvases
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        ingame.uiContainer.forEach { it.mouseMoved(screenX, screenY) }
+        return true
     }
 
-    fun mousePressed(button: Int, x: Int, y: Int) {
-        ingame.uiContainer.forEach { it.mousePressed(button, x, y) } // for MouseControlled UIcanvases
-    }
-
-    fun mouseReleased(button: Int, x: Int, y: Int) {
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (TerrarumGDX.ingame != null) {
             val ingame = TerrarumGDX.ingame!!
             // don't separate Player from this! Physics will break, esp. airborne manoeuvre
@@ -142,39 +147,25 @@ object GameController {
             }
 
 
-            ingame.uiContainer.forEach { it.mouseReleased(button, x, y) } // for MouseControlled UIcanvases
+            ingame.uiContainer.forEach { it.touchUp(screenX, screenY, pointer, button) } // for MouseControlled UIcanvases
         }
+
+        return true
     }
 
-    fun mouseWheelMoved(change: Int) {
-        ingame.uiContainer.forEach { it.mouseWheelMoved(change) } // for MouseControlled UIcanvases
+    override fun scrolled(amount: Int): Boolean {
+        ingame.uiContainer.forEach { it.scrolled(amount) }
+        return true
     }
 
-    fun controllerButtonPressed(controller: Int, button: Int) {
-        ingame.uiContainer.forEach { it.controllerButtonPressed(controller, button) } // for GamepadControlled UIcanvases
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        ingame.uiContainer.forEach { it.touchDragged(screenX, screenY, pointer) }
+        return true
     }
 
-    fun controllerButtonReleased(controller: Int, button: Int) {
-        ingame.uiContainer.forEach { it.controllerButtonReleased(controller, button) } // for GamepadControlled UIcanvases
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        ingame.uiContainer.forEach { it.touchDown(screenX, screenY, pointer, button) }
+        return true
     }
+
 }
-
-/* // Use TerrarumGDX.*
-/** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise) */
-val GameContainer.mouseX: Double
-    get() = GameController.mouseX.toDouble()
-/** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise) */
-val GameContainer.mouseY: Double
-    get() = GameController.mouseY.toDouble()
-/** currently pointing tile coordinate */
-val GameContainer.mouseTileX: Int
-    get() = GameController.mouseTileX
-/** currently pointing tile coordinate */
-val GameContainer.mouseTileY: Int
-    get() = GameController.mouseTileY
-val GameContainer.mouseScreenX: Int
-    get() = Terrarum.appgc.input.mouseX
-val GameContainer.mouseScreenY: Int
-    get() = Terrarum.appgc.input.mouseY*/
-
-

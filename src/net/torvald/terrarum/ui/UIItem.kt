@@ -32,17 +32,14 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     abstract fun render(batch: SpriteBatch)
 
     // keyboard controlled
-    abstract fun keyPressed(key: Int, c: Char)
-    abstract fun keyReleased(key: Int, c: Char)
+    abstract fun keyDown(keycode: Int): Boolean
+    abstract fun keyUp(keycode: Int): Boolean
 
     // mouse controlled
-    abstract fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int)
-    abstract fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int)
-    abstract fun mousePressed(button: Int, x: Int, y: Int)
-    abstract fun mouseReleased(button: Int, x: Int, y: Int)
-    abstract fun mouseWheelMoved(change: Int)
+    abstract fun mouseMoved(screenX: Int, screenY: Int): Boolean
+    abstract fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean
+    abstract fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean
+    abstract fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean
+    abstract fun scrolled(amount: Int): Boolean
 
-    // gamepad controlled
-    abstract fun controllerButtonPressed(controller: Int, button: Int)
-    abstract fun controllerButtonReleased(controller: Int, button: Int)
 }

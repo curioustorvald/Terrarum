@@ -4,7 +4,7 @@ package net.torvald.terrarum.gamecontroller
  * Created by minjaesong on 16-01-15.
  */
 @Deprecated("Use Gdx.Input.Keys")
-object Key {
+object DeprecatedAsFuckKey {
 
     val RETURN = 28
     val BACKSPACE = 14
@@ -44,16 +44,16 @@ object Key {
     val F11 = 87
     val F12 = 88
 
-    val NUM_1 = 2
-    val NUM_2 = 3
-    val NUM_3 = 4
-    val NUM_4 = 5
-    val NUM_5 = 6
-    val NUM_6 = 7
-    val NUM_7 = 8
-    val NUM_8 = 9
-    val NUM_9 = 10
-    val NUM_0 = 11
+    val NUM_1 = 8
+    val NUM_2 = 9
+    val NUM_3 = 10
+    val NUM_4 = 11
+    val NUM_5 = 12
+    val NUM_6 = 13
+    val NUM_7 = 14
+    val NUM_8 = 15
+    val NUM_9 = 16
+    val NUM_0 = 7
 
     // JInput is QWERTY-based
     val Q = 16

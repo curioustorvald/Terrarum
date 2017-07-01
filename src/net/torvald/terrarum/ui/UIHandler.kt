@@ -209,58 +209,66 @@ class UIHandler(val UI: UICanvas,
         }
     }
 
-    fun keyPressed(key: Int, c: Char) {
+    fun keyDown(keycode: Int): Boolean {
         if (isVisible && UI is KeyControlled) {
-            UI.keyPressed(key, c)
+            return UI.keyDown(keycode)
         }
+
+        return false
     }
 
-    fun keyReleased(key: Int, c: Char) {
+    fun keyUp(keycode: Int): Boolean {
         if (isVisible && UI is KeyControlled) {
-            UI.keyReleased(key, c)
+            return UI.keyUp(keycode)
         }
+
+        return false
     }
 
-    fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        if (isVisible && UI is MouseControlled) {
-            UI.mouseMoved(oldx, oldy, newx, newy)
-        }
-    }
-
-    fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
-        if (isVisible && UI is MouseControlled) {
-            UI.mouseDragged(oldx, oldy, newx, newy)
-        }
-    }
-
-    fun mousePressed(button: Int, x: Int, y: Int) {
-        if (isVisible && UI is MouseControlled) {
-            UI.mousePressed(button, x, y)
-        }
-    }
-
-    fun mouseReleased(button: Int, x: Int, y: Int) {
-        if (isVisible && UI is MouseControlled) {
-            UI.mouseReleased(button, x, y)
-        }
-    }
-
-    fun mouseWheelMoved(change: Int) {
-        if (isVisible && UI is MouseControlled) {
-            UI.mouseWheelMoved(change)
-        }
-    }
-
-    fun controllerButtonPressed(controller: Int, button: Int) {
+    fun keyTyped(char: Char): Boolean {
         if (isVisible && UI is KeyControlled) {
-            UI.controllerButtonPressed(controller, button)
+            return UI.keyTyped(char)
+        }
+
+        return false
+    }
+
+    fun mouseMoved(screenX: Int, screenY: Int) {
+        if (isVisible && UI is MouseControlled) {
+            UI.mouseMoved(screenX, screenY)
         }
     }
 
-    fun controllerButtonReleased(controller: Int, button: Int) {
-        if (isVisible && UI is KeyControlled) {
-            UI.controllerButtonReleased(controller, button)
+    fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        if (isVisible && UI is MouseControlled) {
+            UI.touchDragged(screenX, screenY, pointer)
         }
+
+        return false
+    }
+
+    fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        if (isVisible && UI is MouseControlled) {
+            UI.touchDown(screenX, screenY, pointer, button)
+        }
+
+        return false
+    }
+
+    fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        if (isVisible && UI is MouseControlled) {
+            UI.touchUp(screenX, screenY, pointer, button)
+        }
+
+        return false
+    }
+
+    fun scrolled(amount: Int): Boolean {
+        if (isVisible && UI is MouseControlled) {
+            UI.scrolled(amount)
+        }
+
+        return false
     }
 
     // constant UI can't take control

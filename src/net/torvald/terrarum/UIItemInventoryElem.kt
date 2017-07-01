@@ -1,11 +1,10 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.colourutil.CIELabUtil.darkerLab
-import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.ui.UIInventory
 import net.torvald.terrarum.ui.UIItem
@@ -122,10 +121,10 @@ class UIItemInventoryElem(
         }
     }
 
-    override fun keyPressed(key: Int, c: Char) {
-        if (item != null && TerrarumGDX.ingame != null && key in Key.NUM_1..Key.NUM_0) {
+    override fun keyDown(keycode: Int): Boolean {
+        if (item != null && TerrarumGDX.ingame != null && keycode in Input.Keys.NUM_1..Input.Keys.NUM_0) {
             val inventory = TerrarumGDX.ingame!!.player?.inventory
-            val slot = key - Key.NUM_1
+            val slot = if (keycode == Input.Keys.NUM_0) 9 else keycode - Input.Keys.NUM_1
             val currentSlotItem = inventory?.getQuickBar(slot)
 
 
@@ -145,18 +144,24 @@ class UIItemInventoryElem(
                 }
             }
         }
+
+        return true
     }
 
-    override fun keyReleased(key: Int, c: Char) {
+    override fun keyUp(keycode: Int): Boolean {
+        return false
     }
 
-    override fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        return false
     }
 
-    override fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        return false
     }
 
-    override fun mousePressed(button: Int, x: Int, y: Int) {
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (item != null && TerrarumGDX.ingame != null) {
 
             // equip da shit
@@ -172,17 +177,16 @@ class UIItemInventoryElem(
         }
 
         inventoryUI.rebuildList()
+
+        return true
     }
 
-    override fun mouseReleased(button: Int, x: Int, y: Int) {
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return false
     }
 
-    override fun mouseWheelMoved(change: Int) {
-    }
-
-    override fun controllerButtonPressed(controller: Int, button: Int) {
-    }
-
-    override fun controllerButtonReleased(controller: Int, button: Int) {
+    override fun scrolled(amount: Int): Boolean {
+        return false
     }
 }
