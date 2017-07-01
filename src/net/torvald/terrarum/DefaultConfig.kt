@@ -3,7 +3,6 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Input
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import net.torvald.terrarum.gamecontroller.Key
 
 /**
  * Keys must be all lowercase
@@ -52,14 +51,14 @@ object DefaultConfig {
         jsonObject.addProperty("keydown", Input.Keys.D)
         jsonObject.addProperty("keyright", Input.Keys.F)
 
-        jsonObject.addProperty("keymovementaux", Input.Keys.A) // movement-auxiliary, or hookshot
-        jsonObject.addProperty("keyinventory", Input.Keys.W)
+        jsonObject.addProperty("keymovementaux", Input.Keys.W) // movement-auxiliary, or hookshot
+        jsonObject.addProperty("keyinventory", Input.Keys.Q)
         jsonObject.addProperty("keyinteract", Input.Keys.R)
         jsonObject.addProperty("keyclose", Input.Keys.C)
 
         jsonObject.addProperty("keygamemenu", Input.Keys.TAB)
-        jsonObject.addProperty("keyquicksel", Key.CAPS_LOCK) // pie menu
-        val keyquickselalt = JsonArray(); keyquickselalt.add(Input.Keys.BACKSPACE); keyquickselalt.add(Key.L_COMMAND); keyquickselalt.add(Input.Keys.CONTROL_LEFT)
+        jsonObject.addProperty("keyquicksel", Input.Keys.A) // pie menu (A) because GDX does not read CapsLock
+        val keyquickselalt = JsonArray(); keyquickselalt.add(Input.Keys.BACKSPACE); keyquickselalt.add(Input.Keys.CONTROL_LEFT)
         // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command
         // so these keys are treated as the same.
         // FOR ~~FUCKS~~ERGONOMICS' SAKE DON'T USE CTRL AND ALT AS A KEY!

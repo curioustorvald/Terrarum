@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.dataclass.HistoryArray
@@ -9,7 +10,6 @@ import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandInterpreter
 import net.torvald.terrarum.fillRect
-import net.torvald.terrarum.gamecontroller.Key
 
 
 /**
@@ -80,60 +80,59 @@ class ConsoleWindow : UICanvas, KeyControlled {
     }
 
 
-    override fun keyPressed(key: Int, c: Char) {
+    override fun keyDown(key: Int): Boolean {
         // history
-        if (key == Key.UP && historyIndex < commandHistory.history.size)
+        if (key == Input.Keys.UP && historyIndex < commandHistory.history.size)
             historyIndex++
-        else if (key == Key.DOWN && historyIndex >= 0)
+        else if (key == Input.Keys.DOWN && historyIndex >= 0)
             historyIndex--
-        else if (key != Key.UP && key != Key.DOWN)
+        else if (key != Input.Keys.UP && key != Input.Keys.DOWN)
             historyIndex = -1
 
         // execute
-        if (key == Key.RETURN && commandInputPool!!.isNotEmpty()) {
+        if (key == Input.Keys.ENTER && commandInputPool!!.isNotEmpty()) {
             commandHistory.add(commandInputPool!!.toString())
             executeCommand()
             commandInputPool = StringBuilder()
         }
         // erase last letter
-        else if (key == Key.BACKSPACE && commandInputPool!!.isNotEmpty()) {
+        else if (key == Input.Keys.BACKSPACE && commandInputPool!!.isNotEmpty()) {
             commandInputPool!!.deleteCharAt(commandInputPool!!.length - 1)
         }
-        // append acceptable letter
-        else if (key >= 2 && key <= 13
-                 || key >= 16 && key <= 27
-                 || key >= 30 && key <= 40
-                 || key >= 44 && key <= 53
-                 || commandInputPool!!.length > 0 && key == 57) {
-            commandInputPool!!.append(c)
-            inputCursorPos += 1
-        }
         // scroll
-        else if (key == Key.UP || key == Key.DOWN) {
+        else if (key == Input.Keys.UP || key == Input.Keys.DOWN) {
             // create new stringbuilder
             commandInputPool = StringBuilder()
             if (historyIndex >= 0) // just leave blank if index is -1
                 commandInputPool!!.append(commandHistory[historyIndex] ?: "")
         }
         // delete input
-        else if (key == Key.DELETE) {
+        else if (key == Input.Keys.BACKSPACE) {
             commandInputPool = StringBuilder()
         }
         // message scroll up
-        else if (key == Key.PGUP) {
+        else if (key == Input.Keys.PAGE_UP) {
             setDisplayPos(-MESSAGES_DISPLAY_COUNT + 1)
         }
         // message scroll down
-        else if (key == Key.PGDN) {
+        else if (key == Input.Keys.PAGE_DOWN) {
             setDisplayPos(MESSAGES_DISPLAY_COUNT - 1)
         }
+
+
+        return true
     }
 
-    override fun keyReleased(key: Int, c: Char) {
+    override fun keyTyped(character: Char): Boolean {
+        commandInputPool!!.append(character)
+        inputCursorPos += 1
 
+        return true
     }
 
-
+    override fun keyUp(keycode: Int): Boolean {
+        return false
+    }
 
     private fun executeCommand() {
         CommandInterpreter.execute(commandInputPool!!.toString())
@@ -203,12 +202,6 @@ class ConsoleWindow : UICanvas, KeyControlled {
     override fun endClosing(delta: Float) {
         drawOffY = -height.toFloat()
         openingTimeCounter = 0f
-    }
-
-    override fun controllerButtonPressed(controller: Int, button: Int) {
-    }
-
-    override fun controllerButtonReleased(controller: Int, button: Int) {
     }
 
     override fun processInput(delta: Float) {
