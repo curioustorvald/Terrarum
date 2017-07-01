@@ -89,21 +89,28 @@ class UIQuickBar : UICanvas, MouseControlled {
         handler!!.opacity = 0f
     }
 
-    override fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        return false
     }
 
-    override fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        return false
     }
 
-    override fun mousePressed(button: Int, x: Int, y: Int) {
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return false
     }
 
-    override fun mouseReleased(button: Int, x: Int, y: Int) {
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return false
     }
 
-    override fun mouseWheelMoved(change: Int) {
-        selection = selection.plus(if (change > 1) 1 else if (change < -1) -1 else 0).fmod(SLOT_COUNT)
+    override fun scrolled(amount: Int): Boolean {
+        selection = selection.plus(if (amount > 1) 1 else if (amount < -1) -1 else 0).fmod(SLOT_COUNT)
+
+        return true
     }
+
 
     companion object {
         val finalOpacity = 0.8f

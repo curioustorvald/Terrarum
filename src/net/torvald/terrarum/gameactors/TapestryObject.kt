@@ -33,5 +33,5 @@ class TapestryObject(pixmap: Pixmap, val artName: String, val artAuthor: String)
         super.drawBody(batch)
     }
 
-    override var tooltipText: String = "$artName\n$artAuthor"
+    override var tooltipText: String? = "$artName\n$artAuthor"
 }

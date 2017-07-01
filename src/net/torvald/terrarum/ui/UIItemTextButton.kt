@@ -82,30 +82,31 @@ class UIItemTextButton(
         }
     }
 
-    override fun keyPressed(key: Int, c: Char) {
+    override fun keyDown(keycode: Int): Boolean {
+        return false
     }
 
-    override fun keyReleased(key: Int, c: Char) {
+    override fun keyUp(keycode: Int): Boolean {
+        return false
     }
 
-    override fun mouseMoved(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        return false
     }
 
-    override fun mouseDragged(oldx: Int, oldy: Int, newx: Int, newy: Int) {
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        return false
     }
 
-    override fun mousePressed(button: Int, x: Int, y: Int) {
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return false
     }
 
-    override fun mouseReleased(button: Int, x: Int, y: Int) {
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return false
     }
 
-    override fun mouseWheelMoved(change: Int) {
-    }
-
-    override fun controllerButtonPressed(controller: Int, button: Int) {
-    }
-
-    override fun controllerButtonReleased(controller: Int, button: Int) {
+    override fun scrolled(amount: Int): Boolean {
+        return false
     }
 }

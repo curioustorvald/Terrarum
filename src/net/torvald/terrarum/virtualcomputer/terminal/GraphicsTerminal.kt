@@ -3,7 +3,6 @@ package net.torvald.terrarum.virtualcomputer.terminal
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.gameactors.DecodeTapestry
 import net.torvald.terrarum.gameactors.abs
-import net.torvald.terrarum.gamecontroller.Key
 import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import java.util.*
 
