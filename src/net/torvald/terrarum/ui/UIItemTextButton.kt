@@ -68,18 +68,16 @@ class UIItemTextButton(
         blendNormal()
 
 
-        batch.inUse {
-            mouseOver = mouseUp
-            batch.color = if (highlighted) highlightCol
-            else if (mouseOver) activeCol
-            else inactiveCol
+        mouseOver = mouseUp
+        batch.color = if (highlighted) highlightCol
+        else if (mouseOver) activeCol
+        else inactiveCol
 
-            font.draw(batch,
-                    label,
-                    posX.toFloat() + width.minus(textW).div(2) + (preGapX - postGapX).div(2),
-                    posY.toFloat() + height / 4
-            )
-        }
+        font.draw(batch,
+                label,
+                posX.toFloat() + width.minus(textW).div(2) + (preGapX - postGapX).div(2),
+                posY.toFloat() + height / 4
+        )
     }
 
     override fun keyDown(keycode: Int): Boolean {
