@@ -46,9 +46,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     @Transient private val world: GameWorld = TerrarumGDX.ingame!!.world
 
-    var hitboxTranslateX: Double = 0.0// relative to spritePosX
+    var hitboxTranslateX: Int = 0// relative to spritePosX
         protected set
-    var hitboxTranslateY: Double = 0.0// relative to spritePosY
+    var hitboxTranslateY: Int = 0// relative to spritePosY
         protected set
     var baseHitboxW: Int = 0
         protected set
@@ -269,8 +269,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     fun setHitboxDimension(w: Int, h: Int, tx: Int, ty: Int) {
         baseHitboxH = h
         baseHitboxW = w
-        hitboxTranslateX = tx.toDouble()
-        hitboxTranslateY = ty.toDouble()
+        hitboxTranslateX = tx
+        hitboxTranslateY = ty
     }
 
     fun setPosition(pos: Point2d) = setPosition(pos.x, pos.y)
