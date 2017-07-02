@@ -88,7 +88,7 @@ object TerrarumGDX : ApplicationAdapter() {
     /**
      * To be used with physics simulator
      */
-    val TARGET_FPS = 50
+    val TARGET_FPS = 33.333333333333333333333
 
     /**
      * To be used with render, to achieve smooth frame drawing
@@ -526,7 +526,7 @@ inline fun SpriteBatch.drawStraightLine(x: Float, y: Float, p2: Float, thickness
 
 
 
-infix fun Color.mul(other: Color): Color = this.mul(other)
+infix fun Color.mul(other: Color): Color = this.cpy().mul(other)
 
 
 

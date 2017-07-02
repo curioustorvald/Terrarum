@@ -155,18 +155,16 @@ class UIItemTextButtonList(
         buttons.forEach { it.render(batch) }
 
 
-        batch.inUse {
-            if (iconSpriteSheet != null) {
-                val iconY = (buttons[1].height - iconCellHeight) / 2
-                batch.color = iconCol
+        if (iconSpriteSheet != null) {
+            val iconY = (buttons[1].height - iconCellHeight) / 2
+            batch.color = iconCol
 
-                iconSpriteSheetIndices!!.forEachIndexed { counter, imageIndex ->
-                    batch.draw(iconSpriteSheet.get(imageIndex, 0), 32f, buttons[counter].posY + iconY.toFloat())
-                }
+            iconSpriteSheetIndices!!.forEachIndexed { counter, imageIndex ->
+                batch.draw(iconSpriteSheet.get(imageIndex, 0), 32f, buttons[counter].posY + iconY.toFloat())
             }
-
-            batch.color = backgroundCol
         }
+
+        batch.color = backgroundCol
     }
 
     override fun keyDown(keycode: Int): Boolean {
