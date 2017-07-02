@@ -316,7 +316,7 @@ class UIInventory(
     }
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return false
     }
 
     override fun keyDown(keycode: Int): Boolean {
