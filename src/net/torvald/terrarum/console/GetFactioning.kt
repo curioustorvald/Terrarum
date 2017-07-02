@@ -4,17 +4,17 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.Factionable
 import net.torvald.terrarum.gameactors.Player
+import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**
  * Created by minjaesong on 16-02-17.
  */
 internal object GetFactioning : ConsoleCommand {
-    val ccW = 0.toChar()//GameFontBase.colToCode["w"]
-    val ccG = 0.toChar()//GameFontBase.colToCode["g"]
-    val ccY = 0.toChar()//GameFontBase.colToCode["y"]
-    val ccM = 0.toChar()//GameFontBase.colToCode["m"]
-    val ccK = 0.toChar()//GameFontBase.colToCode["k"]
-    val ccB = 0.toChar()//GameFontBase.colToCode["b"]
+    val ccW = GameFontBase.toColorCode(0xFFFF)
+    val ccY = GameFontBase.toColorCode(0xFE8F)
+    val ccM = GameFontBase.toColorCode(0xEAFF)
+    val ccG = GameFontBase.toColorCode(0x8F8F)
+    val ccK = GameFontBase.toColorCode(0x888F)
 
     private val PRINT_INDENTATION = "$ccK    --> $ccW"
 

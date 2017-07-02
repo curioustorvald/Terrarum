@@ -127,11 +127,13 @@ class UIHandler(val UI: UICanvas,
 
     fun render(batch: SpriteBatch) {
         if (isVisible || alwaysVisible) {
+            // camera SHOULD BE CENTERED to HALFX and HALFY (see StateInGame) //
 
-            batch.projectionMatrix = Matrix4()
 
-            if (!customPositioning)
-                TerrarumGDX.ingame?.camera?.position?.set(posX.toFloat(), posY.toFloat(), 0f) // does it work?
+            //batch.projectionMatrix = Matrix4()
+//
+            //if (!customPositioning)
+            //    TerrarumGDX.ingame?.camera?.position?.set(posX.toFloat(), posY.toFloat(), 0f) // does it work?
 
             UI.render(batch)
             //ingameGraphics.flush()
