@@ -390,10 +390,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                 camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
                 camera.update()
                 batch.projectionMatrix = camera.combined
-
-
-
-
+                batch.color = Color.WHITE
                 blendNormal()
 
 
@@ -428,7 +425,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                     blendNormal()
                 else
                     blendMul()
-                LightmapRenderer.draw(batch)
+                //LightmapRenderer.draw(batch)
 
 
                 //////////////////////
@@ -449,11 +446,12 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         /////////////////////////
         // draw to main screen //
         /////////////////////////
-        blendNormal()
         batch.inUse {
             camera.position.set(TerrarumGDX.HALFW.toFloat(), TerrarumGDX.HALFH.toFloat(), 0f) // make camara work
             camera.update()
             batch.projectionMatrix = camera.combined
+            batch.color = Color.WHITE
+            blendNormal()
 
 
             /////////////////////////////////
@@ -462,6 +460,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
             WeatherMixer.render(batch)
 
+            batch.color = Color.WHITE
             val tex = worldDrawFrameBuffer.colorBufferTexture // TODO zoom!
             batch.draw(tex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
 
@@ -529,11 +528,15 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             // draw some overlays (UI) //
             /////////////////////////////
 
-            //uiContainer.forEach { if (it != consoleHandler) it.render(batch) } // FIXME draws black of grey coloured box on top right
+            uiContainer.forEach { if (it != consoleHandler) it.render(batch) } // FIXME draws black of grey coloured box on top right
+            batch.color = Color.WHITE
             debugWindow.render(batch)
             // make sure console draws on top of other UIs
             consoleHandler.render(batch)
             notifier.render(batch)
+
+
+            blendNormal()
         }
 
 
