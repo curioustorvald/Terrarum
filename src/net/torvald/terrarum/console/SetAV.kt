@@ -1,17 +1,12 @@
 package net.torvald.terrarum.console
 
+import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumGDX
 
 /**
  * Created by minjaesong on 16-01-15.
  */
 internal object SetAV : ConsoleCommand {
-
-    val ccW = 0.toChar()//GameFontBase.colToCode["w"]
-    val ccG = 0.toChar()//GameFontBase.colToCode["g"]
-    val ccY = 0.toChar()//GameFontBase.colToCode["y"]
-    val ccR = 0.toChar()//GameFontBase.colToCode["r"]
-    val ccM = 0.toChar()//GameFontBase.colToCode["m"]
 
     override fun printUsage() {
         Echo("${ccW}Set actor value of specific target to desired value.")

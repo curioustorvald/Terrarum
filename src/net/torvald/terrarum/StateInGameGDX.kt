@@ -424,6 +424,10 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                 FeaturesDrawer.drawEnvOverlay(batch)
 
 
+                if (KeyToggler.isOn(Input.Keys.F7))
+                    blendNormal()
+                else
+                    blendMul()
                 LightmapRenderer.draw(batch)
 
 
