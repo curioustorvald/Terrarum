@@ -390,6 +390,7 @@ object BlocksDrawer {
 
         var zeroTileCounter = 0
 
+        val originalBatchColour = batch.color.cpy()
         batch.color = color
 
         // loop
@@ -459,12 +460,14 @@ object BlocksDrawer {
                             // draw a tile
                             if (drawModeTilesBlendMul) {
                                 if (BlocksDrawer.isBlendMul(thisTile)) {
+                                    batch.color = color
                                     drawTile(batch, mode, x, y, thisTileX, thisTileY)
                                 }
                             }
                             else {
                                 // do NOT add "if (!isBlendMul(thisTile))"!
                                 // or else they will not look like they should be when backed with wall
+                                batch.color = color
                                 drawTile(batch, mode, x, y, thisTileX, thisTileY)
                             }
 
@@ -475,6 +478,7 @@ object BlocksDrawer {
                                 val stage = (breakage / maxHealth).times(breakAnimSteps).roundInt()
                                 // actual drawing
                                 if (stage > 0) {
+                                    batch.color = color
                                     drawTile(batch, mode, x, y, 5 + stage, 0)
                                 }
                             }
@@ -485,7 +489,7 @@ object BlocksDrawer {
                         else {
                             zeroTileCounter++ // unused for now
 
-                            batch.color = Color.BLACK
+                            //batch.color = Color.BLACK
 
                             batch.fillRect(x.toFloat(), y.toFloat(), TILE_SIZEF, TILE_SIZEF)
 
@@ -498,6 +502,9 @@ object BlocksDrawer {
 
             }
         }
+
+
+        batch.color = originalBatchColour
     }
 
     /**

@@ -32,7 +32,7 @@ object PlayerBuilderSigrid {
         p.actorValue[AVKey.SPEEDBUFF] = 1.0
         p.actorValue[AVKey.ACCEL] = ActorHumanoid.WALK_ACCEL_BASE
         p.actorValue[AVKey.ACCELBUFF] = 1.0
-        p.actorValue[AVKey.JUMPPOWER] = 5.2
+        p.actorValue[AVKey.JUMPPOWER] = 9.0
 
         p.actorValue[AVKey.BASEMASS] = 80.0
         p.actorValue[AVKey.SCALEBUFF] = 1.0 // Constant 1.0 for player, meant to be used by random mobs

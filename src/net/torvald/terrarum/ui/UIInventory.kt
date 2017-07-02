@@ -216,7 +216,6 @@ class UIInventory(
                     controlHelpHeight - 5f
             )
         }
-
     }
 
     /** Persuade the UI to rebuild its item list */
