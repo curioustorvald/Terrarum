@@ -4,14 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
+import net.torvald.terrarum.*
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.TerrarumGDX
-import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.blendScreen
-import net.torvald.terrarum.fillRect
-import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
+import net.torvald.terrarum.TerrarumGDX.mouseTileX
+import net.torvald.terrarum.TerrarumGDX.mouseTileY
+import net.torvald.terrarum.TerrarumGDX.mouseScreenX
+import net.torvald.terrarum.TerrarumGDX.mouseScreenY
 
 /**
  * Created by minjaesong on 16-03-14.
@@ -30,19 +30,6 @@ class BasicDebugInfoWindow : UICanvas {
 
     private var xdelta = 0.0
     private var ydelta = 0.0
-
-    val ccW = GameFontBase.toColorCode(0xFFFF)
-    val ccY = GameFontBase.toColorCode(0xFE8F)
-    val ccO = GameFontBase.toColorCode(0xFB2F)
-    val ccR = GameFontBase.toColorCode(0xF88F)
-    val ccF = GameFontBase.toColorCode(0xFAEF)
-    val ccM = GameFontBase.toColorCode(0xEAFF)
-    val ccB = GameFontBase.toColorCode(0x88FF)
-    val ccC = GameFontBase.toColorCode(0x8FFF)
-    val ccG = GameFontBase.toColorCode(0x8F8F)
-    val ccV = GameFontBase.toColorCode(0x080F)
-    val ccX = GameFontBase.toColorCode(0x853F)
-    val ccK = GameFontBase.toColorCode(0x888F)
 
 
 
@@ -63,9 +50,6 @@ class BasicDebugInfoWindow : UICanvas {
         fun Int.rawB() = this % LightmapRenderer.MUL
 
         val player = TerrarumGDX.ingame!!.player
-
-        val mouseTileX = ((WorldCamera.x + TerrarumGDX.mouseX / TerrarumGDX.ingame!!.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
-        val mouseTileY = ((WorldCamera.y + TerrarumGDX.mouseY / TerrarumGDX.ingame!!.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
 
         batch.color = Color(0xFFEE88FF.toInt())
 

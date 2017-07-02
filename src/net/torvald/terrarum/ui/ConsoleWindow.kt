@@ -123,11 +123,18 @@ class ConsoleWindow : UICanvas, KeyControlled {
         return true
     }
 
-    override fun keyTyped(character: Char): Boolean {
-        commandInputPool!!.append(character)
-        inputCursorPos += 1
+    val acceptedChars = "1234567890-=qwfpgjluy;[]\\arstdhneio'zxcvbkm,./!@#$%^&*()_+QWFPGJLUY:{}|ARSTDHNEIO\"ZXCVBKM<>? ".toSet()
 
-        return true
+    override fun keyTyped(character: Char): Boolean {
+        if (character in acceptedChars) {
+            commandInputPool!!.append(character)
+            inputCursorPos += 1
+
+            return true
+        }
+        else {
+            return false
+        }
     }
 
     override fun keyUp(keycode: Int): Boolean {

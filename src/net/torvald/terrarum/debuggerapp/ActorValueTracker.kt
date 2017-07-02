@@ -1,5 +1,6 @@
 package net.torvald.terrarum.debuggerapp
 
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorValue
 import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.console.Echo
@@ -74,7 +75,7 @@ class ActorValueTracker constructor() : JFrame() {
             override fun mousePressed(e: MouseEvent?) {
                 if (actorValue != null && modavInputKey.text.isNotBlank()) {
                     actorValue!!.remove(modavInputKey.text)
-                    Echo("${SetAV.ccW}Removed ${SetAV.ccM}${modavInputKey.text} ${SetAV.ccW}of ${SetAV.ccY}${actor!!.referenceID}")
+                    Echo("${ccW}Removed ${ccM}${modavInputKey.text} ${ccW}of ${ccY}${actor!!.referenceID}")
                     println("[ActorValueTracker] Removed ActorValue '${modavInputKey.text}' of $actor")
                 }
             }

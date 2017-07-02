@@ -320,6 +320,8 @@ object LightmapRenderer {
         val this_y_end = for_y_end// + overscan_open
 
 
+        val originalColour = batch.color.cpy()
+
         // draw to the
         try {
             // loop for "scanlines"
@@ -329,7 +331,7 @@ object LightmapRenderer {
                 while (x < this_x_end) {
                     // smoothing enabled and zoom is 0.75 or greater
                     // (zoom of 0.5 should not smoothed, for performance)
-                    if (TerrarumGDX.getConfigBoolean("smoothlighting") ?: false &&
+                    if (TerrarumGDX.getConfigBoolean("smoothlighting") &&
                         TerrarumGDX.ingame!!.screenZoom >= 0.75) {
 
                         val thisLightLevel = getLightForOpaque(x, y) ?: 0
@@ -434,6 +436,8 @@ object LightmapRenderer {
         catch (e: ArrayIndexOutOfBoundsException) {
         }
 
+
+        batch.color = originalColour
 
     }
 
