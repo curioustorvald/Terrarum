@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gamecontroller
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
@@ -24,10 +25,10 @@ object GameController : InputAdapter() {
 
     /** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise) */
     val mouseX: Float
-        get() = (WorldCamera.x + TerrarumGDX.mouseX.toFloat() / (ingame.screenZoom ?: 1f))
+        get() = WorldCamera.x + Gdx.input.x / (ingame.screenZoom)
     /** position of the mouse (pixelwise) relative to the world (also, currently pointing world-wise coordinate, if the world coordinate is pixel-wise)*/
     val mouseY: Float
-        get() = (WorldCamera.y + TerrarumGDX.mouseY.toFloat() / (ingame.screenZoom ?: 1f))
+        get() = WorldCamera.y + Gdx.input.y / (ingame.screenZoom)
     /** currently pointing tile coordinate */
     val mouseTileX: Int
         get() = (mouseX / FeaturesDrawer.TILE_SIZE).floorInt()
@@ -101,6 +102,10 @@ object GameController : InputAdapter() {
         }
 
         ingame.uiContainer.forEach { it.keyDown(keycode) } // for KeyboardControlled UIcanvases
+
+        if (keycode == Input.Keys.F3) {
+            ingame.debugWindow.toggleOpening()
+        }
 
 
         return true

@@ -73,7 +73,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     val ZOOM_MIN = 0.5f
 
     var worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width.div(ZOOM_MIN).ceilInt(), Gdx.graphics.height.div(ZOOM_MIN).ceilInt(), false)
-    var backDrawFrameBuffer =  FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width, Gdx.graphics.height, false)
+    //var backDrawFrameBuffer =  FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width, Gdx.graphics.height, false)
 
     //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
     //private lateinit var shaderBlur: Shader
@@ -127,55 +127,21 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     var camera = OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
 
     // invert Y
-    fun initViewPort(width: Int, height: Int, aspect: Float) {
-        val width = width.toFloat()
-        val height = height.toFloat()
-
-        // Get the window size in pixels
-        val w = Gdx.graphics.width.toFloat()
-        val h = Gdx.graphics.height.toFloat()
-
-        val vw: Float
-        val vh: Float // Viewport size in screen coordinates
-        val ox: Float
-        val oy: Float // Viewport offset in screen coordinates
-
-        // Check aspect ratio
-        if (w > h * aspect) {
-            // Black bars on the sides
-            vh = h
-            vw = Math.round(vh * aspect).toFloat()
-            oy = 0f
-            ox = (w - vw) / 2
-        }
-        else {
-            // Black bars on top and bottom
-            vw = w
-            vh = Math.round(vw * (1 / aspect)).toFloat()
-            ox = 0f
-            oy = (h - vh) / 2
-        }
-
-        // Create camera with the desired resolution
-        //camera = OrthographicCamera(width, height)
-
-        // Move camera center to push 0,0 into the corner
-        //camera.translate(width / 2, height / 2)
-
+    fun initViewPort(width: Int, height: Int) {
         // Set Y to point downwards
-        camera.setToOrtho(true, width, height)
+        camera.setToOrtho(true, width.toFloat(), height.toFloat())
 
         // Update camera matrix
         camera.update()
 
         // Set viewport to restrict drawing
-        Gdx.gl20.glViewport(ox.toInt(), oy.toInt(), vw.toInt(), vh.toInt())
+        Gdx.gl20.glViewport(0, 0, width, height)
     }
 
 
     override fun show() {
         // Set up viewport on first load
-        initViewPort(Gdx.graphics.width, Gdx.graphics.height, Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
+        initViewPort(Gdx.graphics.width, Gdx.graphics.height)
     }
 
 
@@ -183,7 +149,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         Gdx.input.inputProcessor = GameController
 
 
-        initViewPort(Gdx.graphics.width, Gdx.graphics.height, Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat())
+        initViewPort(Gdx.graphics.width, Gdx.graphics.height)
 
 
         // load things when the game entered this "state"
@@ -410,19 +376,21 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             Gdx.gl.glClearColor(0f,0f,0f,0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         }
-        backDrawFrameBuffer.inAction {
-            Gdx.gl.glClearColor(0f,0f,0f,0f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        }
 
 
+        // Post-update; ones that needs everything is completed //
+        LightmapRenderer.renderLightMap()                       //
+        FeaturesDrawer.render(batch)                            //
+        // end of post-update                                   //
 
 
+        // now the actual drawing part //
         worldDrawFrameBuffer.inAction {
             batch.inUse {
                 camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
                 camera.update()
                 batch.projectionMatrix = camera.combined
+
 
 
 
@@ -450,42 +418,33 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                 /////////////////////////////
                 // draw map related stuffs //
                 /////////////////////////////
-                LightmapRenderer.renderLightMap()
 
-                //BlocksDrawer.renderFront(batch, false)
+                BlocksDrawer.renderFront(batch, false)
                 // --> blendNormal() <-- by BlocksDrawer.renderFront
-                //FeaturesDrawer.render(batch)
+                FeaturesDrawer.drawEnvOverlay(batch)
 
 
-                //FeaturesDrawer.drawEnvOverlay(batch)
-
-                //if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul()
-                //else blendNormal()
-                //blendMul()
-                //LightmapRenderer.draw(batch)
-
+                LightmapRenderer.draw(batch)
 
 
                 //////////////////////
                 // draw actor glows //
                 //////////////////////
-                // needs some new blending/shader for glow...
+                // FIXME needs some new blending/shader for glow...
 
                 //actorsRenderMiddle.forEach { it.drawGlow(batch) }
                 //actorsRenderMidTop.forEach { it.drawGlow(batch) }
-                player?.drawGlow(batch)
+                //player?.drawGlow(batch)
                 //actorsRenderFront.forEach { it.drawGlow(batch) }
                 // --> blendLightenOnly() <-- introduced by childs of ActorWithBody //
-
-
             }
         }
 
 
 
-        /////////////////////////////////
-        // draw framebuffers to screen //
-        /////////////////////////////////
+        /////////////////////////
+        // draw to main screen //
+        /////////////////////////
         blendNormal()
         batch.inUse {
             camera.position.set(TerrarumGDX.HALFW.toFloat(), TerrarumGDX.HALFH.toFloat(), 0f) // make camara work
@@ -493,12 +452,97 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             batch.projectionMatrix = camera.combined
 
 
+            /////////////////////////////////
+            // draw framebuffers to screen //
+            /////////////////////////////////
+
             WeatherMixer.render(batch)
 
             val tex = worldDrawFrameBuffer.colorBufferTexture // TODO zoom!
             batch.draw(tex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+
+
+
+
+            ////////////////////////
+            // debug informations //
+            ////////////////////////
+
+            blendNormal()
+            // draw reference ID if debugWindow is open
+            if (debugWindow.isVisible) {
+
+                actorContainer.forEachIndexed { i, actor ->
+                    if (actor is ActorWithBody) {
+                        batch.color = Color.WHITE
+                        TerrarumGDX.fontSmallNumbers.draw(batch,
+                                actor.referenceID.toString(),
+                                actor.hitbox.startX.toFloat(),
+                                actor.hitbox.canonicalY.toFloat() + 4
+                        )
+                    }
+                }
+            }
+            // debug physics
+            if (KeyToggler.isOn(Input.Keys.F11)) {
+                actorContainer.forEachIndexed { i, actor ->
+                    if (actor is ActorWithPhysics) {
+                        /*shapeRenderer.inUse(ShapeRenderer.ShapeType.Line) {
+                            shapeRenderer.color = Color(1f, 0f, 1f, 1f)
+                            //shapeRenderer.lineWidth = 1f
+                            shapeRenderer.rect(
+                                    actor.hitbox.startX.toFloat(),
+                                    actor.hitbox.startY.toFloat(),
+                                    actor.hitbox.width.toFloat(),
+                                    actor.hitbox.height.toFloat()
+                            )
+                        }*/
+
+                        // velocity
+                        batch.color = Color.CHARTREUSE//GameFontBase.codeToCol["g"]
+                        TerrarumGDX.fontSmallNumbers.draw(batch,
+                                "${0x7F.toChar()}X ${actor.externalForce.x}",
+                                actor.hitbox.startX.toFloat(),
+                                actor.hitbox.canonicalY.toFloat() + 4 + 8
+                        )
+                        TerrarumGDX.fontSmallNumbers.draw(batch,
+                                "${0x7F.toChar()}Y ${actor.externalForce.y}",
+                                actor.hitbox.startX.toFloat(),
+                                actor.hitbox.canonicalY.toFloat() + 4 + 8 * 2
+                        )
+                    }
+                }
+            }
+            // fluidmap debug
+            if (KeyToggler.isOn(Input.Keys.F4)) {
+                WorldSimulator.drawFluidMapDebug(batch)
+            }
+
+
+
+
+            /////////////////////////////
+            // draw some overlays (UI) //
+            /////////////////////////////
+
+            //uiContainer.forEach { if (it != consoleHandler) it.render(batch) } // FIXME draws black of grey coloured box on top right
+            debugWindow.render(batch)
+            // make sure console draws on top of other UIs
+            consoleHandler.render(batch)
+            notifier.render(batch)
         }
 
+
+
+
+
+
+
+        //      //////    ////    //      ////  //  //
+        //      //      //      //  //  //      //  //
+        //      ////    //  //  //  //  //        ////
+        //      //      //  //  //////  //          //
+        //////  //////    ////  //  //    ////  ////
 
 
         /////////////////////////////
@@ -1037,15 +1081,12 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     override fun resize(width: Int, height: Int) {
         worldDrawFrameBuffer.dispose()
         worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width.div(ZOOM_MIN).ceilInt(), Gdx.graphics.height.div(ZOOM_MIN).ceilInt(), false)
-        backDrawFrameBuffer.dispose()
-        backDrawFrameBuffer =  FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width, Gdx.graphics.height, false)
-        
+
         // Set up viewport when window is resized
-        initViewPort(width, height, width.toFloat() / height.toFloat())
+        initViewPort(width, height)
     }
 
     override fun dispose() {
         worldDrawFrameBuffer.dispose()
-        backDrawFrameBuffer.dispose()
     }
 }

@@ -342,7 +342,9 @@ object BlocksDrawer {
     }
 
 
-
+    ///////////////////////////////////////////
+    // NO draw lightmap using colour filter, actors must also be hidden behind the darkness
+    ///////////////////////////////////////////
 
     fun renderWall(batch: SpriteBatch) {
         /**

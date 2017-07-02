@@ -11,6 +11,7 @@ import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blendScreen
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**
  * Created by minjaesong on 16-03-14.
@@ -30,11 +31,18 @@ class BasicDebugInfoWindow : UICanvas {
     private var xdelta = 0.0
     private var ydelta = 0.0
 
-    val ccW = 0.toChar()//GameFontBase.colToCode["w"]
-    val ccG = 0.toChar()//GameFontBase.colToCode["g"]
-    val ccY = 0.toChar()//GameFontBase.colToCode["y"]
-    val ccR = 0.toChar()//GameFontBase.colToCode["r"]
-    val ccM = 0.toChar()//GameFontBase.colToCode["m"]
+    val ccW = GameFontBase.toColorCode(0xFFFF)
+    val ccY = GameFontBase.toColorCode(0xFE8F)
+    val ccO = GameFontBase.toColorCode(0xFB2F)
+    val ccR = GameFontBase.toColorCode(0xF88F)
+    val ccF = GameFontBase.toColorCode(0xFAEF)
+    val ccM = GameFontBase.toColorCode(0xEAFF)
+    val ccB = GameFontBase.toColorCode(0x88FF)
+    val ccC = GameFontBase.toColorCode(0x8FFF)
+    val ccG = GameFontBase.toColorCode(0x8F8F)
+    val ccV = GameFontBase.toColorCode(0x080F)
+    val ccX = GameFontBase.toColorCode(0x853F)
+    val ccK = GameFontBase.toColorCode(0x888F)
 
 
 
@@ -59,9 +67,7 @@ class BasicDebugInfoWindow : UICanvas {
         val mouseTileX = ((WorldCamera.x + TerrarumGDX.mouseX / TerrarumGDX.ingame!!.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
         val mouseTileY = ((WorldCamera.y + TerrarumGDX.mouseY / TerrarumGDX.ingame!!.screenZoom) / FeaturesDrawer.TILE_SIZE).toInt()
 
-        //g.color = GameFontBase.codeToCol["y"]
-
-        batch.color = Color.WHITE
+        batch.color = Color(0xFFEE88FF.toInt())
 
         val hitbox = player?.hitbox
 
@@ -155,6 +161,9 @@ class BasicDebugInfoWindow : UICanvas {
                 Gdx.graphics.width - histogramW - 30,
                 Gdx.graphics.height - histogramH - 30
         )
+
+        batch.color = Color.WHITE
+
         if (TerrarumGDX.controller != null) {
             drawGamepadAxis(batch,
                     TerrarumGDX.controller!!.getAxisValue(3),
