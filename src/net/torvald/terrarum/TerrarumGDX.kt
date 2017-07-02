@@ -479,9 +479,9 @@ object TerrarumGDX : ApplicationAdapter() {
     inline val mouseY: Double
         get() = GameController.mouseY.toDouble()
     @JvmStatic inline val mouseTileX: Int
-        get() = mouseX.toInt() / TILE_SIZE
+        get() = GameController.mouseTileX
     @JvmStatic inline val mouseTileY: Int
-        get() = mouseY.toInt() / TILE_SIZE
+        get() = GameController.mouseTileY
     inline val mouseScreenX: Int
         get() = Gdx.input.x
     inline val mouseScreenY: Int
@@ -602,6 +602,17 @@ infix fun Color.minus(other: Color) = Color( // don't turn into an operator!
 fun Int.toHex() = this.toLong().and(0xFFFFFFFF).toString(16).padStart(8, '0').toUpperCase()
 
 
-
+val ccW = GameFontBase.toColorCode(0xFFFF)
+val ccY = GameFontBase.toColorCode(0xFE8F)
+val ccO = GameFontBase.toColorCode(0xFB2F)
+val ccR = GameFontBase.toColorCode(0xF88F)
+val ccF = GameFontBase.toColorCode(0xFAEF)
+val ccM = GameFontBase.toColorCode(0xEAFF)
+val ccB = GameFontBase.toColorCode(0x88FF)
+val ccC = GameFontBase.toColorCode(0x8FFF)
+val ccG = GameFontBase.toColorCode(0x8F8F)
+val ccV = GameFontBase.toColorCode(0x080F)
+val ccX = GameFontBase.toColorCode(0x853F)
+val ccK = GameFontBase.toColorCode(0x888F)
 
 
