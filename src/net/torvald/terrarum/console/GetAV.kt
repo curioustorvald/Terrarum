@@ -1,18 +1,12 @@
 package net.torvald.terrarum.console
 
+import net.torvald.terrarum.*
 import net.torvald.terrarum.TerrarumGDX
 
 /**
  * Created by minjaesong on 16-01-19.
  */
 internal object GetAV : ConsoleCommand {
-
-    val ccW = 0.toChar()//GameFontBase.colToCode["w"]
-    val ccG = 0.toChar()//GameFontBase.colToCode["g"]
-    val ccY = 0.toChar()//GameFontBase.colToCode["y"]
-    val ccM = 0.toChar()//GameFontBase.colToCode["m"]
-    val ccK = 0.toChar()//GameFontBase.colToCode["k"]
-    val ccO = 0.toChar()//GameFontBase.colToCode["o"]
 
     override fun execute(args: Array<String>) {
         try {

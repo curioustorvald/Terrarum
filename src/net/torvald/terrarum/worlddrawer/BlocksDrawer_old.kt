@@ -352,8 +352,7 @@ object BlocksDrawer {
          */
         blendNormal()
 
-        batch.color = wallOverlayColour
-        drawTiles(batch, WALL, false)
+        drawTiles(batch, WALL, false, wallOverlayColour)
     }
 
     fun renderTerrain(batch: SpriteBatch) {
@@ -362,8 +361,7 @@ object BlocksDrawer {
          */
         blendNormal()
 
-        batch.color = Color.WHITE
-        drawTiles(batch, TERRAIN, false) // regular tiles
+        drawTiles(batch, TERRAIN, false, Color.WHITE) // regular tiles
     }
 
     fun renderFront(batch: SpriteBatch, drawWires: Boolean) {
@@ -372,11 +370,10 @@ object BlocksDrawer {
          */
         blendMul()
 
-        batch.color = Color.WHITE
-        drawTiles(batch, TERRAIN, true) // blendmul tiles
+        drawTiles(batch, TERRAIN, true, Color.WHITE) // blendmul tiles
 
         if (drawWires) {
-            drawTiles(batch, WIRE, false)
+            drawTiles(batch, WIRE, false, Color.WHITE)
         }
 
         blendNormal()
@@ -384,7 +381,7 @@ object BlocksDrawer {
 
     private val tileDrawLightThreshold = 2
 
-    private fun drawTiles(batch: SpriteBatch, mode: Int, drawModeTilesBlendMul: Boolean) {
+    private fun drawTiles(batch: SpriteBatch, mode: Int, drawModeTilesBlendMul: Boolean, color: Color) {
         val for_y_start = y / TILE_SIZE
         val for_y_end = BlocksDrawer.clampHTile(for_y_start + (height / TILE_SIZE) + 2)
 
@@ -392,6 +389,8 @@ object BlocksDrawer {
         val for_x_end = for_x_start + (width / TILE_SIZE) + 3
 
         var zeroTileCounter = 0
+
+        batch.color = color
 
         // loop
         for (y in for_y_start..for_y_end) {
@@ -490,7 +489,7 @@ object BlocksDrawer {
 
                             batch.fillRect(x.toFloat(), y.toFloat(), TILE_SIZEF, TILE_SIZEF)
 
-                            batch.color = Color.WHITE
+                            batch.color = color
                         }
                     } // end if (not an air)
                 } catch (e: NullPointerException) {

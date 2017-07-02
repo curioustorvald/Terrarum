@@ -1,8 +1,8 @@
 package net.torvald.terrarum.console
 
+import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
 import java.time.ZonedDateTime
-
 import java.util.ArrayList
 import java.util.Formatter
 import java.util.regex.Pattern
@@ -22,11 +22,6 @@ internal object CommandInterpreter {
             "version",
             "tips"
     )
-
-    private val ccW = 0.toChar()//GameFontBase.colToCode["w"]
-    private val ccG = 0.toChar()//GameFontBase.colToCode["g"]
-    private val ccY = 0.toChar()//GameFontBase.colToCode["y"]
-    private val ccR = 0.toChar()//GameFontBase.colToCode["r"]
 
     internal fun execute(command: String) {
         val cmd: Array<CommandInput?> = parse(command)
