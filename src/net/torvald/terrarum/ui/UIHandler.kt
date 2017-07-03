@@ -18,7 +18,7 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 class UIHandler(val UI: UICanvas,
                 val toggleKey: Int? = null, val toggleButton: Int? = null,
                 // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
-                var customPositioning: Boolean = false,
+                var customPositioning: Boolean = false, // mainly used by vital meter
                 val doNotWarnConstant: Boolean = false
 ) {
 
@@ -141,7 +141,7 @@ class UIHandler(val UI: UICanvas,
             if (!customPositioning)
                 TerrarumGDX.ingame?.setCameraPosition(posX.toFloat(), posY.toFloat())
             batch.color = Color.WHITE
-            
+
             UI.render(batch)
             //ingameGraphics.flush()
         }

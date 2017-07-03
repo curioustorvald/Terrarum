@@ -207,9 +207,9 @@ class BasicDebugInfoWindow : UICanvas {
 
     private fun drawHistogram(batch: SpriteBatch, histogram: LightmapRenderer.Histogram, x: Int, y: Int) {
         val uiColour = Color(0x000000_80.toInt())
-        val barR = Color(0xDD0000_FF.toInt())
-        val barG = Color(0x00DD00_FF.toInt())
-        val barB = Color(0x0000DD_FF.toInt())
+        val barR = Color(0xFF0000_FF.toInt())
+        val barG = Color(0x00FF00_FF.toInt())
+        val barB = Color(0x0000FF_FF.toInt())
         val barColour = arrayOf(barR, barG, barB)
         val w = histogramW.toFloat()
         val h = histogramH.toFloat()
@@ -223,7 +223,7 @@ class BasicDebugInfoWindow : UICanvas {
         TerrarumGDX.fontSmallNumbers.draw(batch, "255", x.toFloat() + w + 1 - 8*3, y.toFloat() + h + 2)
         TerrarumGDX.fontSmallNumbers.draw(batch, "Histogramme", x + w / 2 - 5.5f * 8, y.toFloat() + h + 2)
 
-        //blendScreen()
+        blendScreen()
         for (c in 0..2) {
             for (i in 0..255) {
                 var histogram_value = if (i == 255) 0 else histogram.get(c)[i]
@@ -242,7 +242,7 @@ class BasicDebugInfoWindow : UICanvas {
                 batch.fillRect(bar_x, bar_y, bar_w, bar_h)
             }
         }
-        //blendNormal()
+        blendNormal()
     }
 
     private fun drawGamepadAxis(batch: SpriteBatch, axisX: Float, axisY: Float, uiX: Int, uiY: Int) {
