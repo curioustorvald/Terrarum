@@ -14,7 +14,7 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
 
     @Volatile var hitboxStart: Point2d
         private set
-    val hitboxEnd: Point2d
+    inline val hitboxEnd: Point2d
         get() = Point2d(hitboxStart.x + width, hitboxStart.y + height)
     var width: Double = 0.0
         private set
@@ -134,5 +134,9 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
 
     operator fun minus(other: Hitbox): Vector2 {
         return Vector2(other.centeredX - this.centeredX, other.centeredY - this.centeredY)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return this.hitboxStart == (other as Hitbox).hitboxStart && this.hitboxEnd == (other as Hitbox).hitboxEnd
     }
 }

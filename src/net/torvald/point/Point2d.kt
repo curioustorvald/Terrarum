@@ -7,7 +7,7 @@ import org.dyn4j.geometry.Vector2
 /**
  * Created by minjaesong on 16-01-15.
  */
-class Point2d(var x: Double, var y: Double) : Cloneable {
+data class Point2d(var x: Double, var y: Double) : Cloneable {
 
     override fun toString(): String {
         return "($x, $y)"
@@ -53,4 +53,5 @@ class Point2d(var x: Double, var y: Double) : Cloneable {
 
     fun length(other: Point2d) = distSqr(other).sqrt()
     fun distSqr(other: Point2d) = ((this.x - other.x).sqr() + (this.y - other.y).sqr())
+
 }

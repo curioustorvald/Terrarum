@@ -73,7 +73,6 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     val ZOOM_MIN = 0.5f
 
     var worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width.div(ZOOM_MIN).ceilInt(), Gdx.graphics.height.div(ZOOM_MIN).ceilInt(), false)
-    //var backDrawFrameBuffer =  FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width, Gdx.graphics.height, false)
 
     //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
     //private lateinit var shaderBlur: Shader
@@ -265,7 +264,11 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         )
         uiAlasesPausing.forEach { addUI(it) } // put them all to the UIContainer
         uiAliases.forEach { addUI(it) } // put them all to the UIContainer
-    }
+
+
+
+        LightmapRenderer.fireRecalculateEvent()
+    }// END enter
 
 
     ///////////////
@@ -379,7 +382,6 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
 
         // Post-update; ones that needs everything is completed //
-        LightmapRenderer.renderLightMap()                       //
         FeaturesDrawer.render(batch)                            //
         // end of post-update                                   //
 
@@ -387,9 +389,11 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // now the actual drawing part //
         worldDrawFrameBuffer.inAction {
             batch.inUse {
+                // using custom code; this is obscure and tricky
                 camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
                 camera.update()
                 batch.projectionMatrix = camera.combined
+
                 batch.color = Color.WHITE
                 blendNormal()
 
@@ -423,6 +427,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                     blendNormal()
                 else
                     blendMul()
+                LightmapRenderer.fireRecalculateEvent()
                 LightmapRenderer.draw(batch)
 
 
@@ -806,20 +811,25 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             }
 
             ThreadParallel.startAll()
+
+            playableActorDelegate?.update(delta)
         }
         else {
             actorContainer.forEach {
-                it.update(delta)
+                if (it != playableActorDelegate?.actor) {
+                    it.update(delta)
 
-                if (it is Pocketed) {
-                    it.inventory.forEach { inventoryEntry ->
-                        inventoryEntry.item.effectWhileInPocket(delta)
-                        if (it.equipped(inventoryEntry.item)) {
-                            inventoryEntry.item.effectWhenEquipped(delta)
+                    if (it is Pocketed) {
+                        it.inventory.forEach { inventoryEntry ->
+                            inventoryEntry.item.effectWhileInPocket(delta)
+                            if (it.equipped(inventoryEntry.item)) {
+                                inventoryEntry.item.effectWhenEquipped(delta)
+                            }
                         }
                     }
                 }
             }
+            playableActorDelegate?.update(delta)
             //AmmoMeterProxy(player!!, uiVitalItem.UI as UIVitalMetre)
         }
     }
@@ -1085,6 +1095,9 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
         // Set up viewport when window is resized
         initViewPort(width, height)
+
+
+        LightmapRenderer.fireRecalculateEvent()
     }
 
     override fun dispose() {
@@ -1098,7 +1111,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
      */
     fun setCameraPosition(newX: Float, newY: Float) {
-        camera.position.set(newX + TerrarumGDX.HALFW, newY + TerrarumGDX.HALFH, 0f)
+        camera.position.set(-newX + TerrarumGDX.HALFW, -newY + TerrarumGDX.HALFH, 0f)
         camera.update()
         batch.projectionMatrix = camera.combined
     }

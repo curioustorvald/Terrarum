@@ -34,6 +34,7 @@ class UIQuickBar : UICanvas, MouseControlled {
     }
 
     override fun render(batch: SpriteBatch) {
+
         for (i in 0..SLOT_COUNT - 1) {
             val image = if (i == selection)
                 ItemSlotImageBuilder.produceLarge(false, i + 1)
