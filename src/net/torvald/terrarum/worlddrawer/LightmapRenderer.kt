@@ -85,7 +85,7 @@ object LightmapRenderer {
         }
     }
 
-    fun renderLightMap() {
+    fun fireRecalculateEvent() {
         for_x_start = WorldCamera.x / TILE_SIZE - 1 // fix for premature lightmap rendering
         for_y_start = WorldCamera.y / TILE_SIZE - 1 // on topmost/leftmost side
 
@@ -244,6 +244,8 @@ object LightmapRenderer {
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
 
+        var ambientAccumulator = 0
+
         var lightLevelThis: Int = 0
         val thisTerrain = TerrarumGDX.ingame!!.world.getTileFromTerrain(x, y)
         val thisWall = TerrarumGDX.ingame!!.world.getTileFromWall(x, y)
@@ -281,16 +283,17 @@ object LightmapRenderer {
              *  sample ambient for eight points and apply attenuation for those
              *  maxblend eight values and use it
              */
-            var ambient = 0
-            /* + */ambient = ambient maxBlend darkenColoured(getLight(x - 1, y - 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
-            /* + */ambient = ambient maxBlend darkenColoured(getLight(x + 1, y - 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
-            /* + */ambient = ambient maxBlend darkenColoured(getLight(x - 1, y + 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
-            /* + */ambient = ambient maxBlend darkenColoured(getLight(x + 1, y + 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
-            /* * */ambient = ambient maxBlend darkenColoured(getLight(x    , y - 1) ?: 0, thisTileOpacity)
-            /* * */ambient = ambient maxBlend darkenColoured(getLight(x    , y + 1) ?: 0, thisTileOpacity)
-            /* * */ambient = ambient maxBlend darkenColoured(getLight(x - 1, y    ) ?: 0, thisTileOpacity)
-            /* * */ambient = ambient maxBlend darkenColoured(getLight(x + 1, y    ) ?: 0, thisTileOpacity)
-            return lightLevelThis maxBlend ambient
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y - 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y - 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y + 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y + 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
+
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x    , y - 1) ?: 0, thisTileOpacity)
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x    , y + 1) ?: 0, thisTileOpacity)
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y    ) ?: 0, thisTileOpacity)
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y    ) ?: 0, thisTileOpacity)
+
+            return lightLevelThis maxBlend ambientAccumulator
         }
         else {
             return lightLevelThis
@@ -457,19 +460,15 @@ object LightmapRenderer {
         // use equation with magic number 8.0
         // should draw somewhat exponential curve when you plot the propagation of light in-game
 
-        val r = data.r() * (1f - darken.r() * lightScalingMagic)
-        val g = data.g() * (1f - darken.g() * lightScalingMagic)
-        val b = data.b() * (1f - darken.b() * lightScalingMagic)
-
-        return constructRGBFromFloat(r.clampZero(), g.clampZero(), b.clampZero())
+        return ((data.r() * (1f - darken.r() * lightScalingMagic)).clampZero() * CHANNEL_MAX).round() * MUL_2 +
+               ((data.g() * (1f - darken.g() * lightScalingMagic)).clampZero() * CHANNEL_MAX).round() * MUL +
+               ((data.b() * (1f - darken.b() * lightScalingMagic)).clampZero() * CHANNEL_MAX).round()
     }
 
     fun scaleColour(data: Int, scale: Float): RGB10 {
-        val r = data.r() * scale
-        val g = data.g() * scale
-        val b = data.b() * scale
-
-        return constructRGBFromFloat(r.clampOne(), g.clampOne(), b.clampOne())
+        return ((data.r() * scale).clampOne() * CHANNEL_MAX).round() * MUL_2 +
+               ((data.g() * scale).clampOne() * CHANNEL_MAX).round() * MUL +
+               ((data.b() * scale).clampOne() * CHANNEL_MAX).round()
     }
 
     /**
@@ -557,38 +556,38 @@ object LightmapRenderer {
      * @param rgb2
      * @return
      */
-    private inline infix fun RGB10.maxBlend(other: Int): RGB10 {
+    private infix fun RGB10.maxBlend(other: Int): RGB10 {
         return (if (this.rawR() > other.rawR()) this.rawR() else other.rawR()) * MUL_2 +
                (if (this.rawG() > other.rawG()) this.rawG() else other.rawG()) * MUL +
                (if (this.rawB() > other.rawB()) this.rawB() else other.rawB())
     }
 
-    private inline infix fun RGB10.linMix(other: Int): RGB10 {
+    private infix fun RGB10.linMix(other: Int): RGB10 {
         return ((this.rawR() + other.rawR()) ushr 1) * MUL_2 +
                ((this.rawG() + other.rawG()) ushr 1) * MUL +
                ((this.rawB() + other.rawB()) ushr 1)
     }
 
-    private inline infix fun RGB10.colSub(other: Int): RGB10 {
+    private infix fun RGB10.colSub(other: Int): RGB10 {
         return ((this.rawR() - other.rawR()).clampChannel()) * MUL_2 +
                ((this.rawG() - other.rawG()).clampChannel()) * MUL +
                ((this.rawB() - other.rawB()).clampChannel())
     }
 
-    private inline infix fun RGB10.colAdd(other: Int): RGB10 {
+    private infix fun RGB10.colAdd(other: Int): RGB10 {
         return ((this.rawR() + other.rawR()).clampChannel()) * MUL_2 +
                ((this.rawG() + other.rawG()).clampChannel()) * MUL +
                ((this.rawB() + other.rawB()).clampChannel())
     }
 
-    inline fun RGB10.rawR() = this / MUL_2
-    inline fun RGB10.rawG() = this % MUL_2 / MUL
-    inline fun RGB10.rawB() = this % MUL
+    fun RGB10.rawR() = this / MUL_2
+    fun RGB10.rawG() = this % MUL_2 / MUL
+    fun RGB10.rawB() = this % MUL
 
     /** 0.0 - 1.0 for 0-1023 (0.0 - 0.25 for 0-255) */
-    inline fun RGB10.r(): Float = this.rawR() / CHANNEL_MAX_FLOAT
-    inline fun RGB10.g(): Float = this.rawG() / CHANNEL_MAX_FLOAT
-    inline fun RGB10.b(): Float = this.rawB() / CHANNEL_MAX_FLOAT
+    fun RGB10.r(): Float = this.rawR() / CHANNEL_MAX_FLOAT
+    fun RGB10.g(): Float = this.rawG() / CHANNEL_MAX_FLOAT
+    fun RGB10.b(): Float = this.rawB() / CHANNEL_MAX_FLOAT
 
     /**
 
@@ -631,11 +630,11 @@ object LightmapRenderer {
                (b * CHANNEL_MAX).round()
     }
 
-    inline fun Int.clampZero() = if (this < 0) 0 else this
-    inline fun Float.clampZero() = if (this < 0) 0f else this
-    inline fun Int.clampChannel() = if (this < 0) 0 else if (this > CHANNEL_MAX) CHANNEL_MAX else this
-    inline fun Float.clampOne() = if (this < 0) 0f else if (this > 1) 1f else this
-    inline fun Float.clampChannel() = if (this > CHANNEL_MAX_DECIMAL) CHANNEL_MAX_DECIMAL else this
+    fun Int.clampZero() = if (this < 0) 0 else this
+    fun Float.clampZero() = if (this < 0) 0f else this
+    fun Int.clampChannel() = if (this < 0) 0 else if (this > CHANNEL_MAX) CHANNEL_MAX else this
+    fun Float.clampOne() = if (this < 0) 0f else if (this > 1) 1f else this
+    fun Float.clampChannel() = if (this > CHANNEL_MAX_DECIMAL) CHANNEL_MAX_DECIMAL else this
 
     inline fun getValueFromMap(x: Int, y: Int): Int? = getLight(x, y)
     fun getHighestRGB(x: Int, y: Int): Int? {

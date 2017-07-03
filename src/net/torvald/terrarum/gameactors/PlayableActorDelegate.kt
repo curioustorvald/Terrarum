@@ -1,5 +1,7 @@
 package net.torvald.terrarum.gameactors
 
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
+
 /**
  * A wrapper to support instant player changing (or possessing other NPCs maybe)
  *
@@ -13,4 +15,17 @@ class PlayableActorDelegate(val actor: ActorHumanoid) {
             throw IllegalArgumentException("Player must be 'Controllable'!")
     }
 
+
+    fun update(delta: Float) {
+        //val oldTilewisePos = actor.tilewiseHitbox
+
+        actor.update(delta)
+
+        // fire lightmap recalculate event upon tilewise pos change
+        //val newTilewisePos = actor.tilewiseHitbox
+        //if (oldTilewisePos != newTilewisePos) {
+        //    LightmapRenderer.fireRecalculateEvent()
+        //}
+        // not going to work: think about stationery tiki torches, global lights, etc
+    }
 }

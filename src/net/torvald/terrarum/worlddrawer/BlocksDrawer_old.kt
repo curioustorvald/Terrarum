@@ -407,14 +407,14 @@ object BlocksDrawer {
         val for_x_start = x / TILE_SIZE - 1
         val for_x_end = for_x_start + (width / TILE_SIZE) + 3
 
-        var zeroTileCounter = 0
-
         val originalBatchColour = batch.color.cpy()
         batch.color = color
 
         // loop
         for (y in for_y_start..for_y_end) {
-            for (x in for_x_start..for_x_end - 1) {
+            var zeroTileCounter = 0
+
+            for (x in for_x_start..for_x_end) {
 
                 val thisTile: Int?
                 if (mode % 3 == WALL)
@@ -440,11 +440,13 @@ object BlocksDrawer {
                              LightmapRenderer.getHighestRGB(x - 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
                              LightmapRenderer.getHighestRGB(x + 1, y + 1) ?: 0 >= tileDrawLightThreshold ||
                              LightmapRenderer.getHighestRGB(x + 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x - 1, y + 1) ?: 0 >= tileDrawLightThreshold) {
-                            // blackness
+                             LightmapRenderer.getHighestRGB(x - 1, y + 1) ?: 0 >= tileDrawLightThreshold)
+                        {
+                            // TODO coalesce non-lit black patches
                             if (zeroTileCounter > 0) {
-                                /* unable to do anything */
-
+                                batch.color = Color.BLACK
+                                batch.fillRect(x * TILE_SIZEF, y * TILE_SIZEF, -zeroTileCounter * TILE_SIZEF, TILE_SIZEF)
+                                batch.color = color
                                 zeroTileCounter = 0
                             }
 
@@ -505,17 +507,22 @@ object BlocksDrawer {
                         } // end if (is illuminated)
                         // draw black patch
                         else {
-                            zeroTileCounter++ // unused for now
-
-                            batch.color = Color.BLACK
-                            drawTile(batch, mode, x, y, 1, 0)
-                            batch.color = color
+                            zeroTileCounter += 1 // unused for now
                         }
                     } // end if (not an air)
                 } catch (e: NullPointerException) {
                     // do nothing. WARNING: This exception handling may hide erratic behaviour completely.
                 }
 
+
+                // hit the end of the current scanline
+                // FIXME bad scanlines bug
+                if (x == for_x_end) {
+                    batch.color = Color.BLACK
+                    batch.fillRect(x * TILE_SIZEF, y * TILE_SIZEF, -zeroTileCounter * TILE_SIZEF, TILE_SIZEF)
+                    batch.color = color
+                    zeroTileCounter = 0
+                }
             }
         }
 
@@ -650,14 +657,14 @@ object BlocksDrawer {
         if (mode == TERRAIN || mode == WALL)
             batch.draw(
                     tilesTerrain.get(sheetX, sheetY),
-                    (tilewisePosX * TILE_SIZE).toFloat(),
-                    (tilewisePosY * TILE_SIZE).toFloat()
+                    tilewisePosX * TILE_SIZEF,
+                    tilewisePosY * TILE_SIZEF
             )
         else if (mode == WIRE)
             batch.draw(
                     tilesWire.get(sheetX, sheetY),
-                    (tilewisePosX * TILE_SIZE).toFloat(),
-                    (tilewisePosY * TILE_SIZE).toFloat()
+                    tilewisePosX * TILE_SIZEF,
+                    tilewisePosY * TILE_SIZEF
             )
         else
             throw IllegalArgumentException()
