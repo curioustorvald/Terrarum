@@ -35,7 +35,7 @@ class UIItemTextButtonList(
         val highlightCol: Color = Color(0x00f8ff_ff),
         val highlightBackCol: Color = Color(0xb0b0b0_ff.toInt()),
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
-        val inactiveCol: Color = Color(0xc0c0c0),
+        val inactiveCol: Color = Color(0xc0c0c0_ff.toInt()),
         val backgroundCol: Color = Color(0),
         val backgroundBlendMode: String = BlendMode.NORMAL,
         val kinematic: Boolean = false
