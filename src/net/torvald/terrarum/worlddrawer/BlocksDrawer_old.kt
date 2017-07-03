@@ -381,6 +381,25 @@ object BlocksDrawer {
 
     private val tileDrawLightThreshold = 2
 
+    private fun canIHazRender(mode: Int, x: Int, y: Int) =
+            (world.getTileFrom(mode, x, y) != 0) && // not an air tile
+            // for WALLs:
+            if (mode == WALL)
+                mode == WALL && (
+                        // DRAW WHEN it is visible and 'is a lip'
+                        !BlockCodex[world.getTileFromTerrain(x, y) ?: 0].isSolid ||
+                        !(BlockCodex[world.getTileFromTerrain(x, y) ?: 0].isSolid &&
+                          ((BlockCodex[world.getTileFromTerrain(x, y - 1) ?: 0].isSolid && BlockCodex[world.getTileFromTerrain(x, y + 1) ?: 0].isSolid)
+                           &&
+                           (BlockCodex[world.getTileFromTerrain(x - 1, y) ?: 0].isSolid && BlockCodex[world.getTileFromTerrain(x + 1, y + 1) ?: 0].isSolid)
+                          )
+                         )
+                                )
+            else
+                true
+
+            // end
+
     private fun drawTiles(batch: SpriteBatch, mode: Int, drawModeTilesBlendMul: Boolean, color: Color) {
         val for_y_start = y / TILE_SIZE
         val for_y_end = BlocksDrawer.clampHTile(for_y_start + (height / TILE_SIZE) + 2)
@@ -411,8 +430,7 @@ object BlocksDrawer {
 
                 // draw a tile, but only when illuminated
                 try {
-                    if ((mode == WALL || mode == TERRAIN) &&  // not an air tile
-                        (thisTile ?: 0) != Block.AIR) {
+                    if (canIHazRender(mode, x, y)) {
                     // check if light level of nearby or this tile is illuminated
                         if ( LightmapRenderer.getHighestRGB(x, y) ?: 0 >= tileDrawLightThreshold ||
                              LightmapRenderer.getHighestRGB(x - 1, y) ?: 0 >= tileDrawLightThreshold ||
@@ -489,10 +507,8 @@ object BlocksDrawer {
                         else {
                             zeroTileCounter++ // unused for now
 
-                            //batch.color = Color.BLACK
-
-                            batch.fillRect(x.toFloat(), y.toFloat(), TILE_SIZEF, TILE_SIZEF)
-
+                            batch.color = Color.BLACK
+                            drawTile(batch, mode, x, y, 1, 0)
                             batch.color = color
                         }
                     } // end if (not an air)

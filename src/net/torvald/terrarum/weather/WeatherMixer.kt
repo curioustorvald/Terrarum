@@ -118,12 +118,11 @@ object WeatherMixer {
 
         // draw skybox to provided graphics instance
         batch.end()
-        blendNormal()
         TerrarumGDX.inShapeRenderer {
             it.rect(
                     0f, 0f,
-                    Gdx.graphics.width.toFloat(),// / TerrarumGDX.ingame!!.screenZoom,
-                    Gdx.graphics.height.toFloat(),// / TerrarumGDX.ingame!!.screenZoom
+                    Gdx.graphics.width.toFloat(),
+                    Gdx.graphics.height.toFloat(),
                     getGradientColour(skyboxColourMap, 1, timeNow),
                     getGradientColour(skyboxColourMap, 1, timeNow),
                     getGradientColour(skyboxColourMap, 0, timeNow),
