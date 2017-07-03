@@ -393,8 +393,6 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                 batch.color = Color.WHITE
                 blendNormal()
 
-
-
                 BlocksDrawer.renderWall(batch)
                 actorsRenderBehind.forEach { it.drawBody(batch) }
                 actorsRenderBehind.forEach { it.drawGlow(batch) }
@@ -425,7 +423,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                     blendNormal()
                 else
                     blendMul()
-                //LightmapRenderer.draw(batch)
+                LightmapRenderer.draw(batch)
 
 
                 //////////////////////
@@ -447,9 +445,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // draw to main screen //
         /////////////////////////
         batch.inUse {
-            camera.position.set(TerrarumGDX.HALFW.toFloat(), TerrarumGDX.HALFH.toFloat(), 0f) // make camara work
-            camera.update()
-            batch.projectionMatrix = camera.combined
+            setCameraPosition(0f, 0f)
             batch.color = Color.WHITE
             blendNormal()
 
@@ -527,9 +523,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             /////////////////////////////
             // draw some overlays (UI) //
             /////////////////////////////
-
             uiContainer.forEach { if (it != consoleHandler) it.render(batch) } // FIXME draws black of grey coloured box on top right
-            batch.color = Color.WHITE
+
             debugWindow.render(batch)
             // make sure console draws on top of other UIs
             consoleHandler.render(batch)
@@ -556,7 +551,6 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // draw map related stuffs //
         /////////////////////////////
         /*worldDrawFrameBuffer.inAction {
-            // FIXME wrong and flipped coord; one camera code does not concern other
 
             batch.inUse {
                 camera.position.set(WorldCamera.x.toFloat(), WorldCamera.y.toFloat(), 0f) // make camara work
@@ -1095,5 +1089,17 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
     override fun dispose() {
         worldDrawFrameBuffer.dispose()
+    }
+
+
+    /**
+     * WARNING! this function flushes batch; use this sparingly!
+     *
+     * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
+     */
+    fun setCameraPosition(newX: Float, newY: Float) {
+        camera.position.set(newX + TerrarumGDX.HALFW, newY + TerrarumGDX.HALFH, 0f)
+        camera.update()
+        batch.projectionMatrix = camera.combined
     }
 }

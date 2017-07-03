@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.CpuSpriteBatch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -41,7 +42,7 @@ fun main(args: Array<String>) {
     config.foregroundFPS = TerrarumGDX.RENDER_FPS
     config.backgroundFPS = TerrarumGDX.RENDER_FPS
     //config.vSyncEnabled = true
-    config.resizable = false
+    config.resizable = true
     config.width = 1072
     config.height = 742
     config.backgroundFPS = 9999
@@ -514,8 +515,8 @@ inline fun FrameBuffer.inAction(action: (FrameBuffer) -> Unit) {
 
 
 // ShapeRenderer alternative for rects
-inline fun SpriteBatch.fillRect(x: Float, y: Float, w: Float, h: Float) {
-    this.draw(net.torvald.terrarum.TerrarumGDX.orthoLineTex2px, x, y, w, h)
+fun SpriteBatch.fillRect(x: Float, y: Float, w: Float, h: Float) {
+    this.draw(net.torvald.terrarum.worlddrawer.BlocksDrawer.tilesTerrain.get(1, 0), x, y, w, h)
 }
 inline fun SpriteBatch.drawStraightLine(x: Float, y: Float, p2: Float, thickness: Float, isVertical: Boolean) {
     if (!isVertical)
