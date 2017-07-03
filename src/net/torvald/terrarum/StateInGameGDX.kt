@@ -145,6 +145,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
 
     fun enter() {
+
         Gdx.input.inputProcessor = GameController
 
 

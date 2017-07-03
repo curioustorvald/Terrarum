@@ -31,9 +31,11 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
     /**
      * OriginalName is always read from Language files.
      */
-    abstract protected val originalName: String
+    abstract val originalName: String
 
-    private var newName: String = "I AM VITTUN PLACEHOLDER"
+
+    var newName: String = "I AM VITTUN PLACEHOLDER"
+        private set
 
     var name: String
         set(value) {

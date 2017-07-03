@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.colourutil.CIELabUtil.darkerLab
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.ui.UIInventory
 import net.torvald.terrarum.ui.UIItem
@@ -49,7 +50,7 @@ class UIItemInventoryElem(
     private val textOffsetY = 8f
 
 
-    private val durabilityCol = Color(0x22ff11)
+    private val durabilityCol = Color(0x22ff11_ff)
     private val durabilityBack: Color; get() = durabilityCol.darkerLab(0.4f)
     private val durabilityBarOffY = 35f
 
@@ -84,7 +85,10 @@ class UIItemInventoryElem(
         if (item != null && itemImage != null) {
             blendNormal()
 
+            //println("orgID: ${item!!.originalID}, nameKey: ${BlockCodex[item!!.originalID].nameKey}, itemOrgName: ${item!!.originalName}")
+
             // item image
+            batch.color = Color.WHITE
             batch.draw(itemImage, posX + imgOffset, posY + imgOffset)
 
             // if mouse is over, text lights up
@@ -111,14 +115,18 @@ class UIItemInventoryElem(
 
 
             // quickslot marker (TEMPORARY UNTIL WE GET BETTER DESIGN)
+            batch.color = Color.WHITE
+
             if (quickslot != null) {
                 val label = quickslot!!.plus(0xE010).toChar()
                 val labelW = TerrarumGDX.fontGame.getWidth("$label")
-                batch.color = Color.WHITE
                 TerrarumGDX.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW, posY + textOffsetY)
             }
 
         }
+
+        // see IFs above?
+        batch.color = Color.WHITE
 
     }
 
