@@ -165,7 +165,6 @@ object ModMgr {
         val langPath = "locales/"
 
         @JvmStatic operator fun invoke(module: String) {
-            println("arstneitars")
             Lang.load(getPath(module, langPath))
         }
     }
