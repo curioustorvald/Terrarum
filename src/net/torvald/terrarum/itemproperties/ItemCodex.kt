@@ -53,7 +53,7 @@ object ItemCodex {
                 override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
 
                 init {
-
+                    println("[ItemCodex] recording item ID $originalID")
                 }
 
                 override fun primaryUse(delta: Float): Boolean {

@@ -17,9 +17,11 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWithPhysics.Companion.TILE_SIZE
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.imagefont.TinyAlphNum
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.JsonWriter
 import net.torvald.terrarum.worlddrawer.RGB10
@@ -285,6 +287,10 @@ object TerrarumGDX : ApplicationAdapter() {
 
         fontGame = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = true)
         fontSmallNumbers = TinyAlphNum
+
+
+        ModMgr // invoke Module Manager, will also invoke BlockCodex
+        ItemCodex // invoke Item Codex
 
 
 

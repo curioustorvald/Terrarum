@@ -83,7 +83,7 @@ class UIInventory(
             iconSpriteSheet = TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20),
             iconSpriteSheetIndices = intArrayOf(9,6,7,1,0,2,3,4,5,8),
             iconCol = defaultTextColour,
-            highlightBackCol = Color(0xb8b8b8),
+            highlightBackCol = Color(0xb8b8b8_ff.toInt()),
             highlightBackBlendMode = BlendMode.MULTIPLY,
             backgroundCol = Color(0), // will use custom background colour!
             backgroundBlendMode = BlendMode.NORMAL,
@@ -102,9 +102,9 @@ class UIInventory(
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
-                mouseoverBackCol = Color(0x282828),
+                mouseoverBackCol = Color(0x282828_ff),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = Color(0xd4d4d4),
+                backCol = Color(0xd4d4d4_ff.toInt()),
                 backBlendMode = BlendMode.MULTIPLY,
                 drawBackOnNull = true,
                 inactiveTextCol = defaultTextColour
@@ -167,7 +167,7 @@ class UIInventory(
 
         // cat bar background
         blendMul()
-        batch.color = Color(0xcccccc)
+        batch.color = Color(0xcccccc_ff.toInt())
         batch.fillRect(0f, 0f, catButtons.width.toFloat(), height.toFloat())
 
         catButtons.render(batch)
@@ -196,7 +196,7 @@ class UIInventory(
 
             // encumbrance bar background
             blendMul()
-            batch.color = Color(0xa0a0a0)
+            batch.color = Color(0xa0a0a0_ff.toInt())
             batch.fillRect(
                     width - 3 - weightBarWidth,
                     height - controlHelpHeight + 3f,
@@ -205,7 +205,7 @@ class UIInventory(
             )
             // encumbrance bar
             blendNormal()
-            batch.color = if (isEncumbered) Color(0xccff0000.toInt()) else Color(0xcc00ff00.toInt())
+            batch.color = if (isEncumbered) Color(0xff0000_cc.toInt()) else Color(0x00ff00_cc.toInt())
             batch.fillRect(
                     width - 3 - weightBarWidth,
                     height - controlHelpHeight + 3f,
