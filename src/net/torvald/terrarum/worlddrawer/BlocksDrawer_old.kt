@@ -442,12 +442,12 @@ object BlocksDrawer {
                              LightmapRenderer.getHighestRGB(x + 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
                              LightmapRenderer.getHighestRGB(x - 1, y + 1) ?: 0 >= tileDrawLightThreshold)
                         {
-                            // TODO coalesce non-lit black patches
+                            // FIXME bad scanlines bug
                             if (zeroTileCounter > 0) {
-                                batch.color = Color.BLACK
+                                /*batch.color = Color.BLACK
                                 batch.fillRect(x * TILE_SIZEF, y * TILE_SIZEF, -zeroTileCounter * TILE_SIZEF, TILE_SIZEF)
                                 batch.color = color
-                                zeroTileCounter = 0
+                                zeroTileCounter = 0*/
                             }
 
 
@@ -508,6 +508,8 @@ object BlocksDrawer {
                         // draw black patch
                         else {
                             zeroTileCounter += 1 // unused for now
+                            batch.color = Color.BLACK
+                            batch.fillRect(x * TILE_SIZEF, y * TILE_SIZEF, TILE_SIZEF, TILE_SIZEF)
                         }
                     } // end if (not an air)
                 } catch (e: NullPointerException) {
@@ -517,12 +519,13 @@ object BlocksDrawer {
 
                 // hit the end of the current scanline
                 // FIXME bad scanlines bug
-                if (x == for_x_end) {
+                /*if (x == for_x_end) {
+                    val x = x + 1 // because current tile is also counted
                     batch.color = Color.BLACK
                     batch.fillRect(x * TILE_SIZEF, y * TILE_SIZEF, -zeroTileCounter * TILE_SIZEF, TILE_SIZEF)
                     batch.color = color
                     zeroTileCounter = 0
-                }
+                }*/
             }
         }
 
