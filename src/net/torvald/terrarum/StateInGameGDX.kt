@@ -73,6 +73,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     val ZOOM_MIN = 0.5f
 
     var worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width.div(ZOOM_MIN).ceilInt(), Gdx.graphics.height.div(ZOOM_MIN).ceilInt(), false)
+    var lightmapFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width.div(ZOOM_MIN).ceilInt(), Gdx.graphics.height.div(ZOOM_MIN).ceilInt(), false)
+    // lightmapFrameBuffer: used to smooth out lightmap using shader
 
     //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
     //private lateinit var shaderBlur: Shader
@@ -354,7 +356,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // app-related updates //
         /////////////////////////
 
-        // determine if lightmap blending should be done
+        // determine if smooth lighting should be done
         TerrarumGDX.setConfig("smoothlighting", KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH))
 
 
@@ -372,11 +374,13 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         //camera.position.set(0f, 0f, 0f) // make camara work
         //batch.projectionMatrix = camera.combined
 
-        TerrarumGDX.GLOBAL_RENDER_TIMER += 1
-
 
         // clean the shit beforehand
         worldDrawFrameBuffer.inAction {
+            Gdx.gl.glClearColor(0f,0f,0f,0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        }
+        lightmapFrameBuffer.inAction {
             Gdx.gl.glClearColor(0f,0f,0f,0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         }
@@ -384,16 +388,36 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
         // Post-update; ones that needs everything is completed //
         FeaturesDrawer.render(batch)                            //
+        // update lightmap on every other frames, OR full-frame if the option is true
+        if (TerrarumGDX.getConfigBoolean("fullframelightupdate") or (TerrarumGDX.GLOBAL_RENDER_TIMER and 1 == 1)) {       //
+            LightmapRenderer.fireRecalculateEvent()             //
+        }                                                       //
         // end of post-update                                   //
 
 
         // now the actual drawing part //
-        worldDrawFrameBuffer.inAction {
+        lightmapFrameBuffer.inAction {
+            // TODO gaussian blur p=8
+            //batch.shader = TerrarumGDX.shaderBlur
             batch.inUse {
-                // using custom code; this is obscure and tricky
+                // using custom code for camera; this is obscure and tricky
                 camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
                 camera.update()
                 batch.projectionMatrix = camera.combined
+
+
+                blendNormal()
+                LightmapRenderer.draw(batch)
+            }
+        }
+
+        worldDrawFrameBuffer.inAction {
+            batch.inUse {
+                // using custom code for camera; this is obscure and tricky
+                camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
+                camera.update()
+                batch.projectionMatrix = camera.combined
+
 
                 batch.color = Color.WHITE
                 blendNormal()
@@ -424,12 +448,23 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                 FeaturesDrawer.drawEnvOverlay(batch)
 
 
-                if (KeyToggler.isOn(Input.Keys.F7))
-                    blendNormal()
-                else
-                    blendMul()
-                LightmapRenderer.fireRecalculateEvent()
-                LightmapRenderer.draw(batch)
+                // mix lighpmap canvas to this canvas
+                if (!KeyToggler.isOn(Input.Keys.F6)) { // F6 do disable lightmap draw
+                    setCameraPosition(0f, 0f)
+
+                    val lightTex = lightmapFrameBuffer.colorBufferTexture // TODO zoom!
+                    if (KeyToggler.isOn(Input.Keys.F7)) blendNormal()
+                    else blendMul()
+                    batch.draw(lightTex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+                }
+
+
+
+                // move camera back to its former position
+                // using custom code for camera; this is obscure and tricky
+                camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
+                camera.update()
+                batch.projectionMatrix = camera.combined
 
 
                 //////////////////////
@@ -463,8 +498,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             WeatherMixer.render(batch)
 
             batch.color = Color.WHITE
-            val tex = worldDrawFrameBuffer.colorBufferTexture // TODO zoom!
-            batch.draw(tex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+            val worldTex = worldDrawFrameBuffer.colorBufferTexture // TODO zoom!
+            batch.draw(worldTex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
 
 
 

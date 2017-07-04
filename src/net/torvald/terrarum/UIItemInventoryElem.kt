@@ -84,9 +84,7 @@ class UIItemInventoryElem(
 
         if (item != null && itemImage != null) {
             blendNormal()
-
-            //println("orgID: ${item!!.originalID}, nameKey: ${BlockCodex[item!!.originalID].nameKey}, itemOrgName: ${item!!.originalName}")
-
+            
             // item image
             batch.color = Color.WHITE
             batch.draw(itemImage, posX + imgOffset, posY + imgOffset)

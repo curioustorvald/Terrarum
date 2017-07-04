@@ -81,6 +81,8 @@ object DefaultConfig {
         jsonObject.addProperty("maxparticles", 768)
 
 
+        jsonObject.addProperty("fullframelightupdate", false)
+
 
         return jsonObject
     }
