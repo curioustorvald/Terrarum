@@ -18,11 +18,11 @@ internal object Zoom : ConsoleCommand {
                 return
             }
 
-            if (zoom < TerrarumGDX.ingame!!.ZOOM_MIN) {
-                zoom = TerrarumGDX.ingame!!.ZOOM_MIN
+            if (zoom < TerrarumGDX.ingame!!.ZOOM_MINIMUM) {
+                zoom = TerrarumGDX.ingame!!.ZOOM_MINIMUM
             }
-            else if (zoom > TerrarumGDX.ingame!!.ZOOM_MAX) {
-                zoom = TerrarumGDX.ingame!!.ZOOM_MAX
+            else if (zoom > TerrarumGDX.ingame!!.ZOOM_MAXIMUM) {
+                zoom = TerrarumGDX.ingame!!.ZOOM_MAXIMUM
             }
 
             TerrarumGDX.ingame!!.screenZoom = zoom

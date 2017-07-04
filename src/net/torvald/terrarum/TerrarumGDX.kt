@@ -294,6 +294,7 @@ object TerrarumGDX : ApplicationAdapter() {
         fontSmallNumbers = TinyAlphNum
 
 
+        ShaderProgram.pedantic = false
         shaderBlur = ShaderProgram(Gdx.files.internal("assets/blur.vert"), Gdx.files.internal("assets/blur.frag"))
 
 
