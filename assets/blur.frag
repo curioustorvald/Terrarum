@@ -5,7 +5,7 @@ uniform sampler2D u_texture;
 
 
 
-uniform vec3 iResolution;
+uniform vec2 iResolution;
 uniform float flip;
 uniform vec2 direction;
 

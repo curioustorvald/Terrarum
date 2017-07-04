@@ -83,14 +83,6 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas {
     }
 
     override fun render(batch: SpriteBatch) {
-        // backplate
-        batch.draw(atlas.get(0, 0), 0f, 0f)
-
-        // because what the fuck (rendered darker than what it supposed to be)
-        /*blendScreen()
-        batch.color = Color(0x0c0c0c_ff)
-        batch.draw(atlas.get(0, 1), 0f, 0f)*/
-
         // light overlay or EL
         if (ELon) {
             blendNormal()
@@ -108,9 +100,11 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas {
             else {
                 lightLevel = TerrarumGDX.ingame!!.world.globalLight.normaliseToColour()
             }
-            blendMul()
+
+
+            // backplate
             batch.color = lightLevel
-            batch.draw(atlas.get(0, 1), 0f, 0f)
+            batch.draw(atlas.get(0, 0), 0f, 0f)
         }
 
         // LCD back
