@@ -43,9 +43,9 @@ fun main(args: Array<String>) {
     config.foregroundFPS = TerrarumGDX.RENDER_FPS
     config.backgroundFPS = TerrarumGDX.RENDER_FPS
     //config.vSyncEnabled = true
-    config.resizable = false
-    config.width = 512//1072
-    config.height = 512//742
+    config.resizable = true
+    config.width = 1072
+    config.height = 742
     config.backgroundFPS = 9999
     config.foregroundFPS = 9999
     //config.useGL30 = true
