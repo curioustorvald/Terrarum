@@ -6,10 +6,7 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.assets.loaders.ShaderProgramLoader
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.GL30
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.CpuSpriteBatch
@@ -46,9 +43,9 @@ fun main(args: Array<String>) {
     config.foregroundFPS = TerrarumGDX.RENDER_FPS
     config.backgroundFPS = TerrarumGDX.RENDER_FPS
     //config.vSyncEnabled = true
-    config.resizable = true
-    config.width = 1072
-    config.height = 742
+    config.resizable = false
+    config.width = 512//1072
+    config.height = 512//742
     config.backgroundFPS = 9999
     config.foregroundFPS = 9999
     //config.useGL30 = true
@@ -297,7 +294,6 @@ object TerrarumGDX : ApplicationAdapter() {
         ShaderProgram.pedantic = false
         shaderBlur = ShaderProgram(Gdx.files.internal("assets/blur.vert"), Gdx.files.internal("assets/blur.frag"))
 
-
         ModMgr // invoke Module Manager, will also invoke BlockCodex
         ItemCodex // invoke Item Codex
 
@@ -305,8 +301,9 @@ object TerrarumGDX : ApplicationAdapter() {
 
 
         ingame = StateInGameGDX(batch)
-        ingame!!.enter()
         currentScreen = ingame as Screen
+        ingame!!.enter()
+
     }
 
     override fun render() {
@@ -522,8 +519,12 @@ inline fun ShapeRenderer.inUse(shapeRendererType: ShapeRenderer.ShapeType = Shap
 }
 
 /** Use Batch inside of it! */
-inline fun FrameBuffer.inAction(action: (FrameBuffer) -> Unit) {
+inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?, action: (FrameBuffer) -> Unit) {
     this.begin()
+    camera?.setToOrtho(true, this.width.toFloat(), this.height.toFloat())
+    camera?.position?.set(this.width / 2f, this.height / 2f, 0f) // are these actually needed?
+    camera?.update()                                             // are these actually needed?
+    batch?.projectionMatrix = camera?.combined
     action(this)
     this.end()
 }

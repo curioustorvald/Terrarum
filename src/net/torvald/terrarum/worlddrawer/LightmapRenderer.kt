@@ -13,6 +13,7 @@ import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.fillRect
+import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.inUse
 import java.util.*
 
@@ -285,10 +286,10 @@ object LightmapRenderer {
              *  sample ambient for eight points and apply attenuation for those
              *  maxblend eight values and use it
              */
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y - 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y - 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y + 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y + 1) ?: 0, scaleColour(thisTileOpacity, 1.4142f))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y - 1) ?: 0, scaleSqrt2(thisTileOpacity))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y - 1) ?: 0, scaleSqrt2(thisTileOpacity))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y + 1) ?: 0, scaleSqrt2(thisTileOpacity))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y + 1) ?: 0, scaleSqrt2(thisTileOpacity))
 
             /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x    , y - 1) ?: 0, thisTileOpacity)
             /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x    , y + 1) ?: 0, thisTileOpacity)
@@ -462,16 +463,24 @@ object LightmapRenderer {
         // use equation with magic number 8.0
         // should draw somewhat exponential curve when you plot the propagation of light in-game
 
-        return ((data.r() * (1f - darken.r() * lightScalingMagic)).clampZero() * CHANNEL_MAX).round() * MUL_2 +
-               ((data.g() * (1f - darken.g() * lightScalingMagic)).clampZero() * CHANNEL_MAX).round() * MUL +
+        return ((data.r() * (1f - darken.r() * lightScalingMagic)).clampZero() * CHANNEL_MAX).round().shl(20) or
+               ((data.g() * (1f - darken.g() * lightScalingMagic)).clampZero() * CHANNEL_MAX).round().shl(10) or
                ((data.b() * (1f - darken.b() * lightScalingMagic)).clampZero() * CHANNEL_MAX).round()
     }
 
     fun scaleColour(data: Int, scale: Float): RGB10 {
-        return ((data.r() * scale).clampOne() * CHANNEL_MAX).round() * MUL_2 +
-               ((data.g() * scale).clampOne() * CHANNEL_MAX).round() * MUL +
+        return ((data.r() * scale).clampOne() * CHANNEL_MAX).round().shl(20) or
+               ((data.g() * scale).clampOne() * CHANNEL_MAX).round().shl(10) or
                ((data.b() * scale).clampOne() * CHANNEL_MAX).round()
     }
+
+    private fun scaleSqrt2(data: Int): RGB10 {
+        return scaleSqrt2Lookup[data.rawR()].shl(20) or
+               scaleSqrt2Lookup[data.rawG()].shl(10) or
+               scaleSqrt2Lookup[data.rawB()]
+    }
+
+    private val scaleSqrt2Lookup = IntArray(MUL, { it -> minOf(MUL - 1, (it * 1.41421356).roundInt()) })
 
     /**
      * Add each channel's RGB value.
@@ -559,37 +568,37 @@ object LightmapRenderer {
      * @return
      */
     private infix fun RGB10.maxBlend(other: Int): RGB10 {
-        return (if (this.rawR() > other.rawR()) this.rawR() else other.rawR()) * MUL_2 +
-               (if (this.rawG() > other.rawG()) this.rawG() else other.rawG()) * MUL +
+        return (if (this.rawR() > other.rawR()) this.rawR() else other.rawR()).shl(20) or
+               (if (this.rawG() > other.rawG()) this.rawG() else other.rawG()).shl(10) or
                (if (this.rawB() > other.rawB()) this.rawB() else other.rawB())
     }
 
     private infix fun RGB10.linMix(other: Int): RGB10 {
-        return ((this.rawR() + other.rawR()) ushr 1) * MUL_2 +
-               ((this.rawG() + other.rawG()) ushr 1) * MUL +
+        return ((this.rawR() + other.rawR()) ushr 1).shl(20) or
+               ((this.rawG() + other.rawG()) ushr 1).shl(10) or
                ((this.rawB() + other.rawB()) ushr 1)
     }
 
     private infix fun RGB10.colSub(other: Int): RGB10 {
-        return ((this.rawR() - other.rawR()).clampChannel()) * MUL_2 +
-               ((this.rawG() - other.rawG()).clampChannel()) * MUL +
+        return ((this.rawR() - other.rawR()).clampChannel()).shl(20) or
+               ((this.rawG() - other.rawG()).clampChannel()).shl(10) or
                ((this.rawB() - other.rawB()).clampChannel())
     }
 
     private infix fun RGB10.colAdd(other: Int): RGB10 {
-        return ((this.rawR() + other.rawR()).clampChannel()) * MUL_2 +
-               ((this.rawG() + other.rawG()).clampChannel()) * MUL +
+        return ((this.rawR() + other.rawR()).clampChannel()).shl(20) or
+               ((this.rawG() + other.rawG()).clampChannel()).shl(10) or
                ((this.rawB() + other.rawB()).clampChannel())
     }
 
-    fun RGB10.rawR() = this / MUL_2
-    fun RGB10.rawG() = this % MUL_2 / MUL
-    fun RGB10.rawB() = this % MUL
+    inline fun RGB10.rawR() = this.ushr(20) and 1023
+    inline fun RGB10.rawG() = this.ushr(10) and 1023
+    inline fun RGB10.rawB() = this and 1023
 
     /** 0.0 - 1.0 for 0-1023 (0.0 - 0.25 for 0-255) */
-    fun RGB10.r(): Float = this.rawR() / CHANNEL_MAX_FLOAT
-    fun RGB10.g(): Float = this.rawG() / CHANNEL_MAX_FLOAT
-    fun RGB10.b(): Float = this.rawB() / CHANNEL_MAX_FLOAT
+    inline fun RGB10.r(): Float = this.rawR() / CHANNEL_MAX_FLOAT
+    inline fun RGB10.g(): Float = this.rawG() / CHANNEL_MAX_FLOAT
+    inline fun RGB10.b(): Float = this.rawB() / CHANNEL_MAX_FLOAT
 
     /**
 
@@ -617,8 +626,8 @@ object LightmapRenderer {
         //if (g !in 0..CHANNEL_MAX) throw IllegalArgumentException("Green: out of range ($g)")
         //if (b !in 0..CHANNEL_MAX) throw IllegalArgumentException("Blue: out of range ($b)")
 
-        return r * MUL_2 +
-               g * MUL +
+        return r.shl(20) or
+               g.shl(10) or
                b
     }
 
@@ -627,8 +636,8 @@ object LightmapRenderer {
         //if (g < 0 || g > CHANNEL_MAX_DECIMAL) throw IllegalArgumentException("Green: out of range ($g)")
         //if (b < 0 || b > CHANNEL_MAX_DECIMAL) throw IllegalArgumentException("Blue: out of range ($b)")
 
-        return (r * CHANNEL_MAX).round() * MUL_2 +
-               (g * CHANNEL_MAX).round() * MUL +
+        return (r * CHANNEL_MAX).round().shl(20) or
+               (g * CHANNEL_MAX).round().shl(10) or
                (b * CHANNEL_MAX).round()
     }
 
