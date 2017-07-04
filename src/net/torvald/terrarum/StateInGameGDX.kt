@@ -371,8 +371,6 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     }
 
 
-    val testTex = Texture("assets/test_texture.tga")
-
     private fun renderGame(batch: SpriteBatch) {
         Gdx.gl.glClearColor(.157f, .157f, .157f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -397,8 +395,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         ///////////////////
         // blur lightmap //
         ///////////////////
-        val blurIterations = 16 // ideally, 4 * radius; must be even number -- odd number will flip the image
-        val blurRadius = 4f
+        val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
+        val blurRadius = 4f // (5, 4f); using low numbers for pixel-y aesthetics
 
 
 
@@ -418,8 +416,6 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         var blurReadBuffer = lightmapFboB
 
 
-        KeyToggler.forceSet(Input.Keys.F6, false)
-        KeyToggler.forceSet(Input.Keys.F7, true)
 
 
         // initialise readBuffer with untreated lightmap
@@ -433,54 +429,44 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
                 blendNormal()
                 batch.color = Color.WHITE
-                //LightmapRenderer.draw(batch)
-
-                batch.draw(testTex, 0f, 0f)
+                LightmapRenderer.draw(batch)
             }
         }
 
+        if (TerrarumGDX.getConfigBoolean("smoothlighting")) {
+            for (i in 0..blurIterations - 1) {
+                blurWriteBuffer.inAction(camera, batch) {
 
-        for (i in 0..blurIterations - 1) {
-            blurWriteBuffer.inAction(camera, batch) {
+                    batch.inUse {
+                        val texture = blurReadBuffer.colorBufferTexture
 
-                batch.inUse {
-                    val texture = if (i == 0)
-                        testTex
-                    else
-                        blurReadBuffer.colorBufferTexture
-
-                    texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
 
-                    batch.shader = TerrarumGDX.shaderBlur
-                    batch.shader.setUniformf("iResolution", blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())
-                    batch.shader.setUniformf("flip", 1f)
-                    if (i % 2 == 0)
-                        batch.shader.setUniformf("direction", blurRadius, 0f)
-                    else
-                        batch.shader.setUniformf("direction", 0f, blurRadius)
+                        batch.shader = TerrarumGDX.shaderBlur
+                        batch.shader.setUniformf("iResolution", blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())
+                        batch.shader.setUniformf("flip", 1f)
+                        if (i % 2 == 0)
+                            batch.shader.setUniformf("direction", blurRadius, 0f)
+                        else
+                            batch.shader.setUniformf("direction", 0f, blurRadius)
 
 
-                    batch.color = Color.WHITE
-                    batch.draw(texture, 0f, 0f)
+                        batch.color = Color.WHITE
+                        batch.draw(texture, 0f, 0f)
 
 
-                    // swap
-                    val t = blurWriteBuffer
-                    blurWriteBuffer = blurReadBuffer
-                    blurReadBuffer = t
+                        // swap
+                        val t = blurWriteBuffer
+                        blurWriteBuffer = blurReadBuffer
+                        blurReadBuffer = t
+                    }
                 }
             }
         }
-
-
-        // TEST: passthru to writeBuffer
-        /*blurWriteBuffer.inAction(camera, batch) {
-            batch.inUse {
-                batch.color = Color.WHITE
-                batch.draw(testTex, 0f, 0f)
-            }
-        }*/
+        else {
+            blurWriteBuffer = blurReadBuffer
+        }
 
 
 
@@ -536,13 +522,10 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                     setCameraPosition(0f, 0f)
 
                     val lightTex = blurWriteBuffer.colorBufferTexture // TODO zoom!
-                    if (KeyToggler.isOn(Input.Keys.F7)) blendNormal()
+                    if (KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendNormal()
                     else blendMul()
                     batch.color = Color.WHITE
-                    //batch.draw(lightTex, 0f, 0f, lightTex.width * lightmapDownsample, lightTex.height * lightmapDownsample)
-
-                    TerrarumGDX.fontGame.draw(batch, "Thumbnail:", 100f, 80f)
-                    batch.draw(lightTex, 100f, 100f, 100f, 100f)
+                    batch.draw(lightTex, 0f, 0f, lightTex.width * lightmapDownsample, lightTex.height * lightmapDownsample)
                 }
 
 
