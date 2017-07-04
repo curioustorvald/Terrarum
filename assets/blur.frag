@@ -1,11 +1,13 @@
-precision mediump float;
+precision highp float;
 
 uniform vec3 iResolution;
 uniform sampler2D iChannel0;
 uniform bool flip;
 uniform vec2 direction;
 
-#pragma glslify: blur = require('../')
+//uniform mat4 u_projTrans;
+
+#pragma glslify: blur = require('13')
 
 void main() {
   vec2 uv = vec2(gl_FragCoord.xy / iResolution.xy);

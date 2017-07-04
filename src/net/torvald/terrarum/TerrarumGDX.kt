@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.assets.loaders.ShaderProgramLoader
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
@@ -14,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.CpuSpriteBatch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
@@ -234,6 +236,9 @@ object TerrarumGDX : ApplicationAdapter() {
     val is32BitJVM = !System.getProperty("sun.arch.data.model").contains("64")
 
 
+    lateinit var shaderBlur: ShaderProgram
+
+
     init {
         println("[Terrarum] os.arch = $systemArch") // debug info
 
@@ -289,6 +294,9 @@ object TerrarumGDX : ApplicationAdapter() {
         fontSmallNumbers = TinyAlphNum
 
 
+        shaderBlur = ShaderProgram(Gdx.files.internal("assets/blur.vert"), Gdx.files.internal("assets/blur.frag"))
+
+
         ModMgr // invoke Module Manager, will also invoke BlockCodex
         ItemCodex // invoke Item Codex
 
@@ -302,6 +310,7 @@ object TerrarumGDX : ApplicationAdapter() {
 
     override fun render() {
         currentScreen.render(Gdx.graphics.deltaTime)
+        GLOBAL_RENDER_TIMER += 1
     }
 
     override fun pause() {
