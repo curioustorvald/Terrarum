@@ -69,11 +69,15 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         get() = playableActorDelegate?.actor
 
     var screenZoom = 1.0f
-    val ZOOM_MAX = 4.0f
-    val ZOOM_MIN = 0.5f
+    val ZOOM_MAXIMUM = 4.0f
+    val ZOOM_MINIMUM = 0.5f
 
-    var worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width.div(ZOOM_MIN).ceilInt(), Gdx.graphics.height.div(ZOOM_MIN).ceilInt(), false)
-    var lightmapFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width.div(ZOOM_MIN).ceilInt(), Gdx.graphics.height.div(ZOOM_MIN).ceilInt(), false)
+    companion object {
+        val lightmapDownsample = 1f // have no fucking idea why downsampling wrecks camera and render
+    }
+
+    var worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width, Gdx.graphics.height, false)
+    var lightmapFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width.div(lightmapDownsample).ceilInt(), Gdx.graphics.height.div(lightmapDownsample).ceilInt(), false)
     // lightmapFrameBuffer: used to smooth out lightmap using shader
 
     //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
@@ -389,7 +393,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // Post-update; ones that needs everything is completed //
         FeaturesDrawer.render(batch)                            //
         // update lightmap on every other frames, OR full-frame if the option is true
-        if (TerrarumGDX.getConfigBoolean("fullframelightupdate") or (TerrarumGDX.GLOBAL_RENDER_TIMER and 1 == 1)) {       //
+        if (TerrarumGDX.getConfigBoolean("fullframelightupdate") or (TerrarumGDX.GLOBAL_RENDER_TIMER % 2 == 1)) {       //
             LightmapRenderer.fireRecalculateEvent()             //
         }                                                       //
         // end of post-update                                   //
@@ -398,8 +402,12 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // now the actual drawing part //
         lightmapFrameBuffer.inAction {
             // TODO gaussian blur p=8
-            //batch.shader = TerrarumGDX.shaderBlur
+            TerrarumGDX.shaderBlur.setUniformf("width", lightmapFrameBuffer.width.toFloat())
+            TerrarumGDX.shaderBlur.setUniformf("height", lightmapFrameBuffer.height.toFloat())
             batch.inUse {
+                batch.shader = null//TerrarumGDX.shaderBlur
+
+
                 // using custom code for camera; this is obscure and tricky
                 camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
                 camera.update()
@@ -413,6 +421,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
         worldDrawFrameBuffer.inAction {
             batch.inUse {
+                batch.shader = null
+
                 // using custom code for camera; this is obscure and tricky
                 camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
                 camera.update()
@@ -449,15 +459,14 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
 
                 // mix lighpmap canvas to this canvas
-                if (!KeyToggler.isOn(Input.Keys.F6)) { // F6 do disable lightmap draw
+                if (!KeyToggler.isOn(Input.Keys.F6)) { // F6 to disable lightmap draw
                     setCameraPosition(0f, 0f)
 
                     val lightTex = lightmapFrameBuffer.colorBufferTexture // TODO zoom!
                     if (KeyToggler.isOn(Input.Keys.F7)) blendNormal()
                     else blendMul()
-                    batch.draw(lightTex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+                    batch.draw(lightTex, 0f, 0f, lightTex.width * lightmapDownsample, lightTex.height * lightmapDownsample)
                 }
-
 
 
                 // move camera back to its former position
@@ -486,6 +495,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // draw to main screen //
         /////////////////////////
         batch.inUse {
+            batch.shader = null
+
             setCameraPosition(0f, 0f)
             batch.color = Color.WHITE
             blendNormal()
@@ -499,10 +510,12 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
             batch.color = Color.WHITE
             val worldTex = worldDrawFrameBuffer.colorBufferTexture // TODO zoom!
-            batch.draw(worldTex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+            batch.draw(worldTex, 0f, 0f, worldTex.width.toFloat(), worldTex.height.toFloat())
 
 
 
+            batch.color = Color.RED
+            batch.fillRect(0f, 0f, 16f, 16f)
 
             ////////////////////////
             // debug informations //
@@ -1127,7 +1140,9 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
     override fun resize(width: Int, height: Int) {
         worldDrawFrameBuffer.dispose()
-        worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width.div(ZOOM_MIN).ceilInt(), Gdx.graphics.height.div(ZOOM_MIN).ceilInt(), false)
+        worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
+        lightmapFrameBuffer.dispose()
+        lightmapFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, width.div(lightmapDownsample).ceilInt(), height.div(lightmapDownsample).ceilInt(), false)
 
         // Set up viewport when window is resized
         initViewPort(width, height)

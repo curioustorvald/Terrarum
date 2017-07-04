@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
+import net.torvald.terrarum.StateInGameGDX
 import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameworld.GameWorld
@@ -32,9 +33,9 @@ object LightmapRenderer {
 
     // TODO resize(int, int) -aware
 
-    val LIGHTMAP_WIDTH = TerrarumGDX.ingame!!.ZOOM_MIN.inv().times(Gdx.graphics.width)
+    val LIGHTMAP_WIDTH = TerrarumGDX.ingame!!.ZOOM_MINIMUM.inv().times(Gdx.graphics.width)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
-    val LIGHTMAP_HEIGHT = TerrarumGDX.ingame!!.ZOOM_MIN.inv().times(Gdx.graphics.height)
+    val LIGHTMAP_HEIGHT = TerrarumGDX.ingame!!.ZOOM_MINIMUM.inv().times(Gdx.graphics.height)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
 
     /**
@@ -50,6 +51,7 @@ object LightmapRenderer {
     private val OFFSET_B = 0
 
     private const val TILE_SIZE = FeaturesDrawer.TILE_SIZE
+    private val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / StateInGameGDX.lightmapDownsample
 
     // color model related constants
     const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB
@@ -418,10 +420,10 @@ object LightmapRenderer {
 
                             batch.color = (getLightForOpaque(x, y) ?: 0).normaliseToColourHDR()
                             batch.fillRect(
-                                    (x.toFloat() * TILE_SIZE).round().toFloat(),
-                                    (y.toFloat() * TILE_SIZE).round().toFloat(),
-                                    (TILE_SIZE.toFloat().ceil() * sameLevelCounter).toFloat(),
-                                    TILE_SIZE.toFloat().ceil().toFloat()
+                                    (x * DRAW_TILE_SIZE).round().toFloat(),
+                                    (y * DRAW_TILE_SIZE).round().toFloat(),
+                                    (DRAW_TILE_SIZE.ceil() * sameLevelCounter).toFloat(),
+                                    DRAW_TILE_SIZE.ceil().toFloat()
                             )
 
                             x += sameLevelCounter - 1
