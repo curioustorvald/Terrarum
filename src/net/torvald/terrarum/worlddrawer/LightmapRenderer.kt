@@ -335,105 +335,31 @@ object LightmapRenderer {
                 // loop x
                 var x = this_x_start
                 while (x < this_x_end) {
-                    // smoothing enabled and zoom is 0.75 or greater
-                    // (zoom of 0.5 should not smoothed, for performance)
-                    if (false && //TerrarumGDX.getConfigBoolean("smoothlighting") &&
-                        TerrarumGDX.ingame!!.screenZoom >= 0.75) {
+                    try {
+                        val thisLightLevel = getLightForOpaque(x, y)
 
-                        val thisLightLevel = getLightForOpaque(x, y) ?: 0
+                        // coalesce identical intensity blocks to one
+                        var sameLevelCounter = 1
+                        while (getLightForOpaque(x + sameLevelCounter, y) == thisLightLevel) {
+                            sameLevelCounter += 1
 
-                        if (x < this_x_end && thisLightLevel == 0
-                            && getLightForOpaque(x, y - 1) == 0) {
-                            try {
-                                // coalesce zero intensity blocks to one
-                                var zeroLevelCounter = 1
-                                while (getLightForOpaque(x + zeroLevelCounter, y) == 0) {
-                                    zeroLevelCounter += 1
-
-                                    if (x + zeroLevelCounter >= this_x_end) break
-                                }
-
-                                batch.color = Color.BLACK
-                                batch.fillRect(
-                                        (x.toFloat() * TILE_SIZE).round().toFloat(),
-                                        (y.toFloat() * TILE_SIZE).round().toFloat(),
-                                        (TILE_SIZE * zeroLevelCounter).toFloat(),
-                                        (TILE_SIZE).toFloat()
-                                )
-
-                                x += zeroLevelCounter - 1
-                            }
-                            catch (e: ArrayIndexOutOfBoundsException) {
-                                // do nothing
-                            }
-
+                            if (x + sameLevelCounter >= this_x_end) break
                         }
-                        else {
-                            /**    a
-                             *   +-+-+
-                             *   |i|j|
-                             * b +-+-+ c
-                             *   |k|l|
-                             *   +-+-+
-                             *     d
-                             */
-                            val a = thisLightLevel maxBlend (getLightForOpaque(x, y - 1) ?: thisLightLevel)
-                            val d = thisLightLevel maxBlend (getLightForOpaque(x, y + 1) ?: thisLightLevel)
-                            val b = thisLightLevel maxBlend (getLightForOpaque(x - 1, y) ?: thisLightLevel)
-                            val c = thisLightLevel maxBlend (getLightForOpaque(x + 1, y) ?: thisLightLevel)
 
-                            val colourMapItoL = IntArray(4)
-                            val colMean = (a linMix d) linMix (b linMix c)
-                            val colDelta = thisLightLevel colSub colMean
+                        batch.color = (getLightForOpaque(x, y) ?: 0).normaliseToColourHDR()
+                        batch.fillRect(
+                                (x * DRAW_TILE_SIZE).round().toFloat(),
+                                (y * DRAW_TILE_SIZE).round().toFloat(),
+                                (DRAW_TILE_SIZE.ceil() * sameLevelCounter).toFloat(),
+                                DRAW_TILE_SIZE.ceil().toFloat()
+                        )
 
-                            colourMapItoL[0] = a linMix b colAdd colDelta
-                            colourMapItoL[1] = a linMix c colAdd colDelta
-                            colourMapItoL[2] = b linMix d colAdd colDelta
-                            colourMapItoL[3] = c linMix d colAdd colDelta
-
-                            for (iy in 0..1) {
-                                for (ix in 0..1) {
-                                    batch.color = colourMapItoL[iy * 2 + ix].normaliseToColourHDR()
-                                    batch.fillRect(
-                                            (x.toFloat() * TILE_SIZE).round()
-                                            + ix * TILE_SIZE / 2f,
-                                            (y.toFloat() * TILE_SIZE).round()
-                                            + iy * TILE_SIZE / 2f,
-                                            (TILE_SIZE / 2f).ceil().toFloat(),
-                                            (TILE_SIZE / 2f).ceil().toFloat()
-                                    )
-                                }
-                            }
-                        }
+                        x += sameLevelCounter - 1
                     }
-                    // smoothing disabled
-                    else {
-                        try {
-                            val thisLightLevel = getLightForOpaque(x, y)
-
-                            // coalesce identical intensity blocks to one
-                            var sameLevelCounter = 1
-                            while (getLightForOpaque(x + sameLevelCounter, y) == thisLightLevel) {
-                                sameLevelCounter += 1
-
-                                if (x + sameLevelCounter >= this_x_end) break
-                            }
-
-                            batch.color = (getLightForOpaque(x, y) ?: 0).normaliseToColourHDR()
-                            batch.fillRect(
-                                    (x * DRAW_TILE_SIZE).round().toFloat(),
-                                    (y * DRAW_TILE_SIZE).round().toFloat(),
-                                    (DRAW_TILE_SIZE.ceil() * sameLevelCounter).toFloat(),
-                                    DRAW_TILE_SIZE.ceil().toFloat()
-                            )
-
-                            x += sameLevelCounter - 1
-                        }
-                        catch (e: ArrayIndexOutOfBoundsException) {
-                            // do nothing
-                        }
-
+                    catch (e: ArrayIndexOutOfBoundsException) {
+                        // do nothing
                     }
+
 
                     x++
                 }
