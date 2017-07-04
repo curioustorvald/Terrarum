@@ -402,10 +402,12 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // now the actual drawing part //
         lightmapFrameBuffer.inAction {
             // TODO gaussian blur p=8
-            TerrarumGDX.shaderBlur.setUniformf("width", lightmapFrameBuffer.width.toFloat())
-            TerrarumGDX.shaderBlur.setUniformf("height", lightmapFrameBuffer.height.toFloat())
+
+            batch.shader = TerrarumGDX.shaderBlur
             batch.inUse {
-                batch.shader = null//TerrarumGDX.shaderBlur
+                //batch.shader.setUniform3fv("iResolution", floatArrayOf(lightmapFrameBuffer.width.toFloat(), lightmapFrameBuffer.height.toFloat(), 0f), 0, 12)
+                //batch.shader.setUniformi("iChannel0", 0)
+                //batch.shader.setUniform2fv("direction", floatArrayOf(8f, 8f), 0, 8)
 
 
                 // using custom code for camera; this is obscure and tricky
