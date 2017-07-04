@@ -334,7 +334,7 @@ object LightmapRenderer {
                 while (x < this_x_end) {
                     // smoothing enabled and zoom is 0.75 or greater
                     // (zoom of 0.5 should not smoothed, for performance)
-                    if (TerrarumGDX.getConfigBoolean("smoothlighting") &&
+                    if (false && //TerrarumGDX.getConfigBoolean("smoothlighting") &&
                         TerrarumGDX.ingame!!.screenZoom >= 0.75) {
 
                         val thisLightLevel = getLightForOpaque(x, y) ?: 0
