@@ -1,7 +1,14 @@
-varying vec2 texcoord;
+attribute vec4 a_position;
+attribute vec4 a_color;
+attribute vec2 a_texCoord0;
 
-void main(void) { // fairly usual fullscreen quad setup //
-   vec2 corners = sign(gl_Vertex.xy);
-   texcoord = 0.5 * corners + vec2(0.5);
-   gl_Position = vec4(corners, 0.0, 1.0);
+uniform mat4 u_projTrans;
+
+varying vec4 v_color;
+varying vec2 v_texCoords;
+
+void main() {
+    v_color = a_color;
+    v_texCoords = a_texCoord0;
+    gl_Position = u_projTrans * a_position;
 }
