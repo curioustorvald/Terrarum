@@ -17,8 +17,7 @@ object DefaultConfig {
         jsonObject.addProperty("usevsync", true)
 
 
-        jsonObject.addProperty("smoothlighting", true)
-        jsonObject.addProperty("imtooyoungtodie", false) // perma-death
+        jsonObject.addProperty("imtooyoungtodie", false) // no perma-death
         jsonObject.addProperty("language", TerrarumGDX.sysLang)
         jsonObject.addProperty("notificationshowuptime", 6500)
         jsonObject.addProperty("multithread", true) // experimental!
@@ -41,24 +40,24 @@ object DefaultConfig {
         jsonObject.addProperty("joypadrstickx", 2)
         jsonObject.addProperty("joypadrsticky", 3) // 0-1-2-3 but sometimes 3-2-1-0 ?! what the actual fuck?
 
-        jsonObject.addProperty("joypadlabelstyle", "generic") // "nwii", "logitech", "sonyps", "msxb360", "generic"
+        jsonObject.addProperty("joypadlabelstyle", "msxb360") // "nwii", "logitech", "sonyps", "msxb360", "generic"
 
 
 
-        // control-keyboard (Java key codes. This is what Minecraft also uses)
+        // control-keyboard (GDX key codes)
         jsonObject.addProperty("keyup", Input.Keys.E)
         jsonObject.addProperty("keyleft", Input.Keys.S)
         jsonObject.addProperty("keydown", Input.Keys.D)
         jsonObject.addProperty("keyright", Input.Keys.F)
 
-        jsonObject.addProperty("keymovementaux", Input.Keys.W) // movement-auxiliary, or hookshot
+        jsonObject.addProperty("keymovementaux", Input.Keys.A) // movement-auxiliary, or hookshot
         jsonObject.addProperty("keyinventory", Input.Keys.Q)
         jsonObject.addProperty("keyinteract", Input.Keys.R)
         jsonObject.addProperty("keyclose", Input.Keys.C)
 
         jsonObject.addProperty("keygamemenu", Input.Keys.TAB)
-        jsonObject.addProperty("keyquicksel", Input.Keys.A) // pie menu (A) because GDX does not read CapsLock
-        val keyquickselalt = JsonArray(); keyquickselalt.add(Input.Keys.BACKSPACE); keyquickselalt.add(Input.Keys.CONTROL_LEFT)
+        jsonObject.addProperty("keyquicksel", Input.Keys.SHIFT_LEFT) // pie menu (A) because GDX does not read CapsLock
+        val keyquickselalt = JsonArray(); keyquickselalt.add(Input.Keys.BACKSPACE); keyquickselalt.add(Input.Keys.CONTROL_LEFT); keyquickselalt.add(Input.Keys.BACKSLASH)
         // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command
         // so these keys are treated as the same.
         // FOR ~~FUCKS~~ERGONOMICS' SAKE DON'T USE CTRL AND ALT AS A KEY!
