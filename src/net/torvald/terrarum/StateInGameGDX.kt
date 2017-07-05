@@ -88,7 +88,6 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     private val shaderProgram = 0
 
     val KEY_LIGHTMAP_RENDER = Input.Keys.F7
-    val KEY_LIGHTMAP_SMOOTH = Input.Keys.F8
 
 
 
@@ -203,8 +202,6 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         notifier.setPosition(
                 (Gdx.graphics.width - notifier.UI.width) / 2, Gdx.graphics.height - notifier.UI.height)
 
-        // set smooth lighting as in config
-        KeyToggler.forceSet(KEY_LIGHTMAP_SMOOTH, TerrarumGDX.getConfigBoolean("smoothlighting"))
 
 
 
@@ -360,10 +357,6 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         /////////////////////////
         // app-related updates //
         /////////////////////////
-
-        // determine if smooth lighting should be done
-        TerrarumGDX.setConfig("smoothlighting", KeyToggler.isOn(KEY_LIGHTMAP_SMOOTH))
-
 
 
         /** RENDER CODE GOES HERE */
