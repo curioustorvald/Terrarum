@@ -73,12 +73,12 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     val ZOOM_MINIMUM = 0.5f
 
     companion object {
-        val lightmapDownsample = 1f // have no fucking idea why downsampling wrecks camera and render
+        val lightmapDownsample = 1f
     }
 
-    var worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width, Gdx.graphics.height, false)
-    var lightmapFboA = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width.div(lightmapDownsample).ceilInt(), Gdx.graphics.height.div(lightmapDownsample).ceilInt(), false)
-    var lightmapFboB = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width.div(lightmapDownsample).ceilInt(), Gdx.graphics.height.div(lightmapDownsample).ceilInt(), false)
+    var worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT, true)
+    var lightmapFboA = FrameBuffer(Pixmap.Format.RGBA8888, TerrarumGDX.WIDTH.div(lightmapDownsample.toInt()), TerrarumGDX.HEIGHT.div(lightmapDownsample.toInt()), true)
+    var lightmapFboB = FrameBuffer(Pixmap.Format.RGBA8888, TerrarumGDX.WIDTH.div(lightmapDownsample.toInt()), TerrarumGDX.HEIGHT.div(lightmapDownsample.toInt()), true)
 
 
     //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
@@ -129,10 +129,13 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     // GDX code //
     //////////////
 
-    var camera = OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+    var camera = OrthographicCamera(TerrarumGDX.WIDTH.toFloat(), TerrarumGDX.HEIGHT.toFloat())
 
     // invert Y
     fun initViewPort(width: Int, height: Int) {
+        //val width = if (width % 1 == 1) width + 1 else width
+        //val height = if (height % 1 == 1) height + 1 else width
+
         // Set Y to point downwards
         camera.setToOrtho(true, width.toFloat(), height.toFloat())
 
@@ -146,7 +149,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
     override fun show() {
         // Set up viewport on first load
-        initViewPort(Gdx.graphics.width, Gdx.graphics.height)
+        initViewPort(TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT)
     }
 
 
@@ -155,7 +158,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         Gdx.input.inputProcessor = GameController
 
 
-        initViewPort(Gdx.graphics.width, Gdx.graphics.height)
+        initViewPort(TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT)
 
 
         // load things when the game entered this "state"
@@ -200,7 +203,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         notifier = UIHandler(Notification())
         notifier.UI.handler = notifier
         notifier.setPosition(
-                (Gdx.graphics.width - notifier.UI.width) / 2, Gdx.graphics.height - notifier.UI.height)
+                (TerrarumGDX.WIDTH - notifier.UI.width) / 2, TerrarumGDX.HEIGHT - notifier.UI.height)
 
 
 
@@ -210,7 +213,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         uiInventoryPlayer = UIHandler(
                 UIInventory(player,
                         width = 840,
-                        height = Gdx.graphics.height - 160,
+                        height = TerrarumGDX.HEIGHT - 160,
                         categoryWidth = 210
                 ),
                 toggleKey = TerrarumGDX.getConfigInt("keyinventory")
@@ -243,11 +246,11 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // basic watch-style notification bar (temperature, new mail)
         uiWatchBasic = UIHandler(UIBasicNotifier(player))
         uiWatchBasic.setAsAlwaysVisible()
-        uiWatchBasic.setPosition(Gdx.graphics.width - uiWatchBasic.UI.width, 0)
+        uiWatchBasic.setPosition(TerrarumGDX.WIDTH - uiWatchBasic.UI.width, 0)
 
         uiWatchTierOne = UIHandler(UITierOneWatch(player))
         uiWatchTierOne.setAsAlwaysVisible()
-        uiWatchTierOne.setPosition(Gdx.graphics.width - uiWatchTierOne.UI.width, uiWatchBasic.UI.height - 2)
+        uiWatchTierOne.setPosition(TerrarumGDX.WIDTH - uiWatchTierOne.UI.width, uiWatchBasic.UI.height - 2)
 
 
         // batch-process uiAliases
@@ -388,8 +391,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         ///////////////////
         // blur lightmap //
         ///////////////////
-        val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
-        val blurRadius = 4f // (5, 4f); using low numbers for pixel-y aesthetics
+        val blurIterations = 3 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
+        val blurRadius = 4f / lightmapDownsample // (3, 4f); using low numbers for pixel-y aesthetics
 
 
 
@@ -400,6 +403,11 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
         lightmapFboA.inAction(null, null) {
             Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        }
+
+        worldDrawFrameBuffer.inAction(null, null) {
+            Gdx.gl.glClearColor(0f,0f,0f,0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         }
 
@@ -415,7 +423,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         blurReadBuffer.inAction(camera, batch) {
             batch.inUse {
                 // using custom code for camera; this is obscure and tricky
-                camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
+                camera.position.set((WorldCamera.gdxCamX / lightmapDownsample).round(), (WorldCamera.gdxCamY / lightmapDownsample).round(), 0f) // make camara work
                 camera.update()
                 batch.projectionMatrix = camera.combined
 
@@ -426,7 +434,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             }
         }
 
-        if (TerrarumGDX.getConfigBoolean("smoothlighting")) {
+        if (!KeyToggler.isOn(Input.Keys.F8)) {
             for (i in 0..blurIterations - 1) {
                 blurWriteBuffer.inAction(camera, batch) {
 
@@ -468,12 +476,10 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         ///////////////////////////
 
         worldDrawFrameBuffer.inAction(camera, batch) {
-            Gdx.gl.glClearColor(0f,0f,0f,0f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-
 
             batch.inUse {
                 batch.shader = null
+
 
                 // using custom code for camera; this is obscure and tricky
                 camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
@@ -515,6 +521,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                     setCameraPosition(0f, 0f)
 
                     val lightTex = blurWriteBuffer.colorBufferTexture // TODO zoom!
+                    lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
                     if (KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendNormal()
                     else blendMul()
                     batch.color = Color.WHITE
@@ -547,7 +554,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         /////////////////////////
         // draw to main screen //
         /////////////////////////
-        camera.setToOrtho(true, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        camera.setToOrtho(true, TerrarumGDX.WIDTH.toFloat(), TerrarumGDX.HEIGHT.toFloat())
         batch.projectionMatrix = camera.combined
         batch.inUse {
             batch.shader = null
@@ -565,6 +572,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
             batch.color = Color.WHITE
             val worldTex = worldDrawFrameBuffer.colorBufferTexture // TODO zoom!
+            worldTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
             batch.draw(worldTex, 0f, 0f, worldTex.width.toFloat(), worldTex.height.toFloat())
 
 
@@ -805,8 +813,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // centre marker
         /*gwin.color = Color(0x00FFFF)
         gwin.lineWidth = 1f
-        gwin.drawLine(Gdx.graphics.width / 2f, 0f, Gdx.graphics.width / 2f, Gdx.graphics.height.toFloat())
-        gwin.drawLine(0f, Gdx.graphics.height / 2f, Gdx.graphics.width.toFloat(), Gdx.graphics.height / 2f)*/
+        gwin.drawLine(TerrarumGDX.WIDTH / 2f, 0f, TerrarumGDX.WIDTH / 2f, TerrarumGDX.HEIGHT.toFloat())
+        gwin.drawLine(0f, TerrarumGDX.HEIGHT / 2f, TerrarumGDX.WIDTH.toFloat(), TerrarumGDX.HEIGHT / 2f)*/
     }
 
 
@@ -967,8 +975,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     /** whether the actor is within screen */
     private fun ActorWithBody.inScreen() =
             distToCameraSqr(this) <=
-            (Gdx.graphics.width.plus(this.hitbox.width.div(2)).times(1 / TerrarumGDX.ingame!!.screenZoom).sqr() +
-             Gdx.graphics.height.plus(this.hitbox.height.div(2)).times(1 / TerrarumGDX.ingame!!.screenZoom).sqr())
+            (TerrarumGDX.WIDTH.plus(this.hitbox.width.div(2)).times(1 / TerrarumGDX.ingame!!.screenZoom).sqr() +
+             TerrarumGDX.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / TerrarumGDX.ingame!!.screenZoom).sqr())
 
 
     /** whether the actor is within update range */
@@ -1195,11 +1203,11 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
     override fun resize(width: Int, height: Int) {
         worldDrawFrameBuffer.dispose()
-        worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
+        worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
         lightmapFboA.dispose()
-        lightmapFboA = FrameBuffer(Pixmap.Format.RGBA8888, width.div(lightmapDownsample).ceilInt(), height.div(lightmapDownsample).ceilInt(), false)
+        lightmapFboA = FrameBuffer(Pixmap.Format.RGBA8888, width.div(lightmapDownsample.toInt()), height.div(lightmapDownsample.toInt()), true)
         lightmapFboB.dispose()
-        lightmapFboB = FrameBuffer(Pixmap.Format.RGBA8888, width.div(lightmapDownsample).ceilInt(), height.div(lightmapDownsample).ceilInt(), false)
+        lightmapFboB = FrameBuffer(Pixmap.Format.RGBA8888, width.div(lightmapDownsample.toInt()), height.div(lightmapDownsample.toInt()), true)
 
 
         // Set up viewport when window is resized
@@ -1220,7 +1228,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
      */
     fun setCameraPosition(newX: Float, newY: Float) {
-        camera.position.set(-newX + TerrarumGDX.HALFW, -newY + TerrarumGDX.HALFH, 0f)
+        camera.position.set((-newX + TerrarumGDX.HALFW).round(), (-newY + TerrarumGDX.HALFH).round(), 0f)
         camera.update()
         batch.projectionMatrix = camera.combined
     }

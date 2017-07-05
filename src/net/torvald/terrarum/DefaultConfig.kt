@@ -56,7 +56,7 @@ object DefaultConfig {
         jsonObject.addProperty("keyclose", Input.Keys.C)
 
         jsonObject.addProperty("keygamemenu", Input.Keys.TAB)
-        jsonObject.addProperty("keyquicksel", Input.Keys.SHIFT_LEFT) // pie menu (A) because GDX does not read CapsLock
+        jsonObject.addProperty("keyquicksel", Input.Keys.SHIFT_LEFT) // pie menu is now LShift because GDX does not read CapsLock
         val keyquickselalt = JsonArray(); keyquickselalt.add(Input.Keys.BACKSPACE); keyquickselalt.add(Input.Keys.CONTROL_LEFT); keyquickselalt.add(Input.Keys.BACKSLASH)
         // Colemak, Workman and some typers use CapsLock as Backspace, Apple-JIS and HHKB has Control in place of CapsLock and often re-assigned to Command
         // so these keys are treated as the same.
@@ -65,7 +65,7 @@ object DefaultConfig {
 
         jsonObject.addProperty("keyjump", Input.Keys.SPACE)
 
-        val keyquickbars = JsonArray(); for (i in 2..11) keyquickbars.add(i) // NUM_1 to NUM_0
+        val keyquickbars = JsonArray(); for (i in Input.Keys.NUMPAD_1..Input.Keys.NUMPAD_9) keyquickbars.add(i); keyquickbars.add(Input.Keys.NUMPAD_0) // NUM_1 to NUM_0
         jsonObject.add("keyquickbars", keyquickbars)
 
         jsonObject.addProperty("mouseprimary", Input.Buttons.LEFT) // left mouse
