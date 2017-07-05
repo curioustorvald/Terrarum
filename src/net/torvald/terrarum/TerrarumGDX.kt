@@ -16,8 +16,10 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
+import com.jme3.math.FastMath
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWithPhysics.Companion.TILE_SIZE
+import net.torvald.terrarum.gameactors.floor
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -82,10 +84,16 @@ object TerrarumGDX : ApplicationAdapter() {
     var VSYNC = USE_VSYNC
     val VSYNC_TRIGGER_THRESHOLD = 56
 
+
+    inline val WIDTH: Int
+        get() = Gdx.graphics.width//if (Gdx.graphics.width % 1 == 1) Gdx.graphics.width + 1 else Gdx.graphics.width
+    inline val HEIGHT: Int
+        get() = Gdx.graphics.height//if (Gdx.graphics.height % 1 == 1) Gdx.graphics.height + 1 else Gdx.graphics.height
+
     inline val HALFW: Int
-        get() = Gdx.graphics.width.ushr(1)
+        get() = WIDTH.ushr(1)
     inline val HALFH: Int
-        get() = Gdx.graphics.height.ushr(1)
+        get() = HEIGHT.ushr(1)
 
     /**
      * To be used with physics simulator
@@ -522,13 +530,16 @@ inline fun ShapeRenderer.inUse(shapeRendererType: ShapeRenderer.ShapeType = Shap
 inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?, action: (FrameBuffer) -> Unit) {
     this.begin()
     camera?.setToOrtho(true, this.width.toFloat(), this.height.toFloat())
-    camera?.position?.set(this.width / 2f, this.height / 2f, 0f) // are these actually needed?
-    camera?.update()                                             // are these actually needed?
+    camera?.position?.set((this.width / 2f).round(), (this.height / 2f).round(), 0f) // TODO floor? ceil? round?
+    camera?.update()
     batch?.projectionMatrix = camera?.combined
     action(this)
     this.end()
 }
 
+fun Float.round(): Float {
+    return Math.round(this).toFloat()
+}
 
 
 // ShapeRenderer alternative for rects

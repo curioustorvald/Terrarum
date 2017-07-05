@@ -47,7 +47,7 @@ object FeaturesDrawer {
      * usually targeted for the environmental temperature (desert/winterland), hence the name.
      */
     fun drawEnvOverlay(batch: SpriteBatch) {
-        val onscreen_tiles_max = FastMath.ceil(Gdx.graphics.height * Gdx.graphics.width / FastMath.sqr (TILE_SIZE.toFloat())) * 2
+        val onscreen_tiles_max = FastMath.ceil(TerrarumGDX.HEIGHT * TerrarumGDX.WIDTH / FastMath.sqr (TILE_SIZE.toFloat())) * 2
         val onscreen_tiles_cap = onscreen_tiles_max / 4f
         val onscreen_cold_tiles = BlockStats.getCount(*TILES_COLD).toFloat()
         val onscreen_warm_tiles = BlockStats.getCount(*TILES_WARM).toFloat()
@@ -62,8 +62,8 @@ object FeaturesDrawer {
         batch.color = ColourTemp(colTemp)
         batch.fillRect(WorldCamera.x * zoom,
                 WorldCamera.y * zoom,
-                Gdx.graphics.width * if (zoom < 1) 1f / zoom else zoom,
-                Gdx.graphics.height * if (zoom < 1) 1f / zoom else zoom
+                TerrarumGDX.WIDTH * if (zoom < 1) 1f / zoom else zoom,
+                TerrarumGDX.HEIGHT * if (zoom < 1) 1f / zoom else zoom
         )
     }
 

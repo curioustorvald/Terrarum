@@ -34,9 +34,9 @@ object LightmapRenderer {
 
     // TODO resize(int, int) -aware
 
-    val LIGHTMAP_WIDTH = TerrarumGDX.ingame!!.ZOOM_MINIMUM.inv().times(Gdx.graphics.width)
+    val LIGHTMAP_WIDTH = TerrarumGDX.ingame!!.ZOOM_MINIMUM.inv().times(TerrarumGDX.WIDTH)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
-    val LIGHTMAP_HEIGHT = TerrarumGDX.ingame!!.ZOOM_MINIMUM.inv().times(Gdx.graphics.height)
+    val LIGHTMAP_HEIGHT = TerrarumGDX.ingame!!.ZOOM_MINIMUM.inv().times(TerrarumGDX.HEIGHT)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
 
     /**
@@ -351,7 +351,7 @@ object LightmapRenderer {
                                 (x * DRAW_TILE_SIZE).round().toFloat(),
                                 (y * DRAW_TILE_SIZE).round().toFloat(),
                                 (DRAW_TILE_SIZE.ceil() * sameLevelCounter).toFloat(),
-                                DRAW_TILE_SIZE.ceil().toFloat()
+                                DRAW_TILE_SIZE.ceil().toFloat() + 1f
                         )
 
                         x += sameLevelCounter - 1

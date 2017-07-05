@@ -43,7 +43,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
 
     fun enter() {
         // init view port
-        camera = OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        camera = OrthographicCamera(TerrarumGDX.WIDTH.toFloat(), TerrarumGDX.HEIGHT.toFloat())
 
 
         img = Texture("assets/test_texture.tga")
@@ -55,14 +55,14 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
         blurFboA = FrameBuffer(Pixmap.Format.RGBA8888, img.width, img.height, false)
         blurFboB = FrameBuffer(Pixmap.Format.RGBA8888, img.width, img.height, false)
 
-        worldFbo = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width, Gdx.graphics.height, false)
+        worldFbo = FrameBuffer(Pixmap.Format.RGBA8888, TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT, false)
 
         //blurShader.begin()
         //blurShader.setUniformf("iResolution", img.width.toFloat(), img.height.toFloat(), 0f)
         //blurShader.end()
 
 
-        initViewPort(Gdx.graphics.width, Gdx.graphics.height)
+        initViewPort(TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT)
     }
 
     override fun render(delta: Float) {
@@ -133,7 +133,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
             batch.inUse {
                 batch.shader = null
 
-                camera.position.set(Gdx.graphics.width / 2f - 50f, Gdx.graphics.height / 2f - 50f, 0f)
+                camera.position.set(TerrarumGDX.WIDTH / 2f - 50f, TerrarumGDX.HEIGHT / 2f - 50f, 0f)
                 camera.update()
                 batch.projectionMatrix = camera.combined
 
@@ -145,11 +145,11 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
         }
 
 
-        camera.setToOrtho(true, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        camera.setToOrtho(true, TerrarumGDX.WIDTH.toFloat(), TerrarumGDX.HEIGHT.toFloat())
         batch.projectionMatrix = camera.combined
         batch.inUse {
 
-            camera.position.set(Gdx.graphics.width / 2f, Gdx.graphics.height / 2f, 0f)
+            camera.position.set(TerrarumGDX.WIDTH / 2f, TerrarumGDX.HEIGHT / 2f, 0f)
             camera.update()
             batch.projectionMatrix = camera.combined
 
@@ -166,7 +166,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
     }
 
     override fun show() {
-        initViewPort(Gdx.graphics.width, Gdx.graphics.height)
+        initViewPort(TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT)
     }
 
     override fun pause() {
@@ -199,7 +199,7 @@ object TestTestMain : ApplicationAdapter() {
         // culprit #4
         blurShader.begin()
         blurShader.setUniformf("dir", 0f, 0f); //direction of blur; nil for now
-        blurShader.setUniformf("resolution", maxOf(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())) //size of FBO texture
+        blurShader.setUniformf("resolution", maxOf(TerrarumGDX.WIDTH.toFloat(), TerrarumGDX.HEIGHT.toFloat())) //size of FBO texture
         blurShader.setUniformf("radius", 9f) //radius of blur
         blurShader.end()
 
