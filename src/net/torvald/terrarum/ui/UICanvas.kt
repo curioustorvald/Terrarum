@@ -98,13 +98,13 @@ interface UICanvas {
                 ).roundInt()
                 Position.RIGHT -> handler!!.posX = Movement.fastPullOut(
                         handler.openCloseCounter / openCloseTime,
-                        Gdx.graphics.width.toFloat(),
-                        Gdx.graphics.width - handler.UI.width.toFloat()
+                        TerrarumGDX.WIDTH.toFloat(),
+                        TerrarumGDX.WIDTH - handler.UI.width.toFloat()
                 ).roundInt()
                 Position.BOTTOM -> handler!!.posY = Movement.fastPullOut(
                         handler.openCloseCounter / openCloseTime,
-                        Gdx.graphics.height.toFloat(),
-                        Gdx.graphics.height - handler.UI.height.toFloat()
+                        TerrarumGDX.HEIGHT.toFloat(),
+                        TerrarumGDX.HEIGHT - handler.UI.height.toFloat()
                 ).roundInt()
             }
         }
@@ -122,13 +122,13 @@ interface UICanvas {
                 ).roundInt()
                 Position.RIGHT -> handler!!.posX = Movement.fastPullOut(
                         handler.openCloseCounter / openCloseTime,
-                        Gdx.graphics.width - handler.UI.width.toFloat(),
-                        Gdx.graphics.width.toFloat()
+                        TerrarumGDX.WIDTH - handler.UI.width.toFloat(),
+                        TerrarumGDX.WIDTH.toFloat()
                 ).roundInt()
                 Position.BOTTOM -> handler!!.posY = Movement.fastPullOut(
                         handler.openCloseCounter / openCloseTime,
-                        Gdx.graphics.height - handler.UI.height.toFloat(),
-                        Gdx.graphics.height.toFloat()
+                        TerrarumGDX.HEIGHT - handler.UI.height.toFloat(),
+                        TerrarumGDX.HEIGHT.toFloat()
                 ).roundInt()
             }
         }
@@ -136,16 +136,16 @@ interface UICanvas {
             when (position) {
                 Position.LEFT -> handler!!.posX = 0
                 Position.TOP -> handler!!.posY = 0
-                Position.RIGHT -> handler!!.posX = Gdx.graphics.width - handler.UI.width
-                Position.BOTTOM -> handler!!.posY = Gdx.graphics.height - handler.UI.height
+                Position.RIGHT -> handler!!.posX = TerrarumGDX.WIDTH - handler.UI.width
+                Position.BOTTOM -> handler!!.posY = TerrarumGDX.HEIGHT - handler.UI.height
             }
         }
         fun endClosingPopOut(handler: UIHandler?, position: Position) {
             when (position) {
                 Position.LEFT -> handler!!.posX = -handler.UI.width
                 Position.TOP -> handler!!.posY = -handler.UI.height
-                Position.RIGHT -> handler!!.posX = Gdx.graphics.width
-                Position.BOTTOM -> handler!!.posY = Gdx.graphics.height
+                Position.RIGHT -> handler!!.posX = TerrarumGDX.WIDTH
+                Position.BOTTOM -> handler!!.posY = TerrarumGDX.HEIGHT
             }
         }
 

@@ -32,7 +32,7 @@ class ConsoleWindow : UICanvas, KeyControlled {
     private val LINE_HEIGHT = 20
     private val MESSAGES_DISPLAY_COUNT = 11
 
-    override var width: Int = Gdx.graphics.width
+    override var width: Int = TerrarumGDX.WIDTH
     override var height: Int = LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT + 1)
 
     override var openCloseTime = 0f
