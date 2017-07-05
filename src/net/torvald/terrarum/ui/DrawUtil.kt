@@ -1,8 +1,8 @@
 package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.TerrarumGDX
 
 
 /**
@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 object DrawUtil {
     fun drawCentered(batch: SpriteBatch, image: Texture, screenPosY: Int, ui: UICanvas? = null) {
         val imageW = image.width
-        val targetW = if (ui == null) Gdx.graphics.width else ui.width
+        val targetW = if (ui == null) TerrarumGDX.WIDTH else ui.width
 
         batch.draw(image, targetW.minus(imageW).ushr(1).toFloat(), screenPosY.toFloat())
     }

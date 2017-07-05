@@ -83,7 +83,7 @@ object WeatherMixer {
                 kotlin.repeat(4) {
                     // 4 seems good
                     val rainParticle = ParticleTestRain(
-                            playerPos.x + HQRNG().nextInt(Gdx.graphics.width) - TerrarumGDX.HALFW,
+                            playerPos.x + HQRNG().nextInt(TerrarumGDX.WIDTH) - TerrarumGDX.HALFW,
                             playerPos.y - TerrarumGDX.HALFH
                     )
                     TerrarumGDX.ingame!!.addParticle(rainParticle)
@@ -121,8 +121,8 @@ object WeatherMixer {
         TerrarumGDX.inShapeRenderer {
             it.rect(
                     0f, 0f,
-                    Gdx.graphics.width.toFloat(),
-                    Gdx.graphics.height.toFloat(),
+                    TerrarumGDX.WIDTH.toFloat(),
+                    TerrarumGDX.HEIGHT.toFloat(),
                     getGradientColour(skyboxColourMap, 1, timeNow),
                     getGradientColour(skyboxColourMap, 1, timeNow),
                     getGradientColour(skyboxColourMap, 0, timeNow),
