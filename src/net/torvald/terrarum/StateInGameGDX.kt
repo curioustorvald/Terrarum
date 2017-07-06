@@ -47,6 +47,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     private val ACTOR_UPDATE_RANGE = 4096
 
     lateinit var world: GameWorld
+    lateinit var historicalFigureIDBucket: ArrayList<Int>
 
     /**
      * list of Actors that is sorted by Actors' referenceID
@@ -76,9 +77,19 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         val lightmapDownsample = 1f
     }
 
-    var worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT, true)
-    var lightmapFboA = FrameBuffer(Pixmap.Format.RGBA8888, TerrarumGDX.WIDTH.div(lightmapDownsample.toInt()), TerrarumGDX.HEIGHT.div(lightmapDownsample.toInt()), true)
-    var lightmapFboB = FrameBuffer(Pixmap.Format.RGBA8888, TerrarumGDX.WIDTH.div(lightmapDownsample.toInt()), TerrarumGDX.HEIGHT.div(lightmapDownsample.toInt()), true)
+
+    private val worldFBOformat = Pixmap.Format.RGBA4444 // just a future-proof for mobile
+    private val lightFBOformat = Pixmap.Format.RGBA8888
+
+    var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT, true)
+    var lightmapFboA = FrameBuffer(lightFBOformat, TerrarumGDX.WIDTH.div(lightmapDownsample.toInt()), TerrarumGDX.HEIGHT.div(lightmapDownsample.toInt()), true)
+    var lightmapFboB = FrameBuffer(lightFBOformat, TerrarumGDX.WIDTH.div(lightmapDownsample.toInt()), TerrarumGDX.HEIGHT.div(lightmapDownsample.toInt()), true)
+
+
+    init {
+        println("worldDrawFrameBuffer.colorBufferTexture.textureData.format: ${worldDrawFrameBuffer.colorBufferTexture.textureData.format}")
+        println("lightmapFboB.colorBufferTexture.textureData.format: ${lightmapFboB.colorBufferTexture.textureData.format}")
+    }
 
 
     //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
@@ -152,15 +163,28 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         initViewPort(TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT)
     }
 
+    data class GameSaveData(
+            val world: GameWorld,
+            val historicalFigureIDBucket: ArrayList<Int>,
+            val realGamePlayer: ActorHumanoid
+    )
 
+    fun enter(gameSaveData: GameSaveData) {
+        world = gameSaveData.world
+        historicalFigureIDBucket = gameSaveData.historicalFigureIDBucket
+        playableActorDelegate = PlayableActorDelegate(gameSaveData.realGamePlayer)
+        addNewActor(player!!)
+
+
+
+        initGame()
+    }
+
+
+    /**
+     * Create new world
+     */
     fun enter() {
-
-        Gdx.input.inputProcessor = GameController
-
-
-        initViewPort(TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT)
-
-
         // load things when the game entered this "state"
         // load necessary shaders
         //shader12BitCol = Shader.makeShader("./assets/4096.vert", "./assets/4096.frag")
@@ -176,6 +200,9 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         WorldGenerator.generateMap()
 
 
+        historicalFigureIDBucket = ArrayList<Int>()
+
+
         RoguelikeRandomiser.seed = HQRNG().nextLong()
 
 
@@ -188,6 +215,17 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // test actor
         //addNewActor(PlayerBuilderCynthia())
 
+
+
+        initGame()
+    }
+
+    fun initGame() {
+
+        Gdx.input.inputProcessor = GameController
+
+
+        initViewPort(TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT)
 
 
         // init console window
@@ -391,7 +429,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         ///////////////////
         // blur lightmap //
         ///////////////////
-        val blurIterations = 3 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
+        val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
         val blurRadius = 4f / lightmapDownsample // (3, 4f); using low numbers for pixel-y aesthetics
 
 
@@ -401,7 +439,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         }
 
-        lightmapFboA.inAction(null, null) {
+        lightmapFboB.inAction(null, null) {
             Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         }
@@ -423,7 +461,11 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         blurReadBuffer.inAction(camera, batch) {
             batch.inUse {
                 // using custom code for camera; this is obscure and tricky
-                camera.position.set((WorldCamera.gdxCamX / lightmapDownsample).round(), (WorldCamera.gdxCamY / lightmapDownsample).round(), 0f) // make camara work
+                camera.position.set(
+                        (WorldCamera.gdxCamX / lightmapDownsample).round(),
+                        (WorldCamera.gdxCamY / lightmapDownsample).round(),
+                        0f
+                ) // make camara work
                 camera.update()
                 batch.projectionMatrix = camera.combined
 
@@ -445,7 +487,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
 
                         batch.shader = TerrarumGDX.shaderBlur
-                        batch.shader.setUniformf("iResolution", blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())
+                        batch.shader.setUniformf("iResolution",
+                                blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())
                         batch.shader.setUniformf("flip", 1f)
                         if (i % 2 == 0)
                             batch.shader.setUniformf("direction", blurRadius, 0f)
@@ -479,7 +522,6 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
             batch.inUse {
                 batch.shader = null
-
 
                 // using custom code for camera; this is obscure and tricky
                 camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
@@ -519,14 +561,24 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                 // mix lighpmap canvas to this canvas
                 if (!KeyToggler.isOn(Input.Keys.F6)) { // F6 to disable lightmap draw
                     setCameraPosition(0f, 0f)
+                    batch.shader = null
 
                     val lightTex = blurWriteBuffer.colorBufferTexture // TODO zoom!
+
                     lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
                     if (KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendNormal()
                     else blendMul()
+
                     batch.color = Color.WHITE
-                    batch.draw(lightTex, 0f, 0f, lightTex.width * lightmapDownsample, lightTex.height * lightmapDownsample)
+                    batch.draw(lightTex,
+                            0f, 0f,
+                            lightTex.width * lightmapDownsample, lightTex.height * lightmapDownsample
+                    )
                 }
+
+
+                batch.shader = null
 
 
                 // move camera back to its former position
@@ -567,15 +619,19 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             /////////////////////////////////
             // draw framebuffers to screen //
             /////////////////////////////////
-
             WeatherMixer.render(batch)
 
+            batch.flush()
+
+            batch.shader = null
             batch.color = Color.WHITE
             val worldTex = worldDrawFrameBuffer.colorBufferTexture // TODO zoom!
             worldTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
             batch.draw(worldTex, 0f, 0f, worldTex.width.toFloat(), worldTex.height.toFloat())
 
 
+
+            batch.shader = null
 
             batch.color = Color.RED
             batch.fillRect(0f, 0f, 16f, 16f)
@@ -640,7 +696,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             /////////////////////////////
             // draw some overlays (UI) //
             /////////////////////////////
-            uiContainer.forEach { if (it != consoleHandler) it.render(batch) } // FIXME draws black of grey coloured box on top right
+            uiContainer.forEach { if (it != consoleHandler) it.render(batch) }
 
             debugWindow.render(batch)
             // make sure console draws on top of other UIs
@@ -842,7 +898,9 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // TODO prevent possessing other player on multiplayer
 
         if (!theGameHasActor(refid)) {
-            throw IllegalArgumentException("No such actor in the game: $refid (elemsActive: ${actorContainer.size}, elemsInactive: ${actorContainerInactive.size})")
+            throw IllegalArgumentException(
+                    "No such actor in the game: $refid (elemsActive: ${actorContainer.size}, " +
+                    "elemsInactive: ${actorContainerInactive.size})")
         }
 
         // take care of old delegate
@@ -975,8 +1033,10 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     /** whether the actor is within screen */
     private fun ActorWithBody.inScreen() =
             distToCameraSqr(this) <=
-            (TerrarumGDX.WIDTH.plus(this.hitbox.width.div(2)).times(1 / TerrarumGDX.ingame!!.screenZoom).sqr() +
-             TerrarumGDX.HEIGHT.plus(this.hitbox.height.div(2)).times(1 / TerrarumGDX.ingame!!.screenZoom).sqr())
+            (TerrarumGDX.WIDTH.plus(this.hitbox.width.div(2)).
+                    times(1 / TerrarumGDX.ingame!!.screenZoom).sqr() +
+             TerrarumGDX.HEIGHT.plus(this.hitbox.height.div(2)).
+                     times(1 / TerrarumGDX.ingame!!.screenZoom).sqr())
 
 
     /** whether the actor is within update range */
@@ -1111,7 +1171,9 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     fun addUI(ui: UIHandler) {
         // check for exact duplicates
         if (uiContainer.contains(ui)) {
-            throw IllegalArgumentException("Exact copy of the UI already exists: The instance of ${ui.UI.javaClass.simpleName}")
+            throw IllegalArgumentException(
+                    "Exact copy of the UI already exists: The instance of ${ui.UI.javaClass.simpleName}"
+            )
         }
 
         uiContainer.add(ui)
@@ -1126,7 +1188,11 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             index = actorContainerInactive.binarySearch(ID)
 
             if (index < 0) {
-                JOptionPane.showMessageDialog(null, "Actor with ID $ID does not exist.", null, JOptionPane.ERROR_MESSAGE)
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Actor with ID $ID does not exist.",
+                        null, JOptionPane.ERROR_MESSAGE
+                )
                 throw IllegalArgumentException("Actor with ID $ID does not exist.")
             }
             else
@@ -1203,11 +1269,11 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
     override fun resize(width: Int, height: Int) {
         worldDrawFrameBuffer.dispose()
-        worldDrawFrameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
+        worldDrawFrameBuffer = FrameBuffer(worldFBOformat, width, height, true)
         lightmapFboA.dispose()
-        lightmapFboA = FrameBuffer(Pixmap.Format.RGBA8888, width.div(lightmapDownsample.toInt()), height.div(lightmapDownsample.toInt()), true)
+        lightmapFboA = FrameBuffer(lightFBOformat, width.div(lightmapDownsample.toInt()), height.div(lightmapDownsample.toInt()), true)
         lightmapFboB.dispose()
-        lightmapFboB = FrameBuffer(Pixmap.Format.RGBA8888, width.div(lightmapDownsample.toInt()), height.div(lightmapDownsample.toInt()), true)
+        lightmapFboB = FrameBuffer(lightFBOformat, width.div(lightmapDownsample.toInt()), height.div(lightmapDownsample.toInt()), true)
 
 
         // Set up viewport when window is resized

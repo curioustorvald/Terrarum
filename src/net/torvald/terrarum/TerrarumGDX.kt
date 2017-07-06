@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.Matrix4
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import com.jme3.math.FastMath
@@ -50,7 +51,6 @@ fun main(args: Array<String>) {
     config.height = 742
     config.backgroundFPS = 9999
     config.foregroundFPS = 9999
-    //config.useGL30 = true
     config.title = GAME_NAME
 
     LwjglApplication(TerrarumGDX, config)
@@ -242,6 +242,8 @@ object TerrarumGDX : ApplicationAdapter() {
 
 
     lateinit var shaderBlur: ShaderProgram
+    lateinit var shader4096: ShaderProgram
+    lateinit var shader4096Bayer: ShaderProgram
 
 
     init {
@@ -301,6 +303,14 @@ object TerrarumGDX : ApplicationAdapter() {
 
         ShaderProgram.pedantic = false
         shaderBlur = ShaderProgram(Gdx.files.internal("assets/blur.vert"), Gdx.files.internal("assets/blur.frag"))
+        shader4096 = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096.frag"))
+        shader4096Bayer = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer.frag"))
+
+        shader4096Bayer.begin()
+        shader4096Bayer.setUniformMatrix("Bayer", Matrix4(floatArrayOf(0f,8f,2f,10f,12f,4f,14f,6f,3f,11f,1f,9f,15f,7f,13f,5f)))
+        shader4096Bayer.setUniformf("monitorGamma", 2.2f)
+        shader4096Bayer.end()
+
 
         ModMgr // invoke Module Manager, will also invoke BlockCodex
         ItemCodex // invoke Item Codex
