@@ -430,7 +430,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // blur lightmap //
         ///////////////////
         val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
-        val blurRadius = 4f / lightmapDownsample // (3, 4f); using low numbers for pixel-y aesthetics
+        val blurRadius = 4f / lightmapDownsample // (5, 4f); using low numbers for pixel-y aesthetics
 
 
 
