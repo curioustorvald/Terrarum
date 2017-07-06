@@ -632,7 +632,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             debug1("Collision type: $selfCollisionStatus")
             affectingTiles.forEach {
                 val tileCoord = LandUtil.resolveBlockAddr(it)
-                debug1("affectign tile: ${tileCoord.first}, ${tileCoord.second}")
+                debug2("affectign tile: ${tileCoord.first}, ${tileCoord.second}")
             }
 
             when (selfCollisionStatus) {
@@ -694,6 +694,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                              Vector2(offendingTileWorldX, offendingTileWorldY)).direction
 
 
+                debug1("vectorSum: $vectorSum, vectorDirRaw: ${vectorSum.direction / Math.PI}pi")
+                debug1("incidentAngle: ${angleOfIncidence / Math.PI}pi, threshold: ${angleThreshold / Math.PI}pi")
+
 
                 val displacementAbs = Vector2(
                         (offendingTileWorldX - offendingHitboxPointX).abs(),
@@ -727,6 +730,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                             )
 
                 newHitbox.translate(finalDisplacement)
+
+
+                debug1("displacement: $finalDisplacement")
 
 
                 // TODO: translate other axis proportionally to the incident vector
@@ -1438,9 +1444,9 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 speedMultByTile *
                 scale.sqrt()
 
-    private fun Double.toPositiveRad() = // rad(0..2pi, -2pi..0) -> rad(0..4pi)
-            if (this >= -2 * Math.PI && this < 0.0)
-                4 * Math.PI - this
+    private fun Double.toPositiveRad() = // rad(0..pi, -pi..0) -> rad(0..2pi)
+            if (-Math.PI <= this && this < 0.0)
+                this + 2 * Math.PI
             else
                 this
 }
