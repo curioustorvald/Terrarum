@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.math.Matrix4
 
 /**
  * Created by minjaesong on 2017-07-05.
@@ -37,6 +38,11 @@ object ColorLimiterTest : ApplicationAdapter() {
         ShaderProgram.pedantic = false
 
         shader4096 = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096.frag"))
+        shader4096.begin()
+        //shader4096.setUniformMatrix("Bayer", Matrix4(floatArrayOf(0f,8f,2f,10f,12f,4f,14f,6f,3f,11f,1f,9f,15f,7f,13f,5f)))
+        shader4096.end()
+
+
         img = Texture("assets/test_texture.tga")
 
         batch = SpriteBatch()
@@ -51,7 +57,7 @@ object ColorLimiterTest : ApplicationAdapter() {
 
         batch.inUse {
             batch.shader = shader4096
-            //batch.shader.setUniformf("iResolution", Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+            //batch.shader.setUniformf("monitorGamma", 2.2f)
 
             batch.color = Color.WHITE
             batch.draw(img, 0f, 0f)

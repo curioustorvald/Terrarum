@@ -1,5 +1,7 @@
 package net.torvald.terrarum.gameactors
 
+import net.torvald.random.HQRNG
+import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.gameworld.WorldTime
 
 typealias AnyPlayer = HistoricalFigure
@@ -17,6 +19,25 @@ open class HistoricalFigure(
         val dead: GameDate? = null,
         realAirFriction: Boolean = false
 ) : ActorWithPhysics(Actor.RenderOrder.MIDDLE, realAirFriction) {
+
+    val historicalFigureIdentifier: Int = generateHistoricalFigureIdentifier()
+
+    private fun generateHistoricalFigureIdentifier(): Int {
+        fun hasCollision(value: Int) =
+                try {
+                    TerrarumGDX.ingame!!.historicalFigureIDBucket.contains(value)
+                }
+                catch (gameNotInitialisedException: KotlinNullPointerException) {
+                    false
+                }
+
+        var ret: Int
+        do {
+            ret = HQRNG().nextInt() // set new ID
+        } while (hasCollision(ret)) // check for collision
+        return ret
+    }
+
 
     init {
         this.actorValue["_bornyear"] = born.year
