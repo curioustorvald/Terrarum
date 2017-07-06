@@ -196,15 +196,6 @@ object TestTestMain : ApplicationAdapter() {
         ShaderProgram.pedantic = false
         blurShader = ShaderProgram(Gdx.files.internal("assets/blur.vert"), Gdx.files.internal("assets/blur.frag"))
 
-        // culprit #4
-        blurShader.begin()
-        blurShader.setUniformf("dir", 0f, 0f); //direction of blur; nil for now
-        blurShader.setUniformf("resolution", maxOf(TerrarumGDX.WIDTH.toFloat(), TerrarumGDX.HEIGHT.toFloat())) //size of FBO texture
-        blurShader.setUniformf("radius", 9f) //radius of blur
-        blurShader.end()
-
-        Gdx.graphics.isContinuousRendering = true // culprit #3
-
 
         batch = SpriteBatch()
 

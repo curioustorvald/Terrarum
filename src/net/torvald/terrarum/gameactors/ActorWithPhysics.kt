@@ -61,7 +61,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
      */
     override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // Hitbox is implemented using Double;
 
-    inline val tilewiseHitbox: Hitbox
+    val tilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
@@ -104,7 +104,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
     @Transient val MASS_LOWEST = 0.1 // Kilograms
     /** Apparent mass. Use "avBaseMass" for base mass */
-    inline val mass: Double
+    val mass: Double
         get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT * Math.pow(scale, 3.0)
         /*set(value) { // use "var avBaseMass: Double"
             if (value <= 0)
@@ -185,7 +185,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     @Transient private val gravitation: Vector2 = world.gravitation
     @Transient val DRAG_COEFF_DEFAULT = 1.2
     /** Drag coefficient. Parachutes have much higher value than bare body (1.2) */
-    inline var dragCoefficient: Double
+    var dragCoefficient: Double
         get() = actorValue.getAsDouble(AVKey.DRAGCOEFF) ?: DRAG_COEFF_DEFAULT
         set(value) {
             if (value < 0)
@@ -541,7 +541,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
         fun debug1(wut: Any?) {
             //  vvvvv  set it true to make debug print work
-            if (false) println(wut)
+            if (true) println(wut)
         }
         fun debug2(wut: Any?) {
             //  vvvvv  set it true to make debug print work
@@ -622,10 +622,10 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             val newHitbox = hitbox.reassign(sixteenStep[collidingStep])
 
             var selfCollisionStatus = 0
-            if (isWalled(newHitbox, COLLIDING_LEFT))   selfCollisionStatus += COLL_LEFTSIDE
-            if (isWalled(newHitbox, COLLIDING_RIGHT))  selfCollisionStatus += COLL_RIGHTSIDE
-            if (isWalled(newHitbox, COLLIDING_TOP))    selfCollisionStatus += COLL_TOPSIDE
-            if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE
+            if (isWalled(newHitbox, COLLIDING_LEFT))   selfCollisionStatus += COLL_LEFTSIDE   // 1
+            if (isWalled(newHitbox, COLLIDING_RIGHT))  selfCollisionStatus += COLL_RIGHTSIDE  // 4
+            if (isWalled(newHitbox, COLLIDING_TOP))    selfCollisionStatus += COLL_TOPSIDE    // 8
+            if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE // 2
 
             // fixme UP and RIGHT && LEFT and DOWN bug
 
@@ -645,34 +645,81 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 4, 14 -> { newHitbox.translatePosX(          - newHitbox.endX.modTileDelta())  ; bounceX = true }
                 8, 13 -> { newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta()); bounceY = true }
                 2, 7  -> { newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())  ; bounceY = true }
-                // two-side collision
-                3 -> {
-                    debug1("translateX: ${(TILE_SIZE - newHitbox.startX.modTileDelta()).rem(TILE_SIZE)}")
-                    newHitbox.translatePosX((TILE_SIZE - newHitbox.startX.modTileDelta()).rem(TILE_SIZE))
-                    newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())
-                    bounceX = true; bounceY = true
-                }
-                6 -> {
-                    debug1("translateX: ${(          - newHitbox.endX.modTileDelta())}")
-                    newHitbox.translatePosX(          - newHitbox.endX.modTileDelta())
-                    newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())
-                    bounceX = true; bounceY = true
-                }
-                9 -> {
-                    newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta())
-                    newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta())
-                    bounceX = true; bounceY = true
-                }
-                12 -> {
-                    debug1("translateY: ${(TILE_SIZE - newHitbox.startY.modTileDelta()).rem(TILE_SIZE)}")
-                    newHitbox.translatePosX(          - newHitbox.endX.modTileDelta())
-                    newHitbox.translatePosY((TILE_SIZE - newHitbox.startY.modTileDelta()).rem(TILE_SIZE))
-                    bounceX = true; bounceY = true
-                }
             }
 
+            // two-side collision
             if (selfCollisionStatus in listOf(3,6,9,12)) {
                 debug1("twoside collision $selfCollisionStatus")
+
+                // !! this code is based on Dyn4j Vector's coord system; V(1,0) -> 0, V(0,1) -> pi, V(0,-1) -> -pi !! //
+
+                // we can use selfCollisionStatus to tell which of those four side we care
+
+                // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
+                val offendingTileWorldX = if (selfCollisionStatus in listOf(6, 12))
+                    newHitbox.endX.div(TILE_SIZE).floor() * TILE_SIZE
+                else
+                    newHitbox.startX.div(TILE_SIZE).ceil() * TILE_SIZE
+
+                // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
+                val offendingTileWorldY = if (selfCollisionStatus in listOf(3, 6))
+                    newHitbox.endY.div(TILE_SIZE).floor() * TILE_SIZE
+                else
+                    newHitbox.startY.div(TILE_SIZE).ceil() * TILE_SIZE
+
+                val offendingHitboxPointX = if (selfCollisionStatus in listOf(6, 12))
+                    newHitbox.endX
+                else
+                    newHitbox.startX
+
+                val offendingHitboxPointY = if (selfCollisionStatus in listOf(3, 6))
+                    newHitbox.endY
+                else
+                    newHitbox.startY
+
+                val angleOfIncidence = vectorSum.direction.toPositiveRad()
+                val angleThreshold = (Vector2(offendingHitboxPointX, offendingHitboxPointY) -
+                                      Vector2(offendingTileWorldX, offendingTileWorldY)).direction.toPositiveRad()
+
+
+                val displacementAbs = Vector2(
+                        (offendingTileWorldX - offendingHitboxPointX).abs(),
+                        (offendingTileWorldY - offendingHitboxPointY).abs()
+                )
+
+
+                // conditions should be four? for 4 corners?
+                // or mathe works regardless?
+                // (need to account for I < TH; I > TH; I == TH)
+
+                val displacementUnitVector =
+                        if (angleOfIncidence == angleThreshold)
+                            -vectorSum
+                        else {
+                            when (selfCollisionStatus) {
+                                3 -> if (angleOfIncidence > angleThreshold) Vector2(1.0, 0.0) else Vector2(0.0, -1.0)
+                                6 -> if (angleOfIncidence > angleThreshold) Vector2(0.0, -1.0) else Vector2(-1.0, 0.0)
+                                9 -> if (angleOfIncidence > angleThreshold) Vector2(0.0, 1.0) else Vector2(1.0, 0.0)
+                                12 -> if (angleOfIncidence > angleThreshold) Vector2(-1.0, 0.0) else Vector2(0.0, 1.0)
+                                else -> throw InternalError("Blame hardware or universe")
+                            }
+                        }
+
+                val finalDisplacement =
+                        if (angleOfIncidence == angleThreshold)
+                            displacementUnitVector
+                        else
+                            Vector2(
+                                    displacementAbs.x * displacementUnitVector.x,
+                                    displacementAbs.y * displacementUnitVector.y
+                            )
+
+                newHitbox.translate(finalDisplacement)
+
+
+                bounceX = angleOfIncidence == angleThreshold || displacementUnitVector.x != 0.0
+                bounceY = angleOfIncidence == angleThreshold || displacementUnitVector.y != 0.0
+
             }
 
 
@@ -711,113 +758,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
 
         return
-
-        /*val BLOCK_LEFTSIDE = 1
-        val BLOCK_BOTTOMSIDE = 2
-        val BLOCK_RIGHTSIDE = 4
-        val BLOCK_TOPSIDE = 8
-        fun getBlockCondition(hitbox: Hitbox, blockAddress: BlockAddress): Int {
-            val blockX = (blockAddress % world.width) * TILE_SIZE
-            val blockY = (blockAddress / world.width) * TILE_SIZE
-            var ret = 0
-
-            // test leftside
-            if (hitbox.startX >= blockX && hitbox.startX < blockX + TILE_SIZE) { // TEST ME: <= or <
-                ret += BLOCK_LEFTSIDE
-            }
-            // test bottomside
-            if (hitbox.endY >= blockY && hitbox.endY < blockY + TILE_SIZE) {
-                ret += BLOCK_BOTTOMSIDE
-            }
-            // test rightside
-            if (hitbox.endX >= blockX && hitbox.endX < blockX + TILE_SIZE) {
-                ret += BLOCK_RIGHTSIDE
-            }
-            // test topside
-            if (hitbox.startY >= blockY && hitbox.startY < blockY + TILE_SIZE) {
-                ret += BLOCK_TOPSIDE
-            }
-
-            // cancel two superpositions (change 0b-numbers if you've changed side indices!)
-            //if (ret and 0b1010 == 0b1010) ret = ret and 0b0101
-            //if (ret and 0b0101 == 0b0101) ret = ret and 0b1010
-
-            return ret
-        }
-        infix fun Int.hasSide(side: Int) = this and side != 0
-
-
-
-        var bounceX = false
-        var bounceY = false
-        // collision NOT detected
-        if (collidingStep == null) {
-            hitbox.translate(vectorSum)
-            // grounded = false
-        }
-        // collision detected
-        else {
-            //debug1("Collision detected")
-
-            val newHitbox = hitbox.clone() // this line is wrong (must be hitbox.reassign(sixteenStep[collidingStep])) HOWEVER the following method is also wrong; think about the case where I am placed exactly in between two tiles)
-            // see if four sides of hitbox CROSSES the tile
-            // that information should be able to tell where the hitbox be pushed
-            // blocks can have up to 4 status at once
-            affectingTiles.forEach { blockAddr ->
-                val blockCollStatus = getBlockCondition(newHitbox, blockAddr)
-
-                if (blockCollStatus != 0) debug4("--> blockCollStat: $blockCollStatus")
-
-                // displacements (no ELSE IFs!) superpositions are filtered in getBlockCondition()
-                if (blockCollStatus hasSide BLOCK_LEFTSIDE) {
-                    val displacement = TILE_SIZE - newHitbox.startX.modTileDelta()
-                    newHitbox.translatePosX(displacement)
-                    bounceX = true
-
-                    debug4("--> leftside")
-                }
-                if (blockCollStatus hasSide BLOCK_RIGHTSIDE) {
-                    val displacement = newHitbox.endX.modTileDelta()
-                    newHitbox.translatePosX(displacement)
-                    bounceX = true
-
-                    debug4("--> rightside")
-                }
-                if (blockCollStatus hasSide BLOCK_TOPSIDE) {
-                    val displacement = TILE_SIZE - newHitbox.startY.modTileDelta()
-                    newHitbox.translatePosY(displacement)
-                    bounceY = true
-
-                    debug4("--> topside")
-                }
-                if (blockCollStatus hasSide BLOCK_BOTTOMSIDE) {
-                    val displacement = newHitbox.endY.modTileDelta()
-                    newHitbox.translatePosY(displacement)
-                    bounceY = true
-
-                    debug4("--> bottomside")
-                }
-            }
-
-
-            hitbox.reassign(newHitbox)
-
-
-            // bounce X/Y
-            if (bounceX) {
-                externalForce.x *= elasticity
-                controllerMoveDelta?.let { controllerMoveDelta!!.x *= elasticity }
-            }
-            if (bounceY) {
-                externalForce.y *= elasticity
-                controllerMoveDelta?.let { controllerMoveDelta!!.y *= elasticity }
-            }
-
-
-            // grounded = true
-
-        }// end of collision not detected*/
-
 
 
 
@@ -1458,35 +1398,44 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /**
      * Apparent strength. 1 000 is default value
      */
-    internal inline val avStrength: Double
+    internal val avStrength: Double
         get() = (actorValue.getAsDouble(AVKey.STRENGTH) ?: 1000.0) *
                 (actorValue.getAsDouble(AVKey.STRENGTHBUFF) ?: 1.0) * scale
-    internal inline var avBaseStrength: Double?
+    internal var avBaseStrength: Double?
         get() = actorValue.getAsDouble(AVKey.STRENGTH)
         set(value) {
             actorValue[AVKey.STRENGTH] = value!!
         }
-    internal inline var avBaseMass: Double
-        get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT
+    internal var avBaseMass: Double
+        inline get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT
         set(value) {
+            if (value <= 0 || value.isNaN() || value.isInfinite())
+                throw IllegalArgumentException("Tried to set base mass to invalid value ($value)")
             actorValue[AVKey.BASEMASS] = value
         }
-    internal inline val avAcceleration: Double
+    internal val avAcceleration: Double
         get() = actorValue.getAsDouble(AVKey.ACCEL)!! *
                 actorValue.getAsDouble(AVKey.ACCELBUFF)!! *
                 accelMultMovement *
                 scale.sqrt()
-    internal inline val avSpeedCap: Double
+    internal val avSpeedCap: Double
         get() = actorValue.getAsDouble(AVKey.SPEED)!! *
                 actorValue.getAsDouble(AVKey.SPEEDBUFF)!! *
                 speedMultByTile *
                 scale.sqrt()
+
+    private fun Double.toPositiveRad() = // rad(0..2pi, -2pi..0) -> rad(0..4pi)
+            if (this >= -2 * Math.PI && this < 0.0)
+                4 * Math.PI - this
+            else
+                this
 }
 
 inline fun Int.sqr(): Int = this * this
 inline fun Double.floorInt() = Math.floor(this).toInt()
 inline fun Float.floorInt() = FastMath.floor(this)
 inline fun Float.floor() = FastMath.floor(this).toFloat()
+inline fun Double.ceilInt() = Math.ceil(this).toInt()
 inline fun Float.ceilInt() = FastMath.ceil(this)
 inline fun Double.round() = Math.round(this).toDouble()
 inline fun Double.floor() = Math.floor(this)
@@ -1498,12 +1447,12 @@ inline fun Double.sqr() = this * this
 inline fun Double.sqrt() = Math.sqrt(this)
 inline fun Float.sqrt() = FastMath.sqrt(this)
 inline fun Int.abs() = if (this < 0) -this else this
-inline fun Double.bipolarClamp(limit: Double) =
+fun Double.bipolarClamp(limit: Double) =
         if (this > 0 && this > limit) limit
         else if (this < 0 && this < -limit) -limit
         else this
 
-inline fun absMax(left: Double, right: Double): Double {
+fun absMax(left: Double, right: Double): Double {
     if (left > 0 && right > 0)
         if (left > right) return left
         else return right
@@ -1518,8 +1467,8 @@ inline fun absMax(left: Double, right: Double): Double {
     }
 }
 
-inline fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
-inline fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0
+fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
+fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0
 
 fun interpolateLinear(scale: Double, startValue: Double, endValue: Double): Double {
     if (startValue == endValue) {
