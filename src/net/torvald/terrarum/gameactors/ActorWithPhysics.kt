@@ -657,29 +657,42 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
                 // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
                 val offendingTileWorldX = if (selfCollisionStatus in listOf(6, 12))
-                    newHitbox.endX.div(TILE_SIZE).floor() * TILE_SIZE
-                else
-                    newHitbox.startX.div(TILE_SIZE).ceil() * TILE_SIZE
+                            newHitbox.endX.div(TILE_SIZE).floor() * TILE_SIZE - 0.00001
+                        else
+                            newHitbox.startX.div(TILE_SIZE).ceil() * TILE_SIZE
 
                 // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
                 val offendingTileWorldY = if (selfCollisionStatus in listOf(3, 6))
-                    newHitbox.endY.div(TILE_SIZE).floor() * TILE_SIZE
-                else
-                    newHitbox.startY.div(TILE_SIZE).ceil() * TILE_SIZE
+                            newHitbox.endY.div(TILE_SIZE).floor() * TILE_SIZE - 0.00001
+                        else
+                            newHitbox.startY.div(TILE_SIZE).ceil() * TILE_SIZE
 
                 val offendingHitboxPointX = if (selfCollisionStatus in listOf(6, 12))
-                    newHitbox.endX
-                else
-                    newHitbox.startX
+                            newHitbox.endX
+                        else
+                            newHitbox.startX
 
                 val offendingHitboxPointY = if (selfCollisionStatus in listOf(3, 6))
-                    newHitbox.endY
-                else
-                    newHitbox.startY
+                            newHitbox.endY
+                        else
+                            newHitbox.startY
 
-                val angleOfIncidence = vectorSum.direction.toPositiveRad()
-                val angleThreshold = (Vector2(offendingHitboxPointX, offendingHitboxPointY) -
-                                      Vector2(offendingTileWorldX, offendingTileWorldY)).direction.toPositiveRad()
+
+
+                val angleOfIncidence =
+                        if (selfCollisionStatus in listOf(3, 9))
+                            vectorSum.direction.toPositiveRad()
+                        else
+                            vectorSum.direction
+
+                val angleThreshold =
+                        if (selfCollisionStatus in listOf(3, 9))
+                            (Vector2(offendingHitboxPointX, offendingHitboxPointY) -
+                             Vector2(offendingTileWorldX, offendingTileWorldY)).direction.toPositiveRad()
+                        else
+                            (Vector2(offendingHitboxPointX, offendingHitboxPointY) -
+                             Vector2(offendingTileWorldX, offendingTileWorldY)).direction
+
 
 
                 val displacementAbs = Vector2(
@@ -688,9 +701,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 )
 
 
-                // conditions should be four? for 4 corners?
-                // or mathe works regardless?
-                // (need to account for I < TH; I > TH; I == TH)
+                // FIXME jump-thru-ceil bug on 1px-wide (the edge), case-9 collision (does not occur on case-12 coll.)
+
 
                 val displacementUnitVector =
                         if (angleOfIncidence == angleThreshold)
@@ -716,6 +728,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
                 newHitbox.translate(finalDisplacement)
 
+
+                // TODO: translate other axis proportionally to the incident vector
 
                 bounceX = angleOfIncidence == angleThreshold || displacementUnitVector.x != 0.0
                 bounceY = angleOfIncidence == angleThreshold || displacementUnitVector.y != 0.0
