@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.ItemCodex.ACTORID_MIN
 
@@ -57,7 +57,7 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
     fun generateUniqueReferenceID(): ActorID {
         fun hasCollision(value: ActorID) =
                 try {
-                    TerrarumGDX.ingame!!.theGameHasActor(value) ||
+                    Terrarum.ingame!!.theGameHasActor(value) ||
                     value < ItemCodex.ACTORID_MIN ||
                     value !in when (renderOrder) {
                         RenderOrder.BEHIND -> RANGE_BEHIND

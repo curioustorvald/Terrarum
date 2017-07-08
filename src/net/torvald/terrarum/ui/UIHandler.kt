@@ -2,8 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Matrix4
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamecontroller.KeyToggler
 
 /**
@@ -134,12 +133,12 @@ class UIHandler(val UI: UICanvas,
             //batch.projectionMatrix = Matrix4()
 //
             //if (!customPositioning)
-            //    TerrarumGDX.ingame?.camera?.position?.set(posX.toFloat(), posY.toFloat(), 0f) // does it work?
+            //    Terrarum.ingame?.camera?.position?.set(posX.toFloat(), posY.toFloat(), 0f) // does it work?
 
 
 
             if (!customPositioning)
-                TerrarumGDX.ingame?.setCameraPosition(posX.toFloat(), posY.toFloat())
+                Terrarum.ingame?.setCameraPosition(posX.toFloat(), posY.toFloat())
             batch.color = Color.WHITE
 
             UI.render(batch)

@@ -1,7 +1,7 @@
 package net.torvald.terrarum.serialise
 
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import java.io.IOException
 import java.nio.charset.Charset
 import java.nio.file.Files
@@ -22,10 +22,10 @@ internal object WriteGameMapData {
 
 
     internal fun write(saveDirectoryName: String): Boolean {
-        val path = Paths.get("${TerrarumGDX.defaultSaveDir}" +
-                                       "/$saveDirectoryName/${WriteMeta.META_FILENAME}")
+        val path = Paths.get("${Terrarum.defaultSaveDir}" +
+                             "/$saveDirectoryName/${WriteMeta.META_FILENAME}")
         val tempPath = Files.createTempFile(path.toString(), "_temp")
-        val map = TerrarumGDX.ingame!!.world
+        val map = Terrarum.ingame!!.world
 
         // TODO gzip
 

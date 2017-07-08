@@ -3,13 +3,10 @@ package net.torvald.terrarum
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.assets.loaders.ShaderProgramLoader
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.CpuSpriteBatch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
@@ -17,10 +14,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import com.jme3.math.FastMath
-import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.gameactors.ActorWithPhysics.Companion.TILE_SIZE
-import net.torvald.terrarum.gameactors.floor
+import net.torvald.terrarum.Terrarum.RENDER_FPS
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -30,7 +24,6 @@ import net.torvald.terrarum.worlddrawer.RGB10
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.lwjgl.input.Controllers
-import org.lwjgl.opengl.GL11
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -43,24 +36,27 @@ const val GAME_NAME = "Terrarum"
 
 fun main(args: Array<String>) {
     val config = LwjglApplicationConfiguration()
-    config.foregroundFPS = TerrarumGDX.RENDER_FPS
-    config.backgroundFPS = TerrarumGDX.RENDER_FPS
-    //config.vSyncEnabled = true
+    config.foregroundFPS = Terrarum.RENDER_FPS
+    config.backgroundFPS = Terrarum.RENDER_FPS
+    config.vSyncEnabled = Terrarum.USE_VSYNC
     config.resizable = true
     config.width = 1072
     config.height = 742
-    config.backgroundFPS = 9999
-    config.foregroundFPS = 9999
+    config.backgroundFPS = RENDER_FPS
+    config.foregroundFPS = RENDER_FPS
     config.title = GAME_NAME
 
-    LwjglApplication(TerrarumGDX, config)
+    // the game must run on same speed regardless of the display FPS;
+    // "Terrarum.TARGET_INTERNAL_FPS" denotes "execute as if FPS was set to this value"
+
+    LwjglApplication(Terrarum, config)
 }
 
 
 
 typealias RGBA8888 = Int
 
-object TerrarumGDX : ApplicationAdapter() {
+object Terrarum : ApplicationAdapter() {
 
     lateinit var batch: SpriteBatch
     lateinit var shapeRender: ShapeRenderer // DO NOT USE!! for very limited applications e.g. WeatherMixer
@@ -98,16 +94,13 @@ object TerrarumGDX : ApplicationAdapter() {
     /**
      * To be used with physics simulator
      */
-    val TARGET_FPS = 33.333333333333333333333
+    val TARGET_FPS: Double = 33.33333333333333333333333 // higher value == faster gravity responce
 
     /**
      * To be used with render, to achieve smooth frame drawing
-
      * TARGET_INTERNAL_FPS > TARGET_FPS for smooth frame drawing
-
-     * Must choose a value so that (1000 / VAL) is still integer
      */
-    val TARGET_INTERNAL_FPS = 100
+    val TARGET_INTERNAL_FPS: Double = 60.0
 
 
     /**
@@ -131,7 +124,7 @@ object TerrarumGDX : ApplicationAdapter() {
     var previousScreen: Screen? = null // to be used with temporary states like StateMonitorCheck
 
 
-    var ingame: StateInGameGDX? = null
+    var ingame: Ingame? = null
     private val gameConfig = GameConfig()
 
     val OSName = System.getProperty("os.name")
@@ -318,7 +311,7 @@ object TerrarumGDX : ApplicationAdapter() {
 
 
 
-        ingame = StateInGameGDX(batch)
+        ingame = Ingame(batch)
         currentScreen = ingame as Screen
         ingame!!.enter()
 
@@ -580,26 +573,26 @@ inline fun Color.toRGB10(): RGB10 {
 
 fun blendMul() {
     // I must say: What the fuck is wrong with you, Slick2D? Your built-it blending is just fucking wrong.
-    TerrarumGDX.batch.enableBlending()
-    TerrarumGDX.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    Terrarum.batch.enableBlending()
+    Terrarum.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
 }
 
 fun blendNormal() {
-    TerrarumGDX.batch.enableBlending()
-    TerrarumGDX.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    Terrarum.batch.enableBlending()
+    Terrarum.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
 }
 
 fun blendLightenOnly() {
-    TerrarumGDX.batch.enableBlending()
-    TerrarumGDX.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE)
+    Terrarum.batch.enableBlending()
+    Terrarum.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE)
     Gdx.gl.glBlendEquation(GL30.GL_MAX) // batch.flush does not touch blend equation
 }
 
 fun blendScreen() {
-    TerrarumGDX.batch.enableBlending()
-    TerrarumGDX.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR)
+    Terrarum.batch.enableBlending()
+    Terrarum.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
 }
 

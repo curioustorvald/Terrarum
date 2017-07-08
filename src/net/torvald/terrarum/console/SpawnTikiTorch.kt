@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.FixtureTikiTorch
 
 /**
@@ -9,9 +9,9 @@ import net.torvald.terrarum.gameactors.FixtureTikiTorch
 internal object SpawnTikiTorch : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val torch = FixtureTikiTorch()
-        torch.setPosition(TerrarumGDX.mouseX, TerrarumGDX.mouseY)
+        torch.setPosition(Terrarum.mouseX, Terrarum.mouseY)
 
-        TerrarumGDX.ingame!!.addNewActor(torch)
+        Terrarum.ingame!!.addNewActor(torch)
     }
 
     override fun printUsage() {

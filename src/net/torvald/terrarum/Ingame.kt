@@ -41,7 +41,7 @@ import net.torvald.terrarum.worldgenerator.WorldGenerator
  * Created by minjaesong on 2017-06-16.
  */
 
-class StateInGameGDX(val batch: SpriteBatch) : Screen {
+class Ingame(val batch: SpriteBatch) : Screen {
 
 
     private val ACTOR_UPDATE_RANGE = 4096
@@ -53,7 +53,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
      * list of Actors that is sorted by Actors' referenceID
      */
     val ACTORCONTAINER_INITIAL_SIZE = 64
-    val PARTICLES_MAX = TerrarumGDX.getConfigInt("maxparticles")
+    val PARTICLES_MAX = Terrarum.getConfigInt("maxparticles")
     val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX)
@@ -78,12 +78,12 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     }
 
 
-    private val worldFBOformat = Pixmap.Format.RGBA4444 // just a future-proof for mobile
+    private val worldFBOformat = if (Terrarum.environment == RunningEnvironment.MOBILE) Pixmap.Format.RGBA4444 else Pixmap.Format.RGBA8888
     private val lightFBOformat = Pixmap.Format.RGBA8888
 
-    var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT, true)
-    var lightmapFboA = FrameBuffer(lightFBOformat, TerrarumGDX.WIDTH.div(lightmapDownsample.toInt()), TerrarumGDX.HEIGHT.div(lightmapDownsample.toInt()), true)
-    var lightmapFboB = FrameBuffer(lightFBOformat, TerrarumGDX.WIDTH.div(lightmapDownsample.toInt()), TerrarumGDX.HEIGHT.div(lightmapDownsample.toInt()), true)
+    var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
+    var lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
+    var lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
 
 
     init {
@@ -140,7 +140,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     // GDX code //
     //////////////
 
-    var camera = OrthographicCamera(TerrarumGDX.WIDTH.toFloat(), TerrarumGDX.HEIGHT.toFloat())
+    var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
     // invert Y
     fun initViewPort(width: Int, height: Int) {
@@ -160,7 +160,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
     override fun show() {
         // Set up viewport on first load
-        initViewPort(TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT)
+        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
     }
 
     data class GameSaveData(
@@ -225,7 +225,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         Gdx.input.inputProcessor = GameController
 
 
-        initViewPort(TerrarumGDX.WIDTH, TerrarumGDX.HEIGHT)
+        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
 
         // init console window
@@ -241,7 +241,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         notifier = UIHandler(Notification())
         notifier.UI.handler = notifier
         notifier.setPosition(
-                (TerrarumGDX.WIDTH - notifier.UI.width) / 2, TerrarumGDX.HEIGHT - notifier.UI.height)
+                (Terrarum.WIDTH - notifier.UI.width) / 2, Terrarum.HEIGHT - notifier.UI.height)
 
 
 
@@ -251,10 +251,10 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         uiInventoryPlayer = UIHandler(
                 UIInventory(player,
                         width = 840,
-                        height = TerrarumGDX.HEIGHT - 160,
+                        height = Terrarum.HEIGHT - 160,
                         categoryWidth = 210
                 ),
-                toggleKey = TerrarumGDX.getConfigInt("keyinventory")
+                toggleKey = Terrarum.getConfigInt("keyinventory")
         )
         uiInventoryPlayer.setPosition(
                 -uiInventoryPlayer.UI.width,
@@ -269,7 +269,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
         // pie menu
         uiPieMenu = UIHandler(UIPieMenu())
-        uiPieMenu.setPosition(TerrarumGDX.HALFW, TerrarumGDX.HALFH)
+        uiPieMenu.setPosition(Terrarum.HALFW, Terrarum.HALFH)
 
         // vital metre
         // fill in getter functions by
@@ -284,11 +284,11 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // basic watch-style notification bar (temperature, new mail)
         uiWatchBasic = UIHandler(UIBasicNotifier(player))
         uiWatchBasic.setAsAlwaysVisible()
-        uiWatchBasic.setPosition(TerrarumGDX.WIDTH - uiWatchBasic.UI.width, 0)
+        uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.UI.width, 0)
 
         uiWatchTierOne = UIHandler(UITierOneWatch(player))
         uiWatchTierOne.setAsAlwaysVisible()
-        uiWatchTierOne.setPosition(TerrarumGDX.WIDTH - uiWatchTierOne.UI.width, uiWatchBasic.UI.height - 2)
+        uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.UI.width, uiWatchBasic.UI.height - 2)
 
 
         // batch-process uiAliases
@@ -317,18 +317,36 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     }// END enter
 
 
+    private var updateDeltaCounter = 0.0
+    private val updateRate = 1.0 / Terrarum.TARGET_INTERNAL_FPS
+
     ///////////////
     // prod code //
     ///////////////
     override fun render(delta: Float) {
         Gdx.graphics.setTitle(GAME_NAME +
-                              " — F: ${Gdx.graphics.framesPerSecond} (${TerrarumGDX.TARGET_INTERNAL_FPS})" +
-                              " — M: ${TerrarumGDX.memInUse}M / ${TerrarumGDX.memTotal}M / ${TerrarumGDX.memXmx}M"
+                              " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
+                              " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
         )
+
+        // ASYNCHRONOUS UPDATE AND RENDER //
 
 
         /** UPDATE CODE GOES HERE */
+        updateDeltaCounter += delta
 
+        while (updateDeltaCounter >= updateRate) {
+            updateGame(delta)
+            updateDeltaCounter -= updateRate
+        }
+
+
+
+        /** RENDER CODE GOES HERE */
+        renderGame(batch)
+    }
+
+    private fun updateGame(delta: Float) {
         particlesActive = 0
 
 
@@ -392,18 +410,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
             AVTracker.update()
             ActorsList.update()
         }
-
-
-
-        /////////////////////////
-        // app-related updates //
-        /////////////////////////
-
-
-        /** RENDER CODE GOES HERE */
-        renderGame(batch)
     }
-
 
     private fun renderGame(batch: SpriteBatch) {
         Gdx.gl.glClearColor(.157f, .157f, .157f, 0f)
@@ -418,7 +425,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // Post-update; ones that needs everything is completed //
         FeaturesDrawer.render(batch)                            //
         // update lightmap on every other frames, OR full-frame if the option is true
-        if (TerrarumGDX.getConfigBoolean("fullframelightupdate") or (TerrarumGDX.GLOBAL_RENDER_TIMER % 2 == 1)) {       //
+        if (Terrarum.getConfigBoolean("fullframelightupdate") or (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1)) {       //
             LightmapRenderer.fireRecalculateEvent()             //
         }                                                       //
         // end of post-update                                   /
@@ -486,7 +493,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                         texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
 
-                        batch.shader = TerrarumGDX.shaderBlur
+                        batch.shader = Terrarum.shaderBlur
                         batch.shader.setUniformf("iResolution",
                                 blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())
                         batch.shader.setUniformf("flip", 1f)
@@ -606,7 +613,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         /////////////////////////
         // draw to main screen //
         /////////////////////////
-        camera.setToOrtho(true, TerrarumGDX.WIDTH.toFloat(), TerrarumGDX.HEIGHT.toFloat())
+        camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
         batch.projectionMatrix = camera.combined
         batch.inUse {
             batch.shader = null
@@ -647,7 +654,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                 actorContainer.forEachIndexed { i, actor ->
                     if (actor is ActorWithBody) {
                         batch.color = Color.WHITE
-                        TerrarumGDX.fontSmallNumbers.draw(batch,
+                        Terrarum.fontSmallNumbers.draw(batch,
                                 actor.referenceID.toString(),
                                 actor.hitbox.startX.toFloat(),
                                 actor.hitbox.canonicalY.toFloat() + 4
@@ -672,12 +679,12 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
                         // velocity
                         batch.color = Color.CHARTREUSE//GameFontBase.codeToCol["g"]
-                        TerrarumGDX.fontSmallNumbers.draw(batch,
+                        Terrarum.fontSmallNumbers.draw(batch,
                                 "${0x7F.toChar()}X ${actor.externalForce.x}",
                                 actor.hitbox.startX.toFloat(),
                                 actor.hitbox.canonicalY.toFloat() + 4 + 8
                         )
-                        TerrarumGDX.fontSmallNumbers.draw(batch,
+                        Terrarum.fontSmallNumbers.draw(batch,
                                 "${0x7F.toChar()}Y ${actor.externalForce.y}",
                                 actor.hitbox.startX.toFloat(),
                                 actor.hitbox.canonicalY.toFloat() + 4 + 8 * 2
@@ -789,7 +796,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
                     actorContainer.forEachIndexed { i, actor ->
                         if (actor is ActorWithBody) {
                             batch.color = Color.WHITE
-                            TerrarumGDX.fontSmallNumbers.draw(batch,
+                            Terrarum.fontSmallNumbers.draw(batch,
                                     actor.referenceID.toString(),
                                     actor.hitbox.startX.toFloat(),
                                     actor.hitbox.canonicalY.toFloat() + 4
@@ -814,12 +821,12 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
 
                             // velocity
                             batch.color = Color.CHARTREUSE//GameFontBase.codeToCol["g"]
-                            TerrarumGDX.fontSmallNumbers.draw(batch,
+                            Terrarum.fontSmallNumbers.draw(batch,
                                     "${0x7F.toChar()}X ${actor.externalForce.x}",
                                     actor.hitbox.startX.toFloat(),
                                     actor.hitbox.canonicalY.toFloat() + 4 + 8
                             )
-                            TerrarumGDX.fontSmallNumbers.draw(batch,
+                            Terrarum.fontSmallNumbers.draw(batch,
                                     "${0x7F.toChar()}Y ${actor.externalForce.y}",
                                     actor.hitbox.startX.toFloat(),
                                     actor.hitbox.canonicalY.toFloat() + 4 + 8 * 2
@@ -869,8 +876,8 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
         // centre marker
         /*gwin.color = Color(0x00FFFF)
         gwin.lineWidth = 1f
-        gwin.drawLine(TerrarumGDX.WIDTH / 2f, 0f, TerrarumGDX.WIDTH / 2f, TerrarumGDX.HEIGHT.toFloat())
-        gwin.drawLine(0f, TerrarumGDX.HEIGHT / 2f, TerrarumGDX.WIDTH.toFloat(), TerrarumGDX.HEIGHT / 2f)*/
+        gwin.drawLine(Terrarum.WIDTH / 2f, 0f, Terrarum.WIDTH / 2f, Terrarum.HEIGHT.toFloat())
+        gwin.drawLine(0f, Terrarum.HEIGHT / 2f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT / 2f)*/
     }
 
 
@@ -966,15 +973,15 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
      * NOTE: concurrency for actor updating is currently disabled because of it's poor performance
      */
     fun updateActors(delta: Float) {
-        if (false) { // don't multithread this for now, it's SLOWER //if (TerrarumGDX.MULTITHREAD && actorContainer.size > TerrarumGDX.THREADS) {
+        if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD && actorContainer.size > Terrarum.THREADS) {
             val actors = actorContainer.size.toFloat()
             // set up indices
-            for (i in 0..TerrarumGDX.THREADS - 1) {
+            for (i in 0..Terrarum.THREADS - 1) {
                 ThreadParallel.map(
                         i,
                         ThreadActorUpdate(
-                                actors.div(TerrarumGDX.THREADS).times(i).roundInt(),
-                                actors.div(TerrarumGDX.THREADS).times(i.plus(1)).roundInt() - 1
+                                actors.div(Terrarum.THREADS).times(i).roundInt(),
+                                actors.div(Terrarum.THREADS).times(i.plus(1)).roundInt() - 1
                         ),
                         "ActorUpdate"
                 )
@@ -1033,10 +1040,10 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
     /** whether the actor is within screen */
     private fun ActorWithBody.inScreen() =
             distToCameraSqr(this) <=
-            (TerrarumGDX.WIDTH.plus(this.hitbox.width.div(2)).
-                    times(1 / TerrarumGDX.ingame!!.screenZoom).sqr() +
-             TerrarumGDX.HEIGHT.plus(this.hitbox.height.div(2)).
-                     times(1 / TerrarumGDX.ingame!!.screenZoom).sqr())
+            (Terrarum.WIDTH.plus(this.hitbox.width.div(2)).
+                    times(1 / Terrarum.ingame!!.screenZoom).sqr() +
+             Terrarum.HEIGHT.plus(this.hitbox.height.div(2)).
+                     times(1 / Terrarum.ingame!!.screenZoom).sqr())
 
 
     /** whether the actor is within update range */
@@ -1294,7 +1301,7 @@ class StateInGameGDX(val batch: SpriteBatch) : Screen {
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
      */
     fun setCameraPosition(newX: Float, newY: Float) {
-        camera.position.set((-newX + TerrarumGDX.HALFW).round(), (-newY + TerrarumGDX.HALFH).round(), 0f)
+        camera.position.set((-newX + Terrarum.HALFW).round(), (-newY + Terrarum.HALFH).round(), 0f)
         camera.update()
         batch.projectionMatrix = camera.combined
     }

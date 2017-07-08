@@ -5,7 +5,7 @@
 
 
 import net.torvald.point.Point2d
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.itemproperties.Calculate
@@ -60,27 +60,27 @@ class TestPick extends GameItem {
         int mouseTileY = TerrarumGdx.getMouseTileY()
 
         def mousePoint = new Point2d(mouseTileX, mouseTileY)
-        def actorvalue = TerrarumGDX.ingame.player.actorValue
+        def actorvalue = Terrarum.ingame.player.actorValue
 
         using = true
 
         // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
         // return false if hitting actors
-        TerrarumGDX.ingame.actorContainer.forEach({
+        Terrarum.ingame.actorContainer.forEach({
             if (it instanceof ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
                 return false
         })
 
         // return false if here's no tile
-        if (Block.AIR == TerrarumGDX.ingame.world.getTileFromTerrain(mouseTileX, mouseTileY))
+        if (Block.AIR == Terrarum.ingame.world.getTileFromTerrain(mouseTileX, mouseTileY))
             return false
 
         // filter passed, do the job
         double swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)
 
-        TerrarumGDX.ingame.world.inflictTerrainDamage(
+        Terrarum.ingame.world.inflictTerrainDamage(
                 mouseTileX, mouseTileY,
-                Calculate.pickaxePower(TerrarumGDX.ingame.player, material) * swingDmgToFrameDmg
+                Calculate.pickaxePower(Terrarum.ingame.player, material) * swingDmgToFrameDmg
         )
 
         return true
@@ -90,7 +90,7 @@ class TestPick extends GameItem {
     boolean endPrimaryUse(float delta) {
         using = false
         // reset action timer to zero
-        TerrarumGDX.ingame.player.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
+        Terrarum.ingame.player.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
         return true
     }
 }

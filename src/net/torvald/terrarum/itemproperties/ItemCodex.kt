@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.point.Point2d
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.gameactors.CanBeAnItem
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
@@ -62,11 +62,11 @@ object ItemCodex {
                 }
 
                 override fun secondaryUse(delta: Float): Boolean {
-                    val mousePoint = Point2d(TerrarumGDX.mouseTileX.toDouble(), TerrarumGDX.mouseTileY.toDouble())
+                    val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
 
                     // check for collision with actors (BLOCK only)
                     if (this.inventoryCategory == Category.BLOCK) {
-                        TerrarumGDX.ingame!!.actorContainer.forEach {
+                        Terrarum.ingame!!.actorContainer.forEach {
                             if (it is ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
                                 return false
                         }
@@ -74,27 +74,27 @@ object ItemCodex {
 
                     // return false if the tile is already there
                     if (this.inventoryCategory == Category.BLOCK &&
-                        this.dynamicID == TerrarumGDX.ingame!!.world.getTileFromTerrain(TerrarumGDX.mouseTileX, TerrarumGDX.mouseTileY) ||
+                        this.dynamicID == Terrarum.ingame!!.world.getTileFromTerrain(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
                         this.inventoryCategory == Category.WALL &&
-                        this.dynamicID - ITEM_WALLS.start == TerrarumGDX.ingame!!.world.getTileFromWall(TerrarumGDX.mouseTileX, TerrarumGDX.mouseTileY) ||
+                        this.dynamicID - ITEM_WALLS.start == Terrarum.ingame!!.world.getTileFromWall(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
                         this.inventoryCategory == Category.WIRE &&
-                        this.dynamicID - ITEM_WIRES.start == TerrarumGDX.ingame!!.world.getTileFromWire(TerrarumGDX.mouseTileX, TerrarumGDX.mouseTileY)
+                        this.dynamicID - ITEM_WIRES.start == Terrarum.ingame!!.world.getTileFromWire(Terrarum.mouseTileX, Terrarum.mouseTileY)
                             )
                         return false
 
                     // filter passed, do the job
                     // FIXME this is only useful for Player
                     if (i in ITEM_TILES) {
-                        TerrarumGDX.ingame!!.world.setTileTerrain(
-                                TerrarumGDX.mouseTileX,
-                                TerrarumGDX.mouseTileY,
+                        Terrarum.ingame!!.world.setTileTerrain(
+                                Terrarum.mouseTileX,
+                                Terrarum.mouseTileY,
                                 i
                         )
                     }
                     else {
-                        TerrarumGDX.ingame!!.world.setTileWall(
-                                TerrarumGDX.mouseTileX,
-                                TerrarumGDX.mouseTileY,
+                        Terrarum.ingame!!.world.setTileWall(
+                                Terrarum.mouseTileX,
+                                Terrarum.mouseTileY,
                                 i
                         )
                     }
@@ -126,31 +126,31 @@ object ItemCodex {
             }
 
             override fun primaryUse(delta: Float): Boolean {
-                val mousePoint = Point2d(TerrarumGDX.mouseTileX.toDouble(), TerrarumGDX.mouseTileY.toDouble())
-                val actorvalue = TerrarumGDX.ingame!!.player!!.actorValue
+                val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
+                val actorvalue = Terrarum.ingame!!.player!!.actorValue
 
 
                 using = true
 
                 // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
                 // return false if hitting actors
-                TerrarumGDX.ingame!!.actorContainer.forEach {
+                Terrarum.ingame!!.actorContainer.forEach {
                     if (it is ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
                         return false
                 }
 
                 // return false if there's no tile
-                if (Block.AIR == TerrarumGDX.ingame!!.world.getTileFromTerrain(TerrarumGDX.mouseTileX, TerrarumGDX.mouseTileY))
+                if (Block.AIR == Terrarum.ingame!!.world.getTileFromTerrain(Terrarum.mouseTileX, Terrarum.mouseTileY))
                     return false
 
 
                 // filter passed, do the job
                 val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
-                TerrarumGDX.ingame!!.world.inflictTerrainDamage(
-                        TerrarumGDX.mouseTileX,
-                        TerrarumGDX.mouseTileY,
-                        Calculate.pickaxePower(TerrarumGDX.ingame!!.player!!, material) * swingDmgToFrameDmg
+                Terrarum.ingame!!.world.inflictTerrainDamage(
+                        Terrarum.mouseTileX,
+                        Terrarum.mouseTileY,
+                        Calculate.pickaxePower(Terrarum.ingame!!.player!!, material) * swingDmgToFrameDmg
                 )
                 return true
             }
@@ -158,7 +158,7 @@ object ItemCodex {
             override fun endPrimaryUse(delta: Float): Boolean {
                 using = false
                 // reset action timer to zero
-                TerrarumGDX.ingame!!.player!!.actorValue[AVKey.__ACTION_TIMER] = 0.0
+                Terrarum.ingame!!.player!!.actorValue[AVKey.__ACTION_TIMER] = 0.0
                 return true
             }
         }*/
@@ -177,7 +177,7 @@ object ItemCodex {
             TODO("read from dynamicitem description (JSON)")
         }
         else {
-            val a = TerrarumGDX.ingame!!.getActorByID(code) // actor item
+            val a = Terrarum.ingame!!.getActorByID(code) // actor item
             if (a is CanBeAnItem) return a.itemData
 
             throw IllegalArgumentException("Attempted to get item data of actor that cannot be an item. ($a)")

@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gamecontroller
 
 import com.badlogic.gdx.Gdx
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import java.util.*
 
 object KeyToggler {
@@ -23,7 +23,7 @@ object KeyToggler {
     fun update(gameMode: Boolean = true) {
         for (it in 0..255) {
             if (gameMode && it in gameKeys &&
-                (TerrarumGDX.ingame!!.consoleHandler.isOpening || TerrarumGDX.ingame!!.consoleHandler.isOpened)) {
+                (Terrarum.ingame!!.consoleHandler.isOpening || Terrarum.ingame!!.consoleHandler.isOpened)) {
                 continue
             }
 

@@ -1,15 +1,7 @@
 package net.torvald.terrarum.virtualcomputer.peripheral
 
-import com.badlogic.gdx.graphics.Color
-import net.torvald.terrarum.TerrarumGDX
-import net.torvald.terrarum.gameactors.DecodeTapestry
-import net.torvald.terrarum.gameactors.ai.toLua
-import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
-import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 import org.luaj.vm2.*
 import org.luaj.vm2.lib.*
-import org.luaj.vm2.lib.ThreeArgFunction
-import java.util.*
 
 /**
  * Resolution: 640 x 200, non-square pixels

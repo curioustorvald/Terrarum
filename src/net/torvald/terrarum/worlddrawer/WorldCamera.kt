@@ -1,11 +1,7 @@
 package net.torvald.terrarum.worlddrawer
 
-import com.badlogic.gdx.Gdx
 import com.jme3.math.FastMath
-import net.torvald.terrarum.TerrarumGDX
-import net.torvald.terrarum.gameactors.ceilInt
-import net.torvald.terrarum.gameactors.floor
-import net.torvald.terrarum.gameactors.floorInt
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.round
@@ -14,7 +10,7 @@ import net.torvald.terrarum.round
  * Created by minjaesong on 2016-12-30.
  */
 object WorldCamera {
-    private val world: GameWorld? = TerrarumGDX.ingame?.world
+    private val world: GameWorld? = Terrarum.ingame?.world
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
 
     var x: Int = 0
@@ -35,12 +31,12 @@ object WorldCamera {
         get() = y + height.ushr(1)
 
     fun update() {
-        if (TerrarumGDX.ingame != null) {
+        if (Terrarum.ingame != null) {
 
-            val player = TerrarumGDX.ingame!!.player
+            val player = Terrarum.ingame!!.player
 
-            width = FastMath.ceil(TerrarumGDX.WIDTH / TerrarumGDX.ingame!!.screenZoom) // div, not mul
-            height = FastMath.ceil(TerrarumGDX.HEIGHT / TerrarumGDX.ingame!!.screenZoom)
+            width = FastMath.ceil(Terrarum.WIDTH / Terrarum.ingame!!.screenZoom) // div, not mul
+            height = FastMath.ceil(Terrarum.HEIGHT / Terrarum.ingame!!.screenZoom)
 
             // position - (WH / 2)
             x = (// X only: ROUNDWORLD implementation
