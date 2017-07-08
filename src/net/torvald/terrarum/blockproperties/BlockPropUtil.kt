@@ -46,13 +46,13 @@ object BlockPropUtil {
         return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
     }
 
-    private fun getSlowBreath(baseLum: Int): Int {
+    private fun getSlowBreath(baseLum: Int): RGB10 {
         val funcY = FastMath.sin(FastMath.PI * breathFuncX / breathCycleDuration) * breathRange
 
         return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
     }
 
-    private fun getPulsate(baseLum: Int): Int {
+    private fun getPulsate(baseLum: Int): RGB10 {
         val funcY = FastMath.sin(FastMath.PI * pulsateFuncX / pulsateCycleDuration) * pulsateRange
 
         return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
