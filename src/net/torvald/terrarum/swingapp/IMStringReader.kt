@@ -1,6 +1,6 @@
 package net.torvald.terrarum.swingapp
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.langpack.Lang
 import java.awt.BorderLayout
 import java.awt.FlowLayout
@@ -41,7 +41,7 @@ class IMStringReader(feedInput: (String) -> Unit, message: String? = null) : JFr
         this.title = labelTitle
         defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
 
-        TerrarumGDX.pause()
+        Terrarum.pause()
 
         buttonOkay.addMouseListener(object : MouseListener {
             override fun mouseEntered(e: MouseEvent?) { }
@@ -51,7 +51,7 @@ class IMStringReader(feedInput: (String) -> Unit, message: String? = null) : JFr
             override fun mousePressed(e: MouseEvent?) {
                 userInput = inputArea.text
                 isVisible = false
-                TerrarumGDX.resume()
+                Terrarum.resume()
 
                 feedInput(userInput)
 
@@ -67,7 +67,7 @@ class IMStringReader(feedInput: (String) -> Unit, message: String? = null) : JFr
             override fun mousePressed(e: MouseEvent?) {
                 userInput = ""//null
                 isVisible = false
-                TerrarumGDX.resume()
+                Terrarum.resume()
 
                 dispose()
             }
@@ -79,7 +79,7 @@ class IMStringReader(feedInput: (String) -> Unit, message: String? = null) : JFr
             override fun keyPressed(e: KeyEvent?) {
                 userInput = inputArea.text
                 isVisible = false
-                TerrarumGDX.resume()
+                Terrarum.resume()
 
                 feedInput(userInput)
 

@@ -3,10 +3,8 @@ package net.torvald.terrarum.gamecontroller
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.InputListener
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -18,7 +16,7 @@ object GameController : InputAdapter() {
 
 
 
-    private val ingame = TerrarumGDX.ingame!!
+    private val ingame = Terrarum.ingame!!
     
     // these four values can also be accessed with GameContainer.<varname>
     // e.g.  gc.mouseTileX
@@ -69,14 +67,14 @@ object GameController : InputAdapter() {
 
         // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
         if (ingame.player != null && ingame.canPlayerControl) {
-            if (Gdx.input.isButtonPressed(TerrarumGDX.getConfigInt("mouseprimary")) || Gdx.input.isButtonPressed(TerrarumGDX.getConfigInt("mousesecondary"))) {
+            if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary")) || Gdx.input.isButtonPressed(Terrarum.getConfigInt("mousesecondary"))) {
                 val itemOnGrip = ingame.player!!.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
                 itemOnGrip?.let {
-                    if (Gdx.input.isButtonPressed(TerrarumGDX.getConfigInt("mouseprimary"))) {
+                    if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary"))) {
                         ingame.player!!.consumePrimary(it)
                     }
-                    if (Gdx.input.isButtonPressed(TerrarumGDX.getConfigInt("mousesecondary"))) {
+                    if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mousesecondary"))) {
                         ingame.player!!.consumeSecondary(it)
                     }
                 }
@@ -95,8 +93,8 @@ object GameController : InputAdapter() {
             ingame.player?.keyDown(keycode)
         }
 
-        if (TerrarumGDX.getConfigIntArray("keyquickselalt").contains(keycode)
-            || keycode == TerrarumGDX.getConfigInt("keyquicksel")) {
+        if (Terrarum.getConfigIntArray("keyquickselalt").contains(keycode)
+            || keycode == Terrarum.getConfigInt("keyquicksel")) {
             ingame.uiPieMenu.setAsOpen()
             ingame.uiQuickBar.setAsClose()
         }
@@ -116,8 +114,8 @@ object GameController : InputAdapter() {
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        if (TerrarumGDX.getConfigIntArray("keyquickselalt").contains(keycode)
-            || keycode == TerrarumGDX.getConfigInt("keyquicksel")) {
+        if (Terrarum.getConfigIntArray("keyquickselalt").contains(keycode)
+            || keycode == Terrarum.getConfigInt("keyquicksel")) {
             ingame.uiPieMenu.setAsClose()
             ingame.uiQuickBar.setAsOpen()
         }
@@ -139,17 +137,17 @@ object GameController : InputAdapter() {
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (TerrarumGDX.ingame != null) {
-            val ingame = TerrarumGDX.ingame!!
+        if (Terrarum.ingame != null) {
+            val ingame = Terrarum.ingame!!
             // don't separate Player from this! Physics will break, esp. airborne manoeuvre
             if (ingame.player != null && ingame.canPlayerControl) {
                 val itemOnGrip = ingame.player!!.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
                 if (itemOnGrip != null) {
-                    if (button == TerrarumGDX.getConfigInt("mousePrimary")) {
+                    if (button == Terrarum.getConfigInt("mousePrimary")) {
                         itemOnGrip.endPrimaryUse(Gdx.graphics.deltaTime)
                     }
-                    if (button == TerrarumGDX.getConfigInt("mouseSecondary")) {
+                    if (button == Terrarum.getConfigInt("mouseSecondary")) {
                         itemOnGrip.endSecondaryUse(Gdx.graphics.deltaTime)
                     }
                 }

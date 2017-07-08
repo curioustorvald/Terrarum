@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 
 /**
  * Created by minjaesong on 16-02-03.
@@ -8,7 +8,7 @@ import net.torvald.terrarum.TerrarumGDX
 object PlayerBuilder {
 
     operator fun invoke(): Actor {
-        val p: Actor = Player(TerrarumGDX.ingame!!.world.time.currentTimeAsGameDate)
+        val p: Actor = Player(Terrarum.ingame!!.world.time.currentTimeAsGameDate)
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
         // attach sprite

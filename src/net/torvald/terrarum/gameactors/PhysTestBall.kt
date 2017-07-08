@@ -2,7 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
 
 /**
@@ -21,7 +21,7 @@ class PhysTestBall : ActorWithPhysics(Actor.RenderOrder.MIDDLE, immobileBody = t
     }
 
     override fun drawBody(batch: SpriteBatch) {
-        TerrarumGDX.inShapeRenderer {
+        Terrarum.inShapeRenderer {
             it.color = color
             it.circle(
                     hitbox.startX.toFloat() - 1f,
@@ -30,13 +30,13 @@ class PhysTestBall : ActorWithPhysics(Actor.RenderOrder.MIDDLE, immobileBody = t
             )
 
             it.circle(
-                    hitbox.startX.toFloat() + TerrarumGDX.ingame!!.world.width * TILE_SIZE - 1f,
+                    hitbox.startX.toFloat() + Terrarum.ingame!!.world.width * TILE_SIZE - 1f,
                     hitbox.startY.toFloat() - 1f,
                     hitbox.width.toFloat()
             )
 
             it.circle(
-                    hitbox.startX.toFloat() - TerrarumGDX.ingame!!.world.width * TILE_SIZE - 1f,
+                    hitbox.startX.toFloat() - Terrarum.ingame!!.world.width * TILE_SIZE - 1f,
                     hitbox.startY.toFloat() - 1f,
                     hitbox.width.toFloat()
             )

@@ -1,6 +1,6 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -20,12 +20,12 @@ internal object WriteCSV {
         //val itemCSV = CSVFetcher.readCSVasString(ItemCodex.CSV_PATH)
         //val matCSV = CSVFetcher.readCSVasString(MaterialCodex.CSV_PATH)
 
-        val pathTile = Paths.get("${TerrarumGDX.defaultSaveDir}" +
-                                       "/$saveDirectoryName/${META_FILENAME_TILE}")
-        val pathItem = Paths.get("${TerrarumGDX.defaultSaveDir}" +
-                                       "/$saveDirectoryName/${META_FILENAME_ITEM}")
-        val pathMat = Paths.get("${TerrarumGDX.defaultSaveDir}" +
-                                       "/$saveDirectoryName/${META_FILENAME_MAT}")
+        val pathTile = Paths.get("${Terrarum.defaultSaveDir}" +
+                                 "/$saveDirectoryName/${META_FILENAME_TILE}")
+        val pathItem = Paths.get("${Terrarum.defaultSaveDir}" +
+                                 "/$saveDirectoryName/${META_FILENAME_ITEM}")
+        val pathMat = Paths.get("${Terrarum.defaultSaveDir}" +
+                                "/$saveDirectoryName/${META_FILENAME_MAT}")
         val tempPathTile = Files.createTempFile(pathTile.toString(), "_temp")
         val tempPathItem = Files.createTempFile(pathItem.toString(), "_temp")
         val tempPathMat = Files.createTempFile(pathMat.toString(), "_temp")

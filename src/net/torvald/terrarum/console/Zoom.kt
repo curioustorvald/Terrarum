@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 
 /**
  * Created by minjaesong on 16-01-25.
@@ -18,14 +18,14 @@ internal object Zoom : ConsoleCommand {
                 return
             }
 
-            if (zoom < TerrarumGDX.ingame!!.ZOOM_MINIMUM) {
-                zoom = TerrarumGDX.ingame!!.ZOOM_MINIMUM
+            if (zoom < Terrarum.ingame!!.ZOOM_MINIMUM) {
+                zoom = Terrarum.ingame!!.ZOOM_MINIMUM
             }
-            else if (zoom > TerrarumGDX.ingame!!.ZOOM_MAXIMUM) {
-                zoom = TerrarumGDX.ingame!!.ZOOM_MAXIMUM
+            else if (zoom > Terrarum.ingame!!.ZOOM_MAXIMUM) {
+                zoom = Terrarum.ingame!!.ZOOM_MAXIMUM
             }
 
-            TerrarumGDX.ingame!!.screenZoom = zoom
+            Terrarum.ingame!!.screenZoom = zoom
 
             System.gc()
 

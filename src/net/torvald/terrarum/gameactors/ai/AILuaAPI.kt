@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors.ai
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithPhysics
@@ -240,7 +240,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
                     luatable[y - feetTilePos[1]] = LuaTable()
 
                     for (x in feetTilePos[0] - radius..feetTilePos[0] + radius) {
-                        val tile = BlockCodex[TerrarumGDX.ingame!!.world.getTileFromTerrain(x, y) ?: Block.NULL]
+                        val tile = BlockCodex[Terrarum.ingame!!.world.getTileFromTerrain(x, y) ?: Block.NULL]
                         val solidity = tile.isSolid.toInt()
                         val liquidity = tile.isFluid.toInt()
                         val gravity = tile.isFallable.toInt()
@@ -284,7 +284,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
                     // search down
                     var searchDownCounter = 0
                     while (true) {
-                        val tile = TerrarumGDX.ingame!!.world.getTileFromTerrain(x, feetTilePos[1] + searchDownCounter) ?: Block.STONE
+                        val tile = Terrarum.ingame!!.world.getTileFromTerrain(x, feetTilePos[1] + searchDownCounter) ?: Block.STONE
                         if (BlockCodex[tile].isSolid || searchDownCounter >= searchDownLimit) {
                             luatable[x - feetTilePos[0]] = searchDownCounter
                             break
@@ -327,7 +327,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
                     // search up
                     var searchUpCounter = 0
                     while (true) {
-                        val tile = TerrarumGDX.ingame!!.world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Block.STONE
+                        val tile = Terrarum.ingame!!.world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Block.STONE
                         if (BlockCodex[tile].isSolid || searchUpCounter >= searchUpLimit) {
                             luatable[x - feetTilePos[0]] = searchUpCounter
                             break
@@ -369,7 +369,7 @@ internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
                     // search up
                     var searchUpCounter = 0
                     while (true) {
-                        val tile = TerrarumGDX.ingame!!.world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Block.STONE
+                        val tile = Terrarum.ingame!!.world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Block.STONE
                         if (!BlockCodex[tile].isSolid || searchUpCounter >= searchUpLimit) {
                             luatable[x - feetTilePos[0]] = searchUpCounter
                             break
@@ -388,13 +388,13 @@ internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
 
     class GameVersion : ZeroArgFunction() {
         override fun call(): LuaValue {
-            return TerrarumGDX.VERSION_STRING.toLua()
+            return Terrarum.VERSION_STRING.toLua()
         }
     }
 
     class GameVersionRaw : ZeroArgFunction() {
         override fun call(): LuaValue {
-            return TerrarumGDX.VERSION_RAW.toLua()
+            return Terrarum.VERSION_RAW.toLua()
         }
     }
 }

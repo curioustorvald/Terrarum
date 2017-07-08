@@ -1,30 +1,29 @@
 package net.torvald.terrarum.worlddrawer
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
-import net.torvald.terrarum.StateInGameGDX
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Ingame
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.gameactors.roundInt
-import net.torvald.terrarum.inUse
 import java.util.*
 
 /**
+ * Warning: you are not going to store float value to the lightmap -- see RGB_HDR_LUT (beziér)
+ *
  * Created by minjaesong on 16-01-25.
  */
 
 typealias RGB10 = Int
 
 object LightmapRenderer {
-    private val world: GameWorld = TerrarumGDX.ingame!!.world
+    private val world: GameWorld = Terrarum.ingame!!.world
 
 
     // TODO if (VBO works on BlocksDrawer) THEN overscan of 256, utilise same technique in here
@@ -32,18 +31,22 @@ object LightmapRenderer {
     val overscan_open: Int = Math.min(32, 256f.div(BlockCodex[Block.AIR].opacity and 0xFF).ceil())
     val overscan_opaque: Int = Math.min(8, 256f.div(BlockCodex[Block.STONE].opacity and 0xFF).ceil())
 
+    init {
+        println("[LightmapRenderer] Overscan open: $overscan_open; opaque: $overscan_opaque")
+    }
+
     // TODO resize(int, int) -aware
 
-    val LIGHTMAP_WIDTH = TerrarumGDX.ingame!!.ZOOM_MINIMUM.inv().times(TerrarumGDX.WIDTH)
+    val LIGHTMAP_WIDTH = Terrarum.ingame!!.ZOOM_MINIMUM.inv().times(Terrarum.WIDTH)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
-    val LIGHTMAP_HEIGHT = TerrarumGDX.ingame!!.ZOOM_MINIMUM.inv().times(TerrarumGDX.HEIGHT)
+    val LIGHTMAP_HEIGHT = Terrarum.ingame!!.ZOOM_MINIMUM.inv().times(Terrarum.HEIGHT)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
 
     /**
      * 8-Bit RGB values
      */
     private val lightmap: Array<IntArray> = Array(LIGHTMAP_HEIGHT) { IntArray(LIGHTMAP_WIDTH) } // TODO framebuffer?
-    private val lanternMap = ArrayList<Lantern>(TerrarumGDX.ingame!!.ACTORCONTAINER_INITIAL_SIZE * 4)
+    private val lanternMap = ArrayList<Lantern>(Terrarum.ingame!!.ACTORCONTAINER_INITIAL_SIZE * 4)
 
     private val AIR = Block.AIR
 
@@ -52,7 +55,7 @@ object LightmapRenderer {
     private val OFFSET_B = 0
 
     private const val TILE_SIZE = FeaturesDrawer.TILE_SIZE
-    private val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / StateInGameGDX.lightmapDownsample
+    private val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / Ingame.lightmapDownsample
 
     // color model related constants
     const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB
@@ -161,7 +164,7 @@ object LightmapRenderer {
         // build noop map
         for (i in 0..rect_size) {
             val point = edgeToMaskNum(i)
-            val tile = TerrarumGDX.ingame!!.world.getTileFromTerrain(point.first, point.second) ?: Block.NULL
+            val tile = Terrarum.ingame!!.world.getTileFromTerrain(point.first, point.second) ?: Block.NULL
             val isSolid = BlockCodex[tile].isSolid
 
             noop_mask.set(i, isSolid)
@@ -218,7 +221,7 @@ object LightmapRenderer {
 
     private fun buildLanternmap() {
         lanternMap.clear()
-        TerrarumGDX.ingame!!.actorContainer.forEach { it ->
+        Terrarum.ingame!!.actorContainer.forEach { it ->
             if (it is Luminous && it is ActorWithPhysics) {
                 // put lanterns to the area the luminantBox is occupying
                 for (lightBox in it.lightBoxList) {
@@ -250,11 +253,11 @@ object LightmapRenderer {
         var ambientAccumulator = 0
 
         var lightLevelThis: Int = 0
-        val thisTerrain = TerrarumGDX.ingame!!.world.getTileFromTerrain(x, y)
-        val thisWall = TerrarumGDX.ingame!!.world.getTileFromWall(x, y)
+        val thisTerrain = Terrarum.ingame!!.world.getTileFromTerrain(x, y)
+        val thisWall = Terrarum.ingame!!.world.getTileFromWall(x, y)
         val thisTileLuminosity = BlockCodex[thisTerrain].luminosity
         val thisTileOpacity = BlockCodex[thisTerrain].opacity
-        val sunLight = TerrarumGDX.ingame!!.world.globalLight
+        val sunLight = Terrarum.ingame!!.world.globalLight
 
         // MIX TILE
         // open air
@@ -350,8 +353,8 @@ object LightmapRenderer {
                         batch.fillRect(
                                 (x * DRAW_TILE_SIZE).round().toFloat(),
                                 (y * DRAW_TILE_SIZE).round().toFloat(),
-                                (DRAW_TILE_SIZE.ceil() * sameLevelCounter).toFloat(),
-                                DRAW_TILE_SIZE.ceil().toFloat() + 1f
+                                DRAW_TILE_SIZE.ceil() * sameLevelCounter + 1f,
+                                DRAW_TILE_SIZE.ceil() + 1f
                         )
 
                         x += sameLevelCounter - 1

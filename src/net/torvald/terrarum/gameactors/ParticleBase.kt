@@ -1,10 +1,9 @@
 package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithPhysics.Companion.SI_TO_GAME_ACC
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
@@ -44,7 +43,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, maxLifeTime: Second? = n
             lifetimeCounter += delta
             if (velocity.isZero || lifetimeCounter >= lifetimeMax ||
                 // simple stuck check
-                BlockCodex[TerrarumGDX.ingame!!.world.getTileFromTerrain(
+                BlockCodex[Terrarum.ingame!!.world.getTileFromTerrain(
                         hitbox.canonicalX.div(TILE_SIZE).floorInt(),
                         hitbox.canonicalY.div(TILE_SIZE).floorInt()
                 ) ?: Block.STONE].isSolid) {
@@ -53,7 +52,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, maxLifeTime: Second? = n
 
             // gravity, winds, etc. (external forces)
             if (!isNoSubjectToGrav) {
-                velocity += TerrarumGDX.ingame!!.world.gravitation / dragCoefficient * SI_TO_GAME_ACC
+                velocity += Terrarum.ingame!!.world.gravitation / dragCoefficient * SI_TO_GAME_ACC
             }
 
 

@@ -1,7 +1,6 @@
 package net.torvald.terrarum.gameactors.faction
 
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.TerrarumGDX
 import java.util.HashSet
 
 /**
