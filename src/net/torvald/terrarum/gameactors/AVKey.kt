@@ -39,7 +39,9 @@ object AVKey {
      * 0000 0010000000 0010000000 0010000000
      *      ^ Red      ^ Green    ^ Blue
      */
-    const val LUMINOSITY = "luminosity"
+    const val LUMR = "luminosityred"
+    const val LUMG = "luminositygreen"
+    const val LUMB = "luminosityblue"
     const val DRAGCOEFF = "dragcoeff"
     const val FALLDAMPENMULT = "falldampenmult"
 

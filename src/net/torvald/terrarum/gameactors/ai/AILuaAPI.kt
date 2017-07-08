@@ -73,14 +73,6 @@ internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
 
             t["strength"] = actor.avStrength.toLua()
 
-            val lumrgb: Int = actor.actorValue.getAsInt(AVKey.LUMINOSITY) ?: 0
-            val MUL_2 = LightmapRenderer.MUL_2
-            val MUL = LightmapRenderer.MUL
-            val CHMAX = LightmapRenderer.CHANNEL_MAX
-            t["luminosityRGB"] = lumrgb.toLua()
-            t["luminosity"] = (lumrgb.div(MUL_2).and(CHMAX).times(3) +
-                              lumrgb.div(MUL).and(CHMAX).times(4) +
-                              lumrgb.and(1023)).div(8.0).toLua() // quick luminosity calculation
 
             return t
         }

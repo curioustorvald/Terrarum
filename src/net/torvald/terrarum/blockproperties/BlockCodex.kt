@@ -3,6 +3,7 @@ package net.torvald.terrarum.blockproperties
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import org.apache.commons.csv.CSVRecord
 
 import java.io.IOException
@@ -29,11 +30,11 @@ object BlockCodex {
             println("[BlockCodex] Building block properties table")
 
             records.forEach {
-                if (intVal(it, "blid") == -1) {
+                if (intVal(it, "id") == -1) {
                     setProp(nullProp, it)
                 }
                 else {
-                    setProp(blockProps[intVal(it, "blid")], it)
+                    setProp(blockProps[intVal(it, "id")], it)
                 }
             }
         }
@@ -84,13 +85,20 @@ object BlockCodex {
     private fun setProp(prop: BlockProp, record: CSVRecord) {
         prop.nameKey = record.get("name")
 
-        prop.id = intVal(record, "blid")
-        prop.drop = intVal(record, "drid")
+        prop.id = intVal(record, "id")
+        prop.drop = intVal(record, "drop")
 
-        prop.opacity = intVal(record, "opacity")
+        prop.shadeColR = floatVal(record, "shdr") / LightmapRenderer.MUL_FLOAT
+        prop.shadeColG = floatVal(record, "shdg") / LightmapRenderer.MUL_FLOAT
+        prop.shadeColB = floatVal(record, "shdb") / LightmapRenderer.MUL_FLOAT
+
         prop.strength = intVal(record, "strength")
         prop.density = intVal(record, "dsty")
-        prop.luminosity = intVal(record, "lumcolor")
+
+        prop.lumColR = floatVal(record, "lumr") / LightmapRenderer.MUL_FLOAT
+        prop.lumColG = floatVal(record, "lumg") / LightmapRenderer.MUL_FLOAT
+        prop.lumColB = floatVal(record, "lumb") / LightmapRenderer.MUL_FLOAT
+
         prop.friction = intVal(record, "friction")
         prop.viscosity = intVal(record, "vscs")
 
@@ -102,22 +110,31 @@ object BlockCodex {
 
         prop.dynamicLuminosityFunction = intVal(record, "dlfn")
 
-        print("${intVal(record, "blid")}")
+        print("${intVal(record, "id")}")
         println("\t" + prop.nameKey)
     }
 
     private fun intVal(rec: CSVRecord, s: String): Int {
         var ret = -1
         try {
-            ret = Integer.decode(rec.get(s))!!
+            ret = rec.get(s).toInt()
         }
-        catch (e: NullPointerException) {
+        catch (e: NumberFormatException) {
+        }
+
+        return ret
+    }
+
+    private fun floatVal(rec: CSVRecord, s: String): Float {
+        var ret = -1f
+        try {
+            ret = rec.get(s).toFloat()
+        }
+        catch (e: NumberFormatException) {
         }
 
         return ret
     }
 
     private fun boolVal(rec: CSVRecord, s: String) = intVal(rec, s) != 0
-
-    private fun formatNum2(i: Int) = if (i < 10) "0" + i else i.toString()
 }

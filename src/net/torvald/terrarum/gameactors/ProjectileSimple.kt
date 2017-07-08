@@ -28,8 +28,8 @@ open class ProjectileSimple(
     val speed: Int
 
 
-    override var luminosity: Int
-        get() = bulletDatabase[type][OFFSET_LUMINOSITY] as Int
+    override var luminosity: Color
+        get() = (bulletDatabase[type][OFFSET_LUMINOSITY] as Color).cpy()
         set(value) {
         }
     /**
@@ -115,8 +115,8 @@ open class ProjectileSimple(
         val OFFSET_LUMINOSITY = 4
         val bulletDatabase = arrayOf(
                 // damage, display colour, no gravity, speed
-                arrayOf(7, Color(0xFF5429), true, 40, 32),
-                arrayOf(8, Color(0xFF5429), true, 20, 0)
+                arrayOf(7, Color(0xFF5429_FF.toInt()), true, 40, 32),
+                arrayOf(8, Color(0xFF5429_FF.toInt()), true, 20, 0)
                 // ...
         )
     }

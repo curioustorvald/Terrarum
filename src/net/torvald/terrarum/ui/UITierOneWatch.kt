@@ -12,7 +12,6 @@ import net.torvald.terrarum.imagefont.Watch7SegMain
 import net.torvald.terrarum.imagefont.Watch7SegSmall
 import net.torvald.terrarum.imagefont.WatchDotAlph
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
-import net.torvald.terrarum.worlddrawer.toColor
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -69,11 +68,11 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas {
             if (player != null) {
                 val playerPos = player.tilewiseHitbox
                 lightLevel = (LightmapRenderer.getLight(playerPos.centeredX.toInt(), playerPos.centeredY.toInt()) ?:
-                              Terrarum.ingame!!.world.globalLight.toColor()
+                              Terrarum.ingame!!.world.globalLight
                              )
             }
             else {
-                lightLevel = Terrarum.ingame!!.world.globalLight.toColor()
+                lightLevel = Terrarum.ingame!!.world.globalLight
             }
 
             // backplate
