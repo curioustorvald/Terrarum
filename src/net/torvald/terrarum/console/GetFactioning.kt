@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.Factionable
 import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -23,7 +23,7 @@ internal object GetFactioning : ConsoleCommand {
         val error = Error()
 
         fun printOutFactioning(id: Int) {
-            val a = TerrarumGDX.ingame!!.getActorByID(id)
+            val a = Terrarum.ingame!!.getActorByID(id)
             if (a is Factionable) {
                 Echo("$ccW== Faction assignment for $ccY${if (id == Player.PLAYER_REF_ID) "player" else id.toString()} $ccW==")
                 println("[GetFactioning] == Faction assignment for '${if (id == Player.PLAYER_REF_ID) "player" else id.toString()}' ==")

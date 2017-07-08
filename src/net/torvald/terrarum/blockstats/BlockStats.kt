@@ -1,11 +1,10 @@
 package net.torvald.terrarum.blockstats
 
-import com.badlogic.gdx.Gdx
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import com.jme3.math.FastMath
 
 import java.util.Arrays
@@ -27,11 +26,11 @@ object BlockStats {
 
         // Get stats on no-zoomed screen area. In other words, will behave as if screen zoom were 1.0
         // no matter how the screen is zoomed.
-        val map = TerrarumGDX.ingame!!.world
-        val player = TerrarumGDX.ingame!!.player
+        val map = Terrarum.ingame!!.world
+        val player = Terrarum.ingame!!.player
 
-        val renderWidth = FastMath.ceil(TerrarumGDX.WIDTH.toFloat())
-        val renderHeight = FastMath.ceil(TerrarumGDX.HEIGHT.toFloat())
+        val renderWidth = FastMath.ceil(Terrarum.WIDTH.toFloat())
+        val renderHeight = FastMath.ceil(Terrarum.HEIGHT.toFloat())
 
         val noZoomCameraX = Math.round(FastMath.clamp(
                 (player?.hitbox?.centeredX?.toFloat() ?: 0f) - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))

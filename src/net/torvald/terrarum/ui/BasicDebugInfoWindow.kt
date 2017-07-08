@@ -1,25 +1,21 @@
 package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarumsansbitmap.gdx.GameFontBase
-import net.torvald.terrarum.TerrarumGDX.mouseTileX
-import net.torvald.terrarum.TerrarumGDX.mouseTileY
-import net.torvald.terrarum.TerrarumGDX.mouseScreenX
-import net.torvald.terrarum.TerrarumGDX.mouseScreenY
+import net.torvald.terrarum.Terrarum.mouseTileX
+import net.torvald.terrarum.Terrarum.mouseTileY
 
 /**
  * Created by minjaesong on 16-03-14.
  */
 class BasicDebugInfoWindow : UICanvas {
 
-    override var width: Int = TerrarumGDX.WIDTH
-    override var height: Int = TerrarumGDX.HEIGHT
+    override var width: Int = Terrarum.WIDTH
+    override var height: Int = Terrarum.HEIGHT
 
     override var openCloseTime: Float = 0f
 
@@ -34,7 +30,7 @@ class BasicDebugInfoWindow : UICanvas {
 
 
     override fun update(delta: Float) {
-        val player = TerrarumGDX.ingame!!.player!!
+        val player = Terrarum.ingame!!.player!!
         val hitbox = player.hitbox
 
         xdelta = hitbox.canonicalX - prevPlayerX
@@ -49,7 +45,7 @@ class BasicDebugInfoWindow : UICanvas {
         fun Int.rawG() = this % LightmapRenderer.MUL_2 / LightmapRenderer.MUL
         fun Int.rawB() = this % LightmapRenderer.MUL
 
-        val player = TerrarumGDX.ingame!!.player
+        val player = Terrarum.ingame!!.player
 
         batch.color = Color(0xFFEE88FF.toInt())
 
@@ -123,7 +119,7 @@ class BasicDebugInfoWindow : UICanvas {
                     rawB.toString() + ")"
         printLine(batch, 8, "light@cursor $ccG$lightVal")
 
-        val tileNum = TerrarumGDX.ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
+        val tileNum = Terrarum.ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
 
         printLine(batch, 9, "tile@cursor $ccG$tileNum ($mtX, $mtY)")
 
@@ -134,25 +130,25 @@ class BasicDebugInfoWindow : UICanvas {
         //printLineColumn(batch, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
         //printLineColumn(batch, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
 
-        printLineColumn(batch, 2, 5, "Time $ccG${TerrarumGDX.ingame!!.world.time.todaySeconds.toString().padStart(5, '0')}" +
-                                 " (${TerrarumGDX.ingame!!.world.time.getFormattedTime()})")
+        printLineColumn(batch, 2, 5, "Time $ccG${Terrarum.ingame!!.world.time.todaySeconds.toString().padStart(5, '0')}" +
+                                     " (${Terrarum.ingame!!.world.time.getFormattedTime()})")
         printLineColumn(batch, 2, 6, "Mass $ccG${player?.mass}")
 
         printLineColumn(batch, 2, 7, "noClip $ccG${player?.noClip}")
 
 
         drawHistogram(batch, LightmapRenderer.histogram,
-                TerrarumGDX.WIDTH - histogramW - 30,
-                TerrarumGDX.HEIGHT - histogramH - 30
+                Terrarum.WIDTH - histogramW - 30,
+                Terrarum.HEIGHT - histogramH - 30
         )
 
         batch.color = Color.WHITE
 
-        if (TerrarumGDX.controller != null) {
+        if (Terrarum.controller != null) {
             drawGamepadAxis(batch,
-                    TerrarumGDX.controller!!.getAxisValue(3),
-                    TerrarumGDX.controller!!.getAxisValue(2),
-                    TerrarumGDX.WIDTH - 135,
+                    Terrarum.controller!!.getAxisValue(3),
+                    Terrarum.controller!!.getAxisValue(2),
+                    Terrarum.WIDTH - 135,
                     40
             )
         }
@@ -162,42 +158,42 @@ class BasicDebugInfoWindow : UICanvas {
          */
 
         //g.color = GameFontBase.codeToCol["y"]
-        TerrarumGDX.fontSmallNumbers.draw(batch, "${ccY}MEM ", (TerrarumGDX.WIDTH - 21 * 8 - 2).toFloat(), 2f)
-        //g.draw(batch, "${ccY}FPS $ccG${Terrarum.appgc.fps}", (TerrarumGDX.WIDTH - 6 * 8 - 2).toFloat(), 10f)
-        TerrarumGDX.fontSmallNumbers.draw(batch, "${ccY}CPUs ${if (TerrarumGDX.MULTITHREAD) ccG else ccR}${TerrarumGDX.THREADS}",
-                (TerrarumGDX.WIDTH - 2 - 6*8).toFloat(), 10f)
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}MEM ", (Terrarum.WIDTH - 21 * 8 - 2).toFloat(), 2f)
+        //g.draw(batch, "${ccY}FPS $ccG${Terrarum.appgc.fps}", (Terrarum.WIDTH - 6 * 8 - 2).toFloat(), 10f)
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}CPUs ${if (Terrarum.MULTITHREAD) ccG else ccR}${Terrarum.THREADS}",
+                (Terrarum.WIDTH - 2 - 6 * 8).toFloat(), 10f)
 
         //g.color = GameFontBase.codeToCol["g"]
-        TerrarumGDX.fontSmallNumbers.draw(batch, "${TerrarumGDX.memInUse}M",
-                (TerrarumGDX.WIDTH - 17 * 8 - 2).toFloat(), 2f)
-        TerrarumGDX.fontSmallNumbers.draw(batch, "/${TerrarumGDX.memTotal}M/",
-                (TerrarumGDX.WIDTH - 12 * 8 - 2).toFloat(), 2f)
-        //TerrarumGDX.fontSmallNumbers.color = GameFontBase.codeToCol["m"]
-        TerrarumGDX.fontSmallNumbers.draw(batch, "${TerrarumGDX.memXmx}M",
-                (TerrarumGDX.WIDTH - 5 * 8 - 2).toFloat(), 2f)
+        Terrarum.fontSmallNumbers.draw(batch, "${Terrarum.memInUse}M",
+                (Terrarum.WIDTH - 17 * 8 - 2).toFloat(), 2f)
+        Terrarum.fontSmallNumbers.draw(batch, "/${Terrarum.memTotal}M/",
+                (Terrarum.WIDTH - 12 * 8 - 2).toFloat(), 2f)
+        //Terrarum.fontSmallNumbers.color = GameFontBase.codeToCol["m"]
+        Terrarum.fontSmallNumbers.draw(batch, "${Terrarum.memXmx}M",
+                (Terrarum.WIDTH - 5 * 8 - 2).toFloat(), 2f)
 
         /**
          * Bottom left
          */
 
-        TerrarumGDX.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${TerrarumGDX.ingame!!.actorContainer.size + TerrarumGDX.ingame!!.actorContainerInactive.size}",
-                2f, TerrarumGDX.HEIGHT - 10f)
-        TerrarumGDX.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${TerrarumGDX.ingame!!.actorContainer.size}",
-                (2 + 17*8).toFloat(), TerrarumGDX.HEIGHT - 10f)
-        TerrarumGDX.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${TerrarumGDX.ingame!!.actorContainerInactive.size}",
-                (2 + 28*8).toFloat(), TerrarumGDX.HEIGHT - 10f)
-        TerrarumGDX.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${TerrarumGDX.ingame!!.particlesActive}",
-                (2 + 41*8).toFloat(), TerrarumGDX.HEIGHT - 10f)
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${Terrarum.ingame!!.actorContainer.size + Terrarum.ingame!!.actorContainerInactive.size}",
+                2f, Terrarum.HEIGHT - 10f)
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${Terrarum.ingame!!.actorContainer.size}",
+                (2 + 17*8).toFloat(), Terrarum.HEIGHT - 10f)
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${Terrarum.ingame!!.actorContainerInactive.size}",
+                (2 + 28*8).toFloat(), Terrarum.HEIGHT - 10f)
+        Terrarum.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${Terrarum.ingame!!.particlesActive}",
+                (2 + 41*8).toFloat(), Terrarum.HEIGHT - 10f)
     }
 
     private fun printLine(batch: SpriteBatch, l: Int, s: String) {
-        TerrarumGDX.fontSmallNumbers.draw(batch,
+        Terrarum.fontSmallNumbers.draw(batch,
                 s, 10f, line(l)
         )
     }
 
     private fun printLineColumn(batch: SpriteBatch, col: Int, row: Int, s: String) {
-        TerrarumGDX.fontSmallNumbers.draw(batch,
+        Terrarum.fontSmallNumbers.draw(batch,
                 s, (10 + column(col)), line(row)
         )
     }
@@ -219,9 +215,9 @@ class BasicDebugInfoWindow : UICanvas {
         batch.color = uiColour
         batch.fillRect(x.toFloat(), y.toFloat(), w.plus(1), h)
         batch.color = Color.GRAY
-        TerrarumGDX.fontSmallNumbers.draw(batch, "0", x.toFloat(), y.toFloat() + h + 2)
-        TerrarumGDX.fontSmallNumbers.draw(batch, "255", x.toFloat() + w + 1 - 8*3, y.toFloat() + h + 2)
-        TerrarumGDX.fontSmallNumbers.draw(batch, "Histogramme", x + w / 2 - 5.5f * 8, y.toFloat() + h + 2)
+        Terrarum.fontSmallNumbers.draw(batch, "0", x.toFloat(), y.toFloat() + h + 2)
+        Terrarum.fontSmallNumbers.draw(batch, "255", x.toFloat() + w + 1 - 8 * 3, y.toFloat() + h + 2)
+        Terrarum.fontSmallNumbers.draw(batch, "Histogramme", x + w / 2 - 5.5f * 8, y.toFloat() + h + 2)
 
         blendScreen()
         for (c in 0..2) {
@@ -255,13 +251,13 @@ class BasicDebugInfoWindow : UICanvas {
         val pointDX = axisX * halfW
         val pointDY = axisY * halfH
 
-        val padName = if (TerrarumGDX.controller!!.name.isEmpty()) "Gamepad"
-                      else TerrarumGDX.controller!!.name
+        val padName = if (Terrarum.controller!!.name.isEmpty()) "Gamepad"
+                      else Terrarum.controller!!.name
 
         blendNormal()
 
         batch.end()
-        TerrarumGDX.inShapeRenderer {
+        Terrarum.inShapeRenderer {
             it.color = uiColour
             it.rect(uiX.toFloat(), uiY.toFloat(), w, h)
             it.color = Color.WHITE
@@ -270,7 +266,7 @@ class BasicDebugInfoWindow : UICanvas {
         }
         batch.begin()
 
-        TerrarumGDX.fontSmallNumbers.draw(batch, padName, uiX + w / 2 - (padName.length) * 4, uiY.toFloat() + h + 2)
+        Terrarum.fontSmallNumbers.draw(batch, padName, uiX + w / 2 - (padName.length) * 4, uiY.toFloat() + h + 2)
 
     }
 

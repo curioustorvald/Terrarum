@@ -2,7 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.Gdx
 import com.jme3.math.FastMath
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
@@ -134,7 +134,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     protected var isRightDown = false
     protected var isJumpDown = false
     protected inline val isGamer: Boolean
-        get() = this == TerrarumGDX.ingame!!.player
+        get() = this == Terrarum.ingame!!.player
 
 
     private val nullItem = object : GameItem() {
@@ -195,32 +195,32 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     private fun updateGamerControlBox() {
         if (isGamer) {
-            isUpDown = Gdx.input.isKeyPressed(TerrarumGDX.getConfigInt("keyup"))
-            isLeftDown = Gdx.input.isKeyPressed(TerrarumGDX.getConfigInt("keyleft"))
-            isDownDown = Gdx.input.isKeyPressed(TerrarumGDX.getConfigInt("keydown"))
-            isRightDown = Gdx.input.isKeyPressed(TerrarumGDX.getConfigInt("keyright"))
-            isJumpDown = Gdx.input.isKeyPressed(TerrarumGDX.getConfigInt("keyjump"))
+            isUpDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyup"))
+            isLeftDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyleft"))
+            isDownDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keydown"))
+            isRightDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyright"))
+            isJumpDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyjump"))
 
-            if (TerrarumGDX.controller != null) {
-                axisX =  TerrarumGDX.controller!!.getAxisValue(TerrarumGDX.getConfigInt("joypadlstickx"))
-                axisY =  TerrarumGDX.controller!!.getAxisValue(TerrarumGDX.getConfigInt("joypadlsticky"))
-                axisRX = TerrarumGDX.controller!!.getAxisValue(TerrarumGDX.getConfigInt("joypadrstickx"))
-                axisRY = TerrarumGDX.controller!!.getAxisValue(TerrarumGDX.getConfigInt("joypadrsticky"))
+            if (Terrarum.controller != null) {
+                axisX =  Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadlstickx"))
+                axisY =  Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadlsticky"))
+                axisRX = Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadrstickx"))
+                axisRY = Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadrsticky"))
 
                 // deadzonning
-                if (Math.abs(axisX) < TerrarumGDX.CONTROLLER_DEADZONE) axisX = 0f
-                if (Math.abs(axisY) < TerrarumGDX.CONTROLLER_DEADZONE) axisY = 0f
-                if (Math.abs(axisRX) < TerrarumGDX.CONTROLLER_DEADZONE) axisRX = 0f
-                if (Math.abs(axisRY) < TerrarumGDX.CONTROLLER_DEADZONE) axisRY = 0f
+                if (Math.abs(axisX) < Terrarum.CONTROLLER_DEADZONE) axisX = 0f
+                if (Math.abs(axisY) < Terrarum.CONTROLLER_DEADZONE) axisY = 0f
+                if (Math.abs(axisRX) < Terrarum.CONTROLLER_DEADZONE) axisRX = 0f
+                if (Math.abs(axisRY) < Terrarum.CONTROLLER_DEADZONE) axisRY = 0f
 
-                isJumpDown = Gdx.input.isKeyPressed(TerrarumGDX.getConfigInt("keyjump")) ||
-                             TerrarumGDX.controller!!.isButtonPressed(GAMEPAD_JUMP)
+                isJumpDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyjump")) ||
+                             Terrarum.controller!!.isButtonPressed(GAMEPAD_JUMP)
             }
         }
     }
 
     private inline val hasController: Boolean
-        get() = if (isGamer) TerrarumGDX.controller != null
+        get() = if (isGamer) Terrarum.controller != null
                 else true
     
     override fun processInput(delta: Float) {
@@ -265,11 +265,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         // ↑F, ↓S
         if (isRightDown && !isLeftDown) {
             walkHorizontal(false, AXIS_KEYBOARD)
-            prevHMoveKey = TerrarumGDX.getConfigInt("keyright")
+            prevHMoveKey = Terrarum.getConfigInt("keyright")
         } // ↓F, ↑S
         else if (isLeftDown && !isRightDown) {
             walkHorizontal(true, AXIS_KEYBOARD)
-            prevHMoveKey = TerrarumGDX.getConfigInt("keyleft")
+            prevHMoveKey = Terrarum.getConfigInt("keyleft")
         } // ↓F, ↓S
         /*else if (isLeftDown && isRightDown) {
                if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
@@ -293,11 +293,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
             // ↑E, ↓D
             if (isDownDown && !isUpDown) {
                 walkVertical(false, AXIS_KEYBOARD)
-                prevVMoveKey = TerrarumGDX.getConfigInt("keydown")
+                prevVMoveKey = Terrarum.getConfigInt("keydown")
             } // ↓E, ↑D
             else if (isUpDown && !isDownDown) {
                 walkVertical(true, AXIS_KEYBOARD)
-                prevVMoveKey = TerrarumGDX.getConfigInt("keyup")
+                prevVMoveKey = Terrarum.getConfigInt("keyup")
             } // ↓E, ↓D
             /*else if (isUpDown && isDownDown) {
                 if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
@@ -335,7 +335,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
     override fun keyDown(keycode: Int): Boolean {
         // quickslot (quickbar)
-        val quickbarKeys = TerrarumGDX.getConfigIntArray("keyquickbars")
+        val quickbarKeys = Terrarum.getConfigIntArray("keyquickbars")
         if (keycode in quickbarKeys) {
             actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = quickbarKeys.indexOf(keycode)
         }
@@ -501,7 +501,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
             // force update inventory UI
             try {
-                (TerrarumGDX.ingame!!.uiInventoryPlayer.UI as UIInventory).shutUpAndRebuild()
+                (Terrarum.ingame!!.uiInventoryPlayer.UI as UIInventory).shutUpAndRebuild()
             }
             catch (LateInitMyArse: kotlin.UninitializedPropertyAccessException) { }
         }

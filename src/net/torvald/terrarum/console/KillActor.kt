@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.langpack.Lang
 
 /**
@@ -11,7 +11,7 @@ internal object KillActor : ConsoleCommand {
         if (args.size == 2) {
             try {
                 val actorid = args[1].toInt()
-                TerrarumGDX.ingame!!.removeActor(actorid)
+                Terrarum.ingame!!.removeActor(actorid)
             }
             catch (e: NumberFormatException) {
                 EchoError("Wrong number input.")

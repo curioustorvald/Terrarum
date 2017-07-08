@@ -1,12 +1,12 @@
 package net.torvald.terrarum.concurrent
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 
 /**
  * Created by minjaesong on 16-05-25.
  */
 object ThreadParallel {
-    private val pool: Array<Thread?> = Array(TerrarumGDX.THREADS, { null })
+    private val pool: Array<Thread?> = Array(Terrarum.THREADS, { null })
 
     /**
      * Map Runnable object to certain index of the thread pool.

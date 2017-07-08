@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.point.Point2d
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import org.dyn4j.geometry.Vector2
@@ -72,7 +72,7 @@ open class ProjectileSimple(
         lifetimeCounter += delta
         if (walledTop || walledBottom || walledRight || walledLeft || lifetimeCounter >= lifetimeMax ||
             // stuck check
-            BlockCodex[TerrarumGDX.ingame!!.world.getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Block.STONE].isSolid
+            BlockCodex[Terrarum.ingame!!.world.getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Block.STONE].isSolid
                 ) {
             flagDespawn()
         }
@@ -90,15 +90,15 @@ open class ProjectileSimple(
         colourTail.a = 0.16f
 
         /*batch.end()
-        TerrarumGDX.inShapeRenderer {
+        Terrarum.inShapeRenderer {
             // draw trail of solid colour (Terraria style maybe?)
-            it.lineWidth = 2f * TerrarumGDX.ingame!!.screenZoom
+            it.lineWidth = 2f * Terrarum.ingame!!.screenZoom
             g.drawGradientLine(
-                    hitbox.centeredX.toFloat() * TerrarumGDX.ingame!!.screenZoom,
-                    hitbox.centeredY.toFloat() * TerrarumGDX.ingame!!.screenZoom,
+                    hitbox.centeredX.toFloat() * Terrarum.ingame!!.screenZoom,
+                    hitbox.centeredY.toFloat() * Terrarum.ingame!!.screenZoom,
                     displayColour,
-                    posPre.x.toFloat() * TerrarumGDX.ingame!!.screenZoom,
-                    posPre.y.toFloat() * TerrarumGDX.ingame!!.screenZoom,
+                    posPre.x.toFloat() * Terrarum.ingame!!.screenZoom,
+                    posPre.y.toFloat() * Terrarum.ingame!!.screenZoom,
                     colourTail
             )
         }

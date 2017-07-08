@@ -2,7 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -19,7 +19,7 @@ class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas
     override var height: Int = 0
 
     private var fontCol: Color = if (!isBlackVariant) Color.BLACK else Color.WHITE
-    private val GLYPH_HEIGHT = TerrarumGDX.fontGame.lineHeight
+    private val GLYPH_HEIGHT = Terrarum.fontGame.lineHeight
 
     override var openCloseTime: Second = OPEN_CLOSE_TIME
 
@@ -38,7 +38,7 @@ class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas
     override fun render(batch: SpriteBatch) {
         blendNormal()
 
-        val textWidth = messagesList.map { TerrarumGDX.fontGame.getWidth(it) }.sorted()[1]
+        val textWidth = messagesList.map { Terrarum.fontGame.getWidth(it) }.sorted()[1]
 
         batch.color = Color.WHITE
 
@@ -47,7 +47,7 @@ class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas
         batch.draw(segment.get(2, 0), 2 * LRmargin + textWidth, 0f)
 
         messagesList.forEachIndexed { index, s ->
-            TerrarumGDX.fontGame.draw(batch, s, segment.tileW + LRmargin, (segment.tileH - TerrarumGDX.fontGame.lineHeight) / 2f)
+            Terrarum.fontGame.draw(batch, s, segment.tileW + LRmargin, (segment.tileH - Terrarum.fontGame.lineHeight) / 2f)
         }
     }
 

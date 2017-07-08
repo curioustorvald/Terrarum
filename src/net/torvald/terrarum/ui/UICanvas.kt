@@ -2,7 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.gameactors.roundInt
 
@@ -29,16 +29,16 @@ interface UICanvas {
 
 
     val relativeMouseX: Int
-        get() = (TerrarumGDX.mouseScreenX - (handler?.posX ?: 0))
+        get() = (Terrarum.mouseScreenX - (handler?.posX ?: 0))
     val relativeMouseY: Int
-        get() = (TerrarumGDX.mouseScreenY - (handler?.posY ?: 0))
+        get() = (Terrarum.mouseScreenY - (handler?.posY ?: 0))
 
     /** If mouse is hovering over it */
     val mouseUp: Boolean
         get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
     /** If mouse is hovering over it and mouse is down */
     val mousePushed: Boolean
-        get() = mouseUp && Gdx.input.isButtonPressed(TerrarumGDX.getConfigInt("mouseprimary"))
+        get() = mouseUp && Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary"))
 
 
     fun update(delta: Float)
@@ -98,13 +98,13 @@ interface UICanvas {
                 ).roundInt()
                 Position.RIGHT -> handler!!.posX = Movement.fastPullOut(
                         handler.openCloseCounter / openCloseTime,
-                        TerrarumGDX.WIDTH.toFloat(),
-                        TerrarumGDX.WIDTH - handler.UI.width.toFloat()
+                        Terrarum.WIDTH.toFloat(),
+                        Terrarum.WIDTH - handler.UI.width.toFloat()
                 ).roundInt()
                 Position.BOTTOM -> handler!!.posY = Movement.fastPullOut(
                         handler.openCloseCounter / openCloseTime,
-                        TerrarumGDX.HEIGHT.toFloat(),
-                        TerrarumGDX.HEIGHT - handler.UI.height.toFloat()
+                        Terrarum.HEIGHT.toFloat(),
+                        Terrarum.HEIGHT - handler.UI.height.toFloat()
                 ).roundInt()
             }
         }
@@ -122,13 +122,13 @@ interface UICanvas {
                 ).roundInt()
                 Position.RIGHT -> handler!!.posX = Movement.fastPullOut(
                         handler.openCloseCounter / openCloseTime,
-                        TerrarumGDX.WIDTH - handler.UI.width.toFloat(),
-                        TerrarumGDX.WIDTH.toFloat()
+                        Terrarum.WIDTH - handler.UI.width.toFloat(),
+                        Terrarum.WIDTH.toFloat()
                 ).roundInt()
                 Position.BOTTOM -> handler!!.posY = Movement.fastPullOut(
                         handler.openCloseCounter / openCloseTime,
-                        TerrarumGDX.HEIGHT - handler.UI.height.toFloat(),
-                        TerrarumGDX.HEIGHT.toFloat()
+                        Terrarum.HEIGHT - handler.UI.height.toFloat(),
+                        Terrarum.HEIGHT.toFloat()
                 ).roundInt()
             }
         }
@@ -136,16 +136,16 @@ interface UICanvas {
             when (position) {
                 Position.LEFT -> handler!!.posX = 0
                 Position.TOP -> handler!!.posY = 0
-                Position.RIGHT -> handler!!.posX = TerrarumGDX.WIDTH - handler.UI.width
-                Position.BOTTOM -> handler!!.posY = TerrarumGDX.HEIGHT - handler.UI.height
+                Position.RIGHT -> handler!!.posX = Terrarum.WIDTH - handler.UI.width
+                Position.BOTTOM -> handler!!.posY = Terrarum.HEIGHT - handler.UI.height
             }
         }
         fun endClosingPopOut(handler: UIHandler?, position: Position) {
             when (position) {
                 Position.LEFT -> handler!!.posX = -handler.UI.width
                 Position.TOP -> handler!!.posY = -handler.UI.height
-                Position.RIGHT -> handler!!.posX = TerrarumGDX.WIDTH
-                Position.BOTTOM -> handler!!.posY = TerrarumGDX.HEIGHT
+                Position.RIGHT -> handler!!.posX = Terrarum.WIDTH
+                Position.BOTTOM -> handler!!.posY = Terrarum.HEIGHT
             }
         }
 

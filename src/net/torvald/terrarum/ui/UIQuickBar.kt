@@ -2,7 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.gameworld.fmod
@@ -14,7 +14,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 class UIQuickBar : UICanvas, MouseControlled {
     private val gutter = 8
     override var width: Int = (ItemSlotImageBuilder.slotImage.width + gutter) * SLOT_COUNT
-    override var height: Int = ItemSlotImageBuilder.slotImage.height + 4 + TerrarumGDX.fontGame.lineHeight.toInt()
+    override var height: Int = ItemSlotImageBuilder.slotImage.height + 4 + Terrarum.fontGame.lineHeight.toInt()
     /**
      * In milliseconds
      */
@@ -26,8 +26,8 @@ class UIQuickBar : UICanvas, MouseControlled {
     override var handler: UIHandler? = null
 
     private var selection: Int
-        get() = TerrarumGDX.ingame!!.player?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
-        set(value) { TerrarumGDX.ingame!!.player?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
+        get() = Terrarum.ingame!!.player?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
+        set(value) { Terrarum.ingame!!.player?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
 
     
     override fun update(delta: Float) {
@@ -53,7 +53,7 @@ class UIQuickBar : UICanvas, MouseControlled {
             )
 
             // draw item
-            val itemPair = TerrarumGDX.ingame!!.player!!.inventory.getQuickBar(i)
+            val itemPair = Terrarum.ingame!!.player!!.inventory.getQuickBar(i)
 
             if (itemPair != null) {
                 val itemImage = ItemCodex.getItemImage(itemPair.item)

@@ -8,10 +8,9 @@ import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import org.luaj.vm2.lib.jse.JsePlatform
 import net.torvald.terrarum.KVHashMap
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.gameactors.ceilInt
-import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.virtualcomputer.luaapi.*
 import net.torvald.terrarum.virtualcomputer.peripheral.*
 import net.torvald.terrarum.virtualcomputer.terminal.*
@@ -19,7 +18,6 @@ import net.torvald.terrarum.virtualcomputer.tvd.VDUtil
 import net.torvald.terrarum.virtualcomputer.tvd.VirtualDisk
 import net.torvald.terrarum.virtualcomputer.worldobject.ComputerPartsCodex
 import org.lwjgl.BufferUtils
-import org.lwjgl.openal.AL
 import org.lwjgl.openal.AL10
 import java.io.*
 import java.nio.ByteBuffer
@@ -100,7 +98,7 @@ class TerrarumComputer(peripheralSlots: Int) {
         // put disk in diskRack
         if (filename.isNotEmpty() && filename.isNotBlank()) {
             diskRack[slot] = VDUtil.readDiskArchive(
-                    File(TerrarumGDX.currentSaveDir.path + "/computers/$filename").absoluteFile,
+                    File(Terrarum.currentSaveDir.path + "/computers/$filename").absoluteFile,
                     Level.WARNING,
                     { },
                     Filesystem.sysCharset

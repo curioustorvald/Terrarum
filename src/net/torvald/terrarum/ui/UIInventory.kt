@@ -2,10 +2,9 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
-import net.torvald.terrarum.TerrarumGDX.joypadLabelNinA
-import net.torvald.terrarum.TerrarumGDX.joypadLabelNinY
+import net.torvald.terrarum.Terrarum.joypadLabelNinA
+import net.torvald.terrarum.Terrarum.joypadLabelNinY
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
 import net.torvald.terrarum.itemproperties.GameItem
@@ -57,7 +56,7 @@ class UIInventory(
     val itemStripGutterH = 8
     val itemInterColGutter = 8
 
-    val controlHelpHeight = TerrarumGDX.fontGame.lineHeight.toInt()
+    val controlHelpHeight = Terrarum.fontGame.lineHeight.toInt()
 
     val catButtons = UIItemTextButtonList(
             this,
@@ -116,7 +115,7 @@ class UIInventory(
 
     private val SP = "${0x3000.toChar()}${0x3000.toChar()}${0x3000.toChar()}"
     val listControlHelp: String
-        get() = if (TerrarumGDX.environment == RunningEnvironment.PC)
+        get() = if (Terrarum.environment == RunningEnvironment.PC)
             "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "${0xe011.toChar()}..${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
@@ -125,7 +124,7 @@ class UIInventory(
             "${0xe011.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "$joypadLabelNinA ${Lang["GAME_INVENTORY_DROP"]}"
     val listControlClose: String
-        get() = if (TerrarumGDX.environment == RunningEnvironment.PC)
+        get() = if (Terrarum.environment == RunningEnvironment.PC)
             "${0xe037.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
     else
             "${0xe069.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
@@ -181,16 +180,16 @@ class UIInventory(
         blendNormal()
         batch.color = defaultTextColour
         // W - close
-        TerrarumGDX.fontGame.draw(batch, listControlClose, 4f, height - controlHelpHeight.toFloat())
+        Terrarum.fontGame.draw(batch, listControlClose, 4f, height - controlHelpHeight.toFloat())
         // MouseL - Use ; 1.9 - Register ; T - Drop
-        TerrarumGDX.fontGame.draw(batch, listControlHelp, catButtons.width + 4f, height - controlHelpHeight.toFloat())
+        Terrarum.fontGame.draw(batch, listControlHelp, catButtons.width + 4f, height - controlHelpHeight.toFloat())
         // encumbrance
         if (inventory != null) {
             val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
 
-            TerrarumGDX.fontGame.draw(batch,
+            Terrarum.fontGame.draw(batch,
                     encumbranceText,
-                    width - 9 - TerrarumGDX.fontGame.getWidth(encumbranceText) - weightBarWidth,
+                    width - 9 - Terrarum.fontGame.getWidth(encumbranceText) - weightBarWidth,
                     height - controlHelpHeight.toFloat()
             )
 

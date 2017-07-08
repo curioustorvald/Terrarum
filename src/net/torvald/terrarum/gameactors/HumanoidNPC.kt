@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
 import net.torvald.terrarum.itemproperties.GameItem
@@ -51,8 +51,8 @@ open class HumanoidNPC(
         override fun secondaryUse(delta: Float): Boolean {
             try {
                 // place the actor to the world
-                this@HumanoidNPC.setPosition(TerrarumGDX.mouseX, TerrarumGDX.mouseY)
-                TerrarumGDX.ingame!!.addNewActor(this@HumanoidNPC)
+                this@HumanoidNPC.setPosition(Terrarum.mouseX, Terrarum.mouseY)
+                Terrarum.ingame!!.addNewActor(this@HumanoidNPC)
                 // successful
                 return true
             }

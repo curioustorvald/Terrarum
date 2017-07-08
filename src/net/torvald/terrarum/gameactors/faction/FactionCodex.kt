@@ -1,6 +1,5 @@
 package net.torvald.terrarum.gameactors.faction
 
-import net.torvald.terrarum.TerrarumGDX
 import java.util.*
 
 /**

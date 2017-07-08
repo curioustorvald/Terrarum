@@ -13,12 +13,12 @@ object DefaultConfig {
     fun fetch(): JsonObject {
         val jsonObject = JsonObject()
 
-        jsonObject.addProperty("displayfps", 60)
-        jsonObject.addProperty("usevsync", true)
+        jsonObject.addProperty("displayfps", 0) // 0: no limit, non-zero: limit
+        jsonObject.addProperty("usevsync", false)
 
 
         jsonObject.addProperty("imtooyoungtodie", false) // no perma-death
-        jsonObject.addProperty("language", TerrarumGDX.sysLang)
+        jsonObject.addProperty("language", Terrarum.sysLang)
         jsonObject.addProperty("notificationshowuptime", 6500)
         jsonObject.addProperty("multithread", true) // experimental!
 
@@ -48,7 +48,7 @@ object DefaultConfig {
         jsonObject.addProperty("keyup", Input.Keys.E)
         jsonObject.addProperty("keyleft", Input.Keys.S)
         jsonObject.addProperty("keydown", Input.Keys.D)
-        jsonObject.addProperty("keyright", Input.Keys.F)
+        jsonObject.addProperty("keyright", Input.Keys.F) // ESDF Masterrace
 
         jsonObject.addProperty("keymovementaux", Input.Keys.A) // movement-auxiliary, or hookshot
         jsonObject.addProperty("keyinventory", Input.Keys.Q)

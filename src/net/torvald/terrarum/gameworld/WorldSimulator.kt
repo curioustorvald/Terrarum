@@ -2,7 +2,7 @@ package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AnyPlayer
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
@@ -35,7 +35,7 @@ object WorldSimulator {
     val colourNone = Color(0x808080FF.toInt())
     val colourWater = Color(0x66BBFFFF.toInt())
 
-    private val world = TerrarumGDX.ingame!!.world
+    private val world = Terrarum.ingame!!.world
 
     operator fun invoke(p: AnyPlayer?, delta: Float) {
         if (p != null) {
@@ -167,7 +167,7 @@ object WorldSimulator {
                     else
                         batch.color = colourWater
 
-                    TerrarumGDX.fontSmallNumbers.draw(batch,
+                    Terrarum.fontSmallNumbers.draw(batch,
                             data.toString(),
                             updateXFrom.plus(x).times(FeaturesDrawer.TILE_SIZE).toFloat()
                             + if (data < 10) 4f else 0f,

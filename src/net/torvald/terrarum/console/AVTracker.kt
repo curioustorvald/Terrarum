@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.debuggerapp.ActorValueTracker
 import java.util.*
 
@@ -12,14 +12,14 @@ internal object AVTracker : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         if (args.size < 2) {
-            jPanelInstances.add(ActorValueTracker(TerrarumGDX.ingame!!.player))
+            jPanelInstances.add(ActorValueTracker(Terrarum.ingame!!.player))
         }
         else {
             try {
                 val actorID = args[1].toInt()
 
-                if (TerrarumGDX.ingame!!.theGameHasActor(actorID)) {
-                    jPanelInstances.add(ActorValueTracker(TerrarumGDX.ingame!!.getActorByID(actorID)))
+                if (Terrarum.ingame!!.theGameHasActor(actorID)) {
+                    jPanelInstances.add(ActorValueTracker(Terrarum.ingame!!.getActorByID(actorID)))
                 }
                 else {
                     throw IllegalArgumentException()

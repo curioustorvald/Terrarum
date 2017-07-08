@@ -1,6 +1,5 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.TerrarumGDX
 import net.torvald.terrarum.langpack.Lang
 
 /**

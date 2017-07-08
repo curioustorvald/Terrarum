@@ -3,7 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -35,9 +35,9 @@ class UIPieMenu : UICanvas {
     var selection: Int = -1
 
     override fun update(delta: Float) {
-        if (TerrarumGDX.ingame!!.player != null) {
+        if (Terrarum.ingame!!.player != null) {
             if (selection >= 0)
-                TerrarumGDX.ingame!!.player!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
+                Terrarum.ingame!!.player!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
                         selection % slotCount
         }
     }
@@ -57,8 +57,8 @@ class UIPieMenu : UICanvas {
 
             val slotSize = image.width
 
-            val slotX = slotCentrePoint.x.toFloat() - (slotSize / 2) + TerrarumGDX.HALFW
-            val slotY = slotCentrePoint.y.toFloat() - (slotSize / 2) + TerrarumGDX.HALFH
+            val slotX = slotCentrePoint.x.toFloat() - (slotSize / 2) + Terrarum.HALFW
+            val slotY = slotCentrePoint.y.toFloat() - (slotSize / 2) + Terrarum.HALFH
 
             batch.color = Color(1f, 1f, 1f, handler!!.opacity * UIQuickBar.finalOpacity)
             batch.draw(
@@ -69,7 +69,7 @@ class UIPieMenu : UICanvas {
 
 
             // draw item
-            val itemPair = TerrarumGDX.ingame!!.player!!.inventory.getQuickBar(i)
+            val itemPair = Terrarum.ingame!!.player!!.inventory.getQuickBar(i)
 
             if (itemPair != null) {
                 val itemImage = ItemCodex.getItemImage(itemPair.item)
@@ -88,8 +88,8 @@ class UIPieMenu : UICanvas {
 
     override fun processInput(delta: Float) {
         if (handler!!.isOpened || handler!!.isOpening) {
-            val cursorPos = Vector2(TerrarumGDX.mouseX, TerrarumGDX.mouseY)
-            val centre = Vector2(TerrarumGDX.HALFW.toDouble(), TerrarumGDX.HALFH.toDouble())
+            val cursorPos = Vector2(Terrarum.mouseX, Terrarum.mouseY)
+            val centre = Vector2(Terrarum.HALFW.toDouble(), Terrarum.HALFH.toDouble())
             val deg = -(centre - cursorPos).direction.toFloat()
 
             selection = Math.round(deg * slotCount / FastMath.TWO_PI)

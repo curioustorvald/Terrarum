@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 
 /**
@@ -23,7 +23,7 @@ internal object Teleport : ConsoleCommand {
                 return
             }
 
-            TerrarumGDX.ingame!!.player!!.setPosition(x.toDouble(), y.toDouble())
+            Terrarum.ingame!!.player!!.setPosition(x.toDouble(), y.toDouble())
         }
         else if (args.size == 4) {
             if (args[2].toLowerCase() != "to") {
@@ -35,20 +35,20 @@ internal object Teleport : ConsoleCommand {
             try {
                 val fromActorID = args[1].toInt()
                 val targetActorID = if (args[3].toLowerCase() == "player")
-                    TerrarumGDX.ingame!!.player!!.referenceID
+                    Terrarum.ingame!!.player!!.referenceID
                 else
                     args[3].toInt()
 
                 // if from == target, ignore the action
                 if (fromActorID == targetActorID) return
 
-                if (TerrarumGDX.ingame!!.getActorByID(fromActorID) !is ActorWithPhysics ||
-                    TerrarumGDX.ingame!!.getActorByID(targetActorID) !is ActorWithPhysics) {
+                if (Terrarum.ingame!!.getActorByID(fromActorID) !is ActorWithPhysics ||
+                    Terrarum.ingame!!.getActorByID(targetActorID) !is ActorWithPhysics) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    fromActor = TerrarumGDX.ingame!!.getActorByID(fromActorID) as ActorWithPhysics
-                    targetActor = TerrarumGDX.ingame!!.getActorByID(targetActorID) as ActorWithPhysics
+                    fromActor = Terrarum.ingame!!.getActorByID(fromActorID) as ActorWithPhysics
+                    targetActor = Terrarum.ingame!!.getActorByID(targetActorID) as ActorWithPhysics
                 }
             }
             catch (e: NumberFormatException) {
@@ -79,11 +79,11 @@ internal object Teleport : ConsoleCommand {
                 y = args[4].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
                 val actorID = args[1].toInt()
 
-                if (TerrarumGDX.ingame!!.getActorByID(actorID) !is ActorWithPhysics) {
+                if (Terrarum.ingame!!.getActorByID(actorID) !is ActorWithPhysics) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    actor = TerrarumGDX.ingame!!.getActorByID(actorID) as ActorWithPhysics
+                    actor = Terrarum.ingame!!.getActorByID(actorID) as ActorWithPhysics
                 }
             }
             catch (e: NumberFormatException) {
