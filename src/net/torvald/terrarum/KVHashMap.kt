@@ -72,6 +72,10 @@ open class KVHashMap {
         return value as Double
     }
 
+    fun getAsFloat(key: String): Float? {
+        return getAsDouble(key)?.toFloat()
+    }
+
     fun getAsString(key: String): String? {
         val value = get(key)
 

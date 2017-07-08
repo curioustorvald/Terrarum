@@ -1,9 +1,9 @@
 
 package net.torvald.terrarum.gameworld
 
+import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.worlddrawer.RGB10
 import org.dyn4j.geometry.Vector2
 
 typealias BlockAddress = Long
@@ -32,8 +32,8 @@ class GameWorld(val width: Int, val height: Int) {
     //physics
     /** Meter per second squared. Currently only the downward gravity is supported. No reverse gravity :p */
     var gravitation: Vector2 = Vector2(0.0, 9.8)
-    /** RGB in Integer */
-    var globalLight: RGB10 = 0
+    /** 0.0..1.0+ */
+    var globalLight = Color(0f,0f,0f,1f)
 
 
 

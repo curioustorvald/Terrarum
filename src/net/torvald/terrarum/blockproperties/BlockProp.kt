@@ -1,5 +1,7 @@
 package net.torvald.terrarum.blockproperties
 
+import com.badlogic.gdx.graphics.Color
+
 /**
  * Created by minjaesong on 16-02-16.
  */
@@ -9,10 +11,16 @@ class BlockProp {
 
     var nameKey: String = ""
 
+
+    var shadeColR = 0f
+    var shadeColG = 0f
+    var shadeColB = 0f
+
     /**
      * @param opacity Raw RGB value, without alpha
      */
-    var opacity: Int = 0 // colour attenuation
+    inline val opacity: Color
+        get() = Color(shadeColR, shadeColG, shadeColB, 1f)
 
     var strength: Int = 0
     var density: Int = 0
@@ -23,14 +31,16 @@ class BlockProp {
     var isWallable: Boolean = false
     var isVertFriction: Boolean = false
 
+
+    var lumColR = 0f
+    var lumColG = 0f
+    var lumColB = 0f
+
     /**
      * @param luminosity Raw RGB value, without alpha
      */
-    var luminosity: Int = 0
-        set(value) {
-            field = value
-        }
-        get() = BlockPropUtil.getDynamicLumFunc(field, dynamicLuminosityFunction)
+    inline val luminosity: Color
+        get() = BlockPropUtil.getDynamicLumFunc(Color(lumColR, lumColG, lumColB, 1f), dynamicLuminosityFunction)
 
     var drop: Int = 0
 

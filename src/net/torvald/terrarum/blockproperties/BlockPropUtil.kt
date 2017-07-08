@@ -1,15 +1,14 @@
 package net.torvald.terrarum.blockproperties
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
-import net.torvald.terrarum.toRGB10
 import net.torvald.terrarum.weather.WeatherMixer
-import net.torvald.terrarum.worlddrawer.RGB10
 
 /**
  * Created by minjaesong on 16-06-16.
@@ -38,21 +37,21 @@ object BlockPropUtil {
 
     }
 
-    private fun getTorchFlicker(baseLum: Int): RGB10 {
-        val funcY = FastMath.interpolateCatmullRom(0.0f, flickerFuncX.toFloat() / flickerFuncDomain,
+    private fun getTorchFlicker(baseLum: Color): Color {
+        val funcY = FastMath.interpolateCatmullRom(0.0f, flickerFuncX / flickerFuncDomain,
                 flickerP0, flickerP1, flickerP2, flickerP3
         )
 
         return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
     }
 
-    private fun getSlowBreath(baseLum: Int): RGB10 {
+    private fun getSlowBreath(baseLum: Color): Color {
         val funcY = FastMath.sin(FastMath.PI * breathFuncX / breathCycleDuration) * breathRange
 
         return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
     }
 
-    private fun getPulsate(baseLum: Int): RGB10 {
+    private fun getPulsate(baseLum: Color): Color {
         val funcY = FastMath.sin(FastMath.PI * pulsateFuncX / pulsateCycleDuration) * pulsateRange
 
         return LightmapRenderer.alterBrightnessUniform(baseLum, funcY)
@@ -92,11 +91,11 @@ object BlockPropUtil {
 
     private fun linearInterpolation1D(a: Float, b: Float, x: Float) = a * (1 - x) + b * x
 
-    fun getDynamicLumFunc(baseLum: Int, type: Int): Int {
+    fun getDynamicLumFunc(baseLum: Color, type: Int): Color {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
             2    -> Terrarum.ingame!!.world.globalLight // current global light
-            3    -> WeatherMixer.getGlobalLightOfTime(WorldTime.DAY_LENGTH / 2).toRGB10() // daylight at noon
+            3    -> WeatherMixer.getGlobalLightOfTime(WorldTime.DAY_LENGTH / 2) // daylight at noon
             4    -> getSlowBreath(baseLum)
             5    -> getPulsate(baseLum)
             else -> baseLum

@@ -11,6 +11,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ParticleTestRain
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.WorldTime
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import java.io.File
 import java.util.*
 
