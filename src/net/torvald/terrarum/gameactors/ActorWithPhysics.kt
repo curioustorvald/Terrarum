@@ -1494,11 +1494,11 @@ fun interpolateLinear(scale: Double, startValue: Double, endValue: Double): Doub
     if (startValue == endValue) {
         return startValue
     }
-    if (scale <= 0f) {
+    if (scale <= 0.0) {
         return startValue
     }
-    if (scale >= 1f) {
+    if (scale >= 1.0) {
         return endValue
     }
-    return (1f - scale) * startValue + scale * endValue
+    return (1.0 - scale) * startValue + scale * endValue
 }

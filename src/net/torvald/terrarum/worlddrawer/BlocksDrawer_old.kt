@@ -378,7 +378,7 @@ object BlocksDrawer {
         blendNormal()
     }
 
-    private val tileDrawLightThreshold = 2
+    private val tileDrawLightThreshold = 2f / LightmapRenderer.MUL
 
     private fun canIHazRender(mode: Int, x: Int, y: Int) =
             (world.getTileFrom(mode, x, y) != 0) && // not an air tile
@@ -431,15 +431,15 @@ object BlocksDrawer {
                 try {
                     if (canIHazRender(mode, x, y)) {
                     // check if light level of nearby or this tile is illuminated
-                        if ( LightmapRenderer.getHighestRGB(x, y) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x - 1, y) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x + 1, y) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x, y - 1) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x, y + 1) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x - 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x + 1, y + 1) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x + 1, y - 1) ?: 0 >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x - 1, y + 1) ?: 0 >= tileDrawLightThreshold)
+                        if ( LightmapRenderer.getHighestRGB(x, y) ?: 0f >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x - 1, y) ?: 0f >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x + 1, y) ?: 0f >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x, y - 1) ?: 0f >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x, y + 1) ?: 0f >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x - 1, y - 1) ?: 0f >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x + 1, y + 1) ?: 0f >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x + 1, y - 1) ?: 0f >= tileDrawLightThreshold ||
+                             LightmapRenderer.getHighestRGB(x - 1, y + 1) ?: 0f >= tileDrawLightThreshold)
                         {
                             // FIXME bad scanlines bug
                             if (zeroTileCounter > 0) {

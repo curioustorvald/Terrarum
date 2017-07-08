@@ -2,16 +2,18 @@ package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Ingame
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.fillRect
-import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.toRGB10
+import net.torvald.terrarum.worlddrawer.LightmapRenderer.b
+import net.torvald.terrarum.worlddrawer.LightmapRenderer.g
+import net.torvald.terrarum.worlddrawer.LightmapRenderer.r
 import java.util.*
 
 /**
@@ -45,14 +47,10 @@ object LightmapRenderer {
     /**
      * 8-Bit RGB values
      */
-    private val lightmap: Array<IntArray> = Array(LIGHTMAP_HEIGHT) { IntArray(LIGHTMAP_WIDTH) } // TODO framebuffer?
+    private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,1f) }) } // TODO framebuffer?
     private val lanternMap = ArrayList<Lantern>(Terrarum.ingame!!.ACTORCONTAINER_INITIAL_SIZE * 4)
 
     private val AIR = Block.AIR
-
-    private val OFFSET_R = 2
-    private val OFFSET_G = 1
-    private val OFFSET_B = 0
 
     private const val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / Ingame.lightmapDownsample
@@ -64,6 +62,7 @@ object LightmapRenderer {
     const val CHANNEL_MAX = MUL - 1
     const val CHANNEL_MAX_FLOAT = CHANNEL_MAX.toFloat()
     const val COLOUR_RANGE_SIZE = MUL * MUL_2
+    const val MUL_FLOAT = MUL / 256f
 
     internal var for_x_start: Int = 0
     internal var for_y_start: Int = 0
@@ -73,7 +72,7 @@ object LightmapRenderer {
 
     //inline fun getLightRawPos(x: Int, y: Int) = lightmap[y][x]
 
-    fun getLight(x: Int, y: Int): Int? {
+    fun getLight(x: Int, y: Int): Color? {
         if (y - for_y_start + overscan_open in 0..lightmap.lastIndex &&
             x - for_x_start + overscan_open in 0..lightmap[0].lastIndex) {
 
@@ -83,7 +82,7 @@ object LightmapRenderer {
         return null
     }
 
-    fun setLight(x: Int, y: Int, colour: Int) {
+    fun setLight(x: Int, y: Int, colour: Color) {
         if (y - for_y_start + overscan_open in 0..lightmap.lastIndex &&
             x - for_x_start + overscan_open in 0..lightmap[0].lastIndex) {
 
@@ -244,20 +243,20 @@ object LightmapRenderer {
         }
     }
 
-    private fun calculate(x: Int, y: Int, pass: Int): Int = calculate(x, y, pass, false)
+    private fun calculate(x: Int, y: Int, pass: Int): Color = calculate(x, y, pass, false)
 
-    private fun calculate(x: Int, y: Int, pass: Int, doNotCalculateAmbient: Boolean): Int {
+    private fun calculate(x: Int, y: Int, pass: Int, doNotCalculateAmbient: Boolean): Color {
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
 
-        var ambientAccumulator = 0
+        var ambientAccumulator = Color(0f,0f,0f,1f)
 
-        var lightLevelThis: Int = 0
+        var lightLevelThis: Color = Color(0f,0f,0f,1f)
         val thisTerrain = Terrarum.ingame!!.world.getTileFromTerrain(x, y)
         val thisWall = Terrarum.ingame!!.world.getTileFromWall(x, y)
-        val thisTileLuminosity = BlockCodex[thisTerrain].luminosity
-        val thisTileOpacity = BlockCodex[thisTerrain].opacity
-        val sunLight = Terrarum.ingame!!.world.globalLight
+        val thisTileLuminosity = BlockCodex[thisTerrain].luminosity.toColor()
+        val thisTileOpacity = BlockCodex[thisTerrain].opacity.toColor()
+        val sunLight = Terrarum.ingame!!.world.globalLight.toColor()
 
         // MIX TILE
         // open air
@@ -265,11 +264,11 @@ object LightmapRenderer {
             lightLevelThis = sunLight
         }
         // luminous tile on top of air
-        else if (thisWall == AIR && thisTileLuminosity > 0) {
+        else if (thisWall == AIR && thisTileLuminosity.nonZero()) {
             lightLevelThis = sunLight maxBlend thisTileLuminosity // maximise to not exceed 1.0 with normal (<= 1.0) light
         }
         // opaque wall and luminous tile
-        else if (thisWall != AIR && thisTileLuminosity > 0) {
+        else if (thisWall != AIR && thisTileLuminosity.nonZero()) {
             lightLevelThis = thisTileLuminosity
         }
         // END MIX TILE
@@ -277,7 +276,7 @@ object LightmapRenderer {
         for (i in 0..lanternMap.size - 1) {
             val lmap = lanternMap[i]
             if (lmap.posX == x && lmap.posY == y)
-                lightLevelThis = lightLevelThis maxBlend lmap.luminosity // maximise to not exceed 1.0 with normal (<= 1.0) light
+                lightLevelThis = lightLevelThis maxBlend lmap.luminosity.toColor() // maximise to not exceed 1.0 with normal (<= 1.0) light
         }
 
 
@@ -289,15 +288,15 @@ object LightmapRenderer {
              *  sample ambient for eight points and apply attenuation for those
              *  maxblend eight values and use it
              */
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y - 1) ?: 0, scaleSqrt2(thisTileOpacity))
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y - 1) ?: 0, scaleSqrt2(thisTileOpacity))
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y + 1) ?: 0, scaleSqrt2(thisTileOpacity))
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y + 1) ?: 0, scaleSqrt2(thisTileOpacity))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y - 1) ?: Color(0f,0f,0f,1f), scaleSqrt2(thisTileOpacity))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y - 1) ?: Color(0f,0f,0f,1f), scaleSqrt2(thisTileOpacity))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y + 1) ?: Color(0f,0f,0f,1f), scaleSqrt2(thisTileOpacity))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y + 1) ?: Color(0f,0f,0f,1f), scaleSqrt2(thisTileOpacity))
 
-            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x    , y - 1) ?: 0, thisTileOpacity)
-            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x    , y + 1) ?: 0, thisTileOpacity)
-            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y    ) ?: 0, thisTileOpacity)
-            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y    ) ?: 0, thisTileOpacity)
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x    , y - 1) ?: Color(0f,0f,0f,1f), thisTileOpacity)
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x    , y + 1) ?: Color(0f,0f,0f,1f), thisTileOpacity)
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x - 1, y    ) ?: Color(0f,0f,0f,1f), thisTileOpacity)
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLight(x + 1, y    ) ?: Color(0f,0f,0f,1f), thisTileOpacity)
 
             return lightLevelThis maxBlend ambientAccumulator
         }
@@ -306,15 +305,16 @@ object LightmapRenderer {
         }
     }
 
-    private fun getLightForOpaque(x: Int, y: Int): Int? { // ...so that they wouldn't appear too dark
+    private fun getLightForOpaque(x: Int, y: Int): Color? { // ...so that they wouldn't appear too dark
         val l = getLight(x, y)
         if (l == null) return null
 
         if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) {
-            return constructRGBFromFloat(
-                    (l.r() * 1.25f).clampOne(),
-                    (l.g() * 1.25f).clampOne(),
-                    (l.b() * 1.25f).clampOne()
+            return Color(
+                    (l.r * 1.25f),//.clampOne(),
+                    (l.g * 1.25f),//.clampOne(),
+                    (l.b * 1.25f),//.clampOne()
+                    1f
             )
         }
         else {
@@ -349,7 +349,7 @@ object LightmapRenderer {
                             if (x + sameLevelCounter >= this_x_end) break
                         }
 
-                        batch.color = (getLightForOpaque(x, y) ?: 0).normaliseToColourHDR()
+                        batch.color = (getLightForOpaque(x, y) ?: Color(0f,0f,0f,1f)).normaliseToColourHDR()
                         batch.fillRect(
                                 (x * DRAW_TILE_SIZE).round().toFloat(),
                                 (y * DRAW_TILE_SIZE).round().toFloat(),
@@ -385,16 +385,15 @@ object LightmapRenderer {
      * @param darken (0-255) per channel
      * @return darkened data (0-255) per channel
      */
-    fun darkenColoured(data: Int, darken: Int): RGB10 {
-        if (darken < 0 || darken >= COLOUR_RANGE_SIZE)
-            throw IllegalArgumentException("darken: out of range ($darken)")
-
+    fun darkenColoured(data: Color, darken: Color): Color {
         // use equation with magic number 8.0
         // should draw somewhat exponential curve when you plot the propagation of light in-game
 
-        return ((data.r() * (1f - darken.r() * lightScalingMagic)).clampZero() * CHANNEL_MAX).round().shl(20) or
-               ((data.g() * (1f - darken.g() * lightScalingMagic)).clampZero() * CHANNEL_MAX).round().shl(10) or
-               ((data.b() * (1f - darken.b() * lightScalingMagic)).clampZero() * CHANNEL_MAX).round()
+        return Color(
+                data.r * (1f - darken.r * lightScalingMagic),//.clampZero(),
+                data.g * (1f - darken.g * lightScalingMagic),//.clampZero(),
+                data.b * (1f - darken.b * lightScalingMagic),//.clampZero(),
+                1f)
     }
 
     fun scaleColour(data: Int, scale: Float): RGB10 {
@@ -403,10 +402,12 @@ object LightmapRenderer {
                ((data.b() * scale).clampOne() * CHANNEL_MAX).round()
     }
 
-    private fun scaleSqrt2(data: Int): RGB10 {
-        return scaleSqrt2Lookup[data.rawR()].shl(20) or
-               scaleSqrt2Lookup[data.rawG()].shl(10) or
-               scaleSqrt2Lookup[data.rawB()]
+    private fun scaleSqrt2(data: Color): Color {
+        return Color(
+                data.r * 1.41421356f,
+                data.g * 1.41421356f,
+                data.b * 1.41421356f,
+                1f)
     }
 
     private val scaleSqrt2Lookup = IntArray(MUL, { it -> minOf(MUL - 1, (it * 1.41421356).roundInt()) })
@@ -418,15 +419,13 @@ object LightmapRenderer {
      * @param brighten (0-255) per channel
      * @return brightened data (0-255) per channel
      */
-    fun brightenColoured(data: Int, brighten: Int): RGB10 {
-        if (brighten < 0 || brighten >= COLOUR_RANGE_SIZE)
-            throw IllegalArgumentException("brighten: out of range ($brighten)")
-
-        val r = data.r() * (1f + brighten.r() * lightScalingMagic)
-        val g = data.g() * (1f + brighten.g() * lightScalingMagic)
-        val b = data.b() * (1f + brighten.b() * lightScalingMagic)
-
-        return constructRGBFromFloat(r.clampChannel(), g.clampChannel(), b.clampChannel())
+    fun brightenColoured(data: Color, brighten: Color): Color {
+        return Color(
+                data.r * (1f + brighten.r * lightScalingMagic),
+                data.g * (1f + brighten.g * lightScalingMagic),
+                data.b * (1f + brighten.b * lightScalingMagic),
+                1f
+        )
     }
 
     /**
@@ -436,11 +435,11 @@ object LightmapRenderer {
      * @param darken (0-255)
      * @return
      */
-     fun darkenUniformInt(data: Int, darken: Int): RGB10 {
+     fun darkenUniformInt(data: Color, darken: Float): Color {
         if (darken < 0 || darken > CHANNEL_MAX)
             throw IllegalArgumentException("darken: out of range ($darken)")
 
-        val darkenColoured = constructRGBFromInt(darken, darken, darken)
+        val darkenColoured = Color(darken, darken, darken, 1f)
         return darkenColoured(data, darkenColoured)
      }
 
@@ -451,44 +450,13 @@ object LightmapRenderer {
      * @param brighten (-1.0 - 1.0) negative means darkening
      * @return processed colour
      */
-    fun alterBrightnessUniform(data: Int, brighten: Float): RGB10 {
-        val modifier = if (brighten < 0)
-            constructRGBFromFloat(-brighten, -brighten, -brighten)
-        else
-            constructRGBFromFloat(brighten, brighten, brighten)
-
-        return if (brighten < 0)
-            darkenColoured(data, modifier)
-        else
-            brightenColoured(data, modifier)
-    }
-
-    /**
-     * Deprecated: Fuck it, this vittupää just doesn't want to work
-     */
-    private infix fun RGB10.screenBlend(other: Int): RGB10 {
-        /*val r1 = this.r(); val r2 = other.r(); val newR = 1 - (1 - r1) * (1 - r2)
-        val g1 = this.g(); val g2 = other.g(); val newG = 1 - (1 - g1) * (1 - g2)
-        val b1 = this.b(); val b2 = other.b(); val newB = 1 - (1 - b1) * (1 - b2)*/
-
-        val r1 = this.r(); val r2 = other.r()
-        val g1 = this.g(); val g2 = other.g()
-        val b1 = this.b(); val b2 = other.b()
-
-        var screenR = 1f - (1f - r1).clampZero() * (1f - r2).clampZero()
-        var screenG = 1f - (1f - g1).clampZero() * (1f - g2).clampZero()
-        var screenB = 1f - (1f - b1).clampZero() * (1f - b2).clampZero()
-
-        // hax.
-        val addR = if (r1 > r2) r1 else r2
-        val addG = if (g1 > g2) g1 else g2
-        val addB = if (b1 > b2) b1 else b2
-
-        val newR = Math.min(screenR, addR)
-        val newG = Math.min(screenG, addG)
-        val newB = Math.min(screenB, addB)
-
-        return constructRGBFromFloat(newR, newG, newB)
+    fun alterBrightnessUniform(data: RGB10, brighten: Float): RGB10 {
+        return Color(
+                data.r() + brighten,
+                data.g() + brighten,
+                data.b() + brighten,
+                1f
+        ).toRGB10()
     }
 
     /** Get each channel from two RGB values, return new RGB that has max value of each channel
@@ -496,29 +464,14 @@ object LightmapRenderer {
      * @param rgb2
      * @return
      */
-    private infix fun RGB10.maxBlend(other: Int): RGB10 {
-        return (if (this.rawR() > other.rawR()) this.rawR() else other.rawR()).shl(20) or
-               (if (this.rawG() > other.rawG()) this.rawG() else other.rawG()).shl(10) or
-               (if (this.rawB() > other.rawB()) this.rawB() else other.rawB())
+    private infix fun Color.maxBlend(other: Color): Color {
+        return Color(
+                if (this.r > other.r) this.r else other.r,
+                if (this.g > other.g) this.g else other.g,
+                if (this.b > other.b) this.b else other.b,
+                1f)
     }
 
-    private infix fun RGB10.linMix(other: Int): RGB10 {
-        return ((this.rawR() + other.rawR()) ushr 1).shl(20) or
-               ((this.rawG() + other.rawG()) ushr 1).shl(10) or
-               ((this.rawB() + other.rawB()) ushr 1)
-    }
-
-    private infix fun RGB10.colSub(other: Int): RGB10 {
-        return ((this.rawR() - other.rawR()).clampChannel()).shl(20) or
-               ((this.rawG() - other.rawG()).clampChannel()).shl(10) or
-               ((this.rawB() - other.rawB()).clampChannel())
-    }
-
-    private infix fun RGB10.colAdd(other: Int): RGB10 {
-        return ((this.rawR() + other.rawR()).clampChannel()).shl(20) or
-               ((this.rawG() + other.rawG()).clampChannel()).shl(10) or
-               ((this.rawB() + other.rawB()).clampChannel())
-    }
 
     inline fun RGB10.rawR() = this.ushr(20) and 1023
     inline fun RGB10.rawG() = this.ushr(10) and 1023
@@ -529,26 +482,6 @@ object LightmapRenderer {
     inline fun RGB10.g(): Float = this.rawG() / CHANNEL_MAX_FLOAT
     inline fun RGB10.b(): Float = this.rawB() / CHANNEL_MAX_FLOAT
 
-    /**
-
-     * @param RGB
-     * @param offset 2 = R, 1 = G, 0 = B
-     * @return
-     */
-    fun getRaw(RGB: RGB10, offset: Int): RGB10 {
-        if      (offset == OFFSET_R) return RGB.rawR()
-        else if (offset == OFFSET_G) return RGB.rawG()
-        else if (offset == OFFSET_B) return RGB.rawB()
-        else throw IllegalArgumentException("Channel offset out of range")
-    }
-
-    private fun addRaw(rgb1: RGB10, rgb2: RGB10): RGB10 {
-        val newR = (rgb1.rawR() + rgb2.rawR()).clampChannel()
-        val newG = (rgb1.rawG() + rgb2.rawG()).clampChannel()
-        val newB = (rgb1.rawB() + rgb2.rawB()).clampChannel()
-
-        return constructRGBFromInt(newR, newG, newB)
-    }
 
     inline fun constructRGBFromInt(r: Int, g: Int, b: Int): RGB10 {
         //if (r !in 0..CHANNEL_MAX) throw IllegalArgumentException("Red: out of range ($r)")
@@ -560,7 +493,7 @@ object LightmapRenderer {
                b
     }
 
-    inline fun constructRGBFromFloat(r: Float, g: Float, b: Float): RGB10 {
+    /*inline fun constructRGBFromFloat(r: Float, g: Float, b: Float): RGB10 {
         //if (r < 0 || r > CHANNEL_MAX_DECIMAL) throw IllegalArgumentException("Red: out of range ($r)")
         //if (g < 0 || g > CHANNEL_MAX_DECIMAL) throw IllegalArgumentException("Green: out of range ($g)")
         //if (b < 0 || b > CHANNEL_MAX_DECIMAL) throw IllegalArgumentException("Blue: out of range ($b)")
@@ -568,7 +501,7 @@ object LightmapRenderer {
         return (r * CHANNEL_MAX).round().shl(20) or
                (g * CHANNEL_MAX).round().shl(10) or
                (b * CHANNEL_MAX).round()
-    }
+    }*/
 
     fun Int.clampZero() = if (this < 0) 0 else this
     fun Float.clampZero() = if (this < 0) 0f else this
@@ -576,19 +509,19 @@ object LightmapRenderer {
     fun Float.clampOne() = if (this < 0) 0f else if (this > 1) 1f else this
     fun Float.clampChannel() = if (this > CHANNEL_MAX_DECIMAL) CHANNEL_MAX_DECIMAL else this
 
-    inline fun getValueFromMap(x: Int, y: Int): Int? = getLight(x, y)
-    fun getHighestRGB(x: Int, y: Int): Int? {
+    inline fun getValueFromMap(x: Int, y: Int): Color? = getLight(x, y)
+    fun getHighestRGB(x: Int, y: Int): Float? {
         val value = getLight(x, y)
         if (value == null)
             return null
         else
-            return FastMath.max(value.rawR(), value.rawG(), value.rawB())
+            return FastMath.max(value.r, value.g, value.b)
     }
 
     private fun purgeLightmap() {
         for (y in 0..LIGHTMAP_HEIGHT - 1) {
             for (x in 0..LIGHTMAP_WIDTH - 1) {
-                lightmap[y][x] = 0
+                lightmap[y][x] = Color(0f,0f,0f,1f)
             }
         }
     }
@@ -604,16 +537,32 @@ object LightmapRenderer {
     inline fun Float.ceil() = FastMath.ceil(this)
     inline fun Int.even(): Boolean = this and 1 == 0
     inline fun Int.odd(): Boolean = this and 1 == 1
-    inline fun Int.normaliseToColour(): Color = Color(
+    /*inline fun Int.normaliseToColour(): Color = Color(
             Math.min(this.r(), 1f),
             Math.min(this.g(), 1f),
             Math.min(this.b(), 1f),
             1f
-    )
+    )*/
 
     // TODO: float LUT lookup using linear interpolation
 
-    val RGB_HDR_LUT = floatArrayOf( // polynomial of 6.0   please refer to work_files/HDRcurveBezierLinIntp.kts
+    // input: 0..1 for int 0..1023
+    fun hdr(intensity: Float): Float {
+        val intervalStart = (intensity * MUL).floorInt()
+        val intervalEnd = minOf(rgbHDRLookupTable.lastIndex, (intensity * MUL).floorInt() + 1)
+
+        if (intervalStart == intervalEnd) return rgbHDRLookupTable[intervalStart]
+
+        val intervalPos = (intensity * MUL) - (intensity * MUL).toInt()
+
+        return interpolateLinear(
+                intervalPos,
+                rgbHDRLookupTable[intervalStart],
+                rgbHDRLookupTable[intervalEnd]
+        )
+    }
+
+    val rgbHDRLookupTable = floatArrayOf( // polynomial of 6.0   please refer to work_files/HDRcurveBezierLinIntp.kts
             0.0000f,0.0000f,0.0020f,0.0060f,0.0100f,0.0139f,0.0179f,0.0219f,0.0259f,0.0299f,0.0338f,0.0378f,0.0418f,0.0458f,0.0497f,0.0537f,
             0.0577f,0.0617f,0.0656f,0.0696f,0.0736f,0.0776f,0.0816f,0.0855f,0.0895f,0.0935f,0.0975f,0.1014f,0.1054f,0.1094f,0.1134f,0.1173f,
             0.1213f,0.1253f,0.1293f,0.1332f,0.1372f,0.1412f,0.1451f,0.1491f,0.1531f,0.1571f,0.1610f,0.1650f,0.1690f,0.1730f,0.1769f,0.1809f,
@@ -680,14 +629,16 @@ object LightmapRenderer {
             1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f  // isn't it beautiful?
     )
     /** To eliminated visible edge on the gradient when 255/1023 is exceeded */
-    inline fun Int.normaliseToColourHDR() = Color(
-            RGB_HDR_LUT[this.rawR()],
-            RGB_HDR_LUT[this.rawG()],
-            RGB_HDR_LUT[this.rawB()],
+    inline fun Color.normaliseToColourHDR() = Color(
+            hdr(this.r),
+            hdr(this.g),
+            hdr(this.b),
             1f
     )
 
     data class Lantern(val posX: Int, val posY: Int, val luminosity: Int)
+
+    private fun Color.nonZero() = this.r != 0f || this.g != 0f || this.b != 0f
 
     val histogram: Histogram
         get() {
@@ -699,9 +650,9 @@ object LightmapRenderer {
             // excluiding overscans; only reckon echo lights
             for (y in overscan_open..render_height + overscan_open + 1) {
                 for (x in overscan_open..render_width + overscan_open + 1) {
-                    reds[lightmap[y][x].rawR()] += 1
-                    greens[lightmap[y][x].rawG()] += 1
-                    blues[lightmap[y][x].rawB()] += 1
+                    reds[lightmap[y][x].r.times(MUL).floorInt()] += 1
+                    greens[lightmap[y][x].g.times(MUL).floorInt()] += 1
+                    blues[lightmap[y][x].b.times(MUL).floorInt()] += 1
                 }
             }
             return Histogram(reds, greens, blues)
@@ -749,4 +700,22 @@ object LightmapRenderer {
             }
         }
     }
+
+    fun interpolateLinear(scale: Float, startValue: Float, endValue: Float): Float {
+        if (startValue == endValue) {
+            return startValue
+        }
+        if (scale <= 0f) {
+            return startValue
+        }
+        if (scale >= 1f) {
+            return endValue
+        }
+        return (1f - scale) * startValue + scale * endValue
+    }
+}
+
+
+fun RGB10.toColor(): Color {
+    return Color(this.r(), this.g(), this.b(), 1f)
 }
