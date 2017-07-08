@@ -49,8 +49,9 @@ object PlayerBuilderSigrid {
 
         p.actorValue[AVKey.INTELLIGENT] = true
 
-        //p.actorValue[AVKey.LUMINOSITY] = Color(0x434aff).to10bit()
-        //p.actorValue[AVKey.LUMINOSITY] = 214127943 // bright purple
+        //p.actorValue[AVKey.LUMR] = 0.84f
+        //p.actorValue[AVKey.LUMR] = 0.93f
+        //p.actorValue[AVKey.LUMR] = 1.37f
 
         p.actorValue[AVKey.BASEDEFENCE] = 141
 

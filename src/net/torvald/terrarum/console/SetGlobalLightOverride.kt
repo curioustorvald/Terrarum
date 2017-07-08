@@ -1,5 +1,6 @@
 package net.torvald.terrarum.console
 
+import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.Terrarum
 
@@ -14,10 +15,10 @@ internal object SetGlobalLightOverride : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 4) {
             try {
-                val r = args[1].toInt()
-                val g = args[2].toInt()
-                val b = args[3].toInt()
-                val GL = LightmapRenderer.constructRGBFromInt(r, g, b)
+                val r = args[1].toFloat()
+                val g = args[2].toFloat()
+                val b = args[3].toFloat()
+                val GL = Color(r, g, b, 1f)
 
                 lightOverride = true
                 Terrarum.ingame!!.world.globalLight = GL
@@ -27,25 +28,6 @@ internal object SetGlobalLightOverride : ConsoleCommand {
             }
             catch (e1: IllegalArgumentException) {
                 Echo("Range: 0-" + LightmapRenderer.CHANNEL_MAX + " per channel")
-            }
-
-        }
-        else if (args.size == 2) {
-            try {
-                val GL = args[1].toInt()
-
-                if (GL.toInt() < 0 || GL.toInt() >= LightmapRenderer.COLOUR_RANGE_SIZE) {
-                    Echo("Range: 0-" + (LightmapRenderer.COLOUR_RANGE_SIZE - 1))
-                }
-                else {
-                    Terrarum.ingame!!.world.globalLight = GL
-                }
-            }
-            catch (e: NumberFormatException) {
-                if (args[1].toLowerCase() == "none")
-                    lightOverride = false
-                else
-                    Echo("Wrong number input.")
             }
 
         }

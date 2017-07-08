@@ -107,7 +107,7 @@ class BasicDebugInfoWindow : UICanvas {
         val lightVal: String
         val mtX = mouseTileX.toString()
         val mtY = mouseTileY.toString()
-        val valRaw = LightmapRenderer.getValueFromMap(mouseTileX, mouseTileY)
+        val valRaw = LightmapRenderer.getLight(mouseTileX, mouseTileY)
         val rawR = valRaw?.r?.times(100f)?.round()?.div(100f)
         val rawG = valRaw?.g?.times(100f)?.round()?.div(100f)
         val rawB = valRaw?.b?.times(100f)?.round()?.div(100f)

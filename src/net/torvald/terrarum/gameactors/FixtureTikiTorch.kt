@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameactors
 
+import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -11,11 +12,12 @@ import java.util.*
  */
 internal class FixtureTikiTorch : FixtureBase(), Luminous {
 
-    override var luminosity: Int
+    override var luminosity: Color
         get() = BlockCodex[Block.TORCH].luminosity
         set(value) {
             throw UnsupportedOperationException()
         }
+
     override val lightBoxList: ArrayList<Hitbox>
 
     init {

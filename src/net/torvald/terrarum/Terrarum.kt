@@ -20,7 +20,6 @@ import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.JsonWriter
-import net.torvald.terrarum.worlddrawer.RGB10
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.lwjgl.input.Controllers
@@ -562,12 +561,12 @@ infix fun Color.mul(other: Color): Color = this.cpy().mul(other)
 
 
 
-inline fun Color.toRGB10(): RGB10 {
+/*inline fun Color.toRGB10(): RGB10 {
     val bits = this.toIntBits() // ABGR
     // 0bxxRRRRRRRRRRGGGGGGGGGGBBBBBBBBBB
     // 0bAAAAAAAABBBBBBBBGGGGGGGGRRRRRRRR
     return bits.and(0x0000FF).shl(20) or bits.and(0x00FF00).shl(2) or bits.and(0xFF0000).ushr(16)
-}
+}*/
 
 
 
