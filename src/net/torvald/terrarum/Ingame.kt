@@ -136,6 +136,11 @@ class Ingame(val batch: SpriteBatch) : Screen {
         private set
 
 
+
+    private lateinit var ingameUpdateThread: ThreadIngameUpdate
+    private lateinit var updateThreadWrapper: Thread
+    //private val ingameDrawThread: ThreadIngameDraw // draw must be on the main thread
+
     //////////////
     // GDX code //
     //////////////
@@ -313,16 +318,31 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
 
+        ingameUpdateThread = ThreadIngameUpdate(this)
+        updateThreadWrapper = Thread(ingameUpdateThread, "Terrarum UpdateThread")
+
+
         LightmapRenderer.fireRecalculateEvent()
     }// END enter
 
 
-    private var updateDeltaCounter = 0.0
-    private val updateRate = 1.0 / Terrarum.TARGET_INTERNAL_FPS
+    protected var updateDeltaCounter = 0.0
+    protected val updateRate = 1.0 / Terrarum.TARGET_INTERNAL_FPS
+
+    private var firstTimeRun = true
 
     ///////////////
     // prod code //
     ///////////////
+    private class ThreadIngameUpdate(val ingame: Ingame): Runnable {
+        override fun run() {
+            while (ingame.updateDeltaCounter >= ingame.updateRate) {
+                ingame.updateGame(Gdx.graphics.deltaTime)
+                ingame.updateDeltaCounter -= ingame.updateRate
+            }
+        }
+    }
+
     override fun render(delta: Float) {
         Gdx.graphics.setTitle(GAME_NAME +
                               " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
@@ -335,9 +355,22 @@ class Ingame(val batch: SpriteBatch) : Screen {
         /** UPDATE CODE GOES HERE */
         updateDeltaCounter += delta
 
-        while (updateDeltaCounter >= updateRate) {
-            updateGame(delta)
-            updateDeltaCounter -= updateRate
+
+
+        if (false && Terrarum.getConfigBoolean("multithread")) { // NO MULTITHREADING: camera don't like concurrent modification (jittery actor movements)
+            if (firstTimeRun || updateThreadWrapper.state == Thread.State.TERMINATED) {
+                updateThreadWrapper = Thread(ingameUpdateThread, "Terrarum UpdateThread")
+                updateThreadWrapper.start()
+
+                if (firstTimeRun) firstTimeRun = false
+            }
+            // else, NOP;
+        }
+        else {
+            while (updateDeltaCounter >= updateRate) {
+                updateGame(delta)
+                updateDeltaCounter -= updateRate
+            }
         }
 
 
@@ -346,7 +379,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
         renderGame(batch)
     }
 
-    private fun updateGame(delta: Float) {
+    protected fun updateGame(delta: Float) {
         particlesActive = 0
 
 
