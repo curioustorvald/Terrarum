@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.colourutil.CIELabUtil.darkerLab
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.ui.UIInventory
 import net.torvald.terrarum.ui.UIItem
@@ -92,7 +91,7 @@ class UIItemInventoryElem(
             // if mouse is over, text lights up
             // this one-liner sets color
             batch.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
-            TerrarumGDX.fontGame.draw(batch,
+            Terrarum.fontGame.draw(batch,
                     //"$item" + (if (amount > 0 && item!!.stackable) "$fwsp($amount)" else if (amount != 1) "$fwsp!!$amount!!" else "") +
                     item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amount)" else if (amount != 1) "$fwsp!!$amount!!" else "") +
                     (if (equippedSlot != null) "  ${0xE081.toChar()}\$$equippedSlot" else ""),
@@ -117,8 +116,8 @@ class UIItemInventoryElem(
 
             if (quickslot != null) {
                 val label = quickslot!!.plus(0xE010).toChar()
-                val labelW = TerrarumGDX.fontGame.getWidth("$label")
-                TerrarumGDX.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW, posY + textOffsetY)
+                val labelW = Terrarum.fontGame.getWidth("$label")
+                Terrarum.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW, posY + textOffsetY)
             }
 
         }
@@ -129,8 +128,8 @@ class UIItemInventoryElem(
     }
 
     override fun keyDown(keycode: Int): Boolean {
-        if (item != null && TerrarumGDX.ingame != null && keycode in Input.Keys.NUM_1..Input.Keys.NUM_0) {
-            val inventory = TerrarumGDX.ingame!!.player?.inventory
+        if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_1..Input.Keys.NUM_0) {
+            val inventory = Terrarum.ingame!!.player?.inventory
             val slot = if (keycode == Input.Keys.NUM_0) 9 else keycode - Input.Keys.NUM_1
             val currentSlotItem = inventory?.getQuickBar(slot)
 
@@ -169,11 +168,11 @@ class UIItemInventoryElem(
 
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (item != null && TerrarumGDX.ingame != null) {
+        if (item != null && Terrarum.ingame != null) {
 
             // equip da shit
             val itemEquipSlot = item!!.equipPosition
-            val player = TerrarumGDX.ingame!!.player
+            val player = Terrarum.ingame!!.player
 
             if (item != player?.inventory?.itemEquipped?.get(itemEquipSlot)) { // if this item is unequipped, equip it
                 player?.equipItem(item!!)

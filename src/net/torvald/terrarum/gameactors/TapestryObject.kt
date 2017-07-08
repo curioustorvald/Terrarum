@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -21,7 +21,7 @@ class TapestryObject(pixmap: Pixmap, val artName: String, val artAuthor: String)
 
         makeNewSprite(texturePack)
         setHitboxDimension(texture.width, texture.height, 0, 0)
-        setPosition(TerrarumGDX.mouseX, TerrarumGDX.mouseY)
+        setPosition(Terrarum.mouseX, Terrarum.mouseY)
         // you CAN'T destroy the image
     }
 

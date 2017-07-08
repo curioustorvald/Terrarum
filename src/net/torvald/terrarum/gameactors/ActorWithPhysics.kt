@@ -44,7 +44,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     var drawMode = BlendMode.NORMAL
 
-    @Transient private val world: GameWorld = TerrarumGDX.ingame!!.world
+    @Transient private val world: GameWorld = Terrarum.ingame!!.world
 
     var hitboxTranslateX: Int = 0// relative to spritePosX
         protected set
@@ -492,7 +492,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
              * weight; gravitational force in action
              * W = mass * G (9.8 [m/s^2])
              */
-            val W: Vector2 = gravitation * TerrarumGDX.TARGET_FPS.toDouble()
+            val W: Vector2 = gravitation * Terrarum.TARGET_FPS.toDouble()
             /**
              * Area
              */
@@ -503,7 +503,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
              */
             val D: Vector2 = Vector2(externalForce.x.magnSqr(), externalForce.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
 
-            val V: Vector2 = (W - D) / TerrarumGDX.TARGET_FPS.toDouble() * SI_TO_GAME_ACC
+            val V: Vector2 = (W - D) / Terrarum.TARGET_FPS.toDouble() * SI_TO_GAME_ACC
 
             applyForce(V)
             //}
@@ -767,7 +767,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             // slam-into-whatever damage (such dirty; much hack; wow)
             //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
-            val collisionDamage = mass * (vectorSum.magnitude / (10.0 / TerrarumGDX.TARGET_FPS).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
+            val collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.TARGET_FPS).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
             // kg * m / s^2 (mass * acceleration), acceleration -> (vectorMagn / (0.01)^2).gameToSI()
             if (collisionDamage != 0.0) debug1("Collision damage: $collisionDamage N")
             // FIXME instead of 0.5mv^2, we can model after "change of velocity (aka accel)", just as in real-life; big change of accel on given unit time is what kills
@@ -1358,16 +1358,16 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         /**
          * [m / s^2] * SI_TO_GAME_ACC -> [px / InternalFrame^2]
          */
-        @Transient val SI_TO_GAME_ACC = METER / (TerrarumGDX.TARGET_FPS * TerrarumGDX.TARGET_FPS)
+        @Transient val SI_TO_GAME_ACC = METER / (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS)
         /**
          * [m / s] * SI_TO_GAME_VEL -> [px / InternalFrame]
          */
-        @Transient val SI_TO_GAME_VEL = METER / TerrarumGDX.TARGET_FPS
+        @Transient val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
 
         /**
          * [px / InternalFrame^2] * GAME_TO_SI_ACC -> [m / s^2]
          */
-        @Transient val GAME_TO_SI_ACC = (TerrarumGDX.TARGET_FPS * TerrarumGDX.TARGET_FPS) / METER
+        @Transient val GAME_TO_SI_ACC = (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS) / METER
 
 
         /**
@@ -1388,8 +1388,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
                 return 0
-            else if (x >= TerrarumGDX.ingame!!.world.width shl 4)
-                return TerrarumGDX.ingame!!.world.width - 1
+            else if (x >= Terrarum.ingame!!.world.width shl 4)
+                return Terrarum.ingame!!.world.width - 1
             else
                 return x and 0x7FFFFFFF shr 4
         }
@@ -1397,8 +1397,8 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         private fun div16TruncateToMapHeight(y: Int): Int {
             if (y < 0)
                 return 0
-            else if (y >= TerrarumGDX.ingame!!.world.height shl 4)
-                return TerrarumGDX.ingame!!.world.height - 1
+            else if (y >= Terrarum.ingame!!.world.height shl 4)
+                return Terrarum.ingame!!.world.height - 1
             else
                 return y and 0x7FFFFFFF shr 4
         }

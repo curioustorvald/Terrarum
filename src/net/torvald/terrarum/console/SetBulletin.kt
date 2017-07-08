@@ -1,8 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.TerrarumGDX
-import net.torvald.terrarum.ui.Notification
+import net.torvald.terrarum.Terrarum
 
 /**
  * Created by minjaesong on 16-01-23.
@@ -25,7 +24,7 @@ internal object SetBulletin : ConsoleCommand {
      * @param message real message
      */
     fun send(message: Array<String>) {
-        TerrarumGDX.ingame!!.sendNotification(message)
+        Terrarum.ingame!!.sendNotification(message)
         println("sent notifinator")
     }
 }

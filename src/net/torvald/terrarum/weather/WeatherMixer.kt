@@ -1,11 +1,9 @@
 package net.torvald.terrarum.weather
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
@@ -35,7 +33,7 @@ object WeatherMixer {
     lateinit var mixedWeather: BaseModularWeather
 
     val globalLightNow = Color(0)
-    private val world = TerrarumGDX.ingame!!.world
+    private val world = Terrarum.ingame!!.world
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
@@ -76,17 +74,17 @@ object WeatherMixer {
         currentWeather = weatherList[WEATHER_GENERIC]!![0]
 
 
-        if (TerrarumGDX.ingame!!.player != null) {
+        if (Terrarum.ingame!!.player != null) {
             // test rain toggled by F2
             if (KeyToggler.isOn(Input.Keys.F2)) {
-                val playerPos = TerrarumGDX.ingame!!.player!!.centrePosPoint
+                val playerPos = Terrarum.ingame!!.player!!.centrePosPoint
                 kotlin.repeat(4) {
                     // 4 seems good
                     val rainParticle = ParticleTestRain(
-                            playerPos.x + HQRNG().nextInt(TerrarumGDX.WIDTH) - TerrarumGDX.HALFW,
-                            playerPos.y - TerrarumGDX.HALFH
+                            playerPos.x + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
+                            playerPos.y - Terrarum.HALFH
                     )
-                    TerrarumGDX.ingame!!.addParticle(rainParticle)
+                    Terrarum.ingame!!.addParticle(rainParticle)
                 }
                 globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 1f))
             }
@@ -106,7 +104,7 @@ object WeatherMixer {
     fun render(batch: SpriteBatch) {
 
         // we will not care for nextSkybox for now
-        val timeNow = TerrarumGDX.ingame!!.world.time.todaySeconds
+        val timeNow = Terrarum.ingame!!.world.time.todaySeconds
         val skyboxColourMap = currentWeather.skyboxGradColourMap
         val lightColourMap = currentWeather.globalLightColourMap
 
@@ -118,11 +116,11 @@ object WeatherMixer {
 
         // draw skybox to provided graphics instance
         batch.end()
-        TerrarumGDX.inShapeRenderer {
+        Terrarum.inShapeRenderer {
             it.rect(
                     0f, 0f,
-                    TerrarumGDX.WIDTH.toFloat(),
-                    TerrarumGDX.HEIGHT.toFloat(),
+                    Terrarum.WIDTH.toFloat(),
+                    Terrarum.HEIGHT.toFloat(),
                     getGradientColour(skyboxColourMap, 1, timeNow),
                     getGradientColour(skyboxColourMap, 1, timeNow),
                     getGradientColour(skyboxColourMap, 0, timeNow),

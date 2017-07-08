@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ui.ConsoleWindow
 
 /**
@@ -13,7 +13,7 @@ internal object EchoError : ConsoleCommand {
     }
 
     fun execute(single_line: String) {
-        (TerrarumGDX.ingame!!.consoleHandler.UI as ConsoleWindow).sendMessage(single_line)
+        (Terrarum.ingame!!.consoleHandler.UI as ConsoleWindow).sendMessage(single_line)
     }
 
     operator fun invoke(args: Array<String>) = execute(args)

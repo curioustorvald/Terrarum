@@ -39,7 +39,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas {
     private val lcdLitCol = Color(0x141414_ff)
 
     private val worldTime: WorldTime
-        get() = TerrarumGDX.ingame!!.world.time
+        get() = Terrarum.ingame!!.world.time
 
 
     override fun update(delta: Float) {
@@ -47,7 +47,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas {
             ELuptimer += delta
         }
 
-        if (mouseUp || Gdx.input.isKeyPressed(TerrarumGDX.getConfigInt("keyinteract"))) {
+        if (mouseUp || Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyinteract"))) {
             ELuptimer = 0f
             ELon = true
         }
@@ -69,11 +69,11 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas {
             if (player != null) {
                 val playerPos = player.tilewiseHitbox
                 lightLevel = (LightmapRenderer.getLight(playerPos.centeredX.toInt(), playerPos.centeredY.toInt()) ?:
-                              TerrarumGDX.ingame!!.world.globalLight
+                              Terrarum.ingame!!.world.globalLight
                              ).normaliseToColour()
             }
             else {
-                lightLevel = TerrarumGDX.ingame!!.world.globalLight.normaliseToColour()
+                lightLevel = Terrarum.ingame!!.world.globalLight.normaliseToColour()
             }
 
             // backplate

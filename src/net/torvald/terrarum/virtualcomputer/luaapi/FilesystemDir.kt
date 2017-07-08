@@ -4,8 +4,7 @@ import org.luaj.vm2.*
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
-import net.torvald.terrarum.TerrarumGDX
-import net.torvald.terrarum.toHex
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import net.torvald.terrarum.virtualcomputer.luaapi.Term.Companion.checkIBM437
 import java.io.*
@@ -63,8 +62,8 @@ internal class FilesystemDir(globals: Globals, computer: TerrarumComputer) {
         init {
             try {
                 val uuid = UUID.randomUUID().toString()
-                val lowerCase = File(TerrarumGDX.currentSaveDir, uuid + "oc_rox")
-                val upperCase = File(TerrarumGDX.currentSaveDir, uuid + "OC_ROX")
+                val lowerCase = File(Terrarum.currentSaveDir, uuid + "oc_rox")
+                val upperCase = File(Terrarum.currentSaveDir, uuid + "OC_ROX")
                 // This should NEVER happen but could also lead to VERY weird bugs, so we
                 // make sure the files don't exist.
                 if (lowerCase.exists()) lowerCase.delete()
@@ -105,7 +104,7 @@ internal class FilesystemDir(globals: Globals, computer: TerrarumComputer) {
          */
         fun TerrarumComputer.getRealPath(luapath: LuaValue) : String {
             // direct mounted paths to real path
-            val computerDir = TerrarumGDX.currentSaveDir.absolutePath + "/computers/"
+            val computerDir = Terrarum.currentSaveDir.absolutePath + "/computers/"
             /* if not begins with "(/?)media/", direct to boot
              * else, to corresponding drives
              * 

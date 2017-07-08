@@ -17,6 +17,7 @@ object PlayerBuilderSigrid {
         val p = Player(GameDate(-2147483648, 0)) // XD
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
+        p.historicalFigureIdentifier = 0x51621D // the only constant of this procedural universe
 
 
         p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/test_player.tga"), 28, 51))

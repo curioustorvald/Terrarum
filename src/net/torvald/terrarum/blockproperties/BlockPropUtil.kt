@@ -3,7 +3,7 @@ package net.torvald.terrarum.blockproperties
 import com.badlogic.gdx.Gdx
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
@@ -95,7 +95,7 @@ object BlockPropUtil {
     fun getDynamicLumFunc(baseLum: Int, type: Int): Int {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
-            2    -> TerrarumGDX.ingame!!.world.globalLight // current global light
+            2    -> Terrarum.ingame!!.world.globalLight // current global light
             3    -> WeatherMixer.getGlobalLightOfTime(WorldTime.DAY_LENGTH / 2).toRGB10() // daylight at noon
             4    -> getSlowBreath(baseLum)
             5    -> getPulsate(baseLum)

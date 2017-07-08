@@ -2,7 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 
 
 /**
@@ -17,16 +17,16 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     abstract val height: Int
 
     protected val relativeMouseX: Int
-        get() = (TerrarumGDX.mouseScreenX - (parentUI.handler?.posX ?: 0) - this.posX)
+        get() = (Terrarum.mouseScreenX - (parentUI.handler?.posX ?: 0) - this.posX)
     protected val relativeMouseY: Int
-        get() = (TerrarumGDX.mouseScreenY - (parentUI.handler?.posY ?: 0) - this.posY)
+        get() = (Terrarum.mouseScreenY - (parentUI.handler?.posY ?: 0) - this.posY)
 
     /** If mouse is hovering over it */
     open val mouseUp: Boolean
         get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
     /** If mouse is hovering over it and mouse is down */
     open val mousePushed: Boolean
-        get() = mouseUp && Gdx.input.isButtonPressed(TerrarumGDX.getConfigInt("mouseprimary")!!)
+        get() = mouseUp && Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary")!!)
 
     abstract fun update(delta: Float)
     abstract fun render(batch: SpriteBatch)

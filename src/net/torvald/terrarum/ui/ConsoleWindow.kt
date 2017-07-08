@@ -1,12 +1,11 @@
 package net.torvald.terrarum.ui
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.dataclass.HistoryArray
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandInterpreter
 import net.torvald.terrarum.fillRect
@@ -32,7 +31,7 @@ class ConsoleWindow : UICanvas, KeyControlled {
     private val LINE_HEIGHT = 20
     private val MESSAGES_DISPLAY_COUNT = 11
 
-    override var width: Int = TerrarumGDX.WIDTH
+    override var width: Int = Terrarum.WIDTH
     override var height: Int = LINE_HEIGHT * (MESSAGES_DISPLAY_COUNT + 1)
 
     override var openCloseTime = 0f
@@ -59,12 +58,12 @@ class ConsoleWindow : UICanvas, KeyControlled {
         batch.fillRect(drawOffX, drawOffY, width.toFloat(), LINE_HEIGHT.toFloat())
 
         val input = commandInputPool!!.toString()
-        val inputDrawWidth = TerrarumGDX.fontGame.getWidth(input)
-        val inputDrawHeight = TerrarumGDX.fontGame.lineHeight
+        val inputDrawWidth = Terrarum.fontGame.getWidth(input)
+        val inputDrawHeight = Terrarum.fontGame.lineHeight
 
         // text and cursor
         batch.color = Color.WHITE
-        TerrarumGDX.fontGame.draw(batch, input, 1f + drawOffX, drawOffY)
+        Terrarum.fontGame.draw(batch, input, 1f + drawOffX, drawOffY)
 
         batch.color = Color(0x7f7f7f_ff)
         batch.fillRect(inputDrawWidth.toFloat() + drawOffX + 1, drawOffY, 2f, inputDrawHeight)
@@ -75,7 +74,7 @@ class ConsoleWindow : UICanvas, KeyControlled {
         // messages
         for (i in 0..MESSAGES_DISPLAY_COUNT - 1) {
             val message = messages[messageDisplayPos + i]
-            TerrarumGDX.fontGame.draw(batch, message, 1f + drawOffX, (LINE_HEIGHT * (i + 1)).toFloat() + drawOffY)
+            Terrarum.fontGame.draw(batch, message, 1f + drawOffX, (LINE_HEIGHT * (i + 1)).toFloat() + drawOffY)
         }
     }
 
@@ -182,7 +181,7 @@ class ConsoleWindow : UICanvas, KeyControlled {
         commandInputPool = StringBuilder()
 
         if (Authenticator.b()) {
-            sendMessage("${TerrarumGDX.NAME} ${TerrarumGDX.VERSION_STRING}")
+            sendMessage("${Terrarum.NAME} ${Terrarum.VERSION_STRING}")
             sendMessage(Lang["DEV_MESSAGE_CONSOLE_CODEX"])
         }
     }

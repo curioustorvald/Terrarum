@@ -1,7 +1,6 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.TerrarumGDX
 
 /**
  * Created by minjaesong on 16-01-22.

@@ -30,7 +30,7 @@ class UIItemTextButton(
 ) : UIItem(parentUI) {
 
     companion object {
-        val font = TerrarumGDX.fontGame
+        val font = Terrarum.fontGame
         val height = font.lineHeight.toInt() * 2
         val defaultInactiveCol: Color = Color(0xc8c8c8_ff.toInt())
     }

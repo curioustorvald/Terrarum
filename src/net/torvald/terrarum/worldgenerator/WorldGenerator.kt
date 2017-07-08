@@ -6,7 +6,7 @@ import net.torvald.terrarum.blockproperties.Block
 import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.roundInt
 import java.util.*
@@ -748,14 +748,14 @@ object WorldGenerator {
     }
 
     private fun processNoiseLayers(noiseRecords: Array<TaggedJoise>) {
-        if (TerrarumGDX.MULTITHREAD) {
+        if (Terrarum.MULTITHREAD) {
             // set up indices
-            for (i in 0..TerrarumGDX.THREADS - 1) {
+            for (i in 0..Terrarum.THREADS - 1) {
                 ThreadParallel.map(
                         i,
                         ThreadProcessNoiseLayers(
-                                HEIGHT.toFloat().div(TerrarumGDX.THREADS).times(i).roundInt(),
-                                HEIGHT.toFloat().div(TerrarumGDX.THREADS).times(i.plus(1)).roundInt() - 1,
+                                HEIGHT.toFloat().div(Terrarum.THREADS).times(i).roundInt(),
+                                HEIGHT.toFloat().div(Terrarum.THREADS).times(i.plus(1)).roundInt() - 1,
                                 noiseRecords
                         ),
                         "SampleJoiseMap"

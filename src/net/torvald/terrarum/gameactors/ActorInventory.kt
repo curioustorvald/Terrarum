@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.Gdx
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -59,8 +59,8 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
         if (item.originalID == Player.PLAYER_REF_ID || item.originalID == 0x51621D) // do not delete this magic
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
-        if (TerrarumGDX.ingame != null &&
-            (item.originalID == TerrarumGDX.ingame?.player?.referenceID))
+        if (Terrarum.ingame != null &&
+            (item.originalID == Terrarum.ingame?.player?.referenceID))
             throw IllegalArgumentException("Attempted to put active player into the inventory.")
         if ((!item.stackable || item.dynamicID in ITEM_DYNAMIC) && count > 1)
             throw IllegalArgumentException("Attempting to adding stack of item but the item is not stackable; item: $item, count: $count")

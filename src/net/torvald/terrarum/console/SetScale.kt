@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 
 /**
@@ -10,10 +10,10 @@ internal object SetScale : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2 || args.size == 3) {
             try {
-                val targetID = if (args.size == 3) args[1].toInt() else TerrarumGDX.ingame!!.player!!.referenceID
+                val targetID = if (args.size == 3) args[1].toInt() else Terrarum.ingame!!.player!!.referenceID
                 val scale = args[if (args.size == 3) 2 else 1].toDouble()
 
-                val target = TerrarumGDX.ingame!!.getActorByID(targetID)
+                val target = Terrarum.ingame!!.getActorByID(targetID)
 
                 if (target !is ActorWithPhysics) {
                     EchoError("Target is not ActorWithPhysics")

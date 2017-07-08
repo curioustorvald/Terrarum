@@ -4,10 +4,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.colourutil.CIELabUtil.darkerLab
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.Second
-import net.torvald.terrarum.worlddrawer.WorldCamera
 
 /**
  * Created by SKYHi14 on 2017-03-03.
@@ -56,8 +55,8 @@ class UIVitalMetre(
 
     override fun update(delta: Float) {
         handler!!.setPosition(
-                TerrarumGDX.HALFW,
-                TerrarumGDX.HALFH
+                Terrarum.HALFW,
+                Terrarum.HALFH
         )
     }
 
@@ -69,8 +68,8 @@ class UIVitalMetre(
         
         /*if (vitalGetterVal() != null && vitalGetterMax() != null && player != null) {
             g.translate(
-                    TerrarumGDX.ingame!!.screenZoom * (player!!.centrePosPoint.x.toFloat() - (WorldCamera.x)),
-                    TerrarumGDX.ingame!!.screenZoom * (player!!.centrePosPoint.y.toFloat() - (WorldCamera.y))
+                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.x.toFloat() - (WorldCamera.x)),
+                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.y.toFloat() - (WorldCamera.y))
             )
 
 

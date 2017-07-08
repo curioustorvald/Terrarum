@@ -17,7 +17,6 @@ import net.torvald.terrarum.worlddrawer.WorldCamera.y
 import net.torvald.terrarum.worlddrawer.WorldCamera.height
 import net.torvald.terrarum.worlddrawer.WorldCamera.width
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import org.lwjgl.opengl.GL11
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -28,7 +27,7 @@ import java.util.zip.GZIPInputStream
  * Created by minjaesong on 16-01-19.
  */
 object BlocksDrawer {
-    private val world: GameWorld = TerrarumGDX.ingame!!.world
+    private val world: GameWorld = Terrarum.ingame!!.world
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 

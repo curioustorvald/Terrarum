@@ -34,14 +34,10 @@ bb bb bb bb bb bb bb bb     // 64 bits make one tick
 |Note              Note
 |(C6)              (C1)
 3 bits are program notes, which are:
-- 000 : NOP
-- 001 : (unused)
-- 010 : Halve the speed (applied to next tick)
-- 011 : Double the speed (applied to next tick)
-- 100 : Quarter the speed (applied to next tick)
-- 101 : Quadruple the speed (applied to next tick)
-- 110 : (unused)
-- 111 : Play current tick and halt
+- 000 : NOP, turns off all effects
+- 001 : Engage down-arpeggiator
+- 010 : Engage up-arpeggiator
+- 100 : Engage triggering repeat on that single row (can be combined with arpeggio)
 
 ================================================================================
 Computer tape format

@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 
 import java.io.IOException
 
@@ -11,14 +11,14 @@ import java.io.IOException
 internal object SetLocale : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
-            val prevLocale = TerrarumGDX.gameLocale
-            TerrarumGDX.gameLocale = args[1]
+            val prevLocale = Terrarum.gameLocale
+            Terrarum.gameLocale = args[1]
             try {
-                Echo("Set locale to '" + TerrarumGDX.gameLocale + "'.")
+                Echo("Set locale to '" + Terrarum.gameLocale + "'.")
             }
             catch (e: IOException) {
                 Echo("could not read lang file.")
-                TerrarumGDX.gameLocale = prevLocale
+                Terrarum.gameLocale = prevLocale
             }
 
         }

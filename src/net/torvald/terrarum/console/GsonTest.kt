@@ -1,8 +1,7 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.TerrarumGDX
+import net.torvald.terrarum.Terrarum
 import com.google.gson.Gson
-import com.google.gson.JsonElement
 
 import java.io.BufferedWriter
 import java.io.FileWriter
@@ -14,14 +13,14 @@ import java.io.IOException
 internal object GsonTest : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
-            val avelem = Gson().toJsonTree(TerrarumGDX.ingame!!.player)
+            val avelem = Gson().toJsonTree(Terrarum.ingame!!.player)
 
             val jsonString = avelem.toString()
 
             val bufferedWriter: BufferedWriter
             val writer: FileWriter
             try {
-                writer = FileWriter(TerrarumGDX.defaultDir + "/Exports/" + args[1] + ".json")
+                writer = FileWriter(Terrarum.defaultDir + "/Exports/" + args[1] + ".json")
                 bufferedWriter = BufferedWriter(writer)
 
                 bufferedWriter.write(jsonString)
