@@ -1,5 +1,7 @@
 package net.torvald.terrarum.gameactors
 
+import com.badlogic.gdx.graphics.Color
+
 /**
  * Created by minjaesong on 16-04-26.
  */
@@ -15,7 +17,7 @@ class WeaponSwung(val itemID: Int) : ActorWithPhysics(Actor.RenderOrder.MIDTOP),
     actorValue[AVKey.LUMINOSITY] = value
     }
      */
-    override var luminosity: Int
+    override var luminosity: Color
         get() = throw UnsupportedOperationException()
         set(value) {
         }

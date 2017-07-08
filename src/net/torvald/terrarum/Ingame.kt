@@ -398,7 +398,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             WeatherMixer.update(delta)
             BlockStats.update()
             if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
-                world.globalLight = WeatherMixer.globalLightNow.toRGB10()
+                world.globalLight = WeatherMixer.globalLightNow
 
 
             ///////////////////////////
