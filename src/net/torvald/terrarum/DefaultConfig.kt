@@ -14,7 +14,7 @@ object DefaultConfig {
         val jsonObject = JsonObject()
 
         jsonObject.addProperty("displayfps", 0) // 0: no limit, non-zero: limit
-        jsonObject.addProperty("usevsync", false)
+        jsonObject.addProperty("usevsync", true)
 
 
         jsonObject.addProperty("imtooyoungtodie", false) // no perma-death

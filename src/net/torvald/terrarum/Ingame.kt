@@ -79,11 +79,17 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
     private val worldFBOformat = if (Terrarum.environment == RunningEnvironment.MOBILE) Pixmap.Format.RGBA4444 else Pixmap.Format.RGBA8888
-    private val lightFBOformat = Pixmap.Format.RGBA8888
+    private val lightFBOformat = Pixmap.Format.RGB888
+    private val lightUvFBOformat = Pixmap.Format.Intensity
 
     var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
+    var worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
+    // RGB elements of Lightmap for Color  Vec4(R, G, B, 1.0)  24-bit
     var lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
     var lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
+    // A elements of Lightmap for UV Light  Vec4(A, A, A, A)  8-bit
+    //var lightmapUvFboA = FrameBuffer(lightUvFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
+    //var lightmapUvFboB = FrameBuffer(lightUvFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
 
 
     init {
@@ -92,8 +98,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
     }
 
 
-    //private lateinit var shader12BitCol: Shader // grab LibGDX if you want some shader
-    //private lateinit var shaderBlur: Shader
 
     private val useShader: Boolean = false
     private val shaderProgram = 0
@@ -190,10 +194,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
      * Create new world
      */
     fun enter() {
-        // load things when the game entered this "state"
-        // load necessary shaders
-        //shader12BitCol = Shader.makeShader("./assets/4096.vert", "./assets/4096.frag")
-        //shaderBlur = Shader.makeShader("./assets/blur.vert", "./assets/blur.frag")
 
         // init map as chosen size
         world = GameWorld(8192, 2048)
@@ -445,6 +445,10 @@ class Ingame(val batch: SpriteBatch) : Screen {
         }
     }
 
+
+    private var blurWriteBuffer = lightmapFboA
+    private var blurReadBuffer = lightmapFboB
+
     private fun renderGame(batch: SpriteBatch) {
         Gdx.gl.glClearColor(.157f, .157f, .157f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -469,97 +473,24 @@ class Ingame(val batch: SpriteBatch) : Screen {
         ///////////////////
         // blur lightmap //
         ///////////////////
-        val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
-        val blurRadius = 4f / lightmapDownsample // (5, 4f); using low numbers for pixel-y aesthetics
-
-
-
-        lightmapFboA.inAction(null, null) {
-            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        }
-
-        lightmapFboB.inAction(null, null) {
-            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        }
-
         worldDrawFrameBuffer.inAction(null, null) {
+            Gdx.gl.glClearColor(0f,0f,0f,0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        }
+        worldGlowFrameBuffer.inAction(null, null) {
             Gdx.gl.glClearColor(0f,0f,0f,0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         }
 
 
 
-        var blurWriteBuffer = lightmapFboA
-        var blurReadBuffer = lightmapFboB
-
-
-
-
-        // initialise readBuffer with untreated lightmap
-        blurReadBuffer.inAction(camera, batch) {
-            batch.inUse {
-                // using custom code for camera; this is obscure and tricky
-                camera.position.set(
-                        (WorldCamera.gdxCamX / lightmapDownsample).round(),
-                        (WorldCamera.gdxCamY / lightmapDownsample).round(),
-                        0f
-                ) // make camara work
-                camera.update()
-                batch.projectionMatrix = camera.combined
-
-
-                blendNormal()
-                batch.color = Color.WHITE
-                LightmapRenderer.draw(batch)
-            }
-        }
-
-        if (!KeyToggler.isOn(Input.Keys.F8)) {
-            for (i in 0..blurIterations - 1) {
-                blurWriteBuffer.inAction(camera, batch) {
-
-                    batch.inUse {
-                        val texture = blurReadBuffer.colorBufferTexture
-
-                        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-
-
-                        batch.shader = Terrarum.shaderBlur
-                        batch.shader.setUniformf("iResolution",
-                                blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())
-                        batch.shader.setUniformf("flip", 1f)
-                        if (i % 2 == 0)
-                            batch.shader.setUniformf("direction", blurRadius, 0f)
-                        else
-                            batch.shader.setUniformf("direction", 0f, blurRadius)
-
-
-                        batch.color = Color.WHITE
-                        batch.draw(texture, 0f, 0f)
-
-
-                        // swap
-                        val t = blurWriteBuffer
-                        blurWriteBuffer = blurReadBuffer
-                        blurReadBuffer = t
-                    }
-                }
-            }
-        }
-        else {
-            blurWriteBuffer = blurReadBuffer
-        }
-
-
 
         ///////////////////////////
         // draw world to the FBO //
         ///////////////////////////
+        processBlur(LightmapRenderer.DRAW_FOR_RGB)
 
         worldDrawFrameBuffer.inAction(camera, batch) {
-
             batch.inUse {
                 batch.shader = null
 
@@ -598,7 +529,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 FeaturesDrawer.drawEnvOverlay(batch)
 
 
-                // mix lighpmap canvas to this canvas
+                // mix lighpmap canvas to this canvas (Colors -- RGB channel)
                 if (!KeyToggler.isOn(Input.Keys.F6)) { // F6 to disable lightmap draw
                     setCameraPosition(0f, 0f)
                     batch.shader = null
@@ -626,18 +557,50 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
                 camera.update()
                 batch.projectionMatrix = camera.combined
+            }
+        }
 
+
+        //////////////////////////
+        // draw glow to the FBO //
+        //////////////////////////
+        processBlur(LightmapRenderer.DRAW_FOR_ALPHA)
+
+        worldGlowFrameBuffer.inAction(camera, batch) {
+            batch.inUse {
+                batch.shader = null
 
                 //////////////////////
                 // draw actor glows //
                 //////////////////////
                 // FIXME needs some new blending/shader for glow...
 
-                //actorsRenderMiddle.forEach { it.drawGlow(batch) }
-                //actorsRenderMidTop.forEach { it.drawGlow(batch) }
-                //player?.drawGlow(batch)
-                //actorsRenderFront.forEach { it.drawGlow(batch) }
+
+                actorsRenderMiddle.forEach { it.drawGlow(batch) }
+                actorsRenderMidTop.forEach { it.drawGlow(batch) }
+                player?.drawGlow(batch)
+                actorsRenderFront.forEach { it.drawGlow(batch) }
                 // --> blendLightenOnly() <-- introduced by childs of ActorWithBody //
+
+
+                // mix lighpmap canvas to this canvas (UV lights -- A channel)
+                if (!KeyToggler.isOn(Input.Keys.F6)) { // F6 to disable lightmap draw
+                    setCameraPosition(0f, 0f)
+                    batch.shader = null
+
+                    val lightTex = blurWriteBuffer.colorBufferTexture // TODO zoom!
+
+                    lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
+                    if (KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendNormal()
+                    else blendMul()
+
+                    batch.color = Color.WHITE
+                    batch.draw(lightTex,
+                            0f, 0f,
+                            lightTex.width * lightmapDownsample, lightTex.height * lightmapDownsample
+                    )
+                }
             }
         }
 
@@ -661,12 +624,28 @@ class Ingame(val batch: SpriteBatch) : Screen {
             /////////////////////////////////
             WeatherMixer.render(batch)
 
-            batch.flush()
 
-            batch.shader = null
             batch.color = Color.WHITE
-            val worldTex = worldDrawFrameBuffer.colorBufferTexture // TODO zoom!
+
+            // blend world_normal and world_glow
+            batch.shader = null
+
+            val worldTex = worldDrawFrameBuffer.colorBufferTexture // WORLD: light_color must be applied beforehand
             worldTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
+            /*val glowTex = worldGlowFrameBuffer.colorBufferTexture // GLOW: light_uvlight must be applied beforehand
+            glowTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
+            Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE0)
+            worldTex.bind(GL20.GL_TEXTURE0)
+
+            Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE1)
+            glowTex.bind(GL20.GL_TEXTURE1)
+
+            // setup shader params...*/
+
+
+            // an old code.
             batch.draw(worldTex, 0f, 0f, worldTex.width.toFloat(), worldTex.height.toFloat())
 
 
@@ -912,6 +891,105 @@ class Ingame(val batch: SpriteBatch) : Screen {
         gwin.drawLine(Terrarum.WIDTH / 2f, 0f, Terrarum.WIDTH / 2f, Terrarum.HEIGHT.toFloat())
         gwin.drawLine(0f, Terrarum.HEIGHT / 2f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT / 2f)*/
     }
+
+    private fun processBlur(mode: Int) {
+        val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
+        val blurRadius = 4f / lightmapDownsample // (5, 4f); using low numbers for pixel-y aesthetics
+
+        blurWriteBuffer = lightmapFboA
+        blurReadBuffer = lightmapFboB
+
+
+        lightmapFboA.inAction(null, null) {
+            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        }
+        lightmapFboB.inAction(null, null) {
+            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        }
+
+
+        if (mode == LightmapRenderer.DRAW_FOR_RGB) {
+            // initialise readBuffer with untreated lightmap
+            blurReadBuffer.inAction(camera, batch) {
+                batch.inUse {
+                    // using custom code for camera; this is obscure and tricky
+                    camera.position.set(
+                            (WorldCamera.gdxCamX / lightmapDownsample).round(),
+                            (WorldCamera.gdxCamY / lightmapDownsample).round(),
+                            0f
+                    ) // make camara work
+                    camera.update()
+                    batch.projectionMatrix = camera.combined
+
+
+                    blendNormal()
+                    batch.color = Color.WHITE
+                    LightmapRenderer.draw(batch, LightmapRenderer.DRAW_FOR_RGB)
+                }
+            }
+        }
+        else {
+            // initialise readBuffer with untreated lightmap
+            blurReadBuffer.inAction(camera, batch) {
+                batch.inUse {
+                    // using custom code for camera; this is obscure and tricky
+                    camera.position.set(
+                            (WorldCamera.gdxCamX / lightmapDownsample).round(),
+                            (WorldCamera.gdxCamY / lightmapDownsample).round(),
+                            0f
+                    ) // make camara work
+                    camera.update()
+                    batch.projectionMatrix = camera.combined
+
+
+                    blendNormal()
+                    batch.color = Color.WHITE
+                    LightmapRenderer.draw(batch, LightmapRenderer.DRAW_FOR_ALPHA)
+                }
+            }
+        }
+
+
+
+        if (!KeyToggler.isOn(Input.Keys.F8)) {
+            for (i in 0 until blurIterations) {
+                blurWriteBuffer.inAction(camera, batch) {
+
+                    batch.inUse {
+                        val texture = blurReadBuffer.colorBufferTexture
+
+                        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+
+
+                        batch.shader = Terrarum.shaderBlur
+                        batch.shader.setUniformf("iResolution",
+                                blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())
+                        batch.shader.setUniformf("flip", 1f)
+                        if (i % 2 == 0)
+                            batch.shader.setUniformf("direction", blurRadius, 0f)
+                        else
+                            batch.shader.setUniformf("direction", 0f, blurRadius)
+
+
+                        batch.color = Color.WHITE
+                        batch.draw(texture, 0f, 0f)
+
+
+                        // swap
+                        val t = blurWriteBuffer
+                        blurWriteBuffer = blurReadBuffer
+                        blurReadBuffer = t
+                    }
+                }
+            }
+        }
+        else {
+            blurWriteBuffer = blurReadBuffer
+        }
+    }
+
 
 
     private fun repossessActor() {
@@ -1314,6 +1392,10 @@ class Ingame(val batch: SpriteBatch) : Screen {
         lightmapFboA = FrameBuffer(lightFBOformat, width.div(lightmapDownsample.toInt()), height.div(lightmapDownsample.toInt()), true)
         lightmapFboB.dispose()
         lightmapFboB = FrameBuffer(lightFBOformat, width.div(lightmapDownsample.toInt()), height.div(lightmapDownsample.toInt()), true)
+        //lightmapUvFboA.dispose()
+        //lightmapUvFboA = FrameBuffer(lightUvFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
+        //lightmapUvFboB.dispose()
+        //lightmapUvFboB = FrameBuffer(lightUvFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
 
 
         // Set up viewport when window is resized

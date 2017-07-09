@@ -43,7 +43,8 @@ object LightmapRenderer {
     /**
      * Float value, 1.0 for 1023
      */
-    private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,1f) }) } // TODO framebuffer?
+    // TODO utilise alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
+    private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // TODO framebuffer?
     private val lanternMap = ArrayList<Lantern>(Terrarum.ingame!!.ACTORCONTAINER_INITIAL_SIZE * 4)
 
     private val AIR = Block.AIR
@@ -260,9 +261,9 @@ object LightmapRenderer {
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
 
-        var ambientAccumulator = Color(0f,0f,0f,1f)
+        var ambientAccumulator = Color(0f,0f,0f,0f)
 
-        var lightLevelThis: Color = Color(0f,0f,0f,1f)
+        var lightLevelThis: Color = Color(0f,0f,0f,0f)
         val thisTerrain = Terrarum.ingame!!.world.getTileFromTerrain(x, y)
         val thisWall = Terrarum.ingame!!.world.getTileFromWall(x, y)
         val thisTileLuminosity = BlockCodex[thisTerrain].luminosity // already been div by four
@@ -299,15 +300,15 @@ object LightmapRenderer {
              *  sample ambient for eight points and apply attenuation for those
              *  maxblend eight values and use it
              */
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y - 1) ?: Color(0f,0f,0f,1f), scaleSqrt2(thisTileOpacity))
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y - 1) ?: Color(0f,0f,0f,1f), scaleSqrt2(thisTileOpacity))
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y + 1) ?: Color(0f,0f,0f,1f), scaleSqrt2(thisTileOpacity))
-            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y + 1) ?: Color(0f,0f,0f,1f), scaleSqrt2(thisTileOpacity))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y - 1) ?: Color(0f,0f,0f,0f), scaleSqrt2(thisTileOpacity))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y - 1) ?: Color(0f,0f,0f,0f), scaleSqrt2(thisTileOpacity))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y + 1) ?: Color(0f,0f,0f,0f), scaleSqrt2(thisTileOpacity))
+            /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y + 1) ?: Color(0f,0f,0f,0f), scaleSqrt2(thisTileOpacity))
 
-            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x    , y - 1) ?: Color(0f,0f,0f,1f), thisTileOpacity)
-            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x    , y + 1) ?: Color(0f,0f,0f,1f), thisTileOpacity)
-            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y    ) ?: Color(0f,0f,0f,1f), thisTileOpacity)
-            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y    ) ?: Color(0f,0f,0f,1f), thisTileOpacity)
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x    , y - 1) ?: Color(0f,0f,0f,0f), thisTileOpacity)
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x    , y + 1) ?: Color(0f,0f,0f,0f), thisTileOpacity)
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y    ) ?: Color(0f,0f,0f,0f), thisTileOpacity)
+            /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y    ) ?: Color(0f,0f,0f,0f), thisTileOpacity)
 
             return lightLevelThis maxBlend ambientAccumulator
         }
@@ -325,7 +326,7 @@ object LightmapRenderer {
                     (l.r * 1.25f),//.clampOne(),
                     (l.g * 1.25f),//.clampOne(),
                     (l.b * 1.25f),//.clampOne()
-                    1f
+                    (l.a * 1.25f)
             )
         }
         else {
@@ -333,7 +334,10 @@ object LightmapRenderer {
         }
     }
 
-    fun draw(batch: SpriteBatch) {
+    const val DRAW_FOR_RGB = 0xFFF0
+    const val DRAW_FOR_ALPHA = 0x000F
+
+    fun draw(batch: SpriteBatch, drawMode: Int) {
         val this_x_start = for_x_start// + overscan_open
         val this_x_end = for_x_end// + overscan_open
         val this_y_start = for_y_start// + overscan_open
@@ -360,7 +364,14 @@ object LightmapRenderer {
                             if (x + sameLevelCounter >= this_x_end) break
                         }
 
-                        batch.color = (getLightForOpaque(x, y) ?: Color(0f,0f,0f,1f)).normaliseToColourHDR()
+
+                        if (drawMode == DRAW_FOR_RGB) {
+                            batch.color = (getLightForOpaque(x, y) ?: Color(0f,0f,0f,0f)).normaliseToColourHDR()
+                        }
+                        else if (drawMode == DRAW_FOR_ALPHA) {
+                            batch.color = (getLightForOpaque(x, y) ?: Color(0f,0f,0f,0f)).normaliseToAlphaHDR()
+                        }
+
                         batch.fillRect(
                                 (x * DRAW_TILE_SIZE).round().toFloat(),
                                 (y * DRAW_TILE_SIZE).round().toFloat(),
@@ -404,7 +415,7 @@ object LightmapRenderer {
                 data.r * (1f - darken.r * lightScalingMagic),//.clampZero(),
                 data.g * (1f - darken.g * lightScalingMagic),//.clampZero(),
                 data.b * (1f - darken.b * lightScalingMagic),//.clampZero(),
-                1f)
+                data.a * (1f - darken.b * lightScalingMagic))
     }
 
     private fun scaleSqrt2(data: Color): Color {
@@ -412,7 +423,7 @@ object LightmapRenderer {
                 data.r * 1.41421356f,
                 data.g * 1.41421356f,
                 data.b * 1.41421356f,
-                1f)
+                data.a * 1.41421356f)
     }
 
     /**
@@ -427,7 +438,7 @@ object LightmapRenderer {
                 data.r * (1f + brighten.r * lightScalingMagic),
                 data.g * (1f + brighten.g * lightScalingMagic),
                 data.b * (1f + brighten.b * lightScalingMagic),
-                1f
+                data.a * (1f + brighten.b * lightScalingMagic)
         )
     }
 
@@ -458,7 +469,7 @@ object LightmapRenderer {
                 data.r + brighten,
                 data.g + brighten,
                 data.b + brighten,
-                1f
+                data.a + brighten
         )
     }
 
@@ -472,7 +483,8 @@ object LightmapRenderer {
                 if (this.r > other.r) this.r else other.r,
                 if (this.g > other.g) this.g else other.g,
                 if (this.b > other.b) this.b else other.b,
-                1f)
+                if (this.a > other.a) this.a else other.a
+        )
     }
 
 
@@ -518,6 +530,14 @@ object LightmapRenderer {
             return null
         else
             return FastMath.max(value.r, value.g, value.b)
+    }
+
+    fun getHighestRGBA(x: Int, y: Int): Float? {
+        val value = getLightInternal(x, y)
+        if (value == null)
+            return null
+        else
+            return FastMath.max(value.r, value.g, value.b, value.a)
     }
 
     private fun purgeLightmap() {
@@ -638,9 +658,16 @@ object LightmapRenderer {
             1f
     )
 
+    inline fun Color.normaliseToAlphaHDR() = Color(
+            hdr(this.a),
+            hdr(this.a),
+            hdr(this.a),
+            1f
+    )
+
     data class Lantern(val posX: Int, val posY: Int, val luminosity: Color)
 
-    private fun Color.nonZero() = this.r != 0f || this.g != 0f || this.b != 0f
+    private fun Color.nonZero() = this.r != 0f || this.g != 0f || this.b != 0f || this.a != 0f
 
     val histogram: Histogram
         get() {
