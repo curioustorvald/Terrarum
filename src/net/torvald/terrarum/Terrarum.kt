@@ -34,6 +34,8 @@ import java.util.*
 const val GAME_NAME = "Terrarum"
 
 fun main(args: Array<String>) {
+    Terrarum // invoke
+
     val config = LwjglApplicationConfiguration()
     config.foregroundFPS = Terrarum.RENDER_FPS
     config.backgroundFPS = Terrarum.RENDER_FPS
@@ -44,6 +46,8 @@ fun main(args: Array<String>) {
     config.backgroundFPS = RENDER_FPS
     config.foregroundFPS = RENDER_FPS
     config.title = GAME_NAME
+
+    println("usevsync = ${Terrarum.USE_VSYNC}")
 
     // the game must run on same speed regardless of the display FPS;
     // "Terrarum.TARGET_INTERNAL_FPS" denotes "execute as if FPS was set to this value"
@@ -234,6 +238,8 @@ object Terrarum : ApplicationAdapter() {
 
 
     lateinit var shaderBlur: ShaderProgram
+    lateinit var shaderRGBOnly: ShaderProgram
+    lateinit var shaderAOnly: ShaderProgram
     lateinit var shader4096: ShaderProgram
     lateinit var shader4096Bayer: ShaderProgram
 
@@ -302,6 +308,11 @@ object Terrarum : ApplicationAdapter() {
         shader4096Bayer.setUniformMatrix("Bayer", Matrix4(floatArrayOf(0f,8f,2f,10f,12f,4f,14f,6f,3f,11f,1f,9f,15f,7f,13f,5f)))
         shader4096Bayer.setUniformf("monitorGamma", 2.2f)
         shader4096Bayer.end()
+
+
+        shaderRGBOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbonly.frag"))
+        shaderAOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/aonly.frag"))
+
 
 
         ModMgr // invoke Module Manager, will also invoke BlockCodex
@@ -583,12 +594,6 @@ fun blendNormal() {
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
 }
 
-fun blendLightenOnly() {
-    Terrarum.batch.enableBlending()
-    Terrarum.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE)
-    Gdx.gl.glBlendEquation(GL30.GL_MAX) // batch.flush does not touch blend equation
-}
-
 fun blendScreen() {
     Terrarum.batch.enableBlending()
     Terrarum.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR)
@@ -599,14 +604,14 @@ object BlendMode {
     const val SCREEN   = "GL_BLEND screen"
     const val MULTIPLY = "GL_BLEND multiply"
     const val NORMAL   = "GL_BLEND normal"
-    const val MAX      = "GL_MAX"
+    //const val MAX      = "GL_MAX"
 
     fun resolve(mode: String) {
         when (mode) {
             SCREEN   -> blendScreen()
             MULTIPLY -> blendMul()
             NORMAL   -> blendNormal()
-            MAX      -> blendLightenOnly()
+            //MAX      -> blendLightenOnly()
             else     -> throw Error("Unknown blend mode: $mode")
         }
     }
