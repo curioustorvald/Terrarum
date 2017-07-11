@@ -12,8 +12,7 @@ import java.util.*
  * Created by minjaesong on 16-07-11.
  */
 data class BaseModularWeather(
-        val globalLightColourMap: GdxColorMap,
-        var skyboxGradColourMap: GdxColorMap,
+        var skyboxGradColourMap: GdxColorMap, // row 0: skybox grad top, row 1: skybox grad bottom, row 2: sunlight (RGBA)
         val classification: String,
         var extraImages: ArrayList<Texture>,
         val mixFrom: String? = null,

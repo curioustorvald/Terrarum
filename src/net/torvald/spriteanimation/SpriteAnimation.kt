@@ -77,7 +77,7 @@ class SpriteAnimation(val parentActor: ActorWithPhysics) {
 
     /**
      * Render to specific coordinates. Will assume bottom-center point as image position.
-     * Will round to integer.
+     * Will floor to integer.
      * @param g
      * *
      * @param posX bottom-center point
@@ -97,7 +97,7 @@ class SpriteAnimation(val parentActor: ActorWithPhysics) {
 
             if (flipHorizontal && flipVertical) {
                 batch.draw(region,
-                        Math.round(posX).toFloat() + (2f * parentActor.hitboxTranslateX * parentActor.scale.toFloat() + parentActor.hitbox.width.toFloat()),
+                        FastMath.floor(posX).toFloat() + (2f * parentActor.hitboxTranslateX * parentActor.scale.toFloat() + parentActor.hitbox.width.toFloat()),
                         FastMath.floor(posY).toFloat() + (2f * parentActor.hitboxTranslateY * parentActor.scale.toFloat() + parentActor.hitbox.height.toFloat()),
                         -FastMath.floor(cellWidth * scale).toFloat(),
                         -FastMath.floor(cellHeight * scale).toFloat()
@@ -105,7 +105,7 @@ class SpriteAnimation(val parentActor: ActorWithPhysics) {
             }
             else if (flipHorizontal) {
                 batch.draw(region,
-                        Math.round(posX).toFloat() + (2f * parentActor.hitboxTranslateX * parentActor.scale.toFloat() + parentActor.hitbox.width.toFloat()),
+                        FastMath.floor(posX).toFloat() + (2f * parentActor.hitboxTranslateX * parentActor.scale.toFloat() + parentActor.hitbox.width.toFloat()),
                         FastMath.floor(posY).toFloat(),
                         -FastMath.floor(cellWidth * scale).toFloat(),
                         FastMath.floor(cellHeight * scale).toFloat()
@@ -113,7 +113,7 @@ class SpriteAnimation(val parentActor: ActorWithPhysics) {
             }
             else if (flipVertical) {
                 batch.draw(region,
-                        Math.round(posX).toFloat(),
+                        FastMath.floor(posX).toFloat(),
                         FastMath.floor(posY).toFloat() + (2f * parentActor.hitboxTranslateY * parentActor.scale.toFloat() + parentActor.hitbox.height.toFloat()),
                         FastMath.floor(cellWidth * scale).toFloat(),
                         -FastMath.floor(cellHeight * scale).toFloat()
@@ -121,7 +121,7 @@ class SpriteAnimation(val parentActor: ActorWithPhysics) {
             }
             else {
                 batch.draw(region,
-                        Math.round(posX).toFloat(),
+                        FastMath.floor(posX).toFloat(),
                         FastMath.floor(posY).toFloat(),
                         FastMath.floor(cellWidth * scale).toFloat(),
                         FastMath.floor(cellHeight * scale).toFloat()
