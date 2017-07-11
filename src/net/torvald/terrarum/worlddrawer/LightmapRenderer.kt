@@ -80,7 +80,7 @@ object LightmapRenderer {
             return null
         }
         else {
-            return Color(col.r * MUL_FLOAT, col.g * MUL_FLOAT, col.b * MUL_FLOAT, 1f)
+            return Color(col.r * MUL_FLOAT, col.g * MUL_FLOAT, col.b * MUL_FLOAT, col.a * MUL_FLOAT)
         }
     }
 
@@ -244,10 +244,13 @@ object LightmapRenderer {
                             ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
                         for (x in lightBoxX.div(TILE_SIZE).floorInt()
                                 ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
-                            lanternMap.add(Lantern(x, y, it.luminosity))
+
+                            val normalisedColor = it.color.cpy().mul(DIV_FLOAT)
+
+                            lanternMap.add(Lantern(x, y, normalisedColor))
                             // Q&D fix for Roundworld anomaly
-                            lanternMap.add(Lantern(x + world.width, y, it.luminosity))
-                            lanternMap.add(Lantern(x - world.width, y, it.luminosity))
+                            lanternMap.add(Lantern(x + world.width, y, normalisedColor))
+                            lanternMap.add(Lantern(x - world.width, y, normalisedColor))
                         }
                     }
                 }
@@ -268,7 +271,7 @@ object LightmapRenderer {
         val thisWall = Terrarum.ingame!!.world.getTileFromWall(x, y)
         val thisTileLuminosity = BlockCodex[thisTerrain].luminosity // already been div by four
         val thisTileOpacity = BlockCodex[thisTerrain].opacity // already been div by four
-        val sunLight = Terrarum.ingame!!.world.globalLight.cpy().mul(DIV_FLOAT, DIV_FLOAT, DIV_FLOAT, DIV_FLOAT)
+        val sunLight = Terrarum.ingame!!.world.globalLight.cpy().mul(DIV_FLOAT)
 
         // MIX TILE
         // open air
@@ -285,12 +288,11 @@ object LightmapRenderer {
         }
         // END MIX TILE
 
-        for (i in 0..lanternMap.size - 1) {
+        for (i in 0 until lanternMap.size) {
             val lmap = lanternMap[i]
             if (lmap.posX == x && lmap.posY == y)
-                lightLevelThis = lightLevelThis maxBlend lmap.luminosity // maximise to not exceed 1.0 with normal (<= 1.0) light
+                lightLevelThis = lightLevelThis maxBlend lmap.color // maximise to not exceed 1.0 with normal (<= 1.0) light
         }
-
 
         if (!doNotCalculateAmbient) {
             // calculate ambient
@@ -310,11 +312,18 @@ object LightmapRenderer {
             /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y    ) ?: Color(0f,0f,0f,0f), thisTileOpacity)
             /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y    ) ?: Color(0f,0f,0f,0f), thisTileOpacity)
 
-            return lightLevelThis maxBlend ambientAccumulator
+            val ret = lightLevelThis maxBlend ambientAccumulator
+
+
+
+            return ret
         }
         else {
-            return lightLevelThis
+            val ret = lightLevelThis
+
+            return ret
         }
+
     }
 
     private fun getLightForOpaque(x: Int, y: Int): Color? { // ...so that they wouldn't appear too dark
@@ -415,7 +424,7 @@ object LightmapRenderer {
                 data.r * (1f - darken.r * lightScalingMagic),//.clampZero(),
                 data.g * (1f - darken.g * lightScalingMagic),//.clampZero(),
                 data.b * (1f - darken.b * lightScalingMagic),//.clampZero(),
-                data.a * (1f - darken.b * lightScalingMagic))
+                data.a * (1f - darken.a * lightScalingMagic))
     }
 
     private fun scaleSqrt2(data: Color): Color {
@@ -438,7 +447,7 @@ object LightmapRenderer {
                 data.r * (1f + brighten.r * lightScalingMagic),
                 data.g * (1f + brighten.g * lightScalingMagic),
                 data.b * (1f + brighten.b * lightScalingMagic),
-                data.a * (1f + brighten.b * lightScalingMagic)
+                data.a * (1f + brighten.a * lightScalingMagic)
         )
     }
 
@@ -453,7 +462,7 @@ object LightmapRenderer {
         if (darken < 0 || darken > CHANNEL_MAX)
             throw IllegalArgumentException("darken: out of range ($darken)")
 
-        val darkenColoured = Color(darken, darken, darken, 1f)
+        val darkenColoured = Color(darken, darken, darken, darken)
         return darkenColoured(data, darkenColoured)
      }
 
@@ -543,7 +552,7 @@ object LightmapRenderer {
     private fun purgeLightmap() {
         for (y in 0..LIGHTMAP_HEIGHT - 1) {
             for (x in 0..LIGHTMAP_WIDTH - 1) {
-                lightmap[y][x] = Color(0f,0f,0f,1f)
+                lightmap[y][x] = Color(0f,0f,0f,0f)
             }
         }
     }
@@ -559,12 +568,6 @@ object LightmapRenderer {
     inline fun Float.ceil() = FastMath.ceil(this)
     inline fun Int.even(): Boolean = this and 1 == 0
     inline fun Int.odd(): Boolean = this and 1 == 1
-    /*inline fun Int.normaliseToColour(): Color = Color(
-            Math.min(this.r(), 1f),
-            Math.min(this.g(), 1f),
-            Math.min(this.b(), 1f),
-            1f
-    )*/
 
     // TODO: float LUT lookup using linear interpolation
 
@@ -665,7 +668,10 @@ object LightmapRenderer {
             1f
     )
 
-    data class Lantern(val posX: Int, val posY: Int, val luminosity: Color)
+    /**
+     * color values are normalised -- 0.0 to 1.0 for 0..1023
+     */
+    data class Lantern(val posX: Int, val posY: Int, val color: Color)
 
     private fun Color.nonZero() = this.r != 0f || this.g != 0f || this.b != 0f || this.a != 0f
 

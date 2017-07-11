@@ -152,6 +152,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
     var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
+    /** Actually just a mesh of four vertices, two triangles -- not a literal glQuad */
     var fullscreenQuad = Mesh(
             true, 4, 6,
             VertexAttribute.Position(),
@@ -675,12 +676,8 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 batch.color = Color.WHITE
                 blendNormal()
 
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // reset active textureunit to zero (i don't know tbh)
-
-
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // reset active textureunit to zero (i don't know tbh, but it won't work without this)
                 batch.shader = null
-                batch.color = Color.RED
-                batch.fillRect(0f, 0f, 16f, 16f)
             }
         }
 
@@ -710,9 +707,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
             blendNormal()
             batch.draw(blendedTex, 0f, 0f, blendedTex.width.toFloat(), blendedTex.height.toFloat())
 
-
-            batch.color = Color.GREEN
-            batch.fillRect(16f, 16f, 16f, 16f)
 
 
             // an old code.

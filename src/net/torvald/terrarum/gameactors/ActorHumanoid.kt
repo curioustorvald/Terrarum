@@ -49,7 +49,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         if (houseDesignation != null) houseDesignation!!.clear()
     }
 
-    override var luminosity: Color
+    override var color: Color
         get() = Color(
                 (actorValue.getAsFloat(AVKey.LUMR) ?: 0f) / LightmapRenderer.MUL_FLOAT,
                 (actorValue.getAsFloat(AVKey.LUMG) ?: 0f) / LightmapRenderer.MUL_FLOAT,
