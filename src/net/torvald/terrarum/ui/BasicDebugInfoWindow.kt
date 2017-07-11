@@ -111,12 +111,10 @@ class BasicDebugInfoWindow : UICanvas {
         val rawR = valRaw?.r?.times(100f)?.round()?.div(100f)
         val rawG = valRaw?.g?.times(100f)?.round()?.div(100f)
         val rawB = valRaw?.b?.times(100f)?.round()?.div(100f)
+        val rawA = valRaw?.a?.times(100f)?.round()?.div(100f)
 
         lightVal = if (valRaw == null) "—"
-                   else valRaw.toString() + " (" +
-                    rawR.toString() + " " +
-                    rawG.toString() + " " +
-                    rawB.toString() + ")"
+                   else "$rawR $rawG $rawB $rawA"
         printLine(batch, 8, "light@cursor $ccG$lightVal")
 
         val tileNum = Terrarum.ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1

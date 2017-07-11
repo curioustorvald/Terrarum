@@ -1150,6 +1150,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
     override fun drawGlow(batch: SpriteBatch) {
         if (isVisible && spriteGlow != null) {
+
             blendNormal()
 
             val offsetX = hitboxTranslateX * scale

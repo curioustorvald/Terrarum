@@ -80,10 +80,11 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
     private val worldFBOformat = if (Terrarum.environment == RunningEnvironment.MOBILE) Pixmap.Format.RGBA4444 else Pixmap.Format.RGBA8888
     private val lightFBOformat = Pixmap.Format.RGB888
-    private val lightUvFBOformat = Pixmap.Format.Intensity
+    private val lightUvFBOformat = Pixmap.Format.RGB888
 
     var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
     var worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
+    var worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
     // RGB elements of Lightmap for Color  Vec4(R, G, B, 1.0)  24-bit
     var lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
     var lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
@@ -150,6 +151,23 @@ class Ingame(val batch: SpriteBatch) : Screen {
     //////////////
 
     var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+
+    var fullscreenQuad = Mesh(
+            true, 4, 6,
+            VertexAttribute.Position(),
+            VertexAttribute.ColorUnpacked(),
+            VertexAttribute.TexCoords(0)
+    )
+
+    init {
+        fullscreenQuad.setVertices(floatArrayOf(
+                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
+                Terrarum.WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
+                Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
+                0f, Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
+        ))
+        fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+    }
 
     // invert Y
     fun initViewPort(width: Int, height: Int) {
@@ -478,7 +496,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         }
         worldGlowFrameBuffer.inAction(null, null) {
-            Gdx.gl.glClearColor(0f,0f,0f,0f)
+            Gdx.gl.glClearColor(0f,0f,0f,1f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         }
 
@@ -546,6 +564,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                             0f, 0f,
                             lightTex.width * lightmapDownsample, lightTex.height * lightmapDownsample
                     )
+
                 }
 
 
@@ -557,6 +576,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
                 camera.update()
                 batch.projectionMatrix = camera.combined
+
             }
         }
 
@@ -570,17 +590,25 @@ class Ingame(val batch: SpriteBatch) : Screen {
             batch.inUse {
                 batch.shader = null
 
+                // using custom code for camera; this is obscure and tricky
+                camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
+                camera.update()
+                batch.projectionMatrix = camera.combined
+
+
+                batch.color = Color.WHITE
+                blendNormal()
+
+
                 //////////////////////
                 // draw actor glows //
                 //////////////////////
-                // FIXME needs some new blending/shader for glow...
-
-
+                
                 actorsRenderMiddle.forEach { it.drawGlow(batch) }
                 actorsRenderMidTop.forEach { it.drawGlow(batch) }
                 player?.drawGlow(batch)
                 actorsRenderFront.forEach { it.drawGlow(batch) }
-                // --> blendLightenOnly() <-- introduced by childs of ActorWithBody //
+                // --> blendNormal() <-- introduced by childs of ActorWithBody //
 
 
                 // mix lighpmap canvas to this canvas (UV lights -- A channel)
@@ -600,10 +628,61 @@ class Ingame(val batch: SpriteBatch) : Screen {
                             0f, 0f,
                             lightTex.width * lightmapDownsample, lightTex.height * lightmapDownsample
                     )
+
                 }
+
+
+                blendNormal()
             }
         }
 
+
+        worldBlendFrameBuffer.inAction(camera, batch) {
+            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+            val worldTex = worldDrawFrameBuffer.colorBufferTexture // WORLD: light_color must be applied beforehand
+            val glowTex = worldGlowFrameBuffer.colorBufferTexture // GLOW: light_uvlight must be applied beforehand
+
+            //Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
+            worldTex.bind(0)
+            glowTex.bind(1)
+
+
+            /*val quad = Mesh(
+                    true, 4, 6,
+                    VertexAttribute.Position(),
+                    VertexAttribute.ColorUnpacked(),
+                    VertexAttribute.TexCoords(0)
+            )
+            quad.setVertices(floatArrayOf(
+                    0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
+                    Terrarum.WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
+                    Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
+                    0f, Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
+            ))
+            quad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))*/
+
+            Terrarum.shaderBlendGlow.begin()
+            Terrarum.shaderBlendGlow.setUniformMatrix("u_projTrans", camera.combined)
+            Terrarum.shaderBlendGlow.setUniformi("u_texture", 0)
+            Terrarum.shaderBlendGlow.setUniformi("tex1", 1)
+            fullscreenQuad.render(Terrarum.shaderBlendGlow, GL20.GL_TRIANGLES)
+            Terrarum.shaderBlendGlow.end()
+
+
+            batch.inUse {
+                batch.color = Color.WHITE
+                blendNormal()
+
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // reset active textureunit to zero (i don't know tbh)
+
+
+                batch.shader = null
+                batch.color = Color.RED
+                batch.fillRect(0f, 0f, 16f, 16f)
+            }
+        }
 
 
         /////////////////////////
@@ -625,35 +704,28 @@ class Ingame(val batch: SpriteBatch) : Screen {
             WeatherMixer.render(batch)
 
 
+            val blendedTex = worldBlendFrameBuffer.colorBufferTexture
             batch.color = Color.WHITE
-
-            // blend world_normal and world_glow
             batch.shader = null
+            blendNormal()
+            batch.draw(blendedTex, 0f, 0f, blendedTex.width.toFloat(), blendedTex.height.toFloat())
 
-            val worldTex = worldDrawFrameBuffer.colorBufferTexture // WORLD: light_color must be applied beforehand
-            worldTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
-            /*val glowTex = worldGlowFrameBuffer.colorBufferTexture // GLOW: light_uvlight must be applied beforehand
-            glowTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-
-            Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE0)
-            worldTex.bind(GL20.GL_TEXTURE0)
-
-            Gdx.graphics.gL20.glActiveTexture(GL20.GL_TEXTURE1)
-            glowTex.bind(GL20.GL_TEXTURE1)
-
-            // setup shader params...*/
+            batch.color = Color.GREEN
+            batch.fillRect(16f, 16f, 16f, 16f)
 
 
             // an old code.
-            batch.draw(worldTex, 0f, 0f, worldTex.width.toFloat(), worldTex.height.toFloat())
+            /*batch.shader = null
+            val worldTex = worldDrawFrameBuffer.colorBufferTexture // WORLD: light_color must be applied beforehand
+            val glowTex = worldGlowFrameBuffer.colorBufferTexture // GLOW: light_uvlight must be applied beforehand
+
+
+            batch.draw(worldTex, 0f, 0f, worldTex.width.toFloat(), worldTex.height.toFloat())*/
 
 
 
             batch.shader = null
-
-            batch.color = Color.RED
-            batch.fillRect(0f, 0f, 16f, 16f)
 
             ////////////////////////
             // debug informations //
@@ -725,10 +797,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
             blendNormal()
         }
-
-
-
-
 
 
 
@@ -1385,9 +1453,18 @@ class Ingame(val batch: SpriteBatch) : Screen {
     override fun hide() {
     }
 
+    /**
+     * @param width same as Terrarum.WIDTH
+     * @param height same as Terrarum.HEIGHT
+     * @see net.torvald.terrarum.Terrarum
+     */
     override fun resize(width: Int, height: Int) {
         worldDrawFrameBuffer.dispose()
         worldDrawFrameBuffer = FrameBuffer(worldFBOformat, width, height, true)
+        worldGlowFrameBuffer.dispose()
+        worldGlowFrameBuffer = FrameBuffer(worldFBOformat, width, height, true)
+        worldBlendFrameBuffer.dispose()
+        worldBlendFrameBuffer = FrameBuffer(worldFBOformat, width, height, true)
         lightmapFboA.dispose()
         lightmapFboA = FrameBuffer(lightFBOformat, width.div(lightmapDownsample.toInt()), height.div(lightmapDownsample.toInt()), true)
         lightmapFboB.dispose()
@@ -1402,11 +1479,32 @@ class Ingame(val batch: SpriteBatch) : Screen {
         initViewPort(width, height)
 
 
+
+        // re-calculate fullscreen quad
+        fullscreenQuad = Mesh(
+                true, 4, 6,
+                VertexAttribute.Position(),
+                VertexAttribute.ColorUnpacked(),
+                VertexAttribute.TexCoords(0)
+        )
+        fullscreenQuad.setVertices(floatArrayOf(
+                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
+                Terrarum.WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
+                Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
+                0f, Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
+        ))
+        fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+
+
+
         LightmapRenderer.fireRecalculateEvent()
     }
 
     override fun dispose() {
         worldDrawFrameBuffer.dispose()
+        worldGlowFrameBuffer.dispose()
+        lightmapFboA.dispose()
+        lightmapFboB.dispose()
     }
 
 

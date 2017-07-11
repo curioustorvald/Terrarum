@@ -63,9 +63,9 @@ object BlockPropUtil {
     internal fun dynamicLumFuncTickClock() {
         // FPS-time compensation
         if (Gdx.graphics.framesPerSecond > 0) {
-            flickerFuncX += Gdx.graphics.framesPerSecond
-            breathFuncX += Gdx.graphics.framesPerSecond
-            pulsateFuncX += Gdx.graphics.framesPerSecond
+            flickerFuncX += Gdx.graphics.deltaTime * 1000f
+            breathFuncX  += Gdx.graphics.deltaTime * 1000f
+            pulsateFuncX += Gdx.graphics.deltaTime * 1000f
         }
 
         // flicker-related vars

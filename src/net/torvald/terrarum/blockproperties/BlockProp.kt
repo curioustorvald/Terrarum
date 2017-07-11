@@ -15,12 +15,13 @@ class BlockProp {
     var shadeColR = 0f
     var shadeColG = 0f
     var shadeColB = 0f
+    var shadeColA = 0f
 
     /**
      * @param opacity Raw RGB value, without alpha
      */
     inline val opacity: Color
-        get() = Color(shadeColR, shadeColG, shadeColB, 1f)
+        get() = Color(shadeColR, shadeColG, shadeColB, shadeColA)
 
     var strength: Int = 0
     var density: Int = 0
@@ -35,12 +36,13 @@ class BlockProp {
     var lumColR = 0f
     var lumColG = 0f
     var lumColB = 0f
+    var lumColA = 0f
 
     /**
      * @param luminosity Raw RGB value, without alpha
      */
     inline val luminosity: Color
-        get() = BlockPropUtil.getDynamicLumFunc(Color(lumColR, lumColG, lumColB, 1f), dynamicLuminosityFunction)
+        get() = BlockPropUtil.getDynamicLumFunc(Color(lumColR, lumColG, lumColB, lumColA), dynamicLuminosityFunction)
 
     var drop: Int = 0
 

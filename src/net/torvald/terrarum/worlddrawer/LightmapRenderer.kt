@@ -268,7 +268,7 @@ object LightmapRenderer {
         val thisWall = Terrarum.ingame!!.world.getTileFromWall(x, y)
         val thisTileLuminosity = BlockCodex[thisTerrain].luminosity // already been div by four
         val thisTileOpacity = BlockCodex[thisTerrain].opacity // already been div by four
-        val sunLight = Terrarum.ingame!!.world.globalLight.cpy().mul(DIV_FLOAT, DIV_FLOAT, DIV_FLOAT, 1f)
+        val sunLight = Terrarum.ingame!!.world.globalLight.cpy().mul(DIV_FLOAT, DIV_FLOAT, DIV_FLOAT, DIV_FLOAT)
 
         // MIX TILE
         // open air
@@ -478,7 +478,7 @@ object LightmapRenderer {
      * @param rgb2
      * @return
      */
-    private infix fun Color.maxBlend(other: Color): Color {
+    infix fun Color.maxBlend(other: Color): Color {
         return Color(
                 if (this.r > other.r) this.r else other.r,
                 if (this.g > other.g) this.g else other.g,
