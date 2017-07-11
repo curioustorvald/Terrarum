@@ -102,5 +102,5 @@ val kappa = 24389f/27f
  * u, v: -100+ - 100+
  * (Hundred-based-plus)
  */
-data class CIELab(var L: Float = 0f, var a: Float = 0f, var b: Float = 0f, val alpha: Float = 1f)
+data class CIELab(var L: Float = 0f, var a: Float = 0f, var b: Float = 0f, var alpha: Float = 1f)
 

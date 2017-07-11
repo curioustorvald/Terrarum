@@ -89,14 +89,9 @@ object WeatherMixer {
                 }
                 globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
             }
-        }
-    }
 
-    private fun Color.set(other: Color) {
-        this.r = other.r
-        this.g = other.g
-        this.b = other.b
-        this.a = other.a
+
+        }
     }
 
     /**
@@ -110,9 +105,7 @@ object WeatherMixer {
 
         // calculate global light
         val globalLight = getGradientColour(skyboxColourMap, 2, timeNow)
-        globalLightNow.r = globalLight.r
-        globalLightNow.g = globalLight.g
-        globalLightNow.b = globalLight.b
+        globalLightNow.set(globalLight)
 
         // draw skybox to provided graphics instance
         batch.end()
@@ -140,7 +133,6 @@ object WeatherMixer {
     fun getGlobalLightOfTime(timeInSec: Int): Color =
             getGradientColour(currentWeather.skyboxGradColourMap, 2, timeInSec)
 
-    // TODO colour gradient load from image, store to array
     fun getGradientColour(colorMap: GdxColorMap, row: Int, timeInSec: Int): Color {
         val dataPointDistance = WorldTime.DAY_LENGTH / colorMap.width
 
@@ -150,7 +142,7 @@ object WeatherMixer {
         val colourThis = colorMap.get(phaseThis, row)
         val colourNext = colorMap.get(phaseNext, row)
 
-        // interpolate R, G and B
+        // interpolate R, G, B and A
         val scale = (timeInSec % dataPointDistance).toFloat() / dataPointDistance // [0.0, 1.0]
 
         val newCol = CIELabUtil.getGradient(scale, colourThis, colourNext)

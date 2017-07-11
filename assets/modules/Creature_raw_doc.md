@@ -32,12 +32,12 @@ Creature raw documentation
 
 |name|unit|description|
 |----|----|-----------|
-|luminosity|30-bit RGB (Int)|Self-glow. Set to 0 for not glowing|
+|color|30-bit RGB (Int)|Self-glow. Set to 0 for not glowing|
 |name|String|Given (perhaps customised) name|
 |racename|STRING_ID|Racename token in language CSV|
 |racenameplural|STRING_ID|Racename token in language CSV|
 
-* Note: luminosity uses customised 30-bit RGB. The format specifies ```1.0``` luminosity of white (```#FFFFFF```) be ```0000_0011111111_0011111111_0011111111```, and can hold luminosity range of 0.0-4.0
+* Note: color uses customised 30-bit RGB. The format specifies ```1.0``` color of white (```#FFFFFF```) be ```0000_0011111111_0011111111_0011111111```, and can hold color range of 0.0-4.0
 
 ## Flags ##
 

@@ -11,7 +11,7 @@ class BlockProp {
 
     var nameKey: String = ""
 
-
+    /** 1.0f for 1023, 0.25f for 255 */
     var shadeColR = 0f
     var shadeColG = 0f
     var shadeColB = 0f
@@ -33,6 +33,7 @@ class BlockProp {
     var isVertFriction: Boolean = false
 
 
+    /** 1.0f for 1023, 0.25f for 255 */
     var lumColR = 0f
     var lumColG = 0f
     var lumColB = 0f

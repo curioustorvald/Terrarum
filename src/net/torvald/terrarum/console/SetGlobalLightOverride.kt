@@ -13,12 +13,13 @@ internal object SetGlobalLightOverride : ConsoleCommand {
         private set
 
     override fun execute(args: Array<String>) {
-        if (args.size == 4) {
+        if (args.size == 5) {
             try {
                 val r = args[1].toFloat()
                 val g = args[2].toFloat()
                 val b = args[3].toFloat()
-                val GL = Color(r, g, b, 1f)
+                val a = args[4].toFloat()
+                val GL = Color(r, g, b, a)
 
                 lightOverride = true
                 Terrarum.ingame!!.world.globalLight = GL
@@ -37,6 +38,6 @@ internal object SetGlobalLightOverride : ConsoleCommand {
     }
 
     override fun printUsage() {
-        Echo("Usage: setgl [raw_value|r g b|“none”]")
+        Echo("Usage: setgl [r g b a|“none”]")
     }
 }

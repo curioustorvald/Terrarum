@@ -96,16 +96,16 @@ object CIEXYZUtil {
 }
 
 /** Range: X, Y, Z: 0 - 1.0+ (One-based-plus) */
-data class CIEXYZ(var X: Float = 0f, var Y: Float = 0f, var Z: Float = 0f, val alpha: Float = 1f) {
+data class CIEXYZ(var X: Float = 0f, var Y: Float = 0f, var Z: Float = 0f, var alpha: Float = 1f) {
     init {
         if (X > 2f || Y > 2f || Z > 2f)
-            throw IllegalArgumentException("Value range error - CIEXYZ is one-based (0.0 - 1.0+): ($X, $Y, $Z)")
+            throw IllegalArgumentException("Value range error - this version of CIEXYZ is one-based (0.0 - 1.0+): ($X, $Y, $Z)")
     }
 }
 
 /** Range: r, g, b: 0 - 1.0 (One-based) */
-data class RGB(var r: Float = 0f, var g: Float = 0f, var b: Float = 0f, val alpha: Float = 1f) {
+data class RGB(var r: Float = 0f, var g: Float = 0f, var b: Float = 0f, var alpha: Float = 1f) {
     constructor(color: Color) : this() {
-        r = color.r; g = color.g; b = color.b
+        r = color.r; g = color.g; b = color.b; alpha = color.a
     }
 }
