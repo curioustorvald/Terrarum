@@ -49,9 +49,10 @@ object PlayerBuilderSigrid {
 
         p.actorValue[AVKey.INTELLIGENT] = true
 
-        //p.actorValue[AVKey.LUMR] = 0.84f
-        //p.actorValue[AVKey.LUMR] = 0.93f
-        //p.actorValue[AVKey.LUMR] = 1.37f
+        //p.actorValue[AVKey.LUMR] = 0.84
+        //p.actorValue[AVKey.LUMR] = 0.93
+        //p.actorValue[AVKey.LUMR] = 1.37
+        p.actorValue[AVKey.LUMA] = 0.32
 
         p.actorValue[AVKey.BASEDEFENCE] = 141
 

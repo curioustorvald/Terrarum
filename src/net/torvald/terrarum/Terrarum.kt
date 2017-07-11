@@ -47,6 +47,9 @@ fun main(args: Array<String>) {
     config.foregroundFPS = RENDER_FPS
     config.title = GAME_NAME
 
+    Terrarum.screenW = config.width
+    Terrarum.screenH = config.height
+
     println("usevsync = ${Terrarum.USE_VSYNC}")
 
     // the game must run on same speed regardless of the display FPS;
@@ -61,6 +64,9 @@ typealias RGBA8888 = Int
 
 object Terrarum : ApplicationAdapter() {
 
+    internal var screenW: Int? = null
+    internal var screenH: Int? = null
+
     lateinit var batch: SpriteBatch
     lateinit var shapeRender: ShapeRenderer // DO NOT USE!! for very limited applications e.g. WeatherMixer
     inline fun inShapeRenderer(shapeRendererType: ShapeRenderer.ShapeType = ShapeRenderer.ShapeType.Filled, action: (ShapeRenderer) -> Unit) {
@@ -68,10 +74,6 @@ object Terrarum : ApplicationAdapter() {
         action(shapeRender)
         shapeRender.end()
     }
-
-
-    lateinit var orthoLineTex2px: Texture
-    lateinit var orthoLineTex3px: Texture
 
 
     //////////////////////////////
@@ -84,10 +86,10 @@ object Terrarum : ApplicationAdapter() {
     val VSYNC_TRIGGER_THRESHOLD = 56
 
 
-    inline val WIDTH: Int
-        get() = Gdx.graphics.width//if (Gdx.graphics.width % 1 == 1) Gdx.graphics.width + 1 else Gdx.graphics.width
-    inline val HEIGHT: Int
-        get() = Gdx.graphics.height//if (Gdx.graphics.height % 1 == 1) Gdx.graphics.height + 1 else Gdx.graphics.height
+    val WIDTH: Int
+        get() = if (screenW!! % 2 == 0) screenW!! else screenW!! + 1
+    val HEIGHT: Int
+        get() = if (screenH!! % 2 == 0) screenH!! else screenH!! + 1
 
     inline val HALFW: Int
         get() = WIDTH.ushr(1)
@@ -242,6 +244,7 @@ object Terrarum : ApplicationAdapter() {
     lateinit var shaderAOnly: ShaderProgram
     lateinit var shader4096: ShaderProgram
     lateinit var shader4096Bayer: ShaderProgram
+    lateinit var shaderBlendGlow: ShaderProgram
 
 
     init {
@@ -291,9 +294,6 @@ object Terrarum : ApplicationAdapter() {
         batch = SpriteBatch()
         shapeRender = ShapeRenderer()
 
-        orthoLineTex2px = Texture("assets/graphics/ortho_line_tex_2px.tga")
-        orthoLineTex3px = Texture("assets/graphics/ortho_line_tex_3px.tga")
-
 
         fontGame = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = true)
         fontSmallNumbers = TinyAlphNum
@@ -312,6 +312,13 @@ object Terrarum : ApplicationAdapter() {
 
         shaderRGBOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbonly.frag"))
         shaderAOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/aonly.frag"))
+
+        shaderBlendGlow = ShaderProgram(Gdx.files.internal("assets/blendGlow.vert"), Gdx.files.internal("assets/blendGlow.frag"))
+
+        if (!shaderBlendGlow.isCompiled) {
+            Gdx.app.log("Shader", shaderBlendGlow.log)
+            System.exit(1)
+        }
 
 
 
@@ -348,7 +355,10 @@ object Terrarum : ApplicationAdapter() {
     }
 
     override fun resize(width: Int, height: Int) {
-        currentScreen.resize(width, height)
+        screenW = width
+        screenH = height
+
+        currentScreen.resize(WIDTH, HEIGHT)
     }
 
 

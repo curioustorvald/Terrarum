@@ -87,7 +87,7 @@ object WeatherMixer {
                     )
                     Terrarum.ingame!!.addParticle(rainParticle)
                 }
-                globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 1f))
+                globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
             }
         }
     }
@@ -107,7 +107,6 @@ object WeatherMixer {
         // we will not care for nextSkybox for now
         val timeNow = Terrarum.ingame!!.world.time.todaySeconds
         val skyboxColourMap = currentWeather.skyboxGradColourMap
-        val lightColourMap = currentWeather.globalLightColourMap
 
         // calculate global light
         val globalLight = getGradientColour(skyboxColourMap, 2, timeNow)
@@ -139,7 +138,7 @@ object WeatherMixer {
      * Get a GL of specific time
      */
     fun getGlobalLightOfTime(timeInSec: Int): Color =
-            getGradientColour(currentWeather.globalLightColourMap, 0, timeInSec)
+            getGradientColour(currentWeather.skyboxGradColourMap, 2, timeInSec)
 
     // TODO colour gradient load from image, store to array
     fun getGradientColour(colorMap: GdxColorMap, row: Int, timeInSec: Int): Color {
@@ -167,8 +166,6 @@ object WeatherMixer {
         return newCol
     }
 
-    fun Color.toStringRGB() = "RGB8(${this.r}, ${this.g}, ${this.b})"
-
     fun getWeatherList(classification: String) = weatherList[classification]!!
     fun getRandomWeather(classification: String) =
             getWeatherList(classification)[HQRNG().nextInt(getWeatherList(classification).size)]
@@ -178,8 +175,7 @@ object WeatherMixer {
     fun readFromJson(path: String): BaseModularWeather {
         /* JSON structure:
 {
-  "globalLight": "colourmap/sky_colour.tga", // integer for static, string (path to image) for dynamic
-  "skyboxGradColourMap": "colourmap/sky_colour.tga", // integer for static, string (path to image) for dynamic
+  "skyboxGradColourMap": "colourmap/sky_colour.tga", // string (path to image) for dynamic. Image must be RGBA8888 or RGB888
   "extraImages": [
       // if any, it will be like:
       sun01.tga,
@@ -193,25 +189,13 @@ object WeatherMixer {
 
         val JSON = JsonFetcher(path)
 
-        val globalLightInJson = JSON.get("globalLight").asJsonPrimitive
         val skyboxInJson = JSON.get("skyboxGradColourMap").asJsonPrimitive
         val extraImagesPath = JSON.getAsJsonArray("extraImages")
 
 
 
-        val globalLight = if (globalLightInJson.isString)
-            GdxColorMap(ModMgr.getGdxFile("basegame", "$pathToImage/${globalLightInJson.asString}"))
-        else if (globalLightInJson.isNumber)
-            GdxColorMap(globalLightInJson.asNumber.toInt())
-        else
-            throw IllegalStateException("In weather descriptor $path -- globalLight seems malformed.")
-
-
-
         val skybox = if (skyboxInJson.isString)
             GdxColorMap(ModMgr.getGdxFile("basegame", "$pathToImage/${skyboxInJson.asString}"))
-        else if (globalLightInJson.isNumber)
-            GdxColorMap(skyboxInJson.asNumber.toInt())
         else
             throw IllegalStateException("In weather descriptor $path -- skyboxGradColourMap seems malformed.")
 
@@ -240,7 +224,6 @@ object WeatherMixer {
 
 
         return BaseModularWeather(
-                globalLightColourMap = globalLight,
                 skyboxGradColourMap = skybox,
                 classification = classification,
                 extraImages = extraImages

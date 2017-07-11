@@ -54,12 +54,13 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
                 (actorValue.getAsFloat(AVKey.LUMR) ?: 0f) / LightmapRenderer.MUL_FLOAT,
                 (actorValue.getAsFloat(AVKey.LUMG) ?: 0f) / LightmapRenderer.MUL_FLOAT,
                 (actorValue.getAsFloat(AVKey.LUMB) ?: 0f) / LightmapRenderer.MUL_FLOAT,
-                1f
+                (actorValue.getAsFloat(AVKey.LUMA) ?: 0f) / LightmapRenderer.MUL_FLOAT
         )
         set(value) {
             actorValue[AVKey.LUMR] = value.r * LightmapRenderer.MUL_FLOAT
             actorValue[AVKey.LUMG] = value.g * LightmapRenderer.MUL_FLOAT
             actorValue[AVKey.LUMB] = value.b * LightmapRenderer.MUL_FLOAT
+            actorValue[AVKey.LUMA] = value.a * LightmapRenderer.MUL_FLOAT
         }
 
     /**
