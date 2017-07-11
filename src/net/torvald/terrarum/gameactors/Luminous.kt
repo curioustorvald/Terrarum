@@ -8,9 +8,11 @@ import com.badlogic.gdx.graphics.Color
 interface Luminous {
 
     /**
+     * Range of 0.0 - 4.0 for each channel
+     *
      * Recommended implementation:
      *
-    override var luminosity: Color
+    override var color: Color
         get() = Color(
             (actorValue.getAsFloat(AVKey.LUMR) ?: 0f) / LightmapRenderer.MUL_FLOAT,
             (actorValue.getAsFloat(AVKey.LUMG) ?: 0f) / LightmapRenderer.MUL_FLOAT,
@@ -24,7 +26,7 @@ interface Luminous {
             actorValue[AVKey.LUMA] = value.a * LightmapRenderer.MUL_FLOAT
         }
      */
-    var luminosity: Color
+    var color: Color
 
     /**
      * Arguments:

@@ -11,13 +11,13 @@ class WeaponSwung(val itemID: Int) : ActorWithPhysics(Actor.RenderOrder.MIDTOP),
     /**
      * Recommended implementation:
      *
-    override var luminosity: Int
+    override var color: Int
     get() = actorValue.getAsInt(AVKey.LUMINOSITY) ?: 0
     set(value) {
     actorValue[AVKey.LUMINOSITY] = value
     }
      */
-    override var luminosity: Color
+    override var color: Color
         get() = throw UnsupportedOperationException()
         set(value) {
         }

@@ -33,7 +33,7 @@ class GameWorld(val width: Int, val height: Int) {
     /** Meter per second squared. Currently only the downward gravity is supported. No reverse gravity :p */
     var gravitation: Vector2 = Vector2(0.0, 9.8)
     /** 0.0..1.0+ */
-    var globalLight = Color(0f,0f,0f,1f)
+    var globalLight = Color(0f,0f,0f,0f)
 
 
 

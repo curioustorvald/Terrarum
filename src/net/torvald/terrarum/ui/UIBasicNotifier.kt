@@ -102,7 +102,7 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas {
 
 
             // backplate
-            batch.color = lightLevel
+            batch.color = Color(lightLevel.r, lightLevel.g, lightLevel.b, 1f)
             batch.draw(atlas.get(0, 0), 0f, 0f)
         }
 
