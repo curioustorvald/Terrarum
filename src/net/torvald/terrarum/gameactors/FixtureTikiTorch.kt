@@ -12,7 +12,7 @@ import java.util.*
  */
 internal class FixtureTikiTorch : FixtureBase(), Luminous {
 
-    override var luminosity: Color
+    override var color: Color
         get() = BlockCodex[Block.TORCH].luminosity
         set(value) {
             throw UnsupportedOperationException()

@@ -28,7 +28,7 @@ open class ProjectileSimple(
     val speed: Int
 
 
-    override var luminosity: Color
+    override var color: Color
         get() = (bulletDatabase[type][OFFSET_LUMINOSITY] as Color).cpy()
         set(value) {
         }
