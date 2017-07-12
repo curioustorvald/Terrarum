@@ -247,6 +247,9 @@ object Terrarum : ApplicationAdapter() {
     lateinit var shaderBlendGlow: ShaderProgram
 
 
+    lateinit var textureWhiteSquare: Texture
+
+
     init {
         println("[Terrarum] os.arch = $systemArch") // debug info
 
@@ -297,6 +300,10 @@ object Terrarum : ApplicationAdapter() {
 
         fontGame = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = true)
         fontSmallNumbers = TinyAlphNum
+
+
+        textureWhiteSquare = Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"))
+        textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
 
         ShaderProgram.pedantic = false
@@ -567,7 +574,7 @@ fun Float.round(): Float {
 
 // ShapeRenderer alternative for rects
 fun SpriteBatch.fillRect(x: Float, y: Float, w: Float, h: Float) {
-    this.draw(net.torvald.terrarum.worlddrawer.BlocksDrawer.tilesTerrain.get(1, 0), x, y, w, h)
+    this.draw(Terrarum.textureWhiteSquare, x, y, w, h)
 }
 inline fun SpriteBatch.drawStraightLine(x: Float, y: Float, p2: Float, thickness: Float, isVertical: Boolean) {
     if (!isVertical)

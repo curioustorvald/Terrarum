@@ -2,6 +2,8 @@ package net.torvald.terrarum.worlddrawer
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.floor
+import net.torvald.terrarum.gameactors.floorInt
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.round
@@ -40,16 +42,16 @@ object WorldCamera {
 
             // position - (WH / 2)
             x = (// X only: ROUNDWORLD implementation
-                    (player?.hitbox?.centeredX?.toFloat() ?: 0f) - width / 2).roundInt()
+                    (player?.hitbox?.centeredX?.toFloat() ?: 0f) - width / 2).floorInt()
             y = (FastMath.clamp(
                     (player?.hitbox?.centeredY?.toFloat() ?: 0f) - height / 2,
                     TILE_SIZE.toFloat(),
                     world!!.height * TILE_SIZE - height - TILE_SIZE.toFloat()
-            )).roundInt()
+            )).floorInt()
 
 
-            gdxCamX = x + (width / 2f).round()
-            gdxCamY = y + (height / 2f).round()
+            gdxCamX = x + (width / 2f).floor()
+            gdxCamY = y + (height / 2f).floor()
         }
     }
 }
