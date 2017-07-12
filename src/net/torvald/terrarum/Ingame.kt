@@ -35,6 +35,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.worldgenerator.WorldGenerator
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 
 /**
@@ -197,6 +198,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
     override fun show() {
         initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
+
         // gameLoadMode and gameLoadInfoPayload must be set beforehand!!
 
         when (gameLoadMode) {
@@ -223,7 +225,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
      */
     private fun enter(gameSaveData: GameSaveData) {
         if (gameFullyLoaded) {
-            Error("You are doing things horribly wrong, fucknugget.")
+            Error("You are doing horribly wrong, fucknugget.")
         }
 
         world = gameSaveData.world
@@ -1474,6 +1476,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
     }
 
     override fun hide() {
+        dispose()
     }
 
     /**
@@ -1524,6 +1527,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
     override fun dispose() {
         worldDrawFrameBuffer.dispose()
         worldGlowFrameBuffer.dispose()
+        worldBlendFrameBuffer.dispose()
         lightmapFboA.dispose()
         lightmapFboB.dispose()
     }
