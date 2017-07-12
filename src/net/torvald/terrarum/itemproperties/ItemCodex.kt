@@ -36,6 +36,9 @@ object ItemCodex {
 
 
     init {
+
+        println("[ItemCodex] recording item ID ")
+
         // blocks.csvs are loaded by ModMgr beforehand
         // block items (blocks and walls are the same thing basically)
         for (i in ITEM_TILES + ITEM_WALLS) {
@@ -53,7 +56,7 @@ object ItemCodex {
                 override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
 
                 init {
-                    println("[ItemCodex] recording item ID $originalID")
+                    print("$originalID ")
                 }
 
                 override fun primaryUse(delta: Float): Boolean {
@@ -165,6 +168,10 @@ object ItemCodex {
 
 
         // read from save (if applicable) and fill dynamicItemDescription
+
+
+
+        println()
     }
 
     /**
