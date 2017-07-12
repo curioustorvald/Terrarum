@@ -1,6 +1,7 @@
 package net.torvald.terrarum
 
 import com.badlogic.gdx.ApplicationAdapter
+import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
@@ -14,6 +15,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum.RENDER_FPS
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.imagefont.TinyAlphNum
@@ -62,7 +64,7 @@ fun main(args: Array<String>) {
 
 typealias RGBA8888 = Int
 
-object Terrarum : ApplicationAdapter() {
+object Terrarum : Game() {
 
     internal var screenW: Int? = null
     internal var screenH: Int? = null
@@ -125,7 +127,6 @@ object Terrarum : ApplicationAdapter() {
             return lan + country
         }
 
-    lateinit var currentScreen: Screen
     var previousScreen: Screen? = null // to be used with temporary states like StateMonitorCheck
 
 
@@ -336,26 +337,27 @@ object Terrarum : ApplicationAdapter() {
 
 
         ingame = Ingame(batch)
-        currentScreen = ingame as Screen
-        ingame!!.enter()
+        ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, HQRNG().nextLong())
+        ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
 
+        super.setScreen(ingame)
     }
 
     override fun render() {
-        currentScreen.render(Gdx.graphics.deltaTime)
+        super.screen.render(Gdx.graphics.deltaTime)
         GLOBAL_RENDER_TIMER += 1
     }
 
     override fun pause() {
-        currentScreen.pause()
+        super.screen.pause()
     }
 
     override fun resume() {
-        currentScreen.resume()
+        super.screen.resume()
     }
 
     override fun dispose() {
-        currentScreen.dispose()
+        super.screen.dispose()
         fontGame.dispose()
         fontSmallNumbers.dispose()
         //dispose any other resources used in this level
@@ -365,7 +367,7 @@ object Terrarum : ApplicationAdapter() {
         screenW = width
         screenH = height
 
-        currentScreen.resize(WIDTH, HEIGHT)
+        super.screen.resize(WIDTH, HEIGHT)
     }
 
 
