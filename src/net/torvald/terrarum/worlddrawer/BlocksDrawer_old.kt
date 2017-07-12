@@ -86,7 +86,9 @@ object BlocksDrawer {
         gzTmpFName.forEach { File(it).delete() }
 
         tilesTerrain = TextureRegionPack(Texture(terrainPixMap), TILE_SIZE, TILE_SIZE)
+        tilesTerrain.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         tilesWire = TextureRegionPack(Texture(wirePixMap), TILE_SIZE, TILE_SIZE)
+        tilesWire.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         // also dispose unused temp files
         //terrainPixMap.dispose() // commented: tileItemWall needs it
