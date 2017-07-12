@@ -80,7 +80,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
     private val worldFBOformat = if (Terrarum.environment == RunningEnvironment.MOBILE) Pixmap.Format.RGBA4444 else Pixmap.Format.RGBA8888
     private val lightFBOformat = Pixmap.Format.RGB888
-    private val lightUvFBOformat = Pixmap.Format.RGB888
 
     var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
     var worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
@@ -88,9 +87,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
     // RGB elements of Lightmap for Color  Vec4(R, G, B, 1.0)  24-bit
     var lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
     var lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
-    // A elements of Lightmap for UV Light  Vec4(A, A, A, A)  8-bit
-    //var lightmapUvFboA = FrameBuffer(lightUvFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
-    //var lightmapUvFboB = FrameBuffer(lightUvFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
 
 
     init {
@@ -146,6 +142,11 @@ class Ingame(val batch: SpriteBatch) : Screen {
     private lateinit var updateThreadWrapper: Thread
     //private val ingameDrawThread: ThreadIngameDraw // draw must be on the main thread
 
+
+    private var gameFullyLoaded = false
+
+
+
     //////////////
     // GDX code //
     //////////////
@@ -186,9 +187,22 @@ class Ingame(val batch: SpriteBatch) : Screen {
     }
 
 
+    lateinit var gameLoadMode: GameLoadMode
+    lateinit var gameLoadInfoPayload: Any
+
+    enum class GameLoadMode {
+        CREATE_NEW, LOAD_FROM
+    }
+
     override fun show() {
-        // Set up viewport on first load
         initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+
+        // gameLoadMode and gameLoadInfoPayload must be set beforehand!!
+
+        when (gameLoadMode) {
+            GameLoadMode.CREATE_NEW -> enter(gameLoadInfoPayload as NewWorldParameters)
+            GameLoadMode.LOAD_FROM -> enter(gameLoadInfoPayload as GameSaveData)
+        }
     }
 
     data class GameSaveData(
@@ -197,7 +211,21 @@ class Ingame(val batch: SpriteBatch) : Screen {
             val realGamePlayer: ActorHumanoid
     )
 
-    fun enter(gameSaveData: GameSaveData) {
+    data class NewWorldParameters(
+            val width: Int,
+            val height: Int,
+            val worldGenSeed: Long
+            // other worldgen options
+    )
+
+    /**
+     * Init instance by loading saved world
+     */
+    private fun enter(gameSaveData: GameSaveData) {
+        if (gameFullyLoaded) {
+            Error("You are doing things horribly wrong, fucknugget.")
+        }
+
         world = gameSaveData.world
         historicalFigureIDBucket = gameSaveData.historicalFigureIDBucket
         playableActorDelegate = PlayableActorDelegate(gameSaveData.realGamePlayer)
@@ -206,21 +234,22 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
         initGame()
+
+        gameFullyLoaded = true
     }
 
 
     /**
-     * Create new world
+     * Init instance by creating new world
      */
-    fun enter() {
+    private fun enter(worldParams: NewWorldParameters) {
 
         // init map as chosen size
-        world = GameWorld(8192, 2048)
+        world = GameWorld(worldParams.width, worldParams.height)
 
         // generate terrain for the map
         WorldGenerator.attachMap(world)
-        //WorldGenerator.SEED = 0x51621D2
-        WorldGenerator.SEED = HQRNG().nextLong()
+        WorldGenerator.SEED = worldParams.worldGenSeed
         WorldGenerator.generateMap()
 
 
@@ -1463,10 +1492,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
         lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
         lightmapFboB.dispose()
         lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
-        //lightmapUvFboA.dispose()
-        //lightmapUvFboA = FrameBuffer(lightUvFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
-        //lightmapUvFboB.dispose()
-        //lightmapUvFboB = FrameBuffer(lightUvFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
 
 
         // Set up viewport when window is resized
@@ -1491,7 +1516,9 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
 
-        LightmapRenderer.fireRecalculateEvent()
+        if (gameFullyLoaded) {
+            LightmapRenderer.fireRecalculateEvent()
+        }
     }
 
     override fun dispose() {
