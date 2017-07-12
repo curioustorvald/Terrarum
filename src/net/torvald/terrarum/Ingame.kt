@@ -74,7 +74,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
     val ZOOM_MINIMUM = 0.5f
 
     companion object {
-        val lightmapDownsample = 1f
+        val lightmapDownsample = 2f //2f: still has choppy look when the camera moves but unnoticeable when blurred
     }
 
 
@@ -488,10 +488,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
 
-
-        ///////////////////
-        // blur lightmap //
-        ///////////////////
         worldDrawFrameBuffer.inAction(null, null) {
             Gdx.gl.glClearColor(0f,0f,0f,0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -524,9 +520,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
                 BlocksDrawer.renderWall(batch)
                 actorsRenderBehind.forEach { it.drawBody(batch) }
-                actorsRenderBehind.forEach { it.drawGlow(batch) }
                 particlesContainer.forEach { it.drawBody(batch) }
-                particlesContainer.forEach { it.drawGlow(batch) }
                 BlocksDrawer.renderTerrain(batch)
 
                 /////////////////
@@ -604,7 +598,9 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 //////////////////////
                 // draw actor glows //
                 //////////////////////
-                
+
+                actorsRenderBehind.forEach { it.drawGlow(batch) }
+                particlesContainer.forEach { it.drawGlow(batch) }
                 actorsRenderMiddle.forEach { it.drawGlow(batch) }
                 actorsRenderMidTop.forEach { it.drawGlow(batch) }
                 player?.drawGlow(batch)
@@ -644,6 +640,9 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
             val worldTex = worldDrawFrameBuffer.colorBufferTexture // WORLD: light_color must be applied beforehand
             val glowTex = worldGlowFrameBuffer.colorBufferTexture // GLOW: light_uvlight must be applied beforehand
+
+            worldTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+            glowTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
             //Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
             worldTex.bind(0)
@@ -702,6 +701,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
             val blendedTex = worldBlendFrameBuffer.colorBufferTexture
+            blendedTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
             batch.color = Color.WHITE
             batch.shader = null
             blendNormal()
@@ -1454,15 +1454,15 @@ class Ingame(val batch: SpriteBatch) : Screen {
      */
     override fun resize(width: Int, height: Int) {
         worldDrawFrameBuffer.dispose()
-        worldDrawFrameBuffer = FrameBuffer(worldFBOformat, width, height, true)
+        worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
         worldGlowFrameBuffer.dispose()
-        worldGlowFrameBuffer = FrameBuffer(worldFBOformat, width, height, true)
+        worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
         worldBlendFrameBuffer.dispose()
-        worldBlendFrameBuffer = FrameBuffer(worldFBOformat, width, height, true)
+        worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
         lightmapFboA.dispose()
-        lightmapFboA = FrameBuffer(lightFBOformat, width.div(lightmapDownsample.toInt()), height.div(lightmapDownsample.toInt()), true)
+        lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
         lightmapFboB.dispose()
-        lightmapFboB = FrameBuffer(lightFBOformat, width.div(lightmapDownsample.toInt()), height.div(lightmapDownsample.toInt()), true)
+        lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
         //lightmapUvFboA.dispose()
         //lightmapUvFboA = FrameBuffer(lightUvFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
         //lightmapUvFboB.dispose()
