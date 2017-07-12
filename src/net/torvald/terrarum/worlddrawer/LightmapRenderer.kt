@@ -381,11 +381,12 @@ object LightmapRenderer {
                             batch.color = (getLightForOpaque(x, y) ?: Color(0f,0f,0f,0f)).normaliseToAlphaHDR()
                         }
 
+
                         batch.fillRect(
-                                (x * DRAW_TILE_SIZE).round().toFloat(),
-                                (y * DRAW_TILE_SIZE).round().toFloat(),
-                                DRAW_TILE_SIZE.ceil() * sameLevelCounter + 1f,
-                                DRAW_TILE_SIZE.ceil() + 1f
+                                x * DRAW_TILE_SIZE,
+                                y * DRAW_TILE_SIZE,
+                                (DRAW_TILE_SIZE * sameLevelCounter).ceil().toFloat(),// + 1f,
+                                DRAW_TILE_SIZE.ceil().toFloat()// + 1f
                         )
 
                         x += sameLevelCounter - 1
