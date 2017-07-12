@@ -82,12 +82,6 @@ object Terrarum : Game() {
     // GLOBAL IMMUTABLE CONFIGS //
     //////////////////////////////
 
-    val RENDER_FPS = getConfigInt("displayfps")
-    val USE_VSYNC = getConfigBoolean("usevsync")
-    var VSYNC = USE_VSYNC
-    val VSYNC_TRIGGER_THRESHOLD = 56
-
-
     val WIDTH: Int
         get() = if (screenW!! % 2 == 0) screenW!! else screenW!! + 1
     val HEIGHT: Int
@@ -252,6 +246,16 @@ object Terrarum : Game() {
 
 
     init {
+        getDefaultDirectory()
+        createDirs()
+
+
+        // read config i guess...?
+        val readFromDisk = readConfigJson()
+        if (!readFromDisk) readConfigJson() // what's this for?
+
+
+
         println("[Terrarum] os.arch = $systemArch") // debug info
 
         if (is32BitJVM) {
@@ -273,12 +277,6 @@ object Terrarum : Game() {
 
 
 
-        getDefaultDirectory()
-        createDirs()
-
-        val readFromDisk = readConfigJson()
-        if (!readFromDisk) readConfigJson()
-
         environment = try {
             Controllers.getController(0) // test if controller exists
             if (getConfigString("pcgamepadenv") == "console")
@@ -289,7 +287,15 @@ object Terrarum : Game() {
         catch (e: IndexOutOfBoundsException) {
             RunningEnvironment.PC
         }
+
     }
+
+
+    val RENDER_FPS = getConfigInt("displayfps")
+    val USE_VSYNC = getConfigBoolean("usevsync")
+    var VSYNC = USE_VSYNC
+    val VSYNC_TRIGGER_THRESHOLD = 56
+
 
     override fun create() {
         TextureRegionPack.globalFlipY = true // !! TO MAKE LEGACY CODE RENDER ON ITS POSITION !!
@@ -330,6 +336,11 @@ object Terrarum : Game() {
 
 
 
+        gameLocale = getConfigString("language")
+        println("[Terrarum] locale = $gameLocale")
+
+
+
         ModMgr // invoke Module Manager, will also invoke BlockCodex
         ItemCodex // invoke Item Codex
 
@@ -340,7 +351,8 @@ object Terrarum : Game() {
         ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, HQRNG().nextLong())
         ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
 
-        super.setScreen(ingame)
+        //super.setScreen(ingame)
+        super.setScreen(LoadScreen)
     }
 
     override fun render() {
@@ -498,20 +510,37 @@ object Terrarum : Game() {
             return cfg as IntArray
     }
 
+    /**
+     * Get config from config file. If the entry does not exist, get from defaults; if the entry is not in the default, NullPointerException will be thrown
+     */
+    private val defaultConfig = DefaultConfig.fetch()
+
     private fun getConfigMaster(key: String): Any {
-        var cfg: Any? = null
-        try {
-            cfg = gameConfig[key.toLowerCase()]!!
+        val config = try {
+            gameConfig[key]
         }
         catch (e: NullPointerException) {
-            try {
-                cfg = DefaultConfig.fetch()[key.toLowerCase()]
+            null
+        }
+
+        val defaults = try {
+            defaultConfig.get(key)
+        }
+        catch (e: NullPointerException) {
+            null
+        }
+
+        if (config == null) {
+            if (defaults == null) {
+                throw NullPointerException("key not found: '$key'")
             }
-            catch (e1: NullPointerException) {
-                e.printStackTrace()
+            else {
+                return defaults
             }
         }
-        return cfg!!
+        else {
+            return config
+        }
     }
 
     fun setConfig(key: String, value: Any) {
