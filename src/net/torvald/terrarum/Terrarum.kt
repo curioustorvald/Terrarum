@@ -355,8 +355,15 @@ object Terrarum : Game() {
         ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, HQRNG().nextLong())
         ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
 
-        //super.setScreen(ingame)
+
+        LoadScreen.screenToLoad = ingame!!
         super.setScreen(LoadScreen)
+
+        //super.setScreen(ingame)
+    }
+
+    internal fun changeScreen(screen: Screen) {
+        super.setScreen(screen)
     }
 
     override fun render() {
