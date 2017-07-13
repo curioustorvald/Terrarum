@@ -4,14 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
-import net.torvald.dataclass.CircularArray
 import net.torvald.dataclass.HistoryArray
 import net.torvald.terrarum.gameactors.floor
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2017-07-13.
@@ -46,7 +43,7 @@ object LoadScreen : ScreenAdapter() {
     private lateinit var textOverlayTex: Texture
     private lateinit var textFbo: FrameBuffer
 
-    private val ghostMaxZoom = 1.3f
+    private val ghostMaxZoomX = 1.3f
     private val ghostAlphaMax = 1f
 
     var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
@@ -89,6 +86,8 @@ object LoadScreen : ScreenAdapter() {
 
 
     val textX: Float; get() = (Terrarum.WIDTH * 0.75f).floor()
+
+    private var genuineSonic = false // the "NOW LOADING..." won't appear unless the arrow first run passes it  (it's totally not a GenuineIntel tho)
 
     override fun render(delta: Float) {
         glideDispY = Terrarum.HEIGHT - 100f - Terrarum.fontGame.lineHeight
@@ -140,20 +139,26 @@ object LoadScreen : ScreenAdapter() {
 
             // draw text FBO to screen
             val textTex = textFbo.colorBufferTexture
-            textTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+            textTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
             // --> original text
-            it.color = Color.WHITE
-            it.draw(textTex, textX, glideDispY - 2f)
+            if (genuineSonic) {
+                it.color = Color.WHITE
+                it.draw(textTex, textX, glideDispY - 2f)
+            }
 
             // --> ghost
             it.color = getPulseEffCol()
+
+            if (it.color.a != 0f) genuineSonic = true
+
             val drawWidth = getPulseEffWidthMul() * textTex.width
+            val drawHeight = getPulseEffWidthMul() * textTex.height
             it.draw(textTex,
                     textX - (drawWidth - textTex.width) / 2f,
-                    glideDispY - 2f,
+                    glideDispY - 2f - (drawHeight - textTex.height) / 2f,
                     drawWidth,
-                    textTex.height.toFloat()
+                    drawHeight
             )
 
 
@@ -202,7 +207,7 @@ object LoadScreen : ScreenAdapter() {
             val scaleEnd = arrowObjGlideSize - arrowObjTex.width * 3f
             val scale = (arrowObjPos - scaleStart) / (scaleEnd - scaleStart)
 
-            return FastMath.interpolateLinear(scale, 1f, ghostMaxZoom)
+            return FastMath.interpolateLinear(scale, 1f, ghostMaxZoomX)
         }
     }
 
