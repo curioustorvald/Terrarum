@@ -144,8 +144,9 @@ class Ingame(val batch: SpriteBatch) : Screen {
     //private val ingameDrawThread: ThreadIngameDraw // draw must be on the main thread
 
 
-    private var gameFullyLoaded = false
-
+    var gameFullyLoaded = false
+        private set
+    private var postInitDone = false
 
 
     //////////////
@@ -196,7 +197,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
     }
 
     override fun show() {
-        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+        //initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
 
         // gameLoadMode and gameLoadInfoPayload must be set beforehand!!
@@ -225,54 +226,65 @@ class Ingame(val batch: SpriteBatch) : Screen {
      */
     private fun enter(gameSaveData: GameSaveData) {
         if (gameFullyLoaded) {
-            Error("You are doing horribly wrong, fucknugget.")
+            println("[Ingame] loaded successfully.")
         }
-
-        world = gameSaveData.world
-        historicalFigureIDBucket = gameSaveData.historicalFigureIDBucket
-        playableActorDelegate = PlayableActorDelegate(gameSaveData.realGamePlayer)
-        addNewActor(player!!)
+        else {
+            LoadScreen.addMessage("Loading world from save")
 
 
+            world = gameSaveData.world
+            historicalFigureIDBucket = gameSaveData.historicalFigureIDBucket
+            playableActorDelegate = PlayableActorDelegate(gameSaveData.realGamePlayer)
+            addNewActor(player!!)
 
-        initGame()
 
-        gameFullyLoaded = true
+
+            //initGame()
+
+            gameFullyLoaded = true
+        }
     }
-
 
     /**
      * Init instance by creating new world
      */
     private fun enter(worldParams: NewWorldParameters) {
-
-        // init map as chosen size
-        world = GameWorld(worldParams.width, worldParams.height)
-
-        // generate terrain for the map
-        WorldGenerator.attachMap(world)
-        WorldGenerator.SEED = worldParams.worldGenSeed
-        WorldGenerator.generateMap()
+        if (gameFullyLoaded) {
+            println("[Ingame] loaded successfully.")
+        }
+        else {
+            LoadScreen.addMessage("Creating new world")
 
 
-        historicalFigureIDBucket = ArrayList<Int>()
+            // init map as chosen size
+            world = GameWorld(worldParams.width, worldParams.height)
+
+            // generate terrain for the map
+            WorldGenerator.attachMap(world)
+            WorldGenerator.SEED = worldParams.worldGenSeed
+            WorldGenerator.generateMap()
 
 
-        RoguelikeRandomiser.seed = HQRNG().nextLong()
+            historicalFigureIDBucket = ArrayList<Int>()
 
 
-        // add new player and put it to actorContainer
-        playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
-        //playableActorDelegate = PlayableActorDelegate(PlayerBuilderTestSubject1())
-        addNewActor(player!!)
+            RoguelikeRandomiser.seed = HQRNG().nextLong()
 
 
-        // test actor
-        //addNewActor(PlayerBuilderCynthia())
+            // add new player and put it to actorContainer
+            //playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
+            //playableActorDelegate = PlayableActorDelegate(PlayerBuilderTestSubject1())
+            //addNewActor(player!!)
 
 
+            // test actor
+            //addNewActor(PlayerBuilderCynthia())
 
-        initGame()
+
+            //initGame()
+
+            gameFullyLoaded = true
+        }
     }
 
     fun initGame() {
@@ -394,6 +406,23 @@ class Ingame(val batch: SpriteBatch) : Screen {
     }
 
     override fun render(delta: Float) {
+        if (!postInitDone) { // Q&D solution for LoadScreen and Ingame, where while LoadScreen is working, Ingame now no longer has GL Context
+
+            if (gameLoadMode == GameLoadMode.CREATE_NEW) {
+                playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
+                addNewActor(player!!)
+            }
+
+            initGame()
+
+
+            postInitDone = true
+        }
+
+
+
+
+
         Gdx.graphics.setTitle(GAME_NAME +
                               " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
                               " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"

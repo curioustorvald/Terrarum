@@ -15,8 +15,8 @@ import net.torvald.terrarum.langpack.Lang
  */
 object LoadScreen : ScreenAdapter() {
 
-    private lateinit var actualSceneToBeLoaded: Screen
-    private lateinit var sceneLoadingThread: Thread
+    var screenToLoad: Ingame? = null
+    private lateinit var screenLoadingThread: Thread
 
 
     private val messages = HistoryArray<String>(20)
@@ -49,9 +49,6 @@ object LoadScreen : ScreenAdapter() {
     var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
     fun initViewPort(width: Int, height: Int) {
-        //val width = if (width % 1 == 1) width + 1 else width
-        //val height = if (height % 1 == 1) height + 1 else width
-
         // Set Y to point downwards
         camera.setToOrtho(true, width.toFloat(), height.toFloat())
 
@@ -65,6 +62,24 @@ object LoadScreen : ScreenAdapter() {
 
 
     override fun show() {
+        messages.clear()
+
+
+        if (screenToLoad == null) {
+            println("[LoadScreen] Screen to load is not set. Are you testing the UI?")
+        }
+        else {
+            val runnable = object : Runnable {
+                override fun run() {
+                    screenToLoad!!.show()
+                }
+            }
+            screenLoadingThread = Thread(runnable, "LoadScreen GameLoader")
+
+            screenLoadingThread.start()
+        }
+
+
         initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
         textFbo = FrameBuffer(
@@ -78,10 +93,6 @@ object LoadScreen : ScreenAdapter() {
         arrowObjGlideOffsetX = -arrowObjTex.width.toFloat()
 
         textOverlayTex = Texture(Gdx.files.internal("assets/graphics/test_loading_text_tint.tga"))
-
-
-        addMessage("**** This is a test ****")
-        addMessage("Segmentation fault")
     }
 
 
@@ -90,97 +101,101 @@ object LoadScreen : ScreenAdapter() {
     private var genuineSonic = false // the "NOW LOADING..." won't appear unless the arrow first run passes it  (it's totally not a GenuineIntel tho)
 
     override fun render(delta: Float) {
-        glideDispY = Terrarum.HEIGHT - 100f - Terrarum.fontGame.lineHeight
-        arrowObjGlideSize = arrowObjTex.width + 2f * Terrarum.WIDTH
+        // if loading is done, escape and set screen of the Game to the target
+        if (screenToLoad?.gameFullyLoaded ?: false) {
+            Terrarum.changeScreen(screenToLoad!!)
+        }
+        else {
+            glideDispY = Terrarum.HEIGHT - 100f - Terrarum.fontGame.lineHeight
+            arrowObjGlideSize = arrowObjTex.width + 2f * Terrarum.WIDTH
 
 
 
-        Gdx.gl.glClearColor(.157f, .157f, .157f, 0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-
-        textFbo.inAction(null, null) {
-            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+            Gdx.gl.glClearColor(.157f, .157f, .157f, 0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        }
 
-        glideTimer += delta
-        if (glideTimer >= arrowObjGlideSize / arrowGlideSpeed) {
-            glideTimer -= arrowObjGlideSize / arrowGlideSpeed
-        }
-        arrowObjPos = glideTimer * arrowGlideSpeed
+            textFbo.inAction(null, null) {
+                Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            }
+
+            glideTimer += delta
+            if (glideTimer >= arrowObjGlideSize / arrowGlideSpeed) {
+                glideTimer -= arrowObjGlideSize / arrowGlideSpeed
+            }
+            arrowObjPos = glideTimer * arrowGlideSpeed
 
 
+            // draw text to FBO
+            textFbo.inAction(camera, Terrarum.batch) {
+                Terrarum.batch.inUse {
+                    blendNormal()
+                    Terrarum.fontGame
+                    it.color = Color.WHITE
+                    Terrarum.fontGame.draw(it, Lang["MENU_IO_LOADING"], 0.33f, 0f) // x 0.5? I dunno but it breaks w/o it
 
-        // draw text to FBO
-        textFbo.inAction(camera, Terrarum.batch) {
+
+                    blendMul()
+                    // draw flipped
+                    it.draw(textOverlayTex,
+                            0f,
+                            Terrarum.fontGame.lineHeight,
+                            textOverlayTex.width.toFloat(),
+                            -Terrarum.fontGame.lineHeight
+                    )
+                }
+            }
+
+
             Terrarum.batch.inUse {
+                initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT) // dunno, no render without this
+                it.projectionMatrix = camera.combined
                 blendNormal()
-                Terrarum.fontGame
-                it.color = Color.WHITE
-                Terrarum.fontGame.draw(it, Lang["MENU_IO_LOADING"], 0.5f, 0f) // x 0.5? I dunno but it breaks w/o it
 
+                // draw text FBO to screen
+                val textTex = textFbo.colorBufferTexture
+                textTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
-                blendMul()
-                // draw flipped
-                it.draw(textOverlayTex,
-                        0f,
-                        Terrarum.fontGame.lineHeight,
-                        textOverlayTex.width.toFloat(),
-                        -Terrarum.fontGame.lineHeight
+                // --> original text
+                if (genuineSonic) {
+                    it.color = Color.WHITE
+                    it.draw(textTex, textX, glideDispY - 2f)
+                }
+
+                // --> ghost
+                it.color = getPulseEffCol()
+
+                if (it.color.a != 0f) genuineSonic = true
+
+                val drawWidth = getPulseEffWidthMul() * textTex.width
+                val drawHeight = getPulseEffWidthMul() * textTex.height
+                it.draw(textTex,
+                        textX - (drawWidth - textTex.width) / 2f,
+                        glideDispY - 2f - (drawHeight - textTex.height) / 2f,
+                        drawWidth,
+                        drawHeight
                 )
+
+
+                // draw coloured arrows
+                arrowColours.forEachIndexed { index, color ->
+                    it.color = color
+                    it.draw(arrowObjTex, arrowObjPos + arrowObjGlideOffsetX + arrowObjTex.width * index, glideDispY)
+                }
+
+
+                // log messages
+                it.color = Color.LIGHT_GRAY
+                for (i in 0 until messages.elemCount) {
+                    Terrarum.fontGame.draw(it,
+                            messages[i] ?: "",
+                            40f,
+                            80f + (messages.size - i - 1) * Terrarum.fontGame.lineHeight
+                    )
+                }
             }
+
         }
-
-
-        Terrarum.batch.inUse {
-            initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT) // dunno, no render without this
-            it.projectionMatrix = camera.combined
-            blendNormal()
-
-            // draw text FBO to screen
-            val textTex = textFbo.colorBufferTexture
-            textTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-
-            // --> original text
-            if (genuineSonic) {
-                it.color = Color.WHITE
-                it.draw(textTex, textX, glideDispY - 2f)
-            }
-
-            // --> ghost
-            it.color = getPulseEffCol()
-
-            if (it.color.a != 0f) genuineSonic = true
-
-            val drawWidth = getPulseEffWidthMul() * textTex.width
-            val drawHeight = getPulseEffWidthMul() * textTex.height
-            it.draw(textTex,
-                    textX - (drawWidth - textTex.width) / 2f,
-                    glideDispY - 2f - (drawHeight - textTex.height) / 2f,
-                    drawWidth,
-                    drawHeight
-            )
-
-
-
-            // draw coloured arrows
-            arrowColours.forEachIndexed { index, color ->
-                it.color = color
-                it.draw(arrowObjTex, arrowObjPos + arrowObjGlideOffsetX + arrowObjTex.width * index, glideDispY)
-            }
-
-
-            // log messages
-            it.color = Color.LIGHT_GRAY
-            for (i in 0 until messages.elemCount) {
-                Terrarum.fontGame.draw(it,
-                        messages[i] ?: "",
-                        40f,
-                        80f + (messages.size - i - 1) * Terrarum.fontGame.lineHeight
-                )
-            }
-        }
-
     }
 
     private fun getPulseEffCol(): Color {

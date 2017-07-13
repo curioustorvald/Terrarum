@@ -6,6 +6,7 @@ import net.torvald.terrarum.blockproperties.Block
 import com.jme3.math.FastMath
 import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
+import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.roundInt
@@ -465,6 +466,7 @@ object WorldGenerator {
 
         // fill the area as Joise map
         println("[mapgenerator] Raising and eroding terrain...")
+        LoadScreen.addMessage("Raising and eroding terrain...")
         for (y in 0..(TERRAIN_UNDULATION - 1)) {
             for (x in 0..WIDTH) {
                 // straight-line sampling
@@ -576,6 +578,7 @@ object WorldGenerator {
 
     private fun fillMapByNoiseMap() {
         println("[mapgenerator] Shaping world...")
+        LoadScreen.addMessage("Shaping world...")
         // generate dirt-stone transition line
         // use catmull spline
         val dirtStoneLine = IntArray(WIDTH)
@@ -750,7 +753,7 @@ object WorldGenerator {
     private fun processNoiseLayers(noiseRecords: Array<TaggedJoise>) {
         if (Terrarum.MULTITHREAD) {
             // set up indices
-            for (i in 0..Terrarum.THREADS - 1) {
+            for (i in 0 until Terrarum.THREADS) {
                 ThreadParallel.map(
                         i,
                         ThreadProcessNoiseLayers(
@@ -773,6 +776,7 @@ object WorldGenerator {
 
     private fun generateFloatingIslands() {
         println("[mapgenerator] Placing floating islands...")
+        LoadScreen.addMessage("Placing floating islands...")
 
         val nIslandsMax = Math.round(world.width * 6f / 8192f)
         val nIslandsMin = Math.max(2, Math.round(world.width * 4f / 8192f))
@@ -804,7 +808,8 @@ object WorldGenerator {
     /* Flood */
 
     private fun floodBottomLava() {
-        println("[mapgenerator] Flooding bottom lava...")
+        println("[mapgenerator] Flooding with lava...")
+        LoadScreen.addMessage("Flooding with lava...")
         for (i in HEIGHT * 14 / 15..HEIGHT - 1) {
             for (j in 0..WIDTH - 1) {
                 if (world.terrainArray[i][j].toInt() == 0) {
@@ -818,6 +823,7 @@ object WorldGenerator {
 
     private fun plantGrass() {
         println("[mapgenerator] Planting grass...")
+        LoadScreen.addMessage("Planting grass...")
 
         /* TODO composing dirt and stone
 		 * over certain level, use background dirt with stone 'peckles'
