@@ -123,6 +123,9 @@ class UIVitalMetre(
     override fun endClosing(delta: Float) {
         UICanvas.endClosingFade(handler)
     }
+
+    override fun dispose() {
+    }
 }
 
 fun Float.abs() = FastMath.abs(this)

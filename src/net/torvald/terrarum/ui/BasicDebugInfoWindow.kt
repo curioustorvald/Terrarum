@@ -286,4 +286,7 @@ class BasicDebugInfoWindow : UICanvas {
 
     override fun endClosing(delta: Float) {
     }
+
+    override fun dispose() {
+    }
 }

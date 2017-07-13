@@ -212,4 +212,7 @@ class ConsoleWindow : UICanvas, KeyControlled {
 
     override fun processInput(delta: Float) {
     }
+
+    override fun dispose() {
+    }
 }

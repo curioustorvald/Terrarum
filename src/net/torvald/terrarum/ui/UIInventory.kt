@@ -355,5 +355,8 @@ class UIInventory(
         return false
     }
 
-
+    override fun dispose() {
+        catButtons.dispose()
+        items.forEach { it.dispose() }
+    }
 }

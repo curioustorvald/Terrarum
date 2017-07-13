@@ -131,4 +131,8 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas {
 
     override fun endClosing(delta: Float) {
     }
+
+    override fun dispose() {
+        atlas.dispose()
+    }
 }

@@ -118,4 +118,7 @@ class UIPieMenu : UICanvas {
         UICanvas.endClosingFade(handler)
         handler!!.scale = 1f
     }
+
+    override fun dispose() {
+    }
 }

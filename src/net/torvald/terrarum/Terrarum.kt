@@ -19,7 +19,11 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum.RENDER_FPS
 import net.torvald.terrarum.gamecontroller.GameController
 import net.torvald.terrarum.imagefont.TinyAlphNum
+import net.torvald.terrarum.imagefont.Watch7SegMain
+import net.torvald.terrarum.imagefont.WatchDotAlph
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.ui.ItemSlotImageBuilder
+import net.torvald.terrarum.ui.MessageWindow
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.JsonWriter
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -372,6 +376,15 @@ object Terrarum : Game() {
         super.screen.dispose()
         fontGame.dispose()
         fontSmallNumbers.dispose()
+
+
+        ItemSlotImageBuilder.dispose()
+        WatchDotAlph.dispose()
+        Watch7SegMain.dispose()
+        WatchDotAlph.dispose()
+
+        MessageWindow.SEGMENT_BLACK.dispose()
+        MessageWindow.SEGMENT_WHITE.dispose()
         //dispose any other resources used in this level
     }
 

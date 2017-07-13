@@ -41,5 +41,6 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     abstract fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean
     abstract fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean
     abstract fun scrolled(amount: Int): Boolean
+    abstract fun dispose()
 
 }
