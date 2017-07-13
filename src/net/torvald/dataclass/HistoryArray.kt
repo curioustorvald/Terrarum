@@ -59,4 +59,8 @@ class HistoryArray<T>(val size: Int) {
     val oldest: T?
         get() = this[history.size - 1]
 
+    fun clear() {
+        history.clear()
+    }
+
 }

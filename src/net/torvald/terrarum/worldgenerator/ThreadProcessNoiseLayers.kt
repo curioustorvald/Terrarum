@@ -1,5 +1,7 @@
 package net.torvald.terrarum.worldgenerator
 
+import net.torvald.terrarum.LoadScreen
+
 /**
  * Created by minjaesong on 16-06-13.
  */
@@ -10,6 +12,8 @@ class ThreadProcessNoiseLayers(val startIndex: Int, val endIndex: Int,
     override fun run() {
         for (record in noiseRecords) {
             println("[mapgenerator] ${record.message}...")
+            LoadScreen.addMessage("${record.message}...")
+
             for (y in startIndex..endIndex) {
                 for (x in 0..WorldGenerator.WIDTH - 1) {
                     // straight-line sampling
