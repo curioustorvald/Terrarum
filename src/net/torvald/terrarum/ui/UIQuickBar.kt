@@ -112,6 +112,9 @@ class UIQuickBar : UICanvas, MouseControlled {
         return true
     }
 
+    override fun dispose() {
+    }
+
 
     companion object {
         val finalOpacity = 0.8f

@@ -31,4 +31,7 @@ class NullUI : UICanvas {
 
     override fun endClosing(delta: Float) {
     }
+
+    override fun dispose() {
+    }
 }

@@ -15,6 +15,8 @@ class CircularArray<T>(val size: Int) {
     var tail: Int = 0
     var head: Int = 0
 
+    val lastIndex = size - 1
+
     val elemCount: Int
         get() = if (tail >= head) tail - head else size
 

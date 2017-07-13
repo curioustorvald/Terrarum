@@ -99,4 +99,9 @@ object ItemSlotImageBuilder {
 
     private data class ImageDesc(val color: Color, val number: Int, val isLarge: Boolean)
 
+    fun dispose() {
+        slotImage.dispose()
+        slotLarge.dispose()
+    }
+
 }

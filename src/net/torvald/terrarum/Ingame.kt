@@ -1530,6 +1530,14 @@ class Ingame(val batch: SpriteBatch) : Screen {
         worldBlendFrameBuffer.dispose()
         lightmapFboA.dispose()
         lightmapFboB.dispose()
+
+        actorsRenderBehind.forEach { it.dispose() }
+        actorsRenderMiddle.forEach { it.dispose() }
+        actorsRenderMidTop.forEach { it.dispose() }
+        actorsRenderFront.forEach { it.dispose() }
+
+        uiAliases.forEach { it.dispose() }
+        uiAlasesPausing.forEach { it.dispose() }
     }
 
 
