@@ -1,7 +1,6 @@
 package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 
 /**
  * Actor with visible body
@@ -13,4 +12,6 @@ abstract class ActorWithBody(renderOrder: RenderOrder) : Actor(renderOrder) {
     abstract fun drawBody(batch: SpriteBatch)
     abstract fun drawGlow(batch: SpriteBatch)
     open var tooltipText: String? = null // null: display nothing
+
+    abstract fun dispose()
 }

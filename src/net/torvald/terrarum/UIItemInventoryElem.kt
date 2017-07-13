@@ -195,4 +195,8 @@ class UIItemInventoryElem(
     override fun scrolled(amount: Int): Boolean {
         return false
     }
+
+    override fun dispose() {
+        itemImage?.texture?.dispose()
+    }
 }

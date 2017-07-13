@@ -194,4 +194,8 @@ class UIItemTextButtonList(
     override fun scrolled(amount: Int): Boolean {
         return false
     }
+
+    override fun dispose() {
+        iconSpriteSheet?.dispose()
+    }
 }

@@ -107,4 +107,7 @@ class UIItemTextButton(
     override fun scrolled(amount: Int): Boolean {
         return false
     }
+
+    override fun dispose() {
+    }
 }

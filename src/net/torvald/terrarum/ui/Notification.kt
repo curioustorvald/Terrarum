@@ -68,4 +68,7 @@ class Notification : UICanvas {
         handler!!.opacity = 0f
         handler!!.setAsOpen()
     }
+
+    override fun dispose() {
+    }
 }

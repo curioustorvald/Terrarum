@@ -94,4 +94,7 @@ class UITextTerminal(val terminal: Terminal) : UICanvas, KeyControlled, MouseCon
      */
     override fun endClosing(delta: Float) {
     }
+
+    override fun dispose() {
+    }
 }

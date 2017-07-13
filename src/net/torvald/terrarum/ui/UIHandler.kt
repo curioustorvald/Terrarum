@@ -287,4 +287,8 @@ class UIHandler(val UI: UICanvas,
             }
             return isVisible && !isOpening
         }
+
+    fun dispose() {
+        UI.dispose()
+    }
 }
