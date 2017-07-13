@@ -67,6 +67,8 @@ interface UICanvas {
      */
     fun endClosing(delta: Float)
 
+    fun dispose()
+
     companion object {
         const val OPENCLOSE_GENERIC = 0.2f
 

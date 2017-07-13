@@ -40,4 +40,8 @@ object Watch7SegMain : BitmapFont() {
     override fun getLineHeight() = H.toFloat()
     override fun getCapHeight() = getLineHeight()
     override fun getXHeight() = getLineHeight()
+
+    override fun dispose() {
+        fontSheet.dispose()
+    }
 }

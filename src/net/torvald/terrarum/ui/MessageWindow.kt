@@ -66,12 +66,16 @@ class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas
     override fun endClosing(delta: Float) {
     }
 
+    override fun dispose() {
+    }
+
     companion object {
         // private int messagesShowingIndex = 0;
         val MESSAGES_DISPLAY = 2
         val OPEN_CLOSE_TIME = 0.16f
 
 
+        // will be disposed by Terrarum (application main instance)
         val SEGMENT_BLACK = TextureRegionPack("assets/graphics/gui/message_black.tga", 8, 56)
         val SEGMENT_WHITE = TextureRegionPack("assets/graphics/gui/message_white.tga", 8, 56)
     }

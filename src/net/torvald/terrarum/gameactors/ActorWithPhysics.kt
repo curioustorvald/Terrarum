@@ -1451,6 +1451,11 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 this + 2 * Math.PI
             else
                 this
+
+    override fun dispose() {
+        sprite?.dispose()
+        spriteGlow?.dispose()
+    }
 }
 
 inline fun Int.sqr(): Int = this * this

@@ -180,4 +180,7 @@ class SpriteAnimation(val parentActor: ActorWithPhysics) {
         flipVertical = vertical
     }
 
+    fun dispose() {
+        textureRegion.dispose()
+    }
 }
