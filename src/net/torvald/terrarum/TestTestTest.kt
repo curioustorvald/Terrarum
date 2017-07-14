@@ -73,7 +73,7 @@ class TestTestTest(val batch: SpriteBatch) : Screen {
         val radius = 4f
 
 
-        Gdx.gl.glClearColor(.157f, .157f, .157f, 0f)
+        Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
 

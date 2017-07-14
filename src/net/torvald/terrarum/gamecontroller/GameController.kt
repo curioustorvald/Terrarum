@@ -144,10 +144,10 @@ object GameController : InputAdapter() {
                 val itemOnGrip = ingame.player!!.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
                 if (itemOnGrip != null) {
-                    if (button == Terrarum.getConfigInt("mousePrimary")) {
+                    if (button == Terrarum.getConfigInt("mouseprimary")) {
                         itemOnGrip.endPrimaryUse(Gdx.graphics.deltaTime)
                     }
-                    if (button == Terrarum.getConfigInt("mouseSecondary")) {
+                    if (button == Terrarum.getConfigInt("mousesecondary")) {
                         itemOnGrip.endSecondaryUse(Gdx.graphics.deltaTime)
                     }
                 }

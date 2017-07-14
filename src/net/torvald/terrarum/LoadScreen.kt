@@ -43,7 +43,7 @@ object LoadScreen : ScreenAdapter() {
     private lateinit var textOverlayTex: Texture
     private lateinit var textFbo: FrameBuffer
 
-    private val ghostMaxZoomX = 1.3f
+    private val ghostMaxZoomX = 1.25f
     private val ghostAlphaMax = 1f
 
     var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
@@ -63,6 +63,8 @@ object LoadScreen : ScreenAdapter() {
 
     override fun show() {
         messages.clear()
+        doContextChange = false
+        glideTimer = 0f
 
 
         if (screenToLoad == null) {
@@ -99,33 +101,40 @@ object LoadScreen : ScreenAdapter() {
     val textX: Float; get() = (Terrarum.WIDTH * 0.75f).floor()
 
     private var genuineSonic = false // the "NOW LOADING..." won't appear unless the arrow first run passes it  (it's totally not a GenuineIntel tho)
+    private var doContextChange = false
+
+    private var messageBackgroundColour = Color(0x404040ff)
+    private var messageForegroundColour = Color.WHITE
 
     override fun render(delta: Float) {
-        // if loading is done, escape and set screen of the Game to the target
-        if (screenToLoad?.gameFullyLoaded ?: false) {
-            Terrarum.changeScreen(screenToLoad!!)
-        }
-        else {
-            glideDispY = Terrarum.HEIGHT - 100f - Terrarum.fontGame.lineHeight
-            arrowObjGlideSize = arrowObjTex.width + 2f * Terrarum.WIDTH
+        glideDispY = Terrarum.HEIGHT - 100f - Terrarum.fontGame.lineHeight
+        arrowObjGlideSize = arrowObjTex.width + 2f * Terrarum.WIDTH
 
 
 
-            Gdx.gl.glClearColor(.157f, .157f, .157f, 0f)
+        Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+        textFbo.inAction(null, null) {
+            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        }
 
-            textFbo.inAction(null, null) {
-                Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        glideTimer += delta
+        // reset timer
+        if (glideTimer >= arrowObjGlideSize / arrowGlideSpeed) {
+            glideTimer -= arrowObjGlideSize / arrowGlideSpeed
+
+            // change screen WHEN the timer is reset.
+            // In other words, the arrow must hit the goal BEFORE context change take place
+            if (screenToLoad?.gameFullyLoaded ?: false) {
+                doContextChange = true
             }
-
-            glideTimer += delta
-            if (glideTimer >= arrowObjGlideSize / arrowGlideSpeed) {
-                glideTimer -= arrowObjGlideSize / arrowGlideSpeed
-            }
-            arrowObjPos = glideTimer * arrowGlideSpeed
+        }
+        arrowObjPos = glideTimer * arrowGlideSpeed
 
 
+        if (!doContextChange) {
             // draw text to FBO
             textFbo.inAction(camera, Terrarum.batch) {
                 Terrarum.batch.inUse {
@@ -184,8 +193,39 @@ object LoadScreen : ScreenAdapter() {
                 }
 
 
+
+
+                // message backgrounds
+                it.color = messageBackgroundColour
+                it.fillRect(0f, 60f, Terrarum.WIDTH.toFloat(), 40f + (messages.size) * Terrarum.fontGame.lineHeight)
+
                 // log messages
-                it.color = Color.LIGHT_GRAY
+                it.color = messageForegroundColour
+                for (i in 0 until messages.elemCount) {
+                    Terrarum.fontGame.draw(it,
+                            messages[i] ?: "",
+                            40f,
+                            80f + (messages.size - i - 1) * Terrarum.fontGame.lineHeight
+                    )
+                }
+            }
+        }
+        else {
+            Terrarum.batch.inUse {
+                // recycling part of the draw code //
+
+                initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT) // dunno, no render without this
+                it.projectionMatrix = camera.combined
+                blendNormal()
+
+
+
+                // message backgrounds
+                it.color = messageBackgroundColour
+                it.fillRect(0f, 60f, Terrarum.WIDTH.toFloat(), 40f + (messages.size) * Terrarum.fontGame.lineHeight)
+
+                // log messages
+                it.color = messageForegroundColour
                 for (i in 0 until messages.elemCount) {
                     Terrarum.fontGame.draw(it,
                             messages[i] ?: "",
@@ -195,6 +235,11 @@ object LoadScreen : ScreenAdapter() {
                 }
             }
 
+            Terrarum.batch.flush()
+
+            Thread.sleep(80)
+
+            Terrarum.changeScreen(screenToLoad!!)
         }
     }
 
