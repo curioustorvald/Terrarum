@@ -15,13 +15,13 @@ object WorldCamera {
     private val world: GameWorld? = Terrarum.ingame?.world
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
 
-    var x: Int = 0
+    var x: Int = 0 // left position
         private set
-    var y: Int = 0
+    var y: Int = 0 // top position
         private set
-    var gdxCamX: Float = 0f
+    var gdxCamX: Float = 0f // centre position
         private set
-    var gdxCamY: Float = 0f
+    var gdxCamY: Float = 0f // centre position
         private set
     var width: Int = 0
         private set
@@ -47,11 +47,21 @@ object WorldCamera {
                     (player?.hitbox?.centeredY?.toFloat() ?: 0f) - height / 2,
                     TILE_SIZE.toFloat(),
                     world!!.height * TILE_SIZE - height - TILE_SIZE.toFloat()
-            )).floorInt()
+            )).floorInt().clampCameraY()
 
 
             gdxCamX = x + (width / 2f).floor()
             gdxCamY = y + (height / 2f).floor()
         }
     }
+
+    private fun Int.clampCameraY(): Int {
+        return if (this < 0)
+            0
+        else if (this > (world?.height ?: Terrarum.HEIGHT).times(TILE_SIZE) - Terrarum.HEIGHT)
+            (world?.height ?: Terrarum.HEIGHT).times(TILE_SIZE) - Terrarum.HEIGHT
+        else
+            this
+    }
 }
+

@@ -14,11 +14,11 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
  *
  * Created by minjaesong on 15-12-31.
  */
-class UIHandler(val UI: UICanvas,
-                val toggleKey: Int? = null, val toggleButton: Int? = null,
+class UIHandler(var UI: UICanvas,
+                var toggleKey: Int? = null, var toggleButton: Int? = null,
                 // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
                 var customPositioning: Boolean = false, // mainly used by vital meter
-                val doNotWarnConstant: Boolean = false
+                var doNotWarnConstant: Boolean = false
 ) {
 
     // X/Y Position relative to the game window.
@@ -65,7 +65,7 @@ class UIHandler(val UI: UICanvas,
     fun update(delta: Float) {
         // open/close UI by key pressed
         if (toggleKey != null) {
-            if (KeyToggler.isOn(toggleKey)) {
+            if (KeyToggler.isOn(toggleKey!!)) {
                 setAsOpen()
             }
             else {
@@ -219,7 +219,7 @@ class UIHandler(val UI: UICanvas,
 
     fun keyDown(keycode: Int): Boolean {
         if (isVisible && UI is KeyControlled) {
-            return UI.keyDown(keycode)
+            return (UI as KeyControlled).keyDown(keycode)
         }
 
         return false
@@ -227,7 +227,7 @@ class UIHandler(val UI: UICanvas,
 
     fun keyUp(keycode: Int): Boolean {
         if (isVisible && UI is KeyControlled) {
-            return UI.keyUp(keycode)
+            return (UI as KeyControlled).keyUp(keycode)
         }
 
         return false
@@ -235,7 +235,7 @@ class UIHandler(val UI: UICanvas,
 
     fun keyTyped(char: Char): Boolean {
         if (isVisible && UI is KeyControlled) {
-            return UI.keyTyped(char)
+            return (UI as KeyControlled).keyTyped(char)
         }
 
         return false
@@ -243,13 +243,13 @@ class UIHandler(val UI: UICanvas,
 
     fun mouseMoved(screenX: Int, screenY: Int) {
         if (isVisible && UI is MouseControlled) {
-            UI.mouseMoved(screenX, screenY)
+            (UI as MouseControlled).mouseMoved(screenX, screenY)
         }
     }
 
     fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         if (isVisible && UI is MouseControlled) {
-            UI.touchDragged(screenX, screenY, pointer)
+            (UI as MouseControlled).touchDragged(screenX, screenY, pointer)
         }
 
         return false
@@ -257,7 +257,7 @@ class UIHandler(val UI: UICanvas,
 
     fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (isVisible && UI is MouseControlled) {
-            UI.touchDown(screenX, screenY, pointer, button)
+            (UI as MouseControlled).touchDown(screenX, screenY, pointer, button)
         }
 
         return false
@@ -265,7 +265,7 @@ class UIHandler(val UI: UICanvas,
 
     fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (isVisible && UI is MouseControlled) {
-            UI.touchUp(screenX, screenY, pointer, button)
+            (UI as MouseControlled).touchUp(screenX, screenY, pointer, button)
         }
 
         return false
@@ -273,7 +273,7 @@ class UIHandler(val UI: UICanvas,
 
     fun scrolled(amount: Int): Boolean {
         if (isVisible && UI is MouseControlled) {
-            UI.scrolled(amount)
+            (UI as MouseControlled).scrolled(amount)
         }
 
         return false
