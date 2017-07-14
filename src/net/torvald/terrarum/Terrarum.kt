@@ -674,14 +674,14 @@ object BlendMode {
     const val SCREEN   = "GL_BLEND screen"
     const val MULTIPLY = "GL_BLEND multiply"
     const val NORMAL   = "GL_BLEND normal"
-    //const val MAX      = "GL_MAX"
+    //const val MAX      = "GL_MAX" // not supported by GLES -- use shader
 
     fun resolve(mode: String) {
         when (mode) {
             SCREEN   -> blendScreen()
             MULTIPLY -> blendMul()
             NORMAL   -> blendNormal()
-            //MAX      -> blendLightenOnly()
+            //MAX      -> blendLightenOnly() // not supported by GLES -- use shader
             else     -> throw Error("Unknown blend mode: $mode")
         }
     }

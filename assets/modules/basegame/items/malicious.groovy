@@ -31,7 +31,7 @@ static GameItem invoke(int id) {
         }
 
         @Override
-        protected String getOriginalName() {
+        String getOriginalName() {
             return null
         }
 
