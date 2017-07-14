@@ -27,7 +27,7 @@ import java.util.zip.GZIPInputStream
  * Created by minjaesong on 16-01-19.
  */
 object BlocksDrawer {
-    private val world: GameWorld = Terrarum.ingame!!.world
+    private inline val world: GameWorld; get() = Terrarum.ingame!!.world
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
@@ -385,17 +385,15 @@ object BlocksDrawer {
     private fun canIHazRender(mode: Int, x: Int, y: Int) =
             (world.getTileFrom(mode, x, y) != 0) && // not an air tile
             // for WALLs:
-            if (mode == WALL)
-                mode == WALL && (
-                        // DRAW WHEN it is visible and 'is a lip'
-                        !BlockCodex[world.getTileFromTerrain(x, y) ?: 0].isSolid ||
-                        !(BlockCodex[world.getTileFromTerrain(x, y) ?: 0].isSolid &&
-                          ((BlockCodex[world.getTileFromTerrain(x, y - 1) ?: 0].isSolid && BlockCodex[world.getTileFromTerrain(x, y + 1) ?: 0].isSolid)
-                           &&
-                           (BlockCodex[world.getTileFromTerrain(x - 1, y) ?: 0].isSolid && BlockCodex[world.getTileFromTerrain(x + 1, y + 1) ?: 0].isSolid)
-                          )
-                         )
-                                )
+            if (mode == WALL) { // DRAW WHEN it is visible and 'is a lip'
+                ( BlockCodex[world.getTileFromTerrain(x, y) ?: 0].isClear ||
+                  !
+                  ((!BlockCodex[world.getTileFromTerrain(x, y - 1) ?: 0].isClear && !BlockCodex[world.getTileFromTerrain(x, y + 1) ?: 0].isClear)
+                     &&
+                   (!BlockCodex[world.getTileFromTerrain(x - 1, y) ?: 0].isClear && !BlockCodex[world.getTileFromTerrain(x + 1, y + 1) ?: 0].isClear)
+                  )
+                )
+            }
             else
                 true
 

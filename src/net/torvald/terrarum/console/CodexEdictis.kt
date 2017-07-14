@@ -1,5 +1,6 @@
 package net.torvald.terrarum.console
 
+import net.torvald.terrarum.ccO
 import net.torvald.terrarum.ccW
 import net.torvald.terrarum.langpack.Lang
 
@@ -38,7 +39,7 @@ internal object CodexEdictis : ConsoleCommand {
     private fun printList() {
         Echo(Lang["DEV_MESSAGE_CONSOLE_AVAILABLE_COMMANDS"])
         CommandDict.dict.forEach { name, cmd ->
-            Echo("$ccW• " + name)
+            Echo("$ccO• " + name)
             cmd.printUsage()
         }
     }

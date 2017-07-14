@@ -106,6 +106,7 @@ object BlockCodex {
 
         prop.isFluid = boolVal(record, "fluid")
         prop.isSolid = boolVal(record, "solid")
+        prop.isClear = boolVal(record, "clear")
         prop.isWallable = boolVal(record, "wall")
         prop.isFallable = boolVal(record, "fall")
         prop.isVertFriction = boolVal(record, "fv")
