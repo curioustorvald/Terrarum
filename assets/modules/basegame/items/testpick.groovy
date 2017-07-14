@@ -56,8 +56,8 @@ class TestPick extends GameItem {
 
     @Override
     boolean primaryUse(float delta) {
-        int mouseTileX = TerrarumGdx.getMouseTileX()
-        int mouseTileY = TerrarumGdx.getMouseTileY()
+        int mouseTileX = Terrarum.getMouseTileX()
+        int mouseTileY = Terrarum.getMouseTileY()
 
         def mousePoint = new Point2d(mouseTileX, mouseTileY)
         def actorvalue = Terrarum.ingame.player.actorValue
