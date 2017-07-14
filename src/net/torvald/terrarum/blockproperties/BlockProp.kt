@@ -29,6 +29,7 @@ class BlockProp {
 
     var isFluid: Boolean = false
     var isSolid: Boolean = false
+    var isClear: Boolean = false
     var isWallable: Boolean = false
     var isVertFriction: Boolean = false
 
