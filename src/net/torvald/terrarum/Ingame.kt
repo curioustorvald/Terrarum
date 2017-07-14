@@ -82,12 +82,12 @@ class Ingame(val batch: SpriteBatch) : Screen {
     private val worldFBOformat = if (Terrarum.environment == RunningEnvironment.MOBILE) Pixmap.Format.RGBA4444 else Pixmap.Format.RGBA8888
     private val lightFBOformat = Pixmap.Format.RGB888
 
-    var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
-    var worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
-    var worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
+    var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+    var worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+    var worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
     // RGB elements of Lightmap for Color  Vec4(R, G, B, 1.0)  24-bit
-    var lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
-    var lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
+    var lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
+    var lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
 
 
     init {
@@ -406,7 +406,9 @@ class Ingame(val batch: SpriteBatch) : Screen {
     }
 
     override fun render(delta: Float) {
-        if (!postInitDone) { // Q&D solution for LoadScreen and Ingame, where while LoadScreen is working, Ingame now no longer has GL Context
+        // Q&D solution for LoadScreen and Ingame, where while LoadScreen is working, Ingame now no longer has GL Context
+        // there's still things to load which needs GL context to be present
+        if (!postInitDone) {
 
             if (gameLoadMode == GameLoadMode.CREATE_NEW) {
                 playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
@@ -529,7 +531,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
     private var blurReadBuffer = lightmapFboB
 
     private fun renderGame(batch: SpriteBatch) {
-        Gdx.gl.glClearColor(.157f, .157f, .157f, 0f)
+        Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         //camera.position.set(-WorldCamera.x.toFloat(), -WorldCamera.y.toFloat(), 0f) // make camara work
@@ -1515,15 +1517,15 @@ class Ingame(val batch: SpriteBatch) : Screen {
      */
     override fun resize(width: Int, height: Int) {
         worldDrawFrameBuffer.dispose()
-        worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
+        worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
         worldGlowFrameBuffer.dispose()
-        worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
+        worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
         worldBlendFrameBuffer.dispose()
-        worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, true)
+        worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
         lightmapFboA.dispose()
-        lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
+        lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
         lightmapFboB.dispose()
-        lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), true)
+        lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
 
 
         // Set up viewport when window is resized
