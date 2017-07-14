@@ -135,6 +135,10 @@ class UIInventory(
     private var isEncumbered = false
 
     override fun update(delta: Float) {
+        if (handler == null) {
+            throw Error("Handler for this UI is null, you douchebag.")
+        }
+
         catButtons.update(delta)
 
         if (actor != null && inventory != null) {
