@@ -99,7 +99,7 @@ object Terrarum : Game() {
     /**
      * To be used with physics simulator
      */
-    val TARGET_FPS: Double = 33.33333333333333333333333 // higher value == faster gravity responce
+    val TARGET_FPS: Double = 26.6666666666666666666666666 // lower value == faster gravity responce (IT WON'T HOTSWAP!!)
 
     /**
      * To be used with render, to achieve smooth frame drawing
@@ -536,6 +536,8 @@ object Terrarum : Game() {
     private val defaultConfig = DefaultConfig.fetch()
 
     private fun getConfigMaster(key: String): Any {
+        val key = key.toLowerCase()
+
         val config = try {
             gameConfig[key]
         }

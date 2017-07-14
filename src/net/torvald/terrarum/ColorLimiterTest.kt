@@ -51,7 +51,7 @@ object ColorLimiterTest : ApplicationAdapter() {
     override fun render() {
         Gdx.graphics.setTitle("TestTestTest — F: ${Gdx.graphics.framesPerSecond}")
 
-        Gdx.gl.glClearColor(.157f, .157f, .157f, 0f)
+        Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
 
