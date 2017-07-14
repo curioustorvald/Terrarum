@@ -1553,6 +1553,28 @@ class Ingame(val batch: SpriteBatch) : Screen {
         if (gameFullyLoaded) {
             LightmapRenderer.fireRecalculateEvent()
         }
+
+
+        if (postInitDone) {
+            // resize UIs
+
+            notifier.setPosition(
+                    (Terrarum.WIDTH - notifier.UI.width) / 2, Terrarum.HEIGHT - notifier.UI.height)
+
+            // inventory
+            uiInventoryPlayer.UI =
+                    UIInventory(player,
+                            width = 840,
+                            height = Terrarum.HEIGHT - 160,
+                            categoryWidth = 210
+                    )
+            uiInventoryPlayer.UI.handler = uiInventoryPlayer
+
+
+            // basic watch-style notification bar (temperature, new mail)
+            uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.UI.width, 0)
+            uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.UI.width, uiWatchBasic.UI.height - 2)
+        }
     }
 
     override fun dispose() {

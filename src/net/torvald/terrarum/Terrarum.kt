@@ -652,7 +652,6 @@ infix fun Color.mul(other: Color): Color = this.cpy().mul(other)
 
 
 fun blendMul() {
-    // I must say: What the fuck is wrong with you, Slick2D? Your built-it blending is just fucking wrong.
     Terrarum.batch.enableBlending()
     Terrarum.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
