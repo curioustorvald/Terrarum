@@ -383,8 +383,9 @@ object BlocksDrawer {
     private val tileDrawLightThreshold = 2f / LightmapRenderer.MUL
 
     private fun canIHazRender(mode: Int, x: Int, y: Int) =
-            (world.getTileFrom(mode, x, y) != 0) && // not an air tile
-            // for WALLs:
+            (world.getTileFrom(mode, x, y) != 0) // not an air tile
+                &&
+            // for WALLs; else: ret true
             if (mode == WALL) { // DRAW WHEN it is visible and 'is a lip'
                 ( BlockCodex[world.getTileFromTerrain(x, y) ?: 0].isClear ||
                   !
@@ -398,6 +399,18 @@ object BlocksDrawer {
                 true
 
             // end
+
+    private fun hasLightNearby(x: Int, y: Int) = ( // check if light level of nearby or this tile is illuminated
+            LightmapRenderer.getHighestRGB(x, y) ?: 0f >= tileDrawLightThreshold ||
+            LightmapRenderer.getHighestRGB(x - 1, y) ?: 0f >= tileDrawLightThreshold ||
+            LightmapRenderer.getHighestRGB(x + 1, y) ?: 0f >= tileDrawLightThreshold ||
+            LightmapRenderer.getHighestRGB(x, y - 1) ?: 0f >= tileDrawLightThreshold ||
+            LightmapRenderer.getHighestRGB(x, y + 1) ?: 0f >= tileDrawLightThreshold ||
+            LightmapRenderer.getHighestRGB(x - 1, y - 1) ?: 0f >= tileDrawLightThreshold ||
+            LightmapRenderer.getHighestRGB(x + 1, y + 1) ?: 0f >= tileDrawLightThreshold ||
+            LightmapRenderer.getHighestRGB(x + 1, y - 1) ?: 0f >= tileDrawLightThreshold ||
+            LightmapRenderer.getHighestRGB(x - 1, y + 1) ?: 0f >= tileDrawLightThreshold
+                                                 )
 
     private fun drawTiles(batch: SpriteBatch, mode: Int, drawModeTilesBlendMul: Boolean, color: Color) {
         val for_y_start = y / TILE_SIZE
@@ -430,18 +443,17 @@ object BlocksDrawer {
                 // draw a tile, but only when illuminated
                 try {
                     if (canIHazRender(mode, x, y)) {
-                    // check if light level of nearby or this tile is illuminated
-                        if ( LightmapRenderer.getHighestRGB(x, y) ?: 0f >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x - 1, y) ?: 0f >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x + 1, y) ?: 0f >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x, y - 1) ?: 0f >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x, y + 1) ?: 0f >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x - 1, y - 1) ?: 0f >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x + 1, y + 1) ?: 0f >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x + 1, y - 1) ?: 0f >= tileDrawLightThreshold ||
-                             LightmapRenderer.getHighestRGB(x - 1, y + 1) ?: 0f >= tileDrawLightThreshold)
-                        {
-                            // FIXME bad scanlines bug
+
+                        if (!hasLightNearby(x, y)) {
+                            // draw black patch
+                            zeroTileCounter += 1 // unused for now
+
+                            // temporary solution; FIXME bad scanlines bug
+                            batch.color = Color.BLACK
+                            batch.fillRect(x * TILE_SIZEF, y * TILE_SIZEF, TILE_SIZEF, TILE_SIZEF)
+                        }
+                        else {
+                            // commented out; FIXME bad scanlines bug
                             if (zeroTileCounter > 0) {
                                 /*batch.color = Color.BLACK
                                 batch.fillRect(x * TILE_SIZEF, y * TILE_SIZEF, -zeroTileCounter * TILE_SIZEF, TILE_SIZEF)
@@ -504,12 +516,6 @@ object BlocksDrawer {
 
 
                         } // end if (is illuminated)
-                        // draw black patch
-                        else {
-                            zeroTileCounter += 1 // unused for now
-                            batch.color = Color.BLACK
-                            batch.fillRect(x * TILE_SIZEF, y * TILE_SIZEF, TILE_SIZEF, TILE_SIZEF)
-                        }
                     } // end if (not an air)
                 } catch (e: NullPointerException) {
                     // do nothing. WARNING: This exception handling may hide erratic behaviour completely.

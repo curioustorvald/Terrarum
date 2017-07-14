@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
+import net.torvald.dataclass.Float16
 import net.torvald.terrarum.Ingame
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
@@ -39,6 +40,8 @@ object LightmapRenderer {
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
     val LIGHTMAP_HEIGHT = Terrarum.ingame!!.ZOOM_MINIMUM.inv().times(Terrarum.HEIGHT)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
+
+    //data class Lux(var r: Float16, var g: Float16, var b: Float16, var uv: Float16)
 
     /**
      * Float value, 1.0 for 1023
