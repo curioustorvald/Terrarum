@@ -1,6 +1,5 @@
 package net.torvald.terrarum
 
-import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
@@ -12,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.Matrix4
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.torvald.random.HQRNG
@@ -56,7 +54,7 @@ fun main(args: Array<String>) {
     Terrarum.screenW = config.width
     Terrarum.screenH = config.height
 
-    println("usevsync = ${Terrarum.USE_VSYNC}")
+    println("[TerrarumKt] usevsync = ${Terrarum.USE_VSYNC}")
 
     // the game must run on same speed regardless of the display FPS;
     // "Terrarum.TARGET_INTERNAL_FPS" denotes "execute as if FPS was set to this value"
@@ -227,7 +225,7 @@ object Terrarum : Game() {
      *
      * e.g. 0x02010034 can be translated as 2.1.52
      */
-    const val VERSION_RAW = 0x00_02_018E
+    const val VERSION_RAW = 0x00_02_0226
     const val VERSION_STRING: String =
             "${VERSION_RAW.ushr(24)}.${VERSION_RAW.and(0xFF0000).ushr(16)}.${VERSION_RAW.and(0xFFFF)}"
     const val NAME = "Terrarum"
@@ -241,8 +239,8 @@ object Terrarum : Game() {
     lateinit var shaderBlur: ShaderProgram
     lateinit var shaderRGBOnly: ShaderProgram
     lateinit var shaderAOnly: ShaderProgram
-    lateinit var shader4096: ShaderProgram
-    lateinit var shader4096Bayer: ShaderProgram
+    lateinit var shaderBayer: ShaderProgram
+    lateinit var shaderBayerSkyboxFill: ShaderProgram
     lateinit var shaderBlendGlow: ShaderProgram
 
 
@@ -250,6 +248,9 @@ object Terrarum : Game() {
 
 
     init {
+        println("$NAME version $VERSION_STRING")
+
+
         getDefaultDirectory()
         createDirs()
 
@@ -319,13 +320,15 @@ object Terrarum : Game() {
 
         ShaderProgram.pedantic = false
         shaderBlur = ShaderProgram(Gdx.files.internal("assets/blur.vert"), Gdx.files.internal("assets/blur.frag"))
-        shader4096 = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096.frag"))
-        shader4096Bayer = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer.frag"))
 
-        shader4096Bayer.begin()
-        shader4096Bayer.setUniformMatrix("Bayer", Matrix4(floatArrayOf(0f,8f,2f,10f,12f,4f,14f,6f,3f,11f,1f,9f,15f,7f,13f,5f)))
-        shader4096Bayer.setUniformf("monitorGamma", 2.2f)
-        shader4096Bayer.end()
+        shaderBayer = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer.frag"))
+        shaderBayer.begin()
+        shaderBayer.setUniformf("rcount", 16f)
+        shaderBayer.setUniformf("gcount", 16f)
+        shaderBayer.setUniformf("bcount", 16f)
+        shaderBayer.end()
+
+        shaderBayerSkyboxFill =  ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"))
 
 
         shaderRGBOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbonly.frag"))
@@ -334,10 +337,20 @@ object Terrarum : Game() {
         shaderBlendGlow = ShaderProgram(Gdx.files.internal("assets/blendGlow.vert"), Gdx.files.internal("assets/blendGlow.frag"))
 
         if (!shaderBlendGlow.isCompiled) {
-            Gdx.app.log("Shader", shaderBlendGlow.log)
+            Gdx.app.log("shaderBlendGlow", shaderBlendGlow.log)
             System.exit(1)
         }
 
+
+        if (!shaderBayer.isCompiled) {
+            Gdx.app.log("shaderBayer", shaderBayer.log)
+            System.exit(1)
+        }
+
+        if (!shaderBayerSkyboxFill.isCompiled) {
+            Gdx.app.log("shaderBayerSkyboxFill", shaderBayerSkyboxFill.log)
+            System.exit(1)
+        }
 
 
         gameLocale = getConfigString("language")
@@ -670,9 +683,9 @@ fun blendScreen() {
 }
 
 object BlendMode {
-    const val SCREEN   = "GL_BLEND screen"
-    const val MULTIPLY = "GL_BLEND multiply"
-    const val NORMAL   = "GL_BLEND normal"
+    const val SCREEN   = "screen"
+    const val MULTIPLY = "multiply"
+    const val NORMAL   = "normal"
     //const val MAX      = "GL_MAX" // not supported by GLES -- use shader
 
     fun resolve(mode: String) {

@@ -84,7 +84,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
     var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
     var worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
-    var worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+    var worldBlendFrameBuffer = FrameBuffer(Pixmap.Format.RGB888, Terrarum.WIDTH, Terrarum.HEIGHT, false)
     // RGB elements of Lightmap for Color  Vec4(R, G, B, 1.0)  24-bit
     var lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
     var lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
@@ -253,6 +253,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             println("[Ingame] loaded successfully.")
         }
         else {
+            LoadScreen.addMessage("${Terrarum.NAME} version ${Terrarum.VERSION_STRING}")
             LoadScreen.addMessage("Creating new world")
 
 
@@ -317,11 +318,11 @@ class Ingame(val batch: SpriteBatch) : Screen {
         // inventory
         uiInventoryPlayer = UIHandler(
                 UIInventory(player,
-                        width = 840,
+                        width = 900,
                         height = Terrarum.HEIGHT - 160,
                         categoryWidth = 210
                 ),
-                toggleKey = Terrarum.getConfigInt("keyinventory")
+                toggleKeyLiteral = Terrarum.getConfigInt("keyinventory")
         )
         uiInventoryPlayer.setPosition(
                 -uiInventoryPlayer.UI.width,
@@ -700,30 +701,33 @@ class Ingame(val batch: SpriteBatch) : Screen {
             Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
+
+
+            // draw skybox
+            /*WeatherMixer.render(camera)
+
+
+            batch.inUse {
+                batch.color = Color.WHITE
+                blendNormal()
+
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // reset active textureunit to zero (i don't know tbh, but it won't work without this)
+                batch.shader = null
+            }*/
+
+
+
+
+            // draw blended world
             val worldTex = worldDrawFrameBuffer.colorBufferTexture // WORLD: light_color must be applied beforehand
             val glowTex = worldGlowFrameBuffer.colorBufferTexture // GLOW: light_uvlight must be applied beforehand
 
             worldTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
             glowTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
-            //Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0)
             worldTex.bind(0)
             glowTex.bind(1)
 
-
-            /*val quad = Mesh(
-                    true, 4, 6,
-                    VertexAttribute.Position(),
-                    VertexAttribute.ColorUnpacked(),
-                    VertexAttribute.TexCoords(0)
-            )
-            quad.setVertices(floatArrayOf(
-                    0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
-                    Terrarum.WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                    Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                    0f, Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
-            ))
-            quad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))*/
 
             Terrarum.shaderBlendGlow.begin()
             Terrarum.shaderBlendGlow.setUniformMatrix("u_projTrans", camera.combined)
@@ -756,15 +760,23 @@ class Ingame(val batch: SpriteBatch) : Screen {
             blendNormal()
 
 
+            ///////////////////////////
+            // draw skybox to screen //
+            ///////////////////////////
+
+            WeatherMixer.render(camera)
+
+
+
+
             /////////////////////////////////
             // draw framebuffers to screen //
             /////////////////////////////////
-            WeatherMixer.render(batch)
-
 
             val blendedTex = worldBlendFrameBuffer.colorBufferTexture
             blendedTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
             batch.color = Color.WHITE
+            //batch.shader = Terrarum.shaderBayer
             batch.shader = null
             blendNormal()
             batch.draw(blendedTex, 0f, 0f, blendedTex.width.toFloat(), blendedTex.height.toFloat())
