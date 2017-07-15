@@ -21,6 +21,8 @@ import java.util.*
 
 //typealias RGB10 = Int
 
+// NOTE: no Float16 on this thing: 67 kB of memory footage is totally acceptable
+
 object LightmapRenderer {
     private val world: GameWorld = Terrarum.ingame!!.world
 
@@ -40,8 +42,6 @@ object LightmapRenderer {
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
     val LIGHTMAP_HEIGHT = Terrarum.ingame!!.ZOOM_MINIMUM.inv().times(Terrarum.HEIGHT)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
-
-    //data class Lux(var r: Float16, var g: Float16, var b: Float16, var uv: Float16)
 
     /**
      * Float value, 1.0 for 1023
