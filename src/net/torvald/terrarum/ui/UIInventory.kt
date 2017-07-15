@@ -58,6 +58,10 @@ class UIInventory(
 
     val controlHelpHeight = Terrarum.fontGame.lineHeight.toInt()
 
+    val pageButtonExtraGap = 32
+
+    val pageButtonRealWidth = pageButtonExtraGap + itemStripGutterH
+
     val catButtons = UIItemTextButtonList(
             this,
             arrayOf(
@@ -90,12 +94,12 @@ class UIInventory(
             inactiveCol = defaultTextColour
     )
 
-    val itemsStripWidth = ((width - catButtons.width) - (2 * itemStripGutterH + itemInterColGutter)) / 2
+    val itemsStripWidth = ((width - catButtons.width) - (2 * itemStripGutterH + itemInterColGutter)) / 2 - pageButtonExtraGap
     val items = Array(
             ((height - controlHelpHeight) / (UIItemInventoryElem.height + itemStripGutterV)) * 2, {
         UIItemInventoryElem(
                 parentUI = this,
-                posX = catButtons.width + if (it % 2 == 0) itemStripGutterH else (itemStripGutterH + itemsStripWidth + itemInterColGutter),
+                posX = pageButtonExtraGap + catButtons.width + if (it % 2 == 0) itemStripGutterH else (itemStripGutterH + itemsStripWidth + itemInterColGutter),
                 posY = itemStripGutterH + it / 2 * (UIItemInventoryElem.height + itemStripGutterV),
                 width = itemsStripWidth,
                 item = null,
@@ -133,6 +137,13 @@ class UIInventory(
 
     private var encumbrancePerc = 0f
     private var isEncumbered = false
+
+
+    private val seekLeft: Int;  get() = Terrarum.getConfigInt("keyleft") // to support in-screen keybind changing
+    private val seekRight: Int; get() = Terrarum.getConfigInt("keyright") // to support in-screen keybind changing
+    private val seekUp: Int;    get() = Terrarum.getConfigInt("keyup") // to support in-screen keybind changing
+    private val seekDown: Int;  get() = Terrarum.getConfigInt("keydown") // to support in-screen keybind changing
+
 
     override fun update(delta: Float) {
         if (handler == null) {

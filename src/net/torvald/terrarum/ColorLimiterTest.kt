@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Matrix4
+import net.torvald.terrarum.gameactors.sqrt
+import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**
  * Created by minjaesong on 2017-07-05.
@@ -33,22 +35,47 @@ object ColorLimiterTest : ApplicationAdapter() {
 
     lateinit var batch: SpriteBatch
 
+    lateinit var font: GameFontBase
 
     override fun create() {
         ShaderProgram.pedantic = false
 
         shader4096 = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer.frag"))
         shader4096.begin()
-        shader4096.setUniformf("monitorGamma", 2.2f)
+        shader4096.setUniformf("rcount", 2f)
+        shader4096.setUniformf("gcount", 2f)
+        shader4096.setUniformf("bcount", 2f)
         shader4096.end()
-
 
         img = Texture("assets/test_texture.tga")
 
         batch = SpriteBatch()
+
+        font = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = false)
+
+
+        if (!shader4096.isCompiled) {
+            Gdx.app.log("Shader", shader4096.log)
+            System.exit(1)
+        }
     }
 
+    private var timer = 0f
+    private var timerTick = 0.5f
+    private var ditherStart = 2f
+    private var ditherEnd = 16f
+    private var dither = ditherStart
+
     override fun render() {
+        timer += Gdx.graphics.deltaTime
+
+        if (timer > timerTick) {
+            timer -= timerTick
+            dither += 1f
+            if (dither > ditherEnd)
+                dither = ditherStart
+        }
+
         Gdx.graphics.setTitle("TestTestTest — F: ${Gdx.graphics.framesPerSecond}")
 
         Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
@@ -57,7 +84,9 @@ object ColorLimiterTest : ApplicationAdapter() {
 
         batch.inUse {
             batch.shader = shader4096
-            shader4096.setUniformf("rgbaCounts", 16f, 16f, 16f, 16f)
+            shader4096.setUniformf("rcount", dither)
+            shader4096.setUniformf("gcount", dither)
+            shader4096.setUniformf("bcount", dither)
             batch.color = Color.WHITE
             batch.draw(img, 0f, 0f)
 
@@ -65,6 +94,10 @@ object ColorLimiterTest : ApplicationAdapter() {
             batch.shader = null
             batch.color = Color.WHITE
             batch.draw(img, img.width.toFloat(), 0f)
+
+
+
+            font.draw(batch, "Dither level: ${dither.toInt()}", 10f, Gdx.graphics.height - 30f)
         }
     }
 
