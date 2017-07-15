@@ -15,7 +15,7 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
  * Created by minjaesong on 15-12-31.
  */
 class UIHandler(var UI: UICanvas,
-                var toggleKey: Int? = null, var toggleButton: Int? = null,
+                var toggleKeyLiteral: Int? = null, var toggleButtonLiteral: Int? = null,
                 // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
                 var customPositioning: Boolean = false, // mainly used by vital meter
                 var doNotWarnConstant: Boolean = false
@@ -60,6 +60,10 @@ class UIHandler(var UI: UICanvas,
     init {
         UI.handler = this
     }
+
+
+    private val toggleKey: Int?; get() = toggleKeyLiteral // to support in-screen keybind changing
+    private val toggleButton: Int?; get() = toggleButtonLiteral // to support in-screen keybind changing
 
 
     fun update(delta: Float) {
