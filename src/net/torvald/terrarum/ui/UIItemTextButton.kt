@@ -42,7 +42,6 @@ class UIItemTextButton(
     override val height: Int = UIItemTextButton.height
 
     var highlighted: Boolean = false
-    var mouseOver = false
 
 
     override fun update(delta: Float) {
@@ -59,7 +58,7 @@ class UIItemTextButton(
             batch.color = highlightBackCol
             batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
-        else if (mouseOver) {
+        else if (mouseUp) {
             BlendMode.resolve(activeBackBlendMode)
             batch.color = activeBackCol
             batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
@@ -68,9 +67,8 @@ class UIItemTextButton(
         blendNormal()
 
 
-        mouseOver = mouseUp
         batch.color = if (highlighted) highlightCol
-        else if (mouseOver) activeCol
+        else if (mouseUp) activeCol
         else inactiveCol
 
         font.draw(batch,

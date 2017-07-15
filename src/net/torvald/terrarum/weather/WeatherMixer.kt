@@ -1,9 +1,7 @@
 package net.torvald.terrarum.weather
 
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.*
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
@@ -11,7 +9,6 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ParticleTestRain
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.WorldTime
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import java.io.File
 import java.util.*
 
@@ -94,10 +91,7 @@ object WeatherMixer {
         }
     }
 
-    /**
-     * Warning! Ends and begins SpriteBatch
-     */
-    fun render(batch: SpriteBatch) {
+    fun render(camera: Camera) {
 
         // we will not care for nextSkybox for now
         val timeNow = Terrarum.ingame!!.world.time.todaySeconds
@@ -107,20 +101,20 @@ object WeatherMixer {
         val globalLight = getGradientColour(skyboxColourMap, 2, timeNow)
         globalLightNow.set(globalLight)
 
+
         // draw skybox to provided graphics instance
-        batch.end()
-        Terrarum.inShapeRenderer {
-            it.rect(
-                    0f, 0f,
-                    Terrarum.WIDTH.toFloat(),
-                    Terrarum.HEIGHT.toFloat(),
-                    getGradientColour(skyboxColourMap, 1, timeNow),
-                    getGradientColour(skyboxColourMap, 1, timeNow),
-                    getGradientColour(skyboxColourMap, 0, timeNow),
-                    getGradientColour(skyboxColourMap, 0, timeNow)
-            )
-        }
-        batch.begin()
+        val topCol = getGradientColour(skyboxColourMap, 0, timeNow)
+        val bottomCol = getGradientColour(skyboxColourMap, 1, timeNow)
+
+        Terrarum.textureWhiteSquare.bind(0)
+
+        Terrarum.shaderBayerSkyboxFill.begin()
+        Terrarum.shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
+        Terrarum.shaderBayerSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
+        Terrarum.shaderBayerSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
+        Terrarum.shaderBayerSkyboxFill.setUniformf("screenHeight", Terrarum.HEIGHT.toFloat())
+        Terrarum.ingame!!.fullscreenQuad.render(Terrarum.shaderBayerSkyboxFill, GL20.GL_TRIANGLES)
+        Terrarum.shaderBayerSkyboxFill.end()
     }
 
     fun Float.clampOne() = if (this > 1) 1f else this
