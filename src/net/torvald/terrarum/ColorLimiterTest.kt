@@ -37,9 +37,9 @@ object ColorLimiterTest : ApplicationAdapter() {
     override fun create() {
         ShaderProgram.pedantic = false
 
-        shader4096 = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096.frag"))
+        shader4096 = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer.frag"))
         shader4096.begin()
-        //shader4096.setUniformMatrix("Bayer", Matrix4(floatArrayOf(0f,8f,2f,10f,12f,4f,14f,6f,3f,11f,1f,9f,15f,7f,13f,5f)))
+        shader4096.setUniformf("monitorGamma", 2.2f)
         shader4096.end()
 
 
@@ -57,13 +57,14 @@ object ColorLimiterTest : ApplicationAdapter() {
 
         batch.inUse {
             batch.shader = shader4096
-            //batch.shader.setUniformf("monitorGamma", 2.2f)
-
+            shader4096.setUniformf("rgbaCounts", 16f, 16f, 16f, 16f)
             batch.color = Color.WHITE
             batch.draw(img, 0f, 0f)
 
 
             batch.shader = null
+            batch.color = Color.WHITE
+            batch.draw(img, img.width.toFloat(), 0f)
         }
     }
 
