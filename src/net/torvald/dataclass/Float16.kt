@@ -23,6 +23,13 @@ class Float16() {
         bits = Float16.fromFloat(fval)
     }
 
+
+    operator fun times(other: Float) = fromFloat(this.toFloat() * other)
+    operator fun times(other: Float16) = fromFloat(this.toFloat() * other.toFloat())
+
+    operator fun div(other: Float) = fromFloat(this.toFloat() / other)
+    operator fun div(other: Float16) = fromFloat(this.toFloat() / other.toFloat())
+
     // operators are stripped: you don't calculate from FP16; this is only for storing values //
     
     companion object {
