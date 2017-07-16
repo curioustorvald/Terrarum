@@ -11,7 +11,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 /**
  * Created by minjaesong on 16-07-20.
  */
-class UIQuickBar : UICanvas, MouseControlled {
+class UIQuickBar : UICanvas() {
     private val gutter = 8
     override var width: Int = (ItemSlotImageBuilder.slotImage.width + gutter) * SLOT_COUNT
     override var height: Int = ItemSlotImageBuilder.slotImage.height + 4 + Terrarum.fontGame.lineHeight.toInt()
@@ -71,9 +71,6 @@ class UIQuickBar : UICanvas, MouseControlled {
     }
 
 
-    override fun processInput(delta: Float) {
-    }
-
     override fun doOpening(delta: Float) {
         handler!!.opacity = handler!!.openCloseCounter.toFloat() / openCloseTime
     }
@@ -90,23 +87,9 @@ class UIQuickBar : UICanvas, MouseControlled {
         handler!!.opacity = 0f
     }
 
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        return false
-    }
-
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        return false
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return false
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return false
-    }
-
     override fun scrolled(amount: Int): Boolean {
+        super.scrolled(amount)
+
         selection = selection.plus(if (amount > 1) 1 else if (amount < -1) -1 else 0).fmod(SLOT_COUNT)
 
         return true

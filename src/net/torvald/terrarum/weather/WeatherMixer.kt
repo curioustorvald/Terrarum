@@ -106,13 +106,12 @@ object WeatherMixer {
         val topCol = getGradientColour(skyboxColourMap, 0, timeNow)
         val bottomCol = getGradientColour(skyboxColourMap, 1, timeNow)
 
-        Terrarum.textureWhiteSquare.bind(0)
+        //Terrarum.textureWhiteSquare.bind(0)
 
         Terrarum.shaderBayerSkyboxFill.begin()
         Terrarum.shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
         Terrarum.shaderBayerSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
         Terrarum.shaderBayerSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
-        Terrarum.shaderBayerSkyboxFill.setUniformf("screenHeight", Terrarum.HEIGHT.toFloat())
         Terrarum.ingame!!.fullscreenQuad.render(Terrarum.shaderBayerSkyboxFill, GL20.GL_TRIANGLES)
         Terrarum.shaderBayerSkyboxFill.end()
     }

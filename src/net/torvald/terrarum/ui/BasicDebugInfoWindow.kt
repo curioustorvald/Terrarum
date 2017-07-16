@@ -12,7 +12,7 @@ import net.torvald.terrarum.Terrarum.mouseTileY
 /**
  * Created by minjaesong on 16-03-14.
  */
-class BasicDebugInfoWindow : UICanvas {
+class BasicDebugInfoWindow : UICanvas() {
 
     override var width: Int = Terrarum.WIDTH
     override var height: Int = Terrarum.HEIGHT
@@ -271,9 +271,6 @@ class BasicDebugInfoWindow : UICanvas {
     private fun line(i: Int): Float = i * 10f
 
     private fun column(i: Int): Float = 300f * (i - 1)
-
-    override fun processInput(delta: Float) {
-    }
 
     override fun doOpening(delta: Float) {
     }

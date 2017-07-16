@@ -17,7 +17,7 @@ class UIVitalMetre(
         var vitalGetterMax: () -> Float?,
         var color: Color?,
         val order: Int
-) : UICanvas {
+) : UICanvas() {
 
     init {
         // semitransparent
@@ -103,9 +103,6 @@ class UIVitalMetre(
 
             g.flush()
         }*/
-    }
-
-    override fun processInput(delta: Float) {
     }
 
     override fun doOpening(delta: Float) {

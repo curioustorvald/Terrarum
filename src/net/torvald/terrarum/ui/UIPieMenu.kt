@@ -13,7 +13,7 @@ import org.dyn4j.geometry.Vector2
 /**
  * Created by minjaesong on 16-07-20.
  */
-class UIPieMenu : UICanvas {
+class UIPieMenu : UICanvas() {
     private val cellSize = UIQuickBar.CELL_SIZE
 
     private val slotCount = UIQuickBar.SLOT_COUNT
@@ -39,6 +39,19 @@ class UIPieMenu : UICanvas {
             if (selection >= 0)
                 Terrarum.ingame!!.player!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
                         selection % slotCount
+        }
+
+
+        // update controls
+        if (handler!!.isOpened || handler!!.isOpening) {
+            val cursorPos = Vector2(Terrarum.mouseX, Terrarum.mouseY)
+            val centre = Vector2(Terrarum.HALFW.toDouble(), Terrarum.HALFH.toDouble())
+            val deg = -(centre - cursorPos).direction.toFloat()
+
+            selection = Math.round(deg * slotCount / FastMath.TWO_PI)
+            if (selection < 0) selection += 10
+
+            // TODO add gamepad support
         }
     }
 
@@ -83,19 +96,6 @@ class UIPieMenu : UICanvas {
                         slotY + (CELL_SIZE - itemH) / 2f
                 )
             }
-        }
-    }
-
-    override fun processInput(delta: Float) {
-        if (handler!!.isOpened || handler!!.isOpening) {
-            val cursorPos = Vector2(Terrarum.mouseX, Terrarum.mouseY)
-            val centre = Vector2(Terrarum.HALFW.toDouble(), Terrarum.HALFH.toDouble())
-            val deg = -(centre - cursorPos).direction.toFloat()
-
-            selection = Math.round(deg * slotCount / FastMath.TWO_PI)
-            if (selection < 0) selection += 10
-
-            // TODO add gamepad support
         }
     }
 

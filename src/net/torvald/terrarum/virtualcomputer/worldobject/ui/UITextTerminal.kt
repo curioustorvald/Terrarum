@@ -9,39 +9,8 @@ import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 /**
  * Created by minjaesong on 16-09-08.
  */
-class UITextTerminal(val terminal: Terminal) : UICanvas, KeyControlled, MouseControlled {
+class UITextTerminal(val terminal: Terminal) : UICanvas() {
 
-    override fun keyDown(keycode: Int): Boolean {
-        return false
-    }
-
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        return false
-    }
-
-    override fun keyUp(keycode: Int): Boolean {
-        return false
-    }
-
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        return false
-    }
-
-    override fun keyTyped(character: Char): Boolean {
-        return false
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return false
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return false
-    }
-
-    override fun scrolled(amount: Int): Boolean {
-        return false
-    }
 
     override var width: Int = terminal.displayW// + some
     override var height: Int = terminal.displayH// + frame
@@ -66,9 +35,6 @@ class UITextTerminal(val terminal: Terminal) : UICanvas, KeyControlled, MouseCon
 
     override fun render(batch: SpriteBatch) {
         //terminal.render(gc, terminalDisplay.graphics)
-    }
-
-    override fun processInput(delta: Float) {
     }
 
     /**

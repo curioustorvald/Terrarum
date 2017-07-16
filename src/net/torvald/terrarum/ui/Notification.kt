@@ -7,7 +7,7 @@ import net.torvald.terrarum.gameactors.Second
 /**
  * Created by minjaesong on 16-01-23.
  */
-class Notification : UICanvas {
+class Notification : UICanvas() {
 
     private val SHOWUP_MAX = 15000
 
@@ -40,9 +40,6 @@ class Notification : UICanvas {
 
     override fun render(batch: SpriteBatch) {
         msgUI.render(batch)
-    }
-
-    override fun processInput(delta: Float) {
     }
 
     override fun doOpening(delta: Float) {
