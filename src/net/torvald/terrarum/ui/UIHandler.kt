@@ -215,69 +215,63 @@ class UIHandler(var UI: UICanvas,
         }
     }
 
-    fun processInput(delta: Float) {
-        if (isVisible) {
-            UI.processInput(delta)
-        }
-    }
-
     fun keyDown(keycode: Int): Boolean {
-        if (isVisible && UI is KeyControlled) {
-            return (UI as KeyControlled).keyDown(keycode)
+        if (isVisible) {
+            return UI.keyDown(keycode)
         }
 
         return false
     }
 
     fun keyUp(keycode: Int): Boolean {
-        if (isVisible && UI is KeyControlled) {
-            return (UI as KeyControlled).keyUp(keycode)
+        if (isVisible) {
+            return UI.keyUp(keycode)
         }
 
         return false
     }
 
     fun keyTyped(char: Char): Boolean {
-        if (isVisible && UI is KeyControlled) {
-            return (UI as KeyControlled).keyTyped(char)
+        if (isVisible) {
+            return UI.keyTyped(char)
         }
 
         return false
     }
 
     fun mouseMoved(screenX: Int, screenY: Int) {
-        if (isVisible && UI is MouseControlled) {
-            (UI as MouseControlled).mouseMoved(screenX, screenY)
+        if (isVisible) {
+            UI.mouseMoved(screenX, screenY)
         }
     }
 
     fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        if (isVisible && UI is MouseControlled) {
-            (UI as MouseControlled).touchDragged(screenX, screenY, pointer)
+        if (isVisible) {
+            UI.touchDragged(screenX, screenY, pointer)
         }
 
         return false
     }
 
     fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (isVisible && UI is MouseControlled) {
-            (UI as MouseControlled).touchDown(screenX, screenY, pointer, button)
+        if (isVisible) {
+            UI.touchDown(screenX, screenY, pointer, button)
         }
 
         return false
     }
 
     fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (isVisible && UI is MouseControlled) {
-            (UI as MouseControlled).touchUp(screenX, screenY, pointer, button)
+        if (isVisible) {
+            UI.touchUp(screenX, screenY, pointer, button)
         }
 
         return false
     }
 
     fun scrolled(amount: Int): Boolean {
-        if (isVisible && UI is MouseControlled) {
-            (UI as MouseControlled).scrolled(amount)
+        if (isVisible) {
+            UI.scrolled(amount)
         }
 
         return false

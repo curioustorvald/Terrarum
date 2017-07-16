@@ -144,7 +144,7 @@ class WorldTime(initTime: Long = 0L) {
 
     fun update(delta: Float) {
         //time
-        realMillisec += delta
+        realMillisec += delta * 1000.0
         if (realMillisec >= 1000.0 / REAL_SEC_TO_GAME_SECS) {
             realMillisec -= 1000.0 / REAL_SEC_TO_GAME_SECS
             TIME_T += timeDelta

@@ -11,7 +11,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 16-01-27.
  */
-class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas {
+class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas() {
 
     private val segment = if (isBlackVariant) SEGMENT_BLACK else SEGMENT_WHITE
 
@@ -49,9 +49,6 @@ class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas
         messagesList.forEachIndexed { index, s ->
             Terrarum.fontGame.draw(batch, s, segment.tileW + LRmargin, (segment.tileH - Terrarum.fontGame.lineHeight) / 2f)
         }
-    }
-
-    override fun processInput(delta: Float) {
     }
 
     override fun doOpening(delta: Float) {

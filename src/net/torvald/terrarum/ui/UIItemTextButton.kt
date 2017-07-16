@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
  *
  * Created by SKYHi14 on 2017-03-13.
  */
-class UIItemTextButton(
+open class UIItemTextButton(
         parentUI: UICanvas,
         val labelText: String,
         override var posX: Int,
@@ -44,9 +44,6 @@ class UIItemTextButton(
     var highlighted: Boolean = false
 
 
-    override fun update(delta: Float) {
-    }
-
     private val glyphLayout = GlyphLayout()
 
     override fun render(batch: SpriteBatch) {
@@ -76,34 +73,6 @@ class UIItemTextButton(
                 posX.toFloat() + width.minus(textW).div(2) + (preGapX - postGapX).div(2),
                 posY.toFloat() + height / 4
         )
-    }
-
-    override fun keyDown(keycode: Int): Boolean {
-        return false
-    }
-
-    override fun keyUp(keycode: Int): Boolean {
-        return false
-    }
-
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        return false
-    }
-
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        return false
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return false
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return false
-    }
-
-    override fun scrolled(amount: Int): Boolean {
-        return false
     }
 
     override fun dispose() {

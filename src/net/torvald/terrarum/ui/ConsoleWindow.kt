@@ -14,7 +14,7 @@ import net.torvald.terrarum.fillRect
 /**
  * Created by minjaesong on 15-12-31.
  */
-class ConsoleWindow : UICanvas, KeyControlled {
+class ConsoleWindow : UICanvas() {
 
     internal var UIColour = Color(0x404080_80.toInt())
 
@@ -208,9 +208,6 @@ class ConsoleWindow : UICanvas, KeyControlled {
     override fun endClosing(delta: Float) {
         drawOffY = -height.toFloat()
         openingTimeCounter = 0f
-    }
-
-    override fun processInput(delta: Float) {
     }
 
     override fun dispose() {

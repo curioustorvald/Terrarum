@@ -150,10 +150,21 @@ object Terrarum : Game() {
     private val localeSimple = arrayOf("de", "en", "es", "it")
     var gameLocale = "lateinit"
         set(value) {
-            if (localeSimple.contains(value.substring(0..1)))
-                field = value.substring(0..1)
-            else
-                field = value
+            if (value.isBlank() || value.isEmpty()) {
+                field = sysLang
+            }
+            else {
+                try {
+                    if (localeSimple.contains(value.substring(0..1)))
+                        field = value.substring(0..1)
+                    else
+                        field = value
+                }
+                catch (e: StringIndexOutOfBoundsException) {
+                    field = value
+                }
+            }
+
 
             fontGame.reload(value)
         }
