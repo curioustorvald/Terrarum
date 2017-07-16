@@ -14,7 +14,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2017-06-10.
  */
-class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas {
+class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
     override var width = 116
     override var height = 24
     override var handler: UIHandler? = null
@@ -115,9 +115,6 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas {
         batch.color = lcdLitCol
         font.draw(batch, getTempStr(), 21f, 5f)
         font.draw(batch, getMailStr(), 93f, 5f)
-    }
-
-    override fun processInput(delta: Float) {
     }
 
     override fun doOpening(delta: Float) {

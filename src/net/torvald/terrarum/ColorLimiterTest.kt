@@ -61,7 +61,7 @@ object ColorLimiterTest : ApplicationAdapter() {
     }
 
     private var timer = 0f
-    private var timerTick = 0.5f
+    private var timerTick = 1f
     private var ditherStart = 2f
     private var ditherEnd = 16f
     private var dither = ditherStart

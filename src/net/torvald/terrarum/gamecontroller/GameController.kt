@@ -34,7 +34,7 @@ object GameController : InputAdapter() {
     val mouseTileY: Int
         get() = (mouseY / FeaturesDrawer.TILE_SIZE).floorInt()
 
-    fun processInput(delta: Float) {
+    fun update(delta: Float) {
         // actor process input
         if (!ingame.consoleHandler.isTakingControl) {
             if (ingame.canPlayerControl) {
@@ -50,14 +50,6 @@ object GameController : InputAdapter() {
                     }
                 }
             }
-            else {
-                ingame.uiContainer.forEach {
-                    it.processInput(delta)
-                }
-            }
-        }
-        else {
-            ingame.consoleHandler.processInput(delta)
         }
 
 

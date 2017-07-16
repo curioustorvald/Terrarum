@@ -10,22 +10,25 @@ import net.torvald.terrarum.gameactors.roundInt
 /**
  * Created by minjaesong on 15-12-31.
  */
-interface UICanvas {
+abstract class UICanvas {
 
-    var width: Int
-    var height: Int
+    abstract var width: Int
+    abstract var height: Int
 
     /**
      * Usage: (in StateInGame:) uiHandlerField.ui.handler = uiHandlerField
      */
-    var handler: UIHandler?
+    abstract var handler: UIHandler?
 
     /**
      * In milliseconds
      *
      * Timer itself is implemented in the handler.
      */
-    var openCloseTime: Second
+    abstract var openCloseTime: Second
+
+
+    protected val uiItems = ArrayList<UIItem>()
 
 
     val relativeMouseX: Int
@@ -41,33 +44,69 @@ interface UICanvas {
         get() = mouseUp && Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary"))
 
 
-    fun update(delta: Float)
+    abstract fun update(delta: Float)
 
-    fun render(batch: SpriteBatch)
-
-    fun processInput(delta: Float)
+    abstract fun render(batch: SpriteBatch)
 
     /**
      * Do not modify handler!!.openCloseCounter here.
      */
-    fun doOpening(delta: Float)
+    abstract fun doOpening(delta: Float)
 
     /**
      * Do not modify handler!!.openCloseCounter here.
      */
-    fun doClosing(delta: Float)
+    abstract fun doClosing(delta: Float)
 
     /**
      * Do not modify handler!!.openCloseCounter here.
      */
-    fun endOpening(delta: Float)
+    abstract fun endOpening(delta: Float)
 
     /**
      * Do not modify handler!!.openCloseCounter here.
      */
-    fun endClosing(delta: Float)
+    abstract fun endClosing(delta: Float)
 
-    fun dispose()
+    abstract fun dispose()
+
+    fun addItem(uiItem: UIItem) {
+        uiItems.add(uiItem)
+    }
+
+    open fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        uiItems.forEach { it.mouseMoved(screenX, screenY) }
+        return true
+    }
+    open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        uiItems.forEach { it.touchDragged(screenX, screenY, pointer) }
+        return true
+    }
+    open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        uiItems.forEach { it.touchDown(screenX, screenY, pointer, button) }
+        return true
+    }
+    open fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        uiItems.forEach { it.touchUp(screenX, screenY, pointer, button) }
+        return true
+    }
+    open fun scrolled(amount: Int): Boolean {
+        uiItems.forEach { it.scrolled(amount) }
+        return true
+    }
+
+    open fun keyDown(keycode: Int): Boolean {
+        uiItems.forEach { it.keyDown(keycode) }
+        return true
+    }
+    open fun keyUp(keycode: Int): Boolean {
+        uiItems.forEach { it.keyUp(keycode) }
+        return true
+    }
+    open fun keyTyped(character: Char): Boolean {
+        return false
+        //uiItems.forEach { it.keyT }
+    }
 
     companion object {
         const val OPENCLOSE_GENERIC = 0.2f

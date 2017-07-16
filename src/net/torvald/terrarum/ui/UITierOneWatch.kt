@@ -17,7 +17,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2017-06-11.
  */
-class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas {
+class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
     override var width = 85
     override var height = 52
     override var handler: UIHandler? = null
@@ -105,9 +105,6 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas {
         val moonPhase = (worldTime.moonPhase * moonDialCount).roundInt() % moonDialCount
         batch.color = lcdLitCol
         batch.draw(moonDial.get(moonPhase, 0), 4f, 22f)
-    }
-
-    override fun processInput(delta: Float) {
     }
 
     override fun doOpening(delta: Float) {
