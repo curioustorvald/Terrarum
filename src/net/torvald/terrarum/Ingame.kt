@@ -466,7 +466,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
         KeyToggler.update()
-        GameController.processInput(delta)
+        GameController.update(delta)
 
 
         if (!paused) {
@@ -481,12 +481,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
             BlockStats.update()
             if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
                 world.globalLight = WeatherMixer.globalLightNow
-
-
-            ///////////////////////////
-            // input-related updates //
-            ///////////////////////////
-            uiContainer.forEach { it.processInput(delta) }
 
 
             ////////////////////////////
@@ -608,11 +602,14 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 // mix lighpmap canvas to this canvas (Colors -- RGB channel)
                 if (!KeyToggler.isOn(Input.Keys.F6)) { // F6 to disable lightmap draw
                     setCameraPosition(0f, 0f)
-                    batch.shader = null
+                    batch.shader = Terrarum.shaderBayer
+                    batch.shader.setUniformf("rcount", 64f)
+                    batch.shader.setUniformf("gcount", 64f)
+                    batch.shader.setUniformf("bcount", 64f) // de-banding
 
                     val lightTex = blurWriteBuffer.colorBufferTexture // TODO zoom!
 
-                    lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+                    lightTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
                     if (KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendNormal()
                     else blendMul()
@@ -671,14 +668,17 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 // --> blendNormal() <-- introduced by childs of ActorWithBody //
 
 
-                // mix lighpmap canvas to this canvas (UV lights -- A channel)
+                // mix lighpmap canvas to this canvas (UV lights -- A channel written on RGB as greyscale image)
                 if (!KeyToggler.isOn(Input.Keys.F6)) { // F6 to disable lightmap draw
                     setCameraPosition(0f, 0f)
-                    batch.shader = null
+                    batch.shader = Terrarum.shaderBayer
+                    batch.shader.setUniformf("rcount", 64f)
+                    batch.shader.setUniformf("gcount", 64f)
+                    batch.shader.setUniformf("bcount", 64f) // de-banding
 
                     val lightTex = blurWriteBuffer.colorBufferTexture // TODO zoom!
 
-                    lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+                    lightTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
 
                     if (KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendNormal()
                     else blendMul()
@@ -700,22 +700,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
         worldBlendFrameBuffer.inAction(camera, batch) {
             Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-
-
-
-            // draw skybox
-            /*WeatherMixer.render(camera)
-
-
-            batch.inUse {
-                batch.color = Color.WHITE
-                blendNormal()
-
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // reset active textureunit to zero (i don't know tbh, but it won't work without this)
-                batch.shader = null
-            }*/
-
-
 
 
             // draw blended world
@@ -776,7 +760,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
             val blendedTex = worldBlendFrameBuffer.colorBufferTexture
             blendedTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
             batch.color = Color.WHITE
-            //batch.shader = Terrarum.shaderBayer
             batch.shader = null
             blendNormal()
             batch.draw(blendedTex, 0f, 0f, blendedTex.width.toFloat(), blendedTex.height.toFloat())

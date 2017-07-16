@@ -1,5 +1,7 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
@@ -7,6 +9,7 @@ import net.torvald.terrarum.Terrarum.joypadLabelNinA
 import net.torvald.terrarum.Terrarum.joypadLabelNinY
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.langpack.Lang
@@ -21,7 +24,7 @@ class UIInventory(
         override var width: Int,
         override var height: Int,
         var categoryWidth: Int
-) : UICanvas, MouseControlled, KeyControlled {
+) : UICanvas() {
 
     val inventory: ActorInventory?
         get() = actor?.inventory
@@ -62,7 +65,7 @@ class UIInventory(
 
     val pageButtonRealWidth = pageButtonExtraGap + itemStripGutterH
 
-    val catButtons = UIItemTextButtonList(
+    private val catButtons = UIItemTextButtonList(
             this,
             arrayOf(
                     "MENU_LABEL_ALL",
@@ -95,7 +98,7 @@ class UIInventory(
     )
 
     val itemsStripWidth = ((width - catButtons.width) - (2 * itemStripGutterH + itemInterColGutter)) / 2 - pageButtonExtraGap
-    val items = Array(
+    private val items = Array(
             ((height - controlHelpHeight) / (UIItemInventoryElem.height + itemStripGutterV)) * 2, {
         UIItemInventoryElem(
                 parentUI = this,
@@ -112,7 +115,26 @@ class UIInventory(
                 drawBackOnNull = true,
                 inactiveTextCol = defaultTextColour
         ) })
-    val itemsScrollOffset = 0
+
+
+    private val scrollImageButtonAtlas = TextureRegionPack(
+            Gdx.files.internal("assets/graphics/gui/inventory/page_arrow_button.tga"),
+            40, 54
+    )
+    private val scrollLeftButton = UIItemImageButton(this,
+            scrollImageButtonAtlas.get(0, 0),
+            posX = categoryWidth,
+            posY = (height - controlHelpHeight - scrollImageButtonAtlas.tileH) / 2
+    )
+    private val scrollRightButton = UIItemImageButton(this,
+            scrollImageButtonAtlas.get(1, 0),
+            posX = width - scrollImageButtonAtlas.tileW,
+            posY = (height - controlHelpHeight - scrollImageButtonAtlas.tileH) / 2
+    )
+    var itemPage = 0
+    var maxItemPage = 1 // TODO total size of current category / items.size
+
+
 
     var inventorySortList = ArrayList<InventoryPair>()
     private var rebuildList = true
@@ -145,12 +167,36 @@ class UIInventory(
     private val seekDown: Int;  get() = Terrarum.getConfigInt("keydown") // to support in-screen keybind changing
 
 
+    init {
+        // assign actions to the buttons
+        scrollLeftButton.clickOnceAction = { mouseX, mouseY, button -> // click once action doesn't work ?!
+            if (button == Input.Buttons.LEFT) {
+                println("prevpage")
+                itemPage = (itemPage - 1) fmod maxItemPage
+            }
+        }
+        scrollRightButton.clickOnceAction = { mouseX, mouseY, button ->
+            if (button == Input.Buttons.LEFT) {
+                println("nextpage")
+                itemPage = (itemPage + 1) fmod maxItemPage
+            }
+        }
+
+
+        addItem(scrollLeftButton)
+        addItem(scrollRightButton)
+    }
+
+
     override fun update(delta: Float) {
         if (handler == null) {
             throw Error("Handler for this UI is null, you douchebag.")
         }
 
         catButtons.update(delta)
+
+        scrollLeftButton.update(delta)
+        scrollRightButton.update(delta)
 
         if (actor != null && inventory != null) {
             // monitor and check if category selection has been changed
@@ -186,6 +232,9 @@ class UIInventory(
 
         catButtons.render(batch)
 
+        // left/right page mover
+        scrollLeftButton.render(batch)
+        scrollRightButton.render(batch)
 
         items.forEach {
             it.render(batch)
@@ -265,7 +314,7 @@ class UIInventory(
         for (k in 0..items.size - 1) {
             // we have an item
             try {
-                val sortListItem = inventorySortList[k + itemsScrollOffset]
+                val sortListItem = inventorySortList[k + itemPage * items.size]
                 items[k].item = sortListItem.item
                 items[k].amount = sortListItem.amount
                 items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
@@ -308,8 +357,6 @@ class UIInventory(
     // Inputs //
     ////////////
 
-    override fun processInput(delta: Float) {
-    }
 
     override fun doOpening(delta: Float) {
         UICanvas.doOpeningPopOut(handler, openCloseTime, UICanvas.Companion.Position.LEFT)
@@ -317,7 +364,6 @@ class UIInventory(
 
     override fun doClosing(delta: Float) {
         UICanvas.doClosingPopOut(handler, openCloseTime, UICanvas.Companion.Position.LEFT)
-
     }
 
     override fun endOpening(delta: Float) {
@@ -328,11 +374,9 @@ class UIInventory(
         UICanvas.endClosingPopOut(handler, UICanvas.Companion.Position.LEFT)
     }
 
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        return false
-    }
-
     override fun keyDown(keycode: Int): Boolean {
+        super.keyDown(keycode)
+
         items.forEach { if (it.mouseUp) it.keyDown(keycode) }
         shutUpAndRebuild()
 
@@ -340,21 +384,17 @@ class UIInventory(
     }
 
     override fun keyUp(keycode: Int): Boolean {
+        super.keyUp(keycode)
+
         items.forEach { if (it.mouseUp) it.keyUp(keycode) }
         shutUpAndRebuild()
 
         return true
     }
 
-    override fun keyTyped(character: Char): Boolean {
-        return false
-    }
-
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        return false
-    }
-
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        super.touchDown(screenX, screenY, pointer, button)
+
         items.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
 
         return true
@@ -366,12 +406,9 @@ class UIInventory(
         return true
     }
 
-    override fun scrolled(amount: Int): Boolean {
-        return false
-    }
-
     override fun dispose() {
         catButtons.dispose()
         items.forEach { it.dispose() }
+        scrollImageButtonAtlas.dispose()
     }
 }
