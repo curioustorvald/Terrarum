@@ -82,6 +82,7 @@ object DefaultConfig {
 
         jsonObject.addProperty("fullframelightupdate", false)
 
+        jsonObject.addProperty("useamericanunit", false) // Metric Masterrace -- Filthy imperials.
 
         return jsonObject
     }

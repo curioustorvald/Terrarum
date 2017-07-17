@@ -32,10 +32,10 @@ import javax.swing.JOptionPane
 
 import com.badlogic.gdx.graphics.OrthographicCamera
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.worldgenerator.WorldGenerator
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 
 /**
@@ -65,10 +65,10 @@ class Ingame(val batch: SpriteBatch) : Screen {
     private val actorsRenderMidTop = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
     private val actorsRenderFront  = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
 
-    var playableActorDelegate: PlayableActorDelegate? = null // DO NOT LATEINIT!
+    lateinit var playableActorDelegate: PlayableActorDelegate // player must exist; use dummy player if there is none (required for camera)
         private set
-    inline val player: ActorHumanoid? // currently POSSESSED actor :)
-        get() = playableActorDelegate?.actor
+    inline val player: ActorHumanoid // currently POSSESSED actor :)
+        get() = playableActorDelegate.actor
 
     var screenZoom = 1.0f
     val ZOOM_MAXIMUM = 4.0f
@@ -80,12 +80,11 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
     private val worldFBOformat = if (Terrarum.environment == RunningEnvironment.MOBILE) Pixmap.Format.RGBA4444 else Pixmap.Format.RGBA8888
-    private val worldBlendFBOFormat = if (Terrarum.environment == RunningEnvironment.MOBILE) Pixmap.Format.RGBA4444 else Pixmap.Format.RGBA8888
     private val lightFBOformat = Pixmap.Format.RGB888
 
     var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
     var worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
-    var worldBlendFrameBuffer = FrameBuffer(worldBlendFBOFormat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+    var worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
     // RGB elements of Lightmap for Color  Vec4(R, G, B, 1.0)  24-bit
     var lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
     var lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
@@ -145,9 +144,10 @@ class Ingame(val batch: SpriteBatch) : Screen {
     //private val ingameDrawThread: ThreadIngameDraw // draw must be on the main thread
 
 
+    var gameInitialised = false
+        private set
     var gameFullyLoaded = false
         private set
-    private var postInitDone = false
 
 
     //////////////
@@ -226,7 +226,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
      * Init instance by loading saved world
      */
     private fun enter(gameSaveData: GameSaveData) {
-        if (gameFullyLoaded) {
+        if (gameInitialised) {
             println("[Ingame] loaded successfully.")
         }
         else {
@@ -242,7 +242,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
             //initGame()
 
-            gameFullyLoaded = true
+            gameInitialised = true
         }
     }
 
@@ -250,7 +250,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
      * Init instance by creating new world
      */
     private fun enter(worldParams: NewWorldParameters) {
-        if (gameFullyLoaded) {
+        if (gameInitialised) {
             println("[Ingame] loaded successfully.")
         }
         else {
@@ -285,7 +285,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
             //initGame()
 
-            gameFullyLoaded = true
+            gameInitialised = true
         }
     }
 
@@ -410,17 +410,35 @@ class Ingame(val batch: SpriteBatch) : Screen {
     override fun render(delta: Float) {
         // Q&D solution for LoadScreen and Ingame, where while LoadScreen is working, Ingame now no longer has GL Context
         // there's still things to load which needs GL context to be present
-        if (!postInitDone) {
+        if (!gameFullyLoaded) {
 
             if (gameLoadMode == GameLoadMode.CREATE_NEW) {
                 playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
-                addNewActor(player!!)
+
+                // determine spawn position
+                val spawnX = world.width / 2
+                var solidTileCounter = 0
+                while (true) {
+                    if (BlockCodex[world.getTileFromTerrain(spawnX, solidTileCounter)].isSolid ||
+                        BlockCodex[world.getTileFromTerrain(spawnX - 1, solidTileCounter)].isSolid ||
+                        BlockCodex[world.getTileFromTerrain(spawnX + 1, solidTileCounter)].isSolid
+                            ) break
+
+                    solidTileCounter += 1
+                }
+
+                player.setPosition(
+                        spawnX * FeaturesDrawer.TILE_SIZE.toDouble(),
+                        solidTileCounter * FeaturesDrawer.TILE_SIZE.toDouble()
+                )
+
+                addNewActor(player)
             }
 
             initGame()
 
 
-            postInitDone = true
+            gameFullyLoaded = true
         }
 
 
@@ -1517,7 +1535,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
         worldGlowFrameBuffer.dispose()
         worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
         worldBlendFrameBuffer.dispose()
-        worldBlendFrameBuffer = FrameBuffer(worldBlendFBOFormat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+        worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
         lightmapFboA.dispose()
         lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
         lightmapFboB.dispose()
@@ -1546,12 +1564,12 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
 
-        if (gameFullyLoaded) {
+        if (gameInitialised) {
             LightmapRenderer.fireRecalculateEvent()
         }
 
 
-        if (postInitDone) {
+        if (gameFullyLoaded) {
             // resize UIs
 
             notifier.setPosition(

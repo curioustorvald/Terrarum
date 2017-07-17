@@ -10,6 +10,10 @@ import net.torvald.dataclass.Float16Bits
  */
 class MapLayerFloat(val width: Int, val height: Int) : Iterable<Float16Bits> {
 
+    constructor(width: Int, height: Int, init: Float) : this(width, height) {
+        data = Array(height) { Array(width, { Float16.fromFloat(init) }) }
+    }
+
     internal @Volatile var data: Array<Array<Float16Bits>> // in parallel programming: do not trust your register; always read freshly from RAM!
 
     init {
@@ -45,7 +49,7 @@ class MapLayerFloat(val width: Int, val height: Int) : Iterable<Float16Bits> {
         return if (x !in 0..width - 1 || y !in 0..height - 1)
             null
         else
-            data[y][x].toFloat()
+            Float16.toFloat(data[y][x])
     }
 
     internal fun setValue(x: Int, y: Int, value: Float) {

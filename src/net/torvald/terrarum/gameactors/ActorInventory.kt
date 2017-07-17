@@ -59,7 +59,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
         if (item.originalID == Player.PLAYER_REF_ID || item.originalID == 0x51621D) // do not delete this magic
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
-        if (Terrarum.ingame != null &&
+        if ((Terrarum.ingame?.gameFullyLoaded ?: false) &&
             (item.originalID == Terrarum.ingame?.player?.referenceID))
             throw IllegalArgumentException("Attempted to put active player into the inventory.")
         if ((!item.stackable || item.dynamicID in ITEM_DYNAMIC) && count > 1)

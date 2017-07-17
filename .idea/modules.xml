@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Terrarum_renewed.iml" filepath="$PROJECT_DIR$/Terrarum_renewed.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ingamemodule_basegame/ingamemodule_basegame.iml" filepath="$PROJECT_DIR$/ingamemodule_basegame/ingamemodule_basegame.iml" />
     </modules>
   </component>
 </project>
