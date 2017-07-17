@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import net.torvald.terrarum.gameactors.sqrt
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -34,6 +35,7 @@ object ColorLimiterTest : ApplicationAdapter() {
     lateinit var shader4096: ShaderProgram
 
     lateinit var batch: SpriteBatch
+    lateinit var shapeRenderer: ShapeRenderer
 
     lateinit var font: GameFontBase
 
@@ -42,14 +44,16 @@ object ColorLimiterTest : ApplicationAdapter() {
 
         shader4096 = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer.frag"))
         shader4096.begin()
-        shader4096.setUniformf("rcount", 2f)
-        shader4096.setUniformf("gcount", 2f)
-        shader4096.setUniformf("bcount", 2f)
+        shader4096.setUniformf("rcount", 4f)
+        shader4096.setUniformf("gcount", 4f)
+        shader4096.setUniformf("bcount", 4f)
         shader4096.end()
 
+        //img = Texture("assets/test_gradient.tga")
         img = Texture("assets/test_texture.tga")
 
         batch = SpriteBatch()
+        shapeRenderer = ShapeRenderer()
 
         font = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = false)
 
@@ -84,19 +88,24 @@ object ColorLimiterTest : ApplicationAdapter() {
 
         batch.inUse {
             batch.shader = shader4096
-            shader4096.setUniformf("rcount", dither)
-            shader4096.setUniformf("gcount", dither)
-            shader4096.setUniformf("bcount", dither)
+            shader4096.setUniformf("rcount", 6f)//dither)
+            shader4096.setUniformf("gcount", 6f)//dither)
+            shader4096.setUniformf("bcount", 6f)//dither)
             batch.color = Color.WHITE
             batch.draw(img, 0f, 0f)
+        }
 
+        /*shapeRenderer.inUse {
+            shapeRenderer.rect(512f, 0f, 512f, 512f, Color.BLACK, Color.BLACK, Color.WHITE, Color.WHITE)
+        }*/
 
+        batch.inUse {
             batch.shader = null
             batch.color = Color.WHITE
             batch.draw(img, img.width.toFloat(), 0f)
 
 
-
+            batch.shader = null
             font.draw(batch, "Dither level: ${dither.toInt()}", 10f, Gdx.graphics.height - 30f)
         }
     }
