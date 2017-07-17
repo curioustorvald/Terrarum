@@ -80,11 +80,12 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
     private val worldFBOformat = if (Terrarum.environment == RunningEnvironment.MOBILE) Pixmap.Format.RGBA4444 else Pixmap.Format.RGBA8888
+    private val worldBlendFBOFormat = if (Terrarum.environment == RunningEnvironment.MOBILE) Pixmap.Format.RGBA4444 else Pixmap.Format.RGBA8888
     private val lightFBOformat = Pixmap.Format.RGB888
 
     var worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
     var worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
-    var worldBlendFrameBuffer = FrameBuffer(Pixmap.Format.RGB888, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+    var worldBlendFrameBuffer = FrameBuffer(worldBlendFBOFormat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
     // RGB elements of Lightmap for Color  Vec4(R, G, B, 1.0)  24-bit
     var lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
     var lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
@@ -1516,7 +1517,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
         worldGlowFrameBuffer.dispose()
         worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
         worldBlendFrameBuffer.dispose()
-        worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+        worldBlendFrameBuffer = FrameBuffer(worldBlendFBOFormat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
         lightmapFboA.dispose()
         lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
         lightmapFboB.dispose()
