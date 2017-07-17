@@ -124,12 +124,16 @@ class UIInventory(
     private val scrollLeftButton = UIItemImageButton(this,
             scrollImageButtonAtlas.get(0, 0),
             posX = categoryWidth,
-            posY = (height - controlHelpHeight - scrollImageButtonAtlas.tileH) / 2
+            posY = 0,//(height - controlHelpHeight - scrollImageButtonAtlas.tileH) / 2,
+            width = scrollImageButtonAtlas.tileW,
+            height = height - controlHelpHeight
     )
     private val scrollRightButton = UIItemImageButton(this,
             scrollImageButtonAtlas.get(1, 0),
             posX = width - scrollImageButtonAtlas.tileW,
-            posY = (height - controlHelpHeight - scrollImageButtonAtlas.tileH) / 2
+            posY = 0,//(height - controlHelpHeight - scrollImageButtonAtlas.tileH) / 2,
+            width = scrollImageButtonAtlas.tileW,
+            height = height - controlHelpHeight
     )
     var itemPage = 0
     var itemPageCount = 1 // TODO total size of current category / items.size
@@ -139,7 +143,7 @@ class UIInventory(
     var inventorySortList = ArrayList<InventoryPair>()
     private var rebuildList = true
 
-    private val SP = "${0x3000.toChar()}${0x3000.toChar()}${0x3000.toChar()}"
+    private val SP = "${0x3000.toChar()}${0x3000.toChar()}"
     val listControlHelp: String
         get() = if (Terrarum.environment == RunningEnvironment.PC)
             "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP" +
@@ -161,23 +165,21 @@ class UIInventory(
     private var isEncumbered = false
 
 
-    private val seekLeft: Int;  get() = Terrarum.getConfigInt("keyleft") // to support in-screen keybind changing
-    private val seekRight: Int; get() = Terrarum.getConfigInt("keyright") // to support in-screen keybind changing
-    private val seekUp: Int;    get() = Terrarum.getConfigInt("keyup") // to support in-screen keybind changing
-    private val seekDown: Int;  get() = Terrarum.getConfigInt("keydown") // to support in-screen keybind changing
+    private val seekLeft: Int;  get() = Terrarum.getConfigInt("keyleft")  // getter used to support in-game keybind changing
+    private val seekRight: Int; get() = Terrarum.getConfigInt("keyright") // getter used to support in-game keybind changing
+    private val seekUp: Int;    get() = Terrarum.getConfigInt("keyup")    // getter used to support in-game keybind changing
+    private val seekDown: Int;  get() = Terrarum.getConfigInt("keydown")  // getter used to support in-game keybind changing
 
 
     init {
         // assign actions to the buttons
-        scrollLeftButton.clickOnceAction = { mouseX, mouseY, button -> // click once action doesn't work ?!
+        scrollLeftButton.clickOnceListener = { mouseX, mouseY, button -> // click once action doesn't work ?!
             if (button == Input.Buttons.LEFT) {
-                println("prevpage")
                 itemPage = (itemPage - 1) fmod itemPageCount
             }
         }
-        scrollRightButton.clickOnceAction = { mouseX, mouseY, button ->
+        scrollRightButton.clickOnceListener = { mouseX, mouseY, button ->
             if (button == Input.Buttons.LEFT) {
-                println("nextpage")
                 itemPage = (itemPage + 1) fmod itemPageCount
             }
         }

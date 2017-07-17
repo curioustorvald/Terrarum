@@ -2,6 +2,7 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.graphics.Color
+import net.torvald.dataclass.Float16
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
 import org.dyn4j.geometry.Vector2
@@ -34,6 +35,7 @@ class GameWorld(val width: Int, val height: Int) {
     var gravitation: Vector2 = Vector2(0.0, 9.8)
     /** 0.0..1.0+ */
     var globalLight = Color(0f,0f,0f,0f)
+    var averageTemperature = 288f // 15 deg celsius; simulates global warming
 
 
 
@@ -56,7 +58,7 @@ class GameWorld(val width: Int, val height: Int) {
         layerTerrainLowBits = PairedMapLayer(width, height)
         layerWallLowBits = PairedMapLayer(width, height)
 
-        layerThermal = MapLayerFloat(width / 2, height / 2)
+        layerThermal = MapLayerFloat(width / 2, height / 2, averageTemperature)
 
 
         time = WorldTime(
@@ -286,6 +288,12 @@ class GameWorld(val width: Int, val height: Int) {
     }
     fun getWallDamage(x: Int, y: Int): Float =
             wallDamages[LandUtil.getBlockAddr(x, y)] ?: 0f
+
+
+    fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {
+        return layerThermal.getValue((worldTileX fmod width) / 2, worldTileY / 2)
+    }
+
 
     companion object {
 

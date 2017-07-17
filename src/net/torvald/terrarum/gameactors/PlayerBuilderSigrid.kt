@@ -65,8 +65,6 @@ object PlayerBuilderSigrid {
 
         p.inventory = ActorInventory(p, 0, ActorInventory.CAPACITY_MODE_NO_ENCUMBER)
 
-        p.setPosition((4096 * FeaturesDrawer.TILE_SIZE).toDouble(), (300 * 16).toDouble())
-
         p.faction.add(FactionFactory.create("basegame", "factions/FactionSigrid.json"))
 
 
@@ -78,7 +76,10 @@ object PlayerBuilderSigrid {
                 Block.PLANK_BIRCH, Block.PLANK_BLOODROSE, Block.PLANK_EBONY, Block.PLANK_NORMAL,
                 Block.SANDSTONE, Block.SANDSTONE_BLACK, Block.SANDSTONE_GREEN,
                 Block.SANDSTONE_RED, Block.STONE, Block.STONE_BRICKS,
-                Block.STONE_QUARRIED, Block.STONE_TILE_WHITE, Block.TORCH
+                Block.STONE_QUARRIED, Block.STONE_TILE_WHITE, Block.TORCH,
+                Block.DAYLIGHT_CAPACITOR, Block.ICE_FRAGILE,
+                Block.ILLUMINATOR_WHITE, Block.ILLUMINATOR_BLACK, Block.ILLUMINATOR_ORANGE,
+                Block.ILLUMINATOR_GREEN
         )
         val walls = arrayOf(
                 Block.AIR, Block.DIRT, Block.GLASS_CRUDE,
