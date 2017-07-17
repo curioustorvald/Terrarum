@@ -132,7 +132,7 @@ class UIInventory(
             posY = (height - controlHelpHeight - scrollImageButtonAtlas.tileH) / 2
     )
     var itemPage = 0
-    var maxItemPage = 1 // TODO total size of current category / items.size
+    var itemPageCount = 1 // TODO total size of current category / items.size
 
 
 
@@ -172,13 +172,13 @@ class UIInventory(
         scrollLeftButton.clickOnceAction = { mouseX, mouseY, button -> // click once action doesn't work ?!
             if (button == Input.Buttons.LEFT) {
                 println("prevpage")
-                itemPage = (itemPage - 1) fmod maxItemPage
+                itemPage = (itemPage - 1) fmod itemPageCount
             }
         }
         scrollRightButton.clickOnceAction = { mouseX, mouseY, button ->
             if (button == Input.Buttons.LEFT) {
                 println("nextpage")
-                itemPage = (itemPage + 1) fmod maxItemPage
+                itemPage = (itemPage + 1) fmod itemPageCount
             }
         }
 
@@ -206,6 +206,10 @@ class UIInventory(
                 rebuildList = true
             }
 
+            // reset item page to start
+            if (oldCatSelect != catButtons.selectedIndex) {
+                itemPage = 0
+            }
 
             if (rebuildList) {
                 shutUpAndRebuild()
@@ -349,6 +353,9 @@ class UIInventory(
                 items[k].quickslot = null
             }
         }
+
+
+        itemPageCount = maxOf(1, 1 + (inventorySortList.size.minus(1) / items.size))
     }
 
 

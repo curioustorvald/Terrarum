@@ -9,7 +9,7 @@ uniform vec3 bottomColor;
 
 // "steps" of R, G and B. Must be integer && equal or greater than 2
 uniform float rcount = 64.0; // it even works on 256.0!
-uniform float gcount = 64.0; // using 128: has less banding and most monitors are internally 6-bit
+uniform float gcount = 64.0; // using 64: has less banding and most monitors are internally 6-bit
 uniform float bcount = 64.0;
 
 
