@@ -155,6 +155,12 @@ object WorldSimulator {
         }
     }
 
+
+    fun disperseHeat(delta: Float) {
+
+    }
+
+
     fun drawFluidMapDebug(batch: SpriteBatch) {
         batch.color = colourWater
 

@@ -1,7 +1,6 @@
 package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -127,7 +126,7 @@ object LoadScreen : ScreenAdapter() {
 
             // change screen WHEN the timer is reset.
             // In other words, the arrow must hit the goal BEFORE context change take place
-            if (screenToLoad?.gameFullyLoaded ?: false) {
+            if (screenToLoad?.gameInitialised ?: false) {
                 doContextChange = true
             }
         }
