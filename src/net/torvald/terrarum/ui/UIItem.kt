@@ -31,39 +31,39 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
 
 
     // kind of listener implementation
-    var updateAction: ((Float) -> Unit)? = null
-    var keyDownAction: ((Int) -> Unit)? = null
-    var keyUpAction: ((Int) -> Unit)? = null
-    var mouseMovedAction: ((Int, Int) -> Unit)? = null
-    var touchDraggedAction: ((Int, Int, Int) -> Unit)? = null
-    var touchDownAction: ((Int, Int, Int, Int) -> Unit)? = null
-    var touchUpAction: ((Int, Int, Int, Int) -> Unit)? = null
-    var scrolledAction: ((Int) -> Unit)? = null
+    var updateListener: ((Float) -> Unit)? = null
+    var keyDownListener: ((Int) -> Unit)? = null
+    var keyUpListener: ((Int) -> Unit)? = null
+    var mouseMovedListener: ((Int, Int) -> Unit)? = null
+    var touchDraggedListener: ((Int, Int, Int) -> Unit)? = null
+    var touchDownListener: ((Int, Int, Int, Int) -> Unit)? = null
+    var touchUpListener: ((Int, Int, Int, Int) -> Unit)? = null
+    var scrolledListener: ((Int) -> Unit)? = null
 
-    var clickOnceAction: ((Int, Int, Int) -> Unit)? = null
-    var clickOnceActionEngaged = false
+    var clickOnceListener: ((Int, Int, Int) -> Unit)? = null
+    var clickOnceListenerFired = false
 
 
 
     open fun update(delta: Float) {
-        if (updateAction != null) {
-            updateAction!!.invoke(delta)
+        if (updateListener != null) {
+            updateListener!!.invoke(delta)
         }
     }
     abstract fun render(batch: SpriteBatch)
 
     // keyboard controlled
     open fun keyDown(keycode: Int): Boolean {
-        if (keyDownAction != null) {
-            keyDownAction!!.invoke(keycode)
+        if (keyDownListener != null) {
+            keyDownListener!!.invoke(keycode)
             return true
         }
 
         return false
     }
     open fun keyUp(keycode: Int): Boolean {
-        if (keyUpAction != null) {
-            keyUpAction!!.invoke(keycode)
+        if (keyUpListener != null) {
+            keyUpListener!!.invoke(keycode)
             return true
         }
 
@@ -72,16 +72,16 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
 
     // mouse controlled
     open fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        if (mouseMovedAction != null) {
-            mouseMovedAction!!.invoke(relativeMouseX, relativeMouseY)
+        if (mouseMovedListener != null) {
+            mouseMovedListener!!.invoke(relativeMouseX, relativeMouseY)
             return true
         }
 
         return false
     }
     open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        if (touchDraggedAction != null) {
-            touchDraggedAction!!.invoke(relativeMouseX, relativeMouseY, pointer)
+        if (touchDraggedListener != null) {
+            touchDraggedListener!!.invoke(relativeMouseX, relativeMouseY, pointer)
             return true
         }
 
@@ -90,31 +90,31 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         var actionDone = false
 
-        if (touchDownAction != null) {
-            touchDownAction!!.invoke(relativeMouseX, relativeMouseY, pointer, button)
+        if (touchDownListener != null) {
+            touchDownListener!!.invoke(relativeMouseX, relativeMouseY, pointer, button)
             actionDone = true
         }
 
-        if (!clickOnceActionEngaged && mouseUp) {
-            clickOnceAction!!.invoke(relativeMouseX, relativeMouseY, button)
+        if (!clickOnceListenerFired && mouseUp) {
+            clickOnceListener!!.invoke(relativeMouseX, relativeMouseY, button)
             actionDone = true
         }
 
         return actionDone
     }
     open fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        clickOnceActionEngaged = false
+        clickOnceListenerFired = false
 
-        if (touchUpAction != null) {
-            touchUpAction!!.invoke(relativeMouseX, relativeMouseY, pointer, button)
+        if (touchUpListener != null) {
+            touchUpListener!!.invoke(relativeMouseX, relativeMouseY, pointer, button)
             return true
         }
 
         return false
     }
     open fun scrolled(amount: Int): Boolean {
-        if (scrolledAction != null) {
-            scrolledAction!!.invoke(amount)
+        if (scrolledListener != null) {
+            scrolledListener!!.invoke(amount)
             return true
         }
 

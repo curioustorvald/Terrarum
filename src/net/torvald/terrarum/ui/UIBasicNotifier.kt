@@ -7,6 +7,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.gameactors.abs
+import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.imagefont.Watch7SegSmall
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -44,7 +45,21 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
     }
 
     private val temperature: Int
-        get() = -2
+        get() {
+            if (player != null) {
+                val playerTilePos = player.tilewiseHitbox
+                val tempCelsius = -273f + (Terrarum.ingame?.world?.getTemperature(playerTilePos.centeredX.toInt(), playerTilePos.centeredY.toInt()) ?: 288f)
+                return if (Terrarum.getConfigBoolean("useamericanunit")) {
+                    tempCelsius.times(1.8f).plus(32f).roundInt()
+                }
+                else {
+                    tempCelsius.roundInt()
+                }
+            }
+            else {
+                return 888
+            }
+        }
     private val mailCount: Int
         get() = 0
 
@@ -65,7 +80,12 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
 
         sb.append(temperature.abs())
 
-        sb.append('"') // celsius superscript
+        if (Terrarum.getConfigBoolean("useamericanunit")) {
+            sb.append('#') // fahrenheit subscript
+        }
+        else {
+            sb.append('"') // celsius superscript
+        }
 
         return sb.toString()
     }
