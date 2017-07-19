@@ -8,6 +8,8 @@ import net.torvald.terrarum.gameactors.roundInt
 
 
 /**
+ * UIItems must be added manually at the init!
+ *
  * Created by minjaesong on 15-12-31.
  */
 abstract class UICanvas {

@@ -1,16 +1,19 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.Ingame
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.round
 
 /**
  * UIHandler is a handler for UICanvas. It opens/closes the attached UI, moves the "window" (or "canvas")
  * to the coordinate of displayed cartesian coords, and update and render the UI.
  * It also process game inputs and send control events to the UI so that the UI can handle them.
  *
- * Newly created UI is invisible by default.
+ * New UIs are NORMALLY HIDDEN; set it visible as you need!
  *
  * Created by minjaesong on 15-12-31.
  */
@@ -129,7 +132,7 @@ class UIHandler(var UI: UICanvas,
         }
     }
 
-    fun render(batch: SpriteBatch) {
+    fun render(batch: SpriteBatch, camera: Camera) {
         if (isVisible || alwaysVisible) {
             // camera SHOULD BE CENTERED to HALFX and HALFY (see StateInGame) //
 
@@ -141,8 +144,9 @@ class UIHandler(var UI: UICanvas,
 
 
 
-            if (!customPositioning)
-                Terrarum.ingame?.setCameraPosition(posX.toFloat(), posY.toFloat())
+            if (!customPositioning) {
+                setCameraPosition(batch, camera, posX.toFloat(), posY.toFloat())
+            }
             batch.color = Color.WHITE
 
             UI.render(batch)
@@ -288,5 +292,9 @@ class UIHandler(var UI: UICanvas,
 
     fun dispose() {
         UI.dispose()
+    }
+
+    fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
+        Ingame.setCameraPosition(batch, camera, newX, newY)
     }
 }

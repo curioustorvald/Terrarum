@@ -2,7 +2,6 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.graphics.Color
-import net.torvald.dataclass.Float16
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
 import org.dyn4j.geometry.Vector2
@@ -23,8 +22,10 @@ class GameWorld(val width: Int, val height: Int) {
 
     val layerThermal: MapLayerFloat // in Kelvins
 
-    val spawnX: Int
-    val spawnY: Int
+    /** Tilewise spawn point */
+    var spawnX: Int
+    /** Tilewise spawn point */
+    var spawnY: Int
 
     val wallDamages = HashMap<BlockAddress, BlockDamage>()
     val terrainDamages = HashMap<BlockAddress, BlockDamage>()
@@ -73,7 +74,7 @@ class GameWorld(val width: Int, val height: Int) {
 
      * @return byte[][] terrain layer
      */
-    val terrainArray: Array<ByteArray>
+    val terrainArray: ByteArray
         get() = layerTerrain.data
 
     /**
@@ -81,7 +82,7 @@ class GameWorld(val width: Int, val height: Int) {
 
      * @return byte[][] wall layer
      */
-    val wallArray: Array<ByteArray>
+    val wallArray: ByteArray
         get() = layerWall.data
 
     /**
@@ -89,7 +90,7 @@ class GameWorld(val width: Int, val height: Int) {
 
      * @return byte[][] wire layer
      */
-    val wireArray: Array<ByteArray>
+    val wireArray: ByteArray
         get() = layerWire.data
 
     /**
@@ -97,8 +98,8 @@ class GameWorld(val width: Int, val height: Int) {
      * Format: 0baaaabbbb, aaaa for x = 0, 2, 4, ..., bbbb for x = 1, 3, 5, ...
      * @return byte[][] damage code pair
      */
-    val damageDataArray: Array<ByteArray>
-        get() = layerTerrainLowBits.dataPair
+    val damageDataArray: ByteArray
+        get() = layerTerrainLowBits.data
 
     fun getTileFromWall(x: Int, y: Int): Int? {
         val wall: Int? = layerWall.getTile(x fmod width, y)
@@ -167,7 +168,7 @@ class GameWorld(val width: Int, val height: Int) {
     }
 
     fun setTileWire(x: Int, y: Int, tile: Byte) {
-        layerWire.data[y][x fmod width] = tile
+        layerWire.setTile(x fmod width, y, tile)
     }
 
     fun getTileFrom(mode: Int, x: Int, y: Int): Int? {

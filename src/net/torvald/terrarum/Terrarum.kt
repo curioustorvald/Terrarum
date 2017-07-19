@@ -36,6 +36,7 @@ import java.util.*
  */
 
 const val GAME_NAME = "Terrarum"
+const val COPYRIGHT_DATE_NAME = "Copyright 2013-2017 Torvald (minjaesong)"
 
 fun main(args: Array<String>) {
     Terrarum // invoke
@@ -258,6 +259,11 @@ object Terrarum : Game() {
     lateinit var textureWhiteSquare: Texture
 
 
+    /** Actually just a mesh of four vertices, two triangles -- not a literal glQuad */
+    lateinit var fullscreenQuad: Mesh; private set
+
+
+
     init {
         println("$NAME version $VERSION_STRING")
 
@@ -314,6 +320,25 @@ object Terrarum : Game() {
 
 
     override fun create() {
+        fullscreenQuad = Mesh(
+                true, 4, 6,
+                VertexAttribute.Position(),
+                VertexAttribute.ColorUnpacked(),
+                VertexAttribute.TexCoords(0)
+        )
+
+        fullscreenQuad.setVertices(floatArrayOf(
+                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
+                Terrarum.WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
+                Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
+                0f, Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
+        ))
+        fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+
+
+
+
+
         TextureRegionPack.globalFlipY = true // !! TO MAKE LEGACY CODE RENDER ON ITS POSITION !!
         Gdx.graphics.isContinuousRendering = true
 
@@ -375,13 +400,18 @@ object Terrarum : Game() {
 
 
 
-        ingame = Ingame(batch)
-        ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, HQRNG().nextLong())
-        ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
+        //ingame = Ingame(batch)
+        //ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, HQRNG().nextLong())
+
+        // TODO: create world being used by title screen, and serialise it.
+        //ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
+        //ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
 
 
-        LoadScreen.screenToLoad = ingame!!
-        super.setScreen(LoadScreen)
+        //LoadScreen.screenToLoad = ingame!!
+
+        super.setScreen(TitleScreen(batch))
+        //super.setScreen(LoadScreen)
 
         //super.setScreen(ingame)
     }
@@ -422,6 +452,17 @@ object Terrarum : Game() {
     override fun resize(width: Int, height: Int) {
         screenW = width
         screenH = height
+
+
+        // re-calculate fullscreen quad
+        fullscreenQuad.setVertices(floatArrayOf(
+                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
+                Terrarum.WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
+                Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
+                0f, Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
+        ))
+        fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+
 
         super.screen.resize(WIDTH, HEIGHT)
     }

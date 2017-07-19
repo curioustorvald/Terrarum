@@ -16,11 +16,11 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 class UIItemTextButtonList(
         parentUI: UICanvas,
         labelsList: Array<String>,
-        override val width: Int,
-        override val height: Int,
+        override var width: Int,
+        override var height: Int,
         val verticalGutter: Int = 0,
         val readFromLang: Boolean = false,
-        val defaultSelection: Int = 0,
+        val defaultSelection: Int? = null, // negative: INVALID, positive: valid, null: no select
 
         // icons
         val textAreaWidth: Int,
@@ -36,7 +36,7 @@ class UIItemTextButtonList(
         val highlightBackCol: Color = Color(0xb0b0b0_ff.toInt()),
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
         val inactiveCol: Color = Color(0xc0c0c0_ff.toInt()),
-        val backgroundCol: Color = Color(0),
+        val backgroundCol: Color = Color(0x242424_80),
         val backgroundBlendMode: String = BlendMode.NORMAL,
         val kinematic: Boolean = false
 ) : UIItem(parentUI) {
@@ -93,10 +93,10 @@ class UIItemTextButtonList(
     override var posX = 0
     override var posY = 0
 
-    var selectedIndex = defaultSelection
-    val selectedButton: UIItemTextButton
-        get() = buttons[selectedIndex]
-    private var highlightY = buttons[selectedIndex].posY.toDouble()
+    var selectedIndex: Int? = defaultSelection
+    val selectedButton: UIItemTextButton?
+        get() = if (selectedIndex != null) buttons[selectedIndex!!] else null
+    private var highlightY: Double? = if (selectedIndex != null) buttons[selectedIndex!!].posY.toDouble() else null
     private val highlighterMoveDuration: Second = 0.1f
     private var highlighterMoveTimer: Second = 0f
     private var highlighterMoving = false
@@ -107,12 +107,15 @@ class UIItemTextButtonList(
     override fun update(delta: Float) {
         if (highlighterMoving) {
             highlighterMoveTimer += delta
-            highlightY = UIUtils.moveQuick(
-                    highlighterYStart,
-                    highlighterYEnd,
-                    highlighterMoveTimer.toDouble(),
-                    highlighterMoveDuration.toDouble()
-            )
+
+            if (selectedIndex != null) {
+                highlightY = UIUtils.moveQuick(
+                        highlighterYStart!!,
+                        highlighterYEnd!!,
+                        highlighterMoveTimer.toDouble(),
+                        highlighterMoveDuration.toDouble()
+                )
+            }
 
             if (highlighterMoveTimer > highlighterMoveDuration) {
                 highlighterMoveTimer = 0f
@@ -128,14 +131,14 @@ class UIItemTextButtonList(
 
             if (btn.mousePushed && index != selectedIndex) {
                 if (kinematic) {
-                    highlighterYStart = buttons[selectedIndex].posY.toDouble()
+                    highlighterYStart = buttons[selectedIndex!!].posY.toDouble()
                     selectedIndex = index
                     highlighterMoving = true
-                    highlighterYEnd = buttons[selectedIndex].posY.toDouble()
+                    highlighterYEnd = buttons[selectedIndex!!].posY.toDouble()
                 }
                 else {
                     selectedIndex = index
-                    highlightY = buttons[selectedIndex].posY.toDouble()
+                    highlightY = buttons[selectedIndex!!].posY.toDouble()
                 }
             }
             btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
@@ -150,7 +153,9 @@ class UIItemTextButtonList(
 
         batch.color = highlightBackCol
         BlendMode.resolve(highlightBackBlendMode)
-        batch.fillRect(posX.toFloat(), highlightY.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
+        if (highlightY != null) {
+            batch.fillRect(posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
+        }
 
         buttons.forEach { it.render(batch) }
 

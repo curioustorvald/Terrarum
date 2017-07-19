@@ -8,11 +8,14 @@ import net.torvald.colourutil.ColourTemp
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.fillRect
+import net.torvald.terrarum.gameworld.GameWorld
 
 /**
  * Created by minjaesong on 15-12-31.
  */
 object FeaturesDrawer {
+    lateinit var world: GameWorld
+
     const val TILE_SIZE = 16
 
     private val ENV_COLTEMP_LOWEST = 5500
@@ -36,9 +39,6 @@ object FeaturesDrawer {
     fun update(delta: Float) {
     }
 
-    fun render(batch: SpriteBatch) {
-    }
-
     /**
      * A colour filter used to provide effect that makes whole screen look warmer/cooler,
      * usually targeted for the environmental temperature (desert/winterland), hence the name.
@@ -52,7 +52,7 @@ object FeaturesDrawer {
         val colTemp_cold = colTempLinearFunc(onscreen_cold_tiles / onscreen_tiles_cap)
         val colTemp_warm = colTempLinearFunc(-(onscreen_warm_tiles / onscreen_tiles_cap))
         colTemp = colTemp_warm + colTemp_cold - ENV_COLTEMP_NOON
-        val zoom = Terrarum.ingame!!.screenZoom
+        val zoom = Terrarum.ingame?.screenZoom ?: 1f
 
         blendMul()
 

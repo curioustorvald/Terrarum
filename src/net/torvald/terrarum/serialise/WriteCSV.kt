@@ -48,7 +48,7 @@ internal object WriteCSV {
             Files.copy(tempPathMat, pathMat, StandardCopyOption.REPLACE_EXISTING)
             Files.deleteIfExists(tempPathMat)
 
-            println("Saved map data '${WriteGameMapData.META_FILENAME}' to $saveDirectoryName.")
+            println("Saved map data '${WriteLayerData.META_FILENAME}' to $saveDirectoryName.")
 
             return true
         }

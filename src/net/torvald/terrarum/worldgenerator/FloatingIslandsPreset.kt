@@ -7,6 +7,7 @@ import java.util.Random
 object FloatingIslandsPreset {
 
     val PRESETS = 5
+    val MAX_HEIGHT = 100 // arbitrary value
 
     internal fun generatePreset(random: HQRNG): Array<IntArray> {
         val index = random.nextInt(PRESETS)

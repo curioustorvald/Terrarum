@@ -27,7 +27,9 @@ import java.util.zip.GZIPInputStream
  * Created by minjaesong on 16-01-19.
  */
 object BlocksDrawer {
-    private inline val world: GameWorld; get() = Terrarum.ingame!!.world
+    lateinit var world: GameWorld
+
+
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
