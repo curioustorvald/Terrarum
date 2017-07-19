@@ -24,7 +24,7 @@ import java.util.*
 // NOTE: no Float16 on this thing: 67 kB of memory footage is totally acceptable
 
 object LightmapRenderer {
-    private val world: GameWorld = Terrarum.ingame!!.world
+    lateinit var world: GameWorld
 
 
     // TODO if (VBO works on BlocksDrawer) THEN overscan of 256, utilise same technique in here
@@ -38,9 +38,9 @@ object LightmapRenderer {
 
     // TODO resize(int, int) -aware
 
-    val LIGHTMAP_WIDTH = Terrarum.ingame!!.ZOOM_MINIMUM.inv().times(Terrarum.WIDTH)
+    val LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.WIDTH)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
-    val LIGHTMAP_HEIGHT = Terrarum.ingame!!.ZOOM_MINIMUM.inv().times(Terrarum.HEIGHT)
+    val LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.HEIGHT)
             .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
 
     /**
@@ -48,7 +48,7 @@ object LightmapRenderer {
      */
     // TODO utilise alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
     private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // TODO framebuffer?
-    private val lanternMap = ArrayList<Lantern>(Terrarum.ingame!!.ACTORCONTAINER_INITIAL_SIZE * 4)
+    private val lanternMap = ArrayList<Lantern>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
     private val AIR = Block.AIR
 
@@ -178,7 +178,7 @@ object LightmapRenderer {
         // build noop map
         for (i in 0..rect_size) {
             val point = edgeToMaskNum(i)
-            val tile = Terrarum.ingame!!.world.getTileFromTerrain(point.first, point.second) ?: Block.NULL
+            val tile = world.getTileFromTerrain(point.first, point.second) ?: Block.NULL
             val isSolid = BlockCodex[tile].isSolid
 
             noop_mask.set(i, isSolid)
@@ -235,25 +235,27 @@ object LightmapRenderer {
 
     private fun buildLanternmap() {
         lanternMap.clear()
-        Terrarum.ingame!!.actorContainer.forEach { it ->
-            if (it is Luminous && it is ActorWithPhysics) {
-                // put lanterns to the area the luminantBox is occupying
-                for (lightBox in it.lightBoxList) {
-                    val lightBoxX = it.hitbox.startX + lightBox.startX
-                    val lightBoxY = it.hitbox.startY + lightBox.startY
-                    val lightBoxW = lightBox.width
-                    val lightBoxH = lightBox.height
-                    for (y in lightBoxY.div(TILE_SIZE).floorInt()
-                            ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
-                        for (x in lightBoxX.div(TILE_SIZE).floorInt()
-                                ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
+        Terrarum.ingame?.let {
+            it.actorContainer.forEach { it ->
+                if (it is Luminous && it is ActorWithPhysics) {
+                    // put lanterns to the area the luminantBox is occupying
+                    for (lightBox in it.lightBoxList) {
+                        val lightBoxX = it.hitbox.startX + lightBox.startX
+                        val lightBoxY = it.hitbox.startY + lightBox.startY
+                        val lightBoxW = lightBox.width
+                        val lightBoxH = lightBox.height
+                        for (y in lightBoxY.div(TILE_SIZE).floorInt()
+                                ..lightBoxY.plus(lightBoxH).div(TILE_SIZE).floorInt()) {
+                            for (x in lightBoxX.div(TILE_SIZE).floorInt()
+                                    ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
 
-                            val normalisedColor = it.color.cpy().mul(DIV_FLOAT)
+                                val normalisedColor = it.color.cpy().mul(DIV_FLOAT)
 
-                            lanternMap.add(Lantern(x, y, normalisedColor))
-                            // Q&D fix for Roundworld anomaly
-                            lanternMap.add(Lantern(x + world.width, y, normalisedColor))
-                            lanternMap.add(Lantern(x - world.width, y, normalisedColor))
+                                lanternMap.add(Lantern(x, y, normalisedColor))
+                                // Q&D fix for Roundworld anomaly
+                                lanternMap.add(Lantern(x + world.width, y, normalisedColor))
+                                lanternMap.add(Lantern(x - world.width, y, normalisedColor))
+                            }
                         }
                     }
                 }
@@ -270,11 +272,11 @@ object LightmapRenderer {
         var ambientAccumulator = Color(0f,0f,0f,0f)
 
         var lightLevelThis: Color = Color(0f,0f,0f,0f)
-        val thisTerrain = Terrarum.ingame!!.world.getTileFromTerrain(x, y)
-        val thisWall = Terrarum.ingame!!.world.getTileFromWall(x, y)
+        val thisTerrain = world.getTileFromTerrain(x, y)
+        val thisWall = world.getTileFromWall(x, y)
         val thisTileLuminosity = BlockCodex[thisTerrain].luminosity // already been div by four
         val thisTileOpacity = BlockCodex[thisTerrain].opacity // already been div by four
-        val sunLight = Terrarum.ingame!!.world.globalLight.cpy().mul(DIV_FLOAT)
+        val sunLight = world.globalLight.cpy().mul(DIV_FLOAT)
 
         // MIX TILE
         // open air

@@ -2,6 +2,7 @@ package net.torvald.terrarum.worlddrawer
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.floor
 import net.torvald.terrarum.gameactors.floorInt
 import net.torvald.terrarum.gameactors.roundInt
@@ -12,7 +13,6 @@ import net.torvald.terrarum.round
  * Created by minjaesong on 2016-12-30.
  */
 object WorldCamera {
-    private val world: GameWorld? = Terrarum.ingame?.world
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
 
     var x: Int = 0 // left position
@@ -32,22 +32,20 @@ object WorldCamera {
     val yCentre: Int
         get() = y + height.ushr(1)
 
-    fun update() {
+    fun update(world: GameWorld, player: ActorWithBody) {
         if (Terrarum.ingame != null) {
 
-            val player = Terrarum.ingame!!.player
-
-            width = FastMath.ceil(Terrarum.WIDTH / Terrarum.ingame!!.screenZoom) // div, not mul
-            height = FastMath.ceil(Terrarum.HEIGHT / Terrarum.ingame!!.screenZoom)
+            width = FastMath.ceil(Terrarum.WIDTH / (Terrarum.ingame?.screenZoom ?: 1f)) // div, not mul
+            height = FastMath.ceil(Terrarum.HEIGHT / (Terrarum.ingame?.screenZoom ?: 1f))
 
             // position - (WH / 2)
             x = (// X only: ROUNDWORLD implementation
-                    (player?.hitbox?.centeredX?.toFloat() ?: 0f) - width / 2).floorInt()
+                    player.hitbox.centeredX.toFloat() - width / 2).floorInt()
             y = (FastMath.clamp(
-                    (player?.hitbox?.centeredY?.toFloat() ?: 0f) - height / 2,
+                    player.hitbox.centeredY.toFloat() - height / 2,
                     TILE_SIZE.toFloat(),
-                    world!!.height * TILE_SIZE - height - TILE_SIZE.toFloat()
-            )).floorInt().clampCameraY()
+                    world.height * TILE_SIZE - height - TILE_SIZE.toFloat()
+            )).floorInt().clampCameraY(world)
 
 
             gdxCamX = x + (width / 2f).floor()
@@ -55,11 +53,11 @@ object WorldCamera {
         }
     }
 
-    private fun Int.clampCameraY(): Int {
+    private fun Int.clampCameraY(world: GameWorld): Int {
         return if (this < 0)
             0
-        else if (this > (world?.height ?: Terrarum.HEIGHT).times(TILE_SIZE) - Terrarum.HEIGHT)
-            (world?.height ?: Terrarum.HEIGHT).times(TILE_SIZE) - Terrarum.HEIGHT
+        else if (this > world.height.times(TILE_SIZE) - Terrarum.HEIGHT)
+            world.height.times(TILE_SIZE) - Terrarum.HEIGHT
         else
             this
     }

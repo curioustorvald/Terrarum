@@ -8,6 +8,7 @@ import com.sudoplay.joise.Joise
 import com.sudoplay.joise.module.*
 import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.roundInt
 import java.util.*
@@ -64,6 +65,10 @@ object WorldGenerator {
 
     internal val TILE_MACRO_ALL = -1
 
+    private var floatingIslandDownMax = 0
+
+    private var realMinimumHeight = 708 // minimum height on current setting. 705 + some headroom
+
     fun attachMap(world: GameWorld) {
         this.world = world
         WIDTH = world.width
@@ -78,6 +83,20 @@ object WorldGenerator {
         OCEAN_WIDTH = Math.round(OCEAN_WIDTH * widthMulFactor)
         SHORE_WIDTH = Math.round(SHORE_WIDTH * widthMulFactor)
         GLACIER_MOUNTAIN_WIDTH = Math.round(GLACIER_MOUNTAIN_WIDTH * widthMulFactor)
+
+
+
+        // just a code took from island generator
+        floatingIslandDownMax = minimumFloatingIsleHeight * 2 + FloatingIslandsPreset.MAX_HEIGHT
+
+        /*if (TERRAIN_AVERAGE_HEIGHT - TERRAIN_UNDULATION.div(2) -floatingIslandDownMax <= 0) {
+            throw RuntimeException("Terrain height is too small -- must be greater than " +
+                                   "${HEIGHT - (TERRAIN_AVERAGE_HEIGHT - TERRAIN_UNDULATION.div(2) -floatingIslandDownMax)}"
+            )
+        }*/
+        if (HEIGHT < realMinimumHeight) {
+            throw RuntimeException("Terrain height must be greater than $realMinimumHeight")
+        }
     }
 
     /**
@@ -157,14 +176,23 @@ object WorldGenerator {
         generateFloatingIslands()
 
         //wire layer
-        for (i in 0..HEIGHT - 1) {
-            for (j in 0..WIDTH - 1) {
-                world.wireArray[i][j] = 0
-            }
-        }
+        Arrays.fill(world.wireArray, 0.toByte())
+
+
+        // determine spawn position
+        world.spawnY = getSpawnHeight(world.spawnX)
+
 
         // Free some memories
         System.gc()
+    }
+
+    fun getSpawnHeight(x: Int): Int {
+        var y = minimumFloatingIsleHeight * 2 + FloatingIslandsPreset.MAX_HEIGHT
+        while (!BlockCodex[world.getTileFromTerrain(x, y)].isSolid) {
+            y += 1
+        }
+        return y
     }
 
     /* 1. Raise */
@@ -485,7 +513,6 @@ object WorldGenerator {
                 val sampleY = y / SCALE_Y * 1.5 - 0.6
                 val map: Boolean = joise.get(sampleX, sampleY, sampleZ) == 1.0
 
-                // FIXME joise.get(sampleX, sampleY, sampleZ) returns all zero
                 noiseMap[y + TERRAIN_AVERAGE_HEIGHT - (TERRAIN_UNDULATION / 2)].set(x, map)
             }
         }
@@ -812,7 +839,7 @@ object WorldGenerator {
         LoadScreen.addMessage("Flooding with lava...")
         for (i in HEIGHT * 14 / 15..HEIGHT - 1) {
             for (j in 0..WIDTH - 1) {
-                if (world.terrainArray[i][j].toInt() == 0) {
+                if (world.getTileFromTerrain(j, i) == 0) {
                     world.setTileTerrain(j, i, Block.LAVA)
                 }
             }
@@ -995,25 +1022,6 @@ object WorldGenerator {
 
     private fun getDistance(x1: Float, y1: Float, x2: Float, y2: Float): Float {
         return FastMath.sqrt(FastMath.pow(x1 - x2, 2f) + FastMath.pow(y2 - y1, 2f))
-    }
-
-    private fun circularDig(i: Int, j: Int, brushSize: Int, fillFrom: Int, fill: Int) {
-        val halfBrushSize = brushSize * 0.5f
-
-        for (pointerY in 0..brushSize - 1) {
-            for (pointerX in 0..brushSize - 1) {
-                if (getDistance(j.toFloat(), i.toFloat(), j + pointerX - halfBrushSize, i + pointerY - halfBrushSize) <= FastMath.floor((brushSize / 2).toFloat()) - 1) {
-                    if (Math.round(j + pointerX - halfBrushSize) > brushSize
-                        && Math.round(j + pointerX - halfBrushSize) < WIDTH - brushSize
-                        && Math.round(i + pointerY - halfBrushSize) > brushSize
-                        && Math.round(i + pointerY - halfBrushSize) < HEIGHT - brushSize) {
-                        if (world.terrainArray[Math.round(i + pointerY - halfBrushSize)][Math.round(j + pointerX - halfBrushSize)] == fillFrom.toByte()) {
-                            world.terrainArray[Math.round(i + pointerY - halfBrushSize)][Math.round(j + pointerX - halfBrushSize)] = fill.toByte()
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private fun clamp(x: Int, min: Int, max: Int): Int = if (x < min) min else if (x > max) max else x

@@ -8,7 +8,7 @@ Ord  Hex  Description
 02   4D   M
 03   44   D
 
-04   01   Number of bits per tile divided by 8, only 1 is supported
+04   01   Number of bytes per tile; only 1 is supported
 
 05        Number of layers
 
@@ -35,13 +35,17 @@ Ord  Hex  Description
 16        Default spawn coord Y
 17        Default spawn coord Y
 
-18        Terrain tiles data (MSB)
+# Layer count 1
+18        Terrain tiles data MSB
 
-...       Wall tiles data (MSB)
+# Layer count 2
+...       Wall tiles data MSB
 
-...       Tiles data (LSB)
-     0bAAAABBBB - A: Terrain, B: Wall (0-15)
+# Layer count 3
+...       Terrain tiles data LSB (half size of MSB byte array)
+...       Wall tiles data LSB (half size of MSB byte array)
 
+# Layer count 4
 ...       Wire tiles data (0-255)
 
 <EOF>
