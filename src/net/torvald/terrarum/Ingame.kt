@@ -76,6 +76,14 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
     companion object {
         val lightmapDownsample = 2f //2f: still has choppy look when the camera moves but unnoticeable when blurred
+
+
+        /** Sets camera position so that (0,0) would be top-left of the screen, (width, height) be bottom-right. */
+        fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
+            camera.position.set((-newX + Terrarum.HALFW).round(), (-newY + Terrarum.HALFH).round(), 0f)
+            camera.update()
+            batch.projectionMatrix = camera.combined
+        }
     }
 
 
@@ -156,23 +164,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
     var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
-    /** Actually just a mesh of four vertices, two triangles -- not a literal glQuad */
-    var fullscreenQuad = Mesh(
-            true, 4, 6,
-            VertexAttribute.Position(),
-            VertexAttribute.ColorUnpacked(),
-            VertexAttribute.TexCoords(0)
-    )
-
-    init {
-        fullscreenQuad.setVertices(floatArrayOf(
-                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
-                Terrarum.WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                0f, Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
-        ))
-        fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
-    }
 
     // invert Y
     fun initViewPort(width: Int, height: Int) {
@@ -200,13 +191,18 @@ class Ingame(val batch: SpriteBatch) : Screen {
     override fun show() {
         //initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
-
         // gameLoadMode and gameLoadInfoPayload must be set beforehand!!
 
         when (gameLoadMode) {
             GameLoadMode.CREATE_NEW -> enter(gameLoadInfoPayload as NewWorldParameters)
             GameLoadMode.LOAD_FROM -> enter(gameLoadInfoPayload as GameSaveData)
         }
+
+        LightmapRenderer.world = this.world
+        //BlocksDrawer.world = this.world
+        FeaturesDrawer.world = this.world
+
+        gameInitialised = true
     }
 
     data class GameSaveData(
@@ -236,13 +232,11 @@ class Ingame(val batch: SpriteBatch) : Screen {
             world = gameSaveData.world
             historicalFigureIDBucket = gameSaveData.historicalFigureIDBucket
             playableActorDelegate = PlayableActorDelegate(gameSaveData.realGamePlayer)
-            addNewActor(player!!)
+            addNewActor(player)
 
 
 
             //initGame()
-
-            gameInitialised = true
         }
     }
 
@@ -284,12 +278,15 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
             //initGame()
-
-            gameInitialised = true
         }
     }
 
-    fun initGame() {
+    /** Load rest of the game with GL context */
+    fun postInit() {
+        //LightmapRenderer.world = this.world
+        BlocksDrawer.world = this.world
+        //FeaturesDrawer.world = this.world
+
 
         Gdx.input.inputProcessor = GameController
 
@@ -415,27 +412,16 @@ class Ingame(val batch: SpriteBatch) : Screen {
             if (gameLoadMode == GameLoadMode.CREATE_NEW) {
                 playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
 
-                // determine spawn position
-                val spawnX = world.width / 2
-                var solidTileCounter = 0
-                while (true) {
-                    if (BlockCodex[world.getTileFromTerrain(spawnX, solidTileCounter)].isSolid ||
-                        BlockCodex[world.getTileFromTerrain(spawnX - 1, solidTileCounter)].isSolid ||
-                        BlockCodex[world.getTileFromTerrain(spawnX + 1, solidTileCounter)].isSolid
-                            ) break
-
-                    solidTileCounter += 1
-                }
-
+                // go to spawn position
                 player.setPosition(
-                        spawnX * FeaturesDrawer.TILE_SIZE.toDouble(),
-                        solidTileCounter * FeaturesDrawer.TILE_SIZE.toDouble()
+                        world.spawnX * FeaturesDrawer.TILE_SIZE.toDouble(),
+                        world.spawnY * FeaturesDrawer.TILE_SIZE.toDouble()
                 )
 
                 addNewActor(player)
             }
 
-            initGame()
+            postInit()
 
 
             gameFullyLoaded = true
@@ -496,7 +482,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             BlockPropUtil.dynamicLumFuncTickClock()
             world.updateWorldTime(delta)
             //WorldSimulator(player, delta)
-            WeatherMixer.update(delta)
+            WeatherMixer.update(delta, player)
             BlockStats.update()
             if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
                 world.globalLight = WeatherMixer.globalLightNow
@@ -506,7 +492,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             // camera-related updates //
             ////////////////////////////
             FeaturesDrawer.update(delta)
-            WorldCamera.update()
+            WorldCamera.update(world, player)
 
 
 
@@ -555,7 +541,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
         // Post-update; ones that needs everything is completed //
-        FeaturesDrawer.render(batch)                            //
         // update lightmap on every other frames, OR full-frame if the option is true
         if (Terrarum.getConfigBoolean("fullframelightupdate") or (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1)) {       //
             LightmapRenderer.fireRecalculateEvent()             //
@@ -579,7 +564,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
         ///////////////////////////
         // draw world to the FBO //
         ///////////////////////////
-        processBlur(LightmapRenderer.DRAW_FOR_RGB)
+        processBlur(lightmapFboA, lightmapFboB, LightmapRenderer.DRAW_FOR_RGB)
 
         worldDrawFrameBuffer.inAction(camera, batch) {
             batch.inUse {
@@ -658,7 +643,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
         //////////////////////////
         // draw glow to the FBO //
         //////////////////////////
-        processBlur(LightmapRenderer.DRAW_FOR_ALPHA)
+        processBlur(lightmapFboA, lightmapFboB, LightmapRenderer.DRAW_FOR_ALPHA)
 
         worldGlowFrameBuffer.inAction(camera, batch) {
             batch.inUse {
@@ -736,7 +721,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             Terrarum.shaderBlendGlow.setUniformMatrix("u_projTrans", camera.combined)
             Terrarum.shaderBlendGlow.setUniformi("u_texture", 0)
             Terrarum.shaderBlendGlow.setUniformi("tex1", 1)
-            fullscreenQuad.render(Terrarum.shaderBlendGlow, GL20.GL_TRIANGLES)
+            Terrarum.fullscreenQuad.render(Terrarum.shaderBlendGlow, GL20.GL_TRIANGLES)
             Terrarum.shaderBlendGlow.end()
 
 
@@ -767,7 +752,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             // draw skybox to screen //
             ///////////////////////////
 
-            WeatherMixer.render(camera)
+            WeatherMixer.render(camera, world)
 
 
 
@@ -857,12 +842,12 @@ class Ingame(val batch: SpriteBatch) : Screen {
             /////////////////////////////
             // draw some overlays (UI) //
             /////////////////////////////
-            uiContainer.forEach { if (it != consoleHandler) it.render(batch) }
+            uiContainer.forEach { if (it != consoleHandler) it.render(batch, camera) }
 
-            debugWindow.render(batch)
+            debugWindow.render(batch, camera)
             // make sure console draws on top of other UIs
-            consoleHandler.render(batch)
-            notifier.render(batch)
+            consoleHandler.render(batch, camera)
+            notifier.render(batch, camera)
 
 
             blendNormal()
@@ -1030,7 +1015,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
         gwin.drawLine(0f, Terrarum.HEIGHT / 2f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT / 2f)*/
     }
 
-    private fun processBlur(mode: Int) {
+    fun processBlur(lightmapFboA: FrameBuffer, lightmapFboB: FrameBuffer, mode: Int) {
         val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
         val blurRadius = 4f / lightmapDownsample // (5, 4f); using low numbers for pixel-y aesthetics
 
@@ -1530,6 +1515,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
      * @see net.torvald.terrarum.Terrarum
      */
     override fun resize(width: Int, height: Int) {
+
         worldDrawFrameBuffer.dispose()
         worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
         worldGlowFrameBuffer.dispose()
@@ -1544,23 +1530,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
         // Set up viewport when window is resized
         initViewPort(width, height)
-
-
-
-        // re-calculate fullscreen quad
-        fullscreenQuad = Mesh(
-                true, 4, 6,
-                VertexAttribute.Position(),
-                VertexAttribute.ColorUnpacked(),
-                VertexAttribute.TexCoords(0)
-        )
-        fullscreenQuad.setVertices(floatArrayOf(
-                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
-                Terrarum.WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                0f, Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
-        ))
-        fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
 
 
 
@@ -1614,8 +1583,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
      */
     fun setCameraPosition(newX: Float, newY: Float) {
-        camera.position.set((-newX + Terrarum.HALFW).round(), (-newY + Terrarum.HALFH).round(), 0f)
-        camera.update()
-        batch.projectionMatrix = camera.combined
+        Ingame.setCameraPosition(batch, camera, newX, newY)
     }
 }

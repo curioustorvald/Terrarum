@@ -159,7 +159,7 @@ class UIInventory(
     else
             "${0xe069.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
 
-    private var oldCatSelect = -1
+    private var oldCatSelect: Int? = null
 
     private var encumbrancePerc = 0f
     private var isEncumbered = false
@@ -294,70 +294,72 @@ class UIInventory(
 
 
     fun shutUpAndRebuild() {
-        val filter = catButtonsToCatIdent[catButtons.selectedButton.labelText]
+        if (catButtons.selectedButton != null) {
+            val filter = catButtonsToCatIdent[catButtons.selectedButton!!.labelText]
 
-        // encumbrance
-        encumbrancePerc = inventory!!.capacity.toFloat() / inventory!!.maxCapacity
-        isEncumbered = inventory!!.isEncumbered
+            // encumbrance
+            encumbrancePerc = inventory!!.capacity.toFloat() / inventory!!.maxCapacity
+            isEncumbered = inventory!!.isEncumbered
 
 
 
-        inventorySortList = ArrayList<InventoryPair>()
+            inventorySortList = ArrayList<InventoryPair>()
 
-        // filter items
-        inventory?.forEach {
-            if (it.item.inventoryCategory == filter || filter == "__all__")
-                inventorySortList.add(it)
-        }
+            // filter items
+            inventory?.forEach {
+                if (it.item.inventoryCategory == filter || filter == "__all__")
+                    inventorySortList.add(it)
+            }
 
-        rebuildList = false
+            rebuildList = false
 
-        // sort if needed
-        // test sort by name
-        inventorySortList.sortBy { it.item.name }
+            // sort if needed
+            // test sort by name
+            inventorySortList.sortBy { it.item.name }
 
-        // map sortList to item list
-        for (k in 0..items.size - 1) {
-            // we have an item
-            try {
-                val sortListItem = inventorySortList[k + itemPage * items.size]
-                items[k].item = sortListItem.item
-                items[k].amount = sortListItem.amount
-                items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
+            // map sortList to item list
+            for (k in 0..items.size - 1) {
+                // we have an item
+                try {
+                    val sortListItem = inventorySortList[k + itemPage * items.size]
+                    items[k].item = sortListItem.item
+                    items[k].amount = sortListItem.amount
+                    items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
 
-                // set quickslot number
-                for (qs in 1..UIQuickBar.SLOT_COUNT) {
-                    if (sortListItem.item == actor?.inventory?.getQuickBar(qs - 1)?.item) {
-                        items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
-                        break
-                    }
-                    else
-                        items[k].quickslot = null
-                }
-
-                // set equippedslot number
-                for (eq in 0..actor!!.inventory.itemEquipped.size - 1) {
-                    if (eq < actor!!.inventory.itemEquipped.size) {
-                        if (actor!!.inventory.itemEquipped[eq] == items[k].item) {
-                            items[k].equippedSlot = eq
+                    // set quickslot number
+                    for (qs in 1..UIQuickBar.SLOT_COUNT) {
+                        if (sortListItem.item == actor?.inventory?.getQuickBar(qs - 1)?.item) {
+                            items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                             break
                         }
                         else
-                            items[k].equippedSlot = null
+                            items[k].quickslot = null
+                    }
+
+                    // set equippedslot number
+                    for (eq in 0..actor!!.inventory.itemEquipped.size - 1) {
+                        if (eq < actor!!.inventory.itemEquipped.size) {
+                            if (actor!!.inventory.itemEquipped[eq] == items[k].item) {
+                                items[k].equippedSlot = eq
+                                break
+                            }
+                            else
+                                items[k].equippedSlot = null
+                        }
                     }
                 }
+                // we do not have an item, empty the slot
+                catch (e: IndexOutOfBoundsException) {
+                    items[k].item = null
+                    items[k].amount = 0
+                    items[k].itemImage = null
+                    items[k].quickslot = null
+                }
             }
-            // we do not have an item, empty the slot
-            catch (e: IndexOutOfBoundsException) {
-                items[k].item = null
-                items[k].amount = 0
-                items[k].itemImage = null
-                items[k].quickslot = null
-            }
+
+
+            itemPageCount = maxOf(1, 1 + (inventorySortList.size.minus(1) / items.size))
         }
-
-
-        itemPageCount = maxOf(1, 1 + (inventorySortList.size.minus(1) / items.size))
     }
 
 

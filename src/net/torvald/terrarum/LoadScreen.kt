@@ -59,6 +59,8 @@ object LoadScreen : ScreenAdapter() {
     }
 
 
+    private var errorTrapped = false
+
 
     override fun show() {
         messages.clear()
@@ -72,7 +74,16 @@ object LoadScreen : ScreenAdapter() {
         else {
             val runnable = object : Runnable {
                 override fun run() {
-                    screenToLoad!!.show()
+                    try {
+                        screenToLoad!!.show()
+                    }
+                    catch (e: Exception) {
+                        addMessage("$ccR$e")
+                        errorTrapped = true
+
+                        System.err.println("Error while loading:")
+                        e.printStackTrace()
+                    }
                 }
             }
             screenLoadingThread = Thread(runnable, "LoadScreen GameLoader")
@@ -85,7 +96,10 @@ object LoadScreen : ScreenAdapter() {
 
         textFbo = FrameBuffer(
                 Pixmap.Format.RGBA4444,
-                Terrarum.fontGame.getWidth(Lang["MENU_IO_LOADING"]),
+                maxOf(
+                        Terrarum.fontGame.getWidth(Lang["MENU_IO_LOADING"]),
+                        Terrarum.fontGame.getWidth(Lang["ERROR_GENERIC_TEXT"])
+                ),
                 Terrarum.fontGame.lineHeight.toInt(),
                 true
         )
@@ -97,7 +111,7 @@ object LoadScreen : ScreenAdapter() {
     }
 
 
-    val textX: Float; get() = (Terrarum.WIDTH * 0.75f).floor()
+    val textX: Float; get() = (Terrarum.WIDTH * 0.72f).floor()
 
     private var genuineSonic = false // the "NOW LOADING..." won't appear unless the arrow first run passes it  (it's totally not a GenuineIntel tho)
     private var doContextChange = false
@@ -119,36 +133,50 @@ object LoadScreen : ScreenAdapter() {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         }
 
-        glideTimer += delta
-        // reset timer
-        if (glideTimer >= arrowObjGlideSize / arrowGlideSpeed) {
-            glideTimer -= arrowObjGlideSize / arrowGlideSpeed
+        // update arrow object
+        if (!errorTrapped) {
+            glideTimer += delta
+            // reset timer
+            if (glideTimer >= arrowObjGlideSize / arrowGlideSpeed) {
+                glideTimer -= arrowObjGlideSize / arrowGlideSpeed
 
-            // change screen WHEN the timer is reset.
-            // In other words, the arrow must hit the goal BEFORE context change take place
-            if (screenToLoad?.gameInitialised ?: false) {
-                doContextChange = true
+                // change screen WHEN the timer is reset.
+                // In other words, the arrow must hit the goal BEFORE context change take place
+                if (screenToLoad?.gameInitialised ?: false) {
+                    doContextChange = true
+                }
             }
+            arrowObjPos = glideTimer * arrowGlideSpeed
         }
-        arrowObjPos = glideTimer * arrowGlideSpeed
+        else {
+            genuineSonic = true
+            arrowObjPos = 0f
+        }
 
+
+        val textToPrint = if (errorTrapped) Lang["ERROR_GENERIC_TEXT"] else Lang["MENU_IO_LOADING"]
+        val textWidth = Terrarum.fontGame.getWidth(textToPrint).toFloat()
 
         if (!doContextChange) {
             // draw text to FBO
             textFbo.inAction(camera, Terrarum.batch) {
                 Terrarum.batch.inUse {
+
+
                     blendNormal()
                     Terrarum.fontGame
                     it.color = Color.WHITE
-                    Terrarum.fontGame.draw(it, Lang["MENU_IO_LOADING"], 0.33f, 0f) // x 0.5? I dunno but it breaks w/o it
+
+
+                    Terrarum.fontGame.draw(it, textToPrint, (textFbo.width - textWidth) / 2f + 0.33f, 0f) // x 0.33? I dunno but it breaks w/o it
 
 
                     blendMul()
-                    // draw flipped
+                    // draw colour overlay, flipped
                     it.draw(textOverlayTex,
-                            0f,
+                            (textFbo.width - textWidth) / 2f,
                             Terrarum.fontGame.lineHeight,
-                            textOverlayTex.width.toFloat(),
+                            textWidth,
                             -Terrarum.fontGame.lineHeight
                     )
                 }
@@ -186,9 +214,11 @@ object LoadScreen : ScreenAdapter() {
 
 
                 // draw coloured arrows
-                arrowColours.forEachIndexed { index, color ->
-                    it.color = color
-                    it.draw(arrowObjTex, arrowObjPos + arrowObjGlideOffsetX + arrowObjTex.width * index, glideDispY)
+                if (!errorTrapped) {
+                    arrowColours.forEachIndexed { index, color ->
+                        it.color = color
+                        it.draw(arrowObjTex, arrowObjPos + arrowObjGlideOffsetX + arrowObjTex.width * index, glideDispY)
+                    }
                 }
 
 
