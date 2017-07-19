@@ -1,14 +1,16 @@
 package net.torvald.terrarum.gameworld
 
+import net.torvald.terrarum.virtualcomputer.tvd.ByteArray64
+
 /**
  * Created by minjaesong on 16-01-17.
  */
 class MapLayer(val width: Int, val height: Int) : Iterable<Byte> {
 
-    internal @Volatile var data: Array<ByteArray> // in parallel programming: do not trust your register; always read freshly from RAM!
+    internal @Volatile var data: ByteArray // in parallel programming: do not trust your register; always read freshly from RAM!
 
     init {
-        data = Array(height) { ByteArray(width) }
+        data = ByteArray(width * height)
     }
 
     /**
@@ -31,7 +33,7 @@ class MapLayer(val width: Int, val height: Int) : Iterable<Byte> {
                 // advance counter
                 iteratorCount += 1
 
-                return data[y][x]
+                return data[y * width + x]
             }
         }
     }
@@ -40,11 +42,11 @@ class MapLayer(val width: Int, val height: Int) : Iterable<Byte> {
         return if (x !in 0..width - 1 || y !in 0..height - 1)
             null
         else
-            data[y][x].toUint()
+            data[y * width + x].toUint()
     }
 
     internal fun setTile(x: Int, y: Int, tile: Byte) {
-        data[y][x] = tile
+        data[y * width + x] = tile
     }
 
     fun isInBound(x: Int, y: Int) = (x >= 0 && y >= 0 && x < width && y < height)

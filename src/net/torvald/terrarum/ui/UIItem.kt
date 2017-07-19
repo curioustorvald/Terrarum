@@ -6,6 +6,32 @@ import net.torvald.terrarum.Terrarum
 
 
 /**
+ * ## Attaching Input Listeners
+ *
+ * UIItem provides following listeners:
+ *
+ * - updateListener
+ * - keyDownListener
+ * - keyUpListener
+ * - mouseMovedListene
+ * - touchDraggedListe
+ * - touchDownListener
+ * - touchUpListener
+ * - scrolledListener
+ * - clickOnceListener
+ *
+ * Each listeners are implemented using _functions_, instead of traditional listener _classes_.
+ * What you should do is just override one or more of these variables which has 'function' as their type.
+ * For example:
+ *
+ * ```
+ * <<some_name>>.clickOnceListener = { mouseX, mouseY, button ->
+ *     println("Bo-ing!")
+ * }
+ * ```
+ *
+ * This listener will print out 'Bo-ing!' whenever it's clicked.
+ *
  * Created by minjaesong on 15-12-31.
  */
 abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UIHandler!
@@ -88,6 +114,8 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
         return false
     }
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        println("trsaneirsatneioarsteniotrsaneioarstineoarstneio")
+
         var actionDone = false
 
         if (touchDownListener != null) {

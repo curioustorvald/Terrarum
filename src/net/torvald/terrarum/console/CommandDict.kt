@@ -51,7 +51,11 @@ object CommandDict {
             "spawntorch" to SpawnTikiTorch,
             "musictest" to MusicTest,
             "spawntapestry" to SpawnTapestry,
-            "imtest" to JavaIMTest
+            "imtest" to JavaIMTest,
+
+
+            /* !! */"exportlayer" to ExportLayerData,
+            /* !! */"importlayer" to ImportLayerData
     )
 
     operator fun get(commandName: String): ConsoleCommand {

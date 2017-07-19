@@ -16,6 +16,8 @@ Multiple maps are multiverse in this game; users don't have an access to the mul
 
 Let's be honest: when you play the Terraria bit heavily, you create multiple world to farm resources; this is cheat and you know it, which is why, in this game, you technically can but after hard working so that it'd be less of a cheat.
 
+You can "invite" other persona to your world, from sharing things to multiplayer-on-your-own, but you need to issue "interspace ticket", which will be expensive of course.
+
 ### New World (New Universe)
 
 The teleporter also works as "world manager"; players can create new world or delete existing ones. Lore-wise, creation and deletion is regarded as linking and unlinking.

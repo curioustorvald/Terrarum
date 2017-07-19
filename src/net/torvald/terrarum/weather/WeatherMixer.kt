@@ -6,8 +6,10 @@ import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.ParticleTestRain
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 import java.io.File
 import java.util.*
@@ -31,7 +33,6 @@ object WeatherMixer {
     lateinit var mixedWeather: BaseModularWeather
 
     val globalLightNow = Color(0)
-    private val world = Terrarum.ingame!!.world
 
     // Weather indices
     const val WEATHER_GENERIC = "generic"
@@ -68,33 +69,30 @@ object WeatherMixer {
         nextWeather = getRandomWeather(WEATHER_GENERIC)
     }
 
-    fun update(delta: Float) {
+    fun update(delta: Float, player: ActorWithBody) {
         currentWeather = weatherList[WEATHER_GENERIC]!![0]
 
 
-        if (Terrarum.ingame!!.player != null) {
-            // test rain toggled by F2
-            if (KeyToggler.isOn(Input.Keys.F2)) {
-                val playerPos = Terrarum.ingame!!.player!!.centrePosPoint
-                kotlin.repeat(4) {
-                    // 4 seems good
-                    val rainParticle = ParticleTestRain(
-                            playerPos.x + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
-                            playerPos.y - Terrarum.HALFH
-                    )
-                    Terrarum.ingame!!.addParticle(rainParticle)
-                }
-                globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
+        // test rain toggled by F2
+        /*if (KeyToggler.isOn(Input.Keys.F2)) {
+            val playerPos = player.centrePosPoint
+            kotlin.repeat(4) {
+                // 4 seems good
+                val rainParticle = ParticleTestRain(
+                        playerPos.x + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
+                        playerPos.y - Terrarum.HALFH
+                )
+                Terrarum.ingame!!.addParticle(rainParticle)
             }
+            globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
+        }*/
 
-
-        }
     }
 
-    fun render(camera: Camera) {
+    fun render(camera: Camera, world: GameWorld) {
 
         // we will not care for nextSkybox for now
-        val timeNow = Terrarum.ingame!!.world.time.todaySeconds
+        val timeNow = world.time.todaySeconds
         val skyboxColourMap = currentWeather.skyboxGradColourMap
 
         // calculate global light
@@ -112,7 +110,7 @@ object WeatherMixer {
         Terrarum.shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
         Terrarum.shaderBayerSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
         Terrarum.shaderBayerSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
-        Terrarum.ingame!!.fullscreenQuad.render(Terrarum.shaderBayerSkyboxFill, GL20.GL_TRIANGLES)
+        Terrarum.fullscreenQuad.render(Terrarum.shaderBayerSkyboxFill, GL20.GL_TRIANGLES)
         Terrarum.shaderBayerSkyboxFill.end()
     }
 
