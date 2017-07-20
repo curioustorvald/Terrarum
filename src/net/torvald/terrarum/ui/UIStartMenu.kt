@@ -12,6 +12,7 @@ class UIStartMenu : UICanvas() {
                 "MENU_MODE_SINGLEPLAYER",
                 "MENU_OPTIONS",
                 "MENU_MODULES",
+                "MENU_LABEL_LANGUAGE",
                 "MENU_LABEL_EXIT"
         )
 
@@ -34,6 +35,8 @@ class UIStartMenu : UICanvas() {
             readFromLang = true,
             activeBackCol = Color(0),
             highlightBackCol = Color(0),
+            backgroundCol = Color(0),
+            inactiveCol = Color.WHITE,
             defaultSelection = null
     )
 
