@@ -114,8 +114,6 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
         return false
     }
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        println("trsaneirsatneioarsteniotrsaneioarstineoarstneio")
-
         var actionDone = false
 
         if (touchDownListener != null) {
@@ -123,7 +121,9 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
             actionDone = true
         }
 
-        if (!clickOnceListenerFired && mouseUp) {
+        if (clickOnceListener != null && !clickOnceListenerFired && mouseUp) {
+            println("arstineotarsneio")
+
             clickOnceListener!!.invoke(relativeMouseX, relativeMouseY, button)
             actionDone = true
         }

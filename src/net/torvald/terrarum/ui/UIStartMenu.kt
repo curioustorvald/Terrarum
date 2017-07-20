@@ -16,7 +16,7 @@ class UIStartMenu : UICanvas() {
                 "MENU_LABEL_EXIT"
         )
 
-        val menubarOffY = Terrarum.HEIGHT - 180 - 40 * menuLabels.size.plus(1)
+        val menubarOffY: Int; get() = Terrarum.HEIGHT / 2 - (Terrarum.fontGame.lineHeight * 1.5).toInt()
     }
 
 
@@ -45,7 +45,7 @@ class UIStartMenu : UICanvas() {
 
 
         // attach listeners
-        menubar.buttons[3].clickOnceListener = { _, _, _ -> System.exit(0) }
+        menubar.buttons[menuLabels.indexOf("MENU_LABEL_EXIT")].clickOnceListener = { _, _, _ -> System.exit(0) }
     }
 
     override fun update(delta: Float) {

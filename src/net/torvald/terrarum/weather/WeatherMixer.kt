@@ -126,8 +126,6 @@ object WeatherMixer {
         val topCol = getGradientColour(skyboxColourMap, 0, timeNow)
         val bottomCol = getGradientColour(skyboxColourMap, 1, timeNow)
 
-        println("zero pos: $parallaxZeroPos, domain_size: $parallaxDomainSize")
-
         //Terrarum.textureWhiteSquare.bind(0)
 
         Terrarum.shaderBayerSkyboxFill.begin()
