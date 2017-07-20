@@ -14,7 +14,7 @@ import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.console.*
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.physicssolver.CollisionSolver
-import net.torvald.terrarum.gamecontroller.GameController
+import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldSimulator
@@ -32,7 +32,6 @@ import javax.swing.JOptionPane
 
 import com.badlogic.gdx.graphics.OrthographicCamera
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.worldgenerator.WorldGenerator
@@ -281,6 +280,8 @@ class Ingame(val batch: SpriteBatch) : Screen {
         }
     }
 
+    private val ingameController = IngameController(this)
+
     /** Load rest of the game with GL context */
     fun postInit() {
         //LightmapRenderer.world = this.world
@@ -288,7 +289,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
         //FeaturesDrawer.world = this.world
 
 
-        Gdx.input.inputProcessor = GameController
+        Gdx.input.inputProcessor = ingameController
 
 
         initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
@@ -471,7 +472,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
         KeyToggler.update()
-        GameController.update(delta)
+        ingameController.update(delta)
 
 
         if (!paused) {
@@ -1529,7 +1530,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
         // Set up viewport when window is resized
-        initViewPort(width, height)
+        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
 
 

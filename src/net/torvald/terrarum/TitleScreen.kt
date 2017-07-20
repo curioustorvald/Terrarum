@@ -2,6 +2,7 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -67,7 +68,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
     lateinit var logo: TextureRegion
 
-
+    val uiContainer = ArrayList<UIHandler>()
     private lateinit var uiMenu: UIHandler
 
     private fun loadThingsWhileIntroIsVisible() {
@@ -92,6 +93,8 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         uiMenu.setAsOpen()
 
 
+        uiContainer.add(uiMenu)
+
         loadDone = true
     }
 
@@ -104,6 +107,9 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
         logo = TextureRegion(Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")))
         logo.flip(false, true)
+
+
+        Gdx.input.inputProcessor = TitleScreenController(this)
     }
 
     private var blurWriteBuffer = lightmapFboA
@@ -156,7 +162,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
             // update UIs //
-            uiMenu.update(delta)
+            uiContainer.forEach { it.update(delta) }
 
 
             // render and blur lightmap
@@ -217,7 +223,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         batch.shader = null
 
 
-        uiMenu.render(batch, camera)
+        uiContainer.forEach { it.render(batch, camera) }
     }
 
     private fun renderOverlayTexts() {
@@ -249,7 +255,14 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
     override fun resize(width: Int, height: Int) {
         // Set up viewport when window is resized
-        initViewPort(width, height)
+        initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
+
+
+        if (loadDone) {
+            // resize UI by re-creating it (!!)
+            uiMenu.UI.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+            uiMenu.setPosition(0, UIStartMenu.menubarOffY)
+        }
     }
 
     override fun dispose() {
@@ -259,6 +272,8 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
         uiMenu.dispose()
     }
+
+
 
     fun setCameraPosition(newX: Float, newY: Float) {
         Ingame.setCameraPosition(batch, camera, newX, newY)
@@ -360,4 +375,45 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
 
+    class TitleScreenController(val screen: TitleScreen) : InputAdapter() {
+        override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+            screen.uiContainer.forEach { it.touchUp(screenX, screenY, pointer, button) }
+            return true
+        }
+
+        override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+            screen.uiContainer.forEach { it.mouseMoved(screenX, screenY) }
+            return true
+        }
+
+        override fun keyTyped(character: Char): Boolean {
+            screen.uiContainer.forEach { it.keyTyped(character) }
+            return true
+        }
+
+        override fun scrolled(amount: Int): Boolean {
+            screen.uiContainer.forEach { it.scrolled(amount) }
+            return true
+        }
+
+        override fun keyUp(keycode: Int): Boolean {
+            screen.uiContainer.forEach { it.keyUp(keycode) }
+            return true
+        }
+
+        override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+            screen.uiContainer.forEach { it.touchDragged(screenX, screenY, pointer) }
+            return true
+        }
+
+        override fun keyDown(keycode: Int): Boolean {
+            screen.uiContainer.forEach { it.keyDown(keycode) }
+            return true
+        }
+
+        override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+            screen.uiContainer.forEach { it.touchDown(screenX, screenY, pointer, button) }
+            return true
+        }
+    }
 }
