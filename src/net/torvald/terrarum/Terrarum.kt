@@ -13,9 +13,9 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum.RENDER_FPS
-import net.torvald.terrarum.gamecontroller.GameController
+import net.torvald.terrarum.gameactors.floorInt
+import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.imagefont.Watch7SegMain
 import net.torvald.terrarum.imagefont.WatchDotAlph
@@ -24,6 +24,8 @@ import net.torvald.terrarum.ui.ItemSlotImageBuilder
 import net.torvald.terrarum.ui.MessageWindow
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.JsonWriter
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.lwjgl.input.Controllers
@@ -400,18 +402,18 @@ object Terrarum : Game() {
 
 
 
-        ingame = Ingame(batch)
+        //ingame = Ingame(batch)
         //ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, HQRNG().nextLong())
 
         // TODO: create world being used by title screen, and serialise it.
-        ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
-        ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
+        //ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
+        //ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
 
 
-        LoadScreen.screenToLoad = ingame!!
+        //LoadScreen.screenToLoad = ingame!!
 
-        //super.setScreen(TitleScreen(batch))
-        super.setScreen(LoadScreen)
+        super.setScreen(TitleScreen(batch))
+        //super.setScreen(LoadScreen)
 
         //super.setScreen(ingame)
     }
@@ -645,13 +647,13 @@ object Terrarum : Game() {
         }
 
     inline val mouseX: Double
-        get() = GameController.mouseX.toDouble()
+        get() = WorldCamera.x + Gdx.input.x / (ingame?.screenZoom ?: 1f).toDouble()
     inline val mouseY: Double
-        get() = GameController.mouseY.toDouble()
+        get() = WorldCamera.y + Gdx.input.y / (ingame?.screenZoom ?: 1f).toDouble()
     @JvmStatic inline val mouseTileX: Int
-        get() = GameController.mouseTileX
+        get() = (mouseX / FeaturesDrawer.TILE_SIZE).floorInt()
     @JvmStatic inline val mouseTileY: Int
-        get() = GameController.mouseTileY
+        get() = (mouseY / FeaturesDrawer.TILE_SIZE).floorInt()
     inline val mouseScreenX: Int
         get() = Gdx.input.x
     inline val mouseScreenY: Int

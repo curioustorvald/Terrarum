@@ -139,7 +139,7 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
      *
      * note: DO NOT super() this!
      *
-     * Consumption function is executed in net.torvald.terrarum.gamecontroller.GameController,
+     * Consumption function is executed in net.torvald.terrarum.gamecontroller.IngameController,
      * in which the function itself is defined in net.torvald.terrarum.gameactors.ActorInventory
      */
     open fun primaryUse(delta: Float): Boolean = false

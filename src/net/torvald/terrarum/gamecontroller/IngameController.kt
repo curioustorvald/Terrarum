@@ -3,6 +3,7 @@ package net.torvald.terrarum.gamecontroller
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
+import net.torvald.terrarum.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.*
@@ -12,12 +13,9 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 /**
  * Created by minjaesong on 15-12-31.
  */
-object GameController : InputAdapter() {
+class IngameController(val ingame: Ingame) : InputAdapter() {
 
 
-
-    private val ingame = Terrarum.ingame!!
-    
     // these four values can also be accessed with GameContainer.<varname>
     // e.g.  gc.mouseTileX
 
@@ -58,16 +56,16 @@ object GameController : InputAdapter() {
         ///////////////////
 
         // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
-        if (ingame.player != null && ingame.canPlayerControl) {
+        if (ingame.canPlayerControl) {
             if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary")) || Gdx.input.isButtonPressed(Terrarum.getConfigInt("mousesecondary"))) {
-                val itemOnGrip = ingame.player!!.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
+                val itemOnGrip = ingame.player.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
                 itemOnGrip?.let {
                     if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary"))) {
-                        ingame.player!!.consumePrimary(it)
+                        ingame.player.consumePrimary(it)
                     }
                     if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mousesecondary"))) {
-                        ingame.player!!.consumeSecondary(it)
+                        ingame.player.consumeSecondary(it)
                     }
                 }
             }
@@ -82,7 +80,7 @@ object GameController : InputAdapter() {
     override fun keyDown(keycode: Int): Boolean {
 
         if (ingame.canPlayerControl) {
-            ingame.player?.keyDown(keycode)
+            ingame.player.keyDown(keycode)
         }
 
         if (Terrarum.getConfigIntArray("keyquickselalt").contains(keycode)
@@ -129,25 +127,22 @@ object GameController : InputAdapter() {
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (Terrarum.ingame != null) {
-            val ingame = Terrarum.ingame!!
-            // don't separate Player from this! Physics will break, esp. airborne manoeuvre
-            if (ingame.player != null && ingame.canPlayerControl) {
-                val itemOnGrip = ingame.player!!.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
+        // don't separate Player from this! Physics will break, esp. airborne manoeuvre
+        if (ingame.canPlayerControl) {
+            val itemOnGrip = ingame.player.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
-                if (itemOnGrip != null) {
-                    if (button == Terrarum.getConfigInt("mouseprimary")) {
-                        itemOnGrip.endPrimaryUse(Gdx.graphics.deltaTime)
-                    }
-                    if (button == Terrarum.getConfigInt("mousesecondary")) {
-                        itemOnGrip.endSecondaryUse(Gdx.graphics.deltaTime)
-                    }
+            if (itemOnGrip != null) {
+                if (button == Terrarum.getConfigInt("mouseprimary")) {
+                    itemOnGrip.endPrimaryUse(Gdx.graphics.deltaTime)
+                }
+                if (button == Terrarum.getConfigInt("mousesecondary")) {
+                    itemOnGrip.endSecondaryUse(Gdx.graphics.deltaTime)
                 }
             }
-
-
-            ingame.uiContainer.forEach { it.touchUp(screenX, screenY, pointer, button) } // for MouseControlled UIcanvases
         }
+
+
+        ingame.uiContainer.forEach { it.touchUp(screenX, screenY, pointer, button) } // for MouseControlled UIcanvases
 
         return true
     }
