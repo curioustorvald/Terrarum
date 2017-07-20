@@ -110,6 +110,11 @@ abstract class UICanvas {
         //uiItems.forEach { it.keyT }
     }
 
+    open fun resize(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+    }
+
     companion object {
         const val OPENCLOSE_GENERIC = 0.2f
 
