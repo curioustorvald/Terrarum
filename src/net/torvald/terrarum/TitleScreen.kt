@@ -79,7 +79,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         )
         cameraPlayer.hitbox.setDimension(2.0, 2.0)
 
-        demoWorld.time.timeDelta = 45
+        demoWorld.time.timeDelta = 60
 
 
         LightmapRenderer.world = demoWorld
