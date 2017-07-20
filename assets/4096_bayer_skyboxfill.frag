@@ -5,6 +5,8 @@ uniform sampler2D u_texture;
 
 uniform vec3 topColor;
 uniform vec3 bottomColor;
+uniform float parallax = 0.0; // +1.0: all top col, -1.0: all bototm col, 0.0: normal grad
+uniform float parallax_size = 1.0/3.0; // 0: no parallax
 
 
 // "steps" of R, G and B. Must be integer && equal or greater than 2
@@ -48,7 +50,9 @@ vec4 nearestColour(vec4 incolor) {
 void main(void) {
     float spread = 1.0 / (0.299 * (rcount - 1.0) + 0.587 * (gcount - 1.0) + 0.114 * (bcount - 1.0));  // this spread value is optimised one -- try your own values for various effects!
 
-    float scale = v_texCoords.y;
+    float scale = v_texCoords.y * (1.0 - parallax_size) + (parallax_size / 2.0) + (parallax * parallax_size / 2.0);
+
+
     float inR = mix(bottomColor.r, topColor.r, scale);
     float inG = mix(bottomColor.g, topColor.g, scale);
     float inB = mix(bottomColor.b, topColor.b, scale);
@@ -59,3 +63,15 @@ void main(void) {
 
     gl_FragColor = nearestColour(inColor + spread * (bayer[int(entry.y)][int(entry.x)] / bayerDivider - 0.5));
 }
+
+/*
+UV mapping coord.y
+
+-+ <- 1.0  =
+D|         = // parallax of +1
+i|  =      =
+s|  = // parallax of 0
+p|  =      =
+.|         = // parallax of -1
+-+ <- 0.0  =
+*/
