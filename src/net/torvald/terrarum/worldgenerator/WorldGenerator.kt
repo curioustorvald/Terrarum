@@ -39,16 +39,16 @@ object WorldGenerator {
     private val NOISE_SIMPLEX_ORE_START = 1.42
     private val NOISE_SIMPLEX_ORE_END = 1.28
 
-    private val TERRAIN_UNDULATION = 200
+    val TERRAIN_UNDULATION = 200
 
-    private val SIMPLEXGEN_LARGEST_FEATURE = 200
+    val SIMPLEXGEN_LARGEST_FEATURE = 200
 
-    private var OCEAN_WIDTH = 400
-    private var SHORE_WIDTH = 120
-    private val MAX_OCEAN_DEPTH = 200
+    var OCEAN_WIDTH = 400
+    var SHORE_WIDTH = 120
+    val MAX_OCEAN_DEPTH = 200
 
-    private var GLACIER_MOUNTAIN_WIDTH = 900
-    private val GLACIER_MOUNTAIN_HEIGHT = 300
+    var GLACIER_MOUNTAIN_WIDTH = 900
+    val GLACIER_MOUNTAIN_HEIGHT = 300
 
     private val CAVEGEN_THRE_START = 0.4
     private val CAVEGEN_THRE_END = 0.1

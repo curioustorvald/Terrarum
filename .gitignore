@@ -5,3 +5,5 @@ Thumbs.db
 *.jar
 .DS_Store
 ~$*
+assets/modules/basegame/demoworld
+assets/modules/basegame/demoworld.gz

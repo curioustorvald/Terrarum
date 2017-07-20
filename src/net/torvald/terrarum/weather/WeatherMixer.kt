@@ -2,6 +2,7 @@ package net.torvald.terrarum.weather
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
+import javafx.scene.effect.Light
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
@@ -11,6 +12,10 @@ import net.torvald.terrarum.gameactors.ParticleTestRain
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.terrarum.worldgenerator.WorldGenerator
 import java.io.File
 import java.util.*
 
@@ -89,6 +94,9 @@ object WeatherMixer {
 
     }
 
+    private val parallaxZeroPos = WorldGenerator.TERRAIN_AVERAGE_HEIGHT// + WorldGenerator.TERRAIN_UNDULATION.div(2)
+    private val parallaxDomainSize = WorldGenerator.TERRAIN_UNDULATION / 2f
+
     fun render(camera: Camera, world: GameWorld) {
 
         // we will not care for nextSkybox for now
@@ -100,9 +108,25 @@ object WeatherMixer {
         globalLightNow.set(globalLight)
 
 
+        /* (copied from the shader source)
+         UV mapping coord.y
+
+         -+ <- 1.0  =
+         D|         = // parallax of +1
+         i|  =      =
+         s|  = // parallax of 0
+         p|  =      =
+         .|         = // parallax of -1
+         -+ <- 0.0  =
+         */
+        val parallax: Float = (parallaxZeroPos - WorldCamera.gdxCamY.div(FeaturesDrawer.TILE_SIZE.toFloat())) / parallaxDomainSize
+
+
         // draw skybox to provided graphics instance
         val topCol = getGradientColour(skyboxColourMap, 0, timeNow)
         val bottomCol = getGradientColour(skyboxColourMap, 1, timeNow)
+
+        println("zero pos: $parallaxZeroPos, domain_size: $parallaxDomainSize")
 
         //Terrarum.textureWhiteSquare.bind(0)
 
@@ -110,6 +134,7 @@ object WeatherMixer {
         Terrarum.shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
         Terrarum.shaderBayerSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
         Terrarum.shaderBayerSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
+        Terrarum.shaderBayerSkyboxFill.setUniformf("parallax", parallax)
         Terrarum.fullscreenQuad.render(Terrarum.shaderBayerSkyboxFill, GL20.GL_TRIANGLES)
         Terrarum.shaderBayerSkyboxFill.end()
     }

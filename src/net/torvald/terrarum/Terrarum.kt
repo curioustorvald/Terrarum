@@ -400,18 +400,18 @@ object Terrarum : Game() {
 
 
 
-        //ingame = Ingame(batch)
+        ingame = Ingame(batch)
         //ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, HQRNG().nextLong())
 
         // TODO: create world being used by title screen, and serialise it.
-        //ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
-        //ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
+        ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
+        ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
 
 
-        //LoadScreen.screenToLoad = ingame!!
+        LoadScreen.screenToLoad = ingame!!
 
-        super.setScreen(TitleScreen(batch))
-        //super.setScreen(LoadScreen)
+        //super.setScreen(TitleScreen(batch))
+        super.setScreen(LoadScreen)
 
         //super.setScreen(ingame)
     }
