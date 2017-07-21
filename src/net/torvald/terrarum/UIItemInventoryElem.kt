@@ -129,7 +129,7 @@ class UIItemInventoryElem(
 
     override fun keyDown(keycode: Int): Boolean {
         if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_1..Input.Keys.NUM_0) {
-            val inventory = Terrarum.ingame!!.player?.inventory
+            val inventory = Terrarum.ingame!!.player.inventory
             val slot = if (keycode == Input.Keys.NUM_0) 9 else keycode - Input.Keys.NUM_1
             val currentSlotItem = inventory?.getQuickBar(slot)
 
@@ -161,11 +161,11 @@ class UIItemInventoryElem(
             val itemEquipSlot = item!!.equipPosition
             val player = Terrarum.ingame!!.player
 
-            if (item != player?.inventory?.itemEquipped?.get(itemEquipSlot)) { // if this item is unequipped, equip it
-                player?.equipItem(item!!)
+            if (item != player.inventory?.itemEquipped?.get(itemEquipSlot)) { // if this item is unequipped, equip it
+                player.equipItem(item!!)
             }
             else { // if not, unequip it
-                player?.unequipItem(item!!)
+                player.unequipItem(item!!)
             }
         }
 

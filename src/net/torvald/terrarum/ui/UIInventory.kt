@@ -31,7 +31,6 @@ class UIInventory(
     //val actorValue: ActorValue
     //    get() = (actor as Actor).actorValue
 
-    override var handler: UIHandler? = null
     override var openCloseTime: Second = 0.12f
 
     val catButtonsToCatIdent = HashMap<String, String>()
@@ -204,7 +203,7 @@ class UIInventory(
             // monitor and check if category selection has been changed
             // OR UI is being opened from closed state
             if (oldCatSelect != catButtons.selectedIndex ||
-                    !rebuildList && handler!!.openFired) {
+                    !rebuildList && handler.openFired) {
                 rebuildList = true
             }
 

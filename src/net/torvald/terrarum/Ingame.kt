@@ -269,7 +269,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             // add new player and put it to actorContainer
             //playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
             //playableActorDelegate = PlayableActorDelegate(PlayerBuilderTestSubject1())
-            //addNewActor(player!!)
+            //addNewActor(player)
 
 
             // test actor
@@ -399,7 +399,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
     private class ThreadIngameUpdate(val ingame: Ingame): Runnable {
         override fun run() {
             while (ingame.updateDeltaCounter >= ingame.updateRate) {
-                ingame.updateGame(Gdx.graphics.deltaTime)
+                ingame.updateGame(Terrarum.deltaTime)
                 ingame.updateDeltaCounter -= ingame.updateRate
             }
         }
@@ -541,12 +541,10 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
 
-        // Post-update; ones that needs everything is completed //
         // update lightmap on every other frames, OR full-frame if the option is true
-        if (Terrarum.getConfigBoolean("fullframelightupdate") or (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1)) {       //
-            LightmapRenderer.fireRecalculateEvent()             //
-        }                                                       //
-        // end of post-update                                   /
+        if (Terrarum.getConfigBoolean("fullframelightupdate") or (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1)) {
+            LightmapRenderer.fireRecalculateEvent()
+        }
 
 
 
@@ -590,7 +588,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 /////////////////
                 actorsRenderMiddle.forEach { it.drawBody(batch) }
                 actorsRenderMidTop.forEach { it.drawBody(batch) }
-                player?.drawBody(batch)
+                player.drawBody(batch)
                 actorsRenderFront.forEach { it.drawBody(batch) }
                 // --> Change of blend mode <-- introduced by childs of ActorWithBody //
 
@@ -668,7 +666,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 particlesContainer.forEach { it.drawGlow(batch) }
                 actorsRenderMiddle.forEach { it.drawGlow(batch) }
                 actorsRenderMidTop.forEach { it.drawGlow(batch) }
-                player?.drawGlow(batch)
+                player.drawGlow(batch)
                 actorsRenderFront.forEach { it.drawGlow(batch) }
                 // --> blendNormal() <-- introduced by childs of ActorWithBody //
 
@@ -891,7 +889,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 /////////////////
                 actorsRenderMiddle.forEach { it.drawBody(batch) }
                 actorsRenderMidTop.forEach { it.drawBody(batch) }
-                player?.drawBody(batch)
+                player.drawBody(batch)
                 actorsRenderFront.forEach { it.drawBody(batch) }
                 // --> Change of blend mode <-- introduced by childs of ActorWithBody //
 
@@ -918,7 +916,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 //////////////////////
                 actorsRenderMiddle.forEach { it.drawGlow(batch) }
                 actorsRenderMidTop.forEach { it.drawGlow(batch) }
-                player?.drawGlow(batch)
+                player.drawGlow(batch)
                 actorsRenderFront.forEach { it.drawGlow(batch) }
                 // --> blendLightenOnly() <-- introduced by childs of ActorWithBody //
 
@@ -1133,7 +1131,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
         }
 
         playableActorDelegate = newActor
-        WorldSimulator(player, Gdx.graphics.deltaTime)
+        WorldSimulator(player, Terrarum.deltaTime)
     }
 
     private fun changePossession(refid: Int) {
@@ -1150,7 +1148,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
         // accept new delegate
         playableActorDelegate = PlayableActorDelegate(getActorByID(refid) as ActorHumanoid)
         playableActorDelegate!!.actor.collisionType = ActorWithPhysics.COLLISION_KINEMATIC
-        WorldSimulator(player, Gdx.graphics.deltaTime)
+        WorldSimulator(player, Terrarum.deltaTime)
     }
 
     /** Send message to notifier UI and toggle the UI as opened. */
@@ -1242,7 +1240,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 }
             }
             playableActorDelegate?.update(delta)
-            //AmmoMeterProxy(player!!, uiVitalItem.UI as UIVitalMetre)
+            //AmmoMeterProxy(player, uiVitalItem.UI as UIVitalMetre)
         }
     }
 
@@ -1314,7 +1312,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
      * This is how remove function of [java.util.ArrayList] is defined.
      */
     fun removeActor(actor: Actor) {
-        if (actor.referenceID == player?.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
+        if (actor.referenceID == player.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
             throw RuntimeException("Attempted to remove player.")
         val indexToDelete = actorContainer.binarySearch(actor.referenceID)
         if (indexToDelete >= 0) {

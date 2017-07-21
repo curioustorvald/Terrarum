@@ -202,7 +202,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
                 actor.avStrength / 1000.0
             else
                 1.0 // TODO variable: scale, strength
-            val swingDmgToFrameDmg = Gdx.graphics.deltaTime.toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+            val swingDmgToFrameDmg = Terrarum.deltaTime.toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
             // damage the item
             newItem.durability -= (baseDamagePerSwing * swingDmgToFrameDmg).toFloat()

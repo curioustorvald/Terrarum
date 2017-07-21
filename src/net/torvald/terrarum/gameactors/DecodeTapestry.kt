@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.toUint
 import java.io.File
 import java.nio.charset.Charset
@@ -171,6 +172,6 @@ object DecodeTapestry {
             readCounter++
         }
 
-        return TapestryObject(outImageData, artName, authorName)
+        return TapestryObject(Terrarum.ingame!!.world, outImageData, artName, authorName)
     }
 }

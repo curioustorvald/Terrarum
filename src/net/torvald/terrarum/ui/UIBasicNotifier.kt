@@ -18,7 +18,6 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
     override var width = 116
     override var height = 24
-    override var handler: UIHandler? = null
     override var openCloseTime: Second = 0f
 
     private var ELuptimer = 10f // to make the light turned off by default

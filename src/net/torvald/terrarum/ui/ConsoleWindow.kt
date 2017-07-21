@@ -40,8 +40,6 @@ class ConsoleWindow : UICanvas() {
     private var drawOffY: Float = -height.toFloat()
     private var openingTimeCounter = 0f
 
-    override var handler: UIHandler? = null
-
     private var historyIndex = -1
 
     init {

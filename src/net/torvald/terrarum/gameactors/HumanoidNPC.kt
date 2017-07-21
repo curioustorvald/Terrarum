@@ -3,6 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
 
@@ -12,11 +13,13 @@ import net.torvald.terrarum.itemproperties.Material
  * Created by minjaesong on 16-01-31.
  */
 open class HumanoidNPC(
+        world: GameWorld,
         override val ai: ActorAI, // it's there for written-in-Kotlin, "hard-wired" AIs
-        born: GameDate
-) : ActorHumanoid(born), AIControlled, CanBeAnItem {
+        born: GameDate,
+        usePhysics: Boolean = true
+) : ActorHumanoid(world, born, usePhysics = usePhysics), AIControlled, CanBeAnItem {
 
-    constructor(luaAi: LuaAIWrapper, born: GameDate) : this(luaAi as ActorAI, born) {
+    constructor(world: GameWorld, luaAi: LuaAIWrapper, born: GameDate) : this(world, luaAi as ActorAI, born) {
         luaAi.attachActor(this)
     }
 
@@ -78,8 +81,8 @@ open class HumanoidNPC(
     }
 
     override fun update(delta: Float) {
+        ai.update(this, delta)
         super.update(delta)
-        ai.update(delta)
     }
 
     override fun moveLeft(amount: Float) { // hit the buttons on the controller box

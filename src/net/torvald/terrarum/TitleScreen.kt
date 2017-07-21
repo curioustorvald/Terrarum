@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameactors.Hitbox
+import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.langpack.Lang
@@ -47,17 +47,14 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     private var loadDone = false
 
     private lateinit var demoWorld: GameWorld
-    private val cameraPlayer = object : ActorWithBody(RenderOrder.BEHIND) {
-        override fun drawBody(batch: SpriteBatch) { }
-        override fun drawGlow(batch: SpriteBatch) { }
-        override fun dispose() { }
-        override fun onActorValueChange(key: String, value: Any?) { }
-        override fun run() { }
-
-        override fun update(delta: Float) {
-            // camera walk?
+    private val cameraAI = object : ActorAI {
+        override fun update(actor: HumanoidNPC, delta: Float) {
+            // pan camera
+            //actor.moveRight() // why no work?
+            actor.controllerMoveDelta!!.x = 0.5
         }
     }
+    private lateinit var cameraPlayer: HumanoidNPC
 
     private val gradWhiteTop = Color(0xf8f8f8ff.toInt())
     private val gradWhiteBottom = Color(0xd8d8d8ff.toInt())
@@ -74,11 +71,18 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     private fun loadThingsWhileIntroIsVisible() {
         demoWorld = ReadLayerData(FileInputStream(ModMgr.getFile("basegame", "demoworld")))
 
-        cameraPlayer.hitbox.setPosition(
-                demoWorld.spawnX * FeaturesDrawer.TILE_SIZE.toDouble(),
-                demoWorld.spawnY * FeaturesDrawer.TILE_SIZE.toDouble()
-        )
-        cameraPlayer.hitbox.setDimension(2.0, 2.0)
+
+        cameraPlayer = object : HumanoidNPC(demoWorld, cameraAI, GameDate(1, 1), usePhysics = false) {
+            init {
+                setHitboxDimension(2, 2, 0, 0)
+                hitbox.setPosition(
+                        demoWorld.spawnX * FeaturesDrawer.TILE_SIZE.toDouble(),
+                        (demoWorld.height / 3) * 0.75 * FeaturesDrawer.TILE_SIZE.toDouble()//demoWorld.spawnY * FeaturesDrawer.TILE_SIZE.toDouble()
+                )
+                actorValue[AVKey.SPEED] = 1.0
+                actorValue[AVKey.ACCEL] = 1.0
+            }
+        }
 
         demoWorld.time.timeDelta = 60
 
@@ -146,14 +150,6 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             }
         }
         else {
-            //if (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1) {
-                LightmapRenderer.fireRecalculateEvent()
-            //}
-
-
-            cameraPlayer.hitbox.setPosition(1024 * 16.0, 340 * 16.0)
-
-
             demoWorld.updateWorldTime(delta)
             WeatherMixer.update(delta, cameraPlayer)
             cameraPlayer.update(delta)
@@ -165,11 +161,19 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             uiContainer.forEach { it.update(delta) }
 
 
+            if (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1) {
+                LightmapRenderer.fireRecalculateEvent()
+            }
+
+
             // render and blur lightmap
             //processBlur(LightmapRenderer.DRAW_FOR_RGB)
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE)
 
             // render world
             batch.inUse {
+                setCameraPosition(0f, 0f)
+                batch.color = Color.WHITE
                 batch.shader = null
                 camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
                 camera.update()
@@ -215,6 +219,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         BlocksDrawer.renderTerrain(batch)
         BlocksDrawer.renderFront(batch, false)
         FeaturesDrawer.drawEnvOverlay(batch)
+
     }
 
     private fun renderMenus() {

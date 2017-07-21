@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ai.LuaAIWrapper
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -13,6 +14,7 @@ object PlayerBuilderCynthia {
     operator fun invoke(): ActorWithPhysics {
         //val p: Player = Player(GameDate(100, 143)) // random value thrown
         val p: HumanoidNPC = HumanoidNPC(
+                Terrarum.ingame!!.world,
                 LuaAIWrapper("/net/torvald/terrarum/gameactors/ai/scripts/PokemonNPCAI.lua"),
                 GameDate(100, 143)) // random value thrown
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")

@@ -33,9 +33,9 @@ object BlockStats {
         val renderHeight = FastMath.ceil(Terrarum.HEIGHT.toFloat())
 
         val noZoomCameraX = Math.round(FastMath.clamp(
-                (player?.hitbox?.centeredX?.toFloat() ?: 0f) - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))
+                (player.hitbox?.centeredX?.toFloat() ?: 0f) - renderWidth / 2, TSIZE.toFloat(), map.width * TSIZE - renderWidth - TSIZE.toFloat()))
         val noZoomCameraY = Math.round(FastMath.clamp(
-                (player?.hitbox?.centeredY?.toFloat() ?: 0f) - renderHeight / 2, TSIZE.toFloat(), map.width * TSIZE - renderHeight - TSIZE.toFloat()))
+                (player.hitbox?.centeredY?.toFloat() ?: 0f) - renderHeight / 2, TSIZE.toFloat(), map.width * TSIZE - renderHeight - TSIZE.toFloat()))
 
         val for_x_start = noZoomCameraX / TSIZE
         val for_y_start = noZoomCameraY / TSIZE

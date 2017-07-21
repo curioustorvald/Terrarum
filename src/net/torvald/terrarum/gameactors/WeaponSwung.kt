@@ -1,11 +1,12 @@
 package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.graphics.Color
+import net.torvald.terrarum.gameworld.GameWorld
 
 /**
  * Created by minjaesong on 16-04-26.
  */
-class WeaponSwung(val itemID: Int) : ActorWithPhysics(Actor.RenderOrder.MIDTOP), Luminous {
+class WeaponSwung(world: GameWorld, val itemID: Int) : ActorWithPhysics(world, Actor.RenderOrder.MIDTOP), Luminous {
     // just let the solver use AABB; it's cheap but works just enough
 
     /**

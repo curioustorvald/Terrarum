@@ -4,13 +4,14 @@ import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
 /**
  * Created by minjaesong on 16-06-17.
  */
-internal class FixtureTikiTorch : FixtureBase(), Luminous {
+internal class FixtureTikiTorch(world: GameWorld) : FixtureBase(world), Luminous {
 
     override var color: Color
         get() = BlockCodex[Block.TORCH].luminosity

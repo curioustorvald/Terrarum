@@ -19,8 +19,6 @@ class BasicDebugInfoWindow : UICanvas() {
 
     override var openCloseTime: Float = 0f
 
-    override var handler: UIHandler? = null
-
     private var prevPlayerX = 0.0
     private var prevPlayerY = 0.0
 
@@ -30,7 +28,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
 
     override fun update(delta: Float) {
-        val player = Terrarum.ingame!!.player!!
+        val player = Terrarum.ingame!!.player
         val hitbox = player.hitbox
 
         xdelta = hitbox.canonicalX - prevPlayerX
@@ -49,7 +47,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
         batch.color = Color(0xFFEE88FF.toInt())
 
-        val hitbox = player?.hitbox
+        val hitbox = player.hitbox
 
         /**
          * First column
@@ -80,11 +78,11 @@ class BasicDebugInfoWindow : UICanvas() {
                                  + "${(hitbox?.endY?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
                                  + ")")
 
-        printLine(batch, 3, "veloX reported $ccG${player?.externalForce?.x}")
-        printLine(batch, 4, "veloY reported $ccG${player?.externalForce?.y}")
+        printLine(batch, 3, "veloX reported $ccG${player.externalForce?.x}")
+        printLine(batch, 4, "veloY reported $ccG${player.externalForce?.y}")
 
-        printLine(batch, 5, "p_WalkX $ccG${player?.controllerMoveDelta?.x}")
-        printLine(batch, 6, "p_WalkY $ccG${player?.controllerMoveDelta?.y}")
+        printLine(batch, 5, "p_WalkX $ccG${player.controllerMoveDelta?.x}")
+        printLine(batch, 6, "p_WalkY $ccG${player.controllerMoveDelta?.y}")
 
         printLineColumn(batch, 2, 3, "veloX measured $ccG${xdelta}")
         printLineColumn(batch, 2, 4, "veloY measured $ccG${ydelta}")
@@ -130,9 +128,9 @@ class BasicDebugInfoWindow : UICanvas() {
 
         printLineColumn(batch, 2, 5, "Time $ccG${Terrarum.ingame!!.world.time.todaySeconds.toString().padStart(5, '0')}" +
                                      " (${Terrarum.ingame!!.world.time.getFormattedTime()})")
-        printLineColumn(batch, 2, 6, "Mass $ccG${player?.mass}")
+        printLineColumn(batch, 2, 6, "Mass $ccG${player.mass}")
 
-        printLineColumn(batch, 2, 7, "noClip $ccG${player?.noClip}")
+        printLineColumn(batch, 2, 7, "noClip $ccG${player.noClip}")
 
 
         drawHistogram(batch, LightmapRenderer.histogram,

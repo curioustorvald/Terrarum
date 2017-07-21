@@ -12,7 +12,7 @@ import net.torvald.terrarum.gameactors.Second
  * Created by SKYHi14 on 2017-03-03.
  */
 class UIVitalMetre(
-        var player: ActorHumanoid?,
+        var player: ActorHumanoid,
         var vitalGetterVal: () -> Float?,
         var vitalGetterMax: () -> Float?,
         var color: Color?,
@@ -28,20 +28,13 @@ class UIVitalMetre(
     private val gap = 4f
 
     override var width: Int = 80 + 2 * margin; set(value) { throw Error("operation not permitted") }
-    override var height: Int; get() = player?.baseHitboxH ?: 0 * 3 + margin; set(value) { throw Error("operation not permitted") }
-    override var handler: UIHandler? = null
-        set(value) {
-            // override customPositioning to be true
-            if (value != null) {
-                value.customPositioning = true
-            }
-            field = value
-        }
+    override var height: Int; get() = player.baseHitboxH ?: 0 * 3 + margin; set(value) { throw Error("operation not permitted") }
+
     override var openCloseTime: Second = 0.05f
 
     //private val relativePX = width / 2f
-    private val offsetY: Float; get() = (player?.baseHitboxH ?: 0) * 1.5f
-    private val circleRadius: Float; get() = (player?.baseHitboxH ?: 0) * 3f
+    private val offsetY: Float; get() = (player.baseHitboxH ?: 0) * 1.5f
+    private val circleRadius: Float; get() = (player.baseHitboxH ?: 0) * 3f
 
     private val theta = 33f
     private val halfTheta = theta / 2f
@@ -54,7 +47,7 @@ class UIVitalMetre(
         }
 
     override fun update(delta: Float) {
-        handler!!.setPosition(
+        handler.setPosition(
                 Terrarum.HALFW,
                 Terrarum.HALFH
         )
@@ -68,8 +61,8 @@ class UIVitalMetre(
         
         /*if (vitalGetterVal() != null && vitalGetterMax() != null && player != null) {
             g.translate(
-                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.x.toFloat() - (WorldCamera.x)),
-                    Terrarum.ingame!!.screenZoom * (player!!.centrePosPoint.y.toFloat() - (WorldCamera.y))
+                    Terrarum.ingame!!.screenZoom * (player.centrePosPoint.x.toFloat() - (WorldCamera.x)),
+                    Terrarum.ingame!!.screenZoom * (player.centrePosPoint.y.toFloat() - (WorldCamera.y))
             )
 
 

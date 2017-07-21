@@ -6,6 +6,7 @@ import net.torvald.point.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.gameworld.GameWorld
 import org.dyn4j.geometry.Vector2
 import java.util.*
 
@@ -17,10 +18,11 @@ import java.util.*
 
 // TODO simplified, lightweight physics (does not call PhysicsSolver)
 open class ProjectileSimple(
+        world: GameWorld,
         private val type: Int,
         fromPoint: Vector2, // projected coord
         toPoint: Vector2    // arriving coord
-        ) : ActorWithPhysics(Actor.RenderOrder.MIDTOP), Luminous, Projectile {
+) : ActorWithPhysics(world, Actor.RenderOrder.MIDTOP), Luminous, Projectile {
 
     val damage: Int
     val displayColour: Color
