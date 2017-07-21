@@ -94,10 +94,12 @@ object WeatherMixer {
 
     }
 
-    private val parallaxZeroPos = WorldGenerator.TERRAIN_AVERAGE_HEIGHT// + WorldGenerator.TERRAIN_UNDULATION.div(2)
+    //private val parallaxZeroPos = WorldGenerator.TERRAIN_AVERAGE_HEIGHT * 0.75f // just an arb multiplier (266.66666 -> 200)
     private val parallaxDomainSize = WorldGenerator.TERRAIN_UNDULATION / 2f
 
     fun render(camera: Camera, world: GameWorld) {
+        val parallaxZeroPos = (world.height / 3) * 0.75f // just an arb multiplier (266.66666 -> 200)
+
 
         // we will not care for nextSkybox for now
         val timeNow = world.time.todaySeconds

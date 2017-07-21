@@ -26,14 +26,12 @@ class Notification : UICanvas() {
 
     override var openCloseTime: Second = MessageWindow.OPEN_CLOSE_TIME
 
-    override var handler: UIHandler? = null
-
     override fun update(delta: Float) {
-        if (handler!!.isOpened)
+        if (handler.isOpened)
             displayTimer += delta
 
         if (displayTimer >= visibleTime) {
-            handler!!.setAsClose()
+            handler.setAsClose()
             displayTimer = 0f
         }
     }
@@ -61,9 +59,9 @@ class Notification : UICanvas() {
     fun sendNotification(message: Array<String>) {
         this.message = message
         msgUI.setMessage(this.message)
-        handler!!.openCloseCounter = 0f
-        handler!!.opacity = 0f
-        handler!!.setAsOpen()
+        handler.openCloseCounter = 0f
+        handler.opacity = 0f
+        handler.setAsOpen()
     }
 
     override fun dispose() {

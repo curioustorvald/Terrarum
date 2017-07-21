@@ -1,6 +1,7 @@
 package net.torvald.terrarum.virtualcomputer.worldobject
 
 import net.torvald.terrarum.gameactors.FixtureBase
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 import java.io.PrintStream
@@ -10,7 +11,7 @@ import java.util.*
 /**
  * Created by minjaesong on 16-09-08.
  */
-open class FixtureComputerBase() : FixtureBase() {
+open class FixtureComputerBase(world: GameWorld) : FixtureBase(world) {
 
     /** Connected terminal */
     var terminal: FixtureBasicTerminal? = null

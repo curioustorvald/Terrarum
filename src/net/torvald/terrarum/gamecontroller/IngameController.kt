@@ -33,23 +33,6 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
         get() = (mouseY / FeaturesDrawer.TILE_SIZE).floorInt()
 
     fun update(delta: Float) {
-        // actor process input
-        if (!ingame.consoleHandler.isTakingControl) {
-            if (ingame.canPlayerControl) {
-                ingame.actorContainer.forEach {
-                    if (it is Controllable) {
-                        // disable control of actor if the actor is riding something?
-                        if ((it as ActorHumanoid).vehicleRiding != null) {
-                            it.vehicleRiding!!.processInput(delta)
-                        }
-                        else {
-                            it.processInput(delta)
-                        }
-                    }
-                }
-            }
-        }
-
 
         ///////////////////
         // MOUSE CONTROL //
@@ -133,10 +116,10 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
 
             if (itemOnGrip != null) {
                 if (button == Terrarum.getConfigInt("mouseprimary")) {
-                    itemOnGrip.endPrimaryUse(Gdx.graphics.deltaTime)
+                    itemOnGrip.endPrimaryUse(Terrarum.deltaTime)
                 }
                 if (button == Terrarum.getConfigInt("mousesecondary")) {
-                    itemOnGrip.endSecondaryUse(Gdx.graphics.deltaTime)
+                    itemOnGrip.endSecondaryUse(Terrarum.deltaTime)
                 }
             }
         }

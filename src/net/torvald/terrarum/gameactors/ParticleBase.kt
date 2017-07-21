@@ -20,7 +20,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, maxLifeTime: Second? = n
     /** Will NOT actually delete from the CircularArray */
     @Volatile var flagDespawn = false
 
-    override fun run() = update(Gdx.graphics.deltaTime)
+    override fun run() = update(Terrarum.deltaTime)
 
     var isNoSubjectToGrav = false
     var dragCoefficient = 3.0

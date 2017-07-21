@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.Faction
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
@@ -18,8 +19,14 @@ import java.util.*
  *
  * Created by minjaesong on 16-10-24.
  */
-open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
-    : HistoricalFigure(birth, death), Controllable, Pocketed, Factionable, Luminous, LandHolder {
+open class ActorHumanoid(
+        world: GameWorld,
+        birth: GameDate,
+        death: GameDate? = null,
+        usePhysics: Boolean = true
+) : HistoricalFigure(world, birth, death, usePhysics = usePhysics), Controllable, Pocketed, Factionable, Luminous, LandHolder {
+
+
 
     var vehicleRiding: Controllable? = null // usually player only
 
@@ -38,11 +45,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     override var houseDesignation: ArrayList<Long>? = ArrayList()
 
     override fun addHouseTile(x: Int, y: Int) {
-        if (houseDesignation != null) houseDesignation!!.add(LandUtil.getBlockAddr(x, y))
+        if (houseDesignation != null) houseDesignation!!.add(LandUtil.getBlockAddr(world, x, y))
     }
 
     override fun removeHouseTile(x: Int, y: Int) {
-        if (houseDesignation != null) houseDesignation!!.remove(LandUtil.getBlockAddr(x, y))
+        if (houseDesignation != null) houseDesignation!!.remove(LandUtil.getBlockAddr(world, x, y))
     }
 
     override fun clearHouseDesignation() {
@@ -135,7 +142,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
     protected var isRightDown = false
     protected var isJumpDown = false
     protected inline val isGamer: Boolean
-        get() = this == Terrarum.ingame!!.player
+        get() = if (Terrarum.ingame == null) false else this == Terrarum.ingame!!.player
 
 
     private val nullItem = object : GameItem() {
@@ -163,6 +170,8 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
         // don't put this into keyPressed; execution order is important!
         updateGamerControlBox()
+
+        processInput(delta)
 
         updateSprite(delta)
 
@@ -224,7 +233,7 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
         get() = if (isGamer) Terrarum.controller != null
                 else true
     
-    override fun processInput(delta: Float) {
+    private fun processInput(delta: Float) {
 
         /**
          * L-R stop
@@ -538,11 +547,11 @@ open class ActorHumanoid(birth: GameDate, death: GameDate? = null)
 
             // flipping the sprite
             if (walkHeading == LEFT) {
-                sprite!!.flip(true, false)
+                sprite?.flip(true, false)
                 spriteGlow?.flip(true, false)
             }
             else {
-                sprite!!.flip(false, false)
+                sprite?.flip(false, false)
                 spriteGlow?.flip(false, false)
             }
         }

@@ -1,12 +1,12 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.terrarum.gameworld.GameWorld
 
 /**
  * Created by minjaesong on 16-06-17.
  */
-open class FixtureBase(physics: Boolean = true) :
-        ActorWithPhysics(Actor.RenderOrder.BEHIND, immobileBody = true, physics = physics) {
+open class FixtureBase(world: GameWorld, physics: Boolean = true) :
+        ActorWithPhysics(world, Actor.RenderOrder.BEHIND, immobileBody = true, usePhysics = physics) {
     /**
      * 0: Open
      * 1: Blocked
