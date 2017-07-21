@@ -119,7 +119,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     private var blurWriteBuffer = lightmapFboA
     private var blurReadBuffer = lightmapFboB
 
-    private val minimumIntroTime = 1.0f
+    private val minimumIntroTime = 2.0f
     private var deltaCounter = 0f
 
     override fun render(delta: Float) {
@@ -150,6 +150,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             }
         }
         else {
+            demoWorld.globalLight = WeatherMixer.globalLightNow
             demoWorld.updateWorldTime(delta)
             WeatherMixer.update(delta, cameraPlayer)
             cameraPlayer.update(delta)
@@ -167,8 +168,8 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
             // render and blur lightmap
-            //processBlur(LightmapRenderer.DRAW_FOR_RGB)
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE)
+            processBlur(LightmapRenderer.DRAW_FOR_RGB)
+            //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
             // render world
             batch.inUse {
@@ -220,6 +221,30 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         BlocksDrawer.renderFront(batch, false)
         FeaturesDrawer.drawEnvOverlay(batch)
 
+
+        // draw lightmap //
+        setCameraPosition(0f, 0f)
+        batch.shader = Terrarum.shaderBayer
+        batch.shader.setUniformf("rcount", 64f)
+        batch.shader.setUniformf("gcount", 64f)
+        batch.shader.setUniformf("bcount", 64f) // de-banding
+        val lightTex = blurWriteBuffer.colorBufferTexture
+        lightTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        blendMul()
+        batch.color = Color.WHITE
+        batch.draw(lightTex,
+                0f, 0f,
+                lightTex.width * Ingame.lightmapDownsample, lightTex.height * Ingame.lightmapDownsample
+        )
+
+        batch.shader = null
+
+
+        // move camera back to its former position
+        // using custom code for camera; this is obscure and tricky
+        camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
+        camera.update()
+        batch.projectionMatrix = camera.combined
     }
 
     private fun renderMenus() {
@@ -268,6 +293,12 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             uiMenu.UI.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
             uiMenu.setPosition(0, UIStartMenu.menubarOffY)
         }
+
+        lightmapFboA.dispose()
+        lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(Ingame.lightmapDownsample.toInt()), Terrarum.HEIGHT.div(Ingame.lightmapDownsample.toInt()), false)
+        lightmapFboB.dispose()
+        lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(Ingame.lightmapDownsample.toInt()), Terrarum.HEIGHT.div(Ingame.lightmapDownsample.toInt()), false)
+
     }
 
     override fun dispose() {
