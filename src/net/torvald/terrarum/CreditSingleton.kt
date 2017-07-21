@@ -1,10 +1,25 @@
 package net.torvald.terrarum
 
+import net.torvald.terrarum.langpack.Lang
+
 object CreditSingleton {
 
-    val contents = """Terrarum
+    val contents =
+            Lang["CREDITS_PROGRAMMER"] + "\n\nTorvald (minjaesong)\n\n" +
+            Lang["CREDITS_ARTIST_PLURAL"] + "\n\nTorvald (minjaesong)\nRoundworld (leedonggeun)\"" +
+            """
 
-Copyright (C) 2013-2017 Minjaesong (Torvald)
+
+
+
+Copyright Informations
+
+
+
+
+Terrarum
+
+Copyright (C) 2013-2017 Torvald (minjaesong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

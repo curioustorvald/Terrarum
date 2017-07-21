@@ -696,6 +696,7 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
     batch?.projectionMatrix = camera?.combined
     action(this)
     this.end()
+    camera?.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 }
 
 fun Float.round(): Float {
