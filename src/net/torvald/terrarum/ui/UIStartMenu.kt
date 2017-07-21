@@ -23,7 +23,7 @@ class UIStartMenu : UICanvas() {
 
 
     override var width: Int = 240
-    override var height: Int = 40 * menuLabels.size.plus(1)
+    override var height: Int = 36 * menuLabels.size.plus(1)
     override var openCloseTime = 0f
 
 
