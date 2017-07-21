@@ -33,24 +33,21 @@ object WorldCamera {
         get() = y + height.ushr(1)
 
     fun update(world: GameWorld, player: ActorWithBody) {
-        if (Terrarum.ingame != null) {
+        width = FastMath.ceil(Terrarum.WIDTH / (Terrarum.ingame?.screenZoom ?: 1f)) // div, not mul
+        height = FastMath.ceil(Terrarum.HEIGHT / (Terrarum.ingame?.screenZoom ?: 1f))
 
-            width = FastMath.ceil(Terrarum.WIDTH / (Terrarum.ingame?.screenZoom ?: 1f)) // div, not mul
-            height = FastMath.ceil(Terrarum.HEIGHT / (Terrarum.ingame?.screenZoom ?: 1f))
-
-            // position - (WH / 2)
-            x = (// X only: ROUNDWORLD implementation
-                    player.hitbox.centeredX.toFloat() - width / 2).floorInt()
-            y = (FastMath.clamp(
-                    player.hitbox.centeredY.toFloat() - height / 2,
-                    TILE_SIZE.toFloat(),
-                    world.height * TILE_SIZE - height - TILE_SIZE.toFloat()
-            )).floorInt().clampCameraY(world)
+        // position - (WH / 2)
+        x = (// X only: ROUNDWORLD implementation
+                player.hitbox.centeredX.toFloat() - width / 2).floorInt()
+        y = (FastMath.clamp(
+                player.hitbox.centeredY.toFloat() - height / 2,
+                TILE_SIZE.toFloat(),
+                world.height * TILE_SIZE - height - TILE_SIZE.toFloat()
+        )).floorInt().clampCameraY(world)
 
 
-            gdxCamX = x + (width / 2f).floor()
-            gdxCamY = y + (height / 2f).floor()
-        }
+        gdxCamX = x + (width / 2f).floor()
+        gdxCamY = y + (height / 2f).floor()
     }
 
     private fun Int.clampCameraY(world: GameWorld): Int {

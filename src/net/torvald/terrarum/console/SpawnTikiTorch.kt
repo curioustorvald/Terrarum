@@ -8,7 +8,7 @@ import net.torvald.terrarum.gameactors.FixtureTikiTorch
  */
 internal object SpawnTikiTorch : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        val torch = FixtureTikiTorch()
+        val torch = FixtureTikiTorch(Terrarum.ingame!!.world)
         torch.setPosition(Terrarum.mouseX, Terrarum.mouseY)
 
         Terrarum.ingame!!.addNewActor(torch)

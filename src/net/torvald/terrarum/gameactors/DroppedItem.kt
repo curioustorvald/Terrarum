@@ -4,11 +4,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.gameworld.GameWorld
 
 /**
  * Created by minjaesong on 16-03-15.
  */
-open class DroppedItem(private val item: GameItem) : ActorWithPhysics(Actor.RenderOrder.MIDTOP) {
+open class DroppedItem(world: GameWorld, private val item: GameItem) : ActorWithPhysics(world, Actor.RenderOrder.MIDTOP) {
 
     init {
         if (item.dynamicID >= ItemCodex.ACTORID_MIN)

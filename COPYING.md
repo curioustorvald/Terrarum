@@ -1,4 +1,4 @@
-*Terrarum* by Minjaesong (Torvald)
+*Terrarum*
 
 Copyright (C) 2013-2017 Minjaesong (Torvald) 
 
@@ -23,14 +23,7 @@ Released as public domain
   
 ----
   
-*Joise* modular noise library
-
-Copyright (C) 2013 Jason Taylor.
-Released as open-source under the Apache License, Version 2.0.
-
-============================================================================
-| Joise
-============================================================================
+*Joise*
 
 Copyright (C) 2013 Jason Taylor
 
@@ -46,12 +39,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-============================================================================
-| Accidental Noise Library
-| --------------------------------------------------------------------------
-| Joise is a derivative work based on Josua Tippetts' C++ library:
-| http://accidentalnoise.sourceforge.net/index.html
-============================================================================
+*Accidental Noise Library*
+
+Joise is a derivative work based on Josua Tippetts' C++ library:
+http://accidentalnoise.sourceforge.net/index.html
 
 Copyright (C) 2011 Joshua Tippetts
 
@@ -73,7 +64,7 @@ Copyright (C) 2011 Joshua Tippetts
 
 ----
 
-*Vector2* from Dyn4j
+*Vector2*
 
 Copyright (c) 2010-2015 William Bittle  http://www.dyn4j.org/
 All rights reserved.
@@ -102,7 +93,7 @@ All rights reserved.
   
 ----
 
-Amazing ambient sound recordings:
+Ambient sound recordings:
 
     ambient_forest_01.ogg
     ambient_meadow_01.ogg
@@ -111,7 +102,7 @@ Amazing ambient sound recordings:
     crickets_01.ogg
     crickets_02.ogg
 
-Copyright (C) 2012, 2013, 2015, 2016 Klankbeeld
+Copyright (C) 2012, 2013, 2015, 2016, 2017 Klankbeeld
 Sound from http://www.freesound.org/people/klankbeeld/
 
 ----

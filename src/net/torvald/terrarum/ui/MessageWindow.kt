@@ -23,8 +23,6 @@ class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas
 
     override var openCloseTime: Second = OPEN_CLOSE_TIME
 
-    override var handler: UIHandler? = null
-
     private val LRmargin = 0f // there's "base value" of 8 px for LR (width of segment tile)
 
 

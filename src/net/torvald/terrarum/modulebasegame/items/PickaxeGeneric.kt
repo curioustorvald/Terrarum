@@ -37,7 +37,7 @@ class PickaxeGeneric(override val originalID: ItemID) : GameItem() {
         val mouseTileY = Terrarum.mouseTileY
 
         val mousePoint = Point2d(mouseTileX.toDouble(), mouseTileY.toDouble())
-        val actorvalue = Terrarum.ingame!!.player!!.actorValue
+        val actorvalue = Terrarum.ingame!!.player.actorValue
 
         using = true
 
@@ -57,7 +57,7 @@ class PickaxeGeneric(override val originalID: ItemID) : GameItem() {
 
         Terrarum.ingame!!.world.inflictTerrainDamage(
                 mouseTileX, mouseTileY,
-                Calculate.pickaxePower(Terrarum.ingame!!.player!!, material) * swingDmgToFrameDmg
+                Calculate.pickaxePower(Terrarum.ingame!!.player, material) * swingDmgToFrameDmg
         )
 
         return true
@@ -66,7 +66,7 @@ class PickaxeGeneric(override val originalID: ItemID) : GameItem() {
     override fun endPrimaryUse(delta: Float): Boolean {
         using = false
         // reset action timer to zero
-        Terrarum.ingame!!.player!!.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
+        Terrarum.ingame!!.player.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
         return true
     }
 }

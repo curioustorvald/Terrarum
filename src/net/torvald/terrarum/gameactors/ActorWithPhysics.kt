@@ -1,6 +1,5 @@
 package net.torvald.terrarum.gameactors
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.point.Point2d
@@ -23,15 +22,15 @@ typealias Second = Float
 
 /**
  * Base class for every actor that has animated sprites. This includes furnishings, paintings, gadgets, etc.
- * Also has all the physics
+ * Also has all the usePhysics
  *
  * @param renderOrder Rendering order (BEHIND, MIDDLE, MIDTOP, FRONT)
  * @param immobileBody use realistic air friction (1/1000 of "unrealistic" canonical setup)
- * @param physics use physics simulation
+ * @param usePhysics use usePhysics simulation
  *
  * Created by minjaesong on 16-01-13.
  */
-open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean = false, physics: Boolean = true) :
+open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val immobileBody: Boolean = false, var usePhysics: Boolean = true) :
         ActorWithBody(renderOrder) {
 
 
@@ -44,8 +43,6 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     @Transient internal var spriteGlow: SpriteAnimation? = null
 
     var drawMode = BlendMode.NORMAL
-
-    @Transient private val world: GameWorld = Terrarum.ingame!!.world
 
     var hitboxTranslateX: Int = 0// relative to spritePosX
         protected set
@@ -133,7 +130,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     @Transient private val ELASTICITY_MAX = 1.0//0.993 // No perpetual motion!
 
     /**
-     * what pretty much every physics engine has, instead of my 'elasticity'
+     * what pretty much every usePhysics engine has, instead of my 'elasticity'
      *
      * This is just a simple macro for 'elasticity'.
      *
@@ -164,7 +161,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     /** Default to 'true'  */
     var isVisible = true
     /** Default to 'true'  */
-    var isUpdate = physics
+    var isUpdate = true
     var isNoSubjectToGrav = false
     var isNoCollideWorld = false
     var isNoSubjectToFluidResistance = false
@@ -239,7 +236,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     internal var colliding = false
     
     protected inline val updateDelta: Float
-        get() = Gdx.graphics.deltaTime
+        get() = Terrarum.deltaTime
 
 
     var isWalkingH = false
@@ -336,6 +333,12 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                 isNoSubjectToFluidResistance = isPlayerNoClip
             }
 
+            if (!usePhysics) {
+                isNoCollideWorld = true
+                isNoSubjectToFluidResistance = true
+                isNoSubjectToGrav = true
+            }
+
 
             ////////////////////////////////////////////////////////////////
             // Codes that modifies velocity (moveDelta and externalForce) //
@@ -366,7 +369,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
                  * If and only if:
                  *     This body is NON-STATIC and the other body is STATIC
                  */
-                if (!isPlayerNoClip) {
+                if (!isNoCollideWorld) {
                     // // HOW IT SHOULD WORK // //
                     // ////////////////////////
                     // combineVeloToMoveDelta now
@@ -428,7 +431,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             walledTop = isWalled(hitbox, COLLIDING_TOP)
             walledBottom = isWalled(hitbox, COLLIDING_BOTTOM)
             colliding = isColliding(hitbox)
-            if (isPlayerNoClip) {
+            if (isNoCollideWorld) {
                 walledLeft = false
                 walledRight = false
                 walledTop = false
@@ -586,7 +589,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
             val stepBox = sixteenStep[step]
 
             forEachOccupyingTilePos(stepBox) {
-                val tileCoord = LandUtil.resolveBlockAddr(it)
+                val tileCoord = LandUtil.resolveBlockAddr(this.world, it)
                 val tileProp = BlockCodex.getOrNull(world.getTileFromTerrain(tileCoord.first, tileCoord.second))
 
                 if (tileProp == null || tileProp.isSolid) {
@@ -632,7 +635,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
 
             debug1("Collision type: $selfCollisionStatus")
             affectingTiles.forEach {
-                val tileCoord = LandUtil.resolveBlockAddr(it)
+                val tileCoord = LandUtil.resolveBlockAddr(this.world, it)
                 debug2("affectign tile: ${tileCoord.first}, ${tileCoord.second}")
             }
 
@@ -1265,7 +1268,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
     private fun assertInit() {
         // errors
         if (baseHitboxW == 0 || baseHitboxH == 0)
-            throw Error("Hitbox dimension was not set.")
+            throw Error("Hitbox dimension was not set. (don't modify hitbox directly -- use 'setHitboxDimension()')")
 
         // warnings
         if (sprite == null && isVisible)
@@ -1315,7 +1318,7 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         val tilePosList = ArrayList<BlockAddress>()
         for (y in newTilewiseHitbox.startY.toInt()..newTilewiseHitbox.endY.toInt()) {
             for (x in newTilewiseHitbox.startX.toInt()..newTilewiseHitbox.endX.toInt()) {
-                tilePosList.add(LandUtil.getBlockAddr(x, y))
+                tilePosList.add(LandUtil.getBlockAddr(this.world, x, y))
             }
         }
 
@@ -1437,12 +1440,12 @@ open class ActorWithPhysics(renderOrder: RenderOrder, val immobileBody: Boolean 
         }
     internal val avAcceleration: Double
         get() = actorValue.getAsDouble(AVKey.ACCEL)!! *
-                actorValue.getAsDouble(AVKey.ACCELBUFF)!! *
+                (actorValue.getAsDouble(AVKey.ACCELBUFF) ?: 1.0) *
                 accelMultMovement *
                 scale.sqrt()
     internal val avSpeedCap: Double
         get() = actorValue.getAsDouble(AVKey.SPEED)!! *
-                actorValue.getAsDouble(AVKey.SPEEDBUFF)!! *
+                (actorValue.getAsDouble(AVKey.SPEEDBUFF) ?: 1.0) *
                 speedMultByTile *
                 scale.sqrt()
 

@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum.RENDER_FPS
 import net.torvald.terrarum.gameactors.floorInt
 import net.torvald.terrarum.gamecontroller.IngameController
@@ -91,6 +92,9 @@ object Terrarum : Game() {
         get() = if (screenW!! % 2 == 0) screenW!! else screenW!! + 1
     val HEIGHT: Int
         get() = if (screenH!! % 2 == 0) screenH!! else screenH!! + 1
+
+    val WIDTH_MIN = 800
+    val HEIGHT_MIN = 600
 
     inline val HALFW: Int
         get() = WIDTH.ushr(1)
@@ -265,6 +269,8 @@ object Terrarum : Game() {
     lateinit var fullscreenQuad: Mesh; private set
 
 
+    val deltaTime: Float; get() = Gdx.graphics.rawDeltaTime
+
 
     init {
         println("$NAME version $VERSION_STRING")
@@ -423,7 +429,7 @@ object Terrarum : Game() {
     }
 
     override fun render() {
-        super.screen.render(Gdx.graphics.deltaTime)
+        super.screen.render(deltaTime)
         GLOBAL_RENDER_TIMER += 1
     }
 
@@ -452,6 +458,12 @@ object Terrarum : Game() {
     }
 
     override fun resize(width: Int, height: Int) {
+        var width = maxOf(width, WIDTH_MIN)
+        var height = maxOf(height, HEIGHT_MIN)
+
+        if (width % 2 == 1) width += 1
+        if (height % 2 == 1) height += 1
+
         screenW = width
         screenH = height
 
@@ -466,7 +478,10 @@ object Terrarum : Game() {
         fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
 
 
-        super.screen.resize(WIDTH, HEIGHT)
+        super.resize(width, height)
+        //Gdx.graphics.setWindowedMode(width, height)
+
+        println("newsize: ${Gdx.graphics.width}x${Gdx.graphics.height}")
     }
 
 
@@ -658,10 +673,6 @@ object Terrarum : Game() {
         get() = Gdx.input.x
     inline val mouseScreenY: Int
         get() = Gdx.input.y
-
-
-
-
 }
 
 inline fun SpriteBatch.inUse(action: (SpriteBatch) -> Unit) {

@@ -158,13 +158,13 @@ class GameWorld(val width: Int, val height: Int) {
     fun setTileWall(x: Int, y: Int, tile: Byte, damage: Int) {
         layerWall.setTile(x fmod width, y, tile)
         layerWallLowBits.setData(x fmod width, y, damage)
-        wallDamages.remove(LandUtil.getBlockAddr(x, y))
+        wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
     }
 
     fun setTileTerrain(x: Int, y: Int, tile: Byte, damage: Int) {
         layerTerrain.setTile(x fmod width, y, tile)
         layerTerrainLowBits.setData(x fmod width, y, damage)
-        terrainDamages.remove(LandUtil.getBlockAddr(x, y))
+        terrainDamages.remove(LandUtil.getBlockAddr(this, x, y))
     }
 
     fun setTileWire(x: Int, y: Int, tile: Byte) {
@@ -235,7 +235,7 @@ class GameWorld(val width: Int, val height: Int) {
      */
     fun inflictTerrainDamage(x: Int, y: Int, damage: Double): Boolean {
         val damage = damage.toFloat()
-        val addr = LandUtil.getBlockAddr(x, y)
+        val addr = LandUtil.getBlockAddr(this, x, y)
 
         //println("[GameWorld] ($x, $y) Damage: $damage")
 
@@ -260,14 +260,14 @@ class GameWorld(val width: Int, val height: Int) {
         return false
     }
     fun getTerrainDamage(x: Int, y: Int): Float =
-            terrainDamages[LandUtil.getBlockAddr(x, y)] ?: 0f
+            terrainDamages[LandUtil.getBlockAddr(this, x, y)] ?: 0f
 
     /**
      * @return true if block is broken
      */
     fun inflictWallDamage(x: Int, y: Int, damage: Double): Boolean {
         val damage = damage.toFloat()
-        val addr = LandUtil.getBlockAddr(x, y)
+        val addr = LandUtil.getBlockAddr(this, x, y)
 
         if (wallDamages[addr] == null) { // add new
             wallDamages[addr] = damage
@@ -288,7 +288,7 @@ class GameWorld(val width: Int, val height: Int) {
         return false
     }
     fun getWallDamage(x: Int, y: Int): Float =
-            wallDamages[LandUtil.getBlockAddr(x, y)] ?: 0f
+            wallDamages[LandUtil.getBlockAddr(this, x, y)] ?: 0f
 
 
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {

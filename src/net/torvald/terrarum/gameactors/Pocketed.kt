@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.Gdx
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 
@@ -27,7 +28,7 @@ interface Pocketed {
         }
 
         inventory.itemEquipped[item.equipPosition] = null
-        item.effectOnUnequip(Gdx.graphics.deltaTime)
+        item.effectOnUnequip(Terrarum.deltaTime)
     }
 
     // no need for equipSlot(Int)
@@ -49,7 +50,7 @@ interface Pocketed {
 
         if (item.equipPosition >= 0) {
             inventory.itemEquipped[item.equipPosition] = item
-            item.effectWhenEquipped(Gdx.graphics.deltaTime)
+            item.effectWhenEquipped(Terrarum.deltaTime)
         }
         // else do nothing
     }
@@ -68,13 +69,13 @@ interface Pocketed {
 
 
     fun consumePrimary(item: GameItem) {
-        if (item.primaryUse(Gdx.graphics.deltaTime)) {
+        if (item.primaryUse(Terrarum.deltaTime)) {
             inventory.consumeItem(this as Actor, item) // consume on successful
         }
     }
 
     fun consumeSecondary(item: GameItem) {
-        if (item.secondaryUse(Gdx.graphics.deltaTime))
+        if (item.secondaryUse(Terrarum.deltaTime))
             inventory.consumeItem(this as Actor, item) // consume on successful
     }
 }

@@ -1,7 +1,9 @@
 package net.torvald.terrarum.gameactors.ai
 
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.HumanoidNPC
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaInteger
@@ -45,7 +47,7 @@ class LuaAIWrapper(private val scriptPath: String) : ActorAI {
         luaInstance.call()
     }
 
-    override fun update(delta: Float) {
+    override fun update(actor: HumanoidNPC, delta: Float) {
         // run "update()" function in the script
         luag.get("update").call(delta.toLua())
     }

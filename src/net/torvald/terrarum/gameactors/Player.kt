@@ -1,5 +1,7 @@
 package net.torvald.terrarum.gameactors
 
+import net.torvald.terrarum.gameworld.GameWorld
+
 
 /**
  * Game player (YOU!)
@@ -7,7 +9,7 @@ package net.torvald.terrarum.gameactors
  * Created by minjaesong on 15-12-31.
  */
 
-class Player(born: GameDate) : ActorHumanoid(born) {
+class Player(world: GameWorld, born: GameDate) : ActorHumanoid(world, born) {
 
     companion object {
         @Transient const val PLAYER_REF_ID: Int = 0x91A7E2
