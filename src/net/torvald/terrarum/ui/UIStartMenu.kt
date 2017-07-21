@@ -13,7 +13,8 @@ class UIStartMenu : UICanvas() {
                 "MENU_OPTIONS",
                 "MENU_MODULES",
                 "MENU_LABEL_LANGUAGE",
-                "MENU_LABEL_EXIT"
+                "MENU_LABEL_CREDITS",
+                "MENU_LABEL_QUIT"
         )
 
         val menubarOffY: Int; get() = Terrarum.HEIGHT / 2 - (Terrarum.fontGame.lineHeight * 1.5).toInt()
@@ -23,7 +24,6 @@ class UIStartMenu : UICanvas() {
 
     override var width: Int = 240
     override var height: Int = 40 * menuLabels.size.plus(1)
-    override var handler: UIHandler? = null
     override var openCloseTime = 0f
 
 
@@ -45,7 +45,7 @@ class UIStartMenu : UICanvas() {
 
 
         // attach listeners
-        menubar.buttons[menuLabels.indexOf("MENU_LABEL_EXIT")].clickOnceListener = { _, _, _ -> System.exit(0) }
+        menubar.buttons[menuLabels.indexOf("MENU_LABEL_QUIT")].clickOnceListener = { _, _, _ -> System.exit(0) }
     }
 
     override fun update(delta: Float) {

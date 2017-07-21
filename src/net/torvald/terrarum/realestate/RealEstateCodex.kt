@@ -1,5 +1,6 @@
 package net.torvald.terrarum.realestate
 
+import net.torvald.terrarum.gameworld.GameWorld
 import java.util.*
 
 /**
@@ -13,14 +14,14 @@ object RealEstateCodex {
      */
     private var ownershipRegistry: HashMap<Long, Int> = HashMap()
 
-    fun setOwner(tileX: Int, tileY: Int, refID: Int) {
-        ownershipRegistry[LandUtil.getBlockAddr(tileX, tileY)] = refID
+    fun setOwner(world: GameWorld, tileX: Int, tileY: Int, refID: Int) {
+        ownershipRegistry[LandUtil.getBlockAddr(world, tileX, tileY)] = refID
     }
 
-    fun removeOwner(tileX: Int, tileY: Int) {
-        ownershipRegistry.remove(LandUtil.getBlockAddr(tileX, tileY))
+    fun removeOwner(world: GameWorld, tileX: Int, tileY: Int) {
+        ownershipRegistry.remove(LandUtil.getBlockAddr(world, tileX, tileY))
     }
 
-    fun getOwner(tileX: Int, tileY: Int): Int? =
-            ownershipRegistry[LandUtil.getBlockAddr(tileX, tileY)]
+    fun getOwner(world: GameWorld, tileX: Int, tileY: Int): Int? =
+            ownershipRegistry[LandUtil.getBlockAddr(world, tileX, tileY)]
 }

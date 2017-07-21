@@ -19,11 +19,10 @@ class UIPieMenu : UICanvas() {
     private val slotCount = UIQuickBar.SLOT_COUNT
 
     private val slotDistanceFromCentre: Double
-            get() = cellSize * 2.7 * handler!!.scale
+            get() = cellSize * 2.8 * handler.scale
     override var width: Int = cellSize * 7
     override var height: Int = width
 
-    override var handler: UIHandler? = null
 
     /**
      * In milliseconds
@@ -35,16 +34,14 @@ class UIPieMenu : UICanvas() {
     var selection: Int = -1
 
     override fun update(delta: Float) {
-        if (Terrarum.ingame!!.player != null) {
-            if (selection >= 0)
-                Terrarum.ingame!!.player!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
-                        selection % slotCount
-        }
+        if (selection >= 0)
+            Terrarum.ingame!!.player.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
+                    selection % slotCount
 
 
         // update controls
-        if (handler!!.isOpened || handler!!.isOpening) {
-            val cursorPos = Vector2(Terrarum.mouseX, Terrarum.mouseY)
+        if (handler.isOpened || handler.isOpening) {
+            val cursorPos = Vector2(Terrarum.mouseScreenX.toDouble(), Terrarum.mouseScreenY.toDouble())
             val centre = Vector2(Terrarum.HALFW.toDouble(), Terrarum.HALFH.toDouble())
             val deg = -(centre - cursorPos).direction.toFloat()
 
@@ -60,7 +57,7 @@ class UIPieMenu : UICanvas() {
         for (i in 0..slotCount - 1) {
             // set position
             val angle = Math.PI * 2.0 * (i.toDouble() / slotCount) + Math.PI // 180 deg monitor-wise
-            val slotCentrePoint = Vector2(0.0, slotDistanceFromCentre).setDirection(-angle)// + centrePoint
+            val slotCentrePoint = Vector2(0.0, slotDistanceFromCentre).setDirection(-angle) // NOTE: NOT a center of circle!
 
             // draw cells
             val image = if (i == selection)
@@ -70,10 +67,10 @@ class UIPieMenu : UICanvas() {
 
             val slotSize = image.width
 
-            val slotX = slotCentrePoint.x.toFloat() - (slotSize / 2) + Terrarum.HALFW
-            val slotY = slotCentrePoint.y.toFloat() - (slotSize / 2) + Terrarum.HALFH
+            val slotX = slotCentrePoint.x.toFloat() - (slotSize / 2)
+            val slotY = slotCentrePoint.y.toFloat() - (slotSize / 2)
 
-            batch.color = Color(1f, 1f, 1f, handler!!.opacity * UIQuickBar.finalOpacity)
+            batch.color = Color(1f, 1f, 1f, handler.opacity * UIQuickBar.finalOpacity)
             batch.draw(
                     image,
                     slotX,
@@ -82,14 +79,14 @@ class UIPieMenu : UICanvas() {
 
 
             // draw item
-            val itemPair = Terrarum.ingame!!.player!!.inventory.getQuickBar(i)
+            val itemPair = Terrarum.ingame!!.player.inventory.getQuickBar(i)
 
             if (itemPair != null) {
                 val itemImage = ItemCodex.getItemImage(itemPair.item)
                 val itemW = itemImage.regionWidth
                 val itemH = itemImage.regionHeight
 
-                batch.color = Color(1f, 1f, 1f, handler!!.opacity)
+                batch.color = Color(1f, 1f, 1f, handler.opacity)
                 batch.draw(
                         itemImage, // using fixed CELL_SIZE for reasons
                         slotX + (CELL_SIZE - itemW) / 2f,
@@ -101,22 +98,22 @@ class UIPieMenu : UICanvas() {
 
     override fun doOpening(delta: Float) {
         UICanvas.doOpeningFade(handler, openCloseTime)
-        handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
+        handler.scale = smallenSize + (1f.minus(smallenSize) * handler.opacity)
     }
 
     override fun doClosing(delta: Float) {
         UICanvas.doClosingFade(handler, openCloseTime)
-        handler!!.scale = smallenSize + (1f.minus(smallenSize) * handler!!.opacity)
+        handler.scale = smallenSize + (1f.minus(smallenSize) * handler.opacity)
     }
 
     override fun endOpening(delta: Float) {
         UICanvas.endOpeningFade(handler)
-        handler!!.scale = 1f
+        handler.scale = 1f
     }
 
     override fun endClosing(delta: Float) {
         UICanvas.endClosingFade(handler)
-        handler!!.scale = 1f
+        handler.scale = 1f
     }
 
     override fun dispose() {

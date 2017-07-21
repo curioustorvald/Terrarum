@@ -2,6 +2,7 @@ package net.torvald.terrarum.gameactors
 
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.WorldTime
 
 typealias AnyPlayer = HistoricalFigure
@@ -15,10 +16,12 @@ typealias AnyPlayer = HistoricalFigure
  * Created by minjaesong on 16-10-10.
  */
 open class HistoricalFigure(
+        world: GameWorld,
         val born: GameDate,
         val dead: GameDate? = null,
-        realAirFriction: Boolean = false
-) : ActorWithPhysics(Actor.RenderOrder.MIDDLE, realAirFriction) {
+        realAirFriction: Boolean = false,
+        usePhysics: Boolean = true
+) : ActorWithPhysics(world, Actor.RenderOrder.MIDDLE, realAirFriction, usePhysics) {
 
     var historicalFigureIdentifier: Int = generateHistoricalFigureIdentifier()
         internal set

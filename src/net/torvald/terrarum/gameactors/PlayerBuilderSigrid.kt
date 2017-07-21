@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -14,7 +15,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 object PlayerBuilderSigrid {
 
     operator fun invoke(): Player {
-        val p = Player(GameDate(-2147483648, 0)) // XD
+        val p = Player(Terrarum.ingame!!.world, GameDate(-2147483648, 0)) // XD
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
         p.historicalFigureIdentifier = 0x51621D // the only constant of this procedural universe

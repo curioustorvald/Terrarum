@@ -15,12 +15,7 @@ class UITextTerminal(val terminal: Terminal) : UICanvas() {
     override var width: Int = terminal.displayW// + some
     override var height: Int = terminal.displayH// + frame
 
-   
 
-    /**
-     * Usage: (in StateInGame:) uiHandlerField.ui.handler = uiHandlerField
-     */
-    override var handler: UIHandler? = null
 
     /**
      * In milliseconds
@@ -38,25 +33,25 @@ class UITextTerminal(val terminal: Terminal) : UICanvas() {
     }
 
     /**
-     * Do not modify handler!!.openCloseCounter here.
+     * Do not modify handler.openCloseCounter here.
      */
     override fun doOpening(delta: Float) {
     }
 
     /**
-     * Do not modify handler!!.openCloseCounter here.
+     * Do not modify handler.openCloseCounter here.
      */
     override fun doClosing(delta: Float) {
     }
 
     /**
-     * Do not modify handler!!.openCloseCounter here.
+     * Do not modify handler.openCloseCounter here.
      */
     override fun endOpening(delta: Float) {
     }
 
     /**
-     * Do not modify handler!!.openCloseCounter here.
+     * Do not modify handler.openCloseCounter here.
      */
     override fun endClosing(delta: Float) {
     }

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
@@ -23,12 +24,9 @@ class UIQuickBar : UICanvas() {
     private val startPointX = ItemSlotImageBuilder.slotLarge.width / 2
     private val startPointY = ItemSlotImageBuilder.slotLarge.height / 2
 
-    override var handler: UIHandler? = null
-
     private var selection: Int
-        get() = Terrarum.ingame!!.player?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
-        set(value) { Terrarum.ingame!!.player?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
-
+        get() = Terrarum.ingame!!.player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
+        set(value) { Terrarum.ingame!!.player.actorValue.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
     
     override fun update(delta: Float) {
     }
@@ -45,7 +43,7 @@ class UIQuickBar : UICanvas() {
             val slotY = startPointY.toFloat()
 
             // draw slots
-            batch.color = Color(1f, 1f, 1f, handler!!.opacity * finalOpacity)
+            batch.color = Color(1f, 1f, 1f, handler.opacity * finalOpacity)
             batch.draw(
                     image,
                     slotX,
@@ -53,14 +51,14 @@ class UIQuickBar : UICanvas() {
             )
 
             // draw item
-            val itemPair = Terrarum.ingame!!.player!!.inventory.getQuickBar(i)
+            val itemPair = Terrarum.ingame!!.player.inventory.getQuickBar(i)
 
             if (itemPair != null) {
                 val itemImage = ItemCodex.getItemImage(itemPair.item)
                 val itemW = itemImage.regionWidth
                 val itemH = itemImage.regionHeight
 
-                batch.color = Color(1f, 1f, 1f, handler!!.opacity)
+                batch.color = Color(1f, 1f, 1f, handler.opacity)
                 batch.draw(
                         itemImage, // using fixed CELL_SIZE for reasons
                         slotX + (CELL_SIZE - itemW) / 2f,
@@ -72,25 +70,43 @@ class UIQuickBar : UICanvas() {
 
 
     override fun doOpening(delta: Float) {
-        handler!!.opacity = handler!!.openCloseCounter.toFloat() / openCloseTime
+        handler.opacity = handler.openCloseCounter.toFloat() / openCloseTime
     }
 
     override fun doClosing(delta: Float) {
-        handler!!.opacity = (openCloseTime - handler!!.openCloseCounter.toFloat()) / openCloseTime
+        handler.opacity = (openCloseTime - handler.openCloseCounter.toFloat()) / openCloseTime
     }
 
     override fun endOpening(delta: Float) {
-        handler!!.opacity = 1f
+        handler.opacity = 1f
     }
 
     override fun endClosing(delta: Float) {
-        handler!!.opacity = 0f
+        handler.opacity = 0f
     }
 
     override fun scrolled(amount: Int): Boolean {
-        super.scrolled(amount)
+        // super.scrolled(amount) // no UIItems here
 
         selection = selection.plus(if (amount > 1) 1 else if (amount < -1) -1 else 0).fmod(SLOT_COUNT)
+
+        return true
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        selection = when (keycode) {
+            Input.Keys.NUM_1 -> 0
+            Input.Keys.NUM_2 -> 1
+            Input.Keys.NUM_3 -> 2
+            Input.Keys.NUM_4 -> 3
+            Input.Keys.NUM_5 -> 4
+            Input.Keys.NUM_6 -> 5
+            Input.Keys.NUM_7 -> 6
+            Input.Keys.NUM_8 -> 7
+            Input.Keys.NUM_9 -> 8
+            Input.Keys.NUM_0 -> 9
+            else -> return false
+        }
 
         return true
     }

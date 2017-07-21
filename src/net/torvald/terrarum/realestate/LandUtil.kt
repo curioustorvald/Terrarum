@@ -3,16 +3,17 @@ package net.torvald.terrarum.realestate
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.FactionCodex
 import net.torvald.terrarum.gameworld.BlockAddress
+import net.torvald.terrarum.gameworld.GameWorld
 
 /**
  * Created by minjaesong on 16-03-27.
  */
 object LandUtil {
-    fun getBlockAddr(x: Int, y: Int): BlockAddress =
-            (Terrarum.ingame!!.world.width * y).toLong() + x
+    fun getBlockAddr(world: GameWorld, x: Int, y: Int): BlockAddress =
+            (world.width * y).toLong() + x
 
-    fun resolveBlockAddr(t: BlockAddress): Pair<Int, Int> =
-            Pair((t % Terrarum.ingame!!.world.width).toInt(), (t / Terrarum.ingame!!.world.width).toInt())
+    fun resolveBlockAddr(world: GameWorld, t: BlockAddress): Pair<Int, Int> =
+            Pair((t % world.width).toInt(), (t / world.width).toInt())
 
     /**
      * Get owner ID as an Actor/Faction

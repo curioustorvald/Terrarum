@@ -3,12 +3,13 @@ package net.torvald.terrarum.gameactors
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
 
 /**
  * Created by minjaesong on 16-03-05.
  */
-class PhysTestBall : ActorWithPhysics(Actor.RenderOrder.MIDDLE, immobileBody = true) {
+class PhysTestBall(world: GameWorld) : ActorWithPhysics(world, Actor.RenderOrder.MIDDLE, immobileBody = true) {
 
     private var color = Color.GOLD
 

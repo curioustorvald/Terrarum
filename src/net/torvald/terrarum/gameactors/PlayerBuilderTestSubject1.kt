@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors
 
 import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -9,7 +10,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 object PlayerBuilderTestSubject1 {
     operator fun invoke(): Player {
-        val p: Player = Player(GameDate(100, 143)) // random value thrown
+        val p: Player = Player(Terrarum.ingame!!.world, GameDate(100, 143)) // random value thrown
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
 

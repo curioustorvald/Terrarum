@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 class NullUI : UICanvas() {
     override var width: Int = 0
     override var height: Int = 0
-    override var handler: UIHandler? = null
     override var openCloseTime = 0f
 
     override fun update(delta: Float) {
