@@ -17,6 +17,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ----
 
+*Terrarum Sans Bitmap*
+
+Copyright (c) 2017 Minjae Song (Torvald) and the contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+----
+
 *Simplex Noise Generator*, version 2012-03-09 by Stefan Gustavson
 
 Released as public domain
@@ -64,7 +88,7 @@ Copyright (C) 2011 Joshua Tippetts
 
 ----
 
-*Vector2*
+*Vector2.java*, *Epsilon.java*
 
 Copyright (c) 2010-2015 William Bittle  http://www.dyn4j.org/
 All rights reserved.

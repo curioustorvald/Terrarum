@@ -227,6 +227,12 @@ open class ActorHumanoid(
                              Terrarum.controller!!.isButtonPressed(GAMEPAD_JUMP)
             }
         }
+        else {
+            isUpDown = axisY < 0f
+            isDownDown = axisY > 0f
+            isLeftDown = axisX < 0f
+            isRightDown = axisX > 0f
+        }
     }
 
     private inline val hasController: Boolean
@@ -376,6 +382,13 @@ open class ActorHumanoid(
      * @author minjaesong
      */
     private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
+
+
+        if (avAcceleration.isNaN()) {
+            throw Error("avAccelation is NaN")
+        }
+
+
         if (left && walledLeft || !left && walledRight) return
 
 
@@ -383,18 +396,19 @@ open class ActorHumanoid(
                 if (absAxisVal == AXIS_KEYBOARD)
                     avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f)
                 else
-                    avAcceleration * (if (left) -1f else 1f) * absAxisVal
+                    avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f) * absAxisVal
 
         if (absAxisVal != AXIS_KEYBOARD)
             controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal) }
         else
             controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
 
-        if (absAxisVal == AXIS_KEYBOARD) {
-            walkCounterX += 1
+        if (walkCounterX < 1000000) {
+          walkCounterX += 1
         }
 
         isWalkingH = true
+
 
 
         // Heading flag
@@ -411,18 +425,23 @@ open class ActorHumanoid(
         if (up && walledTop || !up && walledBottom) return
 
 
+        if (avAcceleration.isNaN()) {
+            throw Error("avAccelation is NaN")
+        }
+
+
         readonly_totalY =
                 if (absAxisVal == AXIS_KEYBOARD)
                     avAcceleration * applyVelo(walkCounterY) * (if (up) -1f else 1f)
                 else
-                    avAcceleration * (if (up) -1f else 1f) * absAxisVal
+                    avAcceleration * applyVelo(walkCounterY) * (if (up) -1f else 1f) * absAxisVal
 
         if (absAxisVal != AXIS_KEYBOARD)
             controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap * absAxisVal) }
         else
             controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap) }
 
-        if (absAxisVal == AXIS_KEYBOARD) {
+        if (walkCounterY < 1000000) {
             walkCounterY += 1
         }
 
