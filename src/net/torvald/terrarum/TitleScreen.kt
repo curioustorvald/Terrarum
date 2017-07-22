@@ -1,22 +1,23 @@
 package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.jme3.math.FastMath
+import net.torvald.random.HQRNG
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ai.ActorAI
-import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.ReadLayerData
-import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIHandler
-import net.torvald.terrarum.ui.UIStartMenu
+import net.torvald.terrarum.ui.UITitleRemoConRoot
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -47,11 +48,44 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     private var loadDone = false
 
     private lateinit var demoWorld: GameWorld
+    private lateinit var cameraNodes: FloatArray // camera Y-pos
     private val cameraAI = object : ActorAI {
+        private val axisMax = 1f
+
         override fun update(actor: HumanoidNPC, delta: Float) {
+            // fuck
+            val avSpeed = 0.66 // FIXME camera goes faster when FPS is high
+            actor.actorValue[AVKey.SPEED] = avSpeed
+            actor.actorValue[AVKey.ACCEL] = avSpeed / 5.0
+
+
+
+            val tileSize = FeaturesDrawer.TILE_SIZE.toFloat()
+            val catmullRomTension = 1f
+
             // pan camera
-            //actor.moveRight() // why no work?
-            actor.controllerMoveDelta!!.x = 0.5
+            actor.moveRight(axisMax)
+
+
+            val domainSize = demoWorld.width * tileSize
+            val codomainSize = cameraNodes.size
+            val x = actor.hitbox.canonicalX.toFloat()
+
+            val p1 = (x / (domainSize / codomainSize)).floorInt()
+            val p0 = (p1 - 1) fmod codomainSize
+            val p2 = (p1 + 1) fmod codomainSize
+            val p3 = (p1 + 2) fmod codomainSize
+            val u: Float = 1f - (p2 - (x / (domainSize / codomainSize))) / (p2 - p1)
+
+            val targetYPos = FastMath.interpolateCatmullRom(u, catmullRomTension, cameraNodes[p0], cameraNodes[p1], cameraNodes[p2], cameraNodes[p3])
+            val yDiff = targetYPos - actor.hitbox.canonicalY
+
+            actor.moveDown(yDiff.bipolarClamp(axisMax.toDouble()).toFloat())
+
+
+            println("${actor.hitbox.canonicalX}, ${actor.hitbox.canonicalY}")
+
+            //actor.hitbox.setPosition(actor.hitbox.canonicalX, yPos.toDouble())
         }
     }
     private lateinit var cameraPlayer: HumanoidNPC
@@ -72,15 +106,26 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         demoWorld = ReadLayerData(FileInputStream(ModMgr.getFile("basegame", "demoworld")))
 
 
+        // construct camera nodes
+        val nodeCount = 150
+        cameraNodes = kotlin.FloatArray(nodeCount, { it ->
+            val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorInt()
+            var travelDownCounter = 0
+            while (!BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid) {
+                travelDownCounter += 4
+            }
+            travelDownCounter * FeaturesDrawer.TILE_SIZE.toFloat()
+        })
+
+
         cameraPlayer = object : HumanoidNPC(demoWorld, cameraAI, GameDate(1, 1), usePhysics = false) {
             init {
                 setHitboxDimension(2, 2, 0, 0)
                 hitbox.setPosition(
-                        demoWorld.spawnX * FeaturesDrawer.TILE_SIZE.toDouble(),
+                        HQRNG().nextInt(demoWorld.width) * FeaturesDrawer.TILE_SIZE.toDouble(),
                         (demoWorld.height / 3) * 0.75 * FeaturesDrawer.TILE_SIZE.toDouble()//demoWorld.spawnY * FeaturesDrawer.TILE_SIZE.toDouble()
                 )
-                actorValue[AVKey.SPEED] = 1.0
-                actorValue[AVKey.ACCEL] = 1.0
+                noClip = true
             }
         }
 
@@ -92,8 +137,8 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         FeaturesDrawer.world = demoWorld
 
 
-        uiMenu = UIHandler(UIStartMenu())
-        uiMenu.setPosition(0, UIStartMenu.menubarOffY)
+        uiMenu = UIHandler(UITitleRemoConRoot())
+        uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
         uiMenu.setAsOpen()
 
 
@@ -271,7 +316,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         COPYTING.forEachIndexed { index, s ->
             val textWidth = Terrarum.fontGame.getWidth(s)
             Terrarum.fontGame.draw(batch, s,
-                    Terrarum.WIDTH - textWidth - 1f - 0.667f,
+                    Terrarum.WIDTH - textWidth - 1f - 0.2f,
                     Terrarum.HEIGHT - Terrarum.fontGame.lineHeight * (COPYTING.size - index) - 1f
             )
         }
@@ -291,7 +336,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         if (loadDone) {
             // resize UI by re-creating it (!!)
             uiMenu.UI.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
-            uiMenu.setPosition(0, UIStartMenu.menubarOffY)
+            uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
         }
 
         lightmapFboA.dispose()

@@ -155,7 +155,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
      */
 
     private inline val grounded: Boolean
-        get() = isPlayerNoClip ||
+        get() = isNoClip ||
                 (world.gravitation.y > 0 && isWalled(hitbox, COLLIDING_BOTTOM) ||
                  world.gravitation.y < 0 && isWalled(hitbox, COLLIDING_TOP))
     /** Default to 'true'  */
@@ -328,9 +328,9 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
 
             // make NoClip work for player
             if (this is Player) {
-                isNoSubjectToGrav = isPlayerNoClip || COLLISION_TEST_MODE
-                isNoCollideWorld = isPlayerNoClip
-                isNoSubjectToFluidResistance = isPlayerNoClip
+                isNoSubjectToGrav = isNoClip || COLLISION_TEST_MODE
+                isNoCollideWorld = isNoClip
+                isNoSubjectToFluidResistance = isNoClip
             }
 
             if (!usePhysics) {
@@ -416,7 +416,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
 
                 // FIXME asymmetry on friction
                 setHorizontalFriction() // friction SHOULD use and alter externalForce
-                //if (isPlayerNoClip) { // TODO also hanging on the rope, etc.
+                //if (isNoClip) { // TODO also hanging on the rope, etc.
                     setVerticalFriction()
                 //}
 
@@ -940,7 +940,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
     /** about stopping
      * for about get moving, see updateMovementControl */
     private fun setHorizontalFriction() {
-        val friction = if (isPlayerNoClip)
+        val friction = if (isNoClip)
             BASE_FRICTION * BlockCodex[Block.STONE].friction.frictionToMult()
         else {
             // TODO status quo if !submerged else linearBlend(feetFriction, bodyFriction, submergedRatio)
@@ -969,7 +969,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
     }
 
     private fun setVerticalFriction() {
-        val friction = if (isPlayerNoClip)
+        val friction = if (isNoClip)
             BASE_FRICTION * BlockCodex[Block.STONE].friction.frictionToMult()
         else
             BASE_FRICTION * bodyFriction
@@ -1003,7 +1003,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         val fluidDensity = tileDensity
         val submergedVolume = submergedVolume
 
-        if (!isPlayerNoClip && !grounded) {
+        if (!isNoClip && !grounded) {
             // System.out.println("density: "+density);
             veloY -= ((fluidDensity - this.density).toDouble()
                     * map.gravitation.toDouble() * submergedVolume.toDouble()
@@ -1089,7 +1089,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
      * for about stopping, see setHorizontalFriction */
     internal inline val accelMultMovement: Double
         get() {
-            if (!isPlayerNoClip) {
+            if (!isNoSubjectToFluidResistance && !isNoSubjectToGrav && !isNoCollideWorld) {
                 val notSubmergedAccel = if (grounded)
                     feetFriction
                 else
@@ -1259,8 +1259,8 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
             if (x < 0) 0 else if (x >= world.height) world.height - 1 else x
 
 
-    private val isPlayerNoClip: Boolean
-        get() = this is Player && this.isNoClip()
+    private val isNoClip: Boolean
+        get() = this is ActorHumanoid && this.isNoClip()
 
     private val AUTO_CLIMB_RATE: Int
         get() = Math.min(TILE_SIZE / 8 * Math.sqrt(scale), TILE_SIZE.toDouble()).toInt()
@@ -1272,7 +1272,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
 
         // warnings
         if (sprite == null && isVisible)
-            println("[ActorWithPhysics] Caution: actor ${this.javaClass.simpleName} is echo but the sprite was not set.")
+            println("[ActorWithPhysics] Caution: actor ${this.javaClass.simpleName} is visible but the sprite was not set.")
         else if (sprite != null && !isVisible)
             println("[ActorWithPhysics] Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
 
