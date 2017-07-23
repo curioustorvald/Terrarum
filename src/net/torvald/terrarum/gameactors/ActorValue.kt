@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.KVHashMap
 
 /**
- * Created by SKYHi14 on 2017-04-28.
+ * Created by minjaesong on 2017-04-28.
  */
 class ActorValue(val actor: Actor) : KVHashMap() {
 

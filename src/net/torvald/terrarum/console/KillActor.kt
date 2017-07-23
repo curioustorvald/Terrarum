@@ -4,7 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.langpack.Lang
 
 /**
- * Created by SKYHi14 on 2017-01-31.
+ * Created by minjaesong on 2017-01-31.
  */
 internal object KillActor : ConsoleCommand {
     override fun execute(args: Array<String>) {

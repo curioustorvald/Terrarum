@@ -3,7 +3,7 @@ package net.torvald.terrarum.console
 import net.torvald.terrarum.swingapp.IMStringReader
 
 /**
- * Created by SKYHi14 on 2017-02-05.
+ * Created by minjaesong on 2017-02-05.
  */
 
 internal object JavaIMTest : ConsoleCommand {

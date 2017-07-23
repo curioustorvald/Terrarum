@@ -26,7 +26,7 @@ import javax.script.Invocable
  *         is readily available, ditch that Groovy.
  *
  *
- * Created by SKYHi14 on 2017-04-17.
+ * Created by minjaesong on 2017-04-17.
  */
 object ModMgr {
 

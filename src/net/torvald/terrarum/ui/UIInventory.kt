@@ -17,7 +17,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
 /**
- * Created by SKYHi14 on 2017-03-13.
+ * Created by minjaesong on 2017-03-13.
  */
 class UIInventory(
         var actor: Pocketed?,

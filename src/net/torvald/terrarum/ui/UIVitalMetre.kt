@@ -9,7 +9,7 @@ import net.torvald.terrarum.gameactors.ActorHumanoid
 import net.torvald.terrarum.gameactors.Second
 
 /**
- * Created by SKYHi14 on 2017-03-03.
+ * Created by minjaesong on 2017-03-03.
  */
 class UIVitalMetre(
         var player: ActorHumanoid,

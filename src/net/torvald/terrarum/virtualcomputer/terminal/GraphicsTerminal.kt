@@ -10,7 +10,7 @@ import java.util.*
  * Printing text using Term API triggers 'compatibility' mode, where you are limited to 16 colours.
  * Use PPU API for full 64 colours!
  *
- * Created by SKYHi14 on 2017-02-08.
+ * Created by minjaesong on 2017-02-08.
  */
 /*class GraphicsTerminal(private val host: TerrarumComputer) : Terminal {
     lateinit var videoCard: PeripheralVideoCard
