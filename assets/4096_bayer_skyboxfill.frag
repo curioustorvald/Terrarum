@@ -1,3 +1,6 @@
+#version 120
+
+
 varying vec4 v_color;
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
@@ -15,33 +18,34 @@ uniform float gcount = 64.0; // using 64: has less banding and most monitors are
 uniform float bcount = 64.0;
 
 
-int bayer[7][7] = {
-{32,42,10,27,37,5,15},
-{1,18,28,45,13,23,40},
-{26,36,4,14,31,48,9},
-{44,12,22,39,0,17,34},
-{20,30,47,8,25,35,3},
-{38,6,16,33,43,11,21},
-{7,24,41,2,19,29,46}
-}; // I kind of accidentally create it...
-float bayerSize = 7.0;
+/*int bayer[7 * 7] = int[](
+32,42,10,27,37,5,15,
+1,18,28,45,13,23,40,
+26,36,4,14,31,48,9,
+44,12,22,39,0,17,34,
+20,30,47,8,25,35,3,
+38,6,16,33,43,11,21,
+7,24,41,2,19,29,46
+); // I kind of accidentally create it...
+float bayerSize = 7.0;*/
 
-/*int bayer[9][9] = {
-{50,71,2,23,44,56,77,17,29},
-{72,12,33,45,66,6,18,39,60},
-{22,43,55,76,16,28,49,70,1},
-{53,65,5,26,38,59,80,11,32},
-{75,15,27,48,69,0,21,42,54},
-{25,37,58,79,10,31,52,64,4},
-{47,68,8,20,41,62,74,14,35},
-{78,9,30,51,63,3,24,36,57},
-{19,40,61,73,13,34,46,67,7}
-};
-float bayerSize = 9.0;*/
+int bayer[9 * 9] = int[](
+50,71,2,23,44,56,77,17,29,
+72,12,33,45,66,6,18,39,60,
+22,43,55,76,16,28,49,70,1,
+53,65,5,26,38,59,80,11,32,
+75,15,27,48,69,0,21,42,54,
+25,37,58,79,10,31,52,64,4,
+47,68,8,20,41,62,74,14,35,
+78,9,30,51,63,3,24,36,57,
+19,40,61,73,13,34,46,67,7
+); // I kind of accidentally create it...
+float bayerSize = 9.0;
 
 
 
 float bayerDivider = bayerSize * bayerSize;
+
 
 vec4 nearestColour(vec4 incolor) {
     vec4 rgbaCounts = vec4(rcount, gcount, bcount, 1.0);
@@ -71,7 +75,7 @@ void main(void) {
 
     vec2 entry = mod(gl_FragCoord.xy, vec2(bayerSize, bayerSize));
 
-    gl_FragColor = nearestColour(inColor + spread * (bayer[int(entry.y)][int(entry.x)] / bayerDivider - 0.5));
+    gl_FragColor = nearestColour(inColor + spread * (bayer[int(entry.y) * int(bayerSize) + int(entry.x)] / bayerDivider - 0.5));
 }
 
 /*
