@@ -14,15 +14,15 @@ import net.torvald.terrarum.itemproperties.ItemCodex
  */
 class UIQuickBar : UICanvas() {
     private val gutter = 8
-    override var width: Int = (ItemSlotImageBuilder.slotImage.width + gutter) * SLOT_COUNT
-    override var height: Int = ItemSlotImageBuilder.slotImage.height + 4 + Terrarum.fontGame.lineHeight.toInt()
+    override var width: Int = (ItemSlotImageBuilder.slotImage.tileW + gutter) * SLOT_COUNT
+    override var height: Int = ItemSlotImageBuilder.slotImage.tileH + 4 + Terrarum.fontGame.lineHeight.toInt()
     /**
      * In milliseconds
      */
     override var openCloseTime: Second = 0.16f
 
-    private val startPointX = ItemSlotImageBuilder.slotLarge.width / 2
-    private val startPointY = ItemSlotImageBuilder.slotLarge.height / 2
+    private val startPointX = ItemSlotImageBuilder.slotLarge.tileW / 2
+    private val startPointY = ItemSlotImageBuilder.slotLarge.tileH / 2
 
     private var selection: Int
         get() = Terrarum.ingame!!.player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0

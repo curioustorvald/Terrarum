@@ -105,6 +105,10 @@ object LightmapRenderer {
         }
     }
 
+    fun fireRecalculateEventtt() {
+
+    }
+
     fun fireRecalculateEvent() {
         for_x_start = WorldCamera.x / TILE_SIZE - 1 // fix for premature lightmap rendering
         for_y_start = WorldCamera.y / TILE_SIZE - 1 // on topmost/leftmost side
@@ -116,7 +120,7 @@ object LightmapRenderer {
          * * true: overscanning is limited to 8 tiles in width (overscan_opaque)
          * * false: overscanning will fully applied to 32 tiles in width (overscan_open)
          */
-        val rect_width = for_x_end - for_x_start
+        /*val rect_width = for_x_end - for_x_start
         val rect_height_rem_hbars = for_y_end - for_y_start - 2
         val noop_mask = BitSet(2 * (rect_width) +
                                2 * (rect_height_rem_hbars))
@@ -182,7 +186,7 @@ object LightmapRenderer {
             val isSolid = BlockCodex[tile].isSolid
 
             noop_mask.set(i, isSolid)
-        }
+        }*/
 
         /**
          * Updating order:
@@ -263,20 +267,32 @@ object LightmapRenderer {
         }
     }
 
+
+
+    private var ambientAccumulator = Color(0f,0f,0f,0f)
+    private var lightLevelThis = Color(0f,0f,0f,0f)
+    private var thisTerrain = 0
+    private var thisWall = 0
+    private var thisTileLuminosity = Color(0f,0f,0f,0f)
+    private var thisTileOpacity = Color(0f,0f,0f,0f)
+    private var sunLight = Color(0f,0f,0f,0f)
+
+
     private fun calculate(x: Int, y: Int, pass: Int): Color = calculate(x, y, pass, false)
 
     private fun calculate(x: Int, y: Int, pass: Int, doNotCalculateAmbient: Boolean): Color {
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
 
-        var ambientAccumulator = Color(0f,0f,0f,0f)
+        ambientAccumulator = Color(0f,0f,0f,0f)
 
-        var lightLevelThis: Color = Color(0f,0f,0f,0f)
-        val thisTerrain = world.getTileFromTerrain(x, y)
-        val thisWall = world.getTileFromWall(x, y)
-        val thisTileLuminosity = BlockCodex[thisTerrain].luminosity // already been div by four
-        val thisTileOpacity = BlockCodex[thisTerrain].opacity // already been div by four
-        val sunLight = world.globalLight.cpy().mul(DIV_FLOAT)
+        lightLevelThis = Color(0f,0f,0f,0f)
+        thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
+        thisWall = world.getTileFromWall(x, y) ?: Block.STONE
+        thisTileLuminosity = BlockCodex[thisTerrain].luminosity // already been div by four
+        thisTileOpacity = BlockCodex[thisTerrain].opacity // already been div by four
+        sunLight = world.globalLight.cpy().mul(DIV_FLOAT)
+
 
         // MIX TILE
         // open air

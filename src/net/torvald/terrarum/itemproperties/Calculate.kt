@@ -3,7 +3,7 @@ package net.torvald.terrarum.itemproperties
 import net.torvald.terrarum.gameactors.*
 
 /**
- * Created by SKYHi14 on 2017-04-17.
+ * Created by minjaesong on 2017-04-17.
  */
 object Calculate {
     /**

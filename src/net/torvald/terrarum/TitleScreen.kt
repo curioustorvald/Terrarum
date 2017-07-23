@@ -52,16 +52,19 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     private val cameraAI = object : ActorAI {
         private val axisMax = 1f
 
+        private var firstTime = true
+
         override fun update(actor: HumanoidNPC, delta: Float) {
             // fuck
-            val avSpeed = 0.66 // FIXME camera goes faster when FPS is high
+            val avSpeed = 1.0 // FIXME camera goes faster when FPS is high
             actor.actorValue[AVKey.SPEED] = avSpeed
-            actor.actorValue[AVKey.ACCEL] = avSpeed / 5.0
+            actor.actorValue[AVKey.ACCEL] = avSpeed / 6.0
+            // end fuck
 
 
 
             val tileSize = FeaturesDrawer.TILE_SIZE.toFloat()
-            val catmullRomTension = 1f
+            val catmullRomTension = -1f
 
             // pan camera
             actor.moveRight(axisMax)
@@ -80,12 +83,16 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             val targetYPos = FastMath.interpolateCatmullRom(u, catmullRomTension, cameraNodes[p0], cameraNodes[p1], cameraNodes[p2], cameraNodes[p3])
             val yDiff = targetYPos - actor.hitbox.canonicalY
 
-            actor.moveDown(yDiff.bipolarClamp(axisMax.toDouble()).toFloat())
+            if (!firstTime) {
+                actor.moveDown(yDiff.bipolarClamp(axisMax.toDouble()).toFloat())
+            }
+            else {
+                actor.hitbox.setPosition(actor.hitbox.canonicalX, targetYPos.toDouble())
+                firstTime = false
+            }
 
 
-            println("${actor.hitbox.canonicalX}, ${actor.hitbox.canonicalY}")
-
-            //actor.hitbox.setPosition(actor.hitbox.canonicalX, yPos.toDouble())
+            //println("${actor.hitbox.canonicalX}, ${actor.hitbox.canonicalY}")
         }
     }
     private lateinit var cameraPlayer: HumanoidNPC
@@ -107,7 +114,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
         // construct camera nodes
-        val nodeCount = 150
+        val nodeCount = 60
         cameraNodes = kotlin.FloatArray(nodeCount, { it ->
             val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorInt()
             var travelDownCounter = 0
@@ -123,13 +130,13 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
                 setHitboxDimension(2, 2, 0, 0)
                 hitbox.setPosition(
                         HQRNG().nextInt(demoWorld.width) * FeaturesDrawer.TILE_SIZE.toDouble(),
-                        (demoWorld.height / 3) * 0.75 * FeaturesDrawer.TILE_SIZE.toDouble()//demoWorld.spawnY * FeaturesDrawer.TILE_SIZE.toDouble()
+                        0.0 // placeholder; camera AI will take it over
                 )
                 noClip = true
             }
         }
 
-        demoWorld.time.timeDelta = 60
+        demoWorld.time.timeDelta = 150
 
 
         LightmapRenderer.world = demoWorld
@@ -164,14 +171,18 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     private var blurWriteBuffer = lightmapFboA
     private var blurReadBuffer = lightmapFboB
 
-    private val minimumIntroTime = 2.0f
-    private var deltaCounter = 0f
+    private val minimumIntroTime: Second = 2.0f
+    private val introUncoverTime: Second = 0.3f
+    private var showIntroDeltaCounter = 0f
+    private var introUncoverDeltaCounter = 0f
+    private var updateDeltaCounter = 0.0
+    protected val updateRate = 1.0 / Terrarum.TARGET_INTERNAL_FPS
 
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        if (!loadDone || deltaCounter < minimumIntroTime) {
+        if (!loadDone || showIntroDeltaCounter < minimumIntroTime) {
             // draw load screen
             Terrarum.shaderBayerSkyboxFill.begin()
             Terrarum.shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
@@ -195,52 +206,64 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             }
         }
         else {
-            demoWorld.globalLight = WeatherMixer.globalLightNow
-            demoWorld.updateWorldTime(delta)
-            WeatherMixer.update(delta, cameraPlayer)
-            cameraPlayer.update(delta)
-            // worldcamera update AFTER cameraplayer in this case; the other way is just an exception for actual ingame SFX
-            WorldCamera.update(demoWorld, cameraPlayer)
-
-
-            // update UIs //
-            uiContainer.forEach { it.update(delta) }
-
-
-            if (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1) {
-                LightmapRenderer.fireRecalculateEvent()
+            // async update
+            updateDeltaCounter += delta
+            while (updateDeltaCounter >= updateRate) {
+                updateScreen(delta)
+                updateDeltaCounter -= updateRate
             }
 
-
-            // render and blur lightmap
-            processBlur(LightmapRenderer.DRAW_FOR_RGB)
-            //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
-
-            // render world
-            batch.inUse {
-                setCameraPosition(0f, 0f)
-                batch.color = Color.WHITE
-                batch.shader = null
-                camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
-                camera.update()
-                batch.projectionMatrix = camera.combined
-                batch.color = Color.WHITE
-                blendNormal()
-
-
-
-                renderDemoWorld()
-
-                renderMenus()
-
-                renderOverlayTexts()
-            }
-
+            // render? just do it anyway
+            renderScreen()
         }
 
 
 
-        deltaCounter += delta
+        showIntroDeltaCounter += delta
+    }
+
+    fun updateScreen(delta: Float) {
+        demoWorld.globalLight = WeatherMixer.globalLightNow
+        demoWorld.updateWorldTime(delta)
+        WeatherMixer.update(delta, cameraPlayer)
+        cameraPlayer.update(delta)
+        // worldcamera update AFTER cameraplayer in this case; the other way is just an exception for actual ingame SFX
+        WorldCamera.update(demoWorld, cameraPlayer)
+
+
+        // update UIs //
+        uiContainer.forEach { it.update(delta) }
+
+
+        if (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1) {
+            LightmapRenderer.fireRecalculateEvent()
+        }
+    }
+
+    fun renderScreen() {
+        // render and blur lightmap
+        processBlur(LightmapRenderer.DRAW_FOR_RGB)
+        //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+
+        // render world
+        batch.inUse {
+            setCameraPosition(0f, 0f)
+            batch.color = Color.WHITE
+            batch.shader = null
+            camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
+            camera.update()
+            batch.projectionMatrix = camera.combined
+            batch.color = Color.WHITE
+            blendNormal()
+
+
+
+            renderDemoWorld()
+
+            renderMenus()
+
+            renderOverlayTexts()
+        }
     }
 
     private fun renderDemoWorld() {

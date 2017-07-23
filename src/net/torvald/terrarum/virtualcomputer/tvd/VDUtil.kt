@@ -8,7 +8,7 @@ import javax.naming.OperationNotSupportedException
 import kotlin.collections.ArrayList
 
 /**
- * Created by SKYHi14 on 2017-04-01.
+ * Created by minjaesong on 2017-04-01.
  */
 object VDUtil {
     class VDPath() {

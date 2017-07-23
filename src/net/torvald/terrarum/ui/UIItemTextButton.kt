@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 /**
  * Text button. Height of hitbox is extended (double lineHeight, or 40 px) for better clicking
  *
- * Created by SKYHi14 on 2017-03-13.
+ * Created by minjaesong on 2017-03-13.
  */
 open class UIItemTextButton(
         parentUI: UICanvas,

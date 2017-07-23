@@ -22,7 +22,7 @@ import javax.swing.*
  * Although admittedly, Korean input does not require this hack, you can just write the Input Method
  * out of Java/Kotlin as the language does not need conversion (jp. Henkan) exists in Chinese and Japanese.
  *
- * Created by SKYHi14 on 2017-02-05.
+ * Created by minjaesong on 2017-02-05.
  */
 class IMStringReader(feedInput: (String) -> Unit, message: String? = null) : JFrame() {
 

@@ -5,7 +5,7 @@ import kotlin.experimental.or
 /**
  * https://stackoverflow.com/questions/6162651/half-precision-floating-point-in-java#6162687
  *
- * Created by SKYHi14 on 2017-04-21.
+ * Created by minjaesong on 2017-04-21.
  */
 typealias Float16Bits = Short
 
