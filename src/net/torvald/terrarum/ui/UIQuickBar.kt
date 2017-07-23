@@ -21,8 +21,8 @@ class UIQuickBar : UICanvas() {
      */
     override var openCloseTime: Second = 0.16f
 
-    private val startPointX = ItemSlotImageBuilder.slotLarge.tileW / 2
-    private val startPointY = ItemSlotImageBuilder.slotLarge.tileH / 2
+    private val startPointX = ItemSlotImageBuilder.slotImage.tileW / 2
+    private val startPointY = ItemSlotImageBuilder.slotImage.tileH / 2
 
     private var selection: Int
         get() = Terrarum.ingame!!.player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
@@ -35,9 +35,9 @@ class UIQuickBar : UICanvas() {
 
         for (i in 0..SLOT_COUNT - 1) {
             val image = if (i == selection)
-                ItemSlotImageBuilder.produceLarge(false, i + 1)
+                ItemSlotImageBuilder.produceLarge(false, (i + 1) % SLOT_COUNT)
             else
-                ItemSlotImageBuilder.produce(true, i + 1)
+                ItemSlotImageBuilder.produce(true, (i + 1) % SLOT_COUNT)
 
             val slotX = startPointX + (CELL_SIZE + gutter).times(i).toFloat()
             val slotY = startPointY.toFloat()

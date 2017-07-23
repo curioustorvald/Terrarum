@@ -22,25 +22,23 @@ object ItemSlotImageBuilder {
     val colourBlack = Color(0x404040_FF)
     val colourWhite = Color(0xC0C0C0_FF.toInt())
 
-    val slotImage = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slot.tga"), 38, 38) // must have same w/h as slotLarge
-    val slotLarge = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slot_large.tga"), 38, 38)
+    val slotImage = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slots_atlas.tga"), 38, 38) // must have same w/h as slotLarge
 
 
     private val imageDict = HashMap<Long, Texture>()
 
 
     fun produce(isBlack: Boolean, number: Int = 10): TextureRegion {
-        return slotImage.get(number, 0)
+        return slotImage.get(number, 0 or isBlack.toInt().shl(1))
     }
 
     fun produceLarge(isBlack: Boolean, number: Int = 10): TextureRegion {
-        return slotLarge.get(number, 0)
+        return slotImage.get(number, 1 or isBlack.toInt().shl(1))
     }
 
 
     fun dispose() {
         slotImage.dispose()
-        slotLarge.dispose()
     }
 
 }
