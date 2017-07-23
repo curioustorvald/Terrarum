@@ -9,7 +9,7 @@ import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 
 /**
- * Created by SKYHi14 on 2017-04-16.
+ * Created by minjaesong on 2017-04-16.
  */
 class ItemEffectsLuaAPI(g: Globals) {
 

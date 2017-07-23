@@ -7,7 +7,7 @@ import java.util.function.Consumer
 import java.util.zip.CRC32
 
 /**
- * Created by SKYHi14 on 2017-03-31.
+ * Created by minjaesong on 2017-03-31.
  */
 
 typealias EntryID = Int

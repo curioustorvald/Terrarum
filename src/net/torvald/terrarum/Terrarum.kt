@@ -408,20 +408,17 @@ object Terrarum : Game() {
 
 
 
-        //ingame = Ingame(batch)
-        //ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, HQRNG().nextLong())
+        // jump right into the ingame
+        ingame = Ingame(batch)
+        ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
+        ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
+        LoadScreen.screenToLoad = ingame!!
+        super.setScreen(LoadScreen)
 
-        // TODO: create world being used by title screen, and serialise it.
-        //ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
-        //ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
 
 
-        //LoadScreen.screenToLoad = ingame!!
-
-        super.setScreen(TitleScreen(batch))
-        //super.setScreen(LoadScreen)
-
-        //super.setScreen(ingame)
+        // title screen
+        //super.setScreen(TitleScreen(batch))
     }
 
     internal fun changeScreen(screen: Screen) {
@@ -697,6 +694,8 @@ inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?
     action(this)
     this.end()
     camera?.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+    camera?.update()
+    batch?.projectionMatrix = camera?.combined
 }
 
 fun Float.round(): Float {

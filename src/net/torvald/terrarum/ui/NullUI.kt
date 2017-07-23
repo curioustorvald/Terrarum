@@ -3,7 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
 /**
- * Created by SKYHi14 on 2017-03-13.
+ * Created by minjaesong on 2017-03-13.
  */
 class NullUI : UICanvas() {
     override var width: Int = 0

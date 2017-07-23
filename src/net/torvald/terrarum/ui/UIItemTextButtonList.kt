@@ -12,7 +12,7 @@ import net.torvald.terrarum.inUse
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
- * Created by SKYHi14 on 2017-03-13.
+ * Created by minjaesong on 2017-03-13.
  */
 class UIItemTextButtonList(
         parentUI: UICanvas,

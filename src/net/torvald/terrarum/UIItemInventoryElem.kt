@@ -13,7 +13,7 @@ import net.torvald.terrarum.ui.UIItemTextButton
 /***
  * Note that the UI will not render if either item or itemImage is null.
  *
- * Created by SKYHi14 on 2017-03-16.
+ * Created by minjaesong on 2017-03-16.
  */
 class UIItemInventoryElem(
         parentUI: UIInventory,

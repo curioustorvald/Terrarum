@@ -6,7 +6,7 @@ import org.luaj.vm2.lib.*
 /**
  * Resolution: 640 x 200, non-square pixels
  *
- * Created by SKYHi14 on 2017-02-08.
+ * Created by minjaesong on 2017-02-08.
  */
 /*class PeripheralVideoCard(val host: TerrarumComputer, val termW: Int = 80, val termH: Int = 25) :
         Peripheral("ppu") {

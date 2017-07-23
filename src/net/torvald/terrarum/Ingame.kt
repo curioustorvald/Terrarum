@@ -364,6 +364,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 //uiVitalPrimary,
                 //uiVitalSecondary,
                 //uiVitalItem,
+
                 uiPieMenu,
                 uiQuickBar,
                 uiWatchBasic,
@@ -841,7 +842,8 @@ class Ingame(val batch: SpriteBatch) : Screen {
             /////////////////////////////
             // draw some overlays (UI) //
             /////////////////////////////
-            uiContainer.forEach { if (it != consoleHandler) it.render(batch, camera) }
+
+            uiContainer.forEach { if (it != consoleHandler) it.render(batch, camera) } // FIXME some of the UIs causes memory leak
 
             debugWindow.render(batch, camera)
             // make sure console draws on top of other UIs
@@ -851,167 +853,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
             blendNormal()
         }
-
-
-
-        //      //////    ////    //      ////  //  //
-        //      //      //      //  //  //      //  //
-        //      ////    //  //  //  //  //        ////
-        //      //      //  //  //////  //          //
-        //////  //////    ////  //  //    ////  ////
-
-
-        /////////////////////////////
-        // draw map related stuffs //
-        /////////////////////////////
-        /*worldDrawFrameBuffer.inAction {
-
-            batch.inUse {
-                camera.position.set(WorldCamera.x.toFloat(), WorldCamera.y.toFloat(), 0f) // make camara work
-                camera.update()
-                batch.projectionMatrix = camera.combined
-
-
-                batch.color = Color.WHITE
-                batch.fillRect(WorldCamera.x.toFloat(), WorldCamera.y.toFloat(), 16f, 16f)
-
-
-
-                BlocksDrawer.renderWall(batch)
-                actorsRenderBehind.forEach { it.drawBody(batch) }
-                actorsRenderBehind.forEach { it.drawGlow(batch) }
-                particlesContainer.forEach { it.drawBody(batch) }
-                particlesContainer.forEach { it.drawGlow(batch) }
-                BlocksDrawer.renderTerrain(batch)
-
-                /////////////////
-                // draw actors //
-                /////////////////
-                actorsRenderMiddle.forEach { it.drawBody(batch) }
-                actorsRenderMidTop.forEach { it.drawBody(batch) }
-                player.drawBody(batch)
-                actorsRenderFront.forEach { it.drawBody(batch) }
-                // --> Change of blend mode <-- introduced by childs of ActorWithBody //
-
-
-                /////////////////////////////
-                // draw map related stuffs //
-                /////////////////////////////
-                LightmapRenderer.renderLightMap()
-
-                BlocksDrawer.renderFront(batch, false)
-                // --> blendNormal() <-- by BlocksDrawer.renderFront
-                FeaturesDrawer.render(batch)
-
-
-                FeaturesDrawer.drawEnvOverlay(batch)
-
-                if (!KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendMul()
-                else blendNormal()
-                LightmapRenderer.draw(batch)
-
-
-                //////////////////////
-                // draw actor glows //
-                //////////////////////
-                actorsRenderMiddle.forEach { it.drawGlow(batch) }
-                actorsRenderMidTop.forEach { it.drawGlow(batch) }
-                player.drawGlow(batch)
-                actorsRenderFront.forEach { it.drawGlow(batch) }
-                // --> blendLightenOnly() <-- introduced by childs of ActorWithBody //
-
-
-                ////////////////////////
-                // debug informations //
-                ////////////////////////
-                blendNormal()
-                // draw reference ID if debugWindow is open
-                if (debugWindow.isVisible) {
-                    actorContainer.forEachIndexed { i, actor ->
-                        if (actor is ActorWithBody) {
-                            batch.color = Color.WHITE
-                            Terrarum.fontSmallNumbers.draw(batch,
-                                    actor.referenceID.toString(),
-                                    actor.hitbox.startX.toFloat(),
-                                    actor.hitbox.canonicalY.toFloat() + 4
-                            )
-                        }
-                    }
-                }
-                // debug physics
-                if (KeyToggler.isOn(Key.F11)) {
-                    actorContainer.forEachIndexed { i, actor ->
-                        if (actor is ActorWithPhysics) {
-                            /*shapeRenderer.inUse(ShapeRenderer.ShapeType.Line) {
-                                shapeRenderer.color = Color(1f, 0f, 1f, 1f)
-                                //shapeRenderer.lineWidth = 1f
-                                shapeRenderer.rect(
-                                        actor.hitbox.startX.toFloat(),
-                                        actor.hitbox.startY.toFloat(),
-                                        actor.hitbox.width.toFloat(),
-                                        actor.hitbox.height.toFloat()
-                                )
-                            }*/
-
-                            // velocity
-                            batch.color = Color.CHARTREUSE//GameFontBase.codeToCol["g"]
-                            Terrarum.fontSmallNumbers.draw(batch,
-                                    "${0x7F.toChar()}X ${actor.externalForce.x}",
-                                    actor.hitbox.startX.toFloat(),
-                                    actor.hitbox.canonicalY.toFloat() + 4 + 8
-                            )
-                            Terrarum.fontSmallNumbers.draw(batch,
-                                    "${0x7F.toChar()}Y ${actor.externalForce.y}",
-                                    actor.hitbox.startX.toFloat(),
-                                    actor.hitbox.canonicalY.toFloat() + 4 + 8 * 2
-                            )
-                        }
-                    }
-                }
-                // fluidmap debug
-                if (KeyToggler.isOn(Key.F4))
-                    WorldSimulator.drawFluidMapDebug(batch)
-
-
-            }
-        }
-        /////////////////
-        // GUI Predraw //
-        /////////////////
-        //worldG.flush()
-        batch.inUse {
-            val tex = backDrawFrameBuffer.colorBufferTexture // TODO zoom!
-            batch.draw(tex, 0f, 0f)
-        }*/
-        //backG.drawImage(worldDrawFrameBuffer.getScaledCopy(screenZoom), 0f, 0f)
-        //backG.flush()
-
-
-        /////////////////////
-        // draw UIs  ONLY! //
-        /////////////////////
-        /*batch.inUse {
-            uiContainer.forEach { if (it != consoleHandler) it.render(batch) }
-            debugWindow.render(batch)
-            // make sure console draws on top of other UIs
-            consoleHandler.render(batch)
-            notifier.render(batch)
-        }*/
-
-
-        //////////////////
-        // GUI Postdraw //
-        //////////////////
-        //backG.flush()
-        //gwin.drawImage(backDrawFrameBuffer, 0f, 0f)
-
-
-
-        // centre marker
-        /*gwin.color = Color(0x00FFFF)
-        gwin.lineWidth = 1f
-        gwin.drawLine(Terrarum.WIDTH / 2f, 0f, Terrarum.WIDTH / 2f, Terrarum.HEIGHT.toFloat())
-        gwin.drawLine(0f, Terrarum.HEIGHT / 2f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT / 2f)*/
     }
 
     fun processBlur(lightmapFboA: FrameBuffer, lightmapFboB: FrameBuffer, mode: Int) {

@@ -5,7 +5,7 @@ import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.ui.UIVitalMetre
 
 /**
- * Created by SKYHi14 on 2017-04-21.
+ * Created by minjaesong on 2017-04-21.
  */
 object AmmoMeterProxy {
 
