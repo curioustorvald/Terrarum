@@ -1,3 +1,6 @@
+#version 120
+
+
 varying vec4 v_color;
 varying vec2 v_texCoords;
 uniform sampler2D u_texture; // world texture, has alpha value that is meaningful
