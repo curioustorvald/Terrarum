@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.ui.UIQuickBar.Companion.CELL_SIZE
+import net.torvald.terrarum.ui.UIQuickBar.Companion.SLOT_COUNT
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -46,7 +47,7 @@ class UIPieMenu : UICanvas() {
             val deg = -(centre - cursorPos).direction.toFloat()
 
             selection = Math.round(deg * slotCount / FastMath.TWO_PI)
-            if (selection < 0) selection += 10
+            if (selection < 0) selection += SLOT_COUNT
 
             // TODO add gamepad support
         }
@@ -61,9 +62,9 @@ class UIPieMenu : UICanvas() {
 
             // draw cells
             val image = if (i == selection)
-                ItemSlotImageBuilder.produceLarge(false, i + 1)
+                ItemSlotImageBuilder.produceLarge(false, (i + 1) % SLOT_COUNT)
             else
-                ItemSlotImageBuilder.produce(true, i + 1)
+                ItemSlotImageBuilder.produce(true, (i + 1) % SLOT_COUNT)
 
             val slotSize = image.regionWidth
 
