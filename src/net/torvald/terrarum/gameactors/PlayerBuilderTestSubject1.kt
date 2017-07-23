@@ -6,7 +6,7 @@ import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
- * Created by SKYHi14 on 2017-02-10.
+ * Created by minjaesong on 2017-02-10.
  */
 object PlayerBuilderTestSubject1 {
     operator fun invoke(): Player {

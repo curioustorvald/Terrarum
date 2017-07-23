@@ -65,7 +65,7 @@ class UIPieMenu : UICanvas() {
             else
                 ItemSlotImageBuilder.produce(true, i + 1)
 
-            val slotSize = image.width
+            val slotSize = image.regionWidth
 
             val slotX = slotCentrePoint.x.toFloat() - (slotSize / 2)
             val slotY = slotCentrePoint.y.toFloat() - (slotSize / 2)

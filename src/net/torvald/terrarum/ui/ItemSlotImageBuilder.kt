@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import net.torvald.terrarum.gameactors.ai.toInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 
@@ -15,89 +17,26 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 object ItemSlotImageBuilder {
 
+    // FIXME it leaks mem waaaaagh
+
     val colourBlack = Color(0x404040_FF)
     val colourWhite = Color(0xC0C0C0_FF.toInt())
 
-    private val numberFont = TextureRegionPack(
-            "./assets/graphics/fonts/numeric_small.tga", 5, 8
-    )
-    val slotImage = Pixmap(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slot.tga")) // must have same w/h as slotLarge
-    val slotLarge = Pixmap(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slot_large.tga"))
+    val slotImage = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slot.tga"), 38, 38) // must have same w/h as slotLarge
+    val slotLarge = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slot_large.tga"), 38, 38)
 
 
-    private val imageDict = HashMap<ImageDesc, Texture>()
+    private val imageDict = HashMap<Long, Texture>()
 
 
-    fun produce(isBlack: Boolean, number: Int = -1): Texture {
-        val pixmap = Pixmap(slotImage.width, slotImage.height, Pixmap.Format.RGBA8888)
-        val color = if (isBlack) colourBlack else colourWhite
-
-
-        val desc = ImageDesc(color, number, false)
-        if (imageDict.containsKey(desc))
-            return imageDict[desc]!!
-
-
-        pixmap.setColor(color)
-        pixmap.drawPixmap(slotImage, 0, 0)
-
-
-        /*if (number >= 0) {
-            if (isBlack)
-                pixmap.setColor(colourWhite)
-            else
-                pixmap.setColor(colourBlack)
-
-
-            pixmap.drawPixmap(fontPixmap,
-                    slotImage.width - 10,
-                    slotImage.height - 13
-            )
-        }*/
-
-
-        val retTex = Texture(pixmap)
-        pixmap.dispose()
-        imageDict.put(desc, retTex)
-        return retTex
+    fun produce(isBlack: Boolean, number: Int = 10): TextureRegion {
+        return slotImage.get(number, 0)
     }
 
-    fun produceLarge(isBlack: Boolean, number: Int = -1): Texture {
-        val pixmap = Pixmap(slotLarge.width, slotLarge.height, Pixmap.Format.RGBA8888)
-        val color = if (isBlack) colourBlack else colourWhite
-
-
-        val desc = ImageDesc(color, number, false)
-        if (imageDict.containsKey(desc))
-            return imageDict[desc]!!
-
-
-        pixmap.setColor(color)
-        pixmap.drawPixmap(slotLarge, 0, 0)
-
-
-        /*if (number >= 0) {
-            if (isBlack)
-                pixmap.setColor(colourWhite)
-            else
-                pixmap.setColor(colourBlack)
-
-
-            pixmap.drawPixmap(fontPixmap,
-                    slotImage.width - 10,
-                    slotImage.height - 13
-            )
-        }*/
-
-
-        val retTex = Texture(pixmap)
-        pixmap.dispose()
-        imageDict.put(desc, retTex)
-        return retTex
+    fun produceLarge(isBlack: Boolean, number: Int = 10): TextureRegion {
+        return slotLarge.get(number, 0)
     }
 
-
-    private data class ImageDesc(val color: Color, val number: Int, val isLarge: Boolean)
 
     fun dispose() {
         slotImage.dispose()

@@ -13,7 +13,7 @@ import java.io.InputStreamReader
 import java.io.Reader
 
 /**
- * Created by SKYHi14 on 2017-02-04.
+ * Created by minjaesong on 2017-02-04.
  */
 class LuaAIWrapper(private val scriptPath: String) : ActorAI {
 

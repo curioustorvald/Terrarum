@@ -9,7 +9,7 @@ import net.torvald.terrarum.gameactors.ActorID
  * Design goal: keep the inflation rate low, but not negative (Single market)
  * OR, give each faction (establishment) its own economy and watch them prosper/doomed (DF style)
  *
- * Created by SKYHi14 on 2017-04-23.
+ * Created by minjaesong on 2017-04-23.
  */
 class GameEconomy {
 

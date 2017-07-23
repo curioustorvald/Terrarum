@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
- * Created by SKYHi14 on 2017-03-24.
+ * Created by minjaesong on 2017-03-24.
  */
 class NewRunes : BitmapFont() {
     private val runeSize = 12

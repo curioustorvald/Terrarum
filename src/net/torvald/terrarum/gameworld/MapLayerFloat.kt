@@ -6,7 +6,7 @@ import net.torvald.dataclass.Float16Bits
 /**
  * MapLayer that contains raw Float16 values
  *
- * Created by SKYHi14 on 2017-04-21.
+ * Created by minjaesong on 2017-04-21.
  */
 class MapLayerFloat(val width: Int, val height: Int) : Iterable<Float16Bits> {
 
