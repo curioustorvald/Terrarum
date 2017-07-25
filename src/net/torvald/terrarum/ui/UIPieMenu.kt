@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
@@ -34,7 +35,7 @@ class UIPieMenu : UICanvas() {
 
     var selection: Int = -1
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
         if (selection >= 0)
             Terrarum.ingame!!.player.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
                     selection % slotCount
@@ -53,7 +54,7 @@ class UIPieMenu : UICanvas() {
         }
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // draw radial thingies
         for (i in 0..slotCount - 1) {
             // set position
@@ -98,22 +99,22 @@ class UIPieMenu : UICanvas() {
     }
 
     override fun doOpening(delta: Float) {
-        UICanvas.doOpeningFade(handler, openCloseTime)
+        UICanvas.doOpeningFade(this, openCloseTime)
         handler.scale = smallenSize + (1f.minus(smallenSize) * handler.opacity)
     }
 
     override fun doClosing(delta: Float) {
-        UICanvas.doClosingFade(handler, openCloseTime)
+        UICanvas.doClosingFade(this, openCloseTime)
         handler.scale = smallenSize + (1f.minus(smallenSize) * handler.opacity)
     }
 
     override fun endOpening(delta: Float) {
-        UICanvas.endOpeningFade(handler)
+        UICanvas.endOpeningFade(this)
         handler.scale = 1f
     }
 
     override fun endClosing(delta: Float) {
-        UICanvas.endClosingFade(handler)
+        UICanvas.endClosingFade(this)
         handler.scale = 1f
     }
 

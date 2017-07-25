@@ -1,5 +1,6 @@
 package net.torvald.terrarum.virtualcomputer.worldobject.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.ui.*
@@ -24,11 +25,11 @@ class UITextTerminal(val terminal: Terminal) : UICanvas() {
      */
     override var openCloseTime: Second = OPENCLOSE_GENERIC
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
         terminal.update(delta)
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
         //terminal.render(gc, terminalDisplay.graphics)
     }
 

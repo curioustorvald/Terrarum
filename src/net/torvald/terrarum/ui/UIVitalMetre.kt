@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
@@ -46,7 +47,7 @@ class UIVitalMetre(
             return c
         }
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
         handler.setPosition(
                 Terrarum.HALFW,
                 Terrarum.HALFH
@@ -56,7 +57,7 @@ class UIVitalMetre(
     /**
      * g must be same as World Graphics!
      */
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // TODO now that we just can't draw arcs, we need to re-think about this
         
         /*if (vitalGetterVal() != null && vitalGetterMax() != null && player != null) {
@@ -99,19 +100,19 @@ class UIVitalMetre(
     }
 
     override fun doOpening(delta: Float) {
-        UICanvas.doOpeningFade(handler, openCloseTime)
+        UICanvas.doOpeningFade(this, openCloseTime)
     }
 
     override fun doClosing(delta: Float) {
-        UICanvas.doClosingFade(handler, openCloseTime)
+        UICanvas.doClosingFade(this, openCloseTime)
     }
 
     override fun endOpening(delta: Float) {
-        UICanvas.endOpeningFade(handler)
+        UICanvas.endOpeningFade(this)
     }
 
     override fun endClosing(delta: Float) {
-        UICanvas.endClosingFade(handler)
+        UICanvas.endClosingFade(this)
     }
 
     override fun dispose() {

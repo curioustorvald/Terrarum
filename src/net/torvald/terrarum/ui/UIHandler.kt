@@ -17,7 +17,7 @@ import net.torvald.terrarum.round
  *
  * Created by minjaesong on 15-12-31.
  */
-class UIHandler(var UI: UICanvas,
+class UIHandler(//var UI: UICanvas,
                 var toggleKeyLiteral: Int? = null, var toggleButtonLiteral: Int? = null,
                 // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
                 var customPositioning: Boolean = false, // mainly used by vital meter
@@ -61,7 +61,7 @@ class UIHandler(var UI: UICanvas,
     var openCloseCounter = 0f
 
     init {
-        UI.handler = this
+        //UI.handler = this
     }
 
 
@@ -69,7 +69,23 @@ class UIHandler(var UI: UICanvas,
     private val toggleButton: Int?; get() = toggleButtonLiteral // to support in-screen keybind changing
 
 
-    fun update(delta: Float) {
+    val subUIs = ArrayList<UICanvas>()
+
+    fun addSubUI(ui: UICanvas) {
+        if (subUIs.contains(ui))
+            throw IllegalArgumentException(
+                    "Exact copy of the UI already exists: The instance of ${ui.javaClass.simpleName}"
+            )
+
+        subUIs.add(ui)
+    }
+
+    fun removeSubUI(ui: UICanvas) {
+        subUIs.remove(ui)
+    }
+
+
+    fun update(ui: UICanvas, delta: Float) {
         // open/close UI by key pressed
         if (toggleKey != null) {
             if (KeyToggler.isOn(toggleKey!!)) {
@@ -89,7 +105,7 @@ class UIHandler(var UI: UICanvas,
 
 
         if (isVisible || alwaysVisible) {
-            UI.update(delta)
+            ui.updateUI(delta)
         }
 
         if (isOpening) {
@@ -99,12 +115,12 @@ class UIHandler(var UI: UICanvas,
             // println("UI ${UI.javaClass.simpleName} (open)")
             // println("-> timecounter $openCloseCounter / ${UI.openCloseTime} timetakes")
 
-            if (openCloseCounter < UI.openCloseTime) {
-                UI.doOpening(delta)
+            if (openCloseCounter < ui.openCloseTime) {
+                ui.doOpening(delta)
                 // println("UIHandler.opening ${UI.javaClass.simpleName}")
             }
             else {
-                UI.endOpening(delta)
+                ui.endOpening(delta)
                 isOpening = false
                 isClosing = false
                 isOpened = true
@@ -117,12 +133,12 @@ class UIHandler(var UI: UICanvas,
             // println("UI ${UI.javaClass.simpleName} (close)")
             // println("-> timecounter $openCloseCounter / ${UI.openCloseTime} timetakes")
 
-            if (openCloseCounter < UI.openCloseTime) {
-                UI.doClosing(delta)
+            if (openCloseCounter < ui.openCloseTime) {
+                ui.doClosing(delta)
                 // println("UIHandler.closing ${UI.javaClass.simpleName}")
             }
             else {
-                UI.endClosing(delta)
+                ui.endClosing(delta)
                 isClosing = false
                 isOpening = false
                 isOpened = false
@@ -130,9 +146,13 @@ class UIHandler(var UI: UICanvas,
                 openCloseCounter = 0f
             }
         }
+
+
+        subUIs.forEach { it.update(delta) }
     }
 
-    fun render(batch: SpriteBatch, camera: Camera) {
+    fun render(ui: UICanvas, batch: SpriteBatch, camera: Camera) {
+
         if (isVisible || alwaysVisible) {
             // camera SHOULD BE CENTERED to HALFX and HALFY (see StateInGame) //
 
@@ -149,9 +169,13 @@ class UIHandler(var UI: UICanvas,
             }
             batch.color = Color.WHITE
 
-            UI.render(batch)
+
+            ui.renderUI(batch, camera)
             //ingameGraphics.flush()
         }
+
+
+        subUIs.forEach { it.render(batch, camera) }
     }
 
     fun setPosition(x: Int, y: Int) {
@@ -219,68 +243,6 @@ class UIHandler(var UI: UICanvas,
         }
     }
 
-    fun keyDown(keycode: Int): Boolean {
-        if (isVisible) {
-            return UI.keyDown(keycode)
-        }
-
-        return false
-    }
-
-    fun keyUp(keycode: Int): Boolean {
-        if (isVisible) {
-            return UI.keyUp(keycode)
-        }
-
-        return false
-    }
-
-    fun keyTyped(char: Char): Boolean {
-        if (isVisible) {
-            return UI.keyTyped(char)
-        }
-
-        return false
-    }
-
-    fun mouseMoved(screenX: Int, screenY: Int) {
-        if (isVisible) {
-            UI.mouseMoved(screenX, screenY)
-        }
-    }
-
-    fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        if (isVisible) {
-            UI.touchDragged(screenX, screenY, pointer)
-        }
-
-        return false
-    }
-
-    fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (isVisible) {
-            UI.touchDown(screenX, screenY, pointer, button)
-        }
-
-        return false
-    }
-
-    fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (isVisible) {
-            UI.touchUp(screenX, screenY, pointer, button)
-        }
-
-        return false
-    }
-
-    fun scrolled(amount: Int): Boolean {
-        if (isVisible) {
-            UI.scrolled(amount)
-        }
-
-        return false
-    }
-
     // constant UI can't take control
     val isTakingControl: Boolean
         get() {
@@ -289,10 +251,6 @@ class UIHandler(var UI: UICanvas,
             }
             return isVisible && !isOpening
         }
-
-    fun dispose() {
-        UI.dispose()
-    }
 
     fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
         Ingame.setCameraPosition(batch, camera, newX, newY)
