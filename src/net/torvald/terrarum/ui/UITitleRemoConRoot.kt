@@ -47,12 +47,16 @@ class UITitleRemoConRoot : UICanvas() {
     //private val paneCredits = UIHandler()
     private val remoConCredits = UITitleRemoConCredits(this)
 
+    private val remoConLanguage = UITitleRemoConLanguage(this)
+
 
     init {
+        remoConLanguage.setPosition(0, menubarOffY)
         remoConCredits.setPosition(0, menubarOffY)
 
 
 
+        addSubUI(remoConLanguage)
         addSubUI(remoConCredits)
 
 
@@ -63,9 +67,13 @@ class UITitleRemoConRoot : UICanvas() {
 
 
         // attach listeners
-        menubar.buttons[menuLabels.indexOf("MENU_LABEL_CREDITS")].clickOnceListener = { _, _, _ ->
-            remoConCredits.setAsOpen()
+        menubar.buttons[menuLabels.indexOf("MENU_LABEL_LANGUAGE")].clickOnceListener = { _, _, _ ->
             this.setAsClose()
+            remoConLanguage.setAsOpen()
+        }
+        menubar.buttons[menuLabels.indexOf("MENU_LABEL_CREDITS")].clickOnceListener = { _, _, _ ->
+            this.setAsClose()
+            remoConCredits.setAsOpen()
         }
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_QUIT")].clickOnceListener = { _, _, _ -> System.exit(0) }
     }

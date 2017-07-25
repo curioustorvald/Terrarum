@@ -5,12 +5,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.gameactors.Second
 
-class UITitleRemoConCredits(val superMenu: UICanvas) : UICanvas() {
-
+class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
 
     val menuLabels = arrayOf(
-            "MENU_LABEL_CREDITS",
-            "MENU_CREDIT_GPL_DNT",
             "MENU_LABEL_RETURN"
     )
 
@@ -66,4 +63,5 @@ class UITitleRemoConCredits(val superMenu: UICanvas) : UICanvas() {
 
     override fun dispose() {
     }
+
 }
