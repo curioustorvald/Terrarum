@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
@@ -40,7 +41,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
         get() = Terrarum.ingame!!.world.time
 
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
         if (ELon) {
             ELuptimer += delta
         }
@@ -55,7 +56,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
         }
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // light overlay or EL
         if (ELon) {
             blendNormal()

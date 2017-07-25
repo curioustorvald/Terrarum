@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.gameactors.Second
@@ -29,7 +30,7 @@ class UITitleRemoConCredits(val superMenu: UICanvas) : UICanvas() {
             highlightBackCol = Color(0),
             backgroundCol = Color(0),
             inactiveCol = Color.WHITE,
-            defaultSelection = null
+            defaultSelection = 0
     )
 
     init {
@@ -38,16 +39,17 @@ class UITitleRemoConCredits(val superMenu: UICanvas) : UICanvas() {
 
         // attach listeners
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_RETURN")].clickOnceListener = { _, _, _ ->
-            superMenu.handler.setAsOpen()
-            this.handler.setAsClose()
+            println("UITitleRemoConCredits  srtaenirstneiotrsaeinoarst")
+            superMenu.setAsOpen()
+            this.setAsClose()
         }
     }
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
         menubar.update(delta)
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
         menubar.render(batch)
     }
 

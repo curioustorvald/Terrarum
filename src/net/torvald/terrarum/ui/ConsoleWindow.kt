@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.dataclass.HistoryArray
@@ -46,10 +47,10 @@ class ConsoleWindow : UICanvas() {
         reset()
     }
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // background
         batch.color = UIColour
         batch.fillRect(drawOffX, drawOffY, width.toFloat(), height.toFloat())

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
@@ -28,10 +29,10 @@ class UIQuickBar : UICanvas() {
         get() = Terrarum.ingame!!.player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
         set(value) { Terrarum.ingame!!.player.actorValue.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
     
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
         for (i in 0..SLOT_COUNT - 1) {
             val image = if (i == selection)

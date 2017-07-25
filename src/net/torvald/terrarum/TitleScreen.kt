@@ -16,6 +16,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.ReadLayerData
+import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIHandler
 import net.torvald.terrarum.ui.UITitleRemoConRoot
 import net.torvald.terrarum.weather.WeatherMixer
@@ -64,7 +65,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
             val tileSize = FeaturesDrawer.TILE_SIZE.toFloat()
-            val catmullRomTension = -1f
+            val catmullRomTension = 0f
 
             // pan camera
             actor.moveRight(axisMax)
@@ -80,16 +81,18 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             val p3 = (p1 + 2) fmod codomainSize
             val u: Float = 1f - (p2 - (x / (domainSize / codomainSize))) / (p2 - p1)
 
-            val targetYPos = FastMath.interpolateCatmullRom(u, catmullRomTension, cameraNodes[p0], cameraNodes[p1], cameraNodes[p2], cameraNodes[p3])
+            //val targetYPos = FastMath.interpolateCatmullRom(u, catmullRomTension, cameraNodes[p0], cameraNodes[p1], cameraNodes[p2], cameraNodes[p3])
+            val targetYPos = FastMath.interpolateLinear(u, cameraNodes[p1], cameraNodes[p2])
             val yDiff = targetYPos - actor.hitbox.canonicalY
 
-            if (!firstTime) {
+            /*if (!firstTime) {
                 actor.moveDown(yDiff.bipolarClamp(axisMax.toDouble()).toFloat())
             }
             else {
                 actor.hitbox.setPosition(actor.hitbox.canonicalX, targetYPos.toDouble())
                 firstTime = false
-            }
+            }*/
+            actor.hitbox.setPosition(actor.hitbox.canonicalX, targetYPos.toDouble()) // just move the cameraY to interpolated path
 
 
             //println("${actor.hitbox.canonicalX}, ${actor.hitbox.canonicalY}")
@@ -106,15 +109,15 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
     lateinit var logo: TextureRegion
 
-    val uiContainer = ArrayList<UIHandler>()
-    private lateinit var uiMenu: UIHandler
+    val uiContainer = ArrayList<UICanvas>()
+    private lateinit var uiMenu: UICanvas
 
     private fun loadThingsWhileIntroIsVisible() {
         demoWorld = ReadLayerData(FileInputStream(ModMgr.getFile("basegame", "demoworld")))
 
 
         // construct camera nodes
-        val nodeCount = 60
+        val nodeCount = 100
         cameraNodes = kotlin.FloatArray(nodeCount, { it ->
             val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorInt()
             var travelDownCounter = 0
@@ -144,7 +147,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         FeaturesDrawer.world = demoWorld
 
 
-        uiMenu = UIHandler(UITitleRemoConRoot())
+        uiMenu = UITitleRemoConRoot()
         uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
         uiMenu.setAsOpen()
 
@@ -358,7 +361,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
         if (loadDone) {
             // resize UI by re-creating it (!!)
-            uiMenu.UI.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+            uiMenu.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
             uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
         }
 

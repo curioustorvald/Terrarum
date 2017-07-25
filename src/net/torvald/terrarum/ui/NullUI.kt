@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
 /**
@@ -10,10 +11,10 @@ class NullUI : UICanvas() {
     override var height: Int = 0
     override var openCloseTime = 0f
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
     }
 
     override fun doOpening(delta: Float) {

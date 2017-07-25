@@ -1,5 +1,6 @@
 package net.torvald.terrarum.console
 
+import com.badlogic.gdx.Gdx
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.langpack.Lang
 
@@ -11,6 +12,8 @@ internal object Version : ConsoleCommand {
 
         Echo("${Terrarum.NAME} ${Terrarum.VERSION_STRING}")
         Echo("Polyglot language pack version ${Lang.POLYGLOT_VERSION}")
+        Echo("GL_VERSION: ${Terrarum.GL_VERSION}")
+        Echo("Renderer: ${Gdx.graphics.glVersion.rendererString}, ${Gdx.graphics.glVersion.vendorString}")
     }
 
     override fun printUsage() {

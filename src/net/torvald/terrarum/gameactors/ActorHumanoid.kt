@@ -530,7 +530,7 @@ open class ActorHumanoid(
 
             // force update inventory UI
             try {
-                (Terrarum.ingame!!.uiInventoryPlayer.UI as UIInventory).shutUpAndRebuild()
+                (Terrarum.ingame!!.uiInventoryPlayer as UIInventory).shutUpAndRebuild()
             }
             catch (LateInitMyArse: kotlin.UninitializedPropertyAccessException) { }
         }
