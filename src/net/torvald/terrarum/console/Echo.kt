@@ -16,13 +16,13 @@ internal object Echo : ConsoleCommand {
         val sb = StringBuilder()
         for (ch in single_line) {
             if (ch == '\n') {
-                (Terrarum.ingame!!.consoleHandler.UI as ConsoleWindow).sendMessage(sb.toString())
+                (Terrarum.ingame!!.consoleHandler as ConsoleWindow).sendMessage(sb.toString())
                 sb.delete(0, sb.length - 1)
             }
             else
                 sb.append(ch)
         }
-        (Terrarum.ingame!!.consoleHandler.UI as ConsoleWindow).sendMessage(sb.toString())
+        (Terrarum.ingame!!.consoleHandler as ConsoleWindow).sendMessage(sb.toString())
     }
 
     operator fun invoke(args: Array<String>) = execute(args)

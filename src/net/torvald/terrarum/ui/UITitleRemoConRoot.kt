@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
@@ -44,22 +45,37 @@ class UITitleRemoConRoot : UICanvas() {
 
 
     //private val paneCredits = UIHandler()
-    private val remoConCredits = UIHandler(UITitleRemoConCredits(this))
+    private val remoConCredits = UITitleRemoConCredits(this)
 
 
     init {
+        remoConCredits.setPosition(0, menubarOffY)
+
+
+
+        addSubUI(remoConCredits)
+
+
+        ////////////////////////////
+
+
         uiItems.add(menubar)
 
 
         // attach listeners
+        menubar.buttons[menuLabels.indexOf("MENU_LABEL_CREDITS")].clickOnceListener = { _, _, _ ->
+            remoConCredits.setAsOpen()
+            this.setAsClose()
+        }
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_QUIT")].clickOnceListener = { _, _, _ -> System.exit(0) }
     }
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
         menubar.update(delta)
+        //println("UITitleRemoConRoot bro u even updatez")
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
         menubar.render(batch)
     }
 

@@ -135,6 +135,7 @@ object WeatherMixer {
         Terrarum.shaderBayerSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
         Terrarum.shaderBayerSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
         Terrarum.shaderBayerSkyboxFill.setUniformf("parallax", parallax)
+        Terrarum.shaderBayerSkyboxFill.setUniformf("parallax_size", 1f/3f)
         Terrarum.fullscreenQuad.render(Terrarum.shaderBayerSkyboxFill, GL20.GL_TRIANGLES)
         Terrarum.shaderBayerSkyboxFill.end()
     }

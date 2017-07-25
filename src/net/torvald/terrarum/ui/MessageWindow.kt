@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
@@ -30,10 +31,10 @@ class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas
         this.messagesList = messagesList
     }
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
         blendNormal()
 
         val textWidth = messagesList.map { Terrarum.fontGame.getWidth(it) }.sorted()[1]

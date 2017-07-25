@@ -57,7 +57,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
     val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX)
-    val uiContainer = ArrayList<UIHandler>()
+    val uiContainer = ArrayList<UICanvas>()
 
     private val actorsRenderBehind = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
     private val actorsRenderMiddle = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
@@ -111,26 +111,26 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
 
-    lateinit var consoleHandler: UIHandler
-    lateinit var debugWindow: UIHandler
-    lateinit var notifier: UIHandler
+    lateinit var consoleHandler: UICanvas
+    lateinit var debugWindow: UICanvas
+    lateinit var notifier: UICanvas
 
-    lateinit var uiPieMenu: UIHandler
-    lateinit var uiQuickBar: UIHandler
-    lateinit var uiInventoryPlayer: UIHandler
-    lateinit var uiInventoryContainer: UIHandler
-    lateinit var uiVitalPrimary: UIHandler
-    lateinit var uiVitalSecondary: UIHandler
-    lateinit var uiVitalItem: UIHandler // itemcount/durability of held block or active ammo of held gun. As for the block, max value is 500.
+    lateinit var uiPieMenu: UICanvas
+    lateinit var uiQuickBar: UICanvas
+    lateinit var uiInventoryPlayer: UICanvas
+    lateinit var uiInventoryContainer: UICanvas
+    lateinit var uiVitalPrimary: UICanvas
+    lateinit var uiVitalSecondary: UICanvas
+    lateinit var uiVitalItem: UICanvas // itemcount/durability of held block or active ammo of held gun. As for the block, max value is 500.
 
-    lateinit var uiWatchBasic: UIHandler
-    lateinit var uiWatchTierOne: UIHandler
+    lateinit var uiWatchBasic: UICanvas
+    lateinit var uiWatchTierOne: UICanvas
 
 
     // UI aliases
-    lateinit var uiAliases: ArrayList<UIHandler>
+    lateinit var uiAliases: ArrayList<UICanvas>
         private set
-    lateinit var uiAlasesPausing: ArrayList<UIHandler>
+    lateinit var uiAlasesPausing: ArrayList<UICanvas>
         private set
 
     inline val paused: Boolean
@@ -296,66 +296,63 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
         // init console window
-        consoleHandler = UIHandler(ConsoleWindow())
+        consoleHandler = ConsoleWindow()
         consoleHandler.setPosition(0, 0)
 
 
         // init debug window
-        debugWindow = UIHandler(BasicDebugInfoWindow())
+        debugWindow = BasicDebugInfoWindow()
         debugWindow.setPosition(0, 0)
 
         // init notifier
-        notifier = UIHandler(Notification())
-        notifier.UI.handler = notifier
+        notifier = Notification()
         notifier.setPosition(
-                (Terrarum.WIDTH - notifier.UI.width) / 2, Terrarum.HEIGHT - notifier.UI.height)
+                (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
 
 
 
 
         // >- queue up game UIs that should pause the world -<
         // inventory
-        uiInventoryPlayer = UIHandler(
-                UIInventory(player,
-                        width = 900,
-                        height = Terrarum.HEIGHT - 160,
-                        categoryWidth = 210
-                ),
+        uiInventoryPlayer = UIInventory(player,
+                width = 900,
+                height = Terrarum.HEIGHT - 160,
+                categoryWidth = 210,
                 toggleKeyLiteral = Terrarum.getConfigInt("keyinventory")
         )
         uiInventoryPlayer.setPosition(
-                -uiInventoryPlayer.UI.width,
+                -uiInventoryPlayer.width,
                 70
         )
 
         // >- lesser UIs -<
         // quick bar
-        uiQuickBar = UIHandler(UIQuickBar())
+        uiQuickBar = UIQuickBar()
         uiQuickBar.isVisible = true
         uiQuickBar.setPosition(0, 0)
 
         // pie menu
-        uiPieMenu = UIHandler(UIPieMenu())
+        uiPieMenu = UIPieMenu()
         uiPieMenu.setPosition(Terrarum.HALFW, Terrarum.HALFH)
 
         // vital metre
         // fill in getter functions by
         //      (uiAliases[UI_QUICK_BAR]!!.UI as UIVitalMetre).vitalGetterMax = { some_function }
-        //uiVitalPrimary = UIHandler(UIVitalMetre(player, { 80f }, { 100f }, Color.red, 2), customPositioning = true)
+        //uiVitalPrimary = UIVitalMetre(player, { 80f }, { 100f }, Color.red, 2, customPositioning = true)
         //uiVitalPrimary.setAsAlwaysVisible()
-        //uiVitalSecondary = UIHandler(UIVitalMetre(player, { 73f }, { 100f }, Color(0x00dfff), 1), customPositioning = true)
+        //uiVitalSecondary = UIVitalMetre(player, { 73f }, { 100f }, Color(0x00dfff), 1) customPositioning = true)
         //uiVitalSecondary.setAsAlwaysVisible()
-        //uiVitalItem = UIHandler(UIVitalMetre(player, { null }, { null }, Color(0xffcc00), 0), customPositioning = true)
+        //uiVitalItem = UIVitalMetre(player, { null }, { null }, Color(0xffcc00), 0, customPositioning = true)
         //uiVitalItem.setAsAlwaysVisible()
 
         // basic watch-style notification bar (temperature, new mail)
-        uiWatchBasic = UIHandler(UIBasicNotifier(player))
+        uiWatchBasic = UIBasicNotifier(player)
         uiWatchBasic.setAsAlwaysVisible()
-        uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.UI.width, 0)
+        uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.width, 0)
 
-        uiWatchTierOne = UIHandler(UITierOneWatch(player))
+        uiWatchTierOne = UITierOneWatch(player)
         uiWatchTierOne.setAsAlwaysVisible()
-        uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.UI.width, uiWatchBasic.UI.height - 2)
+        uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.width, uiWatchBasic.height - 2)
 
 
         // batch-process uiAliases
@@ -994,7 +991,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
     /** Send message to notifier UI and toggle the UI as opened. */
     fun sendNotification(msg: Array<String>) {
-        (notifier.UI as Notification).sendNotification(msg)
+        (notifier as Notification).sendNotification(msg)
     }
 
     fun wakeDormantActors() {
@@ -1249,11 +1246,11 @@ class Ingame(val batch: SpriteBatch) : Screen {
         particlesContainer.add(particle)
     }
 
-    fun addUI(ui: UIHandler) {
+    fun addUI(ui: UICanvas) {
         // check for exact duplicates
         if (uiContainer.contains(ui)) {
             throw IllegalArgumentException(
-                    "Exact copy of the UI already exists: The instance of ${ui.UI.javaClass.simpleName}"
+                    "Exact copy of the UI already exists: The instance of ${ui.javaClass.simpleName}"
             )
         }
 
@@ -1382,21 +1379,20 @@ class Ingame(val batch: SpriteBatch) : Screen {
             // resize UIs
 
             notifier.setPosition(
-                    (Terrarum.WIDTH - notifier.UI.width) / 2, Terrarum.HEIGHT - notifier.UI.height)
+                    (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
 
             // inventory
-            uiInventoryPlayer.UI =
+            uiInventoryPlayer =
                     UIInventory(player,
                             width = 840,
                             height = Terrarum.HEIGHT - 160,
                             categoryWidth = 210
                     )
-            uiInventoryPlayer.UI.handler = uiInventoryPlayer
 
 
             // basic watch-style notification bar (temperature, new mail)
-            uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.UI.width, 0)
-            uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.UI.width, uiWatchBasic.UI.height - 2)
+            uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.width, 0)
+            uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.width, uiWatchBasic.height - 2)
         }
     }
 

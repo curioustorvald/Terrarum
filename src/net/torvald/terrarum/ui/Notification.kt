@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.Second
@@ -26,7 +27,7 @@ class Notification : UICanvas() {
 
     override var openCloseTime: Second = MessageWindow.OPEN_CLOSE_TIME
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
         if (handler.isOpened)
             displayTimer += delta
 
@@ -36,24 +37,24 @@ class Notification : UICanvas() {
         }
     }
 
-    override fun render(batch: SpriteBatch) {
-        msgUI.render(batch)
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        msgUI.render(batch, camera)
     }
 
     override fun doOpening(delta: Float) {
-        UICanvas.doOpeningFade(handler, openCloseTime)
+        UICanvas.doOpeningFade(this, openCloseTime)
     }
 
     override fun doClosing(delta: Float) {
-        UICanvas.doClosingFade(handler, openCloseTime)
+        UICanvas.doClosingFade(this, openCloseTime)
     }
 
     override fun endOpening(delta: Float) {
-        UICanvas.endOpeningFade(handler)
+        UICanvas.endOpeningFade(this)
     }
 
     override fun endClosing(delta: Float) {
-        UICanvas.endClosingFade(handler)
+        UICanvas.endClosingFade(this)
     }
     
     fun sendNotification(message: Array<String>) {

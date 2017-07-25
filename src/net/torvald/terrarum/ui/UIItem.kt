@@ -43,9 +43,9 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     abstract val height: Int
 
     protected val relativeMouseX: Int
-        get() = (Terrarum.mouseScreenX - (parentUI.handler?.posX ?: 0) - this.posX)
+        get() = (Terrarum.mouseScreenX - (parentUI.posX) - this.posX)
     protected val relativeMouseY: Int
-        get() = (Terrarum.mouseScreenY - (parentUI.handler?.posY ?: 0) - this.posY)
+        get() = (Terrarum.mouseScreenY - (parentUI.posY) - this.posY)
 
     /** If mouse is hovering over it */
     open val mouseUp: Boolean
@@ -122,8 +122,6 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
         }
 
         if (clickOnceListener != null && !clickOnceListenerFired && mouseUp) {
-            println("arstineotarsneio")
-
             clickOnceListener!!.invoke(relativeMouseX, relativeMouseY, button)
             actionDone = true
         }

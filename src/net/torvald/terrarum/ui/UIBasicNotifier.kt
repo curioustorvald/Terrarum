@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
@@ -28,7 +29,7 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
 
     private var font = Watch7SegSmall
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
         if (ELon) {
             ELuptimer += delta
         }
@@ -100,7 +101,7 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
         return sb.toString()
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // light overlay or EL
         if (ELon) {
             blendNormal()

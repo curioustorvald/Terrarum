@@ -1,19 +1,25 @@
 ## Minimum requirements ##
 
-* Any CPU with 1.8 GHz in speed
-* GPU that supports OpenGL 2.0, is capable of 4K texture (8K for Chinese/Japanese language)
-* 2 GB of RAM
+* Processor with 2.4 GHz speed
+* GPU that can support OpenGL 2.1, is capable of 4K texture
+* 4 GB of RAM
 * 2 GB of free disk space
+* Windows Vista/Mac OS X Lion or higher (Mac OS X Snow Leopard is incompatible with a shader the game uses)
+* PC: Java 8, Up-to-date graphics driver
 
 ## Recommended requirements ##
 
-* Intel i5 with 2.4+ GHz in speed (or any CPU with 4 or more threads, 2.4+ GHz in speed)
-* GPU that supports OpenGL 2.0, is capable of 8K texture
-* 4 GB of RAM
+* Processor with 3.0 GHz speed, 4 threads available
+* GPU that can support OpenGL 2.1, is capable of 4K texture
+* 8 GB of RAM
 * 5 GB of free disk space
+* Windows Vista/Mac OS X Lion or higher
+* PC: Java 8, Up-to-date graphics driver
 
 ## Tested environment ##
 
 (to devs: please extend this list with your test results!)
 
 * MacBookPro9,2 (MacBook Pro 13 inch mid-2012)
+* Intel 6700K, nVidia GTX970, Windows 10
+
