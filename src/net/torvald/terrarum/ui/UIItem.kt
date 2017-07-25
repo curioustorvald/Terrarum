@@ -72,15 +72,17 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
 
 
     open fun update(delta: Float) {
-        if (updateListener != null) {
-            updateListener!!.invoke(delta)
+        if (parentUI.isVisible) {
+            if (updateListener != null) {
+                updateListener!!.invoke(delta)
+            }
         }
     }
     abstract fun render(batch: SpriteBatch)
 
     // keyboard controlled
     open fun keyDown(keycode: Int): Boolean {
-        if (keyDownListener != null) {
+        if (parentUI.isVisible && keyDownListener != null) {
             keyDownListener!!.invoke(keycode)
             return true
         }
@@ -88,7 +90,7 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
         return false
     }
     open fun keyUp(keycode: Int): Boolean {
-        if (keyUpListener != null) {
+        if (parentUI.isVisible && keyUpListener != null) {
             keyUpListener!!.invoke(keycode)
             return true
         }
@@ -98,7 +100,7 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
 
     // mouse controlled
     open fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        if (mouseMovedListener != null) {
+        if (parentUI.isVisible && mouseMovedListener != null) {
             mouseMovedListener!!.invoke(relativeMouseX, relativeMouseY)
             return true
         }
@@ -106,7 +108,7 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
         return false
     }
     open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        if (touchDraggedListener != null) {
+        if (parentUI.isVisible && touchDraggedListener != null) {
             touchDraggedListener!!.invoke(relativeMouseX, relativeMouseY, pointer)
             return true
         }
@@ -116,14 +118,16 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         var actionDone = false
 
-        if (touchDownListener != null) {
-            touchDownListener!!.invoke(relativeMouseX, relativeMouseY, pointer, button)
-            actionDone = true
-        }
+        if (parentUI.isVisible) {
+            if (touchDownListener != null) {
+                touchDownListener!!.invoke(relativeMouseX, relativeMouseY, pointer, button)
+                actionDone = true
+            }
 
-        if (clickOnceListener != null && !clickOnceListenerFired && mouseUp) {
-            clickOnceListener!!.invoke(relativeMouseX, relativeMouseY, button)
-            actionDone = true
+            if (clickOnceListener != null && !clickOnceListenerFired && mouseUp) {
+                clickOnceListener!!.invoke(relativeMouseX, relativeMouseY, button)
+                actionDone = true
+            }
         }
 
         return actionDone
@@ -131,7 +135,7 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     open fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         clickOnceListenerFired = false
 
-        if (touchUpListener != null) {
+        if (parentUI.isVisible && touchUpListener != null) {
             touchUpListener!!.invoke(relativeMouseX, relativeMouseY, pointer, button)
             return true
         }
@@ -139,7 +143,7 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
         return false
     }
     open fun scrolled(amount: Int): Boolean {
-        if (scrolledListener != null) {
+        if (parentUI.isVisible && scrolledListener != null) {
             scrolledListener!!.invoke(amount)
             return true
         }
