@@ -2,6 +2,7 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
@@ -23,8 +24,13 @@ class UIInventory(
         var actor: Pocketed?,
         override var width: Int,
         override var height: Int,
-        var categoryWidth: Int
-) : UICanvas() {
+        var categoryWidth: Int,
+
+        toggleKeyLiteral: Int? = null, toggleButtonLiteral: Int? = null,
+        // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
+        customPositioning: Boolean = false, // mainly used by vital meter
+        doNotWarnConstant: Boolean = false
+) : UICanvas(toggleKeyLiteral, toggleButtonLiteral, customPositioning, doNotWarnConstant) {
 
     val inventory: ActorInventory?
         get() = actor?.inventory
@@ -189,10 +195,7 @@ class UIInventory(
     }
 
 
-    override fun update(delta: Float) {
-        if (handler == null) {
-            throw Error("Handler for this UI is null, you douchebag.")
-        }
+    override fun updateUI(delta: Float) {
 
         catButtons.update(delta)
 
@@ -223,7 +226,7 @@ class UIInventory(
 
     private val weightBarWidth = 60f
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // background
         blendNormal()
         batch.color = backgroundColour
@@ -369,19 +372,19 @@ class UIInventory(
 
 
     override fun doOpening(delta: Float) {
-        UICanvas.doOpeningPopOut(handler, openCloseTime, UICanvas.Companion.Position.LEFT)
+        UICanvas.doOpeningPopOut(this, openCloseTime, UICanvas.Companion.Position.LEFT)
     }
 
     override fun doClosing(delta: Float) {
-        UICanvas.doClosingPopOut(handler, openCloseTime, UICanvas.Companion.Position.LEFT)
+        UICanvas.doClosingPopOut(this, openCloseTime, UICanvas.Companion.Position.LEFT)
     }
 
     override fun endOpening(delta: Float) {
-        UICanvas.endOpeningPopOut(handler, UICanvas.Companion.Position.LEFT)
+        UICanvas.endOpeningPopOut(this, UICanvas.Companion.Position.LEFT)
     }
 
     override fun endClosing(delta: Float) {
-        UICanvas.endClosingPopOut(handler, UICanvas.Companion.Position.LEFT)
+        UICanvas.endClosingPopOut(this, UICanvas.Companion.Position.LEFT)
     }
 
     override fun keyDown(keycode: Int): Boolean {

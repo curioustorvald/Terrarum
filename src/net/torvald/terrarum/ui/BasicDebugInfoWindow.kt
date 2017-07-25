@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
@@ -27,7 +28,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
 
 
-    override fun update(delta: Float) {
+    override fun updateUI(delta: Float) {
         val player = Terrarum.ingame!!.player
         val hitbox = player.hitbox
 
@@ -38,7 +39,7 @@ class BasicDebugInfoWindow : UICanvas() {
         prevPlayerY = hitbox.canonicalY
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
         fun Int.rawR() = this / LightmapRenderer.MUL_2
         fun Int.rawG() = this % LightmapRenderer.MUL_2 / LightmapRenderer.MUL
         fun Int.rawB() = this % LightmapRenderer.MUL
@@ -87,16 +88,14 @@ class BasicDebugInfoWindow : UICanvas() {
         printLineColumn(batch, 2, 3, "veloX measured $ccG${xdelta}")
         printLineColumn(batch, 2, 4, "veloY measured $ccG${ydelta}")
 
-        if (player != null) {
-            printLineColumn(batch, 1, 7,
-                    "walled " +
-                    "${if (player.walledLeft) "$ccR" else "$ccG"}L" +
-                    "${if (player.walledBottom) "$ccR" else "$ccG"}${0x1F.toChar()}" +
-                    "${if (player.walledTop) "$ccR" else "$ccG"}${0x1E.toChar()}" +
-                    "${if (player.walledRight) "$ccR" else "$ccG"}R" +
-                    "${if (player.colliding) "$ccR" else "$ccG"}${0x08.toChar()}"
-            )
-        }
+        printLineColumn(batch, 1, 7,
+                "walled " +
+                "${if (player.walledLeft) "$ccR" else "$ccG"}L" +
+                "${if (player.walledBottom) "$ccR" else "$ccG"}${0x1F.toChar()}" +
+                "${if (player.walledTop) "$ccR" else "$ccG"}${0x1E.toChar()}" +
+                "${if (player.walledRight) "$ccR" else "$ccG"}R" +
+                "${if (player.colliding) "$ccR" else "$ccG"}${0x08.toChar()}"
+        )
 
 
 

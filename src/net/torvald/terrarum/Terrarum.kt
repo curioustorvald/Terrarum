@@ -32,6 +32,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.lwjgl.input.Controllers
 import java.io.File
 import java.io.IOException
+import java.lang.management.ManagementFactory
 import java.util.*
 
 /**
@@ -289,7 +290,7 @@ object Terrarum : Game() {
         println("[Terrarum] os.arch = $systemArch") // debug info
 
         if (is32BitJVM) {
-            println("32 Bit JVM detected")
+            System.err.println("[Terrarum] 32 Bit JVM detected")
         }
 
         joypadLabelStart = when (getConfigString("joypadlabelstyle")) {
@@ -325,9 +326,25 @@ object Terrarum : Game() {
     val USE_VSYNC = getConfigBoolean("usevsync")
     var VSYNC = USE_VSYNC
     val VSYNC_TRIGGER_THRESHOLD = 56
+    val GL_VERSION: Int
+        get() = Gdx.graphics.glVersion.majorVersion * 100 +
+                Gdx.graphics.glVersion.minorVersion * 10 +
+                Gdx.graphics.glVersion.releaseVersion
+    val MINIMAL_GL_VERSION = 210
 
 
     override fun create() {
+        println("[Terrarum] GL_VERSION = $GL_VERSION")
+        println("[Terrarum] GL info:\n${Gdx.graphics.glVersion.debugVersionString}") // debug info
+
+
+        if (GL_VERSION < MINIMAL_GL_VERSION) {
+            // TODO notify properly
+            throw Error("Graphics device not capable -- device's GL_VERSION: $GL_VERSION, required: $MINIMAL_GL_VERSION")
+        }
+
+
+
         fullscreenQuad = Mesh(
                 true, 4, 6,
                 VertexAttribute.Position(),
@@ -409,16 +426,16 @@ object Terrarum : Game() {
 
 
         // jump right into the ingame
-        ingame = Ingame(batch)
+        /*ingame = Ingame(batch)
         ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
         ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
         LoadScreen.screenToLoad = ingame!!
-        super.setScreen(LoadScreen)
+        super.setScreen(LoadScreen)*/
 
 
 
         // title screen
-        //super.setScreen(TitleScreen(batch))
+        super.setScreen(TitleScreen(batch))
     }
 
     internal fun changeScreen(screen: Screen) {

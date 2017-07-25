@@ -173,6 +173,14 @@ class UIItemTextButtonList(
         batch.color = backgroundCol
     }
 
+    fun select(index: Int) {
+        selectedIndex = index
+    }
+
+    fun unselect() {
+        selectedIndex = null
+    }
+
     override fun dispose() {
         iconSpriteSheet?.dispose()
     }

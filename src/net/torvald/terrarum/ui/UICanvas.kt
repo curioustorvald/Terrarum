@@ -1,6 +1,8 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.Second
@@ -12,20 +14,36 @@ import net.torvald.terrarum.gameactors.roundInt
  *
  * Created by minjaesong on 15-12-31.
  */
-abstract class UICanvas {
+abstract class UICanvas(
+        toggleKeyLiteral: Int? = null, toggleButtonLiteral: Int? = null,
+        // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
+        customPositioning: Boolean = false, // mainly used by vital meter
+        doNotWarnConstant: Boolean = false
+) {
 
     abstract var width: Int
     abstract var height: Int
 
+    inline var posX: Int
+        get() = handler.posX
+        set(value) { handler.posX = value }
+    inline var posY: Int
+        get() = handler.posY
+        set(value) { handler.posY = value }
+
     /**
      * Usage: (in StateInGame:) uiHandlerField.ui.handler = uiHandlerField
      */
-    open lateinit var handler: UIHandler
+    protected val handler = UIHandler(toggleKeyLiteral, toggleButtonLiteral, customPositioning, doNotWarnConstant)
+
+    init {
+
+    }
 
     /**
      * In milliseconds
      *
-     * Timer itself is implemented in the handler.
+     * Timer itself is implemented in the ui.handler.
      */
     abstract var openCloseTime: Second
 
@@ -46,27 +64,41 @@ abstract class UICanvas {
         get() = mouseUp && Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary"))
 
 
-    abstract fun update(delta: Float)
+    fun update(delta: Float) {
+        handler.update(this, delta)
+    }
+    fun render(batch: SpriteBatch, camera: Camera) {
+        handler.render(this, batch, camera)
+    }
 
-    abstract fun render(batch: SpriteBatch)
+
+    inline fun addSubUI(ui: UICanvas) {
+        handler.addSubUI(ui)
+    }
+
+
+    /** Override this for the actual update */
+    abstract fun updateUI(delta: Float)
+    /** Override this for the actual render */
+    abstract fun renderUI(batch: SpriteBatch, camera: Camera)
 
     /**
-     * Do not modify handler.openCloseCounter here.
+     * Do not modify ui.handler.openCloseCounter here.
      */
     abstract fun doOpening(delta: Float)
 
     /**
-     * Do not modify handler.openCloseCounter here.
+     * Do not modify ui.handler.openCloseCounter here.
      */
     abstract fun doClosing(delta: Float)
 
     /**
-     * Do not modify handler.openCloseCounter here.
+     * Do not modify ui.handler.openCloseCounter here.
      */
     abstract fun endOpening(delta: Float)
 
     /**
-     * Do not modify handler.openCloseCounter here.
+     * Do not modify ui.handler.openCloseCounter here.
      */
     abstract fun endClosing(delta: Float)
 
@@ -78,31 +110,37 @@ abstract class UICanvas {
 
     open fun mouseMoved(screenX: Int, screenY: Int): Boolean {
         uiItems.forEach { it.mouseMoved(screenX, screenY) }
+        handler.subUIs.forEach { it.mouseMoved(screenX, screenY) }
         return true
     }
     open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         uiItems.forEach { it.touchDragged(screenX, screenY, pointer) }
+        handler.subUIs.forEach { it.touchDragged(screenX, screenY, pointer) }
         return true
     }
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         uiItems.forEach { it.touchDown(screenX, screenY, pointer, button) }
+        handler.subUIs.forEach { it.touchDown(screenX, screenY, pointer, button) }
         return true
     }
     open fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         uiItems.forEach { it.touchUp(screenX, screenY, pointer, button) }
+        handler.subUIs.forEach { it.touchUp(screenX, screenY, pointer, button) }
         return true
     }
     open fun scrolled(amount: Int): Boolean {
         uiItems.forEach { it.scrolled(amount) }
+        handler.subUIs.forEach { it.scrolled(amount) }
         return true
     }
-
     open fun keyDown(keycode: Int): Boolean {
         uiItems.forEach { it.keyDown(keycode) }
+        handler.subUIs.forEach { it.keyDown(keycode) }
         return true
     }
     open fun keyUp(keycode: Int): Boolean {
         uiItems.forEach { it.keyUp(keycode) }
+        handler.subUIs.forEach { it.keyUp(keycode) }
         return true
     }
     open fun keyTyped(character: Char): Boolean {
@@ -115,85 +153,138 @@ abstract class UICanvas {
         this.height = height
     }
 
+
+    // handler func aliases //
+
+    inline fun setPosition(x: Int, y: Int) {
+        handler.setPosition(x, y)
+    }
+
+    inline fun setAsAlwaysVisible() {
+        handler.setAsAlwaysVisible()
+    }
+
+    inline fun setAsOpen() {
+        handler.setAsOpen()
+    }
+
+    inline fun setAsClose() {
+        handler.setAsClose()
+    }
+
+    inline fun toggleOpening() {
+        handler.toggleOpening()
+    }
+
+    inline val isOpened: Boolean
+        get() = handler.isOpened
+
+    inline val isOpening: Boolean
+        get() = handler.isOpening
+
+    inline val isClosing: Boolean
+        get() = handler.isClosing
+
+    inline val isClosed: Boolean
+        get() = handler.isClosed
+
+    inline var opacity: Float
+        get() = handler.opacity
+        set(value) { handler.opacity = value }
+
+    inline var scale: Float
+        get() = handler.scale
+        set(value) { handler.scale = value }
+
+    inline val isTakingControl: Boolean
+        get() = handler.isTakingControl
+
+    inline var isVisible: Boolean
+        get() = handler.isVisible
+        set(value) { handler.isVisible = value }
+
+    // end of handler func aliases
+
+
     companion object {
         const val OPENCLOSE_GENERIC = 0.2f
 
-        fun doOpeningFade(handler: UIHandler, openCloseTime: Second) {
-            handler.opacity = handler.openCloseCounter / openCloseTime
+        fun doOpeningFade(ui: UICanvas, openCloseTime: Second) {
+            ui.handler.opacity = ui.handler.openCloseCounter / openCloseTime
         }
-        fun doClosingFade(handler: UIHandler, openCloseTime: Second) {
-            handler.opacity = (openCloseTime - handler.openCloseCounter) / openCloseTime
+        fun doClosingFade(ui: UICanvas, openCloseTime: Second) {
+            ui.handler.opacity = (openCloseTime - ui.handler.openCloseCounter) / openCloseTime
         }
-        fun endOpeningFade(handler: UIHandler) {
-            handler.opacity = 1f
+        fun endOpeningFade(ui: UICanvas) {
+            ui.handler.opacity = 1f
         }
-        fun endClosingFade(handler: UIHandler) {
-            handler.opacity = 0f
+        fun endClosingFade(ui: UICanvas) {
+            ui.handler.opacity = 0f
         }
 
 
-        fun doOpeningPopOut(handler: UIHandler, openCloseTime: Second, position: Position) {
+        fun doOpeningPopOut(ui: UICanvas, openCloseTime: Second, position: Position) {
             when (position) {
-                Position.LEFT -> handler.posX = Movement.fastPullOut(
-                        handler.openCloseCounter / openCloseTime,
-                        -handler.UI.width.toFloat(),
+                Position.LEFT -> ui.handler.posX = Movement.fastPullOut(
+                        ui.handler.openCloseCounter / openCloseTime,
+                        -ui.width.toFloat(),
                         0f
                 ).roundInt()
-                Position.TOP -> handler.posY = Movement.fastPullOut(
-                        handler.openCloseCounter / openCloseTime,
-                        -handler.UI.height.toFloat(),
+                Position.TOP -> ui.handler.posY = Movement.fastPullOut(
+                        ui.handler.openCloseCounter / openCloseTime,
+                        -ui.height.toFloat(),
                         0f
                 ).roundInt()
-                Position.RIGHT -> handler.posX = Movement.fastPullOut(
-                        handler.openCloseCounter / openCloseTime,
+                Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
+                        ui.handler.openCloseCounter / openCloseTime,
                         Terrarum.WIDTH.toFloat(),
-                        Terrarum.WIDTH - handler.UI.width.toFloat()
+                        Terrarum.WIDTH - ui.width.toFloat()
                 ).roundInt()
-                Position.BOTTOM -> handler.posY = Movement.fastPullOut(
-                        handler.openCloseCounter / openCloseTime,
+                Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
+                        ui.handler.openCloseCounter / openCloseTime,
                         Terrarum.HEIGHT.toFloat(),
-                        Terrarum.HEIGHT - handler.UI.height.toFloat()
+                        Terrarum.HEIGHT - ui.height.toFloat()
                 ).roundInt()
             }
         }
-        fun doClosingPopOut(handler: UIHandler, openCloseTime: Second, position: Position) {
+        fun doClosingPopOut(ui: UICanvas, openCloseTime: Second, position: Position) {
             when (position) {
-                Position.LEFT -> handler.posX = Movement.fastPullOut(
-                        handler.openCloseCounter / openCloseTime,
+                Position.LEFT -> ui.handler.posX = Movement.fastPullOut(
+                        ui.handler.openCloseCounter / openCloseTime,
                         0f,
-                        -handler.UI.width.toFloat()
+                        -ui.width.toFloat()
                 ).roundInt()
-                Position.TOP -> handler.posY = Movement.fastPullOut(
-                        handler.openCloseCounter / openCloseTime,
+                Position.TOP -> ui.handler.posY = Movement.fastPullOut(
+                        ui.handler.openCloseCounter / openCloseTime,
                         0f,
-                        -handler.UI.height.toFloat()
+                        -ui.height.toFloat()
                 ).roundInt()
-                Position.RIGHT -> handler.posX = Movement.fastPullOut(
-                        handler.openCloseCounter / openCloseTime,
-                        Terrarum.WIDTH - handler.UI.width.toFloat(),
+                Position.RIGHT -> ui.handler.posX = Movement.fastPullOut(
+                        ui.handler.openCloseCounter / openCloseTime,
+                        Terrarum.WIDTH - ui.width.toFloat(),
                         Terrarum.WIDTH.toFloat()
                 ).roundInt()
-                Position.BOTTOM -> handler.posY = Movement.fastPullOut(
-                        handler.openCloseCounter / openCloseTime,
-                        Terrarum.HEIGHT - handler.UI.height.toFloat(),
+                Position.BOTTOM -> ui.handler.posY = Movement.fastPullOut(
+                        ui.handler.openCloseCounter / openCloseTime,
+                        Terrarum.HEIGHT - ui.height.toFloat(),
                         Terrarum.HEIGHT.toFloat()
                 ).roundInt()
             }
         }
-        fun endOpeningPopOut(handler: UIHandler, position: Position) {
+        fun endOpeningPopOut(ui: UICanvas, position: Position) {
             when (position) {
-                Position.LEFT -> handler.posX = 0
-                Position.TOP -> handler.posY = 0
-                Position.RIGHT -> handler.posX = Terrarum.WIDTH - handler.UI.width
-                Position.BOTTOM -> handler.posY = Terrarum.HEIGHT - handler.UI.height
+                Position.LEFT -> ui.handler.posX = 0
+                Position.TOP -> ui.handler.posY = 0
+                Position.RIGHT -> ui.handler.posX = Terrarum.WIDTH - ui.width
+                Position.BOTTOM -> ui.handler.posY = Terrarum.HEIGHT - ui.height
             }
         }
-        fun endClosingPopOut(handler: UIHandler, position: Position) {
+        fun endClosingPopOut(ui: UICanvas, position: Position) {
             when (position) {
-                Position.LEFT -> handler.posX = -handler.UI.width
-                Position.TOP -> handler.posY = -handler.UI.height
-                Position.RIGHT -> handler.posX = Terrarum.WIDTH
-                Position.BOTTOM -> handler.posY = Terrarum.HEIGHT
+                Position.LEFT -> ui.handler.posX = -ui.width
+                Position.TOP -> ui.handler.posY = -ui.height
+                Position.RIGHT -> ui.handler.posX = Terrarum.WIDTH
+                Position.BOTTOM -> ui.handler.posY = Terrarum.HEIGHT
             }
         }
 
