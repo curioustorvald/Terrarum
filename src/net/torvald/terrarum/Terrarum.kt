@@ -334,6 +334,12 @@ object Terrarum : Game() {
 
 
     override fun create() {
+        if (environment != RunningEnvironment.MOBILE) {
+            Gdx.gl.glDisable(GL20.GL_DITHER)
+        }
+
+
+
         println("[Terrarum] GL_VERSION = $GL_VERSION")
         println("[Terrarum] GL info:\n${Gdx.graphics.glVersion.debugVersionString}") // debug info
 

@@ -6,5 +6,5 @@
 #     if even that does not exist, an the program will quit with error.
 # and yes, you can disable basegame, but we don't recommend.
 
-basegame,The base game,basegame.groovy,
-dwarventech,Dwarven technicians are emerged from their hiding,,
+basegame
+dwarventech

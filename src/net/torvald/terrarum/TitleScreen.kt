@@ -148,7 +148,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
         uiMenu = UITitleRemoConRoot()
-        uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
+        uiMenu.setPosition(0, 0)
         uiMenu.setAsOpen()
 
 

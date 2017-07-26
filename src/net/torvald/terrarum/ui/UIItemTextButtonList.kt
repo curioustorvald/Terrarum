@@ -17,6 +17,8 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 class UIItemTextButtonList(
         parentUI: UICanvas,
         labelsList: Array<String>,
+        override var posX: Int,
+        override var posY: Int,
         override var width: Int,
         override var height: Int,
         val verticalGutter: Int = 0,
@@ -51,13 +53,15 @@ class UIItemTextButtonList(
     val pregap = (width - textAreaWidth - iconsWithGap) / 2 + iconsWithGap
     val postgap = (width - textAreaWidth - iconsWithGap) / 2
 
+
+
     val buttons = labelsList.mapIndexed { index, s ->
         val height = this.height - UIItemTextButton.height
         if (!kinematic) {
             UIItemTextButton(
                     parentUI, s,
-                    posX = 0,
-                    posY = verticalGutter + ((height - 2 * verticalGutter) / labelsList.size.minus(1).toFloat() * index).roundInt(),
+                    posX = posX,
+                    posY = posY + verticalGutter + ((height - 2 * verticalGutter) / labelsList.size.minus(1).toFloat() * index).roundInt(),
                     width = width,
                     readFromLang = readFromLang,
                     activeCol = activeCol,
@@ -74,8 +78,8 @@ class UIItemTextButtonList(
         else {
             UIItemTextButton(
                     parentUI, s,
-                    posX = 0,
-                    posY = verticalGutter + ((height - 2 * verticalGutter) / labelsList.size.minus(1).toFloat() * index).roundInt(),
+                    posX = posX,
+                    posY = posY + verticalGutter + ((height - 2 * verticalGutter) / labelsList.size.minus(1).toFloat() * index).roundInt(),
                     width = width,
                     readFromLang = readFromLang,
                     activeCol = activeCol,
@@ -91,8 +95,26 @@ class UIItemTextButtonList(
         }
     }
 
-    override var posX = 0
+
+    /*override var posX = 0
+        set(value) {
+            buttons.forEach {
+                val oldPosX = field
+                val newPosX = value
+                it.posX = (newPosX - oldPosX)
+            }
+            field = value
+        }
     override var posY = 0
+        set(value) {
+            buttons.forEach {
+                val oldPosY = field
+                val newPosY = value
+                it.posY = (newPosY - oldPosY)
+            }
+            field = value
+        }*/
+
 
     var selectedIndex: Int? = defaultSelection
     val selectedButton: UIItemTextButton?
@@ -104,6 +126,8 @@ class UIItemTextButtonList(
     private var highlighterYStart = highlightY
     private var highlighterYEnd = highlightY
 
+    /** (oldIndex: Int?, newIndex: Int) -> Unit */
+    var selectionChangeListener: ((Int?, Int) -> Unit)? = null
 
     override fun update(delta: Float) {
         if (highlighterMoving) {
@@ -131,6 +155,8 @@ class UIItemTextButtonList(
 
 
             if (btn.mousePushed && index != selectedIndex) {
+                val oldIndex = selectedIndex
+
                 if (kinematic) {
                     highlighterYStart = buttons[selectedIndex!!].posY.toDouble()
                     selectedIndex = index
@@ -141,6 +167,8 @@ class UIItemTextButtonList(
                     selectedIndex = index
                     highlightY = buttons[selectedIndex!!].posY.toDouble()
                 }
+
+                selectionChangeListener?.invoke(oldIndex, index)
             }
             btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
 
@@ -148,6 +176,7 @@ class UIItemTextButtonList(
     }
 
     override fun render(batch: SpriteBatch) {
+
         batch.color = backgroundCol
         BlendMode.resolve(backgroundBlendMode)
         batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
