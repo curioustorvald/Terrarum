@@ -33,6 +33,7 @@ class UITitleRemoConRoot : UICanvas() {
     private val menubar = UIItemTextButtonList(
             this,
             menuLabels,
+            0, menubarOffY,
             this.width, this.height,
             textAreaWidth = this.width,
             readFromLang = true,
@@ -51,8 +52,8 @@ class UITitleRemoConRoot : UICanvas() {
 
 
     init {
-        remoConLanguage.setPosition(0, menubarOffY)
-        remoConCredits.setPosition(0, menubarOffY)
+        remoConLanguage.setPosition(0, 0)
+        remoConCredits.setPosition(0, 0)
 
 
 
@@ -62,8 +63,8 @@ class UITitleRemoConRoot : UICanvas() {
 
         ////////////////////////////
 
-
         uiItems.add(menubar)
+
 
 
         // attach listeners

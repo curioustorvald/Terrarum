@@ -18,6 +18,11 @@ Contain everything on [TEVD](github.com/minjaesong/TerranVirtualDisk)
     |Byte[4]   |crc3       |CRC-32 of worldinfo3 entry   |
     |Byte[4]   |crc4       |CRC-32 of worldinfo4 entry   |
     |Byte[32]  |hash4321   |SHA-256 of crc4..crc3..crc2..crc1|
+    |Int       |refid      |Reference ID of the player   |
+    |Long      |time_t     |Current world's time_t       |
+    |Byte[6]   |t_create   |Creation time of the savefile in time_t|
+    |Byte[6]   |t_lastacc  |Last play time in time_t     |
+    |Int       |t_wasted   |Total playtime in time_t     |
     
     Endianness: Big
     

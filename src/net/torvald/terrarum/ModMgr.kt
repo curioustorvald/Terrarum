@@ -10,9 +10,11 @@ import net.torvald.terrarum.langpack.Lang
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileReader
 import java.nio.file.FileSystems
+import java.util.*
 import javax.script.ScriptEngineManager
 import javax.script.Invocable
 
@@ -37,14 +39,19 @@ object ModMgr {
     data class ModuleMetadata(
             val order: Int,
             val isDir: Boolean,
-            val desc: String,
+            val properName: String,
+            val description: String,
+            val author: String,
             val entryPoint: String,
+            val releaseDate: String,
+            val version: String,
             val libraries: Array<String>
     ) {
         override fun toString() =
-            "\tModule #$order -- $desc\n" +
-            "\tEntry point: $entryPoint\n" +
-            "\tExternal libraries: ${libraries.joinToString(", ")}"
+                "\tModule #$order -- $properName | $version | $author\n" +
+                "\t$description | $releaseDate\n" +
+                "\tEntry point: $entryPoint\n" +
+                "\tExternal libraries: ${libraries.joinToString(", ")}"
     }
     const val modDir = "./assets/modules"
 
@@ -65,11 +72,18 @@ object ModMgr {
             val moduleName = it[0]
             println("[ModMgr] Loading module $moduleName")
 
-            val description = it[1]
-            val entryPoint = it[2]
-            val libs = it[3].split(';').toTypedArray()
+            val modMetadata = Properties()
+            modMetadata.load(FileInputStream("$modDir/$moduleName/metadata.properties"))
+
+            val properName = modMetadata.getProperty("propername")
+            val description = modMetadata.getProperty("description")
+            val author = modMetadata.getProperty("author")
+            val entryPoint = modMetadata.getProperty("entrypoint")
+            val releaseDate = modMetadata.getProperty("releasedate")
+            val version = modMetadata.getProperty("version")
+            val libs = modMetadata.getProperty("libraries").split(';').toTypedArray()
             val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
-            moduleInfo[moduleName] = ModuleMetadata(index, isDir, description, entryPoint, libs)
+            moduleInfo[moduleName] = ModuleMetadata(index, isDir, properName, description, author, entryPoint, releaseDate, version, libs)
 
             println(moduleInfo[moduleName])
 
