@@ -1,7 +1,7 @@
 Savegame metadata
 
 * Endianness: LITTLE
-* Filename: 'world'
+* Filename: 'worldinfo0'
 * Remarks: GZipped
 
 Ord  Hex  Description
@@ -10,7 +10,7 @@ Ord  Hex  Description
 02   4D   S
 03   44   V
 
-04        Name of the world in UTF-8
+04        Name of the world in UTF-8 (arbitrary length)
 ...  00   String terminator
 
 ...       Terrain seed (8 bytes)
@@ -20,3 +20,10 @@ Ord  Hex  Description
 ...       SHA-256 hash of worldinfo2 when not compressed (32 bytes)
 ...       SHA-256 hash of worldinfo3 when not compressed (32 bytes)
 ...       SHA-256 hash of worldinfo4 when not compressed (32 bytes)
+
+...       ReferenceID of the player (4 bytes)
+...       Current world's time_t (the ingame time, 8 bytes)
+
+...       Creation time in time_t (6 bytes)
+...       Last play time in time_t (6 bytes)
+...       Total playtime in time_t (4 bytes)    // will record 136.1 years of playtime

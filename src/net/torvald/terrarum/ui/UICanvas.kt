@@ -77,9 +77,9 @@ abstract class UICanvas(
     }
 
 
-    /** Override this for the actual update */
+    /** Override this for the actual update. You must update uiItems by yourself. */
     abstract fun updateUI(delta: Float)
-    /** Override this for the actual render */
+    /** Override this for the actual render. You must render uiItems by yourself. */
     abstract fun renderUI(batch: SpriteBatch, camera: Camera)
 
     /**

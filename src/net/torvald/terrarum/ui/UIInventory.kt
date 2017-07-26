@@ -85,6 +85,8 @@ class UIInventory(
                     "GAME_GENRE_MISC"
                     //"GAME_INVENTORY_FAVORITES",
             ),
+            posX = 0,
+            posY = 0,
             width = categoryWidth,
             height = height - controlHelpHeight,
             verticalGutter = itemStripGutterH,

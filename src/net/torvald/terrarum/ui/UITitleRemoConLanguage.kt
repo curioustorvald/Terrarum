@@ -20,6 +20,7 @@ class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
     private val menubar = UIItemTextButtonList(
             this,
             menuLabels,
+            0, UITitleRemoConRoot.menubarOffY,
             this.width, this.height,
             textAreaWidth = this.width,
             readFromLang = true,
@@ -34,8 +35,16 @@ class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
         uiItems.add(menubar)
 
 
+        ////////////////////////////
+
+
+        uiItems.add(menubar)
+
+
+
         // attach listeners
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_RETURN")].clickOnceListener = { _, _, _ ->
+            menubar.selectedIndex = menubar.defaultSelection
             this.setAsClose()
             superMenu.setAsOpen()
         }
