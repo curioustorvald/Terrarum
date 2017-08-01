@@ -38,6 +38,7 @@ Simulation of the world, day and night fast, camera follows landscape
 - Controls
 - Graphics
 - Gameplay Options
+- MIDI (* Do-not-translate)
 - Return
 
 

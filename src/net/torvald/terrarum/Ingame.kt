@@ -166,9 +166,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
     // invert Y
     fun initViewPort(width: Int, height: Int) {
-        //val width = if (width % 1 == 1) width + 1 else width
-        //val height = if (height % 1 == 1) height + 1 else width
-
         // Set Y to point downwards
         camera.setToOrtho(true, width.toFloat(), height.toFloat())
 
@@ -430,7 +427,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
 
-        Gdx.graphics.setTitle(GAME_NAME +
+        Gdx.graphics.setTitle(TerrarumAppLoader.GAME_NAME +
                               " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
                               " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
         )

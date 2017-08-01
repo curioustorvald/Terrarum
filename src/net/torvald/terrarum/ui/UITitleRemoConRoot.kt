@@ -70,13 +70,15 @@ class UITitleRemoConRoot : UICanvas() {
         // attach listeners
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_LANGUAGE")].clickOnceListener = { _, _, _ ->
             this.setAsClose()
+            Thread.sleep(50)
             remoConLanguage.setAsOpen()
         }
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_CREDITS")].clickOnceListener = { _, _, _ ->
             this.setAsClose()
+            Thread.sleep(50)
             remoConCredits.setAsOpen()
         }
-        menubar.buttons[menuLabels.indexOf("MENU_LABEL_QUIT")].clickOnceListener = { _, _, _ -> System.exit(0) }
+        menubar.buttons[menuLabels.indexOf("MENU_LABEL_QUIT")].clickOnceListener = { _, _, _ -> Thread.sleep(50); System.exit(0) }
     }
 
     override fun updateUI(delta: Float) {

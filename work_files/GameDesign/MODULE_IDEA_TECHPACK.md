@@ -13,4 +13,19 @@ If things would run with infinite energy, I'm out. We need realism to implement 
 
 - Direct Current (only! because AC makes EE 10x harder), follows Ohm's law, and EXPLOSION!
 - Take 'some' idea from _IndustrialCraft_ (Minecraft mod)
+- Solar Windows, blocks light bit more than regular windows, high energies are absorbed more (it's a real thing!!)
 
+### Source of Electricity
+
+- Conventional
+    + Fuel burn
+    + Nuclear fission
+- (almost) Infinite
+    + Dark solar panel (traditional panel)
+    + Transparent solar panel (window panel)
+- Capacitor
+    + Battery pack
+    + Pu-238 RTG (super long-lasting battery with radiooactive taste)
+    
+
+    

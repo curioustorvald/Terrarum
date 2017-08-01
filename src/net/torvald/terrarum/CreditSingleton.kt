@@ -4,7 +4,7 @@ import net.torvald.terrarum.langpack.Lang
 
 object CreditSingleton {
 
-    val credit: List<String> =
+    val credit: List<String>; get() =
             ("${Lang["CREDITS_PROGRAMMER"]}\n\nTorvald (minjaesong)\n\n" +
             "${Lang["CREDITS_ARTIST_PLURAL"]}\n\nTorvald (minjaesong)\nRoundworld (leedonggeun)" +
             """
@@ -161,7 +161,7 @@ Sound from http://www.freesound.org/people/klankbeeld/""").split('\n')
 
 
 
-    val gpl3: List<String> = """                    GNU GENERAL PUBLIC LICENSE
+    val gpl3: List<String>; get() = """                    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
