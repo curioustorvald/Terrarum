@@ -32,9 +32,6 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
     // invert Y
     fun initViewPort(width: Int, height: Int) {
-        //val width = if (width % 1 == 1) width + 1 else width
-        //val height = if (height % 1 == 1) height + 1 else width
-
         // Set Y to point downwards
         camera.setToOrtho(true, width.toFloat(), height.toFloat())
 
@@ -335,7 +332,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         batch.color = Color.LIGHT_GRAY
 
         val COPYTING = arrayOf(
-                COPYRIGHT_DATE_NAME,
+                TerrarumAppLoader.COPYRIGHT_DATE_NAME,
                 Lang["COPYRIGHT_GNU_GPL_3"]
         )
 

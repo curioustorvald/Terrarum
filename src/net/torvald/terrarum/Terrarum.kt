@@ -15,6 +15,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum.RENDER_FPS
+import net.torvald.terrarum.TerrarumAppLoader
 import net.torvald.terrarum.gameactors.floorInt
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.imagefont.TinyAlphNum
@@ -36,18 +37,15 @@ import java.lang.management.ManagementFactory
 import java.util.*
 
 /**
- * Created by minjaesong on 2017-06-15.
+ * Slick2d Version Created by minjaesong on 15-12-30.
+ *
+ * LibGDX Version Created by minjaesong on 2017-06-15.
  */
 
-const val GAME_NAME = "Terrarum"
-const val COPYRIGHT_DATE_NAME = "Copyright 2013-2017 Torvald (minjaesong)"
-
-fun main(args: Array<String>) {
+/*fun main(args: Array<String>) {
     Terrarum // invoke
 
     val config = LwjglApplicationConfiguration()
-    config.foregroundFPS = Terrarum.RENDER_FPS
-    config.backgroundFPS = Terrarum.RENDER_FPS
     config.vSyncEnabled = Terrarum.USE_VSYNC
     config.resizable = true
     config.width = 1072
@@ -65,14 +63,16 @@ fun main(args: Array<String>) {
     // "Terrarum.TARGET_INTERNAL_FPS" denotes "execute as if FPS was set to this value"
 
     LwjglApplication(Terrarum, config)
-}
+}*/
 
 
 
 typealias RGBA8888 = Int
 
-object Terrarum : Game() {
+object Terrarum : Screen {
 
+    lateinit var appLoader: TerrarumAppLoader
+    
     internal var screenW: Int? = null
     internal var screenH: Int? = null
 
@@ -90,9 +90,9 @@ object Terrarum : Game() {
     //////////////////////////////
 
     val WIDTH: Int
-        get() = if (screenW!! % 2 == 0) screenW!! else screenW!! + 1
+        get() = if ((screenW ?: Gdx.graphics.width) % 2 == 0) (screenW ?: Gdx.graphics.width) else (screenW ?: Gdx.graphics.width) - 1
     val HEIGHT: Int
-        get() = if (screenH!! % 2 == 0) screenH!! else screenH!! + 1
+        get() = if ((screenH ?: Gdx.graphics.height) % 2 == 0) (screenH ?: Gdx.graphics.height) else (screenH ?: Gdx.graphics.height) - 1
 
     val WIDTH_MIN = 800
     val HEIGHT_MIN = 600
@@ -105,7 +105,7 @@ object Terrarum : Game() {
     /**
      * To be used with physics simulator
      */
-    val TARGET_FPS: Double = 26.6666666666666666666666666 // lower value == faster gravity responce (IT WON'T HOTSWAP!!)
+    val TARGET_FPS: Double = 26.6666666666666666666666666 // lower value == faster gravity response (IT WON'T HOTSWAP!!)
 
     /**
      * To be used with render, to achieve smooth frame drawing
@@ -180,7 +180,7 @@ object Terrarum : Game() {
 
 
     lateinit var fontGame: GameFontBase
-    lateinit var fontSmallNumbers: BitmapFont
+    lateinit var fontSmallNumbers: TinyAlphNum
 
     var joypadLabelStart: Char = 0xE000.toChar() // lateinit
     var joypadLableSelect: Char = 0xE000.toChar() // lateinit
@@ -333,7 +333,7 @@ object Terrarum : Game() {
     val MINIMAL_GL_VERSION = 210
 
 
-    override fun create() {
+    override fun show() {
         if (environment != RunningEnvironment.MOBILE) {
             Gdx.gl.glDisable(GL20.GL_DITHER)
         }
@@ -360,9 +360,9 @@ object Terrarum : Game() {
 
         fullscreenQuad.setVertices(floatArrayOf(
                 0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
-                Terrarum.WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                0f, Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
+                WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
+                WIDTH.toFloat(), HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
+                0f, HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
         ))
         fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
 
@@ -395,7 +395,7 @@ object Terrarum : Game() {
         shaderBayer.setUniformf("bcount", 16f)
         shaderBayer.end()
 
-        shaderBayerSkyboxFill =  ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"))
+        shaderBayerSkyboxFill = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"))
 
 
         shaderRGBOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbonly.frag"))
@@ -441,28 +441,28 @@ object Terrarum : Game() {
 
 
         // title screen
-        super.setScreen(TitleScreen(batch))
+        appLoader.setScreen(TitleScreen(batch))
     }
 
     internal fun changeScreen(screen: Screen) {
-        super.setScreen(screen)
+        appLoader.setScreen(screen)
     }
 
-    override fun render() {
-        super.screen.render(deltaTime)
+    override fun render(delta: Float) {
+        //appLoader.screen.render(deltaTime)
         GLOBAL_RENDER_TIMER += 1
     }
 
     override fun pause() {
-        super.screen.pause()
+        //appLoader.screen.pause()
     }
 
     override fun resume() {
-        super.screen.resume()
+        //appLoader.screen.resume()
     }
 
     override fun dispose() {
-        super.screen.dispose()
+        //appLoader.screen.dispose()
         fontGame.dispose()
         fontSmallNumbers.dispose()
 
@@ -475,6 +475,10 @@ object Terrarum : Game() {
         MessageWindow.SEGMENT_BLACK.dispose()
         MessageWindow.SEGMENT_WHITE.dispose()
         //dispose any other resources used in this level
+    }
+
+    override fun hide() {
+
     }
 
     override fun resize(width: Int, height: Int) {
@@ -498,7 +502,7 @@ object Terrarum : Game() {
         fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
 
 
-        super.resize(width, height)
+        //appLoader.resize(width, height)
         //Gdx.graphics.setWindowedMode(width, height)
 
         println("newsize: ${Gdx.graphics.width}x${Gdx.graphics.height}")

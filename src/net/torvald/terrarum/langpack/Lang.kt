@@ -14,6 +14,8 @@ object Lang {
      * Get record by its STRING_ID
      *
      * HashMap<"$key_$language", Value>
+     *
+     *     E.g. langpack["MENU_LANGUAGE_THIS_fiFI"]
      */
     val langpack = HashMap<String, String>()
     private val FALLBACK_LANG_CODE = "en"
@@ -55,9 +57,10 @@ object Lang {
                 if (!it.name.startsWith("Polyglot") && it.name.endsWith(".json")) {
                     processRegularLangfile(it, lang)
                 }
-                else {
+                else if (it.name.startsWith("Polyglot") && it.name.endsWith(".json")) {
                     processPolyglotLangFile(it, lang)
                 }
+                // else, ignore
             }
 
         }
