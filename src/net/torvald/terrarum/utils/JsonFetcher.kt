@@ -43,10 +43,15 @@ object JsonFetcher {
         return jsonObj
     }
 
-    @Throws(java.io.IOException::class)
     private fun readJsonFileAsString(path: String) {
-        java.nio.file.Files.lines(java.nio.file.FileSystems.getDefault().getPath(path)).forEach(
-                { net.torvald.terrarum.utils.JsonFetcher.jsonString!!.append(it) }
-        ) // JSON does not require line break
+        try {
+            java.nio.file.Files.lines(java.nio.file.FileSystems.getDefault().getPath(path)).forEach(
+                    { net.torvald.terrarum.utils.JsonFetcher.jsonString!!.append(it) }
+            ) // JSON does not require line break
+        }
+        catch (e: IOException) {
+            System.err.println("An error occurred while reading $path")
+            e.printStackTrace()
+        }
     }
 }

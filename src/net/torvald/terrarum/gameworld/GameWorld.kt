@@ -30,7 +30,7 @@ class GameWorld(val width: Int, val height: Int) {
     val wallDamages = HashMap<BlockAddress, BlockDamage>()
     val terrainDamages = HashMap<BlockAddress, BlockDamage>()
 
-    //public World physWorld = new World( new Vec2(0, -TerrarumMain.game.gravitationalAccel) );
+    //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
     /** Meter per second squared. Currently only the downward gravity is supported. No reverse gravity :p */
     var gravitation: Vector2 = Vector2(0.0, 9.8)

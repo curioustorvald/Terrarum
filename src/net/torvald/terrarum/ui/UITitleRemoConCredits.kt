@@ -58,8 +58,9 @@ class UITitleRemoConCredits(val superMenu: UICanvas) : UICanvas() {
 
         // attach listeners
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_RETURN")].clickOnceListener = { _, _, _ ->
-            menubar.selectedIndex = menubar.defaultSelection
             this.setAsClose()
+            Thread.sleep(50)
+            menubar.selectedIndex = menubar.defaultSelection
             superMenu.setAsOpen()
         }
 
@@ -90,6 +91,7 @@ class UITitleRemoConCredits(val superMenu: UICanvas) : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         menubar.render(batch)
         if (drawTextArea) {
+            batch.color = Color.WHITE
             textArea.render(batch)
         }
     }
