@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.floor
 
 class UIItemTextArea(
         parentUI: UICanvas,
@@ -11,10 +12,14 @@ class UIItemTextArea(
         override val width: Int,
         override val height: Int,
         val lineGap: Int = 0,
-        val lineCount: Int = ((height + lineGap) / Terrarum.fontGame.lineHeight).toInt()
+        val lineCount: Int = ((height + lineGap) / Terrarum.fontGame.lineHeight).toInt(),
+        val align: UIItemTextArea.Align = Align.LEFT
 ) : UIItem(parentUI) {
 
 
+    enum class Align {
+        LEFT, CENTRE, RIGHT
+    }
 
 
 
@@ -34,11 +39,16 @@ class UIItemTextArea(
     }
 
     override fun render(batch: SpriteBatch) {
-        batch.color = Color.WHITE
         for (i in scrollPos until minOf(lineCount + scrollPos, entireText.size)) {
             val yPtr = i - scrollPos
 
-            Terrarum.fontGame.draw(batch, entireText[i], posX.toFloat(), posY + yPtr * (Terrarum.fontGame.lineHeight + lineGap))
+            val textWidth = Terrarum.fontGame.getWidth(entireText[i])
+
+            when (align) {
+                Align.LEFT -> Terrarum.fontGame.draw(batch, entireText[i], posX.toFloat(), posY + yPtr * (Terrarum.fontGame.lineHeight + lineGap))
+                Align.CENTRE -> Terrarum.fontGame.draw(batch, entireText[i], posX + ((width - textWidth) / 2f).floor(), posY + yPtr * (Terrarum.fontGame.lineHeight + lineGap))
+                Align.RIGHT -> Terrarum.fontGame.draw(batch, entireText[i], posX + width - textWidth.toFloat(), posY + yPtr * (Terrarum.fontGame.lineHeight + lineGap))
+            }
         }
     }
 

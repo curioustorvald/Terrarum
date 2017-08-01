@@ -7,7 +7,10 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.langpack.Lang
 
-class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
+/**
+ * Created by minjaesong on 2017-08-01.
+ */
+/*class UITitleRemoConModules(val superMenu: UICanvas) : UICanvas() {
 
     val menuLabels = arrayOf(
             "MENU_LABEL_RETURN"
@@ -19,7 +22,9 @@ class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
     override var openCloseTime: Second = 0f
 
 
-    private val menubar = UIItemTextButtonList(
+    private val moduleListWidth = Terrarum.WIDTH / 2
+
+    private val moduleList = UIItemList<UIItemModuleInfoCell>(
             this,
             menuLabels,
             0, UITitleRemoConRoot.menubarOffY,
@@ -108,4 +113,4 @@ class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
     override fun dispose() {
     }
 
-}
+}*/
