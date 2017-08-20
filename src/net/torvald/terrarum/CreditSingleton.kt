@@ -6,13 +6,14 @@ object CreditSingleton {
 
     val credit: List<String>; get() =
             ("${Lang["CREDITS_PROGRAMMER"]}\n\nTorvald (minjaesong)\n\n" +
-            "${Lang["CREDITS_ARTIST_PLURAL"]}\n\nTorvald (minjaesong)\nRoundworld (leedonggeun)" +
+             "${Lang["CREDITS_ARTIST_PLURAL"]}\n\nTorvald (minjaesong)\nRoundworld (leedonggeun)\n\n" +
+             "${Lang["CREDITS_POLYGLOT"]}" +
             """
 
 
 
 
-Copyright Informations
+Copyright Information
 
 
 

@@ -268,7 +268,7 @@ object LoadScreen : ScreenAdapter() {
 
             Thread.sleep(80)
 
-            Terrarum.changeScreen(screenToLoad!!)
+            Terrarum.setScreen(screenToLoad!!)
         }
     }
 
