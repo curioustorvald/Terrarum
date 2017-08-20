@@ -39,12 +39,14 @@ Contain everything on [TEVD](github.com/minjaesong/TerranVirtualDisk)
     worldinfo2 -- tileprop
     worldinfo3 -- itemprop
     worldinfo4 -- materialprop
+    worldinfo5 -- modules loadorder
 
 
 *  Human-readable
     - Tiles_list.txt -- list of tiles in csv
     - Items_list.txt -- list of items in csv
     - Materials_list.txt -- list of materials in csv
+    - load_order.txt -- module load order
 
 
 
@@ -68,3 +70,5 @@ Directory:
       --- (UUID)            virtual disk
      +--- tapestries
       --- (random Int)      tapestry
+
+Alongside with save1.tevd (extension should not exist in real game), keep save1.backup.tevd as a last-working save.

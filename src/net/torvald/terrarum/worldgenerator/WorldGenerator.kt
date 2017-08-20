@@ -637,9 +637,8 @@ object WorldGenerator {
             val splineP3 = splineControlPoints[ clamp(x_1 + 2, 0, dirtStoneLine.size / POINTS_GAP) ].second.toFloat()
 
             if (x in POINTS_GAP - 1..WIDTH - 2 * POINTS_GAP) {
-                dirtStoneLine[x] = Math.round(FastMath.interpolateCatmullRom(
+                dirtStoneLine[x] = Math.round(FastMath.interpolateHermite(
                         (x - splineX1) / POINTS_GAP.toFloat(),
-                        -0.3f,//0.01f,
                         splineP0,
                         splineP1,
                         splineP2,
@@ -647,9 +646,8 @@ object WorldGenerator {
                 ))
             }
             else {
-                dirtStoneLine[x] = Math.round(FastMath.interpolateCatmullRom(
+                dirtStoneLine[x] = Math.round(FastMath.interpolateHermite(
                         (x - splineX1) / POINTS_GAP.toFloat(),
-                        -0.3f,//0.01f,
                         splineP0,
                         splineP1,
                         splineP2,

@@ -3,6 +3,9 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.random.HQRNG
+import net.torvald.terrarum.Ingame
+import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.Terrarum
 
 class UITitleRemoConRoot : UICanvas() {
@@ -45,20 +48,20 @@ class UITitleRemoConRoot : UICanvas() {
     )
 
 
-    //private val paneCredits = UIHandler()
     private val remoConCredits = UITitleRemoConCredits(this)
-
     private val remoConLanguage = UITitleRemoConLanguage(this)
-
+    private val remoConModules = UITitleRemoConModules(this)
 
     init {
         remoConLanguage.setPosition(0, 0)
         remoConCredits.setPosition(0, 0)
+        remoConModules.setPosition(0, 0)
 
 
 
         addSubUI(remoConLanguage)
         addSubUI(remoConCredits)
+        addSubUI(remoConModules)
 
 
         ////////////////////////////
@@ -68,6 +71,26 @@ class UITitleRemoConRoot : UICanvas() {
 
 
         // attach listeners
+
+        // TEST TEST TEST
+        menubar.buttons[menuLabels.indexOf("MENU_MODE_SINGLEPLAYER")].clickOnceListener = { _, _, _ ->
+            this.setAsClose()
+            Thread.sleep(50)
+
+            Terrarum.ingame = Ingame(Terrarum.batch)
+            Terrarum.ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
+            Terrarum.ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
+            LoadScreen.screenToLoad = Terrarum.ingame!!
+            Terrarum.setScreen(LoadScreen)
+        }
+
+
+
+        menubar.buttons[menuLabels.indexOf("MENU_MODULES")].clickOnceListener = { _, _, _ ->
+            this.setAsClose()
+            Thread.sleep(50)
+            remoConModules.setAsOpen()
+        }
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_LANGUAGE")].clickOnceListener = { _, _, _ ->
             this.setAsClose()
             Thread.sleep(50)

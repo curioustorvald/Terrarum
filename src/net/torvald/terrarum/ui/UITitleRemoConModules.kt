@@ -3,14 +3,16 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.langpack.Lang
 
 /**
  * Created by minjaesong on 2017-08-01.
  */
-/*class UITitleRemoConModules(val superMenu: UICanvas) : UICanvas() {
+class UITitleRemoConModules(val superMenu: UICanvas) : UICanvas() {
 
     val menuLabels = arrayOf(
             "MENU_LABEL_RETURN"
@@ -22,9 +24,7 @@ import net.torvald.terrarum.langpack.Lang
     override var openCloseTime: Second = 0f
 
 
-    private val moduleListWidth = Terrarum.WIDTH / 2
-
-    private val moduleList = UIItemList<UIItemModuleInfoCell>(
+    private val menubar = UIItemTextButtonList(
             this,
             menuLabels,
             0, UITitleRemoConRoot.menubarOffY,
@@ -39,34 +39,37 @@ import net.torvald.terrarum.langpack.Lang
     )
 
 
-    private val textAreaHMargin = 48
-    private val textAreaWidth = (Terrarum.WIDTH * 0.75).toInt()
-    private val textAreaHeight = Terrarum.HEIGHT - textAreaHMargin * 2
-    /*private val textArea = UIItemTextArea(this,
-            Terrarum.WIDTH - textAreaWidth, textAreaHMargin,
-            textAreaWidth, textAreaHeight,
-            align = UIItemTextArea.Align.CENTRE
-    )*/
-    private val localeList = Lang.languageList.toList().sorted()
-    private val textArea = UIItemTextButtonList(this,
-            localeList.map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }.toTypedArray(),
-            Terrarum.WIDTH - textAreaWidth, textAreaHMargin,
-            textAreaWidth, textAreaHeight,
-            textAreaWidth = textAreaWidth,
-            readFromLang = false,
-            activeBackCol = Color(0),
-            highlightBackCol = Color(0),
-            backgroundCol = Color(0),
-            inactiveCol = Color.WHITE,
-            defaultSelection = null
+    private val moduleAreaHMargin = 48
+    private val moduleAreaWidth = (Terrarum.WIDTH * 0.75).toInt() - moduleAreaHMargin
+    private val moduleAreaHeight = Terrarum.HEIGHT - moduleAreaHMargin * 2
+
+    private val moduleInfoCells = ArrayList<UIItemModuleInfoCell>()
+    // build module list
+    init {
+        ModMgr.moduleInfo.toList().sortedBy { it.second.order }.forEachIndexed { index, it ->
+            moduleInfoCells.add(UIItemModuleInfoCell(
+                    this,
+                    it.first,
+                    moduleAreaWidth,
+                    0, 0 // placeholder
+            ))
+        }
+    }
+
+    private val mouduleArea = UIItemList<UIItemModuleInfoCell>(
+            this,
+            moduleInfoCells,
+            (Terrarum.WIDTH * 0.25f).toInt(), moduleAreaHMargin,
+            moduleAreaWidth,
+            moduleAreaHeight,
+            inactiveCol = Color.WHITE
     )
 
 
     init {
         uiItems.add(menubar)
+        uiItems.add(mouduleArea)
 
-
-        //textArea.entireText = Lang.languageList.toList().sorted().map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }
 
         ////////////////////////////
 
@@ -74,9 +77,6 @@ import net.torvald.terrarum.langpack.Lang
 
 
         // attach listeners
-        textArea.selectionChangeListener = { _, newSelectionIndex ->
-            Terrarum.gameLocale = localeList[newSelectionIndex]
-        }
 
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_RETURN")].clickOnceListener = { _, _, _ ->
             this.setAsClose()
@@ -88,14 +88,15 @@ import net.torvald.terrarum.langpack.Lang
 
     override fun updateUI(delta: Float) {
         menubar.update(delta)
-        textArea.update(delta)
+        mouduleArea.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         menubar.render(batch)
 
         batch.color = Color.WHITE
-        textArea.render(batch)
+        blendNormal()
+        mouduleArea.render(batch)
     }
 
     override fun doOpening(delta: Float) {
@@ -113,4 +114,4 @@ import net.torvald.terrarum.langpack.Lang
     override fun dispose() {
     }
 
-}*/
+}

@@ -171,41 +171,20 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     private var blurWriteBuffer = lightmapFboA
     private var blurReadBuffer = lightmapFboB
 
-    private val minimumIntroTime: Second = 2.0f
     private val introUncoverTime: Second = 0.3f
-    private var showIntroDeltaCounter = 0f
     private var introUncoverDeltaCounter = 0f
     private var updateDeltaCounter = 0.0
     protected val updateRate = 1.0 / Terrarum.TARGET_INTERNAL_FPS
 
     override fun render(delta: Float) {
-        Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-
-        if (!loadDone || showIntroDeltaCounter < minimumIntroTime) {
-            // draw load screen
-            Terrarum.shaderBayerSkyboxFill.begin()
-            Terrarum.shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
-            Terrarum.shaderBayerSkyboxFill.setUniformf("topColor", gradWhiteTop.r, gradWhiteTop.g, gradWhiteTop.b)
-            Terrarum.shaderBayerSkyboxFill.setUniformf("bottomColor", gradWhiteBottom.r, gradWhiteBottom.g, gradWhiteBottom.b)
-            Terrarum.fullscreenQuad.render(Terrarum.shaderBayerSkyboxFill, GL20.GL_TRIANGLES)
-            Terrarum.shaderBayerSkyboxFill.end()
-
-            batch.inUse {
-                batch.color = Color.WHITE
-                blendNormal()
-                batch.shader = null
-
-
-                setCameraPosition(0f, 0f)
-                batch.draw(logo, (Terrarum.WIDTH - logo.regionWidth) / 2f, (Terrarum.HEIGHT - logo.regionHeight) / 2f)
-            }
-
-            if (!loadDone) {
-                loadThingsWhileIntroIsVisible()
-            }
+        if (!loadDone) {
+            loadThingsWhileIntroIsVisible()
         }
         else {
+            Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+
             // async update
             updateDeltaCounter += delta
             while (updateDeltaCounter >= updateRate) {
@@ -215,11 +194,8 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
             // render? just do it anyway
             renderScreen()
+
         }
-
-
-
-        showIntroDeltaCounter += delta
     }
 
     fun updateScreen(delta: Float) {
