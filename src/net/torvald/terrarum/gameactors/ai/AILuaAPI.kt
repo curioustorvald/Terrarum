@@ -1,6 +1,7 @@
 package net.torvald.terrarum.gameactors.ai
 
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppLoader
 import net.torvald.terrarum.gameactors.AIControlled
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWithPhysics
@@ -380,13 +381,13 @@ internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
 
     class GameVersion : ZeroArgFunction() {
         override fun call(): LuaValue {
-            return Terrarum.VERSION_STRING.toLua()
+            return TerrarumAppLoader.getVERSION_STRING().toLua()
         }
     }
 
     class GameVersionRaw : ZeroArgFunction() {
         override fun call(): LuaValue {
-            return Terrarum.VERSION_RAW.toLua()
+            return TerrarumAppLoader.VERSION_RAW.toLua()
         }
     }
 }

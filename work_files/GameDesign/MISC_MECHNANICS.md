@@ -77,6 +77,9 @@ see SAVE_FORMAT.md
     Attacked thrice: All the NPCs within the same faction become hostile until the player is away
     
     
+    
+Deceased HISTORICAL actors are stored to the inventory of DEBUG CHAR (id: 0x51621D) to make them not accidentally GC'd and for the lore.
+    
 ## Ownership of lands ##
 
 * Codex of Real Estate → assign owner to the tiles → copy the information to the NPC instance
@@ -103,3 +106,12 @@ Villages can be either independent or part of larger country (_Dwarf Fortress_)
 
 Anything goes as long as it does not exceed TL11 of GURPS. Although the universe has the existence of traditional sorcery, the laws of physics of the universe itself is same as we know it. Simply put: NO FUCKING PERPETUAL MOTION AND PERFECT PROPHECY
 
+
+
+## New light sim: Raytracer
+
+Only take NEAREST SUNLIGHT tile into render, as there will be not much artificial lights on the screen.
+
+Not sure about the performance, but it can be fully multi-threaded.
+
+"You know, the world can always use more ideas." - probably not Oxton

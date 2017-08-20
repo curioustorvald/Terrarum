@@ -244,7 +244,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             println("[Ingame] loaded successfully.")
         }
         else {
-            LoadScreen.addMessage("${Terrarum.NAME} version ${Terrarum.VERSION_STRING}")
+            LoadScreen.addMessage("${Terrarum.NAME} version ${TerrarumAppLoader.getVERSION_STRING()}")
             LoadScreen.addMessage("Creating new world")
 
 

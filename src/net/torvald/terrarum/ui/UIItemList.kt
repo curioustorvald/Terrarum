@@ -37,7 +37,7 @@ class UIItemList<Item: UIItem>(
     init {
         itemList.forEachIndexed { index, item ->
             item.posX = this.posX
-            item.posY = if (index == 0) this.posY else itemList[index - 1].posY + itemList[index - 1].height + this.posY
+            item.posY = if (index == 0) this.posY else itemList[index - 1].posY + itemList[index - 1].height
         }
     }
 

@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 
 /**
  * Created by minjaesong on 2017-08-01.
@@ -18,7 +20,22 @@ public class TerrarumAppLoader implements ApplicationListener {
     public static final String GAME_NAME = "Terrarum";
     public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2017 Torvald (minjaesong)";
 
+    /**
+     * 0xAA_BB_XXXX
+     * AA: Major version
+     * BB: Minor version
+     * XXXX: Revision (Repository commits)
+     *
+     * e.g. 0x02010034 can be translated as 2.1.52
+     */
+    public static final int VERSION_RAW = 0x00_02_0226;
+    public static final String getVERSION_STRING() {
+        return String.format("%d.%d.%d", VERSION_RAW >>> 24, (VERSION_RAW & 0xff0000) >>> 16, VERSION_RAW & 0xFFFF);
+    }
+
     private static LwjglApplicationConfiguration appConfig;
+
+    public static GameFontBase fontGame;
 
     public static void main(String[] args) {
         appConfig = new LwjglApplicationConfiguration();
@@ -38,7 +55,7 @@ public class TerrarumAppLoader implements ApplicationListener {
     private Mesh fullscreenQuad;
     private OrthographicCamera camera;
     private SpriteBatch batch;
-    private TextureRegion logo;
+    public static TextureRegion logo;
 
     private Color gradWhiteTop = new Color(0xf8f8f8ff);
     private Color gradWhiteBottom = new Color(0xd8d8d8ff);
@@ -92,6 +109,10 @@ public class TerrarumAppLoader implements ApplicationListener {
 
         logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
         logo.flip(false, true);
+
+
+        TextureRegionPack.Companion.setGlobalFlipY(true);
+        fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true, Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
     }
 
     @Override
@@ -99,6 +120,7 @@ public class TerrarumAppLoader implements ApplicationListener {
         if (screen == null) {
             shaderBayerSkyboxFill.begin();
             shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined);
+            shaderBayerSkyboxFill.setUniformf("parallax_size", 0f);
             shaderBayerSkyboxFill.setUniformf("topColor", gradWhiteTop.r, gradWhiteTop.g, gradWhiteTop.b);
             shaderBayerSkyboxFill.setUniformf("bottomColor", gradWhiteBottom.r, gradWhiteBottom.g, gradWhiteBottom.b);
             fullscreenQuad.render(shaderBayerSkyboxFill, GL20.GL_TRIANGLES);
@@ -121,7 +143,10 @@ public class TerrarumAppLoader implements ApplicationListener {
 
             if (loadTimer >= showupTime) {
                 Terrarum.INSTANCE.setAppLoader(this);
-                setScreen(Terrarum.INSTANCE);
+                Terrarum.INSTANCE.setScreenW(appConfig.width);
+                Terrarum.INSTANCE.setScreenH(appConfig.height);
+                //setScreen(Terrarum.INSTANCE);
+                setScreen(ErrorDisp.INSTANCE);
             }
         }
         else {
@@ -131,7 +156,9 @@ public class TerrarumAppLoader implements ApplicationListener {
 
     @Override
     public void resize(int width, int height) {
-        initViewPort(width, height);
+        //initViewPort(width, height);
+
+        if (screen != null) screen.resize(width, height);
     }
 
     @Override
