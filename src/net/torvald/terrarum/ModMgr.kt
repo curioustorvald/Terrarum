@@ -72,33 +72,38 @@ object ModMgr {
             val moduleName = it[0]
             println("[ModMgr] Loading module $moduleName")
 
-            val modMetadata = Properties()
-            modMetadata.load(FileInputStream("$modDir/$moduleName/metadata.properties"))
+            try {
+                val modMetadata = Properties()
+                modMetadata.load(FileInputStream("$modDir/$moduleName/metadata.properties"))
 
-            val properName = modMetadata.getProperty("propername")
-            val description = modMetadata.getProperty("description")
-            val author = modMetadata.getProperty("author")
-            val entryPoint = modMetadata.getProperty("entrypoint")
-            val releaseDate = modMetadata.getProperty("releasedate")
-            val version = modMetadata.getProperty("version")
-            val libs = modMetadata.getProperty("libraries").split(';').toTypedArray()
-            val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
-            moduleInfo[moduleName] = ModuleMetadata(index, isDir, properName, description, author, entryPoint, releaseDate, version, libs)
+                val properName = modMetadata.getProperty("propername")
+                val description = modMetadata.getProperty("description")
+                val author = modMetadata.getProperty("author")
+                val entryPoint = modMetadata.getProperty("entrypoint")
+                val releaseDate = modMetadata.getProperty("releasedate")
+                val version = modMetadata.getProperty("version")
+                val libs = modMetadata.getProperty("libraries").split(';').toTypedArray()
+                val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
+                moduleInfo[moduleName] = ModuleMetadata(index, isDir, properName, description, author, entryPoint, releaseDate, version, libs)
 
-            println(moduleInfo[moduleName])
+                println(moduleInfo[moduleName])
 
 
-            // run entry script in entry point
-            if (entryPoint.isNotBlank()) {
-                val extension = entryPoint.split('.').last()
-                val engine = ScriptEngineManager().getEngineByExtension(extension)!!
-                val invocable = engine as Invocable
-                engine.eval(FileReader(getFile(moduleName, entryPoint)))
-                invocable.invokeFunction("invoke", moduleName)
+                // run entry script in entry point
+                if (entryPoint.isNotBlank()) {
+                    val extension = entryPoint.split('.').last()
+                    val engine = ScriptEngineManager().getEngineByExtension(extension)!!
+                    val invocable = engine as Invocable
+                    engine.eval(FileReader(getFile(moduleName, entryPoint)))
+                    invocable.invokeFunction("invoke", moduleName)
+                }
+
+
+                println("[ModMgr] $moduleName loaded successfully")
             }
-
-
-            println("[ModMgr] $moduleName loaded successfully")
+            catch (noSuchModule: FileNotFoundException) {
+                System.err.println("[ModMgr] No such module: $moduleName, skipping...")
+            }
         }
 
 

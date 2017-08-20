@@ -25,7 +25,7 @@ If things would run with infinite energy, I'm out. We need realism to implement 
     + Transparent solar panel (window panel)
 - Capacitor
     + Battery pack
-    + Pu-238 RTG (super long-lasting battery with radiooactive taste)
+    + Pu-238 RTG (super long-lasting battery with radioactive taste)
     
 
     

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.utils.GdxRuntimeException
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.torvald.random.HQRNG
@@ -30,10 +31,12 @@ import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import org.lwjgl.BufferUtils
 import org.lwjgl.input.Controllers
 import java.io.File
 import java.io.IOException
 import java.lang.management.ManagementFactory
+import java.nio.IntBuffer
 import java.util.*
 
 /**
@@ -73,8 +76,8 @@ object Terrarum : Screen {
 
     lateinit var appLoader: TerrarumAppLoader
     
-    internal var screenW: Int? = null
-    internal var screenH: Int? = null
+    var screenW = 0
+    var screenH = 0
 
     lateinit var batch: SpriteBatch
     lateinit var shapeRender: ShapeRenderer // DO NOT USE!! for very limited applications e.g. WeatherMixer
@@ -90,12 +93,12 @@ object Terrarum : Screen {
     //////////////////////////////
 
     val WIDTH: Int
-        get() = if ((screenW ?: Gdx.graphics.width) % 2 == 0) (screenW ?: Gdx.graphics.width) else (screenW ?: Gdx.graphics.width) - 1
+        get() = if (screenW % 2 == 0) screenW else screenW - 1
     val HEIGHT: Int
-        get() = if ((screenH ?: Gdx.graphics.height) % 2 == 0) (screenH ?: Gdx.graphics.height) else (screenH ?: Gdx.graphics.height) - 1
+        get() = if (screenH % 2 == 0) screenH else screenH - 1
 
-    val WIDTH_MIN = 800
-    val HEIGHT_MIN = 600
+    //val WIDTH_MIN = 800
+    //val HEIGHT_MIN = 600
 
     inline val HALFW: Int
         get() = WIDTH.ushr(1)
@@ -153,7 +156,8 @@ object Terrarum : Screen {
     val memXmx: Long
         get() = Runtime.getRuntime().maxMemory() shr 20
 
-    val environment: RunningEnvironment
+    var environment: RunningEnvironment
+        private set
 
     private val localeSimple = arrayOf("de", "en", "es", "it")
     var gameLocale = "lateinit"
@@ -179,7 +183,7 @@ object Terrarum : Screen {
 
 
 
-    lateinit var fontGame: GameFontBase
+    val fontGame: GameFontBase = TerrarumAppLoader.fontGame
     lateinit var fontSmallNumbers: TinyAlphNum
 
     var joypadLabelStart: Char = 0xE000.toChar() // lateinit
@@ -236,18 +240,7 @@ object Terrarum : Screen {
 
     private lateinit var configDir: String
 
-    /**
-     * 0xAA_BB_XXXX
-     * AA: Major version
-     * BB: Minor version
-     * XXXX: Revision (Repository commits)
-     *
-     * e.g. 0x02010034 can be translated as 2.1.52
-     */
-    const val VERSION_RAW = 0x00_02_0226
-    const val VERSION_STRING: String =
-            "${VERSION_RAW.ushr(24)}.${VERSION_RAW.and(0xFF0000).ushr(16)}.${VERSION_RAW.and(0xFFFF)}"
-    const val NAME = "Terrarum"
+    const val NAME = TerrarumAppLoader.GAME_NAME
 
 
     val systemArch = System.getProperty("os.arch")
@@ -256,8 +249,6 @@ object Terrarum : Screen {
 
 
     lateinit var shaderBlur: ShaderProgram
-    lateinit var shaderRGBOnly: ShaderProgram
-    lateinit var shaderAOnly: ShaderProgram
     lateinit var shaderBayer: ShaderProgram
     lateinit var shaderBayerSkyboxFill: ShaderProgram
     lateinit var shaderBlendGlow: ShaderProgram
@@ -274,7 +265,7 @@ object Terrarum : Screen {
 
 
     init {
-        println("$NAME version $VERSION_STRING")
+        println("$NAME version ${TerrarumAppLoader.getVERSION_STRING()}")
 
 
         getDefaultDirectory()
@@ -331,6 +322,16 @@ object Terrarum : Screen {
                 Gdx.graphics.glVersion.minorVersion * 10 +
                 Gdx.graphics.glVersion.releaseVersion
     val MINIMAL_GL_VERSION = 210
+    val GL_MAX_TEXTURE_SIZE: Int
+        get() {
+            val intBuffer = BufferUtils.createIntBuffer(16) // size must be at least 16, or else LWJGL complains
+            Gdx.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, intBuffer)
+
+            intBuffer.rewind()
+
+            return intBuffer.get()
+        }
+    val MINIMAL_GL_MAX_TEXTURE_SIZE = 4096
 
 
     override fun show() {
@@ -341,12 +342,13 @@ object Terrarum : Screen {
 
 
         println("[Terrarum] GL_VERSION = $GL_VERSION")
+        println("[Terrarum] GL_MAX_TEXTURE_SIZE = $GL_MAX_TEXTURE_SIZE")
         println("[Terrarum] GL info:\n${Gdx.graphics.glVersion.debugVersionString}") // debug info
 
 
-        if (GL_VERSION < MINIMAL_GL_VERSION) {
+        if (GL_VERSION < MINIMAL_GL_VERSION || GL_MAX_TEXTURE_SIZE < MINIMAL_GL_MAX_TEXTURE_SIZE) {
             // TODO notify properly
-            throw Error("Graphics device not capable -- device's GL_VERSION: $GL_VERSION, required: $MINIMAL_GL_VERSION")
+            throw GdxRuntimeException("Graphics device not capable -- device's GL_VERSION: $GL_VERSION, required: $MINIMAL_GL_VERSION; GL_MAX_TEXTURE_SIZE: $GL_MAX_TEXTURE_SIZE, required: $MINIMAL_GL_MAX_TEXTURE_SIZE")
         }
 
 
@@ -377,7 +379,7 @@ object Terrarum : Screen {
         shapeRender = ShapeRenderer()
 
 
-        fontGame = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = true)
+        //fontGame = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = true)
         fontSmallNumbers = TinyAlphNum
 
 
@@ -397,9 +399,6 @@ object Terrarum : Screen {
 
         shaderBayerSkyboxFill = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"))
 
-
-        shaderRGBOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbonly.frag"))
-        shaderAOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/aonly.frag"))
 
         shaderBlendGlow = ShaderProgram(Gdx.files.internal("assets/blendGlow.vert"), Gdx.files.internal("assets/blendGlow.frag"))
 
@@ -444,7 +443,7 @@ object Terrarum : Screen {
         appLoader.setScreen(TitleScreen(batch))
     }
 
-    internal fun changeScreen(screen: Screen) {
+    internal fun setScreen(screen: Screen) {
         appLoader.setScreen(screen)
     }
 
@@ -475,6 +474,12 @@ object Terrarum : Screen {
         MessageWindow.SEGMENT_BLACK.dispose()
         MessageWindow.SEGMENT_WHITE.dispose()
         //dispose any other resources used in this level
+
+
+        shaderBayer.dispose()
+        shaderBayerSkyboxFill.dispose()
+        shaderBlur.dispose()
+        shaderBlendGlow.dispose()
     }
 
     override fun hide() {
@@ -482,11 +487,14 @@ object Terrarum : Screen {
     }
 
     override fun resize(width: Int, height: Int) {
-        var width = maxOf(width, WIDTH_MIN)
-        var height = maxOf(height, HEIGHT_MIN)
+        //var width = maxOf(width, WIDTH_MIN)
+        //var height = maxOf(height, HEIGHT_MIN)
 
-        if (width % 2 == 1) width += 1
-        if (height % 2 == 1) height += 1
+        var width = width
+        var height = height
+
+        if (width % 2 == 1) width -= 1
+        if (height % 2 == 1) height -= 1
 
         screenW = width
         screenH = height
@@ -521,13 +529,18 @@ object Terrarum : Screen {
             OperationSystem = "OSX"
             defaultDir = System.getProperty("user.home") + "/Library/Application Support/Terrarum"
         }
-        else if (OS.contains("NUX") || OS.contains("NIX")) {
+        else if (OS.contains("NUX") || OS.contains("NIX") || OS.contains("BSD")) {
             OperationSystem = "LINUX"
             defaultDir = System.getProperty("user.home") + "/.Terrarum"
         }
         else if (OS.contains("SUNOS")) {
             OperationSystem = "SOLARIS"
             defaultDir = System.getProperty("user.home") + "/.Terrarum"
+        }
+        else if (System.getProperty("java.runtime.name").toUpperCase().contains("ANDROID")) {
+            OperationSystem = "ANDROID"
+            defaultDir = System.getProperty("user.home") + "/.Terrarum"
+            environment = RunningEnvironment.MOBILE
         }
         else {
             OperationSystem = "UNKNOWN"
