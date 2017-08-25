@@ -198,7 +198,7 @@ object LightmapRenderer {
          * |  |    3|   |↗       |   |       ↖|   |3    |  |
          * +--+-----+   +--------+   +--------+   +-----+--+
          * round:   1            2            3            4
-         * for all staticLightMap[y][x]
+         * for all lightmap[y][x]
          */
 
         purgeLightmap()
