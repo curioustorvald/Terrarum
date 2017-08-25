@@ -145,8 +145,7 @@ public class TerrarumAppLoader implements ApplicationListener {
                 Terrarum.INSTANCE.setAppLoader(this);
                 Terrarum.INSTANCE.setScreenW(appConfig.width);
                 Terrarum.INSTANCE.setScreenH(appConfig.height);
-                //setScreen(Terrarum.INSTANCE);
-                setScreen(ErrorDisp.INSTANCE);
+                setScreen(Terrarum.INSTANCE);
             }
         }
         else {
