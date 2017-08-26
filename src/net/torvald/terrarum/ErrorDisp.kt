@@ -5,30 +5,28 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.langpack.Lang
 
 object ErrorDisp : Screen {
 
-    val logoTex = TerrarumAppLoader.logo
-    val font = TerrarumAppLoader.fontGame
+    private val logoTex = TerrarumAppLoader.logo
+    private val font = TerrarumAppLoader.fontGame
 
 
     var title = Lang["ERROR_GENERIC_TEXT"]
-    var text = arrayListOf<String>("")
+    var text: List<String> = arrayListOf<String>("")
 
-    lateinit var batch: SpriteBatch
+    private lateinit var batch: SpriteBatch
 
 
-    val textPosX = 45f
+    private val textPosX = 45f
 
     lateinit var camera: OrthographicCamera
 
 
-    val titleTextLeftMargin = 8
-    val titleText = "${TerrarumAppLoader.GAME_NAME} ${TerrarumAppLoader.getVERSION_STRING()}"
+    private val titleTextLeftMargin = 8
+    private val titleText = "${TerrarumAppLoader.GAME_NAME} ${TerrarumAppLoader.getVERSION_STRING()}"
 
 
     override fun show() {

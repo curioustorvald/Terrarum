@@ -160,7 +160,7 @@ object Terrarum : Screen {
         private set
 
     private val localeSimple = arrayOf("de", "en", "es", "it")
-    var gameLocale = "lateinit"
+    var gameLocale = "lateinit" // TODO move into AppLoader
         set(value) {
             if (value.isBlank() || value.isEmpty()) {
                 field = sysLang
