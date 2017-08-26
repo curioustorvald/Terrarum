@@ -2,6 +2,7 @@ package net.torvald.terrarum.langpack
 
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppLoader
 import java.io.*
 import java.util.*
 
@@ -111,7 +112,7 @@ object Lang {
         fun fallback(): String = langpack["${key}_$FALLBACK_LANG_CODE"] ?: "$$key"
 
 
-        val ret = langpack["${key}_${Terrarum.gameLocale}"]
+        val ret = langpack["${key}_${TerrarumAppLoader.GAME_LOCALE}"]
         val ret2 = if (ret.isNullOrEmpty()) fallback() else ret!!
 
         // special treatment

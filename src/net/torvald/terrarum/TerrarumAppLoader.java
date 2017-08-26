@@ -17,8 +17,20 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
  */
 public class TerrarumAppLoader implements ApplicationListener {
 
+    private static TerrarumAppLoader INSTANCE = null;
+
+    private TerrarumAppLoader() { }
+
+    public static TerrarumAppLoader getINSTANCE() {
+        if (INSTANCE == null) {
+            INSTANCE = new TerrarumAppLoader();
+        }
+        return INSTANCE;
+    }
+
     public static final String GAME_NAME = "Terrarum";
     public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2017 Torvald (minjaesong)";
+    public static final String GAME_LOCALE = System.getProperty("user.language") + System.getProperty("user.country");
 
     /**
      * 0xAA_BB_XXXX
@@ -61,9 +73,6 @@ public class TerrarumAppLoader implements ApplicationListener {
     private Color gradWhiteBottom = new Color(0xd8d8d8ff);
 
     public Screen screen;
-
-    private TerrarumAppLoader() {
-    }
 
     private void initViewPort(int width, int height) {
         // Set Y to point downwards
