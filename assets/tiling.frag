@@ -46,10 +46,13 @@ void main() {
     // Make sure you don't use gl_FragCoord unknowingly! //
 
 
+    // FIXME: cameraTranslation not working as it should
+
+
     // default gl_FragCoord takes half-integer (represeting centre of the pixel) -- could be useful for phys solver?
     // This one, however, takes exact integer by rounding down. //
-    vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx;
-    vec2 flippedFragCoord = vec2(v_texCoords.x * screenDimension.x, (1 - v_texCoords.y) * screenDimension.y); // NO IVEC2!!
+    vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx; // one used by the tileFromMap
+    vec2 flippedFragCoord = vec2(gl_FragCoord.x, screenDimension.y - gl_FragCoord.y); // NO IVEC2!!; this flips Y
 
     vec2 pxCoord = flippedFragCoord.xy + cameraTranslation;
 
@@ -71,17 +74,4 @@ void main() {
 
 
     gl_FragColor = texture2D(tilesAtlas, finalUVCoordForTile);
-    //gl_FragColor = texture2D(tilemap, v_texCoords); // tilemap seems normal...
-    //gl_FragColor = tileFromMap; // <- oh, THIS WAS THE CULPRIT!
-
-
-
-	//gl_FragColor = fragInAtlas;
-	//gl_FragColor = vec4((gl_FragCoord.xy / vec2(512, 512)), 0, 1.0);
-
-	//vec4 atlascol = texture2D(tilesAtlas, v_texCoords);
-	//vec4 tilemapcol = texture2D(tilemap, v_texCoords);
-
-	//gl_FragColor = atlascol * tilemapcol;
-	//gl_FragColor = vec4(v_texCoords.x, v_texCoords.y, 0, 1.0);
 }
