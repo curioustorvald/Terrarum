@@ -108,6 +108,9 @@ object GlslTilingTest : ApplicationAdapter() {
     }
 
 
+    var cameraX = 0f
+    var cameraY = 0f
+
     override fun render() {
         Gdx.graphics.setTitle("GlslTilingTest — F: ${Gdx.graphics.framesPerSecond}")
 
@@ -149,11 +152,14 @@ object GlslTilingTest : ApplicationAdapter() {
         shader.setUniformi("tilemap", 2)
         shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shader.setUniformf("tilesInAxes", tilesInHorizontal, tilesInVertical)
-        shader.setUniformf("cameraTranslation", 0f, 0f)
+        shader.setUniformf("cameraTranslation", cameraX, cameraY)
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
         shader.end()
         tilesBufferAsTex.dispose()
 
+
+        cameraX += 160 * Gdx.graphics.deltaTime
+        cameraY += 160 * Gdx.graphics.deltaTime
     }
 
     override fun dispose() {
