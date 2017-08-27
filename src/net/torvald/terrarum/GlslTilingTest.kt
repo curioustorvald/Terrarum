@@ -7,7 +7,10 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.jme3.math.FastMath
 import net.torvald.terrarum.gameactors.ceilInt
+import net.torvald.terrarum.gameactors.floor
+import net.torvald.terrarum.gameactors.floorInt
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
@@ -39,6 +42,7 @@ object GlslTilingTest : ApplicationAdapter() {
     lateinit var fucktex: Texture
 
     val TILE_SIZE = 16
+    val TILE_SIZEF = 16f
 
 
     lateinit var tilesBuffer: Pixmap
@@ -66,8 +70,8 @@ object GlslTilingTest : ApplicationAdapter() {
 
 
 
-        val tilesInHorizontal = Gdx.graphics.width.toFloat() / TILE_SIZE
-        val tilesInVertical = Gdx.graphics.height.toFloat() / TILE_SIZE
+        val tilesInHorizontal = (Gdx.graphics.width.toFloat() / TILE_SIZE).ceil() + 1f
+        val tilesInVertical = (Gdx.graphics.height.toFloat() / TILE_SIZE).ceil() + 1f
 
         tilesQuad = Mesh(
                 true, 4, 6,
@@ -76,16 +80,16 @@ object GlslTilingTest : ApplicationAdapter() {
                 VertexAttribute.TexCoords(0)
         )
 
-        tilesQuad.setVertices(floatArrayOf(
-                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
-                Gdx.graphics.width.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                0f, Gdx.graphics.height.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
+        tilesQuad.setVertices(floatArrayOf( // WARNING! not ususal quads; TexCoords of Y is flipped
+                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 0f,
+                Gdx.graphics.width.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 0f,
+                Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 1f,
+                0f, Gdx.graphics.height.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 1f
         ))
         tilesQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
 
 
-        tilesBuffer = Pixmap(tilesInHorizontal.ceilInt(), tilesInVertical.ceilInt(), Pixmap.Format.RGBA8888)
+        tilesBuffer = Pixmap(tilesInHorizontal.toInt(), tilesInVertical.toInt(), Pixmap.Format.RGBA8888)
 
 
         camera = OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
@@ -100,42 +104,52 @@ object GlslTilingTest : ApplicationAdapter() {
         tileAtlas = Texture(Gdx.files.internal("assets/terrain.tga"))//BlocksDrawer.tilesTerrain.texture
 
 
-
         println(tilesBuffer.format)
-        // 0brrrrrrrr_gggggggg_bbbbbbbb_aaaaaaaa
-        for (x in 0 until tilesBuffer.width * tilesBuffer.height) {
-            val color = Color(0f, 1f/16f, 0f, 1f)
-            tilesBuffer.drawPixel(x / tilesBuffer.width, x % tilesBuffer.width, 0x00ff00ff)
-        }
     }
 
 
     override fun render() {
         Gdx.graphics.setTitle("GlslTilingTest — F: ${Gdx.graphics.framesPerSecond}")
 
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight())
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
+
+        // 0brrrrrrrr_gggggggg_bbbbbbbb_aaaaaaaa
+        for (y in 0 until tilesBuffer.height) {
+            for (x in 0 until tilesBuffer.width) {
+                val i = (y * 256) + x
+                val color = Color(i.shl(8).or(255))
+                tilesBuffer.setColor(color)
+                tilesBuffer.drawPixel(x, y)
+            }
+        }
+
+
+
+
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
+        Gdx.gl.glClearColor(1f, 0f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-        val tilesInHorizontal = Gdx.graphics.width.toFloat() / TILE_SIZE
-        val tilesInVertical = Gdx.graphics.height.toFloat() / TILE_SIZE
+        val tilesInHorizontal = (Gdx.graphics.width.toFloat() / TILE_SIZE).ceil() + 1f
+        val tilesInVertical = (Gdx.graphics.height.toFloat() / TILE_SIZE).ceil() + 1f
 
 
 
         val tilesBufferAsTex = Texture(tilesBuffer)
+        tilesBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         tilesBufferAsTex.bind(2)
         tileAtlas.bind(1) // for some fuck reason, it must be bound as last
 
         shader.begin()
         shader.setUniformMatrix("u_projTrans", batch.projectionMatrix)//camera.combined)
+        shader.setUniformf("screenDimension", Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         shader.setUniformi("tilesAtlas", 1)
         shader.setUniformi("tilemap", 2)
-        shader.setUniformf("tilemapSize", tilesBuffer.width.toFloat(), tilesBuffer.height.toFloat())
-        shader.setUniformf("tileInDim", tilesInHorizontal, tilesInVertical)
-        shader.setUniformf("cameraTranslation", 4f, 1f)
+        shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
+        shader.setUniformf("tilesInAxes", tilesInHorizontal, tilesInVertical)
+        shader.setUniformf("cameraTranslation", 0f, 0f)
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
         shader.end()
         tilesBufferAsTex.dispose()
@@ -146,3 +160,5 @@ object GlslTilingTest : ApplicationAdapter() {
         shader.dispose()
     }
 }
+
+private fun Float.ceil(): Float = FastMath.ceil(this).toFloat()

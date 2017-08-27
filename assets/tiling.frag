@@ -12,20 +12,22 @@ varying vec2 v_texCoords;
 uniform sampler2D u_texture;
 
 
+uniform vec2 screenDimension;
+uniform vec2 tilesInAxes;
 
-uniform vec2 tilemapSize;
+uniform ivec2 tilemapDimension;
 uniform sampler2D tilemap; // MUST be RGBA8888
 
 uniform sampler2D tilesAtlas;
 uniform sampler2D backgroundTexture;
 
-uniform vec2 tileInAtlas = vec2(256, 256);
-uniform vec2 atlasTexSize = vec2(4096, 4096);
+uniform ivec2 tileInAtlas = ivec2(256, 256);
+uniform ivec2 atlasTexSize = ivec2(4096, 4096);
 
 
-uniform vec2 tileInDim; // vec2(tiles_in_horizontal, tiles_in_vertical)
+//uniform vec2 tileInDim; // vec2(tiles_in_horizontal, tiles_in_vertical)
 uniform vec2 cameraTranslation = vec2(0, 0); // Y-flipped
-uniform float tileSizeInPx = 16;
+uniform int tileSizeInPx = 16;
 
 
 
@@ -33,23 +35,32 @@ ivec2 getTileXY(int tileNumber) {
     return ivec2(tileNumber % int(tileInAtlas.x), tileNumber / int(tileInAtlas.x));
 }
 
+int getTileFromColor(vec4 color) {
+    return int(color.b * 255) + (int(color.g * 255) * 256) + (int(color.r * 255) * 65536);
+}
+
 void main() {
 
     // READ THE FUCKING MANUAL, YOU DONKEY !! //
-    // Without further code in either GDX or this shader, //
-    // Onscreen TILE COORD WILL BE UPSIDE DOWN (bottom first). //
-    // This is intended behaviour. //
+    // This code purposedly uses flipped fragcoord. //
+    // Make sure you don't use gl_FragCoord unknowingly! //
 
 
-    vec2 pxCoord = gl_FragCoord.xy + cameraTranslation;
+    // default gl_FragCoord takes half-integer (represeting centre of the pixel) -- could be useful for phys solver?
+    // This one, however, takes exact integer by rounding down. //
+    vec2 overscannedScreenDimension = tilesInAxes * tileSizeInPx;
+    vec2 flippedFragCoord = vec2(v_texCoords.x * screenDimension.x, (1 - v_texCoords.y) * screenDimension.y); // NO IVEC2!!
 
-    int tile = 0;// uses usual absolute tile ID for atlas (upper-left); sample from texture2D(tileAtlas, some more code);
+    vec2 pxCoord = flippedFragCoord.xy + cameraTranslation;
+
+    mediump vec4 tileFromMap = texture2D(tilemap, flippedFragCoord / overscannedScreenDimension); // <- THE CULPRIT
+    int tile = getTileFromColor(tileFromMap);
+
+
     ivec2 tileXY = getTileXY(tile);
 
-    vec2 coordInTile = mod(pxCoord, tileSizeInPx) / tileSizeInPx; // 0..1 regardless of tile position in atlas
 
-    // flip Y of coordInTile //
-    coordInTile = vec2(coordInTile.x, 1 - coordInTile.y);
+    vec2 coordInTile = mod(pxCoord, tileSizeInPx) / tileSizeInPx; // 0..1 regardless of tile position in atlas
 
     highp vec2 singleTileSizeInUV = vec2(1) / tileInAtlas; // 0.00390625
     highp vec2 uvCoordForTile = coordInTile * singleTileSizeInUV; // 0..0.00390625 regardless of tile position in atlas
@@ -59,8 +70,9 @@ void main() {
     highp vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffset;// where we should be actually looking for in atlas, using UV coord (0..1)
 
 
-    gl_FragColor = vec4(texture2D(tilesAtlas, finalUVCoordForTile));
-
+    gl_FragColor = texture2D(tilesAtlas, finalUVCoordForTile);
+    //gl_FragColor = texture2D(tilemap, v_texCoords); // tilemap seems normal...
+    //gl_FragColor = tileFromMap; // <- oh, THIS WAS THE CULPRIT!
 
 
 
