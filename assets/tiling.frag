@@ -35,7 +35,7 @@ ivec2 getTileXY(int tileNumber) {
 }
 
 int getTileFromColor(vec4 color) {
-    return int(color.b * 255) + (int(color.g * 255) * 256) + (int(color.r * 255) * 65536);
+    return int(color.b * 255) | (int(color.g * 255) << 8) | (int(color.r * 255) << 16);
 }
 
 void main() {
