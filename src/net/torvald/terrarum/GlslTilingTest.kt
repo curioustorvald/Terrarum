@@ -158,8 +158,9 @@ object GlslTilingTest : ApplicationAdapter() {
         tilesBufferAsTex.dispose()
 
 
-        cameraX += 160 * Gdx.graphics.deltaTime
-        cameraY += 160 * Gdx.graphics.deltaTime
+        cameraX = 6f
+        //cameraX += 160 * Gdx.graphics.deltaTime
+        //cameraY += 160 * Gdx.graphics.deltaTime
     }
 
     override fun dispose() {
