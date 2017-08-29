@@ -415,11 +415,11 @@ object BlocksDrawer {
                                                  )
 
     private fun drawTiles(batch: SpriteBatch, mode: Int, drawModeTilesBlendMul: Boolean, color: Color) {
-        val for_y_start = y / TILE_SIZE
-        val for_y_end = BlocksDrawer.clampHTile(for_y_start + (height / TILE_SIZE) + 2)
+        val for_y_start = WorldCamera.y / TILE_SIZE
+        val for_y_end = clampHTile(for_y_start + (WorldCamera.height / TILE_SIZE) + 2)
 
-        val for_x_start = x / TILE_SIZE - 1
-        val for_x_end = for_x_start + (width / TILE_SIZE) + 3
+        val for_x_start = WorldCamera.x / TILE_SIZE - 1
+        val for_x_end = for_x_start + (WorldCamera.width / TILE_SIZE) + 3
 
         val originalBatchColour = batch.color.cpy()
         batch.color = color

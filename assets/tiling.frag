@@ -21,7 +21,7 @@ uniform sampler2D tilemap; // MUST be RGBA8888
 uniform sampler2D tilesAtlas;
 uniform sampler2D backgroundTexture;
 
-uniform ivec2 tileInAtlas = ivec2(256, 256);
+uniform ivec2 tilesInAtlas = ivec2(256, 256);
 uniform ivec2 atlasTexSize = ivec2(4096, 4096);
 
 
@@ -29,9 +29,8 @@ uniform vec2 cameraTranslation = vec2(0, 0); // Y-flipped
 uniform int tileSizeInPx = 16;
 
 
-
 ivec2 getTileXY(int tileNumber) {
-    return ivec2(tileNumber % int(tileInAtlas.x), tileNumber / int(tileInAtlas.x));
+    return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));
 }
 
 int getTileFromColor(vec4 color) {
@@ -61,7 +60,7 @@ void main() {
 
     vec2 coordInTile = mod(pxCoord, tileSizeInPx) / tileSizeInPx; // 0..1 regardless of tile position in atlas
 
-    highp vec2 singleTileSizeInUV = vec2(1) / tileInAtlas; // constant 0.00390625
+    highp vec2 singleTileSizeInUV = vec2(1) / tilesInAtlas; // constant 0.00390625
     highp vec2 uvCoordForTile = coordInTile * singleTileSizeInUV; // 0..0.00390625 regardless of tile position in atlas
 
     highp vec2 uvCoordOffset = (tileXY + cameraTranslation / tileSizeInPx) * singleTileSizeInUV; // where the tile starts in the atlas, using uv coord (0..1)
@@ -69,5 +68,5 @@ void main() {
     highp vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffset;// where we should be actually looking for in atlas, using UV coord (0..1)
 
 
-    gl_FragColor = texture2D(tilesAtlas, finalUVCoordForTile);
+    gl_FragColor = v_color * texture2D(tilesAtlas, finalUVCoordForTile);
 }
