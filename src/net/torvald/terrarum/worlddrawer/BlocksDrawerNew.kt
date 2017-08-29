@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.*
+import net.torvald.terrarum.gameactors.ceilInt
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
 import net.torvald.terrarum.worlddrawer.WorldCamera.x
@@ -64,6 +65,12 @@ object BlocksDrawerNew {
 
 
     private val GZIP_READBUF_SIZE = 8192
+
+
+    private lateinit var terrainTilesBuffer: Array<IntArray>
+    private lateinit var wallTilesBuffer: Array<IntArray>
+    private lateinit var wireTilesBuffer: Array<IntArray>
+
 
     init {
         // hard-coded as tga.gz
@@ -356,6 +363,7 @@ object BlocksDrawerNew {
         blendNormal()
 
         drawTiles(batch, WALL, false, wallOverlayColour)
+        renderUsingBuffer(WALL)
     }
 
     fun renderTerrain(batch: SpriteBatch) {
@@ -365,6 +373,7 @@ object BlocksDrawerNew {
         blendNormal()
 
         drawTiles(batch, TERRAIN, false, Color.WHITE) // regular tiles
+        renderUsingBuffer(TERRAIN)
     }
 
     fun renderFront(batch: SpriteBatch, drawWires: Boolean) {
@@ -374,9 +383,11 @@ object BlocksDrawerNew {
         blendMul()
 
         drawTiles(batch, TERRAIN, true, Color.WHITE) // blendmul tiles
+        renderUsingBuffer(TERRAIN)
 
         if (drawWires) {
             drawTiles(batch, WIRE, false, Color.WHITE)
+            renderUsingBuffer(WIRE)
         }
 
         blendNormal()
@@ -414,20 +425,21 @@ object BlocksDrawerNew {
             LightmapRenderer.getHighestRGB(x - 1, y + 1) ?: 0f >= tileDrawLightThreshold
                                                  )
 
+    /**
+     * Writes to buffer. Actual draw code must be called after this operation.
+     */
     private fun drawTiles(batch: SpriteBatch, mode: Int, drawModeTilesBlendMul: Boolean, color: Color) {
-        val for_y_start = y / TILE_SIZE
-        val for_y_end = BlocksDrawer.clampHTile(for_y_start + (height / TILE_SIZE) + 2)
+        val for_y_start = WorldCamera.y / TILE_SIZE
+        val for_y_end = clampHTile(for_y_start + (WorldCamera.height / TILE_SIZE) + 2)
 
-        val for_x_start = x / TILE_SIZE - 1
-        val for_x_end = for_x_start + (width / TILE_SIZE) + 3
+        val for_x_start = WorldCamera.x / TILE_SIZE - 1
+        val for_x_end = for_x_start + (WorldCamera.width / TILE_SIZE) + 3
 
         val originalBatchColour = batch.color.cpy()
         batch.color = color
 
         // loop
         for (y in for_y_start..for_y_end) {
-            var zeroTileCounter = 0
-
             for (x in for_x_start..for_x_end) {
 
                 val thisTile: Int?
@@ -448,21 +460,9 @@ object BlocksDrawerNew {
 
                         if (!hasLightNearby(x, y)) {
                             // draw black patch
-                            zeroTileCounter += 1 // unused for now
-
-                            // temporary solution; FIXME bad scanlines bug
-                            batch.color = Color.BLACK
-                            batch.fillRect(x * TILE_SIZEF, y * TILE_SIZEF, TILE_SIZEF, TILE_SIZEF)
+                            writeToBuffer(mode, x, y, 2, 0)
                         }
                         else {
-                            // commented out; FIXME bad scanlines bug
-                            if (zeroTileCounter > 0) {
-                                /*batch.color = Color.BLACK
-                                batch.fillRect(x * TILE_SIZEF, y * TILE_SIZEF, -zeroTileCounter * TILE_SIZEF, TILE_SIZEF)
-                                batch.color = color
-                                zeroTileCounter = 0*/
-                            }
-
 
                             val nearbyTilesInfo: Int
                             if (isPlatform(thisTile)) {
@@ -494,16 +494,14 @@ object BlocksDrawerNew {
                             if (drawModeTilesBlendMul) {
                                 if (BlocksDrawer.isBlendMul(thisTile)) {
                                     batch.color = color
-                                    drawTile(batch, mode, x, y, thisTileX, thisTileY)
-                                    // TODO: store to the buffer (floatArray) instead of draw right away
+                                    writeToBuffer(mode, x, y, thisTileX, thisTileY)
                                 }
                             }
                             else {
                                 // do NOT add "if (!isBlendMul(thisTile))"!
                                 // or else they will not look like they should be when backed with wall
                                 batch.color = color
-                                drawTile(batch, mode, x, y, thisTileX, thisTileY)
-                                // TODO: store to the buffer (floatArray) instead of draw right away
+                                writeToBuffer(mode, x, y, thisTileX, thisTileY)
                             }
 
                             // draw a breakage
@@ -514,8 +512,7 @@ object BlocksDrawerNew {
                                 // actual drawing
                                 if (stage > 0) {
                                     batch.color = color
-                                    drawTile(batch, mode, x, y, 5 + stage, 0)
-                                    // TODO: store to the buffer (floatArray) instead of draw right away
+                                    writeToBuffer(mode, x, y, 5 + stage, 0)
                                 }
                             }
 
@@ -525,17 +522,6 @@ object BlocksDrawerNew {
                 } catch (e: NullPointerException) {
                     // do nothing. WARNING: This exception handling may hide erratic behaviour completely.
                 }
-
-
-                // hit the end of the current scanline
-                // FIXME bad scanlines bug
-                /*if (x == for_x_end) {
-                    val x = x + 1 // because current tile is also counted
-                    batch.color = Color.BLACK
-                    batch.fillRect(x * TILE_SIZEF, y * TILE_SIZEF, -zeroTileCounter * TILE_SIZEF, TILE_SIZEF)
-                    batch.color = color
-                    zeroTileCounter = 0
-                }*/
             }
         }
 
@@ -671,21 +657,44 @@ object BlocksDrawerNew {
             return 7
     }
 
-    private fun drawTile(batch: SpriteBatch, mode: Int, tilewisePosX: Int, tilewisePosY: Int, sheetX: Int, sheetY: Int) {
-        if (mode == TERRAIN || mode == WALL)
-            batch.draw(
-                    tilesTerrain.get(sheetX, sheetY),
-                    tilewisePosX * TILE_SIZEF,
-                    tilewisePosY * TILE_SIZEF
-            )
-        else if (mode == WIRE)
-            batch.draw(
-                    tilesWire.get(sheetX, sheetY),
-                    tilewisePosX * TILE_SIZEF,
-                    tilewisePosY * TILE_SIZEF
-            )
-        else
-            throw IllegalArgumentException()
+    /**
+     * Raw format of RGBA8888, where RGB portion actually encodes the absolute tile number and A is always 255.
+     *
+     * @return Raw colour bits in RGBA8888 format
+     */
+    private fun sheetXYToTilemapColour(mode: Int, sheetX: Int, sheetY: Int): Int = when (mode) {
+        TERRAIN, WALL -> (tilesTerrain.tileW * sheetY + sheetX).shl(8) or 255
+        WIRE -> (tilesWire.tileW * sheetY + sheetX).shl(8) or 255
+        else -> throw IllegalArgumentException()
+    }
+
+    private fun writeToBuffer(mode: Int, bufferPosX: Int, bufferPosY: Int, sheetX: Int, sheetY: Int) {
+        terrainTilesBuffer[bufferPosY][bufferPosX] = sheetXYToTilemapColour(mode, sheetX, sheetY)
+    }
+
+    private fun renderUsingBuffer(mode: Int) {
+        // TODO TODO TODO GlslTilingTest
+    }
+
+    private var oldScreenW = 0
+    private var oldScreenH = 0
+
+    fun resize(screenW: Int, screenH: Int) {
+        val tilesInHorizontal = (screenW.toFloat() / TILE_SIZE).ceilInt() + 1
+        val tilesInVertical = (screenH.toFloat() / TILE_SIZE).ceilInt() + 1
+
+        val oldTH = (oldScreenW.toFloat() / TILE_SIZE).ceilInt() + 1
+        val oldTV = (oldScreenH.toFloat() / TILE_SIZE).ceilInt() + 1
+
+        // only update if it's really necessary
+        if (oldTH != tilesInHorizontal || oldTV != tilesInVertical) {
+            terrainTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
+            wallTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
+            wireTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
+        }
+
+        oldScreenW = screenW
+        oldScreenH = screenH
     }
 
     fun clampH(x: Int): Int {

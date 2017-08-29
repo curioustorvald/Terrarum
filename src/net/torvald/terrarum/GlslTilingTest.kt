@@ -153,6 +153,9 @@ object GlslTilingTest : ApplicationAdapter() {
         shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shader.setUniformf("tilesInAxes", tilesInHorizontal, tilesInVertical)
         shader.setUniformf("cameraTranslation", cameraX, cameraY)
+        shader.setUniformi("tileSizeInPx", 16)
+        shader.setUniformi("tilesInAtlas", 256, 256) //depends on the tile atlas
+        shader.setUniformi("atlasTexSize", 4096, 4096) //depends on the tile atlas
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
         shader.end()
         tilesBufferAsTex.dispose()
