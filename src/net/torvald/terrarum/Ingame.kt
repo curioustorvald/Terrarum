@@ -529,6 +529,9 @@ class Ingame(val batch: SpriteBatch) : Screen {
     private fun renderGame(batch: SpriteBatch) {
         Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         //camera.position.set(-WorldCamera.x.toFloat(), -WorldCamera.y.toFloat(), 0f) // make camara work
         //camera.position.set(0f, 0f, 0f) // make camara work
@@ -1349,6 +1352,8 @@ class Ingame(val batch: SpriteBatch) : Screen {
      * @see net.torvald.terrarum.Terrarum
      */
     override fun resize(width: Int, height: Int) {
+
+        BlocksDrawer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
 
         worldDrawFrameBuffer.dispose()
         worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)

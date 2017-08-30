@@ -199,8 +199,13 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     fun updateScreen(delta: Float) {
+        Gdx.graphics.setTitle(TerrarumAppLoader.GAME_NAME +
+                              " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
+                              " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
+        )
+
         demoWorld.globalLight = WeatherMixer.globalLightNow
-        demoWorld.updateWorldTime(delta)
+        //demoWorld.updateWorldTime(delta)
         WeatherMixer.update(delta, cameraPlayer)
         cameraPlayer.update(delta)
         // worldcamera update AFTER cameraplayer in this case; the other way is just an exception for actual ingame SFX
@@ -222,7 +227,11 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
         // render world
-        batch.inUse {
+        BlocksDrawer.renderWall(batch)
+        BlocksDrawer.renderTerrain(batch)
+        //BlocksDrawer.renderFront(batch, false)
+
+        /*batch.inUse {
             setCameraPosition(0f, 0f)
             batch.color = Color.WHITE
             batch.shader = null
@@ -239,7 +248,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             renderMenus()
 
             renderOverlayTexts()
-        }
+        }*/
     }
 
     private fun renderDemoWorld() {
@@ -260,9 +269,19 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         batch.shader = null
 
         blendNormal()
+
+        batch.end()
+
+
+
         BlocksDrawer.renderWall(batch)
         BlocksDrawer.renderTerrain(batch)
         BlocksDrawer.renderFront(batch, false)
+
+
+
+        batch.begin()
+
         FeaturesDrawer.drawEnvOverlay(batch)
 
 
@@ -331,6 +350,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         // Set up viewport when window is resized
         initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
+        BlocksDrawer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
 
         if (loadDone) {
             // resize UI by re-creating it (!!)

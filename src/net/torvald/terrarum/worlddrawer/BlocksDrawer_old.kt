@@ -12,10 +12,6 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
-import net.torvald.terrarum.worlddrawer.WorldCamera.x
-import net.torvald.terrarum.worlddrawer.WorldCamera.y
-import net.torvald.terrarum.worlddrawer.WorldCamera.height
-import net.torvald.terrarum.worlddrawer.WorldCamera.width
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.BufferedOutputStream
 import java.io.File
@@ -26,7 +22,7 @@ import java.util.zip.GZIPInputStream
 /**
  * Created by minjaesong on 16-01-19.
  */
-object BlocksDrawer {
+object BlocksDrawerOLD {
     lateinit var world: GameWorld
 
 
@@ -710,11 +706,11 @@ object BlocksDrawer {
         }
     }
 
-    fun getRenderStartX(): Int = x / TILE_SIZE
-    fun getRenderStartY(): Int = y / TILE_SIZE
+    fun getRenderStartX(): Int = WorldCamera.x / TILE_SIZE
+    fun getRenderStartY(): Int = WorldCamera.y / TILE_SIZE
 
-    fun getRenderEndX(): Int = clampWTile(getRenderStartX() + (width / TILE_SIZE) + 2)
-    fun getRenderEndY(): Int = clampHTile(getRenderStartY() + (height / TILE_SIZE) + 2)
+    fun getRenderEndX(): Int = clampWTile(getRenderStartX() + (WorldCamera.width / TILE_SIZE) + 2)
+    fun getRenderEndY(): Int = clampHTile(getRenderStartY() + (WorldCamera.height / TILE_SIZE) + 2)
 
     fun isConnectSelf(b: Int?): Boolean = TILES_CONNECT_SELF.contains(b)
     fun isConnectMutual(b: Int?): Boolean = TILES_CONNECT_MUTUAL.contains(b)
@@ -724,5 +720,5 @@ object BlocksDrawer {
 
     fun tileInCamera(x: Int, y: Int) =
             x >= WorldCamera.x.div(TILE_SIZE) && y >= WorldCamera.y.div(TILE_SIZE) &&
-            x <= WorldCamera.x.plus(width).div(TILE_SIZE) && y <= WorldCamera.y.plus(width).div(TILE_SIZE)
+            x <= WorldCamera.x.plus(WorldCamera.width).div(TILE_SIZE) && y <= WorldCamera.y.plus(WorldCamera.width).div(TILE_SIZE)
 }
