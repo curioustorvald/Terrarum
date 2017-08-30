@@ -147,6 +147,7 @@ object GlslTilingTest : ApplicationAdapter() {
 
         shader.begin()
         shader.setUniformMatrix("u_projTrans", batch.projectionMatrix)//camera.combined)
+        //shader.setUniformf("colourFilter", Color.RED)
         shader.setUniformf("screenDimension", Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         shader.setUniformi("tilesAtlas", 1)
         shader.setUniformi("tilemap", 2)
