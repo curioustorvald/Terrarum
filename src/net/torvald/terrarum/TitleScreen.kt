@@ -181,10 +181,6 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             loadThingsWhileIntroIsVisible()
         }
         else {
-            Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-
-
             // async update
             updateDeltaCounter += delta
             while (updateDeltaCounter >= updateRate) {
@@ -222,11 +218,14 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     fun renderScreen() {
+
         // render and blur lightmap
         processBlur(LightmapRenderer.DRAW_FOR_RGB)
         //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
         // render world
+        Gdx.gl.glClearColor(.64f, .754f, .84f, 0f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         BlocksDrawer.renderWall(batch)
         BlocksDrawer.renderTerrain(batch)
         //BlocksDrawer.renderFront(batch, false)
