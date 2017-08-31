@@ -11,7 +11,6 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ceilInt
-import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.BufferedOutputStream
@@ -21,6 +20,31 @@ import java.util.zip.GZIPInputStream
 
 
 /**
+ * Note: You can't just hamburger the three jobs; there's actor draw calls in-between the three jobs, like:
+ *
+```
+    BlocksDrawer.renderWall(batch) // JOB #0
+    actorsRenderBehind.forEach { it.drawBody(batch) }
+    particlesContainer.forEach { it.drawBody(batch) }
+    BlocksDrawer.renderTerrain(batch) // JOB #1
+
+    /////////////////
+    // draw actors //
+    /////////////////
+    actorsRenderMiddle.forEach { it.drawBody(batch) }
+    actorsRenderMidTop.forEach { it.drawBody(batch) }
+    player.drawBody(batch)
+    actorsRenderFront.forEach { it.drawBody(batch) }
+    // --> Change of blend mode <-- introduced by childs of ActorWithBody //
+
+
+    /////////////////////////////
+    // draw map related stuffs //
+    /////////////////////////////
+
+    BlocksDrawer.renderFront(batch, false) // JOB #2
+ ```
+ *
  * Created by minjaesong on 16-01-19.
  */
 object BlocksDrawer {
@@ -362,7 +386,7 @@ object BlocksDrawer {
          */
         blendNormal()
 
-        drawTiles(WALL, false, wallOverlayColour)
+        drawTiles(WALL, false)
         renderUsingBuffer(WALL, batch.projectionMatrix)
     }
 
@@ -372,7 +396,7 @@ object BlocksDrawer {
          */
         blendNormal()
 
-        drawTiles(TERRAIN, false, Color.WHITE) // regular tiles
+        drawTiles(TERRAIN, false) // regular tiles
         renderUsingBuffer(TERRAIN, batch.projectionMatrix)
     }
 
@@ -382,11 +406,11 @@ object BlocksDrawer {
          */
         blendMul()
 
-        drawTiles(TERRAIN, true, Color.WHITE) // blendmul tiles
+        drawTiles(TERRAIN, true) // blendmul tiles
         renderUsingBuffer(TERRAIN, batch.projectionMatrix)
 
         if (drawWires) {
-            drawTiles(WIRE, false, Color.WHITE)
+            drawTiles(WIRE, false)
             renderUsingBuffer(WIRE, batch.projectionMatrix)
         }
 
@@ -429,7 +453,7 @@ object BlocksDrawer {
     /**
      * Writes to buffer. Actual draw code must be called after this operation.
      */
-    private fun drawTiles(mode: Int, drawModeTilesBlendMul: Boolean, color: Color) {
+    private fun drawTiles(mode: Int, drawModeTilesBlendMul: Boolean) {
         val for_y_start = WorldCamera.y / TILE_SIZE
         val for_y_end = for_y_start + tilesBuffer.height - 1//clampHTile(for_y_start + (WorldCamera.height / TILE_SIZE) + 2)
 
@@ -454,11 +478,14 @@ object BlocksDrawer {
 
                 // draw a tile, but only when illuminated
                 try {
-                    if (canIHazRender(mode, x, y)) {
+                    //if (canIHazRender(mode, x, y)) {
 
                         //if (!hasLightNearby(x, y)) {
                         //    // draw black patch
-                        //    writeToBuffer(mode, x - for_x_start, y - for_y_start, 2, 0)
+                        //    if (thisTile == 0)
+                        //        writeToBuffer(mode, x - for_x_start, y - for_y_start, 0, 0)
+                        //    else
+                        //        writeToBuffer(mode, x - for_x_start, y - for_y_start, 2, 0)
                         //}
                         //else {
 
@@ -513,7 +540,7 @@ object BlocksDrawer {
 
 
                         //} // end if (is illuminated)
-                    } // end if (not an air)
+                    //} // end if (not an air)
                 } catch (e: NullPointerException) {
                     // do nothing. WARNING: This exception handling may hide erratic behaviour completely.
                 }
@@ -656,10 +683,21 @@ object BlocksDrawer {
     }
 
     private fun writeToBuffer(mode: Int, bufferPosX: Int, bufferPosY: Int, sheetX: Int, sheetY: Int) {
-        terrainTilesBuffer[bufferPosY][bufferPosX] = sheetXYToTilemapColour(mode, sheetX, sheetY)
+        val sourceBuffer = when(mode) {
+            TERRAIN -> terrainTilesBuffer
+            WALL -> wallTilesBuffer
+            WIRE -> wireTilesBuffer
+            else -> throw IllegalArgumentException()
+        }
+
+
+        sourceBuffer[bufferPosY][bufferPosX] = sheetXYToTilemapColour(mode, sheetX, sheetY)
     }
 
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4) {
+        //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
+        //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
@@ -689,9 +727,6 @@ object BlocksDrawer {
         // write to colour buffer
         for (y in 0 until tilesBuffer.height) {
             for (x in 0 until tilesBuffer.width) {
-                tilesBuffer.setColor(0)
-                tilesBuffer.drawPixel(x, y)
-
                 val color = sourceBuffer[y][x]
                 tilesBuffer.setColor(color)
                 tilesBuffer.drawPixel(x, y)
