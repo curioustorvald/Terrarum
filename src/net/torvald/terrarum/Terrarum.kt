@@ -252,6 +252,8 @@ object Terrarum : Screen {
     lateinit var shaderBayer: ShaderProgram
     lateinit var shaderBayerSkyboxFill: ShaderProgram
     lateinit var shaderBlendGlow: ShaderProgram
+    lateinit var shaderRGBOnly: ShaderProgram
+    lateinit var shaderAtoGrey: ShaderProgram
 
 
     lateinit var textureWhiteSquare: Texture
@@ -399,8 +401,11 @@ object Terrarum : Screen {
 
         shaderBayerSkyboxFill = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"))
 
-
         shaderBlendGlow = ShaderProgram(Gdx.files.internal("assets/blendGlow.vert"), Gdx.files.internal("assets/blendGlow.frag"))
+
+        shaderRGBOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbonly.frag"))
+        shaderAtoGrey = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/aonly.frag"))
+
 
         if (!shaderBlendGlow.isCompiled) {
             Gdx.app.log("shaderBlendGlow", shaderBlendGlow.log)
@@ -417,6 +422,9 @@ object Terrarum : Screen {
             Gdx.app.log("shaderBayerSkyboxFill", shaderBayerSkyboxFill.log)
             System.exit(1)
         }
+
+
+
 
 
         gameLocale = getConfigString("language")
@@ -440,7 +448,8 @@ object Terrarum : Screen {
 
 
         // title screen
-        appLoader.setScreen(TitleScreen(batch))
+        //appLoader.setScreen(TitleScreen(batch))
+        appLoader.setScreen(FuckingWorldRenderer(batch))
     }
 
     internal fun setScreen(screen: Screen) {
