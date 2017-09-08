@@ -16,7 +16,7 @@ uniform vec2 screenDimension;
 uniform vec2 tilesInAxes; // vec2(tiles_in_horizontal, tiles_in_vertical)
 
 uniform ivec2 tilemapDimension;
-uniform sampler2D tilemap; // MUST be RGBA8888
+uniform sampler2D tilemap; // RGB888, A is optional and will be completely ignored
 
 uniform sampler2D tilesAtlas;
 uniform sampler2D backgroundTexture;
@@ -70,6 +70,9 @@ void main() {
     highp vec2 uvCoordOffset = tileXY * singleTileSizeInUV; // where the tile starts in the atlas, using uv coord (0..1)
 
     highp vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffset;// where we should be actually looking for in atlas, using UV coord (0..1)
+
+
+    // TODO blend a breakage (0xrrggbb where 0xr0 -- upper 4 bits of int_red component)
 
 
     if (tileXY.x == 0 && tileXY.y == 0)

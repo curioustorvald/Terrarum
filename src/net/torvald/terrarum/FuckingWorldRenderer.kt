@@ -17,16 +17,15 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.serialise.ReadLayerData
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UIHandler
 import net.torvald.terrarum.ui.UITitleRemoConRoot
 import net.torvald.terrarum.weather.WeatherMixer
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
-import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.terrarum.worlddrawer.*
 import java.io.FileInputStream
 
-class TitleScreen(val batch: SpriteBatch) : Screen {
+/**
+ * Created by minjaesong on 2017-09-02.
+ */
+class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
 
     var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
@@ -141,7 +140,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         demoWorld.time.timeDelta = 150
 
 
-        LightmapRenderer.world = demoWorld
+        LightmapRendererNew.world = demoWorld
         BlocksDrawer.world = demoWorld
         FeaturesDrawer.world = demoWorld
 
@@ -218,14 +217,14 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
         if (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1) {
-            LightmapRenderer.fireRecalculateEvent()
+            LightmapRendererNew.fireRecalculateEvent()
         }
     }
 
     fun renderScreen() {
 
         // render and blur lightmap
-        processBlur(LightmapRenderer.DRAW_FOR_RGB)
+        processBlur(LightmapRendererNew.DRAW_FOR_RGB)
         //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
         // render world
@@ -300,11 +299,13 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         batch.shader.setUniformf("bcount", 64f) // de-banding
         val lightTex = blurWriteBuffer.colorBufferTexture
         lightTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-        blendMul()
+        //blendMul()
+        blendNormal()
         batch.color = Color.WHITE
-        batch.draw(lightTex,
+        batch.draw(logo.texture,//lightTex,
                 0f, 0f,
-                lightTex.width * Ingame.lightmapDownsample, lightTex.height * Ingame.lightmapDownsample
+                //lightTex.width * Ingame.lightmapDownsample, lightTex.height * Ingame.lightmapDownsample
+                lightTex.width.toFloat(), lightTex.height.toFloat()
         )
 
         batch.shader = null
@@ -315,6 +316,11 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
         camera.update()
         batch.projectionMatrix = camera.combined
+
+
+
+        // FIXME failed test tells that something is interfering with SpriteBatch, which makes every draw call within
+        //       the spritebatch all go black
     }
 
     private fun renderMenus() {
@@ -358,6 +364,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
         BlocksDrawer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+        LightmapRendererNew.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
 
         if (loadDone) {
             // resize UI by re-creating it (!!)
@@ -405,7 +412,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         }
 
 
-        if (mode == LightmapRenderer.DRAW_FOR_RGB) {
+        if (mode == LightmapRendererNew.DRAW_FOR_RGB) {
             // initialise readBuffer with untreated lightmap
             blurReadBuffer.inAction(camera, batch) {
                 batch.inUse {
@@ -421,7 +428,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
                     blendNormal()
                     batch.color = Color.WHITE
-                    LightmapRenderer.draw(batch, LightmapRenderer.DRAW_FOR_RGB)
+                    LightmapRendererNew.draw(batch, LightmapRendererNew.DRAW_FOR_RGB)
                 }
             }
         }
@@ -441,7 +448,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
                     blendNormal()
                     batch.color = Color.WHITE
-                    LightmapRenderer.draw(batch, LightmapRenderer.DRAW_FOR_ALPHA)
+                    LightmapRendererNew.draw(batch, LightmapRendererNew.DRAW_FOR_ALPHA)
                 }
             }
         }
@@ -482,7 +489,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
 
-    class TitleScreenController(val screen: TitleScreen) : InputAdapter() {
+    class TitleScreenController(val screen: FuckingWorldRenderer) : InputAdapter() {
         override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
             screen.uiContainer.forEach { it.touchUp(screenX, screenY, pointer, button) }
             return true
