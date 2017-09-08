@@ -381,30 +381,31 @@ object BlocksDrawer {
     ///////////////////////////////////////////
 
     fun renderWall(batch: SpriteBatch) {
-        /**
-         * render to camera
-         */
-        blendNormal()
+        // blend normal
+        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         drawTiles(WALL, false)
         renderUsingBuffer(WALL, batch.projectionMatrix)
     }
 
     fun renderTerrain(batch: SpriteBatch) {
-        /**
-         * render to camera
-         */
-        blendNormal()
+        // blend normal
+        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         drawTiles(TERRAIN, false) // regular tiles
         renderUsingBuffer(TERRAIN, batch.projectionMatrix)
     }
 
+    @Deprecated("It's broken right now; don't use it")
     fun renderFront(batch: SpriteBatch, drawWires: Boolean) {
-        /**
-         * render to camera
-         */
-        blendMul()
+        // blend mul
+        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         drawTiles(TERRAIN, true) // blendmul tiles
         renderUsingBuffer(TERRAIN, batch.projectionMatrix)
@@ -414,7 +415,10 @@ object BlocksDrawer {
             renderUsingBuffer(WIRE, batch.projectionMatrix)
         }
 
-        blendNormal()
+        // blend normal
+        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
     }
 
     private val tileDrawLightThreshold = 2f / LightmapRenderer.MUL
@@ -698,12 +702,9 @@ object BlocksDrawer {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
-        Gdx.gl.glEnable(GL20.GL_BLEND)
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-        val tilesInHorizontal = tilesBuffer.width
-        val tilesInVertical =   tilesBuffer.height
+        //val tilesInHorizontal = tilesBuffer.width
+        //val tilesInVertical =   tilesBuffer.height
 
 
         val tileAtlas = when (mode) {
@@ -759,9 +760,12 @@ object BlocksDrawer {
     private var oldScreenW = 0
     private var oldScreenH = 0
 
+    var tilesInHorizontal = -1; private set
+    var tilesInVertical = -1; private set
+
     fun resize(screenW: Int, screenH: Int) {
-        val tilesInHorizontal = (screenW.toFloat() / TILE_SIZE).ceilInt() + 1
-        val tilesInVertical = (screenH.toFloat() / TILE_SIZE).ceilInt() + 1
+        tilesInHorizontal = (screenW.toFloat() / TILE_SIZE).ceilInt() + 1
+        tilesInVertical = (screenH.toFloat() / TILE_SIZE).ceilInt() + 1
 
         val oldTH = (oldScreenW.toFloat() / TILE_SIZE).ceilInt() + 1
         val oldTV = (oldScreenH.toFloat() / TILE_SIZE).ceilInt() + 1
@@ -772,7 +776,7 @@ object BlocksDrawer {
             wallTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
             wireTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
 
-            tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
+            tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGB888)
         }
 
         if (oldScreenW != screenW || oldScreenH != screenH) {
