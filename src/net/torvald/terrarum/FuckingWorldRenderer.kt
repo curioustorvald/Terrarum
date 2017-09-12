@@ -197,8 +197,8 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
             }
 
             // render? just do it anyway
+            //LightmapRendererNew.fireRecalculateEvent()
             renderScreen()
-
         }
     }
 
@@ -221,9 +221,7 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
 
 
 
-        if (TerrarumAppLoader.GLOBAL_RENDER_TIMER % 2 == 1) {
-            LightmapRendererNew.fireRecalculateEvent()
-        }
+        LightmapRendererNew.fireRecalculateEvent() // don't half-frame update; it will jitter!
     }
 
     fun renderScreen() {
@@ -318,12 +316,11 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
         val xrem = -(WorldCamera.x % TILE_SIZEF)
         val yrem = -(WorldCamera.y % TILE_SIZEF)
         batch.draw(lightTex,
-                if (xrem == 0f) -TILE_SIZEF else xrem,
-                if (yrem == 0f) -TILE_SIZEF else yrem,
+                xrem,
+                yrem,
                 lightTex.width * Ingame.lightmapDownsample, lightTex.height * Ingame.lightmapDownsample
                 //lightTex.width.toFloat(), lightTex.height.toFloat() // for debugging
         )
-        // FIXME dae fucking jitter
 
 
 
