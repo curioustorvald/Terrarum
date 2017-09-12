@@ -773,21 +773,21 @@ infix fun Color.mul(other: Color): Color = this.cpy().mul(other)
 
 
 
-fun blendMul() {
-    Terrarum.batch.enableBlending()
-    Terrarum.batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
+fun blendMul(batch: SpriteBatch? = null) {
+    (batch ?: Terrarum.batch).enableBlending()
+    (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
 }
 
-fun blendNormal() {
-    Terrarum.batch.enableBlending()
-    Terrarum.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+fun blendNormal(batch: SpriteBatch? = null) {
+    (batch ?: Terrarum.batch).enableBlending()
+    (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
 }
 
-fun blendScreen() {
-    Terrarum.batch.enableBlending()
-    Terrarum.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR)
+fun blendScreen(batch: SpriteBatch? = null) {
+    (batch ?: Terrarum.batch).enableBlending()
+    (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
 }
 

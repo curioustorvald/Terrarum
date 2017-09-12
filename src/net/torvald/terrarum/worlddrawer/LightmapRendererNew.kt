@@ -56,7 +56,7 @@ object LightmapRendererNew {
     private val AIR = Block.AIR
 
     private const val TILE_SIZE = FeaturesDrawer.TILE_SIZE
-    private val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / Ingame.lightmapDownsample
+    val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / Ingame.lightmapDownsample
 
     // color model related constants
     const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB
@@ -366,8 +366,8 @@ object LightmapRendererNew {
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
         //      we might not need shader here...
-        batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
-        //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width * DRAW_TILE_SIZE, lightBufferAsTex.height * TILE_SIZE.toFloat())
+        //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
+        batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width * DRAW_TILE_SIZE, lightBufferAsTex.height * DRAW_TILE_SIZE)
 
         //lightBufferAsTex.dispose()
 
