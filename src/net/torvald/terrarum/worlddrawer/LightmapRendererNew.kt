@@ -1,6 +1,8 @@
 package net.torvald.terrarum.worlddrawer
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -8,6 +10,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Ingame
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppLoader
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
@@ -306,15 +309,20 @@ object LightmapRendererNew {
     lateinit var lightBuffer: Pixmap
 
     fun draw(batch: SpriteBatch, drawMode: Int) {
+
         val this_x_start = for_x_start// + overscan_open
         val this_x_end = for_x_end// + overscan_open
         val this_y_start = for_y_start// + overscan_open
         val this_y_end = for_y_end// + overscan_open
 
 
-
         // write to colour buffer
         for (y in this_y_start..this_y_end) {
+            //println("y: $y, this_y_start: $this_y_start")
+            if (y == this_y_start && this_y_start == 0) {
+                //throw Error("Fuck hits again...")
+            }
+
             for (x in this_x_start..this_x_end) {
 
                 val color = if (drawMode == DRAW_FOR_RGB) {
@@ -328,21 +336,40 @@ object LightmapRendererNew {
                 }
 
 
-                //lightBuffer.setColor(color)
-                lightBuffer.setColor(Color.ORANGE)
-                lightBuffer.drawPixel(x - this_x_start, y - this_y_start)
+                lightBuffer.setColor(color)
+
+                //lightBuffer.drawPixel(x - this_x_start, y - this_y_start)
+
+                lightBuffer.drawPixel(x - this_x_start, lightBuffer.height - 1 - y + this_y_start) // flip Y
             }
         }
+        //println()
+
+        // FIXME FUCKS SAKE: this_y_start is sometimes fixed at zero, which fucked old light sys with black screen
+        //  -> recalculate event not being fired
+
+
+        // so this code actually works now...
+        /*for (y in 0 until lightBuffer.height) {
+            for (x in 0 until lightBuffer.width) {
+                val rnd = Math.random().toFloat()
+                lightBuffer.setColor(Color(rnd, rnd, rnd, 1f))
+                lightBuffer.drawPixel(x, y)
+            }
+        }*/
 
 
         // draw to the batch
         val lightBufferAsTex = Texture(lightBuffer)
         lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
-        //      we might not need shader here...
-        batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width * DRAW_TILE_SIZE, lightBufferAsTex.height * DRAW_TILE_SIZE)
 
-        lightBufferAsTex.dispose()
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
+        //      we might not need shader here...
+        batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
+        //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width * DRAW_TILE_SIZE, lightBufferAsTex.height * TILE_SIZE.toFloat())
+
+        //lightBufferAsTex.dispose()
 
 
 
@@ -537,7 +564,7 @@ object LightmapRendererNew {
     fun resize(width: Int, height: Int) {
         // make sure the BlocksDrawer is resized first!
 
-        lightBuffer = Pixmap(BlocksDrawer.tilesInHorizontal, BlocksDrawer.tilesInVertical, Pixmap.Format.RGB888)
+        lightBuffer = Pixmap(BlocksDrawer.tilesInHorizontal, BlocksDrawer.tilesInVertical, Pixmap.Format.RGBA8888)
     }
 
 

@@ -754,6 +754,7 @@ object BlocksDrawer {
         shader.setUniformi("atlasTexSize", tileAtlas.texture.width, tileAtlas.texture.height) //depends on the tile atlas
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
         shader.end()
+
         tilesBufferAsTex.dispose()
     }
 

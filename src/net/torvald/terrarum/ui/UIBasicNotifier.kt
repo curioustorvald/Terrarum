@@ -47,7 +47,7 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
     private val temperature: Int
         get() {
             if (player != null) {
-                val playerTilePos = player.tilewiseHitbox
+                val playerTilePos = player.hIntTilewiseHitbox
                 val tempCelsius = -273f + (Terrarum.ingame?.world?.getTemperature(playerTilePos.centeredX.toInt(), playerTilePos.centeredY.toInt()) ?: 288f)
                 return if (Terrarum.getConfigBoolean("useamericanunit")) {
                     tempCelsius.times(1.8f).plus(32f).roundInt()
@@ -111,7 +111,7 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
             val lightLevel: Color
 
             if (player != null) {
-                val playerPos = player.tilewiseHitbox
+                val playerPos = player.hIntTilewiseHitbox
                 lightLevel = (LightmapRenderer.getLight(playerPos.centeredX.toInt(), playerPos.centeredY.toInt()) ?:
                               Terrarum.ingame!!.world.globalLight
                              )

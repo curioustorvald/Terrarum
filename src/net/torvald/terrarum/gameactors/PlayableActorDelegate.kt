@@ -17,12 +17,12 @@ class PlayableActorDelegate(val actor: ActorHumanoid) {
 
 
     fun update(delta: Float) {
-        //val oldTilewisePos = actor.tilewiseHitbox
+        //val oldTilewisePos = actor.hIntTilewiseHitbox
 
         actor.update(delta)
 
         // fire lightmap recalculate event upon tilewise pos change
-        //val newTilewisePos = actor.tilewiseHitbox
+        //val newTilewisePos = actor.hIntTilewiseHitbox
         //if (oldTilewisePos != newTilewisePos) {
         //    LightmapRenderer.fireRecalculateEvent()
         //}
