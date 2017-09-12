@@ -29,6 +29,8 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
 
     var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
+    private val processBlurBatch = SpriteBatch()
+
     // invert Y
     fun initViewPort(width: Int, height: Int) {
         // Set Y to point downwards
@@ -100,8 +102,9 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
     private val gradWhiteBottom = Color(0xd8d8d8ff.toInt())
 
     private val lightFBOformat = Pixmap.Format.RGB888
-    var lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(Ingame.lightmapDownsample.toInt()), Terrarum.HEIGHT.div(Ingame.lightmapDownsample.toInt()), false)
-    var lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(Ingame.lightmapDownsample.toInt()), Terrarum.HEIGHT.div(Ingame.lightmapDownsample.toInt()), false)
+    lateinit var lightmapFboA: FrameBuffer
+    lateinit var lightmapFboB: FrameBuffer
+    private var lightmapInitialised = false // to avoid nullability of lightmapFBO
 
     lateinit var logo: TextureRegion
 
@@ -109,6 +112,9 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
     private lateinit var uiMenu: UICanvas
 
     private lateinit var worldFBO: FrameBuffer
+
+    private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
+    private val TILE_SIZEF = TILE_SIZE.toFloat()
 
     private fun loadThingsWhileIntroIsVisible() {
         demoWorld = ReadLayerData(FileInputStream(ModMgr.getFile("basegame", "demoworld")))
@@ -172,8 +178,6 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
         worldFBO = FrameBuffer(Pixmap.Format.RGBA8888, Terrarum.WIDTH, Terrarum.HEIGHT, false)
     }
 
-    private var blurWriteBuffer = lightmapFboA
-    private var blurReadBuffer = lightmapFboB
 
     private val introUncoverTime: Second = 0.3f
     private var introUncoverDeltaCounter = 0f
@@ -216,7 +220,7 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
         uiContainer.forEach { it.update(delta) }
 
 
-        
+
         if (TerrarumAppLoader.GLOBAL_RENDER_TIMER % 2 == 1) {
             LightmapRendererNew.fireRecalculateEvent()
         }
@@ -224,8 +228,7 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
 
     fun renderScreen() {
 
-        // render and blur lightmap
-        ///////////processBlur(LightmapRendererNew.DRAW_FOR_RGB)
+        processBlur(LightmapRendererNew.DRAW_FOR_RGB)
         //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
         // render world
@@ -291,24 +294,43 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
         FeaturesDrawer.drawEnvOverlay(batch)
 
 
+        ///////////////////
         // draw lightmap //
+        ///////////////////
+
         setCameraPosition(0f, 0f)
+
         //batch.shader = Terrarum.shaderBayer
         //batch.shader.setUniformf("rcount", 64f)
         //batch.shader.setUniformf("gcount", 64f)
         //batch.shader.setUniformf("bcount", 64f) // de-banding
-        //val lightTex = blurWriteBuffer.colorBufferTexture
-        //lightTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-        //blendMul()
-        blendNormal()
         batch.shader = null
+
+
+        //processBlur(LightmapRendererNew.DRAW_FOR_RGB)
+
+        val lightTex = lightmapFboB.colorBufferTexture // A or B? flipped in Y means you chose wrong buffer; use one that works correctly
+        lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest) // blocky feeling for A E S T H E T I C S
+
+        blendMul()
+
         batch.color = Color.WHITE
-        /*batch.draw(lightTex,
-                0f, 0f,
-                //lightTex.width * Ingame.lightmapDownsample, lightTex.height * Ingame.lightmapDownsample
-                lightTex.width.toFloat(), lightTex.height.toFloat()
-        )*/
-        LightmapRendererNew.draw(batch, LightmapRendererNew.DRAW_FOR_RGB)
+        val xrem = -(WorldCamera.x % TILE_SIZEF)
+        val yrem = -(WorldCamera.y % TILE_SIZEF)
+        batch.draw(lightTex,
+                if (xrem == 0f) -TILE_SIZEF else xrem,
+                if (yrem == 0f) -TILE_SIZEF else yrem,
+                lightTex.width * Ingame.lightmapDownsample, lightTex.height * Ingame.lightmapDownsample
+                //lightTex.width.toFloat(), lightTex.height.toFloat() // for debugging
+        )
+        // FIXME dae fucking jitter
+
+
+
+        //////////////////////
+        // Draw other shits //
+        //////////////////////
+
 
         batch.shader = null
 
@@ -374,11 +396,23 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
             uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
         }
 
-        lightmapFboA.dispose()
-        lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(Ingame.lightmapDownsample.toInt()), Terrarum.HEIGHT.div(Ingame.lightmapDownsample.toInt()), false)
-        lightmapFboB.dispose()
-        lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(Ingame.lightmapDownsample.toInt()), Terrarum.HEIGHT.div(Ingame.lightmapDownsample.toInt()), false)
-
+        if (lightmapInitialised) {
+            lightmapFboA.dispose()
+            lightmapFboB.dispose()
+        }
+        lightmapFboA = FrameBuffer(
+                lightFBOformat,
+                LightmapRendererNew.lightBuffer.width * LightmapRendererNew.DRAW_TILE_SIZE.toInt(),
+                LightmapRendererNew.lightBuffer.height * LightmapRendererNew.DRAW_TILE_SIZE.toInt(),
+                false
+        )
+        lightmapFboB = FrameBuffer(
+                lightFBOformat,
+                LightmapRendererNew.lightBuffer.width * LightmapRendererNew.DRAW_TILE_SIZE.toInt(),
+                LightmapRendererNew.lightBuffer.height * LightmapRendererNew.DRAW_TILE_SIZE.toInt(),
+                false
+        )
+        lightmapInitialised = true // are you the first time?
     }
 
     override fun dispose() {
@@ -400,8 +434,8 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
         val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
         val blurRadius = 4f / Ingame.lightmapDownsample // (5, 4f); using low numbers for pixel-y aesthetics
 
-        blurWriteBuffer = lightmapFboA
-        blurReadBuffer = lightmapFboB
+        var blurWriteBuffer = lightmapFboA
+        var blurReadBuffer = lightmapFboB
 
 
         lightmapFboA.inAction(null, null) {
@@ -418,17 +452,7 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
             // initialise readBuffer with untreated lightmap
             blurReadBuffer.inAction(camera, batch) {
                 batch.inUse {
-                    // using custom code for camera; this is obscure and tricky
-                    camera.position.set(
-                            (WorldCamera.gdxCamX / Ingame.lightmapDownsample).round(),
-                            (WorldCamera.gdxCamY / Ingame.lightmapDownsample).round(),
-                            0f
-                    ) // make camara work
-                    camera.update()
-                    batch.projectionMatrix = camera.combined
-
-
-                    blendNormal()
+                    blendNormal(batch)
                     batch.color = Color.WHITE
                     LightmapRendererNew.draw(batch, LightmapRendererNew.DRAW_FOR_RGB)
                 }
@@ -438,17 +462,7 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
             // initialise readBuffer with untreated lightmap
             blurReadBuffer.inAction(camera, batch) {
                 batch.inUse {
-                    // using custom code for camera; this is obscure and tricky
-                    camera.position.set(
-                            (WorldCamera.gdxCamX / Ingame.lightmapDownsample).round(),
-                            (WorldCamera.gdxCamY / Ingame.lightmapDownsample).round(),
-                            0f
-                    ) // make camara work
-                    camera.update()
-                    batch.projectionMatrix = camera.combined
-
-
-                    blendNormal()
+                    blendNormal(batch)
                     batch.color = Color.WHITE
                     LightmapRendererNew.draw(batch, LightmapRendererNew.DRAW_FOR_ALPHA)
                 }
