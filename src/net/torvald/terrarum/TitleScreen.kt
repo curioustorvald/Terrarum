@@ -217,7 +217,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         uiContainer.forEach { it.update(delta) }
 
 
-        if (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1) {
+        if (TerrarumAppLoader.GLOBAL_RENDER_TIMER % 2 == 1) {
             LightmapRenderer.fireRecalculateEvent()
         }
     }

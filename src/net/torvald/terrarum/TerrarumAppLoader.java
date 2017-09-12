@@ -12,6 +12,8 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 
+import java.util.Random;
+
 /**
  * Created by minjaesong on 2017-08-01.
  */
@@ -48,6 +50,12 @@ public class TerrarumAppLoader implements ApplicationListener {
     private static LwjglApplicationConfiguration appConfig;
 
     public static GameFontBase fontGame;
+
+    /**
+     * For the events depends on rendering frame (e.g. flicker on post-hit invincibility)
+     */
+    public static int GLOBAL_RENDER_TIMER = new Random().nextInt(1020) + 1;
+
 
     public static void main(String[] args) {
         appConfig = new LwjglApplicationConfiguration();
@@ -160,6 +168,9 @@ public class TerrarumAppLoader implements ApplicationListener {
         else {
             screen.render(Gdx.graphics.getDeltaTime());
         }
+
+
+        GLOBAL_RENDER_TIMER += 1;
     }
 
     @Override
