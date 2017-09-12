@@ -59,12 +59,21 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
      */
     override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // Hitbox is implemented using Double;
 
-    val tilewiseHitbox: Hitbox
+    /** half integer tilewise hitbox */ // got the idea from gl_FragCoord
+    val hIntTilewiseHitbox: Hitbox
+        get() = Hitbox.fromTwoPoints(
+                hitbox.startX.div(TILE_SIZE).floor() + 0.5f,
+                hitbox.startY.div(TILE_SIZE).floor() + 0.5f,
+                hitbox.endX.div(TILE_SIZE).floor() + 0.5f,
+                hitbox.endY.div(TILE_SIZE).floor() + 0.5f
+        )
+
+    val intTilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
-                hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
-                hitbox.endY.minus(0.00001).div(TILE_SIZE).floor()
+                hitbox.endX.div(TILE_SIZE).floor(),
+                hitbox.endY.div(TILE_SIZE).floor()
         )
 
     /**
@@ -301,7 +310,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
     inline val feetPosPoint: Point2d
         get() = Point2d(hitbox.centeredX, hitbox.endY)
     inline val feetPosTile: IntArray
-        get() = intArrayOf(tilewiseHitbox.centeredX.floorInt(), tilewiseHitbox.endY.floorInt())
+        get() = intArrayOf(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
 
     override fun run() = update(updateDelta)
 
@@ -1287,8 +1296,8 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
 
     private fun forEachOccupyingTileNum(consumer: (Int?) -> Unit) {
         val tiles = ArrayList<Int?>()
-        for (y in tilewiseHitbox.startY.toInt()..tilewiseHitbox.endY.toInt()) {
-            for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
+        for (y in hIntTilewiseHitbox.startY.toInt()..hIntTilewiseHitbox.endY.toInt()) {
+            for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
                 tiles.add(world.getTileFromTerrain(x, y))
             }
         }
@@ -1298,8 +1307,8 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
 
     private fun forEachOccupyingTile(consumer: (BlockProp?) -> Unit) {
         val tileProps = ArrayList<BlockProp?>()
-        for (y in tilewiseHitbox.startY.toInt()..tilewiseHitbox.endY.toInt()) {
-            for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
+        for (y in hIntTilewiseHitbox.startY.toInt()..hIntTilewiseHitbox.endY.toInt()) {
+            for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
                 tileProps.add(BlockCodex[world.getTileFromTerrain(x, y)])
             }
         }
@@ -1331,7 +1340,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         // offset 1 pixel to the down so that friction would work
         val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorInt()
 
-        for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
+        for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
             tiles.add(world.getTileFromTerrain(x, y))
         }
 
@@ -1344,7 +1353,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         // offset 1 pixel to the down so that friction would work
         val y = hitbox.endY.plus(1.0).div(TILE_SIZE).floorInt()
 
-        for (x in tilewiseHitbox.startX.toInt()..tilewiseHitbox.endX.toInt()) {
+        for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
             tileProps.add(BlockCodex[world.getTileFromTerrain(x, y)])
         }
 

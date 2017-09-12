@@ -44,7 +44,7 @@ class PickaxeGeneric(override val originalID: ItemID) : GameItem() {
         // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
         // return false if hitting actors
         Terrarum.ingame!!.actorContainer.forEach({
-            if (it is ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
+            if (it is ActorWithPhysics && it.hIntTilewiseHitbox.intersects(mousePoint))
                 return false
         })
 
