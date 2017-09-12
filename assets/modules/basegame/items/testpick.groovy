@@ -67,7 +67,7 @@ class TestPick extends GameItem {
         // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
         // return false if hitting actors
         Terrarum.ingame.actorContainer.forEach({
-            if (it instanceof ActorWithPhysics && it.tilewiseHitbox.intersects(mousePoint))
+            if (it instanceof ActorWithPhysics && it.getHIntTilewiseHitbox.intersects(mousePoint))
                 return false
         })
 

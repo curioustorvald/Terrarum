@@ -216,7 +216,8 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
         uiContainer.forEach { it.update(delta) }
 
 
-        if (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1) {
+        
+        if (TerrarumAppLoader.GLOBAL_RENDER_TIMER % 2 == 1) {
             LightmapRendererNew.fireRecalculateEvent()
         }
     }
@@ -224,7 +225,7 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
     fun renderScreen() {
 
         // render and blur lightmap
-        processBlur(LightmapRendererNew.DRAW_FOR_RGB)
+        ///////////processBlur(LightmapRendererNew.DRAW_FOR_RGB)
         //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
         // render world
@@ -246,7 +247,7 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
             batch.shader = null
             batch.color = Color.WHITE
             renderMenus()
-            //renderOverlayTexts()
+            renderOverlayTexts()
         }
 
 
@@ -280,12 +281,11 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
 
 
         // draw tiles //
-
-        blendNormal()
-
-
         BlocksDrawer.renderWall(batch)
         BlocksDrawer.renderTerrain(batch)
+
+
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
 
 
         FeaturesDrawer.drawEnvOverlay(batch)
@@ -293,20 +293,22 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
 
         // draw lightmap //
         setCameraPosition(0f, 0f)
-        batch.shader = Terrarum.shaderBayer
-        batch.shader.setUniformf("rcount", 64f)
-        batch.shader.setUniformf("gcount", 64f)
-        batch.shader.setUniformf("bcount", 64f) // de-banding
-        val lightTex = blurWriteBuffer.colorBufferTexture
-        lightTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        //batch.shader = Terrarum.shaderBayer
+        //batch.shader.setUniformf("rcount", 64f)
+        //batch.shader.setUniformf("gcount", 64f)
+        //batch.shader.setUniformf("bcount", 64f) // de-banding
+        //val lightTex = blurWriteBuffer.colorBufferTexture
+        //lightTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         //blendMul()
         blendNormal()
+        batch.shader = null
         batch.color = Color.WHITE
-        batch.draw(logo.texture,//lightTex,
+        /*batch.draw(lightTex,
                 0f, 0f,
                 //lightTex.width * Ingame.lightmapDownsample, lightTex.height * Ingame.lightmapDownsample
                 lightTex.width.toFloat(), lightTex.height.toFloat()
-        )
+        )*/
+        LightmapRendererNew.draw(batch, LightmapRendererNew.DRAW_FOR_RGB)
 
         batch.shader = null
 

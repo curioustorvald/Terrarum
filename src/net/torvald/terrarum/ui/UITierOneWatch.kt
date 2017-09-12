@@ -66,7 +66,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
             val lightLevel: Color
 
             if (player != null) {
-                val playerPos = player.tilewiseHitbox
+                val playerPos = player.hIntTilewiseHitbox
                 lightLevel = (LightmapRenderer.getLight(playerPos.centeredX.toInt(), playerPos.centeredY.toInt()) ?:
                               Terrarum.ingame!!.world.globalLight
                              )

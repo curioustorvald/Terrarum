@@ -117,12 +117,6 @@ object Terrarum : Screen {
     val TARGET_INTERNAL_FPS: Double = 60.0
 
 
-    /**
-     * For the events depends on rendering frame (e.g. flicker on post-hit invincibility)
-     */
-    var GLOBAL_RENDER_TIMER = Random().nextInt(1020) + 1
-
-
 
 
 
@@ -458,7 +452,8 @@ object Terrarum : Screen {
 
     override fun render(delta: Float) {
         //appLoader.screen.render(deltaTime)
-        GLOBAL_RENDER_TIMER += 1
+        //GLOBAL_RENDER_TIMER += 1
+        // moved to TerrarumAppLoader; global event must be place at the apploader to prevent ACCIDENTAL forgot-to-update type of bug.
     }
 
     override fun pause() {

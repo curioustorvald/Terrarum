@@ -74,7 +74,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
     val ZOOM_MINIMUM = 0.5f
 
     companion object {
-        val lightmapDownsample = 2f //2f: still has choppy look when the camera moves but unnoticeable when blurred
+        val lightmapDownsample = 4f //2f: still has choppy look when the camera moves but unnoticeable when blurred
 
 
         /** Sets camera position so that (0,0) would be top-left of the screen, (width, height) be bottom-right. */
@@ -540,7 +540,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
         // update lightmap on every other frames, OR full-frame if the option is true
-        if (Terrarum.getConfigBoolean("fullframelightupdate") or (Terrarum.GLOBAL_RENDER_TIMER % 2 == 1)) {
+        if (Terrarum.getConfigBoolean("fullframelightupdate") or (TerrarumAppLoader.GLOBAL_RENDER_TIMER % 2 == 1)) {
             LightmapRenderer.fireRecalculateEvent()
         }
 
