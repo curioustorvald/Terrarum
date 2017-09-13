@@ -135,14 +135,14 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
             init {
                 setHitboxDimension(2, 2, 0, 0)
                 hitbox.setPosition(
-                        HQRNG().nextInt(demoWorld.width) * FeaturesDrawer.TILE_SIZE.toDouble(),
-                        0.0 // placeholder; camera AI will take it over
+                        38000.0,//HQRNG().nextInt(demoWorld.width) * FeaturesDrawer.TILE_SIZE.toDouble(),
+                        0.0 // Y pos: placeholder; camera AI will take it over
                 )
                 noClip = true
             }
         }
 
-        demoWorld.time.timeDelta = 150
+        //demoWorld.time.timeDelta = 150
 
 
         LightmapRendererNew.world = demoWorld
@@ -201,7 +201,7 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
     }
 
     fun updateScreen(delta: Float) {
-        Gdx.graphics.setTitle(TerrarumAppLoader.GAME_NAME +
+        Gdx.graphics.setTitle("WorldRenderTest" +
                               " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
                               " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
         )
@@ -248,6 +248,12 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
     }
 
     private fun renderDemoWorld() {
+        println("camera TL: ${WorldCamera.x}, ${WorldCamera.y}")
+        println("camera CN: ${WorldCamera.gdxCamX}, ${WorldCamera.gdxCamY}")
+        println()
+
+
+
         // draw skybox //
 
         setCameraPosition(0f, 0f)
@@ -287,8 +293,8 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
         //blendNormal()
 
         batch.color = Color.WHITE
-        val xrem = -(WorldCamera.x % TILE_SIZEF)
-        val yrem = -(WorldCamera.y % TILE_SIZEF)
+        val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF)
+        val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF)
         batch.draw(lightTex,
                 xrem,
                 yrem,

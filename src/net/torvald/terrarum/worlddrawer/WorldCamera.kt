@@ -37,13 +37,13 @@ object WorldCamera {
         height = FastMath.ceil(Terrarum.HEIGHT / (Terrarum.ingame?.screenZoom ?: 1f))
 
         // position - (WH / 2)
-        x = (// X only: ROUNDWORLD implementation
-                player.hitbox.centeredX.toFloat() - width / 2).floorInt()
+        x = player.hitbox.startX.toFloat().floorInt() // X only: ROUNDWORLD implementation
         y = (FastMath.clamp(
                 player.hitbox.centeredY.toFloat() - height / 2,
                 TILE_SIZE.toFloat(),
                 world.height * TILE_SIZE - height - TILE_SIZE.toFloat()
         )).floorInt().clampCameraY(world)
+
 
 
         gdxCamX = x + (width / 2f).floor()
