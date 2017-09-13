@@ -29,7 +29,6 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
 
     var camera = OrthographicCamera(Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
-    private val processBlurBatch = SpriteBatch()
 
     // invert Y
     fun initViewPort(width: Int, height: Int) {
@@ -197,7 +196,6 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
             }
 
             // render? just do it anyway
-            //LightmapRendererNew.fireRecalculateEvent()
             renderScreen()
         }
     }
@@ -209,9 +207,10 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
         )
 
         demoWorld.globalLight = WeatherMixer.globalLightNow
-        //demoWorld.updateWorldTime(delta)
+        demoWorld.updateWorldTime(delta)
         WeatherMixer.update(delta, cameraPlayer)
         cameraPlayer.update(delta)
+
         // worldcamera update AFTER cameraplayer in this case; the other way is just an exception for actual ingame SFX
         WorldCamera.update(demoWorld, cameraPlayer)
 
@@ -233,10 +232,6 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
         Gdx.gl.glClearColor(.64f, .754f, .84f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        //BlocksDrawer.renderWall(batch)
-        //BlocksDrawer.renderTerrain(batch)
-        //BlocksDrawer.renderFront(batch, false)
-
 
         batch.inUse {
             setCameraPosition(0f, 0f)
@@ -250,26 +245,6 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
             renderMenus()
             renderOverlayTexts()
         }
-
-
-        /*batch.inUse {
-            setCameraPosition(0f, 0f)
-            batch.color = Color.WHITE
-            batch.shader = null
-            camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
-            camera.update()
-            batch.projectionMatrix = camera.combined
-            batch.color = Color.WHITE
-            blendNormal()
-
-
-
-            renderDemoWorld()
-
-            renderMenus()
-
-            renderOverlayTexts()
-        }*/
     }
 
     private fun renderDemoWorld() {
@@ -298,19 +273,18 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
 
         setCameraPosition(0f, 0f)
 
-        //batch.shader = Terrarum.shaderBayer
-        //batch.shader.setUniformf("rcount", 64f)
-        //batch.shader.setUniformf("gcount", 64f)
-        //batch.shader.setUniformf("bcount", 64f) // de-banding
-        batch.shader = null
+        batch.shader = Terrarum.shaderBayer
+        batch.shader.setUniformf("rcount", 64f)
+        batch.shader.setUniformf("gcount", 64f)
+        batch.shader.setUniformf("bcount", 64f) // de-banding
 
 
-        //processBlur(LightmapRendererNew.DRAW_FOR_RGB)
 
         val lightTex = lightmapFboB.colorBufferTexture // A or B? flipped in Y means you chose wrong buffer; use one that works correctly
         lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest) // blocky feeling for A E S T H E T I C S
 
         blendMul()
+        //blendNormal()
 
         batch.color = Color.WHITE
         val xrem = -(WorldCamera.x % TILE_SIZEF)
@@ -337,11 +311,6 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
         camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
         camera.update()
         batch.projectionMatrix = camera.combined
-
-
-
-        // FIXME failed test tells that something is interfering with SpriteBatch, which makes every draw call within
-        //       the spritebatch all go black
     }
 
     private fun renderMenus() {
