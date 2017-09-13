@@ -309,3 +309,4 @@ class GameWorld(val width: Int, val height: Int) {
 }
 
 infix fun Int.fmod(other: Int) = Math.floorMod(this, other)
+infix fun Float.fmod(other: Float) = if (this >= 0f) this % other else (this % other) + other

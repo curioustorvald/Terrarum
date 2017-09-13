@@ -287,8 +287,8 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         //blendNormal()
 
         batch.color = Color.WHITE
-        val xrem = -(WorldCamera.x % TILE_SIZEF)
-        val yrem = -(WorldCamera.y % TILE_SIZEF)
+        val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF)
+        val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF)
         batch.draw(lightTex,
                 xrem,
                 yrem,
@@ -471,7 +471,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
 
-    class TitleScreenController(val screen: FuckingWorldRenderer) : InputAdapter() {
+    class TitleScreenController(val screen: TitleScreen) : InputAdapter() {
         override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
             screen.uiContainer.forEach { it.touchUp(screenX, screenY, pointer, button) }
             return true
