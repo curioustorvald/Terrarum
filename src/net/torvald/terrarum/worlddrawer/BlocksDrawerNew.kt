@@ -11,6 +11,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ceilInt
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.BufferedOutputStream
@@ -748,7 +749,7 @@ object BlocksDrawer {
         shader.setUniformi("tilemap", 2)
         shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shader.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
-        shader.setUniformi("cameraTranslation", WorldCamera.x % TILE_SIZE, WorldCamera.y % TILE_SIZE)
+        shader.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE)
         shader.setUniformi("tileSizeInPx", TILE_SIZE)
         shader.setUniformi("tilesInAtlas", tileAtlas.horizontalCount, tileAtlas.verticalCount) //depends on the tile atlas
         shader.setUniformi("atlasTexSize", tileAtlas.texture.width, tileAtlas.texture.height) //depends on the tile atlas
