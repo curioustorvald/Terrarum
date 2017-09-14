@@ -116,6 +116,8 @@ object Terrarum : Screen {
      */
     val TARGET_INTERNAL_FPS: Double = 60.0
 
+    internal val UPDATE_CATCHUP_MAX_TRIES = 10
+
 
 
 
