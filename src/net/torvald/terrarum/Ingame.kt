@@ -32,6 +32,7 @@ import javax.swing.JOptionPane
 
 import com.badlogic.gdx.graphics.OrthographicCamera
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.worldgenerator.WorldGenerator
@@ -93,13 +94,11 @@ class Ingame(val batch: SpriteBatch) : Screen {
     var worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
     var worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
     // RGB elements of Lightmap for Color  Vec4(R, G, B, 1.0)  24-bit
-    var lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
-    var lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
+    private lateinit var lightmapFboA: FrameBuffer
+    private lateinit var lightmapFboB: FrameBuffer
 
 
     init {
-        println("worldDrawFrameBuffer.colorBufferTexture.textureData.format: ${worldDrawFrameBuffer.colorBufferTexture.textureData.format}")
-        println("lightmapFboB.colorBufferTexture.textureData.format: ${lightmapFboB.colorBufferTexture.textureData.format}")
     }
 
 
@@ -156,6 +155,8 @@ class Ingame(val batch: SpriteBatch) : Screen {
     var gameFullyLoaded = false
         private set
 
+
+    private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
     //////////////
     // GDX code //
@@ -523,9 +524,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
     }
 
 
-    private var blurWriteBuffer = lightmapFboA
-    private var blurReadBuffer = lightmapFboB
-
     private fun renderGame(batch: SpriteBatch) {
         Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -539,10 +537,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
 
-        // update lightmap on every other frames, OR full-frame if the option is true
-        if (Terrarum.getConfigBoolean("fullframelightupdate") or (TerrarumAppLoader.GLOBAL_RENDER_TIMER % 2 == 1)) {
-            LightmapRenderer.fireRecalculateEvent()
-        }
+        LightmapRenderer.fireRecalculateEvent()
 
 
 
@@ -608,17 +603,20 @@ class Ingame(val batch: SpriteBatch) : Screen {
                     batch.shader.setUniformf("gcount", 64f)
                     batch.shader.setUniformf("bcount", 64f) // de-banding
 
-                    val lightTex = blurWriteBuffer.colorBufferTexture // TODO zoom!
-
-                    lightTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                    val lightTex = lightmapFboB.colorBufferTexture // A or B? flipped in Y means you chose wrong buffer; use one that works correctly
+                    lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest) // blocky feeling for A E S T H E T I C S
 
                     if (KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendNormal()
                     else blendMul()
 
                     batch.color = Color.WHITE
+                    val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF)
+                    val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF)
                     batch.draw(lightTex,
-                            0f, 0f,
-                            lightTex.width * lightmapDownsample, lightTex.height * lightmapDownsample
+                            xrem,
+                            yrem,
+                            lightTex.width * Ingame.lightmapDownsample, lightTex.height * Ingame.lightmapDownsample
+                            //lightTex.width.toFloat(), lightTex.height.toFloat() // for debugging
                     )
 
                 }
@@ -677,17 +675,20 @@ class Ingame(val batch: SpriteBatch) : Screen {
                     batch.shader.setUniformf("gcount", 64f)
                     batch.shader.setUniformf("bcount", 64f) // de-banding
 
-                    val lightTex = blurWriteBuffer.colorBufferTexture // TODO zoom!
-
-                    lightTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                    val lightTex = lightmapFboB.colorBufferTexture // A or B? flipped in Y means you chose wrong buffer; use one that works correctly
+                    lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest) // blocky feeling for A E S T H E T I C S
 
                     if (KeyToggler.isOn(KEY_LIGHTMAP_RENDER)) blendNormal()
                     else blendMul()
 
                     batch.color = Color.WHITE
+                    val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF)
+                    val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF)
                     batch.draw(lightTex,
-                            0f, 0f,
-                            lightTex.width * lightmapDownsample, lightTex.height * lightmapDownsample
+                            xrem,
+                            yrem,
+                            lightTex.width * Ingame.lightmapDownsample, lightTex.height * Ingame.lightmapDownsample
+                            //lightTex.width.toFloat(), lightTex.height.toFloat() // for debugging
                     )
 
                 }
@@ -856,8 +857,8 @@ class Ingame(val batch: SpriteBatch) : Screen {
         val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
         val blurRadius = 4f / lightmapDownsample // (5, 4f); using low numbers for pixel-y aesthetics
 
-        blurWriteBuffer = lightmapFboA
-        blurReadBuffer = lightmapFboB
+        var blurWriteBuffer = lightmapFboA
+        var blurReadBuffer = lightmapFboB
 
 
         lightmapFboA.inAction(null, null) {
@@ -874,17 +875,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             // initialise readBuffer with untreated lightmap
             blurReadBuffer.inAction(camera, batch) {
                 batch.inUse {
-                    // using custom code for camera; this is obscure and tricky
-                    camera.position.set(
-                            (WorldCamera.gdxCamX / lightmapDownsample).round(),
-                            (WorldCamera.gdxCamY / lightmapDownsample).round(),
-                            0f
-                    ) // make camara work
-                    camera.update()
-                    batch.projectionMatrix = camera.combined
-
-
-                    blendNormal()
+                    blendNormal(batch)
                     batch.color = Color.WHITE
                     LightmapRenderer.draw(batch, LightmapRenderer.DRAW_FOR_RGB)
                 }
@@ -894,17 +885,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             // initialise readBuffer with untreated lightmap
             blurReadBuffer.inAction(camera, batch) {
                 batch.inUse {
-                    // using custom code for camera; this is obscure and tricky
-                    camera.position.set(
-                            (WorldCamera.gdxCamX / lightmapDownsample).round(),
-                            (WorldCamera.gdxCamY / lightmapDownsample).round(),
-                            0f
-                    ) // make camara work
-                    camera.update()
-                    batch.projectionMatrix = camera.combined
-
-
-                    blendNormal()
+                    blendNormal(batch)
                     batch.color = Color.WHITE
                     LightmapRenderer.draw(batch, LightmapRenderer.DRAW_FOR_ALPHA)
                 }
@@ -1346,6 +1327,10 @@ class Ingame(val batch: SpriteBatch) : Screen {
         dispose()
     }
 
+
+
+    private var lightmapInitialised = false // to avoid nullability of lightmapFBO
+
     /**
      * @param width same as Terrarum.WIDTH
      * @param height same as Terrarum.HEIGHT
@@ -1354,6 +1339,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
     override fun resize(width: Int, height: Int) {
 
         BlocksDrawer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+        LightmapRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
 
         worldDrawFrameBuffer.dispose()
         worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
@@ -1361,10 +1347,24 @@ class Ingame(val batch: SpriteBatch) : Screen {
         worldGlowFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
         worldBlendFrameBuffer.dispose()
         worldBlendFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)
-        lightmapFboA.dispose()
-        lightmapFboA = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
-        lightmapFboB.dispose()
-        lightmapFboB = FrameBuffer(lightFBOformat, Terrarum.WIDTH.div(lightmapDownsample.toInt()), Terrarum.HEIGHT.div(lightmapDownsample.toInt()), false)
+
+        if (lightmapInitialised) {
+            lightmapFboA.dispose()
+            lightmapFboB.dispose()
+        }
+        lightmapFboA = FrameBuffer(
+                lightFBOformat,
+                LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
+                LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
+                false
+        )
+        lightmapFboB = FrameBuffer(
+                lightFBOformat,
+                LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
+                LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
+                false
+        )
+        lightmapInitialised = true // are you the first time?
 
 
         // Set up viewport when window is resized
