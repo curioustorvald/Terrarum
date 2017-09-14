@@ -55,10 +55,6 @@ object BlocksDrawer {
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
-    // TODO modular
-    //val tilesTerrain = SpriteSheet(ModMgr.getPath("basegame", "blocks/terrain.tga.gz"), TILE_SIZE, TILE_SIZE) // 64 MB
-    //val tilesWire = SpriteSheet(ModMgr.getPath("basegame", "blocks/wire.tga.gz"), TILE_SIZE, TILE_SIZE) // 4 MB
-
     val tilesTerrain: TextureRegionPack
     val tilesWire: TextureRegionPack
     val tileItemWall: TextureRegionPack
