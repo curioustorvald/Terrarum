@@ -40,6 +40,9 @@ class UITitleRemoConModules(val superMenu: UICanvas) : UICanvas() {
 
 
     private val moduleAreaHMargin = 48
+
+    private val moduleAreaBorder = 8
+
     private val moduleAreaWidth = (Terrarum.WIDTH * 0.75).toInt() - moduleAreaHMargin
     private val moduleAreaHeight = Terrarum.HEIGHT - moduleAreaHMargin * 2
 
@@ -50,7 +53,7 @@ class UITitleRemoConModules(val superMenu: UICanvas) : UICanvas() {
             moduleInfoCells.add(UIItemModuleInfoCell(
                     this,
                     it.first,
-                    moduleAreaWidth,
+                    moduleAreaWidth - 2 * moduleAreaBorder,
                     0, 0 // placeholder
             ))
         }
@@ -62,7 +65,8 @@ class UITitleRemoConModules(val superMenu: UICanvas) : UICanvas() {
             (Terrarum.WIDTH * 0.25f).toInt(), moduleAreaHMargin,
             moduleAreaWidth,
             moduleAreaHeight,
-            inactiveCol = Color.WHITE
+            inactiveCol = Color.WHITE,
+            border = moduleAreaBorder
     )
 
 

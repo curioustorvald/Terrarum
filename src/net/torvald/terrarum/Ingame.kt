@@ -394,9 +394,15 @@ class Ingame(val batch: SpriteBatch) : Screen {
     ///////////////
     private class ThreadIngameUpdate(val ingame: Ingame): Runnable {
         override fun run() {
+            var updateTries = 0
             while (ingame.updateDeltaCounter >= ingame.updateRate) {
                 ingame.updateGame(Terrarum.deltaTime)
                 ingame.updateDeltaCounter -= ingame.updateRate
+                updateTries++
+
+                if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
+                    break
+                }
             }
         }
     }
@@ -451,9 +457,15 @@ class Ingame(val batch: SpriteBatch) : Screen {
             // else, NOP;
         }
         else {
+            var updateTries = 0
             while (updateDeltaCounter >= updateRate) {
                 updateGame(delta)
                 updateDeltaCounter -= updateRate
+                updateTries++
+
+                if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
+                    break
+                }
             }
         }
 

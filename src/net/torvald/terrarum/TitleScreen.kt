@@ -190,9 +190,15 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         else {
             // async update
             updateDeltaCounter += delta
+            var updateTries = 0
             while (updateDeltaCounter >= updateRate) {
                 updateScreen(delta)
                 updateDeltaCounter -= updateRate
+                updateTries++
+
+                if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
+                    break
+                }
             }
 
             // render? just do it anyway
