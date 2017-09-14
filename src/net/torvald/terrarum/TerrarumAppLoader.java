@@ -34,6 +34,7 @@ public class TerrarumAppLoader implements ApplicationListener {
     public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2017 Torvald (minjaesong)";
     public static final String GAME_LOCALE = System.getProperty("user.language") + System.getProperty("user.country");
 
+
     /**
      * 0xAA_BB_XXXX
      * AA: Major version

@@ -31,13 +31,14 @@ class UIItemList<Item: UIItem>(
         val inactiveCol: Color = Color(0xc0c0c0_ff.toInt()),
         val backgroundCol: Color = Color(0x242424_80),
         val backgroundBlendMode: String = BlendMode.NORMAL,
-        val kinematic: Boolean = false
+        val kinematic: Boolean = false,
+        val border: Int = 0
 ) : UIItem(parentUI) {
 
     init {
         itemList.forEachIndexed { index, item ->
-            item.posX = this.posX
-            item.posY = if (index == 0) this.posY else itemList[index - 1].posY + itemList[index - 1].height
+            item.posX = this.posX + border
+            item.posY = if (index == 0) this.posY + border else itemList[index - 1].posY + itemList[index - 1].height
         }
     }
 
