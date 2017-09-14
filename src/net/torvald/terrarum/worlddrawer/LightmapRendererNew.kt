@@ -26,7 +26,7 @@ import java.util.*
 
 // NOTE: no Float16 on this thing: 67 kB of memory footage is totally acceptable
 
-object LightmapRendererNew {
+object LightmapRenderer {
     lateinit var world: GameWorld
 
 

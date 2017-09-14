@@ -136,7 +136,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
                 setHitboxDimension(2, 2, 0, 0)
                 hitbox.setPosition(
                         HQRNG().nextInt(demoWorld.width) * FeaturesDrawer.TILE_SIZE.toDouble(),
-                        0.0 // placeholder; camera AI will take it over
+                        0.0 // Y pos: placeholder; camera AI will take it over
                 )
                 noClip = true
             }
@@ -145,7 +145,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         demoWorld.time.timeDelta = 150
 
 
-        LightmapRendererNew.world = demoWorld
+        LightmapRenderer.world = demoWorld
         BlocksDrawer.world = demoWorld
         FeaturesDrawer.world = demoWorld
 
@@ -201,7 +201,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     fun updateScreen(delta: Float) {
-        Gdx.graphics.setTitle(TerrarumAppLoader.GAME_NAME +
+        Gdx.graphics.setTitle("WorldRenderTest" +
                               " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
                               " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
         )
@@ -220,12 +220,12 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
 
-        LightmapRendererNew.fireRecalculateEvent() // don't half-frame update; it will jitter!
+        LightmapRenderer.fireRecalculateEvent() // don't half-frame update; it will jitter!
     }
 
     fun renderScreen() {
 
-        processBlur(LightmapRendererNew.DRAW_FOR_RGB)
+        processBlur(LightmapRenderer.DRAW_FOR_RGB)
         //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
         // render world
@@ -248,6 +248,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     private fun renderDemoWorld() {
+
         // draw skybox //
 
         setCameraPosition(0f, 0f)
@@ -354,7 +355,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
         BlocksDrawer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
-        LightmapRendererNew.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+        LightmapRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
 
         if (loadDone) {
             // resize UI by re-creating it (!!)
@@ -368,14 +369,14 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         }
         lightmapFboA = FrameBuffer(
                 lightFBOformat,
-                LightmapRendererNew.lightBuffer.width * LightmapRendererNew.DRAW_TILE_SIZE.toInt(),
-                LightmapRendererNew.lightBuffer.height * LightmapRendererNew.DRAW_TILE_SIZE.toInt(),
+                LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
+                LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 false
         )
         lightmapFboB = FrameBuffer(
                 lightFBOformat,
-                LightmapRendererNew.lightBuffer.width * LightmapRendererNew.DRAW_TILE_SIZE.toInt(),
-                LightmapRendererNew.lightBuffer.height * LightmapRendererNew.DRAW_TILE_SIZE.toInt(),
+                LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
+                LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 false
         )
         lightmapInitialised = true // are you the first time?
@@ -414,13 +415,13 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         }
 
 
-        if (mode == LightmapRendererNew.DRAW_FOR_RGB) {
+        if (mode == LightmapRenderer.DRAW_FOR_RGB) {
             // initialise readBuffer with untreated lightmap
             blurReadBuffer.inAction(camera, batch) {
                 batch.inUse {
                     blendNormal(batch)
                     batch.color = Color.WHITE
-                    LightmapRendererNew.draw(batch, LightmapRendererNew.DRAW_FOR_RGB)
+                    LightmapRenderer.draw(batch, LightmapRenderer.DRAW_FOR_RGB)
                 }
             }
         }
@@ -430,7 +431,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
                 batch.inUse {
                     blendNormal(batch)
                     batch.color = Color.WHITE
-                    LightmapRendererNew.draw(batch, LightmapRendererNew.DRAW_FOR_ALPHA)
+                    LightmapRenderer.draw(batch, LightmapRenderer.DRAW_FOR_ALPHA)
                 }
             }
         }
