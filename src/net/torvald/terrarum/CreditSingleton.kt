@@ -5,10 +5,12 @@ import net.torvald.terrarum.langpack.Lang
 object CreditSingleton {
 
     val credit: List<String>; get() =
-            ("${Lang["CREDITS_PROGRAMMER"]}\n\nTorvald (minjaesong)\n\n" +
-             "${Lang["CREDITS_ARTIST_PLURAL"]}\n\nTorvald (minjaesong)\nRoundworld (leedonggeun)\n\n" +
-             "${Lang["CREDITS_POLYGLOT"]}" +
+            ("${Lang["CREDITS_PROGRAMMER"]}\n\nTorvald (minjaesong)\n\n\n" +
+             "${Lang["CREDITS_ARTIST_PLURAL"]}\n\nTorvald (minjaesong)\nRoundworld (leedonggeun)\n\n\n" +
+             "${Lang["CREDITS_POLYGLOT"]}\n\n\n" +
+             "${Lang["CREDITS_SOUNDTRACK"]}: FreeSound.org\n" +
             """
+Klankbeeld
 
 
 
@@ -144,21 +146,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Kotlin translated and modified code Copyright (C) 2016 Minjaesong (Torvald)
 
-
-
-
-
-Ambient sound recordings:
-
-    ambient_forest_01.ogg
-    ambient_meadow_01.ogg
-    ambient_windy_01.ogg
-    ambient_woods_01.ogg
-    crickets_01.ogg
-    crickets_02.ogg
-
-Copyright (C) 2012, 2013, 2015, 2016, 2017 Klankbeeld
-Sound from http://www.freesound.org/people/klankbeeld/""").split('\n')
+""").split('\n')
 
 
 

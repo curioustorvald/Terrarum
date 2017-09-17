@@ -2,10 +2,7 @@ package net.torvald.terrarum.worlddrawer
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameactors.floor
-import net.torvald.terrarum.gameactors.floorInt
-import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.round
 
@@ -19,25 +16,32 @@ object WorldCamera {
         private set
     var y: Int = 0 // top position
         private set
-    var gdxCamX: Float = 0f // centre position
-        private set
-    var gdxCamY: Float = 0f // centre position
-        private set
+    inline val gdxCamX: Float // centre position
+        get() = xCentre.toFloat()
+    inline val gdxCamY: Float// centre position
+        get() = yCentre.toFloat()
     var width: Int = 0
         private set
     var height: Int = 0
         private set
-    val xCentre: Int
+    inline val xCentre: Int
         get() = x + width.ushr(1)
-    val yCentre: Int
+    inline val yCentre: Int
         get() = y + height.ushr(1)
 
-    fun update(world: GameWorld, player: ActorWithBody) {
+    fun update(world: GameWorld, player: ActorWithPhysics) {
+
+
+
+        // FIXME player is stucked to the left (titlescreen AND ingame)
+
+
+
         width = FastMath.ceil(Terrarum.WIDTH / (Terrarum.ingame?.screenZoom ?: 1f)) // div, not mul
         height = FastMath.ceil(Terrarum.HEIGHT / (Terrarum.ingame?.screenZoom ?: 1f))
 
-        // position - (WH / 2)
-        x = player.hitbox.startX.toFloat().floorInt() // X only: ROUNDWORLD implementation
+        // TOP-LEFT position of camera border
+        x = player.hitbox.centeredX.toFloat().minus(width / 2).floorInt() // X only: ROUNDWORLD implementation
         y = (FastMath.clamp(
                 player.hitbox.centeredY.toFloat() - height / 2,
                 TILE_SIZE.toFloat(),
@@ -45,9 +49,6 @@ object WorldCamera {
         )).floorInt().clampCameraY(world)
 
 
-
-        gdxCamX = x + (width / 2f).floor()
-        gdxCamY = y + (height / 2f).floor()
     }
 
     private fun Int.clampCameraY(world: GameWorld): Int {
