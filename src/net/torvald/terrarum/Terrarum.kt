@@ -108,7 +108,7 @@ object Terrarum : Screen {
     /**
      * To be used with physics simulator
      */
-    val TARGET_FPS: Double = 26.6666666666666666666666666 // lower value == faster gravity response (IT WON'T HOTSWAP!!)
+    val TARGET_FPS: Double = 26.0 + (2.0 / 3.0) // lower value == faster gravity response (IT WON'T HOTSWAP!!)
 
     /**
      * To be used with render, to achieve smooth frame drawing
