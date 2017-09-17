@@ -72,10 +72,10 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             val codomainSize = cameraNodes.size
             val x = actor.hitbox.canonicalX.toFloat()
 
-            val p1 = (x / (domainSize / codomainSize)).floorInt()
-            val p0 = (p1 - 1) fmod codomainSize
-            val p2 = (p1 + 1) fmod codomainSize
-            val p3 = (p1 + 2) fmod codomainSize
+            val p1 = (x / (domainSize / codomainSize)).floorInt() fmod cameraNodes.size
+            val p0 = ((p1 - 1) fmod codomainSize) fmod cameraNodes.size
+            val p2 = ((p1 + 1) fmod codomainSize) fmod cameraNodes.size
+            val p3 = ((p1 + 2) fmod codomainSize) fmod cameraNodes.size
             val u: Float = 1f - (p2 - (x / (domainSize / codomainSize))) / (p2 - p1)
 
             //val targetYPos = FastMath.interpolateCatmullRom(u, catmullRomTension, cameraNodes[p0], cameraNodes[p1], cameraNodes[p2], cameraNodes[p3])
@@ -254,6 +254,11 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     private fun renderDemoWorld() {
+        println("camera TL: ${WorldCamera.x}, ${WorldCamera.y}")
+        println("camera CN: ${WorldCamera.gdxCamX}, ${WorldCamera.gdxCamY}")
+        println()
+
+
 
         // draw skybox //
 
