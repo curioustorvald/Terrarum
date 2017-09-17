@@ -405,8 +405,6 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
 
 
                     displaceHitbox()
-                    //applyNormalForce()
-                    //applyControllerMoveVelo() // TODO
                 }
                 else {
                     hitbox.translate(externalForce)
@@ -1148,11 +1146,22 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
     private fun clampHitbox() {
         val worldsizePxl = world.width.times(TILE_SIZE)
 
+        // DEAR FUTURE ME,
+        //
+        // this code potentially caused a collision bug which only happens near the "edge" of the world.
+        //
+        // -- Signed, 2017-09-17
+        
+
+        // wrap around for X-axis
+        val actorMinimumX = Terrarum.HALFW // to make camera's X stay positive
+        val actorMaximumX = worldsizePxl + actorMinimumX // to make camera's X stay positive
+
         hitbox.setPositionFromPointed(
                 //clampW(hitbox.canonicalX),
-                if (hitbox.canonicalX < 0)
+                if (hitbox.canonicalX < actorMinimumX)
                     hitbox.canonicalX + worldsizePxl
-                else if (hitbox.canonicalX >= worldsizePxl)
+                else if (hitbox.canonicalX >= actorMaximumX)
                     hitbox.canonicalX - worldsizePxl
                 else
                     hitbox.canonicalX, // ROUNDWORLD impl

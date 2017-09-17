@@ -580,10 +580,12 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 batch.projectionMatrix = camera.combined
 
 
+
                 batch.color = Color.WHITE
                 blendNormal()
 
                 BlocksDrawer.renderWall(batch)
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
                 actorsRenderBehind.forEach { it.drawBody(batch) }
                 particlesContainer.forEach { it.drawBody(batch) }
                 BlocksDrawer.renderTerrain(batch)
@@ -591,9 +593,11 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 /////////////////
                 // draw actors //
                 /////////////////
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
                 actorsRenderMiddle.forEach { it.drawBody(batch) }
                 actorsRenderMidTop.forEach { it.drawBody(batch) }
                 player.drawBody(batch)
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
                 actorsRenderFront.forEach { it.drawBody(batch) }
                 // --> Change of blend mode <-- introduced by childs of ActorWithBody //
 
@@ -605,6 +609,9 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 BlocksDrawer.renderFront(batch, false)
                 // --> blendNormal() <-- by BlocksDrawer.renderFront
                 FeaturesDrawer.drawEnvOverlay(batch)
+
+
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
 
 
                 // mix lighpmap canvas to this canvas (Colors -- RGB channel)
@@ -634,6 +641,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 }
 
 
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
                 batch.shader = null
 
 
@@ -666,6 +674,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 blendNormal()
 
 
+
                 //////////////////////
                 // draw actor glows //
                 //////////////////////
@@ -675,9 +684,12 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 actorsRenderMiddle.forEach { it.drawGlow(batch) }
                 actorsRenderMidTop.forEach { it.drawGlow(batch) }
                 player.drawGlow(batch)
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
                 actorsRenderFront.forEach { it.drawGlow(batch) }
                 // --> blendNormal() <-- introduced by childs of ActorWithBody //
 
+
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
 
                 // mix lighpmap canvas to this canvas (UV lights -- A channel written on RGB as greyscale image)
                 if (!KeyToggler.isOn(Input.Keys.F6)) { // F6 to disable lightmap draw
@@ -723,8 +735,8 @@ class Ingame(val batch: SpriteBatch) : Screen {
             worldTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
             glowTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
-            worldTex.bind(0)
             glowTex.bind(1)
+            worldTex.bind(0)
 
 
             Terrarum.shaderBlendGlow.begin()
@@ -735,11 +747,14 @@ class Ingame(val batch: SpriteBatch) : Screen {
             Terrarum.shaderBlendGlow.end()
 
 
+
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
+
+
             batch.inUse {
                 batch.color = Color.WHITE
                 blendNormal()
 
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // reset active textureunit to zero (i don't know tbh, but it won't work without this)
                 batch.shader = null
             }
         }
@@ -751,6 +766,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
         camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
         batch.projectionMatrix = camera.combined
         batch.inUse {
+
             batch.shader = null
 
             setCameraPosition(0f, 0f)
@@ -771,12 +787,16 @@ class Ingame(val batch: SpriteBatch) : Screen {
             // draw framebuffers to screen //
             /////////////////////////////////
 
+
+
             val blendedTex = worldBlendFrameBuffer.colorBufferTexture
             blendedTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
             batch.color = Color.WHITE
             batch.shader = null
             blendNormal()
             batch.draw(blendedTex, 0f, 0f, blendedTex.width.toFloat(), blendedTex.height.toFloat())
+
+
 
 
 
