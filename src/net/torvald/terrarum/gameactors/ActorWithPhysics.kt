@@ -1151,7 +1151,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         // this code potentially caused a collision bug which only happens near the "edge" of the world.
         //
         // -- Signed, 2017-09-17
-        
+
 
         // wrap around for X-axis
         val actorMinimumX = Terrarum.HALFW // to make camera's X stay positive
