@@ -553,16 +553,35 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
 
+        worldBlendFrameBuffer.inAction(null, null) {
+            Gdx.gl.glClearColor(0f,0f,0f,0f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+            Gdx.gl.glEnable(GL20.GL_BLEND)
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        }
         worldDrawFrameBuffer.inAction(null, null) {
             Gdx.gl.glClearColor(0f,0f,0f,0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+            Gdx.gl.glEnable(GL20.GL_BLEND)
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         }
         worldGlowFrameBuffer.inAction(null, null) {
             Gdx.gl.glClearColor(0f,0f,0f,1f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+            Gdx.gl.glEnable(GL20.GL_BLEND)
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         }
 
 
+        fun moveCameraToWorldCoord() {
+            // using custom code for camera; this is obscure and tricky
+            camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
+            camera.update()
+            batch.projectionMatrix = camera.combined
+        }
 
 
         ///////////////////////////
@@ -574,44 +593,45 @@ class Ingame(val batch: SpriteBatch) : Screen {
             batch.inUse {
                 batch.shader = null
 
-                // using custom code for camera; this is obscure and tricky
-                camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
-                camera.update()
-                batch.projectionMatrix = camera.combined
 
 
 
                 batch.color = Color.WHITE
                 blendNormal()
 
+                setCameraPosition(0f, 0f)
                 BlocksDrawer.renderWall(batch)
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
+
+                moveCameraToWorldCoord()
                 actorsRenderBehind.forEach { it.drawBody(batch) }
                 particlesContainer.forEach { it.drawBody(batch) }
+
+                setCameraPosition(0f, 0f)
                 BlocksDrawer.renderTerrain(batch)
+
 
                 /////////////////
                 // draw actors //
                 /////////////////
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
+                moveCameraToWorldCoord()
                 actorsRenderMiddle.forEach { it.drawBody(batch) }
                 actorsRenderMidTop.forEach { it.drawBody(batch) }
                 player.drawBody(batch)
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
                 actorsRenderFront.forEach { it.drawBody(batch) }
-                // --> Change of blend mode <-- introduced by childs of ActorWithBody //
+                // --> Change of blend mode <-- introduced by children of ActorWithBody //
 
 
                 /////////////////////////////
                 // draw map related stuffs //
                 /////////////////////////////
 
+                setCameraPosition(0f, 0f)
                 BlocksDrawer.renderFront(batch, false)
+
                 // --> blendNormal() <-- by BlocksDrawer.renderFront
                 FeaturesDrawer.drawEnvOverlay(batch)
 
 
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
 
 
                 // mix lighpmap canvas to this canvas (Colors -- RGB channel)
@@ -641,7 +661,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 }
 
 
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is REALLY needed; it really depresses me
                 batch.shader = null
 
 
@@ -664,11 +684,6 @@ class Ingame(val batch: SpriteBatch) : Screen {
             batch.inUse {
                 batch.shader = null
 
-                // using custom code for camera; this is obscure and tricky
-                camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
-                camera.update()
-                batch.projectionMatrix = camera.combined
-
 
                 batch.color = Color.WHITE
                 blendNormal()
@@ -678,18 +693,16 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 //////////////////////
                 // draw actor glows //
                 //////////////////////
-
+                moveCameraToWorldCoord()
                 actorsRenderBehind.forEach { it.drawGlow(batch) }
                 particlesContainer.forEach { it.drawGlow(batch) }
                 actorsRenderMiddle.forEach { it.drawGlow(batch) }
                 actorsRenderMidTop.forEach { it.drawGlow(batch) }
                 player.drawGlow(batch)
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
                 actorsRenderFront.forEach { it.drawGlow(batch) }
                 // --> blendNormal() <-- introduced by childs of ActorWithBody //
 
 
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
 
                 // mix lighpmap canvas to this canvas (UV lights -- A channel written on RGB as greyscale image)
                 if (!KeyToggler.isOn(Input.Keys.F6)) { // F6 to disable lightmap draw
@@ -735,8 +748,8 @@ class Ingame(val batch: SpriteBatch) : Screen {
             worldTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
             glowTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
-            glowTex.bind(1)
             worldTex.bind(0)
+            glowTex.bind(1)
 
 
             Terrarum.shaderBlendGlow.begin()
@@ -748,7 +761,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
 
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is REALLY needed; it really depresses me
 
 
             batch.inUse {
@@ -873,7 +886,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
             // draw some overlays (UI) //
             /////////////////////////////
 
-            uiContainer.forEach { if (it != consoleHandler) it.render(batch, camera) } // FIXME some of the UIs causes memory leak
+            uiContainer.forEach { if (it != consoleHandler) it.render(batch, camera) }
 
             debugWindow.render(batch, camera)
             // make sure console draws on top of other UIs

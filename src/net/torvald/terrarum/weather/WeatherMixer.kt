@@ -1,5 +1,6 @@
 package net.torvald.terrarum.weather
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import javafx.scene.effect.Light
@@ -138,6 +139,10 @@ object WeatherMixer {
         Terrarum.shaderBayerSkyboxFill.setUniformf("parallax_size", 1f/3f)
         Terrarum.fullscreenQuad.render(Terrarum.shaderBayerSkyboxFill, GL20.GL_TRIANGLES)
         Terrarum.shaderBayerSkyboxFill.end()
+
+
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
+
     }
 
     fun Float.clampOne() = if (this > 1) 1f else this

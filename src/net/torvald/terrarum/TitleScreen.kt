@@ -254,9 +254,9 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     private fun renderDemoWorld() {
-        println("camera TL: ${WorldCamera.x}, ${WorldCamera.y}")
-        println("camera CN: ${WorldCamera.gdxCamX}, ${WorldCamera.gdxCamY}")
-        println()
+        //println("camera TL: ${WorldCamera.x}, ${WorldCamera.y}")
+        //println("camera CN: ${WorldCamera.gdxCamX}, ${WorldCamera.gdxCamY}")
+        //println()
 
 
 
@@ -271,7 +271,6 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         // draw tiles //
         BlocksDrawer.renderWall(batch)
         BlocksDrawer.renderTerrain(batch)
-
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
 
