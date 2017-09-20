@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Color
 /**
  * OBSOLETE; use CIELchUtil for natural-looking colour
  *
- * Created by minjaesong on 16-01-16.
+ * Created by minjaesong on 2016-01-16.
  */
 object HSVUtil {
 

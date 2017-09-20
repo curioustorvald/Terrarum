@@ -5,7 +5,7 @@ import java.util.*
 /**
  * Simple ArrayList wrapper that acts as history keeper. You can append any data but cannot delete.
  *
- * Created by minjaesong on 16-07-13.
+ * Created by minjaesong on 2016-07-13.
  */
 class HistoryArray<T>(val size: Int) {
 

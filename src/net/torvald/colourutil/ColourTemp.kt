@@ -7,7 +7,7 @@ import net.torvald.terrarum.ModMgr
 
 /**
  * RGB- and CIE-Modeled CCT calculator
- * Created by minjaesong on 16-07-26.
+ * Created by minjaesong on 2016-07-26.
  */
 object ColourTemp {
     private var clut = GdxColorMap(ModMgr.getGdxFile("basegame", "colourmap/black_body_col_1000_40000_K.tga"))

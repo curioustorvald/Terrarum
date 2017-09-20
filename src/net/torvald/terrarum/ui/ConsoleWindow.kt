@@ -14,7 +14,7 @@ import net.torvald.terrarum.fillRect
 
 
 /**
- * Created by minjaesong on 15-12-31.
+ * Created by minjaesong on 2015-12-31.
  */
 class ConsoleWindow : UICanvas() {
 

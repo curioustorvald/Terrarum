@@ -3,7 +3,7 @@ package net.torvald.terrarum.worldgenerator
 import com.jme3.math.FastMath
 
 /**
- * Created by minjaesong on 16-03-31.
+ * Created by minjaesong on 2016-03-31.
  */
 object NoiseFilterSqrt : NoiseFilter {
     override fun getGrad(func_argX: Int, start: Double, end: Double): Double {

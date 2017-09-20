@@ -17,7 +17,7 @@ import java.io.OutputStream
  * If memory at Program Counter is equal to 0xFF, it is interpreted as termination. (0xFF is NOT a
  * valid opcode for input program, however)
  *
- * Created by minjaesong on 17-04-29.
+ * Created by minjaesong on 2017-04-29.
  */
 
 class BFVM(

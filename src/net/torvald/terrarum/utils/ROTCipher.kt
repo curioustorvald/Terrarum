@@ -1,7 +1,7 @@
 package net.torvald.terrarum.utils
 
 /**
- * Created by minjaesong on 16-03-20.
+ * Created by minjaesong on 2016-03-20.
  */
 object ROTCipher {
 

@@ -9,7 +9,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
 /**
- * Created by minjaesong on 16-06-17.
+ * Created by minjaesong on 2016-06-17.
  */
 internal class FixtureTikiTorch(world: GameWorld) : FixtureBase(world), Luminous {
 

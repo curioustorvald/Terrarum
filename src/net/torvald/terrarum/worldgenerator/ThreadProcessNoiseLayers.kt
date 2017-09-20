@@ -3,7 +3,7 @@ package net.torvald.terrarum.worldgenerator
 import net.torvald.terrarum.LoadScreen
 
 /**
- * Created by minjaesong on 16-06-13.
+ * Created by minjaesong on 2016-06-13.
  */
 class ThreadProcessNoiseLayers(val startIndex: Int, val endIndex: Int,
                                val noiseRecords: Array<WorldGenerator.TaggedJoise>) : Runnable {

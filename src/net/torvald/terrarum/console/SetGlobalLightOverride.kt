@@ -5,7 +5,7 @@ import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.Terrarum
 
 /**
- * Created by minjaesong on 16-02-17.
+ * Created by minjaesong on 2016-02-17.
  */
 internal object SetGlobalLightOverride : ConsoleCommand {
 

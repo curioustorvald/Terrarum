@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.Terrarum
 
 /**
- * Created by minjaesong on 16-02-03.
+ * Created by minjaesong on 2016-02-03.
  */
 object PlayerBuilder {
 

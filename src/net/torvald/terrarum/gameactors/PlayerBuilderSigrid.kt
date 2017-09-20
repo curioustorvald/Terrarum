@@ -9,7 +9,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
- * Created by minjaesong on 16-02-03.
+ * Created by minjaesong on 2016-02-03.
  */
 
 object PlayerBuilderSigrid {

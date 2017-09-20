@@ -11,7 +11,7 @@ import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
 
 /**
- * Created by minjaesong on 16-03-14.
+ * Created by minjaesong on 2016-03-14.
  */
 class BasicDebugInfoWindow : UICanvas() {
 

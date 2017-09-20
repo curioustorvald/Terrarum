@@ -11,7 +11,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 
 /**
- * Created by minjaesong on 16-08-03.
+ * Created by minjaesong on 2016-08-03.
  */
 object WorldSimulator {
     /**

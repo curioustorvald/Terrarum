@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 /**
- * Created by minjaesong on 16-01-15.
+ * Created by minjaesong on 2016-01-15.
  */
 interface ConsoleCommand {
 

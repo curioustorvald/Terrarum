@@ -5,7 +5,7 @@ import net.torvald.terrarum.ccR
 import net.torvald.terrarum.ui.ConsoleWindow
 
 /**
- * Created by minjaesong on 16-04-25.
+ * Created by minjaesong on 2016-04-25.
  */
 internal object EchoError : ConsoleCommand {
     override fun execute(args: Array<String>) {

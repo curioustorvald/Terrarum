@@ -6,7 +6,7 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import org.dyn4j.geometry.Vector2
 
 /**
- * Created by minjaesong on 16-03-05.
+ * Created by minjaesong on 2016-03-05.
  */
 internal object SpawnPhysTestBall : ConsoleCommand {
     @Throws(Exception::class)

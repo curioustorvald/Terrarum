@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameworld
 
 /**
- * Created by minjaesong on 16-02-15.
+ * Created by minjaesong on 2016-02-15.
  */
 class PairedMapLayer(width: Int, val height: Int) : Iterable<Byte> {
 

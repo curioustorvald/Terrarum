@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameworld
 import net.torvald.terrarum.virtualcomputer.tvd.ByteArray64
 
 /**
- * Created by minjaesong on 16-01-17.
+ * Created by minjaesong on 2016-01-17.
  */
 class MapLayer(val width: Int, val height: Int) : Iterable<Byte> {
 

@@ -8,7 +8,7 @@ import net.torvald.terrarum.ModMgr
 import java.security.SecureRandom
 
 /**
- * Created by minjaesong on 16-03-25.
+ * Created by minjaesong on 2016-03-25.
  */
 object InjectCreatureRaw {
 

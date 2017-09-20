@@ -11,7 +11,7 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
 
 /**
- * Created by minjaesong on 16-07-20.
+ * Created by minjaesong on 2016-07-20.
  */
 class UIQuickBar : UICanvas() {
     private val gutter = 8

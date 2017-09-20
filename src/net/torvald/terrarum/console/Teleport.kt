@@ -5,7 +5,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 
 /**
- * Created by minjaesong on 16-01-24.
+ * Created by minjaesong on 2016-01-24.
  */
 internal object Teleport : ConsoleCommand {
 

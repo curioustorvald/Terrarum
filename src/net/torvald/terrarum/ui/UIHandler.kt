@@ -15,7 +15,7 @@ import net.torvald.terrarum.round
  *
  * New UIs are NORMALLY HIDDEN; set it visible as you need!
  *
- * Created by minjaesong on 15-12-31.
+ * Created by minjaesong on 2015-12-31.
  */
 class UIHandler(//var UI: UICanvas,
                 var toggleKeyLiteral: Int? = null, var toggleButtonLiteral: Int? = null,

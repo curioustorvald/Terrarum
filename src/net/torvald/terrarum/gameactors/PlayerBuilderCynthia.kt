@@ -7,7 +7,7 @@ import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
- * Created by minjaesong on 16-03-25.
+ * Created by minjaesong on 2016-03-25.
  */
 object PlayerBuilderCynthia {
 

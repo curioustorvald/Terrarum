@@ -11,7 +11,7 @@ import java.security.SecureRandom
 /**
  * Hashes, CSPRNG, Base64
  *
- * Created by minjaesong on 16-09-15.
+ * Created by minjaesong on 2016-09-15.
  */
 internal class Security(globals: Globals) {
 

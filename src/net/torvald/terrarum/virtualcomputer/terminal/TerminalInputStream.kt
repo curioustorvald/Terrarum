@@ -4,7 +4,7 @@ import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 import java.io.InputStream
 
 /**
- * Created by minjaesong on 16-09-10.
+ * Created by minjaesong on 2016-09-10.
  */
 class TerminalInputStream(val host: TerrarumComputer) : InputStream() {
 

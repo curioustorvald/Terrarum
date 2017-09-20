@@ -17,7 +17,7 @@ import net.torvald.colourutil.CIELuvUtil.toXYZ
  * If you're using Mac, you can play around with this colour space with
  * ColorSync Utility's calculator.
  *
- * Created by minjaesong on 16-09-06.
+ * Created by minjaesong on 2016-09-06.
  */
 object CIELuvUtil {
 

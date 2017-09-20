@@ -3,7 +3,7 @@ package net.torvald.terrarum.blockproperties
 import com.badlogic.gdx.graphics.Color
 
 /**
- * Created by minjaesong on 16-02-16.
+ * Created by minjaesong on 2016-02-16.
  */
 class BlockProp {
 
