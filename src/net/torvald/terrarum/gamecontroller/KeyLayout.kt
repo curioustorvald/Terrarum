@@ -4,7 +4,7 @@ import net.torvald.terrarum.utils.JsonFetcher
 import java.util.*
 
 /**
- * Created by minjaesong on 16-07-28.
+ * Created by minjaesong on 2016-07-28.
  */
 object KeyLayout {
 

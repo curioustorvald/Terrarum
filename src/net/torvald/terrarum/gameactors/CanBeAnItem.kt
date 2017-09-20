@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.itemproperties.GameItem
 
 /**
- * Created by minjaesong on 16-01-31.
+ * Created by minjaesong on 2016-01-31.
  */
 interface CanBeAnItem {
 

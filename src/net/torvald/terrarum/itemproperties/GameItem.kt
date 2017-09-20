@@ -11,7 +11,7 @@ import net.torvald.terrarum.langpack.Lang
 typealias ItemID = Int
 
 /**
- * Created by minjaesong on 16-01-16.
+ * Created by minjaesong on 2016-01-16.
  */
 abstract class GameItem : Comparable<GameItem>, Cloneable {
 

@@ -17,7 +17,7 @@ import java.util.*
  * Humanoid actor class to provide same controlling function (such as work, jump)
  * Also applies unreal air friction for movement control
  *
- * Created by minjaesong on 16-10-24.
+ * Created by minjaesong on 2016-10-24.
  */
 open class ActorHumanoid(
         world: GameWorld,

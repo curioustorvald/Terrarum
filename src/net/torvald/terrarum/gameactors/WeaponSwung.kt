@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.gameworld.GameWorld
 
 /**
- * Created by minjaesong on 16-04-26.
+ * Created by minjaesong on 2016-04-26.
  */
 class WeaponSwung(world: GameWorld, val itemID: Int) : ActorWithPhysics(world, Actor.RenderOrder.MIDTOP), Luminous {
     // just let the solver use AABB; it's cheap but works just enough

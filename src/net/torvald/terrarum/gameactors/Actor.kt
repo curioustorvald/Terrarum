@@ -10,7 +10,7 @@ typealias ActorID = Int
 /**
  * @param renderOrder invisible/technical must use "Actor.RenderOrder.MIDDLE"
  *
- * Created by minjaesong on 15-12-31.
+ * Created by minjaesong on 2015-12-31.
  */
 abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable {
 

@@ -4,7 +4,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.Terrarum
 
 /**
- * Created by minjaesong on 16-01-23.
+ * Created by minjaesong on 2016-01-23.
  */
 internal object SetBulletin : ConsoleCommand {
     override fun execute(args: Array<String>) {

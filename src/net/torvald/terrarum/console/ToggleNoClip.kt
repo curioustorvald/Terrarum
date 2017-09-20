@@ -3,7 +3,7 @@ package net.torvald.terrarum.console
 import net.torvald.terrarum.Terrarum
 
 /**
- * Created by minjaesong on 16-01-19.
+ * Created by minjaesong on 2016-01-19.
  */
 internal object ToggleNoClip : ConsoleCommand {
     override fun execute(args: Array<String>) {

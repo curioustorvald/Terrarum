@@ -1,7 +1,7 @@
 package net.torvald.terrarum.itemproperties
 
 /**
- * Created by minjaesong on 16-09-09.
+ * Created by minjaesong on 2016-09-09.
  */
 object IVKey {
     /** Weapon types or Armour types. Does not affect inventory categorising */

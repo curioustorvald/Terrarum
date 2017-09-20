@@ -20,7 +20,7 @@ import java.util.zip.GZIPInputStream
 
 
 /**
- * Created by minjaesong on 16-01-19.
+ * Created by minjaesong on 2016-01-19.
  */
 object BlocksDrawerOLD {
     lateinit var world: GameWorld

@@ -5,7 +5,7 @@ import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 
 /**
- * Created by minjaesong on 16-09-29.
+ * Created by minjaesong on 2016-09-29.
  */
 abstract class Peripheral(val tableName: String) {
 

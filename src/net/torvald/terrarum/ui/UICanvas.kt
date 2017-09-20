@@ -12,7 +12,7 @@ import net.torvald.terrarum.gameactors.roundInt
 /**
  * UIItems must be added manually at the init!
  *
- * Created by minjaesong on 15-12-31.
+ * Created by minjaesong on 2015-12-31.
  */
 abstract class UICanvas(
         toggleKeyLiteral: Int? = null, toggleButtonLiteral: Int? = null,

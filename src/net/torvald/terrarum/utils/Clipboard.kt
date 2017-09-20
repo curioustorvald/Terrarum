@@ -5,7 +5,7 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 
 /**
- * Created by minjaesong on 16-07-31.
+ * Created by minjaesong on 2016-07-31.
  */
 object Clipboard {
     fun fetch(): String =

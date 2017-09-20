@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 /**
- * Created by minjaesong on 16-01-18.
+ * Created by minjaesong on 2016-01-18.
  */
 internal object ForceGC : ConsoleCommand {
     override fun execute(args: Array<String>) {

@@ -7,7 +7,7 @@ import net.torvald.random.HQRNG
 import java.util.*
 
 /**
- * Created by minjaesong on 16-02-23.
+ * Created by minjaesong on 2016-02-23.
  */
 object RoguelikeRandomiser {
 

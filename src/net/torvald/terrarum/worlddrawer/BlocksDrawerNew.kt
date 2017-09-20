@@ -46,7 +46,7 @@ import java.util.zip.GZIPInputStream
     BlocksDrawer.renderFront(batch, false) // JOB #2
  ```
  *
- * Created by minjaesong on 16-01-19.
+ * Created by minjaesong on 2016-01-19.
  */
 object BlocksDrawer {
     lateinit var world: GameWorld

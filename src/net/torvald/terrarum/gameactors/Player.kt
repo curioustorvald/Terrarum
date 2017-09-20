@@ -6,7 +6,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 /**
  * Game player (YOU!)
  *
- * Created by minjaesong on 15-12-31.
+ * Created by minjaesong on 2015-12-31.
  */
 
 class Player(world: GameWorld, born: GameDate) : ActorHumanoid(world, born) {

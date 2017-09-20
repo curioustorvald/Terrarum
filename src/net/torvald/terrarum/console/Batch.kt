@@ -4,7 +4,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 
 /**
- * Created by minjaesong on 16-03-07.
+ * Created by minjaesong on 2016-03-07.
  */
 internal object Batch : ConsoleCommand {
     @Throws(Exception::class)

@@ -28,7 +28,7 @@ typealias Second = Float
  * @param immobileBody use realistic air friction (1/1000 of "unrealistic" canonical setup)
  * @param usePhysics use usePhysics simulation
  *
- * Created by minjaesong on 16-01-13.
+ * Created by minjaesong on 2016-01-13.
  */
 open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val immobileBody: Boolean = false, var usePhysics: Boolean = true) :
         ActorWithBody(renderOrder) {

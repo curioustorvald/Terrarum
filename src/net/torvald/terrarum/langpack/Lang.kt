@@ -7,7 +7,7 @@ import java.io.*
 import java.util.*
 
 /**
- * Created by minjaesong on 16-01-22.
+ * Created by minjaesong on 2016-01-22.
  */
 object Lang {
 

@@ -1,7 +1,7 @@
 --[[
    Bootloader for Operation System
 
-   Created by minjaesong on 16-09-21
+   Created by minjaesong on 2016-09-21
 ]]
 
 -- check directories

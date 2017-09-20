@@ -7,7 +7,7 @@ import java.util.*
 
 /**
  * Image gallery. Images will be equally spaced, counted from top-left to bottom-right.
- * Created by minjaesong on 16-08-08.
+ * Created by minjaesong on 2016-08-08.
  */
 class UIItemImageGallery(
         parentUI: UICanvas,

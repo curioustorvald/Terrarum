@@ -10,7 +10,7 @@ typealias ItemValue = KVHashMap
 typealias GameConfig = KVHashMap
 
 /**
- * Created by minjaesong on 15-12-30.
+ * Created by minjaesong on 2015-12-30.
  */
 open class KVHashMap {
 

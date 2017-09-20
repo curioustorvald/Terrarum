@@ -6,7 +6,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.Second
 
 /**
- * Created by minjaesong on 16-01-23.
+ * Created by minjaesong on 2016-01-23.
  */
 class Notification : UICanvas() {
 

@@ -13,7 +13,7 @@ import net.torvald.terrarum.ui.UIQuickBar.Companion.SLOT_COUNT
 import org.dyn4j.geometry.Vector2
 
 /**
- * Created by minjaesong on 16-07-20.
+ * Created by minjaesong on 2016-07-20.
  */
 class UIPieMenu : UICanvas() {
     private val cellSize = UIQuickBar.CELL_SIZE

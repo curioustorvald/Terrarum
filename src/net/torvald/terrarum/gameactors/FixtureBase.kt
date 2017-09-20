@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 import net.torvald.terrarum.gameworld.GameWorld
 
 /**
- * Created by minjaesong on 16-06-17.
+ * Created by minjaesong on 2016-06-17.
  */
 open class FixtureBase(world: GameWorld, physics: Boolean = true) :
         ActorWithPhysics(world, Actor.RenderOrder.BEHIND, immobileBody = true, usePhysics = physics) {

@@ -10,7 +10,7 @@ import net.torvald.terrarum.itemproperties.Material
 /**
  * @param ai AI class. Use LuaAIWrapper for Lua script
  *
- * Created by minjaesong on 16-01-31.
+ * Created by minjaesong on 2016-01-31.
  */
 open class HumanoidNPC(
         world: GameWorld,

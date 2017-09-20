@@ -7,7 +7,7 @@ import net.torvald.terrarum.gameactors.Player
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**
- * Created by minjaesong on 16-02-17.
+ * Created by minjaesong on 2016-02-17.
  */
 internal object GetFactioning : ConsoleCommand {
     val ccW = GameFontBase.toColorCode(0xFFFF)

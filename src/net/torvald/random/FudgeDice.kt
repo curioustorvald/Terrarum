@@ -3,7 +3,7 @@ package net.torvald.random
 import java.util.Random
 
 /**
- * Created by minjaesong on 16-02-03.
+ * Created by minjaesong on 2016-02-03.
  */
 open class FudgeDice
 /**

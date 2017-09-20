@@ -4,7 +4,7 @@ package net.torvald.terrarum.virtualcomputer.terminal
 /**
  * Default text terminal.
  *
- * Created by minjaesong on 16-09-07.
+ * Created by minjaesong on 2016-09-07.
  */
 /*open class SimpleTextTerminal(
         phosphorColour: Color, override val width: Int, override val height: Int, private val host: TerrarumComputer,

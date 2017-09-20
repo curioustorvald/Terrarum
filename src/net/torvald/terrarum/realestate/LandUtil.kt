@@ -6,7 +6,7 @@ import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 
 /**
- * Created by minjaesong on 16-03-27.
+ * Created by minjaesong on 2016-03-27.
  */
 object LandUtil {
     fun getBlockAddr(world: GameWorld, x: Int, y: Int): BlockAddress =

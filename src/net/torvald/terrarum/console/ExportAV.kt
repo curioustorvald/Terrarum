@@ -6,7 +6,7 @@ import net.torvald.terrarum.Terrarum
 import java.io.IOException
 
 /**
- * Created by minjaesong on 16-02-10.
+ * Created by minjaesong on 2016-02-10.
  */
 internal object ExportAV : ConsoleCommand {
     override fun execute(args: Array<String>) {

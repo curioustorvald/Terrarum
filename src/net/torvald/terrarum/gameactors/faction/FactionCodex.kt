@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors.faction
 import java.util.*
 
 /**
- * Created by minjaesong on 16-05-09.
+ * Created by minjaesong on 2016-05-09.
  */
 object FactionCodex {
     val factionContainer = ArrayList<Faction>()

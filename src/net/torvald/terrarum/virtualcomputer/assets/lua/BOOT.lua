@@ -1,7 +1,7 @@
 --[[
    Must be loaded VERY FIRST!
 
-   Created by minjaesong on 16-09-13.
+   Created by minjaesong on 2016-09-13.
 
    Some codes were taken from OpenComputers, which is distributed under MIT
 --]]
