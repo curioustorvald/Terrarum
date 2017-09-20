@@ -10,7 +10,7 @@ import org.luaj.vm2.LuaValue
 /**
  * Implementation of lua's os.date, to return world info of the game world.
  *
- * Created by minjaesong on 16-09-28.
+ * Created by minjaesong on 2016-09-28.
  */
 class WorldInformationProvider(globals: Globals) {
 

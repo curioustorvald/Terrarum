@@ -1,7 +1,7 @@
 package net.torvald.terrarum.blockproperties
 
 /**
- * Created by minjaesong on 16-02-21.
+ * Created by minjaesong on 2016-02-21.
  */
 object Block {
 

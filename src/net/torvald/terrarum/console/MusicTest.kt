@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
 
 /**
- * Created by minjaesong on 16-08-02.
+ * Created by minjaesong on 2016-08-02.
  */
 internal object MusicTest : ConsoleCommand {
 

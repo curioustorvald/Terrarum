@@ -5,7 +5,7 @@ import net.torvald.terrarum.gameworld.toUint
 /**
  * @param terminal: for sending redraw only
  *
- * Created by minjaesong on 16-08-10.
+ * Created by minjaesong on 2016-08-10.
  */
 /*class AAFrame(var width: Int, var height: Int, var terminal: SimpleTextTerminal) {
 

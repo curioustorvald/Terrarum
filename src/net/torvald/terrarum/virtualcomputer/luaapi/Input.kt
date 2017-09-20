@@ -8,7 +8,7 @@ import org.luaj.vm2.lib.OneArgFunction
 import net.torvald.terrarum.virtualcomputer.computer.TerrarumComputer
 
 /**
- * Created by minjaesong on 16-09-25.
+ * Created by minjaesong on 2016-09-25.
  */
 class Input(globals: Globals, computer: TerrarumComputer) {
 

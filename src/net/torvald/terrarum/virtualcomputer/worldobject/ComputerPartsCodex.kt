@@ -3,7 +3,7 @@ package net.torvald.terrarum.virtualcomputer.worldobject
 import java.util.*
 
 /**
- * Created by minjaesong on 16-09-08.
+ * Created by minjaesong on 2016-09-08.
  */
 object ComputerPartsCodex {
     val rams = HashMap<Int, Int>() // id, capacity in bytes (0 bytes - 8 GBytes)

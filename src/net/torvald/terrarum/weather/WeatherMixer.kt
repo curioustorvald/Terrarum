@@ -28,7 +28,7 @@ import java.util.*
  *     Brightest:Darkest must be "around" 10:1
  *     Is RGBA-formatted (32-bit)
  *
- * Created by minjaesong on 16-07-11.
+ * Created by minjaesong on 2016-07-11.
  */
 object WeatherMixer {
     var weatherList: HashMap<String, ArrayList<BaseModularWeather>>

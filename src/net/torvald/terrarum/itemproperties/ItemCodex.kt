@@ -14,7 +14,7 @@ import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
 import java.util.*
 
 /**
- * Created by minjaesong on 16-03-15.
+ * Created by minjaesong on 2016-03-15.
  */
 object ItemCodex {
 

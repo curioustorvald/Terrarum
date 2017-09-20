@@ -6,7 +6,7 @@ import net.torvald.terrarum.TerrarumAppLoader
 import net.torvald.terrarum.langpack.Lang
 
 /**
- * Created by minjaesong on 16-04-23.
+ * Created by minjaesong on 2016-04-23.
  */
 internal object Version : ConsoleCommand {
     override fun execute(args: Array<String>) {

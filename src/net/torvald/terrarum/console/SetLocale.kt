@@ -6,7 +6,7 @@ import net.torvald.terrarum.Terrarum
 import java.io.IOException
 
 /**
- * Created by minjaesong on 16-01-25.
+ * Created by minjaesong on 2016-01-25.
  */
 internal object SetLocale : ConsoleCommand {
     override fun execute(args: Array<String>) {

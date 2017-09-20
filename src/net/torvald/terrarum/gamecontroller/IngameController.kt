@@ -11,7 +11,7 @@ import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
 /**
- * Created by minjaesong on 15-12-31.
+ * Created by minjaesong on 2015-12-31.
  */
 class IngameController(val ingame: Ingame) : InputAdapter() {
 

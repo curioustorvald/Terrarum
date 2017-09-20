@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 /**
- * Created by minjaesong on 16-09-07.
+ * Created by minjaesong on 2016-09-07.
  */
 internal object EchoConsole : ConsoleCommand {
     /**

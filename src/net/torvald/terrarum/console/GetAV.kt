@@ -4,7 +4,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum
 
 /**
- * Created by minjaesong on 16-01-19.
+ * Created by minjaesong on 2016-01-19.
  */
 internal object GetAV : ConsoleCommand {
 

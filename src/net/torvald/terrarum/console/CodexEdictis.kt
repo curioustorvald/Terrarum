@@ -7,7 +7,7 @@ import net.torvald.terrarum.langpack.Lang
 import java.util.Formatter
 
 /**
- * Created by minjaesong on 16-01-16.
+ * Created by minjaesong on 2016-01-16.
  */
 internal object CodexEdictis : ConsoleCommand {
 

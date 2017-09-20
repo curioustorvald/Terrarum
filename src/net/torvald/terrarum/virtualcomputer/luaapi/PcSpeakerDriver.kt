@@ -14,7 +14,7 @@ import org.luaj.vm2.lib.OneArgFunction
  *
  * Notes are tuned to A440, equal temperament. This is an ISO standard.
  *
- * Created by minjaesong on 16-09-27.
+ * Created by minjaesong on 2016-09-27.
  */
 class PcSpeakerDriver(val globals: Globals, host: TerrarumComputer) {
 

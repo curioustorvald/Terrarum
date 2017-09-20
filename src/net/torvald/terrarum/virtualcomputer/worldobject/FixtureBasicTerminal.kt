@@ -10,7 +10,7 @@ import net.torvald.terrarum.virtualcomputer.worldobject.ui.UITextTerminal
 import java.util.*
 
 /**
- * Created by minjaesong on 16-09-08.
+ * Created by minjaesong on 2016-09-08.
  */
 class FixtureBasicTerminal(world: GameWorld, phosphor: Color) : FixtureBase(world) {
 

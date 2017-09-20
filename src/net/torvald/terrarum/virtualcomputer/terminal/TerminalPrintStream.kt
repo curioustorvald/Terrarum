@@ -5,7 +5,7 @@ import java.io.OutputStream
 import java.io.PrintStream
 
 /**
- * Created by minjaesong on 16-09-10.
+ * Created by minjaesong on 2016-09-10.
  */
 class TerminalPrintStream(val host: TerrarumComputer) : PrintStream(TerminalOutputStream(host))
 

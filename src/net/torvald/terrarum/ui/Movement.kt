@@ -3,7 +3,7 @@ package net.torvald.terrarum.ui
 import com.jme3.math.FastMath
 
 /**
- * Created by minjaesong on 16-03-22.
+ * Created by minjaesong on 2016-03-22.
  */
 object Movement{
     /**

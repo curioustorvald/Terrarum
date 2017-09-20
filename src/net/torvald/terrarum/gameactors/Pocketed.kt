@@ -6,7 +6,7 @@ import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 
 /**
- * Created by minjaesong on 16-01-15.
+ * Created by minjaesong on 2016-01-15.
  */
 interface Pocketed {
 

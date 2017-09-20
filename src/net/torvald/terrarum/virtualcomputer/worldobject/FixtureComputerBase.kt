@@ -9,7 +9,7 @@ import java.security.SecureRandom
 import java.util.*
 
 /**
- * Created by minjaesong on 16-09-08.
+ * Created by minjaesong on 2016-09-08.
  */
 open class FixtureComputerBase(world: GameWorld) : FixtureBase(world) {
 

@@ -13,7 +13,7 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 
 /**
- * Created by minjaesong on 16-10-24.
+ * Created by minjaesong on 2016-10-24.
  */
 internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
 

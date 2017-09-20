@@ -4,7 +4,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import java.util.*
 
 /**
- * Created by minjaesong on 16-03-27.
+ * Created by minjaesong on 2016-03-27.
  */
 object RealEstateCodex {
     /**

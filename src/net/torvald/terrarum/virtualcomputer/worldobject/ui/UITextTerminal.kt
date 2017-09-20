@@ -8,7 +8,7 @@ import net.torvald.terrarum.ui.UICanvas.Companion.OPENCLOSE_GENERIC
 import net.torvald.terrarum.virtualcomputer.terminal.Terminal
 
 /**
- * Created by minjaesong on 16-09-08.
+ * Created by minjaesong on 2016-09-08.
  */
 class UITextTerminal(val terminal: Terminal) : UICanvas() {
 

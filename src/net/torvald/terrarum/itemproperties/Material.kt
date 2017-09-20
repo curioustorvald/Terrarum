@@ -3,7 +3,7 @@ package net.torvald.terrarum.itemproperties
 /**
  * To be used with items AND TILES (electricity resistance, thermal conductivity)
  *
- * Created by minjaesong on 16-03-18.
+ * Created by minjaesong on 2016-03-18.
  */
 data class Material (
     //var maxEdge: Int, // i think weapSharpnessMod would cut it // arbitrary unit

@@ -7,7 +7,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
 
 /**
- * Created by minjaesong on 16-03-05.
+ * Created by minjaesong on 2016-03-05.
  */
 class PhysTestBall(world: GameWorld) : ActorWithPhysics(world, Actor.RenderOrder.MIDDLE, immobileBody = true) {
 

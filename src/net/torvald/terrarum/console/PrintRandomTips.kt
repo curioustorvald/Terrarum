@@ -4,7 +4,7 @@ import net.torvald.terrarum.langpack.Lang
 import java.util.*
 
 /**
- * Created by minjaesong on 16-07-04.
+ * Created by minjaesong on 2016-07-04.
  */
 internal object PrintRandomTips : ConsoleCommand {
     override fun execute(args: Array<String>) {

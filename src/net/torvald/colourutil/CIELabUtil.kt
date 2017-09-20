@@ -21,7 +21,7 @@ import com.badlogic.gdx.graphics.Color
  * If you're using Mac, you can play around with this colour space with
  * ColorSync Utility's calculator.
  *
- * Created by minjaesong on 16-09-01.
+ * Created by minjaesong on 2016-09-01.
  */
 object CIELabUtil {
     fun Color.brighterLab(scale: Float): Color {

@@ -13,7 +13,7 @@ typealias AnyPlayer = HistoricalFigure
  *
  * NOTE: all canonical NPCs are must be HistoricalFigure!! (double excl mark, bitch)
  *
- * Created by minjaesong on 16-10-10.
+ * Created by minjaesong on 2016-10-10.
  */
 open class HistoricalFigure(
         world: GameWorld,

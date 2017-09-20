@@ -9,7 +9,7 @@ import java.util.*
  * (i.e., they have 2 475 px in width and you'll need 79 200 data points for a day)
  * so between two must be interpolated.
  *
- * Created by minjaesong on 16-07-11.
+ * Created by minjaesong on 2016-07-11.
  */
 data class BaseModularWeather(
         var skyboxGradColourMap: GdxColorMap, // row 0: skybox grad top, row 1: skybox grad bottom, row 2: sunlight (RGBA)

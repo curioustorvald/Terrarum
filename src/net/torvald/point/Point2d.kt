@@ -5,7 +5,7 @@ import net.torvald.terrarum.gameactors.sqrt
 import org.dyn4j.geometry.Vector2
 
 /**
- * Created by minjaesong on 16-01-15.
+ * Created by minjaesong on 2016-01-15.
  */
 data class Point2d(var x: Double, var y: Double) : Cloneable {
 

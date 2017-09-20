@@ -32,7 +32,7 @@ import net.torvald.terrarum.Terrarum
  *
  * This listener will print out 'Bo-ing!' whenever it's clicked.
  *
- * Created by minjaesong on 15-12-31.
+ * Created by minjaesong on 2015-12-31.
  */
 abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UIHandler!
 

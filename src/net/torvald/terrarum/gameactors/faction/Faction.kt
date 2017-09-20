@@ -4,7 +4,7 @@ import net.torvald.random.HQRNG
 import java.util.HashSet
 
 /**
- * Created by minjaesong on 16-02-15.
+ * Created by minjaesong on 2016-02-15.
  */
 
 typealias FactionID = Int

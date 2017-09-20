@@ -1,7 +1,7 @@
 package net.torvald.random
 
 /**
- * Created by minjaesong on 16-10-28.
+ * Created by minjaesong on 2016-10-28.
  */
 interface NoiseGenerator1D {
     fun generate(seed: Long)

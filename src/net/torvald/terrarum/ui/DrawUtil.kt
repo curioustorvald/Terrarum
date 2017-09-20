@@ -6,7 +6,7 @@ import net.torvald.terrarum.Terrarum
 
 
 /**
- * Created by minjaesong on 16-08-04.
+ * Created by minjaesong on 2016-08-04.
  */
 object DrawUtil {
     fun drawCentered(batch: SpriteBatch, image: Texture, screenPosY: Int, ui: UICanvas? = null) {

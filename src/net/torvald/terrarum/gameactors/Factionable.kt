@@ -4,7 +4,7 @@ import net.torvald.terrarum.gameactors.faction.Faction
 import java.util.*
 
 /**
- * Created by minjaesong on 16-02-15.
+ * Created by minjaesong on 2016-02-15.
  */
 interface Factionable {
 

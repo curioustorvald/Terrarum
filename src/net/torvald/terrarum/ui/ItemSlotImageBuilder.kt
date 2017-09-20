@@ -13,7 +13,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Make item slot image with number on bottom-right
  *
- * Created by minjaesong on 16-07-20.
+ * Created by minjaesong on 2016-07-20.
  */
 object ItemSlotImageBuilder {
 

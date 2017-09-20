@@ -4,7 +4,7 @@ import net.torvald.terrarum.gameworld.WorldTime
 import net.torvald.terrarum.Terrarum
 
 /**
- * Created by minjaesong on 16-03-20.
+ * Created by minjaesong on 2016-03-20.
  */
 internal object SetTime : ConsoleCommand {
     override fun execute(args: Array<String>) {

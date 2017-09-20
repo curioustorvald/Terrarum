@@ -6,7 +6,7 @@ import net.torvald.terrarum.blendNormal
 import java.util.*
 
 /**
- * Created by minjaesong on 16-09-15.
+ * Created by minjaesong on 2016-09-15.
  */
 /*class TeletypeTerminal : Teletype {
     override val width = 40
