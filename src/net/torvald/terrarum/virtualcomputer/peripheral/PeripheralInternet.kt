@@ -12,7 +12,7 @@ import java.net.URL
 /**
  * Provides internet access.
  *
- * Created by minjaesong on 16-09-24.
+ * Created by minjaesong on 2016-09-24.
  */
 internal class PeripheralInternet(val host: TerrarumComputer)
 : Peripheral("internet"){

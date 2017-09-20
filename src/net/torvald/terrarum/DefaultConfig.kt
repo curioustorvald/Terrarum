@@ -7,7 +7,7 @@ import com.google.gson.JsonObject
 /**
  * Keys must be all lowercase
  *
- * Created by minjaesong on 16-03-12.
+ * Created by minjaesong on 2016-03-12.
  */
 object DefaultConfig {
     fun fetch(): JsonObject {

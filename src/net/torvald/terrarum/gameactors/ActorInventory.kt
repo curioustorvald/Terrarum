@@ -13,7 +13,7 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
 /**
- * Created by minjaesong on 16-03-15.
+ * Created by minjaesong on 2016-03-15.
  */
 
 class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode: Int) {

@@ -3,7 +3,7 @@ package net.torvald.terrarum.console
 import net.torvald.terrarum.langpack.Lang
 
 /**
- * Created by minjaesong on 16-07-11.
+ * Created by minjaesong on 2016-07-11.
  */
 internal object LangTest : ConsoleCommand {
     override fun printUsage() {

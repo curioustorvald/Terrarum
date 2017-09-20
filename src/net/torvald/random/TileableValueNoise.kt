@@ -11,7 +11,7 @@ import java.util.*
  * Generate value noise that is always "tileably looped" every x in loopSize.
  *
  * @param width: power of 2's are recommended.
- * Created by minjaesong on 16-10-28.
+ * Created by minjaesong on 2016-10-28.
  */
 class TileableValueNoise(
         val octaves: Int, val persistency: Float, val width: Int, val initSamples: Int = 4) {

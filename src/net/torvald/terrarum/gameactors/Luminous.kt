@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameactors
 import com.badlogic.gdx.graphics.Color
 
 /**
- * Created by minjaesong on 16-02-19.
+ * Created by minjaesong on 2016-02-19.
  */
 interface Luminous {
 

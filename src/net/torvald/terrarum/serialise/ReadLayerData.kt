@@ -7,7 +7,7 @@ import java.lang.IllegalArgumentException
 import java.util.*
 
 /**
- * Created by minjaesong on 16-08-24.
+ * Created by minjaesong on 2016-08-24.
  */
 // internal for everything: prevent malicious module from messing up the savedata
 internal object ReadLayerData {

@@ -3,7 +3,7 @@ package net.torvald.terrarum.concurrent
 import net.torvald.terrarum.Terrarum
 
 /**
- * Created by minjaesong on 16-05-25.
+ * Created by minjaesong on 2016-05-25.
  */
 object ThreadParallel {
     private val pool: Array<Thread?> = Array(Terrarum.THREADS, { null })

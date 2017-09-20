@@ -8,7 +8,7 @@ import org.dyn4j.geometry.Vector2
  *
  * Can also use Hitbox.fromTwoPoints(x1, y1, x2, y2
  *
- * Created by minjaesong on 16-01-15.
+ * Created by minjaesong on 2016-01-15.
  */
 class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
 

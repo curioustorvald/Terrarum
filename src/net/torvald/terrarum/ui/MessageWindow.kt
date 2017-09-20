@@ -10,7 +10,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 
 /**
- * Created by minjaesong on 16-01-27.
+ * Created by minjaesong on 2016-01-27.
  */
 class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas() {
 

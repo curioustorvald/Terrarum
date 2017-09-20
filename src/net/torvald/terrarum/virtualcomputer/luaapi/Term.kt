@@ -10,7 +10,7 @@ import java.nio.charset.Charset
  * Controls terminal as if it was a monitor
  * (not sending control sequences but just drives it directly)
  *
- * Created by minjaesong on 16-09-12.
+ * Created by minjaesong on 2016-09-12.
  */
 internal class Term(globals: Globals, term: Teletype) {
 

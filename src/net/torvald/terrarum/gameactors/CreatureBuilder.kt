@@ -4,7 +4,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 
 
 /**
- * Created by minjaesong on 16-02-05.
+ * Created by minjaesong on 2016-02-05.
  */
 
 object CreatureBuilder {

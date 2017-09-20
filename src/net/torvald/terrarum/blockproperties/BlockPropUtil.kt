@@ -11,7 +11,7 @@ import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.weather.WeatherMixer
 
 /**
- * Created by minjaesong on 16-06-16.
+ * Created by minjaesong on 2016-06-16.
  */
 object BlockPropUtil {
     var flickerFuncX: Second = 0f // saves current status (time) of func

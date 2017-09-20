@@ -40,7 +40,7 @@ import net.torvald.terrarum.gameactors.GameDate
  * - Equinox/Solstice always occur on 21st day of the month
  *
  *
- * Created by minjaesong on 16-01-24.
+ * Created by minjaesong on 2016-01-24.
  */
 class WorldTime(initTime: Long = 0L) {
     var TIME_T = 0L // Epoch: Year 125, 1st Opal, 0h00:00 (Mondag) // 125-01-01

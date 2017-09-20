@@ -13,7 +13,7 @@ import java.util.*
 /**
  * Simplest projectile.
  *
- * Created by minjaesong on 16-08-29.
+ * Created by minjaesong on 2016-08-29.
  */
 
 // TODO simplified, lightweight physics (does not call PhysicsSolver)

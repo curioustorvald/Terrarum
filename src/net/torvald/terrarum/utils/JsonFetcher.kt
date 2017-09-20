@@ -11,7 +11,7 @@ import java.util.ArrayList
 import java.util.function.Consumer
 
 /**
- * Created by minjaesong on 16-02-15.
+ * Created by minjaesong on 2016-02-15.
  */
 object JsonFetcher {
 

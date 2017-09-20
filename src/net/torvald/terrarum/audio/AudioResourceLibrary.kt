@@ -7,7 +7,7 @@ import net.torvald.terrarum.ModMgr
 import java.util.*
 
 /**
- * Created by minjaesong on 16-07-08.
+ * Created by minjaesong on 2016-07-08.
  */
 object AudioResourceLibrary {
 

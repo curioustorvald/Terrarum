@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
- * Created by minjaesong on 16-04-15.
+ * Created by minjaesong on 2016-04-15.
  */
 object TinyAlphNum : BitmapFont() {
 

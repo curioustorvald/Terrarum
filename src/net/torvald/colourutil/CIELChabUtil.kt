@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.Color
  *
  * reference: http://www.brucelindbloom.com/index.html?Equations.html
  *
- * Created by minjaesong on 16-09-01.
+ * Created by minjaesong on 2016-09-01.
  */
 
 object CIELChabUtil {

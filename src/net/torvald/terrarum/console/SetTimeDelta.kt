@@ -3,7 +3,7 @@ package net.torvald.terrarum.console
 import net.torvald.terrarum.Terrarum
 
 /**
- * Created by minjaesong on 16-03-20.
+ * Created by minjaesong on 2016-03-20.
  */
 internal object SetTimeDelta : ConsoleCommand {
 

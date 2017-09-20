@@ -5,7 +5,7 @@ import net.torvald.terrarum.gameactors.ai.ActorAI
 /**
  * Note: AI-controlled actor must be 'Controllable'
  *
- * Created by minjaesong on 16-01-31.
+ * Created by minjaesong on 2016-01-31.
  */
 interface AIControlled {
     val ai: ActorAI

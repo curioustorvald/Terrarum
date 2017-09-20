@@ -4,7 +4,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum
 
 /**
- * Created by minjaesong on 16-06-16.
+ * Created by minjaesong on 2016-06-16.
  */
 internal object Seed : ConsoleCommand {
 

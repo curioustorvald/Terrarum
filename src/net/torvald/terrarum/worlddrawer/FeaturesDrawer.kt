@@ -11,7 +11,7 @@ import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.gameworld.GameWorld
 
 /**
- * Created by minjaesong on 15-12-31.
+ * Created by minjaesong on 2015-12-31.
  */
 object FeaturesDrawer {
     lateinit var world: GameWorld

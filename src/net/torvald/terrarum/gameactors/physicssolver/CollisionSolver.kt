@@ -5,7 +5,7 @@ import net.torvald.terrarum.gameactors.ActorWithPhysics
 import java.util.*
 
 /**
- * Created by minjaesong on 16-04-22.
+ * Created by minjaesong on 2016-04-22.
  */
 object CollisionSolver {
 

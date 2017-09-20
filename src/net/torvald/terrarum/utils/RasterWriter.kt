@@ -8,7 +8,7 @@ import java.io.File
 import java.io.IOException
 
 /**
- * Created by minjaesong on 16-03-04.
+ * Created by minjaesong on 2016-03-04.
  */
 object RasterWriter {
 

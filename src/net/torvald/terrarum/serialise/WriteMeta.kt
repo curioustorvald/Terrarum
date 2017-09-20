@@ -5,7 +5,7 @@ import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
 import java.nio.charset.Charset
 
 /**
- * Created by minjaesong on 16-03-15.
+ * Created by minjaesong on 2016-03-15.
  */
 // internal for everything: prevent malicious module from messing up the savedata
 internal object WriteMeta {

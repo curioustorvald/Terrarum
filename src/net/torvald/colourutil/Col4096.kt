@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color
 
 /**
  * 12-bit (16-step) RGB with builtin utils.
- * Created by minjaesong on 16-01-23.
+ * Created by minjaesong on 2016-01-23.
  */
 class Col4096 : LimitedColours {
 

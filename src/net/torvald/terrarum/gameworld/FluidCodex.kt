@@ -1,7 +1,7 @@
 package net.torvald.terrarum.gameworld
 
 /**
- * Created by minjaesong on 16-08-06.
+ * Created by minjaesong on 2016-08-06.
  */
 object FluidCodex {
     const val FLUID_LAVA = 0xFE.toByte()

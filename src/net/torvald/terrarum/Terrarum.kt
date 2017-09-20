@@ -40,7 +40,7 @@ import java.nio.IntBuffer
 import java.util.*
 
 /**
- * Slick2d Version Created by minjaesong on 15-12-30.
+ * Slick2d Version Created by minjaesong on 2015-12-30.
  *
  * LibGDX Version Created by minjaesong on 2017-06-15.
  */
@@ -486,6 +486,10 @@ object Terrarum : Screen {
         shaderBayerSkyboxFill.dispose()
         shaderBlur.dispose()
         shaderBlendGlow.dispose()
+
+
+        shapeRender.dispose()
+        batch.dispose()
     }
 
     override fun hide() {

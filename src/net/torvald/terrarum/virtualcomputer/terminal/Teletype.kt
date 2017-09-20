@@ -3,7 +3,7 @@ package net.torvald.terrarum.virtualcomputer.terminal
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
 /**
- * Created by minjaesong on 16-09-14.
+ * Created by minjaesong on 2016-09-14.
  */
 interface Teletype {
     val width: Int

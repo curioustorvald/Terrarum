@@ -22,7 +22,7 @@ import org.apache.commons.codec.digest.DigestUtils
  *      do NOT put plaintext anywhere in the code (except for comments maybe)
  *      must use SHA-256
  *
- * Created by minjaesong on 16-02-19.
+ * Created by minjaesong on 2016-02-19.
  */
 internal object Authenticator : ConsoleCommand {
 

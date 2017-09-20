@@ -5,7 +5,7 @@ import java.util.*
 /**
  * Provides MDL interpretation, pre-compilation and stores state of the interpreter
  *
- * Created by minjaesong on 16-07-30.
+ * Created by minjaesong on 2016-07-30.
  */
 class MDLInterpreterState {
     val stack = MagicArrayStack(20)

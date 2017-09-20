@@ -31,7 +31,7 @@ import kotlin.collections.HashMap
  * @param avFixtureComputer : actor values for FixtureComputerBase
  *
  * @param term : terminal that is connected to the computer fixtures, null if not connected any.
- * Created by minjaesong on 16-09-10.
+ * Created by minjaesong on 2016-09-10.
  */
 class TerrarumComputer(peripheralSlots: Int) {
 

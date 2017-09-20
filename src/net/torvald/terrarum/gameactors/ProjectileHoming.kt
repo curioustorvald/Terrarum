@@ -4,7 +4,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import org.dyn4j.geometry.Vector2
 
 /**
- * Created by minjaesong on 16-08-29.
+ * Created by minjaesong on 2016-08-29.
  */
 class ProjectileHoming(
         world: GameWorld,

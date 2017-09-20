@@ -6,7 +6,7 @@ import net.torvald.terrarum.ModMgr
 import java.io.IOException
 
 /**
- * Created by minjaesong on 16-02-15.
+ * Created by minjaesong on 2016-02-15.
  */
 object FactionFactory {
 

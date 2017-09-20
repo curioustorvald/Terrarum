@@ -14,7 +14,7 @@ import net.torvald.terrarum.gameactors.GameDate
  *
  * And there is no AM/PM concept, 22-hour clock is forced.
  *
- * Created by minjaesong on 16-01-24.
+ * Created by minjaesong on 2016-01-24.
  */
 @Deprecated("Are you even reading the name?")
 class YeOldeWorldTime {
