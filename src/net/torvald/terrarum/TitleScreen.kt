@@ -272,8 +272,6 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         BlocksDrawer.renderWall(batch)
         BlocksDrawer.renderTerrain(batch)
 
-        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
-
 
         FeaturesDrawer.drawEnvOverlay(batch)
 
