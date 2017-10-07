@@ -1,12 +1,8 @@
 package net.torvald.terrarum
 
-import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
@@ -14,11 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.torvald.random.HQRNG
-import net.torvald.terrarum.Terrarum.RENDER_FPS
-import net.torvald.terrarum.TerrarumAppLoader
 import net.torvald.terrarum.gameactors.floorInt
-import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.imagefont.Watch7SegMain
 import net.torvald.terrarum.imagefont.WatchDotAlph
@@ -35,9 +27,7 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.input.Controllers
 import java.io.File
 import java.io.IOException
-import java.lang.management.ManagementFactory
-import java.nio.IntBuffer
-import java.util.*
+
 
 /**
  * Slick2d Version Created by minjaesong on 2015-12-30.

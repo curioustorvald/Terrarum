@@ -590,26 +590,38 @@ class Ingame(val batch: SpriteBatch) : Screen {
         processBlur(lightmapFboA, lightmapFboB, LightmapRenderer.DRAW_FOR_RGB)
 
         worldDrawFrameBuffer.inAction(camera, batch) {
+
+
+            // draw-with-poly doesn't want to co-op with peasant spriteBatch...
+
             batch.inUse {
                 batch.shader = null
-
-
-
-
                 batch.color = Color.WHITE
                 blendNormal()
+            }
 
-                setCameraPosition(0f, 0f)
-                BlocksDrawer.renderWall(batch)
 
+
+            setCameraPosition(0f, 0f)
+            BlocksDrawer.renderWall(batch)
+
+
+
+            batch.inUse {
                 moveCameraToWorldCoord()
                 actorsRenderBehind.forEach { it.drawBody(batch) }
                 particlesContainer.forEach { it.drawBody(batch) }
 
-                setCameraPosition(0f, 0f)
-                BlocksDrawer.renderTerrain(batch)
+            }
 
 
+
+            setCameraPosition(0f, 0f)
+            BlocksDrawer.renderTerrain(batch)
+
+
+
+            batch.inUse {
                 /////////////////
                 // draw actors //
                 /////////////////
@@ -626,7 +638,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 /////////////////////////////
 
                 setCameraPosition(0f, 0f)
-                BlocksDrawer.renderFront(batch, false)
+                //BlocksDrawer.renderFront(batch, false)
 
                 // --> blendNormal() <-- by BlocksDrawer.renderFront
                 FeaturesDrawer.drawEnvOverlay(batch)
