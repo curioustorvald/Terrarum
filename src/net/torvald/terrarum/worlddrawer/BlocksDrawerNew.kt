@@ -398,6 +398,7 @@ object BlocksDrawer {
     }
 
     @Deprecated("It's broken right now; don't use it")
+    // FIXME biatch
     fun renderFront(batch: SpriteBatch, drawWires: Boolean) {
         // blend mul
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
@@ -734,15 +735,15 @@ object BlocksDrawer {
 
         val tilesBufferAsTex = Texture(tilesBuffer)
         tilesBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-        tilesBufferAsTex.bind(2)
-        tileAtlas.texture.bind(1) // for some fuck reason, it must be bound as last
+        tilesBufferAsTex.bind(1) // trying 1 and 0...
+        tileAtlas.texture.bind(0) // for some fuck reason, it must be bound as last
 
         shader.begin()
         shader.setUniformMatrix("u_projTrans", projectionMatrix)//camera.combined)
         shader.setUniformf("colourFilter", vertexColour)
         shader.setUniformf("screenDimension", Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-        shader.setUniformi("tilesAtlas", 1)
-        shader.setUniformi("tilemap", 2)
+        shader.setUniformi("tilesAtlas", 0)
+        shader.setUniformi("tilemap", 1)
         shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shader.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
         shader.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE)
