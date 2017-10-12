@@ -4,7 +4,6 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.round
 
 /**
  * Created by minjaesong on 2016-12-30.
@@ -31,23 +30,21 @@ object WorldCamera {
 
     fun update(world: GameWorld, player: ActorWithPhysics) {
 
-
-
-        // FIXME player is stucked to the left (titlescreen AND ingame)
-
-
-
         width = FastMath.ceil(Terrarum.WIDTH / (Terrarum.ingame?.screenZoom ?: 1f)) // div, not mul
         height = FastMath.ceil(Terrarum.HEIGHT / (Terrarum.ingame?.screenZoom ?: 1f))
 
         // TOP-LEFT position of camera border
-        x = player.hitbox.centeredX.toFloat().minus(width / 2).floorInt() // X only: ROUNDWORLD implementation
+
+        // some hacky equation to position player at the dead centre
+        // NOT tested for WorldDrawer sampling negative coord for its drawing (which causes some fucking artefacts)
+        x = ((player.hitbox.centeredX + player.hitbox.width).toFloat() - (width / 2)).floorInt() // X only: ROUNDWORLD implementation
+
+
         y = (FastMath.clamp(
                 player.hitbox.centeredY.toFloat() - height / 2,
                 TILE_SIZE.toFloat(),
                 world.height * TILE_SIZE - height - TILE_SIZE.toFloat()
         )).floorInt().clampCameraY(world)
-
 
     }
 

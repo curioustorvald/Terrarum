@@ -62,18 +62,18 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
     /** half integer tilewise hitbox */ // got the idea from gl_FragCoord
     val hIntTilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
-                hitbox.startX.div(TILE_SIZE).floor() + 0.5f,
-                hitbox.startY.div(TILE_SIZE).floor() + 0.5f,
-                hitbox.endX.div(TILE_SIZE).floor() + 0.5f,
-                hitbox.endY.div(TILE_SIZE).floor() + 0.5f
+                hitbox.startX.plus(0.0001f).div(TILE_SIZE).floor() + 0.5f,
+                hitbox.startY.plus(0.0001f).div(TILE_SIZE).floor() + 0.5f,
+                hitbox.endX.plus(0.0001f).div(TILE_SIZE).floor() + 0.5f,
+                hitbox.endY.plus(0.0001f).div(TILE_SIZE).floor() + 0.5f
         )
 
     val intTilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
-                hitbox.startX.div(TILE_SIZE).floor(),
-                hitbox.startY.div(TILE_SIZE).floor(),
-                hitbox.endX.div(TILE_SIZE).floor(),
-                hitbox.endY.div(TILE_SIZE).floor()
+                hitbox.startX.plus(0.0001f).div(TILE_SIZE).floor(),
+                hitbox.startY.plus(0.0001f).div(TILE_SIZE).floor(),
+                hitbox.endX.plus(0.0001f).div(TILE_SIZE).floor(),
+                hitbox.endY.plus(0.0001f).div(TILE_SIZE).floor()
         )
 
     /**
@@ -1149,6 +1149,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         // DEAR FUTURE ME,
         //
         // this code potentially caused a collision bug which only happens near the "edge" of the world.
+        // (x_tile: 2400..2433 with world_width = 2400)
         //
         // -- Signed, 2017-09-17
 
@@ -1171,73 +1172,48 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
 
     override fun drawGlow(batch: SpriteBatch) {
         if (isVisible && spriteGlow != null) {
-
             blendNormal()
-
-            val offsetX = hitboxTranslateX * scale
-            val offsetY = spriteGlow!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
-
-            if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
-                // camera center neg, actor center pos
-                spriteGlow!!.render(batch,
-                        (hitbox.startX - offsetX).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.startY - offsetY).toFloat(),
-                        (scale).toFloat()
-                )
-            }
-            else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
-                // camera center pos, actor center neg
-                spriteGlow!!.render(batch,
-                        (hitbox.startX - offsetX).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.startY - offsetY).toFloat(),
-                        (scale).toFloat()
-                )
-            }
-            else {
-                spriteGlow!!.render(batch,
-                        (hitbox.startX - offsetX).toFloat(),
-                        (hitbox.startY - offsetY).toFloat(),
-                        (scale).toFloat()
-                )
-            }
+            drawSpriteInGoodPosition(spriteGlow!!, batch)
         }
     }
 
-    val leftsidePadding = world.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
-    val rightsidePadding = WorldCamera.width.ushr(1)
-
     override fun drawBody(batch: SpriteBatch) {
         if (isVisible && sprite != null) {
-
             BlendMode.resolve(drawMode)
+            drawSpriteInGoodPosition(sprite!!, batch)
+        }
+    }
 
-            val offsetX = hitboxTranslateX * scale
-            val offsetY = sprite!!.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
+    private fun drawSpriteInGoodPosition(sprite: SpriteAnimation, batch: SpriteBatch) {
+        val leftsidePadding = world.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
+        val rightsidePadding = WorldCamera.width.ushr(1)
 
-            if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
-                // camera center neg, actor center pos
-                sprite!!.render(batch,
-                        (hitbox.startX - offsetX).toFloat() + world.width * TILE_SIZE,
-                        (hitbox.startY - offsetY).toFloat(),
-                        (scale).toFloat()
-                )
-            }
-            else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
-                // camera center pos, actor center neg
-                sprite!!.render(batch,
-                        (hitbox.startX - offsetX).toFloat() - world.width * TILE_SIZE,
-                        (hitbox.startY - offsetY).toFloat(),
-                        (scale).toFloat()
-                )
-            }
-            else {
-                sprite!!.render(batch,
-                        (hitbox.startX - offsetX).toFloat(),
-                        (hitbox.startY - offsetY).toFloat(),
-                        (scale).toFloat()
-                )
-            }
+        val offsetX = hitboxTranslateX * scale
+        val offsetY = sprite.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
 
+
+        if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
+            // camera center neg, actor center pos
+            sprite.render(batch,
+                    (hitbox.startX - offsetX + hitbox.width).toFloat() + world.width * TILE_SIZE,
+                    (hitbox.startY - offsetY).toFloat(),
+                    (scale).toFloat()
+            )
+        }
+        else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
+            // camera center pos, actor center neg
+            sprite.render(batch,
+                    (hitbox.startX - offsetX + hitbox.width).toFloat() - world.width * TILE_SIZE,
+                    (hitbox.startY - offsetY).toFloat(),
+                    (scale).toFloat()
+            )
+        }
+        else {
+            sprite.render(batch,
+                    (hitbox.startX - offsetX + hitbox.width).toFloat(),
+                    (hitbox.startY - offsetY).toFloat(),
+                    (scale).toFloat()
+            )
         }
     }
 
