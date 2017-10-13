@@ -397,26 +397,28 @@ object BlocksDrawer {
         renderUsingBuffer(TERRAIN, batch.projectionMatrix)
     }
 
-    @Deprecated("It's broken right now; don't use it")
-    // FIXME biatch
     fun renderFront(batch: SpriteBatch, drawWires: Boolean) {
         // blend mul
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
+
         drawTiles(TERRAIN, true) // blendmul tiles
         renderUsingBuffer(TERRAIN, batch.projectionMatrix)
 
-        if (drawWires) {
-            drawTiles(WIRE, false)
-            renderUsingBuffer(WIRE, batch.projectionMatrix)
-        }
+
+
 
         // blend normal
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+
+        if (drawWires) {
+            drawTiles(WIRE, false)
+            renderUsingBuffer(WIRE, batch.projectionMatrix)
+        }
     }
 
     private val tileDrawLightThreshold = 2f / LightmapRenderer.MUL
@@ -521,6 +523,9 @@ object BlocksDrawer {
                             if (drawModeTilesBlendMul) {
                                 if (isBlendMul(thisTile)) {
                                     writeToBuffer(mode, x - for_x_start, y - for_y_start, thisTileX, thisTileY)
+                                }
+                                else {
+                                    writeToBuffer(mode, x - for_x_start, y - for_y_start, 0, 0)
                                 }
                             }
                             else {
