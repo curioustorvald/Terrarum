@@ -592,7 +592,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
         worldDrawFrameBuffer.inAction(camera, batch) {
 
 
-            // draw-with-poly doesn't want to co-op with peasant spriteBatch...
+            // draw-with-poly doesn't want to co-op with peasant spriteBatch... (it hides sprites)
 
             batch.inUse {
                 batch.shader = null
@@ -636,10 +636,16 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 /////////////////////////////
                 // draw map related stuffs //
                 /////////////////////////////
+            }
 
-                setCameraPosition(0f, 0f)
-                //BlocksDrawer.renderFront(batch, false)
 
+
+            setCameraPosition(0f, 0f)
+            BlocksDrawer.renderFront(batch, false)
+
+
+
+            batch.inUse {
                 // --> blendNormal() <-- by BlocksDrawer.renderFront
                 FeaturesDrawer.drawEnvOverlay(batch)
 
