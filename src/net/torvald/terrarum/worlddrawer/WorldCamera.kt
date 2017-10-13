@@ -37,7 +37,7 @@ object WorldCamera {
 
         // some hacky equation to position player at the dead centre
         // NOT tested for WorldDrawer sampling negative coord for its drawing (which causes some fucking artefacts)
-        x = ((player.hitbox.centeredX + player.hitbox.width).toFloat() - (width / 2)).floorInt() // X only: ROUNDWORLD implementation
+        x = ((player.hitbox.centeredX).toFloat() - (width / 2)).floorInt() // X only: ROUNDWORLD implementation
 
 
         y = (FastMath.clamp(

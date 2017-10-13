@@ -546,12 +546,12 @@ object LightmapRenderer {
 
     // input: 0..1 for int 0..1023
     fun hdr(intensity: Float): Float {
-        val intervalStart = (intensity * MUL).floorInt()
-        val intervalEnd = minOf(rgbHDRLookupTable.lastIndex, (intensity * MUL).floorInt() + 1)
+        val intervalStart = (intensity * CHANNEL_MAX).floorInt()
+        val intervalEnd = minOf(rgbHDRLookupTable.lastIndex, (intensity * CHANNEL_MAX).floorInt() + 1)
 
         if (intervalStart == intervalEnd) return rgbHDRLookupTable[intervalStart]
 
-        val intervalPos = (intensity * MUL) - (intensity * MUL).toInt()
+        val intervalPos = (intensity * CHANNEL_MAX) - (intensity * CHANNEL_MAX).toInt()
 
         return interpolateLinear(
                 intervalPos,
