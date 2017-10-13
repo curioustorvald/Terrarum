@@ -271,6 +271,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         // draw tiles //
         BlocksDrawer.renderWall(batch)
         BlocksDrawer.renderTerrain(batch)
+        BlocksDrawer.renderFront(batch, false)
 
 
         FeaturesDrawer.drawEnvOverlay(batch)
