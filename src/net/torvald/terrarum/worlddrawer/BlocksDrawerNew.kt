@@ -459,7 +459,7 @@ object BlocksDrawer {
         val for_y_start = WorldCamera.y / TILE_SIZE
         val for_y_end = for_y_start + tilesBuffer.height - 1//clampHTile(for_y_start + (WorldCamera.height / TILE_SIZE) + 2)
 
-        val for_x_start = WorldCamera.x / TILE_SIZE - 1
+        val for_x_start = WorldCamera.x / TILE_SIZE
         val for_x_end = for_x_start + tilesBuffer.width - 1//for_x_start + (WorldCamera.width / TILE_SIZE) + 3
 
         // loop
