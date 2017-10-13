@@ -1,5 +1,7 @@
 package net.torvald.terrarum.gameactors
 
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.point.Point2d
@@ -11,6 +13,7 @@ import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -575,7 +578,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
 
 
 
-        // TODO NEW idea: wall pushes the actors (ref. SM64 explained by dutch pancake)
+        // * NEW idea: wall pushes the actors (ref. SM64 explained by dutch pancake) *
         // direction to push is determined by the velocity
         // proc:
         // 10 I detect being walled and displace myself
@@ -810,11 +813,10 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         val y2 = hitbox.endY - A_PIXEL
         // this commands and the commands on isWalled WILL NOT match (1 px gap on endX/Y). THIS IS INTENDED!
 
-
-        val txStart = x1.div(TILE_SIZE).floorInt()
-        val txEnd =   x2.div(TILE_SIZE).floorInt()
-        val tyStart = y1.div(TILE_SIZE).floorInt()
-        val tyEnd =   y2.div(TILE_SIZE).floorInt()
+        val txStart = x1.plus(0.5f).div(TILE_SIZE).floorInt()
+        val txEnd =   x2.plus(0.5f).div(TILE_SIZE).floorInt()
+        val tyStart = y1.plus(0.5f).div(TILE_SIZE).floorInt()
+        val tyEnd =   y2.plus(0.5f).div(TILE_SIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
@@ -878,10 +880,10 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         }
         else throw IllegalArgumentException()
 
-        val txStart = x1.div(TILE_SIZE).floorInt()
-        val txEnd =   x2.div(TILE_SIZE).floorInt()
-        val tyStart = y1.div(TILE_SIZE).floorInt()
-        val tyEnd =   y2.div(TILE_SIZE).floorInt()
+        val txStart = x1.plus(0.5f).div(TILE_SIZE).floorInt()
+        val txEnd =   x2.plus(0.5f).div(TILE_SIZE).floorInt()
+        val tyStart = y1.plus(0.5f).div(TILE_SIZE).floorInt()
+        val tyEnd =   y2.plus(0.5f).div(TILE_SIZE).floorInt()
 
         return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
     }
@@ -1179,8 +1181,24 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
 
     override fun drawBody(batch: SpriteBatch) {
         if (isVisible && sprite != null) {
-            BlendMode.resolve(drawMode)
-            drawSpriteInGoodPosition(sprite!!, batch)
+            if (!KeyToggler.isOn(Input.Keys.F12)) {
+                BlendMode.resolve(drawMode)
+                drawSpriteInGoodPosition(sprite!!, batch)
+            }
+            else {
+                batch.color = Color.NAVY
+                val hb = intTilewiseHitbox
+
+                batch.fillRect(
+                        hb.startX.toFloat() * TILE_SIZE,
+                        hb.startY.toFloat() * TILE_SIZE,
+                        hb.width.toFloat() * TILE_SIZE,
+                        hb.height.toFloat() * TILE_SIZE
+                )
+
+                batch.color = Color.VIOLET
+                batch.fillRect(hitbox.startX.toFloat(), hitbox.startY.toFloat(), hitbox.width.toFloat(), hitbox.height.toFloat())
+            }
         }
     }
 
@@ -1195,7 +1213,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
             // camera center neg, actor center pos
             sprite.render(batch,
-                    (hitbox.startX - offsetX + hitbox.width).toFloat() + world.width * TILE_SIZE,
+                    (hitbox.startX - offsetX).toFloat() + world.width * TILE_SIZE,
                     (hitbox.startY - offsetY).toFloat(),
                     (scale).toFloat()
             )
@@ -1203,14 +1221,14 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
             // camera center pos, actor center neg
             sprite.render(batch,
-                    (hitbox.startX - offsetX + hitbox.width).toFloat() - world.width * TILE_SIZE,
+                    (hitbox.startX - offsetX).toFloat() - world.width * TILE_SIZE,
                     (hitbox.startY - offsetY).toFloat(),
                     (scale).toFloat()
             )
         }
         else {
             sprite.render(batch,
-                    (hitbox.startX - offsetX + hitbox.width).toFloat(),
+                    (hitbox.startX - offsetX).toFloat(),
                     (hitbox.startY - offsetY).toFloat(),
                     (scale).toFloat()
             )
@@ -1383,6 +1401,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         @Transient const val COLLISION_KNOCKBACK_TAKER = 5 // benevolent NPCs
 
         @Transient val TILE_SIZE = FeaturesDrawer.TILE_SIZE
+        @Transient val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
