@@ -1459,6 +1459,9 @@ class Ingame(val batch: SpriteBatch) : Screen {
             uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.width, 0)
             uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.width, uiWatchBasic.height - 2)
         }
+
+
+        println("[Ingame] Resize event")
     }
 
     override fun dispose() {

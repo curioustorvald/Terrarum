@@ -802,6 +802,10 @@ object BlocksDrawer {
 
         oldScreenW = screenW
         oldScreenH = screenH
+
+
+        println("[BlocksDrawerNew] Resize event")
+
     }
 
     fun clampH(x: Int): Int {
