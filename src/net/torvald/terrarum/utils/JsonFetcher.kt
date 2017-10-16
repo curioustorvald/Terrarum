@@ -19,26 +19,34 @@ object JsonFetcher {
 
     @Throws(java.io.IOException::class)
     operator fun invoke(jsonFilePath: String): com.google.gson.JsonObject {
-        net.torvald.terrarum.utils.JsonFetcher.jsonString = StringBuffer() // reset buffer every time it called
-        net.torvald.terrarum.utils.JsonFetcher.readJsonFileAsString(jsonFilePath)
+        jsonString = StringBuffer() // reset buffer every time it called
+        readJsonFileAsString(jsonFilePath)
 
         println("[JsonFetcher] Reading JSON $jsonFilePath")
 
+        if (jsonString == null) {
+            throw Error("[JsonFetcher] jsonString is null!")
+        }
+
         val jsonParser = com.google.gson.JsonParser()
-        val jsonObj = jsonParser.parse(net.torvald.terrarum.utils.JsonFetcher.jsonString!!.toString()).asJsonObject
+        val jsonObj = jsonParser.parse(jsonString.toString()).asJsonObject
 
         return jsonObj
     }
 
     @Throws(java.io.IOException::class)
     operator fun invoke(jsonFile: java.io.File): com.google.gson.JsonObject {
-        net.torvald.terrarum.utils.JsonFetcher.jsonString = StringBuffer() // reset buffer every time it called
-        net.torvald.terrarum.utils.JsonFetcher.readJsonFileAsString(jsonFile.canonicalPath)
+        jsonString = StringBuffer() // reset buffer every time it called
+        readJsonFileAsString(jsonFile.canonicalPath)
 
         println("[JsonFetcher] Reading JSON ${jsonFile.path}")
 
+        if (jsonString == null) {
+            throw Error("[JsonFetcher] jsonString is null!")
+        }
+
         val jsonParser = com.google.gson.JsonParser()
-        val jsonObj = jsonParser.parse(net.torvald.terrarum.utils.JsonFetcher.jsonString!!.toString()).asJsonObject
+        val jsonObj = jsonParser.parse(jsonString.toString()).asJsonObject
 
         return jsonObj
     }
@@ -46,7 +54,7 @@ object JsonFetcher {
     private fun readJsonFileAsString(path: String) {
         try {
             java.nio.file.Files.lines(java.nio.file.FileSystems.getDefault().getPath(path)).forEach(
-                    { net.torvald.terrarum.utils.JsonFetcher.jsonString!!.append(it) }
+                    { jsonString!!.append(it) }
             ) // JSON does not require line break
         }
         catch (e: IOException) {
