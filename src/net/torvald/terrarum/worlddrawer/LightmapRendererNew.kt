@@ -118,8 +118,8 @@ object LightmapRenderer {
     }
 
     fun fireRecalculateEvent() {
-        for_x_start = WorldCamera.x / TILE_SIZE - 1 // fix for premature lightmap rendering
-        for_y_start = WorldCamera.y / TILE_SIZE - 1 // on topmost/leftmost side
+        for_x_start = WorldCamera.x / TILE_SIZE // fix for premature lightmap rendering
+        for_y_start = WorldCamera.y / TILE_SIZE // on topmost/leftmost side
 
         for_x_end = for_x_start + WorldCamera.width / TILE_SIZE + 3
         for_y_end = for_y_start + WorldCamera.height / TILE_SIZE + 2 // same fix as above
@@ -565,6 +565,10 @@ object LightmapRenderer {
         // make sure the BlocksDrawer is resized first!
 
         lightBuffer = Pixmap(BlocksDrawer.tilesInHorizontal, BlocksDrawer.tilesInVertical, Pixmap.Format.RGBA8888)
+
+
+
+        println("[LightmapRendererNew] Resize event")
     }
 
 

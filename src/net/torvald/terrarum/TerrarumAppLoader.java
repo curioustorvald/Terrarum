@@ -178,7 +178,10 @@ public class TerrarumAppLoader implements ApplicationListener {
     public void resize(int width, int height) {
         //initViewPort(width, height);
 
+        Terrarum.INSTANCE.resize(width, height);
         if (screen != null) screen.resize(width, height);
+
+        System.out.println("[AppLoader] Resize event");
     }
 
     @Override

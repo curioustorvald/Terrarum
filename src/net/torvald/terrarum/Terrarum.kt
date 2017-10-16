@@ -247,6 +247,7 @@ object Terrarum : Screen {
 
     /** Actually just a mesh of four vertices, two triangles -- not a literal glQuad */
     lateinit var fullscreenQuad: Mesh; private set
+    private var fullscreenQuadInit = false
 
 
     val deltaTime: Float; get() = Gdx.graphics.rawDeltaTime
@@ -321,6 +322,27 @@ object Terrarum : Screen {
         }
     val MINIMAL_GL_MAX_TEXTURE_SIZE = 4096
 
+    private fun initFullscreenQuad() {
+        if (!fullscreenQuadInit) {
+            fullscreenQuad = Mesh(
+                    true, 4, 6,
+                    VertexAttribute.Position(),
+                    VertexAttribute.ColorUnpacked(),
+                    VertexAttribute.TexCoords(0)
+            )
+            fullscreenQuadInit = true
+        }
+    }
+    private fun updateFullscreenQuad(WIDTH: Int, HEIGHT: Int) {
+        initFullscreenQuad()
+        fullscreenQuad.setVertices(floatArrayOf(
+                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
+                WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
+                WIDTH.toFloat(), HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
+                0f, HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
+        ))
+        fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+    }
 
     override fun show() {
         if (environment != RunningEnvironment.MOBILE) {
@@ -340,23 +362,7 @@ object Terrarum : Screen {
         }
 
 
-
-        fullscreenQuad = Mesh(
-                true, 4, 6,
-                VertexAttribute.Position(),
-                VertexAttribute.ColorUnpacked(),
-                VertexAttribute.TexCoords(0)
-        )
-
-        fullscreenQuad.setVertices(floatArrayOf(
-                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
-                WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                WIDTH.toFloat(), HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                0f, HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
-        ))
-        fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
-
-
+        updateFullscreenQuad(WIDTH, HEIGHT)
 
 
 
@@ -501,19 +507,12 @@ object Terrarum : Screen {
 
 
         // re-calculate fullscreen quad
-        fullscreenQuad.setVertices(floatArrayOf(
-                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
-                Terrarum.WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                0f, Terrarum.HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
-        ))
-        fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
-
+        updateFullscreenQuad(screenW, screenH)
 
         //appLoader.resize(width, height)
         //Gdx.graphics.setWindowedMode(width, height)
 
-        println("newsize: ${Gdx.graphics.width}x${Gdx.graphics.height}")
+        println("[Terrarum] newsize: ${Gdx.graphics.width}x${Gdx.graphics.height} | internal: ${width}x$height")
     }
 
 
@@ -550,8 +549,9 @@ object Terrarum : Screen {
         defaultSaveDir = defaultDir + "/Saves"
         configDir = defaultDir + "/config.json"
 
-        println("[Terrarum] os.name = $OSName")
+        println("[Terrarum] os.name = $OSName (with identifier $OperationSystem)")
         println("[Terrarum] os.version = $OSVersion")
+        println("[Terrarum] default directory: $defaultDir")
     }
 
     private fun createDirs() {
