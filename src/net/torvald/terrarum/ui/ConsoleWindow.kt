@@ -125,6 +125,8 @@ class ConsoleWindow : UICanvas() {
     val acceptedChars = "1234567890-=qwfpgjluy;[]\\arstdhneio'zxcvbkm,./!@#$%^&*()_+QWFPGJLUY:{}|ARSTDHNEIO\"ZXCVBKM<>? ".toSet()
 
     override fun keyTyped(character: Char): Boolean {
+        println("[ConsoleWindow] Key typed event; isVisible = $isVisible")
+
         if (character in acceptedChars) {
             commandInputPool!!.append(character)
             inputCursorPos += 1
