@@ -104,7 +104,7 @@ class UIHandler(//var UI: UICanvas,
         if (closeFired && openCloseCounter > 9) closeFired = false
 
 
-        if (isVisible || alwaysVisible) {
+        if (isVisible) {
             ui.updateUI(delta)
         }
 
@@ -153,7 +153,7 @@ class UIHandler(//var UI: UICanvas,
 
     fun render(ui: UICanvas, batch: SpriteBatch, camera: Camera) {
 
-        if (isVisible || alwaysVisible) {
+        if (isVisible) {
             // camera SHOULD BE CENTERED to HALFX and HALFY (see StateInGame) //
 
 
@@ -254,5 +254,86 @@ class UIHandler(//var UI: UICanvas,
 
     fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
         Ingame.setCameraPosition(batch, camera, newX, newY)
+    }
+
+    fun mouseMoved(uiItems: List<UIItem>, screenX: Int, screenY: Int): Boolean {
+        if (isVisible) {
+            uiItems.forEach { it.mouseMoved(screenX, screenY) }
+            subUIs.forEach { it.mouseMoved(screenX, screenY) }
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    fun touchDragged(uiItems: List<UIItem>, screenX: Int, screenY: Int, pointer: Int): Boolean {
+        if (isVisible) {
+            uiItems.forEach { it.touchDragged(screenX, screenY, pointer) }
+            subUIs.forEach { it.touchDragged(screenX, screenY, pointer) }
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    fun touchDown(uiItems: List<UIItem>, screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        if (isVisible) {
+            uiItems.forEach { it.touchDown(screenX, screenY, pointer, button) }
+            subUIs.forEach { it.touchDown(screenX, screenY, pointer, button) }
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    fun touchUp(uiItems: List<UIItem>, screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        if (isVisible) {
+            uiItems.forEach { it.touchUp(screenX, screenY, pointer, button) }
+            subUIs.forEach { it.touchUp(screenX, screenY, pointer, button) }
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    fun scrolled(uiItems: List<UIItem>, amount: Int): Boolean {
+        if (isVisible) {
+            uiItems.forEach { it.scrolled(amount) }
+            subUIs.forEach { it.scrolled(amount) }
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    fun keyDown(uiItems: List<UIItem>, keycode: Int): Boolean {
+        if (isVisible) {
+            uiItems.forEach { it.keyDown(keycode) }
+            subUIs.forEach { it.keyDown(keycode) }
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    fun keyUp(uiItems: List<UIItem>, keycode: Int): Boolean {
+        if (isVisible) {
+            uiItems.forEach { it.keyUp(keycode) }
+            subUIs.forEach { it.keyUp(keycode) }
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    fun keyTyped(uiItems: List<UIItem>, character: Char): Boolean {
+        if (isVisible) {
+            //uiItems.forEach { it.keyTyped(character) }
+            subUIs.forEach { it.keyTyped(character) }
+            return true
+        }
+        else {
+            return false
+        }
     }
 }

@@ -561,10 +561,14 @@ object LightmapRenderer {
     }
 
 
-    fun resize(width: Int, height: Int) {
+    fun resize(screenW: Int, screenH: Int) {
         // make sure the BlocksDrawer is resized first!
 
-        lightBuffer = Pixmap(BlocksDrawer.tilesInHorizontal, BlocksDrawer.tilesInVertical, Pixmap.Format.RGBA8888)
+        // copied from BlocksDrawer, duh!
+        val tilesInHorizontal = (screenW.toFloat() / TILE_SIZE).ceilInt() + 1
+        val tilesInVertical = (screenH.toFloat() / TILE_SIZE).ceilInt() + 1
+
+        lightBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
 
 
 
