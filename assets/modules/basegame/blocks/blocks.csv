@@ -56,9 +56,9 @@
  "177"; "177";"BLOCK_TORCH_FROST"           ;"0.0312";"0.0312";"0.0312";"0.0312";       "1"; "N/A";"fxtr";    "0";    "0";    "1";   "0";"0.3048";"0.4848";"1.0000";"0.0000";   "0";   "1"; "N/A"; "0";"16"
  "192"; "176";"BLOCK_TORCH"                 ;"0.0312";"0.0312";"0.0312";"0.0312";       "1"; "N/A";"fxtr";    "0";    "0";    "1";   "0";"0.0000";"0.0000";"0.0000";"0.0000";   "0";   "0"; "N/A"; "0";"16"
  "193"; "177";"BLOCK_TORCH_FROST"           ;"0.0312";"0.0312";"0.0312";"0.0312";       "1"; "N/A";"fxtr";    "0";    "0";    "1";   "0";"0.0000";"0.0000";"0.0000";"0.0000";   "0";   "0"; "N/A"; "0";"16"
- "208"; "208";"BLOCK_ILLUMINATOR_WHITE"     ;"0.0312";"0.0312";"0.0312";"0.0312";       "1"; "N/A";"glas";    "0";    "1";    "0";   "1";"0.8916";"0.9304";"0.9148";"0.0000";   "0";   "0"; "N/A"; "0";"16"
+ "208"; "208";"BLOCK_ILLUMINATOR_WHITE"     ;"0.0312";"0.0312";"0.0312";"0.0312";       "1"; "N/A";"glas";    "0";    "1";    "0";   "1";"0.9270";"0.9414";"0.8519";"0.0000";   "0";   "0"; "N/A"; "0";"16"
  "209"; "209";"BLOCK_ILLUMINATOR_YELLOW"    ;"0.0312";"0.0312";"0.0312";"0.0312";       "1"; "N/A";"glas";    "0";    "1";    "0";   "1";"1.0000";"0.8408";"0.0000";"0.0000";   "0";   "0"; "N/A"; "0";"16"
- "210"; "210";"BLOCK_ILLUMINATOR_ORANGE"    ;"0.0312";"0.0312";"0.0312";"0.0312";       "1"; "N/A";"glas";    "0";    "1";    "0";   "1";"1.0000";"0.6100";"0.0000";"0.0000";   "0";   "0"; "N/A"; "0";"16"
+ "210"; "210";"BLOCK_ILLUMINATOR_ORANGE"    ;"0.0312";"0.0312";"0.0312";"0.0312";       "1"; "N/A";"glas";    "0";    "1";    "0";   "1";"1.0000";"0.5294";"0.0000";"0.0000";   "0";   "0"; "N/A"; "0";"16"
  "211"; "211";"BLOCK_ILLUMINATOR_RED"       ;"0.0312";"0.0312";"0.0312";"0.0312";       "1"; "N/A";"glas";    "0";    "1";    "0";   "1";"0.9188";"0.0000";"0.0000";"0.0000";   "0";   "0"; "N/A"; "0";"16"
  "212"; "212";"BLOCK_ILLUMINATOR_FUCHSIA"   ;"0.0312";"0.0312";"0.0312";"0.0312";       "1"; "N/A";"glas";    "0";    "1";    "0";   "1";"0.9188";"0.0000";"0.7156";"0.0000";   "0";   "0"; "N/A"; "0";"16"
  "213"; "213";"BLOCK_ILLUMINATOR_PURPLE"    ;"0.0312";"0.0312";"0.0312";"0.0312";       "1"; "N/A";"glas";    "0";    "1";    "0";   "1";"0.7156";"0.0000";"0.9188";"0.0000";   "0";   "0"; "N/A"; "0";"16"
@@ -159,7 +159,8 @@
 
 ## Illuminators ##
 
-# Illuminator white: RGB(228,238,234), simulation of a halophosphate FL lamp (If you want high CRI lamp, collect a daylight!)
+# Illuminator white: Mercury Lamp; CIELAB of (94, -5.131, 10.613), which is made out of CIEXYZ of (0.947638, 1.146481, 0.482263), measured with ColorMunki Spectrometer (If you want high CRI lamp, collect a daylight!)
+# Illuminator orange: Sodium Lamp; CIE xy of (0.5375, 0.4153), CIEXYZ of (352.531139, 272.379377, 30.980339), measured with ColorMunki Spectrometer
 # Defalut torch : Y 64 x 0.55183 y 0.40966 (Planckian ~1 770 K); real candlelight colour taken from Spyder5 colorimeter (for I couldn't afford i1DisplayPro/Colormunki)
 # Sunstone: Artificial sunlight, change colour over time in sync with sunlight. The light is set by game's code.
 # Sunlight capacitor: daylight at noon. Set by game's code.

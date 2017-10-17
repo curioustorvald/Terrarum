@@ -12,6 +12,8 @@ import net.torvald.terrarum.gameactors.roundInt
 /**
  * UIItems must be added manually at the init!
  *
+ * FIXME: Bad design!!
+ *
  * Created by minjaesong on 2015-12-31.
  */
 abstract class UICanvas(

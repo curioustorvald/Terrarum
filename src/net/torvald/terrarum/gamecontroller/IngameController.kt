@@ -100,7 +100,7 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
     }
 
     override fun keyTyped(character: Char): Boolean {
-        ingame.uiContainer.forEach { it.keyTyped(character) }
+        ingame.uiContainer.forEach { if (it.isVisible) it.keyTyped(character) }
         return true
     }
 
