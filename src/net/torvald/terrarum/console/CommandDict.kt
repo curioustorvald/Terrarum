@@ -41,6 +41,7 @@ object CommandDict {
             "actorslist" to ActorsList,
             "setscale" to SetScale,
             "kill" to KillActor,
+            "money" to MoneyDisp,
 
             // Test codes
             "bulletintest" to SetBulletin,
