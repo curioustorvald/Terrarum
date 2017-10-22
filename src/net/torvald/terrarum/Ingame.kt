@@ -312,16 +312,20 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
         // >- queue up game UIs that should pause the world -<
         // inventory
-        uiInventoryPlayer = UIInventory(player,
+        /*uiInventoryPlayer = UIInventory(player,
                 width = 900,
                 height = Terrarum.HEIGHT - 160,
                 categoryWidth = 210,
                 toggleKeyLiteral = Terrarum.getConfigInt("keyinventory")
-        )
-        uiInventoryPlayer.setPosition(
+        )*/
+        /*uiInventoryPlayer.setPosition(
                 -uiInventoryPlayer.width,
                 70
+        )*/
+        uiInventoryPlayer = UIInventoryFull(player,
+                toggleKeyLiteral = Terrarum.getConfigInt("keyinventory")
         )
+        uiInventoryPlayer.setPosition(0, 0)
 
         // >- lesser UIs -<
         // quick bar
@@ -904,7 +908,12 @@ class Ingame(val batch: SpriteBatch) : Screen {
             // draw some overlays (UI) //
             /////////////////////////////
 
-            uiContainer.forEach { if (it != consoleHandler) it.render(batch, camera) }
+            uiContainer.forEach {
+                if (it != consoleHandler) {
+                    batch.color = Color.WHITE
+                    it.render(batch, camera)
+                }
+            }
 
             debugWindow.render(batch, camera)
             // make sure console draws on top of other UIs
@@ -1447,12 +1456,12 @@ class Ingame(val batch: SpriteBatch) : Screen {
                     (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
 
             // inventory
-            uiInventoryPlayer =
+            /*uiInventoryPlayer =
                     UIInventory(player,
                             width = 840,
                             height = Terrarum.HEIGHT - 160,
                             categoryWidth = 210
-                    )
+                    )*/
 
 
             // basic watch-style notification bar (temperature, new mail)

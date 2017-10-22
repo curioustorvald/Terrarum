@@ -9,7 +9,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.ui.UIInventory
+import net.torvald.terrarum.ui.UIInventoryFull
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import java.util.*
 
@@ -530,7 +530,7 @@ open class ActorHumanoid(
 
             // force update inventory UI
             try {
-                (Terrarum.ingame!!.uiInventoryPlayer as UIInventory).shutUpAndRebuild()
+                (Terrarum.ingame!!.uiInventoryPlayer as UIInventoryFull).rebuildList()
             }
             catch (LateInitMyArse: kotlin.UninitializedPropertyAccessException) { }
         }

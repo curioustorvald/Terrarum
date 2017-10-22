@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -175,7 +176,7 @@ class UIItemTextButtonList(
         }
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun render(batch: SpriteBatch, camera: Camera) {
 
         batch.color = backgroundCol
         BlendMode.resolve(backgroundBlendMode)
@@ -187,7 +188,7 @@ class UIItemTextButtonList(
             batch.fillRect(posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
         }
 
-        buttons.forEach { it.render(batch) }
+        buttons.forEach { it.render(batch, camera) }
 
 
         if (iconSpriteSheet != null) {

@@ -5,20 +5,16 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.ui.*
 
-/***
- * Note that the UI will not render if either item or itemImage is null.
- *
- * Created by minjaesong on 2017-03-16.
+/**
+ * Created by minjaesong on 2017-10-20.
  */
-class UIItemInventoryElem(
+class UIItemInventoryElemSimple(
         parentUI: UIInventoryFull,
         override var posX: Int,
         override var posY: Int,
-        override val width: Int,
         override var item: GameItem?,
         override var amount: Int,
         override var itemImage: TextureRegion?,
@@ -34,28 +30,16 @@ class UIItemInventoryElem(
 ) : UIItemInventoryCellBase(parentUI, posX, posY, item, amount, itemImage, quickslot, equippedSlot) {
 
     companion object {
-        val height = 48
-        val UNIQUE_ITEM_HAS_NO_AMOUNT = -1
-
-        internal val durabilityCol = Color(0x22ff11_ff)
-        internal val durabilityBack: Color; get() = durabilityCol.darkerLab(0.4f)
-        internal val durabilityBarThickness = 3f
+        val height = UIItemInventoryElem.height
     }
 
     private val inventoryUI = parentUI
 
-    override val height = UIItemInventoryElem.height
+    override val width = UIItemInventoryElemSimple.height
+    override val height = UIItemInventoryElemSimple.height
 
     private val imgOffset: Float
         get() = (this.height - itemImage!!.regionHeight).div(2).toFloat() // to snap to the pixel grid
-    private val textOffsetX = 50f
-    private val textOffsetY = 8f
-
-
-
-    private val durabilityBarOffY = 35f
-
-
 
     override fun update(delta: Float) {
         if (item != null) {
@@ -63,10 +47,7 @@ class UIItemInventoryElem(
         }
     }
 
-    private val fwsp = 0x3000.toChar()
-
     override fun render(batch: SpriteBatch, camera: Camera) {
-
         // mouseover background
         if (item != null || drawBackOnNull) {
             // do not highlight even if drawBackOnNull is true
@@ -83,9 +64,12 @@ class UIItemInventoryElem(
         }
 
 
+        // quickslot and equipped slot indicator is not needed as it's intended for blocks and walls
+        // and you can clearly see the quickslot UI anyway
+
         if (item != null && itemImage != null) {
             blendNormal()
-            
+
             // item image
             batch.color = Color.WHITE
             batch.draw(itemImage, posX + imgOffset, posY + imgOffset)
@@ -93,34 +77,29 @@ class UIItemInventoryElem(
             // if mouse is over, text lights up
             // this one-liner sets color
             batch.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
-            // draw name of the item
-            Terrarum.fontGame.draw(batch,
-                    //"$item" + (if (amount > 0 && item!!.stackable) "$fwsp($amount)" else if (amount != 1) "$fwsp!!$amount!!" else "") +
-                    item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amount)" else if (amount != 1) "$fwsp!!$amount!!" else "") +
-                    (if (equippedSlot != null) "  ${0xE081.toChar()}\$$equippedSlot" else ""),
-                    posX + textOffsetX,
-                    posY + textOffsetY
-            )
 
 
-            // durability metre
-            val barFullLen = (width - 8f) - textOffsetX
-            val barOffset = posX + textOffsetX
+            // if item has durability, draw that and don't draw count; durability and itemCount cannot coexist
             if (item!!.maxDurability > 0.0) {
-                batch.color = durabilityBack
-                batch.drawStraightLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen, durabilityBarThickness, false)
-                batch.color = durabilityCol
-                batch.drawStraightLine(barOffset, posY + durabilityBarOffY, barOffset + barFullLen * (item!!.durability / item!!.maxDurability), durabilityBarThickness, false)
+                // draw durability metre
+                val barFullLen = width
+                val barOffset = posX.toFloat()
+                val thickness = UIItemInventoryElem.durabilityBarThickness
+                if (item!!.maxDurability > 0.0) {
+                    batch.color = UIItemInventoryElem.durabilityBack
+                    batch.drawStraightLine(barOffset, posY + height - thickness, barOffset + barFullLen, thickness, false)
+                    batch.color = UIItemInventoryElem.durabilityCol
+                    batch.drawStraightLine(barOffset, posY + height - thickness, barOffset + barFullLen * (item!!.durability / item!!.maxDurability), thickness, false)
+                }
             }
-
-
-            // quickslot marker (TEMPORARY UNTIL WE GET BETTER DESIGN)
-            batch.color = Color.WHITE
-
-            if (quickslot != null) {
-                val label = quickslot!!.plus(0xE010).toChar()
-                val labelW = Terrarum.fontGame.getWidth("$label")
-                Terrarum.fontGame.draw(batch, "$label", barOffset + barFullLen - labelW, posY + textOffsetY)
+            else {
+                // draw item count
+                val amountString = amount.toString()
+                Terrarum.fontSmallNumbers.draw(batch,
+                        amountString,
+                        posX + (width - Terrarum.fontSmallNumbers.getWidth(amountString)).toFloat(),
+                        posY + (height - Terrarum.fontSmallNumbers.H).toFloat()
+                )
             }
 
         }
@@ -201,4 +180,5 @@ class UIItemInventoryElem(
     override fun scrolled(amount: Int): Boolean {
         return super.scrolled(amount)
     }
+
 }

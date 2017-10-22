@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
@@ -38,7 +39,7 @@ class UIItemTextArea(
         if (scrollPos < 0) scrollPos = 0
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun render(batch: SpriteBatch, camera: Camera) {
         for (i in scrollPos until minOf(lineCount + scrollPos, entireText.size)) {
             val yPtr = i - scrollPos
 

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.BlendMode
@@ -103,7 +104,7 @@ class UIItemList<Item: UIItem>(
         }
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun render(batch: SpriteBatch, camera: Camera) {
         batch.color = backgroundCol
         BlendMode.resolve(backgroundBlendMode)
         batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
@@ -114,7 +115,7 @@ class UIItemList<Item: UIItem>(
             batch.fillRect(posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
         }
 
-        itemList.forEach { it.render(batch) }
+        itemList.forEach { it.render(batch, camera) }
 
         batch.color = backgroundCol
     }
