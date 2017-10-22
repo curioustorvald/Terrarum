@@ -33,6 +33,8 @@
           <option name="WRAP_ON_TYPING" value="0" />
         </codeStyleSettings>
         <codeStyleSettings language="kotlin">
+          <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="5" />
+          <option name="KEEP_BLANK_LINES_IN_CODE" value="5" />
           <option name="ELSE_ON_NEW_LINE" value="true" />
           <option name="CATCH_ON_NEW_LINE" value="true" />
           <option name="FINALLY_ON_NEW_LINE" value="true" />

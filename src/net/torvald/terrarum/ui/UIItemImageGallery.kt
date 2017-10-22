@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.gameactors.roundInt
@@ -22,7 +23,7 @@ class UIItemImageGallery(
     override fun update(delta: Float) {
     }
 
-    override fun render(batch: SpriteBatch) {
+    override fun render(batch: SpriteBatch, camera: Camera) {
         fun column(i: Int) = i % column
         fun row(i: Int) = i / column
 

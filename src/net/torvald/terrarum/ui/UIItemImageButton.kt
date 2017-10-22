@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -22,14 +23,21 @@ open class UIItemImageButton(
         val activeBackCol: Color = Color(0xb0b0b0_ff.toInt()),
         val activeBackBlendMode: String = BlendMode.MULTIPLY,
 
+        val highlightCol: Color = Color(0x00f8ff_ff),
+        val highlightBackCol: Color = Color(0xb0b0b0_ff.toInt()),
+        val highlightBackBlendMode: String = BlendMode.MULTIPLY,
+
         override var posX: Int,
         override var posY: Int,
         override val width: Int = image.regionWidth,
-        override val height: Int = image.regionHeight
+        override val height: Int = image.regionHeight,
+
+        var highlightable: Boolean
 ) : UIItem(parent) {
 
+    var highlighted = false
 
-    override fun render(batch: SpriteBatch) {
+    override fun render(batch: SpriteBatch, camera: Camera) {
         // draw background
         if (mouseUp) {
             BlendMode.resolve(activeBackBlendMode)
@@ -46,7 +54,10 @@ open class UIItemImageButton(
         // draw image
         blendNormal()
 
-        batch.color = if (mouseUp) activeCol else buttonCol
+        batch.color = if (highlighted) highlightCol
+        else if (mouseUp) activeCol
+        else buttonCol
+
         batch.draw(image, (posX + (width - image.regionWidth) / 2).toFloat(), (posY + (height - image.regionHeight) / 2).toFloat())
     }
 
@@ -71,6 +82,10 @@ open class UIItemImageButton(
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        if (mouseUp) {
+            highlighted = !highlighted
+        }
+
         return super.touchDown(screenX, screenY, pointer, button)
     }
 

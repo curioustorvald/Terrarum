@@ -20,7 +20,7 @@ import java.util.*
 /**
  * Created by minjaesong on 2017-03-13.
  */
-class UIInventory(
+/*class UIInventory(
         var actor: Pocketed?,
         override var width: Int,
         override var height: Int,
@@ -133,14 +133,16 @@ class UIInventory(
             posX = categoryWidth,
             posY = 0,//(height - controlHelpHeight - scrollImageButtonAtlas.tileH) / 2,
             width = scrollImageButtonAtlas.tileW,
-            height = height - controlHelpHeight
+            height = height - controlHelpHeight,
+            highlightable = false
     )
     private val scrollRightButton = UIItemImageButton(this,
             scrollImageButtonAtlas.get(1, 0),
             posX = width - scrollImageButtonAtlas.tileW,
             posY = 0,//(height - controlHelpHeight - scrollImageButtonAtlas.tileH) / 2,
             width = scrollImageButtonAtlas.tileW,
-            height = height - controlHelpHeight
+            height = height - controlHelpHeight,
+            highlightable = false
     )
     var itemPage = 0
     var itemPageCount = 1 // TODO total size of current category / items.size
@@ -240,14 +242,14 @@ class UIInventory(
         batch.color = Color(0xcccccc_ff.toInt())
         batch.fillRect(0f, 0f, catButtons.width.toFloat(), height.toFloat())
 
-        catButtons.render(batch)
+        catButtons.render(batch, camera)
 
         // left/right page mover
-        scrollLeftButton.render(batch)
-        scrollRightButton.render(batch)
+        scrollLeftButton.render(batch, camera)
+        scrollRightButton.render(batch, camera)
 
         items.forEach {
-            it.render(batch)
+            it.render(batch, camera)
         }
 
         // texts
@@ -322,7 +324,7 @@ class UIInventory(
             inventorySortList.sortBy { it.item.name }
 
             // map sortList to item list
-            for (k in 0..items.size - 1) {
+            for (k in 0 until items.size) {
                 // we have an item
                 try {
                     val sortListItem = inventorySortList[k + itemPage * items.size]
@@ -427,3 +429,4 @@ class UIInventory(
         scrollImageButtonAtlas.dispose()
     }
 }
+*/

@@ -110,7 +110,7 @@ class UITitleRemoConRoot : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        menubar.render(batch)
+        menubar.render(batch, camera)
     }
 
     override fun doOpening(delta: Float) {
