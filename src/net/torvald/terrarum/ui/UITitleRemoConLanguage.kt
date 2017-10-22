@@ -87,10 +87,10 @@ class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        menubar.render(batch)
+        menubar.render(batch, camera)
 
         batch.color = Color.WHITE
-        textArea.render(batch)
+        textArea.render(batch, camera)
     }
 
     override fun doOpening(delta: Float) {

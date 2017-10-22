@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import net.torvald.terrarum.*
 import net.torvald.terrarum.langpack.Lang
 import com.badlogic.gdx.graphics.Color
@@ -46,7 +47,7 @@ open class UIItemTextButton(
 
     private val glyphLayout = GlyphLayout()
 
-    override fun render(batch: SpriteBatch) {
+    override fun render(batch: SpriteBatch, camera: Camera) {
         val textW = font.getWidth(label)
 
 

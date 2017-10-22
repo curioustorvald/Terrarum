@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
 
@@ -55,6 +56,9 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
         get() = mouseUp && Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary")!!)
 
 
+    /** UI to call (show up) while mouse is up */
+    open val mouseOverCall: UICanvas? = null
+
 
     // kind of listener implementation
     var updateListener: ((Float) -> Unit)? = null
@@ -76,9 +80,33 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
             if (updateListener != null) {
                 updateListener!!.invoke(delta)
             }
+
+
+            mouseOverCall?.update(delta)
+
+            if (mouseUp) {
+                if (mouseOverCall?.isVisible ?: false) {
+                    mouseOverCall?.setAsOpen()
+                }
+
+                mouseOverCall?.updateUI(delta)
+            }
+            else {
+                if (mouseOverCall?.isVisible ?: false) {
+                    mouseOverCall?.setAsClose()
+                }
+            }
         }
     }
-    abstract fun render(batch: SpriteBatch)
+    open fun render(batch: SpriteBatch, camera: Camera) {
+        if (parentUI.isVisible) {
+            mouseOverCall?.render(batch, camera)
+
+            if (mouseUp) {
+                mouseOverCall?.renderUI(batch, camera)
+            }
+        }
+    }
 
     // keyboard controlled
     open fun keyDown(keycode: Int): Boolean {
