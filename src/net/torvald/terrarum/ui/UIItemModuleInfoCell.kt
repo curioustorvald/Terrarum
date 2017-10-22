@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.ModMgr
@@ -19,7 +20,7 @@ class UIItemModuleInfoCell(
 
     private val numberAreaWidth = Terrarum.fontSmallNumbers.W * 3 + 4
 
-    override fun render(batch: SpriteBatch) {
+    override fun render(batch: SpriteBatch, camera: Camera) {
         blendNormal()
 
         if (ModMgr.moduleInfo.containsKey(moduleName)) {

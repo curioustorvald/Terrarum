@@ -296,4 +296,5 @@ abstract class UICanvas(
             LEFT, RIGHT, TOP, BOTTOM
         }
     }
+
 }

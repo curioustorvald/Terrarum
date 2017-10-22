@@ -89,10 +89,10 @@ class UITitleRemoConCredits(val superMenu: UICanvas) : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        menubar.render(batch)
+        menubar.render(batch, camera)
         if (drawTextArea) {
             batch.color = Color.WHITE
-            textArea.render(batch)
+            textArea.render(batch, camera)
         }
     }
 

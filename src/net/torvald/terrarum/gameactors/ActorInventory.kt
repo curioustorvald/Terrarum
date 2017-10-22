@@ -35,6 +35,8 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     val itemList = ArrayList<InventoryPair>()
     val quickBar = Array<ItemID?>(10, { null }) // 0: Slot 1, 9: Slot 10
 
+    var currency = 0 // unified currency for whole civs; Dwarf Fortress approach seems too complicated
+
     init {
     }
 
