@@ -747,11 +747,11 @@ fun Float.round(): Float {
 fun SpriteBatch.fillRect(x: Float, y: Float, w: Float, h: Float) {
     this.draw(Terrarum.textureWhiteSquare, x, y, w, h)
 }
-inline fun SpriteBatch.drawStraightLine(x: Float, y: Float, length: Float, thickness: Float, isVertical: Boolean) {
+inline fun SpriteBatch.drawStraightLine(x: Float, y: Float, otherEnd: Float, thickness: Float, isVertical: Boolean) {
     if (!isVertical)
-        this.fillRect(x, y, length - x, thickness)
+        this.fillRect(x, y, otherEnd - x, thickness)
     else
-        this.fillRect(x, y, thickness, length - y)
+        this.fillRect(x, y, thickness, otherEnd - y)
 }
 
 
