@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameactors.Pocketed
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.ArrayList
 
 /**
@@ -32,6 +33,11 @@ class UIInventoryFull(
 
 
 
+    internal val catIcons: TextureRegionPack = TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20)
+    internal val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,3,4,5,8)
+
+
+
     private val SP = "${0x3000.toChar()}${0x3000.toChar()}"
     val listControlHelp: String
         get() = if (Terrarum.environment == RunningEnvironment.PC)
@@ -50,7 +56,7 @@ class UIInventoryFull(
     private var isEncumbered = false
 
 
-    val catBarWidth = 328
+    val catBarWidth = 330
     val catBar = UIItemInventoryCatBar(
             this,
             (Terrarum.WIDTH - catBarWidth) / 2,
@@ -87,7 +93,8 @@ class UIInventoryFull(
 
 
     override fun updateUI(delta: Float) {
-
+        catBar.update(delta)
+        itemList?.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {

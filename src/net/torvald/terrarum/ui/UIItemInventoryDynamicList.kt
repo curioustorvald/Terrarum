@@ -35,6 +35,7 @@ class UIItemInventoryDynamicList(
     override val width  = 496
     override val height = 384
 
+    private val catArrangement = parentUI.catArrangement
 
 
 
@@ -58,7 +59,7 @@ class UIItemInventoryDynamicList(
     private val selectedIcon: Int
         get() = inventoryUI.catSelectedIcon
 
-    private val compactViewCat = setOf(6, 7, 9) // blocks, walls, all (spritesheet order)
+    private val compactViewCat = setOf(4, 6, 7, 9) // potions, blocks, walls, all (spritesheet order)
 
     var itemPage = 0
     var itemPageCount = 1 // TODO total size of current category / items.size
@@ -106,7 +107,7 @@ class UIItemInventoryDynamicList(
     )
 
     private val items: Array<UIItemInventoryCellBase>
-            get() = if (selection in compactViewCat) itemGrid else itemList
+            get() = if (catArrangement[selection] in compactViewCat) itemGrid else itemList
 
 
 
