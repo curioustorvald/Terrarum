@@ -111,9 +111,12 @@ class UIItemInventoryElemSimple(
 
     override fun keyDown(keycode: Int): Boolean {
         if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_1..Input.Keys.NUM_0) {
+            println("keydown elemgrid")
+
+
             val inventory = Terrarum.ingame!!.player.inventory
             val slot = if (keycode == Input.Keys.NUM_0) 9 else keycode - Input.Keys.NUM_1
-            val currentSlotItem = inventory?.getQuickBar(slot)
+            val currentSlotItem = inventory.getQuickBar(slot)
 
 
             inventory.setQuickBar(
@@ -137,6 +140,8 @@ class UIItemInventoryElemSimple(
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        //println("touchdown elemgrid")
+
         if (item != null && Terrarum.ingame != null) {
 
             // equip da shit
