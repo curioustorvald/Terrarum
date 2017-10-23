@@ -111,39 +111,60 @@ abstract class UICanvas(
     }
 
     open fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        uiItems.forEach { it.mouseMoved(screenX, screenY) }
-        handler.subUIs.forEach { it.mouseMoved(screenX, screenY) }
-        return true
+        if (this.isVisible) {
+            uiItems.forEach { it.mouseMoved(screenX, screenY) }
+            handler.subUIs.forEach { it.mouseMoved(screenX, screenY) }
+            return true
+        }
+        else return false
     }
     open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        uiItems.forEach { it.touchDragged(screenX, screenY, pointer) }
-        handler.subUIs.forEach { it.touchDragged(screenX, screenY, pointer) }
-        return true
+        if (this.isVisible) {
+            uiItems.forEach { it.touchDragged(screenX, screenY, pointer) }
+            handler.subUIs.forEach { it.touchDragged(screenX, screenY, pointer) }
+            return true
+        }
+        else return false
     }
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        uiItems.forEach { it.touchDown(screenX, screenY, pointer, button) }
-        handler.subUIs.forEach { it.touchDown(screenX, screenY, pointer, button) }
-        return true
+        if (this.isVisible) {
+            uiItems.forEach { it.touchDown(screenX, screenY, pointer, button) }
+            handler.subUIs.forEach { it.touchDown(screenX, screenY, pointer, button) }
+            return true
+        }
+        else return false
     }
     open fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        uiItems.forEach { it.touchUp(screenX, screenY, pointer, button) }
-        handler.subUIs.forEach { it.touchUp(screenX, screenY, pointer, button) }
-        return true
+        if (this.isVisible) {
+            uiItems.forEach { it.touchUp(screenX, screenY, pointer, button) }
+            handler.subUIs.forEach { it.touchUp(screenX, screenY, pointer, button) }
+            return true
+        }
+        else return false
     }
     open fun scrolled(amount: Int): Boolean {
-        uiItems.forEach { it.scrolled(amount) }
-        handler.subUIs.forEach { it.scrolled(amount) }
-        return true
+        if (this.isVisible) {
+            uiItems.forEach { it.scrolled(amount) }
+            handler.subUIs.forEach { it.scrolled(amount) }
+            return true
+        }
+        else return false
     }
     open fun keyDown(keycode: Int): Boolean {
-        uiItems.forEach { it.keyDown(keycode) }
-        handler.subUIs.forEach { it.keyDown(keycode) }
-        return true
+        if (this.isVisible) {
+            uiItems.forEach { it.keyDown(keycode) }
+            handler.subUIs.forEach { it.keyDown(keycode) }
+            return true
+        }
+        else return false
     }
     open fun keyUp(keycode: Int): Boolean {
-        uiItems.forEach { it.keyUp(keycode) }
-        handler.subUIs.forEach { it.keyUp(keycode) }
-        return true
+        if (this.isVisible) {
+            uiItems.forEach { it.keyUp(keycode) }
+            handler.subUIs.forEach { it.keyUp(keycode) }
+            return true
+        }
+        else return false
     }
     open fun keyTyped(character: Char): Boolean {
         return false
