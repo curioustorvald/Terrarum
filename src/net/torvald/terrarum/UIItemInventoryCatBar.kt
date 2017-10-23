@@ -18,17 +18,19 @@ class UIItemInventoryCatBar(
         parentUI: UICanvas,
         override var posX: Int,
         override var posY: Int,
-        override val width: Int,
-        val catIcons: TextureRegionPack = TextureRegionPack("./assets/graphics/gui/inventory/category.tga", 20, 20),
-        val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,3,4,5,8)
+        override val width: Int
 ) : UIItem(parentUI) {
+
+    private val catIcons = (parentUI as UIInventoryFull).catIcons
+    private val catArrangement = (parentUI as UIInventoryFull).catArrangement
+
 
     private val inventoryUI = parentUI
     override val height = catIcons.tileH + 5
     
 
     private val buttons: Array<UIItemImageButton>
-    private val buttonGapSize = (width.toFloat() - (catArrangement.size * catIcons.tileW)) / (catArrangement.size + 1f)
+    private val buttonGapSize = (width.toFloat() - (catArrangement.size * catIcons.tileW)) / (catArrangement.size)
     var selectedIndex = 0 // default to ALL
         private set
     val selectedIcon: Int
@@ -39,7 +41,7 @@ class UIItemInventoryCatBar(
     init {
         // place sub UIs: Image Buttons
         buttons = Array(catArrangement.size, { index ->
-            val iconPosX = (buttonGapSize + catIcons.tileW).roundInt()
+            val iconPosX = ((buttonGapSize / 2) + index * (catIcons.tileW + buttonGapSize)).roundInt()
             val iconPosY = 0
 
             UIItemImageButton(
@@ -58,10 +60,12 @@ class UIItemInventoryCatBar(
     private val underlineIndTex: Texture
     private val underlineColour = Color(0xeaeaea_40.toInt())
     private val underlineHighlightColour = buttons[0].highlightCol
-    private var highlighterXStart = 0.0 // left-end position
-    private var highlighterXEnd = 0.0 // left-end position
-    private var highlighterXPos = 0.0 // left-end position
-    private val highlighterYPos = catIcons.tileH + 5f
+
+    private var highlighterXPos = buttons[selectedIndex].posX.toDouble()
+    private var highlighterXStart = highlighterXPos
+    private var highlighterXEnd = highlighterXPos
+
+    private val highlighterYPos = catIcons.tileH + 4f
     private var highlighterMoving = false
     private val highlighterMoveDuration: Second = 0.1f
     private var highlighterMoveTimer: Second = 0f
@@ -80,7 +84,10 @@ class UIItemInventoryCatBar(
         }
         underlineIndTex = Texture(pixmap)
         underlineIndTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-        pixmap.dispose() // FIXME is this how it's supposed to work? (still a noob)
+        pixmap.dispose()
+
+
+        buttons[selectedIndex].highlighted = true
     }
 
 
@@ -89,19 +96,17 @@ class UIItemInventoryCatBar(
 
     override fun update(delta: Float) {
         super.update(delta)
-        
+
 
         if (highlighterMoving) {
             highlighterMoveTimer += delta
 
-            if (selectedIndex != null) {
-                highlighterXPos = UIUtils.moveQuick(
-                        highlighterXStart,
-                        highlighterXEnd,
-                        highlighterMoveTimer.toDouble(),
-                        highlighterMoveDuration.toDouble()
-                )
-            }
+            highlighterXPos = UIUtils.moveQuick(
+                    highlighterXStart,
+                    highlighterXEnd,
+                    highlighterMoveTimer.toDouble(),
+                    highlighterMoveDuration.toDouble()
+            )
 
             if (highlighterMoveTimer > highlighterMoveDuration) {
                 highlighterMoveTimer = 0f
@@ -119,10 +124,10 @@ class UIItemInventoryCatBar(
             if (btn.mousePushed && index != selectedIndex) {
                 val oldIndex = selectedIndex
 
-                highlighterXStart = buttons[selectedIndex].posY.toDouble()
+                highlighterXStart = buttons[selectedIndex].posX.toDouble() // using old selectedIndex
                 selectedIndex = index
                 highlighterMoving = true
-                highlighterXEnd = buttons[selectedIndex].posY.toDouble()
+                highlighterXEnd = buttons[selectedIndex].posX.toDouble() // using new selectedIndex
 
                 selectionChangeListener?.invoke(oldIndex, index)
             }
@@ -140,11 +145,11 @@ class UIItemInventoryCatBar(
 
         // underline
         batch.color = underlineColour
-        batch.drawStraightLine(posX.toFloat(), posY + height - 1f, width.toFloat(), 1f, false)
+        batch.drawStraightLine(posX.toFloat(), posY + height - 1f, posX + width.toFloat(), 1f, false)
 
         // indicator
         batch.color = underlineHighlightColour
-        batch.draw(underlineIndTex, (posX + highlighterXPos).toFloat().round(), posY + highlighterYPos)
+        batch.draw(underlineIndTex, (highlighterXPos - buttonGapSize / 2).toFloat().round(), posY + highlighterYPos)
     }
 
 
