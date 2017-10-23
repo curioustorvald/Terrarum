@@ -1,6 +1,8 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.RunningEnvironment
 import net.torvald.terrarum.Terrarum
@@ -89,10 +91,21 @@ class UIInventoryFull(
             addItem(it)
         }
 
+
+        catBar.selectionChangeListener = { old, new  -> rebuildList() }
+
+
+
+        rebuildList()
     }
 
 
     override fun updateUI(delta: Float) {
+        if (handler.openFired) {
+            rebuildList()
+        }
+
+
         catBar.update(delta)
         itemList?.update(delta)
     }

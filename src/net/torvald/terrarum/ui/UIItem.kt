@@ -61,17 +61,17 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
 
 
     // kind of listener implementation
-    var updateListener: ((Float) -> Unit)? = null
-    var keyDownListener: ((Int) -> Unit)? = null
-    var keyUpListener: ((Int) -> Unit)? = null
-    var mouseMovedListener: ((Int, Int) -> Unit)? = null
-    var touchDraggedListener: ((Int, Int, Int) -> Unit)? = null
-    var touchDownListener: ((Int, Int, Int, Int) -> Unit)? = null
-    var touchUpListener: ((Int, Int, Int, Int) -> Unit)? = null
-    var scrolledListener: ((Int) -> Unit)? = null
+    open var updateListener: ((Float) -> Unit)? = null
+    open var keyDownListener: ((Int) -> Unit)? = null
+    open var keyUpListener: ((Int) -> Unit)? = null
+    open var mouseMovedListener: ((Int, Int) -> Unit)? = null
+    open var touchDraggedListener: ((Int, Int, Int) -> Unit)? = null
+    open var touchDownListener: ((Int, Int, Int, Int) -> Unit)? = null
+    open var touchUpListener: ((Int, Int, Int, Int) -> Unit)? = null
+    open var scrolledListener: ((Int) -> Unit)? = null
 
-    var clickOnceListener: ((Int, Int, Int) -> Unit)? = null
-    var clickOnceListenerFired = false
+    open var clickOnceListener: ((Int, Int, Int) -> Unit)? = null
+    open var clickOnceListenerFired = false
 
 
 
