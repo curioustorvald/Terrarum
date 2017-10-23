@@ -59,7 +59,7 @@ class UIItemInventoryDynamicList(
     private val selectedIcon: Int
         get() = inventoryUI.catSelectedIcon
 
-    private val compactViewCat = setOf(4, 6, 7, 9) // potions, blocks, walls, all (spritesheet order)
+    private val compactViewCat = setOf(3, 4, 6, 7, 9) // ingredients, potions, blocks, walls, all (spritesheet order)
 
     var itemPage = 0
     var itemPageCount = 1 // TODO total size of current category / items.size
@@ -189,5 +189,36 @@ class UIItemInventoryDynamicList(
     override fun dispose() {
         itemList.forEach { it.dispose() }
         itemGrid.forEach { it.dispose() }
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        super.touchDown(screenX, screenY, pointer, button)
+
+        items.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
+        return true
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        items.forEach { if (it.mouseUp) it.touchUp(screenX, screenY, pointer, button) }
+
+        return true
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        super.keyDown(keycode)
+
+        items.forEach { if (it.mouseUp) it.keyDown(keycode) }
+        rebuild()
+
+        return true
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        super.keyUp(keycode)
+
+        items.forEach { if (it.mouseUp) it.keyUp(keycode) }
+        rebuild()
+
+        return true
     }
 }

@@ -75,9 +75,9 @@ class UIItemInventoryCatBar(
         // procedurally generate texture
         val pixmap = Pixmap(catIcons.tileW + buttonGapSize.floorInt(), 1, Pixmap.Format.RGBA8888)
         for (x in 0 until pixmap.width.plus(1).ushr(1)) { // eqv. of ceiling the half-int
-            val col = if      (x == 0) 0xffffff_80.toInt()
-                      else if (x == 1) 0xffffff_c0.toInt()
-                      else             0xffffff_ff.toInt()
+            val col = /*if      (x == 0)*/ /*0xffffff_80.toInt()*/
+                      /*else if (x == 1)*/ /*0xffffff_c0.toInt()*/
+                      /*else            */ 0xffffff_ff.toInt()
 
             pixmap.drawPixel(x, 0, col)
             pixmap.drawPixel(pixmap.width - (x + 1), 0, col)
@@ -142,6 +142,10 @@ class UIItemInventoryCatBar(
         // button
         // colour determined by UI items themselves
         buttons.forEach { it.render(batch, camera) }
+
+
+        blendNormal(batch)
+
 
         // underline
         batch.color = underlineColour
