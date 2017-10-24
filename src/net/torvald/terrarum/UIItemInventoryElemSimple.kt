@@ -24,6 +24,7 @@ class UIItemInventoryElemSimple(
         val inactiveTextCol: Color = UIItemTextButton.defaultInactiveCol,
         val backCol: Color = Color(0),
         val backBlendMode: String = BlendMode.NORMAL,
+        val highlightCol: Color = UIItemTextButton.defaultHighlightCol,
         override var quickslot: Int? = null,
         override var equippedSlot: Int? = null,
         val drawBackOnNull: Boolean = true
@@ -51,7 +52,7 @@ class UIItemInventoryElemSimple(
         // mouseover background
         if (item != null || drawBackOnNull) {
             // do not highlight even if drawBackOnNull is true
-            if (mouseUp && item != null) {
+            if (mouseUp && item != null || equippedSlot != null) { // "equippedSlot != null": also highlight back if equipped
                 BlendMode.resolve(mouseoverBackBlendMode)
                 batch.color = mouseoverBackCol
             }
@@ -95,6 +96,13 @@ class UIItemInventoryElemSimple(
             else {
                 // draw item count
                 val amountString = amount.toString()
+
+                // highlight item count (blocks/walls) if the item is equipped
+                if (equippedSlot != null) {
+                    batch.color = highlightCol
+                }
+
+
                 Terrarum.fontSmallNumbers.draw(batch,
                         amountString,
                         posX + (width - Terrarum.fontSmallNumbers.getWidth(amountString)).toFloat(),

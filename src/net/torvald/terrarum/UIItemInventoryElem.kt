@@ -95,9 +95,11 @@ class UIItemInventoryElem(
             batch.color = item!!.nameColour mul if (mouseUp) mouseOverTextCol else inactiveTextCol
             // draw name of the item
             Terrarum.fontGame.draw(batch,
-                    //"$item" + (if (amount > 0 && item!!.stackable) "$fwsp($amount)" else if (amount != 1) "$fwsp!!$amount!!" else "") +
+                    // print name and amount in parens
                     item!!.name + (if (amount > 0 && item!!.stackable) "$fwsp($amount)" else if (amount != 1) "$fwsp!!$amount!!" else "") +
+                    // TEMPORARY print eqipped slot info as well
                     (if (equippedSlot != null) "  ${0xE081.toChar()}\$$equippedSlot" else ""),
+
                     posX + textOffsetX,
                     posY + textOffsetY
             )
