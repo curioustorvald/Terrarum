@@ -22,10 +22,10 @@ open class UIItemTextButton(
         val activeCol: Color = Color.WHITE,
         val activeBackCol: Color = Color(0),
         val activeBackBlendMode: String = BlendMode.NORMAL,
-        val highlightCol: Color = Color(0x00f8ff_ff),
+        val highlightCol: Color = defaultHighlightCol,
         val highlightBackCol: Color = Color(0xb0b0b0_ff.toInt()),
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
-        val inactiveCol: Color = UIItemTextButton.defaultInactiveCol,
+        val inactiveCol: Color = defaultInactiveCol,
         val preGapX:  Int = 0,
         val postGapX: Int = 0
 ) : UIItem(parentUI) {
@@ -34,6 +34,7 @@ open class UIItemTextButton(
         val font = Terrarum.fontGame
         val height = font.lineHeight.toInt() * 2
         val defaultInactiveCol: Color = Color(0xc8c8c8_ff.toInt())
+        val defaultHighlightCol: Color = Color(0x00f8ff_ff)
     }
 
     val label: String
