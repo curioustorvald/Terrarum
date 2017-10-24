@@ -182,6 +182,7 @@ class UIItemInventoryDynamicList(
                 items[k].amount = 0
                 items[k].itemImage = null
                 items[k].quickslot = null
+                items[k].equippedSlot = null
             }
         }
     }
