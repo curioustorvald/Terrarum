@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import net.torvald.terrarum.round
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -31,6 +32,9 @@ object TinyAlphNum : BitmapFont() {
     override fun draw(batch: Batch, text: CharSequence, x: Float, y: Float): GlyphLayout? {
         val originalColour = batch.color
         colourHolder = batch.color
+
+        val x = x.round()
+        val y = y.round()
 
         var charsPrinted = 0
         text.forEachIndexed { index, c ->

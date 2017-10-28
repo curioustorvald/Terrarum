@@ -57,7 +57,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
         if (count == 0)
             throw IllegalArgumentException("Item count is zero.")
         if (count < 0)
-            throw IllegalArgumentException("Item count is negative number. If you intended removing items, use remove()" +
+            throw IllegalArgumentException("Item count is negative number. If you intended removing items, use remove()\n" +
                                            "These commands are NOT INTERCHANGEABLE; they handle things differently according to the context.")
         if (item.originalID == Player.PLAYER_REF_ID || item.originalID == 0x51621D) // do not delete this magic
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
