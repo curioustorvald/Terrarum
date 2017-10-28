@@ -2,11 +2,11 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.RunningEnvironment
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.UIItemInventoryCatBar
+import net.torvald.terrarum.*
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameactors.InventoryPair
 import net.torvald.terrarum.gameactors.Pocketed
 import net.torvald.terrarum.gameactors.Second
@@ -43,7 +43,7 @@ class UIInventoryFull(
     private val SP = "${0x3000.toChar()}${0x3000.toChar()}"
     val listControlHelp: String
         get() = if (Terrarum.environment == RunningEnvironment.PC)
-            "${0xe037.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "${0xe011.toChar()}..${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
@@ -52,7 +52,7 @@ class UIInventoryFull(
             "${Terrarum.joypadLabelNinY} ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "${0xe011.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "${Terrarum.joypadLabelNinA} ${Lang["GAME_INVENTORY_DROP"]}"
-    val controlHelpHeight = Terrarum.fontGame.lineHeight.toInt()
+    val controlHelpHeight = Terrarum.fontGame.lineHeight
 
     private var encumbrancePerc = 0f
     private var isEncumbered = false
@@ -85,11 +85,24 @@ class UIInventoryFull(
     else null
 
 
+    private val equipped: UIItemInventoryEquippedView? =
+            if (actor != null) {
+                UIItemInventoryEquippedView(
+                        this,
+                        actor!!.inventory,
+                        actor as ActorWithPhysics,
+                        internalWidth - UIItemInventoryEquippedView.width + (Terrarum.WIDTH - internalWidth) / 2,
+                        109 + (Terrarum.HEIGHT - internalHeight) / 2
+                )
+            }
+    else null
+
+
+
     init {
         addItem(catBar)
-        itemList?.let {
-            addItem(it)
-        }
+        itemList?.let { addItem(it) }
+        equipped?.let { addItem(it) }
 
 
         catBar.selectionChangeListener = { old, new  -> rebuildList() }
@@ -97,7 +110,12 @@ class UIInventoryFull(
 
 
         rebuildList()
+
     }
+
+    private var offsetX = ((Terrarum.WIDTH - internalWidth)   / 2).toFloat()
+    private var offsetY = ((Terrarum.HEIGHT - internalHeight) / 2).toFloat()
+
 
 
     override fun updateUI(delta: Float) {
@@ -108,22 +126,32 @@ class UIInventoryFull(
 
         catBar.update(delta)
         itemList?.update(delta)
+        equipped?.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         catBar.render(batch, camera)
         itemList?.render(batch, camera)
+        equipped?.render(batch, camera)
+
+
+        // control hints
+        blendNormal(batch)
+        batch.color = Color.WHITE
+        Terrarum.fontGame.draw(batch, listControlHelp, offsetX, offsetY + internalHeight + controlHelpHeight)
     }
 
 
 
     fun rebuildList() {
         itemList?.rebuild()
+        equipped?.rebuild()
     }
 
     override fun dispose() {
         catBar.dispose()
         itemList?.dispose()
+        equipped?.dispose()
     }
 
 
@@ -144,6 +172,9 @@ class UIInventoryFull(
 
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
+
+        offsetX = ((Terrarum.WIDTH - internalWidth)   / 2).toFloat()
+        offsetY = ((Terrarum.HEIGHT - internalHeight) / 2).toFloat()
     }
 
 
