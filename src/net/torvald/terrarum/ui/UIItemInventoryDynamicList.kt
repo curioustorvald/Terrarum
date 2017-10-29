@@ -82,8 +82,8 @@ class UIItemInventoryDynamicList(
                 itemImage = null,
                 mouseoverBackCol = Color(0x282828_ff),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = Color(0xd4d4d4_ff.toInt()),
-                backBlendMode = BlendMode.MULTIPLY,
+                backCol = Color(0x303030_58),
+                backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 inactiveTextCol = defaultTextColour
         ) })
@@ -98,8 +98,8 @@ class UIItemInventoryDynamicList(
                 itemImage = null,
                 mouseoverBackCol = Color(0x282828_ff),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = Color(0xd4d4d4_ff.toInt()),
-                backBlendMode = BlendMode.MULTIPLY,
+                backCol = Color(0x303030_58),
+                backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 inactiveTextCol = defaultTextColour
         )
