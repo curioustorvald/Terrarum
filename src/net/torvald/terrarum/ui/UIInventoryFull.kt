@@ -8,13 +8,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithPhysics
-import net.torvald.terrarum.gameactors.InventoryPair
+import net.torvald.terrarum.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
 import net.torvald.terrarum.gameactors.Pocketed
 import net.torvald.terrarum.gameactors.Second
-import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import java.util.ArrayList
 
 /**
  * Created by minjaesong on 2017-10-21.
@@ -71,7 +69,7 @@ class UIInventoryFull(
     val catSelectedIcon: Int
         get() = catBar.selectedIcon
 
-    override var openCloseTime: Second = 1f
+    override var openCloseTime: Second = 0.1f
 
 
     private val itemList: UIItemInventoryDynamicList? =
@@ -135,7 +133,13 @@ class UIInventoryFull(
     private val shapeRenderer = ShapeRenderer()
     private val gradHeight = 48f
 
+    private val weightBarWidth = 60f
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        val xEnd = (Terrarum.WIDTH + internalWidth).div(2).toFloat()
+        val yEnd = (Terrarum.HEIGHT + internalHeight).div(2).toFloat()
+
+
         // background fill
         batch.end()
         Gdx.gl.glEnable(GL20.GL_BLEND) // ending the batch disables blend
@@ -165,7 +169,41 @@ class UIInventoryFull(
         // control hints
         blendNormal(batch)
         batch.color = Color.WHITE
-        Terrarum.fontGame.draw(batch, listControlHelp, offsetX, offsetY + internalHeight + controlHelpHeight)
+        Terrarum.fontGame.draw(batch, listControlHelp, offsetX, offsetY + internalHeight)
+
+
+        // encumbrance meter
+        if (actor != null) {
+            val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
+
+            Terrarum.fontGame.draw(batch,
+                    encumbranceText,
+                    xEnd - 9 - Terrarum.fontGame.getWidth(encumbranceText) - weightBarWidth,
+                    yEnd
+            )
+
+            // encumbrance bar background
+            blendMul()
+            batch.color = Color(0xa0a0a0_ff.toInt())
+            batch.fillRect(
+                    xEnd - 3 - weightBarWidth,
+                    yEnd + 3f,
+                    weightBarWidth,
+                    controlHelpHeight - 6f
+            )
+            // encumbrance bar
+            blendNormal()
+            batch.color = if (isEncumbered) Color(0xff0000_cc.toInt()) else Color(0x00ff00_cc.toInt())
+            batch.fillRect(
+                    xEnd - 3 - weightBarWidth,
+                    yEnd + 3f,
+                    if (actor?.inventory?.capacityMode == CAPACITY_MODE_NO_ENCUMBER)
+                        1f
+                    else // make sure 1px is always be seen
+                        minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
+                    controlHelpHeight - 5f
+            )
+        }
     }
 
 
@@ -173,6 +211,11 @@ class UIInventoryFull(
     fun rebuildList() {
         itemList?.rebuild()
         equipped?.rebuild()
+
+        actor?.let {
+            encumbrancePerc = actor!!.inventory.capacity.toFloat() / actor!!.inventory.maxCapacity
+            isEncumbered = actor!!.inventory.isEncumbered
+        }
     }
 
     override fun dispose() {
