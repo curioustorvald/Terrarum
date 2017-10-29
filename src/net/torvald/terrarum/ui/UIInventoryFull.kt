@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameactors.InventoryPair
@@ -129,7 +130,33 @@ class UIInventoryFull(
         equipped?.update(delta)
     }
 
+    private val gradStartCol = Color(0x404040_60)
+    private val gradEndCol   = Color(0x000000_70)
+    private val shapeRenderer = ShapeRenderer()
+    private val gradHeight = 48f
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        // background fill
+        batch.end()
+        Gdx.gl.glEnable(GL20.GL_BLEND) // ending the batch disables blend
+
+        val gradTopStart = (Terrarum.HEIGHT - internalHeight).div(2).toFloat()
+        val gradBottomEnd = Terrarum.HEIGHT - gradTopStart
+
+        shapeRenderer.inUse {
+            shapeRenderer.rect(0f, gradTopStart, Terrarum.WIDTH.toFloat(), gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+            shapeRenderer.rect(0f, gradBottomEnd, Terrarum.WIDTH.toFloat(), -gradHeight, gradStartCol, gradStartCol, gradEndCol, gradEndCol)
+
+            shapeRenderer.rect(0f, gradTopStart + gradHeight, Terrarum.WIDTH.toFloat(), internalHeight - (2 * gradHeight), gradEndCol, gradEndCol, gradEndCol, gradEndCol)
+
+            shapeRenderer.rect(0f, 0f, Terrarum.WIDTH.toFloat(), gradTopStart, gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+            shapeRenderer.rect(0f, Terrarum.HEIGHT.toFloat(), Terrarum.WIDTH.toFloat(), -(Terrarum.HEIGHT.toFloat() - gradBottomEnd), gradStartCol, gradStartCol, gradStartCol, gradStartCol)
+        }
+
+
+        batch.begin()
+
+        // UI items
         catBar.render(batch, camera)
         itemList?.render(batch, camera)
         equipped?.render(batch, camera)

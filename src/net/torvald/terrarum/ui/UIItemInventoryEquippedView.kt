@@ -38,7 +38,7 @@ class UIItemInventoryEquippedView(
     lateinit var inventorySortList: Array<GameItem?>
     private var rebuildList = true
     
-    val spriteViewBackCol = Color(0xd4d4d4_ff.toInt())
+    val spriteViewBackCol: Color; get() = Color(0x303030_58.toInt())//Color(0xd4d4d4_ff.toInt())
 
     private val itemGrid = Array<UIItemInventoryCellBase>(
             2 * 5, {
@@ -51,8 +51,8 @@ class UIItemInventoryEquippedView(
                 itemImage = null,
                 mouseoverBackCol = Color(0x282828_ff),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = Color(0xd4d4d4_ff.toInt()),
-                backBlendMode = BlendMode.MULTIPLY,
+                backCol = Color(0x303030_58),
+                backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true
         )
     }
@@ -65,6 +65,7 @@ class UIItemInventoryEquippedView(
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         // sprite background
+        blendNormal()
         batch.color = spriteViewBackCol
         batch.fillRect(
                 posX.toFloat(), posY.toFloat(),
@@ -94,8 +95,7 @@ class UIItemInventoryEquippedView(
         
         rebuildList = false
 
-        // TODO sort if needed
-
+        // sort by equip position
 
         // fill the grid from fastest index, make no gap in-between of slots
         var listPushCnt = 0
