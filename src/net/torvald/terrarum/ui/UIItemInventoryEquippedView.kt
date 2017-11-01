@@ -38,7 +38,7 @@ class UIItemInventoryEquippedView(
     lateinit var inventorySortList: Array<GameItem?>
     private var rebuildList = true
     
-    val spriteViewBackCol: Color; get() = Color(0x303030_58.toInt())//Color(0xd4d4d4_ff.toInt())
+    val spriteViewBackCol: Color; get() = Color(0x404040_88.toInt())//Color(0xd4d4d4_ff.toInt())
 
     private val itemGrid = Array<UIItemInventoryCellBase>(
             2 * 5, {
@@ -51,7 +51,7 @@ class UIItemInventoryEquippedView(
                 itemImage = null,
                 mouseoverBackCol = Color(0x282828_ff),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = Color(0x303030_58),
+                backCol = Color(0x404040_88),
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true
         )
