@@ -82,7 +82,7 @@ class UIItemInventoryDynamicList(
                 itemImage = null,
                 mouseoverBackCol = Color(0x282828_ff),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = Color(0x303030_58),
+                backCol = Color(0x404040_88),
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 inactiveTextCol = defaultTextColour
@@ -98,7 +98,7 @@ class UIItemInventoryDynamicList(
                 itemImage = null,
                 mouseoverBackCol = Color(0x282828_ff),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = Color(0x303030_58),
+                backCol = Color(0x404040_88),
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 inactiveTextCol = defaultTextColour
