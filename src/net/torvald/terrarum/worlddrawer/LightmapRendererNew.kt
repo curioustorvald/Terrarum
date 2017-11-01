@@ -674,10 +674,13 @@ object LightmapRenderer {
             // excluiding overscans; only reckon echo lights
             for (y in overscan_open..render_height + overscan_open + 1) {
                 for (x in overscan_open..render_width + overscan_open + 1) {
-                    val colour = lightmap[y][x]
-                    reds  [minOf(CHANNEL_MAX, colour.r.times(MUL).floorInt())] += 1
-                    greens[minOf(CHANNEL_MAX, colour.g.times(MUL).floorInt())] += 1
-                    blues [minOf(CHANNEL_MAX, colour.b.times(MUL).floorInt())] += 1
+                    try {
+                        val colour = lightmap[y][x]
+                        reds[minOf(CHANNEL_MAX, colour.r.times(MUL).floorInt())] += 1
+                        greens[minOf(CHANNEL_MAX, colour.g.times(MUL).floorInt())] += 1
+                        blues[minOf(CHANNEL_MAX, colour.b.times(MUL).floorInt())] += 1
+                    }
+                    catch (e: ArrayIndexOutOfBoundsException) { }
                 }
             }
             return Histogram(reds, greens, blues)
