@@ -369,7 +369,10 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         if (loadDone) {
             // resize UI by re-creating it (!!)
             uiMenu.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
-            uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
+            //uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
+            uiMenu.setPosition(0, 0) // shitty hack. Could be:
+            // 1: Init code and resize code are different
+            // 2: The UI is coded shit
         }
 
         if (lightmapInitialised) {
