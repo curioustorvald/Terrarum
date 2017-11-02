@@ -84,6 +84,13 @@ object DefaultConfig {
 
         jsonObject.addProperty("useamericanunit", false) // Metric Masterrace -- Filthy imperials.
 
+
+        // "fancy" graphics settings
+        jsonObject.addProperty("fxdither", true)
+        jsonObject.addProperty("fx3dlut", false)
+
+
+
         return jsonObject
     }
 }

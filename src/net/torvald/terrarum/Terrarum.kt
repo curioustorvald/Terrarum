@@ -236,7 +236,7 @@ object Terrarum : Screen {
 
     lateinit var shaderBlur: ShaderProgram
     lateinit var shaderBayer: ShaderProgram
-    lateinit var shaderBayerSkyboxFill: ShaderProgram
+    lateinit var shaderSkyboxFill: ShaderProgram
     lateinit var shaderBlendGlow: ShaderProgram
     lateinit var shaderRGBOnly: ShaderProgram
     lateinit var shaderAtoGrey: ShaderProgram
@@ -384,14 +384,27 @@ object Terrarum : Screen {
         ShaderProgram.pedantic = false
         shaderBlur = ShaderProgram(Gdx.files.internal("assets/blur.vert"), Gdx.files.internal("assets/blur.frag"))
 
-        shaderBayer = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer.frag"))
-        shaderBayer.begin()
-        shaderBayer.setUniformf("rcount", 16f)
-        shaderBayer.setUniformf("gcount", 16f)
-        shaderBayer.setUniformf("bcount", 16f)
-        shaderBayer.end()
 
-        shaderBayerSkyboxFill = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"))
+        if (getConfigBoolean("fxdither")) {
+            shaderBayer = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer.frag"))
+            shaderBayer.begin()
+            shaderBayer.setUniformf("rcount", 64f)
+            shaderBayer.setUniformf("gcount", 64f)
+            shaderBayer.setUniformf("bcount", 64f)
+            shaderBayer.end()
+
+            shaderSkyboxFill = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"))
+            shaderSkyboxFill.begin()
+            shaderSkyboxFill.setUniformf("rcount", 64f)
+            shaderSkyboxFill.setUniformf("gcount", 64f)
+            shaderSkyboxFill.setUniformf("bcount", 64f)
+            shaderSkyboxFill.end()
+        }
+        else {
+            shaderBayer = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/passthru.frag"))
+            shaderSkyboxFill = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/skyboxfill.frag"))
+        }
+
 
         shaderBlendGlow = ShaderProgram(Gdx.files.internal("assets/blendGlow.vert"), Gdx.files.internal("assets/blendGlow.frag"))
 
@@ -405,14 +418,16 @@ object Terrarum : Screen {
         }
 
 
-        if (!shaderBayer.isCompiled) {
-            Gdx.app.log("shaderBayer", shaderBayer.log)
-            System.exit(1)
-        }
+        if (getConfigBoolean("fxdither")) {
+            if (!shaderBayer.isCompiled) {
+                Gdx.app.log("shaderBayer", shaderBayer.log)
+                System.exit(1)
+            }
 
-        if (!shaderBayerSkyboxFill.isCompiled) {
-            Gdx.app.log("shaderBayerSkyboxFill", shaderBayerSkyboxFill.log)
-            System.exit(1)
+            if (!shaderSkyboxFill.isCompiled) {
+                Gdx.app.log("shaderSkyboxFill", shaderSkyboxFill.log)
+                System.exit(1)
+            }
         }
 
 
@@ -479,7 +494,7 @@ object Terrarum : Screen {
 
 
         shaderBayer.dispose()
-        shaderBayerSkyboxFill.dispose()
+        shaderSkyboxFill.dispose()
         shaderBlur.dispose()
         shaderBlendGlow.dispose()
 
