@@ -131,14 +131,14 @@ object WeatherMixer {
 
         //Terrarum.textureWhiteSquare.bind(0)
 
-        Terrarum.shaderBayerSkyboxFill.begin()
-        Terrarum.shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
-        Terrarum.shaderBayerSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
-        Terrarum.shaderBayerSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
-        Terrarum.shaderBayerSkyboxFill.setUniformf("parallax", parallax)
-        Terrarum.shaderBayerSkyboxFill.setUniformf("parallax_size", 1f/3f)
-        Terrarum.fullscreenQuad.render(Terrarum.shaderBayerSkyboxFill, GL20.GL_TRIANGLES)
-        Terrarum.shaderBayerSkyboxFill.end()
+        Terrarum.shaderSkyboxFill.begin()
+        Terrarum.shaderSkyboxFill.setUniformMatrix("u_projTrans", camera.combined)
+        Terrarum.shaderSkyboxFill.setUniformf("topColor", topCol.r, topCol.g, topCol.b)
+        Terrarum.shaderSkyboxFill.setUniformf("bottomColor", bottomCol.r, bottomCol.g, bottomCol.b)
+        Terrarum.shaderSkyboxFill.setUniformf("parallax", parallax)
+        Terrarum.shaderSkyboxFill.setUniformf("parallax_size", 1f/3f)
+        Terrarum.fullscreenQuad.render(Terrarum.shaderSkyboxFill, GL20.GL_TRIANGLES)
+        Terrarum.shaderSkyboxFill.end()
 
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me

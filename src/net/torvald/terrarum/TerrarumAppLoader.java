@@ -8,6 +8,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
@@ -97,6 +98,8 @@ public class TerrarumAppLoader implements ApplicationListener {
     private float loadTimer = 0f;
     private final float showupTime = 50f / 1000f;
 
+    private FrameBuffer renderFBO;
+
     @Override
     public void create() {
         batch = new SpriteBatch();
@@ -135,6 +138,11 @@ public class TerrarumAppLoader implements ApplicationListener {
 
     @Override
     public void render() {
+        renderFBO.begin();
+
+        Gdx.gl.glClearColor(0f,0f,0f,0f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         if (screen == null) {
             shaderBayerSkyboxFill.begin();
             shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined);
@@ -169,6 +177,10 @@ public class TerrarumAppLoader implements ApplicationListener {
         else {
             screen.render(Gdx.graphics.getDeltaTime());
         }
+        renderFBO.end();
+
+
+        PostProcessor.INSTANCE.draw(renderFBO);
 
 
         GLOBAL_RENDER_TIMER += 1;
@@ -180,6 +192,19 @@ public class TerrarumAppLoader implements ApplicationListener {
 
         Terrarum.INSTANCE.resize(width, height);
         if (screen != null) screen.resize(width, height);
+
+
+        if (renderFBO == null ||
+                (renderFBO.getWidth() != Terrarum.INSTANCE.getWIDTH() ||
+                renderFBO.getHeight() != Terrarum.INSTANCE.getHEIGHT())
+                ) {
+            renderFBO = new FrameBuffer(
+                    Pixmap.Format.RGBA8888,
+                    Terrarum.INSTANCE.getWIDTH(),
+                    Terrarum.INSTANCE.getHEIGHT(),
+                    false
+            );
+        }
 
         System.out.println("[AppLoader] Resize event");
     }
