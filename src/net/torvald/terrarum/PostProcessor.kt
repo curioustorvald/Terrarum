@@ -2,12 +2,19 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 
 object PostProcessor {
 
     private val batch = SpriteBatch()
+
+    private lateinit var lutTex: Texture
+
+    fun reloadLUT(filename: String) {
+        lutTex = Texture(Gdx.files.internal("assets/clut/$filename"))
+    }
 
     fun draw(screenTexHolder: FrameBuffer) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 1f)
