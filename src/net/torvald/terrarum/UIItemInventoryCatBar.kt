@@ -9,38 +9,38 @@ import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.gameactors.floorInt
 import net.torvald.terrarum.gameactors.roundInt
 import net.torvald.terrarum.ui.*
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2017-10-20.
  */
 class UIItemInventoryCatBar(
-        parentUI: UICanvas,
+        parentUI: UIInventoryFull,
         override var posX: Int,
         override var posY: Int,
         override val width: Int
 ) : UIItem(parentUI) {
 
-    private val catIcons = (parentUI as UIInventoryFull).catIcons
-    private val catArrangement = (parentUI as UIInventoryFull).catArrangement
+    private val catIcons = parentUI.catIcons
+    private val catArrangement = parentUI.catArrangement
 
 
     private val inventoryUI = parentUI
     override val height = catIcons.tileH + 5
     
 
-    private val buttons: Array<UIItemImageButton>
+    private val mainButtons: Array<UIItemImageButton>
     private val buttonGapSize = (width.toFloat() - (catArrangement.size * catIcons.tileW)) / (catArrangement.size)
     var selectedIndex = 0 // default to ALL
         private set
     val selectedIcon: Int
         get() = catArrangement[selectedIndex]
-    private val catSelectionOld = 0 // default to ALL
 
-    // set up buttons
+    private val sideButtons: Array<UIItemImageButton>
+
+    // set up all the buttons
     init {
         // place sub UIs: Image Buttons
-        buttons = Array(catArrangement.size, { index ->
+        mainButtons = Array(catArrangement.size, { index ->
             val iconPosX = ((buttonGapSize / 2) + index * (catIcons.tileW + buttonGapSize)).roundInt()
             val iconPosY = 0
 
@@ -54,14 +54,46 @@ class UIItemInventoryCatBar(
                     highlightable = true
             )
         })
+
+
+        // side buttons
+        // NOTE: < > arrows must "highlightable = false"; "true" otherwise
+        //  determine gaps: hacky way exploiting that we already know the catbar is always at the c of the ui
+        val relativeStartX = posX - (parentUI.internalWidth - width) / 2
+        val sideButtonsGap = (((parentUI.internalWidth - width) / 2) - 2f * catIcons.tileW) / 3f
+        val iconIndex = arrayOf(12, 16, 17, 13)
+
+
+        println(relativeStartX)
+        println(posX)
+
+        sideButtons = Array(iconIndex.size, { index ->
+            val iconPosX = if (index < 2)
+                (relativeStartX + sideButtonsGap + (sideButtonsGap + catIcons.tileW) * index).roundInt()
+            else
+                (relativeStartX + width + 2 * sideButtonsGap + (sideButtonsGap + catIcons.tileW) * index).roundInt()
+            val iconPosY = 0
+
+            UIItemImageButton(
+                    inventoryUI,
+                    catIcons.get(iconIndex[index], 0),
+                    activeBackCol = Color(0),
+                    activeBackBlendMode = BlendMode.NORMAL,
+                    posX = iconPosX,
+                    posY = posY + iconPosY,
+                    buttonCol = if (index == 0 || index == 3) Color.WHITE else Color(0xffffff7f.toInt()),
+                    activeCol = if (index == 0 || index == 3) Color(0xfff066_ff.toInt()) else Color(0xffffff7f.toInt()),
+                    highlightable = (index == 0 || index == 3)
+            )
+        })
     }
 
 
     private val underlineIndTex: Texture
     private val underlineColour = Color(0xeaeaea_40.toInt())
-    private val underlineHighlightColour = buttons[0].highlightCol
+    private val underlineHighlightColour = mainButtons[0].highlightCol
 
-    private var highlighterXPos = buttons[selectedIndex].posX.toDouble()
+    private var highlighterXPos = mainButtons[selectedIndex].posX.toDouble()
     private var highlighterXStart = highlighterXPos
     private var highlighterXEnd = highlighterXPos
 
@@ -87,7 +119,7 @@ class UIItemInventoryCatBar(
         pixmap.dispose()
 
 
-        buttons[selectedIndex].highlighted = true
+        mainButtons[selectedIndex].highlighted = true
     }
 
 
@@ -117,23 +149,26 @@ class UIItemInventoryCatBar(
         }
 
 
-        buttons.forEachIndexed { index, btn ->
+        mainButtons.forEachIndexed { index, btn ->
             btn.update(delta)
 
 
             if (btn.mousePushed && index != selectedIndex) {
                 val oldIndex = selectedIndex
 
-                highlighterXStart = buttons[selectedIndex].posX.toDouble() // using old selectedIndex
+                highlighterXStart = mainButtons[selectedIndex].posX.toDouble() // using old selectedIndex
                 selectedIndex = index
                 highlighterMoving = true
-                highlighterXEnd = buttons[selectedIndex].posX.toDouble() // using new selectedIndex
+                highlighterXEnd = mainButtons[selectedIndex].posX.toDouble() // using new selectedIndex
 
                 selectionChangeListener?.invoke(oldIndex, index)
             }
             btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
 
         }
+
+        sideButtons[0].update(delta)
+        sideButtons[3].update(delta)
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -141,7 +176,8 @@ class UIItemInventoryCatBar(
 
         // button
         // colour determined by UI items themselves
-        buttons.forEach { it.render(batch, camera) }
+        mainButtons.forEach { it.render(batch, camera) }
+        sideButtons.forEach { it.render(batch, camera) }
 
 
         blendNormal(batch)
@@ -162,5 +198,7 @@ class UIItemInventoryCatBar(
     override fun dispose() {
         underlineIndTex.dispose()
         catIcons.dispose()
+        mainButtons.forEach { it.dispose() }
+        sideButtons.forEach { it.dispose() }
     }
 }
