@@ -1,0 +1,67 @@
+{
+  "displayfps": 0,
+  "usevsync": true,
+
+  "imtooyoungtodie": false,
+  "language": "enUS",
+  "notificationshowuptime": 6500,
+  "multithread": true,
+
+
+  "joypadkeyn": 4,
+  "joypadkeyw": 1,
+  "joypadkeys": 2,
+  "joypadkeye": 3,
+
+  "joypadlup": 4,
+  "joypadrup": 5,
+  "joypadldown": 6,
+  "joypadrdown": 7,
+
+  "joypadlstickx": 0,
+  "joypadlsticky": 1,
+  "joypadrstickx": 2,
+  "joypadrsticky": 3,
+
+  "joypadlabelstyle": "msxb360",
+
+
+  "keyup": 33,
+  "keyleft": 47,
+  "keydown": 32,
+  "keyright": 34,
+
+  "keymovementaux": 29,
+  "keyinventory": 45,
+  "keyinteract": 46,
+  "keyclose": 31,
+
+  "keygamemenu": 61,
+  "keyquicksel": 59,
+
+  "keyquickselalt": [4, 129, 73],
+
+  "keyjump": 62,
+
+  "keyquickbars": [145, 146, 147, 148, 149, 150, 151, 152, 153, 144],
+
+  "mouseprimary": 0,
+  "mousesecondary": 1,
+
+
+  "pcgamepadenv": "console",
+
+  "safetywarning": true,
+
+
+  "maxparticles": 768,
+
+
+  "fullframelightupdate": false,
+
+  "useamericanunit": false,
+
+
+  "fxdither": true,
+  "fx3dlut": false
+}
