@@ -106,15 +106,58 @@ class UIItemInventoryDynamicList(
     }
     )
 
-    private val items: Array<UIItemInventoryCellBase>
-            get() = if (catArrangement[selection] in compactViewCat) itemGrid else itemList
+    private var items: Array<UIItemInventoryCellBase>
+            = if (catArrangement[selection] in compactViewCat) itemGrid else itemList // this is INIT code
 
+    var isCompactView = (catArrangement[selection] in compactViewCat) // this is INIT code
+        set(value) {
+            items = if (value) itemGrid else itemList
+
+            rebuild()
+
+            field = value
+        }
+
+    private val gridModeButtons = Array<UIItemImageButton>(2, { index ->
+        val iconPosX = posX - 12 - parentUI.catIcons.tileW + 2
+        val iconPosY = posY - 2 + (4 + UIItemInventoryElem.height - parentUI.catIcons.tileH) * index
+
+        UIItemImageButton(
+                parentUI,
+                parentUI.catIcons.get(index + 14, 0),
+                activeBackCol = Color(0),
+                activeBackBlendMode = BlendMode.NORMAL,
+                posX = iconPosX,
+                posY = iconPosY,
+                highlightable = true
+        )
+    })
+
+    init {
+        // initially highlight grid mode buttons
+        gridModeButtons[if (isCompactView) 1 else 0].highlighted = true
+
+
+        gridModeButtons[0].touchDownListener = { _, _, _, _ ->
+            isCompactView = false
+            gridModeButtons[0].highlighted = true
+            gridModeButtons[1].highlighted = false
+        }
+        gridModeButtons[1].touchDownListener = { _, _, _, _ ->
+            isCompactView = true
+            gridModeButtons[0].highlighted = false
+            gridModeButtons[1].highlighted = true
+        }
+
+        // if (is.mouseUp) handled by this.touchDown()
+    }
 
 
     override fun render(batch: SpriteBatch, camera: Camera) {
 
         items.forEach { it.render(batch, camera) }
 
+        gridModeButtons.forEach { it.render(batch, camera) }
 
         super.render(batch, camera)
     }
@@ -124,6 +167,8 @@ class UIItemInventoryDynamicList(
         super.update(delta)
 
         items.forEach { it.update(delta) }
+
+        gridModeButtons.forEach { it.update(delta) }
     }
 
 
@@ -190,12 +235,14 @@ class UIItemInventoryDynamicList(
     override fun dispose() {
         itemList.forEach { it.dispose() }
         itemGrid.forEach { it.dispose() }
+        gridModeButtons.forEach { it.dispose() }
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         super.touchDown(screenX, screenY, pointer, button)
 
         items.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
+        gridModeButtons.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
         return true
     }
 

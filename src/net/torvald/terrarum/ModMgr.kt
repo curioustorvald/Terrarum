@@ -7,6 +7,7 @@ import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.utils.JsonFetcher
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import java.io.File
@@ -35,6 +36,8 @@ object ModMgr {
     val groovyEngine = ScriptEngineManager().getEngineByExtension("groovy")!!
     val groovyInvocable = groovyEngine as Invocable
 
+    val metaFilename = "metadata.properties"
+    val defaultConfigFilename = "default.json"
 
     data class ModuleMetadata(
             val order: Int,
@@ -74,7 +77,16 @@ object ModMgr {
 
             try {
                 val modMetadata = Properties()
-                modMetadata.load(FileInputStream("$modDir/$moduleName/metadata.properties"))
+                modMetadata.load(FileInputStream("$modDir/$moduleName/$metaFilename"))
+
+                if (File("$modDir/$moduleName/$defaultConfigFilename").exists()) {
+                    val defaultConfig = JsonFetcher("$modDir/$moduleName/$defaultConfigFilename")
+                    // read config and store it to the game
+
+                    // write to user's config file
+                }
+
+
 
                 val properName = modMetadata.getProperty("propername")
                 val description = modMetadata.getProperty("description")
