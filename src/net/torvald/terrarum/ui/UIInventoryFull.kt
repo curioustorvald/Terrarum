@@ -69,7 +69,7 @@ class UIInventoryFull(
     val catSelectedIcon: Int
         get() = catBar.selectedIcon
 
-    override var openCloseTime: Second = 0.1f
+    override var openCloseTime: Second = 0.0f
 
 
     private val itemList: UIItemInventoryDynamicList? =
@@ -227,15 +227,18 @@ class UIInventoryFull(
 
 
     override fun doOpening(delta: Float) {
+        Terrarum.ingame?.setTooltipMessage(null)
     }
 
     override fun doClosing(delta: Float) {
+        Terrarum.ingame?.setTooltipMessage(null)
     }
 
     override fun endOpening(delta: Float) {
     }
 
     override fun endClosing(delta: Float) {
+        Terrarum.ingame?.setTooltipMessage(null) // required!!
     }
 
 

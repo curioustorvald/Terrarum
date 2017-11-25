@@ -23,6 +23,7 @@ object CIEXYZUtil {
         return xyz.toColor()
     }
 
+    @Deprecated("Use one in CIELAB or CIELUV; CIEXYZ is not perceptually uniform")
     fun getGradient(scale: Float, fromCol: Color, toCol: Color): Color {
         val from = fromCol.toXYZ()
         val to = toCol.toXYZ()
