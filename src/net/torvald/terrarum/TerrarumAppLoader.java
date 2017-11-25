@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -33,7 +34,37 @@ public class TerrarumAppLoader implements ApplicationListener {
 
     public static final String GAME_NAME = "Terrarum";
     public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2017 Torvald (minjaesong)";
-    public static final String GAME_LOCALE = System.getProperty("user.language") + System.getProperty("user.country");
+    public static String GAME_LOCALE = System.getProperty("user.language") + System.getProperty("user.country");
+
+    private static final String[] localeSimple = {"de", "en", "es", "it"}; // must be sorted!!
+
+    public static String getSysLang() {
+        String lan = System.getProperty("user.language");
+        String country = System.getProperty("user.country");
+        return lan + country;
+    }
+
+    public static void setGAME_LOCALE(String value) {
+        if (value.isEmpty() || value.equals("")) {
+            GAME_LOCALE = getSysLang();
+        }
+        else {
+            try {
+                if (Arrays.binarySearch(localeSimple, value.substring(0, 2)) >= 0) {
+                    GAME_LOCALE = value.substring(0, 2);
+                }
+                else {
+                    GAME_LOCALE = value;
+                }
+            }
+            catch (StringIndexOutOfBoundsException e) {
+                GAME_LOCALE = value;
+            }
+        }
+
+
+        fontGame.reload(value);
+    }
 
 
     /**
