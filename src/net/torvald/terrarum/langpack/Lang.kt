@@ -129,7 +129,7 @@ object Lang {
     fun pluralise(word: String, count: Int): String {
         if (count < 2) return word
 
-        when (Terrarum.gameLocale) {
+        when (TerrarumAppLoader.GAME_LOCALE) {
             "fr" -> {
                 if (Arrays.binarySearch(FRENCH_WORD_NORMAL_PLURAL, word) >= 0) {
                     return word + "s"
