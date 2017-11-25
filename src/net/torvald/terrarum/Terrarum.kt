@@ -113,13 +113,6 @@ object Terrarum : Screen {
 
 
 
-    val sysLang: String
-        get() {
-            val lan = System.getProperty("user.language")
-            val country = System.getProperty("user.country")
-            return lan + country
-        }
-
     var previousScreen: Screen? = null // to be used with temporary states like StateMonitorCheck
 
 
@@ -145,27 +138,6 @@ object Terrarum : Screen {
     var environment: RunningEnvironment
         private set
 
-    private val localeSimple = arrayOf("de", "en", "es", "it")
-    var gameLocale = "lateinit" // TODO move into AppLoader
-        set(value) {
-            if (value.isBlank() || value.isEmpty()) {
-                field = sysLang
-            }
-            else {
-                try {
-                    if (localeSimple.contains(value.substring(0..1)))
-                        field = value.substring(0..1)
-                    else
-                        field = value
-                }
-                catch (e: StringIndexOutOfBoundsException) {
-                    field = value
-                }
-            }
-
-
-            fontGame.reload(value)
-        }
 
 
 
@@ -434,12 +406,12 @@ object Terrarum : Screen {
 
 
 
-        gameLocale = getConfigString("language")
-        println("[Terrarum] locale = $gameLocale")
+        TerrarumAppLoader.GAME_LOCALE = getConfigString("language")
+        println("[Terrarum] locale = ${TerrarumAppLoader.GAME_LOCALE}")
 
 
 
-        ModMgr // invoke Module Manager, will also invoke BlockCodex
+        ModMgr // invoke Module Manager, which will also invoke BlockCodex
         ItemCodex // invoke Item Codex
 
 

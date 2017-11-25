@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.TerrarumAppLoader
 import net.torvald.terrarum.gameactors.Second
 import net.torvald.terrarum.langpack.Lang
 
@@ -70,7 +71,7 @@ class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
 
         // attach listeners
         textArea.selectionChangeListener = { _, newSelectionIndex ->
-            Terrarum.gameLocale = localeList[newSelectionIndex]
+            TerrarumAppLoader.GAME_LOCALE = localeList[newSelectionIndex]
         }
 
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_RETURN")].clickOnceListener = { _, _, _ ->

@@ -18,7 +18,7 @@ object DefaultConfig {
 
 
         jsonObject.addProperty("imtooyoungtodie", false) // no perma-death
-        jsonObject.addProperty("language", Terrarum.sysLang)
+        jsonObject.addProperty("language", TerrarumAppLoader.getSysLang())
         jsonObject.addProperty("notificationshowuptime", 6500)
         jsonObject.addProperty("multithread", true) // experimental!
 
