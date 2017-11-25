@@ -136,7 +136,7 @@ object Terrarum : Screen {
         private set
 
     val memInUse: Long
-        get() = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) shr 20
+        get() = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() + Gdx.app.nativeHeap) shr 20
     val memTotal: Long
         get() = Runtime.getRuntime().totalMemory() shr 20
     val memXmx: Long
@@ -713,12 +713,16 @@ object Terrarum : Screen {
             return file // TODO TEST CODE
         }
 
+    /** Position of the cursor in the world */
     inline val mouseX: Double
         get() = WorldCamera.x + Gdx.input.x / (ingame?.screenZoom ?: 1f).toDouble()
+    /** Position of the cursor in the world */
     inline val mouseY: Double
         get() = WorldCamera.y + Gdx.input.y / (ingame?.screenZoom ?: 1f).toDouble()
+    /** Position of the cursor in the world */
     @JvmStatic inline val mouseTileX: Int
         get() = (mouseX / FeaturesDrawer.TILE_SIZE).floorInt()
+    /** Position of the cursor in the world */
     @JvmStatic inline val mouseTileY: Int
         get() = (mouseY / FeaturesDrawer.TILE_SIZE).floorInt()
     inline val mouseScreenX: Int

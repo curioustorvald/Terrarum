@@ -7,7 +7,6 @@ import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.UIItemInventoryElem
 import net.torvald.terrarum.UIItemInventoryElemSimple
-import net.torvald.terrarum.console.Inventory
 import net.torvald.terrarum.gameactors.ActorInventory
 import net.torvald.terrarum.gameactors.InventoryPair
 import net.torvald.terrarum.itemproperties.GameItem
@@ -109,7 +108,7 @@ class UIItemInventoryDynamicList(
     private var items: Array<UIItemInventoryCellBase>
             = if (catArrangement[selection] in compactViewCat) itemGrid else itemList // this is INIT code
 
-    var isCompactView = (catArrangement[selection] in compactViewCat) // this is INIT code
+    var isCompactMode = (catArrangement[selection] in compactViewCat) // this is INIT code
         set(value) {
             items = if (value) itemGrid else itemList
 
@@ -118,6 +117,7 @@ class UIItemInventoryDynamicList(
             field = value
         }
 
+    /** Long/compact mode buttons */
     private val gridModeButtons = Array<UIItemImageButton>(2, { index ->
         val iconPosX = posX - 12 - parentUI.catIcons.tileW + 2
         val iconPosY = posY - 2 + (4 + UIItemInventoryElem.height - parentUI.catIcons.tileH) * index
@@ -135,16 +135,16 @@ class UIItemInventoryDynamicList(
 
     init {
         // initially highlight grid mode buttons
-        gridModeButtons[if (isCompactView) 1 else 0].highlighted = true
+        gridModeButtons[if (isCompactMode) 1 else 0].highlighted = true
 
 
         gridModeButtons[0].touchDownListener = { _, _, _, _ ->
-            isCompactView = false
+            isCompactMode = false
             gridModeButtons[0].highlighted = true
             gridModeButtons[1].highlighted = false
         }
         gridModeButtons[1].touchDownListener = { _, _, _, _ ->
-            isCompactView = true
+            isCompactMode = true
             gridModeButtons[0].highlighted = false
             gridModeButtons[1].highlighted = true
         }
@@ -166,7 +166,26 @@ class UIItemInventoryDynamicList(
     override fun update(delta: Float) {
         super.update(delta)
 
-        items.forEach { it.update(delta) }
+        var tooltipSet = false
+
+
+
+        items.forEach {
+            it.update(delta)
+
+
+            // set tooltip accordingly
+            if (isCompactMode && it.mouseUp && !tooltipSet) {
+                Terrarum.ingame?.setTooltipMessage(it.item?.name)
+                tooltipSet = true
+            }
+        }
+
+        if (!tooltipSet) {
+            Terrarum.ingame?.setTooltipMessage(null)
+        }
+
+
 
         gridModeButtons.forEach { it.update(delta) }
     }
