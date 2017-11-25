@@ -122,9 +122,10 @@ class Ingame(val batch: SpriteBatch) : Screen {
     lateinit var uiVitalSecondary: UICanvas
     lateinit var uiVitalItem: UICanvas // itemcount/durability of held block or active ammo of held gun. As for the block, max value is 500.
 
-    lateinit var uiWatchBasic: UICanvas
-    lateinit var uiWatchTierOne: UICanvas
+    private lateinit var uiWatchBasic: UICanvas
+    private lateinit var uiWatchTierOne: UICanvas
 
+    private lateinit var uiTooltip: UITooltip
 
     // UI aliases
     lateinit var uiAliases: ArrayList<UICanvas>
@@ -357,6 +358,9 @@ class Ingame(val batch: SpriteBatch) : Screen {
         uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.width, uiWatchBasic.height - 2)
 
 
+        uiTooltip = UITooltip()
+
+
         // batch-process uiAliases
         uiAliases = arrayListOf(
                 // drawn first
@@ -367,7 +371,8 @@ class Ingame(val batch: SpriteBatch) : Screen {
                 uiPieMenu,
                 uiQuickBar,
                 uiWatchBasic,
-                uiWatchTierOne
+                uiWatchTierOne,
+                uiTooltip
                 // drawn last
         )
         uiAlasesPausing = arrayListOf(
@@ -382,6 +387,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
         ingameUpdateThread = ThreadIngameUpdate(this)
         updateThreadWrapper = Thread(ingameUpdateThread, "Terrarum UpdateThread")
+
 
 
         LightmapRenderer.fireRecalculateEvent()
@@ -1385,6 +1391,18 @@ class Ingame(val batch: SpriteBatch) : Screen {
         }
         finally {
             lock.unlock()
+        }
+    }
+
+    fun setTooltipMessage(message: String?) {
+        if (message == null) {
+            uiTooltip.setAsClose()
+        }
+        else {
+            if (uiTooltip.isClosed || uiTooltip.isClosing) {
+                uiTooltip.setAsOpen()
+            }
+            uiTooltip.message = message
         }
     }
 
