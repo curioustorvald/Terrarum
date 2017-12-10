@@ -38,8 +38,8 @@ class UITooltip : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        val mouseX = Terrarum.mouseScreenX.toFloat()
-        val mouseY = Terrarum.mouseScreenY.toFloat()
+        val mouseX = Terrarum.mouseScreenX.toFloat() + 4
+        val mouseY = Terrarum.mouseScreenY.toFloat() - 6
 
         val tooltipY = mouseY - textures.tileH
 
