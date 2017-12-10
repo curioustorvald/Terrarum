@@ -53,6 +53,7 @@ object CommandDict {
             "musictest" to MusicTest,
             "spawntapestry" to SpawnTapestry,
             "imtest" to JavaIMTest,
+            "cheatmotherfuckernootnoot" to CheatWarnTest,
 
 
             /* !! */"exportlayer" to ExportLayerData,
