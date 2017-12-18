@@ -7,7 +7,7 @@ import net.torvald.terrarum.ModMgr
 /**
  * Created by minjaesong on 2017-01-20.
  */
-class ParticleTestRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOrder.BEHIND, 6f) {
+class ParticleTestRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOrder.BEHIND, true, 6f) {
 
     init {
         body = TextureRegion(Texture(ModMgr.getGdxFile("basegame", "weathers/raindrop.tga")))

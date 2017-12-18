@@ -493,6 +493,27 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         }
     }*/
 
+    fun getDrag(externalForce: Vector2): Vector2 {
+        /**
+         * weight; gravitational force in action
+         * W = mass * G (9.8 [m/s^2])
+         */
+        val W: Vector2 = gravitation * Terrarum.TARGET_FPS.toDouble()
+        /**
+         * Area
+         */
+        val A: Double = (scale * baseHitboxW / METER) * (scale * baseHitboxW / METER)
+        /**
+         * Drag of atmosphere
+         * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity sqr) * A (area)
+         */
+        val D: Vector2 = Vector2(externalForce.x.magnSqr(), externalForce.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
+
+        val V: Vector2 = (W - D) / Terrarum.TARGET_FPS.toDouble() * SI_TO_GAME_ACC
+
+        return V
+    }
+
     /**
      * Apply gravitation to the every falling body (unless not levitating)
      *
@@ -502,24 +523,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
 
         if (!isNoSubjectToGrav && !(gravitation.y > 0 && walledBottom || gravitation.y < 0 && walledTop)) {
             //if (!isWalled(hitbox, COLLIDING_BOTTOM)) {
-            /**
-             * weight; gravitational force in action
-             * W = mass * G (9.8 [m/s^2])
-             */
-            val W: Vector2 = gravitation * Terrarum.TARGET_FPS.toDouble()
-            /**
-             * Area
-             */
-            val A: Double = (scale * baseHitboxW / METER) * (scale * baseHitboxW / METER)
-            /**
-             * Drag of atmosphere
-             * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity sqr) * A (area)
-             */
-            val D: Vector2 = Vector2(externalForce.x.magnSqr(), externalForce.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
-
-            val V: Vector2 = (W - D) / Terrarum.TARGET_FPS.toDouble() * SI_TO_GAME_ACC
-
-            applyForce(V)
+            applyForce(getDrag(externalForce))
             //}
         }
     }

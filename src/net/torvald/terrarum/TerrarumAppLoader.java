@@ -110,8 +110,8 @@ public class TerrarumAppLoader implements ApplicationListener {
     private SpriteBatch batch;
     public static TextureRegion logo;
 
-    private Color gradWhiteTop = new Color(0xf8f8f8ff);
-    private Color gradWhiteBottom = new Color(0xd8d8d8ff);
+    private Color gradWhiteTop = new Color(0xd8d8d8ff);
+    private Color gradWhiteBottom = new Color(0xf8f8f8ff);
 
     public Screen screen;
 
@@ -160,7 +160,6 @@ public class TerrarumAppLoader implements ApplicationListener {
 
 
         logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
-        logo.flip(false, true);
 
 
         TextureRegionPack.Companion.setGlobalFlipY(true);
