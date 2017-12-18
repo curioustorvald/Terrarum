@@ -15,7 +15,7 @@ import org.dyn4j.geometry.Vector2
  *
  * Created by minjaesong on 2017-01-20.
  */
-open class ParticleBase(renderOrder: Actor.RenderOrder, maxLifeTime: Second? = null) : Runnable {
+open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision: Boolean, maxLifeTime: Second? = null) : Runnable {
 
     /** Will NOT actually delete from the CircularArray */
     @Volatile var flagDespawn = false
@@ -41,12 +41,18 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, maxLifeTime: Second? = n
     fun update(delta: Float) {
         if (!flagDespawn) {
             lifetimeCounter += delta
-            if (velocity.isZero || lifetimeCounter >= lifetimeMax ||
-                // simple stuck check
-                BlockCodex[Terrarum.ingame!!.world.getTileFromTerrain(
-                        hitbox.canonicalX.div(TILE_SIZE).floorInt(),
-                        hitbox.canonicalY.div(TILE_SIZE).floorInt()
-                ) ?: Block.STONE].isSolid) {
+            if (despawnUponCollision) {
+                if (velocity.isZero ||
+                    // simple stuck check
+                    BlockCodex[Terrarum.ingame!!.world.getTileFromTerrain(
+                            hitbox.canonicalX.div(TILE_SIZE).floorInt(),
+                            hitbox.canonicalY.div(TILE_SIZE).floorInt()
+                    ) ?: Block.STONE].isSolid) {
+                    flagDespawn = true
+                }
+            }
+
+            if (lifetimeCounter >= lifetimeMax) {
                 flagDespawn = true
             }
 

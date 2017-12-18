@@ -9,6 +9,7 @@ import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
+import net.torvald.terrarum.gameactors.ParticleMegaRain
 import net.torvald.terrarum.gameactors.ParticleTestRain
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
@@ -80,18 +81,19 @@ object WeatherMixer {
 
 
         // test rain toggled by F2
-        /*if (KeyToggler.isOn(Input.Keys.F2)) {
-            val playerPos = player.centrePosPoint
-            kotlin.repeat(4) {
+        if (KeyToggler.isOn(Input.Keys.F2)) {
+            val playerPosX = player.hitbox.centeredX
+            val playerPosY = player.hitbox.centeredY
+            kotlin.repeat(1) {
                 // 4 seems good
-                val rainParticle = ParticleTestRain(
-                        playerPos.x + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
-                        playerPos.y - Terrarum.HALFH
+                val rainParticle = ParticleMegaRain(
+                        playerPosX + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
+                        playerPosY - Terrarum.HALFH
                 )
                 Terrarum.ingame!!.addParticle(rainParticle)
             }
-            globalLightNow.set(getGlobalLightOfTime(world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
-        }*/
+            //globalLightNow.set(getGlobalLightOfTime(Terrarum.ingame!!.world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
+        }
 
     }
 

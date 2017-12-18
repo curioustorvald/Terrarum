@@ -168,7 +168,7 @@ object LoadScreen : ScreenAdapter() {
                     it.color = Color.WHITE
 
 
-                    Terrarum.fontGame.draw(it, textToPrint, (textFbo.width - textWidth) / 2f + 0.33f, 0f) // x 0.33? I dunno but it breaks w/o it
+                    Terrarum.fontGame.draw(it, textToPrint, ((textFbo.width - textWidth) / 2).toInt().toFloat(), 0f)
 
 
                     blendMul()
@@ -187,6 +187,14 @@ object LoadScreen : ScreenAdapter() {
                 initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT) // dunno, no render without this
                 it.projectionMatrix = camera.combined
                 blendNormal()
+
+
+                // almost black background
+                it.color = Color(0x181818ff)
+                it.fillRect(0f, 0f, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
+
+
+                it.color = Color.WHITE
 
                 // draw text FBO to screen
                 val textTex = textFbo.colorBufferTexture
