@@ -815,6 +815,16 @@ infix fun Color.minus(other: Color) = Color( // don't turn into an operator!
 
 fun Int.toHex() = this.toLong().and(0xFFFFFFFF).toString(16).padStart(8, '0').toUpperCase()
 
+fun MutableList<Any>.shuffle() {
+    for (i in this.size - 1 downTo 1) {
+        val rndIndex = (Math.random() * (i + 1)).toInt()
+
+        val t = this[rndIndex]
+        this[rndIndex] = this[i]
+        this[i] = t
+    }
+}
+
 
 val ccW = GameFontBase.toColorCode(0xFFFF)
 val ccY = GameFontBase.toColorCode(0xFE8F)

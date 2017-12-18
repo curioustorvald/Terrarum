@@ -127,6 +127,8 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
     private lateinit var uiTooltip: UITooltip
 
+    lateinit var uiCheatMotherfuckerNootNoot: UICheatDetected
+
     // UI aliases
     lateinit var uiAliases: ArrayList<UICanvas>
         private set
@@ -288,6 +290,10 @@ class Ingame(val batch: SpriteBatch) : Screen {
         //FeaturesDrawer.world = this.world
 
 
+        MegaRainGovernor // invoke MegaRain Governor
+
+
+
         Gdx.input.inputProcessor = ingameController
 
 
@@ -361,6 +367,9 @@ class Ingame(val batch: SpriteBatch) : Screen {
         uiTooltip = UITooltip()
 
 
+        uiCheatMotherfuckerNootNoot = UICheatDetected()
+
+
         // batch-process uiAliases
         uiAliases = arrayListOf(
                 // drawn first
@@ -378,7 +387,8 @@ class Ingame(val batch: SpriteBatch) : Screen {
         uiAlasesPausing = arrayListOf(
                 uiInventoryPlayer,
                 //uiInventoryContainer,
-                consoleHandler
+                consoleHandler,
+                uiCheatMotherfuckerNootNoot
         )
         uiAlasesPausing.forEach { addUI(it) } // put them all to the UIContainer
         uiAliases.forEach { addUI(it) } // put them all to the UIContainer
@@ -391,6 +401,15 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
 
         LightmapRenderer.fireRecalculateEvent()
+
+
+
+
+
+        // some sketchy test code here
+
+
+
     }// END enter
 
 
