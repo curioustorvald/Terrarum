@@ -134,17 +134,16 @@ object BlocksDrawer {
 
         for (tileID in ITEM_TILES) {
 
-            val tile = tilesTerrain.get((tileID % 16) * 16, (tileID / 16))
+            val tileX = (tileID % 16) * 16
+            val tileY = tileID / 16
+            val tile = tilesTerrain.get(tileX, tileY)
+
 
             // slow memory copy :\  I'm afraid I can't random-access bytebuffer...
-            for (y in 0..TILE_SIZE - 1) {
-                for (x in 0..TILE_SIZE - 1) {
-                    tileItemImgPixMap.pixels.putInt(
-                            terrainPixMap.getPixel(
-                                    tile.regionX + x,
-                                    tile.regionY + y
-                            )
-                    )
+            for (scanline in 0 until tileItemImgPixMap.height) {
+                for (x in 0 until TILE_SIZE) {
+                    val pixel = terrainPixMap.getPixel(tileX + x, scanline)
+                    tileItemImgPixMap.drawPixel(x + TILE_SIZE * (tileID % 16), scanline, pixel)
                 }
             }
         }

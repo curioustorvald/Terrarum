@@ -11,6 +11,7 @@ import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.ui.UIInventoryFull
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import org.dyn4j.geometry.Vector2
 import java.util.*
 
 /**
@@ -473,30 +474,89 @@ open class ActorHumanoid(
         isWalkingV = false
     }
 
+    private fun getJumpAcc(pwr: Double, timedJumpCharge: Double): Double {
+        return pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
+    }
+
+    private var oldMAX_JUMP_LENGTH = -1 // init
+    private var oldJUMPPOWER = -1.0 // init
+    private var oldJUMPPOWERBUFF = -1.0 // init
+    private var oldScale = -1.0
+    private var oldDragCoefficient = -1.0
+    val jumpAirTime: Double = -1.0
+        get() {
+            // compare all the affecting variables
+            if (oldMAX_JUMP_LENGTH == MAX_JUMP_LENGTH &&
+                    oldJUMPPOWER == actorValue.getAsDouble(AVKey.JUMPPOWER)!! &&
+                    oldJUMPPOWERBUFF == actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0 &&
+                    oldScale == scale &&
+                    oldDragCoefficient == dragCoefficient) {
+                return field
+            }
+            // if variables are changed, get new value, store it and return it
+            else {
+                oldMAX_JUMP_LENGTH = MAX_JUMP_LENGTH
+                oldJUMPPOWER = actorValue.getAsDouble(AVKey.JUMPPOWER)!!
+                oldJUMPPOWERBUFF = actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0
+                oldScale = scale
+                oldDragCoefficient = dragCoefficient
+
+
+                var frames = 0
+
+                var simYPos = 0.0
+                var forceVec = Vector2(0.0, 0.0)
+                var jmpCtr = 0
+                while (true) {
+                    if (jmpCtr < MAX_JUMP_LENGTH) jmpCtr++
+
+
+                    val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, jmpCtr)
+                    forceVec.y -= getJumpAcc(jumpPower, timedJumpCharge)
+                    forceVec.y += getDrag(forceVec).y
+
+                    simYPos += forceVec.y // ignoring all the fluid drag OTHER THAN THE AIR
+
+
+                    if ((simYPos >= 0.0 && frames > 0) || frames >= 1000) break
+
+
+                    frames++
+                }
+
+
+                field = frames * (1.0 / Terrarum.TARGET_FPS)
+                // fixme: looks good but return value is wrong -- 2.25 seconds? when I jump it barely goes past 1 sec
+
+
+                return field
+            }
+        }
+
+    private val jumpPower: Double
+        get() = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0)
+
+    private fun jumpFunc(len: Int, counter: Int): Double {
+        // linear time mode
+        val init = (len + 1) / 2.0
+        var timedJumpCharge = init - init / len * counter
+        if (timedJumpCharge < 0) timedJumpCharge = 0.0
+        return timedJumpCharge
+    }
+
     /**
      * See ./work_files/Jump power by pressing time.gcx
      *
      * TODO linear function (play Super Mario Bros. and you'll get what I'm talking about) -- SCRATCH THAT!
      */
     private fun jump() {
-        val len = MAX_JUMP_LENGTH.toFloat()
-        val pwr = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0)
-
-        fun jumpFunc(counter: Int): Double {
-            // linear time mode
-            val init = (len + 1) / 2.0
-            var timedJumpCharge = init - init / len * counter
-            if (timedJumpCharge < 0) timedJumpCharge = 0.0
-            return timedJumpCharge
-        }
-
         if (jumping) {// && jumpable) {
             // increment jump counter
-            if (jumpCounter < len) jumpCounter += 1
+            if (jumpCounter < MAX_JUMP_LENGTH) jumpCounter += 1
 
-            val timedJumpCharge = jumpFunc(jumpCounter)
+            val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, jumpCounter)
 
-            jumpAcc = pwr * timedJumpCharge * JUMP_ACCELERATION_MOD * Math.sqrt(scale) // positive value
+            jumpAcc = getJumpAcc(jumpPower, timedJumpCharge)
 
             controllerMoveDelta?.y?.let { controllerMoveDelta!!.y -= jumpAcc } // feed negative value to the vector
             // do not think of resetting this to zero when counter hit the ceiling; that's HOW NOT
@@ -510,7 +570,7 @@ open class ActorHumanoid(
         }*/
 
         // release "jump key" of AIs
-        if (jumpCounter >= len && !isGamer) {
+        if (jumpCounter >= MAX_JUMP_LENGTH && !isGamer) {
             isJumpDown = false
             jumping = false
             jumpCounter = 0
