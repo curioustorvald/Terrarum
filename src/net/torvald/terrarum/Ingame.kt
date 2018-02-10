@@ -1449,6 +1449,7 @@ class Ingame(val batch: SpriteBatch) : Screen {
 
         BlocksDrawer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
         LightmapRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+        MegaRainGovernor.resize()
 
         worldDrawFrameBuffer.dispose()
         worldDrawFrameBuffer = FrameBuffer(worldFBOformat, Terrarum.WIDTH, Terrarum.HEIGHT, false)

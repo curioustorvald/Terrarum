@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 
+/**
+ * Must be called by the App Loader
+ */
 object PostProcessor {
 
     private val batch = SpriteBatch()
@@ -21,7 +24,7 @@ object PostProcessor {
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
 
-        batch.shader = null
+        batch.shader = Terrarum.shader18Bit // essential design decision; 262 144 colours VGA; NOT related with LCD monitor's internals
         batch.inUse {
             val texture = screenTexHolder.colorBufferTexture
             batch.shader.setUniformMatrix("u_projTrans", batch.projectionMatrix)

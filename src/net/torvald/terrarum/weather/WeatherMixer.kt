@@ -84,11 +84,10 @@ object WeatherMixer {
         if (KeyToggler.isOn(Input.Keys.F2)) {
             val playerPosX = player.hitbox.centeredX
             val playerPosY = player.hitbox.centeredY
-            kotlin.repeat(1) {
-                // 4 seems good
+            kotlin.repeat(7) {
                 val rainParticle = ParticleMegaRain(
                         playerPosX + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
-                        playerPosY - Terrarum.HALFH
+                        playerPosY - Terrarum.HEIGHT
                 )
                 Terrarum.ingame!!.addParticle(rainParticle)
             }
@@ -229,13 +228,13 @@ object WeatherMixer {
 
         var mixFrom: String?
         try { mixFrom = JSON.get("mixFrom").asJsonPrimitive.asString }
-        catch (e: NullPointerException) { mixFrom = null }
+        catch (e: IllegalStateException) { mixFrom = null }
 
 
 
         var mixPercentage: Double?
         try { mixPercentage = JSON.get("mixPercentage").asJsonPrimitive.asDouble }
-        catch (e: NullPointerException) { mixPercentage = null }
+        catch (e: IllegalStateException) { mixPercentage = null }
 
 
 
