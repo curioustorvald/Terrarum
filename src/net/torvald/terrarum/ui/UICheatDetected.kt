@@ -28,6 +28,9 @@ class UICheatDetected : UICanvas() {
     private val backgroundCol = Color(0x181818C0)
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        Terrarum.ingame?.consoleHandler?.setAsClose()
+        Terrarum.ingame?.consoleHandler?.isVisible = false
+
         batch.color = backgroundCol
         batch.fillRect(0f, 0f, width.toFloat(), height.toFloat())
 
