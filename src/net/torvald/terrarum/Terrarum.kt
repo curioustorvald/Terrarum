@@ -2,6 +2,7 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -10,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
+import net.torvald.terrarum.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameactors.floorInt
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.imagefont.Watch7SegMain
@@ -98,7 +100,9 @@ object Terrarum : Screen {
     /**
      * To be used with physics simulator
      */
-    val TARGET_FPS: Double = 26.0 + (2.0 / 3.0) // lower value == faster gravity response (IT WON'T HOTSWAP!!)
+    val TARGET_FPS: Double = 26.0 + (2.0 / 3.0)
+    // 26.0 + (2.0 / 3.0) // lower value == faster gravity response (IT WON'T HOTSWAP!!)
+    // protip: using METER, game unit and SI unit will have same number
 
     /**
      * To be used with render, to achieve smooth frame drawing
@@ -212,6 +216,7 @@ object Terrarum : Screen {
     lateinit var shaderBlendGlow: ShaderProgram
     lateinit var shaderRGBOnly: ShaderProgram
     lateinit var shaderAtoGrey: ShaderProgram
+    lateinit var shader18Bit: ShaderProgram
 
 
     lateinit var textureWhiteSquare: Texture
@@ -223,6 +228,9 @@ object Terrarum : Screen {
 
 
     val deltaTime: Float; get() = Gdx.graphics.rawDeltaTime
+
+
+    lateinit var assetManager: AssetManager
 
 
     init {
@@ -322,6 +330,8 @@ object Terrarum : Screen {
         }
 
 
+        assetManager = AssetManager()
+
 
         println("[Terrarum] GL_VERSION = $GL_VERSION")
         println("[Terrarum] GL_MAX_TEXTURE_SIZE = $GL_MAX_TEXTURE_SIZE")
@@ -382,6 +392,8 @@ object Terrarum : Screen {
 
         shaderRGBOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbonly.frag"))
         shaderAtoGrey = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/aonly.frag"))
+
+        shader18Bit = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/18BitColour.frag"))
 
 
         if (!shaderBlendGlow.isCompiled) {

@@ -124,6 +124,8 @@ object BlockCodex {
         }
         catch (e: NumberFormatException) {
         }
+        catch (e1: IllegalStateException) {
+        }
 
         return ret
     }
@@ -134,6 +136,8 @@ object BlockCodex {
             ret = rec.get(s).toFloat()
         }
         catch (e: NumberFormatException) {
+        }
+        catch (e1: IllegalStateException) {
         }
 
         return ret

@@ -54,6 +54,7 @@ object CommandDict {
             "spawntapestry" to SpawnTapestry,
             "imtest" to JavaIMTest,
             "cheatmotherfuckernootnoot" to CheatWarnTest,
+            "spawnlunarlander" to SpawnPhysTestLunarLander,
 
 
             /* !! */"exportlayer" to ExportLayerData,

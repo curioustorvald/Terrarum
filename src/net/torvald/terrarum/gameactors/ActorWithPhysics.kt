@@ -1375,7 +1375,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
          * Constants
          */
 
-        @Transient private val METER = 24.0
+        @Transient val METER = 24.0
         /**
          * [m / s^2] * SI_TO_GAME_ACC -> [px / InternalFrame^2]
          */

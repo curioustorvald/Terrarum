@@ -1,5 +1,7 @@
 package net.torvald.random
 
+import net.torvald.terrarum.serialise.toLittleLong
+import org.apache.commons.codec.digest.DigestUtils
 import java.util.Random
 
 /**
@@ -14,8 +16,10 @@ class HQRNG @JvmOverloads constructor(seed: Long = System.nanoTime()) : Random()
         if (seed == 0L)
             throw IllegalArgumentException("Invalid seed: cannot be zero")
 
-        s0 = (6364136223846793005L * seed + 1442695040888963407L)
-        s1 = (6364136223846793005L * s0   + 1442695040888963407L)
+        val hash = DigestUtils.sha256(seed.toString())
+
+        s0 = hash.copyOfRange(0, 8).toLittleLong()
+        s1 = hash.copyOfRange(8, 16).toLittleLong()
     }
 
     override fun nextLong(): Long {
