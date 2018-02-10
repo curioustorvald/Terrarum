@@ -10,7 +10,7 @@ import net.torvald.terrarum.Terrarum
 /**
  * Created by minjaesong on 2017-12-18.
  */
-class ParticleMegaRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOrder.BEHIND, false, 3.2f) {
+class ParticleMegaRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOrder.BEHIND, true, 3.2f) {
 
     init {
         body = MegaRainGovernor.get()
@@ -22,7 +22,7 @@ class ParticleMegaRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOr
                 w, h
         )
 
-        velocity.y = 18.0
+        velocity.y = 11.5 * ActorWithPhysics.SI_TO_GAME_VEL
     }
 
 }
@@ -46,11 +46,12 @@ object MegaRainGovernor {
         val h = body.height
 
         bodies = Array(1024) {
-            val pixmap = Pixmap(Terrarum.WIDTH * 2, Terrarum.HEIGHT / 4, Pixmap.Format.RGBA8888)
+            //val pixmap = Pixmap(Terrarum.WIDTH * 2, Terrarum.HEIGHT / 4, Pixmap.Format.RGBA8888)
+            val pixmap = Pixmap(64, 64, Pixmap.Format.RGBA8888)
 
             val rng = HQRNG()
 
-            repeat(64) {
+            repeat(rng.nextInt(2) + 3) { // 3 or 4
                 val rndX = rng.nextInt(pixmap.width - body.width)
                 val rndY = rng.nextInt(pixmap.height - body.height)
 
@@ -71,7 +72,7 @@ object MegaRainGovernor {
     fun get(): TextureRegion {
         if (withdrawCounter >= bodies.size) {
             withdrawCounter = 0
-            bodies.shuffle()
+            //bodies.shuffle() // if pre-rendered random set is sufficiently large, it'd look random enough
         }
 
         return bodies[withdrawCounter++]

@@ -21,10 +21,7 @@ internal object SpawnPhysTestBall : ConsoleCommand {
             val yvel = if (args.size >= 4) args[3].toDouble() else 0.0
 
             val ball = PhysTestBall(Terrarum.ingame!!.world)
-            ball.setPosition(
-                    (mouseX + WorldCamera.x).toDouble(),
-                    (mouseY + WorldCamera.y).toDouble()
-            )
+            ball.setPosition(mouseX, mouseY)
             ball.elasticity = elasticity
             ball.applyForce(Vector2(xvel, yvel))
 
@@ -34,10 +31,7 @@ internal object SpawnPhysTestBall : ConsoleCommand {
             val elasticity = args[1].toDouble()
 
             val ball = PhysTestBall(Terrarum.ingame!!.world)
-            ball.setPosition(
-                    (mouseX + WorldCamera.x).toDouble(),
-                    (mouseY + WorldCamera.y).toDouble()
-            )
+            ball.setPosition(mouseX, mouseY)
             ball.elasticity = elasticity
 
             Terrarum.ingame!!.addNewActor(ball)

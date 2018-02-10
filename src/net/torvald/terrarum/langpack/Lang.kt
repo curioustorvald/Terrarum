@@ -184,12 +184,12 @@ object Lang {
             val index = lastChar.toInt() - HANGUL_SYL_START
             return if (index % 28 == 0) word + "는" else word + "은"
         }
-        else if (lastChar >= 'A' && lastChar <= 'Z' || lastChar >= 'a' && lastChar <= 'z') {
+        else if (lastChar in 'A'..'Z' || lastChar in 'a'..'z') {
             val index = (lastChar.toInt() - 0x41) % 0x20
             return if (HANGUL_POST_INDEX_ALPH[index] == 0) word + "는" else word + "은"
         }
         else {
-            return "은(는)"
+            return "은"
         }
     }
 
@@ -200,12 +200,12 @@ object Lang {
             val index = lastChar.toInt() - HANGUL_SYL_START
             return if (index % 28 == 0) word + "가" else word + "이"
         }
-        else if (lastChar >= 'A' && lastChar <= 'Z' || lastChar >= 'a' && lastChar <= 'z') {
+        else if (lastChar in 'A'..'Z' || lastChar in 'a'..'z') {
             val index = (lastChar.toInt() - 0x41) % 0x20
             return if (HANGUL_POST_INDEX_ALPH[index] == 0) word + "가" else word + "이"
         }
         else {
-            return "이(가)"
+            return "이"
         }
     }
 
