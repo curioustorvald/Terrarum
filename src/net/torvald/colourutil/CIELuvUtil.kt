@@ -37,6 +37,18 @@ object CIELuvUtil {
         return luv.toColor()
     }
 
+    /** Tend to have more vivid (or saturated) colour */
+    fun getGradient(scale: Float, fromCol: Color, toCol: Color): Color {
+        val from = fromCol.toLuv()
+        val to = toCol.toLuv()
+        val newL = FastMath.interpolateLinear(scale, from.L, to.L)
+        val newU = FastMath.interpolateLinear(scale, from.u, to.u)
+        val newV = FastMath.interpolateLinear(scale, from.v, to.v)
+        val newAlpha = FastMath.interpolateLinear(scale, from.alpha, to.alpha)
+
+        return CIELab(newL, newU, newV, newAlpha).toColor()
+    }
+
     /**
      * Alpha value will be overwritten to 1.0
      */

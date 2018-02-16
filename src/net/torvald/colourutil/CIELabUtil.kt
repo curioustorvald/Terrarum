@@ -40,7 +40,7 @@ object CIELabUtil {
         return lab.toColor()
     }
 
-    /** Sweet Lab linear gradient */
+    /** Tend to have more natural (or less saturated) colour */
     fun getGradient(scale: Float, fromCol: Color, toCol: Color): Color {
         val from = fromCol.toLab()
         val to = toCol.toLab()
@@ -92,9 +92,9 @@ fun RGB.toLab() = this.toXYZ().toLab()
 fun CIELab.toColor() = this.toXYZ().toColor()
 fun CIELab.toRGB() = this.toXYZ().toRGB()
 
-internal val D65 = CIEXYZ(0.95047f, 1f, 1.08883f)
-val epsilon = 216f/24389f
-val kappa = 24389f/27f
+internal val D65 = CIEXYZ(0.95047f, 1f, 1.08883f) // D50 in this case will make the colour excessively blue, dunno why tho
+const val epsilon = 216f/24389f
+const val kappa = 24389f/27f
 
 /**
  * Range:
