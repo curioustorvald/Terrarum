@@ -3,8 +3,9 @@ package net.torvald.terrarum.virtualcomputer.tvd
 import java.io.IOException
 import java.nio.charset.Charset
 import java.util.*
-import java.util.function.Consumer
 import java.util.zip.CRC32
+import kotlin.experimental.and
+import kotlin.experimental.or
 
 /**
  * Created by minjaesong on 2017-03-31.
@@ -12,23 +13,33 @@ import java.util.zip.CRC32
 
 typealias EntryID = Int
 
-val specversion = 0x02.toByte()
+val specversion = 0x03.toByte()
 
 class VirtualDisk(
         /** capacity of 0 makes the disk read-only */
         var capacity: Long,
-        var diskName: ByteArray = ByteArray(NAME_LENGTH)
+        var diskName: ByteArray = ByteArray(NAME_LENGTH),
+        footer: ByteArray64 = ByteArray64(8) // default to mandatory 8-byte footer
 ) {
+    var footerBytes: ByteArray64 = footer
+        private set
     val entries = HashMap<EntryID, DiskEntry>()
-    val isReadOnly: Boolean
-        get() = capacity == 0L
+    var isReadOnly: Boolean
+        set(value) { footerBytes[0] = (footerBytes[0] and 0xFE.toByte()) or value.toBit() }
+        get() = capacity == 0L || (footerBytes.size > 0 && footerBytes[0].and(1) == 1.toByte())
     fun getDiskNameString(charset: Charset) = String(diskName, charset)
     val root: DiskEntry
         get() = entries[0]!!
 
 
+    private fun Boolean.toBit() = if (this) 1.toByte() else 0.toByte()
+
+    internal fun __internalSetFooter__(footer: ByteArray64) {
+        footerBytes = footer
+    }
+
     private fun serializeEntriesOnly(): ByteArray64 {
-        val bufferList = ArrayList<Byte>()
+        val bufferList = ArrayList<Byte>() // FIXME this part would take up excessive memory for large files
         entries.forEach {
             val serialised = it.value.serialize()
             serialised.forEach { bufferList.add(it) }
@@ -41,7 +52,7 @@ class VirtualDisk(
 
     fun serialize(): AppendableByteBuffer {
         val entriesBuffer = serializeEntriesOnly()
-        val buffer = AppendableByteBuffer(HEADER_SIZE + entriesBuffer.size + FOOTER_SIZE)
+        val buffer = AppendableByteBuffer(HEADER_SIZE + entriesBuffer.size + FOOTER_SIZE + footerBytes.size)
         val crc = hashCode().toBigEndian()
 
         buffer.put(MAGIC)
@@ -51,6 +62,7 @@ class VirtualDisk(
         buffer.put(specversion)
         buffer.put(entriesBuffer)
         buffer.put(FOOTER_START_MARK)
+        buffer.put(footerBytes)
         buffer.put(EOF_MARK)
 
         return buffer
@@ -122,6 +134,8 @@ class DiskEntry(
         val NORMAL_FILE = 1.toByte()
         val DIRECTORY =   2.toByte()
         val SYMLINK =     3.toByte()
+        val COMPRESSED_FILE = 0x11.toByte()
+
         private fun DiskEntryContent.getTypeFlag() =
                 if      (this is EntryFile)      NORMAL_FILE
                 else if (this is EntryDirectory) DIRECTORY
@@ -168,7 +182,12 @@ interface DiskEntryContent {
     fun getSizePure(): Long
     fun getSizeEntry(): Long
 }
-class EntryFile(var bytes: ByteArray64) : DiskEntryContent {
+
+/**
+ * Do not retrieve bytes directly from this! Use VDUtil.retrieveFile(DiskEntry)
+ * And besides, the bytes could be compressed.
+ */
+open class EntryFile(internal var bytes: ByteArray64) : DiskEntryContent {
 
     override fun getSizePure() = bytes.size
     override fun getSizeEntry() = getSizePure() + 6
@@ -179,6 +198,21 @@ class EntryFile(var bytes: ByteArray64) : DiskEntryContent {
     override fun serialize(): AppendableByteBuffer {
         val buffer = AppendableByteBuffer(getSizeEntry())
         buffer.put(getSizePure().toInt48())
+        buffer.put(bytes)
+        return buffer
+    }
+}
+class EntryFileCompressed(internal var uncompressedSize: Long, bytes: ByteArray64) : EntryFile(bytes) {
+
+    override fun getSizePure() = bytes.size
+    override fun getSizeEntry() = getSizePure() + 12
+
+    /* No new blank file for the compressed */
+
+    override fun serialize(): AppendableByteBuffer {
+        val buffer = AppendableByteBuffer(getSizeEntry())
+        buffer.put(getSizePure().toInt48())
+        buffer.put(uncompressedSize.toInt48())
         buffer.put(bytes)
         return buffer
     }
