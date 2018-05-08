@@ -4,6 +4,10 @@ import java.io.*
 import java.nio.charset.Charset
 import java.util.*
 import java.util.logging.Level
+import java.util.zip.DeflaterOutputStream
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
+import java.util.zip.InflaterOutputStream
 import javax.naming.OperationNotSupportedException
 import kotlin.collections.ArrayList
 
@@ -41,7 +45,7 @@ object VDUtil {
                 unsanitisedHierarchy.removeAt(0)
             //  removes tail slash
             if (unsanitisedHierarchy.size > 0 &&
-                unsanitisedHierarchy[unsanitisedHierarchy.lastIndex].isEmpty())
+                    unsanitisedHierarchy[unsanitisedHierarchy.lastIndex].isEmpty())
                 unsanitisedHierarchy.removeAt(unsanitisedHierarchy.lastIndex)
 
             unsanitisedHierarchy.forEach {
@@ -116,12 +120,12 @@ object VDUtil {
 
 
 
-        if (magicMismatch(VirtualDisk.MAGIC, inbytes.sliceArray(0L..3L).toByteArray()))
+        if (magicMismatch(VirtualDisk.MAGIC, inbytes.sliceArray64(0L..3L).toByteArray()))
             throw RuntimeException("Invalid Virtual Disk file!")
 
-        val diskSize = inbytes.sliceArray(4L..9L).toInt48Big()
-        val diskName = inbytes.sliceArray(10L..10L + 31)
-        val diskCRC = inbytes.sliceArray(10L + 32..10L + 32 + 3).toIntBig() // to check with completed vdisk
+        val diskSize = inbytes.sliceArray64(4L..9L).toInt48Big()
+        val diskName = inbytes.sliceArray64(10L..10L + 31)
+        val diskCRC = inbytes.sliceArray64(10L + 32..10L + 32 + 3).toIntBig() // to check with completed vdisk
         val diskSpecVersion = inbytes[10L + 32 + 4]
 
 
@@ -133,30 +137,31 @@ object VDUtil {
         //println("[VDUtil] currentUnixtime = $currentUnixtime")
 
         var entryOffset = VirtualDisk.HEADER_SIZE
-        while (!Arrays.equals(inbytes.sliceArray(entryOffset..entryOffset + 3).toByteArray(), VirtualDisk.FOOTER_START_MARK)) {
+        // not footer, entries
+        while (!Arrays.equals(inbytes.sliceArray64(entryOffset..entryOffset + 3).toByteArray(), VirtualDisk.FOOTER_START_MARK)) {
             //println("[VDUtil] entryOffset = $entryOffset")
             // read and prepare all the shits
-            val entryID = inbytes.sliceArray(entryOffset..entryOffset + 3).toIntBig()
-            val entryParentID = inbytes.sliceArray(entryOffset + 4..entryOffset + 7).toIntBig()
+            val entryID = inbytes.sliceArray64(entryOffset..entryOffset + 3).toIntBig()
+            val entryParentID = inbytes.sliceArray64(entryOffset + 4..entryOffset + 7).toIntBig()
             val entryTypeFlag = inbytes[entryOffset + 8]
-            val entryFileName = inbytes.sliceArray(entryOffset + 9..entryOffset + 9 + 255).toByteArray()
-            val entryCreationTime = inbytes.sliceArray(entryOffset + 265..entryOffset + 270).toInt48Big()
-            val entryModifyTime = inbytes.sliceArray(entryOffset + 271..entryOffset + 276).toInt48Big()
-            val entryCRC = inbytes.sliceArray(entryOffset + 277..entryOffset + 280).toIntBig() // to check with completed entry
+            val entryFileName = inbytes.sliceArray64(entryOffset + 9..entryOffset + 9 + 255).toByteArray()
+            val entryCreationTime = inbytes.sliceArray64(entryOffset + 265..entryOffset + 270).toInt48Big()
+            val entryModifyTime = inbytes.sliceArray64(entryOffset + 271..entryOffset + 276).toInt48Big()
+            val entryCRC = inbytes.sliceArray64(entryOffset + 277..entryOffset + 280).toIntBig() // to check with completed entry
 
             val entryData = when (entryTypeFlag) {
                 DiskEntry.NORMAL_FILE -> {
-                    val filesize = inbytes.sliceArray(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 5).toInt48Big()
+                    val filesize = inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 5).toInt48Big()
                     //println("[VDUtil] --> is file; filesize = $filesize")
-                    inbytes.sliceArray(entryOffset + DiskEntry.HEADER_SIZE + 6..entryOffset + DiskEntry.HEADER_SIZE + 5 + filesize)
+                    inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE + 6..entryOffset + DiskEntry.HEADER_SIZE + 5 + filesize)
                 }
                 DiskEntry.DIRECTORY   -> {
-                    val entryCount = inbytes.sliceArray(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 1).toShortBig()
+                    val entryCount = inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 1).toShortBig()
                     //println("[VDUtil] --> is directory; entryCount = $entryCount")
-                    inbytes.sliceArray(entryOffset + DiskEntry.HEADER_SIZE + 2..entryOffset + DiskEntry.HEADER_SIZE + 1 + entryCount * 4)
+                    inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE + 2..entryOffset + DiskEntry.HEADER_SIZE + 1 + entryCount * 4)
                 }
                 DiskEntry.SYMLINK     -> {
-                    inbytes.sliceArray(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 3)
+                    inbytes.sliceArray64(entryOffset + DiskEntry.HEADER_SIZE..entryOffset + DiskEntry.HEADER_SIZE + 3)
                 }
                 else -> throw RuntimeException("Unknown entry with type $entryTypeFlag at entryOffset $entryOffset")
             }
@@ -165,9 +170,10 @@ object VDUtil {
 
             // update entryOffset so that we can fetch next entry in the binary
             entryOffset += DiskEntry.HEADER_SIZE + entryData.size + when (entryTypeFlag) {
-                DiskEntry.NORMAL_FILE -> 6
-                DiskEntry.DIRECTORY   -> 2
-                DiskEntry.SYMLINK     -> 0
+                DiskEntry.COMPRESSED_FILE -> 12 // PLEASE DO REFER TO Spec.md
+                DiskEntry.NORMAL_FILE -> 6      // PLEASE DO REFER TO Spec.md
+                DiskEntry.DIRECTORY   -> 2      // PLEASE DO REFER TO Spec.md
+                DiskEntry.SYMLINK     -> 0      // PLEASE DO REFER TO Spec.md
                 else -> throw RuntimeException("Unknown entry with type $entryTypeFlag")
             }
 
@@ -185,7 +191,7 @@ object VDUtil {
                     else if (entryTypeFlag == DiskEntry.DIRECTORY) {
                         val entryList = ArrayList<EntryID>()
                         (0..entryData.size / 4 - 1).forEach {
-                            entryList.add(entryData.sliceArray(4 * it..4 * it + 3).toIntBig())
+                            entryList.add(entryData.sliceArray64(4 * it..4 * it + 3).toIntBig())
                         }
 
                         EntryDirectory(entryList)
@@ -202,7 +208,7 @@ object VDUtil {
                 val calculatedCRC = diskEntry.hashCode()
 
                 val crcMsg = "CRC failed: expected ${entryCRC.toHex()}, got ${calculatedCRC.toHex()}\n" +
-                             "at file \"${diskEntry.getFilenameString(charset)}\" (entry ID ${diskEntry.entryID})"
+                        "at file \"${diskEntry.getFilenameString(charset)}\" (entry ID ${diskEntry.entryID})"
 
                 if (calculatedCRC != entryCRC) {
                     if (crcWarnLevel == Level.SEVERE)
@@ -214,6 +220,15 @@ object VDUtil {
 
             // add entry to disk
             vdisk.entries[entryID] = diskEntry
+        }
+        // entries ends, footers are to be read
+        run {
+            entryOffset += 4 // skip footer marker
+
+            val footerSize = inbytes.size - entryOffset - VirtualDisk.EOF_MARK.size
+            if (footerSize > 0) {
+                vdisk.__internalSetFooter__(inbytes.sliceArray64(entryOffset..entryOffset + footerSize - 1))
+            }
         }
 
 
@@ -234,6 +249,11 @@ object VDUtil {
         return vdisk
     }
 
+
+    fun isFile(disk: VirtualDisk, entryID: EntryID) = disk.entries[entryID]?.contents is EntryFile
+    fun isCompressedFile(disk: VirtualDisk, entryID: EntryID) = disk.entries[entryID]?.contents is EntryFileCompressed
+    fun isDirectory(disk: VirtualDisk, entryID: EntryID) = disk.entries[entryID]?.contents is EntryDirectory
+    fun isSymlink(disk: VirtualDisk, entryID: EntryID) = disk.entries[entryID]?.contents is EntrySymlink
 
     /**
      * Get list of entries of directory.
@@ -317,12 +337,12 @@ object VDUtil {
      */
     private fun DiskEntry.getAsNormalFile(disk: VirtualDisk): EntryFile =
             this.contents as? EntryFile ?:
-            if (this.contents is EntryDirectory)
-                throw RuntimeException("this is directory")
-            else if (this.contents is EntrySymlink)
-                disk.entries[this.contents.target]!!.getAsNormalFile(disk)
-            else
-                throw RuntimeException("Unknown entry type")
+                    if (this.contents is EntryDirectory)
+                        throw RuntimeException("this is directory")
+                    else if (this.contents is EntrySymlink)
+                        disk.entries[this.contents.target]!!.getAsNormalFile(disk)
+                    else
+                        throw RuntimeException("Unknown entry type")
     /**
      * SYNOPSIS  disk.getFile("bin/msh.lua")!!.first.getAsNormalFile(disk)
      *
@@ -330,12 +350,12 @@ object VDUtil {
      */
     private fun DiskEntry.getAsDirectory(disk: VirtualDisk): EntryDirectory =
             this.contents as? EntryDirectory ?:
-            if (this.contents is EntrySymlink)
-                disk.entries[this.contents.target]!!.getAsDirectory(disk)
-            else if (this.contents is EntryFile)
-                throw RuntimeException("this is not directory")
-            else
-                throw RuntimeException("Unknown entry type")
+                    if (this.contents is EntrySymlink)
+                        disk.entries[this.contents.target]!!.getAsDirectory(disk)
+                    else if (this.contents is EntryFile)
+                        throw RuntimeException("this is not directory")
+                    else
+                        throw RuntimeException("Unknown entry type")
 
     /**
      * Search for the file and returns a instance of normal file.
@@ -441,14 +461,28 @@ object VDUtil {
      * Add file to the specified directory.
      * The file will get new EntryID and its ParentID will be overwritten.
      */
-    fun addFile(disk: VirtualDisk, parentPath: VDPath, file: DiskEntry) {
+    fun addFile(disk: VirtualDisk, parentPath: VDPath, file: DiskEntry, compress: Boolean = false) {
         val targetDirID = getFile(disk, parentPath)!!.entryID
-        return addFile(disk, targetDirID, file)
+        return addFile(disk, targetDirID, file, compress)
     }
+
+    fun randomBase62(length: Int): String {
+        val glyphs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+        val sb = StringBuilder()
+
+        kotlin.repeat(length) {
+            sb.append(glyphs[(Math.random() * glyphs.length).toInt()])
+        }
+
+        return sb.toString()
+    }
+
     /**
      * Add file to the specified directory. ParentID of the file will be overwritten.
+     *
+     * @param compressTheFile Used to compress un-compressed file. Will be ignored if the entry is Dir, Symlink or EntryFileCompressed
      */
-    fun addFile(disk: VirtualDisk, directoryID: EntryID, file: DiskEntry) {
+    fun addFile(disk: VirtualDisk, directoryID: EntryID, file: DiskEntry, compressTheFile: Boolean = false) {
         disk.checkReadOnly()
         disk.checkCapacity(file.serialisedSize)
 
@@ -457,8 +491,53 @@ object VDUtil {
             file.entryID = disk.generateUniqueID()
             // add record to the directory
             getAsDirectory(disk, directoryID).add(file.entryID)
-            // add entry on the disk
-            disk.entries[file.entryID] = file
+
+            // DEFLATE fat boy if marked as
+            if (compressTheFile && file.contents is EntryFile) {
+                val filename = "./tmp_" + randomBase62(10)
+
+                // dump the deflated bytes to disk
+                file.contents.bytes.forEachBanks {
+                    val fos = BufferedOutputStream(FileOutputStream(filename))
+                    val deflater = DeflaterOutputStream(fos, true)
+
+                    deflater.write(it)
+                    deflater.flush()
+                    deflater.close()
+                }
+
+
+                // read back deflated bytes untouched and store it
+                val tempFile = File(filename)
+                val tempFileFIS = FileInputStream(tempFile)
+                val readBytes = ByteArray64(tempFile.length())
+
+                var c = 0L
+
+                while (true) {
+                    val r = tempFileFIS.read()
+                    if (r == -1) break
+                    else         readBytes[c] = r.toByte()
+
+                    c++
+                }
+
+                tempFileFIS.close()
+
+
+                val newContent = EntryFileCompressed(file.contents.bytes.size, readBytes)
+                val newEntry = DiskEntry(
+                        file.entryID, file.parentEntryID, file.filename, file.creationDate, file.modificationDate,
+                        newContent
+                )
+
+                disk.entries[file.entryID] = newEntry
+            }
+            // just the add the boy to the house
+            else {
+                disk.entries[file.entryID] = file
+            }
+
             // make this boy recognise his new parent
             file.parentEntryID = directoryID
         }
@@ -599,7 +678,20 @@ object VDUtil {
      */
     fun exportFile(entryFile: EntryFile, outfile: File) {
         outfile.createNewFile()
-        outfile.writeBytes64(entryFile.bytes)
+
+        if (entryFile is EntryFileCompressed) {
+            entryFile.bytes.forEachBanks {
+                val fos = FileOutputStream(outfile)
+                val inflater = InflaterOutputStream(fos)
+
+                inflater.write(it)
+                inflater.flush()
+                inflater.close()
+            }
+        }
+        else {
+            outfile.writeBytes64(entryFile.bytes)
+        }
     }
 
     fun exportDirRecurse(disk: VirtualDisk, parentDir: EntryID, outfile: File, charset: Charset) {
@@ -851,6 +943,7 @@ object VDUtil {
 }
 
 fun Byte.toUint() = java.lang.Byte.toUnsignedInt(this)
+fun Byte.toUlong() = java.lang.Byte.toUnsignedLong(this)
 fun magicMismatch(magic: ByteArray, array: ByteArray): Boolean {
     return !Arrays.equals(array, magic)
 }
