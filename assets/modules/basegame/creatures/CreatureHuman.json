@@ -12,7 +12,7 @@
   "speed": 3.0,
   "speedmult": [100,100,100,100,100,100,100],
 
-  "jumppower": 4.3,
+  "jumppower": 13.0,
   "jumppowermult": [100,100,100,100,100,100,100],
 
   "scale": 1.0,

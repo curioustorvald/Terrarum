@@ -119,7 +119,7 @@ open class ActorHumanoid(
     /** how long the walk button has down, in frames */
     internal var walkCounterX = 0
     internal var walkCounterY = 0
-    @Transient private val MAX_JUMP_LENGTH = 31 // manages "heaviness" of the jump control. Higher = heavier
+    @Transient private val MAX_JUMP_LENGTH = 25 // manages "heaviness" of the jump control. Higher = heavier
 
     private var readonly_totalX = 0.0
     private var readonly_totalY = 0.0
