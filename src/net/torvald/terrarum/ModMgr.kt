@@ -6,6 +6,7 @@ import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.utils.JsonFetcher
 import org.apache.commons.csv.CSVFormat
@@ -182,12 +183,14 @@ object ModMgr {
         @JvmStatic operator fun invoke(module: String) {
             val csv = CSVFetcher.readFromModule(module, itemPath + "itemid.csv")
             csv.forEach {
-                val filename = it["filename"].toString()
-                val script = getFile(module, itemPath + filename).readText()
+                val className = it["classname"].toString()
                 val itemID = it["id"].toInt()
 
-                groovyEngine.eval(script)
-                ItemCodex[itemID] = groovyInvocable.invokeFunction("invoke", itemID) as GameItem
+                val loadedClass = Class.forName(className)
+                val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
+                val loadedClassInstance = loadedClassConstructor.newInstance(itemID)
+
+                ItemCodex[itemID] = loadedClassInstance as GameItem
             }
         }
     }

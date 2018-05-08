@@ -1,22 +1,27 @@
 package net.torvald.terrarum.virtualcomputer.tvd
 
+import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 
 
 /**
- * ByteArray that can hold larger than 4 GiB of Data.
+ * ByteArray that can hold larger than 2 GiB of Data.
  *
  * Works kind of like Bank Switching of old game console's cartridges which does same thing.
  *
  * Created by Minjaesong on 2017-04-12.
  */
 class ByteArray64(val size: Long) {
-    private val bankSize: Int = 1 shl 30 // 2^30 Bytes, or 1 GiB
+    companion object {
+        val bankSize: Int = 8192
+    }
+
     private val data: Array<ByteArray>
 
     init {
-        if (size <= 0)
+        if (size < 0)
             throw IllegalArgumentException("Invalid array size!")
 
         val requiredBanks: Int = 1 + ((size - 1) / bankSize).toInt()
@@ -94,11 +99,20 @@ class ByteArray64(val size: Long) {
 
     fun forEach(consumer: (Byte) -> Unit) = iterator().forEach { consumer(it) }
     fun forEachInt32(consumer: (Int) -> Unit) = iteratorChoppedToInt().forEach { consumer(it) }
+    fun forEachBanks(consumer: (ByteArray) -> Unit) = data.forEach(consumer)
 
-    fun sliceArray(range: LongRange): ByteArray64 {
+    fun sliceArray64(range: LongRange): ByteArray64 {
         val newarr = ByteArray64(range.last - range.first + 1)
         range.forEach { index ->
             newarr[index - range.first] = this[index]
+        }
+        return newarr
+    }
+
+    fun sliceArray(range: IntRange): ByteArray {
+        val newarr = ByteArray(range.last - range.first + 1)
+        range.forEach { index ->
+            newarr[index - range.first] = this[index.toLong()]
         }
         return newarr
     }
@@ -123,6 +137,21 @@ class ByteArray64(val size: Long) {
                 fos.flush()
             }
             fos.close()
+        }
+    }
+}
+
+class ByteArray64InputStream(val byteArray64: ByteArray64): InputStream() {
+    private var readCounter = 0L
+
+    override fun read(): Int {
+        readCounter += 1
+
+        return try {
+            byteArray64[readCounter - 1].toUint()
+        }
+        catch (e: ArrayIndexOutOfBoundsException) {
+            -1
         }
     }
 }
