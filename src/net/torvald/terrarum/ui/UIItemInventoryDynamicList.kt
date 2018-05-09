@@ -9,6 +9,7 @@ import net.torvald.terrarum.UIItemInventoryElem
 import net.torvald.terrarum.UIItemInventoryElemSimple
 import net.torvald.terrarum.gameactors.ActorInventory
 import net.torvald.terrarum.gameactors.InventoryPair
+import net.torvald.terrarum.gameactors.ceilInt
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import java.util.ArrayList
@@ -62,6 +63,7 @@ class UIItemInventoryDynamicList(
 
     var itemPage = 0
     var itemPageCount = 1 // TODO total size of current category / items.size
+        private set
 
     var inventorySortList = ArrayList<InventoryPair>()
     private var rebuildList = true
@@ -117,21 +119,44 @@ class UIItemInventoryDynamicList(
             field = value
         }
 
+
+    private val iconPosX = posX - 12 - parentUI.catIcons.tileW + 2
+    private fun getIconPosY(index: Int) =
+            posY - 2 + (4 + UIItemInventoryElem.height - (parentUI as UIInventoryFull).catIcons.tileH) * index
+
     /** Long/compact mode buttons */
     private val gridModeButtons = Array<UIItemImageButton>(2, { index ->
-        val iconPosX = posX - 12 - parentUI.catIcons.tileW + 2
-        val iconPosY = posY - 2 + (4 + UIItemInventoryElem.height - parentUI.catIcons.tileH) * index
-
         UIItemImageButton(
                 parentUI,
                 parentUI.catIcons.get(index + 14, 0),
                 activeBackCol = Color(0),
                 activeBackBlendMode = BlendMode.NORMAL,
                 posX = iconPosX,
-                posY = iconPosY,
+                posY = getIconPosY(index),
                 highlightable = true
         )
     })
+
+    private val scrollUpButton = UIItemImageButton(
+            parentUI,
+            parentUI.catIcons.get(18, 0),
+            activeBackCol = Color(0),
+            activeBackBlendMode = BlendMode.NORMAL,
+            posX = iconPosX,
+            posY = getIconPosY(2),
+            highlightable = false
+    )
+
+    private val scrollDownButton = UIItemImageButton(
+            parentUI,
+            parentUI.catIcons.get(19, 0),
+            activeBackCol = Color(0),
+            activeBackBlendMode = BlendMode.NORMAL,
+            posX = iconPosX,
+            posY = getIconPosY(3),
+            highlightable = false
+    )
+
 
     init {
         // initially highlight grid mode buttons
@@ -142,22 +167,58 @@ class UIItemInventoryDynamicList(
             isCompactMode = false
             gridModeButtons[0].highlighted = true
             gridModeButtons[1].highlighted = false
+            itemPage = 0
+            rebuild()
         }
         gridModeButtons[1].touchDownListener = { _, _, _, _ ->
             isCompactMode = true
             gridModeButtons[0].highlighted = false
             gridModeButtons[1].highlighted = true
+            itemPage = 0
+            rebuild()
+        }
+
+        scrollUpButton.clickOnceListener = { _, _, _ ->
+            if (itemPage > 0) itemPage--
+            scrollUpButton.highlighted = false
+            rebuild()
+        }
+        scrollDownButton.clickOnceListener = { _, _, _ ->
+            if (itemPage < itemPageCount - 1) itemPage++
+            scrollDownButton.highlighted = false
+            rebuild()
         }
 
         // if (is.mouseUp) handled by this.touchDown()
     }
 
 
+    private val upDownButtonGapToDots = 7 // apparent gap may vary depend on the texture itself
+
     override fun render(batch: SpriteBatch, camera: Camera) {
+        fun getScrollDotYHeight(i: Int) = scrollUpButton.posY + 10 + upDownButtonGapToDots + 10 * i
+
+        scrollDownButton.posY = getScrollDotYHeight(itemPageCount) + upDownButtonGapToDots
+
+
 
         items.forEach { it.render(batch, camera) }
 
         gridModeButtons.forEach { it.render(batch, camera) }
+        scrollUpButton.render(batch, camera)
+        scrollDownButton.render(batch, camera)
+
+        // draw scroll dots
+        for (i in 0 until itemPageCount) {
+            val colour = if (i == itemPage) Color.WHITE else Color(0xffffff7f.toInt())
+
+            batch.color = colour
+            batch.draw(
+                    (parentUI as UIInventoryFull).catIcons.get(20,0),
+                    scrollUpButton.posX.toFloat(),
+                    getScrollDotYHeight(i).toFloat()
+            )
+        }
 
         super.render(batch, camera)
     }
@@ -188,11 +249,17 @@ class UIItemInventoryDynamicList(
 
 
         gridModeButtons.forEach { it.update(delta) }
+        scrollUpButton.update(delta)
+        scrollDownButton.update(delta)
     }
 
 
 
     internal fun rebuild() {
+        //println("Rebuilt inventory")
+        //println("rebuild: actual itempage: $itemPage")
+
+
         val filter = catIconsMeaning[selectedIcon]
 
         inventorySortList = ArrayList<InventoryPair>()
@@ -202,8 +269,6 @@ class UIItemInventoryDynamicList(
             if (it.item.inventoryCategory == filter || filter == "__all__")
                 inventorySortList.add(it)
         }
-
-        rebuildList = false
 
         // sort if needed
         // test sort by name
@@ -249,12 +314,20 @@ class UIItemInventoryDynamicList(
                 items[k].equippedSlot = null
             }
         }
+
+
+        itemPageCount = (inventorySortList.size.toFloat() / items.size.toFloat()).ceilInt()
+
+
+        rebuildList = false
     }
 
     override fun dispose() {
         itemList.forEach { it.dispose() }
         itemGrid.forEach { it.dispose() }
         gridModeButtons.forEach { it.dispose() }
+        scrollUpButton.dispose()
+        scrollDownButton.dispose()
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -262,6 +335,8 @@ class UIItemInventoryDynamicList(
 
         items.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
         gridModeButtons.forEach { if (it.mouseUp) it.touchDown(screenX, screenY, pointer, button) }
+        if (scrollUpButton.mouseUp) scrollUpButton.touchDown(screenX, screenY, pointer, button)
+        if (scrollDownButton.mouseUp) scrollDownButton.touchDown(screenX, screenY, pointer, button)
         return true
     }
 
