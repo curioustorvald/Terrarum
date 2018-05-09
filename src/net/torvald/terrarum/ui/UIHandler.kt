@@ -100,8 +100,8 @@ class UIHandler(//var UI: UICanvas,
         }
 
 
-        if (openFired && openCloseCounter > 9) openFired = false
-        if (closeFired && openCloseCounter > 9) closeFired = false
+        //if (openFired && openCloseCounter > 9) openFired = false
+        //if (closeFired && openCloseCounter > 9) closeFired = false
 
 
         if (isVisible) {
@@ -109,6 +109,8 @@ class UIHandler(//var UI: UICanvas,
         }
 
         if (isOpening) {
+            openFired = false
+
             isVisible = true
             openCloseCounter += delta
 
@@ -128,6 +130,8 @@ class UIHandler(//var UI: UICanvas,
             }
         }
         else if (isClosing) {
+            closeFired = false
+
             openCloseCounter += delta
 
             // println("UI ${UI.javaClass.simpleName} (close)")
