@@ -1,0 +1,60 @@
+package net.torvald.terrarum.modulecomputers.virtualcomputer.worldobject.ui
+
+import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.Second
+import net.torvald.terrarum.ui.*
+
+/**
+ * Created by minjaesong on 2016-09-08.
+ */
+class UITextTerminal(val terminal: net.torvald.terrarum.modulecomputers.virtualcomputer.terminal.Terminal) : UICanvas() {
+
+
+    override var width: Int = terminal.displayW// + some
+    override var height: Int = terminal.displayH// + frame
+
+
+
+    /**
+     * In milliseconds
+     *
+     * Timer itself is implemented in the handler.
+     */
+    override var openCloseTime: Second = OPENCLOSE_GENERIC
+
+    override fun updateUI(delta: Float) {
+        terminal.update(delta)
+    }
+
+    override fun renderUI(batch: SpriteBatch, camera: Camera) {
+        //terminal.render(gc, terminalDisplay.graphics)
+    }
+
+    /**
+     * Do not modify handler.openCloseCounter here.
+     */
+    override fun doOpening(delta: Float) {
+    }
+
+    /**
+     * Do not modify handler.openCloseCounter here.
+     */
+    override fun doClosing(delta: Float) {
+    }
+
+    /**
+     * Do not modify handler.openCloseCounter here.
+     */
+    override fun endOpening(delta: Float) {
+    }
+
+    /**
+     * Do not modify handler.openCloseCounter here.
+     */
+    override fun endClosing(delta: Float) {
+    }
+
+    override fun dispose() {
+    }
+}

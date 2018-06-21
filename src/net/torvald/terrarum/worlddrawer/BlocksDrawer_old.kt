@@ -10,7 +10,7 @@ import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.roundInt
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.BufferedOutputStream

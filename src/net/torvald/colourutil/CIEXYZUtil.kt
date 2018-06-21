@@ -7,6 +7,34 @@ import com.badlogic.gdx.graphics.Color
  * Created by minjaesong on 2017-01-12.
  */
 object CIEXYZUtil {
+
+    /**
+     * 0..255 -> 0.0..1.0
+     */
+    private val rgbLineariseLUT = Array<Float>(257, {
+        val step = minOf(it, 255) / 255f
+
+        if (step > 0.04045f)
+            ((step + 0.055f) / 1.055f).powerOf(2.4f)
+        else step / 12.92f
+    })
+
+    /**
+     * 0..255 -> 0.0..1.0
+     */
+    private val rgbUnLineariseLUT = Array<Float>(257, {
+        val step = minOf(it, 255) / 255f
+
+        if (step > 0.0031308f)
+            1.055f * step.powerOf(1f / 2.4f) - 0.055f
+        else
+            step * 12.92f
+    })
+
+
+
+
+
     fun Color.brighterXYZ(scale: Float): Color {
         val xyz = this.toXYZ()
         xyz.X = xyz.X.times(1f + scale).clampOne()
@@ -37,8 +65,8 @@ object CIEXYZUtil {
 
     fun Color.toXYZ(): CIEXYZ = RGB(this).toXYZ()
 
-    fun RGB.toXYZ(): CIEXYZ {
-        val newR = if (r > 0.04045f)
+    fun RGB.linearise(): RGB {
+        /*val newR = if (r > 0.04045f)
             ((r + 0.055f) / 1.055f).powerOf(2.4f)
         else r / 12.92f
         val newG = if (g > 0.04045f)
@@ -48,32 +76,78 @@ object CIEXYZUtil {
             ((b + 0.055f) / 1.055f).powerOf(2.4f)
         else b / 12.92f
 
-        val x = 0.4124564f * newR + 0.3575761f * newG + 0.1804375f * newB
-        val y = 0.2126729f * newR + 0.7151522f * newG + 0.0721750f * newB
-        val z = 0.0193339f * newR + 0.1191920f * newG + 0.9503041f * newB
+
+        return RGB(newR, newG, newB, alpha)*/
+
+        val out = floatArrayOf(0f, 0f, 0f)
+        for (i in 0..2) {
+            val value = when (i) {
+                0 -> this.r
+                1 -> this.g
+                2 -> this.b
+                else -> throw Exception("Fuck you")
+            }
+            val step = value.clampOne() * 255f
+            val intStep = step.toInt()
+
+            out[i] = interpolateLinear(step - intStep, rgbLineariseLUT[intStep], rgbLineariseLUT[intStep + 1])
+        }
+
+
+        return RGB(out[0], out[1], out[2], alpha)
+    }
+
+    fun RGB.unLinearise(): RGB {
+        /*val newR = if (r > 0.0031308f)
+            1.055f * r.powerOf(1f / 2.4f) - 0.055f
+        else
+            r * 12.92f
+        val newG = if (g > 0.0031308f)
+            1.055f * g.powerOf(1f / 2.4f) - 0.055f
+        else
+            g * 12.92f
+        val newB = if (b > 0.0031308f)
+            1.055f * b.powerOf(1f / 2.4f) - 0.055f
+        else
+            b * 12.92f
+
+
+        return RGB(newR, newG, newB, alpha)*/
+
+        val out = floatArrayOf(0f, 0f, 0f)
+        for (i in 0..2) {
+            val value = when (i) {
+                0 -> this.r
+                1 -> this.g
+                2 -> this.b
+                else -> throw Exception("Fuck you")
+            }
+            val step = value.clampOne() * 255f
+            val intStep = step.toInt()
+
+            out[i] = interpolateLinear(step - intStep, rgbUnLineariseLUT[intStep], rgbUnLineariseLUT[intStep + 1])
+        }
+
+
+        return RGB(out[0], out[1], out[2], alpha)
+    }
+
+    fun RGB.toXYZ(): CIEXYZ {
+        val new = this.linearise()
+
+        val x = 0.4124564f * new.r + 0.3575761f * new.g + 0.1804375f * new.b
+        val y = 0.2126729f * new.r + 0.7151522f * new.g + 0.0721750f * new.b
+        val z = 0.0193339f * new.r + 0.1191920f * new.g + 0.9503041f * new.b
 
         return CIEXYZ(x, y, z, alpha)
     }
 
     fun CIEXYZ.toRGB(): RGB {
-        var r = 3.2404542f * X - 1.5371385f * Y - 0.4985314f * Z
-        var g = -0.9692660f * X + 1.8760108f * Y + 0.0415560f * Z
-        var b = 0.0556434f * X - 0.2040259f * Y + 1.0572252f * Z
+        val r = 3.2404542f * X - 1.5371385f * Y - 0.4985314f * Z
+        val g = -0.9692660f * X + 1.8760108f * Y + 0.0415560f * Z
+        val b = 0.0556434f * X - 0.2040259f * Y + 1.0572252f * Z
 
-        if (r > 0.0031308f)
-            r = 1.055f * r.powerOf(1f / 2.4f) - 0.055f
-        else
-            r *= 12.92f
-        if (g > 0.0031308f)
-            g = 1.055f * g.powerOf(1f / 2.4f) - 0.055f
-        else
-            g *= 12.92f
-        if (b > 0.0031308f)
-            b = 1.055f * b.powerOf(1f / 2.4f) - 0.055f
-        else
-            b *= 12.92f
-
-        return RGB(r, g, b, alpha)
+        return RGB(r, g, b, alpha).unLinearise()
     }
 
     fun CIEXYZ.toColor(): Color {
@@ -94,7 +168,21 @@ object CIEXYZUtil {
 
     private fun Float.powerOf(exp: Float) = FastMath.pow(this, exp)
     private fun Float.clampOne() = if (this > 1f) 1f else if (this < 0f) 0f else this
+
+    private fun interpolateLinear(scale: Float, startValue: Float, endValue: Float): Float {
+        if (startValue == endValue) {
+            return startValue
+        }
+        if (scale <= 0f) {
+            return startValue
+        }
+        return if (scale >= 1f) {
+            endValue
+        }
+        else (1f - scale) * startValue + scale * endValue
+    }
 }
+
 
 /** Range: X, Y, Z: 0 - 1.0+ (One-based-plus) */
 data class CIEXYZ(var X: Float = 0f, var Y: Float = 0f, var Z: Float = 0f, var alpha: Float = 1f) {

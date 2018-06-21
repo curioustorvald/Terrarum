@@ -3,6 +3,7 @@ package net.torvald.terrarum.console
 import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.modulebasegame.Ingame
 
 /**
  * Created by minjaesong on 2016-02-17.
@@ -22,7 +23,7 @@ internal object SetGlobalLightOverride : ConsoleCommand {
                 val GL = Color(r, g, b, a)
 
                 lightOverride = true
-                Terrarum.ingame!!.world.globalLight = GL
+                (Terrarum.ingame!! as Ingame).world.globalLight = GL
             }
             catch (e: NumberFormatException) {
                 Echo("Wrong number input.")

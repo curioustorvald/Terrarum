@@ -8,10 +8,6 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.jme3.math.FastMath
-import net.torvald.terrarum.gameactors.ceilInt
-import net.torvald.terrarum.gameactors.floor
-import net.torvald.terrarum.gameactors.floorInt
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**
@@ -64,7 +60,7 @@ object GlslTilingTest : ApplicationAdapter() {
 
             //ErrorDisp.title = "Error in shader ${shader.vertexShaderSource}"
             //ErrorDisp.text = shader.log.split('\n')
-            //TerrarumAppLoader.getINSTANCE().setScreen(ErrorDisp)
+            //AppLoader.getINSTANCE().setScreen(ErrorDisp)
             System.exit(1)
         }
 
@@ -172,4 +168,3 @@ object GlslTilingTest : ApplicationAdapter() {
     }
 }
 
-private fun Float.ceil(): Float = FastMath.ceil(this).toFloat()

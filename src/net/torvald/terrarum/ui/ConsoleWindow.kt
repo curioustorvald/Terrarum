@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.dataclass.HistoryArray
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.TerrarumAppLoader
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.CommandInterpreter
 import net.torvald.terrarum.fillRect
@@ -181,7 +181,7 @@ class ConsoleWindow : UICanvas() {
         commandInputPool = StringBuilder()
 
         if (Authenticator.b()) {
-            sendMessage("${Terrarum.NAME} ${TerrarumAppLoader.getVERSION_STRING()}")
+            sendMessage("${Terrarum.NAME} ${AppLoader.getVERSION_STRING()}")
             sendMessage(Lang["DEV_MESSAGE_CONSOLE_CODEX"])
         }
     }

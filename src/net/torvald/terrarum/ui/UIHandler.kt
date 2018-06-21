@@ -3,10 +3,8 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.Ingame
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.round
 
 /**
  * UIHandler is a handler for UICanvas. It opens/closes the attached UI, moves the "window" (or "canvas")

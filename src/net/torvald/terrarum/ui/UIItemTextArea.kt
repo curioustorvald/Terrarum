@@ -1,10 +1,9 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.floor
+import net.torvald.terrarum.floor
 
 class UIItemTextArea(
         parentUI: UICanvas,

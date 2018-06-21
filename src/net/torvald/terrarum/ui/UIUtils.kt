@@ -1,6 +1,6 @@
 package net.torvald.terrarum.ui
 
-import net.torvald.terrarum.gameactors.sqr
+import net.torvald.terrarum.sqr
 
 /**
  * Created by minjaesong on 2017-03-14.

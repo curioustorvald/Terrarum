@@ -1,5 +1,6 @@
 package net.torvald.terrarum.console
 
+import net.torvald.terrarum.modulebasegame.console.*
 import java.util.HashMap
 
 /**

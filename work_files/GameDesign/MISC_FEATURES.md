@@ -4,7 +4,7 @@
 
 - Players can create their own décors (hang on wall), dresses.
 - Two looms (16 palette mode, 64 palette mode)
-- __IMPLEMENTED__ — see net.torvald.terrarum.gameactors.DecodeTapestry
+- __IMPLEMENTED__ — see net.torvald.terrarum.modulebasegame.gameactors.DecodeTapestry
 
 
 ### Music making ###

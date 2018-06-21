@@ -3,13 +3,11 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.fillRect
-import net.torvald.terrarum.gameactors.Second
+import net.torvald.terrarum.Second
 import net.torvald.terrarum.gameactors.ai.toInt
-import net.torvald.terrarum.gameactors.roundInt
-import net.torvald.terrarum.inUse
+import net.torvald.terrarum.roundInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
