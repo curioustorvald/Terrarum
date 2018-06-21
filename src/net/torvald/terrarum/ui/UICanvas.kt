@@ -2,11 +2,10 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.Second
-import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.Second
+import net.torvald.terrarum.roundInt
 
 
 /**

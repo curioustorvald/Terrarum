@@ -1,6 +1,7 @@
 package net.torvald.terrarum.itemproperties
 
-import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.sqrt
 
 /**
  * Created by minjaesong on 2017-04-17.

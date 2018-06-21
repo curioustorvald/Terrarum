@@ -2,8 +2,6 @@ package net.torvald.terrarum.gameworld
 
 import net.torvald.point.Point2d
 
-import java.io.Serializable
-
 
 class MapPoint {
     var startPoint: Point2d? = null

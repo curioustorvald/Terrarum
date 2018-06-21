@@ -8,6 +8,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.EntryPoint
 import net.torvald.terrarum.utils.JsonFetcher
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
@@ -33,9 +34,6 @@ import javax.script.Invocable
  * Created by minjaesong on 2017-04-17.
  */
 object ModMgr {
-
-    val groovyEngine = ScriptEngineManager().getEngineByExtension("groovy")!!
-    val groovyInvocable = groovyEngine as Invocable
 
     val metaFilename = "metadata.properties"
     val defaultConfigFilename = "default.json"
@@ -104,11 +102,11 @@ object ModMgr {
 
                 // run entry script in entry point
                 if (entryPoint.isNotBlank()) {
-                    val extension = entryPoint.split('.').last()
-                    val engine = ScriptEngineManager().getEngineByExtension(extension)!!
-                    val invocable = engine as Invocable
-                    engine.eval(FileReader(getFile(moduleName, entryPoint)))
-                    invocable.invokeFunction("invoke", moduleName)
+                    val newClass = Class.forName(entryPoint)
+                    val newClassConstructor = newClass.getConstructor(/* no args defined */)
+                    val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
+
+                    (newClassInstance as ModuleEntryPoint).invoke()
                 }
 
 

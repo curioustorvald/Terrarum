@@ -1,9 +1,6 @@
 package net.torvald.terrarum.gameactors.ai
 
 import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorHumanoid
-import net.torvald.terrarum.gameactors.ActorWithPhysics
-import net.torvald.terrarum.gameactors.HumanoidNPC
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaInteger
@@ -15,7 +12,7 @@ import java.io.Reader
 /**
  * Created by minjaesong on 2017-02-04.
  */
-class LuaAIWrapper(private val scriptPath: String) : ActorAI {
+/*class LuaAIWrapper(private val scriptPath: String) : ActorAI {
 
     protected val luag: Globals = JsePlatform.standardGlobals()
 
@@ -27,14 +24,14 @@ class LuaAIWrapper(private val scriptPath: String) : ActorAI {
 
     private lateinit var aiLuaAPI: AILuaAPI
 
-    private lateinit var targetActor: ActorWithPhysics
+    private lateinit var targetActor: Actor
 
     /**
      * The initialiser
      *
      * Use ```(p.ai as LuaAIWrapper).attachActor(p)```
      */
-    fun attachActor(actor: ActorWithPhysics) {
+    fun attachActor(actor: Actor) {
         targetActor = actor
 
         luag["io"] = LuaValue.NIL
@@ -47,7 +44,7 @@ class LuaAIWrapper(private val scriptPath: String) : ActorAI {
         luaInstance.call()
     }
 
-    override fun update(actor: HumanoidNPC, delta: Float) {
+    override fun update(actor: Actor, delta: Float) {
         // run "update()" function in the script
         luag.get("update").call(delta.toLua())
     }
@@ -112,4 +109,4 @@ class LuaAIWrapper(private val scriptPath: String) : ActorAI {
     }
 
     fun Float.toLua(): LuaValue = LuaInteger.valueOf(this.toDouble())
-}
+}*/

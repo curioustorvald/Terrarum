@@ -3,7 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.roundInt
 import java.util.*
 
 /**

@@ -5,8 +5,9 @@ import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.Second
-import net.torvald.terrarum.gameworld.WorldTime
+import net.torvald.terrarum.Second
+import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.weather.WeatherMixer
 
@@ -20,7 +21,7 @@ object BlockPropUtil {
 
     var breathFuncX = 0f
     val breathRange = 0.02f
-    val breathCycleDuration: Second = 2f 
+    val breathCycleDuration: Second = 2f
 
     var pulsateFuncX = 0f
     val pulsateRange = 0.034f
@@ -94,7 +95,7 @@ object BlockPropUtil {
     fun getDynamicLumFunc(baseLum: Color, type: Int): Color {
         return when (type) {
             1    -> getTorchFlicker(baseLum)
-            2    -> Terrarum.ingame!!.world.globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT) // current global light
+            2    -> (Terrarum.ingame!! as Ingame).world.globalLight.cpy().mul(LightmapRenderer.DIV_FLOAT) // current global light
             3    -> WeatherMixer.getGlobalLightOfTime(WorldTime.DAY_LENGTH / 2).cpy().mul(LightmapRenderer.DIV_FLOAT) // daylight at noon
             4    -> getSlowBreath(baseLum)
             5    -> getPulsate(baseLum)
