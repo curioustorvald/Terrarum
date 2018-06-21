@@ -1,7 +1,7 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.worldgenerator.WorldGenerator
-import net.torvald.terrarum.worldgenerator.RoguelikeRandomiser
+import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
+import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import java.nio.charset.Charset
 
 /**

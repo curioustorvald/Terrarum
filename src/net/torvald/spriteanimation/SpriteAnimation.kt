@@ -7,7 +7,7 @@ package net.torvald.spriteanimation
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
-import net.torvald.terrarum.gameactors.ActorWithPhysics
+import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 class SpriteAnimation(val parentActor: ActorWithPhysics) {

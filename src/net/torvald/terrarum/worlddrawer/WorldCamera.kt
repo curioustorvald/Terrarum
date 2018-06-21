@@ -2,8 +2,9 @@ package net.torvald.terrarum.worlddrawer
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.floorInt
 
 /**
  * Created by minjaesong on 2016-12-30.

@@ -3,21 +3,19 @@ package net.torvald.terrarum.weather
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
-import javafx.scene.effect.Light
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameactors.ParticleMegaRain
-import net.torvald.terrarum.gameactors.ParticleTestRain
+import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.WorldTime
+import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
-import net.torvald.terrarum.worldgenerator.WorldGenerator
+import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
 import java.io.File
 import java.util.*
 
@@ -89,9 +87,9 @@ object WeatherMixer {
                         playerPosX + HQRNG().nextInt(Terrarum.WIDTH) - Terrarum.HALFW,
                         playerPosY - Terrarum.HEIGHT
                 )
-                Terrarum.ingame!!.addParticle(rainParticle)
+                (Terrarum.ingame!! as Ingame).addParticle(rainParticle)
             }
-            //globalLightNow.set(getGlobalLightOfTime(Terrarum.ingame!!.world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
+            //globalLightNow.set(getGlobalLightOfTime((Terrarum.ingame!! as Ingame).world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
         }
 
     }

@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
+import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
 import net.torvald.terrarum.ui.*
 
 /**
@@ -122,7 +125,7 @@ class UIItemInventoryElemSimple(
             println("keydown elemgrid")
 
 
-            val inventory = Terrarum.ingame!!.player.inventory
+            val inventory = (Terrarum.ingame!! as Ingame).player.inventory
             val slot = if (keycode == Input.Keys.NUM_0) 9 else keycode - Input.Keys.NUM_1
             val currentSlotItem = inventory.getQuickBar(slot)
 
@@ -154,7 +157,7 @@ class UIItemInventoryElemSimple(
 
             // equip da shit
             val itemEquipSlot = item!!.equipPosition
-            val player = Terrarum.ingame!!.player
+            val player = (Terrarum.ingame!! as Ingame).player
 
             if (item != player.inventory.itemEquipped.get(itemEquipSlot)) { // if this item is unequipped, equip it
                 player.equipItem(item!!)

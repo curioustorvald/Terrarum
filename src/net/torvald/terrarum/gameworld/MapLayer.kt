@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameworld
 
-import net.torvald.terrarum.virtualcomputer.tvd.ByteArray64
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 
 /**
  * Created by minjaesong on 2016-01-17.

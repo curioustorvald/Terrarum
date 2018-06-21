@@ -8,16 +8,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
-import net.torvald.random.HQRNG
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.serialise.ReadLayerData
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.ui.UITitleRemoConRoot
+import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConRoot
 import net.torvald.terrarum.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.*
 import java.io.FileInputStream
@@ -52,7 +53,9 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
 
         private var firstTime = true
 
-        override fun update(actor: HumanoidNPC, delta: Float) {
+        override fun update(actor: Actor, delta: Float) {
+            val actor = actor as HumanoidNPC
+
             // fuck
             val avSpeed = 1.0 // FIXME camera goes faster when FPS is high
             actor.actorValue[AVKey.SPEED] = avSpeed
@@ -336,7 +339,7 @@ class FuckingWorldRenderer(val batch: SpriteBatch) : Screen {
         batch.color = Color.LIGHT_GRAY
 
         val COPYTING = arrayOf(
-                TerrarumAppLoader.COPYRIGHT_DATE_NAME,
+                AppLoader.COPYRIGHT_DATE_NAME,
                 Lang["COPYRIGHT_GNU_GPL_3"]
         )
 

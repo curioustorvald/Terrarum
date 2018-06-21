@@ -3,11 +3,11 @@ package net.torvald.terrarum.gamecontroller
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
-import net.torvald.terrarum.Ingame
+import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
 /**

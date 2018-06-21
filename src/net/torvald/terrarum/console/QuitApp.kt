@@ -1,5 +1,7 @@
 package net.torvald.terrarum.console
 
+import net.torvald.terrarum.console.ConsoleCommand
+
 /**
  * Created by minjaesong on 2016-01-15.
  */
