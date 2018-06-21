@@ -10,8 +10,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.Matrix4
-import net.torvald.terrarum.gameactors.sqrt
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**

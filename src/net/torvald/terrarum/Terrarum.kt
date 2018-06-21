@@ -11,14 +11,11 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.torvald.terrarum.gameactors.ActorWithPhysics
-import net.torvald.terrarum.gameactors.floorInt
+import com.jme3.math.FastMath
+import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.imagefont.TinyAlphNum
-import net.torvald.terrarum.imagefont.Watch7SegMain
-import net.torvald.terrarum.imagefont.WatchDotAlph
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.ui.ItemSlotImageBuilder
-import net.torvald.terrarum.ui.MessageWindow
+import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.JsonWriter
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -29,6 +26,14 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.input.Controllers
 import java.io.File
 import java.io.IOException
+import java.util.ArrayList
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
+import javax.swing.JOptionPane
+
+
+
+typealias RGBA8888 = Int
 
 
 /**
@@ -36,38 +41,8 @@ import java.io.IOException
  *
  * LibGDX Version Created by minjaesong on 2017-06-15.
  */
-
-/*fun main(args: Array<String>) {
-    Terrarum // invoke
-
-    val config = LwjglApplicationConfiguration()
-    config.vSyncEnabled = Terrarum.USE_VSYNC
-    config.resizable = true
-    config.width = 1072
-    config.height = 742
-    config.backgroundFPS = RENDER_FPS
-    config.foregroundFPS = RENDER_FPS
-    config.title = GAME_NAME
-
-    Terrarum.screenW = config.width
-    Terrarum.screenH = config.height
-
-    println("[TerrarumKt] usevsync = ${Terrarum.USE_VSYNC}")
-
-    // the game must run on same speed regardless of the display FPS;
-    // "Terrarum.TARGET_INTERNAL_FPS" denotes "execute as if FPS was set to this value"
-
-    LwjglApplication(Terrarum, config)
-}*/
-
-
-
-typealias RGBA8888 = Int
-
 object Terrarum : Screen {
 
-    lateinit var appLoader: TerrarumAppLoader
-    
     var screenW = 0
     var screenH = 0
 
@@ -120,7 +95,7 @@ object Terrarum : Screen {
     var previousScreen: Screen? = null // to be used with temporary states like StateMonitorCheck
 
 
-    var ingame: Ingame? = null
+    var ingame: IngameInstance? = null
     private val gameConfig = GameConfig()
 
     val OSName = System.getProperty("os.name")
@@ -145,7 +120,7 @@ object Terrarum : Screen {
 
 
 
-    val fontGame: GameFontBase = TerrarumAppLoader.fontGame
+    val fontGame: GameFontBase = AppLoader.fontGame
     lateinit var fontSmallNumbers: TinyAlphNum
 
     var joypadLabelStart: Char = 0xE000.toChar() // lateinit
@@ -202,7 +177,7 @@ object Terrarum : Screen {
 
     private lateinit var configDir: String
 
-    const val NAME = TerrarumAppLoader.GAME_NAME
+    const val NAME = AppLoader.GAME_NAME
 
 
     val systemArch = System.getProperty("os.arch")
@@ -234,7 +209,7 @@ object Terrarum : Screen {
 
 
     init {
-        println("$NAME version ${TerrarumAppLoader.getVERSION_STRING()}")
+        println("$NAME version ${AppLoader.getVERSION_STRING()}")
 
 
         getDefaultDirectory()
@@ -418,14 +393,16 @@ object Terrarum : Screen {
 
 
 
-        TerrarumAppLoader.GAME_LOCALE = getConfigString("language")
-        println("[Terrarum] locale = ${TerrarumAppLoader.GAME_LOCALE}")
+        AppLoader.GAME_LOCALE = getConfigString("language")
+        println("[Terrarum] locale = ${AppLoader.GAME_LOCALE}")
 
 
 
-        ModMgr // invoke Module Manager, which will also invoke BlockCodex
-        ItemCodex // invoke Item Codex
+        ModMgr // invoke Module Manager
 
+
+
+        println("[Terrarum] all modules loaded successfully")
 
 
 
@@ -439,18 +416,18 @@ object Terrarum : Screen {
 
 
         // title screen
-        appLoader.setScreen(TitleScreen(batch))
+        AppLoader.getINSTANCE().setScreen(TitleScreen(batch))
         //appLoader.setScreen(FuckingWorldRenderer(batch))
     }
 
     internal fun setScreen(screen: Screen) {
-        appLoader.setScreen(screen)
+        AppLoader.getINSTANCE().setScreen(screen)
     }
 
     override fun render(delta: Float) {
-        //appLoader.screen.render(deltaTime)
+        AppLoader.getINSTANCE().screen.render(deltaTime)
         //GLOBAL_RENDER_TIMER += 1
-        // moved to TerrarumAppLoader; global event must be place at the apploader to prevent ACCIDENTAL forgot-to-update type of bug.
+        // moved to AppLoader; global event must be place at the apploader to prevent ACCIDENTAL forgot-to-update type of bug.
     }
 
     override fun pause() {
@@ -467,13 +444,6 @@ object Terrarum : Screen {
         fontSmallNumbers.dispose()
 
 
-        ItemSlotImageBuilder.dispose()
-        WatchDotAlph.dispose()
-        Watch7SegMain.dispose()
-        WatchDotAlph.dispose()
-
-        MessageWindow.SEGMENT_BLACK.dispose()
-        MessageWindow.SEGMENT_WHITE.dispose()
         //dispose any other resources used in this level
 
 
@@ -715,6 +685,159 @@ object Terrarum : Screen {
         get() = Gdx.input.y
 }
 
+open class IngameInstance(val batch: SpriteBatch) : Screen {
+
+    var screenZoom = 1.0f
+    val ZOOM_MAXIMUM = 4.0f
+    val ZOOM_MINIMUM = 0.5f
+
+    lateinit var consoleHandler: ConsoleWindow
+
+    val ACTORCONTAINER_INITIAL_SIZE = 64
+    val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
+    val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
+
+    override fun hide() {
+    }
+
+    override fun show() {
+    }
+
+    override fun render(delta: Float) {
+    }
+
+    override fun pause() {
+    }
+
+    override fun resume() {
+    }
+
+    override fun resize(width: Int, height: Int) {
+    }
+
+    override fun dispose() {
+    }
+
+    fun getActorByID(ID: Int): Actor {
+        if (actorContainer.size == 0 && actorContainerInactive.size == 0)
+            throw IllegalArgumentException("Actor with ID $ID does not exist.")
+
+        var index = actorContainer.binarySearch(ID)
+        if (index < 0) {
+            index = actorContainerInactive.binarySearch(ID)
+
+            if (index < 0) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Actor with ID $ID does not exist.",
+                        null, JOptionPane.ERROR_MESSAGE
+                )
+                throw IllegalArgumentException("Actor with ID $ID does not exist.")
+            }
+            else
+                return actorContainerInactive[index]
+        }
+        else
+            return actorContainer[index]
+    }
+
+    fun ArrayList<*>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID!!)
+
+    fun ArrayList<*>.binarySearch(ID: Int): Int {
+        // code from collections/Collections.kt
+        var low = 0
+        var high = this.size - 1
+
+        while (low <= high) {
+            val mid = (low + high).ushr(1) // safe from overflows
+
+            val midVal = get(mid)!!
+
+            if (ID > midVal.hashCode())
+                low = mid + 1
+            else if (ID < midVal.hashCode())
+                high = mid - 1
+            else
+                return mid // key found
+        }
+        return -(low + 1)  // key not found
+    }
+
+    open fun removeActor(ID: Int) = removeActor(getActorByID(ID))
+    /**
+     * get index of the actor and delete by the index.
+     * we can do this as the list is guaranteed to be sorted
+     * and only contains unique values.
+     *
+     * Any values behind the index will be automatically pushed to front.
+     * This is how remove function of [java.util.ArrayList] is defined.
+     */
+    open fun removeActor(actor: Actor) {
+        val indexToDelete = actorContainer.binarySearch(actor.referenceID!!)
+        if (indexToDelete >= 0) {
+            actorContainer.removeAt(indexToDelete)
+        }
+    }
+
+    open /**
+     * Check for duplicates, append actor and sort the list
+     */
+    fun addNewActor(actor: Actor) {
+        if (theGameHasActor(actor.referenceID!!)) {
+            throw Error("The actor $actor already exists in the game")
+        }
+        else {
+            actorContainer.add(actor)
+            insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
+        }
+    }
+
+    fun isActive(ID: Int): Boolean =
+            if (actorContainer.size == 0)
+                false
+            else
+                actorContainer.binarySearch(ID) >= 0
+
+    fun isInactive(ID: Int): Boolean =
+            if (actorContainerInactive.size == 0)
+                false
+            else
+                actorContainerInactive.binarySearch(ID) >= 0
+
+    /**
+     * actorContainer extensions
+     */
+    fun theGameHasActor(actor: Actor?) = if (actor == null) false else theGameHasActor(actor.referenceID!!)
+
+    fun theGameHasActor(ID: Int): Boolean =
+            isActive(ID) || isInactive(ID)
+
+
+
+
+    fun insertionSortLastElem(arr: ArrayList<Actor>) {
+        lock(ReentrantLock()) {
+            var j = arr.lastIndex - 1
+            val x = arr.last()
+            while (j >= 0 && arr[j] > x) {
+                arr[j + 1] = arr[j]
+                j -= 1
+            }
+            arr[j + 1] = x
+        }
+    }
+
+    inline fun lock(lock: Lock, body: () -> Unit) {
+        lock.lock()
+        try {
+            body()
+        }
+        finally {
+            lock.unlock()
+        }
+    }
+}
+
 inline fun SpriteBatch.inUse(action: (SpriteBatch) -> Unit) {
     this.begin()
     action(this)
@@ -852,3 +975,56 @@ val ccX = GameFontBase.toColorCode(0x853F)
 val ccK = GameFontBase.toColorCode(0x888F)
 
 
+typealias Second = Float
+
+inline fun Int.sqr(): Int = this * this
+inline fun Double.floorInt() = Math.floor(this).toInt()
+inline fun Float.floorInt() = FastMath.floor(this)
+inline fun Float.floor() = FastMath.floor(this).toFloat()
+inline fun Double.ceilInt() = Math.ceil(this).toInt()
+inline fun Float.ceil(): Float = FastMath.ceil(this).toFloat()
+inline fun Float.ceilInt() = FastMath.ceil(this)
+inline fun Double.round() = Math.round(this).toDouble()
+inline fun Double.floor() = Math.floor(this)
+inline fun Double.ceil() = this.floor() + 1.0
+inline fun Double.roundInt(): Int = Math.round(this).toInt()
+inline fun Float.roundInt(): Int = Math.round(this)
+inline fun Double.abs() = Math.abs(this)
+inline fun Double.sqr() = this * this
+inline fun Double.sqrt() = Math.sqrt(this)
+inline fun Float.sqrt() = FastMath.sqrt(this)
+inline fun Int.abs() = if (this < 0) -this else this
+fun Double.bipolarClamp(limit: Double) =
+        if (this > 0 && this > limit) limit
+        else if (this < 0 && this < -limit) -limit
+        else this
+
+fun absMax(left: Double, right: Double): Double {
+    if (left > 0 && right > 0)
+        if (left > right) return left
+        else return right
+    else if (left < 0 && right < 0)
+        if (left < right) return left
+        else return right
+    else {
+        val absL = left.abs()
+        val absR = right.abs()
+        if (absL > absR) return left
+        else return right
+    }
+}
+
+fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
+fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0
+fun interpolateLinear(scale: Double, startValue: Double, endValue: Double): Double {
+    if (startValue == endValue) {
+        return startValue
+    }
+    if (scale <= 0.0) {
+        return startValue
+    }
+    if (scale >= 1.0) {
+        return endValue
+    }
+    return (1.0 - scale) * startValue + scale * endValue
+}

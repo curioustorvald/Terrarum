@@ -1,10 +1,8 @@
 package net.torvald.aa
 
 import net.torvald.point.Point2d
-import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.ActorWithPhysics
-import net.torvald.terrarum.gameactors.sqr
-import java.util.*
+import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.sqr
 
 /**
  * k-d Tree that uses binary heap instead of binary tree to improve data locality

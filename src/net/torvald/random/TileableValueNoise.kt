@@ -1,9 +1,7 @@
 package net.torvald.random
 
 import com.jme3.math.FastMath
-import net.torvald.terrarum.gameactors.floorInt
-import net.torvald.terrarum.gameactors.round
-import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameworld.fmod
 import java.util.*
 

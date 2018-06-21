@@ -3,8 +3,8 @@ package net.torvald.terrarum.itemproperties
 import com.badlogic.gdx.graphics.Color
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.ItemValue
-import net.torvald.terrarum.gameactors.ActorInventory
-import net.torvald.terrarum.gameactors.Pocketed
+import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
 import net.torvald.terrarum.langpack.Lang
 
@@ -140,7 +140,7 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
      * note: DO NOT super() this!
      *
      * Consumption function is executed in net.torvald.terrarum.gamecontroller.IngameController,
-     * in which the function itself is defined in net.torvald.terrarum.gameactors.ActorInventory
+     * in which the function itself is defined in net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
      */
     open fun primaryUse(delta: Float): Boolean = false
 

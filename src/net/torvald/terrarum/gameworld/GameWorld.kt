@@ -4,6 +4,8 @@ package net.torvald.terrarum.gameworld
 import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.modulebasegame.gameworld.GameEconomy
+import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import org.dyn4j.geometry.Vector2
 
 typealias BlockAddress = Long

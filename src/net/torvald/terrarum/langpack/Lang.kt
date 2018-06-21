@@ -2,7 +2,7 @@ package net.torvald.terrarum.langpack
 
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.TerrarumAppLoader
+import net.torvald.terrarum.AppLoader
 import java.io.*
 import java.util.*
 
@@ -112,7 +112,7 @@ object Lang {
         fun fallback(): String = langpack["${key}_$FALLBACK_LANG_CODE"] ?: "$$key"
 
 
-        val ret = langpack["${key}_${TerrarumAppLoader.GAME_LOCALE}"]
+        val ret = langpack["${key}_${AppLoader.GAME_LOCALE}"]
         val ret2 = if (ret.isNullOrEmpty()) fallback() else ret!!
 
         // special treatment
@@ -129,7 +129,7 @@ object Lang {
     fun pluralise(word: String, count: Int): String {
         if (count < 2) return word
 
-        when (TerrarumAppLoader.GAME_LOCALE) {
+        when (AppLoader.GAME_LOCALE) {
             "fr" -> {
                 if (Arrays.binarySearch(FRENCH_WORD_NORMAL_PLURAL, word) >= 0) {
                     return word + "s"

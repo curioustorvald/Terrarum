@@ -1,9 +1,11 @@
 package net.torvald.terrarum
 
+import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonValue
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import net.torvald.terrarum.gameactors.Actor
-import java.util.*
-import java.util.function.Consumer
 import kotlin.collections.HashMap
 
 typealias ItemValue = KVHashMap
@@ -12,7 +14,7 @@ typealias GameConfig = KVHashMap
 /**
  * Created by minjaesong on 2015-12-30.
  */
-open class KVHashMap {
+open class KVHashMap : GsonSerialisable {
 
     constructor() {
         hashMap = HashMap<String, Any>()
@@ -114,4 +116,15 @@ open class KVHashMap {
         return KVHashMap(cloneOfMap)
     }
 
+    override fun read(gson: JsonObject) {
+    }
+
+    override fun write(targetGson: JsonObject) {
+        hashMap.forEach { t, u ->
+            if (u is JsonPrimitive)
+                targetGson.add(t, u)
+            else
+                targetGson.add(t, Gson().toJsonTree(u))
+        }
+    }
 }

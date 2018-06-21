@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.gameactors.Second
-import net.torvald.terrarum.gameactors.floorInt
-import net.torvald.terrarum.gameactors.roundInt
+import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.ui.*
 
 /**

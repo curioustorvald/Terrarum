@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.dataclass.HistoryArray
-import net.torvald.terrarum.gameactors.floor
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.Ingame
 
 /**
  * Created by minjaesong on 2017-07-13.

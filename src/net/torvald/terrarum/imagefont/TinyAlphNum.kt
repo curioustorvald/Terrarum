@@ -48,7 +48,7 @@ object TinyAlphNum : BitmapFont() {
             else if (c in 0.toChar()..255.toChar()) {
                 batch.color = colourHolder.cpy().mul(0.5f, 0.5f, 0.5f, 1f)
                 batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W + 1, y)
-                batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W    , y + 1)
+                batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W, y + 1)
                 batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W + 1, y + 1)
 
 

@@ -9,6 +9,7 @@ import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
+import net.torvald.terrarum.modulebasegame.Ingame
 
 /**
  * Created by minjaesong on 2016-03-14.
@@ -26,10 +27,10 @@ class BasicDebugInfoWindow : UICanvas() {
     private var xdelta = 0.0
     private var ydelta = 0.0
 
-
+    private val ingame = Terrarum.ingame!! as Ingame
 
     override fun updateUI(delta: Float) {
-        val player = Terrarum.ingame!!.player
+        val player = ingame.player
         val hitbox = player.hitbox
 
         xdelta = hitbox.canonicalX - prevPlayerX
@@ -44,7 +45,7 @@ class BasicDebugInfoWindow : UICanvas() {
         fun Int.rawG() = this % LightmapRenderer.MUL_2 / LightmapRenderer.MUL
         fun Int.rawB() = this % LightmapRenderer.MUL
 
-        val player = Terrarum.ingame!!.player
+        val player = ingame.player
 
         batch.color = Color(0xFFEE88FF.toInt())
 
@@ -114,7 +115,7 @@ class BasicDebugInfoWindow : UICanvas() {
                    else "$rawR $rawG $rawB $rawA"
         printLine(batch, 8, "light@cursor $ccG$lightVal")
 
-        val tileNum = Terrarum.ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
+        val tileNum = ingame.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
 
         printLine(batch, 9, "tile@cursor $ccG$tileNum ($mtX, $mtY)")
 
@@ -125,8 +126,8 @@ class BasicDebugInfoWindow : UICanvas() {
         //printLineColumn(batch, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
         //printLineColumn(batch, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
 
-        printLineColumn(batch, 2, 5, "Time $ccG${Terrarum.ingame!!.world.time.todaySeconds.toString().padStart(5, '0')}" +
-                                     " (${Terrarum.ingame!!.world.time.getFormattedTime()})")
+        printLineColumn(batch, 2, 5, "Time $ccG${ingame.world.time.todaySeconds.toString().padStart(5, '0')}" +
+                                     " (${ingame.world.time.getFormattedTime()})")
         printLineColumn(batch, 2, 6, "Mass $ccG${player.mass}")
 
         printLineColumn(batch, 2, 7, "noClip $ccG${player.noClip}")
@@ -171,13 +172,13 @@ class BasicDebugInfoWindow : UICanvas() {
          * Bottom left
          */
 
-        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${Terrarum.ingame!!.actorContainer.size + Terrarum.ingame!!.actorContainerInactive.size}",
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${ingame.actorContainer.size + ingame.actorContainerInactive.size}",
                 2f, Terrarum.HEIGHT - 10f)
-        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${Terrarum.ingame!!.actorContainer.size}",
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${ingame.actorContainer.size}",
                 (2 + 17*8).toFloat(), Terrarum.HEIGHT - 10f)
-        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${Terrarum.ingame!!.actorContainerInactive.size}",
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${ingame.actorContainerInactive.size}",
                 (2 + 28*8).toFloat(), Terrarum.HEIGHT - 10f)
-        Terrarum.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${Terrarum.ingame!!.particlesActive}",
+        Terrarum.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${ingame.particlesActive}",
                 (2 + 41*8).toFloat(), Terrarum.HEIGHT - 10f)
     }
 

@@ -1,7 +1,7 @@
 package net.torvald.point
 
-import net.torvald.terrarum.gameactors.sqr
-import net.torvald.terrarum.gameactors.sqrt
+import net.torvald.terrarum.sqr
+import net.torvald.terrarum.sqrt
 import org.dyn4j.geometry.Vector2
 
 /**

@@ -8,12 +8,14 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
-import net.torvald.terrarum.Ingame
+import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.TerrarumAppLoader
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.floorInt
 import java.util.*
 
 /**

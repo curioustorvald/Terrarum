@@ -2,6 +2,7 @@ package net.torvald.terrarum.itemproperties
 
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ai.toLua
+import net.torvald.terrarum.modulebasegame.Ingame
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -43,13 +44,13 @@ class ItemEffectsLuaAPI(g: Globals) {
 
     class StrikeEarth : ThreeArgFunction() {
         override fun call(x: LuaValue, y: LuaValue, power: LuaValue): LuaValue {
-            Terrarum.ingame!!.world.inflictTerrainDamage(x.checkint(), y.checkint(), power.checkdouble())
+            (Terrarum.ingame!! as Ingame).world.inflictTerrainDamage(x.checkint(), y.checkint(), power.checkdouble())
             return LuaValue.NONE
         }
     }
     class StrikeWall : ThreeArgFunction() {
         override fun call(x: LuaValue, y: LuaValue, power: LuaValue): LuaValue {
-            Terrarum.ingame!!.world.inflictWallDamage(x.checkint(), y.checkint(), power.checkdouble())
+            (Terrarum.ingame!! as Ingame).world.inflictWallDamage(x.checkint(), y.checkint(), power.checkdouble())
             return LuaValue.NONE
         }
     }
