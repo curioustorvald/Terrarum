@@ -310,7 +310,7 @@ object LightmapRenderer {
 
     lateinit var lightBuffer: Pixmap
 
-    fun draw(batch: SpriteBatch, drawMode: Int) {
+    fun draw(batch: SpriteBatch, donotuse: Int) {
 
         val this_x_start = for_x_start// + overscan_open
         val this_x_end = for_x_end// + overscan_open
@@ -327,15 +327,7 @@ object LightmapRenderer {
 
             for (x in this_x_start..this_x_end) {
 
-                val color = if (drawMode == DRAW_FOR_RGB) {
-                    (getLightForOpaque(x, y) ?: Color(0f,0f,0f,0f)).normaliseToColourHDR()
-                }
-                else if (drawMode == DRAW_FOR_ALPHA) {
-                    (getLightForOpaque(x, y) ?: Color(0f,0f,0f,0f)).normaliseToAlphaHDR()
-                }
-                else {
-                    throw IllegalArgumentException()
-                }
+                val color = (getLightForOpaque(x, y) ?: Color(0f,0f,0f,0f)).normaliseToRGBAHDR()
 
 
                 lightBuffer.setColor(color)
@@ -657,6 +649,13 @@ object LightmapRenderer {
             hdr(this.a),
             hdr(this.a),
             1f
+    )
+
+    inline fun Color.normaliseToRGBAHDR() = Color(
+            hdr(this.r),
+            hdr(this.g),
+            hdr(this.b),
+            hdr(this.a)
     )
 
     /**
