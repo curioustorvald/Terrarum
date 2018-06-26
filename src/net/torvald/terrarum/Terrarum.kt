@@ -192,9 +192,14 @@ object Terrarum : Screen {
     lateinit var shaderRGBOnly: ShaderProgram
     lateinit var shaderAtoGrey: ShaderProgram
     lateinit var shader18Bit: ShaderProgram
+    lateinit var shaderMulRGBX: ShaderProgram
+    lateinit var shaderMulAAAX: ShaderProgram
 
 
     lateinit var textureWhiteSquare: Texture
+
+
+    lateinit var testTexture: Texture
 
 
     /** Actually just a mesh of four vertices, two triangles -- not a literal glQuad */
@@ -308,6 +313,9 @@ object Terrarum : Screen {
         assetManager = AssetManager()
 
 
+        testTexture = Texture(Gdx.files.internal("./assets/test_texture.tga"))
+
+
         println("[Terrarum] GL_VERSION = $GL_VERSION")
         println("[Terrarum] GL_MAX_TEXTURE_SIZE = $GL_MAX_TEXTURE_SIZE")
         println("[Terrarum] GL info:\n${Gdx.graphics.glVersion.debugVersionString}") // debug info
@@ -367,6 +375,10 @@ object Terrarum : Screen {
 
         shaderRGBOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbonly.frag"))
         shaderAtoGrey = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/aonly.frag"))
+
+        shaderMulRGBX = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbxmul.frag"))
+        shaderMulAAAX = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/aaaxmul.frag"))
+
 
         shader18Bit = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/18BitColour.frag"))
 
