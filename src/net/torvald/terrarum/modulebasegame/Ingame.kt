@@ -527,7 +527,10 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         else {
             var updateTries = 0
             while (updateDeltaCounter >= updateRate) {
-                updateGame(delta)
+
+                //updateGame(delta)
+                measureRuntime({ updateGame(delta) }, prependMsg = "Update Game: ")
+
                 updateDeltaCounter -= updateRate
                 updateTries++
 
@@ -540,7 +543,15 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         /** RENDER CODE GOES HERE */
-        renderGame(batch)
+        //renderGame(batch)
+        measureRuntime({ renderGame(batch) }, prependMsg = "Render Game: ")
+    }
+
+    private fun measureRuntime(function: (() -> Unit), out: PrintStream = System.err, prependMsg: String = "", appendMsg: String = "") {
+        val startTime = System.nanoTime()
+        function.invoke()
+        val endTime = System.nanoTime()
+        println("$prependMsg${endTime - startTime} ns$appendMsg")
     }
 
     protected fun updateGame(delta: Float) {

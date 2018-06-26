@@ -26,7 +26,7 @@ class EntryPoint : ModuleEntryPoint() {
         // load customised item loader //
         /////////////////////////////////
 
-        println("[ItemCodex] recording item ID ")
+        println("[ModuleBaseGame.EntryPoint] recording item ID ")
 
         // blocks.csvs are loaded by ModMgr beforehand
         // block items (blocks and walls are the same thing basically)
