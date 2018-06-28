@@ -46,6 +46,7 @@ import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.ui.*
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
+import kotlin.system.measureNanoTime
 
 
 /**
@@ -529,7 +530,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             while (updateDeltaCounter >= updateRate) {
 
                 //updateGame(delta)
-                measureRuntime({ updateGame(delta) }, prependMsg = "Update Game: ")
+                Terrarum.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
 
                 updateDeltaCounter -= updateRate
                 updateTries++
@@ -544,14 +545,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         /** RENDER CODE GOES HERE */
         //renderGame(batch)
-        measureRuntime({ renderGame(batch) }, prependMsg = "Render Game: ")
-    }
-
-    private fun measureRuntime(function: (() -> Unit), out: PrintStream = System.err, prependMsg: String = "", appendMsg: String = "") {
-        val startTime = System.nanoTime()
-        function.invoke()
-        val endTime = System.nanoTime()
-        println("$prependMsg${endTime - startTime} ns$appendMsg")
+        Terrarum.debugTimers["Ingame.render"] = measureNanoTime { renderGame(batch) }
     }
 
     protected fun updateGame(delta: Float) {
@@ -998,6 +992,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
             blendNormal()
         }
+
     }
 
     fun processBlur(lightmapFboA: FrameBuffer, lightmapFboB: FrameBuffer, mode: Int) {

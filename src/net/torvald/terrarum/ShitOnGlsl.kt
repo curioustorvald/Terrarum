@@ -36,10 +36,12 @@ object ShitOnGlsl : ApplicationAdapter() {
 
     lateinit var fucktex: Texture
 
+    lateinit var testTex: Texture
+
     override fun create() {
         ShaderProgram.pedantic = false
 
-        shader = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/loadingCircle.frag"))
+        shader = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/crt.frag"))
 
 
         font = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = false)
@@ -76,6 +78,7 @@ object ShitOnGlsl : ApplicationAdapter() {
         batch = SpriteBatch()
 
         fucktex = Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"))
+        testTex = Texture(Gdx.files.internal("assets/test_texture.tga"))
     }
 
 
@@ -91,14 +94,15 @@ object ShitOnGlsl : ApplicationAdapter() {
 
             batch.shader = shader
 
-            shader.setUniformMatrix("u_projTrans", camera.combined)
-            shader.setUniformi("u_texture", 0)
+            //shader.setUniformMatrix("u_projTrans", camera.combined)
+            //shader.setUniformi("u_texture", 0)
+            shader.setUniformf("resolution", 1072f, 742f)
             shader.setUniformf("circleCentrePoint", Gdx.graphics.width / 2f, Gdx.graphics.height / 2f)
             shader.setUniformf("colorCentrePoint", Gdx.graphics.width / 2f, Gdx.graphics.height / 2f)
             shader.setUniformf("circleSize", 200f)
-            //fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
 
-            batch.draw(fucktex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+            //batch.draw(fucktex, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+            batch.draw(testTex, 0f, 0f)
 
         }
 

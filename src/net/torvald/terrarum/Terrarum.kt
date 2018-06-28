@@ -43,6 +43,8 @@ typealias RGBA8888 = Int
  */
 object Terrarum : Screen {
 
+    val debugTimers = HashMap<String, Long>()
+
     var screenW = 0
     var screenH = 0
 
@@ -191,7 +193,6 @@ object Terrarum : Screen {
     lateinit var shaderBlendGlow: ShaderProgram
     lateinit var shaderRGBOnly: ShaderProgram
     lateinit var shaderAtoGrey: ShaderProgram
-    lateinit var shader18Bit: ShaderProgram
     lateinit var shaderMulRGBX: ShaderProgram
     lateinit var shaderMulAAAX: ShaderProgram
 
@@ -378,9 +379,6 @@ object Terrarum : Screen {
 
         shaderMulRGBX = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbxmul.frag"))
         shaderMulAAAX = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/aaaxmul.frag"))
-
-
-        shader18Bit = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/18BitColour.frag"))
 
 
         if (!shaderBlendGlow.isCompiled) {
