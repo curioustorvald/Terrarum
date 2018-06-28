@@ -83,7 +83,7 @@ public class AppLoader implements ApplicationListener {
         return String.format("%d.%d.%d", VERSION_RAW >>> 24, (VERSION_RAW & 0xff0000) >>> 16, VERSION_RAW & 0xFFFF);
     }
 
-    private static LwjglApplicationConfiguration appConfig;
+    public static LwjglApplicationConfiguration appConfig;
 
     public static GameFontBase fontGame;
 
@@ -107,10 +107,11 @@ public class AppLoader implements ApplicationListener {
     }
 
 
-    private ShaderProgram shaderBayerSkyboxFill;
-    private Mesh fullscreenQuad;
+    private static ShaderProgram shaderBayerSkyboxFill;
+    public static ShaderProgram shader18Bit;
+    public static Mesh fullscreenQuad;
     private OrthographicCamera camera;
-    private SpriteBatch batch;
+    private SpriteBatch logoBatch;
     public static TextureRegion logo;
 
     private Color gradWhiteTop = new Color(0xd8d8d8ff);
@@ -136,7 +137,7 @@ public class AppLoader implements ApplicationListener {
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
+        logoBatch = new SpriteBatch();
         camera = new OrthographicCamera(((float) appConfig.width), ((float) appConfig.height));
 
 
@@ -144,6 +145,13 @@ public class AppLoader implements ApplicationListener {
 
 
         shaderBayerSkyboxFill = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"));
+
+        //shader18Bit = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/18BitColour.frag"));
+
+        // Q & D test for the new post shader
+        shader18Bit = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/crt.frag"));
+
+
 
 
         fullscreenQuad = new Mesh(
@@ -171,10 +179,7 @@ public class AppLoader implements ApplicationListener {
 
     @Override
     public void render() {
-        renderFBO.begin();
 
-        Gdx.gl.glClearColor(0f,0f,0f,0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         if (screen == null) {
             shaderBayerSkyboxFill.begin();
@@ -185,17 +190,17 @@ public class AppLoader implements ApplicationListener {
             fullscreenQuad.render(shaderBayerSkyboxFill, GL20.GL_TRIANGLES);
             shaderBayerSkyboxFill.end();
 
-            batch.begin();
-            batch.setColor(Color.WHITE);
+            logoBatch.begin();
+            logoBatch.setColor(Color.WHITE);
             //blendNormal();
-            batch.setShader(null);
+            logoBatch.setShader(null);
 
 
             setCameraPosition(0f, 0f);
-            batch.draw(logo, (appConfig.width - logo.getRegionWidth()) / 2f,
+            logoBatch.draw(logo, (appConfig.width - logo.getRegionWidth()) / 2f,
                     (appConfig.height - logo.getRegionHeight()) / 2f
             );
-            batch.end();
+            logoBatch.end();
 
 
             loadTimer += Gdx.graphics.getRawDeltaTime();
@@ -207,12 +212,25 @@ public class AppLoader implements ApplicationListener {
             }
         }
         else {
+            renderFBO.begin();
+
+
+
+            //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f);
+            //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            //Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
+            //Gdx.gl.glEnable(GL20.GL_BLEND);
+            //Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
             screen.render(Gdx.graphics.getDeltaTime());
+
+
+
+            renderFBO.end();
+
+
+            //PostProcessor.INSTANCE.draw(renderFBO);
         }
-        renderFBO.end();
-
-
-        PostProcessor.INSTANCE.draw(renderFBO);
 
 
         GLOBAL_RENDER_TIMER += 1;
@@ -272,6 +290,6 @@ public class AppLoader implements ApplicationListener {
     private void setCameraPosition(float newX, float newY) {
         camera.position.set((-newX + appConfig.width / 2), (-newY + appConfig.height / 2), 0f);
         camera.update();
-        batch.setProjectionMatrix(camera.combined);
+        logoBatch.setProjectionMatrix(camera.combined);
     }
 }
