@@ -11,17 +11,17 @@ uniform sampler2D u_texture;
 uniform vec2 resolution;
 
 uniform vec3 phosphor_colour = vec3(1.3, 0.8567, 0.0);
-vec3 scanline_darkening = vec3(0.45, 0.45, 0.45);
+vec3 scanline_darkening = vec3(0.66, 0.66, 0.66);
 
 // 0: every odd line will get darkened; 1: every even line will get darkened
 uniform float alternative_scanline = 0.0; // 1.0: true
 
-uniform float blur_blend = 0.3;
+uniform float blur_blend = 0.8;
 
 void main(void) {
-    vec3 color = texture2D(u_texture, v_texCoords).rgb;
-    vec3 color_pre =  texture2D(u_texture, (gl_FragCoord + vec2(-1.0, 0.0)) / resolution).rgb;
-    vec3 color_next = texture2D(u_texture, (gl_FragCoord + vec2( 1.0, 0.0)) / resolution).rgb;
+    vec4 color = texture2D(u_texture, v_texCoords).rgba;
+    vec4 color_pre =  texture2D(u_texture, (v_texCoords + (vec2(-2.0, 0.0) / resolution))).rgba;
+    vec4 color_next = texture2D(u_texture, (v_texCoords + (vec2( 2.0, 0.0) / resolution))).rgba;
 
     color = color * (1.0 - blur_blend) + color_pre * (blur_blend / 2.0) + color_next * (blur_blend / 2.0);
 
@@ -34,11 +34,12 @@ void main(void) {
     ) / 8.0;
 
     // out colour
-    color = vec3(color_luminosity) * phosphor_colour;
+    vec3 out_color = vec3(color_luminosity) * phosphor_colour;
 
     if (is_scanline) {
-        color = color * scanline_darkening;
+        out_color = out_color * scanline_darkening;
     }
 
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(out_color, 0.5);
+
 }

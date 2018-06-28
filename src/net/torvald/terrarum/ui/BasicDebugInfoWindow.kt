@@ -119,6 +119,14 @@ class BasicDebugInfoWindow : UICanvas() {
 
         printLine(batch, 9, "tile@cursor $ccG$tileNum ($mtX, $mtY)")
 
+
+        var dbgCnt = 11
+        Terrarum.debugTimers.forEach { t, u ->
+            printLine(batch, dbgCnt, "$ccM$t $ccG$u$ccY ns")
+            dbgCnt++
+        }
+
+
         /**
          * Second column
          */
