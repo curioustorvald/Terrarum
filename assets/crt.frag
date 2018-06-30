@@ -40,6 +40,6 @@ void main(void) {
         out_color = out_color * scanline_darkening;
     }
 
-    gl_FragColor = vec4(out_color, 0.5);
+    gl_FragColor = vec4(out_color, 1);
 
 }

@@ -41,7 +41,7 @@ class BlockProp {
     var lumColA = 0f
 
     /**
-     * @param luminosity Raw RGB value, without alpha
+     * @param luminosity
      */
     inline val luminosity: Color
         get() = BlockPropUtil.getDynamicLumFunc(Color(lumColR, lumColG, lumColB, lumColA), dynamicLuminosityFunction)
