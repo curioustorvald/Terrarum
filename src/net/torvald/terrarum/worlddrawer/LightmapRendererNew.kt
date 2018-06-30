@@ -16,6 +16,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
 import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.floorInt
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import java.util.*
 
 /**
@@ -58,7 +59,7 @@ object LightmapRenderer {
     private val AIR = Block.AIR
 
     private const val TILE_SIZE = FeaturesDrawer.TILE_SIZE
-    val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / Ingame.lightmapDownsample
+    val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / IngameRenderer.lightmapDownsample
 
     // color model related constants
     const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB
@@ -292,6 +293,7 @@ object LightmapRenderer {
         val l = getLightInternal(x, y)
         if (l == null) return null
 
+        // brighten if solid
         if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) {
             return Color(
                     (l.r * 1.25f),//.clampOne(),
@@ -310,12 +312,19 @@ object LightmapRenderer {
 
     lateinit var lightBuffer: Pixmap
 
-    fun draw(batch: SpriteBatch, drawMode: Int) {
+    private val colourNull = Color(0)
+
+    fun draw(batch: SpriteBatch) {
 
         val this_x_start = for_x_start// + overscan_open
         val this_x_end = for_x_end// + overscan_open
         val this_y_start = for_y_start// + overscan_open
         val this_y_end = for_y_end// + overscan_open
+
+        // wipe out beforehand. You DO need this
+        lightBuffer.blending = Pixmap.Blending.None // gonna overwrite
+        lightBuffer.setColor(colourNull)
+        lightBuffer.fillRectangle(0, 0, lightBuffer.width, lightBuffer.height)
 
 
         // write to colour buffer
@@ -327,16 +336,7 @@ object LightmapRenderer {
 
             for (x in this_x_start..this_x_end) {
 
-                val color = if (drawMode == DRAW_FOR_RGB) {
-                    (getLightForOpaque(x, y) ?: Color(0f,0f,0f,0f)).normaliseToColourHDR()
-                }
-                else if (drawMode == DRAW_FOR_ALPHA) {
-                    (getLightForOpaque(x, y) ?: Color(0f,0f,0f,0f)).normaliseToAlphaHDR()
-                }
-                else {
-                    throw IllegalArgumentException()
-                }
-
+                val color = (getLightForOpaque(x, y) ?: Color(0f,0f,0f,0f)).normaliseToHDR()
 
                 lightBuffer.setColor(color)
 
@@ -366,7 +366,7 @@ object LightmapRenderer {
         lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
 
-        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
         //      we might not need shader here...
         //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
         batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width * DRAW_TILE_SIZE, lightBufferAsTex.height * DRAW_TILE_SIZE)
@@ -374,10 +374,6 @@ object LightmapRenderer {
         //lightBufferAsTex.dispose()
 
 
-
-        // TODO: set lightmap BACK TO array
-        // TODO: re-iterate over the lightmap, applying filters like getLightForOpaque(x, y) and save it to new buffer (pixmap)
-        // TODO: and THEN draw the map using SHADER
 
     }
 
@@ -555,11 +551,13 @@ object LightmapRenderer {
 
         val intervalPos = (intensity * CHANNEL_MAX) - (intensity * CHANNEL_MAX).toInt()
 
-        return interpolateLinear(
+        val ret = interpolateLinear(
                 intervalPos,
                 rgbHDRLookupTable[intervalStart],
                 rgbHDRLookupTable[intervalEnd]
         )
+
+        return ret
     }
 
 
@@ -645,18 +643,11 @@ object LightmapRenderer {
             1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f  // isn't it beautiful?
     )
     /** To eliminated visible edge on the gradient when 255/1023 is exceeded */
-    inline fun Color.normaliseToColourHDR() = Color(
+    inline fun Color.normaliseToHDR() = Color(
             hdr(this.r),
             hdr(this.g),
             hdr(this.b),
-            1f
-    )
-
-    inline fun Color.normaliseToAlphaHDR() = Color(
-            hdr(this.a),
-            hdr(this.a),
-            hdr(this.a),
-            1f
+            hdr(this.a)
     )
 
     /**
