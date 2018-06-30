@@ -584,6 +584,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private fun renderGame() {
         IngameRenderer.invoke(
+                world,
                 actorsRenderBehind,
                 actorsRenderMiddle,
                 actorsRenderMidTop,
