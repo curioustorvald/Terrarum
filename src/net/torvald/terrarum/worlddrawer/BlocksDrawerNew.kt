@@ -376,27 +376,27 @@ object BlocksDrawer {
     // NO draw lightmap using colour filter, actors must also be hidden behind the darkness
     ///////////////////////////////////////////
 
-    fun renderWall(batch: SpriteBatch) {
+    fun renderWall(projectionMatrix: Matrix4) {
         // blend normal
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         drawTiles(WALL, false)
-        renderUsingBuffer(WALL, batch.projectionMatrix)
+        renderUsingBuffer(WALL, projectionMatrix)
     }
 
-    fun renderTerrain(batch: SpriteBatch) {
+    fun renderTerrain(projectionMatrix: Matrix4) {
         // blend normal
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         drawTiles(TERRAIN, false) // regular tiles
-        renderUsingBuffer(TERRAIN, batch.projectionMatrix)
+        renderUsingBuffer(TERRAIN, projectionMatrix)
     }
 
-    fun renderFront(batch: SpriteBatch, drawWires: Boolean) {
+    fun renderFront(projectionMatrix: Matrix4, drawWires: Boolean) {
         // blend mul
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
@@ -404,7 +404,7 @@ object BlocksDrawer {
 
 
         drawTiles(TERRAIN, true) // blendmul tiles
-        renderUsingBuffer(TERRAIN, batch.projectionMatrix)
+        renderUsingBuffer(TERRAIN, projectionMatrix)
 
 
 
@@ -416,7 +416,7 @@ object BlocksDrawer {
 
         if (drawWires) {
             drawTiles(WIRE, false)
-            renderUsingBuffer(WIRE, batch.projectionMatrix)
+            renderUsingBuffer(WIRE, projectionMatrix)
         }
     }
 
@@ -757,7 +757,7 @@ object BlocksDrawer {
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
         shader.end()
 
-        tilesBufferAsTex.dispose()
+        //tilesBufferAsTex.dispose()
     }
 
     private var oldScreenW = 0

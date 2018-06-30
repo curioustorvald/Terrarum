@@ -140,7 +140,7 @@ object WeatherMixer {
         Terrarum.shaderSkyboxFill.end()
 
 
-        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
     }
 

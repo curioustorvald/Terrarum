@@ -15,6 +15,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.JsonWriter
@@ -193,8 +194,6 @@ object Terrarum : Screen {
     lateinit var shaderBlendGlow: ShaderProgram
     lateinit var shaderRGBOnly: ShaderProgram
     lateinit var shaderAtoGrey: ShaderProgram
-    lateinit var shaderMulRGBX: ShaderProgram
-    lateinit var shaderMulAAAX: ShaderProgram
 
 
     lateinit var textureWhiteSquare: Texture
@@ -204,8 +203,7 @@ object Terrarum : Screen {
 
 
     /** Actually just a mesh of four vertices, two triangles -- not a literal glQuad */
-    lateinit var fullscreenQuad: Mesh; private set
-    private var fullscreenQuadInit = false
+    val fullscreenQuad = AppLoader.fullscreenQuad
 
 
     val deltaTime: Float; get() = Gdx.graphics.rawDeltaTime
@@ -283,28 +281,6 @@ object Terrarum : Screen {
         }
     val MINIMAL_GL_MAX_TEXTURE_SIZE = 4096
 
-    private fun initFullscreenQuad() {
-        if (!fullscreenQuadInit) {
-            fullscreenQuad = Mesh(
-                    true, 4, 6,
-                    VertexAttribute.Position(),
-                    VertexAttribute.ColorUnpacked(),
-                    VertexAttribute.TexCoords(0)
-            )
-            fullscreenQuadInit = true
-        }
-    }
-    private fun updateFullscreenQuad(WIDTH: Int, HEIGHT: Int) {
-        initFullscreenQuad()
-        fullscreenQuad.setVertices(floatArrayOf(
-                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
-                WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                WIDTH.toFloat(), HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                0f, HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f
-        ))
-        fullscreenQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
-    }
-
     override fun show() {
         if (environment != RunningEnvironment.MOBILE) {
             Gdx.gl.glDisable(GL20.GL_DITHER)
@@ -327,9 +303,7 @@ object Terrarum : Screen {
             throw GdxRuntimeException("Graphics device not capable -- device's GL_VERSION: $GL_VERSION, required: $MINIMAL_GL_VERSION; GL_MAX_TEXTURE_SIZE: $GL_MAX_TEXTURE_SIZE, required: $MINIMAL_GL_MAX_TEXTURE_SIZE")
         }
 
-
-        updateFullscreenQuad(WIDTH, HEIGHT)
-
+        // resize fullscreen quad?
 
 
         TextureRegionPack.globalFlipY = true // !! TO MAKE LEGACY CODE RENDER ON ITS POSITION !!
@@ -376,9 +350,6 @@ object Terrarum : Screen {
 
         shaderRGBOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbonly.frag"))
         shaderAtoGrey = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/aonly.frag"))
-
-        shaderMulRGBX = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbxmul.frag"))
-        shaderMulAAAX = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/aaaxmul.frag"))
 
 
         if (!shaderBlendGlow.isCompiled) {
@@ -486,7 +457,7 @@ object Terrarum : Screen {
 
 
         // re-calculate fullscreen quad
-        updateFullscreenQuad(screenW, screenH)
+        //updateFullscreenQuad(screenW, screenH)
 
         //appLoader.resize(width, height)
         //Gdx.graphics.setWindowedMode(width, height)
@@ -921,6 +892,10 @@ fun blendScreen(batch: SpriteBatch? = null) {
     (batch ?: Terrarum.batch).enableBlending()
     (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
+}
+
+fun blendDisable(batch: SpriteBatch? = null) {
+    (batch ?: Terrarum.batch).disableBlending()
 }
 
 object BlendMode {
