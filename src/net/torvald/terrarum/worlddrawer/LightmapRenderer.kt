@@ -12,6 +12,7 @@ import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
 import net.torvald.terrarum.floorInt
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import java.util.*
 
 /**
@@ -54,7 +55,7 @@ object LightmapRendererOld {
     private val AIR = Block.AIR
 
     private const val TILE_SIZE = FeaturesDrawer.TILE_SIZE
-    private val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / Ingame.lightmapDownsample
+    private val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / IngameRenderer.lightmapDownsample
 
     // color model related constants
     const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB

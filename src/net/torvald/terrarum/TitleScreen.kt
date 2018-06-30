@@ -16,6 +16,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.serialise.ReadLayerData
 import net.torvald.terrarum.ui.UICanvas
@@ -104,7 +105,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     private val gradWhiteTop = Color(0xf8f8f8ff.toInt())
     private val gradWhiteBottom = Color(0xd8d8d8ff.toInt())
 
-    private val lightFBOformat = Pixmap.Format.RGB888
+    private val lightFBOformat = Pixmap.Format.RGBA8888
     lateinit var lightmapFboA: FrameBuffer
     lateinit var lightmapFboB: FrameBuffer
     private var lightmapInitialised = false // to avoid nullability of lightmapFBO
@@ -278,9 +279,9 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
         // draw tiles //
-        BlocksDrawer.renderWall(batch)
-        BlocksDrawer.renderTerrain(batch)
-        BlocksDrawer.renderFront(batch, false)
+        BlocksDrawer.renderWall(batch.projectionMatrix)
+        BlocksDrawer.renderTerrain(batch.projectionMatrix)
+        BlocksDrawer.renderFront(batch.projectionMatrix, false)
 
 
         FeaturesDrawer.drawEnvOverlay(batch)
@@ -311,7 +312,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         batch.draw(lightTex,
                 xrem,
                 yrem,
-                lightTex.width * Ingame.lightmapDownsample, lightTex.height * Ingame.lightmapDownsample
+                lightTex.width * IngameRenderer.lightmapDownsample, lightTex.height * IngameRenderer.lightmapDownsample
                 //lightTex.width.toFloat(), lightTex.height.toFloat() // for debugging
         )
 
@@ -420,7 +421,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
     fun processBlur(mode: Int) {
         val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
-        val blurRadius = 4f / Ingame.lightmapDownsample // (5, 4f); using low numbers for pixel-y aesthetics
+        val blurRadius = 4f / IngameRenderer.lightmapDownsample // (5, 4f); using low numbers for pixel-y aesthetics
 
         var blurWriteBuffer = lightmapFboA
         var blurReadBuffer = lightmapFboB
@@ -429,10 +430,12 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         lightmapFboA.inAction(null, null) {
             Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            Gdx.gl.glDisable(GL20.GL_BLEND)
         }
         lightmapFboB.inAction(null, null) {
             Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            Gdx.gl.glDisable(GL20.GL_BLEND)
         }
 
 
@@ -440,9 +443,10 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             // initialise readBuffer with untreated lightmap
             blurReadBuffer.inAction(camera, batch) {
                 batch.inUse {
-                    blendNormal(batch)
+                    //blendNormal(batch)
+                    blendDisable(batch)
                     batch.color = Color.WHITE
-                    LightmapRenderer.draw(batch, LightmapRenderer.DRAW_FOR_RGB)
+                    LightmapRenderer.draw(batch)
                 }
             }
         }
@@ -450,9 +454,10 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             // initialise readBuffer with untreated lightmap
             blurReadBuffer.inAction(camera, batch) {
                 batch.inUse {
-                    blendNormal(batch)
+                    //blendNormal(batch)
+                    blendDisable(batch)
                     batch.color = Color.WHITE
-                    LightmapRenderer.draw(batch, LightmapRenderer.DRAW_FOR_ALPHA)
+                    LightmapRenderer.draw(batch)
                 }
             }
         }

@@ -25,12 +25,6 @@ object PostProcessor {
     }
 
     fun draw(fbo: FrameBuffer) {
-        //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
-        //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        //Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
-        //Gdx.gl.glEnable(GL20.GL_BLEND)
-        //Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-
 
         if (textureRegion == null) {
             textureRegion = TextureRegion(fbo.colorBufferTexture)
@@ -49,20 +43,23 @@ object PostProcessor {
 
         Terrarum.debugTimers["GFX.PostProcessor"] = measureNanoTime {
 
+            //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
+            //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            //Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+            //Gdx.gl.glEnable(GL20.GL_BLEND)
+            //Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+
             val shader = AppLoader.shader18Bit
 
             // no-screen screen renders but the game don't? wtf?
 
-            batch.inUse {
-
-                batch.shader = shader
-                shader.setUniformf("resolution", AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
-                batch.draw(textureRegion, 0f, 0f)
-
-            }
+            shader.begin()
+            shader.setUniformf("resolution", AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
+            AppLoader.fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
+            shader.end()
 
 
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // don't know why it is needed; it really depresses me
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
 
         }
