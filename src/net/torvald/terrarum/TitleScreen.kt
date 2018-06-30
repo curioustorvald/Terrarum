@@ -105,10 +105,6 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     private val gradWhiteTop = Color(0xf8f8f8ff.toInt())
     private val gradWhiteBottom = Color(0xd8d8d8ff.toInt())
 
-    private val lightFBOformat = Pixmap.Format.RGBA8888
-    lateinit var lightmapFboA: FrameBuffer
-    lateinit var lightmapFboB: FrameBuffer
-    private var lightmapInitialised = false // to avoid nullability of lightmapFBO
 
     lateinit var logo: TextureRegion
 
@@ -241,7 +237,6 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
     fun renderScreen() {
 
-        processBlur(LightmapRenderer.DRAW_FOR_RGB)
         //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
         // render world
@@ -249,97 +244,15 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
 
+        IngameRenderer.invoke(world = demoWorld, uisToDraw = uiContainer)
+
+
         batch.inUse {
             setCameraPosition(0f, 0f)
             batch.shader = null
-
-            Gdx.gl.glEnable(GL20.GL_BLEND)
-            renderDemoWorld()
-
-            batch.shader = null
             batch.color = Color.WHITE
-            renderMenus()
             renderOverlayTexts()
         }
-    }
-
-    private fun renderDemoWorld() {
-        //println("camera TL: ${WorldCamera.x}, ${WorldCamera.y}")
-        //println("camera CN: ${WorldCamera.gdxCamX}, ${WorldCamera.gdxCamY}")
-        //println()
-
-
-
-        // draw skybox //
-
-        setCameraPosition(0f, 0f)
-        batch.color = Color.WHITE
-        blendNormal()
-        WeatherMixer.render(camera, demoWorld)
-
-
-        // draw tiles //
-        BlocksDrawer.renderWall(batch.projectionMatrix)
-        BlocksDrawer.renderTerrain(batch.projectionMatrix)
-        BlocksDrawer.renderFront(batch.projectionMatrix, false)
-
-
-        FeaturesDrawer.drawEnvOverlay(batch)
-
-
-        ///////////////////
-        // draw lightmap //
-        ///////////////////
-
-        setCameraPosition(0f, 0f)
-
-        batch.shader = Terrarum.shaderBayer
-        batch.shader.setUniformf("rcount", 64f)
-        batch.shader.setUniformf("gcount", 64f)
-        batch.shader.setUniformf("bcount", 64f) // de-banding
-
-
-
-        val lightTex = lightmapFboB.colorBufferTexture // A or B? flipped in Y means you chose wrong buffer; use one that works correctly
-        lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest) // blocky feeling for A E S T H E T I C S
-
-        blendMul()
-        //blendNormal()
-
-        batch.color = Color.WHITE
-        val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF)
-        val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF)
-        batch.draw(lightTex,
-                xrem,
-                yrem,
-                lightTex.width * IngameRenderer.lightmapDownsample, lightTex.height * IngameRenderer.lightmapDownsample
-                //lightTex.width.toFloat(), lightTex.height.toFloat() // for debugging
-        )
-
-
-
-        //////////////////////
-        // Draw other shits //
-        //////////////////////
-
-
-        batch.shader = null
-
-
-        // move camera back to its former position
-        // using custom code for camera; this is obscure and tricky
-        camera.position.set(WorldCamera.gdxCamX, WorldCamera.gdxCamY, 0f) // make camara work
-        camera.update()
-        batch.projectionMatrix = camera.combined
-    }
-
-    private fun renderMenus() {
-        setCameraPosition(0f, 0f)
-        blendNormal()
-        batch.shader = null
-
-
-        uiContainer.forEach { it.render(batch, camera) }
     }
 
     private fun renderOverlayTexts() {
@@ -385,29 +298,13 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             // 2: The UI is coded shit
         }
 
-        if (lightmapInitialised) {
-            lightmapFboA.dispose()
-            lightmapFboB.dispose()
-        }
-        lightmapFboA = FrameBuffer(
-                lightFBOformat,
-                LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
-                LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
-                false
-        )
-        lightmapFboB = FrameBuffer(
-                lightFBOformat,
-                LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
-                LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
-                false
-        )
-        lightmapInitialised = true // are you the first time?
+        IngameRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
     }
 
     override fun dispose() {
         logo.texture.dispose()
-        lightmapFboA.dispose()
-        lightmapFboB.dispose()
+
+        IngameRenderer.dispose()
 
         uiMenu.dispose()
     }
@@ -418,84 +315,6 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         Ingame.setCameraPosition(batch, camera, newX, newY)
     }
 
-
-    fun processBlur(mode: Int) {
-        val blurIterations = 5 // ideally, 4 * radius; must be even/odd number -- odd/even number will flip the image
-        val blurRadius = 4f / IngameRenderer.lightmapDownsample // (5, 4f); using low numbers for pixel-y aesthetics
-
-        var blurWriteBuffer = lightmapFboA
-        var blurReadBuffer = lightmapFboB
-
-
-        lightmapFboA.inAction(null, null) {
-            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-            Gdx.gl.glDisable(GL20.GL_BLEND)
-        }
-        lightmapFboB.inAction(null, null) {
-            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-            Gdx.gl.glDisable(GL20.GL_BLEND)
-        }
-
-
-        if (mode == LightmapRenderer.DRAW_FOR_RGB) {
-            // initialise readBuffer with untreated lightmap
-            blurReadBuffer.inAction(camera, batch) {
-                batch.inUse {
-                    //blendNormal(batch)
-                    blendDisable(batch)
-                    batch.color = Color.WHITE
-                    LightmapRenderer.draw(batch)
-                }
-            }
-        }
-        else {
-            // initialise readBuffer with untreated lightmap
-            blurReadBuffer.inAction(camera, batch) {
-                batch.inUse {
-                    //blendNormal(batch)
-                    blendDisable(batch)
-                    batch.color = Color.WHITE
-                    LightmapRenderer.draw(batch)
-                }
-            }
-        }
-
-
-
-        for (i in 0 until blurIterations) {
-            blurWriteBuffer.inAction(camera, batch) {
-
-                batch.inUse {
-                    val texture = blurReadBuffer.colorBufferTexture
-
-                    texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-
-
-                    batch.shader = Terrarum.shaderBlur
-                    batch.shader.setUniformf("iResolution",
-                            blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())
-                    batch.shader.setUniformf("flip", 1f)
-                    if (i % 2 == 0)
-                        batch.shader.setUniformf("direction", blurRadius, 0f)
-                    else
-                        batch.shader.setUniformf("direction", 0f, blurRadius)
-
-
-                    batch.color = Color.WHITE
-                    batch.draw(texture, 0f, 0f)
-
-
-                    // swap
-                    val t = blurWriteBuffer
-                    blurWriteBuffer = blurReadBuffer
-                    blurReadBuffer = t
-                }
-            }
-        }
-
-    }
 
 
     class TitleScreenController(val screen: TitleScreen) : InputAdapter() {

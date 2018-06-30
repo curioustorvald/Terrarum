@@ -9,6 +9,7 @@ import net.torvald.dataclass.CircularArray
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleBase
@@ -49,8 +50,7 @@ object IngameRenderer {
 
     private var initDone = false
 
-    private val world = (Terrarum.ingame as Ingame).world
-    private lateinit var player: ActorHumanoid
+    private var player: ActorHumanoid? = null
 
     var uiListToDraw = ArrayList<UICanvas>()
 
@@ -59,12 +59,13 @@ object IngameRenderer {
     private var debugMode = 0
 
     operator fun invoke(
-            actorsRenderBehind: List<ActorWithBody>,
-            actorsRenderMiddle: List<ActorWithBody>,
-            actorsRenderMidTop: List<ActorWithBody>,
-            actorsRenderFront : List<ActorWithBody>,
-            particlesContainer: CircularArray<ParticleBase>,
-            player: ActorHumanoid,
+            world: GameWorld,
+            actorsRenderBehind: List<ActorWithBody>? = null,
+            actorsRenderMiddle: List<ActorWithBody>? = null,
+            actorsRenderMidTop: List<ActorWithBody>? = null,
+            actorsRenderFront : List<ActorWithBody>? = null,
+            particlesContainer: CircularArray<ParticleBase>? = null,
+            player: ActorHumanoid? = null,
             uisToDraw: ArrayList<UICanvas>? = null
     ) {
 
@@ -72,7 +73,7 @@ object IngameRenderer {
             uiListToDraw = uisToDraw
         }
 
-        init()
+        init(world)
         this.player = player
 
 
@@ -214,11 +215,11 @@ object IngameRenderer {
     }
 
     private fun drawToRGB(
-            actorsRenderBehind: List<ActorWithBody>,
-            actorsRenderMiddle: List<ActorWithBody>,
-            actorsRenderMidTop: List<ActorWithBody>,
-            actorsRenderFront : List<ActorWithBody>,
-            particlesContainer: CircularArray<ParticleBase>
+            actorsRenderBehind: List<ActorWithBody>?,
+            actorsRenderMiddle: List<ActorWithBody>?,
+            actorsRenderMidTop: List<ActorWithBody>?,
+            actorsRenderFront : List<ActorWithBody>?,
+            particlesContainer: CircularArray<ParticleBase>?
     ) {
         fboRGB.inAction(null, null) { clearBuffer() }
         fboRGB_lightMixed.inAction(null, null) { clearBuffer() }
@@ -235,8 +236,8 @@ object IngameRenderer {
 
             batch.inUse {
                 moveCameraToWorldCoord()
-                actorsRenderBehind.forEach { it.drawBody(batch) }
-                particlesContainer.forEach { it.drawBody(batch) }
+                actorsRenderBehind?.forEach { it.drawBody(batch) }
+                particlesContainer?.forEach { it.drawBody(batch) }
             }
 
             setCameraPosition(0f, 0f)
@@ -247,10 +248,10 @@ object IngameRenderer {
                 // draw actors //
                 /////////////////
                 moveCameraToWorldCoord()
-                actorsRenderMiddle.forEach { it.drawBody(batch) }
-                actorsRenderMidTop.forEach { it.drawBody(batch) }
-                player.drawBody(batch)
-                actorsRenderFront.forEach { it.drawBody(batch) }
+                actorsRenderMiddle?.forEach { it.drawBody(batch) }
+                actorsRenderMidTop?.forEach { it.drawBody(batch) }
+                player?.drawBody(batch)
+                actorsRenderFront?.forEach { it.drawBody(batch) }
                 // --> Change of blend mode <-- introduced by children of ActorWithBody //
             }
 
@@ -299,11 +300,11 @@ object IngameRenderer {
     }
 
     private fun drawToA(
-            actorsRenderBehind: List<ActorWithBody>,
-            actorsRenderMiddle: List<ActorWithBody>,
-            actorsRenderMidTop: List<ActorWithBody>,
-            actorsRenderFront : List<ActorWithBody>,
-            particlesContainer: CircularArray<ParticleBase>
+            actorsRenderBehind: List<ActorWithBody>?,
+            actorsRenderMiddle: List<ActorWithBody>?,
+            actorsRenderMidTop: List<ActorWithBody>?,
+            actorsRenderFront : List<ActorWithBody>?,
+            particlesContainer: CircularArray<ParticleBase>?
     ) {
         fboA.inAction(null, null) {
             clearBuffer()
@@ -325,8 +326,8 @@ object IngameRenderer {
 
             batch.inUse {
                 moveCameraToWorldCoord()
-                actorsRenderBehind.forEach { it.drawGlow(batch) }
-                particlesContainer.forEach { it.drawGlow(batch) }
+                actorsRenderBehind?.forEach { it.drawGlow(batch) }
+                particlesContainer?.forEach { it.drawGlow(batch) }
             }
 
             setCameraPosition(0f, 0f)
@@ -337,10 +338,10 @@ object IngameRenderer {
                 // draw actors //
                 /////////////////
                 moveCameraToWorldCoord()
-                actorsRenderMiddle.forEach { it.drawGlow(batch) }
-                actorsRenderMidTop.forEach { it.drawGlow(batch) }
-                player.drawGlow(batch)
-                actorsRenderFront.forEach { it.drawGlow(batch) }
+                actorsRenderMiddle?.forEach { it.drawGlow(batch) }
+                actorsRenderMidTop?.forEach { it.drawGlow(batch) }
+                player?.drawGlow(batch)
+                actorsRenderFront?.forEach { it.drawGlow(batch) }
                 // --> Change of blend mode <-- introduced by children of ActorWithBody //
             }
         }
@@ -382,7 +383,7 @@ object IngameRenderer {
     }
 
 
-    private fun init() {
+    private fun init(world: GameWorld) {
         if (!initDone) {
             batch = SpriteBatch()
             camera = OrthographicCamera(widthf, heightf)
