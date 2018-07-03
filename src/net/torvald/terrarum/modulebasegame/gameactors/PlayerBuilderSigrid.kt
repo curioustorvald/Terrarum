@@ -15,10 +15,9 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 object PlayerBuilderSigrid {
 
     operator fun invoke(): Player {
-        val p = Player((Terrarum.ingame!! as Ingame).world, GameDate(-2147483648, 0)) // XD
+        val p = Player((Terrarum.ingame!! as Ingame).world, -9223372036854775807L) // XD
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
-        p.historicalFigureIdentifier = 0x51621D // the only constant of this procedural universe
 
 
         p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/test_player.tga"), 28, 51))

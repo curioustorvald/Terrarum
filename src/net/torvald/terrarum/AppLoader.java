@@ -110,7 +110,9 @@ public class AppLoader implements ApplicationListener {
 
 
     private static ShaderProgram shaderBayerSkyboxFill;
-    public static ShaderProgram shader18Bit;
+    public static ShaderProgram shaderHicolour;
+    public static ShaderProgram shaderColLUT;
+
     public static Mesh fullscreenQuad;
     private OrthographicCamera camera;
     private SpriteBatch logoBatch;
@@ -147,8 +149,8 @@ public class AppLoader implements ApplicationListener {
 
 
         shaderBayerSkyboxFill = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"));
-
-        shader18Bit = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/18BitColour.frag"));
+        shaderHicolour = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/hicolour.frag"));
+        shaderColLUT = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/passthru.frag"));
 
 
 

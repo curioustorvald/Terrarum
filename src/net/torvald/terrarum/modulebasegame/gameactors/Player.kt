@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.gameworld.time_t
 
 
 /**
@@ -9,7 +10,7 @@ import net.torvald.terrarum.gameworld.GameWorld
  * Created by minjaesong on 2015-12-31.
  */
 
-class Player(world: GameWorld, born: GameDate) : ActorHumanoid(world, born) {
+class Player(world: GameWorld, born: time_t) : ActorHumanoid(world, born) {
 
     companion object {
         @Transient const val PLAYER_REF_ID: Int = 0x91A7E2

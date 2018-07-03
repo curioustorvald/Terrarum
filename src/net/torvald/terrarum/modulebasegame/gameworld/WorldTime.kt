@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
-import net.torvald.terrarum.modulebasegame.gameactors.GameDate
+
+typealias time_t = Long
 
 /**
  * The World Calendar implementation of Dwarven Calendar, except:
@@ -107,9 +108,6 @@ class WorldTime(initTime: Long = 0L) {
     )
     val MONTH_NAMES_SHORT = arrayOf("Opal", "Obsi", "Gran", "Slat", "Fels", "Hema",
             "Mala", "Gale", "Lime", "Sand", "Timb", "Moon")
-
-    inline val currentTimeAsGameDate: GameDate
-        get() = GameDate(years, yearlyDays)
 
     companion object {
         /** Each day is 22-hour long */

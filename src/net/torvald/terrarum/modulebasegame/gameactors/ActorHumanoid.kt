@@ -14,6 +14,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameworld.time_t
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
@@ -28,10 +29,10 @@ import java.util.*
  */
 open class ActorHumanoid(
         world: GameWorld,
-        birth: GameDate,
-        death: GameDate? = null,
+        birth: time_t,
+        death: time_t? = null,
         usePhysics: Boolean = true
-) : HistoricalFigure(world, birth, death, usePhysics = usePhysics), Controllable, Pocketed, Factionable, Luminous, LandHolder {
+) : ActorWithPhysics(world, RenderOrder.MIDDLE, usePhysics = usePhysics), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
 
 
 
@@ -163,6 +164,11 @@ open class ActorHumanoid(
         override var stackable = false
         override val isDynamic = false
         override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
+    }
+
+    init {
+        actorValue[AVKey.__HISTORICAL_BORNTIME] = birth
+        death?.let { actorValue[AVKey.__HISTORICAL_DEADTIME] = death }
     }
 
     override fun update(delta: Float) {
