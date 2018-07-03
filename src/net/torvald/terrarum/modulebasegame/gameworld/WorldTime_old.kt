@@ -1,7 +1,5 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
-import net.torvald.terrarum.modulebasegame.gameactors.GameDate
-
 /**
  * The World Calendar implementation of Dwarven Calendar (we're talking about DF!)
  *
@@ -49,8 +47,6 @@ class YeOldeWorldTime {
     val MONTH_NAMES_SHORT = arrayOf("Opal", "Obsi", "Gran", "Slat", "Fels", "Hema",
             "Mala", "Gale", "Lime", "Sand", "Timb", "Moon")
 
-    val currentTimeAsGameDate: GameDate
-        get() = GameDate(years, yearlyDays)
 
     @Transient val REAL_SEC_IN_MILLI = 1000
 

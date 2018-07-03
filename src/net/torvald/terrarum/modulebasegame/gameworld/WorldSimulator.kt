@@ -3,7 +3,6 @@ package net.torvald.terrarum.modulebasegame.gameworld
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.gameactors.AnyPlayer
 import net.torvald.terrarum.roundInt
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -12,6 +11,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameworld.FluidCodex
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 
 /**
  * Created by minjaesong on 2016-08-03.
@@ -40,7 +40,7 @@ object WorldSimulator {
 
     private val world = (Terrarum.ingame!! as Ingame).world
 
-    operator fun invoke(p: AnyPlayer?, delta: Float) {
+    operator fun invoke(p: ActorHumanoid?, delta: Float) {
         if (p != null) {
             updateXFrom = p.hitbox.centeredX.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
             updateYFrom = p.hitbox.centeredY.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()

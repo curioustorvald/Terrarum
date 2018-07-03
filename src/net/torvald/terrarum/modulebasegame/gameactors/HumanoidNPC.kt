@@ -6,6 +6,8 @@ import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
+import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics.Companion.COLLISION_DYNAMIC
+import net.torvald.terrarum.modulebasegame.gameworld.time_t
 
 /**
  * @param ai AI class. Use LuaAIWrapper for Lua script
@@ -15,7 +17,7 @@ import net.torvald.terrarum.itemproperties.Material
 open class HumanoidNPC(
         world: GameWorld,
         override val ai: ActorAI, // it's there for written-in-Kotlin, "hard-wired" AIs
-        born: GameDate,
+        born: time_t,
         usePhysics: Boolean = true,
         forceAssignRefID: Int? = null
 ) : ActorHumanoid(world, born, usePhysics = usePhysics), AIControlled, CanBeAnItem {
