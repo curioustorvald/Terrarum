@@ -23,14 +23,11 @@ uniform sampler2D backgroundTexture;
 
 uniform ivec2 tilesInAtlas = ivec2(256, 256);
 uniform ivec2 atlasTexSize = ivec2(4096, 4096);
+ivec2 tileSizeInPx = atlasTexSize / tilesInAtlas;
 
 uniform vec4 colourFilter = vec4(1, 1, 1, 1);
 
 uniform ivec2 cameraTranslation = ivec2(0, 0);
-uniform int tileSizeInPx = 16;
-
-
-vec4 nocolour = vec4(0,0,0,0);
 
 
 ivec2 getTileXY(int tileNumber) {
@@ -75,8 +72,10 @@ void main() {
     // TODO blend a breakage (0xrrggbb where 0xr0 -- upper 4 bits of int_red component)
 
 
-    if (tileXY.x == 0 && tileXY.y == 0)
+    // if statements considered harmful
+    //        --definitely not Dijkstra
+    /*if (tileXY.x == 0 && tileXY.y == 0)
         gl_FragColor = nocolour;
-    else
+    else*/
         gl_FragColor = colourFilter * texture2D(tilesAtlas, finalUVCoordForTile);
 }

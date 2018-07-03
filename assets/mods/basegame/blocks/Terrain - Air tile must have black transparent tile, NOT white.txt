@@ -1,0 +1,1 @@
+Air tile (tile 0,0) must have colour of 0x00000000, NOT 0xFFFFFF00. You can modify the tga file directly to correct bad exporter behaviour.
