@@ -94,6 +94,8 @@ public class AppLoader implements ApplicationListener {
 
 
     public static void main(String[] args) {
+        ShaderProgram.pedantic = false;
+
         appConfig = new LwjglApplicationConfiguration();
         appConfig.vSyncEnabled = false;
         appConfig.resizable = false;//true;
@@ -114,8 +116,8 @@ public class AppLoader implements ApplicationListener {
     private SpriteBatch logoBatch;
     public static TextureRegion logo;
 
-    private Color gradWhiteTop = new Color(0xd8d8d8ff);
-    private Color gradWhiteBottom = new Color(0xf8f8f8ff);
+    private Color gradWhiteTop = new Color(0xf8f8f8ff);
+    private Color gradWhiteBottom = new Color(0xd8d8d8ff);
 
     public Screen screen;
 
@@ -131,7 +133,7 @@ public class AppLoader implements ApplicationListener {
     }
 
     private float loadTimer = 0f;
-    private final float showupTime = 50f / 1000f;
+    private final float showupTime = 100f / 1000f;
 
     private FrameBuffer renderFBO;
 
@@ -168,6 +170,7 @@ public class AppLoader implements ApplicationListener {
 
 
         logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
+        logo.flip(false, true);
 
 
         TextureRegionPack.Companion.setGlobalFlipY(true);
@@ -177,6 +180,18 @@ public class AppLoader implements ApplicationListener {
     @Override
     public void render() {
 
+        FrameBufferManager.begin(renderFBO);
+        Gdx.gl.glClearColor(.094f, .094f, .094f, 0f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD);
+        FrameBufferManager.end();
+
+
+        FrameBufferManager.begin(renderFBO);
+        setCameraPosition(0, 0);
 
         if (screen == null) {
             shaderBayerSkyboxFill.begin();
@@ -209,28 +224,14 @@ public class AppLoader implements ApplicationListener {
             }
         }
         else {
-            FrameBufferManager.begin(renderFBO);
-            Gdx.gl.glClearColor(.094f, .094f, .094f, 0f);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-            Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-            Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD);
-            FrameBufferManager.end();
-
-
-
-            // nested FBOs are just not a thing in GL!
-
-            FrameBufferManager.begin(renderFBO);
-            setCameraPosition(0, 0);
             screen.render(Gdx.graphics.getDeltaTime());
-            FrameBufferManager.end();
-
-
-
-            PostProcessor.INSTANCE.draw(camera.combined, renderFBO);
         }
+
+        // nested FBOs are just not a thing in GL!
+        FrameBufferManager.end();
+
+        PostProcessor.INSTANCE.draw(camera.combined, renderFBO);
+
 
 
         GLOBAL_RENDER_TIMER += 1;
