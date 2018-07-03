@@ -108,4 +108,8 @@ object AVKey {
 
     const val HEALTH = "health"
     const val MAGIC = "magic"
+
+
+    const val __HISTORICAL_BORNTIME = "__borntime" // time_t
+    const val __HISTORICAL_DEADTIME = "__deadtime" // time_t
 }
