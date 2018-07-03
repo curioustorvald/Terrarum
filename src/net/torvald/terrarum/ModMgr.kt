@@ -24,7 +24,7 @@ import javax.script.Invocable
 
 
 /**
- * Modules Resource Manager
+ * Modules (or Mods) Resource Manager
  *
  *
  * NOTE!!: Usage of Groovy is only temporary; if Kotlin's "JSR 223" is no longer experimental and
@@ -47,15 +47,17 @@ object ModMgr {
             val entryPoint: String,
             val releaseDate: String,
             val version: String,
-            val libraries: Array<String>
+            val libraries: Array<String>,
+            val dependencies: Array<String>
     ) {
         override fun toString() =
                 "\tModule #$order -- $properName | $version | $author\n" +
                 "\t$description | $releaseDate\n" +
                 "\tEntry point: $entryPoint\n" +
-                "\tExternal libraries: ${libraries.joinToString(", ")}"
+                "\tExternal libraries: ${libraries.joinToString(", ")}\n" +
+                "\tDependencies: ${dependencies.joinToString("\n\t")}"
     }
-    const val modDir = "./assets/modules"
+    const val modDir = "./assets/mods"
 
     val moduleInfo = HashMap<String, ModuleMetadata>()
 
@@ -93,9 +95,10 @@ object ModMgr {
                 val entryPoint = modMetadata.getProperty("entrypoint")
                 val releaseDate = modMetadata.getProperty("releasedate")
                 val version = modMetadata.getProperty("version")
-                val libs = modMetadata.getProperty("libraries").split(';').toTypedArray()
+                val libs = modMetadata.getProperty("libraries").split(Regex(""";[ ]*""")).toTypedArray()
+                val dependency = modMetadata.getProperty("dependency").split(Regex(""";[ ]*""")).toTypedArray()
                 val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
-                moduleInfo[moduleName] = ModuleMetadata(index, isDir, properName, description, author, entryPoint, releaseDate, version, libs)
+                moduleInfo[moduleName] = ModuleMetadata(index, isDir, properName, description, author, entryPoint, releaseDate, version, libs, dependency)
 
                 println(moduleInfo[moduleName])
 
@@ -107,6 +110,7 @@ object ModMgr {
                     val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
 
                     (newClassInstance as ModuleEntryPoint).invoke()
+
                 }
 
 
@@ -114,6 +118,9 @@ object ModMgr {
             }
             catch (noSuchModule: FileNotFoundException) {
                 System.err.println("[ModMgr] No such module: $moduleName, skipping...")
+            }
+            catch (e: ClassNotFoundException) {
+                System.err.println("[ModMgr] $moduleName has nonexisting entry point, skipping...")
             }
         }
 

@@ -96,7 +96,7 @@ public class AppLoader implements ApplicationListener {
     public static void main(String[] args) {
         appConfig = new LwjglApplicationConfiguration();
         appConfig.vSyncEnabled = false;
-        appConfig.resizable = true;
+        appConfig.resizable = false;//true;
         appConfig.width = 1072;
         appConfig.height = 742;
         appConfig.backgroundFPS = 9999;
@@ -146,10 +146,7 @@ public class AppLoader implements ApplicationListener {
 
         shaderBayerSkyboxFill = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"));
 
-        //shader18Bit = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/18BitColour.frag"));
-
-        // Q & D test for the new post shader
-        shader18Bit = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/crt.frag"));
+        shader18Bit = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/18BitColour.frag"));
 
 
 
@@ -212,24 +209,27 @@ public class AppLoader implements ApplicationListener {
             }
         }
         else {
-            renderFBO.begin();
-
-
-
+            FrameBufferManager.begin(renderFBO);
             Gdx.gl.glClearColor(.094f, .094f, .094f, 0f);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
             Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD);
+            FrameBufferManager.end();
 
+
+
+            // nested FBOs are just not a thing in GL!
+
+            FrameBufferManager.begin(renderFBO);
+            setCameraPosition(0, 0);
             screen.render(Gdx.graphics.getDeltaTime());
+            FrameBufferManager.end();
 
 
 
-            renderFBO.end();
-
-
-            //PostProcessor.INSTANCE.draw(renderFBO);
+            PostProcessor.INSTANCE.draw(camera.combined, renderFBO);
         }
 
 
@@ -241,7 +241,7 @@ public class AppLoader implements ApplicationListener {
         //initViewPort(width, height);
 
         Terrarum.INSTANCE.resize(width, height);
-        if (screen != null) screen.resize(width, height);
+        if (screen != null) screen.resize(Terrarum.INSTANCE.getWIDTH(), Terrarum.INSTANCE.getHEIGHT());
 
 
         if (renderFBO == null ||
@@ -255,6 +255,9 @@ public class AppLoader implements ApplicationListener {
                     false
             );
         }
+
+        appConfig.width = Terrarum.INSTANCE.getWIDTH();
+        appConfig.height = Terrarum.INSTANCE.getHEIGHT();
 
         System.out.println("[AppLoader] Resize event");
     }

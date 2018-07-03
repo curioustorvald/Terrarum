@@ -86,7 +86,12 @@ object IngameRenderer {
         drawToA(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
 
         // clear main or whatever super-FBO being used
-        clearBuffer()
+        //clearBuffer()
+        Gdx.gl.glClearColor(.64f, .754f, .84f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         ///////////////////////////////////////////////////////////////////////
 
@@ -277,6 +282,7 @@ object IngameRenderer {
 
                 // multiply light on top of it
                 val lightTex = lightmapFboB.colorBufferTexture
+                lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
                 if (KeyToggler.isOn(Input.Keys.F8))
                     blendNormal(batch)
@@ -360,6 +366,7 @@ object IngameRenderer {
 
                 // multiply light on top of it
                 val lightTex = lightmapFboB.colorBufferTexture
+                lightTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
                 if (KeyToggler.isOn(Input.Keys.F8))
                     blendNormal(batch)
