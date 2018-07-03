@@ -1,0 +1,9 @@
+\contentsline {section}{\numberline {0.1}Arcanum Fluxes}{7}{section.0.1}
+\contentsline {section}{\numberline {0.2}Arcanum Ports}{7}{section.0.2}
+\contentsline {section}{\numberline {0.3}Arcanum Manipulation}{7}{section.0.3}
+\contentsline {section}{\numberline {0.4}Cost of Power}{8}{section.0.4}
+\contentsline {section}{\numberline {0.5}Fluctuating Calculation}{8}{section.0.5}
+\contentsline {section}{\numberline {0.6}Different Ports}{8}{section.0.6}
+\contentsline {section}{\numberline {0.7}Writing System}{8}{section.0.7}
+\contentsline {section}{\numberline {0.8}Arcane Language}{8}{section.0.8}
+\contentsline {section}{\numberline {0.9}Where They Come From}{8}{section.0.9}
