@@ -413,6 +413,11 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
 
+        // these need to appear on top of any others
+        uiContainer.add(notifier)
+        uiContainer.add(debugWindow)
+
+
         LightmapRenderer.fireRecalculateEvent()
 
 
@@ -571,8 +576,8 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         // ui-related updates //
         ////////////////////////
         uiContainer.forEach { it.update(delta) }
-        debugWindow.update(delta)
-        notifier.update(delta)
+        //debugWindow.update(delta)
+        //notifier.update(delta)
 
         // update debuggers using javax.swing //
         if (Authenticator.b()) {
