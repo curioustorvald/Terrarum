@@ -5,5 +5,5 @@ Class-Path: lib/commons-codec-1.10.jar lib/commons-csv-1.2.jar lib/gdx
  .jar lib/gson-2.5.jar lib/jnlp.jar lib/jogg-0.0.7.jar lib/jopus.jar l
  ib/jorbis-0.0.17.jar lib/kotlin-reflect.jar lib/kotlin-stdlib.jar lib
  /luaj-jse-3.0.1.jar lib/Terrarum_Joise.jar lib/TerrarumSansBitmap.jar
-Main-Class: net.torvald.terrarum.TerrarumKt
+Main-Class: net.torvald.terrarum.AppLoader
 
