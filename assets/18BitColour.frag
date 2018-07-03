@@ -10,5 +10,5 @@ void main(void) {
     color.b = floor(63.0 * color.b + 0.5) / 63.0;
     // a: passthrough
 
-    gl_FragColor = vec4(color.rgb, 0.0);
+    gl_FragColor = vec4(color.rgb, 1);
 }
