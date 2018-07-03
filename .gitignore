@@ -5,8 +5,8 @@ Thumbs.db
 *.jar
 .DS_Store
 ~$*
-assets/modules/basegame/demoworld
-assets/modules/basegame/demoworld.gz
+assets/mods/basegame/demoworld
+assets/mods/basegame/demoworld.gz
 external_resource_packs.zip
 .idea/workspace.xml
 .tmp*

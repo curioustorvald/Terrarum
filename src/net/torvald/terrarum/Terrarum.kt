@@ -833,13 +833,19 @@ inline fun ShapeRenderer.inUse(shapeRendererType: ShapeRenderer.ShapeType = Shap
 
 /** Use Batch inside of it! */
 inline fun FrameBuffer.inAction(camera: OrthographicCamera?, batch: SpriteBatch?, action: (FrameBuffer) -> Unit) {
-    this.begin()
+    //this.begin()
+    FrameBufferManager.begin(this)
+
     camera?.setToOrtho(true, this.width.toFloat(), this.height.toFloat())
     camera?.position?.set((this.width / 2f).round(), (this.height / 2f).round(), 0f) // TODO floor? ceil? round?
     camera?.update()
     batch?.projectionMatrix = camera?.combined
+
     action(this)
-    this.end()
+
+    //this.end()
+    FrameBufferManager.end()
+
     camera?.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
     camera?.update()
     batch?.projectionMatrix = camera?.combined
