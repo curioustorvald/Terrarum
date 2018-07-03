@@ -17,7 +17,7 @@ object PlayerBuilderCynthia {
         val p: HumanoidNPC = HumanoidNPC(
                 (Terrarum.ingame!! as Ingame).world,
                 NullAI(),
-                GameDate(100, 143)) // random value thrown
+                -589141658L) // random value thrown
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
 
