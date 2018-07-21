@@ -21,6 +21,10 @@ Colour overlay is set to 6 500 K as untouched. The value must be
 
 Sunlight of the midday must have colour temperature of 5 700 K.
 
+When the atmos is dusty, "colours" of sunrise/sunsets are more apparent: when in sunset, global light and the fog-of-war is more orange/red (atmos gets more colour from the sunlight and less from the sky-blue due to the mie scattering)
+
+Colour of the mie scattering DOES follow the colourimeter observation (orange -> red -> wine bordeaux -> (very short term of) grey -> blueish grey)
+
 
 ## Weather effects ##
 
