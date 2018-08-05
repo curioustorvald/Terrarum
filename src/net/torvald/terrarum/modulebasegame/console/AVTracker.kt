@@ -16,7 +16,7 @@ internal object AVTracker : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         if (args.size < 2) {
-            jPanelInstances.add(ActorValueTracker((Terrarum.ingame!! as Ingame).player))
+            jPanelInstances.add(ActorValueTracker((Terrarum.ingame!! as Ingame).playableActor))
         }
         else {
             try {

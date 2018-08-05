@@ -5,10 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.bipolarClamp
-import net.torvald.terrarum.gameactors.Controllable
-import net.torvald.terrarum.gameactors.Factionable
-import net.torvald.terrarum.gameactors.Hitbox
-import net.torvald.terrarum.gameactors.Luminous
+import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
@@ -32,7 +29,7 @@ open class ActorHumanoid(
         birth: time_t,
         death: time_t? = null,
         usePhysics: Boolean = true
-) : ActorWithPhysics(world, RenderOrder.MIDDLE, usePhysics = usePhysics), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
+) : ActorWBMovable(world, RenderOrder.MIDDLE, usePhysics = usePhysics), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
 
 
 
@@ -139,8 +136,6 @@ open class ActorHumanoid(
     @Transient private var prevHMoveKey = KEY_NULL
     @Transient private var prevVMoveKey = KEY_NULL
 
-    internal var noClip = false
-
     @Transient private val AXIS_KEYBOARD = -13372f // leetz
     @Transient private val GAMEPAD_JUMP = 7
 
@@ -150,7 +145,7 @@ open class ActorHumanoid(
     protected var isRightDown = false
     protected var isJumpDown = false
     protected inline val isGamer: Boolean
-        get() = if (Terrarum.ingame == null) false else this == (Terrarum.ingame!! as Ingame).player
+        get() = if (Terrarum.ingame == null) false else this == Terrarum.ingame!!.playableActor
 
 
     private val nullItem = object : GameItem() {
@@ -174,7 +169,7 @@ open class ActorHumanoid(
     override fun update(delta: Float) {
         super.update(delta)
 
-        if (vehicleRiding is Player)
+        if (vehicleRiding is IngamePlayer)
             throw Error("Attempted to 'ride' player object. ($vehicleRiding)")
         if (vehicleRiding != null && vehicleRiding == this)
             throw Error("Attempted to 'ride' itself. ($vehicleRiding)")
@@ -188,7 +183,7 @@ open class ActorHumanoid(
 
         updateSprite(delta)
 
-        if (noClip) {
+        if (isNoClip) {
             //grounded = true
         }
 
@@ -277,7 +272,7 @@ open class ActorHumanoid(
         }
         // ↑E
         // ↑D
-        if (isNoClip() && !isUpDown && !isDownDown) {
+        if (isNoClip && !isUpDown && !isDownDown) {
             walkVStop()
             prevVMoveKey = KEY_NULL
         }
@@ -313,7 +308,7 @@ open class ActorHumanoid(
         /**
          * Up/Down movement
          */
-        if (noClip || COLLISION_TEST_MODE) {
+        if (isNoClip || COLLISION_TEST_MODE) {
             if (hasController) {
                 if (axisY != 0f) {
                     walkVertical(axisY < 0, axisY.abs())
@@ -343,7 +338,7 @@ open class ActorHumanoid(
          * Jump control
          */
         if (isJumpDown) {
-            if (!noClip) {
+            if (!isNoClip) {
                 if (airJumpingAllowed ||
                     (!airJumpingAllowed && walledBottom)) {
                     jumping = true
@@ -385,7 +380,7 @@ open class ActorHumanoid(
      * this code base, ACCELERATION must be changed (in other words, we must deal with JERK) accordingly
      * to the FRICTION.
      *
-     * So I'm adding walkX/Y and getting the ActorWithPhysics.setNewNextHitbox to use the velocity value of
+     * So I'm adding walkX/Y and getting the ActorWBMovable.setNewNextHitbox to use the velocity value of
      * walkX/Y + velocity, which is stored in variable moveDelta.
      *
      * Be warned.
@@ -608,18 +603,6 @@ open class ActorHumanoid(
         }
     }
 
-    fun isNoClip(): Boolean {
-        return noClip
-    }
-
-    fun setNoClip(b: Boolean) {
-        noClip = b
-
-        if (b) {
-            externalForce.zero()
-            controllerMoveDelta?.zero()
-        }
-    }
 
     fun Float.abs() = FastMath.abs(this)
 

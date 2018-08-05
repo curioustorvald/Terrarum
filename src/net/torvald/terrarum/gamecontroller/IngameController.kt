@@ -41,14 +41,14 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
         // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
         if (ingame.canPlayerControl) {
             if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary")) || Gdx.input.isButtonPressed(Terrarum.getConfigInt("mousesecondary"))) {
-                val itemOnGrip = ingame.player.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
+                val itemOnGrip = ingame.playableActor.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
                 itemOnGrip?.let {
                     if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary"))) {
-                        ingame.player.consumePrimary(it)
+                        ingame.playableActor.consumePrimary(it)
                     }
                     if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mousesecondary"))) {
-                        ingame.player.consumeSecondary(it)
+                        ingame.playableActor.consumeSecondary(it)
                     }
                 }
             }
@@ -63,7 +63,7 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
     override fun keyDown(keycode: Int): Boolean {
 
         if (ingame.canPlayerControl) {
-            ingame.player.keyDown(keycode)
+            ingame.playableActor.keyDown(keycode)
         }
 
         if (Terrarum.getConfigIntArray("keyquickselalt").contains(keycode)
@@ -112,7 +112,7 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         // don't separate Player from this! Physics will break, esp. airborne manoeuvre
         if (ingame.canPlayerControl) {
-            val itemOnGrip = ingame.player.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
+            val itemOnGrip = ingame.playableActor.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
             if (itemOnGrip != null) {
                 if (button == Terrarum.getConfigInt("mouseprimary")) {

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.gameactors.AVKey
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -28,8 +28,8 @@ class UIQuickBar : UICanvas() {
     private val startPointY = ItemSlotImageBuilder.slotImage.tileH / 2
 
     private var selection: Int
-        get() = (Terrarum.ingame!! as Ingame).player.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
-        set(value) { (Terrarum.ingame!! as Ingame).player.actorValue.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
+        get() = (Terrarum.ingame!! as Ingame).playableActor.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
+        set(value) { (Terrarum.ingame!! as Ingame).playableActor.actorValue.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
     
     override fun updateUI(delta: Float) {
     }
@@ -54,7 +54,7 @@ class UIQuickBar : UICanvas() {
             )
 
             // draw item
-            val itemPair = (Terrarum.ingame!! as Ingame).player.inventory.getQuickBar(i)
+            val itemPair = (Terrarum.ingame!! as Ingame).playableActor.inventory.getQuickBar(i)
 
             if (itemPair != null) {
                 val itemImage = ItemCodex.getItemImage(itemPair.item)

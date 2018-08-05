@@ -1,4 +1,4 @@
-package net.torvald.terrarum.modulebasegame.gameactors
+package net.torvald.terrarum.gameactors
 
 /**
  * See [res/raw/Creature_raw_doc.md] for information about raw.

@@ -3,7 +3,7 @@ package net.torvald.terrarum.worlddrawer
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.floorInt
 
 /**
@@ -29,7 +29,7 @@ object WorldCamera {
     inline val yCentre: Int
         get() = y + height.ushr(1)
 
-    fun update(world: GameWorld, player: ActorWithPhysics) {
+    fun update(world: GameWorld, player: ActorWBMovable) {
 
         width = FastMath.ceil(Terrarum.WIDTH / (Terrarum.ingame?.screenZoom ?: 1f)) // div, not mul
         height = FastMath.ceil(Terrarum.HEIGHT / (Terrarum.ingame?.screenZoom ?: 1f))

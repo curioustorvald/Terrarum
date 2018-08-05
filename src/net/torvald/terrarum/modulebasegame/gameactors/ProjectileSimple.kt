@@ -2,14 +2,14 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.point.Point2d
+import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.Ingame
 import org.dyn4j.geometry.Vector2
 import java.util.*
 
@@ -25,7 +25,7 @@ open class ProjectileSimple(
         private val type: Int,
         fromPoint: Vector2, // projected coord
         toPoint: Vector2    // arriving coord
-) : ActorWithPhysics(world, RenderOrder.MIDTOP), Luminous, Projectile {
+) : ActorWBMovable(world, RenderOrder.MIDTOP), Luminous, Projectile {
 
     val damage: Int
     val displayColour: Color
@@ -77,7 +77,7 @@ open class ProjectileSimple(
         lifetimeCounter += delta
         if (walledTop || walledBottom || walledRight || walledLeft || lifetimeCounter >= lifetimeMax ||
             // stuck check
-            BlockCodex[(Terrarum.ingame!! as Ingame).world.getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Block.STONE].isSolid
+            BlockCodex[(Terrarum.ingame!!.world).getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Block.STONE].isSolid
                 ) {
             flagDespawn()
         }

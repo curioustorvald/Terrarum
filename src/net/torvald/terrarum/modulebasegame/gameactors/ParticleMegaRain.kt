@@ -7,6 +7,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameactors.ActorWBMovable
 
 /**
  * Created by minjaesong on 2017-12-18.
@@ -23,7 +24,7 @@ class ParticleMegaRain(posX: Double, posY: Double) : ParticleBase(Actor.RenderOr
                 w, h
         )
 
-        velocity.y = 11.5 * ActorWithPhysics.SI_TO_GAME_VEL
+        velocity.y = 11.5 * ActorWBMovable.SI_TO_GAME_VEL
     }
 
 }

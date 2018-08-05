@@ -8,7 +8,7 @@ import net.torvald.dataclass.Float16Bits
  *
  * Created by minjaesong on 2017-04-21.
  */
-class MapLayerFloat(val width: Int, val height: Int) : Iterable<Float16Bits> {
+open class MapLayerHalfFloat(val width: Int, val height: Int) : Iterable<Float16Bits> {
 
     constructor(width: Int, height: Int, init: Float) : this(width, height) {
         data = Array(height) { Array(width, { Float16.fromFloat(init) }) }

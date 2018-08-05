@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameworld
 
-import net.torvald.point.Point2d
+import net.torvald.terrarum.Point2d
 
 
 class MapPoint {

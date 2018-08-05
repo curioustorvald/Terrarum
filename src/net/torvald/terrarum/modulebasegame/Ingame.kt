@@ -1,11 +1,8 @@
 package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 
 import net.torvald.dataclass.CircularArray
 import net.torvald.terrarum.blockproperties.BlockPropUtil
@@ -18,28 +15,24 @@ import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
-import net.torvald.terrarum.weather.WeatherMixer
+import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
 import java.util.ArrayList
-import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-import javax.swing.JOptionPane
-
-import com.badlogic.gdx.graphics.OrthographicCamera
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
-import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.console.AVTracker
 import net.torvald.terrarum.modulebasegame.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.SetGlobalLightOverride
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.gameactors.*
+import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.imagefont.Watch7SegMain
 import net.torvald.terrarum.modulebasegame.imagefont.WatchDotAlph
 import net.torvald.terrarum.modulebasegame.ui.*
@@ -53,13 +46,15 @@ import kotlin.system.measureNanoTime
  * Created by minjaesong on 2017-06-16.
  */
 
-class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
-
+open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private val ACTOR_UPDATE_RANGE = 4096
 
-    lateinit var world: GameWorld
     lateinit var historicalFigureIDBucket: ArrayList<Int>
+
+    lateinit var gameworld: GameWorldExtension
+
+    lateinit var theRealGamer: IngamePlayer
 
     /**
      * list of Actors that is sorted by Actors' referenceID
@@ -76,54 +71,17 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     private val actorsRenderMidTop = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
     private val actorsRenderFront  = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
 
-    lateinit var playableActorDelegate: PlayableActorDelegate // player must exist; use dummy player if there is none (required for camera)
-        private set
-    inline val player: ActorHumanoid // currently POSSESSED actor :)
-        get() = playableActorDelegate.actor
 
     //var screenZoom = 1.0f   // definition moved to IngameInstance
     //val ZOOM_MAXIMUM = 4.0f // definition moved to IngameInstance
     //val ZOOM_MINIMUM = 0.5f // definition moved to IngameInstance
 
     companion object {
-        //val lightmapDownsample = 4f //2f: still has choppy look when the camera moves but unnoticeable when blurred
-
-
         /** Sets camera position so that (0,0) would be top-left of the screen, (width, height) be bottom-right. */
         fun setCameraPosition(batch: SpriteBatch, camera: Camera, newX: Float, newY: Float) {
             camera.position.set((-newX + Terrarum.HALFW).round(), (-newY + Terrarum.HALFH).round(), 0f)
             camera.update()
             batch.projectionMatrix = camera.combined
-        }
-
-
-
-        /**
-         * Usage:
-         *
-         * override var referenceID: Int = generateUniqueReferenceID()
-         */
-        fun generateUniqueReferenceID(renderOrder: Actor.RenderOrder): ActorID {
-            fun hasCollision(value: ActorID) =
-                    try {
-                        Terrarum.ingame!!.theGameHasActor(value) ||
-                        value < ItemCodex.ACTORID_MIN ||
-                        value !in when (renderOrder) {
-                            Actor.RenderOrder.BEHIND -> Actor.RANGE_BEHIND
-                            Actor.RenderOrder.MIDDLE -> Actor.RANGE_MIDDLE
-                            Actor.RenderOrder.MIDTOP -> Actor.RANGE_MIDTOP
-                            Actor.RenderOrder.FRONT  -> Actor.RANGE_FRONT
-                        }
-                    }
-                    catch (gameNotInitialisedException: KotlinNullPointerException) {
-                        false
-                    }
-
-            var ret: Int
-            do {
-                ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
-            } while (hasCollision(ret)) // check for collision
-            return ret
         }
     }
 
@@ -131,13 +89,6 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     init {
     }
-
-
-
-    private val useShader: Boolean = false
-    private val shaderProgram = 0
-
-    val KEY_LIGHTMAP_RENDER = Input.Keys.F7
 
 
 
@@ -213,7 +164,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             GameLoadMode.LOAD_FROM  -> enter(gameLoadInfoPayload as GameSaveData)
         }
 
-        LightmapRenderer.world = this.world
+        //LightmapRenderer.world = this.world
         //BlocksDrawer.world = this.world
         FeaturesDrawer.world = this.world
 
@@ -221,9 +172,9 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     data class GameSaveData(
-            val world: GameWorld,
+            val world: GameWorldExtension,
             val historicalFigureIDBucket: ArrayList<Int>,
-            val realGamePlayer: ActorHumanoid
+            val realGamePlayer: IngamePlayer
     )
 
     data class NewWorldParameters(
@@ -244,10 +195,12 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             LoadScreen.addMessage("Loading world from save")
 
 
-            world = gameSaveData.world
+            gameworld = gameSaveData.world
+            world = gameworld
             historicalFigureIDBucket = gameSaveData.historicalFigureIDBucket
-            playableActorDelegate = PlayableActorDelegate(gameSaveData.realGamePlayer)
-            addNewActor(player)
+            theRealGamer = gameSaveData.realGamePlayer
+            playableActor = gameSaveData.realGamePlayer
+            addNewActor(playableActor)
 
 
 
@@ -268,7 +221,8 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             // init map as chosen size
-            world = GameWorld(worldParams.width, worldParams.height)
+            gameworld = GameWorldExtension(worldParams.width, worldParams.height)
+            world = gameworld as GameWorld
 
             // generate terrain for the map
             WorldGenerator.attachMap(world)
@@ -301,7 +255,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     /** Load rest of the game with GL context */
     fun postInit() {
         //LightmapRenderer.world = this.world
-        BlocksDrawer.world = this.world
+        //BlocksDrawer.world = this.world
         //FeaturesDrawer.world = this.world
 
 
@@ -342,7 +296,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 -uiInventoryPlayer.width,
                 70
         )*/
-        uiInventoryPlayer = UIInventoryFull(player,
+        uiInventoryPlayer = UIInventoryFull(playableActor,
                 toggleKeyLiteral = Terrarum.getConfigInt("keyinventory")
         )
         uiInventoryPlayer.setPosition(0, 0)
@@ -368,11 +322,11 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         //uiVitalItem.setAsAlwaysVisible()
 
         // basic watch-style notification bar (temperature, new mail)
-        uiWatchBasic = UIBasicNotifier(player)
+        uiWatchBasic = UIBasicNotifier(playableActor)
         uiWatchBasic.setAsAlwaysVisible()
         uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.width, 0)
 
-        uiWatchTierOne = UITierOneWatch(player)
+        uiWatchTierOne = UITierOneWatch(playableActor)
         uiWatchTierOne.setAsAlwaysVisible()
         uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.width, uiWatchBasic.height - 2)
 
@@ -460,15 +414,15 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         if (!gameFullyLoaded) {
 
             if (gameLoadMode == GameLoadMode.CREATE_NEW) {
-                playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
+                playableActor = PlayerBuilderSigrid()
 
                 // go to spawn position
-                player.setPosition(
+                playableActor.setPosition(
                         world.spawnX * FeaturesDrawer.TILE_SIZE.toDouble(),
                         world.spawnY * FeaturesDrawer.TILE_SIZE.toDouble()
                 )
 
-                addNewActor(player)
+                addNewActor(playableActor)
             }
 
             postInit()
@@ -527,6 +481,8 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     protected fun updateGame(delta: Float) {
+        val world = this.world as GameWorldExtension
+
         particlesActive = 0
 
 
@@ -542,17 +498,17 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             BlockPropUtil.dynamicLumFuncTickClock()
             world.updateWorldTime(delta)
             //WorldSimulator(player, delta)
-            WeatherMixer.update(delta, player)
+            WeatherMixer.update(delta, playableActor)
             BlockStats.update()
             if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
-                world.globalLight = WeatherMixer.globalLightNow
+                gameworld.globalLight = WeatherMixer.globalLightNow
 
 
             ////////////////////////////
             // camera-related updates //
             ////////////////////////////
             FeaturesDrawer.update(delta)
-            WorldCamera.update(world, player)
+            WorldCamera.update(gameworld, playableActor)
 
 
 
@@ -589,13 +545,13 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private fun renderGame() {
         IngameRenderer.invoke(
-                world,
+                world as GameWorldExtension,
                 actorsRenderBehind,
                 actorsRenderMiddle,
                 actorsRenderMidTop,
                 actorsRenderFront,
                 particlesContainer,
-                player,
+                playableActor,
                 uiContainer
         )
     }
@@ -603,39 +559,32 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private fun repossessActor() {
         // check if currently pocessed actor is removed from game
-        if (!theGameHasActor(player)) {
+        if (!theGameHasActor(playableActor)) {
             // re-possess canonical player
-            if (theGameHasActor(Player.PLAYER_REF_ID))
-                changePossession(Player.PLAYER_REF_ID)
+            if (theGameHasActor(Terrarum.PLAYER_REF_ID))
+                changePossession(Terrarum.PLAYER_REF_ID)
             else
                 changePossession(0x51621D) // FIXME fallback debug mode (FIXME is there for a reminder visible in ya IDE)
         }
     }
 
-    private fun changePossession(newActor: PlayableActorDelegate) {
-        if (!theGameHasActor(player)) {
+    private fun changePossession(newActor: ActorHumanoid) {
+        if (!theGameHasActor(playableActor)) {
             throw IllegalArgumentException("No such actor in the game: $newActor")
         }
 
-        playableActorDelegate = newActor
-        WorldSimulator(player, Terrarum.deltaTime)
+        playableActor = newActor
+        WorldSimulator(playableActor, Terrarum.deltaTime)
     }
 
     private fun changePossession(refid: Int) {
-        // TODO prevent possessing other player on multiplayer
+        val actorToChange = getActorByID(refid)
 
-        if (!theGameHasActor(refid)) {
-            throw IllegalArgumentException(
-                    "No such actor in the game: $refid (elemsActive: ${actorContainer.size}, " +
-                    "elemsInactive: ${actorContainerInactive.size})")
+        if (actorToChange !is ActorHumanoid) {
+            throw Error("Unpossessable actor $refid: type expected ActorHumanoid, got ${actorToChange.javaClass.canonicalName}")
         }
 
-        // take care of old delegate
-        playableActorDelegate!!.actor.collisionType = HumanoidNPC.DEFAULT_COLLISION_TYPE
-        // accept new delegate
-        playableActorDelegate = PlayableActorDelegate(getActorByID(refid) as ActorHumanoid)
-        playableActorDelegate!!.actor.collisionType = ActorWithPhysics.COLLISION_KINEMATIC
-        WorldSimulator(player, Terrarum.deltaTime)
+        changePossession(getActorByID(refid) as ActorHumanoid)
     }
 
     /** Send message to notifier UI and toggle the UI as opened. */
@@ -709,11 +658,11 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
             ThreadParallel.startAll()
 
-            playableActorDelegate?.update(delta)
+            playableActor.update(delta)
         }
         else {
             actorContainer.forEach {
-                if (it != playableActorDelegate?.actor) {
+                if (it != playableActor) {
                     it.update(delta)
 
                     if (it is Pocketed) {
@@ -726,7 +675,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                     }
                 }
             }
-            playableActorDelegate?.update(delta)
+            playableActor.update(delta)
             //AmmoMeterProxy(player, uiVitalItem.UI as UIVitalMetre)
         }
     }
@@ -779,7 +728,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      * This is how remove function of [java.util.ArrayList] is defined.
      */
     override fun removeActor(actor: Actor) {
-        if (actor.referenceID == player.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
+        if (actor.referenceID == theRealGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
             throw RuntimeException("Attempted to remove player.")
         val indexToDelete = actorContainer.binarySearch(actor.referenceID!!)
         if (indexToDelete >= 0) {
@@ -929,8 +878,6 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      */
     override fun resize(width: Int, height: Int) {
 
-        BlocksDrawer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
-        LightmapRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
         MegaRainGovernor.resize()
 
 

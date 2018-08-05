@@ -143,16 +143,33 @@ object CIEXYZUtil {
     }
 
     fun CIEXYZ.toRGB(): RGB {
-        val r = 3.2404542f * X - 1.5371385f * Y - 0.4985314f * Z
+        val r =  3.2404542f * X - 1.5371385f * Y - 0.4985314f * Z
         val g = -0.9692660f * X + 1.8760108f * Y + 0.0415560f * Z
-        val b = 0.0556434f * X - 0.2040259f * Y + 1.0572252f * Z
+        val b =  0.0556434f * X - 0.2040259f * Y + 1.0572252f * Z
 
         return RGB(r, g, b, alpha).unLinearise()
+    }
+
+    fun CIEXYZ.toRGBRaw(): RGB {
+        val r =  3.2404542f * X - 1.5371385f * Y - 0.4985314f * Z
+        val g = -0.9692660f * X + 1.8760108f * Y + 0.0415560f * Z
+        val b =  0.0556434f * X - 0.2040259f * Y + 1.0572252f * Z
+
+        return RGB(r, g, b, alpha)
     }
 
     fun CIEXYZ.toColor(): Color {
         val rgb = this.toRGB()
         return Color(rgb.r, rgb.g, rgb.b, rgb.alpha)
+    }
+
+    fun CIEXYZ.toColorRaw(): Color {
+        val rgb = this.toRGBRaw()
+        return Color(rgb.r, rgb.g, rgb.b, rgb.alpha)
+    }
+
+    fun CIEYXY.toXYZ(): CIEXYZ {
+        return CIEXYZ(x * yy / y, yy, (1f - x - y) * yy / y)
     }
 
     fun colourTempToXYZ(temp: Float, Y: Float): CIEXYZ {
@@ -187,8 +204,15 @@ object CIEXYZUtil {
 /** Range: X, Y, Z: 0 - 1.0+ (One-based-plus) */
 data class CIEXYZ(var X: Float = 0f, var Y: Float = 0f, var Z: Float = 0f, var alpha: Float = 1f) {
     init {
-        if (X > 2f || Y > 2f || Z > 2f)
+        if (X !in -5f..5f || Y!in -5f..5f || Z !in -5f..5f)
             throw IllegalArgumentException("Value range error - this version of CIEXYZ is one-based (0.0 - 1.0+): ($X, $Y, $Z)")
+    }
+}
+
+data class CIEYXY(val yy: Float = 0f, var x: Float = 0f, var y: Float = 0f, var alpha: Float = 1f) {
+    init {
+        if (yy < 0f || x < 0f || y < 0f)
+            throw IllegalArgumentException("Value range error - parametres of YXY cannot be negative: ($yy, $x, $y)")
     }
 }
 

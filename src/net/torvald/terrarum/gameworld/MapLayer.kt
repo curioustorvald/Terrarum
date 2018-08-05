@@ -1,11 +1,9 @@
 package net.torvald.terrarum.gameworld
 
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
-
 /**
  * Created by minjaesong on 2016-01-17.
  */
-class MapLayer(val width: Int, val height: Int) : Iterable<Byte> {
+open class MapLayer(val width: Int, val height: Int) : Iterable<Byte> {
 
     internal @Volatile var data: ByteArray // in parallel programming: do not trust your register; always read freshly from RAM!
 

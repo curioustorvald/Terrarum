@@ -12,10 +12,14 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import com.jme3.math.FastMath
+import net.torvald.dataclass.ArrayListMap
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameactors.ActorID
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.IngameRenderer
+import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.utils.JsonWriter
@@ -27,7 +31,7 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.input.Controllers
 import java.io.File
 import java.io.IOException
-import java.util.ArrayList
+import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import javax.swing.JOptionPane
@@ -44,7 +48,12 @@ typealias RGBA8888 = Int
  */
 object Terrarum : Screen {
 
-    val debugTimers = HashMap<String, Long>()
+    /**
+     * All singleplayer "Player" must have this exact reference ID.
+     */
+    const val PLAYER_REF_ID: Int = 0x91A7E2
+
+    val debugTimers = ArrayListMap<String, Long>()
 
     var screenW = 0
     var screenH = 0
@@ -209,11 +218,12 @@ object Terrarum : Screen {
     val deltaTime: Float; get() = Gdx.graphics.rawDeltaTime
 
 
-    lateinit var assetManager: AssetManager
+    lateinit var assetManager: AssetManager // TODO
 
 
     init {
         println("$NAME version ${AppLoader.getVERSION_STRING()}")
+        println("Java Runtime version ${System.getProperty("java.version")}")
 
 
         getDefaultDirectory()
@@ -401,26 +411,28 @@ object Terrarum : Screen {
         //appLoader.setScreen(FuckingWorldRenderer(batch))
     }
 
-    internal fun setScreen(screen: Screen) {
+    fun setScreen(screen: Screen) {
         AppLoader.getINSTANCE().setScreen(screen)
     }
 
     override fun render(delta: Float) {
+        Terrarum.debugTimers["GDX.delta"] = delta.times(1000_000_000f).toLong()
         AppLoader.getINSTANCE().screen.render(deltaTime)
         //GLOBAL_RENDER_TIMER += 1
         // moved to AppLoader; global event must be place at the apploader to prevent ACCIDENTAL forgot-to-update type of bug.
     }
 
     override fun pause() {
-        //appLoader.screen.pause()
+        AppLoader.getINSTANCE().screen.pause()
     }
 
     override fun resume() {
-        //appLoader.screen.resume()
+        AppLoader.getINSTANCE().screen.resume()
     }
 
     override fun dispose() {
-        //appLoader.screen.dispose()
+        AppLoader.getINSTANCE().screen.dispose()
+
         fontGame.dispose()
         fontSmallNumbers.dispose()
 
@@ -439,7 +451,7 @@ object Terrarum : Screen {
     }
 
     override fun hide() {
-
+        AppLoader.getINSTANCE().screen.hide()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -455,6 +467,11 @@ object Terrarum : Screen {
         screenW = width
         screenH = height
 
+
+        try {
+            AppLoader.getINSTANCE().screen.resize(screenW, screenH)
+        }
+        catch (e: NullPointerException) { }
 
         // re-calculate fullscreen quad
         //updateFullscreenQuad(screenW, screenH)
@@ -664,6 +681,35 @@ object Terrarum : Screen {
         get() = Gdx.input.x
     inline val mouseScreenY: Int
         get() = Gdx.input.y
+
+
+    /**
+     * Usage:
+     *
+     * override var referenceID: Int = generateUniqueReferenceID()
+     */
+    fun generateUniqueReferenceID(renderOrder: Actor.RenderOrder): ActorID {
+        fun hasCollision(value: ActorID) =
+                try {
+                    Terrarum.ingame!!.theGameHasActor(value) ||
+                    value < ItemCodex.ACTORID_MIN ||
+                    value !in when (renderOrder) {
+                        Actor.RenderOrder.BEHIND -> Actor.RANGE_BEHIND
+                        Actor.RenderOrder.MIDDLE -> Actor.RANGE_MIDDLE
+                        Actor.RenderOrder.MIDTOP -> Actor.RANGE_MIDTOP
+                        Actor.RenderOrder.FRONT  -> Actor.RANGE_FRONT
+                    }
+                }
+                catch (gameNotInitialisedException: KotlinNullPointerException) {
+                    false
+                }
+
+        var ret: Int
+        do {
+            ret = HQRNG().nextInt().and(0x7FFFFFFF) // set new ID
+        } while (hasCollision(ret)) // check for collision
+        return ret
+    }
 }
 
 open class IngameInstance(val batch: SpriteBatch) : Screen {
@@ -672,7 +718,16 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val ZOOM_MAXIMUM = 4.0f
     val ZOOM_MINIMUM = 0.5f
 
-    lateinit var consoleHandler: ConsoleWindow
+    open lateinit var consoleHandler: ConsoleWindow
+
+    open lateinit var world: GameWorld
+    /** The actor the game is currently allowing you to control.
+     *
+     *  Most of the time it'd be the "player", but think about the case where you have possessed
+     *  some random actor of the game. Now that actor is now playableActor, the actual gamer's avatar
+     *  (reference ID of 0x91A7E2) (must) stay in the actorContainer, but it's not a playableActor.
+     */
+    open lateinit var playableActor: ActorHumanoid
 
     val ACTORCONTAINER_INITIAL_SIZE = 64
     val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
@@ -760,10 +815,10 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         }
     }
 
-    open /**
+    /**
      * Check for duplicates, append actor and sort the list
      */
-    fun addNewActor(actor: Actor) {
+    open fun addNewActor(actor: Actor) {
         if (theGameHasActor(actor.referenceID!!)) {
             throw Error("The actor $actor already exists in the game")
         }
@@ -986,9 +1041,7 @@ inline fun Double.sqrt() = Math.sqrt(this)
 inline fun Float.sqrt() = FastMath.sqrt(this)
 inline fun Int.abs() = if (this < 0) -this else this
 fun Double.bipolarClamp(limit: Double) =
-        if (this > 0 && this > limit) limit
-        else if (this < 0 && this < -limit) -limit
-        else this
+        this.coerceIn(-limit, limit)
 
 fun absMax(left: Double, right: Double): Double {
     if (left > 0 && right > 0)

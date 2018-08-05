@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -10,8 +11,8 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  * Created by minjaesong on 2017-02-10.
  */
 object PlayerBuilderTestSubject1 {
-    operator fun invoke(): Player {
-        val p: Player = Player((Terrarum.ingame!! as Ingame).world, -589141658L) // random value thrown
+    operator fun invoke(): IngamePlayer {
+        val p: IngamePlayer = IngamePlayer((Terrarum.ingame!! as Ingame).gameworld, -589141658L) // random value thrown
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
 

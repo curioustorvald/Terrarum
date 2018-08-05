@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.magiccontroller
 
-import net.torvald.terrarum.modulebasegame.gameactors.AVKey
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 
 /**
