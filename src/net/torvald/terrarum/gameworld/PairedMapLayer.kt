@@ -3,7 +3,7 @@ package net.torvald.terrarum.gameworld
 /**
  * Created by minjaesong on 2016-02-15.
  */
-class PairedMapLayer(width: Int, val height: Int) : Iterable<Byte> {
+open class PairedMapLayer(width: Int, val height: Int) : Iterable<Byte> {
 
     /**
      * 0b_xxxx_yyyy, x for lower index, y for higher index

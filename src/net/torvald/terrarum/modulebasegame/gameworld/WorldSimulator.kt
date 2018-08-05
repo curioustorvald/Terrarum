@@ -38,7 +38,7 @@ object WorldSimulator {
     val colourNone = Color(0x808080FF.toInt())
     val colourWater = Color(0x66BBFFFF.toInt())
 
-    private val world = (Terrarum.ingame!! as Ingame).world
+    private val world = (Terrarum.ingame!!.world)
 
     operator fun invoke(p: ActorHumanoid?, delta: Float) {
         if (p != null) {

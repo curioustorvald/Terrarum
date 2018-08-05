@@ -13,8 +13,9 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleBase
+import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.weather.WeatherMixer
+import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
@@ -50,7 +51,7 @@ object IngameRenderer {
 
     private var initDone = false
 
-    private var player: ActorHumanoid? = null
+    private var player: ActorWithBody? = null
 
     var uiListToDraw = ArrayList<UICanvas>()
 
@@ -59,13 +60,13 @@ object IngameRenderer {
     private var debugMode = 0
 
     operator fun invoke(
-            world: GameWorld,
+            world: GameWorldExtension,
             actorsRenderBehind: List<ActorWithBody>? = null,
             actorsRenderMiddle: List<ActorWithBody>? = null,
             actorsRenderMidTop: List<ActorWithBody>? = null,
             actorsRenderFront : List<ActorWithBody>? = null,
             particlesContainer: CircularArray<ParticleBase>? = null,
-            player: ActorHumanoid? = null,
+            player: ActorWithBody? = null,
             uisToDraw: ArrayList<UICanvas>? = null
     ) {
 
@@ -75,8 +76,6 @@ object IngameRenderer {
 
         init(world)
         this.player = player
-
-
 
 
         LightmapRenderer.fireRecalculateEvent()
@@ -141,7 +140,7 @@ object IngameRenderer {
                 batch.fillRect(0f, 0f, 6f, 10f)
                 batch.color = Color.LIME
                 batch.fillRect(6f, 0f, 6f, 10f)
-                batch.color = Color.BLUE
+                batch.color = Color.ROYAL
                 batch.fillRect(12f, 0f, 6f, 10f)
                 batch.color = Color.WHITE
             }
@@ -390,7 +389,7 @@ object IngameRenderer {
     }
 
 
-    private fun init(world: GameWorld) {
+    private fun init(world: GameWorldExtension) {
         if (!initDone) {
             batch = SpriteBatch()
             camera = OrthographicCamera(widthf, heightf)
@@ -401,13 +400,13 @@ object IngameRenderer {
 
             resize(width, height)
 
-            LightmapRenderer.world = world
-
-
-
-
             initDone = true
         }
+
+
+        BlocksDrawer.world = world
+        LightmapRenderer.setWorld(world)
+        FeaturesDrawer.world = world
     }
 
     private fun clearBuffer() {
@@ -513,6 +512,9 @@ object IngameRenderer {
 
         BlocksDrawer.resize(width, height)
         LightmapRenderer.resize(width, height)
+
+
+        //LightmapRenderer.fireRecalculateEvent()
     }
 
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()

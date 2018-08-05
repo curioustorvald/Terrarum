@@ -36,7 +36,7 @@ public class AppLoader implements ApplicationListener {
     }
 
     public static final String GAME_NAME = "Terrarum";
-    public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2017 Torvald (minjaesong)";
+    public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2018 Torvald (minjaesong)";
     public static String GAME_LOCALE = System.getProperty("user.language") + System.getProperty("user.country");
 
     private static final String[] localeSimple = {"de", "en", "es", "it"}; // must be sorted!!
@@ -64,9 +64,6 @@ public class AppLoader implements ApplicationListener {
                 GAME_LOCALE = value;
             }
         }
-
-
-        fontGame.reload(value);
     }
 
 
@@ -99,8 +96,10 @@ public class AppLoader implements ApplicationListener {
         appConfig = new LwjglApplicationConfiguration();
         appConfig.vSyncEnabled = false;
         appConfig.resizable = false;//true;
-        appConfig.width = 1072;
-        appConfig.height = 742;
+        //appConfig.width = 1072; // IMAX ratio
+        //appConfig.height = 742; // IMAX ratio
+        appConfig.width = 1110; // photographic ratio (1.5:1)
+        appConfig.height = 740; // photographic ratio (1.5:1)
         appConfig.backgroundFPS = 9999;
         appConfig.foregroundFPS = 9999;
         appConfig.title = GAME_NAME;

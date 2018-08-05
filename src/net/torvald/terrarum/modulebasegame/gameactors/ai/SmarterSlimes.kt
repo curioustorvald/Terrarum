@@ -35,7 +35,7 @@ class SmarterSlimes : ActorAI {
 
 
         // TEST: just target player
-        val playerXPos = (Terrarum.ingame!! as Ingame).player.centrePosPoint.x
+        val playerXPos = (Terrarum.ingame!! as Ingame).playableActor.centrePosPoint.x
         val thisXPos = actor.centrePosPoint.x
         val xDiff = thisXPos - playerXPos
 

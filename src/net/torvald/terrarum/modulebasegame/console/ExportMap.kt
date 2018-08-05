@@ -62,7 +62,7 @@ internal object ExportMap : ConsoleCommand {
     }
 
     override fun execute(args: Array<String>) {
-        val world = (Terrarum.ingame!! as Ingame).world
+        val world = (Terrarum.ingame!!.world)
         
         if (args.size == 2) {
 

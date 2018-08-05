@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameworld.GameWorld
@@ -18,10 +19,11 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.*
+import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.serialise.ReadLayerData
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConRoot
-import net.torvald.terrarum.weather.WeatherMixer
+import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.*
 import java.io.FileInputStream
 
@@ -48,7 +50,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
     private var loadDone = false
 
-    private lateinit var demoWorld: GameWorld
+    private lateinit var demoWorld: GameWorldExtension
     private lateinit var cameraNodes: FloatArray // camera Y-pos
     private val cameraAI = object : ActorAI {
         private val axisMax = 1f
@@ -135,23 +137,23 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         })
 
 
-        cameraPlayer = object : HumanoidNPC(demoWorld, cameraAI, born = 0, usePhysics = false, forceAssignRefID = Player.PLAYER_REF_ID) {
+        cameraPlayer = object : HumanoidNPC(demoWorld, cameraAI, born = 0, usePhysics = false, forceAssignRefID = Terrarum.PLAYER_REF_ID) {
             init {
                 setHitboxDimension(2, 2, 0, 0)
                 hitbox.setPosition(
                         HQRNG().nextInt(demoWorld.width) * FeaturesDrawer.TILE_SIZE.toDouble(),
                         0.0 // Y pos: placeholder; camera AI will take it over
                 )
-                noClip = true
+                isNoClip = true
             }
         }
 
         demoWorld.time.timeDelta = 150
 
 
-        LightmapRenderer.world = demoWorld
-        BlocksDrawer.world = demoWorld
-        FeaturesDrawer.world = demoWorld
+        //LightmapRenderer.setWorld(demoWorld)
+        //BlocksDrawer.world = demoWorld
+        //FeaturesDrawer.world = demoWorld
 
 
         uiMenu = UITitleRemoConRoot()

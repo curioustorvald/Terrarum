@@ -115,11 +115,11 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
             if (player != null) {
                 val playerPos = player.hIntTilewiseHitbox
                 lightLevel = (LightmapRenderer.getLight(playerPos.centeredX.toInt(), playerPos.centeredY.toInt()) ?:
-                              (Terrarum.ingame!! as Ingame).world.globalLight
+                              (Terrarum.ingame!!.world).globalLight
                              )
             }
             else {
-                lightLevel = (Terrarum.ingame!! as Ingame).world.globalLight
+                lightLevel = (Terrarum.ingame!!.world).globalLight
             }
 
 

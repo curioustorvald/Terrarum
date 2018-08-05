@@ -5,7 +5,9 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.faction.FactionFactory
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -14,8 +16,8 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 object PlayerBuilderSigrid {
 
-    operator fun invoke(): Player {
-        val p = Player((Terrarum.ingame!! as Ingame).world, -9223372036854775807L) // XD
+    operator fun invoke(): IngamePlayer {
+        val p = IngamePlayer((Terrarum.ingame!! as Ingame).gameworld, -9223372036854775807L) // XD
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
 

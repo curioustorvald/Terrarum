@@ -23,7 +23,7 @@ internal object SetGlobalLightOverride : ConsoleCommand {
                 val GL = Color(r, g, b, a)
 
                 lightOverride = true
-                (Terrarum.ingame!! as Ingame).world.globalLight = GL
+                (Terrarum.ingame!!.world).globalLight = GL
             }
             catch (e: NumberFormatException) {
                 Echo("Wrong number input.")

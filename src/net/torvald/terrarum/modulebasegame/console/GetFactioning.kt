@@ -6,8 +6,7 @@ import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.gameactors.Factionable
-import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.modulebasegame.gameactors.Player
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 
 /**
@@ -29,8 +28,8 @@ internal object GetFactioning : ConsoleCommand {
         fun printOutFactioning(id: Int) {
             val a = Terrarum.ingame!!.getActorByID(id)
             if (a is Factionable) {
-                Echo("$ccW== Faction assignment for $ccY${if (id == Player.PLAYER_REF_ID) "player" else id.toString()} $ccW==")
-                println("[GetFactioning] == Faction assignment for '${if (id == Player.PLAYER_REF_ID) "player" else id.toString()}' ==")
+                Echo("$ccW== Faction assignment for $ccY${if (id == Terrarum.PLAYER_REF_ID) "player" else id.toString()} $ccW==")
+                println("[GetFactioning] == Faction assignment for '${if (id == Terrarum.PLAYER_REF_ID) "player" else id.toString()}' ==")
 
                 // get all factioning data of player
                 val factionSet = a.faction
@@ -84,7 +83,7 @@ internal object GetFactioning : ConsoleCommand {
         }
 
         if (args.size == 1) {
-            printOutFactioning(Player.PLAYER_REF_ID)
+            printOutFactioning(Terrarum.PLAYER_REF_ID)
         }
         else {
             if (!args[1].isNum()) {

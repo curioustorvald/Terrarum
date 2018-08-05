@@ -90,6 +90,8 @@ object DefaultConfig {
         jsonObject.addProperty("fx3dlut", false)
 
 
+        jsonObject.addProperty("__debug", false)
+
 
         return jsonObject
     }

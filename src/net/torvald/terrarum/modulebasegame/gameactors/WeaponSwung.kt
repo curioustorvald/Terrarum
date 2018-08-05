@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.Color
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.GameWorld
@@ -8,7 +9,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 /**
  * Created by minjaesong on 2016-04-26.
  */
-class WeaponSwung(world: GameWorld, val itemID: Int) : ActorWithPhysics(world, RenderOrder.MIDTOP), Luminous {
+class WeaponSwung(world: GameWorld, val itemID: Int) : ActorWBMovable(world, RenderOrder.MIDTOP), Luminous {
     // just let the solver use AABB; it's cheap but works just enough
 
     /**

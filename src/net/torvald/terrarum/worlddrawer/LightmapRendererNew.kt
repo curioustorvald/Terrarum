@@ -8,19 +8,19 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import java.util.*
+import kotlin.system.measureNanoTime
 
 /**
- * Warning: you are not going to store float value to the lightmap -- see RGB_HDR_LUT (beziér)
+ * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
  *
  * Created by minjaesong on 2016-01-25.
  */
@@ -29,9 +29,26 @@ import java.util.*
 
 // NOTE: no Float16 on this thing: 67 kB of memory footage is totally acceptable
 
-object LightmapRenderer {
-    lateinit var world: GameWorld
+internal object LightmapRenderer {
+    private lateinit var world: GameWorld
 
+    fun setWorld(world: GameWorld) {
+        try {
+            if (this.world != world) {
+                for (y in 0 until LIGHTMAP_HEIGHT) {
+                    for (x in 0 until LIGHTMAP_WIDTH) {
+                        lightmap[y][x] = Color(0)
+                    }
+                }
+            }
+        }
+        catch (e: UninitializedPropertyAccessException) {
+            // new init, do nothing
+        }
+        finally {
+            this.world = world
+        }
+    }
 
     // TODO if (VBO works on BlocksDrawer) THEN overscan of 256, utilise same technique in here
 
@@ -86,7 +103,7 @@ object LightmapRenderer {
      * @param x world tile coord
      * @param y world tile coord
      */
-    fun getLight(x: Int, y: Int): Color? {
+    internal fun getLight(x: Int, y: Int): Color? {
         val col = getLightInternal(x, y)
         if (col == null) {
             return null
@@ -120,7 +137,15 @@ object LightmapRenderer {
         }
     }
 
-    fun fireRecalculateEvent() {
+    internal fun fireRecalculateEvent() {
+        try {
+            world.getTileFromTerrain(0, 0) // test inquiry
+        }
+        catch (e: UninitializedPropertyAccessException) {
+            return // quit prematually
+        }
+
+
         for_x_start = WorldCamera.x / TILE_SIZE // fix for premature lightmap rendering
         for_y_start = WorldCamera.y / TILE_SIZE // on topmost/leftmost side
 
@@ -140,37 +165,47 @@ object LightmapRenderer {
          * for all lightmap[y][x]
          */
 
-        buildLanternmap()
+        Terrarum.debugTimers["Renderer.Lanterns"] = measureNanoTime {
+            buildLanternmap()
+        }
 
         // O(36n) == O(n) where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with ADDITIVE blend (aka maxblend)
 
 
         // Round 1
-        for (y in for_y_start - overscan_open..for_y_end) {
-            for (x in for_x_start - overscan_open..for_x_end) {
-                setLight(x, y, calculate(x, y, 1))
+        Terrarum.debugTimers["Renderer.Light1"] = measureNanoTime {
+            for (y in for_y_start - overscan_open..for_y_end) {
+                for (x in for_x_start - overscan_open..for_x_end) {
+                    setLight(x, y, calculate(x, y, 1))
+                }
             }
         }
 
         // Round 2
-        for (y in for_y_end + overscan_open downTo for_y_start) {
-            for (x in for_x_start - overscan_open..for_x_end) {
-                setLight(x, y, calculate(x, y, 2))
+        Terrarum.debugTimers["Renderer.Light2"] = measureNanoTime {
+            for (y in for_y_end + overscan_open downTo for_y_start) {
+                for (x in for_x_start - overscan_open..for_x_end) {
+                    setLight(x, y, calculate(x, y, 2))
+                }
             }
         }
 
         // Round 3
-        for (y in for_y_end + overscan_open downTo for_y_start) {
-            for (x in for_x_end + overscan_open downTo for_x_start) {
-                setLight(x, y, calculate(x, y, 3))
+        Terrarum.debugTimers["Renderer.Light3"] = measureNanoTime {
+            for (y in for_y_end + overscan_open downTo for_y_start) {
+                for (x in for_x_end + overscan_open downTo for_x_start) {
+                    setLight(x, y, calculate(x, y, 3))
+                }
             }
         }
 
         // Round 4
-        for (y in for_y_start - overscan_open..for_y_end) {
-            for (x in for_x_end + overscan_open downTo for_x_start) {
-                setLight(x, y, calculate(x, y, 4))
+        Terrarum.debugTimers["Renderer.Light4"] = measureNanoTime {
+            for (y in for_y_start - overscan_open..for_y_end) {
+                for (x in for_x_end + overscan_open downTo for_x_start) {
+                    setLight(x, y, calculate(x, y, 4))
+                }
             }
         }
     }
@@ -179,7 +214,7 @@ object LightmapRenderer {
         lanternMap.clear()
         Terrarum.ingame?.let {
             it.actorContainer.forEach { it ->
-                if (it is Luminous && it is ActorWithPhysics) {
+                if (it is Luminous && it is ActorWBMovable) {
                     // put lanterns to the area the luminantBox is occupying
                     for (lightBox in it.lightBoxList) {
                         val lightBoxX = it.hitbox.startX + lightBox.startX
@@ -314,7 +349,7 @@ object LightmapRenderer {
 
     private val colourNull = Color(0)
 
-    fun draw(batch: SpriteBatch) {
+    internal fun draw(batch: SpriteBatch) {
 
         val this_x_start = for_x_start// + overscan_open
         val this_x_end = for_x_end// + overscan_open
@@ -643,7 +678,7 @@ object LightmapRenderer {
             1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f  // isn't it beautiful?
     )
     /** To eliminated visible edge on the gradient when 255/1023 is exceeded */
-    inline fun Color.normaliseToHDR() = Color(
+    internal inline fun Color.normaliseToHDR() = Color(
             hdr(this.r),
             hdr(this.g),
             hdr(this.b),

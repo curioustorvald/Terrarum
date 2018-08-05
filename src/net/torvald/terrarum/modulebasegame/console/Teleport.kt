@@ -6,7 +6,7 @@ import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.ActorWBMovable
 
 /**
  * Created by minjaesong on 2016-01-24.
@@ -27,32 +27,32 @@ internal object Teleport : ConsoleCommand {
                 return
             }
 
-            (Terrarum.ingame!! as Ingame).player.setPosition(x.toDouble(), y.toDouble())
+            (Terrarum.ingame!! as Ingame).playableActor.setPosition(x.toDouble(), y.toDouble())
         }
         else if (args.size == 4) {
             if (args[2].toLowerCase() != "to") {
                 EchoError("missing 'to' on teleport command")
                 return
             }
-            val fromActor: ActorWithPhysics
-            val targetActor: ActorWithPhysics
+            val fromActor: ActorWBMovable
+            val targetActor: ActorWBMovable
             try {
                 val fromActorID = args[1].toInt()
                 val targetActorID = if (args[3].toLowerCase() == "player")
-                    (Terrarum.ingame!! as Ingame).player.referenceID!!
+                    (Terrarum.ingame!! as Ingame).playableActor.referenceID!!
                 else
                     args[3].toInt()
 
                 // if from == target, ignore the action
                 if (fromActorID == targetActorID) return
 
-                if (Terrarum.ingame!!.getActorByID(fromActorID) !is ActorWithPhysics ||
-                    Terrarum.ingame!!.getActorByID(targetActorID) !is ActorWithPhysics) {
+                if (Terrarum.ingame!!.getActorByID(fromActorID) !is ActorWBMovable ||
+                    Terrarum.ingame!!.getActorByID(targetActorID) !is ActorWBMovable) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    fromActor = Terrarum.ingame!!.getActorByID(fromActorID) as ActorWithPhysics
-                    targetActor = Terrarum.ingame!!.getActorByID(targetActorID) as ActorWithPhysics
+                    fromActor = Terrarum.ingame!!.getActorByID(fromActorID) as ActorWBMovable
+                    targetActor = Terrarum.ingame!!.getActorByID(targetActorID) as ActorWBMovable
                 }
             }
             catch (e: NumberFormatException) {
@@ -75,7 +75,7 @@ internal object Teleport : ConsoleCommand {
                 return
             }
 
-            val actor: ActorWithPhysics
+            val actor: ActorWBMovable
             val x: Int
             val y: Int
             try {
@@ -83,11 +83,11 @@ internal object Teleport : ConsoleCommand {
                 y = args[4].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
                 val actorID = args[1].toInt()
 
-                if (Terrarum.ingame!!.getActorByID(actorID) !is ActorWithPhysics) {
+                if (Terrarum.ingame!!.getActorByID(actorID) !is ActorWBMovable) {
                     throw IllegalArgumentException()
                 }
                 else {
-                    actor = Terrarum.ingame!!.getActorByID(actorID) as ActorWithPhysics
+                    actor = Terrarum.ingame!!.getActorByID(actorID) as ActorWBMovable
                 }
             }
             catch (e: NumberFormatException) {

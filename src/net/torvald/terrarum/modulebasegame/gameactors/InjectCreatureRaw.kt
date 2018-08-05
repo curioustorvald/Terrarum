@@ -5,6 +5,7 @@ import net.torvald.random.Fudge3
 import net.torvald.terrarum.langpack.Lang
 import com.google.gson.JsonObject
 import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorValue
 import java.security.SecureRandom
 

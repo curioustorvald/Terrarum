@@ -8,6 +8,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.roundInt
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.imagefont.Watch7SegMain
@@ -40,7 +41,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
     private val lcdLitCol = Color(0x141414_ff)
 
     private val worldTime: WorldTime
-        get() = (Terrarum.ingame!! as Ingame).world.time
+        get() = (Terrarum.ingame!!.world as GameWorldExtension).time
 
 
     override fun updateUI(delta: Float) {
@@ -70,11 +71,11 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
             if (player != null) {
                 val playerPos = player.hIntTilewiseHitbox
                 lightLevel = (LightmapRenderer.getLight(playerPos.centeredX.toInt(), playerPos.centeredY.toInt()) ?:
-                              (Terrarum.ingame!! as Ingame).world.globalLight
+                              (Terrarum.ingame!!.world).globalLight
                              )
             }
             else {
-                lightLevel = (Terrarum.ingame!! as Ingame).world.globalLight
+                lightLevel = (Terrarum.ingame!!.world).globalLight
             }
 
             // backplate

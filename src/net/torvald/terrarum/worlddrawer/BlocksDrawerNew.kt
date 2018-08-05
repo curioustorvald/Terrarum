@@ -21,34 +21,11 @@ import java.util.zip.GZIPInputStream
 
 
 /**
- * Note: You can't just hamburger the three jobs; there's actor draw calls in-between the three jobs, like:
- *
-```
-    BlocksDrawer.renderWall(batch) // JOB #0
-    actorsRenderBehind.forEach { it.drawBody(batch) }
-    particlesContainer.forEach { it.drawBody(batch) }
-    BlocksDrawer.renderTerrain(batch) // JOB #1
-
-    /////////////////
-    // draw actors //
-    /////////////////
-    actorsRenderMiddle.forEach { it.drawBody(batch) }
-    actorsRenderMidTop.forEach { it.drawBody(batch) }
-    player.drawBody(batch)
-    actorsRenderFront.forEach { it.drawBody(batch) }
-    // --> Change of blend mode <-- introduced by childs of ActorWithBody //
-
-
-    /////////////////////////////
-    // draw map related stuffs //
-    /////////////////////////////
-
-    BlocksDrawer.renderFront(batch, false) // JOB #2
- ```
+ * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
  *
  * Created by minjaesong on 2016-01-19.
  */
-object BlocksDrawer {
+internal object BlocksDrawer {
     lateinit var world: GameWorld
 
 
@@ -376,7 +353,7 @@ object BlocksDrawer {
     // NO draw lightmap using colour filter, actors must also be hidden behind the darkness
     ///////////////////////////////////////////
 
-    fun renderWall(projectionMatrix: Matrix4) {
+    internal fun renderWall(projectionMatrix: Matrix4) {
         // blend normal
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
@@ -386,7 +363,7 @@ object BlocksDrawer {
         renderUsingBuffer(WALL, projectionMatrix)
     }
 
-    fun renderTerrain(projectionMatrix: Matrix4) {
+    internal fun renderTerrain(projectionMatrix: Matrix4) {
         // blend normal
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
@@ -396,7 +373,7 @@ object BlocksDrawer {
         renderUsingBuffer(TERRAIN, projectionMatrix)
     }
 
-    fun renderFront(projectionMatrix: Matrix4, drawWires: Boolean) {
+    internal fun renderFront(projectionMatrix: Matrix4, drawWires: Boolean) {
         // blend mul
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
@@ -562,7 +539,7 @@ object BlocksDrawer {
      * *
      * @return binary [0-15] 1: up, 2: right, 4: down, 8: left
      */
-    fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
+    internal fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
         val nearbyTiles = IntArray(4)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: Block.NULL
@@ -580,7 +557,7 @@ object BlocksDrawer {
         return ret
     }
 
-    fun getNearbyTilesInfoNonSolid(x: Int, y: Int, mode: Int): Int {
+    internal fun getNearbyTilesInfoNonSolid(x: Int, y: Int, mode: Int): Int {
         val nearbyTiles = IntArray(4)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: Block.NULL
@@ -603,7 +580,7 @@ object BlocksDrawer {
         return ret
     }
 
-    fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
+    internal fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
         val nearbyTiles = IntArray(4)
         val NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP
         nearbyTiles[NEARBY_TILE_KEY_LEFT] =  world.getTileFrom(TERRAIN, x - 1, y) ?: Block.NULL
@@ -637,7 +614,7 @@ object BlocksDrawer {
         }
     }
 
-    fun getNearbyTilesInfoPlatform(x: Int, y: Int): Int {
+    internal fun getNearbyTilesInfoPlatform(x: Int, y: Int): Int {
         val nearbyTiles = IntArray(4)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(TERRAIN, x - 1, y) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y) ?: Block.NULL

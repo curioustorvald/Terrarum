@@ -1,12 +1,13 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameworld.GameWorld
 
 /**
  * Created by minjaesong on 2016-06-17.
  */
 open class FixtureBase(world: GameWorld, physics: Boolean = true) :
-        ActorWithPhysics(world, RenderOrder.BEHIND, immobileBody = true, usePhysics = physics) {
+        ActorWBMovable(world, RenderOrder.BEHIND, immobileBody = true, usePhysics = physics) {
     /**
      * 0: Open
      * 1: Blocked

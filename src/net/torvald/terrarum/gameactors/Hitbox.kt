@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.point.Point2d
+import net.torvald.terrarum.Point2d
 import org.dyn4j.geometry.Vector2
 
 /**
