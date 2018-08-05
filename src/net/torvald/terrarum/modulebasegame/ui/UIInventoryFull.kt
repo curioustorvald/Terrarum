@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.Second
@@ -91,7 +91,7 @@ class UIInventoryFull(
                 UIItemInventoryEquippedView(
                         this,
                         actor!!.inventory,
-                        actor as ActorWithPhysics,
+                        actor as ActorWBMovable,
                         internalWidth - UIItemInventoryEquippedView.width + (Terrarum.WIDTH - internalWidth) / 2,
                         109 + (Terrarum.HEIGHT - internalHeight) / 2
                 )

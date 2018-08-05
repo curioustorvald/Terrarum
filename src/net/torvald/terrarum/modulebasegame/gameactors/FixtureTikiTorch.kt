@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.GameWorld

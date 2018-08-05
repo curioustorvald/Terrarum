@@ -605,7 +605,7 @@ object WorldGenerator {
 
     private fun fillMapByNoiseMap() {
         println("[mapgenerator] Shaping world...")
-        LoadScreen.addMessage("Shaping world...")
+        LoadScreen.addMessage("Reticulating splines...") // RETICULATING SPLINES
         // generate dirt-stone transition line
         // use catmull spline
         val dirtStoneLine = IntArray(WIDTH)

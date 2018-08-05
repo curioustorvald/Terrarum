@@ -20,10 +20,10 @@ object ImportLayerData : ConsoleCommand {
 
         //val fis = GZIPInputStream(FileInputStream(args[1])) // this gzip is kaput
         val fis = FileInputStream(args[1])
-        (Terrarum.ingame!! as Ingame).world = ReadLayerData(fis)
-        (Terrarum.ingame!! as Ingame).player.setPosition(
-                (Terrarum.ingame!! as Ingame).world.spawnY * FeaturesDrawer.TILE_SIZE.toDouble(),
-                (Terrarum.ingame!! as Ingame).world.spawnX * FeaturesDrawer.TILE_SIZE.toDouble()
+        (Terrarum.ingame!!.world) = ReadLayerData(fis)
+        (Terrarum.ingame!! as Ingame).playableActor.setPosition(
+                (Terrarum.ingame!!.world).spawnY * FeaturesDrawer.TILE_SIZE.toDouble(),
+                (Terrarum.ingame!!.world).spawnX * FeaturesDrawer.TILE_SIZE.toDouble()
         )
         fis.close()
         Echo("Successfully loaded ${args[1]}")

@@ -1,8 +1,6 @@
 package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.gameactors.Actor
-import net.torvald.terrarum.gameactors.Hitbox
 
 /**
  * Actor with visible body

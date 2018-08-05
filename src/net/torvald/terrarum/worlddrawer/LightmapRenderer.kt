@@ -4,13 +4,12 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import java.util.*
@@ -243,7 +242,7 @@ object LightmapRendererOld {
         lanternMap.clear()
         Terrarum.ingame?.let {
             it.actorContainer.forEach { it ->
-                if (it is Luminous && it is ActorWithPhysics) {
+                if (it is Luminous && it is ActorWBMovable) {
                     // put lanterns to the area the luminantBox is occupying
                     for (lightBox in it.lightBoxList) {
                         val lightBoxX = it.hitbox.startX + lightBox.startX

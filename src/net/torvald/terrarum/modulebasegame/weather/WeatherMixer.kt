@@ -1,4 +1,4 @@
-package net.torvald.terrarum.weather
+package net.torvald.terrarum.modulebasegame.weather
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -10,8 +10,8 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -20,6 +20,8 @@ import java.io.File
 import java.util.*
 
 /**
+ *
+ *
  * Current, next are there for cross-fading two weathers
  *
  *
@@ -29,7 +31,7 @@ import java.util.*
  *
  * Created by minjaesong on 2016-07-11.
  */
-object WeatherMixer {
+internal object WeatherMixer {
     var weatherList: HashMap<String, ArrayList<BaseModularWeather>>
 
     var currentWeather: BaseModularWeather
@@ -74,6 +76,9 @@ object WeatherMixer {
         nextWeather = getRandomWeather(WEATHER_GENERIC)
     }
 
+    /**
+     * Part of Ingame update
+     */
     fun update(delta: Float, player: ActorWithBody) {
         currentWeather = weatherList[WEATHER_GENERIC]!![0]
 
@@ -89,7 +94,7 @@ object WeatherMixer {
                 )
                 (Terrarum.ingame!! as Ingame).addParticle(rainParticle)
             }
-            //globalLightNow.set(getGlobalLightOfTime((Terrarum.ingame!! as Ingame).world.time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
+            //globalLightNow.set(getGlobalLightOfTime((Terrarum.ingame!!.world).time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
         }
 
     }
@@ -97,7 +102,10 @@ object WeatherMixer {
     //private val parallaxZeroPos = WorldGenerator.TERRAIN_AVERAGE_HEIGHT * 0.75f // just an arb multiplier (266.66666 -> 200)
     private val parallaxDomainSize = WorldGenerator.TERRAIN_UNDULATION / 2f
 
-    fun render(camera: Camera, world: GameWorld) {
+    /**
+     * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
+     */
+    internal fun render(camera: Camera, world: GameWorldExtension) {
         val parallaxZeroPos = (world.height / 3) * 0.75f // just an arb multiplier (266.66666 -> 200)
 
 

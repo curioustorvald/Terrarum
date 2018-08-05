@@ -26,7 +26,7 @@ internal object WriteLayerData {
     internal operator fun invoke(saveDirectoryName: String): Boolean {
         val path = "${Terrarum.defaultSaveDir}/$saveDirectoryName/${META_FILENAME}"
         val tempPath = "${path}_bak"
-        val map = (Terrarum.ingame!! as Ingame).world
+        val map = (Terrarum.ingame!!.world)
 
         val parentDir = File("${Terrarum.defaultSaveDir}/$saveDirectoryName")
         if (!parentDir.exists()) {

@@ -1,10 +1,10 @@
 package net.torvald.terrarum.modulebasegame.items
 
-import net.torvald.point.Point2d
+import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.modulebasegame.gameactors.AVKey
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemID
@@ -38,27 +38,27 @@ class PickaxeGeneric(override val originalID: ItemID) : GameItem() {
         val mouseTileY = Terrarum.mouseTileY
 
         val mousePoint = Point2d(mouseTileX.toDouble(), mouseTileY.toDouble())
-        val actorvalue = (Terrarum.ingame!! as Ingame).player.actorValue
+        val actorvalue = (Terrarum.ingame!! as Ingame).playableActor.actorValue
 
         using = true
 
         // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
         // return false if hitting actors
         Terrarum.ingame!!.actorContainer.forEach({
-            if (it is ActorWithPhysics && it.hIntTilewiseHitbox.intersects(mousePoint))
+            if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
                 return false
         })
 
         // return false if here's no tile
-        if (Block.AIR == (Terrarum.ingame!! as Ingame).world.getTileFromTerrain(mouseTileX, mouseTileY))
+        if (Block.AIR == (Terrarum.ingame!!.world).getTileFromTerrain(mouseTileX, mouseTileY))
             return false
 
         // filter passed, do the job
         val swingDmgToFrameDmg = delta.toDouble() / actorvalue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
-        (Terrarum.ingame!! as Ingame).world.inflictTerrainDamage(
+        (Terrarum.ingame!!.world).inflictTerrainDamage(
                 mouseTileX, mouseTileY,
-                Calculate.pickaxePower((Terrarum.ingame!! as Ingame).player, material) * swingDmgToFrameDmg
+                Calculate.pickaxePower((Terrarum.ingame!! as Ingame).playableActor, material) * swingDmgToFrameDmg
         )
 
         return true
@@ -67,7 +67,7 @@ class PickaxeGeneric(override val originalID: ItemID) : GameItem() {
     override fun endPrimaryUse(delta: Float): Boolean {
         using = false
         // reset action timer to zero
-        (Terrarum.ingame!! as Ingame).player.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
+        (Terrarum.ingame!! as Ingame).playableActor.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
         return true
     }
 }

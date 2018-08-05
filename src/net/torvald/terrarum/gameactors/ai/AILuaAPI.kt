@@ -1,20 +1,11 @@
 package net.torvald.terrarum.gameactors.ai
 
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.gameactors.AIControlled
-import net.torvald.terrarum.modulebasegame.gameactors.AVKey
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
-import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
 import org.luaj.vm2.*
-import org.luaj.vm2.lib.OneArgFunction
-import org.luaj.vm2.lib.ZeroArgFunction
 
 /**
  * Created by minjaesong on 2016-10-24.
  */
-/*internal class AILuaAPI(g: Globals, actor: ActorWithPhysics) {
+/*internal class AILuaAPI(g: Globals, actor: ActorWBMovable) {
 
     // FIXME when actor jumps, the actor releases left/right stick
 
@@ -51,9 +42,9 @@ import org.luaj.vm2.lib.ZeroArgFunction
 
     companion object {
         /**
-         * Reads arbitrary ActorWithPhysics and returns its information as Lua table
+         * Reads arbitrary ActorWBMovable and returns its information as Lua table
          */
-        fun composeActorObject(actor: ActorWithPhysics): LuaTable {
+        fun composeActorObject(actor: ActorWBMovable): LuaTable {
             val t: LuaTable = LuaTable()
             val moveDelta = actor.externalForce + actor.controllerMoveDelta
 
@@ -80,7 +71,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
         operator fun LuaTable.set(index: Int, value: Int) { this[index] = value.toLua() }
     }
 
-    class GetSelfActorInfo(val actor: ActorWithPhysics) : ZeroArgFunction() {
+    class GetSelfActorInfo(val actor: ActorWBMovable) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return composeActorObject(actor)
         }
@@ -116,13 +107,13 @@ import org.luaj.vm2.lib.ZeroArgFunction
         }
     }
 
-    class GetX(val actor: ActorWithPhysics) : ZeroArgFunction() {
+    class GetX(val actor: ActorWBMovable) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(actor.hitbox.centeredX)
         }
     }
 
-    class GetY(val actor: ActorWithPhysics) : ZeroArgFunction() {
+    class GetY(val actor: ActorWBMovable) : ZeroArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(actor.hitbox.centeredY)
         }
@@ -205,7 +196,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
         }
     }
 
-    class GetNearbyTiles(val actor: ActorWithPhysics) : OneArgFunction() {
+    class GetNearbyTiles(val actor: ActorWBMovable) : OneArgFunction() {
         /** @param radius
          *
          *  3 will return 7x7 array, 0 will return 1x1, 1 will return 3x3
@@ -232,7 +223,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
                     luatable[y - feetTilePos[1]] = LuaTable()
 
                     for (x in feetTilePos[0] - radius..feetTilePos[0] + radius) {
-                        val tile = BlockCodex[(Terrarum.ingame!! as Ingame).world.getTileFromTerrain(x, y) ?: Block.NULL]
+                        val tile = BlockCodex[(Terrarum.ingame!!.world).getTileFromTerrain(x, y) ?: Block.NULL]
                         val solidity = tile.isSolid.toInt()
                         val liquidity = tile.isFluid.toInt()
                         val gravity = tile.isFallable.toInt()
@@ -247,7 +238,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
         }
     }
 
-    class GetFloorsHeight(val actor: ActorWithPhysics) : OneArgFunction() {
+    class GetFloorsHeight(val actor: ActorWBMovable) : OneArgFunction() {
         /** @param radius
          *
          *  3 will return len:7 array, 0 will return len:1, 1 will return len:3
@@ -276,7 +267,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
                     // search down
                     var searchDownCounter = 0
                     while (true) {
-                        val tile = (Terrarum.ingame!! as Ingame).world.getTileFromTerrain(x, feetTilePos[1] + searchDownCounter) ?: Block.STONE
+                        val tile = (Terrarum.ingame!!.world).getTileFromTerrain(x, feetTilePos[1] + searchDownCounter) ?: Block.STONE
                         if (BlockCodex[tile].isSolid || searchDownCounter >= searchDownLimit) {
                             luatable[x - feetTilePos[0]] = searchDownCounter
                             break
@@ -290,7 +281,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
         }
     }
 
-    class GetCeilingsHeight(val actor: ActorWithPhysics) : OneArgFunction() {
+    class GetCeilingsHeight(val actor: ActorWBMovable) : OneArgFunction() {
         /** @param arg radius
          *
          *  3 will return 7x7 array, 0 will return 1x1, 1 will return 3x3
@@ -319,7 +310,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
                     // search up
                     var searchUpCounter = 0
                     while (true) {
-                        val tile = (Terrarum.ingame!! as Ingame).world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Block.STONE
+                        val tile = (Terrarum.ingame!!.world).getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Block.STONE
                         if (BlockCodex[tile].isSolid || searchUpCounter >= searchUpLimit) {
                             luatable[x - feetTilePos[0]] = searchUpCounter
                             break
@@ -333,7 +324,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
         }
     }
 
-    class GetLedgesHeight(val actor: ActorWithPhysics) : OneArgFunction() {
+    class GetLedgesHeight(val actor: ActorWBMovable) : OneArgFunction() {
         /** @param arg radius
          * ==
          *    <- (non-solid found)
@@ -361,7 +352,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
                     // search up
                     var searchUpCounter = 0
                     while (true) {
-                        val tile = (Terrarum.ingame!! as Ingame).world.getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Block.STONE
+                        val tile = (Terrarum.ingame!!.world).getTileFromTerrain(x, feetTilePos[1] - searchUpCounter) ?: Block.STONE
                         if (!BlockCodex[tile].isSolid || searchUpCounter >= searchUpLimit) {
                             luatable[x - feetTilePos[0]] = searchUpCounter
                             break

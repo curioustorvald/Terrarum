@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.gameactors.AVKey
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
@@ -39,7 +39,7 @@ class UIPieMenu : UICanvas() {
 
     override fun updateUI(delta: Float) {
         if (selection >= 0)
-            (Terrarum.ingame!! as Ingame).player.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
+            (Terrarum.ingame!! as Ingame).playableActor.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
                     selection % slotCount
 
 
@@ -83,7 +83,7 @@ class UIPieMenu : UICanvas() {
 
 
             // draw item
-            val itemPair = (Terrarum.ingame!! as Ingame).player.inventory.getQuickBar(i)
+            val itemPair = (Terrarum.ingame!! as Ingame).playableActor.inventory.getQuickBar(i)
 
             if (itemPair != null) {
                 val itemImage = ItemCodex.getItemImage(itemPair.item)

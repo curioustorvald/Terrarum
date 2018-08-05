@@ -17,9 +17,9 @@ internal object GetAV : ConsoleCommand {
             val ingame = Terrarum.ingame!! as Ingame
             
             
-            if (args.size == 1 && ingame.player != null) {
+            if (args.size == 1 && ingame.playableActor != null) {
                 // print all actorvalue of player
-                val av = ingame.player.actorValue
+                val av = ingame.playableActor.actorValue
                 val keyset = av.keySet
 
                 Echo("$ccW== ActorValue list for ${ccY}player $ccW==")
@@ -37,14 +37,14 @@ internal object GetAV : ConsoleCommand {
                 if (!args[1].isNum()) { // args[1] is ActorValue name
                     Echo("${ccW}player.$ccM${args[1]} $ccW= " +
                                                       ccG +
-                                                      ingame.player.actorValue[args[1]] +
+                                                      ingame.playableActor.actorValue[args[1]] +
                                                       " $ccO" +
-                                                      ingame.player.actorValue[args[1]]!!.javaClass.simpleName
+                                                      ingame.playableActor.actorValue[args[1]]!!.javaClass.simpleName
                     )
                     println("[GetAV] player.${args[1]} = " +
-                            ingame.player.actorValue[args[1]] +
+                            ingame.playableActor.actorValue[args[1]] +
                             " " +
-                            ingame.player.actorValue[args[1]]!!.javaClass.simpleName
+                            ingame.playableActor.actorValue[args[1]]!!.javaClass.simpleName
                     )
                 }
                 else {

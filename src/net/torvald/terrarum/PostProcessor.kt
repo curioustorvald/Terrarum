@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Matrix4
 import kotlin.system.measureNanoTime
 
@@ -30,17 +31,13 @@ object PostProcessor {
         if (textureRegion == null) {
             textureRegion = TextureRegion(fbo.colorBufferTexture)
             batch = SpriteBatch()
-            //camera = OrthographicCamera(AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
-
-            //camera.setToOrtho(true, AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
-            //camera.update()
             Gdx.gl20.glViewport(0, 0, AppLoader.appConfig.width, AppLoader.appConfig.height)
         }
 
 
 
 
-        Terrarum.debugTimers["GFX.PostProcessor"] = measureNanoTime {
+        Terrarum.debugTimers["Renderer.PostProcessor"] = measureNanoTime {
 
             Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -48,18 +45,20 @@ object PostProcessor {
             Gdx.gl.glEnable(GL20.GL_BLEND)
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-            val shader = AppLoader.shaderHicolour
-
-            // no-screen screen renders but the game don't? wtf?
+            val shader: ShaderProgram? =
+                    if (Terrarum.getConfigBoolean("fxdither"))
+                            AppLoader.shaderHicolour
+                    else
+                        null
 
             fbo.colorBufferTexture.bind(0)
 
-            shader.begin()
-            shader.setUniformf("resolution", AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
-            shader.setUniformMatrix("u_projTrans", projMat)
-            shader.setUniformi("u_texture", 0)
+            shader?.begin()
+            shader?.setUniformf("resolution", AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
+            shader?.setUniformMatrix("u_projTrans", projMat)
+            shader?.setUniformi("u_texture", 0)
             AppLoader.fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
-            shader.end()
+            shader?.end()
 
 
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it

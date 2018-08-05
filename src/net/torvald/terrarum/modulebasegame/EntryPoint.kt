@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame
 
-import net.torvald.point.Point2d
+import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.ModuleEntryPoint
 import net.torvald.terrarum.Terrarum
@@ -8,7 +8,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.ActorWBMovable
 
 /**
  * Created by minjaesong on 2018-06-21.
@@ -61,7 +61,7 @@ class EntryPoint : ModuleEntryPoint() {
                     // check for collision with actors (BLOCK only)
                     if (this.inventoryCategory == Category.BLOCK) {
                         ingame.actorContainer.forEach {
-                            if (it is ActorWithPhysics && it.hIntTilewiseHitbox.intersects(mousePoint))
+                            if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
                                 return false
                         }
                     }

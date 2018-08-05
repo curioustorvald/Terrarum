@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
  */
 internal object SetTime : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        val world = (Terrarum.ingame!! as Ingame).world
+        val world = (Terrarum.ingame!! as Ingame).gameworld
         
         
         if (args.size == 2) {

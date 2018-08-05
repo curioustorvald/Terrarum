@@ -7,6 +7,7 @@ import net.torvald.random.HQRNG
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
 
@@ -14,13 +15,14 @@ class UITitleRemoConRoot : UICanvas() {
 
     companion object {
         val remoConWidth = 240
+        fun getRemoConHeight(menu: ArrayList<String>) = 36 * menu.size.plus(1)
         fun getRemoConHeight(menu: Array<String>) = 36 * menu.size.plus(1)
         val menubarOffY: Int; get() = Terrarum.HEIGHT / 2 - (Terrarum.fontGame.lineHeight * 1.5).toInt()
     }
 
 
     /** Contains STRING_IDs */
-    val menuLabels = arrayOf(
+    val menuLabels = arrayListOf(
             "MENU_MODE_SINGLEPLAYER",
             "MENU_OPTIONS",
             "MENU_MODULES",
@@ -28,6 +30,15 @@ class UITitleRemoConRoot : UICanvas() {
             "MENU_LABEL_CREDITS",
             "MENU_LABEL_QUIT"
     )
+
+    init {
+        if (Terrarum.getConfigBoolean("__debug")) {
+            menuLabels.addAll(arrayOf(
+                    " Development Tools $",
+                    "Building Maker"
+            ))
+        }
+    }
 
 
     override var width: Int = remoConWidth
@@ -37,7 +48,7 @@ class UITitleRemoConRoot : UICanvas() {
 
     private val menubar = UIItemTextButtonList(
             this,
-            menuLabels,
+            menuLabels.toTypedArray(),
             0, menubarOffY,
             this.width, this.height,
             textAreaWidth = this.width,
@@ -104,6 +115,19 @@ class UITitleRemoConRoot : UICanvas() {
             remoConCredits.setAsOpen()
         }
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_QUIT")].clickOnceListener = { _, _, _ -> Thread.sleep(50); System.exit(0) }
+
+
+        if (Terrarum.getConfigBoolean("__debug")) {
+
+            menubar.buttons[menuLabels.indexOf("Building Maker")].clickOnceListener = { _, _, _ ->
+                this.setAsClose()
+                Thread.sleep(50)
+
+                val maker = BuildingMaker(Terrarum.batch)
+                Terrarum.ingame = maker
+                Terrarum.setScreen(maker)
+            }
+        }
     }
 
     override fun updateUI(delta: Float) {

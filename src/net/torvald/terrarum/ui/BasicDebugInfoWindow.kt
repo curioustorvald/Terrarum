@@ -10,6 +10,7 @@ import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 
 /**
  * Created by minjaesong on 2016-03-14.
@@ -28,9 +29,10 @@ class BasicDebugInfoWindow : UICanvas() {
     private var ydelta = 0.0
 
     private val ingame = Terrarum.ingame!! as Ingame
+    private val world = ingame.world as GameWorldExtension
 
     override fun updateUI(delta: Float) {
-        val player = ingame.player
+        val player = ingame.playableActor
         val hitbox = player.hitbox
 
         xdelta = hitbox.canonicalX - prevPlayerX
@@ -45,7 +47,7 @@ class BasicDebugInfoWindow : UICanvas() {
         fun Int.rawG() = this % LightmapRenderer.MUL_2 / LightmapRenderer.MUL
         fun Int.rawB() = this % LightmapRenderer.MUL
 
-        val player = ingame.player
+        val player = ingame.playableActor
 
         batch.color = Color(0xFFEE88FF.toInt())
 
@@ -134,11 +136,11 @@ class BasicDebugInfoWindow : UICanvas() {
         //printLineColumn(batch, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
         //printLineColumn(batch, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
 
-        printLineColumn(batch, 2, 5, "Time $ccG${ingame.world.time.todaySeconds.toString().padStart(5, '0')}" +
-                                     " (${ingame.world.time.getFormattedTime()})")
+        printLineColumn(batch, 2, 5, "Time $ccG${world.time.todaySeconds.toString().padStart(5, '0')}" +
+                                     " (${world.time.getFormattedTime()})")
         printLineColumn(batch, 2, 6, "Mass $ccG${player.mass}")
 
-        printLineColumn(batch, 2, 7, "noClip $ccG${player.noClip}")
+        printLineColumn(batch, 2, 7, "noClip $ccG${player.isNoClip}")
 
 
         drawHistogram(batch, LightmapRenderer.histogram,

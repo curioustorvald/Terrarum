@@ -1,7 +1,5 @@
-package net.torvald.point
+package net.torvald.terrarum
 
-import net.torvald.terrarum.sqr
-import net.torvald.terrarum.sqrt
 import org.dyn4j.geometry.Vector2
 
 /**

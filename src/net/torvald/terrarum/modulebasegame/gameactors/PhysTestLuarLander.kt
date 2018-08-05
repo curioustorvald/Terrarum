@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Controllable
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameworld.GameWorld
@@ -13,7 +15,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 /**
  * Created by minjaesong on 2018-01-17.
  */
-class PhysTestLuarLander(world: GameWorld) : ActorWithPhysics(world, RenderOrder.MIDTOP), Controllable {
+class PhysTestLuarLander(world: GameWorld) : ActorWBMovable(world, RenderOrder.MIDTOP), Controllable {
 
     private val texture = Texture(ModMgr.getGdxFile("basegame", "sprites/phystest_lunarlander.tga"))
 

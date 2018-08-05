@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors.physicssolver
 
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.ActorWBMovable
 
 /**
  * Created by minjaesong on 2016-05-01.
@@ -11,7 +11,7 @@ object VelocitySolver {
 
     }
 
-    private fun applyGravity(actor: ActorWithPhysics) {
+    private fun applyGravity(actor: ActorWBMovable) {
 
     }
 

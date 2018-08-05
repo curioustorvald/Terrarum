@@ -4,14 +4,12 @@ package net.torvald.terrarum.gameworld
 import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.modulebasegame.gameworld.GameEconomy
-import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import org.dyn4j.geometry.Vector2
 
 typealias BlockAddress = Long
 typealias BlockDamage = Float
 
-class GameWorld(val width: Int, val height: Int) {
+open class GameWorld(val width: Int, val height: Int) {
 
 
     //layers
@@ -22,7 +20,8 @@ class GameWorld(val width: Int, val height: Int) {
     val layerWallLowBits: PairedMapLayer
     val layerTerrainLowBits: PairedMapLayer
 
-    val layerThermal: MapLayerFloat // in Kelvins
+    val layerThermal: MapLayerHalfFloat // in Kelvins
+    val layerAirPressure: MapLayerHalfFloat // (milibar - 1000)
 
     /** Tilewise spawn point */
     var spawnX: Int
@@ -42,10 +41,6 @@ class GameWorld(val width: Int, val height: Int) {
 
 
 
-    val time: WorldTime
-    val economy = GameEconomy()
-
-
 
     var generatorSeed: Long = 0
 
@@ -61,14 +56,11 @@ class GameWorld(val width: Int, val height: Int) {
         layerTerrainLowBits = PairedMapLayer(width, height)
         layerWallLowBits = PairedMapLayer(width, height)
 
-        layerThermal = MapLayerFloat(width / 2, height / 2, averageTemperature)
+        // temperature layer: 2x2 is one cell
+        layerThermal = MapLayerHalfFloat(width / 2, height / 2, averageTemperature)
 
-
-        time = WorldTime(
-                71 * WorldTime.DAY_LENGTH +
-                7 * WorldTime.HOUR_SEC +
-                30L * WorldTime.MINUTE_SEC
-        )
+        // air pressure layer: 4 * 8 is one cell
+        layerAirPressure = MapLayerHalfFloat(width / 4, height / 8, 13f) // 1013 mBar
     }
 
     /**
@@ -187,10 +179,6 @@ class GameWorld(val width: Int, val height: Int) {
             throw IllegalArgumentException("illegal mode input: " + mode.toString())
     }
 
-    fun updateWorldTime(delta: Float) {
-        time.update(delta)
-    }
-
     fun terrainIterator(): Iterator<Int> {
         return object : Iterator<Int> {
 
@@ -296,6 +284,11 @@ class GameWorld(val width: Int, val height: Int) {
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {
         return layerThermal.getValue((worldTileX fmod width) / 2, worldTileY / 2)
     }
+
+    fun getAirPressure(worldTileX: Int, worldTileY: Int): Float? {
+        return layerAirPressure.getValue((worldTileX fmod width) / 4, worldTileY / 8)
+    }
+
 
 
     companion object {

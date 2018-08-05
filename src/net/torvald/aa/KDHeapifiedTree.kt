@@ -1,7 +1,7 @@
 package net.torvald.aa
 
-import net.torvald.point.Point2d
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.Point2d
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.sqr
 
 /**
@@ -21,7 +21,7 @@ class KDHeapifiedTree() {
 
     private val dimension = 2
     private val initialSize = 128
-    private val nodes = Array<ActorWithPhysics?>(initialSize, { null })
+    private val nodes = Array<ActorWBMovable?>(initialSize, { null })
 
     private val root: Int = 0
 
@@ -32,13 +32,13 @@ class KDHeapifiedTree() {
     private fun Int.getActor() = nodes[this]
     private fun Int.getLeft() = this * 2 + 1
     private fun Int.getRight() = this * 2 + 2
-    private fun Int.set(value: ActorWithPhysics?) { nodes[this] = value }
-    private fun Int.setLeftChild(value: ActorWithPhysics?) { nodes[this.getLeft()] = value }
-    private fun Int.setRightChild(value: ActorWithPhysics?) { nodes[this.getRight()] = value }
+    private fun Int.set(value: ActorWBMovable?) { nodes[this] = value }
+    private fun Int.setLeftChild(value: ActorWBMovable?) { nodes[this.getLeft()] = value }
+    private fun Int.setRightChild(value: ActorWBMovable?) { nodes[this.getRight()] = value }
 
     private val zeroPoint = Point2d(0.0, 0.0)
 
-    private fun create(points: List<ActorWithPhysics?>, depth: Int, index: Int): ActorWithPhysics? {
+    private fun create(points: List<ActorWBMovable?>, depth: Int, index: Int): ActorWBMovable? {
         if (points.isEmpty()) {
             index.set(null)
 
@@ -89,7 +89,7 @@ class KDHeapifiedTree() {
 
     private fun expandArray() {
         val prevNodes = nodes.copyOf()
-        Array<ActorWithPhysics?>(prevNodes.size * 2, { null })
+        Array<ActorWBMovable?>(prevNodes.size * 2, { null })
         create(prevNodes.toList(), 0, 0)
     }
 

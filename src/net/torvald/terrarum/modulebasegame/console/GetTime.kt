@@ -3,7 +3,7 @@ package net.torvald.terrarum.modulebasegame.console
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 
 /**
  * Created by minjaesong on 2016-03-20.
@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
 internal object GetTime : ConsoleCommand {
     override fun execute(args: Array<String>) {
 
-        val worldTime = (Terrarum.ingame!! as Ingame).world.time
+        val worldTime = (Terrarum.ingame!!.world as GameWorldExtension).time
         Echo(worldTime.getFormattedTime())
     }
 
