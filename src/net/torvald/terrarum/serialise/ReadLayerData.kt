@@ -1,6 +1,7 @@
 package net.torvald.terrarum.serialise
 
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import java.io.IOException
 import java.io.InputStream
 import java.lang.IllegalArgumentException
@@ -13,7 +14,7 @@ import java.util.*
 internal object ReadLayerData {
 
 
-    internal operator fun invoke(inputStream: InputStream, inWorld: GameWorld? = null): GameWorld {
+    internal operator fun invoke(inputStream: InputStream, inWorld: GameWorldExtension? = null): GameWorldExtension {
         val magicBytes = ByteArray(4)
         val layerSizeBytes = ByteArray(1)
         val layerCountBytes = ByteArray(1)
@@ -62,7 +63,7 @@ internal object ReadLayerData {
 
         // create world out of tiles data
 
-        val retWorld = inWorld ?: GameWorld(worldWidth, worldHeight)
+        val retWorld = inWorld ?: GameWorldExtension(worldWidth, worldHeight)
 
         retWorld.layerTerrain.data = terrainLayerMSB
         retWorld.layerWall.data = wallLayerMSB

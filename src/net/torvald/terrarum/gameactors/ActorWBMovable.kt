@@ -1,9 +1,9 @@
-package net.torvald.terrarum.modulebasegame.gameactors
+package net.torvald.terrarum.gameactors
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.point.Point2d
+import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -12,12 +12,8 @@ import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
-import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.gameactors.Controllable
-import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.BlockAddress
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
@@ -25,7 +21,7 @@ import java.util.*
 
 
 /**
- * Base class for every actor that has animated sprites. This includes furnishings, paintings, gadgets, etc.
+ * Actor with body movable. Base class for every actor that has animated sprites. This includes furnishings, paintings, gadgets, etc.
  * Also has all the usePhysics
  *
  * @param renderOrder Rendering order (BEHIND, MIDDLE, MIDTOP, FRONT)
@@ -34,7 +30,7 @@ import java.util.*
  *
  * Created by minjaesong on 2016-01-13.
  */
-open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val immobileBody: Boolean = false, var usePhysics: Boolean = true) :
+open class ActorWBMovable(val world: GameWorld, renderOrder: RenderOrder, val immobileBody: Boolean = false, var usePhysics: Boolean = true) :
         ActorWithBody(renderOrder) {
 
 
@@ -121,7 +117,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
             if (value <= 0)
                 throw IllegalArgumentException("mass cannot be less than or equal to zero.")
             else if (value < MASS_LOWEST) {
-                println("[ActorWithPhysics] input too small; using $MASS_LOWEST instead.")
+                println("[ActorWBMovable] input too small; using $MASS_LOWEST instead.")
                 actorValue[AVKey.BASEMASS] = MASS_LOWEST
             }
 
@@ -134,7 +130,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
             if (value < 0)
                 throw IllegalArgumentException("invalid elasticity value $value; valid elasticity value is [0, 1].")
             else if (value >= ELASTICITY_MAX) {
-                println("[ActorWithPhysics] Elasticity were capped to $ELASTICITY_MAX.")
+                println("[ActorWBMovable] Elasticity were capped to $ELASTICITY_MAX.")
                 field = ELASTICITY_MAX
             }
             else
@@ -158,7 +154,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
     var density = 1000.0
         set(value) {
             if (value < 0)
-                throw IllegalArgumentException("[ActorWithPhysics] $value: density cannot be negative.")
+                throw IllegalArgumentException("[ActorWBMovable] $value: density cannot be negative.")
 
             field = value
         }
@@ -200,7 +196,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         get() = actorValue.getAsDouble(AVKey.DRAGCOEFF) ?: DRAG_COEFF_DEFAULT
         set(value) {
             if (value < 0)
-                throw IllegalArgumentException("[ActorWithPhysics] drag coefficient cannot be negative.")
+                throw IllegalArgumentException("[ActorWBMovable] drag coefficient cannot be negative.")
             actorValue[AVKey.DRAGCOEFF] = value
         }
 
@@ -274,8 +270,8 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
      * @param h
      * @param tx positive: translate sprite to LEFT.
      * @param ty positive: translate sprite to DOWN.
-     * @see ActorWithPhysics.drawBody
-     * @see ActorWithPhysics.drawGlow
+     * @see ActorWBMovable.drawBody
+     * @see ActorWBMovable.drawGlow
      */
     fun setHitboxDimension(w: Int, h: Int, tx: Int, ty: Int) {
         baseHitboxH = h
@@ -340,7 +336,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
             if (spriteGlow != null) spriteGlow!!.update(delta)
 
             // make NoClip work for player
-            if (this is Player) {
+            if (true) {//this == Terrarum.ingame!!.playableActor) {
                 isNoSubjectToGrav = isNoClip || COLLISION_TEST_MODE
                 isNoCollideWorld = isNoClip
                 isNoSubjectToFluidResistance = isNoClip
@@ -655,7 +651,7 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
             }
 
             when (selfCollisionStatus) {
-                0 -> { debug1("[ActorWithPhysics] Contradiction -- collision detected by CCD, but isWalled() says otherwise") }
+                0 -> { debug1("[ActorWBMovable] Contradiction -- collision detected by CCD, but isWalled() says otherwise") }
                 5 ->  { zeroX = true }
                 10 -> { zeroY = true }
                 15 -> { newHitbox.reassign(sixteenStep[0]); zeroX = true; zeroY = true }
@@ -913,23 +909,23 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
             val tileY: Int
             if (side == COLLIDING_LEFT) {
                 tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundInt()
-                                                                                                                          + i + translateX)
+                                                                                                           + i + translateX)
                 tileY = div16TruncateToMapHeight(hitbox.hitboxEnd.y.roundInt() + translateY)
             }
             else if (side == COLLIDING_TOP) {
                 tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundInt()
-                                                                                                                          + i + translateX)
+                                                                                                           + i + translateX)
                 tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundInt() + translateY)
             }
             else if (side == COLLIDING_RIGHT) {
                 tileX = div16TruncateToMapWidth(hitbox.hitboxEnd.x.roundInt() + translateX)
                 tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundInt()
-                                                                                                                           + i + translateY)
+                                                                                                            + i + translateY)
             }
             else if (side == COLLIDING_LEFT) {
                 tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundInt() + translateX)
                 tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundInt()
-                                                                                                                           + i + translateY)
+                                                                                                            + i + translateY)
             }
             else {
                 throw IllegalArgumentException(side.toString() + ": Wrong side input")
@@ -1276,8 +1272,15 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
             if (x < 0) 0 else if (x >= world.height) world.height - 1 else x
 
 
-    private val isNoClip: Boolean
-        get() = this is ActorHumanoid && this.isNoClip()
+    var isNoClip: Boolean = false
+        set(value) {
+            field = value
+
+            if (value) {
+                externalForce.zero()
+                controllerMoveDelta?.zero()
+            }
+        }
 
     private val AUTO_CLIMB_RATE: Int
         get() = Math.min(TILE_SIZE / 8 * Math.sqrt(scale), TILE_SIZE.toDouble()).toInt()
@@ -1289,9 +1292,9 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
 
         // warnings
         if (sprite == null && isVisible)
-            println("[ActorWithPhysics] Caution: actor ${this.javaClass.simpleName} is visible but the sprite was not set.")
+            println("[ActorWBMovable] Caution: actor ${this.javaClass.simpleName} is visible but the sprite was not set.")
         else if (sprite != null && !isVisible)
-            println("[ActorWithPhysics] Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
+            println("[ActorWBMovable] Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
 
         assertPrinted = true
     }
@@ -1299,7 +1302,6 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
     internal fun flagDespawn() {
         flagDespawn = true
     }
-
 
 
     private fun forEachOccupyingTileNum(consumer: (Int?) -> Unit) {
@@ -1411,8 +1413,8 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
                 return 0
-            else if (x >= (Terrarum.ingame!! as Ingame).world.width shl 4)
-                return (Terrarum.ingame!! as Ingame).world.width - 1
+            else if (x >= Terrarum.ingame!!.world.width shl 4)
+                return Terrarum.ingame!!.world.width - 1
             else
                 return x and 0x7FFFFFFF shr 4
         }
@@ -1420,8 +1422,8 @@ open class ActorWithPhysics(val world: GameWorld, renderOrder: RenderOrder, val 
         private fun div16TruncateToMapHeight(y: Int): Int {
             if (y < 0)
                 return 0
-            else if (y >= (Terrarum.ingame!! as Ingame).world.height shl 4)
-                return (Terrarum.ingame!! as Ingame).world.height - 1
+            else if (y >= Terrarum.ingame!!.world.height shl 4)
+                return Terrarum.ingame!!.world.height - 1
             else
                 return y and 0x7FFFFFFF shr 4
         }

@@ -119,7 +119,12 @@ object Lang {
         if (key.startsWith("MENU_LABEL_PRESS_START_SYMBOL"))
             return ret2.replace('>', Terrarum.joypadLabelStart).capitalize()
 
-        return ret2.capitalize()
+        return if (AppLoader.GAME_LOCALE.contains("bg"))
+            "${AppLoader.fontGame.charsetOverrideBulgarian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideNormal}"
+        else if (AppLoader.GAME_LOCALE.contains("sr"))
+            "${AppLoader.fontGame.charsetOverrideBulgarian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideNormal}"
+        else
+            ret2.capitalize()
     }
 
     fun pluraliseLang(key: String, count: Int): String {
@@ -210,7 +215,7 @@ object Lang {
     }
 
     private fun isHangul(c: Char): Boolean {
-        return c.toInt() >= 0xAC00 && c.toInt() <= 0xD7A3
+        return c.toInt() in 0xAC00..0xD7A3
     }
 
     private fun getLastChar(s: String): Char {

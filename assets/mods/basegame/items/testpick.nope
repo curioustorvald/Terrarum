@@ -4,10 +4,10 @@
  */
 
 
-import net.torvald.point.Point2d
+import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.gameactors.AVKey
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.itemproperties.Calculate
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
@@ -60,7 +60,7 @@ class TestPick extends GameItem {
         int mouseTileY = Terrarum.getMouseTileY()
 
         def mousePoint = new Point2d(mouseTileX, mouseTileY)
-        def actorvalue = Terrarum.ingame.player.actorValue
+        def actorvalue = Terrarum.ingame.playableActor.actorValue
 
         using = true
 
@@ -80,7 +80,7 @@ class TestPick extends GameItem {
 
         Terrarum.ingame.world.inflictTerrainDamage(
                 mouseTileX, mouseTileY,
-                Calculate.pickaxePower(Terrarum.ingame.player, material) * swingDmgToFrameDmg
+                Calculate.pickaxePower(Terrarum.ingame.playableActor, material) * swingDmgToFrameDmg
         )
 
         return true
@@ -90,7 +90,7 @@ class TestPick extends GameItem {
     boolean endPrimaryUse(float delta) {
         using = false
         // reset action timer to zero
-        Terrarum.ingame.player.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
+        Terrarum.ingame.playableActor.actorValue.set(AVKey.__ACTION_TIMER, 0.0)
         return true
     }
 }

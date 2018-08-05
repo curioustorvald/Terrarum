@@ -1,4 +1,4 @@
-package net.torvald.terrarum.weather
+package net.torvald.terrarum.modulebasegame.weather
 
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.terrarum.GdxColorMap

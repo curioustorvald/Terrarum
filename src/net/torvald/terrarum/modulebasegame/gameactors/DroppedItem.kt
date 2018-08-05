@@ -4,12 +4,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameworld.GameWorld
 
 /**
  * Created by minjaesong on 2016-03-15.
  */
-open class DroppedItem(world: GameWorld, private val item: GameItem) : ActorWithPhysics(world, RenderOrder.MIDTOP) {
+open class DroppedItem(world: GameWorld, private val item: GameItem) : ActorWBMovable(world, RenderOrder.MIDTOP) {
 
     init {
         if (item.dynamicID >= ItemCodex.ACTORID_MIN)

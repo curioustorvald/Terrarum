@@ -2,8 +2,9 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.ai.NullAI
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -12,10 +13,10 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 object PlayerBuilderCynthia {
 
-    operator fun invoke(): ActorWithPhysics {
-        //val p: Player = Player(GameDate(100, 143)) // random value thrown
+    operator fun invoke(): ActorWBMovable {
+        //val p: IngamePlayer = IngamePlayer(GameDate(100, 143)) // random value thrown
         val p: HumanoidNPC = HumanoidNPC(
-                (Terrarum.ingame!! as Ingame).world,
+                (Terrarum.ingame!!.world),
                 NullAI(),
                 -589141658L) // random value thrown
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")

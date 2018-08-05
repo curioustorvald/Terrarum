@@ -2,7 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors.physicssolver
 
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import java.util.*
 
 /**
@@ -20,9 +20,9 @@ object CollisionSolver {
     private val collListX = ArrayList<CollisionMarkings>(COLL_LIST_SIZE)
     private val collListY = ArrayList<CollisionMarkings>(COLL_LIST_SIZE)
 
-    private val collCandidateX = ArrayList<Pair<ActorWithPhysics, ActorWithPhysics>>(COLL_CANDIDATES_SIZE)
-    private val collCandidateY = ArrayList<Pair<ActorWithPhysics, ActorWithPhysics>>(COLL_CANDIDATES_SIZE)
-    private var collCandidates = ArrayList<Pair<ActorWithPhysics, ActorWithPhysics>>(COLL_FINAL_CANDIDATES_SIZE)
+    private val collCandidateX = ArrayList<Pair<ActorWBMovable, ActorWBMovable>>(COLL_CANDIDATES_SIZE)
+    private val collCandidateY = ArrayList<Pair<ActorWBMovable, ActorWBMovable>>(COLL_CANDIDATES_SIZE)
+    private var collCandidates = ArrayList<Pair<ActorWBMovable, ActorWBMovable>>(COLL_FINAL_CANDIDATES_SIZE)
 
     private val collCandidateStack = Stack<CollisionMarkings>()
 
@@ -40,7 +40,7 @@ object CollisionSolver {
 
         // mark list x
         (Terrarum.ingame!! as Ingame).actorContainer.forEach { it ->
-            if (it is ActorWithPhysics) {
+            if (it is ActorWBMovable) {
                 collListX.add(CollisionMarkings(it.hitbox.hitboxStart.x, STARTPOINT, it))
                 collListX.add(CollisionMarkings(it.hitbox.hitboxEnd.x, ENDPOINT, it))
             }
@@ -73,7 +73,7 @@ object CollisionSolver {
 
         // mark list y
         (Terrarum.ingame!! as Ingame).actorContainer.forEach { it ->
-            if (it is ActorWithPhysics) {
+            if (it is ActorWBMovable) {
                 collListY.add(CollisionMarkings(it.hitbox.hitboxStart.y, STARTPOINT, it))
                 collListY.add(CollisionMarkings(it.hitbox.hitboxEnd.y, ENDPOINT, it))
             }
@@ -89,7 +89,7 @@ object CollisionSolver {
             else if (it.kind == ENDPOINT) {
                 val mark_this = it
                 val mark_other = collCandidateStack.pop()
-                val collCandidate: Pair<ActorWithPhysics, ActorWithPhysics>
+                val collCandidate: Pair<ActorWBMovable, ActorWBMovable>
                 // make sure actor with lower ID comes first
                 if (mark_this.actor < mark_other.actor)
                     collCandidate = Pair(mark_this.actor, mark_other.actor)
@@ -137,7 +137,7 @@ object CollisionSolver {
         return indexOfEqFn(this, other) >= 0
     }
 
-    private fun solveCollision(a: ActorWithPhysics, b: ActorWithPhysics) {
+    private fun solveCollision(a: ActorWBMovable, b: ActorWBMovable) {
         // some of the Pair(a, b) are either duplicates or erroneously reported.
         // e.g. (A, B), (B, C) and then (A, C);
         //      in some situation (A, C) will not making any contact with each other
@@ -173,11 +173,11 @@ object CollisionSolver {
         }
     }
 
-    private infix fun ActorWithPhysics.makesCollisionWith(other: ActorWithPhysics) =
-            this.collisionType != ActorWithPhysics.COLLISION_NOCOLLIDE &&
-            other.collisionType != ActorWithPhysics.COLLISION_NOCOLLIDE
+    private infix fun ActorWBMovable.makesCollisionWith(other: ActorWBMovable) =
+            this.collisionType != ActorWBMovable.COLLISION_NOCOLLIDE &&
+            other.collisionType != ActorWBMovable.COLLISION_NOCOLLIDE
 
-    private infix fun ActorWithPhysics.isCollidingWith(other: ActorWithPhysics): Boolean {
+    private infix fun ActorWBMovable.isCollidingWith(other: ActorWBMovable): Boolean {
         val ax = this.hitbox.centeredX
         val ay = this.hitbox.centeredY
         val bx = other.hitbox.centeredX
@@ -208,7 +208,7 @@ object CollisionSolver {
     data class CollisionMarkings(
             val pos: Double,
             val kind: Int,
-            val actor: ActorWithPhysics
+            val actor: ActorWBMovable
     )
 
     /**

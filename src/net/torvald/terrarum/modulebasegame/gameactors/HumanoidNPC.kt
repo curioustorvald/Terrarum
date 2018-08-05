@@ -2,11 +2,11 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AIControlled
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ai.ActorAI
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics.Companion.COLLISION_DYNAMIC
 import net.torvald.terrarum.modulebasegame.gameworld.time_t
 
 /**

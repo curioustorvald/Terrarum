@@ -2,14 +2,11 @@ package net.torvald.terrarum.itemproperties
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.point.Point2d
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
 import java.util.*
@@ -75,7 +72,7 @@ object ItemCodex {
                     // check for collision with actors (BLOCK only)
                     if (this.inventoryCategory == Category.BLOCK) {
                         ingame.actorContainer.forEach {
-                            if (it is ActorWithPhysics && it.hIntTilewiseHitbox.intersects(mousePoint))
+                            if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
                                 return false
                         }
                     }
@@ -135,7 +132,7 @@ object ItemCodex {
 
             override fun primaryUse(delta: Float): Boolean {
                 val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
-                val actorvalue = ingame.player.actorValue
+                val actorvalue = ingame.playableActor.actorValue
 
 
                 using = true
@@ -143,7 +140,7 @@ object ItemCodex {
                 // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
                 // return false if hitting actors
                 ingame.actorContainer.forEach {
-                    if (it is ActorWithPhysics && it.hIntTilewiseHitbox.intersects(mousePoint))
+                    if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
                         return false
                 }
 
@@ -158,7 +155,7 @@ object ItemCodex {
                 ingame.world.inflictTerrainDamage(
                         Terrarum.mouseTileX,
                         Terrarum.mouseTileY,
-                        Calculate.pickaxePower(ingame.player, material) * swingDmgToFrameDmg
+                        Calculate.pickaxePower(ingame.playableActor, material) * swingDmgToFrameDmg
                 )
                 return true
             }
@@ -166,7 +163,7 @@ object ItemCodex {
             override fun endPrimaryUse(delta: Float): Boolean {
                 using = false
                 // reset action timer to zero
-                ingame.player.actorValue[AVKey.__ACTION_TIMER] = 0.0
+                ingame.playableActor.actorValue[AVKey.__ACTION_TIMER] = 0.0
                 return true
             }
         }*/

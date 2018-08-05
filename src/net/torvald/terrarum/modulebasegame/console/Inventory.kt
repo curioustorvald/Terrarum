@@ -4,7 +4,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.modulebasegame.gameactors.Player
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
@@ -14,7 +14,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
  */
 internal object Inventory : ConsoleCommand {
 
-    private var target: Pocketed? = (Terrarum.ingame!! as Ingame).player
+    private var target: Pocketed? = (Terrarum.ingame!! as Ingame).playableActor
 
     override fun execute(args: Array<String>) {
         if (args.size == 1) {
@@ -48,7 +48,7 @@ internal object Inventory : ConsoleCommand {
         }
     }
 
-    private fun setTarget(actorRefId: Int = Player.PLAYER_REF_ID) {
+    private fun setTarget(actorRefId: Int = Terrarum.PLAYER_REF_ID) {
         val actor = Terrarum.ingame!!.getActorByID(actorRefId)
         if (actor !is Pocketed) {
             EchoError("Cannot edit inventory of incompatible actor: $actor")

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.modulebasegame.Ingame
 
@@ -10,7 +11,9 @@ import net.torvald.terrarum.modulebasegame.Ingame
 object PlayerBuilder {
 
     operator fun invoke(): Actor {
-        val p: Actor = Player((Terrarum.ingame!! as Ingame).world, (Terrarum.ingame!! as Ingame).world.time.TIME_T)
+        val world = (Terrarum.ingame!! as Ingame).gameworld
+
+        val p: Actor = IngamePlayer(world, world.time.TIME_T)
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
         // attach sprite

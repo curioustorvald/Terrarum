@@ -7,7 +7,7 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.console.SetAV
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.modulebasegame.gameactors.ActorWithPhysics
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import java.awt.BorderLayout
 import java.awt.GridLayout
@@ -29,7 +29,7 @@ class ActorValueTracker constructor() : JFrame() {
     private val avPosArea = JTextArea()
     private val avPosScroller = JScrollPane(avPosArea)
 
-    private var actor: ActorWithPhysics? = null
+    private var actor: ActorWBMovable? = null
     private var actorValue: ActorValue? = null
 
     private val modavInputKey = JTextField()
@@ -84,11 +84,11 @@ class ActorValueTracker constructor() : JFrame() {
         buttonChangeActor.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 if (actorIDField.text.toLowerCase() == "player") {
-                    actor = (Terrarum.ingame!! as Ingame).player
+                    actor = (Terrarum.ingame!! as Ingame).playableActor
                     actorValue = actor!!.actorValue
                 }
                 else if (actorIDField.text.isNotBlank()) {
-                    actor = Terrarum.ingame!!.getActorByID(actorIDField.text.toInt()) as ActorWithPhysics
+                    actor = Terrarum.ingame!!.getActorByID(actorIDField.text.toInt()) as ActorWBMovable
                     actorValue = actor!!.actorValue
                 }
             }
@@ -152,7 +152,7 @@ class ActorValueTracker constructor() : JFrame() {
 
         this.title = "AVTracker — $actor"
 
-        if (actor is ActorWithPhysics) {
+        if (actor is ActorWBMovable) {
             this.actor = actor
         }
 

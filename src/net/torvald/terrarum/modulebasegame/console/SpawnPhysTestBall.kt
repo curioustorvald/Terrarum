@@ -13,7 +13,7 @@ import org.dyn4j.geometry.Vector2
 internal object SpawnPhysTestBall : ConsoleCommand {
     @Throws(Exception::class)
     override fun execute(args: Array<String>) {
-        val world = (Terrarum.ingame!! as Ingame).world
+        val world = (Terrarum.ingame!!.world)
 
 
         val mouseX = Terrarum.mouseX
