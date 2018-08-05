@@ -1,0 +1,34 @@
+fun sky(direction, location, date, time, conditions) -> spectral radiance
+
+T<turbidity> = (t_m + t_h) / t_m; t_m = molecular atmos; t_h = haze atmos; See Fig 3
+
+// CIE model for parametric model for clear skies
+Y_C = Y_z * (0.91 + 10 * e pow (-3 * gamma) + 0.45 * cos2(gamma)) * (1 - e pow (-0.32/cos(theta)))
+          /((0.91 + 10 * e pow (-3 * theta) + 0.45 * cos2(theta_s)) * (1 - e pow (-0.32)));
+      Y_z = luminance at the zenith (see Fig 4)
+
+// for overcast skies
+Y_OC = Y_z * (1 + 2 * cos(theta)) / 3
+
+// Perez model
+fun F(theta, gamma) = (1 + A * e pow (B / cos(theta))) * (1 + C * e pow (D * gamma) + E * cos2(gamma));
+                      A, B, C, D, E = distributional coefficients;
+                      gamma, theta = angles as in Fig 4
+
+// luminance Y for sky in any viewing direction
+Y_P = Y_z * F(theta, gamma) / F(0, theta_s)
+
+
+
+x_z and y_z are the sun's spectral radiance, given in the Appendix
+x<Chromacity> = x_z * F(theta, gamma) / F(0, theta_s),
+y<Chromacity> = y_z * F(theta, gamma) / F(0, theta_s)
+
+
+// Aerial perspective model
+// attenuation
+// TODO
+
+
+
+J. Preetham, A & Shirley, Peter & E. Smits, Brian. (1999). A Practical Analytic Model for Daylight. Proceedings of ACM SIGGRAPH. 99. 91-100. 10.1145/311535.311545. 
