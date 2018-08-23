@@ -36,9 +36,8 @@ object Model {
 
     /*private*/ fun _getFbyPerez(theta: Double, gamma: Double, dc: DistributionCoeff): Double {
         val A = dc.A; val B = dc.B; val C = dc.C; val D = dc.D; val E = dc.E
-        val e = Math.E
-        return (1.0 + A * e.pow(B / cos(theta))) *
-               (1.0 + C * e.pow(D * gamma) + E * cos2(gamma))
+        return (1.0 + A * Math.exp(B / cos(theta))) *
+               (1.0 + C * Math.exp(D * gamma) + E * cos2(gamma))
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -124,7 +123,8 @@ object Model {
      * @return Luminance in candela per metre squared
      */
     fun getAbsoluteZenithLuminance(T: Double, theta_s: Double): Double {
-        return (4.0453 * T - 4.9710) * tan((4.0 / 9.0 - T / 120.0) * (PI - 2 * theta_s)) - 0.2155 * T + 2.4192
+        return (4.0453 * T - 4.9710) * tan((4.0 / 9.0 - T / 120.0) * (PI - 2 * theta_s)) - 0.2155 * T +
+               2.4192
     }
 
     /**
@@ -341,7 +341,6 @@ object Model {
 
     ///////////////////////////////////////////////////////////////////////////
 
-    private val E = Math.E
     private val HALFPI = 0.5 * Math.PI
     private val PI = Math.PI
     private val TWOPI = 2.0 * Math.PI
