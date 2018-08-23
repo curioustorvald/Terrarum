@@ -204,8 +204,11 @@ object CIEXYZUtil {
 /** Range: X, Y, Z: 0 - 1.0+ (One-based-plus) */
 data class CIEXYZ(var X: Float = 0f, var Y: Float = 0f, var Z: Float = 0f, var alpha: Float = 1f) {
     init {
-        if (X !in -5f..5f || Y!in -5f..5f || Z !in -5f..5f)
-            throw IllegalArgumentException("Value range error - this version of CIEXYZ is one-based (0.0 - 1.0+): ($X, $Y, $Z)")
+        if (X.isNaN() && Y.isNaN() && Z.isNaN()) {
+            this.X = 0f; this.Y = 0f; this.Z = 0f
+        }
+        //if (X !in -5f..5f || Y!in -5f..5f || Z !in -5f..5f)
+        //    throw IllegalArgumentException("Value range error - this version of CIEXYZ is one-based (0.0 - 1.0+): ($X, $Y, $Z)")
     }
 }
 
