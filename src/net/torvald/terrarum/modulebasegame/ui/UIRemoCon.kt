@@ -16,7 +16,7 @@ import kotlin.collections.ArrayList
 /**
  * Created by minjaesong on 2018-08-29.
  */
-class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
+open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     override var openCloseTime = 0f
 
@@ -28,14 +28,38 @@ class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
         get() = remoConTray.height
         set(value) {}
 
+    private val screens = ArrayList<Pair<String, UICanvas>>()
+
+    private val yamlSep = Regex(" : ")
+
     init {
         remoConTray = generateNewRemoCon(currentRemoConContents)
+
+        treeRepresentation.traversePreorder { node, _ ->
+            val splittedNodeName = node.data?.split(yamlSep)
+
+            if (splittedNodeName?.size == 2) {
+                val attachedClass = loadClass(splittedNodeName[1])
+
+                attachedClass.posX = 0
+                attachedClass.posY = 0
+
+                screens.add((node.data ?: "(null)") to attachedClass)
+            }
+        }
+    }
+
+    private fun loadClass(name: String): UICanvas {
+        val newClass = Class.forName(name)
+        val newClassConstructor = newClass.getConstructor(/* no args defined */)
+        val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
+        return newClassInstance as UICanvas
     }
 
     private var mouseActionAvailable = true
 
     private fun generateNewRemoCon(node: QNDTreeNode<String>): UIRemoConElement {
-        val dynamicStrArray = Array(node.children.size, { node.children[it].data ?: "(null)" })
+        val dynamicStrArray = Array(node.children.size, { node.children[it].data?.split(yamlSep)?.get(0) ?: "(null)" })
         return UIRemoConElement(this, dynamicStrArray)
     }
 
@@ -50,7 +74,11 @@ class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
         val selectedIndex = remoConTray.selectedIndex
 
         selectedItem?.let {
-            if (it.labelText == "MENU_LABEL_RETURN") {
+            // selection change
+            if (it.labelText == "MENU_LABEL_QUIT") {
+                System.exit(0)
+            }
+            else if (it.labelText == "MENU_LABEL_RETURN") {
                 if (currentRemoConContents.parent != null) {
                     remoConTray.consume()
 
@@ -79,6 +107,23 @@ class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
                     throw RuntimeException("Index: $selectedIndex, Size: ${currentRemoConContents.children.size}")
                 }
             }
+
+
+            // do something with the actual selection
+            println(currentRemoConContents.data)
+            screens.forEach {
+                if (currentRemoConContents.data == it.first) {
+                    it.second.setAsOpen()
+
+                }
+                else {
+                    it.second.setAsClose()
+                }
+
+                it.second.update(delta) // update is required anyway
+                // but this is not updateUI, so whenever the UI is completely hidden,
+                // underlying handler will block any update until the UI is open again
+            }
         }
 
 
@@ -90,6 +135,11 @@ class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         remoConTray.render(batch, camera)
 
+        screens.forEach {
+            if (currentRemoConContents.data == it.first) {
+                it.second.render(batch, camera) // again, underlying handler will block unnecessary renders
+            }
+        }
     }
 
     override fun doOpening(delta: Float) {
@@ -111,6 +161,88 @@ class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
     override fun dispose() {
 
     }
+
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        screens.forEach {
+            if (currentRemoConContents.data == it.first) {
+                it.second.mouseMoved(screenX, screenY) // again, underlying handler will block unnecessary renders
+            }
+        }
+
+        return true
+    }
+
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        screens.forEach {
+            if (currentRemoConContents.data == it.first) {
+                it.second.touchDragged(screenX, screenY, pointer) // again, underlying handler will block unnecessary renders
+            }
+        }
+
+        return true
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        screens.forEach {
+            if (currentRemoConContents.data == it.first) {
+                it.second.touchDown(screenX, screenY, pointer, button) // again, underlying handler will block unnecessary renders
+            }
+        }
+
+        return true
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        screens.forEach {
+            if (currentRemoConContents.data == it.first) {
+                it.second.touchUp(screenX, screenY, pointer, button) // again, underlying handler will block unnecessary renders
+            }
+        }
+
+        return true
+    }
+
+    override fun scrolled(amount: Int): Boolean {
+        screens.forEach {
+            if (currentRemoConContents.data == it.first) {
+                it.second.scrolled(amount) // again, underlying handler will block unnecessary renders
+            }
+        }
+
+        return true
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        screens.forEach {
+            if (currentRemoConContents.data == it.first) {
+                it.second.keyDown(keycode) // again, underlying handler will block unnecessary renders
+            }
+        }
+
+        return true
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        screens.forEach {
+            if (currentRemoConContents.data == it.first) {
+                it.second.keyUp(keycode) // again, underlying handler will block unnecessary renders
+            }
+        }
+
+        return true
+    }
+
+    override fun keyTyped(character: Char): Boolean {
+        screens.forEach {
+            if (currentRemoConContents.data == it.first) {
+                it.second.keyTyped(character) // again, underlying handler will block unnecessary renders
+            }
+        }
+
+        return true
+    }
+
+
 
     class UIRemoConElement(uiRemoCon: UIRemoCon, val labels: Array<String>) {
 

@@ -14,39 +14,19 @@ import net.torvald.terrarum.ui.UIItemTextButtonList
 /**
  * Created by minjaesong on 2017-08-01.
  */
-class UITitleRemoConModules(val superMenu: UICanvas) : UICanvas() {
+class UITitleModules : UICanvas() {
 
-    val menuLabels = arrayOf(
-            "MENU_LABEL_RETURN"
-    )
-
-
-    override var width: Int = UITitleRemoConRoot.remoConWidth
-    override var height: Int = UITitleRemoConRoot.getRemoConHeight(menuLabels)
     override var openCloseTime: Second = 0f
 
-
-    private val menubar = UIItemTextButtonList(
-            this,
-            menuLabels,
-            0, UITitleRemoConRoot.menubarOffY,
-            this.width, this.height,
-            textAreaWidth = this.width,
-            readFromLang = true,
-            activeBackCol = Color(0),
-            highlightBackCol = Color(0),
-            backgroundCol = Color(0),
-            inactiveCol = Color.WHITE,
-            defaultSelection = null
-    )
 
 
     private val moduleAreaHMargin = 48
 
     private val moduleAreaBorder = 8
 
-    private val moduleAreaWidth = (Terrarum.WIDTH * 0.75).toInt() - moduleAreaHMargin
-    private val moduleAreaHeight = Terrarum.HEIGHT - moduleAreaHMargin * 2
+    override var width = (Terrarum.WIDTH * 0.75).toInt() - moduleAreaHMargin
+    override var height = Terrarum.HEIGHT - moduleAreaHMargin * 2
+
 
     private val moduleInfoCells = ArrayList<UIItemModuleInfoCell>()
     // build module list
@@ -55,7 +35,7 @@ class UITitleRemoConModules(val superMenu: UICanvas) : UICanvas() {
             moduleInfoCells.add(UIItemModuleInfoCell(
                     this,
                     it.first,
-                    moduleAreaWidth - 2 * moduleAreaBorder,
+                    width - 2 * moduleAreaBorder,
                     0, 0 // placeholder
             ))
         }
@@ -65,41 +45,22 @@ class UITitleRemoConModules(val superMenu: UICanvas) : UICanvas() {
             this,
             moduleInfoCells,
             (Terrarum.WIDTH * 0.25f).toInt(), moduleAreaHMargin,
-            moduleAreaWidth,
-            moduleAreaHeight,
+            width,
+            height,
             inactiveCol = Color.WHITE,
             border = moduleAreaBorder
     )
 
 
     init {
-        uiItems.add(menubar)
         uiItems.add(mouduleArea)
-
-
-        ////////////////////////////
-
-
-
-
-        // attach listeners
-
-        menubar.buttons[menuLabels.indexOf("MENU_LABEL_RETURN")].clickOnceListener = { _, _, _ ->
-            this.setAsClose()
-            Thread.sleep(50)
-            menubar.selectedIndex = menubar.defaultSelection
-            superMenu.setAsOpen()
-        }
     }
 
     override fun updateUI(delta: Float) {
-        menubar.update(delta)
         mouduleArea.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        menubar.render(batch, camera)
-
         batch.color = Color.WHITE
         blendNormal()
         mouduleArea.render(batch, camera)
