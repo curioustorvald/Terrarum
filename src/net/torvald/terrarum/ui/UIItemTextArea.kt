@@ -23,7 +23,7 @@ class UIItemTextArea(
 
 
 
-    var entireText: List<String> = listOf("") // placeholder
+    private var entireText: List<String> = listOf("") // placeholder
 
     var scrollPos = 0
 

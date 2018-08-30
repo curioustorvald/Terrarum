@@ -6,7 +6,7 @@ import java.util.*
 
 object UITitleRemoConYaml {
 
-    // YAML indent with a space!
+    // YAML indent with a space, separate label and class with " : " verbatim!
 
     val menus = """
         - MENU_MODE_SINGLEPLAYER
@@ -18,13 +18,13 @@ object UITitleRemoConYaml {
          - MENU_OPTIONS_CONTROLS
          - MENU_OPTIONS_SOUND
          - MENU_LABEL_RETURN
-        - MENU_MODULES
+        - MENU_MODULES : net.torvald.terrarum.modulebasegame.ui.UITitleModules
          - MENU_LABEL_RETURN
         - MENU_LABEL_LANGUAGE
          - MENU_LABEL_RETURN
-        - MENU_LABEL_CREDITS
-         - MENU_LABEL_CREDITS
-         - MENU_CREDIT_GPL_DNT
+        - MENU_LABEL_CREDITS : net.torvald.terrarum.modulebasegame.ui.UITitleCredits
+         - MENU_LABEL_CREDITS : net.torvald.terrarum.modulebasegame.ui.UITitleCredits
+         - MENU_CREDIT_GPL_DNT : net.torvald.terrarum.modulebasegame.ui.UITitleGPL3
          - MENU_LABEL_RETURN
         - MENU_LABEL_QUIT
         """.trimIndent()
@@ -74,16 +74,11 @@ object UITitleRemoConYaml {
 
 
         // test traverse resulting tree
-        fun preorder(node: QNDTreeNode<String>, depth: Int = 1) {
-            //if (node == null) return
-
-            repeat(depth) { print("-") }
+        /*root.traversePreorder { node, depth ->
+            repeat(depth + 1) { print("-") }
             println("${node.data} -> ${node.parent}")
+        }*/
 
-            node.children.forEach { preorder(it, depth + 1) }
-        }
-
-        preorder(root)
 
         return root
     }
@@ -103,4 +98,25 @@ object UITitleRemoConYaml {
 
 class QNDTreeNode<T>(var data: T? = null, var parent: QNDTreeNode<T>? = null) {
     var children = ArrayList<QNDTreeNode<T>>()
+
+
+    private fun traverse1(node: QNDTreeNode<T>, action: (QNDTreeNode<T>, Int) -> Unit, depth: Int = 0) {
+        //if (node == null) return
+        action(node, depth)
+        node.children.forEach { traverse1(it, action, depth + 1) }
+    }
+
+    private fun traverse2(node: QNDTreeNode<T>, action: (QNDTreeNode<T>, Int) -> Unit, depth: Int = 0) {
+        //if (node == null) return
+        node.children.forEach { traverse2(it, action, depth + 1) }
+        action(node, depth)
+    }
+
+    fun traversePreorder(action: (QNDTreeNode<T>, Int) -> Unit) {
+        this.traverse1(this, action)
+    }
+
+    fun traversePostorder(action: (QNDTreeNode<T>, Int) -> Unit) {
+        this.traverse2(this, action)
+    }
 }
