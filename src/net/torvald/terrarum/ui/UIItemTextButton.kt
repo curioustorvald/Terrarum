@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
  */
 open class UIItemTextButton(
         parentUI: UICanvas,
+        /** Stored text (independent to the Langpack) */
         val labelText: String,
         override var posX: Int,
         override var posY: Int,
@@ -37,6 +38,7 @@ open class UIItemTextButton(
         val defaultHighlightCol: Color = Color(0x00f8ff_ff)
     }
 
+    /** Actually displayed text (changes with the app language) */
     val label: String
         get() = if (readFromLang) Lang[labelText] else labelText
 
