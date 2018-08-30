@@ -3,19 +3,14 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.CreditSingleton
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Second
-import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItemTextArea
 import net.torvald.terrarum.ui.UIItemTextButtonList
 
-class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
-
-    val menuLabels = arrayOf(
-            "MENU_LABEL_RETURN"
-    )
-
+open class UITitleWallOfText(text: List<String>) : UICanvas() {
 
     override var openCloseTime: Second = 0f
 
@@ -23,38 +18,16 @@ class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
     private val textAreaHMargin = 48
     override var width = (Terrarum.WIDTH * 0.75).toInt()
     override var height = Terrarum.HEIGHT - textAreaHMargin * 2
-
-    private val localeList = Lang.languageList.toList().sorted()
-    private val textArea = UIItemTextButtonList(this,
-            localeList.map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }.toTypedArray(),
+    private val textArea = UIItemTextArea(this,
             Terrarum.WIDTH - width, textAreaHMargin,
-            width, height,
-            textAreaWidth = width,
-            readFromLang = false,
-            activeBackCol = Color(0),
-            highlightBackCol = Color(0),
-            backgroundCol = Color(0),
-            inactiveCol = Color.WHITE,
-            defaultSelection = null
+            width, height
     )
 
 
     init {
+        uiItems.add(textArea)
 
-
-        //textArea.entireText = Lang.languageList.toList().sorted().map { Lang.langpack["MENU_LANGUAGE_THIS_$it"] ?: "!ERR: $it" }
-
-        ////////////////////////////
-
-
-
-
-        // attach listeners
-        textArea.selectionChangeListener = { _, newSelectionIndex ->
-            AppLoader.GAME_LOCALE = localeList[newSelectionIndex]
-        }
-
-
+        textArea.setWallOfText(text)
     }
 
     override fun updateUI(delta: Float) {
@@ -62,7 +35,6 @@ class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-
         batch.color = Color.WHITE
         textArea.render(batch, camera)
     }
@@ -81,5 +53,7 @@ class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
 
     override fun dispose() {
     }
-
 }
+
+class UITitleCredits : UITitleWallOfText(CreditSingleton.credit)
+class UITitleGPL3 : UITitleWallOfText(CreditSingleton.gpl3)

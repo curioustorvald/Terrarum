@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
 
-class UITitleRemoConRoot : UICanvas() {
+/*class UITitleRemoConRoot : UICanvas() {
 
     companion object {
         val remoConWidth = 240
@@ -63,7 +63,7 @@ class UITitleRemoConRoot : UICanvas() {
 
     private val remoConCredits = UITitleRemoConCredits(this)
     private val remoConLanguage = UITitleRemoConLanguage(this)
-    private val remoConModules = UITitleRemoConModules(this)
+    private val remoConModules = UITitleModules(this)
 
     init {
         remoConLanguage.setPosition(0, 0)
@@ -159,4 +159,4 @@ class UITitleRemoConRoot : UICanvas() {
 
     }
 
-}
+}*/
