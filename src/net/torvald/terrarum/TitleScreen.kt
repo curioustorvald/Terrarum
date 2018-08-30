@@ -20,9 +20,11 @@ import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
+import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.serialise.ReadLayerData
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConRoot
+import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.worlddrawer.*
 import java.io.FileInputStream
@@ -156,7 +158,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         //FeaturesDrawer.world = demoWorld
 
 
-        uiMenu = UITitleRemoConRoot()
+        uiMenu = UIRemoCon(UITitleRemoConYaml())//UITitleRemoConRoot()
         uiMenu.setPosition(0, 0)
         uiMenu.setAsOpen()
 

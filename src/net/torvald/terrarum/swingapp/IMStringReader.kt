@@ -24,6 +24,7 @@ import javax.swing.*
  *
  * Created by minjaesong on 2017-02-05.
  */
+@Deprecated("Use Gdx.input.GetTextInput")
 class IMStringReader(feedInput: (String) -> Unit, message: String? = null) : JFrame() {
 
     private val inputArea = JTextField()

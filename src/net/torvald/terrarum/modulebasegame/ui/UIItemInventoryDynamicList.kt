@@ -183,12 +183,12 @@ class UIItemInventoryDynamicList(
         }
 
         scrollUpButton.clickOnceListener = { _, _, _ ->
-            itemPage = (itemPage - 1).fmod(itemPageCount)
+            itemPage = if (itemPageCount == 0) 0 else (itemPage - 1).fmod(itemPageCount)
             scrollUpButton.highlighted = false
             rebuild()
         }
         scrollDownButton.clickOnceListener = { _, _, _ ->
-            itemPage = (itemPage + 1).fmod(itemPageCount)
+            itemPage = if (itemPageCount == 0) 0 else (itemPage + 1).fmod(itemPageCount)
             scrollDownButton.highlighted = false
             rebuild()
         }

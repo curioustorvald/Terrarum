@@ -60,16 +60,16 @@ class UIInventoryFull(
 
 
     val catBarWidth = 330
-    val catBar = UIItemInventoryCatBar(
+    val categoryBar = UIItemInventoryCatBar(
             this,
             (Terrarum.WIDTH - catBarWidth) / 2,
             66 + (Terrarum.HEIGHT - internalHeight) / 2,
             catBarWidth
     )
     val catSelection: Int
-        get() = catBar.selectedIndex
+        get() = categoryBar.selectedIndex
     val catSelectedIcon: Int
-        get() = catBar.selectedIcon
+        get() = categoryBar.selectedIcon
 
     override var openCloseTime: Second = 0.0f
 
@@ -101,12 +101,16 @@ class UIInventoryFull(
 
 
     init {
-        addItem(catBar)
+        addItem(categoryBar)
         itemList?.let { addItem(it) }
         equipped?.let { addItem(it) }
 
 
-        catBar.selectionChangeListener = { old, new  -> rebuildList() }
+        categoryBar.selectionChangeListener = { old, new  ->
+            rebuildList()
+            itemList?.itemPage = 0 // set scroll to zero
+            itemList?.rebuild() // have to manually rebuild, too!
+        }
 
 
 
@@ -125,7 +129,7 @@ class UIInventoryFull(
         }
 
 
-        catBar.update(delta)
+        categoryBar.update(delta)
         itemList?.update(delta)
         equipped?.update(delta)
     }
@@ -163,7 +167,7 @@ class UIInventoryFull(
         batch.begin()
 
         // UI items
-        catBar.render(batch, camera)
+        categoryBar.render(batch, camera)
         itemList?.render(batch, camera)
         equipped?.render(batch, camera)
 
@@ -221,7 +225,7 @@ class UIInventoryFull(
     }
 
     override fun dispose() {
-        catBar.dispose()
+        categoryBar.dispose()
         itemList?.dispose()
         equipped?.dispose()
     }
