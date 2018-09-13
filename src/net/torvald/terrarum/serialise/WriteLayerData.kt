@@ -3,7 +3,6 @@ package net.torvald.terrarum.serialise
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.modulebasegame.Ingame
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -11,12 +10,14 @@ import java.nio.charset.Charset
 import java.util.zip.GZIPOutputStream
 
 /**
+ * TODO this one does not use TerranVirtualDisk
+ *
  * Created by minjaesong on 2016-03-18.
  */
 // internal for everything: prevent malicious module from messing up the savedata
 internal object WriteLayerData {
 
-    val META_FILENAME = "worldinfo1"
+    val LAYERS_FILENAME = "worldinfo1"
 
     val MAGIC = "TEMD".toByteArray(charset = Charset.forName("US-ASCII"))
 
@@ -24,7 +25,7 @@ internal object WriteLayerData {
 
 
     internal operator fun invoke(saveDirectoryName: String): Boolean {
-        val path = "${Terrarum.defaultSaveDir}/$saveDirectoryName/${META_FILENAME}"
+        val path = "${Terrarum.defaultSaveDir}/$saveDirectoryName/${LAYERS_FILENAME}"
         val tempPath = "${path}_bak"
         val map = (Terrarum.ingame!!.world)
 
@@ -69,7 +70,7 @@ internal object WriteLayerData {
             outFile.delete()
             tempFile.copyTo(outFile, overwrite = true)
             tempFile.delete()
-            println("Saved map data '$META_FILENAME' to $saveDirectoryName.")
+            println("Saved map data '$LAYERS_FILENAME' to $saveDirectoryName.")
 
             return true
         }

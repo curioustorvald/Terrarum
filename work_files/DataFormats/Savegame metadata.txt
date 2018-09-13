@@ -15,15 +15,23 @@ Ord  Hex  Description
 
 ...       Terrain seed (8 bytes)
 ...       Randomiser seed (8 bytes)
+...       Randomiser iterations (4 bytes)
+...       Weather seed (8 bytes)
+...       Weather iterations (4 bytes)
 
 ...       SHA-256 hash of worldinfo1 when not compressed (32 bytes)
 ...       SHA-256 hash of worldinfo2 when not compressed (32 bytes)
 ...       SHA-256 hash of worldinfo3 when not compressed (32 bytes)
 ...       SHA-256 hash of worldinfo4 when not compressed (32 bytes)
 
-...       ReferenceID of the player (4 bytes)
+...       ReferenceID of the player (4 bytes, a fixed value of 91A7E2)
 ...       Current world's time_t (the ingame time, 8 bytes)
 
 ...       Creation time in time_t (6 bytes)
 ...       Last play time in time_t (6 bytes)
 ...       Total playtime in time_t (4 bytes)    // will record 136.1 years of playtime
+
+
+
+
+
