@@ -62,7 +62,7 @@ import net.torvald.terrarum.ui.UIItemTextButtonList
 
 
     private val remoConCredits = UITitleRemoConCredits(this)
-    private val remoConLanguage = UITitleRemoConLanguage(this)
+    private val remoConLanguage = UITitleLanguage(this)
     private val remoConModules = UITitleModules(this)
 
     init {

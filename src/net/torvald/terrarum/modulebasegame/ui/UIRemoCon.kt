@@ -23,7 +23,9 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
     private var remoConTray: UIRemoConElement // this remocon is dynamically generated
     private var currentRemoConContents = treeRepresentation
 
-    override var width = remoConWidth
+    override var width: Int
+        get() = remoConWidth // somehow NOT making this constant causes a weird issue
+        set(value) {}        // where the remocon widens to screen width
     override var height: Int
         get() = remoConTray.height
         set(value) {}

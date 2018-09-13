@@ -10,7 +10,7 @@ import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButtonList
 
-class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
+class UITitleLanguage : UICanvas() {
 
     val menuLabels = arrayOf(
             "MENU_LABEL_RETURN"
@@ -59,6 +59,7 @@ class UITitleRemoConLanguage(val superMenu: UICanvas) : UICanvas() {
 
     override fun updateUI(delta: Float) {
         textArea.update(delta)
+        println("should be printing indefinitely")
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {

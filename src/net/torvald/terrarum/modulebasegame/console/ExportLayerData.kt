@@ -18,7 +18,7 @@ object ExportLayerData : ConsoleCommand {
 
         WriteLayerData(saveDirectoryName)
 
-        Echo("Layer data exported to $saveDirectoryName/${WriteLayerData.META_FILENAME}")
+        Echo("Layer data exported to $saveDirectoryName/${WriteLayerData.LAYERS_FILENAME}")
     }
 
     override fun printUsage() {
