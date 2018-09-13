@@ -10,6 +10,7 @@ import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.concurrent.ThreadParallel
+import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.roundInt
 import java.util.*
 
