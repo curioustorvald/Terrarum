@@ -11,6 +11,7 @@ import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -31,7 +32,13 @@ import java.util.*
  *
  * Created by minjaesong on 2016-07-11.
  */
-internal object WeatherMixer {
+internal object WeatherMixer : RNGConsumer {
+
+    override val RNG = HQRNG()
+    override var seed = 0L
+    override var iterations = 0
+
+
     var weatherList: HashMap<String, ArrayList<BaseModularWeather>>
 
     var currentWeather: BaseModularWeather

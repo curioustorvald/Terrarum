@@ -19,7 +19,7 @@ Ord  Hex  Description
 05        Number of swatches
      00 - No palette mode (using defined palette)
         - 256 colours (using user-defined)
-     nn - Colour count (1-255)
+     nn - Colour count (0-255; 0 is interpreted as 256)
 
 06        Width of the image (LSB)
 07        Width of the image (MSB)
@@ -37,6 +37,6 @@ Ord  Hex  Description
 ...       Palette colour 2, if any (0R)
 ...       Palette colour 2, if any (GB)
 
-...       Colour indices
+...       Colour indices, each byte represents each pixel
 
 <EOF>

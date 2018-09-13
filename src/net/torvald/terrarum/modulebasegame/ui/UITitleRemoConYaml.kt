@@ -6,10 +6,12 @@ import java.util.*
 
 object UITitleRemoConYaml {
 
-    // YAML indent with a space, separate label and class with " : " verbatim!
+    // YAML indent with a space, separate label and class with " : " (\x20\x3A\x20)
 
     val menus = """
-        - MENU_MODE_SINGLEPLAYER
+        - MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UITitleCharactersList
+         - CONTEXT_CHARACTER_NEW
+         - CONTEXT_CHARACTER_DELETE
          - MENU_LABEL_RETURN
         - MENU_MODE_MULTIPLAYER
          - MENU_LABEL_RETURN
@@ -20,7 +22,7 @@ object UITitleRemoConYaml {
          - MENU_LABEL_RETURN
         - MENU_MODULES : net.torvald.terrarum.modulebasegame.ui.UITitleModules
          - MENU_LABEL_RETURN
-        - MENU_LABEL_LANGUAGE
+        - MENU_LABEL_LANGUAGE : net.torvald.terrarum.modulebasegame.ui.UITitleLanguage
          - MENU_LABEL_RETURN
         - MENU_LABEL_CREDITS : net.torvald.terrarum.modulebasegame.ui.UITitleCredits
          - MENU_LABEL_CREDITS : net.torvald.terrarum.modulebasegame.ui.UITitleCredits

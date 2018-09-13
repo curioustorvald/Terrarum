@@ -4,12 +4,13 @@ import com.badlogic.gdx.graphics.Color
 import net.torvald.dataclass.IntArrayStack
 import net.torvald.colourutil.Col4096
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.modulebasegame.RNGConsumer
 import java.util.*
 
 /**
  * Created by minjaesong on 2016-02-23.
  */
-object RoguelikeRandomiser {
+object RoguelikeRandomiser : RNGConsumer {
 
     val POTION_PRIMARY_COLSET = intArrayOf(15, 15, 7, 7, 0, 0)
 
@@ -18,8 +19,8 @@ object RoguelikeRandomiser {
 
     val coloursTaken: ArrayList<Col4096> = ArrayList()
 
-    var seed: Long = 0
-    private val random: Random = HQRNG()
+    override val RNG = HQRNG()
+    override var seed = 0L
 
     private val POTION_HEAL_TIER1 = 0x00
     private val POTION_HEAL_TIRE2 = 0x01
@@ -28,7 +29,7 @@ object RoguelikeRandomiser {
 
     private val POTION_BERSERK_TIER1 = 0x20
 
-
+    override var iterations = 0
 
     fun setupColours() {
 
@@ -59,6 +60,8 @@ object RoguelikeRandomiser {
             val a = ar[index];
             ar[index] = ar[i];
             ar[i] = a;
+
+            iterations++
         }
     }
 }

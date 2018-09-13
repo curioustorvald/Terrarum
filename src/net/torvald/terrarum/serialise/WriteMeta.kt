@@ -1,5 +1,6 @@
 package net.torvald.terrarum.serialise
 
+import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import java.nio.charset.Charset
@@ -10,7 +11,7 @@ import java.nio.charset.Charset
 // internal for everything: prevent malicious module from messing up the savedata
 internal object WriteMeta {
 
-    val META_FILENAME = "world"
+    val META_FILENAME = "worldinfo0"
 
     val MAGIC = "TESV".toByteArray(charset = Charset.forName("US-ASCII"))
 
@@ -19,6 +20,9 @@ internal object WriteMeta {
 
     val terraseed: Long = WorldGenerator.SEED
     val rogueseed: Long = RoguelikeRandomiser.seed
+    val rogueiter: Int = RoguelikeRandomiser.iterations
+    val weatherseed: Long = WeatherMixer.seed
+    val weatheriter: Int = WeatherMixer.iterations
 
     /**
      * Write save meta to specified directory. Returns false if something went wrong.
