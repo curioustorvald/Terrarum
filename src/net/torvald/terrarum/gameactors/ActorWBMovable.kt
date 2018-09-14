@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockProp
@@ -117,7 +118,7 @@ open class ActorWBMovable(val world: GameWorld, renderOrder: RenderOrder, val im
             if (value <= 0)
                 throw IllegalArgumentException("mass cannot be less than or equal to zero.")
             else if (value < MASS_LOWEST) {
-                println("[ActorWBMovable] input too small; using $MASS_LOWEST instead.")
+                printdbg(this, "input too small; using $MASS_LOWEST instead.")
                 actorValue[AVKey.BASEMASS] = MASS_LOWEST
             }
 
@@ -130,7 +131,7 @@ open class ActorWBMovable(val world: GameWorld, renderOrder: RenderOrder, val im
             if (value < 0)
                 throw IllegalArgumentException("invalid elasticity value $value; valid elasticity value is [0, 1].")
             else if (value >= ELASTICITY_MAX) {
-                println("[ActorWBMovable] Elasticity were capped to $ELASTICITY_MAX.")
+                printdbg(this, "Elasticity were capped to $ELASTICITY_MAX.")
                 field = ELASTICITY_MAX
             }
             else
@@ -1292,9 +1293,9 @@ open class ActorWBMovable(val world: GameWorld, renderOrder: RenderOrder, val im
 
         // warnings
         if (sprite == null && isVisible)
-            println("[ActorWBMovable] Caution: actor ${this.javaClass.simpleName} is visible but the sprite was not set.")
+            printdbg(this, "Caution: actor ${this.javaClass.simpleName} is visible but the sprite was not set.")
         else if (sprite != null && !isVisible)
-            println("[ActorWBMovable] Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
+            printdbg(this, "Caution: actor ${this.javaClass.simpleName} is invisible but the sprite was given.")
 
         assertPrinted = true
     }

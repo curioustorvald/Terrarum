@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.CreditSingleton
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.Second
@@ -10,7 +11,7 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextArea
 import net.torvald.terrarum.ui.UIItemTextButtonList
 
-open class UITitleWallOfText(text: List<String>) : UICanvas() {
+open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
 
     override var openCloseTime: Second = 0f
 
@@ -37,6 +38,8 @@ open class UITitleWallOfText(text: List<String>) : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         batch.color = Color.WHITE
         textArea.render(batch, camera)
+
+        //AppLoader.printdbg(this, "Rendering texts of length ${text.size}")
     }
 
     override fun doOpening(delta: Float) {

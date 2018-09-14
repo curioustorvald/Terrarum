@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
@@ -120,7 +121,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     private val TILE_SIZEF = TILE_SIZE.toFloat()
 
     private fun loadThingsWhileIntroIsVisible() {
-        println("[TitleScreen] Intro pre-load")
+        printdbg(this, "Intro pre-load")
 
 
         demoWorld = ReadLayerData(FileInputStream(ModMgr.getFile("basegame", "demoworld")))
@@ -172,7 +173,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     override fun show() {
-        println("[TitleScreen] atrniartsientsarinoetsar")
+        printdbg(this, "atrniartsientsarinoetsar")
 
         initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
@@ -216,7 +217,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     fun updateScreen(delta: Float) {
-        Gdx.graphics.setTitle("WorldRenderTest" +
+        Gdx.graphics.setTitle(AppLoader.GAME_NAME +
                               " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
                               " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
         )
@@ -273,10 +274,16 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         COPYTING.forEachIndexed { index, s ->
             val textWidth = Terrarum.fontGame.getWidth(s)
             Terrarum.fontGame.draw(batch, s,
-                    Terrarum.WIDTH - textWidth - 1f - 0.2f,
-                    Terrarum.HEIGHT - Terrarum.fontGame.lineHeight * (COPYTING.size - index) - 1f
+                    (Terrarum.WIDTH - textWidth - 1f).toInt().toFloat(),
+                    (Terrarum.HEIGHT - Terrarum.fontGame.lineHeight * (COPYTING.size - index) - 1f).toInt().toFloat()
             )
         }
+
+        Terrarum.fontGame.draw(batch, "${AppLoader.GAME_NAME} ${AppLoader.getVERSION_STRING()}",
+                1f.toInt().toFloat(),
+                (Terrarum.HEIGHT - Terrarum.fontGame.lineHeight - 1f).toInt().toFloat()
+        )
+
     }
 
     override fun pause() {

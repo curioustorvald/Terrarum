@@ -59,7 +59,8 @@ class UITitleLanguage : UICanvas() {
 
     override fun updateUI(delta: Float) {
         textArea.update(delta)
-        println("should be printing indefinitely")
+
+        //AppLoader.printdbg(this, "should be printing indefinitely")
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {

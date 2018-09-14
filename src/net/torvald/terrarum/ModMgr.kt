@@ -2,6 +2,8 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
+import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.AppLoader.printdbgerr
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -74,7 +76,7 @@ object ModMgr {
 
         loadOrder.forEachIndexed { index, it ->
             val moduleName = it[0]
-            println("[ModMgr] Loading module $moduleName")
+            printdbg(this, "Loading module $moduleName")
 
             try {
                 val modMetadata = Properties()
@@ -100,7 +102,7 @@ object ModMgr {
                 val isDir = FileSystems.getDefault().getPath("$modDir/$moduleName").toFile().isDirectory
                 moduleInfo[moduleName] = ModuleMetadata(index, isDir, properName, description, author, entryPoint, releaseDate, version, libs, dependency)
 
-                println(moduleInfo[moduleName])
+                printdbg(this, moduleInfo[moduleName])
 
 
                 // run entry script in entry point
@@ -114,13 +116,13 @@ object ModMgr {
                 }
 
 
-                println("[ModMgr] $moduleName loaded successfully")
+                printdbg(this, "$moduleName loaded successfully")
             }
             catch (noSuchModule: FileNotFoundException) {
-                System.err.println("[ModMgr] No such module: $moduleName, skipping...")
+                printdbgerr(this, "No such module: $moduleName, skipping...")
             }
             catch (e: ClassNotFoundException) {
-                System.err.println("[ModMgr] $moduleName has nonexisting entry point, skipping...")
+                printdbgerr(this, "$moduleName has nonexisting entry point, skipping...")
             }
         }
 

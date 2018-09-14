@@ -3,6 +3,7 @@ package net.torvald.terrarum.langpack
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.AppLoader.printdbg
 import java.io.*
 import java.util.*
 
@@ -44,7 +45,7 @@ object Lang {
     }
 
     fun load(localesDir: String) {
-        println("[Lang] Loading languages from $localesDir")
+        printdbg(this, "Loading languages from $localesDir")
 
         val localesDir = File(localesDir)
 
@@ -119,13 +120,15 @@ object Lang {
         if (key.startsWith("MENU_LABEL_PRESS_START_SYMBOL"))
             return ret2.replace('>', Terrarum.joypadLabelStart).capitalize()
 
-        return if (AppLoader.GAME_LOCALE.contains("bg"))
+        return if (key.getEndTag().contains("bg"))
             "${AppLoader.fontGame.charsetOverrideBulgarian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideNormal}"
-        else if (AppLoader.GAME_LOCALE.contains("sr"))
-            "${AppLoader.fontGame.charsetOverrideBulgarian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideNormal}"
+        else if (key.getEndTag().contains("sr"))
+            "${AppLoader.fontGame.charsetOverrideSerbian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideNormal}"
         else
             ret2.capitalize()
     }
+
+    private fun String.getEndTag() = this.split("_").last()
 
     fun pluraliseLang(key: String, count: Int): String {
         return if (count > 1) get(key + "_PLURAL") else get(key)

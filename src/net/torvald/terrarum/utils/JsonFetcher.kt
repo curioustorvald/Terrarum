@@ -2,6 +2,7 @@ package net.torvald.terrarum.utils
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import net.torvald.terrarum.AppLoader.printdbg
 import java.io.File
 
 import java.io.IOException
@@ -22,7 +23,7 @@ object JsonFetcher {
         jsonString = StringBuffer() // reset buffer every time it called
         readJsonFileAsString(jsonFilePath)
 
-        println("[JsonFetcher] Reading JSON $jsonFilePath")
+        printdbg(this, "Reading JSON $jsonFilePath")
 
         if (jsonString == null) {
             throw Error("[JsonFetcher] jsonString is null!")
@@ -39,7 +40,7 @@ object JsonFetcher {
         jsonString = StringBuffer() // reset buffer every time it called
         readJsonFileAsString(jsonFile.canonicalPath)
 
-        println("[JsonFetcher] Reading JSON ${jsonFile.path}")
+        printdbg(this, "Reading JSON ${jsonFile.path}")
 
         if (jsonString == null) {
             throw Error("[JsonFetcher] jsonString is null!")
@@ -58,7 +59,7 @@ object JsonFetcher {
             ) // JSON does not require line break
         }
         catch (e: IOException) {
-            System.err.println("An error occurred while reading $path")
+            System.err.println("[JsonFetcher] An error occurred while reading $path")
             e.printStackTrace()
         }
     }

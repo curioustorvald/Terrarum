@@ -1,5 +1,7 @@
 package net.torvald.terrarum.utils
 
+import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.ModMgr
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
@@ -21,7 +23,7 @@ object CSVFetcher {
         net.torvald.terrarum.utils.CSVFetcher.csvString = StringBuffer() // reset buffer every time it called
         net.torvald.terrarum.utils.CSVFetcher.readCSVasString(csvFilePath)
 
-        println("[CSVFetcher] Reading CSV $csvFilePath")
+        printdbg(this, "Reading CSV $csvFilePath")
 
         val csvParser = org.apache.commons.csv.CSVParser.parse(
                 net.torvald.terrarum.utils.CSVFetcher.csvString!!.toString(),

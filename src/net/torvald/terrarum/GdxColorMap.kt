@@ -22,7 +22,7 @@ class GdxColorMap {
         })
 
 
-        println("[GdxColorMap] Loading colormap from ${imageFile.name()}; PixmapFormat: ${pixmap.format}; Dimension: $width x $height")
+        AppLoader.printdbg(this, "Loading colormap from ${imageFile.name()}; PixmapFormat: ${pixmap.format}; Dimension: $width x $height")
 
 
         pixmap.dispose()
