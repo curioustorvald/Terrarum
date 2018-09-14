@@ -24,6 +24,20 @@ import java.util.Random;
  */
 public class AppLoader implements ApplicationListener {
 
+    /**
+     * 0xAA_BB_XXXX
+     * AA: Major version
+     * BB: Minor version
+     * XXXX: Revision (Repository commits, or something arbitrary)
+     *
+     * e.g. 0x02010034 can be translated as 2.1.52
+     */
+    public static final int VERSION_RAW = 0x00_02_027C;
+    public static final boolean IS_DEVELOPMENT_BUILD = true;
+
+
+
+
     private static AppLoader INSTANCE = null;
 
     private AppLoader() { }
@@ -66,16 +80,6 @@ public class AppLoader implements ApplicationListener {
         }
     }
 
-
-    /**
-     * 0xAA_BB_XXXX
-     * AA: Major version
-     * BB: Minor version
-     * XXXX: Revision (Repository commits)
-     *
-     * e.g. 0x02010034 can be translated as 2.1.52
-     */
-    public static final int VERSION_RAW = 0x00_02_0270;
     public static final String getVERSION_STRING() {
         return String.format("%d.%d.%d", VERSION_RAW >>> 24, (VERSION_RAW & 0xff0000) >>> 16, VERSION_RAW & 0xFFFF);
     }
@@ -261,7 +265,7 @@ public class AppLoader implements ApplicationListener {
         appConfig.width = Terrarum.INSTANCE.getWIDTH();
         appConfig.height = Terrarum.INSTANCE.getHEIGHT();
 
-        System.out.println("[AppLoader] Resize event");
+        printdbg(this, "Resize event");
     }
 
     @Override
@@ -280,7 +284,7 @@ public class AppLoader implements ApplicationListener {
     }
 
     public void setScreen(Screen screen) {
-        System.out.println("[AppLoader] Changing screen to " + screen.getClass().getCanonicalName());
+        printdbg(this, "Changing screen to " + screen.getClass().getCanonicalName());
 
         if (this.screen != null) this.screen.hide();
         this.screen = screen;
@@ -289,7 +293,7 @@ public class AppLoader implements ApplicationListener {
             this.screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         }
 
-        System.out.println("[AppLoader] Screen transisiton complete: " + this.screen.getClass().getCanonicalName());
+        printdbg(this, "Screen transisiton complete: " + this.screen.getClass().getCanonicalName());
     }
 
     private void setCameraPosition(float newX, float newY) {
@@ -306,5 +310,17 @@ public class AppLoader implements ApplicationListener {
                 0f, HEIGHT, 0f, 1f, 1f, 1f, 1f, 0f, 0f
         });
         fullscreenQuad.setIndices(new short[]{0, 1, 2, 2, 3, 0});
+    }
+
+
+    public static final void printdbg(Object obj, Object message) {
+        if (IS_DEVELOPMENT_BUILD) {
+            System.out.println("["+obj.getClass().getSimpleName()+"] "+message.toString());
+        }
+    }
+    public static final void printdbgerr(Object obj, Object message) {
+        if (IS_DEVELOPMENT_BUILD) {
+            System.err.println("["+obj.getClass().getSimpleName()+"] "+message.toString());
+        }
     }
 }

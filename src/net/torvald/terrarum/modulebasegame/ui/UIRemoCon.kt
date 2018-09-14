@@ -5,6 +5,8 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.AppLoader.printdbgerr
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ui.UICanvas
@@ -22,6 +24,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     private var remoConTray: UIRemoConElement // this remocon is dynamically generated
     private var currentRemoConContents = treeRepresentation
+    private var currentlySelectedRemoConItem = treeRepresentation.data
 
     override var width: Int
         get() = remoConWidth // somehow NOT making this constant causes a weird issue
@@ -41,12 +44,17 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
             val splittedNodeName = node.data?.split(yamlSep)
 
             if (splittedNodeName?.size == 2) {
-                val attachedClass = loadClass(splittedNodeName[1])
+                try {
+                    val attachedClass = loadClass(splittedNodeName[1])
 
-                attachedClass.posX = 0
-                attachedClass.posY = 0
+                    attachedClass.posX = 0
+                    attachedClass.posY = 0
 
-                screens.add((node.data ?: "(null)") to attachedClass)
+                    screens.add((node.data ?: "(null)") to attachedClass)
+                }
+                catch (e: java.lang.ClassNotFoundException) {
+                    printdbgerr(this, "class '${splittedNodeName[1]}' was not found, skipping")
+                }
             }
         }
     }
@@ -85,6 +93,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
                     remoConTray.consume()
 
                     currentRemoConContents = currentRemoConContents.parent!!
+                    currentlySelectedRemoConItem = currentRemoConContents.data
                     remoConTray = generateNewRemoCon(currentRemoConContents)
                 }
                 else {
@@ -98,12 +107,17 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
                 if (currentRemoConContents.children.size > selectedIndex ?: 0x7FFFFFFF) {
 
+
+                    val newCurrentRemoConContents = currentRemoConContents.children[selectedIndex!!]
+
                     // only go deeper if that node has child to navigate
                     if (currentRemoConContents.children[selectedIndex!!].children.size != 0) {
                         remoConTray.consume()
-                        currentRemoConContents = currentRemoConContents.children[selectedIndex!!]
-                        remoConTray = generateNewRemoCon(currentRemoConContents)
+                        remoConTray = generateNewRemoCon(newCurrentRemoConContents)
+                        currentRemoConContents = newCurrentRemoConContents
                     }
+
+                    currentlySelectedRemoConItem = newCurrentRemoConContents.data
                 }
                 else {
                     throw RuntimeException("Index: $selectedIndex, Size: ${currentRemoConContents.children.size}")
@@ -112,21 +126,30 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
 
             // do something with the actual selection
-            println(currentRemoConContents.data)
+            //printdbg(this, "$currentlySelectedRemoConItem")
+
             screens.forEach {
-                if (currentRemoConContents.data == it.first) {
+                //printdbg(this, "> ${it.first}")
+
+                if (currentlySelectedRemoConItem == it.first) {
                     it.second.setAsOpen()
 
+
+                    //printdbg(this, ">> ding - ${it.second.javaClass.canonicalName}")
                 }
                 else {
                     it.second.setAsClose()
                 }
-
-                it.second.update(delta) // update is required anyway
-                // but this is not updateUI, so whenever the UI is completely hidden,
-                // underlying handler will block any update until the UI is open again
             }
         }
+
+
+        screens.forEach {
+            it.second.update(delta) // update is required anyway
+            // but this is not updateUI, so whenever the UI is completely hidden,
+            // underlying handler will block any update until the UI is open again
+        }
+
 
 
         if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
@@ -138,9 +161,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
         remoConTray.render(batch, camera)
 
         screens.forEach {
-            if (currentRemoConContents.data == it.first) {
-                it.second.render(batch, camera) // again, underlying handler will block unnecessary renders
-            }
+            it.second.render(batch, camera) // again, underlying handler will block unnecessary renders
         }
     }
 
@@ -166,9 +187,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
         screens.forEach {
-            if (currentRemoConContents.data == it.first) {
-                it.second.mouseMoved(screenX, screenY) // again, underlying handler will block unnecessary renders
-            }
+            it.second.mouseMoved(screenX, screenY) // again, underlying handler will block unnecessary renders
         }
 
         return true
@@ -176,9 +195,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         screens.forEach {
-            if (currentRemoConContents.data == it.first) {
-                it.second.touchDragged(screenX, screenY, pointer) // again, underlying handler will block unnecessary renders
-            }
+            it.second.touchDragged(screenX, screenY, pointer) // again, underlying handler will block unnecessary renders
         }
 
         return true
@@ -186,9 +203,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         screens.forEach {
-            if (currentRemoConContents.data == it.first) {
-                it.second.touchDown(screenX, screenY, pointer, button) // again, underlying handler will block unnecessary renders
-            }
+            it.second.touchDown(screenX, screenY, pointer, button) // again, underlying handler will block unnecessary renders
         }
 
         return true
@@ -196,9 +211,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         screens.forEach {
-            if (currentRemoConContents.data == it.first) {
-                it.second.touchUp(screenX, screenY, pointer, button) // again, underlying handler will block unnecessary renders
-            }
+            it.second.touchUp(screenX, screenY, pointer, button) // again, underlying handler will block unnecessary renders
         }
 
         return true
@@ -206,9 +219,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     override fun scrolled(amount: Int): Boolean {
         screens.forEach {
-            if (currentRemoConContents.data == it.first) {
-                it.second.scrolled(amount) // again, underlying handler will block unnecessary renders
-            }
+            it.second.scrolled(amount) // again, underlying handler will block unnecessary renders
         }
 
         return true
@@ -216,9 +227,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     override fun keyDown(keycode: Int): Boolean {
         screens.forEach {
-            if (currentRemoConContents.data == it.first) {
-                it.second.keyDown(keycode) // again, underlying handler will block unnecessary renders
-            }
+            it.second.keyDown(keycode) // again, underlying handler will block unnecessary renders
         }
 
         return true
@@ -226,9 +235,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     override fun keyUp(keycode: Int): Boolean {
         screens.forEach {
-            if (currentRemoConContents.data == it.first) {
-                it.second.keyUp(keycode) // again, underlying handler will block unnecessary renders
-            }
+            it.second.keyUp(keycode) // again, underlying handler will block unnecessary renders
         }
 
         return true
@@ -236,9 +243,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     override fun keyTyped(character: Char): Boolean {
         screens.forEach {
-            if (currentRemoConContents.data == it.first) {
-                it.second.keyTyped(character) // again, underlying handler will block unnecessary renders
-            }
+            it.second.keyTyped(character) // again, underlying handler will block unnecessary renders
         }
 
         return true

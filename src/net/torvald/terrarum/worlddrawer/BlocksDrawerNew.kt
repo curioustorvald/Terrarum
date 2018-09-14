@@ -10,6 +10,7 @@ import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
@@ -780,7 +781,7 @@ internal object BlocksDrawer {
         oldScreenH = screenH
 
 
-        println("[BlocksDrawerNew] Resize event")
+        printdbg(this, "Resize event")
 
     }
 
