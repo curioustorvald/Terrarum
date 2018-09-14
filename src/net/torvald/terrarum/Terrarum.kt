@@ -14,6 +14,8 @@ import com.google.gson.JsonPrimitive
 import com.jme3.math.FastMath
 import net.torvald.dataclass.ArrayListMap
 import net.torvald.random.HQRNG
+import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.AppLoader.printdbgerr
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.gameworld.GameWorld
@@ -236,10 +238,10 @@ object Terrarum : Screen {
 
 
 
-        println("[Terrarum] os.arch = $systemArch") // debug info
+        printdbg(this, "os.arch = $systemArch") // debug info
 
         if (is32BitJVM) {
-            System.err.println("[Terrarum] 32 Bit JVM detected")
+            printdbgerr(this, "32 Bit JVM detected")
         }
 
         joypadLabelStart = when (getConfigString("joypadlabelstyle")) {
@@ -303,9 +305,9 @@ object Terrarum : Screen {
         testTexture = Texture(Gdx.files.internal("./assets/test_texture.tga"))
 
 
-        println("[Terrarum] GL_VERSION = $GL_VERSION")
-        println("[Terrarum] GL_MAX_TEXTURE_SIZE = $GL_MAX_TEXTURE_SIZE")
-        println("[Terrarum] GL info:\n${Gdx.graphics.glVersion.debugVersionString}") // debug info
+        printdbg(this, "GL_VERSION = $GL_VERSION")
+        printdbg(this, "GL_MAX_TEXTURE_SIZE = $GL_MAX_TEXTURE_SIZE")
+        printdbg(this, "GL info:\n${Gdx.graphics.glVersion.debugVersionString}") // debug info
 
 
         if (GL_VERSION < MINIMAL_GL_VERSION || GL_MAX_TEXTURE_SIZE < MINIMAL_GL_MAX_TEXTURE_SIZE) {
@@ -385,7 +387,7 @@ object Terrarum : Screen {
 
 
         AppLoader.GAME_LOCALE = getConfigString("language")
-        println("[Terrarum] locale = ${AppLoader.GAME_LOCALE}")
+        printdbg(this, "locale = ${AppLoader.GAME_LOCALE}")
 
 
 
@@ -393,7 +395,7 @@ object Terrarum : Screen {
 
 
 
-        println("[Terrarum] all modules loaded successfully")
+        printdbg(this, "all modules loaded successfully")
 
 
 
@@ -479,7 +481,7 @@ object Terrarum : Screen {
         //appLoader.resize(width, height)
         //Gdx.graphics.setWindowedMode(width, height)
 
-        println("[Terrarum] newsize: ${Gdx.graphics.width}x${Gdx.graphics.height} | internal: ${width}x$height")
+        printdbg(this, "newsize: ${Gdx.graphics.width}x${Gdx.graphics.height} | internal: ${width}x$height")
     }
 
 
@@ -516,9 +518,9 @@ object Terrarum : Screen {
         defaultSaveDir = defaultDir + "/Saves"
         configDir = defaultDir + "/config.json"
 
-        println("[Terrarum] os.name = $OSName (with identifier $OperationSystem)")
-        println("[Terrarum] os.version = $OSVersion")
-        println("[Terrarum] default directory: $defaultDir")
+        printdbg(this, "os.name = $OSName (with identifier $OperationSystem)")
+        printdbg(this, "os.version = $OSVersion")
+        printdbg(this, "default directory: $defaultDir")
     }
 
     private fun createDirs() {

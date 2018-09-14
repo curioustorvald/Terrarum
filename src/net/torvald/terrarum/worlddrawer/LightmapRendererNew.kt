@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
@@ -56,7 +57,7 @@ internal object LightmapRenderer {
     val overscan_opaque: Int = 8
 
     init {
-        println("[LightmapRenderer] Overscan open: $overscan_open; opaque: $overscan_opaque")
+        printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
     }
 
     // TODO resize(int, int) -aware
@@ -607,7 +608,7 @@ internal object LightmapRenderer {
 
 
 
-        println("[LightmapRendererNew] Resize event")
+        printdbg(this, "Resize event")
     }
 
 
