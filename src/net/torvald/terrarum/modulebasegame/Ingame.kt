@@ -26,6 +26,7 @@ import java.util.concurrent.locks.ReentrantLock
 
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.modulebasegame.console.AVTracker
 import net.torvald.terrarum.modulebasegame.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
@@ -193,7 +194,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      */
     private fun enter(gameSaveData: GameSaveData) {
         if (gameInitialised) {
-            println("[Ingame] loaded successfully.")
+            printdbg(this, "loaded successfully.")
         }
         else {
             LoadScreen.addMessage("Loading world from save")
@@ -221,7 +222,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      */
     private fun enter(worldParams: NewWorldParameters) {
         if (gameInitialised) {
-            println("[Ingame] loaded successfully.")
+            printdbg(this, "loaded successfully.")
         }
         else {
             LoadScreen.addMessage("${Terrarum.NAME} version ${AppLoader.getVERSION_STRING()}")

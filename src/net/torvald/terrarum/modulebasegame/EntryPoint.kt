@@ -1,5 +1,7 @@
 package net.torvald.terrarum.modulebasegame
 
+import net.torvald.terrarum.AppLoader.IS_DEVELOPMENT_BUILD
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.ModuleEntryPoint
@@ -26,7 +28,7 @@ class EntryPoint : ModuleEntryPoint() {
         // load customised item loader //
         /////////////////////////////////
 
-        println("[ModuleBaseGame.EntryPoint] recording item ID ")
+        printdbg(this, "recording item ID ")
 
         // blocks.csvs are loaded by ModMgr beforehand
         // block items (blocks and walls are the same thing basically)
@@ -45,7 +47,8 @@ class EntryPoint : ModuleEntryPoint() {
                 override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
 
                 init {
-                    print("$originalID ")
+                    if (IS_DEVELOPMENT_BUILD)
+                        print("$originalID ")
                 }
 
                 override fun primaryUse(delta: Float): Boolean {

@@ -1,5 +1,6 @@
 package net.torvald.terrarum.blockproperties
 
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
@@ -27,7 +28,7 @@ object BlockCodex {
         try {
             val records = CSVFetcher.readFromModule(module, path)
 
-            println("[BlockCodex] Building block properties table")
+            AppLoader.printdbg(this, "Building block properties table")
 
             records.forEach {
                 if (intVal(it, "id") == -1) {
