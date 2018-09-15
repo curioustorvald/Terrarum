@@ -121,9 +121,9 @@ object Lang {
             return ret2.replace('>', Terrarum.joypadLabelStart).capitalize()
 
         return if (key.getEndTag().contains("bg"))
-            "${AppLoader.fontGame.charsetOverrideBulgarian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideNormal}"
+            "${AppLoader.fontGame.charsetOverrideBulgarian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideDefault}"
         else if (key.getEndTag().contains("sr"))
-            "${AppLoader.fontGame.charsetOverrideSerbian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideNormal}"
+            "${AppLoader.fontGame.charsetOverrideSerbian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideDefault}"
         else
             ret2.capitalize()
     }

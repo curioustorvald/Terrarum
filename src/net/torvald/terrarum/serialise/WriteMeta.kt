@@ -19,10 +19,7 @@ internal object WriteMeta {
     val BYTE_NULL: Byte = 0
 
     val terraseed: Long = WorldGenerator.SEED
-    val rogueseed: Long = RoguelikeRandomiser.seed
-    val rogueiter: Int = RoguelikeRandomiser.iterations
-    val weatherseed: Long = WeatherMixer.seed
-    val weatheriter: Int = WeatherMixer.iterations
+
 
     /**
      * Write save meta to specified directory. Returns false if something went wrong.

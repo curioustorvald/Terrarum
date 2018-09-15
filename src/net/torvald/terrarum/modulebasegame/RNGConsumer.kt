@@ -1,29 +1,14 @@
 package net.torvald.terrarum.modulebasegame
 
+import net.torvald.random.HQRNG
 import java.util.*
 
 internal interface RNGConsumer {
 
-    val RNG: Random
-    var seed: Long
-    var iterations: Int
+    val RNG: HQRNG
 
-    fun loadFromSave(seed: Long, iterations: Int) {
-        this.seed = seed
-        this.iterations = iterations
-
-        repeat(iterations, { RNG.nextInt() })
-    }
-
-    private fun incIterations() {
-        iterations++
-
-        if (iterations < 0) iterations = 0
-    }
-
-    fun getRandomLong(): Long {
-        iterations++
-        return RNG.nextLong()
+    fun loadFromSave(s0: Long, s1: Long) {
+        RNG.reseed(s0, s1)
     }
 
 }

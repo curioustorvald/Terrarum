@@ -14,10 +14,10 @@ Ord  Hex  Description
 ...  00   String terminator
 
 ...       Terrain seed (8 bytes)
-...       Randomiser seed (8 bytes)
-...       Randomiser iterations (4 bytes)
-...       Weather seed (8 bytes)
-...       Weather iterations (4 bytes)
+...       Randomiser s0 (8 bytes)
+...       Randomiser s1 (4 bytes)
+...       Weather s0 (8 bytes)
+...       Weather s1 (4 bytes)
 
 ...       SHA-256 hash of worldinfo1 when not compressed (32 bytes)
 ...       SHA-256 hash of worldinfo2 when not compressed (32 bytes)
