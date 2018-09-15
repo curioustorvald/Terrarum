@@ -20,7 +20,6 @@ object RoguelikeRandomiser : RNGConsumer {
     val coloursTaken: ArrayList<Col4096> = ArrayList()
 
     override val RNG = HQRNG()
-    override var seed = 0L
 
     private val POTION_HEAL_TIER1 = 0x00
     private val POTION_HEAL_TIRE2 = 0x01
@@ -29,7 +28,6 @@ object RoguelikeRandomiser : RNGConsumer {
 
     private val POTION_BERSERK_TIER1 = 0x20
 
-    override var iterations = 0
 
     fun setupColours() {
 
@@ -55,13 +53,11 @@ object RoguelikeRandomiser : RNGConsumer {
 
     fun shuffleArrayInt(ar: IntArray, rnd: Random) {
         for (i in ar.size - 1 downTo 0) {
-            val index = rnd.nextInt(i + 1);
+            val index = rnd.nextInt(i + 1)
             // Simple swap
-            val a = ar[index];
-            ar[index] = ar[i];
-            ar[i] = a;
-
-            iterations++
+            val a = ar[index]
+            ar[index] = ar[i]
+            ar[i] = a
         }
     }
 }

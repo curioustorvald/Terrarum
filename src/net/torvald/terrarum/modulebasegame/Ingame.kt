@@ -176,10 +176,10 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             val world: GameWorldExtension,
             val historicalFigureIDBucket: ArrayList<Int>,
             val realGamePlayer: IngamePlayer,
-            val rogueseed: Long,
-            val rogueiter: Int,
-            val weatherseed: Long,
-            val weatheriter: Int
+            val rogueS0: Long,
+            val rogueS1: Long,
+            val weatherS0: Long,
+            val weatherS1: Long
     )
 
     data class NewWorldParameters(
@@ -209,8 +209,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             // set the randomisers right
-            RoguelikeRandomiser.loadFromSave(gameSaveData.rogueseed, gameSaveData.rogueiter)
-            WeatherMixer.loadFromSave(gameSaveData.weatherseed, gameSaveData.weatheriter)
+            RoguelikeRandomiser.loadFromSave(gameSaveData.rogueS0, gameSaveData.rogueS1)
+            WeatherMixer.loadFromSave(gameSaveData.weatherS0, gameSaveData.weatherS1)
 
 
             //initGame()
@@ -241,8 +241,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
             historicalFigureIDBucket = ArrayList<Int>()
 
-
-            RoguelikeRandomiser.seed = HQRNG().nextLong()
 
 
             // add new player and put it to actorContainer

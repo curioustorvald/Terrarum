@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulecomputers.virtualcomputer.terminal
 
-import net.torvald.terrarumsansbitmap.slick2d.GameFontBase
 import net.torvald.terrarum.blendMul
 import net.torvald.terrarum.blendNormal
 import java.util.*

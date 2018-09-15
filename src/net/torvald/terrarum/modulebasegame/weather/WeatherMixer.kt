@@ -35,8 +35,6 @@ import java.util.*
 internal object WeatherMixer : RNGConsumer {
 
     override val RNG = HQRNG()
-    override var seed = 0L
-    override var iterations = 0
 
 
     var weatherList: HashMap<String, ArrayList<BaseModularWeather>>
