@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.ui
 
+import net.torvald.terrarum.AppLoader
 import java.util.*
 
 
@@ -33,10 +34,14 @@ object UITitleRemoConYaml {
 
     val debugTools = """
         -  Development Tools $
-        - Building Maker
+         - Building Maker
+         - Start New Random Game
         """.trimIndent()
 
-    operator fun invoke() = parseYamlList(menus)
+    operator fun invoke() = if (AppLoader.IS_DEVELOPMENT_BUILD)
+        parseYamlList(menus + "\n" + debugTools)
+    else
+        parseYamlList(menus)
 
     fun parseYamlList(yaml: String): QNDTreeNode<String> {
         var currentIndentLevel = -1
