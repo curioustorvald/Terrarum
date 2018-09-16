@@ -84,7 +84,7 @@ class ActorValueTracker constructor() : JFrame() {
         buttonChangeActor.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 if (actorIDField.text.toLowerCase() == "player") {
-                    actor = (Terrarum.ingame!! as Ingame).playableActor
+                    actor = (Terrarum.ingame!! as Ingame).actorNowPlaying
                     actorValue = actor!!.actorValue
                 }
                 else if (actorIDField.text.isNotBlank()) {

@@ -84,7 +84,9 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Part of Ingame update
      */
-    fun update(delta: Float, player: ActorWithBody) {
+    fun update(delta: Float, player: ActorWithBody?) {
+        if (player == null) return
+
         currentWeather = weatherList[WEATHER_GENERIC]!![0]
 
 

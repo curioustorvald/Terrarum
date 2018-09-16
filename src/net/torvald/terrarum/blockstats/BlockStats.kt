@@ -28,7 +28,8 @@ object BlockStats {
         // Get stats on no-zoomed screen area. In other words, will behave as if screen zoom were 1.0
         // no matter how the screen is zoomed.
         val map = (Terrarum.ingame!!.world)
-        val player = (Terrarum.ingame!! as Ingame).playableActor
+        val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+        if (player == null) return
 
         val renderWidth = FastMath.ceil(Terrarum.WIDTH.toFloat())
         val renderHeight = FastMath.ceil(Terrarum.HEIGHT.toFloat())

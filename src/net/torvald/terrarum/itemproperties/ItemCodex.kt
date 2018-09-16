@@ -132,7 +132,7 @@ object ItemCodex {
 
             override fun primaryUse(delta: Float): Boolean {
                 val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
-                val actorvalue = ingame.playableActor.actorValue
+                val actorvalue = ingame.actorNowPlaying.actorValue
 
 
                 using = true
@@ -155,7 +155,7 @@ object ItemCodex {
                 ingame.world.inflictTerrainDamage(
                         Terrarum.mouseTileX,
                         Terrarum.mouseTileY,
-                        Calculate.pickaxePower(ingame.playableActor, material) * swingDmgToFrameDmg
+                        Calculate.pickaxePower(ingame.actorNowPlaying, material) * swingDmgToFrameDmg
                 )
                 return true
             }
@@ -163,7 +163,7 @@ object ItemCodex {
             override fun endPrimaryUse(delta: Float): Boolean {
                 using = false
                 // reset action timer to zero
-                ingame.playableActor.actorValue[AVKey.__ACTION_TIMER] = 0.0
+                ingame.actorNowPlaying.actorValue[AVKey.__ACTION_TIMER] = 0.0
                 return true
             }
         }*/

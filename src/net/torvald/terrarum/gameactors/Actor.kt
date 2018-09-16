@@ -39,7 +39,11 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
     var actorValue = ActorValue(this)
     @Volatile var flagDespawn = false
 
-    override fun equals(other: Any?) = referenceID == (other as Actor).referenceID
+    override fun equals(other: Any?): Boolean {
+        if (other == null) return false
+
+        return referenceID == (other as Actor).referenceID
+    }
     override fun hashCode() = referenceID!!
     override fun toString() =
             if (actorValue.getAsString("name").isNullOrEmpty())
