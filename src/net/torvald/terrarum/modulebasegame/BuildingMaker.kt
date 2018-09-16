@@ -2,12 +2,9 @@ package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.IngameInstance
-import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
@@ -49,7 +46,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
 
-    override var playableActor: ActorHumanoid = MovableWorldCamera(world)
+    override var actorNowPlaying: ActorHumanoid? = MovableWorldCamera(world)
 
     val uiToolbox = UIBuildingMakerToolbox()
     val notifier = Notification()
@@ -104,7 +101,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
                 (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
 
 
-        playableActor.setPosition(512 * 16.0, 149 * 16.0)
+        actorNowPlaying?.setPosition(512 * 16.0, 149 * 16.0)
 
 
 
@@ -153,10 +150,10 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     private fun updateGame(delta: Float) {
         blockPointingCursor.update(delta)
-        playableActor.update(delta)
+        actorNowPlaying?.update(delta)
         uiContainer.forEach { it.update(delta) }
 
-        WorldCamera.update(world, playableActor)
+        WorldCamera.update(world, actorNowPlaying)
     }
 
     private fun renderGame() {

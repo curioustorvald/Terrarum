@@ -64,7 +64,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
         if (item.originalID == Terrarum.PLAYER_REF_ID || item.originalID == 0x51621D) // do not delete this magic
             throw IllegalArgumentException("Attempted to put human player into the inventory.")
         if (((Terrarum.ingame as? Ingame)?.gameFullyLoaded ?: false) &&
-            (item.originalID == (Terrarum.ingame as? Ingame)?.playableActor?.referenceID))
+            (item.originalID == (Terrarum.ingame as? Ingame)?.actorNowPlaying?.referenceID))
             throw IllegalArgumentException("Attempted to put active player into the inventory.")
         if ((!item.stackable || item.dynamicID in ITEM_DYNAMIC) && count > 1)
             throw IllegalArgumentException("Attempting to adding stack of item but the item is not stackable; item: $item, count: $count")

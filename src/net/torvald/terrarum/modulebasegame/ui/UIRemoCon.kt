@@ -5,10 +5,14 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.AppLoader.printdbgerr
+import net.torvald.terrarum.LoadScreen
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderSigrid
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.ui.UIItemTextButtonList
@@ -99,6 +103,22 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
                 else {
                     throw NullPointerException("No parent node to return")
                 }
+            }
+            else if (it.labelText.contains("Start New Random Game")) {
+
+                printdbg(this, 1)
+
+                val ingame = Ingame(Terrarum.batch)
+                ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
+                ingame.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
+
+                printdbg(this, 2)
+
+                Terrarum.ingame = ingame
+                LoadScreen.screenToLoad = ingame
+                Terrarum.setScreen(LoadScreen)
+
+                printdbg(this, 3)
             }
             else {
                 // check if target exists

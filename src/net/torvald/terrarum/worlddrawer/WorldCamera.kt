@@ -29,7 +29,8 @@ object WorldCamera {
     inline val yCentre: Int
         get() = y + height.ushr(1)
 
-    fun update(world: GameWorld, player: ActorWBMovable) {
+    fun update(world: GameWorld, player: ActorWBMovable?) {
+        if (player == null) return
 
         width = FastMath.ceil(Terrarum.WIDTH / (Terrarum.ingame?.screenZoom ?: 1f)) // div, not mul
         height = FastMath.ceil(Terrarum.HEIGHT / (Terrarum.ingame?.screenZoom ?: 1f))

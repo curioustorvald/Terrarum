@@ -15,8 +15,11 @@ internal object ExportAV : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
             try {
+                val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+                if (player == null) return
+
                 JsonWriter.writeToFile(
-                        (Terrarum.ingame!! as Ingame).playableActor.actorValue,
+                        player.actorValue,
                         Terrarum.defaultDir + "/Exports/" + args[1] + ".json")
 
                 Echo("ExportAV: exported to " + args[1] + ".json")
