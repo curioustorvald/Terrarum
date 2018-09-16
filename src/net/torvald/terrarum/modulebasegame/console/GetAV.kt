@@ -15,11 +15,13 @@ internal object GetAV : ConsoleCommand {
     override fun execute(args: Array<String>) {
         try {
             val ingame = Terrarum.ingame!! as Ingame
+            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+            if (player == null) return
             
             
-            if (args.size == 1 && ingame.playableActor != null) {
+            if (args.size == 1 && player != null) {
                 // print all actorvalue of player
-                val av = ingame.playableActor.actorValue
+                val av = player.actorValue
                 val keyset = av.keySet
 
                 Echo("$ccW== ActorValue list for ${ccY}player $ccW==")
@@ -36,15 +38,15 @@ internal object GetAV : ConsoleCommand {
                 // check if args[1] is number or not
                 if (!args[1].isNum()) { // args[1] is ActorValue name
                     Echo("${ccW}player.$ccM${args[1]} $ccW= " +
-                                                      ccG +
-                                                      ingame.playableActor.actorValue[args[1]] +
-                                                      " $ccO" +
-                                                      ingame.playableActor.actorValue[args[1]]!!.javaClass.simpleName
+                         ccG +
+                         player.actorValue[args[1]] +
+                         " $ccO" +
+                         player.actorValue[args[1]]!!.javaClass.simpleName
                     )
                     println("[GetAV] player.${args[1]} = " +
-                            ingame.playableActor.actorValue[args[1]] +
+                            player.actorValue[args[1]] +
                             " " +
-                            ingame.playableActor.actorValue[args[1]]!!.javaClass.simpleName
+                            player.actorValue[args[1]]!!.javaClass.simpleName
                     )
                 }
                 else {

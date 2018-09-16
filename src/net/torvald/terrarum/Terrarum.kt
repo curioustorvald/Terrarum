@@ -726,10 +726,12 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     /** The actor the game is currently allowing you to control.
      *
      *  Most of the time it'd be the "player", but think about the case where you have possessed
-     *  some random actor of the game. Now that actor is now playableActor, the actual gamer's avatar
-     *  (reference ID of 0x91A7E2) (must) stay in the actorContainer, but it's not a playableActor.
+     *  some random actor of the game. Now that actor is now actorNowPlaying, the actual gamer's avatar
+     *  (reference ID of 0x91A7E2) (must) stay in the actorContainer, but it's not a actorNowPlaying.
+     *
+     *  Nullability of this property is believed to be unavoidable (trust me!). I'm sorry for the inconvenience.
      */
-    open lateinit var playableActor: ActorHumanoid
+    open var actorNowPlaying: ActorHumanoid? = null
 
     val ACTORCONTAINER_INITIAL_SIZE = 64
     val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
@@ -810,7 +812,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      * Any values behind the index will be automatically pushed to front.
      * This is how remove function of [java.util.ArrayList] is defined.
      */
-    open fun removeActor(actor: Actor) {
+    open fun removeActor(actor: Actor?) {
+        if (actor == null) return
+
         val indexToDelete = actorContainer.binarySearch(actor.referenceID!!)
         if (indexToDelete >= 0) {
             actorContainer.removeAt(indexToDelete)
@@ -820,7 +824,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     /**
      * Check for duplicates, append actor and sort the list
      */
-    open fun addNewActor(actor: Actor) {
+    open fun addNewActor(actor: Actor?) {
+        if (actor == null) return
+
         if (theGameHasActor(actor.referenceID!!)) {
             throw Error("The actor $actor already exists in the game")
         }

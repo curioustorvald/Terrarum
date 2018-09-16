@@ -14,7 +14,11 @@ internal object SetScale : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2 || args.size == 3) {
             try {
-                val targetID = if (args.size == 3) args[1].toInt() else (Terrarum.ingame!! as Ingame).playableActor.referenceID
+                val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+                if (player == null) return
+
+
+                val targetID = if (args.size == 3) args[1].toInt() else player.referenceID
                 val scale = args[if (args.size == 3) 2 else 1].toDouble()
 
                 val target = Terrarum.ingame!!.getActorByID(targetID!!)

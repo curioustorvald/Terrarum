@@ -8,9 +8,10 @@ import net.torvald.terrarum.gameactors.Controllable
  * @param actor : here you 'attach' the actor you wish to control
  * Created by minjaesong on 2016-10-23.
  */
+@Deprecated("The ingame should discriminate 'theRealGamer' and 'actorNowPlaying'")
 class PlayableActorDelegate(val actor: ActorHumanoid) {
 
-    init {
+    /*init {
         if (actor !is Controllable)
             throw IllegalArgumentException("Player must be 'Controllable'!")
     }
@@ -27,5 +28,5 @@ class PlayableActorDelegate(val actor: ActorHumanoid) {
         //    LightmapRenderer.fireRecalculateEvent()
         //}
         // not going to work: think about stationery tiki torches, global lights, etc
-    }
+    }*/
 }

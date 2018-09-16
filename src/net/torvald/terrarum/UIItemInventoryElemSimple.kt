@@ -124,8 +124,10 @@ class UIItemInventoryElemSimple(
         if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_1..Input.Keys.NUM_0) {
             println("keydown elemgrid")
 
+            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+            if (player == null) return false
 
-            val inventory = (Terrarum.ingame!! as Ingame).playableActor.inventory
+            val inventory = player.inventory
             val slot = if (keycode == Input.Keys.NUM_0) 9 else keycode - Input.Keys.NUM_1
             val currentSlotItem = inventory.getQuickBar(slot)
 
@@ -157,7 +159,8 @@ class UIItemInventoryElemSimple(
 
             // equip da shit
             val itemEquipSlot = item!!.equipPosition
-            val player = (Terrarum.ingame!! as Ingame).playableActor
+            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+            if (player == null) return false
 
             if (item != player.inventory.itemEquipped.get(itemEquipSlot)) { // if this item is unequipped, equip it
                 player.equipItem(item!!)

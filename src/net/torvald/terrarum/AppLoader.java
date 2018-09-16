@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -271,6 +272,11 @@ public class AppLoader implements ApplicationListener {
     @Override
     public void dispose () {
         if (screen != null) screen.hide();
+
+        System.out.println("Goodbye !");
+
+        // delete temp files
+        new File("./tmp_wenquanyi.tga").delete();
     }
 
     @Override

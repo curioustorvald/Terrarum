@@ -63,9 +63,16 @@ internal object SetAV : ConsoleCommand {
                 return
             }
 
-            (Terrarum.ingame!! as Ingame).playableActor.actorValue[args[1]] = newValue
-            Echo("${ccW}Set $ccM${args[1]} ${ccW}for ${ccY}player ${ccW}to $ccG$newValue")
-            println("[SetAV] set ActorValue '${args[1]}' for player to '$newValue'.")
+            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+            if (player == null) {
+                EchoError("Player does not exist")
+                println("[SetAV] Player does not exist")
+            }
+            else {
+                player.actorValue[args[1]] = newValue
+                Echo("${ccW}Set $ccM${args[1]} ${ccW}for ${ccY}player ${ccW}to $ccG$newValue")
+                println("[SetAV] set ActorValue '${args[1]}' for player to '$newValue'.")
+            }
         }
         else if (args.size == 4) {
             try {
