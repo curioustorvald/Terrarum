@@ -145,7 +145,7 @@ open class ActorHumanoid(
     protected var isRightDown = false
     protected var isJumpDown = false
     protected inline val isGamer: Boolean
-        get() = if (Terrarum.ingame == null) false else this == Terrarum.ingame!!.playableActor
+        get() = if (Terrarum.ingame == null) false else this == Terrarum.ingame!!.actorNowPlaying
 
 
     private val nullItem = object : GameItem() {

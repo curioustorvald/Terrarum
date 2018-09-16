@@ -38,8 +38,8 @@ class UIPieMenu : UICanvas() {
     var selection: Int = -1
 
     override fun updateUI(delta: Float) {
-        if (selection >= 0)
-            (Terrarum.ingame!! as Ingame).playableActor.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
+        if (selection >= 0 && (Terrarum.ingame!! as Ingame).actorNowPlaying != null)
+            (Terrarum.ingame!! as Ingame).actorNowPlaying!!.actorValue[AVKey.__PLAYER_QUICKSLOTSEL] =
                     selection % slotCount
 
 
@@ -83,7 +83,11 @@ class UIPieMenu : UICanvas() {
 
 
             // draw item
-            val itemPair = (Terrarum.ingame!! as Ingame).playableActor.inventory.getQuickBar(i)
+            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
+            if (player == null) return // don't draw actual items
+
+
+            val itemPair = player.inventory.getQuickBar(i)
 
             if (itemPair != null) {
                 val itemImage = ItemCodex.getItemImage(itemPair.item)

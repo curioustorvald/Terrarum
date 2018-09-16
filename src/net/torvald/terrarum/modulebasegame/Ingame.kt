@@ -16,7 +16,6 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -24,14 +23,12 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.util.ArrayList
 import java.util.concurrent.locks.ReentrantLock
 
-import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.modulebasegame.console.AVTracker
 import net.torvald.terrarum.modulebasegame.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.SetGlobalLightOverride
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.imagefont.Watch7SegMain
@@ -53,9 +50,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     lateinit var historicalFigureIDBucket: ArrayList<Int>
 
-    lateinit var gameworld: GameWorldExtension
-
-    lateinit var theRealGamer: IngamePlayer
 
     /**
      * list of Actors that is sorted by Actors' referenceID
@@ -150,6 +144,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     lateinit var gameLoadMode: GameLoadMode
     lateinit var gameLoadInfoPayload: Any
+    lateinit var gameworld: GameWorldExtension
+    lateinit var theRealGamer: IngamePlayer
 
     enum class GameLoadMode {
         CREATE_NEW, LOAD_FROM
@@ -189,6 +185,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             // other worldgen options
     )
 
+    private fun setTheRealGamerFirstTime(actor: IngamePlayer) {
+        actorNowPlaying = actor
+        theRealGamer = actor
+        addNewActor(actorNowPlaying)
+    }
+
     /**
      * Init instance by loading saved world
      */
@@ -203,17 +205,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             gameworld = gameSaveData.world
             world = gameworld
             historicalFigureIDBucket = gameSaveData.historicalFigureIDBucket
-            theRealGamer = gameSaveData.realGamePlayer
-            playableActor = gameSaveData.realGamePlayer
-            addNewActor(playableActor)
+            setTheRealGamerFirstTime(gameSaveData.realGamePlayer)
 
 
             // set the randomisers right
             RoguelikeRandomiser.loadFromSave(gameSaveData.rogueS0, gameSaveData.rogueS1)
             WeatherMixer.loadFromSave(gameSaveData.weatherS0, gameSaveData.weatherS1)
-
-
-            //initGame()
         }
     }
 
@@ -221,6 +218,11 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      * Init instance by creating new world
      */
     private fun enter(worldParams: NewWorldParameters) {
+        printdbg(this, "Ingame called")
+        Thread.currentThread().getStackTrace().forEach {
+            printdbg(this, "->   $it")
+        }
+
         if (gameInitialised) {
             printdbg(this, "loaded successfully.")
         }
@@ -252,8 +254,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             // test actor
             //addNewActor(PlayerBuilderCynthia())
 
-
-            //initGame()
+            setTheRealGamerFirstTime(PlayerBuilderSigrid())
         }
     }
 
@@ -303,7 +304,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 -uiInventoryPlayer.width,
                 70
         )*/
-        uiInventoryPlayer = UIInventoryFull(playableActor,
+        uiInventoryPlayer = UIInventoryFull(actorNowPlaying,
                 toggleKeyLiteral = Terrarum.getConfigInt("keyinventory")
         )
         uiInventoryPlayer.setPosition(0, 0)
@@ -329,11 +330,11 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         //uiVitalItem.setAsAlwaysVisible()
 
         // basic watch-style notification bar (temperature, new mail)
-        uiWatchBasic = UIBasicNotifier(playableActor)
+        uiWatchBasic = UIBasicNotifier(actorNowPlaying)
         uiWatchBasic.setAsAlwaysVisible()
         uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.width, 0)
 
-        uiWatchTierOne = UITierOneWatch(playableActor)
+        uiWatchTierOne = UITierOneWatch(actorNowPlaying)
         uiWatchTierOne.setAsAlwaysVisible()
         uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.width, uiWatchBasic.height - 2)
 
@@ -421,15 +422,15 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         if (!gameFullyLoaded) {
 
             if (gameLoadMode == GameLoadMode.CREATE_NEW) {
-                playableActor = PlayerBuilderSigrid()
+                actorNowPlaying = PlayerBuilderSigrid()
 
                 // go to spawn position
-                playableActor.setPosition(
+                actorNowPlaying?.setPosition(
                         world.spawnX * FeaturesDrawer.TILE_SIZE.toDouble(),
                         world.spawnY * FeaturesDrawer.TILE_SIZE.toDouble()
                 )
 
-                addNewActor(playableActor)
+                addNewActor(actorNowPlaying)
             }
 
             postInit()
@@ -505,7 +506,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             BlockPropUtil.dynamicLumFuncTickClock()
             world.updateWorldTime(delta)
             //WorldSimulator(player, delta)
-            WeatherMixer.update(delta, playableActor)
+            WeatherMixer.update(delta, actorNowPlaying)
             BlockStats.update()
             if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
                 gameworld.globalLight = WeatherMixer.globalLightNow
@@ -515,7 +516,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             // camera-related updates //
             ////////////////////////////
             FeaturesDrawer.update(delta)
-            WorldCamera.update(gameworld, playableActor)
+            WorldCamera.update(gameworld, actorNowPlaying)
 
 
 
@@ -558,7 +559,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 actorsRenderMidTop,
                 actorsRenderFront,
                 particlesContainer,
-                playableActor,
+                actorNowPlaying,
                 uiContainer
         )
     }
@@ -566,7 +567,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private fun repossessActor() {
         // check if currently pocessed actor is removed from game
-        if (!theGameHasActor(playableActor)) {
+        if (!theGameHasActor(actorNowPlaying)) {
             // re-possess canonical player
             if (theGameHasActor(Terrarum.PLAYER_REF_ID))
                 changePossession(Terrarum.PLAYER_REF_ID)
@@ -576,12 +577,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun changePossession(newActor: ActorHumanoid) {
-        if (!theGameHasActor(playableActor)) {
+        if (!theGameHasActor(actorNowPlaying)) {
             throw IllegalArgumentException("No such actor in the game: $newActor")
         }
 
-        playableActor = newActor
-        WorldSimulator(playableActor, Terrarum.deltaTime)
+        actorNowPlaying = newActor
+        WorldSimulator(actorNowPlaying, Terrarum.deltaTime)
     }
 
     private fun changePossession(refid: Int) {
@@ -665,11 +666,11 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
             ThreadParallel.startAll()
 
-            playableActor.update(delta)
+            actorNowPlaying?.update(delta)
         }
         else {
             actorContainer.forEach {
-                if (it != playableActor) {
+                if (it != actorNowPlaying) {
                     it.update(delta)
 
                     if (it is Pocketed) {
@@ -682,7 +683,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                     }
                 }
             }
-            playableActor.update(delta)
+            actorNowPlaying?.update(delta)
             //AmmoMeterProxy(player, uiVitalItem.UI as UIVitalMetre)
         }
     }
@@ -734,7 +735,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      * Any values behind the index will be automatically pushed to front.
      * This is how remove function of [java.util.ArrayList] is defined.
      */
-    override fun removeActor(actor: Actor) {
+    override fun removeActor(actor: Actor?) {
+        if (actor == null) return
+
         if (actor.referenceID == theRealGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
             throw RuntimeException("Attempted to remove player.")
         val indexToDelete = actorContainer.binarySearch(actor.referenceID!!)
@@ -769,7 +772,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     /**
      * Check for duplicates, append actor and sort the list
      */
-    override fun addNewActor(actor: Actor) {
+    override fun addNewActor(actor: Actor?) {
+        if (actor == null) return
+
         if (theGameHasActor(actor.referenceID!!)) {
             throw Error("The actor $actor already exists in the game")
         }

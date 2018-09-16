@@ -337,7 +337,7 @@ open class ActorWBMovable(val world: GameWorld, renderOrder: RenderOrder, val im
             if (spriteGlow != null) spriteGlow!!.update(delta)
 
             // make NoClip work for player
-            if (true) {//this == Terrarum.ingame!!.playableActor) {
+            if (true) {//this == Terrarum.ingame!!.actorNowPlaying) {
                 isNoSubjectToGrav = isNoClip || COLLISION_TEST_MODE
                 isNoCollideWorld = isNoClip
                 isNoSubjectToFluidResistance = isNoClip

@@ -32,14 +32,16 @@ class BasicDebugInfoWindow : UICanvas() {
     private val world = ingame.world as GameWorldExtension
 
     override fun updateUI(delta: Float) {
-        val player = ingame.playableActor
-        val hitbox = player.hitbox
+        val player = ingame.actorNowPlaying
+        val hitbox = player?.hitbox
 
-        xdelta = hitbox.canonicalX - prevPlayerX
-        ydelta = hitbox.canonicalY - prevPlayerY
+        if (hitbox != null) {
+            xdelta = hitbox.canonicalX - prevPlayerX
+            ydelta = hitbox.canonicalY - prevPlayerY
 
-        prevPlayerX = hitbox.canonicalX
-        prevPlayerY = hitbox.canonicalY
+            prevPlayerX = hitbox.canonicalX
+            prevPlayerY = hitbox.canonicalY
+        }
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -47,58 +49,61 @@ class BasicDebugInfoWindow : UICanvas() {
         fun Int.rawG() = this % LightmapRenderer.MUL_2 / LightmapRenderer.MUL
         fun Int.rawB() = this % LightmapRenderer.MUL
 
-        val player = ingame.playableActor
+        val player = ingame.actorNowPlaying
 
         batch.color = Color(0xFFEE88FF.toInt())
 
-        val hitbox = player.hitbox
+        val hitbox = player?.hitbox
 
         /**
          * First column
          */
 
-        printLineColumn(batch, 1, 1, "startX "
-                                 + ccG
-                                 + "${hitbox?.startX}"
-                                 + " ("
-                                 + "${(hitbox?.startX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
-                                 + ")")
-        printLineColumn(batch, 2, 1, "endX "
-                                 + ccG
-                                 + "${hitbox?.endX}"
-                                 + " ("
-                                 + "${(hitbox?.endX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
-                                 + ")")
-        printLineColumn(batch, 1, 2, "startY "
-                                 + ccG
-                                 + "${hitbox?.startY}"
-                                 + " ("
-                                 + "${(hitbox?.startY?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
-                                 + ")")
-        printLineColumn(batch, 2, 2, "endY "
-                                 + ccG
-                                 + "${hitbox?.endY}"
-                                 + " ("
-                                 + "${(hitbox?.endY?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
-                                 + ")")
+        if (player != null) {
 
-        printLine(batch, 3, "veloX reported $ccG${player.externalForce?.x}")
-        printLine(batch, 4, "veloY reported $ccG${player.externalForce?.y}")
+            printLineColumn(batch, 1, 1, "startX "
+                                         + ccG
+                                         + "${hitbox?.startX}"
+                                         + " ("
+                                         + "${(hitbox?.startX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                         + ")")
+            printLineColumn(batch, 2, 1, "endX "
+                                         + ccG
+                                         + "${hitbox?.endX}"
+                                         + " ("
+                                         + "${(hitbox?.endX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                         + ")")
+            printLineColumn(batch, 1, 2, "startY "
+                                         + ccG
+                                         + "${hitbox?.startY}"
+                                         + " ("
+                                         + "${(hitbox?.startY?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                         + ")")
+            printLineColumn(batch, 2, 2, "endY "
+                                         + ccG
+                                         + "${hitbox?.endY}"
+                                         + " ("
+                                         + "${(hitbox?.endY?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                         + ")")
 
-        printLine(batch, 5, "p_WalkX $ccG${player.controllerMoveDelta?.x}")
-        printLine(batch, 6, "p_WalkY $ccG${player.controllerMoveDelta?.y}")
+            printLine(batch, 3, "veloX reported $ccG${player.externalForce?.x}")
+            printLine(batch, 4, "veloY reported $ccG${player.externalForce?.y}")
 
-        printLineColumn(batch, 2, 3, "veloX measured $ccG${xdelta}")
-        printLineColumn(batch, 2, 4, "veloY measured $ccG${ydelta}")
+            printLine(batch, 5, "p_WalkX $ccG${player.controllerMoveDelta?.x}")
+            printLine(batch, 6, "p_WalkY $ccG${player.controllerMoveDelta?.y}")
 
-        printLineColumn(batch, 1, 7,
-                "walled " +
-                "${if (player.walledLeft) "$ccR" else "$ccG"}L" +
-                "${if (player.walledBottom) "$ccR" else "$ccG"}${0x1F.toChar()}" +
-                "${if (player.walledTop) "$ccR" else "$ccG"}${0x1E.toChar()}" +
-                "${if (player.walledRight) "$ccR" else "$ccG"}R" +
-                "${if (player.colliding) "$ccR" else "$ccG"}${0x08.toChar()}"
-        )
+            printLineColumn(batch, 2, 3, "veloX measured $ccG${xdelta}")
+            printLineColumn(batch, 2, 4, "veloY measured $ccG${ydelta}")
+
+            printLineColumn(batch, 1, 7,
+                    "walled " +
+                    "${if (player.walledLeft) "$ccR" else "$ccG"}L" +
+                    "${if (player.walledBottom) "$ccR" else "$ccG"}${0x1F.toChar()}" +
+                    "${if (player.walledTop) "$ccR" else "$ccG"}${0x1E.toChar()}" +
+                    "${if (player.walledRight) "$ccR" else "$ccG"}R" +
+                    "${if (player.colliding) "$ccR" else "$ccG"}${0x08.toChar()}"
+            )
+        }
 
 
 
@@ -138,10 +143,12 @@ class BasicDebugInfoWindow : UICanvas() {
 
         printLineColumn(batch, 2, 5, "Time $ccG${world.time.todaySeconds.toString().padStart(5, '0')}" +
                                      " (${world.time.getFormattedTime()})")
-        printLineColumn(batch, 2, 6, "Mass $ccG${player.mass}")
 
-        printLineColumn(batch, 2, 7, "noClip $ccG${player.isNoClip}")
+        if (player != null) {
+            printLineColumn(batch, 2, 6, "Mass $ccG${player.mass}")
 
+            printLineColumn(batch, 2, 7, "noClip $ccG${player.isNoClip}")
+        }
 
         drawHistogram(batch, LightmapRenderer.histogram,
                 Terrarum.WIDTH - histogramW - 30,
