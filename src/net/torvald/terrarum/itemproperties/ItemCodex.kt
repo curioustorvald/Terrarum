@@ -61,12 +61,12 @@ object ItemCodex {
                     print("$originalID ")
                 }
 
-                override fun primaryUse(delta: Float): Boolean {
+                override fun startPrimaryUse(delta: Float): Boolean {
                     return false
                     // TODO base punch attack
                 }
 
-                override fun secondaryUse(delta: Float): Boolean {
+                override fun startSecondaryUse(delta: Float): Boolean {
                     val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
 
                     // check for collision with actors (BLOCK only)
@@ -130,7 +130,7 @@ object ItemCodex {
                 name = "Stone pickaxe"
             }
 
-            override fun primaryUse(delta: Float): Boolean {
+            override fun startPrimaryUse(delta: Float): Boolean {
                 val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
                 val actorvalue = ingame.actorNowPlaying.actorValue
 

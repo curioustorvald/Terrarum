@@ -69,13 +69,13 @@ interface Pocketed {
 
 
     fun consumePrimary(item: GameItem) {
-        if (item.primaryUse(Terrarum.deltaTime)) {
+        if (item.startPrimaryUse(Terrarum.deltaTime)) {
             inventory.consumeItem(this as Actor, item) // consume on successful
         }
     }
 
     fun consumeSecondary(item: GameItem) {
-        if (item.secondaryUse(Terrarum.deltaTime))
+        if (item.startSecondaryUse(Terrarum.deltaTime))
             inventory.consumeItem(this as Actor, item) // consume on successful
     }
 }

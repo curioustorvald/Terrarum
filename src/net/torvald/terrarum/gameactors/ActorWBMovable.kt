@@ -507,10 +507,20 @@ open class ActorWBMovable(val world: GameWorld, renderOrder: RenderOrder, val im
          */
         val D: Vector2 = Vector2(externalForce.x.magnSqr(), externalForce.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
 
-        val V: Vector2 = (W - D) / Terrarum.TARGET_FPS.toDouble() * SI_TO_GAME_ACC
+        val V: Vector2 = (W - D) / Terrarum.TARGET_FPS * SI_TO_GAME_ACC
 
         return V
     }
+
+    /**
+     * Event for collision (event gets fired when it collided with the world or other actors)
+     *
+     * This event may fired two or more times per update.
+     */
+    open fun collided(other: Array<CollisionMessage>) {
+    }
+
+    data class CollisionMessage(val targetID: Int, val AkspfisWorld: Boolean)
 
     /**
      * Apply gravitation to the every falling body (unless not levitating)
@@ -662,6 +672,14 @@ open class ActorWBMovable(val world: GameWorld, renderOrder: RenderOrder, val im
                 8, 13 -> { newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta()); bounceY = true }
                 2, 7  -> { newHitbox.translatePosY(          - newHitbox.endY.modTileDelta())  ; bounceY = true }
             }
+
+
+            // fire Collision Event with one/two/three-side collision
+            // for the ease of writing, this jumptable is separated from above.
+            when (selfCollisionStatus) {
+                // TODO compose CollisionInfo and fire collided()
+            }
+
 
             // two-side collision
             if (selfCollisionStatus in listOf(3,6,9,12)) {

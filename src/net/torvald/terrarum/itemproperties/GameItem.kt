@@ -142,7 +142,7 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
      * Consumption function is executed in net.torvald.terrarum.gamecontroller.IngameController,
      * in which the function itself is defined in net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
      */
-    open fun primaryUse(delta: Float): Boolean = false
+    open fun startPrimaryUse(delta: Float): Boolean = false
 
     /**
      * Apply effects (continuously or not) while secondary button (usually right mouse button) is down
@@ -152,7 +152,7 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
      *
      * note: DO NOT super() this!
      */
-    open fun secondaryUse(delta: Float): Boolean = false
+    open fun startSecondaryUse(delta: Float): Boolean = false
 
     open fun endPrimaryUse(delta: Float): Boolean = false
     open fun endSecondaryUse(delta: Float): Boolean = false

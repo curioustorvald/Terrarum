@@ -4,15 +4,15 @@ A savegame is a single file in the format of TerranVirtualDisk.
 Files contained the TerranVirtualDisk is as follows:
 
 (root)
-    worldinfo0      -- Savegame Metadata GZipped (TESV)
-    worldinfo1      -- Layer Data GZipped (TEMD)
+    worldinfo0      -- Savegame Metadata (TESV)
+    worldinfo1      -- Layer Data (TEMD)
     worldinfo2      -- Copy of blocks.csv GZipped    -- will use this from the next load
     worldinfo3      -- Copy of items.csv GZipped     -- will use this from the next load
     worldinfo4      -- Copy of materials.csv GZipped -- will use this from the next load
     (any random number in Hex ACTORID_MIN..FFFFFFFF)    -- Serialised Entity Information (including Player)
     (PLAYER_REF_ID in Hex -- 91A7E2)    -- Player Character Information (Serialised Entity Information)
     (51621D)        -- The Debug Player (Serialised Entity Information)
-    load_order.txt  -- LoadOrder.csv
+    load_order.txt  -- LoadOrder.csv (NOT zipped)
 
 
 

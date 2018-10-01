@@ -115,14 +115,14 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         // don't separate Player from this! Physics will break, esp. airborne manoeuvre
         if (ingame.canPlayerControl) {
-            val itemOnGrip = ingame.actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP) ?: null
+            // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
+            if (ingame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
-            if (itemOnGrip != null) {
                 if (button == Terrarum.getConfigInt("mouseprimary")) {
-                    itemOnGrip.endPrimaryUse(Terrarum.deltaTime)
+                    ingame.worldPrimaryClickEnd(Terrarum.deltaTime)
                 }
                 if (button == Terrarum.getConfigInt("mousesecondary")) {
-                    itemOnGrip.endSecondaryUse(Terrarum.deltaTime)
+                    ingame.worldSecondaryClickEnd(Terrarum.deltaTime)
                 }
             }
         }
@@ -144,6 +144,21 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        // don't separate Player from this! Physics will break, esp. airborne manoeuvre
+        if (ingame.canPlayerControl) {
+            // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
+            if (ingame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
+
+                if (button == Terrarum.getConfigInt("mouseprimary")) {
+                    ingame.worldPrimaryClickStart(Terrarum.deltaTime)
+                }
+                if (button == Terrarum.getConfigInt("mousesecondary")) {
+                    ingame.worldSecondaryClickStart(Terrarum.deltaTime)
+                }
+            }
+        }
+
+
         ingame.uiContainer.forEach { it.touchDown(screenX, screenY, pointer, button) }
         return true
     }
