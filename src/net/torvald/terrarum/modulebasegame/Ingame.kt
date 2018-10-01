@@ -220,9 +220,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      */
     private fun enter(worldParams: NewWorldParameters) {
         printdbg(this, "Ingame called")
-        Thread.currentThread().getStackTrace().forEach {
-            printdbg(this, "->   $it")
-        }
+        printStackTrace()
 
         if (gameInitialised) {
             printdbg(this, "loaded successfully.")
@@ -255,7 +253,10 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             // test actor
             //addNewActor(PlayerBuilderCynthia())
 
-            setTheRealGamerFirstTime(PlayerBuilderSigrid())
+
+            // it won't work:
+            //setTheRealGamerFirstTime(PlayerBuilderSigrid())
+            // because NO GL CONTEXT IN THIS THREAD, might want 'postInit()'?
         }
     }
 
@@ -263,9 +264,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     /** Load rest of the game with GL context */
     fun postInit() {
-        //LightmapRenderer.world = this.world
-        //BlocksDrawer.world = this.world
-        //FeaturesDrawer.world = this.world
+        setTheRealGamerFirstTime(PlayerBuilderSigrid())
+
 
 
         MegaRainGovernor // invoke MegaRain Governor
@@ -442,15 +442,11 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         if (!gameFullyLoaded) {
 
             if (gameLoadMode == GameLoadMode.CREATE_NEW) {
-                actorNowPlaying = PlayerBuilderSigrid()
-
                 // go to spawn position
                 actorNowPlaying?.setPosition(
                         world.spawnX * FeaturesDrawer.TILE_SIZE.toDouble(),
                         world.spawnY * FeaturesDrawer.TILE_SIZE.toDouble()
                 )
-
-                addNewActor(actorNowPlaying)
             }
 
             postInit()
@@ -762,6 +758,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             throw RuntimeException("Attempted to remove player.")
         val indexToDelete = actorContainer.binarySearch(actor.referenceID!!)
         if (indexToDelete >= 0) {
+            printdbg(this, "Removing actor $actor")
+            printStackTrace()
+
             actorContainer.removeAt(indexToDelete)
 
             // indexToDelete >= 0 means that the actor certainly exists in the game
@@ -799,6 +798,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             throw Error("The actor $actor already exists in the game")
         }
         else {
+            printdbg(this, "Adding actor $actor")
+            printStackTrace()
+
             actorContainer.add(actor)
             insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
 
@@ -968,4 +970,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
 
+    private fun printStackTrace() {
+        Thread.currentThread().getStackTrace().forEach {
+            printdbg(this, "->   $it")
+        }
+    }
 }
