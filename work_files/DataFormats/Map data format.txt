@@ -6,11 +6,11 @@ Ord  Hex  Description
 00   54   T
 01   45   E
 02   4D   M
-03   44   D
+03   7A   z               # 'z' because it's compressed
 
-04   01   Number of bytes per tile; only 1 is supported
+04   01   Version revision number
 
-05        Number of layers
+05   03   Number of layers
 
 06   00   Reserved
 07   00   Reserved
@@ -36,16 +36,30 @@ Ord  Hex  Description
 17        Default spawn coord Y
 
 # Layer count 1
-18        Terrain tiles data MSB
+18   54   T
+19   45   E
+20   52   R
+21   52   R
+
+22        Uncompressed size of DEFLATEd payload
+23        Uncompressed size of DEFLATEd payload
+24        Uncompressed size of DEFLATEd payload
+25        Uncompressed size of DEFLATEd payload
+
+26...     DEFLATEd payload for the terrain (MSB ++ LSB; uncompressed size must be 1.5x of MSB)  # ++ is a list concat sign in Haskell
 
 # Layer count 2
-...       Wall tiles data MSB
+...       "WALL"
+...       Uncompressed size of DEFLATEd payload
+...       DEFLATEd payload for the wall (MSB ++ LSB; uncompressed size must be 1.5x of MSB)
+
 
 # Layer count 3
-...       Terrain tiles data LSB (half size of MSB byte array)
-...       Wall tiles data LSB (half size of MSB byte array)
-
-# Layer count 4
-...       Wire tiles data (0-255)
+...       "WIRE"
+...       Uncompressed size of DEFLATEd payload
+...       Wire tiles data (MSB only)
 
 <EOF>
+
+
+* To read layers: you'll need to search for specific strings, namely ["TERR", "WALL", "WIRE"]

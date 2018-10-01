@@ -33,7 +33,7 @@ class PickaxeGeneric(override val originalID: ItemID) : GameItem() {
         super.name = "Builtin Pickaxe"
     }
 
-    override fun primaryUse(delta: Float): Boolean {
+    override fun startPrimaryUse(delta: Float): Boolean {
         val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
         if (player == null) return false
 
