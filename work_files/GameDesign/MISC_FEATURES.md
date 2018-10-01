@@ -38,7 +38,7 @@ Connect two or more tracker head to play the array of trackers play simultaneous
 ## Aimhack ##
 
 - Include a valid way of obtaining Aimhack (possessed weapon shit?)
-- Implement it on ```<item>.primaryUse(gc, delta)```
+- Implement it on ```<item>.startPrimaryUse(gc, delta)```
 
 
 ## Particles ##

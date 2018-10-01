@@ -36,6 +36,7 @@ object UITitleRemoConYaml {
         -  Development Tools $
          - Building Maker
          - Start New Random Game
+         - MENU_LABEL_RETURN
         """.trimIndent()
 
     operator fun invoke() = if (AppLoader.IS_DEVELOPMENT_BUILD)

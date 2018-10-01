@@ -50,7 +50,7 @@ open class HumanoidNPC(
         override val isDynamic = false
         override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
 
-        override fun secondaryUse(delta: Float): Boolean {
+        override fun startSecondaryUse(delta: Float): Boolean {
             try {
                 // place the actor to the world
                 this@HumanoidNPC.setPosition(Terrarum.mouseX, Terrarum.mouseY)

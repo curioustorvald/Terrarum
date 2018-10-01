@@ -57,7 +57,7 @@ abstract class UICanvas(
     val relativeMouseY: Int
         get() = Terrarum.mouseScreenY - handler.posY
 
-    /** If mouse is hovering over it */
+    /** If mouse is hovering over it regardless of its visibility */
     val mouseUp: Boolean
         get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
     /** If mouse is hovering over it and mouse is down */
