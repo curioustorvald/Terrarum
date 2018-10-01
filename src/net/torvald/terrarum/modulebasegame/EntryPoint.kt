@@ -51,12 +51,12 @@ class EntryPoint : ModuleEntryPoint() {
                         print("$originalID ")
                 }
 
-                override fun primaryUse(delta: Float): Boolean {
+                override fun startPrimaryUse(delta: Float): Boolean {
                     return false
                     // TODO base punch attack
                 }
 
-                override fun secondaryUse(delta: Float): Boolean {
+                override fun startSecondaryUse(delta: Float): Boolean {
                     val ingame = Terrarum.ingame!! as Ingame
 
                     val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())

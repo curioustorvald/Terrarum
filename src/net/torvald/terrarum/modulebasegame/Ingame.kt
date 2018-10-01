@@ -29,6 +29,7 @@ import net.torvald.terrarum.modulebasegame.console.AVTracker
 import net.torvald.terrarum.modulebasegame.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.console.SetGlobalLightOverride
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.imagefont.Watch7SegMain
@@ -392,6 +393,25 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     }// END enter
 
+    override fun worldPrimaryClickStart(delta: Float) {
+        val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
+        itemOnGrip?.startPrimaryUse(delta)
+    }
+
+    override fun worldPrimaryClickEnd(delta: Float) {
+        val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
+        itemOnGrip?.endPrimaryUse(delta)
+    }
+
+    override fun worldSecondaryClickStart(delta: Float) {
+        val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
+        itemOnGrip?.startSecondaryUse(delta)
+    }
+
+    override fun worldSecondaryClickEnd(delta: Float) {
+        val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
+        itemOnGrip?.endSecondaryUse(delta)
+    }
 
     protected var updateDeltaCounter = 0.0
     protected val updateRate = 1.0 / Terrarum.TARGET_INTERNAL_FPS
