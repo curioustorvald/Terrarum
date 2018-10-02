@@ -2,7 +2,6 @@ Savegame metadata
 
 * Endianness: LITTLE
 * Filename: 'worldinfo0'
-* Remarks: GZipped
 
 Ord  Hex  Description
 00   54   T
@@ -15,14 +14,14 @@ Ord  Hex  Description
 
 ...       Terrain seed (8 bytes)
 ...       Randomiser s0 (8 bytes)
-...       Randomiser s1 (4 bytes)
+...       Randomiser s1 (8 bytes)
 ...       Weather s0 (8 bytes)
-...       Weather s1 (4 bytes)
+...       Weather s1 (8 bytes)
 
-...       SHA-256 hash of worldinfo1 when not compressed (32 bytes)
-...       SHA-256 hash of worldinfo2 when not compressed (32 bytes)
-...       SHA-256 hash of worldinfo3 when not compressed (32 bytes)
-...       SHA-256 hash of worldinfo4 when not compressed (32 bytes)
+...       SHA-256 hash of worldinfo1 (32 bytes)
+...       SHA-256 hash of worldinfo2 (32 bytes)
+...       SHA-256 hash of worldinfo3 (32 bytes)
+...       SHA-256 hash of worldinfo4 (32 bytes)
 
 ...       ReferenceID of the player (4 bytes, a fixed value of 91A7E2)
 ...       Current world's time_t (the ingame time, 8 bytes)
