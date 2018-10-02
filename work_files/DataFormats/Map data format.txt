@@ -8,12 +8,13 @@ Ord  Hex  Description
 02   4D   M
 03   7A   z               # 'z' because it's compressed
 
-04   01   Version revision number
+04   03   Version revision number (unreleased numbers also count)
 
-05   03   Number of layers
+05   03   Number of layers, NOT the number of payload
 
-06   00   Reserved
-07   00   Reserved
+06   05   Number of payloads
+
+07   01   Compression algorithm, 0 for none, 1 for DEFLATE, otherwise undefined (maybe LZMA2 for the future?)
 
 08        World width
 09        World width
@@ -25,41 +26,49 @@ Ord  Hex  Description
 0E        World height
 0F        World height
 
-10        Default spawn coord X
-11        Default spawn coord X
-12        Default spawn coord X
-13        Default spawn coord X
+10        Default spawn coord in Absolute Tile Number
+11        Default spawn coord in Absolute Tile Number
+12        Default spawn coord in Absolute Tile Number
+13        Default spawn coord in Absolute Tile Number
+14        Default spawn coord in Absolute Tile Number
+15        Default spawn coord in Absolute Tile Number
 
-14        Default spawn coord Y
-15        Default spawn coord Y
-16        Default spawn coord Y
-17        Default spawn coord Y
-
-# Layer count 1
-18   54   T
-19   45   E
-20   52   R
-21   52   R
-
-22        Uncompressed size of DEFLATEd payload
-23        Uncompressed size of DEFLATEd payload
-24        Uncompressed size of DEFLATEd payload
-25        Uncompressed size of DEFLATEd payload
-
-26...     DEFLATEd payload for the terrain (MSB ++ LSB; uncompressed size must be 1.5x of MSB)  # ++ is a list concat sign in Haskell
-
-# Layer count 2
-...       "WALL"
-...       Uncompressed size of DEFLATEd payload
-...       DEFLATEd payload for the wall (MSB ++ LSB; uncompressed size must be 1.5x of MSB)
+# Payload
+#
+# Each layer and other information are stored as a "payload"
+# A payload is consisted as follows:
+#
+#   Literal        Description
+#   "\0pLd"        Payload header  [00, 70, 4C, 64]
+#   [4]            Identifier. 4 lettres ASCII string
+#   [6]            Uncompressed size of DEFLATEd binary (max size 256 TB)
+#   [..]           DEFLATEd binary
+#   "EndPYLd\xFF"  Payload footer  [45, 6E, 64, 50, 59, 4C, 64, FF]
 
 
-# Layer count 3
-...       "WIRE"
-...       Uncompressed size of DEFLATEd payload
-...       Wire tiles data (MSB only)
+Payload "TERR" -- world terrain data, concatenation of MSB and LSB arrays. In Haskell style: Deflate(MSB ++ LSB)
+                  Uncompressed size will be 1.5x of (width * height)
 
-<EOF>
+Payload "WALL" -- world walls data, concatenation of MSB and LSB arrays. In Haskell style: Deflate(MSB ++ LSB)
+                  Uncompressed size will be 1.5x of (width * height)
+
+Payload "WIRE" -- world wires data
+                  Uncompressed size will be as same as (width * height)
+
+Payload "TdMG" -- world terrain damage data, array of: (Int48 tileAddress, Float32 damage)
+                  Uncompressed size will be arbitrary
+
+Payload "WdMG" -- world walls damage data, array of: (Int48 tileAddress, Float32 damage)
+                  Uncompressed size will be arbitrary
+
+EOF  45   E
+EOF  6E   n
+EOF  64   d
+EOF  54   T
+EOF  45   E
+EOF  4D   M
+EOF  FF   Byte order mark
+EOF  FE   Byte order mark
 
 
 * To read layers: you'll need to search for specific strings, namely ["TERR", "WALL", "WIRE"]
