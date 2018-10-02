@@ -72,18 +72,16 @@ object LoadScreen : ScreenAdapter() {
             println("[LoadScreen] Screen to load is not set. Are you testing the UI?")
         }
         else {
-            val runnable = object : Runnable {
-                override fun run() {
-                    try {
-                        screenToLoad!!.show()
-                    }
-                    catch (e: Exception) {
-                        addMessage("$ccR$e")
-                        errorTrapped = true
+            val runnable = {
+                try {
+                    screenToLoad!!.show()
+                }
+                catch (e: Exception) {
+                    addMessage("$ccR$e")
+                    errorTrapped = true
 
-                        System.err.println("Error while loading:")
-                        e.printStackTrace()
-                    }
+                    System.err.println("Error while loading:")
+                    e.printStackTrace()
                 }
             }
             screenLoadingThread = Thread(runnable, "LoadScreen GameLoader")
