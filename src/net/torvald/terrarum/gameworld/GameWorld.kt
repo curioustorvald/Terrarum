@@ -9,7 +9,7 @@ import org.dyn4j.geometry.Vector2
 typealias BlockAddress = Long
 typealias BlockDamage = Float
 
-open class GameWorld(val width: Int, val height: Int) {
+open class GameWorld(var worldIndex: Int, val width: Int, val height: Int) {
 
 
     //layers

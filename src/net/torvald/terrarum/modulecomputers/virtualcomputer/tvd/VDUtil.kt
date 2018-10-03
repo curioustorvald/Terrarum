@@ -792,18 +792,22 @@ object VDUtil {
     /**
      * Creates new zero-filled file with given name and size
      */
-    fun createNewBlankFile(disk: VirtualDisk, directoryID: EntryID, fileSize: Long, filename: String, charset: Charset) {
+    fun createNewBlankFile(disk: VirtualDisk, directoryID: EntryID, fileSize: Long, filename: String, charset: Charset): EntryID {
         disk.checkReadOnly()
         disk.checkCapacity(fileSize + DiskEntry.HEADER_SIZE + 4)
 
-        addFile(disk, directoryID, DiskEntry(
+        val newEntry = DiskEntry(
                 disk.generateUniqueID(),
                 directoryID,
                 filename.toEntryName(DiskEntry.NAME_LENGTH, charset = charset),
                 currentUnixtime,
                 currentUnixtime,
                 EntryFile(fileSize)
-        ))
+        )
+
+        addFile(disk, directoryID, newEntry)
+
+        return newEntry.entryID
     }
 
 
