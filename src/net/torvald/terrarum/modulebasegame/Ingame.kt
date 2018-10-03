@@ -231,7 +231,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             // init map as chosen size
-            gameworld = GameWorldExtension(worldParams.width, worldParams.height)
+            gameworld = GameWorldExtension(1, worldParams.width, worldParams.height)
+            gameworldCount++
             world = gameworld as GameWorld
 
             // generate terrain for the map

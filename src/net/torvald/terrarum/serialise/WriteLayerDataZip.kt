@@ -14,7 +14,12 @@ import java.util.zip.DeflaterOutputStream
 import java.util.zip.GZIPOutputStream
 
 /**
- * TODO this one does not use TerranVirtualDisk
+ * This object only writes a file named 'worldinfo1'.
+ *
+ * The intended operation is as follows:
+ *  1. This and others write
+ *
+ *  TODO temporarily dump on the disk THEN pack? Or put all the files (in ByteArray64) in the RAM THEN pack?
  *
  * Created by minjaesong on 2016-03-18.
  */
@@ -23,7 +28,7 @@ internal object WriteLayerDataZip {
 
     // FIXME UNTESTED !!
 
-    val LAYERS_FILENAME = "worldinfo1"
+    val LAYERS_FILENAME = "world"
 
     val MAGIC = byteArrayOf(0x54, 0x45, 0x4D, 0x7A)
     val VERSION_NUMBER = 3.toByte()
@@ -34,29 +39,36 @@ internal object WriteLayerDataZip {
     val PAYLOAD_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x50, 0x59, 0x4C, 0x64, -1)
     val FILE_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x54, 0x45, 0x4D, -1, -2)
 
-    val NULL: Byte = 0
+    //val NULL: Byte = 0
 
 
-    internal operator fun invoke(saveDirectoryName: String): Boolean {
-        val path = "${Terrarum.defaultSaveDir}/$saveDirectoryName/${LAYERS_FILENAME}"
-        val tempPath = "${path}_bak"
+    /**
+     * TODO currently it'll dump the temporary file (tmp_worldinfo1) onto the disk and will return the temp file.
+     *
+     * @return File on success; `null` on failure
+     */
+    internal operator fun invoke(): File? {
         val world = (Terrarum.ingame!!.world)
 
-        val parentDir = File("${Terrarum.defaultSaveDir}/$saveDirectoryName")
+        val path = "${Terrarum.defaultSaveDir}/tmp_$LAYERS_FILENAME${world.worldIndex}"
+
+        // TODO let's try dump-on-the-disk-then-pack method...
+
+        /*val parentDir = File("${Terrarum.defaultSaveDir}/$saveDirectoryName")
         if (!parentDir.exists()) {
             parentDir.mkdir()
         }
         else if (!parentDir.isDirectory) {
             EchoError("Savegame directory is not actually a directory, aborting...")
             return false
-        }
+        }*/
 
 
-        val tempFile = File(tempPath)
         val outFile = File(path)
-        tempFile.createNewFile()
+        if (outFile.exists()) outFile.delete()
+        outFile.createNewFile()
 
-        val outputStream = BufferedOutputStream(FileOutputStream(tempFile), 8192)
+        val outputStream = BufferedOutputStream(FileOutputStream(outFile), 8192)
         val deflater = DeflaterOutputStream(outputStream, true)
 
         fun wb(byteArray: ByteArray) { outputStream.write(byteArray) }
@@ -152,12 +164,8 @@ internal object WriteLayerDataZip {
             outputStream.flush()
             outputStream.close()
 
-            outFile.delete()
-            tempFile.copyTo(outFile, overwrite = true)
-            tempFile.delete()
-            println("Saved map data '$LAYERS_FILENAME' to $saveDirectoryName.")
 
-            return true
+            return outFile
         }
         catch (e: IOException) {
             e.printStackTrace()
@@ -166,7 +174,7 @@ internal object WriteLayerDataZip {
             outputStream.close()
         }
 
-        return false
+        return null
     }
 
 

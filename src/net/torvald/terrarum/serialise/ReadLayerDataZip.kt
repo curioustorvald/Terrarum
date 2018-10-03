@@ -4,13 +4,12 @@ import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.BlockDamage
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskSkimmer.Companion.read
 import java.io.*
 import java.nio.charset.Charset
 import java.util.*
 import java.util.zip.Inflater
-import java.util.zip.InflaterOutputStream
 import kotlin.IllegalArgumentException
 import kotlin.collections.HashMap
 
@@ -27,13 +26,6 @@ internal object ReadLayerDataZip {
 
 
         val magicBytes = ByteArray(4)
-        val versionNumber = ByteArray(1)
-        val layerCount = ByteArray(1)
-        val payloadCountByte = ByteArray(1)
-        val compression = ByteArray(1)
-        val worldWidth = ByteArray(4)
-        val worldHeight = ByteArray(4)
-        val spawnAddress = ByteArray(6)
 
 
         //////////////////
@@ -47,18 +39,16 @@ internal object ReadLayerDataZip {
             throw IllegalArgumentException("File not a Layer Data")
         }
 
-
-        inputStream.read(versionNumber)
-        inputStream.read(layerCount)
-        inputStream.read(payloadCountByte)
-        inputStream.read(compression)
-        inputStream.read(worldWidth)
-        inputStream.read(worldHeight)
-        inputStream.read(spawnAddress)
+        val versionNumber = inputStream.read(1)[0].toUint()
+        val layerCount = inputStream.read(1)[0].toUint()
+        val payloadCount = inputStream.read(1)[0].toUint()
+        val compression = inputStream.read(1)[0].toUint()
+        val width = inputStream.read(4).toLittleInt()
+        val height = inputStream.read(4).toLittleInt()
+        val spawnAddress = inputStream.read(6).toLittleInt48()
 
         // read payloads
 
-        val payloadCount = payloadCountByte[0].toUint()
         val pldBuffer4 = ByteArray(4)
         val pldBuffer6 = ByteArray(6)
         val pldBuffer8 = ByteArray(8)
@@ -114,8 +104,6 @@ internal object ReadLayerDataZip {
         // END OF FILE READ //
         //////////////////////
 
-        val width = worldWidth.toLittleInt()
-        val height = worldHeight.toLittleInt()
         val worldSize = width.toLong() * height
 
         val payloadBytes = HashMap<String, ByteArray>()
@@ -140,7 +128,7 @@ internal object ReadLayerDataZip {
             }
         }
 
-        val spawnPoint = LandUtil.resolveBlockAddr(width, spawnAddress.toLittleInt48())
+        val spawnPoint = LandUtil.resolveBlockAddr(width, spawnAddress)
 
         val terrainDamages = HashMap<BlockAddress, BlockDamage>()
         val wallDamages = HashMap<BlockAddress, BlockDamage>()
