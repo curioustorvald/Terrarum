@@ -20,8 +20,8 @@ open class GameWorld(val width: Int, val height: Int) {
     val layerWallLowBits: PairedMapLayer
     val layerTerrainLowBits: PairedMapLayer
 
-    val layerThermal: MapLayerHalfFloat // in Kelvins
-    val layerAirPressure: MapLayerHalfFloat // (milibar - 1000)
+    //val layerThermal: MapLayerHalfFloat // in Kelvins
+    //val layerAirPressure: MapLayerHalfFloat // (milibar - 1000)
 
     /** Tilewise spawn point */
     var spawnX: Int
@@ -57,10 +57,10 @@ open class GameWorld(val width: Int, val height: Int) {
         layerWallLowBits = PairedMapLayer(width, height)
 
         // temperature layer: 2x2 is one cell
-        layerThermal = MapLayerHalfFloat(width / 2, height / 2, averageTemperature)
+        //layerThermal = MapLayerHalfFloat(width / 2, height / 2, averageTemperature)
 
         // air pressure layer: 4 * 8 is one cell
-        layerAirPressure = MapLayerHalfFloat(width / 4, height / 8, 13f) // 1013 mBar
+        //layerAirPressure = MapLayerHalfFloat(width / 4, height / 8, 13f) // 1013 mBar
     }
 
     /**
@@ -282,11 +282,13 @@ open class GameWorld(val width: Int, val height: Int) {
 
 
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {
-        return layerThermal.getValue((worldTileX fmod width) / 2, worldTileY / 2)
+        return null
+        //return layerThermal.getValue((worldTileX fmod width) / 2, worldTileY / 2)
     }
 
     fun getAirPressure(worldTileX: Int, worldTileY: Int): Float? {
-        return layerAirPressure.getValue((worldTileX fmod width) / 4, worldTileY / 8)
+        return null
+        //return layerAirPressure.getValue((worldTileX fmod width) / 4, worldTileY / 8)
     }
 
 

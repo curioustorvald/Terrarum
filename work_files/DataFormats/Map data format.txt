@@ -56,10 +56,10 @@ Payload "WIRE" -- world wires data
                   Uncompressed size will be as same as (width * height)
 
 Payload "TdMG" -- world terrain damage data, array of: (Int48 tileAddress, Float32 damage)
-                  Uncompressed size will be arbitrary
+                  Uncompressed size will be arbitrary (multiple of tens)
 
 Payload "WdMG" -- world walls damage data, array of: (Int48 tileAddress, Float32 damage)
-                  Uncompressed size will be arbitrary
+                  Uncompressed size will be arbitrary (multiple of tens)
 
 EOF  45   E
 EOF  6E   n

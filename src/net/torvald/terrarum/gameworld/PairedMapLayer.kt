@@ -3,7 +3,10 @@ package net.torvald.terrarum.gameworld
 /**
  * Created by minjaesong on 2016-02-15.
  */
-open class PairedMapLayer(width: Int, val height: Int) : Iterable<Byte> {
+open class PairedMapLayer : Iterable<Byte> {
+
+    val width: Int; val height: Int
+
 
     /**
      * 0b_xxxx_yyyy, x for lower index, y for higher index
@@ -15,13 +18,18 @@ open class PairedMapLayer(width: Int, val height: Int) : Iterable<Byte> {
      */
     internal @Volatile var data: ByteArray
 
-    val width: Int
-
-    init {
+    constructor(width: Int, height: Int) {
         this.width = width / 2
-
+        this.height = height
         data = ByteArray(width * height / 2)
     }
+
+    constructor(width: Int, height: Int, data: ByteArray) {
+        this.data = data
+        this.width = width / 2
+        this.height = height
+    }
+
 
     /**
      * Returns an iterator over elements of type `T`.
