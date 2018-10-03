@@ -5,10 +5,13 @@ Files contained the TerranVirtualDisk is as follows:
 
 (root)
     worldinfo0      -- Savegame Metadata (TESV)
-    worldinfo1      -- Layer Data (TEMD)
-    worldinfo2      -- Copy of blocks.csv     -- will use this from the next load
-    worldinfo3      -- Copy of items.csv      -- will use this from the next load
-    worldinfo4      -- Copy of materials.csv  -- will use this from the next load
+                       Has fixed Entry ID of 32767
+    worldinfo1      -- Copy of blocks.csv     -- will use this from the next load
+    worldinfo2      -- Copy of items.csv      -- will use this from the next load
+    worldinfo3      -- Copy of materials.csv  -- will use this from the next load
+    world[n]        -- Layer Data (TEMD); [n] is a serial number of the world (starts at 1)
+                       Has fixed Entry ID of [n]
+    (any random number in Hex 32768..ACTORID_MIN - 1)   -- Serialised Dynamic Item?
     (any random number in Hex ACTORID_MIN..FFFFFFFF)    -- Serialised Entity Information (including Player)
     (PLAYER_REF_ID in Hex -- 91A7E2)    -- Player Character Information (Serialised--JSON'd--Entity Information)
     (51621D)        -- The Debug Player (Serialised Entity Information)
