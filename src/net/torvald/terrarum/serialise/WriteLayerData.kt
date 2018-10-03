@@ -87,7 +87,7 @@ internal object WriteLayerData {
 
 }
 
-fun Int.toLittle() = byteArrayOf(
+/*fun Int.toLittle() = byteArrayOf(
         this.and(0xFF).toByte(),
         this.ushr(8).and(0xFF).toByte(),
         this.ushr(16).and(0xFF).toByte(),
@@ -125,4 +125,4 @@ fun ByteArray.toLittleLong() =
 fun ByteArray.toLittleDouble() = java.lang.Double.longBitsToDouble(this.toLittleLong())
 
 fun Byte.toUlong() = java.lang.Byte.toUnsignedLong(this)
-fun Byte.toUint() = java.lang.Byte.toUnsignedInt(this)
+fun Byte.toUint() = java.lang.Byte.toUnsignedInt(this)*/
