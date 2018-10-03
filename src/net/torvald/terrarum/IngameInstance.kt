@@ -11,6 +11,10 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import javax.swing.JOptionPane
 
+/**
+ * Although the game (as product) can have infinitely many stages/planets/etc., those stages must be manually managed by YOU;
+ * this instance only stores the stage that is currently being used.
+ */
 open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     var screenZoom = 1.0f
@@ -20,6 +24,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     open lateinit var consoleHandler: ConsoleWindow
 
     open lateinit var world: GameWorld
+    /** how many different planets/stages/etc. are thenre. Whole stages must be manually managed by YOU. */
+    var gameworldCount = 0
     /** The actor the game is currently allowing you to control.
      *
      *  Most of the time it'd be the "player", but think about the case where you have possessed

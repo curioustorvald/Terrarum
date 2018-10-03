@@ -7,7 +7,7 @@ import kotlin.properties.Delegates
 /**
  * Created by minjaesong on 2018-07-03.
  */
-class GameWorldExtension(width: Int, height: Int): GameWorld(width, height) {
+class GameWorldExtension(worldIndex: Int, width: Int, height: Int): GameWorld(worldIndex, width, height) {
 
     val time: WorldTime
     val economy = GameEconomy()
