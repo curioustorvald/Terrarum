@@ -79,6 +79,10 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     open var clickOnceListenerFired = false
 
 
+    /** Since gamepads can't just choose which UIItem to control, this variable is used to allow processing of
+     * gamepad button events for one or more UIItems in one or more UICanvases. */
+    open var controllerInFocus = false
+
 
     open fun update(delta: Float) {
         if (parentUI.isVisible) {
