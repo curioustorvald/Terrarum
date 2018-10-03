@@ -3,12 +3,21 @@ package net.torvald.terrarum.gameworld
 /**
  * Created by minjaesong on 2016-01-17.
  */
-open class MapLayer(val width: Int, val height: Int) : Iterable<Byte> {
+open class MapLayer : Iterable<Byte> {
 
+    val width: Int; val height: Int
     internal @Volatile var data: ByteArray // in parallel programming: do not trust your register; always read freshly from RAM!
 
-    init {
+    constructor(width: Int, height: Int) {
+        this.width = width
+        this.height = height
         data = ByteArray(width * height)
+    }
+
+    constructor(width: Int, height: Int, data: ByteArray) {
+        this.data = data
+        this.width = width
+        this.height = height
     }
 
     /**

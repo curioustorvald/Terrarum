@@ -15,6 +15,9 @@ object LandUtil {
     fun resolveBlockAddr(world: GameWorld, t: BlockAddress): Pair<Int, Int> =
             Pair((t % world.width).toInt(), (t / world.width).toInt())
 
+    fun resolveBlockAddr(width: Int, t: BlockAddress): Pair<Int, Int> =
+            Pair((t % width).toInt(), (t / width).toInt())
+
     /**
      * Get owner ID as an Actor/Faction
      */
