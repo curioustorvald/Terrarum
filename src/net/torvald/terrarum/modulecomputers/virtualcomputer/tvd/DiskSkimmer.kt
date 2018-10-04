@@ -161,6 +161,7 @@ class DiskSkimmer(private val diskFile: File) {
     }
 
     companion object {
+        /** Only use it when you're sure you won't reach EOF; unavailable cells in array will be filled with -1. */
         fun InputStream.read(size: Int): ByteArray {
             val ba = ByteArray(size)
             this.read(ba)

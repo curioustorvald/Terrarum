@@ -115,7 +115,8 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
                     printdbg(this, 1)
 
                     val ingame = Ingame(Terrarum.batch)
-                    ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
+                    //ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
+                    ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, 0x51621DL)
                     ingame.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
 
                     printdbg(this, 2)
