@@ -4,12 +4,17 @@ package net.torvald.terrarum.gameworld
 import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.serialise.ReadLayerDataZip
 import org.dyn4j.geometry.Vector2
 
 typealias BlockAddress = Long
 typealias BlockDamage = Float
 
-open class GameWorld(var worldIndex: Int, val width: Int, val height: Int) {
+open class GameWorld {
+
+    var worldIndex: Int
+    val width: Int
+    val height: Int
 
 
     //layers
@@ -28,8 +33,8 @@ open class GameWorld(var worldIndex: Int, val width: Int, val height: Int) {
     /** Tilewise spawn point */
     var spawnY: Int
 
-    val wallDamages = HashMap<BlockAddress, BlockDamage>()
-    val terrainDamages = HashMap<BlockAddress, BlockDamage>()
+    val wallDamages: HashMap<BlockAddress, BlockDamage>
+    val terrainDamages: HashMap<BlockAddress, BlockDamage>
 
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
@@ -40,13 +45,15 @@ open class GameWorld(var worldIndex: Int, val width: Int, val height: Int) {
     var averageTemperature = 288f // 15 deg celsius; simulates global warming
 
 
-
-
     var generatorSeed: Long = 0
+        internal set
 
 
+    constructor(worldIndex: Int, width: Int, height: Int) {
+        this.worldIndex = worldIndex
+        this.width = width
+        this.height = height
 
-    init {
         this.spawnX = width / 2
         this.spawnY = 200
 
@@ -56,12 +63,35 @@ open class GameWorld(var worldIndex: Int, val width: Int, val height: Int) {
         layerTerrainLowBits = PairedMapLayer(width, height)
         layerWallLowBits = PairedMapLayer(width, height)
 
+        wallDamages = HashMap<BlockAddress, BlockDamage>()
+        terrainDamages = HashMap<BlockAddress, BlockDamage>()
+
         // temperature layer: 2x2 is one cell
         //layerThermal = MapLayerHalfFloat(width / 2, height / 2, averageTemperature)
 
         // air pressure layer: 4 * 8 is one cell
         //layerAirPressure = MapLayerHalfFloat(width / 4, height / 8, 13f) // 1013 mBar
     }
+
+    internal constructor(worldIndex: Int, layerData: ReadLayerDataZip.LayerData) {
+        this.worldIndex = worldIndex
+
+        layerTerrain = layerData.layerTerrain
+        layerWall = layerData.layerWall
+        layerWire = layerData.layerWire
+        layerTerrainLowBits = layerData.layerTerrainLowBits
+        layerWallLowBits = layerData.layerWallLowBits
+
+        wallDamages = layerData.wallDamages
+        terrainDamages = layerData.terrainDamages
+
+        spawnX = layerData.spawnX
+        spawnY = layerData.spawnY
+
+        width = layerTerrain.width
+        height = layerTerrain.height
+    }
+
 
     /**
      * Get 2d array data of terrain

@@ -2,12 +2,17 @@ package net.torvald.terrarum.modulebasegame.gameworld
 
 import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.gameworld.*
+import net.torvald.terrarum.serialise.ReadLayerDataZip
 import kotlin.properties.Delegates
 
 /**
  * Created by minjaesong on 2018-07-03.
  */
-class GameWorldExtension(worldIndex: Int, width: Int, height: Int): GameWorld(worldIndex, width, height) {
+class GameWorldExtension: GameWorld {
+
+    constructor(worldIndex: Int, width: Int, height: Int) : super(worldIndex, width, height)
+    internal constructor(worldIndex: Int, layerData: ReadLayerDataZip.LayerData) : super(worldIndex, layerData)
+
 
     val time: WorldTime
     val economy = GameEconomy()

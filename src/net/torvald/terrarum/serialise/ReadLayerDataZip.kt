@@ -1,11 +1,13 @@
 package net.torvald.terrarum.serialise
 
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.BlockDamage
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskSkimmer.Companion.read
+import net.torvald.terrarum.toHex
 import java.io.*
 import java.nio.charset.Charset
 import java.util.*
@@ -47,6 +49,12 @@ internal object ReadLayerDataZip {
         val height = inputStream.read(4).toLittleInt()
         val spawnAddress = inputStream.read(6).toLittleInt48()
 
+        printdbg(this, "Version number: $versionNumber")
+        printdbg(this, "Layers count: $layerCount")
+        printdbg(this, "Payloads count: $payloadCount")
+        printdbg(this, "Compression: $compression")
+        printdbg(this, "Dimension: ${width}x$height")
+
         // read payloads
 
         val pldBuffer4 = ByteArray(4)
@@ -60,11 +68,13 @@ internal object ReadLayerDataZip {
 
             // check payload header
             if (!pldBuffer4.contentEquals(WriteLayerDataZip.PAYLOAD_HEADER))
-                throw InternalError("Payload not found")
+                throw InternalError("Payload $pldCnt not found -- expected ${WriteLayerDataZip.PAYLOAD_HEADER.toByteString()}, got ${pldBuffer4.toByteString()}")
 
             // get payload's name
             inputStream.read(pldBuffer4)
             val payloadName = pldBuffer4.toString(Charset.forName("US-ASCII"))
+
+            printdbg(this, "Payload $pldCnt name: $payloadName") // maybe maybe related with buffer things?
 
             // get uncompressed size
             inputStream.read(pldBuffer6)
@@ -79,18 +89,26 @@ internal object ReadLayerDataZip {
             // loop main
             while (!pldBuffer8.contentEquals(WriteLayerDataZip.PAYLOAD_FOOTER)) {
                 val aByte = inputStream.read(); deflatedSize += 1
-                if (aByte == -1) throw InternalError("Unexpected end-of-file")
+                if (aByte == -1) throw InternalError("Unexpected end-of-file at payload $pldCnt")
                 pldBuffer8.shiftLeftBy(1, aByte.toByte())
             }
+
             // at this point, we should have correct size of deflated bytestream
+
+            printdbg(this, "Payload $pldCnt compressed size: $deflatedSize")
+
             val deflatedBytes = ByteArray(deflatedSize) // FIXME deflated stream cannot be larger than 2 GB
             inputStream.reset() // go back to marked spot
             inputStream.read(deflatedBytes)
+
+            // PRO Debug tip: every deflated bytes must begin with 0x789C or 0x78DA
+            // Thus, \0pLd + [10] must be either of these.
+
             // put constructed payload into a container
             payloads.put(payloadName, TEMzPayload(uncompressedSize, deflatedBytes))
 
             // skip over to be aligned with the next payload
-            inputStream.skip(18L + deflatedSize)
+            inputStream.skip(8)
         }
 
 
@@ -238,5 +256,15 @@ internal object ReadLayerDataZip {
         }
 
         return i
+    }
+
+    fun ByteArray.toByteString(): String {
+        val sb = StringBuilder()
+        this.forEach {
+            sb.append(it.toUint().toHex().takeLast(2))
+            sb.append(' ')
+        }
+        sb.deleteCharAt(sb.lastIndex)
+        return sb.toString()
     }
 }
