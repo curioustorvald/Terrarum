@@ -63,6 +63,9 @@ internal object ReadLayerDataZip {
 
         val payloads = HashMap<String, TEMzPayload>()
 
+
+        // TODO please test the read; write has been fixed up
+
         for (pldCnt in 0 until payloadCount) {
             inputStream.read(pldBuffer4)
 
