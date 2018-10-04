@@ -3,10 +3,10 @@ package net.torvald.terrarum.modulebasegame.console
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.serialise.ReadLayerData
+import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
+import net.torvald.terrarum.serialise.ReadLayerDataZip
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import java.io.FileInputStream
+import java.io.File
 
 /**
  * Created by minjaesong on 2017-07-18.
@@ -18,14 +18,15 @@ object ImportLayerData : ConsoleCommand {
             return
         }
 
-        //val fis = GZIPInputStream(FileInputStream(args[1])) // this gzip is kaput
-        val fis = FileInputStream(args[1])
-        (Terrarum.ingame!!.world) = ReadLayerData(fis)
-        (Terrarum.ingame!! as Ingame).actorNowPlaying?.setPosition(
+        val file = File(args[1])
+        val layerData = ReadLayerDataZip(file)
+
+
+        Terrarum.ingame!!.world = GameWorldExtension(1, layerData)
+        Terrarum.ingame!!.actorNowPlaying?.setPosition(
                 (Terrarum.ingame!!.world).spawnY * FeaturesDrawer.TILE_SIZE.toDouble(),
                 (Terrarum.ingame!!.world).spawnX * FeaturesDrawer.TILE_SIZE.toDouble()
         )
-        fis.close()
         Echo("Successfully loaded ${args[1]}")
     }
 

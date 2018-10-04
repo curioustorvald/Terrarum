@@ -100,6 +100,9 @@ internal object WriteLayerDataZip {
         outputStream.flush()
 
         // TERR payload
+        // PRO Debug tip: every deflated bytes must begin with 0x789C or 0x78DA
+        // Thus, \0pLd + [10] must be either of these.
+
         wb(PAYLOAD_HEADER); wb("TERR".toByteArray())
         wi48(world.width * world.height * 3L / 2)
         deflater.write(world.terrainArray)
