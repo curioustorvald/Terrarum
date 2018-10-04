@@ -73,7 +73,7 @@ internal object WriteLayerDataZip {
         outFile.createNewFile()
 
         val outputStream = BufferedOutputStream(FileOutputStream(outFile), 8192)
-        val deflater = DeflaterOutputStream(outputStream, true)
+        var deflater: DeflaterOutputStream // couldn't really use one outputstream for all the files.
 
         fun wb(byteArray: ByteArray) { outputStream.write(byteArray) }
         fun wb(byte: Byte) { outputStream.write(byte.toInt()) }
@@ -105,48 +105,55 @@ internal object WriteLayerDataZip {
 
         wb(PAYLOAD_HEADER); wb("TERR".toByteArray())
         wi48(world.width * world.height * 3L / 2)
+        deflater = DeflaterOutputStream(outputStream, true)
         deflater.write(world.terrainArray)
         deflater.write(world.layerTerrainLowBits.data)
-        deflater.flush()
+        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // WALL payload
         wb(PAYLOAD_HEADER); wb("WALL".toByteArray())
         wi48(world.width * world.height * 3L / 2)
+        deflater = DeflaterOutputStream(outputStream, true)
         deflater.write(world.wallArray)
-        deflater.write(world.layerWall.data)
-        deflater.flush()
+        deflater.write(world.layerWallLowBits.data)
+        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // WIRE payload
         wb(PAYLOAD_HEADER); wb("WIRE".toByteArray())
         wi48(world.width * world.height.toLong())
+        deflater = DeflaterOutputStream(outputStream, true)
         deflater.write(world.wireArray)
-        deflater.flush()
+        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // TdMG payload
         wb(PAYLOAD_HEADER); wb("TdMG".toByteArray())
         wi48(world.terrainDamages.size.toLong())
 
+        deflater = DeflaterOutputStream(outputStream, true)
+
         world.terrainDamages.forEach { t, u ->
             deflater.write(t.toLittle48())
             deflater.write(u.toRawBits().toLittle())
         }
 
-        deflater.flush()
+        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // WdMG payload
         wb(PAYLOAD_HEADER); wb("WdMG".toByteArray())
         wi48(world.wallDamages.size.toLong())
 
+        deflater = DeflaterOutputStream(outputStream, true)
+
         world.wallDamages.forEach { t, u ->
             deflater.write(t.toLittle48())
             deflater.write(u.toRawBits().toLittle())
         }
 
-        deflater.flush()
+        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // write footer
@@ -161,9 +168,6 @@ internal object WriteLayerDataZip {
 
         // replace savemeta with tempfile
         try {
-            deflater.finish()
-            deflater.close()
-
             outputStream.flush()
             outputStream.close()
 
