@@ -42,7 +42,7 @@ Ord  Hex  Description
 #   "\0pLd"        Payload header  [00, 70, 4C, 64]
 #   [4]            Identifier. 4 lettres ASCII string
 #   [6]            Uncompressed size of DEFLATEd binary (max size 256 TB)
-#   [..]           DEFLATEd binary
+#   [..]           DEFLATEd binary (begins with one of these: 0x789C, 0x78DA, 0x7801)
 #   "EndPYLd\xFF"  Payload footer  [45, 6E, 64, 50, 59, 4C, 64, FF]
 
 

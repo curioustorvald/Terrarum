@@ -12,7 +12,7 @@ import java.nio.channels.FileChannel;
  */
 public class MarkableFileInputStream extends FilterInputStream {
     private FileChannel myFileChannel;
-    private long mark = -1;
+    private long mark = 0;
 
     public MarkableFileInputStream(FileInputStream fis) {
         super(fis);
@@ -29,7 +29,9 @@ public class MarkableFileInputStream extends FilterInputStream {
         try {
             mark = myFileChannel.position();
         } catch (IOException ex) {
-            mark = -1;
+            //mark = -1;
+            System.err.println("MarkableFileInputStream: mark failed");
+            ex.printStackTrace();
         }
     }
 
