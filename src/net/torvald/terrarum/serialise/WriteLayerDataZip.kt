@@ -26,7 +26,11 @@ import java.util.zip.GZIPOutputStream
 // internal for everything: prevent malicious module from messing up the savedata
 internal object WriteLayerDataZip {
 
-    // FIXME UNTESTED !!
+    // FIXME output seems legit, but I can't confirm right now !!
+
+
+    // 2400x800  world sizes about  90 kB
+    // 8192x2048 world sizes about 670 kB
 
     val LAYERS_FILENAME = "world"
 
@@ -73,7 +77,7 @@ internal object WriteLayerDataZip {
 
         fun wb(byteArray: ByteArray) { outputStream.write(byteArray) }
         fun wb(byte: Byte) { outputStream.write(byte.toInt()) }
-        fun wb(byte: Int) { outputStream.write(byte) }
+        //fun wb(byte: Int) { outputStream.write(byte) }
         fun wi32(int: Int) { wb(int.toLittle()) }
         fun wi48(long: Long) { wb(long.toLittle48()) }
         fun wi64(long: Long) { wb(long.toLittle()) }
@@ -89,7 +93,7 @@ internal object WriteLayerDataZip {
         wb(MAGIC); wb(VERSION_NUMBER); wb(NUMBER_OF_LAYERS); wb(NUMBER_OF_PAYLOADS); wb(COMPRESSION_ALGORITHM)
 
         // world width, height, and spawn point
-        wb(world.width); wb(world.height)
+        wi32(world.width); wi32(world.height)
         wi48(LandUtil.getBlockAddr(world, world.spawnX, world.spawnY))
 
         // write payloads //
@@ -101,7 +105,6 @@ internal object WriteLayerDataZip {
         deflater.write(world.terrainArray)
         deflater.write(world.layerTerrainLowBits.data)
         deflater.flush()
-        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // WALL payload
@@ -110,7 +113,6 @@ internal object WriteLayerDataZip {
         deflater.write(world.wallArray)
         deflater.write(world.layerWall.data)
         deflater.flush()
-        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // WIRE payload
@@ -118,7 +120,6 @@ internal object WriteLayerDataZip {
         wi48(world.width * world.height.toLong())
         deflater.write(world.wireArray)
         deflater.flush()
-        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // TdMG payload
@@ -131,7 +132,6 @@ internal object WriteLayerDataZip {
         }
 
         deflater.flush()
-        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // WdMG payload
@@ -144,7 +144,6 @@ internal object WriteLayerDataZip {
         }
 
         deflater.flush()
-        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // write footer
@@ -159,6 +158,7 @@ internal object WriteLayerDataZip {
 
         // replace savemeta with tempfile
         try {
+            deflater.finish()
             deflater.close()
 
             outputStream.flush()
