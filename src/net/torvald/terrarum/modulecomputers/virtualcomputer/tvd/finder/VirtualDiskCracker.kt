@@ -1,4 +1,4 @@
-package net.torvald.terrarum.virtualcomputer.tvd.finder
+package net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.finder
 
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
 import java.awt.BorderLayout
