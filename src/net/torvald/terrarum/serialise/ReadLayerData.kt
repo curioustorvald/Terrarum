@@ -63,7 +63,7 @@ internal object ReadLayerData {
 
         // create world out of tiles data
 
-        val retWorld = inWorld ?: GameWorldExtension(worldWidth, worldHeight)
+        val retWorld = inWorld ?: GameWorldExtension(1, worldWidth, worldHeight)
 
         retWorld.layerTerrain.data = terrainLayerMSB
         retWorld.layerWall.data = wallLayerMSB

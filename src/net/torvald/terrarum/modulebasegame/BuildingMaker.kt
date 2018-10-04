@@ -24,7 +24,7 @@ import kotlin.system.measureNanoTime
  */
 class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
-    val gameWorld = GameWorldExtension(1024, 256)
+    val gameWorld = GameWorldExtension(1, 1024, 256)
 
     init {
         // ghetto world for building
