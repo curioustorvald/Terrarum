@@ -29,8 +29,11 @@ internal object WriteLayerDataZip {
     // FIXME output seems legit, but I can't confirm right now !!
 
 
-    // 2400x800  world sizes about  90 kB
-    // 8192x2048 world sizes about 670 kB
+    // 2400x800  world size, default comp level: about  90 kB
+    // 8192x2048 world size, default comp level: about 670 kB
+
+    // 2400x800  world size, best comp level: about  75 kB
+    // 8192x2048 world size, best comp level: about 555 kB
 
     val LAYERS_FILENAME = "world"
 
@@ -105,7 +108,7 @@ internal object WriteLayerDataZip {
 
         wb(PAYLOAD_HEADER); wb("TERR".toByteArray())
         wi48(world.width * world.height * 3L / 2)
-        deflater = DeflaterOutputStream(outputStream, true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
         deflater.write(world.terrainArray)
         deflater.write(world.layerTerrainLowBits.data)
         deflater.finish()
@@ -114,7 +117,7 @@ internal object WriteLayerDataZip {
         // WALL payload
         wb(PAYLOAD_HEADER); wb("WALL".toByteArray())
         wi48(world.width * world.height * 3L / 2)
-        deflater = DeflaterOutputStream(outputStream, true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
         deflater.write(world.wallArray)
         deflater.write(world.layerWallLowBits.data)
         deflater.finish()
@@ -123,7 +126,7 @@ internal object WriteLayerDataZip {
         // WIRE payload
         wb(PAYLOAD_HEADER); wb("WIRE".toByteArray())
         wi48(world.width * world.height.toLong())
-        deflater = DeflaterOutputStream(outputStream, true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
         deflater.write(world.wireArray)
         deflater.finish()
         wb(PAYLOAD_FOOTER)
@@ -132,7 +135,7 @@ internal object WriteLayerDataZip {
         wb(PAYLOAD_HEADER); wb("TdMG".toByteArray())
         wi48(world.terrainDamages.size.toLong())
 
-        deflater = DeflaterOutputStream(outputStream, true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
 
         world.terrainDamages.forEach { t, u ->
             deflater.write(t.toLittle48())
@@ -146,7 +149,7 @@ internal object WriteLayerDataZip {
         wb(PAYLOAD_HEADER); wb("WdMG".toByteArray())
         wi48(world.wallDamages.size.toLong())
 
-        deflater = DeflaterOutputStream(outputStream, true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
 
         world.wallDamages.forEach { t, u ->
             deflater.write(t.toLittle48())

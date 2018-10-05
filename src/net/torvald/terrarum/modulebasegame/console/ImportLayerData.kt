@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.console
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
+import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.serialise.ReadLayerDataZip
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -27,6 +28,9 @@ object ImportLayerData : ConsoleCommand {
                 (Terrarum.ingame!!.world).spawnY * FeaturesDrawer.TILE_SIZE.toDouble(),
                 (Terrarum.ingame!!.world).spawnX * FeaturesDrawer.TILE_SIZE.toDouble()
         )
+
+        IngameRenderer.
+
         Echo("Successfully loaded ${args[1]}")
     }
 
