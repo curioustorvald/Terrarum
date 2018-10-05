@@ -3,9 +3,8 @@ package net.torvald.terrarum.modulebasegame.console
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
-import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
-import net.torvald.terrarum.serialise.ReadLayerDataZip
+import net.torvald.terrarum.serialise.ReadLayerDataLzma
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import java.io.File
 
@@ -20,7 +19,7 @@ object ImportLayerData : ConsoleCommand {
         }
 
         val file = File(args[1])
-        val layerData = ReadLayerDataZip(file)
+        val layerData = ReadLayerDataLzma(file)
 
 
         Terrarum.ingame!!.world = GameWorldExtension(1, layerData)

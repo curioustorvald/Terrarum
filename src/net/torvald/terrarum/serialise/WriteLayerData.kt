@@ -15,6 +15,7 @@ import java.util.zip.GZIPOutputStream
  * Created by minjaesong on 2016-03-18.
  */
 // internal for everything: prevent malicious module from messing up the savedata
+@Deprecated("TEMD is deprecated format; use TEMz which does compression")
 internal object WriteLayerData {
 
     val LAYERS_FILENAME = "worldinfo1"
@@ -86,43 +87,3 @@ internal object WriteLayerData {
 
 
 }
-
-/*fun Int.toLittle() = byteArrayOf(
-        this.and(0xFF).toByte(),
-        this.ushr(8).and(0xFF).toByte(),
-        this.ushr(16).and(0xFF).toByte(),
-        this.ushr(24).and(0xFF).toByte()
-)
-fun Long.toLittle() = byteArrayOf(
-        this.and(0xFF).toByte(),
-        this.ushr(8).and(0xFF).toByte(),
-        this.ushr(16).and(0xFF).toByte(),
-        this.ushr(24).and(0xFF).toByte(),
-        this.ushr(32).and(0xFF).toByte(),
-        this.ushr(40).and(0xFF).toByte(),
-        this.ushr(48).and(0xFF).toByte(),
-        this.ushr(56).and(0xFF).toByte()
-)
-fun Double.toLittle() = java.lang.Double.doubleToRawLongBits(this).toLittle()
-fun Boolean.toLittle() = byteArrayOf(if (this) 0xFF.toByte() else 0.toByte())
-
-fun ByteArray.toLittleInt() =
-        if (this.size != 4) throw Error("Array not in size of 4")
-        else    this[0].toUint() or
-                this[1].toUint().shl(8) or
-                this[2].toUint().shl(16) or
-                this[3].toUint().shl(24)
-fun ByteArray.toLittleLong() =
-        if (this.size != 8) throw Error("Array not in size of 8")
-        else    this[0].toUlong() or
-                this[1].toUlong().shl(8) or
-                this[2].toUlong().shl(16) or
-                this[3].toUlong().shl(24) or
-                this[4].toUlong().shl(32) or
-                this[5].toUlong().shl(40) or
-                this[6].toUlong().shl(48) or
-                this[7].toUlong().shl(56)
-fun ByteArray.toLittleDouble() = java.lang.Double.longBitsToDouble(this.toLittleLong())
-
-fun Byte.toUlong() = java.lang.Byte.toUnsignedLong(this)
-fun Byte.toUint() = java.lang.Byte.toUnsignedInt(this)*/
