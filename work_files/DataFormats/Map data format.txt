@@ -15,6 +15,7 @@ Ord  Hex  Description
 06   05   Number of payloads
 
 07   01   Compression algorithm, 0 for none, 1 for DEFLATE, 2 for LZMA, otherwise undefined (maybe LZMA2 for the future?)
+          Value of 01 (DEFLATE) is recommended for its faster compression
 
 08        World width
 09        World width
