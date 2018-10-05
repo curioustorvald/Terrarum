@@ -137,12 +137,12 @@ internal object ReadLayerDataZip {
 
             // just in case
             if (uncompLen.toLong() != u.uncompressedSize)
-                throw InternalError("DEFLATE size mismatch -- expected ${u.uncompressedSize}, got $uncompLen")
+                throw InternalError("Payload $t DEFLATE size mismatch -- expected ${u.uncompressedSize}, got $uncompLen")
 
             // deal with (MSB ++ LSB)
             if (t == "TERR" || t == "WALL") {
                 payloadBytes["${t}_MSB"] = inflatedFile.sliceArray(0 until worldSize.toInt()) // FIXME deflated stream cannot be larger than 2 GB
-                payloadBytes["${t}_LSb"] = inflatedFile.sliceArray(worldSize.toInt() until inflatedFile.size) // FIXME deflated stream cannot be larger than 2 GB
+                payloadBytes["${t}_LSB"] = inflatedFile.sliceArray(worldSize.toInt() until uncompLen) // FIXME deflated stream cannot be larger than 2 GB
             }
             else {
                 payloadBytes[t] = inflatedFile
