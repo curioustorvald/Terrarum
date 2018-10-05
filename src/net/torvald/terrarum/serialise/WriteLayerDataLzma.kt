@@ -1,17 +1,13 @@
 package net.torvald.terrarum.serialise
 
+import com.badlogic.gdx.utils.compression.Lzma
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.realestate.LandUtil
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
 import java.nio.charset.Charset
-import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
-import java.util.zip.GZIPOutputStream
 
 /**
  * This object only writes a file named 'worldinfo1'.
@@ -24,16 +20,14 @@ import java.util.zip.GZIPOutputStream
  * Created by minjaesong on 2016-03-18.
  */
 // internal for everything: prevent malicious module from messing up the savedata
-internal object WriteLayerDataZip {
+internal object WriteLayerDataLzma {
 
     // FIXME TERRAIN DAMAGE UNTESTED
 
 
-    // 2400x800  world size, default comp level: about  90 kB
-    // 8192x2048 world size, default comp level: about 670 kB
+    // 2400x800  world size: about  .. kB
+    // 8192x2048 world size: about 470 kB but writes much slower than DEFLATE
 
-    // 2400x800  world size, best comp level: about  75 kB
-    // 8192x2048 world size, best comp level: about 555 kB
 
     val LAYERS_FILENAME = "world"
 
@@ -41,7 +35,7 @@ internal object WriteLayerDataZip {
     val VERSION_NUMBER = 3.toByte()
     val NUMBER_OF_LAYERS = 3.toByte()
     val NUMBER_OF_PAYLOADS = 5.toByte()
-    val COMPRESSION_ALGORITHM = 1.toByte()
+    val COMPRESSION_ALGORITHM = 2.toByte()
     val PAYLOAD_HEADER = byteArrayOf(0, 0x70, 0x4C, 0x64)
     val PAYLOAD_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x50, 0x59, 0x4C, 0x64, -1)
     val FILE_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x54, 0x45, 0x4D, -1, -2)
@@ -108,55 +102,45 @@ internal object WriteLayerDataZip {
 
         wb(PAYLOAD_HEADER); wb("TERR".toByteArray())
         wi48(world.width * world.height * 3L / 2)
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
-        deflater.write(world.terrainArray)
-        deflater.write(world.layerTerrainLowBits.data)
-        deflater.finish()
+        Lzma.compress(ByteArrayInputStream(world.terrainArray), outputStream)
+        Lzma.compress(ByteArrayInputStream(world.layerTerrainLowBits.data), outputStream)
         wb(PAYLOAD_FOOTER)
 
         // WALL payload
         wb(PAYLOAD_HEADER); wb("WALL".toByteArray())
         wi48(world.width * world.height * 3L / 2)
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
-        deflater.write(world.wallArray)
-        deflater.write(world.layerWallLowBits.data)
-        deflater.finish()
+        Lzma.compress(ByteArrayInputStream(world.wallArray), outputStream)
+        Lzma.compress(ByteArrayInputStream(world.layerWallLowBits.data), outputStream)
         wb(PAYLOAD_FOOTER)
 
         // WIRE payload
         wb(PAYLOAD_HEADER); wb("WIRE".toByteArray())
         wi48(world.width * world.height.toLong())
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
-        deflater.write(world.wireArray)
-        deflater.finish()
+        Lzma.compress(ByteArrayInputStream(world.wireArray), outputStream)
         wb(PAYLOAD_FOOTER)
 
         // TdMG payload
         wb(PAYLOAD_HEADER); wb("TdMG".toByteArray())
         wi48(world.terrainDamages.size.toLong())
 
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
 
         world.terrainDamages.forEach { t, u ->
-            deflater.write(t.toLittle48())
-            deflater.write(u.toRawBits().toLittle())
+            Lzma.compress(ByteArrayInputStream(t.toLittle48()), outputStream)
+            Lzma.compress(ByteArrayInputStream(u.toRawBits().toLittle()), outputStream)
         }
 
-        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // WdMG payload
         wb(PAYLOAD_HEADER); wb("WdMG".toByteArray())
         wi48(world.wallDamages.size.toLong())
 
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
 
         world.wallDamages.forEach { t, u ->
-            deflater.write(t.toLittle48())
-            deflater.write(u.toRawBits().toLittle())
+            Lzma.compress(ByteArrayInputStream(t.toLittle48()), outputStream)
+            Lzma.compress(ByteArrayInputStream(u.toRawBits().toLittle()), outputStream)
         }
 
-        deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // write footer
