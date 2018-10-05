@@ -1,9 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
-import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.gameworld.*
-import net.torvald.terrarum.serialise.ReadLayerDataZip
-import kotlin.properties.Delegates
+import net.torvald.terrarum.serialise.ReadLayerDataLzma
 
 /**
  * Created by minjaesong on 2018-07-03.
@@ -11,7 +9,7 @@ import kotlin.properties.Delegates
 class GameWorldExtension: GameWorld {
 
     constructor(worldIndex: Int, width: Int, height: Int) : super(worldIndex, width, height)
-    internal constructor(worldIndex: Int, layerData: ReadLayerDataZip.LayerData) : super(worldIndex, layerData)
+    internal constructor(worldIndex: Int, layerData: ReadLayerDataLzma.LayerData) : super(worldIndex, layerData)
 
 
     val time: WorldTime

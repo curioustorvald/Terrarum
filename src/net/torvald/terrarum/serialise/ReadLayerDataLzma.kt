@@ -1,5 +1,6 @@
 package net.torvald.terrarum.serialise
 
+import com.badlogic.gdx.utils.compression.Lzma
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.BlockDamage
@@ -11,7 +12,6 @@ import net.torvald.terrarum.toHex
 import java.io.*
 import java.nio.charset.Charset
 import java.util.*
-import java.util.zip.Inflater
 import kotlin.IllegalArgumentException
 import kotlin.collections.HashMap
 
@@ -19,7 +19,7 @@ import kotlin.collections.HashMap
  * Created by minjaesong on 2016-08-24.
  */
 // internal for everything: prevent malicious module from messing up the savedata
-internal object ReadLayerDataZip {
+internal object ReadLayerDataLzma {
 
     // FIXME TERRAIN DAMAGE UNTESTED
 
@@ -49,7 +49,7 @@ internal object ReadLayerDataZip {
         val height = inputStream.read(4).toLittleInt()
         val spawnAddress = inputStream.read(6).toLittleInt48()
 
-        if (compression != 1) throw IllegalArgumentException("Input file is not compressed as DEFLATE; it's using algorithm $compression")
+        if (compression != 2) throw IllegalArgumentException("Input file is not compressed as LZMA; it's using algorithm $compression")
 
         printdbg(this, "Version number: $versionNumber")
         printdbg(this, "Layers count: $layerCount")
@@ -132,19 +132,21 @@ internal object ReadLayerDataZip {
         val payloadBytes = HashMap<String, ByteArray>()
 
         payloads.forEach { t, u ->
-            val inflatedFile = ByteArray(u.uncompressedSize.toInt()) // FIXME deflated stream cannot be larger than 2 GB
-            val inflater = Inflater()
-            inflater.setInput(u.bytes, 0, u.bytes.size)
-            val uncompLen = inflater.inflate(inflatedFile)
+            val inflatedOS = ByteArrayOutputStream(u.uncompressedSize.toInt()) // FIXME deflated stream cannot be larger than 2 GB
 
-            // just in case
-            if (uncompLen.toLong() != u.uncompressedSize)
-                throw InternalError("Payload $t DEFLATE size mismatch -- expected ${u.uncompressedSize}, got $uncompLen")
+            try {
+                Lzma.decompress(ByteArrayInputStream(u.bytes), inflatedOS)
+            }
+            catch (e: RuntimeException) {
+                // keep it empty (zero-sized file was compressed)
+            }
+
+            val inflatedFile = inflatedOS.toByteArray()
 
             // deal with (MSB ++ LSB)
             if (t == "TERR" || t == "WALL") {
                 payloadBytes["${t}_MSB"] = inflatedFile.sliceArray(0 until worldSize.toInt()) // FIXME deflated stream cannot be larger than 2 GB
-                payloadBytes["${t}_LSB"] = inflatedFile.sliceArray(worldSize.toInt() until uncompLen) // FIXME deflated stream cannot be larger than 2 GB
+                payloadBytes["${t}_LSB"] = inflatedFile.sliceArray(worldSize.toInt() until u.uncompressedSize.toInt()) // FIXME deflated stream cannot be larger than 2 GB
             }
             else {
                 payloadBytes[t] = inflatedFile

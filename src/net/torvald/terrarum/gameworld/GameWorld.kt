@@ -4,7 +4,7 @@ package net.torvald.terrarum.gameworld
 import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.serialise.ReadLayerDataZip
+import net.torvald.terrarum.serialise.ReadLayerDataLzma
 import org.dyn4j.geometry.Vector2
 
 typealias BlockAddress = Long
@@ -73,7 +73,7 @@ open class GameWorld {
         //layerAirPressure = MapLayerHalfFloat(width / 4, height / 8, 13f) // 1013 mBar
     }
 
-    internal constructor(worldIndex: Int, layerData: ReadLayerDataZip.LayerData) {
+    internal constructor(worldIndex: Int, layerData: ReadLayerDataLzma.LayerData) {
         this.worldIndex = worldIndex
 
         layerTerrain = layerData.layerTerrain
