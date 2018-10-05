@@ -523,10 +523,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             BlockPropUtil.dynamicLumFuncTickClock()
             world.updateWorldTime(delta)
             //WorldSimulator(player, delta)
-            WeatherMixer.update(delta, actorNowPlaying)
+            WeatherMixer.update(delta, actorNowPlaying, world)
             BlockStats.update()
-            if (!(CommandDict["setgl"] as SetGlobalLightOverride).lightOverride)
-                gameworld.globalLight = WeatherMixer.globalLightNow
+
 
 
             ////////////////////////////

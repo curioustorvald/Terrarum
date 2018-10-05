@@ -30,12 +30,18 @@ import kotlin.system.measureNanoTime
 
 // NOTE: no Float16 on this thing: 67 kB of memory footage is totally acceptable
 
-internal object LightmapRenderer {
+/** This object should not be called by yourself; must be only being used and manipulated by your
+ * own ingame renderer
+ */
+object LightmapRenderer {
     private lateinit var world: GameWorld
 
+    /** do not call this yourself! Let your game renderer handle this! */
     fun setWorld(world: GameWorld) {
         try {
             if (this.world != world) {
+                println("World change detected -- old world: ${this.world.hashCode()}, new world: ${world.hashCode()}")
+
                 for (y in 0 until LIGHTMAP_HEIGHT) {
                     for (x in 0 until LIGHTMAP_WIDTH) {
                         lightmap[y][x] = Color(0)

@@ -74,7 +74,12 @@ object IngameRenderer {
             uiListToDraw = uisToDraw
         }
 
-        init(world)
+        init()
+
+        BlocksDrawer.world = world
+        LightmapRenderer.setWorld(world)
+        FeaturesDrawer.world = world
+
         this.player = player
 
 
@@ -389,7 +394,7 @@ object IngameRenderer {
     }
 
 
-    private fun init(world: GameWorldExtension) {
+    private fun init() {
         if (!initDone) {
             batch = SpriteBatch()
             camera = OrthographicCamera(widthf, heightf)
@@ -402,11 +407,6 @@ object IngameRenderer {
 
             initDone = true
         }
-
-
-        BlocksDrawer.world = world
-        LightmapRenderer.setWorld(world)
-        FeaturesDrawer.world = world
     }
 
     private fun clearBuffer() {

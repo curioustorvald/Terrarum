@@ -139,7 +139,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         })
 
 
-        cameraPlayer = object : HumanoidNPC(demoWorld, cameraAI, born = 0, usePhysics = false, forceAssignRefID = Terrarum.PLAYER_REF_ID) {
+        cameraPlayer = object : HumanoidNPC(cameraAI, born = 0, usePhysics = false, forceAssignRefID = Terrarum.PLAYER_REF_ID) {
             init {
                 setHitboxDimension(2, 2, 0, 0)
                 hitbox.setPosition(
@@ -224,7 +224,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
         demoWorld.globalLight = WeatherMixer.globalLightNow
         demoWorld.updateWorldTime(delta)
-        WeatherMixer.update(delta, cameraPlayer)
+        WeatherMixer.update(delta, cameraPlayer, demoWorld)
         cameraPlayer.update(delta)
 
         // worldcamera update AFTER cameraplayer in this case; the other way is just an exception for actual ingame SFX

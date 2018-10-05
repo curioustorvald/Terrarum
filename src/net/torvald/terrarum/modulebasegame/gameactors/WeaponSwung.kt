@@ -9,7 +9,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 /**
  * Created by minjaesong on 2016-04-26.
  */
-class WeaponSwung(world: GameWorld, val itemID: Int) : ActorWBMovable(world, RenderOrder.MIDTOP), Luminous {
+class WeaponSwung(val itemID: Int) : ActorWBMovable(RenderOrder.MIDTOP), Luminous {
     // just let the solver use AABB; it's cheap but works just enough
 
     /**

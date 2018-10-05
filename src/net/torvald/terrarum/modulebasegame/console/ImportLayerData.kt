@@ -29,8 +29,6 @@ object ImportLayerData : ConsoleCommand {
                 (Terrarum.ingame!!.world).spawnX * FeaturesDrawer.TILE_SIZE.toDouble()
         )
 
-        IngameRenderer.
-
         Echo("Successfully loaded ${args[1]}")
     }
 

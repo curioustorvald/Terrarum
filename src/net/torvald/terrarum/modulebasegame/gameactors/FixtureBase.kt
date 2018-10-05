@@ -6,8 +6,8 @@ import net.torvald.terrarum.gameworld.GameWorld
 /**
  * Created by minjaesong on 2016-06-17.
  */
-open class FixtureBase(world: GameWorld, physics: Boolean = true) :
-        ActorWBMovable(world, RenderOrder.BEHIND, immobileBody = true, usePhysics = physics) {
+open class FixtureBase(physics: Boolean = true) :
+        ActorWBMovable(RenderOrder.BEHIND, immobileBody = true, usePhysics = physics) {
     /**
      * 0: Open
      * 1: Blocked

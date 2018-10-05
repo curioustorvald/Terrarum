@@ -15,12 +15,11 @@ import net.torvald.terrarum.modulebasegame.gameworld.time_t
  * Created by minjaesong on 2016-01-31.
  */
 open class HumanoidNPC(
-        world: GameWorld,
         override val ai: ActorAI, // it's there for written-in-Kotlin, "hard-wired" AIs
         born: time_t,
         usePhysics: Boolean = true,
         forceAssignRefID: Int? = null
-) : ActorHumanoid(world, born, usePhysics = usePhysics), AIControlled, CanBeAnItem {
+) : ActorHumanoid(born, usePhysics = usePhysics), AIControlled, CanBeAnItem {
 
     companion object {
         val DEFAULT_COLLISION_TYPE = COLLISION_DYNAMIC
