@@ -13,7 +13,7 @@ internal object SpawnPhysTestLunarLander : ConsoleCommand {
     override fun execute(args: Array<String>) {
         val mouseX = Terrarum.mouseX
         val mouseY = Terrarum.mouseY
-        val lander = PhysTestLuarLander((Terrarum.ingame!!.world))
+        val lander = PhysTestLuarLander()
 
         lander.setPosition(mouseX, mouseY)
 

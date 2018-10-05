@@ -4,14 +4,12 @@ import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 
 /**
  * Created by minjaesong on 2016-02-17.
  */
 internal object SetGlobalLightOverride : ConsoleCommand {
-
-    var lightOverride = false
-        private set
 
     override fun execute(args: Array<String>) {
         if (args.size == 5) {
@@ -22,7 +20,7 @@ internal object SetGlobalLightOverride : ConsoleCommand {
                 val a = args[4].toFloat()
                 val GL = Color(r, g, b, a)
 
-                lightOverride = true
+                WeatherMixer.globalLightOverridden = true
                 (Terrarum.ingame!!.world).globalLight = GL
             }
             catch (e: NumberFormatException) {
@@ -32,6 +30,9 @@ internal object SetGlobalLightOverride : ConsoleCommand {
                 Echo("Range: 0-" + LightmapRenderer.CHANNEL_MAX + " per channel")
             }
 
+        }
+        else if (args.size == 2 && args[1].trim().toLowerCase() == "none") {
+            WeatherMixer.globalLightOverridden = false
         }
         else {
             printUsage()

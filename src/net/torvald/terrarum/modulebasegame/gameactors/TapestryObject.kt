@@ -10,7 +10,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 /**
  * Created by minjaesong on 2017-01-07.
  */
-class TapestryObject(world: GameWorld, pixmap: Pixmap, val artName: String, val artAuthor: String) : FixtureBase(world, physics = false) {
+class TapestryObject(pixmap: Pixmap, val artName: String, val artAuthor: String) : FixtureBase(physics = false) {
 
     // physics = false only speeds up for ~2 frames with 50 tapestries
 

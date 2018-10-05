@@ -10,7 +10,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 /**
  * Created by minjaesong on 2016-03-15.
  */
-open class DroppedItem(world: GameWorld, private val item: GameItem) : ActorWBMovable(world, RenderOrder.MIDTOP) {
+open class DroppedItem(private val item: GameItem) : ActorWBMovable(RenderOrder.MIDTOP) {
 
     init {
         if (item.dynamicID >= ItemCodex.ACTORID_MIN)

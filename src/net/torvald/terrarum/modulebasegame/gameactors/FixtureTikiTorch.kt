@@ -14,7 +14,7 @@ import java.util.*
 /**
  * Created by minjaesong on 2016-06-17.
  */
-internal class FixtureTikiTorch(world: GameWorld) : FixtureBase(world), Luminous {
+internal class FixtureTikiTorch : FixtureBase(), Luminous {
 
     override var color: Color
         get() = BlockCodex[Block.TORCH].luminosity

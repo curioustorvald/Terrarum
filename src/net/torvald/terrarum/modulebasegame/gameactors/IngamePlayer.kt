@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.gameworld.time_t
  * Created by minjaesong on 2015-12-31.
  */
 
-class IngamePlayer(world: GameWorldExtension, born: time_t) : ActorHumanoid(world, born) {
+class IngamePlayer(born: time_t) : ActorHumanoid(born) {
 
     /**
      * Creates new Player instance with empty elements (sprites, actorvalue, etc.).
