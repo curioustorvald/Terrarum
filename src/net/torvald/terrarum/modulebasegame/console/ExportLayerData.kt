@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.console
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
+import net.torvald.terrarum.serialise.WriteLayerDataLzma
 import net.torvald.terrarum.serialise.WriteLayerDataZip
 
 /**
@@ -11,7 +12,7 @@ import net.torvald.terrarum.serialise.WriteLayerDataZip
 object ExportLayerData : ConsoleCommand {
     override fun execute(args: Array<String>) {
         try {
-            val outfile = WriteLayerDataZip()
+            val outfile = WriteLayerDataLzma()
             Echo("Layer data exported to ${outfile!!.canonicalPath}")
         }
         catch (e: Exception) {
