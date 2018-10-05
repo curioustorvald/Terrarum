@@ -16,7 +16,6 @@ object PlayerBuilderCynthia {
     operator fun invoke(): ActorWBMovable {
         //val p: IngamePlayer = IngamePlayer(GameDate(100, 143)) // random value thrown
         val p: HumanoidNPC = HumanoidNPC(
-                (Terrarum.ingame!!.world),
                 NullAI(),
                 -589141658L) // random value thrown
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")

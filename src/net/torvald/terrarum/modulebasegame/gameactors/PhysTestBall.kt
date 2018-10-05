@@ -10,7 +10,7 @@ import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 /**
  * Created by minjaesong on 2016-03-05.
  */
-class PhysTestBall(world: GameWorld) : ActorWBMovable(world, RenderOrder.MIDDLE, immobileBody = true) {
+class PhysTestBall : ActorWBMovable(RenderOrder.MIDDLE, immobileBody = true) {
 
     private var color = Color.GOLD
 

@@ -12,7 +12,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 object PlayerBuilderTestSubject1 {
     operator fun invoke(): IngamePlayer {
-        val p: IngamePlayer = IngamePlayer((Terrarum.ingame!! as Ingame).gameworld, -589141658L) // random value thrown
+        val p: IngamePlayer = IngamePlayer(-589141658L) // random value thrown
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
 

@@ -15,8 +15,8 @@ object CreatureBuilder {
     /**
      * @Param jsonFileName with extension
      */
-    operator fun invoke(world: GameWorld, module: String, jsonFileName: String): ActorWBMovable {
-        val actor = ActorWBMovable(world, Actor.RenderOrder.MIDDLE)
+    operator fun invoke(module: String, jsonFileName: String): ActorWBMovable {
+        val actor = ActorWBMovable(Actor.RenderOrder.MIDDLE)
         InjectCreatureRaw(actor.actorValue, module, jsonFileName)
 
 

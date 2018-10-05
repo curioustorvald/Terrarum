@@ -15,7 +15,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 /**
  * Created by minjaesong on 2018-01-17.
  */
-class PhysTestLuarLander(world: GameWorld) : ActorWBMovable(world, RenderOrder.MIDTOP), Controllable {
+class PhysTestLuarLander : ActorWBMovable(RenderOrder.MIDTOP), Controllable {
 
     private val texture = Texture(ModMgr.getGdxFile("basegame", "sprites/phystest_lunarlander.tga"))
 

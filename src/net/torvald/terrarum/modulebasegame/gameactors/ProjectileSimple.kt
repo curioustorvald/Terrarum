@@ -21,11 +21,10 @@ import java.util.*
 
 // TODO simplified, lightweight physics (does not call PhysicsSolver)
 open class ProjectileSimple(
-        world: GameWorld,
         private val type: Int,
         fromPoint: Vector2, // projected coord
         toPoint: Vector2    // arriving coord
-) : ActorWBMovable(world, RenderOrder.MIDTOP), Luminous, Projectile {
+) : ActorWBMovable(RenderOrder.MIDTOP), Luminous, Projectile {
 
     val damage: Int
     val displayColour: Color

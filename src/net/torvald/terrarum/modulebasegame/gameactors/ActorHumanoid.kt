@@ -25,12 +25,13 @@ import java.util.*
  * Created by minjaesong on 2016-10-24.
  */
 open class ActorHumanoid(
-        world: GameWorld,
         birth: time_t,
         death: time_t? = null,
         usePhysics: Boolean = true
-) : ActorWBMovable(world, RenderOrder.MIDDLE, usePhysics = usePhysics), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
+) : ActorWBMovable(RenderOrder.MIDDLE, usePhysics = usePhysics), Controllable, Pocketed, Factionable, Luminous, LandHolder, HistoricalFigure {
 
+    private val world: GameWorld?
+        get() = Terrarum.ingame?.world
 
 
     var vehicleRiding: Controllable? = null // usually player only
@@ -50,11 +51,11 @@ open class ActorHumanoid(
     override var houseDesignation: ArrayList<Long>? = ArrayList()
 
     override fun addHouseTile(x: Int, y: Int) {
-        if (houseDesignation != null) houseDesignation!!.add(LandUtil.getBlockAddr(world, x, y))
+        if (houseDesignation != null) houseDesignation!!.add(LandUtil.getBlockAddr(world!!, x, y))
     }
 
     override fun removeHouseTile(x: Int, y: Int) {
-        if (houseDesignation != null) houseDesignation!!.remove(LandUtil.getBlockAddr(world, x, y))
+        if (houseDesignation != null) houseDesignation!!.remove(LandUtil.getBlockAddr(world!!, x, y))
     }
 
     override fun clearHouseDesignation() {

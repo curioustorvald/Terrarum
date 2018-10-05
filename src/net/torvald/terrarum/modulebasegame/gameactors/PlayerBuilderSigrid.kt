@@ -17,7 +17,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 object PlayerBuilderSigrid {
 
     operator fun invoke(): IngamePlayer {
-        val p = IngamePlayer((Terrarum.ingame!! as Ingame).gameworld, -9223372036854775807L) // XD
+        val p = IngamePlayer(-9223372036854775807L) // XD
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
 
