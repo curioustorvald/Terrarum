@@ -173,6 +173,6 @@ object DecodeTapestry {
             readCounter++
         }
 
-        return TapestryObject((Terrarum.ingame!!.world), outImageData, artName, authorName)
+        return TapestryObject(outImageData, artName, authorName)
     }
 }

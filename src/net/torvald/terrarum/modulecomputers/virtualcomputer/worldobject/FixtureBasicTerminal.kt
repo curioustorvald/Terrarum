@@ -7,7 +7,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 /**
  * Created by minjaesong on 2016-09-08.
  */
-class FixtureBasicTerminal(world: GameWorld, phosphor: Color) : FixtureBase(world) {
+class FixtureBasicTerminal(phosphor: Color) : FixtureBase() {
 
     /*val computer = TerrarumComputer(8)
     val vt: Terminal = SimpleTextTerminal(phosphor, 80, 25, computer)

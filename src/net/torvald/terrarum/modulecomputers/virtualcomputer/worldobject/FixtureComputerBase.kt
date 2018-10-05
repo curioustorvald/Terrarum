@@ -6,7 +6,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 /**
  * Created by minjaesong on 2016-09-08.
  */
-open class FixtureComputerBase(world: GameWorld) : FixtureBase(world) {
+open class FixtureComputerBase : FixtureBase() {
 
     /** Connected terminal */
     var terminal: FixtureBasicTerminal? = null

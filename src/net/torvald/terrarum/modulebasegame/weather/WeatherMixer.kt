@@ -3,13 +3,17 @@ package net.torvald.terrarum.modulebasegame.weather
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.utils.GdxRuntimeException
 import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.colourutil.*
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.*
+import net.torvald.terrarum.console.CommandDict
+import net.torvald.terrarum.console.SetGlobalLightOverride
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.RNGConsumer
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
@@ -36,6 +40,7 @@ internal object WeatherMixer : RNGConsumer {
 
     override val RNG = HQRNG()
 
+    var globalLightOverridden = false
 
     var weatherList: HashMap<String, ArrayList<BaseModularWeather>>
 
@@ -84,7 +89,7 @@ internal object WeatherMixer : RNGConsumer {
     /**
      * Part of Ingame update
      */
-    fun update(delta: Float, player: ActorWithBody?) {
+    fun update(delta: Float, player: ActorWithBody?, world: GameWorldExtension) {
         if (player == null) return
 
         currentWeather = weatherList[WEATHER_GENERIC]!![0]
@@ -104,6 +109,10 @@ internal object WeatherMixer : RNGConsumer {
             //globalLightNow.set(getGlobalLightOfTime((Terrarum.ingame!!.world).time.todaySeconds).mul(0.3f, 0.3f, 0.3f, 0.58f))
         }
 
+
+        if (!globalLightOverridden) {
+            world.globalLight = WeatherMixer.globalLightNow
+        }
     }
 
     //private val parallaxZeroPos = WorldGenerator.TERRAIN_AVERAGE_HEIGHT * 0.75f // just an arb multiplier (266.66666 -> 200)

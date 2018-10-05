@@ -8,7 +8,6 @@ import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.ui.Notification
@@ -46,7 +45,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
 
-    override var actorNowPlaying: ActorHumanoid? = MovableWorldCamera(world)
+    override var actorNowPlaying: ActorHumanoid? = MovableWorldCamera()
 
     val uiToolbox = UIBuildingMakerToolbox()
     val notifier = Notification()
@@ -170,7 +169,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 }
 
 
-class MovableWorldCamera(world: GameWorld) : ActorHumanoid(world, 0, usePhysics = false) {
+class MovableWorldCamera : ActorHumanoid(0, usePhysics = false) {
 
     init {
         referenceID = Terrarum.PLAYER_REF_ID

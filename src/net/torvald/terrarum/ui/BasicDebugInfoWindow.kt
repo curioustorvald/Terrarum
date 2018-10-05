@@ -9,6 +9,7 @@ import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 
@@ -29,7 +30,10 @@ class BasicDebugInfoWindow : UICanvas() {
     private var ydelta = 0.0
 
     private val ingame = Terrarum.ingame!! as Ingame
-    private val world = ingame.world as GameWorldExtension
+
+    private val world: GameWorldExtension
+        get() = Terrarum.ingame!!.world as GameWorldExtension
+
 
     override fun updateUI(delta: Float) {
         val player = ingame.actorNowPlaying
