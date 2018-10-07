@@ -9,7 +9,7 @@ Ord  Hex  Description
 02   4D   S
 03   44   V
 
-04        Name of the world in UTF-8 (arbitrary length)
+04        Name of the world in UTF-8 (arbitrary length, must not contain NULL)
 ...  00   String terminator
 
 ...       Terrain seed (8 bytes)
@@ -21,7 +21,6 @@ Ord  Hex  Description
 ...       SHA-256 hash of worldinfo1 (32 bytes)
 ...       SHA-256 hash of worldinfo2 (32 bytes)
 ...       SHA-256 hash of worldinfo3 (32 bytes)
-...       SHA-256 hash of worldinfo4 (32 bytes)
 
 ...       ReferenceID of the player (4 bytes, a fixed value of 91A7E2)
 ...       Current world's time_t (the ingame time, 8 bytes)
