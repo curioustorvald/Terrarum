@@ -61,6 +61,7 @@ object ModMgr {
     }
     const val modDir = "./assets/mods"
 
+    /** Module name (directory name), ModuleMetadata */
     val moduleInfo = HashMap<String, ModuleMetadata>()
 
     init {
@@ -156,6 +157,7 @@ object ModMgr {
         checkExistence(module)
         return "$modDir/$module/${path.sanitisePath()}"
     }
+    /** Returning files are read-only */
     fun getGdxFile(module: String, path: String): FileHandle {
         return Gdx.files.internal(getPath(module, path))
     }
@@ -172,6 +174,40 @@ object ModMgr {
         else {
             return dir.listFiles()
         }
+    }
+
+    /** Get a common file from all the installed mods. Files are guaranteed to exist. If a mod does not
+     * contain the file, the mod will be skipped. */
+    fun getFilesFromEveryMod(path: String): List<File> {
+        val path = path.sanitisePath()
+        val moduleNames = moduleInfo.keys.toList()
+
+        val filesList = ArrayList<File>()
+        moduleNames.forEach {
+            val file = File(getPath(it, path))
+
+            if (file.exists()) filesList.add(file)
+        }
+
+        return filesList.toList()
+    }
+
+    /** Get a common file from all the installed mods. Files are guaranteed to exist. If a mod does not
+     * contain the file, the mod will be skipped.
+     *
+     * Returning files are read-only. */
+    fun getGdxFilesFromEveryMod(path: String): List<FileHandle> {
+        val path = path.sanitisePath()
+        val moduleNames = moduleInfo.keys.toList()
+
+        val filesList = ArrayList<FileHandle>()
+        moduleNames.forEach {
+            val file = Gdx.files.internal(getPath(it, path))
+
+            if (file.exists()) filesList.add(file)
+        }
+
+        return filesList.toList()
     }
 
 

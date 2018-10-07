@@ -24,6 +24,9 @@ object BlockCodex {
         blockProps = Array<BlockProp>(TILE_UNIQUE_MAX * 2, { BlockProp() })
     }
 
+    /**
+     * Later entry (possible from other modules) will replace older ones
+     */
     operator fun invoke(module: String, path: String) {
         try {
             val records = CSVFetcher.readFromModule(module, path)
