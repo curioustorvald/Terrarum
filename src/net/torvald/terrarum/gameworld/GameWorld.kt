@@ -12,10 +12,17 @@ typealias BlockDamage = Float
 
 open class GameWorld {
 
+    var worldName: String = "New World"
     var worldIndex: Int
     val width: Int
     val height: Int
 
+    val creationTime: Long
+    var lastPlayTime: Long
+        internal set // there's a case of save-and-continue-playing
+
+    /** Used to calculate play time */
+    val loadTime: Long = System.currentTimeMillis() / 1000L
 
     //layers
     val layerWall: MapLayer
@@ -49,7 +56,7 @@ open class GameWorld {
         internal set
 
 
-    constructor(worldIndex: Int, width: Int, height: Int) {
+    constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long = creationTIME_T) {
         this.worldIndex = worldIndex
         this.width = width
         this.height = height
@@ -71,9 +78,13 @@ open class GameWorld {
 
         // air pressure layer: 4 * 8 is one cell
         //layerAirPressure = MapLayerHalfFloat(width / 4, height / 8, 13f) // 1013 mBar
+
+
+        creationTime = creationTIME_T
+        lastPlayTime = lastPlayTIME_T
     }
 
-    internal constructor(worldIndex: Int, layerData: ReadLayerDataLzma.LayerData) {
+    internal constructor(worldIndex: Int, layerData: ReadLayerDataLzma.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long = creationTIME_T) {
         this.worldIndex = worldIndex
 
         layerTerrain = layerData.layerTerrain
@@ -90,6 +101,10 @@ open class GameWorld {
 
         width = layerTerrain.width
         height = layerTerrain.height
+
+
+        creationTime = creationTIME_T
+        lastPlayTime = lastPlayTIME_T
     }
 
 

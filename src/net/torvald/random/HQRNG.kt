@@ -10,8 +10,8 @@ import java.util.Random
  */
 class HQRNG @JvmOverloads constructor(seed: Long = System.nanoTime()) : Random() {
 
-    private var s0: Long
-    private var s1: Long
+    var s0: Long; private set
+    var s1: Long; private set
 
     constructor(s0: Long, s1: Long) : this() {
         this.s0 = s0
