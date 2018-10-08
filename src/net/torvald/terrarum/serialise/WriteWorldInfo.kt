@@ -15,8 +15,6 @@ import java.io.FileOutputStream
 
 object WriteWorldInfo {
 
-    // FIXME UNTESTED
-
     val META_MAGIC = "TESV".toByteArray(Charsets.UTF_8)
     val NULL = 0.toByte()
 
@@ -108,9 +106,10 @@ object WriteWorldInfo {
         metaOut.write(timeNow.toLittle48())
 
         // get playtime and save it
-        val timeToAdd = timeNow - world.loadTime
-        metaOut.write(world.lastPlayTime.plus(timeToAdd).toInt().toLittle())
+        val timeToAdd = (timeNow - world.loadTime).toInt()
+        metaOut.write((world.totalPlayTime + timeToAdd).toLittle())
         world.lastPlayTime = timeNow
+        world.totalPlayTime += timeToAdd
 
 
 
