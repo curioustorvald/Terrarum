@@ -27,11 +27,11 @@ class UITitleCharactersList : UICanvas() {
     override var height = Terrarum.HEIGHT - moduleAreaHMargin * 2
 
     private val moduleInfoCells = ArrayList<UIItemSavegameInfoCell>()
-    // build module list
+    // build characters list
     init {
-        SavegameLedger.getSavefileList()?.forEachIndexed { index, file ->
-
-        }
+        //SavegameLedger.getSavefileList()?.forEachIndexed { index, file ->
+        //
+        //}
     }
 
     private val mouduleArea = UIItemList<UIItemSavegameInfoCell>(

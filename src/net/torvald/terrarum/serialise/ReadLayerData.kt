@@ -66,7 +66,7 @@ internal object ReadLayerData {
 
         // create world out of tiles data
 
-        val retWorld = inWorld ?: GameWorldExtension(1, worldWidth, worldHeight)
+        val retWorld = inWorld ?: GameWorldExtension(1, worldWidth, worldHeight, 0, 0, 0) // FIXME null TIME_T for the (partial) test to pass
 
         retWorld.layerTerrain.data = terrainLayerMSB
         retWorld.layerWall.data = wallLayerMSB
