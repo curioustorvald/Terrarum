@@ -231,7 +231,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             // init map as chosen size
-            gameworld = GameWorldExtension(1, worldParams.width, worldParams.height)
+            val timeNow = System.currentTimeMillis() / 1000
+            gameworld = GameWorldExtension(1, worldParams.width, worldParams.height, timeNow, timeNow, 0) // new game, so the creation time is right now
             gameworldCount++
             world = gameworld as GameWorld
 

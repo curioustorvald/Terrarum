@@ -20,6 +20,8 @@ open class GameWorld {
     val creationTime: Long
     var lastPlayTime: Long
         internal set // there's a case of save-and-continue-playing
+    var totalPlayTime: Int
+        internal set
 
     /** Used to calculate play time */
     val loadTime: Long = System.currentTimeMillis() / 1000L
@@ -56,7 +58,7 @@ open class GameWorld {
         internal set
 
 
-    constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long = creationTIME_T) {
+    constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
         this.worldIndex = worldIndex
         this.width = width
         this.height = height
@@ -82,9 +84,10 @@ open class GameWorld {
 
         creationTime = creationTIME_T
         lastPlayTime = lastPlayTIME_T
+        this.totalPlayTime = totalPlayTime
     }
 
-    internal constructor(worldIndex: Int, layerData: ReadLayerDataLzma.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long = creationTIME_T) {
+    internal constructor(worldIndex: Int, layerData: ReadLayerDataLzma.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
         this.worldIndex = worldIndex
 
         layerTerrain = layerData.layerTerrain
@@ -105,6 +108,7 @@ open class GameWorld {
 
         creationTime = creationTIME_T
         lastPlayTime = lastPlayTIME_T
+        this.totalPlayTime = totalPlayTime
     }
 
 

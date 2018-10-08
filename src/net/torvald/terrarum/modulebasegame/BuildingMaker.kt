@@ -23,7 +23,9 @@ import kotlin.system.measureNanoTime
  */
 class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
-    val gameWorld = GameWorldExtension(1, 1024, 256)
+    private val timeNow = System.currentTimeMillis() / 1000
+
+    val gameWorld = GameWorldExtension(1, 1024, 256, timeNow, timeNow, 0)
 
     init {
         // ghetto world for building

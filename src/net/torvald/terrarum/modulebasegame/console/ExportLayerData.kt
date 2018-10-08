@@ -5,6 +5,7 @@ import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.serialise.WriteLayerDataLzma
 import net.torvald.terrarum.serialise.WriteLayerDataZip
+import net.torvald.terrarum.serialise.WriteWorldInfo
 
 /**
  * Created by minjaesong on 2017-07-18.
@@ -12,7 +13,8 @@ import net.torvald.terrarum.serialise.WriteLayerDataZip
 object ExportLayerData : ConsoleCommand {
     override fun execute(args: Array<String>) {
         try {
-            val outfile = WriteLayerDataLzma()
+            val outfile = WriteLayerDataZip()
+            WriteWorldInfo()
             Echo("Layer data exported to ${outfile!!.canonicalPath}")
         }
         catch (e: Exception) {
