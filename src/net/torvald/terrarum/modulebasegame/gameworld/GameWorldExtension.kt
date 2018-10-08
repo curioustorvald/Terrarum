@@ -8,8 +8,8 @@ import net.torvald.terrarum.serialise.ReadLayerDataLzma
  */
 class GameWorldExtension: GameWorld {
 
-    constructor(worldIndex: Int, width: Int, height: Int) : super(worldIndex, width, height)
-    internal constructor(worldIndex: Int, layerData: ReadLayerDataLzma.LayerData) : super(worldIndex, layerData)
+    constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) : super(worldIndex, width, height, creationTIME_T, lastPlayTIME_T, totalPlayTime)
+    internal constructor(worldIndex: Int, layerData: ReadLayerDataLzma.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) : super(worldIndex, layerData, creationTIME_T, lastPlayTIME_T, totalPlayTime)
 
 
     val time: WorldTime
