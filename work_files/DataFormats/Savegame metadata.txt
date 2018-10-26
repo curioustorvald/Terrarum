@@ -9,7 +9,11 @@ Ord  Hex  Description
 02   4D   S
 03   44   V
 
-04        Name of the world in UTF-8 (arbitrary length, must not contain NULL)
+04   01   Descriptor version number
+
+05   03   Number of hashes
+
+06        Name of the world in UTF-8 (arbitrary length, must not contain NULL)
 ...  00   String terminator
 
 ...       Terrain seed (8 bytes)
@@ -18,10 +22,6 @@ Ord  Hex  Description
 ...       Weather s0 (8 bytes)
 ...       Weather s1 (8 bytes)
 
-...       SHA-256 hash of worldinfo1 (32 bytes)
-...       SHA-256 hash of worldinfo2 (32 bytes)
-...       SHA-256 hash of worldinfo3 (32 bytes)
-
 ...       ReferenceID of the player (4 bytes, a fixed value of 91A7E2)
 ...       Current world's time_t (the ingame time, 8 bytes)
 
@@ -29,7 +29,9 @@ Ord  Hex  Description
 ...       Last play time in time_t (6 bytes)
 ...       Total playtime in time_t (4 bytes)    // will record 136.1 years of playtime
 
-
+...       SHA-256 hash of worldinfo1 (32 bytes)
+...       SHA-256 hash of worldinfo2 (32 bytes)
+...       SHA-256 hash of worldinfo3 (32 bytes)
 
 
 

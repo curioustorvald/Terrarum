@@ -22,6 +22,11 @@ object ReadWorldInfo {
             throw IllegalArgumentException("File not a Save Meta")
         }
 
+
+        val descVersion = fis.read(1) // 0-127
+        val numberOfHashes = fis.read() // 0-127
+
+
         var byteRead = fis.read()
         while (byteRead != 0) {
             if (byteRead == -1)
@@ -38,14 +43,14 @@ object ReadWorldInfo {
                 fis.read(8).toLittleLong(), // rng s1
                 fis.read(8).toLittleLong(), // weather s0
                 fis.read(8).toLittleLong(), // weather s1
-                fis.read(32),
-                fis.read(32),
-                fis.read(32),
                 fis.read(4).toLittleInt(), // player id
                 fis.read(8).toLittleLong(), // world TIME_T
                 fis.read(6).toLittleLong(), // creation time
                 fis.read(6).toLittleLong(), // last play time
-                fis.read(4).toLittleInt()  // total time wasted
+                fis.read(4).toLittleInt(), // total time wasted
+                fis.read(32), // sha256sum worldinfo1
+                fis.read(32), // sha256sum worldinfo2
+                fis.read(32) // sha256sum worldinfo3
         )
     }
 
@@ -57,13 +62,13 @@ object ReadWorldInfo {
             val rngS1: Long,
             val weatherS0: Long,
             val weatherS1: Long,
-            val worldinfo1Hash: ByteArray,
-            val worldInfo2Hash: ByteArray,
-            val worldInfo3Hash: ByteArray,
             val playerID: Int,
             val timeNow: Long,
             val creationTime: Long,
             val lastPlayTime: Long,
-            val totalPlayTime: Int
+            val totalPlayTime: Int,
+            val worldinfo1Hash: ByteArray,
+            val worldInfo2Hash: ByteArray,
+            val worldInfo3Hash: ByteArray
     )
 }
