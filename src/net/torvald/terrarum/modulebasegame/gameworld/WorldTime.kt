@@ -13,9 +13,10 @@ typealias time_t = Long
  *      https://en.wikipedia.org/wiki/World_Calendar
  *      http://dwarffortresswiki.org/index.php/DF2014:Calendar
  *
- * And there is no AM/PM concept, 22-hour clock is forced; no leap years.
- * (AM 12 is still 00h in this system, again, to reduce confusion)
+ * And there is no AM/PM concept, 24-hour clock is forced; no leap years.
+ * An ingame day should last 22 real-life minutes.
  *
+ * // TODO 4-month year? like Stardew Valley
  *
  *  Calendar
  *
@@ -110,13 +111,13 @@ class WorldTime(initTime: Long = 0L) {
             "Mala", "Gale", "Lime", "Sand", "Timb", "Moon")
 
     companion object {
-        /** Each day is 22-hour long */
-        val DAY_LENGTH = 79200 //must be the multiple of 3600
+        /** Each day is displayed as 24 hours, but in real-life clock it's 22 mins long */
+        val DAY_LENGTH = 86400 //must be the multiple of 3600
 
         val HOUR_SEC: Int = 3600
         val MINUTE_SEC: Int = 60
         val HOUR_MIN: Int = 60
-        val GAME_MIN_TO_REAL_SEC: Float = 60f
+        val GAME_MIN_TO_REAL_SEC: Float = 720f/11f
         val HOURS_PER_DAY = DAY_LENGTH / HOUR_SEC
 
         val YEAR_DAYS: Int = 365
@@ -164,8 +165,8 @@ class WorldTime(initTime: Long = 0L) {
     val dayName: String
         get() = DAY_NAMES[dayOfWeek]
 
-    inline fun Long.toPositiveInt() = this.and(0x7FFFFFFF).toInt()
-    inline fun Long.abs() = Math.abs(this)
+    fun Long.toPositiveInt() = this.and(0x7FFFFFFF).toInt()
+    fun Long.abs() = Math.abs(this)
 
     /** Format: "%A, %d %B %Y %X" */
     fun getFormattedTime() = "${getDayNameShort()}, " +

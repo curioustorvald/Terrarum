@@ -491,7 +491,7 @@ open class ActorHumanoid(
     private var oldJUMPPOWERBUFF = -1.0 // init
     private var oldScale = -1.0
     private var oldDragCoefficient = -1.0
-    val jumpAirTime: Double = -1.0
+    var jumpAirTime: Double = -1.0
         get() {
             // compare all the affecting variables
             if (oldMAX_JUMP_LENGTH == MAX_JUMP_LENGTH &&
