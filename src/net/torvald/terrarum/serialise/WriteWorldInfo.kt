@@ -18,6 +18,9 @@ object WriteWorldInfo {
     val META_MAGIC = "TESV".toByteArray(Charsets.UTF_8)
     val NULL = 0.toByte()
 
+    val VERSION = 1
+    val HASHED_FILES_COUNT = 3
+
     /**
      * TODO currently it'll dump the temporary file (tmp_worldinfo1) onto the disk and will return the temp file.
      *
@@ -38,10 +41,11 @@ object WriteWorldInfo {
 
         val outFiles = ArrayList<File>()
         outFiles.add(metaFile)
+
         val worldInfoHash = ArrayList<ByteArray>() // hash of worldinfo1-3
         // try to write worldinfo1-3
 
-        for (filenum in 1..3) {
+        for (filenum in 1..HASHED_FILES_COUNT) {
             val outFile = File(path + filenum.toString())
             if (outFile.exists()) outFile.delete()
             outFile.createNewFile()
@@ -65,11 +69,13 @@ object WriteWorldInfo {
         }
 
 
-        // compose save meta
+        // compose save meta (actual writing part)
         val metaOut = BufferedOutputStream(FileOutputStream(metaFile), 256)
 
 
         metaOut.write(META_MAGIC)
+        metaOut.write(VERSION)
+        metaOut.write(HASHED_FILES_COUNT)
 
         // world name
         val worldNameBytes = world.worldName.toByteArray(Charsets.UTF_8)
@@ -80,28 +86,23 @@ object WriteWorldInfo {
         metaOut.write(world.generatorSeed.toLittle())
 
         // randomiser seed
-        metaOut.write(RoguelikeRandomiser.RNG.s0.toLittle())
-        metaOut.write(RoguelikeRandomiser.RNG.s1.toLittle())
+        metaOut.write(RoguelikeRandomiser.RNG.state0.toLittle())
+        metaOut.write(RoguelikeRandomiser.RNG.state1.toLittle())
 
         // weather seed
-        metaOut.write(WeatherMixer.RNG.s0.toLittle())
-        metaOut.write(WeatherMixer.RNG.s1.toLittle())
-
-        // SHA256SUM of worldinfo1-3
-        worldInfoHash.forEach {
-            metaOut.write(it)
-        }
+        metaOut.write(WeatherMixer.RNG.state0.toLittle())
+        metaOut.write(WeatherMixer.RNG.state1.toLittle())
 
         // reference ID of the player
         metaOut.write(Terrarum.PLAYER_REF_ID.toLittle())
 
-        // time_t
+        // ingame time_t
         metaOut.write((world as GameWorldExtension).time.TIME_T.toLittle())
 
         // creation time (real world time)
         metaOut.write(world.creationTime.toLittle48())
 
-        // time at save
+        // time at save (real world time)
         val timeNow = System.currentTimeMillis() / 1000L
         metaOut.write(timeNow.toLittle48())
 
@@ -111,7 +112,13 @@ object WriteWorldInfo {
         world.lastPlayTime = timeNow
         world.totalPlayTime += timeToAdd
 
+        // SHA256SUM of worldinfo1-3
+        worldInfoHash.forEach {
+            metaOut.write(it)
+        }
 
+
+        // more data goes here //
 
 
         metaOut.flush()
