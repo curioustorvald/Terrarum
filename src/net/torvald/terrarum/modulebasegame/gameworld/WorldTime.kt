@@ -18,25 +18,34 @@ typealias time_t = Long
  *
  * // TODO 4-month year? like Stardew Valley
  *
- *  Calendar
+ *  The Yearly Calendar
  *
+ *  A calendar tailored to this very game. A year is consisted of 4 seasons (month),
+ *  and each season last fixed length of 30 days, leap years does not occur.
+ *
+ * =========================
  * |Mo|Ty|Mi|To|Fr|La|Su|Ve|
  * |--|--|--|--|--|--|--|--|
  * | 1| 2| 3| 4| 5| 6| 7|  |
  * | 8| 9|10|11|12|13|14|  |
  * |15|16|17|18|19|20|21|  |
  * |22|23|24|25|26|27|28|  |
- * |29|30|31| 1| 2| 3| 4|  |
- * | 5| 6| 7| 8| 9|10|11|  |
- * |12|13|14|15|16|17|18|  |
- * |19|20|21|22|23|24|25|  |
- * |26|27|28|29|30| 1| 2|  |
- * | 3| 4| 5| 6| 7| 8| 9|  |
- * |10|11|12|13|14|15|16|  |
- * |17|18|19|20|21|22|23|  |
- * |24|25|26|27|28|29|30|31|
+ * |29|30| 1| 2| 3| 4| 5|  |
+ * | 6| 7| 8| 9|10|11|12|  |
+ * |13|14|15|16|17|18|19|  |
+ * |20|21|22|23|24|25|26|  |
+ * |27|28|29|30| 1| 2| 3|  |
+ * | 4| 5| 6| 7| 8| 9|10|  |
+ * |11|12|13|14|15|16|17|  |
+ * |18|19|20|21|22|23|24|  |
+ * |25|26|27|28|29|30| 1|  |
+ * | 2| 3| 4| 5| 6| 7| 8|  |
+ * | 9|10|11|12|13|14|15|  |
+ * |16|17|18|19|20|21|22|  |
+ * |23|24|25|26|27|28|29|30|
+ * =========================
  *
- * Verddag only appears on the last day of the year (31st Moonstone)
+ * Verddag only appears on the last day of the year (30th winter)
  *
  * (Check please:)
  * - Equinox/Solstice always occur on 21st day of the month
@@ -45,7 +54,7 @@ typealias time_t = Long
  * Created by minjaesong on 2016-01-24.
  */
 class WorldTime(initTime: Long = 0L) {
-    var TIME_T = 0L // Epoch: Year 125, 1st Opal, 0h00:00 (Mondag) // 125-01-01
+    var TIME_T = 0L // Epoch: Year 125 Spring 1st, 0h00:00 (Mondag) // 125-01-01
         private set
 
     init {
@@ -59,7 +68,8 @@ class WorldTime(initTime: Long = 0L) {
     inline val hours: Int // 0 - 21
         get() = TIME_T.div(HOUR_SEC).abs().toInt() % HOURS_PER_DAY
 
-    inline val yearlyDays: Int // 0 - 364
+    // The World Calendar implementation
+    /*inline val yearlyDays: Int // 0 - 364
         get() = (TIME_T.toPositiveInt().div(DAY_LENGTH) % YEAR_DAYS)
 
     inline val days: Int // 1 - 31
@@ -81,9 +91,23 @@ class WorldTime(initTime: Long = 0L) {
     inline val quarterlyDays: Int // 0 - 90(91)
         get() = if (yearlyDays == YEAR_DAYS - 1) 91 else (yearlyDays % QUARTER_LENGTH)
     inline val quarterlyMonthOffset: Int // 0 - 2
-        get() = months.minus(1) % 3
+        get() = months.minus(1) % 3*/
 
-    inline val dayOfWeek: Int //0: Mondag-The first day of weekday (0 - 7)
+
+    // these functions won't need inlining for performance
+    val yearlyDays: Int // 0 - 119
+        get() = (TIME_T.toPositiveInt().div(DAY_LENGTH) % YEAR_DAYS)
+    val days: Int // 1 - 30 fixed
+        get() = (yearlyDays % 30) + 1
+    val months: Int // 1 - 4
+        get() = (yearlyDays / 30) + 1
+    val years: Int
+        get() = TIME_T.div(YEAR_DAYS * DAY_LENGTH).abs().toInt() + EPOCH_YEAR
+
+    val quarter = months - 1 // 0 - 3
+
+
+    val dayOfWeek: Int //0: Mondag-The first day of weekday (0 - 7)
         get() = if (yearlyDays == YEAR_DAYS - 1) 7 else yearlyDays % 7
 
     var timeDelta: Int = 1
@@ -94,8 +118,8 @@ class WorldTime(initTime: Long = 0L) {
     inline val moonPhase: Double
         get() = (TIME_T.plus(1700000L) % LUNAR_CYCLE).toDouble() / LUNAR_CYCLE
 
-    @Transient private var realMillisec: Double = 0.0
-    @Transient private val REAL_SEC_TO_GAME_SECS = 60
+    @Transient private var realSecAcc: Double = 0.0
+    @Transient private val REAL_SEC_TO_GAME_SECS = 1.0 / GAME_MIN_TO_REAL_SEC // how slow is real-life clock (second-wise) relative to the ingame one
 
     val DAY_NAMES = arrayOf(//daynames are taken from Nynorsk (å -> o)
             "Mondag", "Tysdag", "Midtveke" //middle-week
@@ -103,12 +127,15 @@ class WorldTime(initTime: Long = 0L) {
     )
     val DAY_NAMES_SHORT = arrayOf("Mon", "Tys", "Mid", "Tor", "Fre", "Lau", "Sun", "Ver")
 
-    val MONTH_NAMES = arrayOf(
+    // dwarven calendar of 12 monthes
+    /*val MONTH_NAMES = arrayOf(
             "Opal", "Obsidian", "Granite", "Slate", "Felsite", "Hematite",
             "Malachite", "Galena", "Limestone", "Sandstone", "Timber", "Moonstone"
     )
     val MONTH_NAMES_SHORT = arrayOf("Opal", "Obsi", "Gran", "Slat", "Fels", "Hema",
-            "Mala", "Gale", "Lime", "Sand", "Timb", "Moon")
+            "Mala", "Gale", "Lime", "Sand", "Timb", "Moon")*/
+    val MONTH_NAMES = arrayOf("Spring", "Summer", "Autumn", "Winter")
+    val MONTH_NAMES_SHORT = arrayOf("Spri", "Summ", "Autm", "Wint")
 
     companion object {
         /** Each day is displayed as 24 hours, but in real-life clock it's 22 mins long */
@@ -117,11 +144,12 @@ class WorldTime(initTime: Long = 0L) {
         val HOUR_SEC: Int = 3600
         val MINUTE_SEC: Int = 60
         val HOUR_MIN: Int = 60
-        val GAME_MIN_TO_REAL_SEC: Float = 720f/11f
+        val GAME_MIN_TO_REAL_SEC: Double = 720.0 / 11.0
         val HOURS_PER_DAY = DAY_LENGTH / HOUR_SEC
 
-        val YEAR_DAYS: Int = 365
-        val QUARTER_LENGTH = 91 // as per The World Calendar
+        val YEAR_DAYS: Int = 120
+
+        val MONTH_LENGTH = 30 // ingame calendar specific
 
         val EPOCH_YEAR = 125
 
@@ -138,15 +166,17 @@ class WorldTime(initTime: Long = 0L) {
                 }
 
 
-        val LUNAR_CYCLE: Int = 2342643// 29 days, 12 hours, 44 minutes, and 3 seconds in-game calendar
+        val LUNAR_CYCLE: Int = 29 * DAY_LENGTH + 12 * HOUR_SEC + 44 * MINUTE_SEC + 3 // 29 days, 12 hours, 44 minutes, and 3 seconds in-game calendar
     }
 
     fun update(delta: Float) {
         //time
-        realMillisec += delta * 1000.0
-        if (realMillisec >= 1000.0 / REAL_SEC_TO_GAME_SECS) {
-            realMillisec -= 1000.0 / REAL_SEC_TO_GAME_SECS
-            TIME_T += timeDelta
+        realSecAcc += delta
+        if (realSecAcc >= REAL_SEC_TO_GAME_SECS) {
+            while (realSecAcc >= REAL_SEC_TO_GAME_SECS) {
+                realSecAcc -= REAL_SEC_TO_GAME_SECS
+                TIME_T += timeDelta
+            }
         }
     }
 
@@ -168,11 +198,11 @@ class WorldTime(initTime: Long = 0L) {
     fun Long.toPositiveInt() = this.and(0x7FFFFFFF).toInt()
     fun Long.abs() = Math.abs(this)
 
-    /** Format: "%A, %d %B %Y %X" */
+    /** Format: "%A, %Y %B %d %X" */
     fun getFormattedTime() = "${getDayNameShort()}, " +
-                             "$days " +
-                             "${getMonthNameShort()} " +
                              "$years " +
+                             "${getMonthNameShort()} " +
+                             "$days " +
                              "${String.format("%02d", hours)}:" +
                              "${String.format("%02d", minutes)}:" +
                              "${String.format("%02d", seconds)}"
