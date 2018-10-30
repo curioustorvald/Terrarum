@@ -3,7 +3,9 @@ package net.torvald.random;
 import java.util.Random;
 
 /**
- * Xoroshift128
+ * Xoroshiro128
+ *
+ * Note: low 4 bits are considered "dirty"; avoid these bits for making random set of booleans
  *
  * see https://github.com/SquidPony/SquidLib/blob/master/squidlib-util/src/main/java/squidpony/squidmath/XoRoRNG.java
  */
