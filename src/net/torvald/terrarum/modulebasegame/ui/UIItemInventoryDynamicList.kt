@@ -23,8 +23,8 @@ import java.util.ArrayList
  *
  * Note: everything is pretty much fixed size.
  *
- * Dimension of the whole area: 496x384
- * Number of grids: 9x7
+ * Dimension of the whole area: 552x384
+ * Number of grids: 10x7
  * Number of lists: 2x7
  *
  * Created by minjaesong on 2017-10-21.
@@ -79,9 +79,9 @@ class UIItemInventoryDynamicList(
             7 * 2, {
         UIItemInventoryElem(
                 parentUI = inventoryUI,
-                posX = this.posX + (244 + listGap) * (it % 2),
+                posX = this.posX + (272 + listGap) * (it % 2),
                 posY = this.posY + (UIItemInventoryElem.height + listGap) * (it / 2),
-                width = 244,
+                width = 272,
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
@@ -93,11 +93,11 @@ class UIItemInventoryDynamicList(
                 inactiveTextCol = defaultTextColour
         ) })
     private val itemGrid = Array<UIItemInventoryCellBase>(
-            7 * 9, {
+            7 * 10, {
         UIItemInventoryElemSimple(
                 parentUI = inventoryUI,
-                posX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % 9),
-                posY = this.posY + (UIItemInventoryElemSimple.height + listGap) * (it / 9),
+                posX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % 10),
+                posY = this.posY + (UIItemInventoryElemSimple.height + listGap) * (it / 10),
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,

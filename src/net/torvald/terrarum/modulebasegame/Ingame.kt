@@ -79,6 +79,10 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             camera.update()
             batch.projectionMatrix = camera.combined
         }
+
+        fun getCanonicalTitle() = AppLoader.GAME_NAME +
+                                " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
+                                " — M: J${Terrarum.memJavaHeap}M / N${Terrarum.memNativeHeap}M / X${Terrarum.memXmx}M"
     }
 
 
@@ -461,10 +465,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
 
-        Gdx.graphics.setTitle(AppLoader.GAME_NAME +
-                              " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
-                              " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
-        )
+        Gdx.graphics.setTitle(getCanonicalTitle())
 
         // ASYNCHRONOUS UPDATE AND RENDER //
 
@@ -913,7 +914,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      */
     override fun resize(width: Int, height: Int) {
 
-        MegaRainGovernor.resize()
+        // FIXME debugger is pointing at this thing, not sure it actually caused memleak
+        //MegaRainGovernor.resize()
 
 
         IngameRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)

@@ -320,7 +320,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
     }
 
     companion object {
-        val remoConWidth = 280
+        val remoConWidth = 304
         fun getRemoConHeight(menu: ArrayList<String>) = 36 * menu.size.plus(1)
         fun getRemoConHeight(menu: Array<String>) = 36 * menu.size.plus(1)
         val menubarOffY: Int; get() = Terrarum.HEIGHT / 2 - (Terrarum.fontGame.lineHeight * 1.5).toInt()
