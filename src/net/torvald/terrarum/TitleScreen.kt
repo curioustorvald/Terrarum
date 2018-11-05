@@ -217,10 +217,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     fun updateScreen(delta: Float) {
-        Gdx.graphics.setTitle(AppLoader.GAME_NAME +
-                              " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
-                              " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
-        )
+        Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
 
         demoWorld.globalLight = WeatherMixer.globalLightNow
         demoWorld.updateWorldTime(delta)

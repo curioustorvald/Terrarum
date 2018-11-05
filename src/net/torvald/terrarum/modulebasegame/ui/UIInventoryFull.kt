@@ -31,7 +31,7 @@ class UIInventoryFull(
     override var width: Int = Terrarum.WIDTH
     override var height: Int = Terrarum.HEIGHT
 
-    val internalWidth: Int = 630
+    val internalWidth: Int = 686
     val internalHeight: Int = 558 // grad_begin..grad_end..contents..grad_begin..grad_end
 
 

@@ -181,9 +181,9 @@ class BasicDebugInfoWindow : UICanvas() {
                 (Terrarum.WIDTH - 2 - 6 * 8).toFloat(), 10f)
 
         //g.color = GameFontBase.codeToCol["g"]
-        Terrarum.fontSmallNumbers.draw(batch, "${Terrarum.memInUse}M",
+        Terrarum.fontSmallNumbers.draw(batch, "${Terrarum.memJavaHeap}M",
                 (Terrarum.WIDTH - 17 * 8 - 2).toFloat(), 2f)
-        Terrarum.fontSmallNumbers.draw(batch, "/${Terrarum.memTotal}M/",
+        Terrarum.fontSmallNumbers.draw(batch, "/${Terrarum.memNativeHeap}M/",
                 (Terrarum.WIDTH - 12 * 8 - 2).toFloat(), 2f)
         //Terrarum.fontSmallNumbers.color = GameFontBase.codeToCol["m"]
         Terrarum.fontSmallNumbers.draw(batch, "${Terrarum.memXmx}M",
