@@ -180,7 +180,7 @@ public class AppLoader implements ApplicationListener {
 
 
         TextureRegionPack.Companion.setGlobalFlipY(true);
-        fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true, Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false);
+        fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true, Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 128, false);
     }
 
     @Override

@@ -110,10 +110,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun render(delta: Float) {
-        Gdx.graphics.setTitle("${AppLoader.GAME_NAME} Building Maker" +
-                              " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
-                              " — M: ${Terrarum.memInUse}M / ${Terrarum.memTotal}M / ${Terrarum.memXmx}M"
-        )
+        Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
+
 
         // ASYNCHRONOUS UPDATE AND RENDER //
 

@@ -288,6 +288,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         baseHitboxW = w
         hitboxTranslateX = tx
         hitboxTranslateY = ty
+        hitbox.setDimension(w.toDouble(), h.toDouble())
     }
 
     fun setPosition(pos: Point2d) = setPosition(pos.x, pos.y)
@@ -1079,8 +1080,10 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     }*/
 
     private inline val submergedRatio: Double
-        get() = submergedHeight / hitbox.height
-
+        get() {
+            if (hitbox.height == 0.0) throw RuntimeException("Hitbox.height is zero")
+            return submergedHeight / hitbox.height
+        }
     private inline val submergedVolume: Double
         get() = submergedHeight * hitbox.width * hitbox.width
 
@@ -1538,10 +1541,12 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             actorValue[AVKey.BASEMASS] = value
         }
     internal val avAcceleration: Double
-        get() = actorValue.getAsDouble(AVKey.ACCEL)!! *
+        get() { if (accelMultMovement.isNaN()) println("accelMultMovement: $accelMultMovement")
+            return actorValue.getAsDouble(AVKey.ACCEL)!! *
                 (actorValue.getAsDouble(AVKey.ACCELBUFF) ?: 1.0) *
                 accelMultMovement *
                 scale.sqrt()
+        }
     internal val avSpeedCap: Double
         get() = actorValue.getAsDouble(AVKey.SPEED)!! *
                 (actorValue.getAsDouble(AVKey.SPEEDBUFF) ?: 1.0) *
