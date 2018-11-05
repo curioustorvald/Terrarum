@@ -13,6 +13,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import com.jme3.math.FastMath
 import net.torvald.dataclass.ArrayListMap
+import net.torvald.dataclass.CircularArray
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.AppLoader.printdbgerr
@@ -114,12 +115,29 @@ object Terrarum : Screen {
     lateinit var defaultSaveDir: String
         private set
 
-    val memInUse: Long
-        get() = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() + Gdx.app.nativeHeap) shr 20
-    val memTotal: Long
-        get() = Runtime.getRuntime().totalMemory() shr 20
-    val memXmx: Long
-        get() = Runtime.getRuntime().maxMemory() shr 20
+
+
+    private val javaHeapCircularArray = CircularArray<Int>(128)
+    private val nativeHeapCircularArray = CircularArray<Int>(128)
+
+    val memJavaHeap: Int
+        get() {
+            javaHeapCircularArray.add((Gdx.app.javaHeap shr 20).toInt())
+
+            var acc = 0
+            javaHeapCircularArray.forEach { acc = maxOf(acc, it) }
+            return acc
+        }
+    val memNativeHeap: Int
+        get() {
+            nativeHeapCircularArray.add((Gdx.app.javaHeap shr 20).toInt())
+
+            var acc = 0
+            nativeHeapCircularArray.forEach { acc = maxOf(acc, it) }
+            return acc
+        }
+    val memXmx: Int
+        get() = (Runtime.getRuntime().maxMemory() shr 20).toInt()
 
     var environment: RunningEnvironment
         private set

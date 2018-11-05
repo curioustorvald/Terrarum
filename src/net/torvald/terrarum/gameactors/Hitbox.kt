@@ -71,6 +71,12 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
 
     fun setPosition(x1: Double, y1: Double): Hitbox {
         hitboxStart = Point2d(x1, y1)
+
+        if (width == 0.0 || height == 0.0) {
+            println("[Hitbox] width or height is zero, perhaps you want to check it out?")
+            Thread.currentThread().stackTrace.forEach { println(it) }
+        }
+
         return this
     }
     fun setPosition(vector: Vector2) = setPosition(vector.x, vector.y)

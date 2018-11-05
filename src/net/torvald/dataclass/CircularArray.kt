@@ -29,13 +29,6 @@ class CircularArray<T>(val size: Int) {
     }
 
     inline fun forEach(action: (T) -> Unit) {
-        /*if (tail >= head) { // queue not full
-            (head..tail - 1).map { buffer[it] }.forEach { action(it) }
-        }
-        else { // queue full
-            (0..size - 1).map { buffer[(it + head) % size] }.forEach { action(it) }
-        }*/
-
         // has slightly better iteration performance than lambda
         if (tail >= head) {
             for (i in head..tail - 1)
@@ -45,6 +38,22 @@ class CircularArray<T>(val size: Int) {
             for (i in 0..size - 1)
                 action(buffer[(i + head) % size])
         }
+    }
+
+    // FIXME not working as intended
+    inline fun <R> fold(initial: R, operation: (R, T) -> R): R {
+        var accumulator = initial
+        //for (element in buffer) accumulator = operation(accumulator, element)
+        if (tail >= head) {
+            for (i in head..tail - 1)
+                operation(accumulator, buffer[i])
+        }
+        else {
+            for (i in 0..size - 1)
+                operation(accumulator, buffer[(i + head) % size])
+        }
+
+        return accumulator
     }
 
     inline fun forEachConcurrent(action: (T) -> Unit) {
