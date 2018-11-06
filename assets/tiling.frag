@@ -72,7 +72,7 @@ void main() {
     // TODO blend a breakage (0xrrggbb where 0xr0 -- upper 4 bits of int_red component)
 
 
-    // if statements considered harmful
+    // if statements considered harmful (on shader program)
     //        --definitely not Dijkstra
     /*if (tileXY.x == 0 && tileXY.y == 0)
         gl_FragColor = nocolour;
