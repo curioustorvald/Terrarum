@@ -35,8 +35,7 @@ class GameWorldExtension: GameWorld {
     val damageDataArray: ByteArray; get() = baseworld.damageDataArray*/
 
     init {
-        time = WorldTime(
-                71 * WorldTime.DAY_LENGTH +
+        time = WorldTime( // Year EPOCH (125), Month 1, Day 1 is implied
                 7 * WorldTime.HOUR_SEC +
                 30L * WorldTime.MINUTE_SEC
         )
