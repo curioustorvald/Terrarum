@@ -24,6 +24,10 @@ import java.util.zip.GZIPInputStream
 /**
  * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
  *
+ * The terrain texture atlas is HARD CODED as "4096x4096, on which 256x256 tiles are contained"
+ * in the shader (tiling.frag). This will not be a problem in the base game, but if you are modifying
+ * this engine for your project, you must edit the shader program accordingly.
+ *
  * Created by minjaesong on 2016-01-19.
  */
 internal object BlocksDrawer {

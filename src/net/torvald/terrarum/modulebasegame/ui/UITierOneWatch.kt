@@ -22,15 +22,15 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  * Created by minjaesong on 2017-06-11.
  */
 class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
-    override var width = 85
-    override var height = 52
+    override var width = 77
+    override var height = 53
     override var openCloseTime: Second = 0f
 
-    private var ELuptimer = 10f // to make the light turned off by default
+    private var ELuptimer = 10f // init value higher than uptime: to make the light turned off by default
     private val ELuptime = 4f
     private var ELon = false
 
-    private var atlas = TextureRegionPack(ModMgr.getPath("basegame", "gui/watchface_atlas.tga"), width, height)
+    private var atlas = TextureRegionPack(ModMgr.getPath("basegame", "gui/watchface2_atlas.tga"), width, height)
 
     private var littleFont = Watch7SegSmall
     private var timeFont = Watch7SegMain
@@ -91,23 +91,24 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
         
         // day name
         batch.color = lcdLitCol
-        textFont.draw(batch, worldTime.getDayNameShort().toUpperCase(), 7f, 7f)
+        textFont.draw(batch, worldTime.getDayNameShort().toUpperCase(), 9f, 5f)
 
-        // month
-        littleFont.draw(batch, worldTime.months.toString().padStart(2, ' '), 40f, 6f)
         // day
-        littleFont.draw(batch, worldTime.days.toString().padStart(2, ' '), 62f, 6f)
+        littleFont.draw(batch, worldTime.days.toString().padStart(2, ' '), 54f, 4f)
 
         // hour
-        timeFont.draw(batch, worldTime.hours.toString().padStart(2, '/'), 30f, 28f)
+        timeFont.draw(batch, worldTime.hours.toString().padStart(2, '/'), 25f, 31f)
         // minute
-        timeFont.draw(batch, worldTime.minutes.toString().padStart(2, '0'), 58f, 28f)
+        timeFont.draw(batch, worldTime.minutes.toString().padStart(2, '0'), 53f, 31f)
+
+        // season marker
+        batch.draw(atlas.get(1, worldTime.months - 1), 0f, 0f)
 
 
         // moon dial
         val moonPhase = (worldTime.moonPhase * moonDialCount).roundInt() % moonDialCount
         batch.color = lcdLitCol
-        batch.draw(moonDial.get(moonPhase, 0), 4f, 22f)
+        batch.draw(moonDial.get(moonPhase, 0), 4f, 19f)
     }
 
     override fun doOpening(delta: Float) {
