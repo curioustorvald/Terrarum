@@ -14,7 +14,6 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ai.ActorAI
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
@@ -191,7 +190,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     private val introUncoverTime: Second = 0.3f
     private var introUncoverDeltaCounter = 0f
     private var updateDeltaCounter = 0.0
-    protected val updateRate = 1.0 / Terrarum.TARGET_INTERNAL_FPS
+    protected val renderRate = Terrarum.renderRate
 
     override fun render(delta: Float) {
         if (!loadDone) {
@@ -201,9 +200,9 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             // async update
             updateDeltaCounter += delta
             var updateTries = 0
-            while (updateDeltaCounter >= updateRate) {
+            while (updateDeltaCounter >= renderRate) {
                 updateScreen(delta)
-                updateDeltaCounter -= updateRate
+                updateDeltaCounter -= renderRate
                 updateTries++
 
                 if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
