@@ -25,7 +25,7 @@ uniform ivec2 tilesInAtlas = ivec2(256, 256);
 uniform ivec2 atlasTexSize = ivec2(4096, 4096);
 ivec2 tileSizeInPx = atlasTexSize / tilesInAtlas;
 
-uniform vec4 colourFilter = vec4(1, 1, 1, 1);
+uniform vec4 colourFilter = vec4(1, 1, 1, 1); // used by WALL to darken it
 
 uniform ivec2 cameraTranslation = ivec2(0, 0);
 
