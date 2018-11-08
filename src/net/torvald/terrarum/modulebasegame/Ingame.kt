@@ -8,7 +8,6 @@ import net.torvald.dataclass.CircularArray
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.concurrent.ThreadParallel
-import net.torvald.terrarum.console.*
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.gamecontroller.IngameController
@@ -28,7 +27,6 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.modulebasegame.console.AVTracker
 import net.torvald.terrarum.modulebasegame.console.ActorsList
 import net.torvald.terrarum.console.Authenticator
-import net.torvald.terrarum.console.SetGlobalLightOverride
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
@@ -81,8 +79,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         fun getCanonicalTitle() = AppLoader.GAME_NAME +
-                                " — F: ${Gdx.graphics.framesPerSecond} (${Terrarum.TARGET_INTERNAL_FPS})" +
-                                " — M: J${Terrarum.memJavaHeap}M / N${Terrarum.memNativeHeap}M / X${Terrarum.memXmx}M"
+                                  " — F: ${Gdx.graphics.framesPerSecond} (Δt${Terrarum.updateRateStr} / RT${Terrarum.renderRateStr})" +
+                                  " — M: J${Terrarum.memJavaHeap}M / N${Terrarum.memNativeHeap}M / X${Terrarum.memXmx}M"
     }
 
 
@@ -420,7 +418,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     protected var updateDeltaCounter = 0.0
-    protected val updateRate = 1.0 / Terrarum.TARGET_INTERNAL_FPS
+    protected val renderRate = Terrarum.renderRate
 
     private var firstTimeRun = true
 
@@ -430,9 +428,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     private class ThreadIngameUpdate(val ingame: Ingame): Runnable {
         override fun run() {
             var updateTries = 0
-            while (ingame.updateDeltaCounter >= ingame.updateRate) {
+            while (ingame.updateDeltaCounter >= ingame.renderRate) {
                 ingame.updateGame(Terrarum.deltaTime)
-                ingame.updateDeltaCounter -= ingame.updateRate
+                ingame.updateDeltaCounter -= ingame.renderRate
                 updateTries++
 
                 if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
@@ -486,12 +484,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
         else {
             var updateTries = 0
-            while (updateDeltaCounter >= updateRate) {
+            while (updateDeltaCounter >= renderRate) {
 
                 //updateGame(delta)
                 Terrarum.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
 
-                updateDeltaCounter -= updateRate
+                updateDeltaCounter -= renderRate
                 updateTries++
 
                 if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {

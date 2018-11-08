@@ -694,7 +694,14 @@ object Terrarum : Screen {
         get() = Gdx.input.x
     inline val mouseScreenY: Int
         get() = Gdx.input.y
-
+    /** Bigger than 1.0 */
+    inline val updateRate: Double
+        get() = 1.0 / Gdx.graphics.deltaTime
+    val updateRateStr: String
+        get() = String.format("%.2f", updateRate)
+    /** Smaller than 1.0 */
+    val renderRate = 1.0 / TARGET_INTERNAL_FPS
+    val renderRateStr = TARGET_INTERNAL_FPS.toString()
 
     /**
      * Usage:
