@@ -34,8 +34,21 @@ ivec2 getTileXY(int tileNumber) {
     return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));
 }
 
-int getTileFromColor(vec4 color) {
+// return: int=0xrrggbb
+int _colToInt(vec4 color) {
     return int(color.b * 255) | (int(color.g * 255) << 8) | (int(color.r * 255) << 16);
+}
+
+// 0x0rggbb where int=0xaarrggbb
+// return: [0..1048575]
+int getTileFromColor(vec4 color) {
+    return _colToInt(color) & 0x0FFFFF;
+}
+
+// 0xr00000 where int=0xaarrggbb
+// return: [0..15]
+int getBreakageFromColor(vec4 color) {
+    return (_colToInt(color) >> 20) & 0xF;
 }
 
 void main() {
@@ -54,28 +67,31 @@ void main() {
 
     mediump vec4 tileFromMap = texture2D(tilemap, flippedFragCoord / overscannedScreenDimension); // <- THE CULPRIT
     int tile = getTileFromColor(tileFromMap);
+    int breakage = getBreakageFromColor(tileFromMap);
 
 
     ivec2 tileXY = getTileXY(tile);
+    ivec2 breakageXY = getTileXY(breakage + 5);
 
 
     vec2 coordInTile = mod(pxCoord, tileSizeInPx) / tileSizeInPx; // 0..1 regardless of tile position in atlas
 
     highp vec2 singleTileSizeInUV = vec2(1) / tilesInAtlas; // constant 0.00390625
+
     highp vec2 uvCoordForTile = coordInTile * singleTileSizeInUV; // 0..0.00390625 regardless of tile position in atlas
 
     highp vec2 uvCoordOffset = tileXY * singleTileSizeInUV; // where the tile starts in the atlas, using uv coord (0..1)
+    highp vec2 uvCoordOffsetBreakage = breakageXY * singleTileSizeInUV;
 
     highp vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffset;// where we should be actually looking for in atlas, using UV coord (0..1)
+    highp vec2 finalUVCoordForBreakage = uvCoordForTile + uvCoordOffsetBreakage;
 
 
-    // TODO blend a breakage (0xrrggbb where 0xr0 -- upper 4 bits of int_red component)
+    // TODO finally "blend" a breakage (0xrrggbb where 0xr00000 -- upper 4 bits of int_red component)
 
+    mediump vec4 finalTile = texture2D(tilesAtlas, finalUVCoordForTile);
+    mediump vec4 finalBreakage = texture2D(tilesAtlas, finalUVCoordForBreakage);
 
-    // if statements considered harmful (on shader program)
-    //        --definitely not Dijkstra
-    /*if (tileXY.x == 0 && tileXY.y == 0)
-        gl_FragColor = nocolour;
-    else*/
-        gl_FragColor = colourFilter * texture2D(tilesAtlas, finalUVCoordForTile);
+    gl_FragColor = colourFilter * (mix(finalTile, finalBreakage, finalBreakage.a));
+
 }
