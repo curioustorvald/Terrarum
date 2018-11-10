@@ -216,7 +216,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     fun updateScreen(delta: Float) {
-        Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
+        //Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
 
         demoWorld.globalLight = WeatherMixer.globalLightNow
         demoWorld.updateWorldTime(delta)

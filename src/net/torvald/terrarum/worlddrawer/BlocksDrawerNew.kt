@@ -179,7 +179,14 @@ internal object BlocksDrawer {
             Block.ILLUMINATOR_TAN_OFF,
             Block.ILLUMINATOR_WHITE_OFF,
             Block.ILLUMINATOR_YELLOW,
-            Block.DAYLIGHT_CAPACITOR
+            Block.DAYLIGHT_CAPACITOR,
+
+            Block.ORE_COPPER,
+            Block.ORE_IRON,
+            Block.ORE_GOLD,
+            Block.ORE_SILVER,
+            Block.ORE_ILMENITE,
+            Block.ORE_AURICHALCUM
     )
 
     /**
@@ -216,12 +223,6 @@ internal object BlocksDrawer {
             Block.SNOW,
             Block.ICE_NATURAL,
             Block.ICE_MAGICAL,
-            Block.ORE_COPPER,
-            Block.ORE_IRON,
-            Block.ORE_GOLD,
-            Block.ORE_SILVER,
-            Block.ORE_ILMENITE,
-            Block.ORE_AURICHALCUM,
 
             Block.SANDSTONE,
             Block.SANDSTONE_BLACK,
@@ -499,20 +500,28 @@ internal object BlocksDrawer {
 
                             val thisTileY = (thisTile ?: 0) / PairedMapLayer.RANGE
 
+                            val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
+                            val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
+                            val breakingStage = (breakage / maxHealth).times(breakAnimSteps).roundInt()
+
+
 
                             // draw a tile
                             if (drawModeTilesBlendMul) {
+                                // while iterating through, only the some tiles are actually eligible to be drawn as MUL,
+                                // so obviously when we caught not eligible tile, we need to skip that by marking as Tile No. zero
+
                                 if (isBlendMul(thisTile)) {
-                                    writeToBuffer(mode, x - for_x_start, y - for_y_start, thisTileX, thisTileY)
+                                    writeToBuffer(mode, x - for_x_start, y - for_y_start, thisTileX, thisTileY, breakingStage)
                                 }
                                 else {
-                                    writeToBuffer(mode, x - for_x_start, y - for_y_start, 0, 0)
+                                    writeToBuffer(mode, x - for_x_start, y - for_y_start, 0, 0, 0)
                                 }
                             }
                             else {
                                 // do NOT add "if (!isBlendMul(thisTile))"!
                                 // or else they will not look like they should be when backed with wall
-                                writeToBuffer(mode, x - for_x_start, y - for_y_start, thisTileX, thisTileY)
+                                writeToBuffer(mode, x - for_x_start, y - for_y_start, thisTileX, thisTileY, breakingStage)
                             }
 
                             // draw a breakage
@@ -664,13 +673,17 @@ internal object BlocksDrawer {
      *
      * @return Raw colour bits in RGBA8888 format
      */
-    private fun sheetXYToTilemapColour(mode: Int, sheetX: Int, sheetY: Int): Int = when (mode) {
-        TERRAIN, WALL -> (tilesTerrain.horizontalCount * sheetY + sheetX).shl(8) or 255
-        WIRE -> (tilesWire.horizontalCount * sheetY + sheetX).shl(8) or 255
+    private fun sheetXYToTilemapColour(mode: Int, sheetX: Int, sheetY: Int, breakage: Int): Int = when (mode) {
+        // the tail ".or(255)" is there to write 1.0 to the A channel (remember, return type is RGBA)
+
+        TERRAIN, WALL ->
+                (tilesTerrain.horizontalCount * sheetY + sheetX).shl(8).or(255) or // the actual tile bits
+                breakage.and(15).shl(28) // breakage bits
+        WIRE -> (tilesWire.horizontalCount * sheetY + sheetX).shl(8).or(255)
         else -> throw IllegalArgumentException()
     }
 
-    private fun writeToBuffer(mode: Int, bufferPosX: Int, bufferPosY: Int, sheetX: Int, sheetY: Int) {
+    private fun writeToBuffer(mode: Int, bufferPosX: Int, bufferPosY: Int, sheetX: Int, sheetY: Int, breakage: Int) {
         val sourceBuffer = when(mode) {
             TERRAIN -> terrainTilesBuffer
             WALL -> wallTilesBuffer
@@ -679,7 +692,7 @@ internal object BlocksDrawer {
         }
 
 
-        sourceBuffer[bufferPosY][bufferPosX] = sheetXYToTilemapColour(mode, sheetX, sheetY)
+        sourceBuffer[bufferPosY][bufferPosX] = sheetXYToTilemapColour(mode, sheetX, sheetY, breakage)
     }
 
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4) {

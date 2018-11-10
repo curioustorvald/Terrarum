@@ -463,7 +463,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
 
-        Gdx.graphics.setTitle(getCanonicalTitle())
+        //Gdx.graphics.setTitle(getCanonicalTitle())
 
         // ASYNCHRONOUS UPDATE AND RENDER //
 
