@@ -46,24 +46,24 @@ internal object BlocksDrawer {
 
     val wallOverlayColour = Color(2f/3f, 2f/3f, 2f/3f, 1f)
 
-    val breakAnimSteps = 10
+    const val breakAnimSteps = 10
 
     val WALL = GameWorld.WALL
     val TERRAIN = GameWorld.TERRAIN
     val WIRE = GameWorld.WIRE
 
-    private val NEARBY_TILE_KEY_UP = 0
-    private val NEARBY_TILE_KEY_RIGHT = 1
-    private val NEARBY_TILE_KEY_DOWN = 2
-    private val NEARBY_TILE_KEY_LEFT = 3
+    private const val NEARBY_TILE_KEY_UP = 0
+    private const val NEARBY_TILE_KEY_RIGHT = 1
+    private const val NEARBY_TILE_KEY_DOWN = 2
+    private const val NEARBY_TILE_KEY_LEFT = 3
 
-    private val NEARBY_TILE_CODE_UP = 1
-    private val NEARBY_TILE_CODE_RIGHT = 2
-    private val NEARBY_TILE_CODE_DOWN = 4
-    private val NEARBY_TILE_CODE_LEFT = 8
+    private const val NEARBY_TILE_CODE_UP = 1
+    private const val NEARBY_TILE_CODE_RIGHT = 2
+    private const val NEARBY_TILE_CODE_DOWN = 4
+    private const val NEARBY_TILE_CODE_LEFT = 8
 
 
-    private val GZIP_READBUF_SIZE = 8192
+    private const val GZIP_READBUF_SIZE = 8192
 
 
     private lateinit var terrainTilesBuffer: Array<IntArray>

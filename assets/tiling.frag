@@ -65,32 +65,34 @@ void main() {
 
     vec2 pxCoord = flippedFragCoord.xy;
 
-    mediump vec4 tileFromMap = texture2D(tilemap, flippedFragCoord / overscannedScreenDimension); // <- THE CULPRIT
+    // TODO do I really need mediump for this thing ? (default to smapler2D is lowp)
+    vec4 tileFromMap = texture2D(tilemap, flippedFragCoord / overscannedScreenDimension); // <- THE CULPRIT
     int tile = getTileFromColor(tileFromMap);
     int breakage = getBreakageFromColor(tileFromMap);
 
 
     ivec2 tileXY = getTileXY(tile);
-    ivec2 breakageXY = getTileXY(breakage + 5);
+    ivec2 breakageXY = getTileXY(breakage + 5); // +5 is hard-coded constant that depends on the atlas
 
 
-    vec2 coordInTile = mod(pxCoord, tileSizeInPx) / tileSizeInPx; // 0..1 regardless of tile position in atlas
+    mediump vec2 coordInTile = mod(pxCoord, tileSizeInPx) / tileSizeInPx; // 0..1 regardless of tile position in atlas
 
-    highp vec2 singleTileSizeInUV = vec2(1) / tilesInAtlas; // constant 0.00390625
+    // don't really need highp here; read the GLES spec
+    mediump vec2 singleTileSizeInUV = vec2(1) / tilesInAtlas; // constant 0.00390625 for unmodified default uniforms
 
-    highp vec2 uvCoordForTile = coordInTile * singleTileSizeInUV; // 0..0.00390625 regardless of tile position in atlas
+    mediump vec2 uvCoordForTile = coordInTile * singleTileSizeInUV; // 0..0.00390625 regardless of tile position in atlas
 
-    highp vec2 uvCoordOffset = tileXY * singleTileSizeInUV; // where the tile starts in the atlas, using uv coord (0..1)
-    highp vec2 uvCoordOffsetBreakage = breakageXY * singleTileSizeInUV;
+    mediump vec2 uvCoordOffsetTile = tileXY * singleTileSizeInUV; // where the tile starts in the atlas, using uv coord (0..1)
+    mediump vec2 uvCoordOffsetBreakage = breakageXY * singleTileSizeInUV;
 
-    highp vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffset;// where we should be actually looking for in atlas, using UV coord (0..1)
-    highp vec2 finalUVCoordForBreakage = uvCoordForTile + uvCoordOffsetBreakage;
+    mediump vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffsetTile;// where we should be actually looking for in atlas, using UV coord (0..1)
+    mediump vec2 finalUVCoordForBreakage = uvCoordForTile + uvCoordOffsetBreakage;
 
 
-    // TODO finally "blend" a breakage (0xrrggbb where 0xr00000 -- upper 4 bits of int_red component)
+    // blending a breakage tex with main tex
 
-    mediump vec4 finalTile = texture2D(tilesAtlas, finalUVCoordForTile);
-    mediump vec4 finalBreakage = texture2D(tilesAtlas, finalUVCoordForBreakage);
+    vec4 finalTile = texture2D(tilesAtlas, finalUVCoordForTile);
+    vec4 finalBreakage = texture2D(tilesAtlas, finalUVCoordForBreakage);
 
     gl_FragColor = colourFilter * (mix(finalTile, finalBreakage, finalBreakage.a));
 
