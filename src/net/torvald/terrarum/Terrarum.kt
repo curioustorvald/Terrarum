@@ -237,6 +237,7 @@ object Terrarum : Screen {
     init {
         println("$NAME version ${AppLoader.getVERSION_STRING()}")
         println("Java Runtime version ${System.getProperty("java.version")}")
+        println("LibGDX version ${com.badlogic.gdx.Version.VERSION}")
 
 
         getDefaultDirectory()
