@@ -4,9 +4,10 @@
       <root url="file://$PROJECT_DIR$/lib" />
     </CLASSES>
     <JAVADOC>
-      <root url="http://slick.ninjacave.com/javadoc/" />
       <root url="file://$PROJECT_DIR$/lib/javadoc" />
       <root url="http://libgdx.badlogicgames.com/nightlies/docs/api/" />
+      <root url="https://libgdx.badlogicgames.com/ci/nightlies/docs/api/" />
+      <root url="jar://$PROJECT_DIR$/lib/javadoc/gdx-docs.zip!/" />
     </JAVADOC>
     <NATIVE>
       <root url="file://$PROJECT_DIR$/lib" />

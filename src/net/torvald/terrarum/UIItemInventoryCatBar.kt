@@ -38,7 +38,7 @@ class UIItemInventoryCatBar(
     // set up all the buttons
     init {
         // place sub UIs: Image Buttons
-        mainButtons = Array(catArrangement.size, { index ->
+        mainButtons = Array(catArrangement.size) { index ->
             val iconPosX = ((buttonGapSize / 2) + index * (catIcons.tileW + buttonGapSize)).roundInt()
             val iconPosY = 0
 
@@ -51,7 +51,7 @@ class UIItemInventoryCatBar(
                     posY = posY + iconPosY,
                     highlightable = true
             )
-        })
+        }
 
 
         // side buttons
@@ -65,7 +65,7 @@ class UIItemInventoryCatBar(
         println("[UIItemInventoryCatBar] relativeStartX: $relativeStartX")
         println("[UIItemInventoryCatBar] posX: $posX")
 
-        sideButtons = Array(iconIndex.size, { index ->
+        sideButtons = Array(iconIndex.size) { index ->
             val iconPosX = if (index < 2)
                 (relativeStartX + sideButtonsGap + (sideButtonsGap + catIcons.tileW) * index).roundInt()
             else
@@ -83,7 +83,7 @@ class UIItemInventoryCatBar(
                     activeCol = if (index == 0 || index == 3) Color(0xfff066_ff.toInt()) else Color(0xffffff7f.toInt()),
                     highlightable = (index == 0 || index == 3)
             )
-        })
+        }
     }
 
 
