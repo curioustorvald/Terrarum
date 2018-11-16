@@ -42,10 +42,14 @@ object LightmapRenderer {
             if (this.world != world) {
                 println("World change detected -- old world: ${this.world.hashCode()}, new world: ${world.hashCode()}")
 
-                for (y in 0 until LIGHTMAP_HEIGHT) {
+                /*for (y in 0 until LIGHTMAP_HEIGHT) {
                     for (x in 0 until LIGHTMAP_WIDTH) {
                         lightmap[y][x] = Color(0)
                     }
+                }*/
+
+                for (i in 0 until lightmap.size) {
+                    lightmap[i] = Color(0)
                 }
             }
         }
@@ -77,7 +81,8 @@ object LightmapRenderer {
      * Float value, 1.0 for 1023
      */
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
-    private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // TODO framebuffer?
+    //private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
+    private val lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0f,0f,0f,0f) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lanternMap = ArrayList<Lantern>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
     private val AIR = Block.AIR
@@ -126,21 +131,31 @@ object LightmapRenderer {
      * @param x world tile coord
      * @param y world tile coord
      */
+    // TODO in regard of "colour math against integers", return Int?
     private fun getLightInternal(x: Int, y: Int): Color? {
         if (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
             x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH) {
 
-            return lightmap[y - for_y_start + overscan_open][x - for_x_start + overscan_open]
+            val ypos = y - for_y_start + overscan_open
+            val xpos = x - for_x_start + overscan_open
+
+            //return lightmap[ypos][xpos]
+            return lightmap[ypos * LIGHTMAP_WIDTH + xpos]
         }
 
         return null
     }
 
+    // TODO in regard of "colour math against integers", take Int
     private fun setLight(x: Int, y: Int, colour: Color) {
         if (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
             x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH) {
 
-            lightmap[y - for_y_start + overscan_open][x - for_x_start + overscan_open] = colour
+            val ypos = y - for_y_start + overscan_open
+            val xpos = x - for_x_start + overscan_open
+
+            //lightmap[ypos][xpos] = colour
+            lightmap[ypos * LIGHTMAP_WIDTH + xpos] = colour
         }
     }
 
@@ -174,48 +189,58 @@ object LightmapRenderer {
 
         Terrarum.debugTimers["Renderer.Lanterns"] = measureNanoTime {
             buildLanternmap()
-        }
+        } // usually takes 3000 ns
 
         // O(36n) == O(n) where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with ADDITIVE blend (aka maxblend)
 
 
-        // Round 1
-        Terrarum.debugTimers["Renderer.Light1"] = measureNanoTime {
-            for (y in for_y_start - overscan_open..for_y_end) {
-                for (x in for_x_start - overscan_open..for_x_end) {
-                    setLight(x, y, calculate(x, y, 1))
+        // each usually takes 1-3 miliseconds when not threaded
+
+        if (!Terrarum.getConfigBoolean("multithread")) {
+            // Round 1
+            Terrarum.debugTimers["Renderer.Light1"] = measureNanoTime {
+                for (y in for_y_start - overscan_open..for_y_end) {
+                    for (x in for_x_start - overscan_open..for_x_end) {
+                        setLight(x, y, calculate(x, y, 1))
+                    }
+                }
+            }
+
+            // Round 2
+            Terrarum.debugTimers["Renderer.Light2"] = measureNanoTime {
+                for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_start - overscan_open..for_x_end) {
+                        setLight(x, y, calculate(x, y, 2))
+                    }
+                }
+            }
+
+            // Round 3
+            Terrarum.debugTimers["Renderer.Light3"] = measureNanoTime {
+                for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_end + overscan_open downTo for_x_start) {
+                        setLight(x, y, calculate(x, y, 3))
+                    }
+                }
+            }
+
+            // Round 4
+            Terrarum.debugTimers["Renderer.Light4"] = measureNanoTime {
+                for (y in for_y_start - overscan_open..for_y_end) {
+                    for (x in for_x_end + overscan_open downTo for_x_start) {
+                        setLight(x, y, calculate(x, y, 4))
+                    }
                 }
             }
         }
-
-        // Round 2
-        Terrarum.debugTimers["Renderer.Light2"] = measureNanoTime {
-            for (y in for_y_end + overscan_open downTo for_y_start) {
-                for (x in for_x_start - overscan_open..for_x_end) {
-                    setLight(x, y, calculate(x, y, 2))
-                }
-            }
-        }
-
-        // Round 3
-        Terrarum.debugTimers["Renderer.Light3"] = measureNanoTime {
-            for (y in for_y_end + overscan_open downTo for_y_start) {
-                for (x in for_x_end + overscan_open downTo for_x_start) {
-                    setLight(x, y, calculate(x, y, 3))
-                }
-            }
-        }
-
-        // Round 4
-        Terrarum.debugTimers["Renderer.Light4"] = measureNanoTime {
-            for (y in for_y_start - overscan_open..for_y_end) {
-                for (x in for_x_end + overscan_open downTo for_x_start) {
-                    setLight(x, y, calculate(x, y, 4))
-                }
-            }
+        else {
+            TODO()
+            //val bufferForPasses = arrayOf(lightmap.)
         }
     }
+
+
 
     private fun buildLanternmap() {
         lanternMap.clear()
@@ -306,6 +331,7 @@ object LightmapRenderer {
 
             // will "overwrite" what's there in the lightmap if it's the first pass
             if (pass > 1) {
+                // TODO colour math against integers
                 /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y - 1) ?: Color(0f, 0f, 0f, 0f), scaleSqrt2(thisTileOpacity))
                 /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y - 1) ?: Color(0f, 0f, 0f, 0f), scaleSqrt2(thisTileOpacity))
                 /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y + 1) ?: Color(0f, 0f, 0f, 0f), scaleSqrt2(thisTileOpacity))
@@ -418,6 +444,10 @@ object LightmapRenderer {
 
 
 
+
+    }
+
+    fun dispose() {
 
     }
 
@@ -712,7 +742,8 @@ object LightmapRenderer {
             for (y in overscan_open..render_height + overscan_open + 1) {
                 for (x in overscan_open..render_width + overscan_open + 1) {
                     try {
-                        val colour = lightmap[y][x]
+                        //val colour = lightmap[y][x]
+                        val colour = lightmap[y * LIGHTMAP_WIDTH + x]
                         reds[minOf(CHANNEL_MAX, colour.r.times(MUL).floorInt())] += 1
                         greens[minOf(CHANNEL_MAX, colour.g.times(MUL).floorInt())] += 1
                         blues[minOf(CHANNEL_MAX, colour.b.times(MUL).floorInt())] += 1
