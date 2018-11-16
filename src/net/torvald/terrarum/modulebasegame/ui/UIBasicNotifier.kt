@@ -31,6 +31,10 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
 
     private var font = Watch7SegSmall
 
+    private val TEMP_AMERICAN = -1
+    private val TEMP_KELVIN = 0
+    private val TEMP_CELCIUS = 1
+
     override fun updateUI(delta: Float) {
         if (ELon) {
             ELuptimer += delta
@@ -51,11 +55,11 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
             if (player != null) {
                 val playerTilePos = player.hIntTilewiseHitbox
                 val tempCelsius = -273f + ((Terrarum.ingame as? Ingame)?.world?.getTemperature(playerTilePos.centeredX.toInt(), playerTilePos.centeredY.toInt()) ?: 288f)
-                return if (Terrarum.getConfigBoolean("useamericanunit")) {
-                    tempCelsius.times(1.8f).plus(32f).roundInt()
-                }
-                else {
-                    tempCelsius.roundInt()
+
+                return when (Terrarum.getConfigInt("temperatureunit")) {
+                    TEMP_KELVIN -> tempCelsius.times(1.8f).plus(32f).roundInt()
+                    TEMP_CELCIUS -> tempCelsius.roundInt()
+                    else -> tempCelsius.plus(273.15f).roundInt()
                 }
             }
             else {
