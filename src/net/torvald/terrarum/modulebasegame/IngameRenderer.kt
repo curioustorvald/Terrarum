@@ -524,5 +524,7 @@ object IngameRenderer {
         fboA_lightMixed.dispose()
         lightmapFboA.dispose()
         lightmapFboB.dispose()
+
+        LightmapRenderer.dispose()
     }
 }

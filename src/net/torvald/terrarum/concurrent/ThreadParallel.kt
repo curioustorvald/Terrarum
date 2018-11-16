@@ -18,6 +18,16 @@ object ThreadParallel {
         pool[index] = Thread(runnable, "$prefix-$index")
     }
 
+    fun map(index: Int, runFunc: (Int) -> Unit, prefix: String) {
+        val runnable = object : Runnable {
+            override fun run() {
+                runFunc(index)
+            }
+        }
+
+        map(index, runnable, prefix)
+    }
+
     /**
      * Start all thread in the pool. If the thread in the pool is NULL, it will simply ignored.
      */
