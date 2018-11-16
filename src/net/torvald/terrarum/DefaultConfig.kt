@@ -82,7 +82,7 @@ object DefaultConfig {
 
         jsonObject.addProperty("fullframelightupdate", false)
 
-        jsonObject.addProperty("useamericanunit", false) // Metric Masterrace -- Filthy imperials.
+        jsonObject.addProperty("temperatureunit", 1) // -1: american, 0: kelvin, 1: celcius
 
 
         // "fancy" graphics settings
