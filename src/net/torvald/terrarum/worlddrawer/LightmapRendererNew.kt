@@ -356,6 +356,8 @@ object LightmapRenderer {
 
     private val colourNull = Color(0)
 
+    private var _lightBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
+
     internal fun draw(batch: SpriteBatch) {
 
         val this_x_start = for_x_start// + overscan_open
@@ -404,16 +406,16 @@ object LightmapRenderer {
 
 
         // draw to the batch
-        val lightBufferAsTex = Texture(lightBuffer)
-        lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        _lightBufferAsTex.dispose()
+        _lightBufferAsTex = Texture(lightBuffer)
+        _lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
 
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
         //      we might not need shader here...
         //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
-        batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width * DRAW_TILE_SIZE, lightBufferAsTex.height * DRAW_TILE_SIZE)
+        batch.draw(_lightBufferAsTex, 0f, 0f, _lightBufferAsTex.width * DRAW_TILE_SIZE, _lightBufferAsTex.height * DRAW_TILE_SIZE)
 
-        //lightBufferAsTex.dispose()
 
 
 
@@ -701,9 +703,9 @@ object LightmapRenderer {
 
     val histogram: Histogram
         get() {
-            var reds = IntArray(MUL) // reds[intensity] ← counts
-            var greens = IntArray(MUL) // do.
-            var blues = IntArray(MUL) // do.
+            val reds = IntArray(MUL) // reds[intensity] ← counts
+            val greens = IntArray(MUL) // do.
+            val blues = IntArray(MUL) // do.
             val render_width = for_x_end - for_x_start
             val render_height = for_y_end - for_y_start
             // excluiding overscans; only reckon echo lights
