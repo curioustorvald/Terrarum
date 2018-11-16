@@ -82,11 +82,14 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
 
         sb.append(temperature.abs())
 
-        if (Terrarum.getConfigBoolean("useamericanunit")) {
+        if (Terrarum.getConfigInt("temperatureunit") == 1) {
+            sb.append('"') // celsius superscript
+        }
+        else if (Terrarum.getConfigInt("temperatureunit") == -1) {
             sb.append('#') // fahrenheit subscript
         }
         else {
-            sb.append('"') // celsius superscript
+            sb.append(' ') // display nothing for kelvin
         }
 
         return sb.toString()
