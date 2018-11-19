@@ -745,7 +745,7 @@ internal object BlocksDrawer {
         shader.setUniformi("tilemap", 1)
         shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shader.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
-        shader.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE)
+        shader.setUniformi("cameraTranslation", WorldCamera.x % TILE_SIZE, WorldCamera.y % TILE_SIZE) // surprisingly, using 'fmod' instead of '%' doesn't work
         /*shader hard-code*/shader.setUniformi("tilesInAtlas", tileAtlas.horizontalCount, tileAtlas.verticalCount) //depends on the tile atlas
         /*shader hard-code*/shader.setUniformi("atlasTexSize", tileAtlas.texture.width, tileAtlas.texture.height) //depends on the tile atlas
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
