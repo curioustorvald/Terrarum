@@ -178,6 +178,9 @@ object LightmapRenderer {
         for_x_start = WorldCamera.x / TILE_SIZE // fix for premature lightmap rendering
         for_y_start = WorldCamera.y / TILE_SIZE // on topmost/leftmost side
 
+        if (for_x_start < 0) for_x_start -= 1 // to fix that the light shifts 1 tile to the left when WorldCamera < 0
+        //if (for_y_start < 0) for_y_start -= 1 // not needed when we only wrap at x axis
+
         for_x_end = for_x_start + WorldCamera.width / TILE_SIZE + 3
         for_y_end = for_y_start + WorldCamera.height / TILE_SIZE + 2 // same fix as above
 

@@ -1218,19 +1218,47 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         //
         // -- Signed, 2017-09-17
 
+        // DEAR PAST ME AT 2017-09-23,
+        //
+        // I'm starting to thinking that actually fixing the negative-coord-bug in collision part (you know
+        // it's caused by wrapping the values to the negative part internally, eh?) ought to be actually faster
+        // to resolve this year-old issue
+        //
+        // Or maybe just allow cameraX (left point) to be negative number and fix the renderer (in which whole
+        // tiles shifts to left)?
+        //
+        // It was interesting; 'fmod' in
+        //     shader.setUniformi("cameraTranslation", WorldCamera.x % TILE_SIZE, WorldCamera.y % TILE_SIZE) // surprisingly, using 'fmod' instead of '%' doesn't work
+        // broke it, had to use '%';
+        // Also, in the lightmap renderer, I had to add this line when updating for_x_start:
+        //     if (for_x_start < 0) for_x_start -= 1
+        // Apparently this also fixes notorious jumping issue because hitbox position is changed (wrapped to
+        // different coord?), which I'm not sure about
+        //
+        // Following issues are still remain/reintroduced:
+        //     FIXME while in this "special" zone, leftmost column tiles are duplicated (prob related to < 0 camera)
+        //     FIXME there's large grey box at block coord 0,0
+        //
+        // -- Unsigned, 2018-11-20
+
 
         // wrap around for X-axis
-        val actorMinimumX = Terrarum.HALFW // to make camera's X stay positive
-        val actorMaximumX = worldsizePxl + actorMinimumX // to make camera's X stay positive
+        //val actorMinimumX = Terrarum.HALFW // to make camera's X stay positive
+        //val actorMaximumX = worldsizePxl + actorMinimumX // to make camera's X stay positive
 
         hitbox.setPositionFromPointed(
-                //clampW(hitbox.canonicalX),
-                if (hitbox.canonicalX < actorMinimumX)
+                if (hitbox.canonicalX >= worldsizePxl) // just wrap normally and allow camera coord to be negative
+                    hitbox.canonicalX - worldsizePxl
+                else if (hitbox.canonicalX < 0)
+                    hitbox.canonicalX + worldsizePxl
+                else
+                    hitbox.canonicalX, // Fixed ROUNDWORLD impl
+                /*if (hitbox.canonicalX < actorMinimumX)
                     hitbox.canonicalX + worldsizePxl
                 else if (hitbox.canonicalX >= actorMaximumX)
                     hitbox.canonicalX - worldsizePxl
                 else
-                    hitbox.canonicalX, // ROUNDWORLD impl
+                    hitbox.canonicalX, // ROUNDWORLD impl */
                 clampH(hitbox.canonicalY)
         )
     }
