@@ -781,13 +781,12 @@ object WorldGenerator {
             // set up indices
             for (i in 0 until Terrarum.THREADS) {
                 ThreadParallel.map(
-                        i,
+                        i, "SampleJoiseMap",
                         ThreadProcessNoiseLayers(
                                 HEIGHT.toFloat().div(Terrarum.THREADS).times(i).roundInt(),
                                 HEIGHT.toFloat().div(Terrarum.THREADS).times(i.plus(1)).roundInt() - 1,
                                 noiseRecords
-                        ),
-                        "SampleJoiseMap"
+                        )
                 )
             }
 

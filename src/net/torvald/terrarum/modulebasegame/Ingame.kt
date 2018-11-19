@@ -671,12 +671,11 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             // set up indices
             for (i in 0..Terrarum.THREADS - 1) {
                 ThreadParallel.map(
-                        i,
+                        i, "ActorUpdate",
                         ThreadActorUpdate(
                                 actors.div(Terrarum.THREADS).times(i).roundInt(),
-                                actors.div(Terrarum.THREADS).times(i.plus(1)).roundInt() - 1
-                        ),
-                        "ActorUpdate"
+                                actors.div(Terrarum.THREADS).times(i + 1).roundInt() - 1
+                        )
                 )
             }
 
