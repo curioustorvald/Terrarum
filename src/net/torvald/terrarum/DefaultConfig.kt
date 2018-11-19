@@ -20,7 +20,8 @@ object DefaultConfig {
         jsonObject.addProperty("imtooyoungtodie", false) // no perma-death
         jsonObject.addProperty("language", AppLoader.getSysLang())
         jsonObject.addProperty("notificationshowuptime", 6500)
-        jsonObject.addProperty("multithread", false) // experimental!
+        jsonObject.addProperty("multithread", true) // experimental!
+        jsonObject.addProperty("multithreadedlight", false) // experimental!
 
 
 
