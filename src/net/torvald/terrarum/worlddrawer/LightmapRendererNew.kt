@@ -10,14 +10,17 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.modulebasegame.IngameRenderer
-import java.util.*
+import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
+import kotlin.collections.ArrayList
 import kotlin.system.measureNanoTime
 
 /**
@@ -148,6 +151,10 @@ object LightmapRenderer {
 
     // TODO in regard of "colour math against integers", take Int
     private fun setLight(x: Int, y: Int, colour: Color) {
+        setLightOf(lightmap, x, y, colour)
+    }
+
+    private fun setLightOf(list: Array<Color>, x: Int, y: Int, colour: Color) {
         if (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
             x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH) {
 
@@ -155,7 +162,7 @@ object LightmapRenderer {
             val xpos = x - for_x_start + overscan_open
 
             //lightmap[ypos][xpos] = colour
-            lightmap[ypos * LIGHTMAP_WIDTH + xpos] = colour
+            list[ypos * LIGHTMAP_WIDTH + xpos] = colour
         }
     }
 
@@ -195,9 +202,9 @@ object LightmapRenderer {
         // Because of inevitable overlaps on the area, it only works with ADDITIVE blend (aka maxblend)
 
 
-        // each usually takes 1-3 miliseconds when not threaded
+        // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
 
-        if (!Terrarum.getConfigBoolean("multithread")) {
+        if (!Terrarum.getConfigBoolean("multithreadedlight")) {
             // Round 1
             Terrarum.debugTimers["Renderer.Light1"] = measureNanoTime {
                 for (y in for_y_start - overscan_open..for_y_end) {
@@ -233,13 +240,103 @@ object LightmapRenderer {
                     }
                 }
             }
+
+            Terrarum.debugTimers["Renderer.LightSequential"] =
+                    Terrarum.debugTimers["Renderer.Light1"]!! +
+                    Terrarum.debugTimers["Renderer.Light2"]!! +
+                    Terrarum.debugTimers["Renderer.Light3"]!! +
+                    Terrarum.debugTimers["Renderer.Light4"]!!
         }
         else {
-            TODO()
-            //val bufferForPasses = arrayOf(lightmap.)
+            Terrarum.debugTimers["Renderer.LightPre"] = measureNanoTime {
+
+                val bufferForPasses = arrayOf(
+                        lightmap.copyOf(), lightmap.copyOf(), lightmap.copyOf(), lightmap.copyOf()
+                )
+                //val combiningBuffer = Array(lightmap.size) { Color(0) }
+
+                // this is kind of inefficient...
+                val calcTask = ArrayList<ThreadedLightmapUpdateMessage>()
+
+                // Round 1 preload
+                for (y in for_y_start - overscan_open..for_y_end) {
+                    for (x in for_x_start - overscan_open..for_x_end) {
+                        calcTask.add(ThreadedLightmapUpdateMessage(x, y, 1))
+                    }
+                }
+
+                // Round 2 preload
+                for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_start - overscan_open..for_x_end) {
+                        calcTask.add(ThreadedLightmapUpdateMessage(x, y, 2))
+                    }
+                }
+
+                // Round 3 preload
+                for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_end + overscan_open downTo for_x_start) {
+                        calcTask.add(ThreadedLightmapUpdateMessage(x, y, 3))
+                    }
+                }
+
+                // Round 4 preload
+                for (y in for_y_start - overscan_open..for_y_end) {
+                    for (x in for_x_end + overscan_open downTo for_x_start) {
+                        calcTask.add(ThreadedLightmapUpdateMessage(x, y, 4))
+                    }
+                }
+
+                val calcTasks = calcTask.sliceEvenly(Terrarum.THREADS)
+                val combineTasks = (0 until lightmap.size).sliceEvenly(Terrarum.THREADS)
+
+
+                // couldn't help but do this nested timer
+
+                Terrarum.debugTimers["Renderer.LightParallel${Terrarum.THREADS}x"] = measureNanoTime {
+                    calcTasks.forEachIndexed { index, list ->
+                        ThreadParallel.map(index, "LightCalculate") { index -> // this index is that index
+                            list.forEach {
+                                val msg = it as ThreadedLightmapUpdateMessage
+
+                                setLightOf(bufferForPasses[it.pass - 1], it.x, it.y, calculate(it.x, it.y, it.pass))
+                                //setLightOf(bufferForPasses[it.pass - 1], it.x, it.y, calculate(it.x, it.y, 1))
+                            }
+                        }
+                    }
+
+                    ThreadParallel.startAllWaitForDie()
+                }
+
+                Terrarum.debugTimers["Runderer.LightPost"] = measureNanoTime {
+                    combineTasks.forEachIndexed { index, intRange ->
+                        ThreadParallel.map(index, "LightCombine") { index -> // this index is that index
+                            for (i in intRange) {
+                                val max1 = bufferForPasses[0][i] maxBlend bufferForPasses[1][i]
+                                val max2 = bufferForPasses[2][i] maxBlend bufferForPasses[3][i]
+                                val max = max1 maxBlend max2
+
+                                lightmap[i] = max
+                            }
+                        }
+                    }
+
+                    ThreadParallel.startAllWaitForDie()
+                }
+            }
+
+
+            // get correct Renderer.LightPre by subtracting some shits
+            Terrarum.debugTimers["Renderer.LightParaTotal"] = Terrarum.debugTimers["Renderer.LightPre"]!!
+            Terrarum.debugTimers["Renderer.LightPre"] =
+                    Terrarum.debugTimers["Renderer.LightPre"]!! -
+                    Terrarum.debugTimers["Renderer.LightParallel${Terrarum.THREADS}x"]!! -
+                    Terrarum.debugTimers["Runderer.LightPost"]!!
+
+            // accuracy may suffer (overheads maybe?) but it doesn't matter (i think...)
         }
     }
 
+    internal data class ThreadedLightmapUpdateMessage(val x: Int, val y: Int, val pass: Int)
 
 
     private fun buildLanternmap() {
@@ -282,9 +379,14 @@ object LightmapRenderer {
     private var thisTileOpacity = Color(0f,0f,0f,0f)
     private var sunLight = Color(0f,0f,0f,0f)
 
-
+    /**
+     * @param pass one-based
+     */
     private fun calculate(x: Int, y: Int, pass: Int): Color = calculate(x, y, pass, false)
 
+    /**
+     * @param pass one-based
+     */
     private fun calculate(x: Int, y: Int, pass: Int, doNotCalculateAmbient: Boolean): Color {
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
@@ -392,9 +494,9 @@ object LightmapRenderer {
         val this_y_end = for_y_end// + overscan_open
 
         // wipe out beforehand. You DO need this
-        lightBuffer.blending = Pixmap.Blending.None // gonna overwrite
+        lightBuffer.blending = Pixmap.Blending.None // gonna overwrite (remove this line causes the world to go bit darker)
         lightBuffer.setColor(colourNull)
-        lightBuffer.fillRectangle(0, 0, lightBuffer.width, lightBuffer.height)
+        lightBuffer.fill()
 
 
         // write to colour buffer
@@ -441,8 +543,6 @@ object LightmapRenderer {
         //      we might not need shader here...
         //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
         batch.draw(_lightBufferAsTex, 0f, 0f, _lightBufferAsTex.width * DRAW_TILE_SIZE, _lightBufferAsTex.height * DRAW_TILE_SIZE)
-
-
 
 
     }
