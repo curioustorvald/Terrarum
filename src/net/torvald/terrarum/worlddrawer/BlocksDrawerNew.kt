@@ -440,11 +440,16 @@ internal object BlocksDrawer {
      * Writes to buffer. Actual draw code must be called after this operation.
      */
     private fun drawTiles(mode: Int, drawModeTilesBlendMul: Boolean) {
-        val for_y_start = WorldCamera.y / TILE_SIZE
-        val for_y_end = for_y_start + tilesBuffer.height - 1//clampHTile(for_y_start + (WorldCamera.height / TILE_SIZE) + 2)
+        // can't be "WorldCamera.y / TILE_SIZE":
+        //      ( 3 / 16) == 0
+        //      (-3 / 16) == -1  <-- We want it to be '-1', not zero
+        // using cast and floor instead of IF on ints: the other way causes jitter artefact, which I don't fucking know why
 
-        val for_x_start = WorldCamera.x / TILE_SIZE
-        val for_x_end = for_x_start + tilesBuffer.width - 1//for_x_start + (WorldCamera.width / TILE_SIZE) + 3
+        val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
+        val for_y_end = for_y_start + tilesBuffer.height - 1
+
+        val for_x_start = (WorldCamera.x.toFloat() / TILE_SIZE).floorInt()
+        val for_x_end = for_x_start + tilesBuffer.width - 1
 
         // loop
         for (y in for_y_start..for_y_end) {
@@ -745,7 +750,7 @@ internal object BlocksDrawer {
         shader.setUniformi("tilemap", 1)
         shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shader.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
-        shader.setUniformi("cameraTranslation", WorldCamera.x % TILE_SIZE, WorldCamera.y % TILE_SIZE) // surprisingly, using 'fmod' instead of '%' doesn't work
+        shader.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div
         /*shader hard-code*/shader.setUniformi("tilesInAtlas", tileAtlas.horizontalCount, tileAtlas.verticalCount) //depends on the tile atlas
         /*shader hard-code*/shader.setUniformi("atlasTexSize", tileAtlas.texture.width, tileAtlas.texture.height) //depends on the tile atlas
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
