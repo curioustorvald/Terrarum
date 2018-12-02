@@ -1,6 +1,7 @@
 package net.torvald.terrarum.tests
 
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
+//import org.junit.Test
 
 /**
  * Created by minjaesong on 2018-12-02.
@@ -11,10 +12,26 @@ class TestWorldTime {
 
     //@Test
     fun testEndOfYear() {
-        repeat(3) {
-            println(time.getShortTime())
+        repeat(5) {
+            println(time.getFormattedTime())
+            time.addTime(1)
+        }
+
+        println()
+        time.addTime(86400 - 5)
+
+        repeat(5) {
+            println(time.getFormattedTime())
             time.addTime(1)
         }
     }
 
+
+
+
+}
+
+
+fun main(args: Array<String>) {
+    TestWorldTime().testEndOfYear()
 }
