@@ -93,7 +93,8 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
         selectedItem?.let {
             // selection change
             if (it.labelText == "MENU_LABEL_QUIT") {
-                System.exit(0)
+                //System.exit(0)
+                Gdx.app.exit()
             }
             else if (it.labelText == "MENU_LABEL_RETURN") {
                 if (currentRemoConContents.parent != null) {
