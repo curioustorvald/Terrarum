@@ -4,48 +4,48 @@ package net.torvald.terrarum.modulebasegame.gameworld
 typealias time_t = Long
 
 /**
- * The World Calendar implementation of Dwarven Calendar, except:
- *      - the year begins with Mondag instead of Sundag (which is ISO standard)
- *      - the first month is Opal instead of Granite    (to reduce confusion)
- *
- *
  * Please also see:
  *      https://en.wikipedia.org/wiki/World_Calendar
- *      http://dwarffortresswiki.org/index.php/DF2014:Calendar
  *
- * And there is no AM/PM concept, 24-hour clock is forced; no leap years.
+ * There is no AM/PM concept, 24-hour clock is forced; no leap years.
  * An ingame day should last 22 real-life minutes.
  *
- * // TODO 4-month year? like Stardew Valley
+ * ## The Yearly Calendar
  *
- *  The Yearly Calendar
+ * A calendar tailored to this very game. A year is consisted of 4 seasons (month),
+ * and each season last fixed length of 30 days, leap years does not occur.
  *
- *  A calendar tailored to this very game. A year is consisted of 4 seasons (month),
- *  and each season last fixed length of 30 days, leap years does not occur.
+ *     =========================
+ *     |Mo|Ty|Mi|To|Fr|La|Su|Ve|
+ *     |--|--|--|--|--|--|--|--|
+ *     | 1| 2| 3| 4| 5| 6| 7|  | <- Spring
+ *     | 8| 9|10|11|12|13|14|  |
+ *     |15|16|17|18|19|20|21|  |
+ *     |22|23|24|25|26|27|28|  |
+ *     |29|30| 1| 2| 3| 4| 5|  | <- Summer
+ *     | 6| 7| 8| 9|10|11|12|  |
+ *     |13|14|15|16|17|18|19|  |
+ *     |20|21|22|23|24|25|26|  |
+ *     |27|28|29|30| 1| 2| 3|  | <- Autumn
+ *     | 4| 5| 6| 7| 8| 9|10|  |
+ *     |11|12|13|14|15|16|17|  |
+ *     |18|19|20|21|22|23|24|  |
+ *     |25|26|27|28|29|30| 1|  | <- Winter
+ *     | 2| 3| 4| 5| 6| 7| 8|  |
+ *     | 9|10|11|12|13|14|15|  |
+ *     |16|17|18|19|20|21|22|  |
+ *     |23|24|25|26|27|28|29|30|
+ *     =========================
  *
- * =========================
- * |Mo|Ty|Mi|To|Fr|La|Su|Ve|
- * |--|--|--|--|--|--|--|--|
- * | 1| 2| 3| 4| 5| 6| 7|  |
- * | 8| 9|10|11|12|13|14|  |
- * |15|16|17|18|19|20|21|  |
- * |22|23|24|25|26|27|28|  |
- * |29|30| 1| 2| 3| 4| 5|  |
- * | 6| 7| 8| 9|10|11|12|  |
- * |13|14|15|16|17|18|19|  |
- * |20|21|22|23|24|25|26|  |
- * |27|28|29|30| 1| 2| 3|  |
- * | 4| 5| 6| 7| 8| 9|10|  |
- * |11|12|13|14|15|16|17|  |
- * |18|19|20|21|22|23|24|  |
- * |25|26|27|28|29|30| 1|  |
- * | 2| 3| 4| 5| 6| 7| 8|  |
- * | 9|10|11|12|13|14|15|  |
- * |16|17|18|19|20|21|22|  |
- * |23|24|25|26|27|28|29|30|
- * =========================
- *
- * Verddag only appears on the last day of the year (30th winter)
+ * - A year is 120 days, 8th day of the week (Verddag, Winter 30th) does occur as in The World calendar.
+ * - Starting day of the week is monday (Mondag).
+ * - Spring 1st is the New Year holiday, Winter 30th is the New Year's Eve holiday.
+ * - Human-readable date format is always Year-MonthName-Date, no matter where you (the real-life you) come from.
+ * For number-only format, months are enumerated from 1.
+ * (Spring-1, Summer-2, Autumn-3, Winter-4) E.g. 0125-Wint-07, or 0125-04-07. For more details, please refer to the
+ * internal functions `getFormattedTime()`, `getShortTime()`, and `getFilenameTime()`
+ * - Preferred computerised date format is YearMonthDate. E.g. 01250407
+ * - Rest of the format (e.g. time intervals) follows ISO 8601 standard.
  *
  * (Check please:)
  * - Equinox/Solstice always occur on 21st day of the month
@@ -201,11 +201,13 @@ class WorldTime(initTime: Long = 0L) {
     /** Format: "%A, %Y %B %d %X" */
     fun getFormattedTime() = "${getDayNameShort()}, " +
                              "$years " +
-                             "${getMonthNameShort()} " +
+                             "${getMonthNameFull()} " +
                              "$days " +
                              "${String.format("%02d", hours)}:" +
                              "${String.format("%02d", minutes)}:" +
                              "${String.format("%02d", seconds)}"
+    fun getShortTime() = "${years.toString().padStart(4, '0')}-${getMonthNameShort()}-${days.toString().padStart(2, '0')}"
+    fun getFilenameTime() = "${years.toString().padStart(4, '0')}${months.toString().padStart(2, '0')}${days.toString().padStart(2, '0')}"
 
     fun getDayNameFull() = DAY_NAMES[dayOfWeek]
     fun getDayNameShort() = DAY_NAMES_SHORT[dayOfWeek]
