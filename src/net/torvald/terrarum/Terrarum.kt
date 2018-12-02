@@ -31,6 +31,7 @@ import org.lwjgl.BufferUtils
 import org.lwjgl.input.Controllers
 import java.io.File
 import java.io.IOException
+import net.torvald.getcpuname.GetCpuName
 
 
 
@@ -206,6 +207,8 @@ object Terrarum : Screen {
 
 
     val systemArch = System.getProperty("os.arch")
+    val processor = GetCpuName.getModelName()
+    val processorVendor = GetCpuName.getCPUID()
 
     val is32BitJVM = !System.getProperty("sun.arch.data.model").contains("64")
 
@@ -250,11 +253,16 @@ object Terrarum : Screen {
 
 
 
-        printdbg(this, "os.arch = $systemArch") // debug info
+        println("os.arch = $systemArch") // debug info
 
         if (is32BitJVM) {
             printdbgerr(this, "32 Bit JVM detected")
         }
+
+
+        println("processor = $processor")
+        println("vendor = $processorVendor")
+
 
         joypadLabelStart = when (getConfigString("joypadlabelstyle")) {
             "nwii"     -> 0xE04B.toChar() // + mark
@@ -317,9 +325,9 @@ object Terrarum : Screen {
         testTexture = Texture(Gdx.files.internal("./assets/test_texture.tga"))
 
 
-        printdbg(this, "GL_VERSION = $GL_VERSION")
-        printdbg(this, "GL_MAX_TEXTURE_SIZE = $GL_MAX_TEXTURE_SIZE")
-        printdbg(this, "GL info:\n${Gdx.graphics.glVersion.debugVersionString}") // debug info
+        println("GL_VERSION = $GL_VERSION")
+        println("GL_MAX_TEXTURE_SIZE = $GL_MAX_TEXTURE_SIZE")
+        println("GL info:\n${Gdx.graphics.glVersion.debugVersionString}") // debug info
 
 
         if (GL_VERSION < MINIMAL_GL_VERSION || GL_MAX_TEXTURE_SIZE < MINIMAL_GL_MAX_TEXTURE_SIZE) {
@@ -530,9 +538,9 @@ object Terrarum : Screen {
         defaultSaveDir = defaultDir + "/Saves"
         configDir = defaultDir + "/config.json"
 
-        printdbg(this, "os.name = $OSName (with identifier $OperationSystem)")
-        printdbg(this, "os.version = $OSVersion")
-        printdbg(this, "default directory: $defaultDir")
+        println("os.name = $OSName (with identifier $OperationSystem)")
+        println("os.version = $OSVersion")
+        println("default directory: $defaultDir")
     }
 
     private fun createDirs() {
