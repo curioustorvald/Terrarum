@@ -1,5 +1,7 @@
 out/*
 bin/*
+build/*
+.gradle/*
 hs_err_pid*
 Thumbs.db
 *.jar
