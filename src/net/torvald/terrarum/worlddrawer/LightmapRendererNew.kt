@@ -37,6 +37,9 @@ import kotlin.system.measureNanoTime
  * own ingame renderer
  */
 object LightmapRenderer {
+
+    // FIXME lightmap shifts to left, ONLY AT x=33.5-34.5
+
     private lateinit var world: GameWorld
 
     /** do not call this yourself! Let your game renderer handle this! */

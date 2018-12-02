@@ -1,5 +1,7 @@
 out/*
 bin/*
+build/*
+.gradle/*
 hs_err_pid*
 Thumbs.db
 *.jar
@@ -11,5 +13,3 @@ external_resource_packs.zip
 workspace.xml
 .tmp*
 tmp_*
-.gradle/*
-build/*
