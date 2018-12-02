@@ -60,7 +60,7 @@ class WorldInformationProvider(globals: Globals) {
                 "%x" -> "${String.format("%02d", time.years)}-${String.format("%02d", time.months)}-${String.format("%02d", time.days)}"
                 "%X" -> "${String.format("%02d", time.hours)}:${String.format("%02d", time.minutes)}:${String.format("%02d", time.seconds)}"
                 "%Y" -> time.years.toString()
-                "%y" -> time.years.mod(100).toString()
+                "%y" -> time.years.rem(100).toString()
                 "%%" -> "%"
                 else -> throw IllegalArgumentException("Unknown format string: $this")
             }
