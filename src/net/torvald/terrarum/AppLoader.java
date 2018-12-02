@@ -108,6 +108,7 @@ public class AppLoader implements ApplicationListener {
         appConfig.backgroundFPS = 9999;
         appConfig.foregroundFPS = 9999;
         appConfig.title = GAME_NAME;
+        appConfig.forceExit = false;
 
         new LwjglApplication(new AppLoader(), appConfig);
     }
