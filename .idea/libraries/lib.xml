@@ -19,7 +19,6 @@
       <root url="jar://$PROJECT_DIR$/lib/Terrarum_Joise.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/source/gdx-backend-lwjgl-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/TerrarumSansBitmap.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/kotlin-stdlib-sources.jar!/" />
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/lib/source" recursive="false" type="SOURCES" />

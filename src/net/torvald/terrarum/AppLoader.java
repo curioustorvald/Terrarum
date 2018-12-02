@@ -234,7 +234,7 @@ public class AppLoader implements ApplicationListener {
         }
 
         // nested FBOs are just not a thing in GL!
-        FrameBufferManager.end();
+        net.torvald.terrarum.FrameBufferManager.end();
 
         PostProcessor.INSTANCE.draw(camera.combined, renderFBO);
 
