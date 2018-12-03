@@ -1,15 +1,33 @@
+# Build-related
 out/*
 bin/*
 build/*
 .gradle/*
+
+# Java native errors
 hs_err_pid*
+
+# OS files
 Thumbs.db
-*.jar
 .DS_Store
-~$*
+
+# Resources that should not be tracked
+*.jar
 assets/mods/basegame/demoworld
 assets/mods/basegame/demoworld.gz
 external_resource_packs.zip
+
+# IntelliJ
 workspace.xml
+
+# Temporary files
 .tmp*
 tmp_*
+~$*
+
+# Eclipse MAT heap files
+*.hprof
+*.bin
+*.index
+*.threads
+*_Leak_Suspects.zip
