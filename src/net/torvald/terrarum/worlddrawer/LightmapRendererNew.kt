@@ -377,13 +377,13 @@ object LightmapRenderer {
 
 
 
-    private var ambientAccumulator = Color(0f,0f,0f,0f)
-    private var lightLevelThis = Color(0f,0f,0f,0f)
+    private val ambientAccumulator = Color(0f,0f,0f,0f)
+    private val lightLevelThis = Color(0f,0f,0f,0f)
     private var thisTerrain = 0
     private var thisWall = 0
-    private var thisTileLuminosity = Color(0f,0f,0f,0f)
-    private var thisTileOpacity = Color(0f,0f,0f,0f)
-    private var sunLight = Color(0f,0f,0f,0f)
+    private val thisTileLuminosity = Color(0f,0f,0f,0f)
+    private val thisTileOpacity = Color(0f,0f,0f,0f)
+    private val sunLight = Color(0f,0f,0f,0f)
 
     /**
      * @param pass one-based
@@ -397,35 +397,35 @@ object LightmapRenderer {
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
 
-        ambientAccumulator = Color(0f,0f,0f,0f)
+        ambientAccumulator.set(0f,0f,0f,0f)
 
-        lightLevelThis = Color(0f,0f,0f,0f)
+        lightLevelThis.set(0f,0f,0f,0f)
         thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
         thisWall = world.getTileFromWall(x, y) ?: Block.STONE
-        thisTileLuminosity = BlockCodex[thisTerrain].luminosity // already been div by four
-        thisTileOpacity = BlockCodex[thisTerrain].opacity // already been div by four
-        sunLight = world.globalLight.cpy().mul(DIV_FLOAT)
+        thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity) // already been div by four
+        thisTileOpacity.set(BlockCodex[thisTerrain].opacity) // already been div by four
+        sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
 
 
         // MIX TILE
         // open air
         if (thisTerrain == AIR && thisWall == AIR) {
-            lightLevelThis = sunLight
+            lightLevelThis.set(sunLight)
         }
         // luminous tile on top of air
         else if (thisWall == AIR && thisTileLuminosity.nonZero()) {
-            lightLevelThis = sunLight maxBlend thisTileLuminosity // maximise to not exceed 1.0 with normal (<= 1.0) light
+            lightLevelThis.set(sunLight maxBlend thisTileLuminosity) // maximise to not exceed 1.0 with normal (<= 1.0) light
         }
         // opaque wall and luminous tile
         else if (thisWall != AIR && thisTileLuminosity.nonZero()) {
-            lightLevelThis = thisTileLuminosity
+            lightLevelThis.set(thisTileLuminosity)
         }
         // END MIX TILE
 
         for (i in 0 until lanternMap.size) {
             val lmap = lanternMap[i]
             if (lmap.posX == x && lmap.posY == y)
-                lightLevelThis = lightLevelThis maxBlend lmap.color // maximise to not exceed 1.0 with normal (<= 1.0) light
+                lightLevelThis.set(lightLevelThis maxBlend lmap.color) // maximise to not exceed 1.0 with normal (<= 1.0) light
         }
 
         if (!doNotCalculateAmbient) {
@@ -440,15 +440,15 @@ object LightmapRenderer {
             // will "overwrite" what's there in the lightmap if it's the first pass
             if (pass > 1) {
                 // TODO colour math against integers
-                /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y - 1) ?: Color(0f, 0f, 0f, 0f), scaleSqrt2(thisTileOpacity))
-                /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y - 1) ?: Color(0f, 0f, 0f, 0f), scaleSqrt2(thisTileOpacity))
-                /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y + 1) ?: Color(0f, 0f, 0f, 0f), scaleSqrt2(thisTileOpacity))
-                /* + */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y + 1) ?: Color(0f, 0f, 0f, 0f), scaleSqrt2(thisTileOpacity))
+                /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y - 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
+                /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y - 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
+                /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y + 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
+                /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y + 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
 
-                /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y - 1) ?: Color(0f, 0f, 0f, 0f), thisTileOpacity)
-                /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y + 1) ?: Color(0f, 0f, 0f, 0f), thisTileOpacity)
-                /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y) ?: Color(0f, 0f, 0f, 0f), thisTileOpacity)
-                /* * */ambientAccumulator = ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y) ?: Color(0f, 0f, 0f, 0f), thisTileOpacity)
+                /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y - 1) ?: Color.CLEAR, thisTileOpacity))
+                /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y + 1) ?: Color.CLEAR, thisTileOpacity))
+                /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y) ?: Color.CLEAR, thisTileOpacity))
+                /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y) ?: Color.CLEAR, thisTileOpacity))
             }
 
             val ret = lightLevelThis maxBlend ambientAccumulator
