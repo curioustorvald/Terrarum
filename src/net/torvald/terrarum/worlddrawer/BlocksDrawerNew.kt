@@ -69,7 +69,7 @@ internal object BlocksDrawer {
     private lateinit var terrainTilesBuffer: Array<IntArray>
     private lateinit var wallTilesBuffer: Array<IntArray>
     private lateinit var wireTilesBuffer: Array<IntArray>
-    private lateinit var tilesBuffer: Pixmap
+    private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGB888)
 
 
     private lateinit var tilesQuad: Mesh
@@ -91,28 +91,28 @@ internal object BlocksDrawer {
             fos.close()
         }
 
-        val terrainPixMap = Pixmap(Gdx.files.internal(gzTmpFName[0]))
-        val wirePixMap = Pixmap(Gdx.files.internal(gzTmpFName[1]))
+        val _terrainPixMap = Pixmap(Gdx.files.internal(gzTmpFName[0]))
+        val _wirePixMap = Pixmap(Gdx.files.internal(gzTmpFName[1]))
 
         // delete temp files
         gzTmpFName.forEach { File(it).delete() }
 
-        tilesTerrain = TextureRegionPack(Texture(terrainPixMap), TILE_SIZE, TILE_SIZE)
+        tilesTerrain = TextureRegionPack(Texture(_terrainPixMap), TILE_SIZE, TILE_SIZE)
         tilesTerrain.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-        tilesWire = TextureRegionPack(Texture(wirePixMap), TILE_SIZE, TILE_SIZE)
+        tilesWire = TextureRegionPack(Texture(_wirePixMap), TILE_SIZE, TILE_SIZE)
         tilesWire.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         // also dispose unused temp files
         //terrainPixMap.dispose() // commented: tileItemWall needs it
-        wirePixMap.dispose()
+        _wirePixMap.dispose()
 
 
 
 
         // create item_wall images
         // --> make pixmap
-        val tileItemImgPixMap = Pixmap(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16, Pixmap.Format.RGBA8888)
-        tileItemImgPixMap.pixels.rewind()
+        val _tileItemImgPixMap = Pixmap(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16, Pixmap.Format.RGBA8888)
+        _tileItemImgPixMap.pixels.rewind()
 
         for (tileID in ITEM_TILES) {
 
@@ -122,21 +122,21 @@ internal object BlocksDrawer {
 
 
             // slow memory copy :\  I'm afraid I can't random-access bytebuffer...
-            for (scanline in 0 until tileItemImgPixMap.height) {
+            for (scanline in 0 until _tileItemImgPixMap.height) {
                 for (x in 0 until TILE_SIZE) {
-                    val pixel = terrainPixMap.getPixel(tileX + x, scanline)
-                    tileItemImgPixMap.drawPixel(x + TILE_SIZE * (tileID % 16), scanline, pixel)
+                    val pixel = _terrainPixMap.getPixel(tileX + x, scanline)
+                    _tileItemImgPixMap.drawPixel(x + TILE_SIZE * (tileID % 16), scanline, pixel)
                 }
             }
         }
-        tileItemImgPixMap.pixels.rewind()
+        _tileItemImgPixMap.pixels.rewind()
         // turn pixmap into texture
-        tileItemWall = TextureRegionPack(Texture(tileItemImgPixMap), TILE_SIZE, TILE_SIZE)
+        tileItemWall = TextureRegionPack(Texture(_tileItemImgPixMap), TILE_SIZE, TILE_SIZE)
 
 
 
-        tileItemImgPixMap.dispose()
-        terrainPixMap.dispose() // finally
+        _tileItemImgPixMap.dispose()
+        _terrainPixMap.dispose() // finally
     }
 
     /**
@@ -700,6 +700,8 @@ internal object BlocksDrawer {
         sourceBuffer[bufferPosY][bufferPosX] = sheetXYToTilemapColour(mode, sheetX, sheetY, breakage)
     }
 
+    private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
+
     private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -737,9 +739,10 @@ internal object BlocksDrawer {
         }
 
 
-        val tilesBufferAsTex = Texture(tilesBuffer)
-        tilesBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-        tilesBufferAsTex.bind(1) // trying 1 and 0...
+        _tilesBufferAsTex.dispose()
+        _tilesBufferAsTex = Texture(tilesBuffer)
+        _tilesBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        _tilesBufferAsTex.bind(1) // trying 1 and 0...
         tileAtlas.texture.bind(0) // for some fuck reason, it must be bound as last
 
         shader.begin()
@@ -778,6 +781,7 @@ internal object BlocksDrawer {
             wallTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
             wireTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
 
+            tilesBuffer.dispose()
             tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGB888)
         }
 
