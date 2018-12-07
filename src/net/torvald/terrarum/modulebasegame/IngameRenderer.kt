@@ -490,7 +490,21 @@ object IngameRenderer {
         blendNormal(batch)
     }
 
+    private var init = false
+
     fun resize(width: Int, height: Int) {
+        if (!init) {
+            init = true
+        }
+        else {
+            fboRGB.dispose()
+            fboRGB_lightMixed.dispose()
+            fboA.dispose()
+            fboA_lightMixed.dispose()
+            lightmapFboA.dispose()
+            lightmapFboB.dispose()
+        }
+
         fboRGB = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
         fboRGB_lightMixed = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
         fboA = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
