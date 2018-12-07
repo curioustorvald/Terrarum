@@ -216,8 +216,6 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     fun updateScreen(delta: Float) {
-        //Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
-
         demoWorld.globalLight = WeatherMixer.globalLightNow
         demoWorld.updateWorldTime(delta)
         WeatherMixer.update(delta, cameraPlayer, demoWorld)
@@ -236,6 +234,8 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     fun renderScreen() {
+        Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
+
 
         //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 

@@ -209,6 +209,8 @@ object Terrarum : Screen {
     val systemArch = System.getProperty("os.arch")
     val processor = GetCpuName.getModelName()
     val processorVendor = GetCpuName.getCPUID()
+    lateinit var renderer: String
+    lateinit var rendererVendor: String
 
     val is32BitJVM = !System.getProperty("sun.arch.data.model").contains("64")
 
@@ -325,9 +327,15 @@ object Terrarum : Screen {
         testTexture = Texture(Gdx.files.internal("./assets/test_texture.tga"))
 
 
+        val glInfo = Gdx.graphics.glVersion.debugVersionString
+
         println("GL_VERSION = $GL_VERSION")
         println("GL_MAX_TEXTURE_SIZE = $GL_MAX_TEXTURE_SIZE")
-        println("GL info:\n${Gdx.graphics.glVersion.debugVersionString}") // debug info
+        println("GL info:\n$glInfo") // debug info
+
+        // set up renderer info variables
+        renderer = Gdx.graphics.glVersion.rendererString
+        rendererVendor = Gdx.graphics.glVersion.vendorString
 
 
         if (GL_VERSION < MINIMAL_GL_VERSION || GL_MAX_TEXTURE_SIZE < MINIMAL_GL_MAX_TEXTURE_SIZE) {

@@ -460,11 +460,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
 
-
-
-
-        //Gdx.graphics.setTitle(getCanonicalTitle())
-
         // ASYNCHRONOUS UPDATE AND RENDER //
 
 
@@ -568,6 +563,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
     private fun renderGame() {
+        Gdx.graphics.setTitle(getCanonicalTitle())
+
         IngameRenderer.invoke(
                 world as GameWorldExtension,
                 actorsRenderBehind,
