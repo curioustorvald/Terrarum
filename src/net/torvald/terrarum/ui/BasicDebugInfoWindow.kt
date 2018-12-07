@@ -1,5 +1,6 @@
 package net.torvald.terrarum.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -174,20 +175,22 @@ class BasicDebugInfoWindow : UICanvas() {
          * Top right
          */
 
-        //g.color = GameFontBase.codeToCol["y"]
+        // memory pressure
         Terrarum.fontSmallNumbers.draw(batch, "${ccY}MEM ", (Terrarum.WIDTH - 21 * 8 - 2).toFloat(), 2f)
-        //g.draw(batch, "${ccY}FPS $ccG${Terrarum.appgc.fps}", (Terrarum.WIDTH - 6 * 8 - 2).toFloat(), 10f)
-        Terrarum.fontSmallNumbers.draw(batch, "${ccY}CPUs ${if (Terrarum.MULTITHREAD) ccG else ccR}${Terrarum.THREADS}",
+        // thread count
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}CPUs${if (Terrarum.MULTITHREAD) ccG else ccR}${Terrarum.THREADS.toString().padStart(2, ' ')}",
                 (Terrarum.WIDTH - 2 - 6 * 8).toFloat(), 10f)
 
-        //g.color = GameFontBase.codeToCol["g"]
+        // memory texts
         Terrarum.fontSmallNumbers.draw(batch, "${Terrarum.memJavaHeap}M",
                 (Terrarum.WIDTH - 17 * 8 - 2).toFloat(), 2f)
         Terrarum.fontSmallNumbers.draw(batch, "/${Terrarum.memNativeHeap}M/",
                 (Terrarum.WIDTH - 12 * 8 - 2).toFloat(), 2f)
-        //Terrarum.fontSmallNumbers.color = GameFontBase.codeToCol["m"]
         Terrarum.fontSmallNumbers.draw(batch, "${Terrarum.memXmx}M",
                 (Terrarum.WIDTH - 5 * 8 - 2).toFloat(), 2f)
+        // FPS count
+        Terrarum.fontSmallNumbers.draw(batch, "${ccY}FPS${ccG}${Gdx.graphics.framesPerSecond.toString().padStart(3, ' ')}",
+                (Terrarum.WIDTH - 2 - 13 * 8).toFloat(), 10F)
 
         /**
          * Bottom left
@@ -201,7 +204,20 @@ class BasicDebugInfoWindow : UICanvas() {
                 (2 + 28*8).toFloat(), Terrarum.HEIGHT - 10f)
         Terrarum.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${ingame.particlesActive}",
                 (2 + 41*8).toFloat(), Terrarum.HEIGHT - 10f)
+
+
+        /**
+         * Bottom right
+         */
+
+        // processor and renderer
+        Terrarum.fontSmallNumbers.draw(batch, "$ccY$totalHardwareName",
+                (Terrarum.WIDTH - 2 - totalHardwareName.length * 8).toFloat(), Terrarum.HEIGHT - 10f)
     }
+
+    private val processorName = Terrarum.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "")
+    private val rendererName = Terrarum.renderer
+    private val totalHardwareName = "$processorName  $rendererName"
 
     private fun printLine(batch: SpriteBatch, l: Int, s: String) {
         Terrarum.fontSmallNumbers.draw(batch,
