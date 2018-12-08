@@ -5,18 +5,13 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.random.HQRNG
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.AppLoader.printdbgerr
-import net.torvald.terrarum.LoadScreen
-import net.torvald.terrarum.Second
+import net.torvald.terrarum.QNDTreeNode
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilderSigrid
+import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.ui.UIItemTextButtonList
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -39,7 +34,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     private val screens = ArrayList<Pair<String, UICanvas>>()
 
-    private val yamlSep = Regex(" : ")
+    private val yamlSep = Yaml.SEPARATOR
 
     init {
         remoConTray = generateNewRemoCon(currentRemoConContents)

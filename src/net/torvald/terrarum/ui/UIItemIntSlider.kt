@@ -1,8 +1,10 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.BlendMode
+import net.torvald.terrarum.GdxColorMap
 import java.awt.Color
 
 /**
@@ -16,6 +18,9 @@ class UIItemIntSlider(
         val minValue: Int,
         val maxValue: Int,
         val step: Int,
+
+        // BASIC OPTIONS //
+
         /** Show prev- and next values (if any) */
         var showNotches: Boolean,
         var showMinMaxValues: Boolean,
@@ -27,8 +32,12 @@ class UIItemIntSlider(
 
         val notchCol: Color,
         val barCol: Color,
-        val barAndNotchBlend: BlendMode
+        val barAndNotchBlend: BlendMode,
 
+        // EXTENDED OPTIONS //
+
+        val sliderUseColourMap: GdxColorMap? = null,
+        val sliderUseTexture: Texture? = null
 ) : UIItem(parent) {
 
     constructor(
@@ -61,6 +70,11 @@ class UIItemIntSlider(
     var value = initValue
 
 
+    init {
+        if (sliderUseColourMap != null && sliderUseTexture != null) {
+            throw IllegalArgumentException("Can't use colour map and texture at the same time -- ColorMap: $sliderUseColourMap, Texture: $sliderUseTexture")
+        }
+    }
 
 
     // TODO unimplemented

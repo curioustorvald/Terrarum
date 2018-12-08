@@ -55,4 +55,40 @@ class GdxColorMap {
     fun getRaw(x: Int, y: Int): RGBA8888 = data[y * width + x]
     fun getRaw(x: Int): RGBA8888 = if (is2D) throw OperationNotSupportedException("This is 2D color map") else data[x]
 
+    override fun toString(): String {
+        val sb = StringBuilder()
+
+        sb.append("ColorMap ${width}x$height:\n")
+
+        var yi = 0
+        var xi = 0
+        for (y in ((0 until height).take(2) + (0 until height).toList().takeLast(2)).distinct()) {
+
+            if (y - yi > 1) {
+                sb.append(when (width) {
+                    in 1..4 -> ".......... ".repeat(width) + '\n'
+                    else -> ".......... .......... ... .......... .......... \n"
+                }
+                )
+            }
+
+            for (x in ((0 until width).take(2) + (0 until width).toList().takeLast(2)).distinct()) {
+                if (x - xi > 1) {
+                    sb.append("... ")
+                }
+
+                sb.append("0x")
+                sb.append(getRaw(x, y).toLong().and(0xFFFFFFFF).toString(16).toUpperCase().padStart(8, '0'))
+                sb.append(' ')
+
+                xi = x
+            }
+
+            sb.append('\n')
+
+            yi = y
+        }
+
+        return sb.toString()
+    }
 }
