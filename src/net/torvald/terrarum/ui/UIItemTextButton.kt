@@ -61,17 +61,17 @@ open class UIItemTextButton(
 
 
         if (highlighted) {
-            BlendMode.resolve(highlightBackBlendMode)
+            BlendMode.resolve(highlightBackBlendMode, batch)
             batch.color = highlightBackCol
             batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
         else if (mouseUp) {
-            BlendMode.resolve(activeBackBlendMode)
+            BlendMode.resolve(activeBackBlendMode, batch)
             batch.color = activeBackCol
             batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
 
-        blendNormal()
+        blendNormal(batch)
 
 
         batch.color = if (highlighted) highlightCol

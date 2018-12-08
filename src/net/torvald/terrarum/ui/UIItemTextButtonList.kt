@@ -181,11 +181,11 @@ class UIItemTextButtonList(
     override fun render(batch: SpriteBatch, camera: Camera) {
 
         batch.color = backgroundCol
-        BlendMode.resolve(backgroundBlendMode)
+        BlendMode.resolve(backgroundBlendMode, batch)
         batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
 
         batch.color = highlightBackCol
-        BlendMode.resolve(highlightBackBlendMode)
+        BlendMode.resolve(highlightBackBlendMode, batch)
         if (highlightY != null) {
             batch.fillRect(posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
         }
