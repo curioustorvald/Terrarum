@@ -44,6 +44,7 @@ import java.util.*
  * - All lines are indented with one space
  * - All entries are preceded by '- ' (dash and a space)
  * - All propery are separated by ' : ' (space colon space)
+ * - A line that does not start with '- ' are simply ignored, so you can freely make empty lines and/or comments.
  *
  * Any deviation to the above rule will cause a parse failure, because it's simple and dumb as that.
  *
@@ -55,39 +56,41 @@ inline class Yaml(val text: String) {
         val SEPARATOR = Regex(" : ")
     }
 
-
     fun parse(): QNDTreeNode<String> {
         var currentIndentLevel = -1
         val root = QNDTreeNode<String>()
         var currentNode = root
         val nodesStack = Stack<QNDTreeNode<String>>()
+        val validLineStartRe = Regex(""" *\- """)
 
         nodesStack.push(currentNode)
 
         text.split('\n') .forEach {
-            val indentLevel = it.countSpaces()
-            val it = it.trimIndent()
-            if (it.startsWith("- ")) {
-                val nodeName = it.drop(2)
+            if (validLineStartRe.containsMatchIn(it)) { // take partial match; do the task if the text's line is valid
+                val indentLevel = it.countSpaces()
+                val it = it.trimIndent()
+                if (it.startsWith("- ")) { // just double check if indent-trimmed line looks valid
+                    val nodeName = it.drop(2)
 
-                if (indentLevel == currentIndentLevel) {
-                    val sibling = QNDTreeNode(nodeName, currentNode.parent)
-                    currentNode.parent!!.children.add(sibling)
-                    currentNode = sibling
-                }
-                else if (indentLevel > currentIndentLevel) {
-                    val childNode = QNDTreeNode(nodeName, currentNode)
-                    currentNode.children.add(childNode)
-                    nodesStack.push(currentNode)
-                    currentNode = childNode
-                    currentIndentLevel = indentLevel
-                }
-                else {
-                    repeat(currentIndentLevel - indentLevel) { currentNode = nodesStack.pop() }
-                    currentIndentLevel = indentLevel
-                    val sibling = QNDTreeNode(nodeName, currentNode.parent)
-                    currentNode.parent!!.children.add(sibling)
-                    currentNode = sibling
+                    if (indentLevel == currentIndentLevel) {
+                        val sibling = QNDTreeNode(nodeName, currentNode.parent)
+                        currentNode.parent!!.children.add(sibling)
+                        currentNode = sibling
+                    }
+                    else if (indentLevel > currentIndentLevel) {
+                        val childNode = QNDTreeNode(nodeName, currentNode)
+                        currentNode.children.add(childNode)
+                        nodesStack.push(currentNode)
+                        currentNode = childNode
+                        currentIndentLevel = indentLevel
+                    }
+                    else {
+                        repeat(currentIndentLevel - indentLevel) { currentNode = nodesStack.pop() }
+                        currentIndentLevel = indentLevel
+                        val sibling = QNDTreeNode(nodeName, currentNode.parent)
+                        currentNode.parent!!.children.add(sibling)
+                        currentNode = sibling
+                    }
                 }
             }
         }
