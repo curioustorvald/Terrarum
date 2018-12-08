@@ -222,10 +222,6 @@ object Terrarum : Screen {
     lateinit var shaderRGBOnly: ShaderProgram
     lateinit var shaderAtoGrey: ShaderProgram
 
-
-    lateinit var textureWhiteSquare: Texture
-
-
     lateinit var testTexture: Texture
 
 
@@ -355,10 +351,6 @@ object Terrarum : Screen {
 
         //fontGame = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = true)
         fontSmallNumbers = TinyAlphNum
-
-
-        textureWhiteSquare = Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"))
-        textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
 
         ShaderProgram.pedantic = false
@@ -788,7 +780,7 @@ fun Float.round(): Float {
 
 // ShapeRenderer alternative for rects
 fun SpriteBatch.fillRect(x: Float, y: Float, w: Float, h: Float) {
-    this.draw(Terrarum.textureWhiteSquare, x, y, w, h)
+    this.draw(AppLoader.textureWhiteSquare, x, y, w, h)
 }
 inline fun SpriteBatch.drawStraightLine(x: Float, y: Float, otherEnd: Float, thickness: Float, isVertical: Boolean) {
     if (!isVertical)
@@ -840,11 +832,11 @@ object BlendMode {
     const val NORMAL   = "normal"
     //const val MAX      = "GL_MAX" // not supported by GLES -- use shader
 
-    fun resolve(mode: String) {
+    fun resolve(mode: String, batch: SpriteBatch? = null) {
         when (mode) {
-            SCREEN   -> blendScreen()
-            MULTIPLY -> blendMul()
-            NORMAL   -> blendNormal()
+            SCREEN   -> blendScreen(batch)
+            MULTIPLY -> blendMul(batch)
+            NORMAL   -> blendNormal(batch)
             //MAX      -> blendLightenOnly() // not supported by GLES -- use shader
             else     -> throw Error("Unknown blend mode: $mode")
         }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.floor
+import net.torvald.terrarum.ui.UIItemTextButton.Companion.Alignment
 
 class UIItemTextArea(
         parentUI: UICanvas,
@@ -13,15 +14,8 @@ class UIItemTextArea(
         override val height: Int,
         val lineGap: Int = 0,
         val lineCount: Int = ((height + lineGap) / Terrarum.fontGame.lineHeight).toInt(),
-        val align: UIItemTextArea.Align = Align.LEFT
+        val align: Alignment = Alignment.LEFT
 ) : UIItem(parentUI) {
-
-
-    enum class Align {
-        LEFT, CENTRE, RIGHT
-    }
-
-
 
     private var entireText: List<String> = listOf("") // placeholder
 
@@ -45,9 +39,9 @@ class UIItemTextArea(
             val textWidth = Terrarum.fontGame.getWidth(entireText[i])
 
             when (align) {
-                Align.LEFT -> Terrarum.fontGame.draw(batch, entireText[i], posX.toFloat(), posY + yPtr * (Terrarum.fontGame.lineHeight + lineGap))
-                Align.CENTRE -> Terrarum.fontGame.draw(batch, entireText[i], posX + ((width - textWidth) / 2f).floor(), posY + yPtr * (Terrarum.fontGame.lineHeight + lineGap))
-                Align.RIGHT -> Terrarum.fontGame.draw(batch, entireText[i], posX + width - textWidth.toFloat(), posY + yPtr * (Terrarum.fontGame.lineHeight + lineGap))
+                Alignment.LEFT -> Terrarum.fontGame.draw(batch, entireText[i], posX.toFloat(), posY + yPtr * (Terrarum.fontGame.lineHeight + lineGap))
+                Alignment.CENTRE -> Terrarum.fontGame.draw(batch, entireText[i], posX + ((width - textWidth) / 2f).floor(), posY + yPtr * (Terrarum.fontGame.lineHeight + lineGap))
+                Alignment.RIGHT -> Terrarum.fontGame.draw(batch, entireText[i], posX + width - textWidth.toFloat(), posY + yPtr * (Terrarum.fontGame.lineHeight + lineGap))
             }
         }
     }
