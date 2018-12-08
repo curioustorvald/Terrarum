@@ -14,7 +14,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
  */
 object LoadScreen : ScreenAdapter() {
 
-    var screenToLoad: Ingame? = null
+    var screenToLoad: IngameInstance? = null
     private lateinit var screenLoadingThread: Thread
 
 

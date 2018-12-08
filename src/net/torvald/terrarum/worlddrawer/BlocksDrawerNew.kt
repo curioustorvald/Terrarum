@@ -730,6 +730,7 @@ internal object BlocksDrawer {
 
 
         // write to colour buffer
+        // As the texture size is very small, multithreading it would be less effective
         for (y in 0 until tilesBuffer.height) {
             for (x in 0 until tilesBuffer.width) {
                 val color = sourceBuffer[y][x]

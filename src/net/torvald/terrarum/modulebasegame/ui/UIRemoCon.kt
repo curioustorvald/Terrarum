@@ -108,27 +108,6 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
                     throw NullPointerException("No parent node to return")
                 }
             }
-            else if (it.labelText.contains("Start New Random Game")) {
-                if (!startNewGameCalled) {
-                    startNewGameCalled = true
-
-
-                    printdbg(this, 1)
-
-                    val ingame = Ingame(Terrarum.batch)
-                    ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
-                    //ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(8192, 2048, 0x51621DL)
-                    ingame.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
-
-                    printdbg(this, 2)
-
-                    Terrarum.ingame = ingame
-                    LoadScreen.screenToLoad = ingame
-                    Terrarum.setScreen(LoadScreen)
-
-                    printdbg(this, 3)
-                }
-            }
             else {
                 // check if target exists
                 //println("current node: ${currentRemoConContents.data}")
