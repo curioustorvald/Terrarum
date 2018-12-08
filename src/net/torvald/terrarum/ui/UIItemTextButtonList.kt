@@ -40,7 +40,9 @@ class UIItemTextButtonList(
         val inactiveCol: Color = Color(0xc0c0c0_ff.toInt()),
         val backgroundCol: Color = Color(0x242424_80),
         val backgroundBlendMode: String = BlendMode.NORMAL,
-        val kinematic: Boolean = false
+        val kinematic: Boolean = false,
+
+        val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.CENTRE
 ) : UIItem(parentUI) {
 
     val iconToTextGap = 20
@@ -71,7 +73,8 @@ class UIItemTextButtonList(
                     highlightBackBlendMode = highlightBackBlendMode,
                     inactiveCol = inactiveCol,
                     preGapX = pregap,
-                    postGapX = postgap
+                    postGapX = postgap,
+                    alignment = alignment
             )
         }
         else {
@@ -89,7 +92,8 @@ class UIItemTextButtonList(
                     highlightBackBlendMode = activeBackBlendMode, // we are using custom highlighter
                     inactiveCol = inactiveCol,
                     preGapX = pregap,
-                    postGapX = postgap
+                    postGapX = postgap,
+                    alignment = alignment
             )
         }
     }

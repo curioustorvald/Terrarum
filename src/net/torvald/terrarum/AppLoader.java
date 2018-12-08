@@ -41,7 +41,19 @@ public class AppLoader implements ApplicationListener {
 
     private static AppLoader INSTANCE = null;
 
-    private AppLoader() { }
+    private static Screen injectScreen = null;
+
+    public AppLoader(LwjglApplicationConfiguration appConfig, Screen injectScreen) {
+        AppLoader.injectScreen = injectScreen;
+        AppLoader.appConfig = appConfig;
+    }
+
+    public AppLoader(LwjglApplicationConfiguration appConfig) {
+        AppLoader.appConfig = appConfig;
+    }
+
+    public AppLoader() {
+    }
 
     public static AppLoader getINSTANCE() {
         if (INSTANCE == null) {
@@ -98,7 +110,7 @@ public class AppLoader implements ApplicationListener {
     public static void main(String[] args) {
         ShaderProgram.pedantic = false;
 
-        appConfig = new LwjglApplicationConfiguration();
+        LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
         appConfig.vSyncEnabled = false;
         appConfig.resizable = false;//true;
         //appConfig.width = 1072; // IMAX ratio
@@ -110,7 +122,7 @@ public class AppLoader implements ApplicationListener {
         appConfig.title = GAME_NAME;
         appConfig.forceExit = false;
 
-        new LwjglApplication(new AppLoader(), appConfig);
+        new LwjglApplication(new AppLoader(appConfig), appConfig);
     }
 
 
@@ -127,6 +139,8 @@ public class AppLoader implements ApplicationListener {
     private Color gradWhiteBottom = new Color(0xd8d8d8ff);
 
     public Screen screen;
+
+    public static Texture textureWhiteSquare;
 
     private void initViewPort(int width, int height) {
         // Set Y to point downwards
@@ -151,6 +165,10 @@ public class AppLoader implements ApplicationListener {
 
 
         initViewPort(appConfig.width, appConfig.height);
+
+
+        textureWhiteSquare = new Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"));
+        textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
 
         shaderBayerSkyboxFill = new ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"));
@@ -182,6 +200,12 @@ public class AppLoader implements ApplicationListener {
 
         TextureRegionPack.Companion.setGlobalFlipY(true);
         fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true, Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 128, false);
+
+
+        // if there is a predefined screen, open that screen after my init process
+        if (injectScreen != null) {
+            setScreen(injectScreen);
+        }
     }
 
     @Override
@@ -200,6 +224,7 @@ public class AppLoader implements ApplicationListener {
         FrameBufferManager.begin(renderFBO);
         setCameraPosition(0, 0);
 
+        // if there's no predefined screen, default to the actual game's screen, and set the screen as the one
         if (screen == null) {
             shaderBayerSkyboxFill.begin();
             shaderBayerSkyboxFill.setUniformMatrix("u_projTrans", camera.combined);

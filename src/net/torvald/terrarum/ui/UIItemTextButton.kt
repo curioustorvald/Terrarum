@@ -28,7 +28,9 @@ open class UIItemTextButton(
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
         val inactiveCol: Color = defaultInactiveCol,
         val preGapX:  Int = 0,
-        val postGapX: Int = 0
+        val postGapX: Int = 0,
+
+        val alignment: Alignment = Alignment.CENTRE
 ) : UIItem(parentUI) {
 
     companion object {
@@ -36,6 +38,10 @@ open class UIItemTextButton(
         val height = font.lineHeight.toInt() * 2
         val defaultInactiveCol: Color = Color(0xc8c8c8_ff.toInt())
         val defaultHighlightCol: Color = Color(0x00f8ff_ff)
+
+        enum class Alignment {
+            CENTRE, LEFT, RIGHT
+        }
     }
 
     /** Actually displayed text (changes with the app language) */
@@ -74,7 +80,11 @@ open class UIItemTextButton(
 
         font.draw(batch,
                 label,
-                posX.toFloat() + width.minus(textW).div(2) + (preGapX - postGapX).div(2),
+                when (alignment) {
+                    Alignment.CENTRE -> posX.toFloat() + width.minus(textW).div(2) + (preGapX - postGapX).div(2)
+                    Alignment.LEFT -> posX.toFloat() + preGapX
+                    Alignment.RIGHT -> width - postGapX - textW.toFloat()
+                },
                 posY.toFloat() + height / 4
         )
     }
