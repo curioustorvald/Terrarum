@@ -11,9 +11,10 @@ import net.torvald.terrarum.Yaml
         override var posX: Int,
         override var posY: Int,
         override var width: Int,
-        val tree: Yaml
+        val treeRepresentation: Yaml
 ) : UIItem(parent) {
 
-    override val height: Int
-        get() = TODO("not implemented")
+    val tree = treeRepresentation.parse()
+
+    override val height = -1
 }*/
