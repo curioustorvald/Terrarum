@@ -36,6 +36,11 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      */
     open var actorNowPlaying: ActorHumanoid? = null
 
+    open var gameInitialised = false
+        internal set
+    open var gameFullyLoaded = false
+        internal set
+
     val ACTORCONTAINER_INITIAL_SIZE = 64
     val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
@@ -44,6 +49,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     }
 
     override fun show() {
+        // the very basic show() implementation
+        gameInitialised = true
     }
 
     override fun render(delta: Float) {

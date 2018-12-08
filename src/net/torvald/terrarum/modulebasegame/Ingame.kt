@@ -132,10 +132,10 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     //private val ingameDrawThread: ThreadIngameDraw // draw must be on the main thread
 
 
-    var gameInitialised = false
-        private set
-    var gameFullyLoaded = false
-        private set
+    override var gameInitialised = false
+        internal set
+    override var gameFullyLoaded = false
+        internal set
 
 
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
@@ -168,7 +168,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         //BlocksDrawer.world = this.world
         FeaturesDrawer.world = this.world
 
-        gameInitialised = true
+
+        super.show() // gameInitialised = true
     }
 
     data class GameSaveData(

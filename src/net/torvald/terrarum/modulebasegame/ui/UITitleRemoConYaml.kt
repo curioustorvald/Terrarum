@@ -7,8 +7,11 @@ import java.util.*
 
 object UITitleRemoConYaml {
 
-    // YAML indent with a space, separate label and class with " : " (\x20\x3A\x20)
-
+    /**
+     * YAML indent with a space, separate label and class with " : " (\x20\x3A\x20)
+     *
+     * The class must be the UICanvas
+     */
     val menus = """
         - MENU_MODE_SINGLEPLAYER : net.torvald.terrarum.modulebasegame.ui.UITitleCharactersList
          - CONTEXT_CHARACTER_NEW
@@ -34,8 +37,8 @@ object UITitleRemoConYaml {
 
     val debugTools = """
         -  Development Tools $
-         - Building Maker
-         - Start New Random Game
+         - Building Maker : net.torvald.terrarum.modulebasegame.ui.UIProxyNewBuildingMaker
+         - Start New Random Game : net.torvald.terrarum.modulebasegame.ui.UIProxyNewRandomGame
          - MENU_LABEL_RETURN
         """.trimIndent()
 
