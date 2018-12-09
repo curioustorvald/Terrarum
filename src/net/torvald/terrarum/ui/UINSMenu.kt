@@ -17,8 +17,9 @@ class UINSMenu(
 
         val titleBackCol: Color = Color(0f,0f,0f,.77f),
         val titleTextCol: Color = Color.WHITE,
-        val titleBlendMode: String = BlendMode.NORMAL
+        val titleBlendMode: String = BlendMode.NORMAL,
 
+        val allowDrag: Boolean = true
 ) : UICanvas() {
 
     override var openCloseTime: Second = 0f
@@ -59,11 +60,11 @@ class UINSMenu(
         // draw title bar
         batch.color = titleBackCol
         BlendMode.resolve(titleBlendMode, batch)
-        batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), LINE_HEIGHT.toFloat())
+        batch.fillRect(0f, 0f, width.toFloat(), LINE_HEIGHT.toFloat())
 
         batch.color = titleTextCol
         blendNormal(batch)
-        Terrarum.fontGame.draw(batch, title, posX + TEXT_OFFSETX, posY + TEXT_OFFSETY)
+        Terrarum.fontGame.draw(batch, title, TEXT_OFFSETX, TEXT_OFFSETY)
 
         // draw the list
         batch.color = Color.WHITE
@@ -73,6 +74,9 @@ class UINSMenu(
     override fun dispose() {
         theRealList.dispose()
     }
+
+    fun mouseOnTitleBar() =
+            relativeMouseX in 0 until width && relativeMouseY in 0 until LINE_HEIGHT
 
     override fun doOpening(delta: Float) {
     }
@@ -90,12 +94,34 @@ class UINSMenu(
         return super.mouseMoved(screenX, screenY)
     }
 
+    private var dragOriginX = 0 // relative mousepos
+    private var dragOriginY = 0 // relative mousepos
+    private var dragForReal = false
+
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        return super.touchDragged(screenX, screenY, pointer)
+        if (!allowDrag) return false
+
+        if (mouseInScreen(screenX, screenY)) {
+            if (dragForReal) {
+                handler.setPosition(screenX - dragOriginX, screenY - dragOriginY)
+                println("drag $screenX, $screenY")
+            }
+        }
+
+        return true
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchDown(screenX, screenY, pointer, button)
+        if (mouseOnTitleBar()) {
+            dragOriginX = relativeMouseX
+            dragOriginY = relativeMouseY
+            dragForReal = true
+        }
+        else {
+            dragForReal = false
+        }
+
+        return true
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

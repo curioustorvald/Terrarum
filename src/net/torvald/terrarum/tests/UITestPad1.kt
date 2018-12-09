@@ -1,9 +1,6 @@
 package net.torvald.terrarum.tests
 
-import com.badlogic.gdx.Game
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Screen
-import com.badlogic.gdx.ScreenAdapter
+import com.badlogic.gdx.*
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
@@ -60,6 +57,8 @@ class UITestPad1 : ScreenAdapter() {
     lateinit var camera: OrthographicCamera
 
     override fun show() {
+        Gdx.input.inputProcessor = UITestPad1Controller(this)
+
         nsMenu = UINSMenu(
                 "Menu",
                 96,
@@ -84,16 +83,30 @@ class UITestPad1 : ScreenAdapter() {
     var _dct = 0f
 
     override fun render(delta: Float) {
+        // UPDATE
+
+
+        // RENDER
+
         batch.inUse {
             batch.color = bgCol
             batch.fillRect(0f, 0f, 2048f, 2048f)
 
             nsMenu.render(batch, camera)
+
+            batch.color = if (nsMenu.mouseOnTitleBar())
+                Color.LIME
+            else
+                Color.FIREBRICK
+            AppLoader.fontGame.draw(batch, "Mouse: ${Terrarum.mouseScreenX}, ${Terrarum.mouseScreenY}", 8f, 740 - 28f)
         }
 
         _dct = (_dct + delta*2) % 10f
         //nsMenu.setPosition(_dct.toInt(), _dct.toInt())
     }
+
+
+
 
     override fun pause() {
         super.pause()
@@ -112,6 +125,18 @@ class UITestPad1 : ScreenAdapter() {
     }
 
 
+}
+
+class UITestPad1Controller(val host: UITestPad1) : InputAdapter() {
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        host.nsMenu.touchDragged(screenX, screenY, pointer)
+        return true
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        host.nsMenu.touchDown(screenX, screenY, pointer, button)
+        return true
+    }
 }
 
 
