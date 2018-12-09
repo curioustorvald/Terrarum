@@ -62,7 +62,7 @@ class UITestPad1 : ScreenAdapter() {
     override fun show() {
         nsMenu = UINSMenu(
                 "Menu",
-                160,
+                96,
                 Yaml(treeStr)
         )
         batch = SpriteBatch()
@@ -74,12 +74,14 @@ class UITestPad1 : ScreenAdapter() {
 
         resize(AppLoader.appConfig.width, AppLoader.appConfig.height)
 
-        nsMenu.setPosition(10, 10)
+        nsMenu.setPosition(0, 0)
         nsMenu.setAsAlwaysVisible()
 
     }
 
     val bgCol = Color(.62f,.79f,1f,1f)
+
+    var _dct = 0f
 
     override fun render(delta: Float) {
         batch.inUse {
@@ -89,7 +91,8 @@ class UITestPad1 : ScreenAdapter() {
             nsMenu.render(batch, camera)
         }
 
-        //nsMenu.setPosition(20, 20) // FIXME the prolonged bug, "the entire screen is shifted!" is caused by these kind of operations
+        _dct = (_dct + delta*2) % 10f
+        //nsMenu.setPosition(_dct.toInt(), _dct.toInt())
     }
 
     override fun pause() {
