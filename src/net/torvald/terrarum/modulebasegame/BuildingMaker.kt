@@ -8,6 +8,7 @@ import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.ui.Notification
@@ -148,6 +149,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun updateGame(delta: Float) {
+        KeyToggler.update(false)
+
         blockPointingCursor.update(delta)
         actorNowPlaying?.update(delta)
         uiContainer.forEach { it.update(delta) }

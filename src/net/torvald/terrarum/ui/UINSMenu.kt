@@ -29,7 +29,7 @@ class UINSMenu(
 
 
     val tree = treeRepresentation.parse()
-    override var width = minOf(minimumWidth, tree.getLevelData(1).map { Terrarum.fontGame.getWidth(it ?: "") }.max() ?: 0)
+    override var width = maxOf(minimumWidth, tree.getLevelData(1).map { Terrarum.fontGame.getWidth(it ?: "") }.max() ?: 0)
     override var height = LINE_HEIGHT * (tree.children.size + 1)
     private val treeChildrenLabels = Array<String>(tree.children.size) {
         tree.children[it].toString() + if (tree.children[it].children.isNotEmpty()) "  $CHILD_ARROW" else ""
@@ -38,11 +38,14 @@ class UINSMenu(
     private val theRealList = UIItemTextButtonList(
             this,
             treeChildrenLabels,
-            posX + TEXT_OFFSETX.toInt(), posY + LINE_HEIGHT,
-            width - (2 * TEXT_OFFSETX.toInt()), height - LINE_HEIGHT,
-            TEXT_OFFSETY.toInt(),
+            posX, posY + LINE_HEIGHT,
+            width, height - LINE_HEIGHT,
             textAreaWidth = width - (2 * TEXT_OFFSETX.toInt()),
-            alignment = UIItemTextButton.Companion.Alignment.LEFT
+            alignment = UIItemTextButton.Companion.Alignment.LEFT,
+            activeBackCol = Color(0x242424_80),//Color(1f,0f,.75f,1f),
+            inactiveCol = Color(.94f,.94f,.94f,1f),
+            itemHitboxSize = LINE_HEIGHT
+
     )
 
     val selectedIndex: Int?
@@ -60,9 +63,10 @@ class UINSMenu(
 
         batch.color = titleTextCol
         blendNormal(batch)
-        Terrarum.fontGame.draw(batch, title, posX + TEXT_OFFSETX, TEXT_OFFSETY)
+        Terrarum.fontGame.draw(batch, title, posX + TEXT_OFFSETX, posY + TEXT_OFFSETY)
 
         // draw the list
+        batch.color = Color.WHITE
         theRealList.render(batch, camera)
     }
 
