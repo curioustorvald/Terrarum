@@ -66,9 +66,11 @@ abstract class UICanvas(
         get() = mouseUp && Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary"))
 
 
+    /** Called by the screen */
     fun update(delta: Float) {
         handler.update(this, delta)
     }
+    /** Called by the screen */
     fun render(batch: SpriteBatch, camera: Camera) {
         handler.render(this, batch, camera)
     }
@@ -127,6 +129,8 @@ abstract class UICanvas(
     }
 
     /**
+     * Called by the screen's InputProcessor
+     *
      * When implementing this, make sure to use ```mouseInScreen()``` function!
      */
     open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
@@ -137,6 +141,7 @@ abstract class UICanvas(
         }
         else return false
     }
+    /** Called by the screen's InputProcessor */
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (this.isVisible && mouseInScreen(screenX, screenY)) {
             uiItems.forEach { it.touchDown(screenX, screenY, pointer, button) }
@@ -145,6 +150,7 @@ abstract class UICanvas(
         }
         else return false
     }
+    /** Called by the screen's InputProcessor */
     open fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (this.isVisible) {
             uiItems.forEach { it.touchUp(screenX, screenY, pointer, button) }
@@ -153,6 +159,7 @@ abstract class UICanvas(
         }
         else return false
     }
+    /** Called by the screen's InputProcessor */
     open fun scrolled(amount: Int): Boolean {
         if (this.isVisible) {
             uiItems.forEach { it.scrolled(amount) }
@@ -161,6 +168,7 @@ abstract class UICanvas(
         }
         else return false
     }
+    /** Called by the screen's InputProcessor */
     open fun keyDown(keycode: Int): Boolean {
         if (this.isVisible) {
             uiItems.forEach { it.keyDown(keycode) }
@@ -169,6 +177,7 @@ abstract class UICanvas(
         }
         else return false
     }
+    /** Called by the screen's InputProcessor */
     open fun keyUp(keycode: Int): Boolean {
         if (this.isVisible) {
             uiItems.forEach { it.keyUp(keycode) }
@@ -177,6 +186,7 @@ abstract class UICanvas(
         }
         else return false
     }
+    /** Called by the screen's InputProcessor */
     open fun keyTyped(character: Char): Boolean {
         return false
         //uiItems.forEach { it.keyT }

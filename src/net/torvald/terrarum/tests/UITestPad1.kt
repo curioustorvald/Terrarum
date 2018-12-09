@@ -84,7 +84,7 @@ class UITestPad1 : ScreenAdapter() {
 
     override fun render(delta: Float) {
         // UPDATE
-
+        nsMenu.update(delta)
 
         // RENDER
 
