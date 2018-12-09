@@ -20,6 +20,9 @@ object KeyToggler {
         return currentState[key]
     }
 
+    /**
+     * Put this into the each scene's update/render method.
+     */
     fun update(gameMode: Boolean = true) {
         for (it in 0..255) {
             if (gameMode && it in gameKeys &&

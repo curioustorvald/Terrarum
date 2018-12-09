@@ -30,12 +30,13 @@ open class UIItemTextButton(
         val preGapX:  Int = 0,
         val postGapX: Int = 0,
 
-        val alignment: Alignment = Alignment.CENTRE
+        val alignment: Alignment = Alignment.CENTRE,
+        val hitboxSize: Int = UIItemTextButton.height
 ) : UIItem(parentUI) {
 
     companion object {
         val font = Terrarum.fontGame
-        val height = font.lineHeight.toInt() * 2
+        val height = font.lineHeight.toInt()
         val defaultInactiveCol: Color = Color(0xc8c8c8_ff.toInt())
         val defaultHighlightCol: Color = Color(0x00f8ff_ff)
 
@@ -49,7 +50,7 @@ open class UIItemTextButton(
         get() = if (readFromLang) Lang[labelText] else labelText
 
 
-    override val height: Int = UIItemTextButton.height
+    override val height: Int = hitboxSize
 
     var highlighted: Boolean = false
 
@@ -85,7 +86,7 @@ open class UIItemTextButton(
                     Alignment.LEFT -> posX.toFloat() + preGapX
                     Alignment.RIGHT -> width - postGapX - textW.toFloat()
                 },
-                posY.toFloat() + height / 4
+                posY.toFloat() + (hitboxSize - UIItemTextButton.height) / 2f
         )
     }
 

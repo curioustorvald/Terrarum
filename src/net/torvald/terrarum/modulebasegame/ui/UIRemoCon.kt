@@ -264,11 +264,12 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
                 uiRemoCon.width, getRemoConHeight(labels),
                 textAreaWidth = uiRemoCon.width,
                 readFromLang = true,
-                activeBackCol = Color(0),
+                activeBackCol = Color(0),//Color(1f,0f,.75f,1f),
                 highlightBackCol = Color(0),
                 backgroundCol = Color(0),
                 inactiveCol = Color.WHITE,
-                defaultSelection = null
+                defaultSelection = null,
+                itemHitboxSize = 34
         )
 
         fun update(delta: Float) {
