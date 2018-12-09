@@ -174,6 +174,9 @@ class UIHandler(//var UI: UICanvas,
 
             ui.renderUI(batch, camera)
             //ingameGraphics.flush()
+
+
+            setCameraPosition(batch, camera, 0f, 0f)
         }
 
 
