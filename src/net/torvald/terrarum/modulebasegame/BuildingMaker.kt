@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.KeyToggler
@@ -169,6 +170,16 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
                 (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
         println("[BuildingMaker] Resize event")
     }
+
+
+
+    private val menuYaml = Yaml("""
+- File
+ - New
+ - Export
+ - Import
+- Edit
+    """.trimIndent())
 }
 
 
