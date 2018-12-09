@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.roundInt
@@ -80,7 +81,12 @@ abstract class UICanvas(
 
     /** Override this for the actual update. Note that you must update uiItems by yourself. */
     abstract fun updateUI(delta: Float)
-    /** Override this for the actual render. Note that you must render uiItems by yourself. */
+    /**
+     * Override this for the actual render. Note that you must render uiItems by yourself.
+     *
+     * Under normal circumstances, draws are automatically translated as per the handler's X/Y position.
+     * This means, don't write like: ```draw(posX + 4, posY + 32)```, do instead: ```draw(4, 32)``` unless you have a good reason to do so.
+     */
     abstract fun renderUI(batch: SpriteBatch, camera: Camera)
 
     /**
@@ -109,6 +115,8 @@ abstract class UICanvas(
         uiItems.add(uiItem)
     }
 
+    fun mouseInScreen(x: Int, y: Int) = x in 0 until AppLoader.appConfig.width && y in 0 until AppLoader.appConfig.height
+
     open fun mouseMoved(screenX: Int, screenY: Int): Boolean {
         if (this.isVisible) {
             uiItems.forEach { it.mouseMoved(screenX, screenY) }
@@ -117,6 +125,10 @@ abstract class UICanvas(
         }
         else return false
     }
+
+    /**
+     * When implementing this, make sure to use ```mouseInScreen()``` function!
+     */
     open fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         if (this.isVisible) {
             uiItems.forEach { it.touchDragged(screenX, screenY, pointer) }
@@ -126,7 +138,7 @@ abstract class UICanvas(
         else return false
     }
     open fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (this.isVisible) {
+        if (this.isVisible && mouseInScreen(screenX, screenY)) {
             uiItems.forEach { it.touchDown(screenX, screenY, pointer, button) }
             handler.subUIs.forEach { it.touchDown(screenX, screenY, pointer, button) }
             return true

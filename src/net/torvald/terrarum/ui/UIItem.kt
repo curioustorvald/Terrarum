@@ -107,6 +107,10 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
             }
         }
     }
+
+    /**
+     * In this time, you do write like: ```draw(posX + 4, posY + 32)```, unlike UICanvas, because posX/posY comes from the parent UI.
+     */
     open fun render(batch: SpriteBatch, camera: Camera) {
         if (parentUI.isVisible) {
             mouseOverCall?.render(batch, camera)
