@@ -20,7 +20,6 @@ class UIItemTextButtonList(
         override var posY: Int,
         override var width: Int,
         override var height: Int,
-        val verticalGutter: Int = 0,
         val readFromLang: Boolean = false,
         val defaultSelection: Int? = null, // negative: INVALID, positive: valid, null: no select
 
@@ -42,7 +41,8 @@ class UIItemTextButtonList(
         val backgroundBlendMode: String = BlendMode.NORMAL,
         val kinematic: Boolean = false,
 
-        val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.CENTRE
+        val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.CENTRE,
+        val itemHitboxSize: Int = UIItemTextButton.height
 ) : UIItem(parentUI) {
 
     val iconToTextGap = 20
@@ -56,13 +56,20 @@ class UIItemTextButtonList(
 
 
 
-    val buttons = labelsList.mapIndexed { index, s ->
-        val height = this.height - UIItemTextButton.height
+    val buttons = labelsList.mapIndexed { i, s ->
+        //val height = this.height - UIItemTextButton.height
+
+        val h = height.toFloat()
+        val ss = labelsList.size.toFloat()
+        val half_lh = UIItemTextButton.height / 2f
+        val vertOff = (i * h/ss - half_lh).roundInt()
+        println("$i -> $vertOff for height $height")
+
         if (!kinematic) {
             UIItemTextButton(
                     parentUI, s,
                     posX = posX,
-                    posY = posY + verticalGutter + ((height - 2 * verticalGutter) / labelsList.size.minus(1).toFloat() * index).roundInt(),
+                    posY = posY + vertOff,
                     width = width,
                     readFromLang = readFromLang,
                     activeCol = activeCol,
@@ -74,14 +81,15 @@ class UIItemTextButtonList(
                     inactiveCol = inactiveCol,
                     preGapX = pregap,
                     postGapX = postgap,
-                    alignment = alignment
+                    alignment = alignment,
+                    hitboxSize = itemHitboxSize
             )
         }
         else {
             UIItemTextButton(
                     parentUI, s,
                     posX = posX,
-                    posY = posY + verticalGutter + ((height - 2 * verticalGutter) / labelsList.size.minus(1).toFloat() * index).roundInt(),
+                    posY = posY + vertOff,
                     width = width,
                     readFromLang = readFromLang,
                     activeCol = activeCol,
@@ -93,7 +101,8 @@ class UIItemTextButtonList(
                     inactiveCol = inactiveCol,
                     preGapX = pregap,
                     postGapX = postgap,
-                    alignment = alignment
+                    alignment = alignment,
+                    hitboxSize = itemHitboxSize
             )
         }
     }
