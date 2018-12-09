@@ -61,9 +61,8 @@ class UIItemTextButtonList(
 
         val h = height.toFloat()
         val ss = labelsList.size.toFloat()
-        val half_lh = UIItemTextButton.height / 2f
-        val vertOff = (i * h/ss - half_lh).roundInt()
-        println("$i -> $vertOff for height $height")
+        val lh = UIItemTextButton.height
+        val vertOff = (h/ss * i + (h/ss - lh) / 2f).roundInt()
 
         if (!kinematic) {
             UIItemTextButton(
