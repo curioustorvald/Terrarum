@@ -106,6 +106,61 @@ inline class Yaml(val text: String) {
         return root
     }
 
+    fun parseAsYamlInvokable(): QNDTreeNode<Pair<String, YamlInvokable?>> {
+        var currentIndentLevel = -1
+        val root = QNDTreeNode<Pair<String, YamlInvokable?>>()
+        var currentNode = root
+        val nodesStack = Stack<QNDTreeNode<Pair<String, YamlInvokable?>>>()
+        val validLineStartRe = Regex(""" *\- """)
+
+        nodesStack.push(currentNode)
+
+        text.split('\n') .forEach {
+            if (validLineStartRe.containsMatchIn(it)) { // take partial match; do the task if the text's line is valid
+                val indentLevel = it.countSpaces()
+                val it = it.trimIndent()
+                if (it.startsWith("- ")) { // just double check if indent-trimmed line looks valid
+                    val nodeString = it.drop(2)
+                    val nodeNameAndInvocation = nodeString.split(SEPARATOR)
+                    val nodeName = nodeNameAndInvocation[0]
+                    val nodeInvocation = loadClass(nodeNameAndInvocation[1])
+
+                    val nameInvokePair = nodeName to nodeInvocation
+
+                    if (indentLevel == currentIndentLevel) {
+                        val sibling = QNDTreeNode(nameInvokePair, currentNode.parent)
+                        currentNode.parent!!.children.add(sibling)
+                        currentNode = sibling
+                    }
+                    else if (indentLevel > currentIndentLevel) {
+                        val childNode = QNDTreeNode(nameInvokePair, currentNode)
+                        currentNode.children.add(childNode)
+                        nodesStack.push(currentNode)
+                        currentNode = childNode
+                        currentIndentLevel = indentLevel
+                    }
+                    else {
+                        repeat(currentIndentLevel - indentLevel) { currentNode = nodesStack.pop() }
+                        currentIndentLevel = indentLevel
+                        val sibling = QNDTreeNode(nameInvokePair, currentNode.parent)
+                        currentNode.parent!!.children.add(sibling)
+                        currentNode = sibling
+                    }
+                }
+            }
+        }
+
+
+        // test traverse resulting tree
+        /*root.traversePreorder { node, depth ->
+            repeat(depth + 1) { print("-") }
+            println("${node.data} -> ${node.parent}")
+        }*/
+
+
+        return root
+    }
+
     private fun String.countSpaces(): Int {
         var c = 0
         while (c <= this.length) {
@@ -118,4 +173,25 @@ inline class Yaml(val text: String) {
         return c
     }
 
+    private fun loadClass(name: String): YamlInvokable {
+        val newClass = Class.forName(name)
+        val newClassConstructor = newClass.getConstructor(/* no args defined */)
+        val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
+        return newClassInstance as YamlInvokable
+    }
+
+}
+
+/**
+ * A simple interface that meant to be attached with Yaml tree, so that the entry can be ```invoke()```d.
+ *
+ * Example usage in Yaml:
+ * ```
+ * - File
+ *  - Import : net.torvald.terrarum.whatever.package.ImportFile
+ * ```
+ *
+ */
+interface YamlInvokable {
+    operator fun invoke()
 }
