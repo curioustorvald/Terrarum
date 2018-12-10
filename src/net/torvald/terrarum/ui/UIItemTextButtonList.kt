@@ -61,7 +61,7 @@ class UIItemTextButtonList(
 
         val h = height.toFloat()
         val ss = labelsList.size.toFloat()
-        val lh = UIItemTextButton.height
+        val lh = itemHitboxSize
         val vertOff = (h/ss * i + (h/ss - lh) / 2f).roundInt()
 
         if (!kinematic) {
