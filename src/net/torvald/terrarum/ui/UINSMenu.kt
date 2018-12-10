@@ -24,7 +24,7 @@ class UINSMenu(
 ) : UICanvas() {
 
     override var openCloseTime: Second = 0f
-    val LINE_HEIGHT = 30
+    val LINE_HEIGHT = 24
     val TEXT_OFFSETX = 3f
     val TEXT_OFFSETY = (LINE_HEIGHT - Terrarum.fontGame.lineHeight) / 2f
     val CHILD_ARROW = "${0x2023.toChar()}"
@@ -40,7 +40,7 @@ class UINSMenu(
     private val listStack = ArrayList<MenuPack>()
     private var currentDepth = 0
 
-    private data class MenuPack(val title: String, val list: UIItemTextButtonList)
+    private data class MenuPack(val title: String, val ui: UIItemTextButtonList)
 
     private fun ArrayList<MenuPack>.push(item: MenuPack) { this.add(item) }
     private fun ArrayList<MenuPack>.pop() = this.removeAt(this.lastIndex)!!
@@ -48,26 +48,31 @@ class UINSMenu(
 
 
     val selectedIndex: Int?
-        get() = listStack.peek().list.selectedIndex
+        get() = listStack.peek().ui.selectedIndex
 
     init {
         addSubMenu(tree)
     }
 
     private fun addSubMenu(tree: QNDTreeNode<String>) {
+        val menuTitle = tree.data ?: title
         val stringsFromTree = Array<String>(tree.children.size) {
             tree.children[it].toString() + if (tree.children[it].children.isNotEmpty()) "  $CHILD_ARROW" else ""
         }
 
-        val listWidth = maxOf(minimumWidth, tree.getLevelData(1).map { Terrarum.fontGame.getWidth(it ?: "") }.max() ?: 0)
+        val listWidth = maxOf(
+                Terrarum.fontGame.getWidth(menuTitle), minimumWidth,
+                stringsFromTree.map { Terrarum.fontGame.getWidth(it) }.max() ?: 0
+        )
+        val uiWidth = listWidth + (2 * TEXT_OFFSETX.toInt())
         val listHeight = stringsFromTree.size * LINE_HEIGHT
 
         val list = UIItemTextButtonList(
                 this,
                 stringsFromTree,
                 width, LINE_HEIGHT,
-                listWidth, listHeight,
-                textAreaWidth = listWidth - (2 * TEXT_OFFSETX.toInt()),
+                uiWidth, listHeight,
+                textAreaWidth = listWidth,
                 alignment = UIItemTextButton.Companion.Alignment.LEFT,
                 activeBackCol = Color(0x242424_80),//Color(1f,0f,.75f,1f),
                 inactiveCol = Color(.94f,.94f,.94f,1f),
@@ -86,7 +91,7 @@ class UINSMenu(
             // 2. push the new menu
 
             // 1. pop as far as possible
-            while (listStack.peek().list != list) {
+            while (listStack.peek().ui != list) {
                 popSubMenu()
             }
 
@@ -99,9 +104,9 @@ class UINSMenu(
 
 
         // push the processed list
-        listStack.push(MenuPack(tree.data ?: title, list))
+        listStack.push(MenuPack(menuTitle, list))
         // increment the memoized width
-        width += listWidth
+        width += uiWidth
         currentDepth += 1
     }
 
@@ -109,7 +114,7 @@ class UINSMenu(
         if (listStack.size == 1) throw Error("Tried to pop root menu")
 
         val poppedUIItem = listStack.pop()
-        width -= poppedUIItem.list.width
+        width -= poppedUIItem.ui.width
     }
 
     override fun updateUI(delta: Float) {
@@ -119,7 +124,7 @@ class UINSMenu(
 
         var c = 0
         while (c < listStack.size) {
-            listStack[c].list.update(delta)
+            listStack[c].ui.update(delta)
             c += 1
         }
     }
@@ -129,21 +134,21 @@ class UINSMenu(
             // draw title bar
             batch.color = titleBackCol
             BlendMode.resolve(titleBlendMode, batch)
-            batch.fillRect(it.list.posX.toFloat(), it.list.posY.toFloat() - LINE_HEIGHT, it.list.width.toFloat(), LINE_HEIGHT.toFloat())
+            batch.fillRect(it.ui.posX.toFloat(), it.ui.posY.toFloat() - LINE_HEIGHT, it.ui.width.toFloat(), LINE_HEIGHT.toFloat())
 
             batch.color = titleTextCol
             blendNormal(batch)
-            Terrarum.fontGame.draw(batch, it.title, TEXT_OFFSETX + it.list.posX, TEXT_OFFSETY + it.list.posY - LINE_HEIGHT)
+            Terrarum.fontGame.draw(batch, it.title, TEXT_OFFSETX + it.ui.posX, TEXT_OFFSETY + it.ui.posY - LINE_HEIGHT)
 
             // draw the list
             batch.color = Color.WHITE
-            it.list.render(batch, camera)
+            it.ui.render(batch, camera)
         }
 
     }
 
     override fun dispose() {
-        listStack.forEach { it.list.dispose() }
+        listStack.forEach { it.ui.dispose() }
     }
 
     fun mouseOnTitleBar() =
