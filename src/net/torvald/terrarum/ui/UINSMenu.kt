@@ -78,16 +78,20 @@ class UINSMenu(
         // List selection change listener
         list.selectionChangeListener = { old, new ->
             // if the selection has a child...
+
+            //println("new sel: ${tree.children[new]}")
+
+
+            // 1. pop as far as possible
+            // 2. push the new menu
+
+            // 1. pop as far as possible
+            while (listStack.peek().list != list) {
+                popSubMenu()
+            }
+
+            // 2. push the new menu
             if (tree.children[new].children.isNotEmpty()) {
-                // 1. pop as far as possible
-                // 2. push the new menu
-
-                // 1. pop as far as possible
-                while (listStack.peek().list != list) {
-                    popSubMenu()
-                }
-
-                // 2. push the new menu
                 addSubMenu(tree.children[new])
             }
         }

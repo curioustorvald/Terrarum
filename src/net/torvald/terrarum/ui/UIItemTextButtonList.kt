@@ -169,8 +169,8 @@ class UIItemTextButtonList(
                 val oldIndex = selectedIndex
 
                 if (kinematic) {
-                    highlighterYStart = buttons[selectedIndex!!].posY.toDouble()
                     selectedIndex = index
+                    highlighterYStart = buttons[selectedIndex!!].posY.toDouble()
                     highlighterMoving = true
                     highlighterYEnd = buttons[selectedIndex!!].posY.toDouble()
                 }
@@ -195,7 +195,7 @@ class UIItemTextButtonList(
         batch.color = highlightBackCol
         BlendMode.resolve(highlightBackBlendMode, batch)
         if (highlightY != null) {
-            batch.fillRect(posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
+            batch.fillRect(posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), itemHitboxSize.toFloat())
         }
 
         buttons.forEach { it.render(batch, camera) }
