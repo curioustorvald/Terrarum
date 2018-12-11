@@ -24,7 +24,8 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
  */
 object IngameRenderer {
 
-    private lateinit var batch: SpriteBatch
+    /** for non-private use, use with care! */
+    lateinit var batch: SpriteBatch
     private lateinit var camera: OrthographicCamera
 
     private lateinit var lightmapFboA: FrameBuffer
@@ -59,11 +60,12 @@ object IngameRenderer {
 
     operator fun invoke(
             world: GameWorldExtension,
-            actorsRenderBehind: List<ActorWithBody>? = null,
-            actorsRenderMiddle: List<ActorWithBody>? = null,
-            actorsRenderMidTop: List<ActorWithBody>? = null,
-            actorsRenderFront : List<ActorWithBody>? = null,
-            particlesContainer: CircularArray<ParticleBase>? = null,
+            actorsRenderBehind : List<ActorWithBody>? = null,
+            actorsRenderMiddle : List<ActorWithBody>? = null,
+            actorsRenderMidTop : List<ActorWithBody>? = null,
+            actorsRenderFront  : List<ActorWithBody>? = null,
+            actorsRenderOverlay: List<ActorWithBody>? = null,
+            particlesContainer : CircularArray<ParticleBase>? = null,
             player: ActorWithBody? = null,
             uisToDraw: ArrayList<UICanvas>? = null
     ) {
@@ -86,6 +88,7 @@ object IngameRenderer {
         prepLightmapRGBA()
         drawToRGB(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
         drawToA(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
+        drawOverlayActors(actorsRenderOverlay)
 
         // clear main or whatever super-FBO being used
         //clearBuffer()
@@ -389,6 +392,27 @@ object IngameRenderer {
 
 
         blendNormal(batch)
+    }
+
+    private fun drawOverlayActors(actors: List<ActorWithBody>?) {
+        fboRGB_lightMixed.inAction(camera, batch) {
+
+            batch.inUse {
+                batch.shader = null
+                batch.color = Color.WHITE
+            }
+
+            setCameraPosition(0f, 0f)
+            // BlocksDrawer.renderWhateverGlow_WALL
+
+            batch.inUse {
+                moveCameraToWorldCoord()
+                actors?.forEach { it.drawBody(batch) }
+            }
+
+            setCameraPosition(0f, 0f)
+            // BlocksDrawer.renderWhateverGlow_TERRAIN
+        }
     }
 
 

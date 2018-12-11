@@ -3,15 +3,13 @@ package net.torvald.terrarum.modulebasegame
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.IngameInstance
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.Yaml
+import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
+import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.Notification
 import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerToolbox
 import net.torvald.terrarum.ui.UICanvas
@@ -56,11 +54,16 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     val uiContainer = ArrayList<UICanvas>()
 
-    val blockPointingCursor = object : ActorWithBody(Actor.RenderOrder.FRONT) {
+    val blockPointingCursor = object : ActorWithBody(Actor.RenderOrder.OVERLAY) {
 
         override var referenceID: ActorID? = Terrarum.generateUniqueReferenceID(renderOrder)
         val body = TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16)
         override val hitbox = Hitbox(0.0, 0.0, 16.0, 16.0)
+
+        init {
+            this.actorValue[AVKey.LUMR] = 1.0
+            this.actorValue[AVKey.LUMG] = 1.0
+        }
 
         override fun drawBody(batch: SpriteBatch) {
             batch.color = Color.YELLOW
@@ -68,6 +71,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         override fun drawGlow(batch: SpriteBatch) { }
+
         override fun dispose() {
             body.dispose()
         }
@@ -89,10 +93,13 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     protected var updateDeltaCounter = 0.0
     protected val updateRate = 1.0 / Terrarum.TARGET_INTERNAL_FPS
 
-    private val actorsRenderTop = ArrayList<ActorWithBody>()
+    private val actorsRenderOverlay = ArrayList<ActorWithBody>()
 
     init {
-        actorsRenderTop.add(blockPointingCursor)
+        gameWorld.time.setTimeOfToday(WorldTime.HOUR_SEC * 10)
+        gameWorld.globalLight = Color(.8f,.8f,.8f,.8f)
+
+        actorsRenderOverlay.add(blockPointingCursor)
 
         uiContainer.add(uiToolbox)
         uiContainer.add(notifier)
@@ -160,7 +167,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun renderGame() {
-        IngameRenderer(world as GameWorldExtension, actorsRenderFront = actorsRenderTop, uisToDraw = uiContainer)
+        IngameRenderer(world as GameWorldExtension, actorsRenderOverlay = actorsRenderOverlay, uisToDraw = uiContainer)
     }
 
     override fun resize(width: Int, height: Int) {
@@ -171,7 +178,9 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         println("[BuildingMaker] Resize event")
     }
 
-
+    override fun dispose() {
+        IngameRenderer.dispose()
+    }
 
     private val menuYaml = Yaml("""
 - File

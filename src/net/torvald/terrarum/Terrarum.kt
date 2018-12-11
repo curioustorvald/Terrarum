@@ -421,17 +421,17 @@ object Terrarum : Screen {
 
 
         // jump right into the ingame
-        val ingame = Ingame(batch)
+        /*val ingame = Ingame(batch)
         ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
         ingame.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
         LoadScreen.screenToLoad = ingame
         this.ingame = ingame
-        setScreen(LoadScreen)
+        setScreen(LoadScreen)*/
 
 
 
         // title screen
-        //AppLoader.getINSTANCE().setScreen(TitleScreen(batch))
+        AppLoader.getINSTANCE().setScreen(TitleScreen(batch))
     }
 
     fun setScreen(screen: Screen) {
@@ -728,6 +728,7 @@ object Terrarum : Screen {
                         Actor.RenderOrder.MIDDLE -> Actor.RANGE_MIDDLE
                         Actor.RenderOrder.MIDTOP -> Actor.RANGE_MIDTOP
                         Actor.RenderOrder.FRONT  -> Actor.RANGE_FRONT
+                        Actor.RenderOrder.OVERLAY-> Actor.RANDE_OVERLAY
                     }
                 }
                 catch (gameNotInitialisedException: KotlinNullPointerException) {
