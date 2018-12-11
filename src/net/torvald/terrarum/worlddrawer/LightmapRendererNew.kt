@@ -10,7 +10,6 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
@@ -40,7 +39,7 @@ object LightmapRenderer {
 
     // FIXME lightmap shifts to left, ONLY AT x=33.5-34.5
 
-    private lateinit var world: GameWorld
+    private var world: GameWorld = GameWorld.makeNullWorld()
 
     /** do not call this yourself! Let your game renderer handle this! */
     fun setWorld(world: GameWorld) {
@@ -486,7 +485,7 @@ object LightmapRenderer {
     const val DRAW_FOR_RGB = 0xFFF0
     const val DRAW_FOR_ALPHA = 0x000F
 
-    lateinit var lightBuffer: Pixmap
+    var lightBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
     private val colourNull = Color(0)
 

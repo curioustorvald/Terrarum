@@ -47,7 +47,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private val ACTOR_UPDATE_RANGE = 4096
 
-    lateinit var historicalFigureIDBucket: ArrayList<Int>
+    var historicalFigureIDBucket: ArrayList<Int> = ArrayList<Int>()
 
 
     /**

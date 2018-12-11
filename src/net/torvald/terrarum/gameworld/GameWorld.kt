@@ -35,7 +35,7 @@ open class GameWorld {
     val layerTerrainLowBits: PairedMapLayer
 
     //val layerThermal: MapLayerHalfFloat // in Kelvins
-    //val layerAirPressure: MapLayerHalfFloat // (milibar - 1000)
+    //val layerFluidPressure: MapLayerHalfFloat // (milibar - 1000)
 
     /** Tilewise spawn point */
     var spawnX: Int
@@ -59,6 +59,8 @@ open class GameWorld {
 
 
     constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
+        if (width <= 0 || height <= 0) throw IllegalArgumentException("Non-positive width/height: ($width, $height)")
+
         this.worldIndex = worldIndex
         this.width = width
         this.height = height
@@ -76,10 +78,10 @@ open class GameWorld {
         terrainDamages = HashMap<BlockAddress, BlockDamage>()
 
         // temperature layer: 2x2 is one cell
-        //layerThermal = MapLayerHalfFloat(width / 2, height / 2, averageTemperature)
+        //layerThermal = MapLayerHalfFloat(width, height, averageTemperature)
 
-        // air pressure layer: 4 * 8 is one cell
-        //layerAirPressure = MapLayerHalfFloat(width / 4, height / 8, 13f) // 1013 mBar
+        // fluid pressure layer: 4 * 8 is one cell
+        //layerFluidPressure = MapLayerHalfFloat(width, height, 13f) // 1013 mBar
 
 
         creationTime = creationTIME_T
@@ -337,13 +339,12 @@ open class GameWorld {
 
     fun getAirPressure(worldTileX: Int, worldTileY: Int): Float? {
         return null
-        //return layerAirPressure.getValue((worldTileX fmod width) / 4, worldTileY / 8)
+        //return layerFluidPressure.getValue((worldTileX fmod width) / 4, worldTileY / 8)
     }
 
 
 
     companion object {
-
         @Transient val WALL = 0
         @Transient val TERRAIN = 1
         @Transient val WIRE = 2
@@ -351,6 +352,8 @@ open class GameWorld {
         @Transient val TILES_SUPPORTED = MapLayer.RANGE * PairedMapLayer.RANGE
         @Transient val SIZEOF: Byte = MapLayer.SIZEOF
         @Transient val LAYERS: Byte = 4 // terrain, wall (layerTerrainLowBits + layerWallLowBits), wire
+
+        fun makeNullWorld() = GameWorld(-1, 1, 1, 0, 0, 0)
     }
 }
 

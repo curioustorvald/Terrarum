@@ -32,6 +32,7 @@ import org.lwjgl.input.Controllers
 import java.io.File
 import java.io.IOException
 import net.torvald.getcpuname.GetCpuName
+import net.torvald.terrarum.modulebasegame.Ingame
 
 
 
@@ -420,16 +421,17 @@ object Terrarum : Screen {
 
 
         // jump right into the ingame
-        /*ingame = Ingame(batch)
-        ingame!!.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
-        ingame!!.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
-        LoadScreen.screenToLoad = ingame!!
-        super.setScreen(LoadScreen)*/
+        val ingame = Ingame(batch)
+        ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
+        ingame.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
+        LoadScreen.screenToLoad = ingame
+        this.ingame = ingame
+        setScreen(LoadScreen)
 
 
 
         // title screen
-        AppLoader.getINSTANCE().setScreen(TitleScreen(batch))
+        //AppLoader.getINSTANCE().setScreen(TitleScreen(batch))
     }
 
     fun setScreen(screen: Screen) {
