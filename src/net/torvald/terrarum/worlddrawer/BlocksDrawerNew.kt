@@ -2,7 +2,6 @@ package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Matrix4
 import net.torvald.terrarum.gameworld.GameWorld
@@ -31,8 +30,8 @@ import java.util.zip.GZIPInputStream
  * Created by minjaesong on 2016-01-19.
  */
 internal object BlocksDrawer {
-    lateinit var world: GameWorld
 
+    var world: GameWorld = GameWorld.makeNullWorld()
 
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()

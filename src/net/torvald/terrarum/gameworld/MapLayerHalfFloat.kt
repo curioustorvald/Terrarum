@@ -11,13 +11,13 @@ import net.torvald.dataclass.Float16Bits
 open class MapLayerHalfFloat(val width: Int, val height: Int) : Iterable<Float16Bits> {
 
     constructor(width: Int, height: Int, init: Float) : this(width, height) {
-        data = Array(height) { Array(width, { Float16.fromFloat(init) }) }
+        data = Array(height) { Array(width) { Float16.fromFloat(init) } }
     }
 
     internal @Volatile var data: Array<Array<Float16Bits>> // in parallel programming: do not trust your register; always read freshly from RAM!
 
     init {
-        data = Array(height) { Array(width, { 0.toShort() }) }
+        data = Array(height) { Array(width) { 0.toShort() } }
     }
 
     /**
