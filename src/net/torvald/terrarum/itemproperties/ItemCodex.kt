@@ -26,8 +26,8 @@ object ItemCodex {
     val ITEM_TILES = 0..GameWorld.TILES_SUPPORTED - 1
     val ITEM_WALLS = GameWorld.TILES_SUPPORTED..GameWorld.TILES_SUPPORTED * 2 - 1
     val ITEM_WIRES = GameWorld.TILES_SUPPORTED * 2..GameWorld.TILES_SUPPORTED * 2 + 255
-    val ITEM_STATIC = ITEM_WIRES.endInclusive + 1..32767
-    val ITEM_DYNAMIC = 32768..0x0FFF_FFFF
+    val ITEM_STATIC = ITEM_WIRES.endInclusive + 1..0x0F_FFFF
+    val ITEM_DYNAMIC = 0x10_0000..0x0FFF_FFFF
     val ACTORID_MIN = ITEM_DYNAMIC.endInclusive + 1
 
     private val itemImagePlaceholder = TextureRegion(Texture("./assets/item_kari_24.tga"))
