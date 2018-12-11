@@ -19,14 +19,16 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
         BEHIND, // tapestries, some particles (obstructed by terrain)
         MIDDLE, // actors
         MIDTOP, // bullets, thrown items
-        FRONT   // fake tiles
+        FRONT,  // fake tiles
+        OVERLAY // screen overlay, not affected by lightmap
     }
 
     companion object {
-        val RANGE_BEHIND = ACTORID_MIN..0x1FFF_FFFF
-        val RANGE_MIDDLE = 0x2000_0000..0x5FFF_FFFF
-        val RANGE_MIDTOP = 0x6000_0000..0x6FFF_FFFF
-        val RANGE_FRONT  = 0x7000_0000..0x7FFF_FFFF
+        val RANGE_BEHIND = ACTORID_MIN..0x1FFF_FFFF // 1
+        val RANGE_MIDDLE = 0x2000_0000..0x4FFF_FFFF // 3
+        val RANGE_MIDTOP = 0x5000_0000..0x5FFF_FFFF // 1
+        val RANGE_FRONT  = 0x6000_0000..0x6FFF_FFFF // 1
+        val RANDE_OVERLAY= 0x7000_0000..0x7FFF_FFFF // 1
     }
 
     abstract fun update(delta: Float)

@@ -45,7 +45,7 @@ object LightmapRenderer {
     fun setWorld(world: GameWorld) {
         try {
             if (this.world != world) {
-                println("World change detected -- old world: ${this.world.hashCode()}, new world: ${world.hashCode()}")
+                printdbg(this, "World change detected -- old world: ${this.world.hashCode()}, new world: ${world.hashCode()}")
 
                 /*for (y in 0 until LIGHTMAP_HEIGHT) {
                     for (x in 0 until LIGHTMAP_WIDTH) {

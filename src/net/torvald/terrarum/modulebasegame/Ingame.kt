@@ -64,6 +64,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     private val actorsRenderMiddle = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
     private val actorsRenderMidTop = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
     private val actorsRenderFront  = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
+    private val actorsRenderOverlay= ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
 
 
     //var screenZoom = 1.0f   // definition moved to IngameInstance
@@ -572,6 +573,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 actorsRenderMiddle,
                 actorsRenderMidTop,
                 actorsRenderFront,
+                actorsRenderOverlay,
                 particlesContainer,
                 actorNowPlaying,
                 uiContainer
