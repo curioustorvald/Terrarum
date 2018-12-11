@@ -430,7 +430,6 @@ object Terrarum : Screen {
 
         // title screen
         AppLoader.getINSTANCE().setScreen(TitleScreen(batch))
-        //appLoader.setScreen(FuckingWorldRenderer(batch))
     }
 
     fun setScreen(screen: Screen) {
