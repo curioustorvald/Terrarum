@@ -3,8 +3,8 @@
 |0..4095|Tiles (4096 possible)|
 |4096..8191|Walls (4096 possible)|
 |8192..8447|Wires (256 possible)|
-|8448..32767|Items (static) (24320 possible)|
-|32768..0x0FFF_FFFF|Items (dynamic\*) (268M possible)|
+|8448..0x0F_FFFF|Items (static) (1M possible)|
+|0x10_0000..0x0FFF_FFFF|Items (dynamic\*) (267M possible)|
 |0x1000_0000..0x7FFF_FFFF|Actors (1879M possible)|
 |-2147483648..-1 (all negative numbers)|Faction (2147M possible)|
 
