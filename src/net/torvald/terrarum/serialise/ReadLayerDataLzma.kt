@@ -3,7 +3,6 @@ package net.torvald.terrarum.serialise
 import com.badlogic.gdx.utils.compression.Lzma
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameworld.BlockAddress
-import net.torvald.terrarum.gameworld.BlockDamage
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.realestate.LandUtil
@@ -155,8 +154,10 @@ internal object ReadLayerDataLzma {
 
         val spawnPoint = LandUtil.resolveBlockAddr(width, spawnAddress)
 
-        val terrainDamages = HashMap<BlockAddress, BlockDamage>()
-        val wallDamages = HashMap<BlockAddress, BlockDamage>()
+        val terrainDamages = HashMap<BlockAddress, Float>()
+        val wallDamages = HashMap<BlockAddress, Float>()
+        val fluidTypes = HashMap<BlockAddress, Int>()
+        val fluidFills = HashMap<BlockAddress, Float>()
 
         // parse terrain damages
         for (c in 0 until payloadBytes["TdMG"]!!.size step 10) {
@@ -179,6 +180,9 @@ internal object ReadLayerDataLzma {
             wallDamages[tileAddr.toLittleInt48()] = value.toLittleFloat()
         }
 
+
+        // TODO parse fluid(Types|Fills)
+
         
         return LayerData(
                 MapLayer(width, height, payloadBytes["WALL_MSB"]!!),
@@ -189,7 +193,7 @@ internal object ReadLayerDataLzma {
 
                 spawnPoint.first, spawnPoint.second,
 
-                wallDamages, terrainDamages
+                wallDamages, terrainDamages, fluidTypes, fluidFills
         )
     }
 
@@ -209,8 +213,10 @@ internal object ReadLayerDataLzma {
 
             val spawnX: Int,
             val spawnY: Int,
-            val wallDamages: HashMap<BlockAddress, BlockDamage>,
-            val terrainDamages: HashMap<BlockAddress, BlockDamage>
+            val wallDamages: HashMap<BlockAddress, Float>,
+            val terrainDamages: HashMap<BlockAddress, Float>,
+            val fluidTypes: HashMap<BlockAddress, Int>,
+            val fluidFills: HashMap<BlockAddress, Float>
     )
 
     private fun ByteArray.shiftLeftBy(size: Int, fill: Byte = 0.toByte()) {
