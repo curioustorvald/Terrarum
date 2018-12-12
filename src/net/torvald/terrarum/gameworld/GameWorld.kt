@@ -301,6 +301,7 @@ open class GameWorld {
         // remove tile from the world
         if (terrainDamages[addr] ?: 0f >= BlockCodex[getTileFromTerrain(x, y)].strength) {
             setTileTerrain(x, y, 0)
+            terrainDamages.remove(addr)
             return true
         }
 
@@ -329,6 +330,7 @@ open class GameWorld {
         // remove tile from the world
         if (wallDamages[addr]!! >= BlockCodex[getTileFromWall(x, y)].strength) {
             setTileWall(x, y, 0)
+            wallDamages.remove(addr)
             return true
         }
 
