@@ -833,7 +833,7 @@ object WorldGenerator {
     /* Flood */
 
     private fun floodBottomLava() {
-        println("[mapgenerator] Flooding with lava...")
+        /*println("[mapgenerator] Flooding with lava...")
         LoadScreen.addMessage("Flooding with lava...")
         for (i in HEIGHT * 14 / 15..HEIGHT - 1) {
             for (j in 0..WIDTH - 1) {
@@ -841,7 +841,7 @@ object WorldGenerator {
                     world.setTileTerrain(j, i, Block.LAVA)
                 }
             }
-        }
+        }*/
     }
 
     /* Plant */
@@ -921,11 +921,11 @@ object WorldGenerator {
             if (ix < OCEAN_WIDTH) {
                 if (worldOceanPosition == TYPE_OCEAN_LEFT) {
                     for (y in getTerrainHeightFromHeightMap(OCEAN_WIDTH)..getTerrainHeightFromHeightMap(ix) - 1) {
-                        world.setTileTerrain(ix, y, Block.WATER)
+                        //world.setTileTerrain(ix, y, Block.WATER)
                     }
                 } else if (worldOceanPosition == TYPE_OCEAN_RIGHT) {
                     for (y in getTerrainHeightFromHeightMap(world.width - 1 - OCEAN_WIDTH)..getTerrainHeightFromHeightMap(world.width - 1 - ix) - 1) {
-                        world.setTileTerrain(world.width - 1 - ix, y, Block.WATER)
+                        //world.setTileTerrain(world.width - 1 - ix, y, Block.WATER)
                     }
                 }
             }

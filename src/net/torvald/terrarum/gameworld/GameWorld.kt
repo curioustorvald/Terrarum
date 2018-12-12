@@ -2,6 +2,7 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.graphics.Color
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.serialise.ReadLayerDataLzma
@@ -335,6 +336,13 @@ open class GameWorld {
     }
     fun getWallDamage(x: Int, y: Int): Float =
             wallDamages[LandUtil.getBlockAddr(this, x, y)] ?: 0f
+
+    fun setFluid(x: Int, y: Int, fluidType: Int, fill: Float) {
+        val addr = LandUtil.getBlockAddr(this, x, y)
+        fluidTypes[addr] = fluidType
+        fluidFills[addr] = fill
+        setTileTerrain(x, y, Block.FLUID_MARKER)
+    }
 
 
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {

@@ -42,8 +42,7 @@ internal object ExportMap : ConsoleCommand {
         colorTable.put(Block.RAW_TOPAZ, Col4096(0xC70))
         colorTable.put(Block.RAW_AMETHYST, Col4096(0x70C))
 
-        colorTable.put(Block.WATER, Col4096(0x038))
-        colorTable.put(Block.LAVA, Col4096(0xF50))
+        colorTable.put(Block.FLUID_MARKER, Col4096(0x038))
 
         colorTable.put(Block.SAND, Col4096(0xDDB))
         colorTable.put(Block.SAND_WHITE, Col4096(0xFFD))
