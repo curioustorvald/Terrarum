@@ -8,7 +8,6 @@ import net.torvald.terrarum.serialise.ReadLayerDataLzma
 import org.dyn4j.geometry.Vector2
 
 typealias BlockAddress = Long
-typealias BlockDamage = Float
 
 open class GameWorld {
 
@@ -42,8 +41,10 @@ open class GameWorld {
     /** Tilewise spawn point */
     var spawnY: Int
 
-    val wallDamages: HashMap<BlockAddress, BlockDamage>
-    val terrainDamages: HashMap<BlockAddress, BlockDamage>
+    val wallDamages: HashMap<BlockAddress, Float>
+    val terrainDamages: HashMap<BlockAddress, Float>
+    val fluidTypes: HashMap<BlockAddress, Int>
+    val fluidFills: HashMap<BlockAddress, Float>
 
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
@@ -74,8 +75,10 @@ open class GameWorld {
         layerTerrainLowBits = PairedMapLayer(width, height)
         layerWallLowBits = PairedMapLayer(width, height)
 
-        wallDamages = HashMap<BlockAddress, BlockDamage>()
-        terrainDamages = HashMap<BlockAddress, BlockDamage>()
+        wallDamages = HashMap<BlockAddress, Float>()
+        terrainDamages = HashMap<BlockAddress, Float>()
+        fluidTypes = HashMap<BlockAddress, Int>()
+        fluidFills = HashMap<BlockAddress, Float>()
 
         // temperature layer: 2x2 is one cell
         //layerThermal = MapLayerHalfFloat(width, height, averageTemperature)
@@ -100,6 +103,8 @@ open class GameWorld {
 
         wallDamages = layerData.wallDamages
         terrainDamages = layerData.terrainDamages
+        fluidTypes = layerData.fluidTypes
+        fluidFills = layerData.fluidFills
 
         spawnX = layerData.spawnX
         spawnY = layerData.spawnY
