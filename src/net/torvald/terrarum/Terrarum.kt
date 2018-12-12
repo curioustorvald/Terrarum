@@ -33,6 +33,7 @@ import java.io.File
 import java.io.IOException
 import net.torvald.getcpuname.GetCpuName
 import net.torvald.terrarum.modulebasegame.Ingame
+import kotlin.math.absoluteValue
 
 
 
@@ -908,7 +909,7 @@ inline fun Double.abs() = Math.abs(this)
 inline fun Double.sqr() = this * this
 inline fun Double.sqrt() = Math.sqrt(this)
 inline fun Float.sqrt() = FastMath.sqrt(this)
-inline fun Int.abs() = if (this < 0) -this else this
+inline fun Int.abs() = this.absoluteValue
 fun Double.bipolarClamp(limit: Double) =
         this.coerceIn(-limit, limit)
 
