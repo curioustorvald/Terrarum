@@ -1,7 +1,7 @@
 #### Before we begin, please read following articles:
 
 - Celluar Automata https://w-shadow.com/blog/2009/09/01/simple-fluid-simulation/
-- Pressure sim in DF http://www.gamasutra.com/view/feature/131954/interview_the_making_of_dwarf_.php
+- Pressure sim in DF (see Page 9) http://www.gamasutra.com/view/feature/131954/interview_the_making_of_dwarf_.php
 
 ### Serialisation
 - FluidType: Hashed list of BlockAddress, Int
