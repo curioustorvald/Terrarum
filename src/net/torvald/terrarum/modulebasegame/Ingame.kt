@@ -598,7 +598,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         actorNowPlaying = newActor
-        WorldSimulator(actorNowPlaying, Terrarum.deltaTime)
+        //WorldSimulator(actorNowPlaying, Terrarum.deltaTime)
     }
 
     private fun changePossession(refid: Int) {

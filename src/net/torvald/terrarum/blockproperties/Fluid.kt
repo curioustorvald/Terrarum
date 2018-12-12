@@ -1,13 +1,15 @@
 package net.torvald.terrarum.blockproperties
 
+import net.torvald.terrarum.gameworld.FluidType
+
 /**
  * Created by minjaesong on 2016-08-06.
  */
 object Fluid {
 
-    val NULL = 0
+    val NULL = FluidType(0)
 
-    val WATER = 1
-    val STATIC_WATER = -1
+    val WATER = FluidType(1)
+    val STATIC_WATER = FluidType(-1)
 
 }

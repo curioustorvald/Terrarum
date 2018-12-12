@@ -5,9 +5,11 @@ import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.serialise.ReadLayerDataLzma
 import org.dyn4j.geometry.Vector2
+import kotlin.math.absoluteValue
 
 typealias BlockAddress = Long
 
@@ -45,7 +47,7 @@ open class GameWorld {
 
     val wallDamages: HashMap<BlockAddress, Float>
     val terrainDamages: HashMap<BlockAddress, Float>
-    val fluidTypes: HashMap<BlockAddress, Int>
+    val fluidTypes: HashMap<BlockAddress, FluidType>
     val fluidFills: HashMap<BlockAddress, Float>
 
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
@@ -79,7 +81,7 @@ open class GameWorld {
 
         wallDamages = HashMap<BlockAddress, Float>()
         terrainDamages = HashMap<BlockAddress, Float>()
-        fluidTypes = HashMap<BlockAddress, Int>()
+        fluidTypes = HashMap<BlockAddress, FluidType>()
         fluidFills = HashMap<BlockAddress, Float>()
 
         // temperature layer: 2x2 is one cell
@@ -154,8 +156,8 @@ open class GameWorld {
         get() = layerTerrainLowBits.data
 
     fun getTileFromWall(x: Int, y: Int): Int? {
-        val wall: Int? = layerWall.getTile(x fmod width, y)
-        val wallDamage: Int? = getWallLowBits(x fmod width, y)
+        val wall: Int? = layerWall.getTile(x fmod width, y.coerceWorld().coerceWorld())
+        val wallDamage: Int? = getWallLowBits(x fmod width, y.coerceWorld())
         return if (wall == null || wallDamage == null)
             null
         else
@@ -163,8 +165,8 @@ open class GameWorld {
     }
 
     fun getTileFromTerrain(x: Int, y: Int): Int? {
-        val terrain: Int? = layerTerrain.getTile(x fmod width, y)
-        val terrainDamage: Int? = getTerrainLowBits(x fmod width, y)
+        val terrain: Int? = layerTerrain.getTile(x fmod width, y.coerceWorld())
+        val terrainDamage: Int? = getTerrainLowBits(x fmod width, y.coerceWorld())
         return if (terrain == null || terrainDamage == null)
             null
         else
@@ -172,15 +174,15 @@ open class GameWorld {
     }
 
     fun getTileFromWire(x: Int, y: Int): Int? {
-        return layerWire.getTile(x fmod width, y)
+        return layerWire.getTile(x fmod width, y.coerceWorld())
     }
 
     fun getWallLowBits(x: Int, y: Int): Int? {
-        return layerWallLowBits.getData(x fmod width, y)
+        return layerWallLowBits.getData(x fmod width, y.coerceWorld())
     }
 
     fun getTerrainLowBits(x: Int, y: Int): Int? {
-        return layerTerrainLowBits.getData(x fmod width, y)
+        return layerTerrainLowBits.getData(x fmod width, y.coerceWorld())
     }
 
     /**
@@ -192,7 +194,7 @@ open class GameWorld {
      * @param combinedTilenum (tilenum * 16) + damage
      */
     fun setTileWall(x: Int, y: Int, combinedTilenum: Int) {
-        setTileWall(x fmod width, y, (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
+        setTileWall(x fmod width, y.coerceWorld(), (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
     }
 
     /**
@@ -204,23 +206,23 @@ open class GameWorld {
      * @param combinedTilenum (tilenum * 16) + damage
      */
     fun setTileTerrain(x: Int, y: Int, combinedTilenum: Int) {
-        setTileTerrain(x fmod width, y, (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
+        setTileTerrain(x fmod width, y.coerceWorld(), (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
     }
 
     fun setTileWall(x: Int, y: Int, tile: Byte, damage: Int) {
-        layerWall.setTile(x fmod width, y, tile)
-        layerWallLowBits.setData(x fmod width, y, damage)
+        layerWall.setTile(x fmod width, y.coerceWorld(), tile)
+        layerWallLowBits.setData(x fmod width, y.coerceWorld(), damage)
         wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
     }
 
     fun setTileTerrain(x: Int, y: Int, tile: Byte, damage: Int) {
-        layerTerrain.setTile(x fmod width, y, tile)
-        layerTerrainLowBits.setData(x fmod width, y, damage)
+        layerTerrain.setTile(x fmod width, y.coerceWorld(), tile)
+        layerTerrainLowBits.setData(x fmod width, y.coerceWorld(), damage)
         terrainDamages.remove(LandUtil.getBlockAddr(this, x, y))
     }
 
     fun setTileWire(x: Int, y: Int, tile: Byte) {
-        layerWire.setTile(x fmod width, y, tile)
+        layerWire.setTile(x fmod width, y.coerceWorld(), tile)
     }
 
     fun getTileFrom(mode: Int, x: Int, y: Int): Int? {
@@ -340,13 +342,20 @@ open class GameWorld {
     fun getWallDamage(x: Int, y: Int): Float =
             wallDamages[LandUtil.getBlockAddr(this, x, y)] ?: 0f
 
-    fun setFluid(x: Int, y: Int, fluidType: Int, fill: Float) {
+    fun setFluid(x: Int, y: Int, fluidType: FluidType, fill: Float) {
         val addr = LandUtil.getBlockAddr(this, x, y)
+        // fluid completely drained
         if (fill <= WorldSimulator.FLUID_MIN_MASS) {
-            fluidTypes.remove(addr)
-            fluidFills.remove(addr)
-            setTileTerrain(x, y, 0)
+            /**********/ fluidTypes.remove(addr)
+            val oldMap = fluidFills.remove(addr)
+
+            // oldMap not being null means there actually was a fluid there, so we can put AIR onto it
+            // otherwise, it means it was some solid and therefore we DON'T want to put AIR onto it
+            if (oldMap != null) {
+                setTileTerrain(x, y, 0)
+            }
         }
+        // update the fluid amount
         else {
             fluidTypes[addr] = fluidType
             fluidFills[addr] = fill
@@ -354,27 +363,28 @@ open class GameWorld {
         }
     }
 
-    fun getFluid(x: Int, y: Int): Pair<Int, Float>? {
+    fun getFluid(x: Int, y: Int): FluidInfo {
         val addr = LandUtil.getBlockAddr(this, x, y)
         val fill = fluidFills[addr]
         val type = fluidTypes[addr]
 
-        return if (type == null) null else Pair(type!!, fill!!)
+        return if (type == null) FluidInfo(Fluid.NULL, 0f) else FluidInfo(type, fill!!)
     }
+
+    data class FluidInfo(val type: FluidType, val amount: Float)
 
 
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {
         return null
-        //return layerThermal.getValue((worldTileX fmod width) / 2, worldTileY / 2)
     }
 
     fun getAirPressure(worldTileX: Int, worldTileY: Int): Float? {
         return null
-        //return layerFluidPressure.getValue((worldTileX fmod width) / 4, worldTileY / 8)
     }
 
 
-
+    private fun Int.coerceWorld() = this.coerceIn(0, height - 1)
+    
     companion object {
         @Transient val WALL = 0
         @Transient val TERRAIN = 1
@@ -390,3 +400,7 @@ open class GameWorld {
 
 infix fun Int.fmod(other: Int) = Math.floorMod(this, other)
 infix fun Float.fmod(other: Float) = if (this >= 0f) this % other else (this % other) + other
+
+inline class FluidType(val value: Int) {
+    infix fun sameAs(other: FluidType) = this.value.absoluteValue == other.value.absoluteValue
+}
