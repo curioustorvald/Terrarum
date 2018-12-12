@@ -47,9 +47,10 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
 
     var nameColour = Color.WHITE
 
-
+    /** In kg */
     abstract var baseMass: Double
 
+    /** In kg */
     abstract var baseToolSize: Double?
 
     abstract var inventoryCategory: String // "weapon", "tool", "armor", etc. (all smallcaps)

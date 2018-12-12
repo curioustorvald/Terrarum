@@ -215,9 +215,9 @@ object BlocksDrawerOLD {
             Block.SANDSTONE_DESERT,
             Block.SANDSTONE_RED,
             Block.SANDSTONE_WHITE,
-            Block.SANDSTONE_GREEN,
+            Block.SANDSTONE_GREEN
 
-            Block.WATER,
+            /*Block.WATER,
             Block.WATER_1,
             Block.WATER_2,
             Block.WATER_3,
@@ -248,7 +248,7 @@ object BlocksDrawerOLD {
             Block.LAVA_12,
             Block.LAVA_13,
             Block.LAVA_14,
-            Block.LAVA_15
+            Block.LAVA_15*/
     )
 
     /**
@@ -298,8 +298,8 @@ object BlocksDrawerOLD {
      * will blend colour using colour multiplication
      * i.e. red hues get lost if you dive into the water
      */
-    private val TILES_BLEND_MUL = hashSetOf(
-            Block.WATER,
+    private val TILES_BLEND_MUL = hashSetOf(-1
+            /*Block.WATER,
             Block.WATER_1,
             Block.WATER_2,
             Block.WATER_3,
@@ -330,7 +330,7 @@ object BlocksDrawerOLD {
             Block.LAVA_12,
             Block.LAVA_13,
             Block.LAVA_14,
-            Block.LAVA_15
+            Block.LAVA_15*/
     )
 
     /**

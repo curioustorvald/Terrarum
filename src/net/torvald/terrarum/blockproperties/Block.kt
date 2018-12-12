@@ -115,39 +115,7 @@ object Block {
     val SUNSTONE = 257
     val DAYLIGHT_CAPACITOR = 258
 
-    val WATER_1 =  4080
-    val WATER_2 =  4081
-    val WATER_3 =  4082
-    val WATER_4 =  4083
-    val WATER_5 =  4084
-    val WATER_6 =  4085
-    val WATER_7 =  4086
-    val WATER_8 =  4087
-    val WATER_9 =  4088
-    val WATER_10 = 4089
-    val WATER_11 = 4090
-    val WATER_12 = 4091
-    val WATER_13 = 4092
-    val WATER_14 = 4093
-    val WATER_15 = 4094
-    val WATER =    4095
-
-    val LAVA_1 =  4064
-    val LAVA_2 =  4065
-    val LAVA_3 =  4066
-    val LAVA_4 =  4067
-    val LAVA_5 =  4068
-    val LAVA_6 =  4069
-    val LAVA_7 =  4070
-    val LAVA_8 =  4071
-    val LAVA_9 =  4072
-    val LAVA_10 = 4073
-    val LAVA_11 = 4074
-    val LAVA_12 = 4075
-    val LAVA_13 = 4076
-    val LAVA_14 = 4077
-    val LAVA_15 = 4078
-    val LAVA =    4079
+    val FLUID_MARKER = 4095
 
     val NULL = -1
 }

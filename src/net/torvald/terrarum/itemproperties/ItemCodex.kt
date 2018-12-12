@@ -169,6 +169,30 @@ object ItemCodex {
         }*/
 
 
+        // test water bucket
+        itemCodex[9000] = object : GameItem() {
+            override var dynamicID: ItemID = 9000
+            override val originalID: ItemID = 9000
+
+            override val isUnique: Boolean = true
+            override val originalName: String = "Infinite Water Bucket"
+
+            override var baseMass: Double = 1000.0
+            override var baseToolSize: Double? = null
+
+            override var inventoryCategory: String = "tool"
+            override var stackable: Boolean = false
+
+            override val isDynamic: Boolean = false
+            override val material: Material = Material(1,1,1,1,1,1,1,1,1,1.0)
+
+            override fun startSecondaryUse(delta: Float): Boolean {
+                return super.startSecondaryUse(delta)
+            }
+        }
+
+
+
         // read from save (if applicable) and fill dynamicItemDescription
 
 

@@ -2,7 +2,6 @@ package net.torvald.terrarum.serialise
 
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameworld.BlockAddress
-import net.torvald.terrarum.gameworld.BlockDamage
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.realestate.LandUtil
@@ -153,8 +152,8 @@ internal object ReadLayerDataZip {
 
         val spawnPoint = LandUtil.resolveBlockAddr(width, spawnAddress)
 
-        val terrainDamages = HashMap<BlockAddress, BlockDamage>()
-        val wallDamages = HashMap<BlockAddress, BlockDamage>()
+        val terrainDamages = HashMap<BlockAddress, Float>()
+        val wallDamages = HashMap<BlockAddress, Float>()
 
         // parse terrain damages
         for (c in 0 until payloadBytes["TdMG"]!!.size step 10) {
@@ -207,8 +206,8 @@ internal object ReadLayerDataZip {
 
             val spawnX: Int,
             val spawnY: Int,
-            val wallDamages: HashMap<BlockAddress, BlockDamage>,
-            val terrainDamages: HashMap<BlockAddress, BlockDamage>
+            val wallDamages: HashMap<BlockAddress, Float>,
+            val terrainDamages: HashMap<BlockAddress, Float>
     )
 
     private fun ByteArray.shiftLeftBy(size: Int, fill: Byte = 0.toByte()) {
