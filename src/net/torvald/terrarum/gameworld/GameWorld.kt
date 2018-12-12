@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.serialise.ReadLayerDataLzma
 import org.dyn4j.geometry.Vector2
 
@@ -341,9 +342,24 @@ open class GameWorld {
 
     fun setFluid(x: Int, y: Int, fluidType: Int, fill: Float) {
         val addr = LandUtil.getBlockAddr(this, x, y)
-        fluidTypes[addr] = fluidType
-        fluidFills[addr] = fill
-        setTileTerrain(x, y, Block.FLUID_MARKER)
+        if (fill <= WorldSimulator.FLUID_MIN_MASS) {
+            fluidTypes.remove(addr)
+            fluidFills.remove(addr)
+            setTileTerrain(x, y, 0)
+        }
+        else {
+            fluidTypes[addr] = fluidType
+            fluidFills[addr] = fill
+            setTileTerrain(x, y, Block.FLUID_MARKER)
+        }
+    }
+
+    fun getFluid(x: Int, y: Int): Pair<Int, Float>? {
+        val addr = LandUtil.getBlockAddr(this, x, y)
+        val fill = fluidFills[addr]
+        val type = fluidTypes[addr]
+
+        return if (type == null) null else Pair(type!!, fill!!)
     }
 
 

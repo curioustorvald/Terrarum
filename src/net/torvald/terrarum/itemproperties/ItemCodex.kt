@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.KVHashMap
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.modulebasegame.Ingame
@@ -32,12 +33,14 @@ object ItemCodex {
 
     private val itemImagePlaceholder = TextureRegion(Texture("./assets/item_kari_24.tga"))
 
-    //private val ingame = Terrarum.ingame!! as Ingame
+    //private val ingame = Terrarum.ingame!! as Ingame // WARNING you can't put this here, ExceptionInInitializerError
 
 
     // TODO: when generalised, there's no guarantee that blocks will be used as an item. Write customised item prop loader and init it on the Ingame
 
     init {
+        //val ingame = Terrarum.ingame!! as Ingame // WARNING you can't put this here, ExceptionInInitializerError
+
 
         /*println("[ItemCodex] recording item ID ")
 
@@ -186,8 +189,12 @@ object ItemCodex {
             override val isDynamic: Boolean = false
             override val material: Material = Material(1,1,1,1,1,1,1,1,1,1.0)
 
+            override val equipPosition: Int = EquipPosition.HAND_GRIP
+
             override fun startSecondaryUse(delta: Float): Boolean {
-                return super.startSecondaryUse(delta)
+                val ingame = Terrarum.ingame!! as Ingame // must be in here
+                ingame.world.setFluid(Terrarum.mouseTileX, Terrarum.mouseTileY, Fluid.WATER, 1f)
+                return true
             }
         }
 

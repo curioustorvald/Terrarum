@@ -519,7 +519,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             ///////////////////////////
             BlockPropUtil.dynamicLumFuncTickClock()
             world.updateWorldTime(delta)
-            //WorldSimulator(player, delta)
+            WorldSimulator.invoke(actorNowPlaying, delta)
             WeatherMixer.update(delta, actorNowPlaying, world)
             BlockStats.update()
 

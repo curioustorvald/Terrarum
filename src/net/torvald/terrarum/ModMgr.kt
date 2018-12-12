@@ -229,6 +229,8 @@ object ModMgr {
                 val className = it["classname"].toString()
                 val itemID = it["id"].toInt()
 
+                printdbg(this, "Reading item #$itemID with className $className")
+
                 val loadedClass = Class.forName(className)
                 val loadedClassConstructor = loadedClass.getConstructor(ItemID::class.java)
                 val loadedClassInstance = loadedClassConstructor.newInstance(itemID)

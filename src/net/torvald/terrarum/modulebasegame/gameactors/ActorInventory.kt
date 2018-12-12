@@ -177,6 +177,9 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
         if (item.stackable && !item.isDynamic) {
             remove(item, 1)
         }
+        else if (item.isUnique) {
+            return // don't consume a bike!
+        }
         else {
             val newItem: GameItem
 
