@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
 import com.badlogic.gdx.graphics.Color
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.roundInt
@@ -49,6 +50,8 @@ object WorldSimulator {
     private val world = (Terrarum.ingame!!.world)
 
     operator fun invoke(p: ActorHumanoid?, delta: Float) {
+        //printdbg(this, "============================")
+
         if (p != null) {
             updateXFrom = p.hitbox.centeredX.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
             updateYFrom = p.hitbox.centeredY.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
@@ -58,6 +61,8 @@ object WorldSimulator {
 
         moveFluids(delta)
         displaceFallables(delta)
+
+        //printdbg(this, "============================")
     }
 
     /**
@@ -71,7 +76,98 @@ object WorldSimulator {
     fun moveFluids(delta: Float) {
         makeFluidMapFromWorld()
 
+        //simCompression()
+        for (y in 1 until fluidMap.size - 1) {
+            for (x in 1 until fluidMap[0].size - 1) {
+                val worldX = x + updateXFrom
+                val worldY = y + updateYFrom
 
+                /*if (worldX == 60 && worldY == 256) {
+                    printdbg(this, "tile: ${world.getTileFromTerrain(worldX, worldY)}, isSolid = ${isSolid(worldX, worldY)}")
+                }*/
+
+                if (isSolid(worldX, worldY)) continue
+                val remainingMass = fluidMap[y][x]
+
+                /*if (worldX == 60 && worldY == 256) {
+                    printdbg(this, "remainimgMass: $remainingMass at ($worldX, $worldY)")
+                }*/
+
+                if (!isSolid(worldX, worldY + 1)) {
+                    fluidNewMap[y][x] -= remainingMass
+                    fluidNewMap[y + 1][x] += remainingMass
+                }
+            }
+        }
+
+        fluidmapToWorld()
+    }
+
+    fun isFlowable(type: FluidType, worldX: Int, worldY: Int): Boolean {
+        val targetFluid = world.getFluid(worldX, worldY)
+
+        // true if target's type is the same as mine, or it's NULL (air)
+        return (targetFluid.type sameAs type || targetFluid.type sameAs Fluid.NULL)
+    }
+
+    fun isSolid(worldX: Int, worldY: Int): Boolean {
+        val tile = world.getTileFromTerrain(worldX, worldY)
+        if (tile != Block.WATER) {
+            // check for block properties isSolid
+            return BlockCodex[tile].isSolid
+        }
+        else {
+            // check for fluid
+
+            // no STATIC is implement yet, just return false
+            return false
+        }
+    }
+
+    /*
+    Explanation of get_stable_state_b (well, kind-of) :
+
+    if x <= 1, all water goes to the lower cell
+        * a = 0
+        * b = 1
+
+    if x > 1 & x < 2*MaxMass + MaxCompress, the lower cell should have MaxMass + (upper_cell/MaxMass) * MaxCompress
+        b = MaxMass + (a/MaxMass)*MaxCompress
+        a = x - b
+
+        ->
+
+        b = MaxMass + ((x - b)/MaxMass)*MaxCompress ->
+            b = MaxMass + (x*MaxCompress - b*MaxCompress)/MaxMass
+            b*MaxMass = MaxMass^2 + (x*MaxCompress - b*MaxCompress)
+            b*(MaxMass + MaxCompress) = MaxMass*MaxMass + x*MaxCompress
+
+            * b = (MaxMass*MaxMass + x*MaxCompress)/(MaxMass + MaxCompress)
+        * a = x - b;
+
+    if x >= 2 * MaxMass + MaxCompress, the lower cell should have upper+MaxCompress
+
+        b = a + MaxCompress
+        a = x - b
+
+        ->
+
+        b = x - b + MaxCompress ->
+        2b = x + MaxCompress ->
+
+        * b = (x + MaxCompress)/2
+        * a = x - b
+      */
+    private fun getStableStateB(totalMass: Float): Float {
+        if (totalMass <= 1)
+            return 1f
+        else if (totalMass < 2f * FLUID_MAX_MASS + FLUID_MAX_COMP)
+            return (FLUID_MAX_MASS * FLUID_MAX_MASS + totalMass * FLUID_MAX_COMP) / (FLUID_MAX_MASS + FLUID_MAX_COMP)
+        else
+            return (totalMass + FLUID_MAX_COMP) / 2f
+    }
+
+    private fun simCompression() {
         // before data: fluidMap/fluidTypeMap
         // after data: fluidNewMap/fluidNewTypeMap
         var flow = 0f
@@ -156,73 +252,6 @@ object WorldSimulator {
 
             }
         }
-
-
-        fluidmapToWorld()
-    }
-
-    fun isFlowable(type: FluidType, worldX: Int, worldY: Int): Boolean {
-        val targetFluid = world.getFluid(worldX, worldY)
-
-        // true if target's type is the same as mine, or it's NULL (air)
-        return (targetFluid.type sameAs type || targetFluid.type sameAs Fluid.NULL)
-    }
-
-    fun isSolid(worldX: Int, worldY: Int): Boolean {
-        val tile = world.getTileFromTerrain(worldX, worldY)
-        if (tile != Block.FLUID_MARKER) {
-            // check for block properties isSolid
-            return BlockCodex[tile].isSolid
-        }
-        else {
-            // check for fluid
-
-            // no STATIC is implement yet, just return true
-            return true
-        }
-    }
-
-    /*
-    Explanation of get_stable_state_b (well, kind-of) :
-
-    if x <= 1, all water goes to the lower cell
-        * a = 0
-        * b = 1
-
-    if x > 1 & x < 2*MaxMass + MaxCompress, the lower cell should have MaxMass + (upper_cell/MaxMass) * MaxCompress
-        b = MaxMass + (a/MaxMass)*MaxCompress
-        a = x - b
-
-        ->
-
-        b = MaxMass + ((x - b)/MaxMass)*MaxCompress ->
-            b = MaxMass + (x*MaxCompress - b*MaxCompress)/MaxMass
-            b*MaxMass = MaxMass^2 + (x*MaxCompress - b*MaxCompress)
-            b*(MaxMass + MaxCompress) = MaxMass*MaxMass + x*MaxCompress
-
-            * b = (MaxMass*MaxMass + x*MaxCompress)/(MaxMass + MaxCompress)
-        * a = x - b;
-
-    if x >= 2 * MaxMass + MaxCompress, the lower cell should have upper+MaxCompress
-
-        b = a + MaxCompress
-        a = x - b
-
-        ->
-
-        b = x - b + MaxCompress ->
-        2b = x + MaxCompress ->
-
-        * b = (x + MaxCompress)/2
-        * a = x - b
-      */
-    private fun getStableStateB(totalMass: Float): Float {
-        if (totalMass <= 1)
-            return 1f
-        else if (totalMass < 2f * FLUID_MAX_MASS + FLUID_MAX_COMP)
-            return (FLUID_MAX_MASS * FLUID_MAX_MASS + totalMass * FLUID_MAX_COMP) / (FLUID_MAX_MASS + FLUID_MAX_COMP)
-        else
-            return (totalMass + FLUID_MAX_COMP) / 2f
     }
 
     /**
@@ -260,6 +289,8 @@ object WorldSimulator {
     }
 
     private fun makeFluidMapFromWorld() {
+        //printdbg(this, "Scan area: ($updateXFrom,$updateYFrom)..(${updateXFrom + fluidMap[0].size},${updateYFrom + fluidMap.size})")
+
         for (y in 0 until fluidMap.size) {
             for (x in 0 until fluidMap[0].size) {
                 val fluidData = world.getFluid(x + updateXFrom, y + updateYFrom)
@@ -267,6 +298,10 @@ object WorldSimulator {
                 fluidTypeMap[y][x] = fluidData.type
                 fluidNewMap[y][x] = fluidData.amount
                 fluidNewTypeMap[y][x] = fluidData.type
+
+                if (x + updateXFrom == 60 && y + updateYFrom == 256) {
+                    printdbg(this, "making array amount ${fluidData.amount} for (60,256)")
+                }
             }
         }
     }
