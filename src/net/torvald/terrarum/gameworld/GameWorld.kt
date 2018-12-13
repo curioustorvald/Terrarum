@@ -2,6 +2,7 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.graphics.Color
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -215,10 +216,20 @@ open class GameWorld {
         wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
     }
 
+    /**
+     * Warning: this function alters fluid lists: be wary of call order!
+     */
     fun setTileTerrain(x: Int, y: Int, tile: Byte, damage: Int) {
         layerTerrain.setTile(x fmod width, y.coerceWorld(), tile)
         layerTerrainLowBits.setData(x fmod width, y.coerceWorld(), damage)
-        terrainDamages.remove(LandUtil.getBlockAddr(this, x, y))
+        val blockAddr = LandUtil.getBlockAddr(this, x, y)
+        terrainDamages.remove(blockAddr)
+
+        if (!BlockCodex[tile * PairedMapLayer.RANGE + damage].isFluid) {
+            fluidFills.remove(blockAddr)
+            fluidTypes.remove(blockAddr)
+        }
+        // fluid tiles-item should be modified so that they will also place fluid onto their respective map
     }
 
     fun setTileWire(x: Int, y: Int, tile: Byte) {
@@ -343,6 +354,11 @@ open class GameWorld {
             wallDamages[LandUtil.getBlockAddr(this, x, y)] ?: 0f
 
     fun setFluid(x: Int, y: Int, fluidType: FluidType, fill: Float) {
+        /*if (x == 60 && y == 256) {
+            printdbg(this, "Setting fluid $fill at ($x,$y)")
+        }*/
+
+
         val addr = LandUtil.getBlockAddr(this, x, y)
         // fluid completely drained
         if (fill <= WorldSimulator.FLUID_MIN_MASS) {
@@ -357,10 +373,19 @@ open class GameWorld {
         }
         // update the fluid amount
         else {
+            //printdbg(this, "> Setting nonzero ($fill) on ($x,$y)")
+
+            setTileTerrain(x, y, Block.WATER) // this function alters fluid list, must be called first // TODO fluidType aware
             fluidTypes[addr] = fluidType
             fluidFills[addr] = fill
-            setTileTerrain(x, y, Block.FLUID_MARKER)
         }
+
+
+        /*if (x == 60 && y == 256) {
+            printdbg(this, "TileTerrain: ${getTileFromTerrain(x, y)}")
+            printdbg(this, "fluidTypes[$addr] = ${fluidTypes[addr]} (should be ${fluidType.value})")
+            printdbg(this, "fluidFills[$addr] = ${fluidFills[addr]} (should be $fill)")
+        }*/
     }
 
     fun getFluid(x: Int, y: Int): FluidInfo {
@@ -390,6 +415,7 @@ open class GameWorld {
         @Transient val TERRAIN = 1
         @Transient val WIRE = 2
 
+        /** 4096 */
         @Transient val TILES_SUPPORTED = MapLayer.RANGE * PairedMapLayer.RANGE
         @Transient val SIZEOF: Byte = MapLayer.SIZEOF
         @Transient val LAYERS: Byte = 4 // terrain, wall (layerTerrainLowBits + layerWallLowBits), wire
@@ -403,4 +429,5 @@ infix fun Float.fmod(other: Float) = if (this >= 0f) this % other else (this % o
 
 inline class FluidType(val value: Int) {
     infix fun sameAs(other: FluidType) = this.value.absoluteValue == other.value.absoluteValue
+    fun abs() = this.value.absoluteValue
 }

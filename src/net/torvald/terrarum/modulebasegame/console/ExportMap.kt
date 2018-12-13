@@ -7,7 +7,6 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.modulebasegame.Ingame
 
 import java.io.*
 import java.util.HashMap
@@ -42,7 +41,7 @@ internal object ExportMap : ConsoleCommand {
         colorTable.put(Block.RAW_TOPAZ, Col4096(0xC70))
         colorTable.put(Block.RAW_AMETHYST, Col4096(0x70C))
 
-        colorTable.put(Block.FLUID_MARKER, Col4096(0x038))
+        colorTable.put(Block.WATER, Col4096(0x038))
 
         colorTable.put(Block.SAND, Col4096(0xDDB))
         colorTable.put(Block.SAND_WHITE, Col4096(0xFFD))

@@ -1,0 +1,24 @@
+Let's say you want to do some operation over a 2D array:
+
+10 04 06 14
+08 00 02 08
+02 16 04 12
+06 02 12 14
+
+Our task: get the average of px[y][x] and px[y+1][x]
+
+Single-threaded
+
+09 02 04 11
+05 08 03 10
+04 09 08 13
+06 02 12 14  (Observation: can work with "scrachpad", but also inline mutable)
+
+4 threads
+
+09 02 04 11  .. .. .. ..  .. .. .. ..  .. .. .. ..  These are single scrachpad but
+.. .. .. ..  05 08 03 10  .. .. .. ..  .. .. .. ..  threads are writing to un-shared
+.. .. .. ..  .. .. .. ..  04 09 08 13  .. .. .. ..  portion of the array
+.. .. .. ..  .. .. .. ..  .. .. .. ..  06 02 12 14
+
+(Observation: "scrachpad" is a must, making original array immutable, this multithreading works)

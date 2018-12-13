@@ -115,7 +115,9 @@ object Block {
     val SUNSTONE = 257
     val DAYLIGHT_CAPACITOR = 258
 
-    val FLUID_MARKER = 4095
+
+    val LAVA = 4094
+    val WATER = 4095
 
     val NULL = -1
 }
