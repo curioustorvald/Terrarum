@@ -102,12 +102,18 @@ class NoiseGenerator : ScreenAdapter() {
     override fun render(delta: Float) {
         Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
 
+
+        updateTestGovernor(delta)
+
+
         // regen
         if (timerFired && BlockingThreadPool.allFinished()) {
             val timeTook = System.currentTimeMillis() - timerStart
             timerFired = false
 
             printdbg(this, "> $timeTook ms")
+            rawTimerRecords.add(timeTook)
+            totalTestsDone += 1
         }
 
         if (regenerate && BlockingThreadPool.allFinished()) {
@@ -135,6 +141,46 @@ class NoiseGenerator : ScreenAdapter() {
             batch.draw(texture, 0f, 0f)
         }
 
+    }
+
+    private val testSets = listOf(1, 2, 4, 6, 8, 12, 16, 20, 24, 32, 48, 64)
+    private val samplingCount = 50
+    private var totalTestsDone = 0
+    private val rawTimerRecords = ArrayList<Long>()
+
+    private fun updateTestGovernor(delta: Float) {
+        // time to end the test
+        if (totalTestsDone == testSets.size * samplingCount) {
+            println("Test completed:")
+            println("Total tests done = $totalTestsDone")
+
+            // print a table
+            for (x in 0 until testSets.size) {
+                // print table header
+                print("${testSets[x]}\t")
+            }
+            println()
+
+            for (y in 0 until totalTestsDone / testSets.size) {
+                for (x in 0 until testSets.size) {
+                    // print table contents
+                    print("${rawTimerRecords[x * testSets.size + y]}\t")
+                }
+                println()
+            }
+
+            System.exit(0)
+        }
+        // time to construct a new test
+        if (totalTestsDone % samplingCount == 0) {
+            pixelsInSingleJob = (IMAGE_SIZE * IMAGE_SIZE) / testSets[totalTestsDone / samplingCount]
+            println("Preparing test for ${testSets[totalTestsDone / samplingCount]} task sets")
+        }
+
+        // auto-press SPACE
+        if (BlockingThreadPool.allFinished()) {
+            regenerate = true
+        }
     }
 
     override fun pause() {
