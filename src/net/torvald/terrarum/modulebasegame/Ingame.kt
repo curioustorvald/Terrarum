@@ -869,7 +869,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun insertionSortLastElemAV(arr: ArrayList<ActorWithBody>) { // out-projection doesn't work, duh
-        lock(ReentrantLock()) {
+        ReentrantLock().lock {
             var j = arr.lastIndex - 1
             val x = arr.last()
             while (j >= 0 && arr[j] > x) {

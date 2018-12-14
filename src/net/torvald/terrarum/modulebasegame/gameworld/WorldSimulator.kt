@@ -76,8 +76,8 @@ object WorldSimulator {
     fun moveFluids(delta: Float) {
         makeFluidMapFromWorld()
 
-        //simCompression()
-        for (y in 1 until fluidMap.size - 1) {
+        simCompression()
+        /*for (y in 1 until fluidMap.size - 1) {
             for (x in 1 until fluidMap[0].size - 1) {
                 val worldX = x + updateXFrom
                 val worldY = y + updateYFrom
@@ -98,7 +98,7 @@ object WorldSimulator {
                     fluidNewMap[y + 1][x] += remainingMass
                 }
             }
-        }
+        }*/
 
         fluidmapToWorld()
     }

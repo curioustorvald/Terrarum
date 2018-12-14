@@ -9,6 +9,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_WALLS
 import net.torvald.terrarum.itemproperties.ItemID
+import net.torvald.terrarum.lock
 import net.torvald.terrarum.modulebasegame.Ingame
 import java.util.*
 import java.util.concurrent.locks.Lock
@@ -253,7 +254,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             return itemList[index]
     }
     private fun insertionSortLastElem(arr: ArrayList<InventoryPair>) {
-        lock(ReentrantLock()) {
+        ReentrantLock().lock {
             var j = arr.lastIndex - 1
             val x = arr.last()
             while (j >= 0 && arr[j].item > x.item) {
@@ -283,15 +284,6 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
                 return mid // key found
         }
         return -(low + 1)  // key not found
-    }
-    inline fun lock(lock: Lock, body: () -> Unit) {
-        lock.lock()
-        try {
-            body()
-        }
-        finally {
-            lock.unlock()
-        }
     }
 }
 
