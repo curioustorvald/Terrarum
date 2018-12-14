@@ -204,7 +204,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
 
     fun insertionSortLastElem(arr: ArrayList<Actor>) {
-        lock(ReentrantLock()) {
+        ReentrantLock().lock {
             var j = arr.lastIndex - 1
             val x = arr.last()
             while (j >= 0 && arr[j] > x) {
@@ -215,13 +215,14 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         }
     }
 
-    inline fun lock(lock: Lock, body: () -> Unit) {
-        lock.lock()
-        try {
-            body()
-        }
-        finally {
-            lock.unlock()
-        }
+}
+
+inline fun Lock.lock(body: () -> Unit) {
+    this.lock()
+    try {
+        body()
+    }
+    finally {
+        this.unlock()
     }
 }

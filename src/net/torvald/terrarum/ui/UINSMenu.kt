@@ -111,7 +111,13 @@ class UINSMenu(
     }
 
     private fun popSubMenu() {
-        if (listStack.size == 1) throw Error("Tried to pop root menu")
+        if (listStack.size == 1) {
+            System.err.println("[UINSMenu] Tried to pop root menu")
+            Thread.currentThread().getStackTrace().forEach {
+                System.err.println(it)
+            }
+            return
+        }
 
         val poppedUIItem = listStack.pop()
         width -= poppedUIItem.ui.width
