@@ -76,8 +76,8 @@ object WorldSimulator {
     fun moveFluids(delta: Float) {
         makeFluidMapFromWorld()
 
-        simCompression()
-        /*for (y in 1 until fluidMap.size - 1) {
+        //simCompression()
+        for (y in 1 until fluidMap.size - 1) {
             for (x in 1 until fluidMap[0].size - 1) {
                 val worldX = x + updateXFrom
                 val worldY = y + updateYFrom
@@ -98,7 +98,7 @@ object WorldSimulator {
                     fluidNewMap[y + 1][x] += remainingMass
                 }
             }
-        }*/
+        }
 
         fluidmapToWorld()
     }
@@ -299,9 +299,9 @@ object WorldSimulator {
                 fluidNewMap[y][x] = fluidData.amount
                 fluidNewTypeMap[y][x] = fluidData.type
 
-                if (x + updateXFrom == 60 && y + updateYFrom == 256) {
+                /*if (x + updateXFrom == 60 && y + updateYFrom == 256) {
                     printdbg(this, "making array amount ${fluidData.amount} for (60,256)")
-                }
+                }*/
             }
         }
     }

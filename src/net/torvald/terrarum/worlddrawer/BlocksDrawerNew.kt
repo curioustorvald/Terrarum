@@ -10,14 +10,18 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
+import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.GZIPInputStream
+import kotlin.math.roundToInt
 
 
 /**
@@ -311,39 +315,9 @@ internal object BlocksDrawer {
      * will blend colour using colour multiplication
      * i.e. red hues get lost if you dive into the water
      */
-    private val TILES_BLEND_MUL = hashSetOf(-1
-            /*Block.WATER,
-            Block.WATER_1,
-            Block.WATER_2,
-            Block.WATER_3,
-            Block.WATER_4,
-            Block.WATER_5,
-            Block.WATER_6,
-            Block.WATER_7,
-            Block.WATER_8,
-            Block.WATER_9,
-            Block.WATER_10,
-            Block.WATER_11,
-            Block.WATER_12,
-            Block.WATER_13,
-            Block.WATER_14,
-            Block.WATER_15,
-            Block.LAVA,
-            Block.LAVA_1,
-            Block.LAVA_2,
-            Block.LAVA_3,
-            Block.LAVA_4,
-            Block.LAVA_5,
-            Block.LAVA_6,
-            Block.LAVA_7,
-            Block.LAVA_8,
-            Block.LAVA_9,
-            Block.LAVA_10,
-            Block.LAVA_11,
-            Block.LAVA_12,
-            Block.LAVA_13,
-            Block.LAVA_14,
-            Block.LAVA_15*/
+    private val TILES_BLEND_MUL = hashSetOf(
+            Block.WATER,
+            Block.LAVA
     )
 
     /**
@@ -387,6 +361,7 @@ internal object BlocksDrawer {
 
         drawTiles(TERRAIN, true) // blendmul tiles
         renderUsingBuffer(TERRAIN, projectionMatrix)
+        renderFluids(projectionMatrix)
 
 
 
@@ -454,6 +429,9 @@ internal object BlocksDrawer {
         for (y in for_y_start..for_y_end) {
             for (x in for_x_start..for_x_end) {
 
+                val bufferX = x - for_x_start
+                val bufferY = y - for_y_start
+
                 val thisTile: Int?
                 if (mode % 3 == WALL)
                     thisTile = world.getTileFromWall(x, y)
@@ -516,28 +494,38 @@ internal object BlocksDrawer {
                                 // so obviously when we caught not eligible tile, we need to skip that by marking as Tile No. zero
 
                                 if (isBlendMul(thisTile)) {
-                                    writeToBuffer(mode, x - for_x_start, y - for_y_start, thisTileX, thisTileY, breakingStage)
+                                    if (BlockCodex[thisTile].isFluid) {
+                                        val fluid = world.getFluid(x, y)
+
+                                        if (fluid.type == Fluid.NULL && fluid.amount != 0f) {
+                                            throw Error("Illegal fluid at ($x,$y): $fluid")
+                                        }
+
+                                        if (fluid.amount >= WorldSimulator.FLUID_MIN_MASS) {
+                                            val fluidLevel = fluid.amount.coerceIn(0f,1f).times(PairedMapLayer.RANGE - 1).roundToInt()
+                                            val baseTileID = (GameWorld.TILES_SUPPORTED) - fluid.type.abs()
+                                            val tileX = fluidLevel + (baseTileID % 16) * PairedMapLayer.RANGE
+                                            val tileY = baseTileID / 16
+
+                                            printdbg(this, "$fluid")
+                                            printdbg(this, "$fluidLevel, $baseTileID, $tileX, $tileY")
+
+                                            writeToBuffer(mode, bufferX, bufferY, tileX, tileY, 0)
+                                        }
+                                    }
+                                    else {
+                                        writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
+                                    }
                                 }
                                 else {
-                                    writeToBuffer(mode, x - for_x_start, y - for_y_start, 0, 0, 0)
+                                    writeToBuffer(mode, bufferX, bufferY, 0, 0, 0)
                                 }
                             }
                             else {
                                 // do NOT add "if (!isBlendMul(thisTile))"!
                                 // or else they will not look like they should be when backed with wall
-                                writeToBuffer(mode, x - for_x_start, y - for_y_start, thisTileX, thisTileY, breakingStage)
+                                writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
                             }
-
-                            // draw a breakage
-                            /*if (mode == TERRAIN || mode == WALL) {
-                                val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
-                                val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
-                                val stage = (breakage / maxHealth).times(breakAnimSteps).roundInt()
-                                // actual drawing
-                                if (stage > 0) {
-                                    writeToBuffer(mode, x - for_x_start, y - for_y_start, 5 + stage, 0)
-                                }
-                            }*/
 
 
                         //} // end if (is illuminated)
@@ -760,6 +748,10 @@ internal object BlocksDrawer {
         shader.end()
 
         //tilesBufferAsTex.dispose()
+    }
+
+    private fun renderFluids(projectionMatrix: Matrix4) {
+
     }
 
     private var oldScreenW = 0
