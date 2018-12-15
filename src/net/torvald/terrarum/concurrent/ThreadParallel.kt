@@ -71,6 +71,7 @@ object ThreadParallel {
  *
  * Tasks are not guaranteed to be done orderly; but the first task in the list will be executed first.
  */
+@Deprecated("Experimental.", ReplaceWith("ThreadParallel", "net.torvald.terrarum.concurrent.ThreadParallel"))
 object BlockingThreadPool {
     val threadCount = Terrarum.THREADS // modify this to your taste
     private val pool: Array<Thread?> = Array(threadCount, { null })
@@ -115,7 +116,6 @@ object BlockingThreadPool {
                 // then, sleep this very thread, wake if any of the thread in the pool is terminated,
                 // and GOTO loop_start; if we don't sleep, this function will be busy-waiting
 
-
             }
         }
     }
@@ -125,7 +125,10 @@ object BlockingThreadPool {
         return true
     }
 
-    private fun RunnableFun.makeRunnable() = Runnable { this.invoke() }
+
+    private fun RunnableFun.makeRunnable() = Runnable {
+        this.invoke()
+    }
 }
 
 object ParallelUtils {
