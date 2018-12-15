@@ -192,7 +192,7 @@ object Terrarum : Screen {
     val CONTROLLER_DEADZONE = 0.1f
 
     /** Available CPU threads */
-    val THREADS = Runtime.getRuntime().availableProcessors()
+    val THREADS = Runtime.getRuntime().availableProcessors() + 1
 
     /**
      * If the game is multithreading.
@@ -201,7 +201,7 @@ object Terrarum : Screen {
      *     THREADS >= 2 and config "multithread" is true
      */
     val MULTITHREAD: Boolean
-        get() = THREADS >= 2 && getConfigBoolean("multithread")
+        get() = THREADS >= 3 && getConfigBoolean("multithread")
 
     private lateinit var configDir: String
 

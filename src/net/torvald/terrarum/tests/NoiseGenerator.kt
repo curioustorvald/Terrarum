@@ -20,6 +20,7 @@ import com.sudoplay.joise.module.ModuleScaleOffset
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.concurrent.BlockingThreadPool
 import net.torvald.terrarum.concurrent.RunnableFun
 import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
@@ -57,6 +58,11 @@ class NoiseGenerator : ScreenAdapter() {
 
         pixmap = Pixmap(IMAGE_SIZE, IMAGE_SIZE, Pixmap.Format.RGBA8888)
         texture = Texture(1, 1, Pixmap.Format.RGBA8888)
+
+        batch.projectionMatrix = camera.combined
+
+        println("Test runs: ${testSets.size * samplingCount}")
+        println("Warmup runs: $warmupTries")
     }
 
     var regenerate = true
@@ -108,16 +114,13 @@ class NoiseGenerator : ScreenAdapter() {
 
         // regen
         if (timerFired && BlockingThreadPool.allFinished()) {
-            val timeTook = System.currentTimeMillis() - timerStart
             timerFired = false
 
-            printdbg(this, "> $timeTook ms")
-            rawTimerRecords.add(timeTook)
             totalTestsDone += 1
         }
 
         if (regenerate && BlockingThreadPool.allFinished()) {
-            printdbg(this, "Reticulating splines...")
+            //printdbg(this, "Reticulating splines...")
 
             regenerate = false
             // don't join while rendering noise
@@ -139,47 +142,86 @@ class NoiseGenerator : ScreenAdapter() {
         batch.inUse {
             batch.color = Color.WHITE
             batch.draw(texture, 0f, 0f)
+
+            batch.color = Color.CYAN
+            Terrarum.fontGame.draw(batch, "Tests: $totalTestsDone / ${testSets.size * samplingCount}", 10f, 10f)
         }
 
     }
 
-    private val testSets = listOf(1, 2, 4, 6, 8, 12, 16, 20, 24, 32, 48, 64)
-    private val samplingCount = 50
+    //private val testSets = listOf(1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096, 6144, 8192)//, 12288, 16384, 24576, 32768, 49152, 65536)
+    private val testSets = listOf(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16)
+    private val samplingCount = 20
     private var totalTestsDone = 0
     private val rawTimerRecords = ArrayList<Long>()
 
+    private var warmupDone = false
+    private val warmupTries = (testSets.size * samplingCount) / 4
+    private var constructOnce = false
+
+    private val timeWhenTestBegun = System.currentTimeMillis()
+
+    private var wholeJobTimer = 0L
+
     private fun updateTestGovernor(delta: Float) {
+        // cut the warm-up {
+        if (!warmupDone && totalTestsDone >= warmupTries) {
+            println("######## WARMUP DONE, THE TEST BEGINS HERE ########")
+            totalTestsDone = 0
+            //rawTimerRecords.clear()
+            warmupDone = true
+        }
+
+
         // time to end the test
         if (totalTestsDone == testSets.size * samplingCount) {
             println("Test completed:")
             println("Total tests done = $totalTestsDone")
 
             // print a table
-            for (x in 0 until testSets.size) {
-                // print table header
-                print("${testSets[x]}\t")
-            }
-            println()
-
-            for (y in 0 until totalTestsDone / testSets.size) {
-                for (x in 0 until testSets.size) {
-                    // print table contents
-                    print("${rawTimerRecords[x * testSets.size + y]}\t")
+            println("Timer raw:")
+            rawTimerRecords.forEachIndexed { index, l ->
+                if (index < rawTimerRecords.size - testSets.size) {
+                    println("* $l")
                 }
-                println()
+                else {
+                    println("$l")
+                }
             }
+
+            // k thx bye
+            val timeWasted = (System.currentTimeMillis() - timeWhenTestBegun) / 1000
+            println("Total testing time: " +
+                    "${timeWasted.div(60).toString().padStart(2, '0')}:" +
+                    "${timeWasted.rem(60).toString().padStart(2, '0')}")
 
             System.exit(0)
         }
         // time to construct a new test
-        if (totalTestsDone % samplingCount == 0) {
+        if (totalTestsDone % samplingCount == 0 && BlockingThreadPool.allFinished()) {
             pixelsInSingleJob = (IMAGE_SIZE * IMAGE_SIZE) / testSets[totalTestsDone / samplingCount]
-            println("Preparing test for ${testSets[totalTestsDone / samplingCount]} task sets")
+
+
+            if (!constructOnce) {
+                if (warmupDone)
+                    println("Preparing test for ${testSets[totalTestsDone / samplingCount]} task sets")
+                else
+                    println("This is warm-up, task sets: $${testSets[totalTestsDone / samplingCount]}")
+
+                val endTime = System.currentTimeMillis()
+                rawTimerRecords.add(endTime - wholeJobTimer)
+                println("> Timer end: $endTime")
+                wholeJobTimer = endTime
+                println("> Timer start: $wholeJobTimer")
+
+                constructOnce = true
+            }
         }
 
         // auto-press SPACE
         if (BlockingThreadPool.allFinished()) {
             regenerate = true
+            constructOnce = false
         }
     }
 
