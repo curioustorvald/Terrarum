@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
 import com.badlogic.gdx.graphics.Color
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
@@ -88,16 +89,26 @@ object WorldSimulator {
 
                 if (isSolid(worldX, worldY)) continue
                 val remainingMass = fluidMap[y][x]
+                val remainingType = fluidTypeMap[y][x]
+
+                if (remainingMass != 0f && remainingType == Fluid.NULL) throw InternalError("wtf? (Type: $remainingType, fill: $remainingMass)")
 
                 /*if (worldX == 60 && worldY == 256) {
                     printdbg(this, "remainimgMass: $remainingMass at ($worldX, $worldY)")
                 }*/
 
+                if (remainingMass == 0f) continue
+
                 if (!isSolid(worldX, worldY + 1)) {
                     fluidNewMap[y][x] -= remainingMass
                     fluidNewMap[y + 1][x] += remainingMass
+                    fluidNewTypeMap[y + 1][x] = remainingType
                 }
             }
+        }
+
+        if (AppLoader.IS_DEVELOPMENT_BUILD) {
+            monitorIllegalFluidSetup() // non-air non-zero fluid is kinda inevitable
         }
 
         fluidmapToWorld()
@@ -286,6 +297,17 @@ object WorldSimulator {
 
     fun disperseHeat(delta: Float) {
 
+    }
+
+    private fun monitorIllegalFluidSetup() {
+        for (y in 0 until fluidMap.size) {
+            for (x in 0 until fluidMap[0].size) {
+                val fluidData = world.getFluid(x + updateXFrom, y + updateYFrom)
+                if (fluidData.amount < 0f) {
+                    throw InternalError("Negative amount of fluid at (${x + updateXFrom},${y + updateYFrom}): $fluidData")
+                }
+            }
+        }
     }
 
     private fun makeFluidMapFromWorld() {

@@ -446,90 +446,109 @@ internal object BlocksDrawer {
 
                 // draw a tile, but only when illuminated
                 try {
-                    //if (canIHazRender(mode, x, y)) {
-
-                        //if (!hasLightNearby(x, y)) {
-                        //    // draw black patch
-                        //    if (thisTile == 0)
-                        //        writeToBuffer(mode, x - for_x_start, y - for_y_start, 0, 0)
-                        //    else
-                        //        writeToBuffer(mode, x - for_x_start, y - for_y_start, 2, 0)
-                        //}
-                        //else {
-
-                            val nearbyTilesInfo: Int
-                            if (isPlatform(thisTile)) {
-                                nearbyTilesInfo = getNearbyTilesInfoPlatform(x, y)
-                            }
-                            else if (isWallSticker(thisTile)) {
-                                nearbyTilesInfo = getNearbyTilesInfoWallSticker(x, y)
-                            }
-                            else if (isConnectMutual(thisTile)) {
-                                nearbyTilesInfo = getNearbyTilesInfoNonSolid(x, y, mode)
-                            }
-                            else if (isConnectSelf(thisTile)) {
-                                nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile)
-                            }
-                            else {
-                                nearbyTilesInfo = 0
-                            }
+                    val nearbyTilesInfo: Int
+                    if (isPlatform(thisTile)) {
+                        nearbyTilesInfo = getNearbyTilesInfoPlatform(x, y)
+                    }
+                    else if (isWallSticker(thisTile)) {
+                        nearbyTilesInfo = getNearbyTilesInfoWallSticker(x, y)
+                    }
+                    else if (isConnectMutual(thisTile)) {
+                        nearbyTilesInfo = getNearbyTilesInfoNonSolid(x, y, mode)
+                    }
+                    else if (isConnectSelf(thisTile)) {
+                        nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile)
+                    }
+                    else {
+                        nearbyTilesInfo = 0
+                    }
 
 
-                            val thisTileX = if (!noDamageLayer)
-                                PairedMapLayer.RANGE * ((thisTile ?: 0) % PairedMapLayer.RANGE) + nearbyTilesInfo
-                            else
-                                nearbyTilesInfo
+                    val thisTileX = if (!noDamageLayer)
+                        PairedMapLayer.RANGE * ((thisTile ?: 0) % PairedMapLayer.RANGE) + nearbyTilesInfo
+                    else
+                        nearbyTilesInfo
 
-                            val thisTileY = (thisTile ?: 0) / PairedMapLayer.RANGE
+                    val thisTileY = (thisTile ?: 0) / PairedMapLayer.RANGE
 
-                            val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
-                            val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
-                            val breakingStage = (breakage / maxHealth).times(breakAnimSteps).roundInt()
+                    val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
+                    val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
+                    val breakingStage = (breakage / maxHealth).times(breakAnimSteps).roundInt()
 
 
 
-                            // draw a tile
-                            if (drawModeTilesBlendMul) {
-                                // while iterating through, only the some tiles are actually eligible to be drawn as MUL,
-                                // so obviously when we caught not eligible tile, we need to skip that by marking as Tile No. zero
+                    // draw a tile
 
-                                if (isBlendMul(thisTile)) {
-                                    if (BlockCodex[thisTile].isFluid) {
-                                        val fluid = world.getFluid(x, y)
+                    // I don't know what the fuck is going on here, one thing I sure is it will draw twice, blending
+                    // over what had drawn in first pass (blendNormal)
+                    // this code works, but may not work in the way I wanted
+                    // also, it DOES have a code snippet written twice:
+                    //     if (BlockCodex[thisTile].isFluid) {
+                    //         ...
+                    //     }
+                    //     else {
+                    //         ...
+                    //     }
 
-                                        if (fluid.type == Fluid.NULL && fluid.amount != 0f) {
-                                            throw Error("Illegal fluid at ($x,$y): $fluid")
-                                        }
+                    if (drawModeTilesBlendMul) {
+                        // while iterating through, only the some tiles are actually eligible to be drawn as MUL,
+                        // so obviously when we caught not eligible tile, we need to skip that by marking as Tile No. zero
 
-                                        if (fluid.amount >= WorldSimulator.FLUID_MIN_MASS) {
-                                            val fluidLevel = fluid.amount.coerceIn(0f,1f).times(PairedMapLayer.RANGE - 1).roundToInt()
-                                            val baseTileID = (GameWorld.TILES_SUPPORTED) - fluid.type.abs()
-                                            val tileX = fluidLevel + (baseTileID % 16) * PairedMapLayer.RANGE
-                                            val tileY = baseTileID / 16
+                        if (isBlendMul(thisTile)) {
+                            if (BlockCodex[thisTile].isFluid) {
+                                val fluid = world.getFluid(x, y)
 
-                                            printdbg(this, "$fluid")
-                                            printdbg(this, "$fluidLevel, $baseTileID, $tileX, $tileY")
-
-                                            writeToBuffer(mode, bufferX, bufferY, tileX, tileY, 0)
-                                        }
-                                    }
-                                    else {
-                                        writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
-                                    }
+                                if (AppLoader.IS_DEVELOPMENT_BUILD && fluid.type == Fluid.NULL && fluid.amount != 0f) {
+                                    throw Error("Illegal fluid at ($x,$y): $fluid")
                                 }
-                                else {
-                                    writeToBuffer(mode, bufferX, bufferY, 0, 0, 0)
+
+                                if (fluid.amount >= WorldSimulator.FLUID_MIN_MASS) {
+                                    val fluidLevel = fluid.amount.coerceIn(0f,1f).times(PairedMapLayer.RANGE - 1).roundToInt()
+                                    val baseTileID = (GameWorld.TILES_SUPPORTED) - fluid.type.abs()
+                                    val tileX = fluidLevel + (baseTileID % 16) * PairedMapLayer.RANGE
+                                    val tileY = baseTileID / 16
+
+                                    //printdbg(this, "$fluid")
+                                    //printdbg(this, "$fluidLevel, $baseTileID, $tileX, $tileY")
+
+                                    writeToBuffer(mode, bufferX, bufferY, tileX, tileY, 0)
                                 }
                             }
                             else {
-                                // do NOT add "if (!isBlendMul(thisTile))"!
-                                // or else they will not look like they should be when backed with wall
                                 writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
                             }
+                        }
+                        else {
+                            writeToBuffer(mode, bufferX, bufferY, 0, 0, 0)
+                        }
+                    }
+                    else {
+                        // do NOT add "if (!isBlendMul(thisTile))"!
+                        // or else they will not look like they should be when backed with wall
 
+                        if (BlockCodex[thisTile].isFluid) {
+                            val fluid = world.getFluid(x, y)
 
-                        //} // end if (is illuminated)
-                    //} // end if (not an air)
+                            if (AppLoader.IS_DEVELOPMENT_BUILD && fluid.type == Fluid.NULL && fluid.amount != 0f) {
+                                throw Error("Illegal fluid at ($x,$y): $fluid")
+                            }
+
+                            if (fluid.amount >= WorldSimulator.FLUID_MIN_MASS) {
+                                val fluidLevel = fluid.amount.coerceIn(0f,1f).times(PairedMapLayer.RANGE - 1).roundToInt()
+                                val baseTileID = (GameWorld.TILES_SUPPORTED) - fluid.type.abs()
+                                val tileX = fluidLevel + (baseTileID % 16) * PairedMapLayer.RANGE
+                                val tileY = baseTileID / 16
+
+                                //printdbg(this, "$fluid")
+                                //printdbg(this, "$fluidLevel, $baseTileID, $tileX, $tileY")
+
+                                writeToBuffer(mode, bufferX, bufferY, tileX, tileY, 0)
+                            }
+                        }
+                        else {
+                            writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
+                        }
+                    }
                 } catch (e: NullPointerException) {
                     // do nothing. WARNING: This exception handling may hide erratic behaviour completely.
                 }
