@@ -108,7 +108,7 @@ object BlockCodex {
         prop.friction = intVal(record, "friction")
         prop.viscosity = intVal(record, "vscs")
 
-        prop.isFluid = Fluid.isThisTileFluid(prop.id)//boolVal(record, "fluid")
+        prop.isFluid = boolVal(record, "fluid")
         prop.isSolid = boolVal(record, "solid")
         prop.isClear = boolVal(record, "clear")
         prop.isWallable = boolVal(record, "wall")

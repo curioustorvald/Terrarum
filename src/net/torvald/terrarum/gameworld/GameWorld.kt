@@ -359,6 +359,11 @@ open class GameWorld {
         }*/
 
 
+        if (fluidType == Fluid.NULL && fill != 0f) {
+            throw Error("Illegal fluid at ($x,$y): ${FluidInfo(fluidType, fill)}")
+        }
+
+
         val addr = LandUtil.getBlockAddr(this, x, y)
         // fluid completely drained
         if (fill <= WorldSimulator.FLUID_MIN_MASS) {
@@ -396,7 +401,9 @@ open class GameWorld {
         return if (type == null) FluidInfo(Fluid.NULL, 0f) else FluidInfo(type, fill!!)
     }
 
-    data class FluidInfo(val type: FluidType, val amount: Float)
+    data class FluidInfo(val type: FluidType, val amount: Float) {
+        override fun toString() = "Fluid type: ${type.value}, amount: $amount"
+    }
 
 
     fun getTemperature(worldTileX: Int, worldTileY: Int): Float? {
