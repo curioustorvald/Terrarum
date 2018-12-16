@@ -15,7 +15,9 @@ import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
+import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
+import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.BufferedOutputStream
 import java.io.File
@@ -43,6 +45,7 @@ internal object BlocksDrawer {
     val tilesTerrain: TextureRegionPack
     val tilesWire: TextureRegionPack
     val tileItemWall: TextureRegionPack
+    val tilesTerrainBlend: TextureRegionPack
 
     //val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
 
@@ -80,8 +83,8 @@ internal object BlocksDrawer {
 
     init {
         // hard-coded as tga.gz
-        val gzFileList = listOf("blocks/terrain.tga.gz", "blocks/wire.tga.gz")
-        val gzTmpFName = listOf("tmp_terrain.tga", "tmp_wire.tga")
+        val gzFileList = listOf("blocks/terrain.tga.gz", "blocks/wire.tga.gz", "blocks/terrain_autumn.tga.gz")
+        val gzTmpFName = listOf("tmp_terrain.tga", "tmp_wire.tga", "tmp_terrain_autumn.tga")
         // unzip GZIP temporarily
         gzFileList.forEachIndexed { index, filename ->
             val terrainTexFile = ModMgr.getGdxFile("basegame", filename)
@@ -96,6 +99,7 @@ internal object BlocksDrawer {
 
         val _terrainPixMap = Pixmap(Gdx.files.internal(gzTmpFName[0]))
         val _wirePixMap = Pixmap(Gdx.files.internal(gzTmpFName[1]))
+        val _terrainBlendPixMap = Pixmap(Gdx.files.internal(gzTmpFName[2]))
 
         // delete temp files
         gzTmpFName.forEach { File(it).delete() }
@@ -104,10 +108,13 @@ internal object BlocksDrawer {
         tilesTerrain.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         tilesWire = TextureRegionPack(Texture(_wirePixMap), TILE_SIZE, TILE_SIZE)
         tilesWire.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        tilesTerrainBlend = TextureRegionPack(Texture(_terrainBlendPixMap), TILE_SIZE, TILE_SIZE)
+        tilesTerrainBlend.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         // also dispose unused temp files
         //terrainPixMap.dispose() // commented: tileItemWall needs it
         _wirePixMap.dispose()
+        _terrainBlendPixMap.dispose()
 
 
 
@@ -418,6 +425,13 @@ internal object BlocksDrawer {
         //      ( 3 / 16) == 0
         //      (-3 / 16) == -1  <-- We want it to be '-1', not zero
         // using cast and floor instead of IF on ints: the other way causes jitter artefact, which I don't fucking know why
+
+        // TODO the real fluid rendering must use separate function, but its code should be similar to this.
+        //      shader's tileAtlas will be fluid.tga, pixels written to the buffer is in accordance with the new
+        //      atlas. IngameRenderer must be modified so that fluid-draw call is separated from drawing tiles.
+        //      The MUL draw mode can be removed from this (it turns out drawing tinted glass is tricky because of
+        //      the window frame which should NOT be MUL'd)
+        
 
         val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
         val for_y_end = for_y_start + tilesBuffer.height - 1
@@ -749,6 +763,7 @@ internal object BlocksDrawer {
         _tilesBufferAsTex.dispose()
         _tilesBufferAsTex = Texture(tilesBuffer)
         _tilesBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        tilesTerrainBlend.texture.bind(2)
         _tilesBufferAsTex.bind(1) // trying 1 and 0...
         tileAtlas.texture.bind(0) // for some fuck reason, it must be bound as last
 
@@ -757,12 +772,19 @@ internal object BlocksDrawer {
         shader.setUniformf("colourFilter", vertexColour)
         shader.setUniformf("screenDimension", Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         shader.setUniformi("tilesAtlas", 0)
+        shader.setUniformi("tilesBlendAtlas", 2)
         shader.setUniformi("tilemap", 1)
         shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shader.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
         shader.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div
         /*shader hard-code*/shader.setUniformi("tilesInAtlas", tileAtlas.horizontalCount, tileAtlas.verticalCount) //depends on the tile atlas
         /*shader hard-code*/shader.setUniformi("atlasTexSize", tileAtlas.texture.width, tileAtlas.texture.height) //depends on the tile atlas
+        // set the blend value as world's time progresses, in linear fashion
+        shader.setUniformf("tilesBlend", if (world is GameWorldExtension)
+            (world as GameWorldExtension).time.days.minus(1f) / WorldTime.MONTH_LENGTH
+        else
+            0f
+        )
         tilesQuad.render(shader, GL20.GL_TRIANGLES)
         shader.end()
 
