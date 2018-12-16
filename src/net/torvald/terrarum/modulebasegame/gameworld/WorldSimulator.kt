@@ -187,6 +187,8 @@ object WorldSimulator {
         var remainingMass = 0f
         var remainingType = Fluid.NULL
 
+        // FIXME water doesn't disappear when they should
+
         for (y in 1 until fluidMap.size - 1) {
             for (x in 1 until fluidMap[0].size - 1) {
                 val worldX = x + updateXFrom
