@@ -533,7 +533,7 @@ open class ActorHumanoid(
                 }
 
 
-                field = frames * (1.0 / Terrarum.TARGET_FPS)
+                field = frames * (1.0 / Terrarum.PHYS_TIME_FRAME)
                 // fixme: looks good but return value is wrong -- 2.25 seconds? when I jump it barely goes past 1 sec
 
 

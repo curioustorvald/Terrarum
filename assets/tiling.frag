@@ -1,3 +1,13 @@
+/*
+
+Texture binding:
+
+0 <- Tiles atlas
+1 <- Tiles buffer that holds tiles to be drawn
+2 <- Fluid tiles atlas
+
+*/
+
 #version 120
 #ifdef GL_ES
     precision mediump float;
@@ -16,7 +26,7 @@ uniform vec2 screenDimension;
 uniform vec2 tilesInAxes; // vec2(tiles_in_horizontal, tiles_in_vertical)
 
 uniform ivec2 tilemapDimension;
-uniform sampler2D tilemap; // RGB888, A is optional and will be completely ignored
+uniform sampler2D tilemap; // RGBA8888
 
 uniform sampler2D tilesAtlas;
 uniform sampler2D backgroundTexture;
@@ -34,21 +44,27 @@ ivec2 getTileXY(int tileNumber) {
     return ivec2(tileNumber % int(tilesInAtlas.x), tileNumber / int(tilesInAtlas.x));
 }
 
-// return: int=0xrrggbb
+// return: int=0xaarrggbb
 int _colToInt(vec4 color) {
-    return int(color.b * 255) | (int(color.g * 255) << 8) | (int(color.r * 255) << 16);
+    return int(color.b * 255) | (int(color.g * 255) << 8) | (int(color.r * 255) << 16) | (int(color.a * 255) << 24);
 }
 
 // 0x0rggbb where int=0xaarrggbb
 // return: [0..1048575]
 int getTileFromColor(vec4 color) {
-    return _colToInt(color) & 0x0FFFFF;
+    return _colToInt(color) & 0xFFFFF;
 }
 
-// 0xr00000 where int=0xaarrggbb
+// 0x00r00000 where int=0xaarrggbb
 // return: [0..15]
 int getBreakageFromColor(vec4 color) {
     return (_colToInt(color) >> 20) & 0xF;
+}
+
+// 0xa0000000 where int=0xaarrggbb
+// return: [0..15]
+int getTextureIndexFromColor(vec4 color) {
+    return (_colToInt(color) >> 28) & 0xF;
 }
 
 void main() {

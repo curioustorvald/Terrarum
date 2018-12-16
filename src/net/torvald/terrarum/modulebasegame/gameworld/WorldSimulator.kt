@@ -50,6 +50,8 @@ object WorldSimulator {
 
     private val world = (Terrarum.ingame!!.world)
 
+
+
     operator fun invoke(p: ActorHumanoid?, delta: Float) {
         //printdbg(this, "============================")
 
@@ -77,8 +79,8 @@ object WorldSimulator {
     fun moveFluids(delta: Float) {
         makeFluidMapFromWorld()
 
-        //simCompression()
-        for (y in 1 until fluidMap.size - 1) {
+        simCompression()
+        /*for (y in 1 until fluidMap.size - 1) {
             for (x in 1 until fluidMap[0].size - 1) {
                 val worldX = x + updateXFrom
                 val worldY = y + updateYFrom
@@ -105,7 +107,7 @@ object WorldSimulator {
                     fluidNewTypeMap[y + 1][x] = remainingType
                 }
             }
-        }
+        }*/
 
         if (AppLoader.IS_DEVELOPMENT_BUILD) {
             monitorIllegalFluidSetup() // non-air non-zero fluid is kinda inevitable
@@ -183,6 +185,7 @@ object WorldSimulator {
         // after data: fluidNewMap/fluidNewTypeMap
         var flow = 0f
         var remainingMass = 0f
+        var remainingType = Fluid.NULL
 
         for (y in 1 until fluidMap.size - 1) {
             for (x in 1 until fluidMap[0].size - 1) {
@@ -197,12 +200,13 @@ object WorldSimulator {
 
                 // Custom push-only flow
                 flow = 0f
-                remainingMass = fluidMap[y][x]
+                remainingMass = fluidNewMap[y][x]
+                remainingType = fluidNewTypeMap[y][x]
                 if (remainingMass <= 0) continue
 
                 // The block below this one
                 if (!isSolid(worldX, worldY + 1)) { // TODO use isFlowable
-                    flow = getStableStateB(remainingMass + fluidMap[y + 1][x]) - fluidMap[y + 1][x]
+                    flow = getStableStateB(remainingMass + fluidNewMap[y + 1][x]) - fluidNewMap[y + 1][x]
                     if (flow > minFlow) {
                         flow *= 0.5f // leads to smoother flow
                     }
@@ -210,6 +214,7 @@ object WorldSimulator {
 
                     fluidNewMap[y][x] -= flow
                     fluidNewMap[y + 1][x] += flow
+                    fluidNewTypeMap[y + 1][x] = remainingType
                     remainingMass -= flow
                 }
 
@@ -218,7 +223,7 @@ object WorldSimulator {
                 // Left
                 if (!isSolid(worldX - 1, worldY)) { // TODO use isFlowable
                     // Equalise the amount fo water in this block and its neighbour
-                    flow = (fluidMap[y][x] - fluidMap[y][x - 1]) / 4f
+                    flow = (fluidNewMap[y][x] - fluidNewMap[y][x - 1]) / 4f
                     if (flow > minFlow) {
                         flow *= 0.5f
                     }
@@ -226,6 +231,7 @@ object WorldSimulator {
 
                     fluidNewMap[y][x] -= flow
                     fluidNewMap[y][x - 1] += flow
+                    fluidNewTypeMap[y][x - 1] = remainingType
                     remainingMass -= flow
                 }
 
@@ -234,7 +240,7 @@ object WorldSimulator {
                 // Right
                 if (!isSolid(worldX + 1, worldY)) { // TODO use isFlowable
                     // Equalise the amount fo water in this block and its neighbour
-                    flow = (fluidMap[y][x] - fluidMap[y][x + 1]) / 4f
+                    flow = (fluidNewMap[y][x] - fluidNewMap[y][x + 1]) / 4f
                     if (flow > minFlow) {
                         flow *= 0.5f
                     }
@@ -242,6 +248,7 @@ object WorldSimulator {
 
                     fluidNewMap[y][x] -= flow
                     fluidNewMap[y][x + 1] += flow
+                    fluidNewTypeMap[y][x + 1] = remainingType
                     remainingMass -= flow
                 }
 
@@ -249,7 +256,7 @@ object WorldSimulator {
 
                 // Up; only compressed water flows upwards
                 if (!isSolid(worldX, worldY - 1)) { // TODO use isFlowable
-                    flow = remainingMass - getStableStateB(remainingMass + fluidMap[y - 1][x])
+                    flow = remainingMass - getStableStateB(remainingMass + fluidNewMap[y - 1][x])
                     if (flow > minFlow) {
                         flow *= 0.5f
                     }
@@ -257,6 +264,7 @@ object WorldSimulator {
 
                     fluidNewMap[y][x] -= flow
                     fluidNewMap[y - 1][x] += flow
+                    fluidNewTypeMap[y - 1][x] = remainingType
                     remainingMass -= flow
                 }
 

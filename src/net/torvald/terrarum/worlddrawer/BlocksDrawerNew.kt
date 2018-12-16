@@ -72,7 +72,7 @@ internal object BlocksDrawer {
     private lateinit var terrainTilesBuffer: Array<IntArray>
     private lateinit var wallTilesBuffer: Array<IntArray>
     private lateinit var wireTilesBuffer: Array<IntArray>
-    private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGB888)
+    private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
 
     private lateinit var tilesQuad: Mesh
@@ -793,7 +793,7 @@ internal object BlocksDrawer {
             wireTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
 
             tilesBuffer.dispose()
-            tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGB888)
+            tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
         }
 
         if (oldScreenW != screenW || oldScreenH != screenH) {
