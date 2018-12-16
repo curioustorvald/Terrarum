@@ -506,7 +506,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
          * weight; gravitational force in action
          * W = mass * G (9.8 [m/s^2])
          */
-        val W: Vector2 = gravitation * Terrarum.TARGET_FPS.toDouble()
+        val W: Vector2 = gravitation * Terrarum.PHYS_TIME_FRAME.toDouble()
         /**
          * Area
          */
@@ -517,7 +517,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
          */
         val D: Vector2 = Vector2(externalForce.x.magnSqr(), externalForce.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
 
-        val V: Vector2 = (W - D) / Terrarum.TARGET_FPS * SI_TO_GAME_ACC
+        val V: Vector2 = (W - D) / Terrarum.PHYS_TIME_FRAME * SI_TO_GAME_ACC
 
         return V
     }
@@ -833,7 +833,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
                 // slam-into-whatever damage (such dirty; much hack; wow)
                 //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
-                val collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.TARGET_FPS).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
+                val collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.PHYS_TIME_FRAME).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
                 // kg * m / s^2 (mass * acceleration), acceleration -> (vectorMagn / (0.01)^2).gameToSI()
                 if (collisionDamage != 0.0) debug1("Collision damage: $collisionDamage N")
                 // FIXME instead of 0.5mv^2, we can model after "change of velocity (aka accel)", just as in real-life; big change of accel on given unit time is what kills
@@ -1492,16 +1492,16 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         /**
          * [m / s^2] * SI_TO_GAME_ACC -> [px / InternalFrame^2]
          */
-        @Transient val SI_TO_GAME_ACC = METER / (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS)
+        @Transient val SI_TO_GAME_ACC = METER / (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME)
         /**
          * [m / s] * SI_TO_GAME_VEL -> [px / InternalFrame]
          */
-        @Transient val SI_TO_GAME_VEL = METER / Terrarum.TARGET_FPS
+        @Transient val SI_TO_GAME_VEL = METER / Terrarum.PHYS_TIME_FRAME
 
         /**
          * [px / InternalFrame^2] * GAME_TO_SI_ACC -> [m / s^2]
          */
-        @Transient val GAME_TO_SI_ACC = (Terrarum.TARGET_FPS * Terrarum.TARGET_FPS) / METER
+        @Transient val GAME_TO_SI_ACC = (Terrarum.PHYS_TIME_FRAME * Terrarum.PHYS_TIME_FRAME) / METER
 
 
         /**

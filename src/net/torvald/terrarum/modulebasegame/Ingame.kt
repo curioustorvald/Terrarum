@@ -481,6 +481,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
         else {
             var updateTries = 0
+            val oldDeltaCtr = updateDeltaCounter
             while (updateDeltaCounter >= renderRate) {
 
                 //updateGame(delta)
@@ -490,6 +491,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 updateTries++
 
                 if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
+                    printdbg(this, "Update couldn't catch up -- delta-T buildup was $oldDeltaCtr seconds")
                     break
                 }
             }

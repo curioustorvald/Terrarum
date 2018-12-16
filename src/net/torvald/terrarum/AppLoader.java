@@ -31,30 +31,57 @@ public class AppLoader implements ApplicationListener {
      * BB: Minor version
      * XXXX: Revision (Repository commits, or something arbitrary)
      *
-     * e.g. 0x02010034 can be translated as 2.1.52
+     * e.g. 0x02010034 will be translated as 2.1.52
      */
     public static final int VERSION_RAW = 0x00_02_027C;
+    public static final String getVERSION_STRING() {
+        return String.format("%d.%d.%d", VERSION_RAW >>> 24, (VERSION_RAW & 0xff0000) >>> 16, VERSION_RAW & 0xFFFF);
+    }
+
+    /**
+     * when FALSE, some assertion and print code will not execute
+     */
     public static final boolean IS_DEVELOPMENT_BUILD = true;
 
 
-
-
+    /**
+     * Singleton instance
+     */
     private static AppLoader INSTANCE = null;
 
+    /**
+     * Screen injected at init, so that you run THAT screen instead of the main game.
+     */
     private static Screen injectScreen = null;
 
+    /**
+     * Initialise the application with the alternative Screen you choose
+     * @param appConfig LWJGL(2) Application Configuration
+     * @param injectScreen GDX Screen you want to run
+     */
     public AppLoader(LwjglApplicationConfiguration appConfig, Screen injectScreen) {
         AppLoader.injectScreen = injectScreen;
         AppLoader.appConfig = appConfig;
     }
 
+    /**
+     * Initialise the application with default game screen
+     * @param appConfig LWJGL(2) Application Configuration
+     */
     public AppLoader(LwjglApplicationConfiguration appConfig) {
         AppLoader.appConfig = appConfig;
     }
 
+    /**
+     * Default null constructor. Don't use it.
+     */
     public AppLoader() {
     }
 
+    /**
+     * Singleton pattern implementation in Java.
+     * @return
+     */
     public static AppLoader getINSTANCE() {
         if (INSTANCE == null) {
             INSTANCE = new AppLoader();
@@ -66,6 +93,9 @@ public class AppLoader implements ApplicationListener {
     public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2018 Torvald (minjaesong)";
     public static String GAME_LOCALE = System.getProperty("user.language") + System.getProperty("user.country");
 
+    /**
+     * These languages won't distinguish regional differences (e.g. enUS and enUK, frFR and frCA)
+     */
     private static final String[] localeSimple = {"de", "en", "es", "it"}; // must be sorted!!
 
     public static String getSysLang() {
@@ -91,10 +121,6 @@ public class AppLoader implements ApplicationListener {
                 GAME_LOCALE = value;
             }
         }
-    }
-
-    public static final String getVERSION_STRING() {
-        return String.format("%d.%d.%d", VERSION_RAW >>> 24, (VERSION_RAW & 0xff0000) >>> 16, VERSION_RAW & 0xFFFF);
     }
 
     public static LwjglApplicationConfiguration appConfig;

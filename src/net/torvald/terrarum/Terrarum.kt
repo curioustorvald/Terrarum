@@ -86,17 +86,17 @@ object Terrarum : Screen {
     /**
      * To be used with physics simulator
      */
-    val TARGET_FPS: Double = 26.0 + (2.0 / 3.0)
+    val PHYS_TIME_FRAME: Double = 26.0 + (2.0 / 3.0)
     // 26.0 + (2.0 / 3.0) // lower value == faster gravity response (IT WON'T HOTSWAP!!)
     // protip: using METER, game unit and SI unit will have same number
 
     /**
      * To be used with render, to achieve smooth frame drawing
-     * TARGET_INTERNAL_FPS > TARGET_FPS for smooth frame drawing
+     * TARGET_INTERNAL_FPS > PHYS_TIME_FRAME for smooth frame drawing
      */
     val TARGET_INTERNAL_FPS: Double = 60.0
 
-    internal val UPDATE_CATCHUP_MAX_TRIES = 10
+    internal val UPDATE_CATCHUP_MAX_TRIES = 4
 
 
 

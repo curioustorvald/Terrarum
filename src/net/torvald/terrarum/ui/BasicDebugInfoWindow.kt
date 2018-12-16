@@ -128,11 +128,13 @@ class BasicDebugInfoWindow : UICanvas() {
         printLine(batch, 8, "light@cursor $ccG$lightVal")
 
         val tileNum = ingame.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
+        val fluid = ingame.world.getFluid(mouseTileX, mouseTileY)
 
         printLine(batch, 9, "tile@cursor $ccG$tileNum ($mtX, $mtY)")
+        printLine(batch, 10, "fluid@cursor ${ccY}Type $ccM${fluid.type.value} ${ccY}Fill $ccG${fluid.amount}f")
 
 
-        var dbgCnt = 11
+        var dbgCnt = 12
         Terrarum.debugTimers.forEach { t, u ->
             printLine(batch, dbgCnt, "$ccM$t $ccG$u$ccY ns")
             dbgCnt++
