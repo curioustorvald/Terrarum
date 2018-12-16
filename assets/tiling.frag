@@ -28,8 +28,9 @@ uniform vec2 tilesInAxes; // vec2(tiles_in_horizontal, tiles_in_vertical)
 uniform ivec2 tilemapDimension;
 uniform sampler2D tilemap; // RGBA8888
 
-uniform sampler2D tilesAtlas;
-uniform sampler2D backgroundTexture;
+uniform sampler2D tilesAtlas; // terrain, wire, fluids, etc.
+uniform sampler2D tilesBlendAtlas; // weather mix (e.g. yellowed grass)
+uniform float tilesBlend = 0.0; // percentage of blending [0f..1f]. 0: draws tilesAtlas, 1: draws tilesBlendAtlas
 
 uniform ivec2 tilesInAtlas = ivec2(256, 256);
 uniform ivec2 atlasTexSize = ivec2(4096, 4096);
@@ -59,12 +60,6 @@ int getTileFromColor(vec4 color) {
 // return: [0..15]
 int getBreakageFromColor(vec4 color) {
     return (_colToInt(color) >> 20) & 0xF;
-}
-
-// 0xa0000000 where int=0xaarrggbb
-// return: [0..15]
-int getTextureIndexFromColor(vec4 color) {
-    return (_colToInt(color) >> 28) & 0xF;
 }
 
 void main() {
@@ -107,7 +102,11 @@ void main() {
 
     // blending a breakage tex with main tex
 
-    vec4 finalTile = texture2D(tilesAtlas, finalUVCoordForTile);
+    vec4 tileCol = texture2D(tilesAtlas, finalUVCoordForTile);
+    vec4 tileAltCol = texture2D(tilesBlendAtlas, finalUVCoordForTile);
+
+    vec4 finalTile = mix(tileCol, tileAltCol, tilesBlend);
+
     vec4 finalBreakage = texture2D(tilesAtlas, finalUVCoordForBreakage);
 
     gl_FragColor = colourFilter * (mix(finalTile, finalBreakage, finalBreakage.a));
