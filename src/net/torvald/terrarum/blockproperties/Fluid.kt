@@ -13,8 +13,13 @@ object Fluid {
     val WATER = FluidType(1)
     val STATIC_WATER = FluidType(-1)
 
+    val LAVA = FluidType(2)
+    val STATIC_LAVA = FluidType(-2)
+
+    val fluidTilesRange = 4094..4095 // MANUAL UPDATE
+    val fluidRange = 1..2 // MANUAL UPDATE
+
 
     fun getFluidTileFrom(type: FluidType) = GameWorld.TILES_SUPPORTED - type.abs()
-    private val fluidTilesRange = 4094..4095
     fun isThisTileFluid(tileid: Int) = tileid in fluidTilesRange
 }

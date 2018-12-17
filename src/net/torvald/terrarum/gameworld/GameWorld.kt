@@ -380,7 +380,7 @@ open class GameWorld {
         else {
             //printdbg(this, "> Setting nonzero ($fill) on ($x,$y)")
 
-            setTileTerrain(x, y, Block.WATER) // this function alters fluid list, must be called first // TODO fluidType aware
+            setTileTerrain(x, y, fluidTypeToBlock(fluidType)) // this function alters fluid list, must be called first // TODO fluidType aware
             fluidTypes[addr] = fluidType
             fluidFills[addr] = fill
         }
@@ -399,6 +399,12 @@ open class GameWorld {
         val type = fluidTypes[addr]
 
         return if (type == null) FluidInfo(Fluid.NULL, 0f) else FluidInfo(type, fill!!)
+    }
+
+    private fun fluidTypeToBlock(type: FluidType) = when (type.abs()) {
+        Fluid.NULL.value -> Block.AIR
+        in Fluid.fluidRange -> GameWorld.TILES_SUPPORTED - type.abs()
+        else -> throw IllegalArgumentException("Unsupported fluid type: $type")
     }
 
     data class FluidInfo(val type: FluidType, val amount: Float) {
