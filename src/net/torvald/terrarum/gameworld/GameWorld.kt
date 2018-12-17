@@ -365,24 +365,20 @@ open class GameWorld {
 
 
         val addr = LandUtil.getBlockAddr(this, x, y)
-        // fluid completely drained
-        if (fill <= WorldSimulator.FLUID_MIN_MASS) {
-            /**********/ fluidTypes.remove(addr)
-            val oldMap = fluidFills.remove(addr)
 
-            // oldMap not being null means there actually was a fluid there, so we can put AIR onto it
-            // otherwise, it means it was some solid and therefore we DON'T want to put AIR onto it
-            if (oldMap != null) {
-                setTileTerrain(x, y, 0)
-            }
-        }
-        // update the fluid amount
-        else {
-            //printdbg(this, "> Setting nonzero ($fill) on ($x,$y)")
-
-            setTileTerrain(x, y, fluidTypeToBlock(fluidType)) // this function alters fluid list, must be called first // TODO fluidType aware
-            fluidTypes[addr] = fluidType
+        if (fill > WorldSimulator.FLUID_MIN_MASS) {
+            setTileTerrain(x, y, fluidTypeToBlock(fluidType))
             fluidFills[addr] = fill
+            fluidTypes[addr] = fluidType
+        }
+        else {
+            fluidFills.remove(addr)
+            fluidTypes.remove(addr)
+
+            // if old tile was fluid
+            if (BlockCodex[getTileFromTerrain(x, y) ?: Block.STONE].isFluid) {
+                setTileTerrain(x, y, Block.AIR)
+            }
         }
 
 
@@ -397,7 +393,6 @@ open class GameWorld {
         val addr = LandUtil.getBlockAddr(this, x, y)
         val fill = fluidFills[addr]
         val type = fluidTypes[addr]
-
         return if (type == null) FluidInfo(Fluid.NULL, 0f) else FluidInfo(type, fill!!)
     }
 
