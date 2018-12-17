@@ -431,7 +431,7 @@ internal object BlocksDrawer {
         //      atlas. IngameRenderer must be modified so that fluid-draw call is separated from drawing tiles.
         //      The MUL draw mode can be removed from this (it turns out drawing tinted glass is tricky because of
         //      the window frame which should NOT be MUL'd)
-        
+
 
         val for_y_start = (WorldCamera.y.toFloat() / TILE_SIZE).floorInt()
         val for_y_end = for_y_start + tilesBuffer.height - 1
