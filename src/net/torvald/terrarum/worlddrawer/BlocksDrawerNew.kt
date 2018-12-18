@@ -82,6 +82,12 @@ internal object BlocksDrawer {
     private val shader = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/tiling.frag"))
 
     init {
+        // PNG still doesn't work right.
+        // The thing is, pixel with alpha 0 must have RGB of also 0, which PNG does not guarantee it.
+        // (pixels of RGB = 255, A = 0 -- white transparent -- causes 'glow')
+        // with TGA, you have a complete control over this, with the expense of added hassle on your side.
+        // -- Torvald, 2018-12-19
+
         // hard-coded as tga.gz
         val gzFileList = listOf("blocks/terrain.tga.gz", "blocks/wire.tga.gz", "blocks/terrain_autumn.tga.gz")
         val gzTmpFName = listOf("tmp_terrain.tga", "tmp_wire.tga", "tmp_terrain_autumn.tga")
