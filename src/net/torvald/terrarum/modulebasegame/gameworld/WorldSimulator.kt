@@ -25,6 +25,7 @@ object WorldSimulator {
      * In tiles;
      * square width/height = field * 2
      */
+    // TODO: increase the radius and then MULTITHREAD
     const val FLUID_UPDATING_SQUARE_RADIUS = 80 // larger value will have dramatic impact on performance
     const private val DOUBLE_RADIUS = FLUID_UPDATING_SQUARE_RADIUS * 2
 
