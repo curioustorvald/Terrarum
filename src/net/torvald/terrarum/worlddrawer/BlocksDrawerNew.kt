@@ -46,6 +46,7 @@ internal object BlocksDrawer {
     val tilesWire: TextureRegionPack
     val tileItemWall: TextureRegionPack
     val tilesTerrainBlend: TextureRegionPack
+    val tilesFluid: TextureRegionPack
 
     //val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
 
@@ -57,6 +58,7 @@ internal object BlocksDrawer {
     val WALL = GameWorld.WALL
     val TERRAIN = GameWorld.TERRAIN
     val WIRE = GameWorld.WIRE
+    val FLUID = -2
 
     private const val NEARBY_TILE_KEY_UP = 0
     private const val NEARBY_TILE_KEY_RIGHT = 1
@@ -75,6 +77,7 @@ internal object BlocksDrawer {
     private lateinit var terrainTilesBuffer: Array<IntArray>
     private lateinit var wallTilesBuffer: Array<IntArray>
     private lateinit var wireTilesBuffer: Array<IntArray>
+    private lateinit var fluidTilesBuffer: Array<IntArray>
     private var tilesBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
 
@@ -89,8 +92,8 @@ internal object BlocksDrawer {
         // -- Torvald, 2018-12-19
 
         // hard-coded as tga.gz
-        val gzFileList = listOf("blocks/terrain.tga.gz", "blocks/wire.tga.gz", "blocks/terrain_autumn.tga.gz")
-        val gzTmpFName = listOf("tmp_terrain.tga", "tmp_wire.tga", "tmp_terrain_autumn.tga")
+        val gzFileList = listOf("blocks/terrain.tga.gz", "blocks/wire.tga.gz", "blocks/terrain_autumn.tga.gz", "blocks/fluids.tga.gz")
+        val gzTmpFName = listOf("tmp_terrain.tga", "tmp_wire.tga", "tmp_terrain_autumn.tga", "tmp_fluids.tga")
         // unzip GZIP temporarily
         gzFileList.forEachIndexed { index, filename ->
             val terrainTexFile = ModMgr.getGdxFile("basegame", filename)
@@ -106,6 +109,7 @@ internal object BlocksDrawer {
         val _terrainPixMap = Pixmap(Gdx.files.internal(gzTmpFName[0]))
         val _wirePixMap = Pixmap(Gdx.files.internal(gzTmpFName[1]))
         val _terrainBlendPixMap = Pixmap(Gdx.files.internal(gzTmpFName[2]))
+        val _fluidPixMap = Pixmap(Gdx.files.internal(gzTmpFName[3]))
 
         // delete temp files
         gzTmpFName.forEach { File(it).delete() }
@@ -116,11 +120,14 @@ internal object BlocksDrawer {
         tilesWire.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         tilesTerrainBlend = TextureRegionPack(Texture(_terrainBlendPixMap), TILE_SIZE, TILE_SIZE)
         tilesTerrainBlend.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        tilesFluid = TextureRegionPack(Texture(_fluidPixMap), TILE_SIZE, TILE_SIZE)
+        tilesFluid.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         // also dispose unused temp files
         //terrainPixMap.dispose() // commented: tileItemWall needs it
         _wirePixMap.dispose()
         _terrainBlendPixMap.dispose()
+        _fluidPixMap.dispose()
 
 
 
@@ -719,6 +726,7 @@ internal object BlocksDrawer {
             TERRAIN -> terrainTilesBuffer
             WALL -> wallTilesBuffer
             WIRE -> wireTilesBuffer
+            FLUID -> fluidTilesBuffer
             else -> throw IllegalArgumentException()
         }
 
@@ -740,16 +748,18 @@ internal object BlocksDrawer {
         val tileAtlas = when (mode) {
             TERRAIN, WALL -> tilesTerrain
             WIRE -> tilesWire
+            FLUID -> tilesFluid
             else -> throw IllegalArgumentException()
         }
         val sourceBuffer = when(mode) {
             TERRAIN -> terrainTilesBuffer
             WALL -> wallTilesBuffer
             WIRE -> wireTilesBuffer
+            FLUID -> fluidTilesBuffer
             else -> throw IllegalArgumentException()
         }
         val vertexColour = when (mode) {
-            TERRAIN, WIRE -> Color.WHITE
+            TERRAIN, WIRE, FLUID -> Color.WHITE
             WALL -> wallOverlayColour
             else -> throw IllegalArgumentException()
         }
@@ -819,6 +829,7 @@ internal object BlocksDrawer {
             terrainTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
             wallTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
             wireTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
+            fluidTilesBuffer = Array<IntArray>(tilesInVertical, { kotlin.IntArray(tilesInHorizontal) })
 
             tilesBuffer.dispose()
             tilesBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
