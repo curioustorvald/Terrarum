@@ -33,7 +33,7 @@ public class AppLoader implements ApplicationListener {
      *
      * e.g. 0x02010034 will be translated as 2.1.52
      */
-    public static final int VERSION_RAW = 0x00_02_027C;
+    public static final int VERSION_RAW = 0x00_02_04B1;
     public static final String getVERSION_STRING() {
         return String.format("%d.%d.%d", VERSION_RAW >>> 24, (VERSION_RAW & 0xff0000) >>> 16, VERSION_RAW & 0xFFFF);
     }
