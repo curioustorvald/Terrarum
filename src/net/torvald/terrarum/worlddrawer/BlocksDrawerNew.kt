@@ -10,9 +10,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.ceilInt
-import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
@@ -42,6 +40,11 @@ internal object BlocksDrawer {
     private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
 
+    /**
+     * Widths of the tile atlases must have exactly the same width (height doesn't matter)
+     * If not, the engine will choose wrong tile for a number you provided.
+     */
+
     val tilesTerrain: TextureRegionPack
     val tilesWire: TextureRegionPack
     val tileItemWall: TextureRegionPack
@@ -53,7 +56,10 @@ internal object BlocksDrawer {
 
     val wallOverlayColour = Color(2f/3f, 2f/3f, 2f/3f, 1f)
 
-    const val breakAnimSteps = 10
+    const val BREAKAGE_STEPS = 10
+    const val TILES_PER_BLOCK = PairedMapLayer.RANGE
+    const val BLOCKS_IN_ATLAS_X = 16  // assuming atlas size of 4096x4096 px
+    const val BLOCKS_IN_ATLAS_Y = 256 // assuming atlas size of 4096x4096 px
 
     val WALL = GameWorld.WALL
     val TERRAIN = GameWorld.TERRAIN
@@ -352,37 +358,40 @@ internal object BlocksDrawer {
     // NO draw lightmap using colour filter, actors must also be hidden behind the darkness
     ///////////////////////////////////////////
 
-    internal fun renderWall(projectionMatrix: Matrix4) {
+    internal fun renderData() {
+        drawTiles(WALL)
+        drawTiles(TERRAIN) // regular tiles
+        drawTiles(WIRE)
+        drawTiles(FLUID)
+    }
+
+    internal fun drawWall(projectionMatrix: Matrix4) {
         // blend normal
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-        drawTiles(WALL, false)
         renderUsingBuffer(WALL, projectionMatrix)
     }
 
-    internal fun renderTerrain(projectionMatrix: Matrix4) {
+    internal fun drawTerrain(projectionMatrix: Matrix4) {
         // blend normal
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-        drawTiles(TERRAIN, false) // regular tiles
         renderUsingBuffer(TERRAIN, projectionMatrix)
+        renderUsingBuffer(FLUID, projectionMatrix)
     }
 
-    internal fun renderFront(projectionMatrix: Matrix4, drawWires: Boolean) {
+    internal fun drawFront(projectionMatrix: Matrix4, drawWires: Boolean) {
         // blend mul
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-
-        drawTiles(TERRAIN, true) // blendmul tiles
-        renderUsingBuffer(TERRAIN, projectionMatrix)
-        renderFluids(projectionMatrix)
-
+        // let's just not MUL on terrain, make it FLUID only...
+        renderUsingBuffer(FLUID, projectionMatrix)
 
 
 
@@ -392,48 +401,62 @@ internal object BlocksDrawer {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         if (drawWires) {
-            drawTiles(WIRE, false)
             renderUsingBuffer(WIRE, projectionMatrix)
+        }
+    }
+
+    /**
+     * Returns a tile number as if we're addressing tile number in the main atlas. That is, returning int of
+     * 18 means will point to the tile (32, 1) of the fluid atlas.
+     *
+     * This behaviour is to keep compatibility with World.getTile() method, this method need to mimic the World's
+     * behaviour to return "starting point" of the tile, so nearby information (int 0..15) can simply be added to
+     * the X-position that can be deduced from the tile number.
+     *
+     * As a consequence, fluids.tga must have the same width as tiles.tga.
+     */
+    private fun GameWorld.FluidInfo.toFluidTile(): Int {
+        /*
+        val fluid = world.getFluid(x, y)
+
+        if (AppLoader.IS_DEVELOPMENT_BUILD && fluid.type == Fluid.NULL && fluid.amount != 0f) {
+            throw Error("Illegal fluid at ($x,$y): $fluid")
+        }
+
+        if (fluid.amount >= WorldSimulator.FLUID_MIN_MASS) {
+            val fluidLevel = fluid.amount.coerceIn(0f,1f).times(PairedMapLayer.RANGE - 1).roundToInt()
+            val baseTileID = (GameWorld.TILES_SUPPORTED) - fluid.type.abs()
+            val tileX = fluidLevel + (baseTileID % 16) * PairedMapLayer.RANGE
+            val tileY = baseTileID / 16
+
+            //printdbg(this, "$fluid")
+            //printdbg(this, "$fluidLevel, $baseTileID, $tileX, $tileY")
+
+            writeToBuffer(mode, bufferX, bufferY, tileX, tileY, 0)
+        }
+         */
+
+
+        val fluidNum = this.type.abs()
+
+        if (this.amount >= WorldSimulator.FLUID_MIN_MASS) {
+            val fluidLevel = this.amount.coerceIn(0f,1f).times(PairedMapLayer.RANGE - 1).roundToInt()
+
+            return fluidLevel * BLOCKS_IN_ATLAS_X + fluidNum
+        }
+        else {
+            return 0
         }
     }
 
     private val tileDrawLightThreshold = 2f / LightmapRenderer.MUL
 
-    private fun canIHazRender(mode: Int, x: Int, y: Int) =
-            //(world.getTileFrom(mode, x, y) != 0) // not an air tile
-            //&&
-
-            // for WALLs; else: ret true
-            if (mode == WALL) { // DRAW WHEN it is visible and 'is a lip'
-                ( BlockCodex[world.getTileFromTerrain(x, y) ?: 0].isClear ||
-                  !
-                  ((!BlockCodex[world.getTileFromTerrain(x, y - 1) ?: 0].isClear && !BlockCodex[world.getTileFromTerrain(x, y + 1) ?: 0].isClear)
-                   &&
-                   (!BlockCodex[world.getTileFromTerrain(x - 1, y) ?: 0].isClear && !BlockCodex[world.getTileFromTerrain(x + 1, y + 1) ?: 0].isClear)
-                  )
-                )
-            }
-            else
-                true
-
-    // end
-
-    private fun hasLightNearby(x: Int, y: Int) = ( // check if light level of nearby or this tile is illuminated
-            LightmapRenderer.getHighestRGB(x, y) ?: 0f >= tileDrawLightThreshold ||
-            LightmapRenderer.getHighestRGB(x - 1, y) ?: 0f >= tileDrawLightThreshold ||
-            LightmapRenderer.getHighestRGB(x + 1, y) ?: 0f >= tileDrawLightThreshold ||
-            LightmapRenderer.getHighestRGB(x, y - 1) ?: 0f >= tileDrawLightThreshold ||
-            LightmapRenderer.getHighestRGB(x, y + 1) ?: 0f >= tileDrawLightThreshold ||
-            LightmapRenderer.getHighestRGB(x - 1, y - 1) ?: 0f >= tileDrawLightThreshold ||
-            LightmapRenderer.getHighestRGB(x + 1, y + 1) ?: 0f >= tileDrawLightThreshold ||
-            LightmapRenderer.getHighestRGB(x + 1, y - 1) ?: 0f >= tileDrawLightThreshold ||
-            LightmapRenderer.getHighestRGB(x - 1, y + 1) ?: 0f >= tileDrawLightThreshold
-                                                 )
-
     /**
      * Writes to buffer. Actual draw code must be called after this operation.
+     *
+     * @param drawModeTilesBlendMul If current drawing mode is MULTIPLY. Doesn't matter if mode is FLUID.
      */
-    private fun drawTiles(mode: Int, drawModeTilesBlendMul: Boolean) {
+    private fun drawTiles(mode: Int) {
         // can't be "WorldCamera.y / TILE_SIZE":
         //      ( 3 / 16) == 0
         //      (-3 / 16) == -1  <-- We want it to be '-1', not zero
@@ -459,122 +482,56 @@ internal object BlocksDrawer {
                 val bufferX = x - for_x_start
                 val bufferY = y - for_y_start
 
-                val thisTile: Int?
-                if (mode % 3 == WALL)
-                    thisTile = world.getTileFromWall(x, y)
-                else if (mode % 3 == TERRAIN)
-                    thisTile = world.getTileFromTerrain(x, y)
-                else if (mode % 3 == WIRE)
-                    thisTile = world.getTileFromWire(x, y)
-                else
-                    throw IllegalArgumentException()
+                val thisTile = when (mode) {
+                    WALL -> world.getTileFromWall(x, y)
+                    TERRAIN -> world.getTileFromTerrain(x, y)
+                    WIRE -> world.getTileFromWire(x, y)
+                    FLUID -> world.getFluid(x, y).toFluidTile()
+                    else -> throw IllegalArgumentException()
+                }
 
-                val noDamageLayer = mode % 3 == WIRE
 
                 // draw a tile, but only when illuminated
                 try {
-                    val nearbyTilesInfo: Int
-                    if (isPlatform(thisTile)) {
-                        nearbyTilesInfo = getNearbyTilesInfoPlatform(x, y)
+                    val nearbyTilesInfo = if (mode == FLUID) {
+                        getNearbyTilesInfoFluids(x, y)
+                    }
+                    else if (isPlatform(thisTile)) {
+                        getNearbyTilesInfoPlatform(x, y)
                     }
                     else if (isWallSticker(thisTile)) {
-                        nearbyTilesInfo = getNearbyTilesInfoWallSticker(x, y)
+                        getNearbyTilesInfoWallSticker(x, y)
                     }
                     else if (isConnectMutual(thisTile)) {
-                        nearbyTilesInfo = getNearbyTilesInfoNonSolid(x, y, mode)
+                        getNearbyTilesInfoNonSolid(x, y, mode)
                     }
                     else if (isConnectSelf(thisTile)) {
-                        nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile)
+                        getNearbyTilesInfo(x, y, mode, thisTile)
                     }
                     else {
-                        nearbyTilesInfo = 0
+                        0
                     }
 
 
-                    val thisTileX = if (!noDamageLayer)
-                        PairedMapLayer.RANGE * ((thisTile ?: 0) % PairedMapLayer.RANGE) + nearbyTilesInfo
-                    else
-                        nearbyTilesInfo
-
-                    val thisTileY = (thisTile ?: 0) / PairedMapLayer.RANGE
+                    val thisTileX = TILES_PER_BLOCK * ((thisTile ?: 0) % BLOCKS_IN_ATLAS_X) + nearbyTilesInfo
+                    val thisTileY = (thisTile ?: 0) / BLOCKS_IN_ATLAS_X
 
                     val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
                     val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
-                    val breakingStage = (breakage / maxHealth).times(breakAnimSteps).roundInt()
+                    val breakingStage = (breakage / maxHealth).times(BREAKAGE_STEPS).roundInt()
 
 
 
                     // draw a tile
 
-                    // I don't know what the fuck is going on here, one thing I sure is it will draw twice, blending
-                    // over what had drawn in first pass (blendNormal)
-                    // this code works, but may not work in the way I wanted
-                    // also, it DOES have a code snippet written twice:
-                    //     if (BlockCodex[thisTile].isFluid) {
-                    //         ...
-                    //     }
-                    //     else {
-                    //         ...
-                    //     }
-
-                    if (drawModeTilesBlendMul) {
-                        // while iterating through, only the some tiles are actually eligible to be drawn as MUL,
-                        // so obviously when we caught not eligible tile, we need to skip that by marking as Tile No. zero
-
-                        if (isBlendMul(thisTile)) {
-                            if (BlockCodex[thisTile].isFluid) {
-                                val fluid = world.getFluid(x, y)
-
-                                if (AppLoader.IS_DEVELOPMENT_BUILD && fluid.type == Fluid.NULL && fluid.amount != 0f) {
-                                    throw Error("Illegal fluid at ($x,$y): $fluid")
-                                }
-
-                                if (fluid.amount >= WorldSimulator.FLUID_MIN_MASS) {
-                                    val fluidLevel = fluid.amount.coerceIn(0f,1f).times(PairedMapLayer.RANGE - 1).roundToInt()
-                                    val baseTileID = (GameWorld.TILES_SUPPORTED) - fluid.type.abs()
-                                    val tileX = fluidLevel + (baseTileID % 16) * PairedMapLayer.RANGE
-                                    val tileY = baseTileID / 16
-
-                                    //printdbg(this, "$fluid")
-                                    //printdbg(this, "$fluidLevel, $baseTileID, $tileX, $tileY")
-
-                                    writeToBuffer(mode, bufferX, bufferY, tileX, tileY, 0)
-                                }
-                            }
-                            else {
-                                writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
-                            }
-                        }
-                        else {
-                            writeToBuffer(mode, bufferX, bufferY, 0, 0, 0)
-                        }
+                    if (mode == FLUID) {
+                        writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, 0)
+                    }
+                    else if (!BlockCodex[thisTile].isFluid) {
+                        writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
                     }
                     else {
-                        // do NOT add "if (!isBlendMul(thisTile))"!
-                        // or else they will not look like they should be when backed with wall
-
-                        if (BlockCodex[thisTile].isFluid) {
-                            val fluid = world.getFluid(x, y)
-
-                            if (AppLoader.IS_DEVELOPMENT_BUILD && fluid.type == Fluid.NULL && fluid.amount != 0f) {
-                                throw Error("Illegal fluid at ($x,$y): $fluid")
-                            }
-
-                            if (fluid.amount >= WorldSimulator.FLUID_MIN_MASS) {
-                                val fluidLevel = fluid.amount.coerceIn(0f,1f).times(PairedMapLayer.RANGE - 1).roundToInt()
-                                val baseTileID = (GameWorld.TILES_SUPPORTED) - fluid.type.abs()
-                                val tileX = fluidLevel + (baseTileID % 16) * PairedMapLayer.RANGE
-                                val tileY = baseTileID / 16
-
-                                //printdbg(this, "$fluid")
-                                //printdbg(this, "$fluidLevel, $baseTileID, $tileX, $tileY")
-
-                                writeToBuffer(mode, bufferX, bufferY, tileX, tileY, 0)
-                            }
-                        }
-                        else {
-                            writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
-                        }
+                        writeToBuffer(mode, bufferX, bufferY, 0, 0, 0)
                     }
                 } catch (e: NullPointerException) {
                     // do nothing. WARNING: This exception handling may hide erratic behaviour completely.
@@ -620,8 +577,33 @@ internal object BlocksDrawer {
         var ret = 0
         for (i in 0..3) {
             try {
-                if (!BlockCodex[nearbyTiles[i]].isSolid &&
-                    !BlockCodex[nearbyTiles[i]].isFluid) {
+                if (!BlockCodex[nearbyTiles[i]].isSolid) {
+                    ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+                }
+            } catch (e: ArrayIndexOutOfBoundsException) {
+            }
+
+        }
+
+        return ret
+    }
+
+    /**
+     * Basically getNearbyTilesInfoNonSolid() but connects mutually with all the fluids
+     */
+    internal fun getNearbyTilesInfoFluids(x: Int, y: Int): Int {
+        val nearbyTiles = IntArray(4)
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFromTerrain(x - 1, y) ?: Block.NULL
+        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFromTerrain(x + 1, y) ?: Block.NULL
+        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFromTerrain(x    , y - 1) ?: 4906
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFromTerrain(x    , y + 1) ?: Block.NULL
+
+        // try for
+        var ret = 0
+        for (i in 0..3) {
+            try {
+                if (!BlockCodex[nearbyTiles[i]].isFluid &&
+                    !BlockCodex[nearbyTiles[i]].isSolid) {
                     ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
                 }
             } catch (e: ArrayIndexOutOfBoundsException) {
@@ -711,15 +693,14 @@ internal object BlocksDrawer {
      *
      * @return Raw colour bits in RGBA8888 format
      */
-    private fun sheetXYToTilemapColour(mode: Int, sheetX: Int, sheetY: Int, breakage: Int): Int = when (mode) {
-        // the tail ".or(255)" is there to write 1.0 to the A channel (remember, return type is RGBA)
+    private fun sheetXYToTilemapColour(mode: Int, sheetX: Int, sheetY: Int, breakage: Int): Int =
+            // the tail ".or(255)" is there to write 1.0 to the A channel (remember, return type is RGBA)
 
-        TERRAIN, WALL ->
-                (tilesTerrain.horizontalCount * sheetY + sheetX).shl(8).or(255) or // the actual tile bits
+            // this code is synced to the tilesTerrain's tile configuration, but everything else is hard-coded
+            // right now.
+            (tilesTerrain.horizontalCount * sheetY + sheetX).shl(8).or(255) or // the actual tile bits
                 breakage.and(15).shl(28) // breakage bits
-        WIRE -> (tilesWire.horizontalCount * sheetY + sheetX).shl(8).or(255)
-        else -> throw IllegalArgumentException()
-    }
+
 
     private fun writeToBuffer(mode: Int, bufferPosX: Int, bufferPosY: Int, sheetX: Int, sheetY: Int, breakage: Int) {
         val sourceBuffer = when(mode) {
@@ -796,7 +777,7 @@ internal object BlocksDrawer {
         /*shader hard-code*/shader.setUniformi("tilesInAtlas", tileAtlas.horizontalCount, tileAtlas.verticalCount) //depends on the tile atlas
         /*shader hard-code*/shader.setUniformi("atlasTexSize", tileAtlas.texture.width, tileAtlas.texture.height) //depends on the tile atlas
         // set the blend value as world's time progresses, in linear fashion
-        shader.setUniformf("tilesBlend", if (world is GameWorldExtension)
+        shader.setUniformf("tilesBlend", if (world is GameWorldExtension && mode != FLUID)
             (world as GameWorldExtension).time.days.minus(1f) / WorldTime.MONTH_LENGTH
         else
             0f
@@ -805,10 +786,6 @@ internal object BlocksDrawer {
         shader.end()
 
         //tilesBufferAsTex.dispose()
-    }
-
-    private fun renderFluids(projectionMatrix: Matrix4) {
-
     }
 
     private var oldScreenW = 0
