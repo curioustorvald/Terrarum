@@ -20,6 +20,9 @@ object Fluid {
     val fluidRange = 1..2 // MANUAL UPDATE
 
 
+    /**
+     * Returns tile number in the main tile atlas. Water being 4095.
+     */
     fun getFluidTileFrom(type: FluidType) = GameWorld.TILES_SUPPORTED - type.abs()
     fun isThisTileFluid(tileid: Int) = tileid in fluidTilesRange
 }

@@ -86,6 +86,7 @@ object IngameRenderer {
         LightmapRenderer.fireRecalculateEvent()
 
         prepLightmapRGBA()
+        BlocksDrawer.renderData()
         drawToRGB(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
         drawToA(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
         drawOverlayActors(actorsRenderOverlay)
@@ -242,7 +243,7 @@ object IngameRenderer {
             }
 
             setCameraPosition(0f, 0f)
-            BlocksDrawer.renderWall(batch.projectionMatrix)
+            BlocksDrawer.drawWall(batch.projectionMatrix)
 
             batch.inUse {
                 moveCameraToWorldCoord()
@@ -251,7 +252,7 @@ object IngameRenderer {
             }
 
             setCameraPosition(0f, 0f)
-            BlocksDrawer.renderTerrain(batch.projectionMatrix)
+            BlocksDrawer.drawTerrain(batch.projectionMatrix)
 
             batch.inUse {
                 /////////////////
@@ -266,7 +267,7 @@ object IngameRenderer {
             }
 
             setCameraPosition(0f, 0f)
-            BlocksDrawer.renderFront(batch.projectionMatrix, false) // blue coloured filter of water, etc.
+            BlocksDrawer.drawFront(batch.projectionMatrix, false) // blue coloured filter of water, etc.
 
             batch.inUse {
                 FeaturesDrawer.drawEnvOverlay(batch)
