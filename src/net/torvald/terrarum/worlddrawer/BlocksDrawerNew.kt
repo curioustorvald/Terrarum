@@ -552,7 +552,7 @@ internal object BlocksDrawer {
         val nearbyTiles = IntArray(4)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFrom(mode, x    , y - 1) ?: 4906
+        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFrom(mode, x    , y - 1) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(mode, x    , y + 1) ?: Block.NULL
 
         // try for
@@ -570,7 +570,7 @@ internal object BlocksDrawer {
         val nearbyTiles = IntArray(4)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFrom(mode, x    , y - 1) ?: 4906
+        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFrom(mode, x    , y - 1) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(mode, x    , y + 1) ?: Block.NULL
 
         // try for
@@ -595,7 +595,7 @@ internal object BlocksDrawer {
         val nearbyTiles = IntArray(4)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFromTerrain(x - 1, y) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFromTerrain(x + 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFromTerrain(x    , y - 1) ?: 4906
+        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFromTerrain(x    , y - 1) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFromTerrain(x    , y + 1) ?: Block.NULL
 
         // try for
@@ -611,7 +611,15 @@ internal object BlocksDrawer {
 
         }
 
-        return ret
+        //return ret
+        
+        val upTile = world.getTileFromTerrain(x    , y - 1) ?: Block.NULL
+        return if (ret == 15 || ret == 10)
+            ret
+        else if (BlockCodex[upTile].isFluid)
+            0
+        else
+            1
     }
 
     internal fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
