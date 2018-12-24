@@ -340,6 +340,8 @@ public class AppLoader implements ApplicationListener {
         appConfig.width = screenW;
         appConfig.height = screenH;
 
+        updateFullscreenQuad(screenW, screenH);
+
         printdbg(this, "Resize event");
     }
 
