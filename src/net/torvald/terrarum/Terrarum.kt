@@ -100,6 +100,7 @@ object Terrarum : Screen {
 
     private val javaHeapCircularArray = CircularArray<Int>(128)
     private val nativeHeapCircularArray = CircularArray<Int>(128)
+    private val updateRateCircularArray = CircularArray<Double>(128)
 
     val memJavaHeap: Int
         get() {
@@ -119,6 +120,14 @@ object Terrarum : Screen {
         }
     val memXmx: Int
         get() = (Runtime.getRuntime().maxMemory() shr 20).toInt()
+    val updateRateStr: String
+        get() {
+            updateRateCircularArray.add(updateRate)
+
+            var acc = 0.0
+            updateRateCircularArray.forEach { acc = maxOf(acc, it) }
+            return String.format("%.2f", acc)
+        }
 
 
 
@@ -482,8 +491,6 @@ object Terrarum : Screen {
     /** Bigger than 1.0 */
     inline val updateRate: Double
         get() = 1.0 / Gdx.graphics.deltaTime
-    val updateRateStr: String
-        get() = String.format("%.2f", updateRate)
     /** Smaller than 1.0 */
     val renderRate = 1.0 / TARGET_INTERNAL_FPS
     val renderRateStr = TARGET_INTERNAL_FPS.toString()
@@ -559,7 +566,7 @@ fun Float.round(): Float {
 fun SpriteBatch.fillRect(x: Float, y: Float, w: Float, h: Float) {
     this.draw(AppLoader.textureWhiteSquare, x, y, w, h)
 }
-inline fun SpriteBatch.drawStraightLine(x: Float, y: Float, otherEnd: Float, thickness: Float, isVertical: Boolean) {
+fun SpriteBatch.drawStraightLine(x: Float, y: Float, otherEnd: Float, thickness: Float, isVertical: Boolean) {
     if (!isVertical)
         this.fillRect(x, y, otherEnd - x, thickness)
     else
@@ -667,23 +674,23 @@ val ccK = GameFontBase.toColorCode(0x888F)
 
 typealias Second = Float
 
-inline fun Int.sqr(): Int = this * this
-inline fun Double.floorInt() = Math.floor(this).toInt()
-inline fun Float.floorInt() = FastMath.floor(this)
-inline fun Float.floor() = FastMath.floor(this).toFloat()
-inline fun Double.ceilInt() = Math.ceil(this).toInt()
-inline fun Float.ceil(): Float = FastMath.ceil(this).toFloat()
-inline fun Float.ceilInt() = FastMath.ceil(this)
-inline fun Double.round() = Math.round(this).toDouble()
-inline fun Double.floor() = Math.floor(this)
-inline fun Double.ceil() = this.floor() + 1.0
-inline fun Double.roundInt(): Int = Math.round(this).toInt()
-inline fun Float.roundInt(): Int = Math.round(this)
-inline fun Double.abs() = Math.abs(this)
-inline fun Double.sqr() = this * this
-inline fun Double.sqrt() = Math.sqrt(this)
-inline fun Float.sqrt() = FastMath.sqrt(this)
-inline fun Int.abs() = this.absoluteValue
+fun Int.sqr(): Int = this * this
+fun Double.floorInt() = Math.floor(this).toInt()
+fun Float.floorInt() = FastMath.floor(this)
+fun Float.floor() = FastMath.floor(this).toFloat()
+fun Double.ceilInt() = Math.ceil(this).toInt()
+fun Float.ceil(): Float = FastMath.ceil(this).toFloat()
+fun Float.ceilInt() = FastMath.ceil(this)
+fun Double.round() = Math.round(this).toDouble()
+fun Double.floor() = Math.floor(this)
+fun Double.ceil() = this.floor() + 1.0
+fun Double.roundInt(): Int = Math.round(this).toInt()
+fun Float.roundInt(): Int = Math.round(this)
+fun Double.abs() = Math.abs(this)
+fun Double.sqr() = this * this
+fun Double.sqrt() = Math.sqrt(this)
+fun Float.sqrt() = FastMath.sqrt(this)
+fun Int.abs() = this.absoluteValue
 fun Double.bipolarClamp(limit: Double) =
         this.coerceIn(-limit, limit)
 

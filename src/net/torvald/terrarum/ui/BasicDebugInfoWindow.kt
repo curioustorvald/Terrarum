@@ -6,13 +6,12 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
 
 /**
  * Created by minjaesong on 2016-03-14.
@@ -91,8 +90,8 @@ class BasicDebugInfoWindow : UICanvas() {
                                          + "${(hitbox?.endY?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
                                          + ")")
 
-            printLine(batch, 3, "veloX reported $ccG${player.externalForce?.x}")
-            printLine(batch, 4, "veloY reported $ccG${player.externalForce?.y}")
+            printLine(batch, 3, "veloX reported $ccG${player.externalForce.x}")
+            printLine(batch, 4, "veloY reported $ccG${player.externalForce.y}")
 
             printLine(batch, 5, "p_WalkX $ccG${player.controllerMoveDelta?.x}")
             printLine(batch, 6, "p_WalkY $ccG${player.controllerMoveDelta?.y}")
