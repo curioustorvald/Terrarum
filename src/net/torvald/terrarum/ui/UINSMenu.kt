@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import java.lang.Error
 
 /**
  * Nextstep-themed menu bar with mandatory title line
@@ -43,8 +42,8 @@ class UINSMenu(
     private data class MenuPack(val title: String, val ui: UIItemTextButtonList)
 
     private fun ArrayList<MenuPack>.push(item: MenuPack) { this.add(item) }
-    private fun ArrayList<MenuPack>.pop() = this.removeAt(this.lastIndex)!!
-    private fun ArrayList<MenuPack>.peek() = this.last()!!
+    private fun ArrayList<MenuPack>.pop() = this.removeAt(this.lastIndex)
+    private fun ArrayList<MenuPack>.peek() = this.last()
 
 
     val selectedIndex: Int?

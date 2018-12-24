@@ -114,7 +114,7 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
                     val newCurrentRemoConContents = currentRemoConContents.children[selectedIndex!!]
 
                     // only go deeper if that node has child to navigate
-                    if (currentRemoConContents.children[selectedIndex!!].children.size != 0) {
+                    if (currentRemoConContents.children[selectedIndex].children.size != 0) {
                         remoConTray.consume()
                         remoConTray = generateNewRemoCon(newCurrentRemoConContents)
                         currentRemoConContents = newCurrentRemoConContents

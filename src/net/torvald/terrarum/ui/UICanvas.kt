@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.Second
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.roundInt
 
 
@@ -76,7 +76,7 @@ abstract class UICanvas(
     }
 
 
-    inline fun addSubUI(ui: UICanvas) {
+    fun addSubUI(ui: UICanvas) {
         handler.addSubUI(ui)
     }
 
@@ -200,23 +200,23 @@ abstract class UICanvas(
 
     // handler func aliases //
 
-    inline fun setPosition(x: Int, y: Int) {
+    fun setPosition(x: Int, y: Int) {
         handler.setPosition(x, y)
     }
 
-    inline fun setAsAlwaysVisible() {
+    fun setAsAlwaysVisible() {
         handler.setAsAlwaysVisible()
     }
 
-    inline fun setAsOpen() {
+    fun setAsOpen() {
         handler.setAsOpen()
     }
 
-    inline fun setAsClose() {
+    fun setAsClose() {
         handler.setAsClose()
     }
 
-    inline fun toggleOpening() {
+    fun toggleOpening() {
         handler.toggleOpening()
     }
 

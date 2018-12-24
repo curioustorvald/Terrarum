@@ -2,15 +2,15 @@ package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.fillRect
-import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.floorInt
+import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.Luminous
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import java.util.*
 
@@ -580,17 +580,17 @@ object LightmapRendererOld {
         }
     }
 
-    inline infix fun Float.powerOf(f: Float) = FastMath.pow(this, f)
-    private inline fun Float.sqr() = this * this
-    private inline fun Float.sqrt() = FastMath.sqrt(this)
-    private inline fun Float.inv() = 1f / this
-    inline fun Float.floor() = FastMath.floor(this)
-    inline fun Double.floorInt() = Math.floor(this).toInt()
-    inline fun Float.round(): Int = Math.round(this)
-    inline fun Double.round(): Int = Math.round(this).toInt()
-    inline fun Float.ceil() = FastMath.ceil(this)
-    inline fun Int.even(): Boolean = this and 1 == 0
-    inline fun Int.odd(): Boolean = this and 1 == 1
+    infix fun Float.powerOf(f: Float) = FastMath.pow(this, f)
+    private fun Float.sqr() = this * this
+    private fun Float.sqrt() = FastMath.sqrt(this)
+    private fun Float.inv() = 1f / this
+    fun Float.floor() = FastMath.floor(this)
+    fun Double.floorInt() = Math.floor(this).toInt()
+    fun Float.round(): Int = Math.round(this)
+    fun Double.round(): Int = Math.round(this).toInt()
+    fun Float.ceil() = FastMath.ceil(this)
+    fun Int.even(): Boolean = this and 1 == 0
+    fun Int.odd(): Boolean = this and 1 == 1
 
     // TODO: float LUT lookup using linear interpolation
 
@@ -677,14 +677,14 @@ object LightmapRendererOld {
             1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f  // isn't it beautiful?
     )
     /** To eliminated visible edge on the gradient when 255/1023 is exceeded */
-    inline fun Color.normaliseToColourHDR() = Color(
+    fun Color.normaliseToColourHDR() = Color(
             hdr(this.r),
             hdr(this.g),
             hdr(this.b),
             1f
     )
 
-    inline fun Color.normaliseToAlphaHDR() = Color(
+    fun Color.normaliseToAlphaHDR() = Color(
             hdr(this.a),
             hdr(this.a),
             hdr(this.a),

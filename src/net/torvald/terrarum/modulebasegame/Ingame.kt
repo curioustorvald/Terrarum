@@ -1,41 +1,41 @@
 package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-
 import net.torvald.dataclass.CircularArray
+import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.concurrent.ThreadParallel
-import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
+import net.torvald.terrarum.console.Authenticator
+import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
-import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
-import net.torvald.terrarum.worlddrawer.WorldCamera
-
-import java.util.ArrayList
-import java.util.concurrent.locks.ReentrantLock
-
-import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.modulebasegame.console.AVTracker
 import net.torvald.terrarum.modulebasegame.console.ActorsList
-import net.torvald.terrarum.console.Authenticator
-import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.modulebasegame.gameactors.*
+import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
+import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.imagefont.Watch7SegMain
 import net.torvald.terrarum.modulebasegame.imagefont.WatchDotAlph
 import net.torvald.terrarum.modulebasegame.ui.*
-import net.torvald.terrarum.ui.*
+import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
+import net.torvald.terrarum.ui.BasicDebugInfoWindow
+import net.torvald.terrarum.ui.ConsoleWindow
+import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import net.torvald.terrarum.worlddrawer.WorldCamera
+import java.util.*
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.system.measureNanoTime
 
 
@@ -80,8 +80,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         fun getCanonicalTitle() = AppLoader.GAME_NAME +
-                                  " — F: ${Gdx.graphics.framesPerSecond} (Δt${Terrarum.updateRateStr} / RT${Terrarum.renderRateStr})" +
-                                  " — M: J${Terrarum.memJavaHeap}M / N${Terrarum.memNativeHeap}M / X${Terrarum.memXmx}M"
+                                  " — F: ${Gdx.graphics.framesPerSecond}" +
+                                  if (AppLoader.IS_DEVELOPMENT_BUILD)
+                                      " (Δt${Terrarum.updateRateStr} / RT${Terrarum.renderRateStr})" +
+                                      " — M: J${Terrarum.memJavaHeap}M / N${Terrarum.memNativeHeap}M / X${Terrarum.memXmx}M"
+                                  else
+                                      ""
     }
 
 
@@ -784,6 +788,10 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                         val i = actorsRenderFront.binarySearch(actor.referenceID!!)
                         actorsRenderFront.removeAt(i)
                     }
+                    Actor.RenderOrder.OVERLAY-> {
+                        val i = actorsRenderOverlay.binarySearch(actor.referenceID!!)
+                        actorsRenderFront.removeAt(i)
+                    }
                 }
             }
         }
@@ -819,6 +827,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                     Actor.RenderOrder.FRONT  -> {
                         actorsRenderFront.add(actor); insertionSortLastElemAV(actorsRenderFront)
                     }
+                    Actor.RenderOrder.OVERLAY-> {
+                        actorsRenderOverlay.add(actor); insertionSortLastElemAV(actorsRenderOverlay)
+                    }
                 }
             }
         }
@@ -849,6 +860,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                     }
                     Actor.RenderOrder.FRONT  -> {
                         actorsRenderFront.add(actor); insertionSortLastElemAV(actorsRenderFront)
+                    }
+                    Actor.RenderOrder.OVERLAY-> {
+                        actorsRenderOverlay.add(actor); insertionSortLastElemAV(actorsRenderOverlay)
                     }
                 }
             }

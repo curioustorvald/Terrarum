@@ -6,21 +6,20 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.floorInt
+import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.Luminous
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
-import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
-import kotlin.collections.ArrayList
 import kotlin.system.measureNanoTime
 
 /**
@@ -708,17 +707,17 @@ object LightmapRenderer {
         }
     */
 
-    inline infix fun Float.powerOf(f: Float) = FastMath.pow(this, f)
-    private inline fun Float.sqr() = this * this
-    private inline fun Float.sqrt() = FastMath.sqrt(this)
-    private inline fun Float.inv() = 1f / this
-    inline fun Float.floor() = FastMath.floor(this)
-    inline fun Double.floorInt() = Math.floor(this).toInt()
-    inline fun Float.round(): Int = Math.round(this)
-    inline fun Double.round(): Int = Math.round(this).toInt()
-    inline fun Float.ceil() = FastMath.ceil(this)
-    inline fun Int.even(): Boolean = this and 1 == 0
-    inline fun Int.odd(): Boolean = this and 1 == 1
+    infix fun Float.powerOf(f: Float) = FastMath.pow(this, f)
+    private fun Float.sqr() = this * this
+    private fun Float.sqrt() = FastMath.sqrt(this)
+    private fun Float.inv() = 1f / this
+    fun Float.floor() = FastMath.floor(this)
+    fun Double.floorInt() = Math.floor(this).toInt()
+    fun Float.round(): Int = Math.round(this)
+    fun Double.round(): Int = Math.round(this).toInt()
+    fun Float.ceil() = FastMath.ceil(this)
+    fun Int.even(): Boolean = this and 1 == 0
+    fun Int.odd(): Boolean = this and 1 == 1
 
     // TODO: float LUT lookup using linear interpolation
 
@@ -830,7 +829,7 @@ object LightmapRenderer {
             1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f,1.0000f  // isn't it beautiful?
     )
     /** To eliminated visible edge on the gradient when 255/1023 is exceeded */
-    internal inline fun Color.normaliseToHDR() = Color(
+    internal fun Color.normaliseToHDR() = Color(
             hdr(this.r),
             hdr(this.g),
             hdr(this.b),
