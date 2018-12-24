@@ -9,7 +9,6 @@ import com.google.gson.JsonPrimitive
 import kotlin.collections.HashMap
 
 typealias ItemValue = KVHashMap
-typealias GameConfig = KVHashMap
 
 /**
  * Created by minjaesong on 2015-12-30.

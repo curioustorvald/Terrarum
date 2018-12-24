@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.bipolarClamp
 import net.torvald.terrarum.gameactors.*
@@ -214,17 +215,17 @@ open class ActorHumanoid(
 
     private fun updateGamerControlBox() {
         if (isGamer) {
-            isUpDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyup"))
-            isLeftDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyleft"))
-            isDownDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keydown"))
-            isRightDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyright"))
-            isJumpDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyjump"))
+            isUpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyup"))
+            isLeftDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyleft"))
+            isDownDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keydown"))
+            isRightDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyright"))
+            isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump"))
 
             if (Terrarum.controller != null) {
-                axisX =  Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadlstickx"))
-                axisY =  Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadlsticky"))
-                axisRX = Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadrstickx"))
-                axisRY = Terrarum.controller!!.getAxisValue(Terrarum.getConfigInt("joypadrsticky"))
+                axisX =  Terrarum.controller!!.getAxisValue(AppLoader.getConfigInt("joypadlstickx"))
+                axisY =  Terrarum.controller!!.getAxisValue(AppLoader.getConfigInt("joypadlsticky"))
+                axisRX = Terrarum.controller!!.getAxisValue(AppLoader.getConfigInt("joypadrstickx"))
+                axisRY = Terrarum.controller!!.getAxisValue(AppLoader.getConfigInt("joypadrsticky"))
 
                 // deadzonning
                 if (Math.abs(axisX) < Terrarum.CONTROLLER_DEADZONE) axisX = 0f
@@ -232,7 +233,7 @@ open class ActorHumanoid(
                 if (Math.abs(axisRX) < Terrarum.CONTROLLER_DEADZONE) axisRX = 0f
                 if (Math.abs(axisRY) < Terrarum.CONTROLLER_DEADZONE) axisRY = 0f
 
-                isJumpDown = Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyjump")) ||
+                isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump")) ||
                              Terrarum.controller!!.isButtonPressed(GAMEPAD_JUMP)
             }
         }
@@ -290,11 +291,11 @@ open class ActorHumanoid(
         // ↑F, ↓S
         if (isRightDown && !isLeftDown) {
             walkHorizontal(false, AXIS_KEYBOARD)
-            prevHMoveKey = Terrarum.getConfigInt("keyright")
+            prevHMoveKey = AppLoader.getConfigInt("keyright")
         } // ↓F, ↑S
         else if (isLeftDown && !isRightDown) {
             walkHorizontal(true, AXIS_KEYBOARD)
-            prevHMoveKey = Terrarum.getConfigInt("keyleft")
+            prevHMoveKey = AppLoader.getConfigInt("keyleft")
         } // ↓F, ↓S
         /*else if (isLeftDown && isRightDown) {
                if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
@@ -318,11 +319,11 @@ open class ActorHumanoid(
             // ↑E, ↓D
             if (isDownDown && !isUpDown) {
                 walkVertical(false, AXIS_KEYBOARD)
-                prevVMoveKey = Terrarum.getConfigInt("keydown")
+                prevVMoveKey = AppLoader.getConfigInt("keydown")
             } // ↓E, ↑D
             else if (isUpDown && !isDownDown) {
                 walkVertical(true, AXIS_KEYBOARD)
-                prevVMoveKey = Terrarum.getConfigInt("keyup")
+                prevVMoveKey = AppLoader.getConfigInt("keyup")
             } // ↓E, ↓D
             /*else if (isUpDown && isDownDown) {
                 if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
@@ -360,7 +361,7 @@ open class ActorHumanoid(
 
     override fun keyDown(keycode: Int): Boolean {
         // quickslot (quickbar)
-        val quickbarKeys = Terrarum.getConfigIntArray("keyquickbars")
+        val quickbarKeys = AppLoader.getConfigIntArray("keyquickbars")
         if (keycode in quickbarKeys) {
             actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = quickbarKeys.indexOf(keycode)
         }

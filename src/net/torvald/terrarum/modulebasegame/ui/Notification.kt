@@ -2,7 +2,7 @@ package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.ui.UICanvas
 
@@ -19,7 +19,7 @@ class Notification : UICanvas() {
 
     override var height: Int = msgUI.height
     private val visibleTime = Math.min(
-            Terrarum.getConfigInt("notificationshowuptime"),
+            AppLoader.getConfigInt("notificationshowuptime"),
             SHOWUP_MAX
     )
     private var displayTimer = 0f

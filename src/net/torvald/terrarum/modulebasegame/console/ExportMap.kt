@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame.console
 
 import net.torvald.colourutil.Col4096
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.utils.RasterWriter
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
@@ -78,7 +79,7 @@ internal object ExportMap : ConsoleCommand {
                 mapDataPointer += 3
             }
 
-            val dir = Terrarum.defaultDir + "/Exports/"
+            val dir = AppLoader.defaultDir + "/Exports/"
             val dirAsFile = File(dir)
             if (!dirAsFile.exists()) {
                 dirAsFile.mkdir()

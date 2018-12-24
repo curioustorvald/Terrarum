@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.blockproperties.BlockCodex
 import com.jme3.math.FastMath
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
@@ -199,7 +200,7 @@ object LightmapRenderer {
          * for all lightmap[y][x]
          */
 
-        Terrarum.debugTimers["Renderer.Lanterns"] = measureNanoTime {
+        AppLoader.debugTimers["Renderer.Lanterns"] = measureNanoTime {
             buildLanternmap()
         } // usually takes 3000 ns
 
@@ -209,9 +210,9 @@ object LightmapRenderer {
 
         // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
 
-        if (!Terrarum.getConfigBoolean("multithreadedlight")) {
+        if (!AppLoader.getConfigBoolean("multithreadedlight")) {
             // Round 1
-            Terrarum.debugTimers["Renderer.Light1"] = measureNanoTime {
+            AppLoader.debugTimers["Renderer.Light1"] = measureNanoTime {
                 for (y in for_y_start - overscan_open..for_y_end) {
                     for (x in for_x_start - overscan_open..for_x_end) {
                         setLight(x, y, calculate(x, y, 1))
@@ -220,7 +221,7 @@ object LightmapRenderer {
             }
 
             // Round 2
-            Terrarum.debugTimers["Renderer.Light2"] = measureNanoTime {
+            AppLoader.debugTimers["Renderer.Light2"] = measureNanoTime {
                 for (y in for_y_end + overscan_open downTo for_y_start) {
                     for (x in for_x_start - overscan_open..for_x_end) {
                         setLight(x, y, calculate(x, y, 2))
@@ -229,7 +230,7 @@ object LightmapRenderer {
             }
 
             // Round 3
-            Terrarum.debugTimers["Renderer.Light3"] = measureNanoTime {
+            AppLoader.debugTimers["Renderer.Light3"] = measureNanoTime {
                 for (y in for_y_end + overscan_open downTo for_y_start) {
                     for (x in for_x_end + overscan_open downTo for_x_start) {
                         setLight(x, y, calculate(x, y, 3))
@@ -238,7 +239,7 @@ object LightmapRenderer {
             }
 
             // Round 4
-            Terrarum.debugTimers["Renderer.Light4"] = measureNanoTime {
+            AppLoader.debugTimers["Renderer.Light4"] = measureNanoTime {
                 for (y in for_y_start - overscan_open..for_y_end) {
                     for (x in for_x_end + overscan_open downTo for_x_start) {
                         setLight(x, y, calculate(x, y, 4))
@@ -246,14 +247,14 @@ object LightmapRenderer {
                 }
             }
 
-            Terrarum.debugTimers["Renderer.LightSequential"] =
-                    Terrarum.debugTimers["Renderer.Light1"]!! +
-                    Terrarum.debugTimers["Renderer.Light2"]!! +
-                    Terrarum.debugTimers["Renderer.Light3"]!! +
-                    Terrarum.debugTimers["Renderer.Light4"]!!
+            AppLoader.debugTimers["Renderer.LightSequential"] =
+                    (AppLoader.debugTimers["Renderer.Light1"]!! as Long) +
+                    (AppLoader.debugTimers["Renderer.Light2"]!! as Long) +
+                    (AppLoader.debugTimers["Renderer.Light3"]!! as Long) +
+                    (AppLoader.debugTimers["Renderer.Light4"]!! as Long)
         }
         else {
-            Terrarum.debugTimers["Renderer.LightPre"] = measureNanoTime {
+            AppLoader.debugTimers["Renderer.LightPre"] = measureNanoTime {
 
                 val bufferForPasses = arrayOf(
                         lightmap.copyOf(), lightmap.copyOf(), lightmap.copyOf(), lightmap.copyOf()
@@ -297,7 +298,7 @@ object LightmapRenderer {
 
                 // couldn't help but do this nested timer
 
-                Terrarum.debugTimers["Renderer.LightParallel${Terrarum.THREADS}x"] = measureNanoTime {
+                AppLoader.debugTimers["Renderer.LightParallel${Terrarum.THREADS}x"] = measureNanoTime {
                     calcTasks.forEachIndexed { index, list ->
                         ThreadParallel.map(index, "LightCalculate") { index -> // this index is that index
                             list.forEach {
@@ -312,7 +313,7 @@ object LightmapRenderer {
                     ThreadParallel.startAllWaitForDie()
                 }
 
-                Terrarum.debugTimers["Runderer.LightPost"] = measureNanoTime {
+                AppLoader.debugTimers["Runderer.LightPost"] = measureNanoTime {
                     combineTasks.forEachIndexed { index, intRange ->
                         ThreadParallel.map(index, "LightCombine") { index -> // this index is that index
                             for (i in intRange) {
@@ -331,11 +332,11 @@ object LightmapRenderer {
 
 
             // get correct Renderer.LightPre by subtracting some shits
-            Terrarum.debugTimers["Renderer.LightParaTotal"] = Terrarum.debugTimers["Renderer.LightPre"]!!
-            Terrarum.debugTimers["Renderer.LightPre"] =
-                    Terrarum.debugTimers["Renderer.LightPre"]!! -
-                    Terrarum.debugTimers["Renderer.LightParallel${Terrarum.THREADS}x"]!! -
-                    Terrarum.debugTimers["Runderer.LightPost"]!!
+            AppLoader.debugTimers["Renderer.LightParaTotal"] = AppLoader.debugTimers["Renderer.LightPre"]!!
+            AppLoader.debugTimers["Renderer.LightPre"] =
+                    (AppLoader.debugTimers["Renderer.LightPre"]!! as Long) -
+                    (AppLoader.debugTimers["Renderer.LightParallel${Terrarum.THREADS}x"]!! as Long) -
+                    (AppLoader.debugTimers["Runderer.LightPost"]!! as Long)
 
             // accuracy may suffer (overheads maybe?) but it doesn't matter (i think...)
         }

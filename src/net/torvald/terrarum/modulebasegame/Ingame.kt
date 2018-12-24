@@ -54,7 +54,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      * list of Actors that is sorted by Actors' referenceID
      */
     //val ACTORCONTAINER_INITIAL_SIZE = 64
-    val PARTICLES_MAX = Terrarum.getConfigInt("maxparticles")
+    val PARTICLES_MAX = AppLoader.getConfigInt("maxparticles")
     //val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     //val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX)
@@ -305,14 +305,14 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 width = 900,
                 height = Terrarum.HEIGHT - 160,
                 categoryWidth = 210,
-                toggleKeyLiteral = Terrarum.getConfigInt("keyinventory")
+                toggleKeyLiteral = AppLoader.getConfigInt("keyinventory")
         )*/
         /*uiInventoryPlayer.setPosition(
                 -uiInventoryPlayer.width,
                 70
         )*/
         uiInventoryPlayer = UIInventoryFull(actorNowPlaying,
-                toggleKeyLiteral = Terrarum.getConfigInt("keyinventory")
+                toggleKeyLiteral = AppLoader.getConfigInt("keyinventory")
         )
         uiInventoryPlayer.setPosition(0, 0)
 
@@ -470,7 +470,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
 
-        if (false && Terrarum.getConfigBoolean("multithread")) { // NO MULTITHREADING: camera don't like concurrent modification (jittery actor movements)
+        if (false && AppLoader.getConfigBoolean("multithread")) { // NO MULTITHREADING: camera don't like concurrent modification (jittery actor movements)
             if (firstTimeRun || updateThreadWrapper.state == Thread.State.TERMINATED) {
                 updateThreadWrapper = Thread(ingameUpdateThread, "Terrarum UpdateThread")
                 updateThreadWrapper.start()
@@ -485,7 +485,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             while (updateDeltaCounter >= renderRate) {
 
                 //updateGame(delta)
-                Terrarum.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
+                AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
 
                 updateDeltaCounter -= renderRate
                 updateTries++
@@ -501,7 +501,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         /** RENDER CODE GOES HERE */
         //renderGame(batch)
-        Terrarum.debugTimers["Ingame.render"] = measureNanoTime { renderGame() }
+        AppLoader.debugTimers["Ingame.render"] = measureNanoTime { renderGame() }
     }
 
     protected fun updateGame(delta: Float) {

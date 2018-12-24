@@ -135,7 +135,7 @@ class BasicDebugInfoWindow : UICanvas() {
 
 
         var dbgCnt = 12
-        Terrarum.debugTimers.forEach { t, u ->
+        AppLoader.debugTimers.forEach { t, u ->
             printLine(batch, dbgCnt, "$ccM$t $ccG$u$ccY ns")
             dbgCnt++
         }

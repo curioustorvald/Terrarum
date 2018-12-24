@@ -1,6 +1,7 @@
 package net.torvald.terrarum.serialise
 
 import com.badlogic.gdx.utils.compression.Lzma
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.EchoError
@@ -51,11 +52,11 @@ internal object WriteLayerDataLzma {
     internal operator fun invoke(): File? {
         val world = (Terrarum.ingame!!.world)
 
-        val path = "${Terrarum.defaultSaveDir}/tmp_$LAYERS_FILENAME${world.worldIndex}"
+        val path = "${AppLoader.defaultSaveDir}/tmp_$LAYERS_FILENAME${world.worldIndex}"
 
         // TODO let's try dump-on-the-disk-then-pack method...
 
-        /*val parentDir = File("${Terrarum.defaultSaveDir}/$saveDirectoryName")
+        /*val parentDir = File("${AppLoader.defaultSaveDir}/$saveDirectoryName")
         if (!parentDir.exists()) {
             parentDir.mkdir()
         }

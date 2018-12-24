@@ -1,8 +1,9 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.EchoError
+import net.torvald.terrarum.gameworld.GameWorld
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -26,11 +27,11 @@ internal object WriteLayerData {
 
 
     internal operator fun invoke(saveDirectoryName: String): Boolean {
-        val path = "${Terrarum.defaultSaveDir}/$saveDirectoryName/${LAYERS_FILENAME}"
+        val path = "${AppLoader.defaultSaveDir}/$saveDirectoryName/${LAYERS_FILENAME}"
         val tempPath = "${path}_bak"
         val map = (Terrarum.ingame!!.world)
 
-        val parentDir = File("${Terrarum.defaultSaveDir}/$saveDirectoryName")
+        val parentDir = File("${AppLoader.defaultSaveDir}/$saveDirectoryName")
         if (!parentDir.exists()) {
             parentDir.mkdir()
         }

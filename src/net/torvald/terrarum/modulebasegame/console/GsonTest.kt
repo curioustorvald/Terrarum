@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.console
 
 import net.torvald.terrarum.Terrarum
 import com.google.gson.Gson
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.Ingame
@@ -23,7 +24,7 @@ internal object GsonTest : ConsoleCommand {
             val bufferedWriter: BufferedWriter
             val writer: FileWriter
             try {
-                writer = FileWriter(Terrarum.defaultDir + "/Exports/" + args[1] + ".json")
+                writer = FileWriter(AppLoader.defaultDir + "/Exports/" + args[1] + ".json")
                 bufferedWriter = BufferedWriter(writer)
 
                 bufferedWriter.write(jsonString)
