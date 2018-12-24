@@ -8,11 +8,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWBMovable
-import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
-import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
-import net.torvald.terrarum.Second
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
+import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -43,7 +42,7 @@ class UIInventoryFull(
 
     private val SP = "${0x3000.toChar()}${0x3000.toChar()}"
     val listControlHelp: String
-        get() = if (Terrarum.environment == RunningEnvironment.PC)
+        get() = if (AppLoader.environment == RunningEnvironment.PC)
             "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
             "${0xe006.toChar()} ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "${0xe011.toChar()}..${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +

@@ -32,7 +32,7 @@ import net.torvald.terrarum.ui.UIItemTextButtonList
     )
 
     init {
-        if (Terrarum.getConfigBoolean("__debug")) {
+        if (AppLoader.getConfigBoolean("__debug")) {
             menuLabels.addAll(arrayOf(
                     " Development Tools $",
                     "Building Maker"
@@ -117,7 +117,7 @@ import net.torvald.terrarum.ui.UIItemTextButtonList
         menubar.buttons[menuLabels.indexOf("MENU_LABEL_QUIT")].clickOnceListener = { _, _, _ -> Thread.sleep(50); System.exit(0) }
 
 
-        if (Terrarum.getConfigBoolean("__debug")) {
+        if (AppLoader.getConfigBoolean("__debug")) {
 
             menubar.buttons[menuLabels.indexOf("Building Maker")].clickOnceListener = { _, _, _ ->
                 this.setAsClose()

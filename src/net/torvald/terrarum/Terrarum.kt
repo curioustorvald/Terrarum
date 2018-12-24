@@ -3,26 +3,24 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.GdxRuntimeException
-import com.google.gson.JsonArray
-import com.google.gson.JsonPrimitive
 import com.jme3.math.FastMath
-import net.torvald.dataclass.ArrayListMap
 import net.torvald.dataclass.CircularArray
+import net.torvald.getcpuname.GetCpuName
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.AppLoader.printdbgerr
+import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.terrarum.utils.JsonWriter
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -30,9 +28,6 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.lwjgl.BufferUtils
 import org.lwjgl.input.Controllers
 import java.io.File
-import java.io.IOException
-import net.torvald.getcpuname.GetCpuName
-import net.torvald.terrarum.modulebasegame.Ingame
 import kotlin.math.absoluteValue
 
 
@@ -52,11 +47,6 @@ object Terrarum : Screen {
      */
     const val PLAYER_REF_ID: Int = 0x91A7E2
 
-    val debugTimers = ArrayListMap<String, Long>()
-
-    var screenW = 0
-    var screenH = 0
-
     lateinit var batch: SpriteBatch
     lateinit var shapeRender: ShapeRenderer // DO NOT USE!! for very limited applications e.g. WeatherMixer
     inline fun inShapeRenderer(shapeRendererType: ShapeRenderer.ShapeType = ShapeRenderer.ShapeType.Filled, action: (ShapeRenderer) -> Unit) {
@@ -71,9 +61,9 @@ object Terrarum : Screen {
     //////////////////////////////
 
     val WIDTH: Int
-        get() = if (screenW % 2 == 0) screenW else screenW - 1
+        get() = AppLoader.screenW
     val HEIGHT: Int
-        get() = if (screenH % 2 == 0) screenH else screenH - 1
+        get() = AppLoader.screenH
 
     //val WIDTH_MIN = 800
     //val HEIGHT_MIN = 600
@@ -107,18 +97,6 @@ object Terrarum : Screen {
 
 
     var ingame: IngameInstance? = null
-    private val gameConfig = GameConfig()
-
-    val OSName = System.getProperty("os.name")
-    val OSVersion = System.getProperty("os.version")
-    lateinit var OperationSystem: String // all caps "WINDOWS, "OSX", "LINUX", "SOLARIS", "UNKNOWN"
-        private set
-    lateinit var defaultDir: String
-        private set
-    lateinit var defaultSaveDir: String
-        private set
-
-
 
     private val javaHeapCircularArray = CircularArray<Int>(128)
     private val nativeHeapCircularArray = CircularArray<Int>(128)
@@ -141,9 +119,6 @@ object Terrarum : Screen {
         }
     val memXmx: Int
         get() = (Runtime.getRuntime().maxMemory() shr 20).toInt()
-
-    var environment: RunningEnvironment
-        private set
 
 
 
@@ -203,8 +178,6 @@ object Terrarum : Screen {
     val MULTITHREAD: Boolean
         get() = THREADS >= 3 && getConfigBoolean("multithread")
 
-    private lateinit var configDir: String
-
     const val NAME = AppLoader.GAME_NAME
 
 
@@ -243,16 +216,6 @@ object Terrarum : Screen {
         println("LibGDX version ${com.badlogic.gdx.Version.VERSION}")
 
 
-        getDefaultDirectory()
-        createDirs()
-
-
-        // read config i guess...?
-        val readFromDisk = readConfigJson()
-        if (!readFromDisk) readConfigJson() // what's this for?
-
-
-
         println("os.arch = $systemArch") // debug info
 
         if (is32BitJVM) {
@@ -278,18 +241,19 @@ object Terrarum : Screen {
         }
 
 
-
-        environment = try {
-            Controllers.getController(0) // test if controller exists
-            if (getConfigString("pcgamepadenv") == "console")
-                RunningEnvironment.CONSOLE
-            else
+        // setting environment as MOBILE precedes this code
+        if (environment != RunningEnvironment.MOBILE) {
+            environment = try {
+                Controllers.getController(0) // test if controller exists
+                if (getConfigString("pcgamepadenv") == "console")
+                    RunningEnvironment.CONSOLE
+                else
+                    RunningEnvironment.PC
+            }
+            catch (e: IndexOutOfBoundsException) {
                 RunningEnvironment.PC
+            }
         }
-        catch (e: IndexOutOfBoundsException) {
-            RunningEnvironment.PC
-        }
-
     }
 
 
@@ -440,7 +404,7 @@ object Terrarum : Screen {
     }
 
     override fun render(delta: Float) {
-        Terrarum.debugTimers["GDX.delta"] = delta.times(1000_000_000f).toLong()
+        AppLoader.debugTimers["GDX.delta"] = delta.times(1000_000_000f).toLong()
         AppLoader.getINSTANCE().screen.render(deltaTime)
         //GLOBAL_RENDER_TIMER += 1
         // moved to AppLoader; global event must be place at the apploader to prevent ACCIDENTAL forgot-to-update type of bug.
@@ -479,205 +443,15 @@ object Terrarum : Screen {
     }
 
     override fun resize(width: Int, height: Int) {
-        //var width = maxOf(width, WIDTH_MIN)
-        //var height = maxOf(height, HEIGHT_MIN)
-
-        var width = width
-        var height = height
-
-        if (width % 2 == 1) width -= 1
-        if (height % 2 == 1) height -= 1
-
-        screenW = width
-        screenH = height
-
-
-        try {
-            AppLoader.getINSTANCE().screen.resize(screenW, screenH)
+        /*try {
+            AppLoader.getINSTANCE().screen.resize(width, height)
         }
-        catch (e: NullPointerException) { }
-
-        // re-calculate fullscreen quad
-        //updateFullscreenQuad(screenW, screenH)
-
-        //appLoader.resize(width, height)
-        //Gdx.graphics.setWindowedMode(width, height)
+        catch (e: NullPointerException) { }*/ // I sense circular recursion...
 
         printdbg(this, "newsize: ${Gdx.graphics.width}x${Gdx.graphics.height} | internal: ${width}x$height")
     }
 
 
-
-
-    private fun getDefaultDirectory() {
-        val OS = System.getProperty("os.name").toUpperCase()
-        if (OS.contains("WIN")) {
-            OperationSystem = "WINDOWS"
-            defaultDir = System.getenv("APPDATA") + "/Terrarum"
-        }
-        else if (OS.contains("OS X")) {
-            OperationSystem = "OSX"
-            defaultDir = System.getProperty("user.home") + "/Library/Application Support/Terrarum"
-        }
-        else if (OS.contains("NUX") || OS.contains("NIX") || OS.contains("BSD")) {
-            OperationSystem = "LINUX"
-            defaultDir = System.getProperty("user.home") + "/.Terrarum"
-        }
-        else if (OS.contains("SUNOS")) {
-            OperationSystem = "SOLARIS"
-            defaultDir = System.getProperty("user.home") + "/.Terrarum"
-        }
-        else if (System.getProperty("java.runtime.name").toUpperCase().contains("ANDROID")) {
-            OperationSystem = "ANDROID"
-            defaultDir = System.getProperty("user.home") + "/.Terrarum"
-            environment = RunningEnvironment.MOBILE
-        }
-        else {
-            OperationSystem = "UNKNOWN"
-            defaultDir = System.getProperty("user.home") + "/.Terrarum"
-        }
-
-        defaultSaveDir = defaultDir + "/Saves"
-        configDir = defaultDir + "/config.json"
-
-        println("os.name = $OSName (with identifier $OperationSystem)")
-        println("os.version = $OSVersion")
-        println("default directory: $defaultDir")
-    }
-
-    private fun createDirs() {
-        val dirs = arrayOf(File(defaultSaveDir))
-        dirs.forEach { if (!it.exists()) it.mkdirs() }
-    }
-
-    private fun createConfigJson() {
-        val configFile = File(configDir)
-
-        if (!configFile.exists() || configFile.length() == 0L) {
-            JsonWriter.writeToFile(DefaultConfig.fetch(), configDir)
-        }
-    }
-
-    private fun readConfigJson(): Boolean {
-        try {
-            // read from disk and build config from it
-            val jsonObject = JsonFetcher(configDir)
-
-            // make config
-            jsonObject.entrySet().forEach { entry -> gameConfig[entry.key] = entry.value }
-
-            return true
-        }
-        catch (e: IOException) {
-            // write default config to game dir. Call this method again to read config from it.
-            try {
-                createConfigJson()
-            }
-            catch (e1: IOException) {
-                e.printStackTrace()
-            }
-
-            return false
-        }
-
-    }
-
-    /**
-     * Return config from config set. If the config does not exist, default value will be returned.
-     * @param key
-     * *
-     * @return Config from config set or default config if it does not exist.
-     * *
-     * @throws NullPointerException if the specified config simply does not exist.
-     */
-    fun getConfigInt(key: String): Int {
-        val cfg = getConfigMaster(key)
-        if (cfg is JsonPrimitive)
-            return cfg.asInt
-        else
-            return cfg as Int
-    }
-
-    /**
-     * Return config from config set. If the config does not exist, default value will be returned.
-     * @param key
-     * *
-     * @return Config from config set or default config if it does not exist.
-     * *
-     * @throws NullPointerException if the specified config simply does not exist.
-     */
-    fun getConfigString(key: String): String {
-        val cfg = getConfigMaster(key)
-        if (cfg is JsonPrimitive)
-            return cfg.asString
-        else
-            return cfg as String
-    }
-
-    /**
-     * Return config from config set. If the config does not exist, default value will be returned.
-     * @param key
-     * *
-     * @return Config from config set or default config if it does not exist.
-     * *
-     * @throws NullPointerException if the specified config simply does not exist.
-     */
-    fun getConfigBoolean(key: String): Boolean {
-        val cfg = getConfigMaster(key)
-        if (cfg is JsonPrimitive)
-            return cfg.asBoolean
-        else
-            return cfg as Boolean
-    }
-
-    fun getConfigIntArray(key: String): IntArray {
-        val cfg = getConfigMaster(key)
-        if (cfg is JsonArray) {
-            val jsonArray = cfg.asJsonArray
-            return IntArray(jsonArray.size(), { i -> jsonArray[i].asInt })
-        }
-        else
-            return cfg as IntArray
-    }
-
-    /**
-     * Get config from config file. If the entry does not exist, get from defaults; if the entry is not in the default, NullPointerException will be thrown
-     */
-    private val defaultConfig = DefaultConfig.fetch()
-
-    private fun getConfigMaster(key: String): Any {
-        val key = key.toLowerCase()
-
-        val config = try {
-            gameConfig[key]
-        }
-        catch (e: NullPointerException) {
-            null
-        }
-
-        val defaults = try {
-            defaultConfig.get(key)
-        }
-        catch (e: NullPointerException) {
-            null
-        }
-
-        if (config == null) {
-            if (defaults == null) {
-                throw NullPointerException("key not found: '$key'")
-            }
-            else {
-                return defaults
-            }
-        }
-        else {
-            return config
-        }
-    }
-
-    fun setConfig(key: String, value: Any) {
-        gameConfig[key] = value
-    }
 
     val currentSaveDir: File
         get() {

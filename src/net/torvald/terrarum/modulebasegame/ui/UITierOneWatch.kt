@@ -49,7 +49,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
             ELuptimer += delta
         }
 
-        if (mouseUp || Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyinteract"))) {
+        if (mouseUp || Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyinteract"))) {
             ELuptimer = 0f
             ELon = true
         }

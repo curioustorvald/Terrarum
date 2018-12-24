@@ -40,7 +40,7 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
             ELuptimer += delta
         }
 
-        if (mouseUp || Gdx.input.isKeyPressed(Terrarum.getConfigInt("keyinteract"))) {
+        if (mouseUp || Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyinteract"))) {
             ELuptimer = 0f
             ELon = true
         }
@@ -56,7 +56,7 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
                 val playerTilePos = player.hIntTilewiseHitbox
                 val tempCelsius = -273f + ((Terrarum.ingame as? Ingame)?.world?.getTemperature(playerTilePos.centeredX.toInt(), playerTilePos.centeredY.toInt()) ?: 288f)
 
-                return when (Terrarum.getConfigInt("temperatureunit")) {
+                return when (AppLoader.getConfigInt("temperatureunit")) {
                     TEMP_KELVIN -> tempCelsius.times(1.8f).plus(32f).roundInt()
                     TEMP_CELCIUS -> tempCelsius.roundInt()
                     else -> tempCelsius.plus(273.15f).roundInt()
@@ -86,10 +86,10 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
 
         sb.append(temperature.abs())
 
-        if (Terrarum.getConfigInt("temperatureunit") == 1) {
+        if (AppLoader.getConfigInt("temperatureunit") == 1) {
             sb.append('"') // celsius superscript
         }
-        else if (Terrarum.getConfigInt("temperatureunit") == -1) {
+        else if (AppLoader.getConfigInt("temperatureunit") == -1) {
             sb.append('#') // fahrenheit subscript
         }
         else {

@@ -1,6 +1,7 @@
 package net.torvald.terrarum.serialise
 
 import com.badlogic.gdx.Gdx
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilder
@@ -29,7 +30,7 @@ object WriteWorldInfo {
     internal operator fun invoke(): List<File>? {
         val world = (Terrarum.ingame!!.world)
 
-        val path = "${Terrarum.defaultSaveDir}/tmp_worldinfo"
+        val path = "${AppLoader.defaultSaveDir}/tmp_worldinfo"
 
         val infileList = arrayOf(
                 ModMgr.getGdxFilesFromEveryMod("blocks/blocks.csv"),

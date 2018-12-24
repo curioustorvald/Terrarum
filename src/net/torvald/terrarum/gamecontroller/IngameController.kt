@@ -3,6 +3,7 @@ package net.torvald.terrarum.gamecontroller
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
@@ -40,17 +41,19 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
 
         // Use item: assuming the player has only one effective grip (EquipPosition.HAND_GRIP)
         if (ingame.canPlayerControl) {
-            if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary")) || Gdx.input.isButtonPressed(Terrarum.getConfigInt("mousesecondary"))) {
+            if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary")) ||
+                Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
+
                 val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
                 if (player == null) return
 
                 val itemOnGrip = player.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
 
                 itemOnGrip?.let {
-                    if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mouseprimary"))) {
+                    if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
                         player.consumePrimary(it)
                     }
-                    if (Gdx.input.isButtonPressed(Terrarum.getConfigInt("mousesecondary"))) {
+                    if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
                         player.consumeSecondary(it)
                     }
                 }
@@ -69,8 +72,8 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
             ingame.actorNowPlaying?.keyDown(keycode)
         }
 
-        if (Terrarum.getConfigIntArray("keyquickselalt").contains(keycode)
-            || keycode == Terrarum.getConfigInt("keyquicksel")) {
+        if (AppLoader.getConfigIntArray("keyquickselalt").contains(keycode)
+            || keycode == AppLoader.getConfigInt("keyquicksel")) {
             ingame.uiPieMenu.setAsOpen()
             ingame.uiQuickBar.setAsClose()
         }
@@ -90,8 +93,8 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        if (Terrarum.getConfigIntArray("keyquickselalt").contains(keycode)
-            || keycode == Terrarum.getConfigInt("keyquicksel")) {
+        if (AppLoader.getConfigIntArray("keyquickselalt").contains(keycode)
+            || keycode == AppLoader.getConfigInt("keyquicksel")) {
             ingame.uiPieMenu.setAsClose()
             ingame.uiQuickBar.setAsOpen()
         }
@@ -118,10 +121,10 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
             if (ingame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
-                if (button == Terrarum.getConfigInt("mouseprimary")) {
+                if (button == AppLoader.getConfigInt("mouseprimary")) {
                     ingame.worldPrimaryClickEnd(Terrarum.deltaTime)
                 }
-                if (button == Terrarum.getConfigInt("mousesecondary")) {
+                if (button == AppLoader.getConfigInt("mousesecondary")) {
                     ingame.worldSecondaryClickEnd(Terrarum.deltaTime)
                 }
             }
@@ -149,10 +152,10 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
             // fire world click events; the event is defined as Ingame's (or any others') WorldClick event
             if (ingame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
-                if (button == Terrarum.getConfigInt("mouseprimary")) {
+                if (button == AppLoader.getConfigInt("mouseprimary")) {
                     ingame.worldPrimaryClickStart(Terrarum.deltaTime)
                 }
-                if (button == Terrarum.getConfigInt("mousesecondary")) {
+                if (button == AppLoader.getConfigInt("mousesecondary")) {
                     ingame.worldSecondaryClickStart(Terrarum.deltaTime)
                 }
             }

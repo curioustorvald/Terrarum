@@ -1,15 +1,14 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.AppLoader
 import java.io.File
-import java.io.FileFilter
 import java.io.FileInputStream
 
 
 
 object SavegameLedger {
 
-    private val SAVE_DIRECTORY = File(Terrarum.defaultSaveDir)
+    private val SAVE_DIRECTORY = File(AppLoader.defaultSaveDir)
 
     fun hasSavegameDirectory() = SAVE_DIRECTORY.exists() && SAVE_DIRECTORY.isDirectory
 

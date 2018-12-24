@@ -37,7 +37,7 @@ object PostProcessor {
 
 
 
-        Terrarum.debugTimers["Renderer.PostProcessor"] = measureNanoTime {
+        AppLoader.debugTimers["Renderer.PostProcessor"] = measureNanoTime {
 
             Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -46,7 +46,7 @@ object PostProcessor {
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
             val shader: ShaderProgram? =
-                    if (Terrarum.getConfigBoolean("fxdither"))
+                    if (AppLoader.getConfigBoolean("fxdither"))
                             AppLoader.shaderHicolour
                     else
                         null

@@ -41,7 +41,7 @@ internal object WriteMeta {
         props.map { hashArray.add(DigestUtils.sha256(it)) }
 
         // open file and delete it
-        val metaPath = Paths.get("$Terrarum.defaultSaveDir" +
+        val metaPath = Paths.get("$AppLoader.defaultSaveDir" +
                                        "/$saveDirectoryName/$META_FILENAME")
         val metaTempPath = Files.createTempFile(metaPath.toString(), "_temp")
 

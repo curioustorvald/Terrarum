@@ -130,7 +130,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
 
 
-        if (false && Terrarum.getConfigBoolean("multithread")) { // NO MULTITHREADING: camera don't like concurrent modification (jittery actor movements)
+        if (false && AppLoader.getConfigBoolean("multithread")) { // NO MULTITHREADING: camera don't like concurrent modification (jittery actor movements)
             // else, NOP;
         }
         else {
@@ -138,7 +138,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
             while (updateDeltaCounter >= updateRate) {
 
                 //updateGame(delta)
-                Terrarum.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
+                AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
 
                 updateDeltaCounter -= updateRate
                 updateTries++
@@ -153,7 +153,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         /** RENDER CODE GOES HERE */
         //renderGame(batch)
-        Terrarum.debugTimers["Ingame.render"] = measureNanoTime { renderGame() }
+        AppLoader.debugTimers["Ingame.render"] = measureNanoTime { renderGame() }
     }
 
     private fun updateGame(delta: Float) {
