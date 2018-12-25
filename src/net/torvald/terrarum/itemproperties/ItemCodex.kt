@@ -3,13 +3,12 @@ package net.torvald.terrarum.itemproperties
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.KVHashMap
-import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
+import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import java.util.*
 
 /**
@@ -242,8 +241,8 @@ object ItemCodex {
         // wall
         else if (item.originalID in ITEM_WALLS) {
             return BlocksDrawer.tileItemWall.get(
-                    (item.originalID.minus(ITEM_WALLS.first) % 16) * TILE_SIZE,
-                    (item.originalID.minus(ITEM_WALLS.first) / 16) * TILE_SIZE
+                    (item.originalID.minus(ITEM_WALLS.first) % 16) * 16,
+                    (item.originalID.minus(ITEM_WALLS.first) / 16)
             )
         }
         // wire

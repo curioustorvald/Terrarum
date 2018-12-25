@@ -13,7 +13,6 @@ import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
@@ -56,7 +55,7 @@ internal object BlocksDrawer {
     //val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
 
 
-    val wallOverlayColour = Color(2f/3f, 2f/3f, 2f/3f, 1f)
+    val wallOverlayColour = Color(5f/9f,5f/9f,5f/9f,1f)
 
     const val BREAKAGE_STEPS = 10
     const val TILES_PER_BLOCK = PairedMapLayer.RANGE
@@ -144,32 +143,10 @@ internal object BlocksDrawer {
         printdbg(this, "Making wall item textures...")
 
         // create item_wall images
-        // --> make pixmap
-        val _tileItemImgPixMap = Pixmap(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16, Pixmap.Format.RGBA8888)
-        _tileItemImgPixMap.pixels.rewind()
-
-        for (tileID in ITEM_TILES) {
-
-            val tileX = (tileID % 16) * 16
-            val tileY = tileID / 16
-            val tile = tilesTerrain.get(tileX, tileY)
+        // will just use the terrain texture :p
+        tileItemWall = tilesTerrain
 
 
-            // slow memory copy :\  I'm afraid I can't random-access bytebuffer...
-            for (scanline in 0 until _tileItemImgPixMap.height) {
-                for (x in 0 until TILE_SIZE) {
-                    val pixel = _terrainPixMap.getPixel(tileX + x, scanline)
-                    _tileItemImgPixMap.drawPixel(x + TILE_SIZE * (tileID % 16), scanline, pixel)
-                }
-            }
-        }
-        _tileItemImgPixMap.pixels.rewind()
-        // turn pixmap into texture
-        tileItemWall = TextureRegionPack(Texture(_tileItemImgPixMap), TILE_SIZE, TILE_SIZE)
-
-
-
-        _tileItemImgPixMap.dispose()
         _terrainPixMap.dispose() // finally
 
 
