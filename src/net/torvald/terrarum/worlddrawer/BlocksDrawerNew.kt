@@ -4,18 +4,20 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Matrix4
-import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.PairedMapLayer
+import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.floorInt
+import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
+import net.torvald.terrarum.roundInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.BufferedOutputStream
 import java.io.File
@@ -91,6 +93,8 @@ internal object BlocksDrawer {
     private val shader = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/tiling.frag"))
 
     init {
+        printdbg(this, "Unpacking textures...")
+
         // PNG still doesn't work right.
         // The thing is, pixel with alpha 0 must have RGB of also 0, which PNG does not guarantee it.
         // (pixels of RGB = 255, A = 0 -- white transparent -- causes 'glow')
@@ -137,6 +141,7 @@ internal object BlocksDrawer {
 
 
 
+        printdbg(this, "Making wall item textures...")
 
         // create item_wall images
         // --> make pixmap
@@ -166,6 +171,9 @@ internal object BlocksDrawer {
 
         _tileItemImgPixMap.dispose()
         _terrainPixMap.dispose() // finally
+
+
+        printdbg(this, "init() exit")
     }
 
     /**

@@ -3,6 +3,7 @@ package net.torvald.terrarum;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.*;
@@ -14,6 +15,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.torvald.dataclass.ArrayListMap;
+import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
@@ -85,6 +87,7 @@ public class AppLoader implements ApplicationListener {
     /**
      * Default null constructor. Don't use it.
      */
+    @Deprecated
     public AppLoader() {
     }
 
@@ -153,6 +156,7 @@ public class AppLoader implements ApplicationListener {
         ShaderProgram.pedantic = false;
 
         LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
+        appConfig.useGL30 = true;
         appConfig.vSyncEnabled = false;
         appConfig.resizable = false;//true;
         //appConfig.width = 1072; // IMAX ratio
@@ -176,6 +180,7 @@ public class AppLoader implements ApplicationListener {
     private OrthographicCamera camera;
     private SpriteBatch logoBatch;
     public static TextureRegion logo;
+    public static AudioDevice audioDevice;
 
     private Color gradWhiteTop = new Color(0xf8f8f8ff);
     private Color gradWhiteBottom = new Color(0xd8d8d8ff);
@@ -228,28 +233,15 @@ public class AppLoader implements ApplicationListener {
                 VertexAttribute.ColorUnpacked(),
                 VertexAttribute.TexCoords(0)
         );
-
-        fullscreenQuad.setVertices(new float[]{
-                0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
-                ((float) appConfig.width), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                ((float) appConfig.width), ((float) appConfig.height), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                0f, ((float) appConfig.height), 0f, 1f, 1f, 1f, 1f, 0f, 0f
-        });
-        fullscreenQuad.setIndices(new short[]{0, 1, 2, 2, 3, 0});
-
-
-        // load configs
-        getDefaultDirectory();
-        createDirs();
-        readConfigJson();
+        updateFullscreenQuad(appConfig.width, appConfig.height);
     }
 
     @Override
     public void render() {
 
         if (splashDisplayed && !postInitFired) {
-            postInit();
             postInitFired = true;
+            postInit();
         }
 
 
@@ -347,12 +339,19 @@ public class AppLoader implements ApplicationListener {
 
     @Override
     public void dispose() {
-        if (screen != null) screen.hide();
-
         System.out.println("Goodbye !");
 
+
+        if (screen != null) {
+            screen.hide();
+            screen.dispose();
+        }
+
+        IngameRenderer.INSTANCE.dispose();
+
+
         // delete temp files
-        new File("./tmp_wenquanyi.tga").delete();
+        new File("./tmp_wenquanyi.tga").delete(); // FIXME this is pretty much ad-hoc
     }
 
     @Override
@@ -368,7 +367,11 @@ public class AppLoader implements ApplicationListener {
     public void setScreen(Screen screen) {
         printdbg(this, "Changing screen to " + screen.getClass().getCanonicalName());
 
-        if (this.screen != null) this.screen.hide();
+        // this whole thing is directtly copied from com.badlogic.gdx.Game
+
+        if (this.screen != null) {
+            this.screen.hide();
+        }
         this.screen = screen;
         if (this.screen != null) {
             this.screen.show();
@@ -379,6 +382,11 @@ public class AppLoader implements ApplicationListener {
     }
 
     private void postInit() {
+        // load configs
+        getDefaultDirectory();
+        createDirs();
+        readConfigJson();
+
         textureWhiteSquare = new Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"));
         textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
@@ -387,11 +395,15 @@ public class AppLoader implements ApplicationListener {
                 Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 128, false
         );
 
+        audioDevice = Gdx.audio.newAudioDevice(48000, false);
 
         // if there is a predefined screen, open that screen after my init process
         if (injectScreen != null) {
             setScreen(injectScreen);
         }
+
+
+        printdbg(this, "PostInit done");
     }
 
 
@@ -623,13 +635,13 @@ public class AppLoader implements ApplicationListener {
     // //
 
     public static final void printdbg(Object obj, Object message) {
-        if (IS_DEVELOPMENT_BUILD) {
+        if (IS_DEVELOPMENT_BUILD || getConfigBoolean("forcedevbuild")) {
             System.out.println("[" + obj.getClass().getSimpleName() + "] " + message.toString());
         }
     }
 
     public static final void printdbgerr(Object obj, Object message) {
-        if (IS_DEVELOPMENT_BUILD) {
+        if (IS_DEVELOPMENT_BUILD || getConfigBoolean("forcedevbuild")) {
             System.err.println("[" + obj.getClass().getSimpleName() + "] " + message.toString());
         }
     }
