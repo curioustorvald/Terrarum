@@ -15,6 +15,7 @@ object DefaultConfig {
 
         jsonObject.addProperty("displayfps", 0) // 0: no limit, non-zero: limit
         jsonObject.addProperty("usevsync", true)
+        jsonObject.addProperty("forcedevbuild", false)
 
 
         jsonObject.addProperty("imtooyoungtodie", false) // no perma-death
@@ -75,23 +76,20 @@ object DefaultConfig {
 
         jsonObject.addProperty("pcgamepadenv", "console")
 
-        jsonObject.addProperty("safetywarning", true)
+        //jsonObject.addProperty("safetywarning", true)
 
 
         jsonObject.addProperty("maxparticles", 768)
 
 
-        jsonObject.addProperty("fullframelightupdate", false)
+        //jsonObject.addProperty("fullframelightupdate", false)
 
         jsonObject.addProperty("temperatureunit", 1) // -1: american, 0: kelvin, 1: celcius
 
 
         // "fancy" graphics settings
         jsonObject.addProperty("fxdither", true)
-        jsonObject.addProperty("fx3dlut", false)
-
-
-        jsonObject.addProperty("__debug", false)
+        //jsonObject.addProperty("fx3dlut", false)
 
 
         return jsonObject

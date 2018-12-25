@@ -24,7 +24,7 @@ class Notification : UICanvas() {
     )
     private var displayTimer = 0f
 
-    internal var message: Array<String> = Array(MessageWindow.MESSAGES_DISPLAY, { "" })
+    internal var message: Array<String> = Array(MessageWindow.MESSAGES_DISPLAY) { "" }
 
     override var openCloseTime: Second = MessageWindow.OPEN_CLOSE_TIME
 

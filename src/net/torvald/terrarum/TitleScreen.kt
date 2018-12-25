@@ -18,14 +18,16 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.IngameRenderer
-import net.torvald.terrarum.modulebasegame.gameactors.*
+import net.torvald.terrarum.modulebasegame.gameactors.HumanoidNPC
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
-import net.torvald.terrarum.serialise.ReadLayerData
-import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
-import net.torvald.terrarum.worlddrawer.*
+import net.torvald.terrarum.serialise.ReadLayerData
+import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.FileInputStream
 
 /**
@@ -49,7 +51,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
 
-    private var loadDone = false
+    //private var loadDone = false // not required; draw-while-loading is implemented in the AppLoader
 
     private lateinit var demoWorld: GameWorldExtension
     private lateinit var cameraNodes: FloatArray // camera Y-pos
@@ -128,14 +130,14 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
         // construct camera nodes
         val nodeCount = 100
-        cameraNodes = kotlin.FloatArray(nodeCount, { it ->
+        cameraNodes = kotlin.FloatArray(nodeCount) { it ->
             val tileXPos = (demoWorld.width.toFloat() * it / nodeCount).floorInt()
             var travelDownCounter = 0
             while (!BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid) {
                 travelDownCounter += 4
             }
             travelDownCounter * FeaturesDrawer.TILE_SIZE.toFloat()
-        })
+        }
 
 
         cameraPlayer = object : HumanoidNPC(cameraAI, born = 0, usePhysics = false, forceAssignRefID = Terrarum.PLAYER_REF_ID) {
@@ -164,7 +166,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
         uiContainer.add(uiMenu)
 
-        loadDone = true
+        //loadDone = true
     }
 
 
@@ -172,7 +174,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     override fun show() {
-        printdbg(this, "atrniartsientsarinoetsar")
+        printdbg(this, "show() called")
 
         initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
@@ -184,6 +186,10 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
         worldFBO = FrameBuffer(Pixmap.Format.RGBA8888, Terrarum.WIDTH, Terrarum.HEIGHT, false)
+
+        loadThingsWhileIntroIsVisible()
+
+        printdbg(this, "show() exit")
     }
 
 
@@ -193,26 +199,21 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     protected val renderRate = Terrarum.renderRate
 
     override fun render(delta: Float) {
-        if (!loadDone) {
-            loadThingsWhileIntroIsVisible()
-        }
-        else {
-            // async update
-            updateDeltaCounter += delta
-            var updateTries = 0
-            while (updateDeltaCounter >= renderRate) {
-                updateScreen(delta)
-                updateDeltaCounter -= renderRate
-                updateTries++
+        // async update
+        updateDeltaCounter += delta
+        var updateTries = 0
+        while (updateDeltaCounter >= renderRate) {
+            updateScreen(delta)
+            updateDeltaCounter -= renderRate
+            updateTries++
 
-                if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
-                    break
-                }
+            if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
+                break
             }
-
-            // render? just do it anyway
-            renderScreen()
         }
+
+        // render? just do it anyway
+        renderScreen()
     }
 
     fun updateScreen(delta: Float) {
@@ -289,22 +290,24 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     }
 
     override fun resize(width: Int, height: Int) {
+        printdbg(this, "resize() called")
+
         // Set up viewport when window is resized
         initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT)
 
-        BlocksDrawer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
-        LightmapRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
 
-        if (loadDone) {
-            // resize UI by re-creating it (!!)
-            uiMenu.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
-            //uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
-            uiMenu.setPosition(0, 0) // shitty hack. Could be:
-            // 1: Init code and resize code are different
-            // 2: The UI is coded shit
-        }
+        // resize UI by re-creating it (!!)
+        uiMenu.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+        // TODO I forgot what the fuck kind of hack I was talking about
+        //uiMenu.setPosition(0, UITitleRemoConRoot.menubarOffY)
+        uiMenu.setPosition(0, 0) // shitty hack. Could be:
+        // 1: Init code and resize code are different
+        // 2: The UI is coded shit
+
 
         IngameRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
+
+        printdbg(this, "resize() exit")
     }
 
     override fun dispose() {

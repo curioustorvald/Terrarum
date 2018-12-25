@@ -970,6 +970,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         actorsRenderMiddle.forEach { it.dispose() }
         actorsRenderMidTop.forEach { it.dispose() }
         actorsRenderFront.forEach { it.dispose() }
+        actorsRenderOverlay.forEach { it.dispose() }
 
         uiAliases.forEach { it.dispose() }
         uiAlasesPausing.forEach { it.dispose() }
