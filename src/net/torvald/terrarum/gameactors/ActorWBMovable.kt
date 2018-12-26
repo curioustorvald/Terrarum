@@ -3,19 +3,18 @@ package net.torvald.terrarum.gameactors
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.Point2d
-import net.torvald.terrarum.*
-import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.spriteanimation.SpriteAnimation
+import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.BlockAddress
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.*
@@ -579,22 +578,22 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
             fun debug1(wut: Any?) {
                 //  vvvvv  set it true to make debug print work
-                if (true) println(wut)
+                if (true) printdbg(this, wut)
             }
 
             fun debug2(wut: Any?) {
                 //  vvvvv  set it true to make debug print work
-                if (false) println(wut)
+                if (false) printdbg(this, wut)
             }
 
             fun debug3(wut: Any?) {
                 //  vvvvv  set it true to make debug print work
-                if (false) println(wut)
+                if (false) printdbg(this, wut)
             }
 
             fun debug4(wut: Any?) {
                 //  vvvvv  set it true to make debug print work
-                if (false) println(wut)
+                if (false) printdbg(this, wut)
             }
 
             fun Double.modTile() = this.toInt().div(TILE_SIZE).times(TILE_SIZE)
