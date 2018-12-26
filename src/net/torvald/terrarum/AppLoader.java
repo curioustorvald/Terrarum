@@ -87,8 +87,7 @@ public class AppLoader implements ApplicationListener {
     /**
      * Default null constructor. Don't use it.
      */
-    @Deprecated
-    public AppLoader() {
+    private AppLoader() {
     }
 
     /**
