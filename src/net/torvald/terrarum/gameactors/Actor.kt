@@ -1,8 +1,5 @@
 package net.torvald.terrarum.gameactors
 
-import net.torvald.random.HQRNG
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.ItemCodex.ACTORID_MIN
 
 
@@ -63,6 +60,8 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
      * @param value null if the key is deleted
      */
     abstract @Event fun onActorValueChange(key: String, value: Any?)
+
+    abstract fun dispose()
 
 }
 

@@ -1,9 +1,13 @@
 package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.IngameInstance
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.KeyToggler
@@ -11,8 +15,8 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.Notification
-import net.torvald.terrarum.modulebasegame.ui.UIBuildingMakerToolbox
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -22,6 +26,32 @@ import kotlin.system.measureNanoTime
  * Created by minjaesong on 2018-07-06.
  */
 class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
+
+    private val menuYaml = Yaml("""
+- File
+ - New
+ - Export…
+ - Export sel…
+ - Import…
+ - Save world…
+ - Load world…
+- Tool
+ - Pencil
+ - Eyedropper
+ - Select mrq.
+ - Move
+ - Undo
+ - Redo
+- Time
+ - Morning
+ - Noon
+ - Dusk
+ - Night
+ - Set…
+- Weather
+ - Sunny
+ - Raining
+    """.trimIndent())
 
     private val timeNow = System.currentTimeMillis() / 1000
 
@@ -49,7 +79,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     override var actorNowPlaying: ActorHumanoid? = MovableWorldCamera()
 
-    val uiToolbox = UIBuildingMakerToolbox()
+    val uiToolbox = UINSMenu("Menu", 100, menuYaml)
     val notifier = Notification()
 
     val uiContainer = ArrayList<UICanvas>()
@@ -106,7 +136,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
 
 
-        uiToolbox.setPosition(Terrarum.WIDTH - 20, 4)
+        uiToolbox.setPosition(0, 0)
+        uiToolbox.isVisible = true
         notifier.setPosition(
                 (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
 
@@ -116,6 +147,11 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         LightmapRenderer.fireRecalculateEvent()
+    }
+
+    override fun show() {
+        Gdx.input.inputProcessor = BuildingMakerController(this)
+        super.show()
     }
 
     override fun render(delta: Float) {
@@ -172,7 +208,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     override fun resize(width: Int, height: Int) {
         IngameRenderer.resize(Terrarum.WIDTH, Terrarum.HEIGHT)
-        uiToolbox.setPosition(Terrarum.WIDTH - 20, 4)
+        uiToolbox.setPosition(0, 0)
         notifier.setPosition(
                 (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
         println("[BuildingMaker] Resize event")
@@ -181,16 +217,49 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     override fun dispose() {
         IngameRenderer.dispose()
     }
-
-    private val menuYaml = Yaml("""
-- File
- - New
- - Export
- - Import
-- Edit
-    """.trimIndent())
 }
 
+class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        screen.uiContainer.forEach { it.touchUp(screenX, screenY, pointer, button) }
+        return true
+    }
+
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        screen.uiContainer.forEach { it.mouseMoved(screenX, screenY) }
+        return true
+    }
+
+    override fun keyTyped(character: Char): Boolean {
+        screen.uiContainer.forEach { it.keyTyped(character) }
+        return true
+    }
+
+    override fun scrolled(amount: Int): Boolean {
+        screen.uiContainer.forEach { it.scrolled(amount) }
+        return true
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        screen.uiContainer.forEach { it.keyUp(keycode) }
+        return true
+    }
+
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        screen.uiContainer.forEach { it.touchDragged(screenX, screenY, pointer) }
+        return true
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        screen.uiContainer.forEach { it.keyDown(keycode) }
+        return true
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        screen.uiContainer.forEach { it.touchDown(screenX, screenY, pointer, button) }
+        return true
+    }
+}
 
 class MovableWorldCamera : ActorHumanoid(0, usePhysics = false) {
 
