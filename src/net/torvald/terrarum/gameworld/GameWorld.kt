@@ -224,7 +224,7 @@ open class GameWorld {
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
         terrainDamages.remove(blockAddr)
 
-        if (!BlockCodex[tile * PairedMapLayer.RANGE + damage].isFluid) {
+        if (BlockCodex[tile * PairedMapLayer.RANGE + damage].isSolid) {
             fluidFills.remove(blockAddr)
             fluidTypes.remove(blockAddr)
         }
@@ -374,10 +374,6 @@ open class GameWorld {
             fluidFills.remove(addr)
             fluidTypes.remove(addr)
 
-            // if old tile was fluid
-            if (BlockCodex[getTileFromTerrain(x, y) ?: Block.STONE].isFluid) {
-                //setTileTerrain(x, y, Block.AIR)
-            }
         }
 
 
@@ -404,6 +400,7 @@ open class GameWorld {
     data class FluidInfo(val type: FluidType, val amount: Float) {
         /** test if this fluid should be considered as one */
         fun isFluid() = type != Fluid.NULL && amount >= WorldSimulator.FLUID_MIN_MASS
+        fun getProp() = FluidCodex[type]
         override fun toString() = "Fluid type: ${type.value}, amount: $amount"
     }
 

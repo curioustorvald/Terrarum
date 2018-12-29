@@ -1,12 +1,11 @@
 package net.torvald.terrarum.blockproperties
 
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
+import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import org.apache.commons.csv.CSVRecord
-
 import java.io.IOException
 
 /**
@@ -108,7 +107,7 @@ object BlockCodex {
         prop.friction = intVal(record, "friction")
         prop.viscosity = intVal(record, "vscs")
 
-        prop.isFluid = boolVal(record, "fluid")
+        //prop.isFluid = boolVal(record, "fluid")
         prop.isSolid = boolVal(record, "solid")
         prop.isClear = boolVal(record, "clear")
         prop.isWallable = boolVal(record, "wall")

@@ -491,11 +491,8 @@ internal object BlocksDrawer {
                     if (mode == FLUID) {
                         writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, 0)
                     }
-                    else if (!BlockCodex[thisTile].isFluid) {
-                        writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
-                    }
                     else {
-                        writeToBuffer(mode, bufferX, bufferY, 0, 0, 0)
+                        writeToBuffer(mode, bufferX, bufferY, thisTileX, thisTileY, breakingStage)
                     }
                 } catch (e: NullPointerException) {
                     // do nothing. WARNING: This exception handling may hide erratic behaviour completely.
@@ -580,10 +577,9 @@ internal object BlocksDrawer {
 
         //return ret
         
-        val upTile = world.getTileFromTerrain(x    , y - 1) ?: Block.NULL
         return if (ret == 15 || ret == 10)
             ret
-        else if (world.getFluid(x, y-1).isFluid())
+        else if (world.getFluid(x, y-1).isFluid()) // if tile above is a fluid
             0
         else
             1

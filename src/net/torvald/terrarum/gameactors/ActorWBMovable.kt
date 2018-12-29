@@ -988,7 +988,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             }
 
             // evaluate
-            if (BlockCodex[world!!.getTileFromTerrain(tileX, tileY)].isFluid) {
+            if (world!!.getFluid(tileX, tileY).isFluid()) {
                 contactAreaCounter += 1
             }
         }
@@ -1177,10 +1177,10 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     private inline val tileDensityFluid: Int
         get() {
             var density = 0
-            forEachOccupyingTile {
+            forEachOccupyingFluid {
                 // get max density for each tile
-                if (it?.isFluid ?: false && it?.density ?: 0 > density) {
-                    density = it?.density ?: 0
+                if (it?.isFluid() ?: false && it?.getProp()?.density ?: 0 > density) {
+                    density = it?.getProp()?.density ?: 0
                 }
             }
 
@@ -1424,6 +1424,21 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         }
 
         return tileProps.forEach(consumer)
+    }
+
+    private fun forEachOccupyingFluid(consumer: (GameWorld.FluidInfo?) -> Unit) {
+        if (world == null) return
+
+
+        val fluids = ArrayList<GameWorld.FluidInfo?>()
+
+        for (y in hIntTilewiseHitbox.startY.toInt()..hIntTilewiseHitbox.endY.toInt()) {
+            for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
+                fluids.add(world!!.getFluid(x, y))
+            }
+        }
+
+        return fluids.forEach(consumer)
     }
 
     private fun forEachOccupyingTilePos(hitbox: Hitbox, consumer: (BlockAddress) -> Unit) {

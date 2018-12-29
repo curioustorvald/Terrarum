@@ -1,7 +1,6 @@
 package net.torvald.terrarum.blockproperties
 
 import net.torvald.terrarum.gameworld.FluidType
-import net.torvald.terrarum.gameworld.GameWorld
 
 /**
  * Created by minjaesong on 2016-08-06.
@@ -16,13 +15,6 @@ object Fluid {
     val LAVA = FluidType(2)
     val STATIC_LAVA = FluidType(-2)
 
-    val fluidTilesRange = 4094..4095 // MANUAL UPDATE
-    val fluidRange = 1..2 // MANUAL UPDATE
 
-
-    /**
-     * Returns tile number in the main tile atlas. Water being 4095.
-     */
-    fun getFluidTileFrom(type: FluidType) = GameWorld.TILES_SUPPORTED - type.abs()
-    fun isThisTileFluid(tileid: Int) = tileid in fluidTilesRange
+    val fluidRange = 1..2 // TODO MANUAL UPDATE
 }
