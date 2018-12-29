@@ -1,12 +1,12 @@
 package net.torvald.terrarum.modulecomputers.virtualcomputer.worldobject
 
+import net.torvald.terrarum.modulebasegame.gameactors.BlockBox
 import net.torvald.terrarum.modulebasegame.gameactors.FixtureBase
-import net.torvald.terrarum.gameworld.GameWorld
 
 /**
  * Created by minjaesong on 2016-09-08.
  */
-open class FixtureComputerBase : FixtureBase() {
+open class FixtureComputerBase : FixtureBase(BlockBox(BlockBox.NO_COLLISION, 1, 1)) {
 
     /** Connected terminal */
     var terminal: FixtureBasicTerminal? = null
@@ -18,7 +18,6 @@ open class FixtureComputerBase : FixtureBase() {
         actorValue["computerid"] = "none"
 
 
-        collisionFlag = COLLISION_PLATFORM
     }
 
     ////////////////////////////////////

@@ -400,28 +400,7 @@ internal object BlocksDrawer {
      *
      * As a consequence, fluids.tga must have the same width as tiles.tga.
      */
-    private fun GameWorld.FluidInfo.toFluidTile(): Int {
-        /*
-        val fluid = world.getFluid(x, y)
-
-        if (AppLoader.IS_DEVELOPMENT_BUILD && fluid.type == Fluid.NULL && fluid.amount != 0f) {
-            throw Error("Illegal fluid at ($x,$y): $fluid")
-        }
-
-        if (fluid.amount >= WorldSimulator.FLUID_MIN_MASS) {
-            val fluidLevel = fluid.amount.coerceIn(0f,1f).times(PairedMapLayer.RANGE - 1).roundToInt()
-            val baseTileID = (GameWorld.TILES_SUPPORTED) - fluid.type.abs()
-            val tileX = fluidLevel + (baseTileID % 16) * PairedMapLayer.RANGE
-            val tileY = baseTileID / 16
-
-            //printdbg(this, "$fluid")
-            //printdbg(this, "$fluidLevel, $baseTileID, $tileX, $tileY")
-
-            writeToBuffer(mode, bufferX, bufferY, tileX, tileY, 0)
-        }
-         */
-
-
+    private fun GameWorld.FluidInfo.toTileInFluidAtlas(): Int {
         val fluidNum = this.type.abs()
 
         if (this.amount >= WorldSimulator.FLUID_MIN_MASS) {
@@ -471,7 +450,7 @@ internal object BlocksDrawer {
                     WALL -> world.getTileFromWall(x, y)
                     TERRAIN -> world.getTileFromTerrain(x, y)
                     WIRE -> world.getTileFromWire(x, y)
-                    FLUID -> world.getFluid(x, y).toFluidTile()
+                    FLUID -> world.getFluid(x, y).toTileInFluidAtlas()
                     else -> throw IllegalArgumentException()
                 }
 
@@ -578,16 +557,19 @@ internal object BlocksDrawer {
      */
     internal fun getNearbyTilesInfoFluids(x: Int, y: Int): Int {
         val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFromTerrain(x - 1, y) ?: Block.NULL
+        nearbyTiles[NEARBY_TILE_KEY_UP] =    world.getTileFromTerrain(x    , y - 1) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFromTerrain(x + 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFromTerrain(x    , y - 1) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFromTerrain(x    , y + 1) ?: Block.NULL
+        nearbyTiles[NEARBY_TILE_KEY_DOWN] =  world.getTileFromTerrain(x    , y + 1) ?: Block.NULL
+        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  world.getTileFromTerrain(x - 1, y) ?: Block.NULL
+
+        val nearX = intArrayOf(x, x+1, x, x-1)
+        val nearY = intArrayOf(y-1, y, y+1, y)
 
         // try for
         var ret = 0
         for (i in 0..3) {
             try {
-                if (!BlockCodex[nearbyTiles[i]].isFluid &&
+                if (!world.getFluid(nearX[i], nearY[i]).isFluid() && // is not a fluid and...
                     !BlockCodex[nearbyTiles[i]].isSolid) {
                     ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
                 }
@@ -601,7 +583,7 @@ internal object BlocksDrawer {
         val upTile = world.getTileFromTerrain(x    , y - 1) ?: Block.NULL
         return if (ret == 15 || ret == 10)
             ret
-        else if (BlockCodex[upTile].isFluid)
+        else if (world.getFluid(x, y-1).isFluid())
             0
         else
             1
