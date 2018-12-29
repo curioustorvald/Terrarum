@@ -27,7 +27,6 @@ class BlockProp {
     var density: Int = 0
     var viscosity: Int = 0
 
-    var isFluid: Boolean = false
     var isSolid: Boolean = false
     var isClear: Boolean = false
     var isWallable: Boolean = false

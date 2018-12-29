@@ -1,13 +1,10 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.faction.FactionFactory
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
+import net.torvald.terrarum.gameactors.faction.FactionFactory
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -82,7 +79,8 @@ object PlayerBuilderSigrid {
                 Block.DAYLIGHT_CAPACITOR, Block.ICE_FRAGILE,
                 Block.ILLUMINATOR_WHITE, Block.ILLUMINATOR_BLACK, Block.ILLUMINATOR_ORANGE,
                 Block.ILLUMINATOR_GREEN, Block.ILLUMINATOR_CYAN, Block.SUNSTONE,
-                Block.ORE_COPPER
+                Block.ORE_COPPER,
+                Block.PLATFORM_WOODEN
         )
         val walls = arrayOf(
                 Block.AIR, Block.DIRT, Block.GLASS_CRUDE,

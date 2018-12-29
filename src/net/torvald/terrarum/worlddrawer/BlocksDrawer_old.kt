@@ -5,12 +5,11 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameworld.PairedMapLayer
+import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.*
-import net.torvald.terrarum.roundInt
+import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_TILES
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.BufferedOutputStream
@@ -573,8 +572,8 @@ object BlocksDrawerOLD {
         var ret = 0
         for (i in 0..3) {
             try {
-                if (!BlockCodex[nearbyTiles[i]].isSolid &&
-                    !BlockCodex[nearbyTiles[i]].isFluid) {
+                if (!BlockCodex[nearbyTiles[i]].isSolid) {
+                    //&& !BlockCodex[nearbyTiles[i]].isFluid) {
                     ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
                 }
             } catch (e: ArrayIndexOutOfBoundsException) {
