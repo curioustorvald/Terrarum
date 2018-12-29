@@ -42,7 +42,22 @@ open class FixtureBase(val blockBox: BlockBox) :
     }
 }
 
-data class BlockBox(val collisionType: Int, val width: Int, val height: Int) {
+data class BlockBox(var collisionType: Int, var width: Int, var height: Int) {
+
+    fun redefine(collisionType: Int, width: Int, height: Int) {
+        redefine(collisionType)
+        redefine(width, height)
+    }
+
+    fun redefine(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+    }
+
+    fun redefine(collisionType: Int) {
+        this.collisionType = collisionType
+    }
+
     companion object {
         const val NO_COLLISION = Block.ACTORBLOCK_NO_COLLISION
         const val FULL_COLLISION = Block.ACTORBLOCK_FULL_COLLISION

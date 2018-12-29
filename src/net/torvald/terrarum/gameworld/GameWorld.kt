@@ -2,12 +2,11 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.graphics.Color
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.serialise.ReadLayerDataLzma
 import org.dyn4j.geometry.Vector2
 import kotlin.math.absoluteValue
@@ -367,7 +366,7 @@ open class GameWorld {
         val addr = LandUtil.getBlockAddr(this, x, y)
 
         if (fill > WorldSimulator.FLUID_MIN_MASS) {
-            setTileTerrain(x, y, fluidTypeToBlock(fluidType))
+            //setTileTerrain(x, y, fluidTypeToBlock(fluidType))
             fluidFills[addr] = fill
             fluidTypes[addr] = fluidType
         }
@@ -377,7 +376,7 @@ open class GameWorld {
 
             // if old tile was fluid
             if (BlockCodex[getTileFromTerrain(x, y) ?: Block.STONE].isFluid) {
-                setTileTerrain(x, y, Block.AIR)
+                //setTileTerrain(x, y, Block.AIR)
             }
         }
 
@@ -403,6 +402,8 @@ open class GameWorld {
     }
 
     data class FluidInfo(val type: FluidType, val amount: Float) {
+        /** test if this fluid should be considered as one */
+        fun isFluid() = type != Fluid.NULL && amount >= WorldSimulator.FLUID_MIN_MASS
         override fun toString() = "Fluid type: ${type.value}, amount: $amount"
     }
 
