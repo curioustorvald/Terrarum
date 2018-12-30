@@ -390,31 +390,6 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                  *     This body is NON-STATIC and the other body is STATIC
                  */
                 if (!isNoCollideWorld) {
-                    // // HOW IT SHOULD WORK // //
-                    // ////////////////////////
-                    // combineVeloToMoveDelta now
-                    // displace hitbox (!! force--moveDelta--still exist, do not touch the force !!)
-                    //      make sure "touching" is perfectly useable
-                    //      16-step ccd applies here
-                    // ((nextHitbox <- hitbox))
-                    // resolve forces (use up the force && deform the vector):
-                    //      // "touching" should work at this point if displaceHitbox is successful
-                    //      [Collision]:
-                    //          if touching (test for both axes):
-                    //              re-direct force vector by mul w/ elasticity
-                    //          if not touching:
-                    //              do nothing
-                    //      [Friction]:
-                    //          deform vector "externalForce"
-                    //          if isControllable:
-                    //              also alter walkX/Y
-                    // translate ((nextHitbox)) hitbox by moveDelta (forces), this consumes force
-                    //      DO NOT set whatever delta to zero
-                    // ((hitbox <- nextHitbox))
-                    //
-                    // ((comments))  [Label]
-
-
                     displaceHitbox()
                 }
                 else {
@@ -574,6 +549,29 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     }*/
 
     private fun displaceHitbox() {
+        // // HOW IT SHOULD WORK // //
+        // ////////////////////////
+        // combineVeloToMoveDelta now
+        // displace hitbox (!! force--moveDelta--still exist, do not touch the force !!)
+        //      make sure "touching" is perfectly useable
+        //      16-step ccd applies here
+        // ((nextHitbox <- hitbox))
+        // resolve forces (use up the force && deform the vector):
+        //      // "touching" should work at this point if displaceHitbox is successful
+        //      [Collision]:
+        //          if touching (test for both axes):
+        //              re-direct force vector by mul w/ elasticity
+        //          if not touching:
+        //              do nothing
+        //      [Friction]:
+        //          deform vector "externalForce"
+        //          if isControllable:
+        //              also alter walkX/Y
+        // translate ((nextHitbox)) hitbox by moveDelta (forces), this consumes force
+        //      DO NOT set whatever delta to zero
+        // ((hitbox <- nextHitbox))
+        //
+        // ((comments))  [Label]
 
         if (world != null) {
 
@@ -616,10 +614,10 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             // 20 sixteenStep may be optional, I think, but it'd be good to have
 
             // ignore MOST of the codes below (it might be possible to recycle the structure??)
+            // and the idea above has not yet implemented, and may never will. --Torvald, 2018-12-30
 
             val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(vectorSum * (it / ccdSteps.toDouble())) } // zeroth step is for special condition
 
-            val affectingTiles = ArrayList<BlockAddress>()
             var collidingStep: Int? = null
 
             for (step in 1..ccdSteps) {
@@ -631,14 +629,11 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                     val tile = world!!.getTileFromTerrain(tileCoord.first, tileCoord.second) ?: Block.STONE
 
                     if (shouldICollideWithThis(tile)) {
-                        affectingTiles.add(it)
+                        collidingStep = step
                     }
                 }
 
-                if (affectingTiles.isNotEmpty()) {
-                    collidingStep = step
-                    break // collision found on this step, break and proceed to next step
-                }
+                if (collidingStep != null) break
             }
 
 
@@ -661,7 +656,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 debug1("== Collision step: $collidingStep / $ccdSteps")
 
 
-                val newHitbox = hitbox.reassign(sixteenStep[collidingStep])
+                val newHitbox = hitbox.reassign(sixteenStep[collidingStep!!])
 
                 var selfCollisionStatus = 0
                 if (isWalled(newHitbox, COLLIDING_LEFT)) selfCollisionStatus += COLL_LEFTSIDE   // 1
@@ -670,13 +665,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE // 2
 
                 // fixme UP and RIGHT && LEFT and DOWN bug
-
-                debug1("Collision type: $selfCollisionStatus")
-                affectingTiles.forEach {
-                    val tileCoord = LandUtil.resolveBlockAddr(world!!, it)
-                    debug2("affectign tile: ${tileCoord.first}, ${tileCoord.second}")
-                }
-
+                
                 when (selfCollisionStatus) {
                     0     -> {
                         debug1("[ActorWBMovable] Contradiction -- collision detected by CCD, but isWalled() says otherwise")
