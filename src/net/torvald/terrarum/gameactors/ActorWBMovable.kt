@@ -964,16 +964,13 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      *
      * Very straightforward for the actual solid tiles, not so much for the platforms
      */
-    private fun shouldICollideWithThis(tile: Int): Boolean {
+    private fun shouldICollideWithThis(tile: Int) =
         // regular solid block
-        return if (BlockCodex[tile].isSolid)
-            return true
+        (BlockCodex[tile].isSolid) ||
         // platforms and their necessary conditionals
-        else if (BlockCodex[tile].isPlatform)
-            return true
+        (BlockCodex[tile].isPlatform && externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0)
 
-        else return false
-    }
+
 
     private fun getContactingAreaFluid(side: Int, translateX: Int = 0, translateY: Int = 0): Int {
         if (world == null) return 0
