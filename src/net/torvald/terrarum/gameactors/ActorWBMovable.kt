@@ -66,21 +66,32 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      */
     override val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0) // Hitbox is implemented using Double;
 
-    /** half integer tilewise hitbox */ // got the idea from gl_FragCoord
+    /** half integer tilewise hitbox.
+     * May hold width/height of zero; the end point should be inclusive!
+     *
+     * e.g. USE `for (x in hitbox.startX..hitbox.endX)`, NOT `for (x in hitbox.startX until hitbox.endX)`
+     */ // got the idea from gl_FragCoord
     val hIntTilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
                 hitbox.startX.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
                 hitbox.startY.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
                 hitbox.endX.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
-                hitbox.endY.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f
-        )
+                hitbox.endY.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
+                true
+            )
 
+
+    /** May hold width/height of zero; the end point should be inclusive!
+     *
+     * e.g. USE `for (x in hitbox.startX..hitbox.endX)`, NOT `for (x in hitbox.startX until hitbox.endX)`
+     */
     val intTilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
                 hitbox.startX.plus(0.00001f).div(TILE_SIZE).floor(),
                 hitbox.startY.plus(0.00001f).div(TILE_SIZE).floor(),
                 hitbox.endX.plus(0.00001f).div(TILE_SIZE).floor(),
-                hitbox.endY.plus(0.00001f).div(TILE_SIZE).floor()
+                hitbox.endY.plus(0.00001f).div(TILE_SIZE).floor(),
+                true
         )
 
     /**
@@ -601,7 +612,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                         hitbox.startX.div(TILE_SIZE).floor(),
                         hitbox.startY.div(TILE_SIZE).floor(),
                         hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
-                        hitbox.endY.minus(0.00001).div(TILE_SIZE).floor()
+                        hitbox.endY.minus(0.00001).div(TILE_SIZE).floor(),
+                        true
                 )
 
                        // offset 1 pixel to the down so that friction would work
@@ -1491,8 +1503,9 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
                 hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
-                hitbox.endY.minus(0.00001).div(TILE_SIZE).floor()
-        )
+                hitbox.endY.minus(0.00001).div(TILE_SIZE).floor(),
+                true
+        ) // NOT the same as intTilewiseHitbox !!
 
         val tilePosList = ArrayList<BlockAddress>()
         for (y in newTilewiseHitbox.startY.toInt()..newTilewiseHitbox.endY.toInt()) {
