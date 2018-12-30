@@ -21,6 +21,7 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -394,18 +395,18 @@ object Terrarum : Screen {
 
 
 
-        // jump right into the ingame
-        /*val ingame = Ingame(batch)
+        // jump straight into the ingame
+        val ingame = Ingame(batch)
         ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
         ingame.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
         LoadScreen.screenToLoad = ingame
         this.ingame = ingame
-        setScreen(LoadScreen)*/
+        setScreen(LoadScreen)
 
 
 
         // title screen
-        AppLoader.getINSTANCE().setScreen(TitleScreen(batch))
+        //AppLoader.getINSTANCE().setScreen(TitleScreen(batch))
     }
 
     fun setScreen(screen: Screen) {

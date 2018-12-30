@@ -6,16 +6,12 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
-import net.torvald.terrarum.roundInt
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.imagefont.Watch7SegMain
 import net.torvald.terrarum.modulebasegame.imagefont.Watch7SegSmall
 import net.torvald.terrarum.modulebasegame.imagefont.WatchDotAlph
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -66,20 +62,8 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
             batch.draw(atlas.get(0, 2), 0f, 0f)
         }
         else {
-            val lightLevel: Color
-
-            if (player != null) {
-                val playerPos = player.hIntTilewiseHitbox
-                lightLevel = (LightmapRenderer.getLight(playerPos.centeredX.toInt(), playerPos.centeredY.toInt()) ?:
-                              (Terrarum.ingame!!.world).globalLight
-                             )
-            }
-            else {
-                lightLevel = (Terrarum.ingame!!.world).globalLight
-            }
-
             // backplate
-            batch.color = Color(lightLevel.r, lightLevel.g, lightLevel.b, 1f)
+            batch.color = Color.WHITE
             batch.draw(atlas.get(0, 0), 0f, 0f)
         }
 

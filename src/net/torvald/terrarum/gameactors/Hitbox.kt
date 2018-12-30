@@ -10,7 +10,7 @@ import org.dyn4j.geometry.Vector2
  *
  * Created by minjaesong on 2016-01-15.
  */
-class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
+class Hitbox(x1: Double, y1: Double, width: Double, height: Double, var suppressWarning: Boolean = false) {
 
     @Volatile var hitboxStart: Point2d
         private set
@@ -25,6 +25,11 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
         hitboxStart = Point2d(x1, y1)
         this.width = width
         this.height = height
+
+        if (!suppressWarning && (width == 0.0 || height == 0.0)) {
+            println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
+            Thread.currentThread().stackTrace.forEach { println(it) }
+        }
     }
 
     override fun toString(): String {
@@ -59,6 +64,12 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
         hitboxStart = Point2d(x1, y1)
         this.width = width
         this.height = height
+
+        if (!suppressWarning && (width == 0.0 || height == 0.0)) {
+            println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
+            Thread.currentThread().stackTrace.forEach { println(it) }
+        }
+
         return this
     }
     fun setFromTwoPoints(x1: Double, y1: Double, x2: Double, y2: Double): Hitbox {
@@ -72,8 +83,8 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
     fun setPosition(x1: Double, y1: Double): Hitbox {
         hitboxStart = Point2d(x1, y1)
 
-        if (width == 0.0 || height == 0.0) {
-            println("[Hitbox] width or height is zero, perhaps you want to check it out?")
+        if (!suppressWarning && (width == 0.0 || height == 0.0)) {
+            println("[Hitbox] width or height is zero ($this), perhaps you want to check it out?")
             Thread.currentThread().stackTrace.forEach { println(it) }
         }
 
@@ -125,7 +136,7 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
     val centeredY: Double
         get() = (hitboxStart.y + hitboxEnd.y) * 0.5
 
-    fun intersects(position: Point2d) =
+    infix fun intersects(position: Point2d) =
             (position.x >= startX && position.x <= startX + width) &&
             (position.y >= startY && position.y <= startY + height)
 
@@ -134,8 +145,8 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double) {
     fun clone(): Hitbox = Hitbox(startX, startY, width, height)
 
     companion object {
-        fun fromTwoPoints(x1: Double, y1: Double, x2: Double, y2: Double) =
-                Hitbox(x1, y1, x2 - x1, y2 - y1)
+        fun fromTwoPoints(x1: Double, y1: Double, x2: Double, y2: Double, nowarn: Boolean = false) =
+                Hitbox(x1, y1, x2 - x1, y2 - y1, nowarn)
     }
 
     operator fun minus(other: Hitbox): Vector2 {
