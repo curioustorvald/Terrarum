@@ -627,9 +627,9 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
                 forEachOccupyingTilePos(stepBox) {
                     val tileCoord = LandUtil.resolveBlockAddr(world!!, it)
-                    val tileProp = BlockCodex.getOrNull(world!!.getTileFromTerrain(tileCoord.first, tileCoord.second))
+                    val tile = world!!.getTileFromTerrain(tileCoord.first, tileCoord.second) ?: Block.STONE
 
-                    if (tileProp == null || tileProp.isSolid) {
+                    if (shouldICollideWithThis(tile)) {
                         affectingTiles.add(it)
                     }
                 }
@@ -946,13 +946,33 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         
         for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
-                val tile = world!!.getTileFromTerrain(x, y)
-                if (BlockCodex[tile].isSolid)
+                val tile = world!!.getTileFromTerrain(x, y) ?: Block.STONE
+
+                if (shouldICollideWithThis(tile))
                     return true
+
+                // this weird statement means that if's the condition is TRUE, return TRUE;
+                // if the condition is FALSE, do nothing and let succeeding code handle it.
             }
         }
 
         return false
+    }
+
+    /**
+     * If this tile should be treated as "collidable"
+     *
+     * Very straightforward for the actual solid tiles, not so much for the platforms
+     */
+    private fun shouldICollideWithThis(tile: Int): Boolean {
+        // regular solid block
+        return if (BlockCodex[tile].isSolid)
+            return true
+        // platforms and their necessary conditionals
+        else if (BlockCodex[tile].isPlatform)
+            return true
+
+        else return false
     }
 
     private fun getContactingAreaFluid(side: Int, translateX: Int = 0, translateY: Int = 0): Int {
