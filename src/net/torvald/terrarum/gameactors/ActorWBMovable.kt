@@ -12,6 +12,7 @@ import net.torvald.terrarum.blockproperties.BlockProp
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -967,8 +968,15 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     private fun shouldICollideWithThis(tile: Int) =
         // regular solid block
         (BlockCodex[tile].isSolid) ||
-        // platforms and their necessary conditionals
-        (BlockCodex[tile].isPlatform && externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0)
+        // platforms, moving downward AND not "going down"
+        (this is ActorHumanoid && BlockCodex[tile].isPlatform &&
+         externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0 &&
+         !this.isDownDown && this.axisY <= 0f) ||
+        // platforms, moving downward
+        (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
+         externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0)
+        // TODO: as for the platform, only apply it when it's a feet tile
+
 
 
 

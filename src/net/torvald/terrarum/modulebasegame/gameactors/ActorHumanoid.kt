@@ -13,8 +13,8 @@ import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameworld.time_t
-import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import org.dyn4j.geometry.Vector2
 import java.util.*
@@ -105,10 +105,10 @@ open class ActorHumanoid(
     // MOVEMENT RELATED FUNCTIONS //
     ////////////////////////////////
 
-    var axisX = 0f
-    var axisY = 0f
-    var axisRX = 0f
-    var axisRY = 0f
+    var axisX = 0f; protected set
+    var axisY = 0f; protected set
+    var axisRX = 0f; protected set
+    var axisRY = 0f; protected set
 
     /** empirical value. */
     @Transient private val JUMP_ACCELERATION_MOD = 51.0 / 10000.0 // (170 * (17/MAX_JUMP_LENGTH)^2) / 10000.0
@@ -141,11 +141,11 @@ open class ActorHumanoid(
     @Transient private val AXIS_KEYBOARD = -13372f // leetz
     @Transient private val GAMEPAD_JUMP = 7
 
-    protected var isUpDown = false
-    protected var isDownDown = false
-    protected var isLeftDown = false
-    protected var isRightDown = false
-    protected var isJumpDown = false
+    var isUpDown = false; protected set
+    var isDownDown = false; protected set
+    var isLeftDown = false; protected set
+    var isRightDown = false; protected set
+    var isJumpDown = false; protected set
     protected inline val isGamer: Boolean
         get() = if (Terrarum.ingame == null) false else this == Terrarum.ingame!!.actorNowPlaying
 
