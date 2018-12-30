@@ -28,7 +28,8 @@ class BlockProp {
     var viscosity: Int = 0
 
     var isSolid: Boolean = false
-    var isClear: Boolean = false
+    //var isClear: Boolean = false
+    var isPlatform: Boolean = false
     var isWallable: Boolean = false
     var isVertFriction: Boolean = false
 

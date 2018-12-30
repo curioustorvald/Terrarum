@@ -1,4 +1,4 @@
-package net.torvald.terrarum.worlddrawer
+/*package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
@@ -721,3 +721,4 @@ object BlocksDrawerOLD {
             x >= WorldCamera.x.div(TILE_SIZE) && y >= WorldCamera.y.div(TILE_SIZE) &&
             x <= WorldCamera.x.plus(WorldCamera.width).div(TILE_SIZE) && y <= WorldCamera.y.plus(WorldCamera.width).div(TILE_SIZE)
 }
+*/
