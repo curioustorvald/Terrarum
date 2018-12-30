@@ -69,18 +69,18 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     /** half integer tilewise hitbox */ // got the idea from gl_FragCoord
     val hIntTilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
-                hitbox.startX.plus(0.0001f).div(TILE_SIZE).floor() + 0.5f,
-                hitbox.startY.plus(0.0001f).div(TILE_SIZE).floor() + 0.5f,
-                hitbox.endX.plus(0.0001f).div(TILE_SIZE).floor() + 0.5f,
-                hitbox.endY.plus(0.0001f).div(TILE_SIZE).floor() + 0.5f
+                hitbox.startX.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
+                hitbox.startY.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
+                hitbox.endX.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
+                hitbox.endY.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f
         )
 
     val intTilewiseHitbox: Hitbox
         get() = Hitbox.fromTwoPoints(
-                hitbox.startX.plus(0.0001f).div(TILE_SIZE).floor(),
-                hitbox.startY.plus(0.0001f).div(TILE_SIZE).floor(),
-                hitbox.endX.plus(0.0001f).div(TILE_SIZE).floor(),
-                hitbox.endY.plus(0.0001f).div(TILE_SIZE).floor()
+                hitbox.startX.plus(0.00001f).div(TILE_SIZE).floor(),
+                hitbox.startY.plus(0.00001f).div(TILE_SIZE).floor(),
+                hitbox.endX.plus(0.00001f).div(TILE_SIZE).floor(),
+                hitbox.endY.plus(0.00001f).div(TILE_SIZE).floor()
         )
 
     /**
@@ -595,6 +595,20 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 if (false) printdbg(this, wut)
             }
 
+            fun BlockAddress.isFeetTile(hitbox: Hitbox): Boolean {
+                val (x, y) = LandUtil.resolveBlockAddr(world!!, this)
+                val newTilewiseHitbox = Hitbox.fromTwoPoints(
+                        hitbox.startX.div(TILE_SIZE).floor(),
+                        hitbox.startY.div(TILE_SIZE).floor(),
+                        hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
+                        hitbox.endY.minus(0.00001).div(TILE_SIZE).floor()
+                )
+
+                       // offset 1 pixel to the down so that friction would work
+                return (y == hitbox.endY.plus(1.0).div(TILE_SIZE).floorInt()) && // copied from forEachFeetTileNum
+                       (x in newTilewiseHitbox.startX.toInt()..newTilewiseHitbox.endX.toInt()) // copied from forEachOccupyingTilePos
+            }
+
             fun Double.modTile() = this.toInt().div(TILE_SIZE).times(TILE_SIZE)
             fun Double.modTileDelta() = this - this.modTile()
 
@@ -628,7 +642,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                     val tileCoord = LandUtil.resolveBlockAddr(world!!, it)
                     val tile = world!!.getTileFromTerrain(tileCoord.first, tileCoord.second) ?: Block.STONE
 
-                    if (shouldICollideWithThis(tile)) {
+                    if (shouldICollideWithThis(tile) || (it.isFeetTile(stepBox) && shouldICollideWithThisFeet(tile))) {
                         collidingStep = step
                     }
                 }
@@ -665,7 +679,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE // 2
 
                 // fixme UP and RIGHT && LEFT and DOWN bug
-                
+
                 when (selfCollisionStatus) {
                     0     -> {
                         debug1("[ActorWBMovable] Contradiction -- collision detected by CCD, but isWalled() says otherwise")
@@ -928,18 +942,24 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         val tyStart = y1.plus(0.5f).div(TILE_SIZE).floorInt()
         val tyEnd =   y2.plus(0.5f).div(TILE_SIZE).floorInt()
 
-        return isCollidingInternal(txStart, tyStart, txEnd, tyEnd)
+        return isCollidingInternal(txStart, tyStart, txEnd, tyEnd, option == COLLIDING_BOTTOM)
     }
 
-    private fun isCollidingInternal(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int): Boolean {
+    private fun isCollidingInternal(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int, feet: Boolean = false): Boolean {
         if (world == null) return false
         
         for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
                 val tile = world!!.getTileFromTerrain(x, y) ?: Block.STONE
 
-                if (shouldICollideWithThis(tile))
-                    return true
+                if (feet) {
+                    if (shouldICollideWithThisFeet(tile))
+                        return true
+                }
+                else {
+                    if (shouldICollideWithThis(tile))
+                        return true
+                }
 
                 // this weird statement means that if's the condition is TRUE, return TRUE;
                 // if the condition is FALSE, do nothing and let succeeding code handle it.
@@ -955,17 +975,25 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * Very straightforward for the actual solid tiles, not so much for the platforms
      */
     private fun shouldICollideWithThis(tile: Int) =
-        // regular solid block
-        (BlockCodex[tile].isSolid) ||
-        // platforms, moving downward AND not "going down"
-        (this is ActorHumanoid && BlockCodex[tile].isPlatform &&
-         externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0 &&
-         !this.isDownDown && this.axisY <= 0f) ||
-        // platforms, moving downward
-        (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
-         externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0)
-        // TODO: as for the platform, only apply it when it's a feet tile
+            // regular solid block
+            (BlockCodex[tile].isSolid)
 
+    /**
+     * If this tile should be treated as "collidable"
+     *
+     * Just like "shouldICollideWithThis" but it's intended to work with feet tiles
+     */
+    private fun shouldICollideWithThisFeet(tile: Int) =
+            // regular solid block
+            (BlockCodex[tile].isSolid) ||
+            // platforms, moving downward AND not "going down"
+            (this is ActorHumanoid && BlockCodex[tile].isPlatform &&
+             externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0 &&
+             !this.isDownDown && this.axisY <= 0f) ||
+            // platforms, moving downward
+            (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
+             externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0)
+            // TODO: as for the platform, only apply it when it's a feet tile
 
 
 
