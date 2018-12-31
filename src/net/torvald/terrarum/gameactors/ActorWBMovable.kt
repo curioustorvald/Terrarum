@@ -1149,6 +1149,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
     // body friction is always as same as the air. Fluid doesn't matter, they use viscosity
     //    (or viscosity was the wrong way and the friction DO matter? hmm... -- Torvald, 2018-12-31)
+    //    (or perhaps... they work in tandem, viscocity slows things down, friction makes go and stop fast -- Torvald, 2019-01-01; not the proudest thing to do in the ney year)
     // going down the platform won't show abnormal slowing (it's because of the friction prop!)
     internal inline val bodyFriction: Double
         get() {
