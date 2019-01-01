@@ -96,7 +96,7 @@ object BlockCodex {
         prop.shadeColB = floatVal(record, "shdb") / LightmapRenderer.MUL_FLOAT
         prop.shadeColA = floatVal(record, "shduv") / LightmapRenderer.MUL_FLOAT
 
-        prop.strength = intVal(record, "strength")
+        prop.strength = intVal(record, "str")
         prop.density = intVal(record, "dsty")
 
         prop.lumColR = floatVal(record, "lumr") / LightmapRenderer.MUL_FLOAT
