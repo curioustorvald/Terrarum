@@ -65,7 +65,12 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
     private val mailCount: Int
         get() = 0
 
-    private val lcdLitCol = Color(0x141414_ff)
+    private val drawCol = Color(1f,1f,1f,0.5f)
+    private val lcdLitColELoff = Color(0x141414_aa)
+    private val lcdLitColELon = Color(0x141414_ff)
+
+    private val lcdLitCol: Color
+        get() = if (ELon) lcdLitColELon else lcdLitColELoff
 
     fun getTempStr(): String {
         val sb = StringBuilder()
@@ -114,7 +119,7 @@ class UIBasicNotifier(private val player: ActorHumanoid?) : UICanvas() {
         }
         else {
             // backplate
-            batch.color = Color.WHITE
+            batch.color = drawCol
             batch.draw(atlas.get(0, 0), 0f, 0f)
         }
 

@@ -1,21 +1,21 @@
 package net.torvald.terrarum.utils
 
-import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.ModMgr
 import org.apache.commons.csv.CSVFormat
-import org.apache.commons.csv.CSVParser
-import org.apache.commons.csv.CSVRecord
-
-import java.io.IOException
-import java.io.InputStreamReader
-import java.nio.file.FileSystems
-import java.nio.file.Files
 
 /**
  * Created by minjaesong on 2016-02-16.
  */
 object CSVFetcher {
+
+    val terrarumCSVFormat: CSVFormat = org.apache.commons.csv.CSVFormat.DEFAULT.withIgnoreSurroundingSpaces()
+                .withHeader()
+                .withIgnoreEmptyLines()
+                .withDelimiter(';')
+                .withCommentMarker('#')
+                .withNullString("N/A")
+                .withRecordSeparator('\n')
 
     private var csvString: StringBuffer? = null
 
@@ -27,13 +27,7 @@ object CSVFetcher {
 
         val csvParser = org.apache.commons.csv.CSVParser.parse(
                 net.torvald.terrarum.utils.CSVFetcher.csvString!!.toString(),
-                org.apache.commons.csv.CSVFormat.DEFAULT.withIgnoreSurroundingSpaces()
-                        .withHeader()
-                        .withIgnoreEmptyLines()
-                        .withDelimiter(';')
-                        .withCommentMarker('#')
-                        .withNullString("N/A")
-                        .withRecordSeparator('\n')
+                terrarumCSVFormat
         )
 
         val csvRecordList = csvParser.records
@@ -47,13 +41,7 @@ object CSVFetcher {
     fun readFromString(csv: String): List<org.apache.commons.csv.CSVRecord> {
         val csvParser = org.apache.commons.csv.CSVParser.parse(
                 csv,
-                org.apache.commons.csv.CSVFormat.DEFAULT.withIgnoreSurroundingSpaces()
-                        .withHeader()
-                        .withIgnoreEmptyLines()
-                        .withDelimiter(';')
-                        .withCommentMarker('#')
-                        .withNullString("N/A")
-                        .withRecordSeparator('\n')
+                terrarumCSVFormat
         )
 
         val csvRecordList = csvParser.records
