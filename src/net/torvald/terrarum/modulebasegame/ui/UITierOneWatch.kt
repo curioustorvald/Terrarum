@@ -34,7 +34,12 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
     private var moonDial = TextureRegionPack(ModMgr.getPath("basegame", "fonts/watch_17pxmoondial.tga"), 17, 17)
     private var moonDialCount = moonDial.horizontalCount
 
-    private val lcdLitCol = Color(0x141414_ff)
+    private val drawCol = Color(1f,1f,1f,0.5f)
+    private val lcdLitColELoff = Color(0x141414_aa)
+    private val lcdLitColELon = Color(0x141414_ff)
+
+    private val lcdLitCol: Color
+        get() = if (ELon) lcdLitColELon else lcdLitColELoff
 
     private val worldTime: WorldTime
         get() = (Terrarum.ingame!!.world as GameWorldExtension).time
@@ -63,7 +68,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
         }
         else {
             // backplate
-            batch.color = Color.WHITE
+            batch.color = drawCol
             batch.draw(atlas.get(0, 0), 0f, 0f)
         }
 

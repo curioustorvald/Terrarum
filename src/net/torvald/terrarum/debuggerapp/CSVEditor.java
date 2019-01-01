@@ -1,5 +1,8 @@
 package net.torvald.terrarum.debuggerapp;
 
+import net.torvald.terrarum.utils.CSVFetcher;
+import org.apache.commons.csv.CSVFormat;
+
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -24,6 +27,8 @@ public class CSVEditor extends JFrame {
     private final int ARBITRARY = 240;
     private int[] colWidth = new int[]{FOUR_DIGIT, FOUR_DIGIT, ARBITRARY, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, TWO_DIGIT, FOUR_DIGIT, FOUR_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT};
     private String[][] dummyData = new String[128][columns.length];
+
+    private CSVFormat csvFormat = CSVFetcher.INSTANCE.getTerrarumCSVFormat();
 
     private JPanel panelSpreadSheet = new JPanel();
     private JPanel panelComment = new JPanel();
@@ -126,6 +131,14 @@ public class CSVEditor extends JFrame {
         new CSVEditor();
     }
 
+    private String toCSV() {
+        StringBuilder sb = new StringBuilder();
+
+        // add
+
+
+        return sb.toString();
+    }
 
     private String captionProperties =
             "" + // dummy string to make IDE happy with the auto indent

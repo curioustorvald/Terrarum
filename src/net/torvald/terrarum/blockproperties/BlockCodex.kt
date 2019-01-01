@@ -104,7 +104,7 @@ object BlockCodex {
         prop.lumColB = floatVal(record, "lumb") / LightmapRenderer.MUL_FLOAT
         prop.lumColA = floatVal(record, "lumuv") / LightmapRenderer.MUL_FLOAT
 
-        prop.friction = intVal(record, "friction")
+        prop.friction = intVal(record, "fr")
         prop.viscosity = intVal(record, "vscs")
 
         //prop.isFluid = boolVal(record, "fluid")
