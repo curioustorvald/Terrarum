@@ -53,9 +53,10 @@ object CSVFetcher {
     @Throws(java.io.IOException::class)
     fun readCSVasString(path: String): String {
         net.torvald.terrarum.utils.CSVFetcher.csvString = StringBuffer()
-        java.nio.file.Files.lines(java.nio.file.FileSystems.getDefault().getPath(path)).forEach(
-                { s -> net.torvald.terrarum.utils.CSVFetcher.csvString!!.append("$s\n") }
-        )
+        java.nio.file.Files.lines(java.nio.file.FileSystems.getDefault().getPath(path)).forEach {
+            s -> net.torvald.terrarum.utils.CSVFetcher.csvString!!.append("$s\n")
+        }
+
         return net.torvald.terrarum.utils.CSVFetcher.csvString!!.toString()
     }
 }

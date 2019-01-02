@@ -13,6 +13,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
@@ -76,7 +77,7 @@ public class CSVEditor extends JFrame {
 
         comment.setVisible(true);
         comment.setPreferredSize(new Dimension(100, 220));
-        comment.setText("# This is a comment section.\n# All the comment must begin with this '#' mark.");
+        comment.setText("# This is a comment section.\n# All the comment must begin with this '#' mark.\n# null value on the CSV is represented as 'N/A'.");
 
         panelSpreadSheet.add(menuBar, BorderLayout.NORTH);
         panelSpreadSheet.add(new JScrollPane(spreadsheet, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
@@ -133,31 +134,49 @@ public class CSVEditor extends JFrame {
                                     // construct newRow
                                     for (String column : columns) {
                                         String value = record.get(column);
+                                        if (value == null) {
+                                            value = csvFormat.getNullString();
+                                        }
 
                                         newRow.add(spreadsheet.getColumnModel().getColumnIndex(column), value);
                                     }
 
                                     ((DefaultTableModel) spreadsheet.getModel()).addRow(newRow);
                                 }
+
+                                // then add the comments
+                                // since the Commons CSV simply ignores the comments, we have to read them on our own.
+                                try {
+                                    StringBuilder sb = new StringBuilder();
+                                    List<String> allTheLines = Files.readAllLines(fileChooser.getSelectedFile().toPath());
+
+                                    allTheLines.forEach(line -> {
+                                        if (line.startsWith("" + csvFormat.getCommentMarker().toString())) {
+                                            sb.append(line);
+                                            sb.append('\n');
+                                        }
+                                    });
+
+                                    comment.setText(sb.toString());
+                                }
+                                catch (Throwable fuck) {
+                                    throw new InternalError(fuck);
+                                }
                             }
-                            else {
-                                // cancelled opening
-                                displayMessage("OPERATION_CANCELLED");
-                            }
+
+                            // if opening cancelled, do nothing
                         }
 
                         // if discard cancelled, do nothing
                     }
                 });
 
-                add("Save").addMouseListener(new MouseAdapter() {
+                add("Save…").addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
                         System.out.println(toCSV());
                     }
                 });
-
-                add("Save as…");
             }
         });
         menuBar.add(new JMenu("Edit") {
@@ -169,7 +188,7 @@ public class CSVEditor extends JFrame {
             }
         });
 
-        menuBar.setSize(new Dimension(100, 18));
+        menuBar.revalidate();
 
         // setup spreadsheet //
 
@@ -203,9 +222,6 @@ public class CSVEditor extends JFrame {
             }
         });
 
-
-        // will fix some components not "updating" at init, with some minor consequences...?
-        this.repaint();
     }
 
     public static void main(String[] args) {
@@ -248,6 +264,7 @@ public class CSVEditor extends JFrame {
                 sb.append('"');
                 if (col + 1 < cols) sb.append(';');
             }
+            sb.append("\n");
         } sb.append("\n\n");
 
         // add comments
