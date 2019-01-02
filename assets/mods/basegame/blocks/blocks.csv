@@ -102,55 +102,56 @@
   "-1";   "0";"BLOCK_NULL"                  ;"4.0000";"4.0000";"4.0000";"4.0000"; "-1";"2600";"NULL";    "0";   "0";    "1";   "1";   "0";   "0"; "N/A"; "0";"16";"0.0000";"0.0000";"0.0000";"0.0000"
 
 ## Notes ##
-
+#
 # Lava/Water props are left for future references, do not delete them until FluidCodex is built #
-
+#
 # id: Block ID
 # drop: Drop ID
-
+#
 # shdr/g/b, lumr/g/b: Shade RGB/ Lum RGB.
 #    valid range: float of 0..4; 1.0 for 255
-
+#
 # solid: whether the tile has full collision (affects physics; flowers are not solid, glass is solid)
 # clear: [PENDING FOR REMOVAL] whether the tile has trnasparency (affects render; flowers AND glass is clear)
 # plat: if the block is a Platform (applicable target: actual platforms, furniture filler block that collision == PLATFORM)
-
+#
 # vscs: viscosity, (velocity) / (1 + (n/16)), 16 halves movement speed, can be used to non-fluid tiles (sticky hazard, tarmac road in Terraria)
-
+#
 # str: strength
-
+#
 # dsty: density. As we are putting water an 1000, it is identical to specific gravity. [g/l]
-
+#
 # dlfn: dynamic luminosity function.
 #    0-static, 1-torch flicker, 2-current global light (sun, star, moon), 3-daylight at noon,
 #    4-slow breath, 5-pulsate
-
+#
 # mate: material, four-letter code
-
+#
 # fv: vertical friction (boolean)
 # fr: horizontal friction. 0: frictionless, <16: slippery, 16: regular, >16: sticky
-
-
+#
+#
 ## Illuminators ##
-
+#
 # Illuminator white: Mercury Lamp; CIELAB of (94, -5.131, 10.613), which is made out of CIEXYZ of (0.947638, 1.146481, 0.482263), measured with ColorMunki Spectrometer (If you don't want green tinge, collect a daylight!)
 # Illuminator orange: Sodium Lamp; CIE xy of (0.5375, 0.4153), CIEXYZ of (352.531139, 272.379377, 30.980339), measured with ColorMunki Spectrometer
 # Defalut torch : Y 64 x 0.55183 y 0.40966 (Planckian ~1 770 K); real candlelight colour taken from Spyder5 colorimeter (for I couldn't afford i1DisplayPro/Colormunki -- at least back then!)
 # Sunstone: Artificial sunlight, change colour over time in sync with sunlight. The light is set by game's code.
 # Sunlight capacitor: daylight at noon. Set by game's code.
-
+#
 # BLOCK_ILLUMINATOR_CYAN is actually a SUPER_LUMINATOR, cyan colour is used as:
 #   1. It has quite a brightness on RGB colour space
 #   2. Helmholz-Kohlraush effect
-
-
+#
+#
 ## Tiles ##
-
+#
 # 16 colour palette : games's 16-colour palette
 # Magical ice: theoretical __metallic__ ice that might form under super-high pressure (> 5 TPa). Its density is a wild guess.
-
-
+#
+#
 ## References ##
-
+#
 #     * Density of various woods : http://www.engineeringtoolbox.com/wood-density-d_40.html
 #     * Density of various phases of ice : http://www1.lsbu.ac.uk/water/ice_phases.html
+#
