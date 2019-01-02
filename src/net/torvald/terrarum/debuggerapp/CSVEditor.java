@@ -9,7 +9,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.StringReader;
@@ -100,8 +99,6 @@ public class CSVEditor extends JFrame {
 
         menuBar.add(new JMenu("File") {
             {
-                this.setMnemonic(KeyEvent.VK_F);
-
                 add("Open…").addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
@@ -175,6 +172,24 @@ public class CSVEditor extends JFrame {
                     @Override
                     public void mousePressed(MouseEvent e) {
                         System.out.println(toCSV());
+                    }
+                });
+
+                add("New").addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (discardAgreed()) {
+                            // ask new rows
+                            Integer rows = askInteger("NEW_ROWS");
+
+                            if (rows != null) {
+                                // first, delete everything
+                                ((DefaultTableModel) spreadsheet.getModel()).setRowCount(0);
+
+                                // then add some columns
+                                ((DefaultTableModel) spreadsheet.getModel()).setRowCount(rows);
+                            }
+                        }
                     }
                 });
             }
@@ -297,6 +312,23 @@ public class CSVEditor extends JFrame {
         );
     }
 
+    /**
+     *
+     * @param messageKey
+     * @return null if the operation cancelled, nonzero int if the choice was made
+     */
+    private Integer askInteger(String messageKey) {
+        OptionSize optionWindow = new OptionSize(lang.getProperty(messageKey));
+        int confirmedStatus = optionWindow.showDialog();
+
+        if (confirmedStatus == JOptionPane.CANCEL_OPTION) {
+            return null;
+        }
+        else {
+            return ((Integer) optionWindow.capacity.getValue());
+        }
+    }
+
     private String captionProperties =
             "" + // dummy string to make IDE happy with the auto indent
                     "id=ID of this block\n" +
@@ -321,8 +353,36 @@ public class CSVEditor extends JFrame {
                     "fv=Vertical friction when player slide on the cliff. 0 means not slide-able\n" +
                     "fr=Horizontal friction. &lt;16:slippery 16:regular &gt;16:sticky\n";
 
+    /**
+     * ¤ is used as a \n marker
+     */
     private String translations =
             "" +
                     "WARNING_YOUR_DATA_WILL_GONE=Existing edits will be lost, continue?\n" +
-                    "OPERATION_CANCELLED=Operation cancelled.\n";
+                    "OPERATION_CANCELLED=Operation cancelled.\n" +
+                    "NEW_ROWS=Enter the number of rows to initialise the new CSV.¤Remember, you can always add or delete rows.\n" +
+                    "ADD_ROWS=Enter the number of rows to add:\n";
+}
+
+class OptionSize {
+    JSpinner capacity = new JSpinner(new SpinnerNumberModel(
+            10,
+            1,
+            4096,
+            1
+    ));
+    private JPanel settingPanel = new JPanel();
+
+    OptionSize(String message) {
+        settingPanel.add(new JLabel("<html>" + message.replace("¤", "<br />") + "</html>"));
+        settingPanel.add(capacity);
+    }
+
+    /**
+     * returns either JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION
+     */
+    int showDialog() {
+        return JOptionPane.showConfirmDialog(null, settingPanel,
+                null, JOptionPane.OK_CANCEL_OPTION);
+    }
 }
