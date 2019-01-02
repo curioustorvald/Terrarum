@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.StringReader;
@@ -26,7 +27,7 @@ public class CSVEditor extends JFrame {
     private final int TWO_DIGIT = 30;
     private final int ARBITRARY = 240;
     private int[] colWidth = new int[]{FOUR_DIGIT, FOUR_DIGIT, ARBITRARY, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, TWO_DIGIT, FOUR_DIGIT, FOUR_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT};
-    private String[][] dummyData = new String[128][columns.length];
+    private String[][] dummyData = new String[2][columns.length];
 
     private CSVFormat csvFormat = CSVFetcher.INSTANCE.getTerrarumCSVFormat();
 
@@ -88,10 +89,28 @@ public class CSVEditor extends JFrame {
         // setup menubar //
 
         menuBar.add(new JMenu("File") {
+            {
+                this.setMnemonic(KeyEvent.VK_F);
 
+                add("Open…");
+
+                add("Save").addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        System.out.println(toCSV());
+                    }
+                });
+
+                add("Save as…");
+            }
         });
         menuBar.add(new JMenu("Edit") {
-
+            {
+                add("New rows…");
+                add("New column…");
+                add("Delete current row");
+                add("Delete current column");
+            }
         });
 
         // setup spreadsheet //
@@ -134,7 +153,43 @@ public class CSVEditor extends JFrame {
     private String toCSV() {
         StringBuilder sb = new StringBuilder();
 
-        // add
+        int cols = spreadsheet.getColumnModel().getColumnCount();
+        int rows = spreadsheet.getRowCount(); // actual rows, not counting the titles row
+
+        // add all the column titles
+        for (int i = 0; i < cols; i++) {
+            sb.append('"');
+            sb.append(spreadsheet.getColumnName(i));
+            sb.append('"');
+            if (i + 1 < cols) sb.append(';');
+        } sb.append('\n');
+
+        // loop for all the rows
+        forEachRow:
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                Object rawValue = spreadsheet.getModel().getValueAt(row, col);
+
+                String cell;
+                if (rawValue == null)
+                    cell = "";
+                else
+                    cell = ((String) rawValue).toUpperCase();
+
+                // skip if ID cell is empty
+                if (col == 0 && cell.isEmpty()) {
+                    continue forEachRow;
+                }
+
+                sb.append('"');
+                sb.append(cell);
+                sb.append('"');
+                if (col + 1 < cols) sb.append(';');
+            }
+        } sb.append("\n\n");
+
+        // add comments
+        sb.append(comment.getText());
 
 
         return sb.toString();
