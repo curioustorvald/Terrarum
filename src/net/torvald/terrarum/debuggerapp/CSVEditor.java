@@ -11,6 +11,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.util.List;
@@ -46,7 +48,7 @@ public class CSVEditor extends JFrame {
     private JTable spreadsheet = new JTable(new DefaultTableModel(columns, INITIAL_ROWS)); // it MUST be DefaultTableModel because that's what I'm using
     private JTextPane caption = new JTextPane();
     private JTextPane comment = new JTextPane();
-    private JLabel statBar = new JLabel("Creating a new CSV. You can still open existing file.");
+    private JLabel statBar = new JLabel("null.");
 
     private Properties props = new Properties();
     private Properties lang = new Properties();
@@ -116,62 +118,91 @@ public class CSVEditor extends JFrame {
                             fileChooser.showOpenDialog(null);
 
                             if (fileChooser.getSelectedFile() != null) {
-                                List<CSVRecord> records = CSVFetcher.INSTANCE.readFromFile(
-                                        fileChooser.getSelectedFile().getAbsolutePath());
+                                if (fileChooser.getSelectedFile().exists()) {
+                                    List<CSVRecord> records = CSVFetcher.INSTANCE.readFromFile(
+                                            fileChooser.getSelectedFile().getAbsolutePath());
 
-                                // turn list of records into a spreadsheet
+                                    // turn list of records into a spreadsheet
 
-                                // first dispose of any existing data
-                                ((DefaultTableModel) spreadsheet.getModel()).setRowCount(0);
+                                    // first dispose of any existing data
+                                    ((DefaultTableModel) spreadsheet.getModel()).setRowCount(0);
 
-                                // then work on the file
-                                for (CSVRecord record : records) {
-                                    Vector newRow = new Vector(columns.length);
+                                    // then work on the file
+                                    for (CSVRecord record : records) {
+                                        Vector newRow = new Vector(columns.length);
 
-                                    // construct newRow
-                                    for (String column : columns) {
-                                        String value = record.get(column);
-                                        if (value == null) {
-                                            value = csvFormat.getNullString();
+                                        // construct newRow
+                                        for (String column : columns) {
+                                            String value = record.get(column);
+                                            if (value == null) {
+                                                value = csvFormat.getNullString();
+                                            }
+
+                                            newRow.add(spreadsheet.getColumnModel().getColumnIndex(column), value);
                                         }
 
-                                        newRow.add(spreadsheet.getColumnModel().getColumnIndex(column), value);
+                                        ((DefaultTableModel) spreadsheet.getModel()).addRow(newRow);
                                     }
 
-                                    ((DefaultTableModel) spreadsheet.getModel()).addRow(newRow);
+                                    // then add the comments
+                                    // since the Commons CSV simply ignores the comments, we have to read them on our own.
+                                    try {
+                                        StringBuilder sb = new StringBuilder();
+                                        List<String> allTheLines = Files.readAllLines(
+                                                fileChooser.getSelectedFile().toPath());
+
+                                        allTheLines.forEach(line -> {
+                                            if (line.startsWith("" + csvFormat.getCommentMarker().toString())) {
+                                                sb.append(line);
+                                                sb.append('\n');
+                                            }
+                                        });
+
+                                        comment.setText(sb.toString());
+
+                                        statBar.setText(lang.getProperty("STAT_LOAD_SUCCESSFUL"));
+                                    }
+                                    catch (Throwable fuck) {
+                                        displayError("ERROR_INTERNAL", fuck);
+                                    }
                                 }
-
-                                // then add the comments
-                                // since the Commons CSV simply ignores the comments, we have to read them on our own.
-                                try {
-                                    StringBuilder sb = new StringBuilder();
-                                    List<String> allTheLines = Files.readAllLines(fileChooser.getSelectedFile().toPath());
-
-                                    allTheLines.forEach(line -> {
-                                        if (line.startsWith("" + csvFormat.getCommentMarker().toString())) {
-                                            sb.append(line);
-                                            sb.append('\n');
-                                        }
-                                    });
-
-                                    comment.setText(sb.toString());
+                                // if file not found
+                                else {
+                                    displayMessage("NO_SUCH_FILE");
                                 }
-                                catch (Throwable fuck) {
-                                    throw new InternalError(fuck);
-                                }
-                            }
-
-                            // if opening cancelled, do nothing
-                        }
-
-                        // if discard cancelled, do nothing
+                            } // if opening cancelled, do nothing
+                        } // if discard cancelled, do nothing
                     }
                 });
 
                 add("Save…").addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
-                        System.out.println(toCSV());
+                        JFileChooser fileChooser = new JFileChooser() {
+                            {
+                                setFileSelectionMode(JFileChooser.FILES_ONLY);
+                                setMultiSelectionEnabled(false);
+                            }
+                        };
+
+                        fileChooser.showSaveDialog(null);
+
+                        if (fileChooser.getSelectedFile() != null) {
+                            try {
+                                FileOutputStream fos = new FileOutputStream(fileChooser.getSelectedFile());
+
+                                fos.write(toCSV().getBytes());
+
+                                fos.flush();
+                                fos.close();
+
+
+                                statBar.setText(lang.getProperty("STAT_SAVE_SUCCESSFUL"));
+                            }
+                            catch (IOException iofuck) {
+                                displayError("WRITE_FAIL", iofuck);
+                            }
+                        } // if saving cancelled, do nothing
                     }
                 });
 
@@ -188,6 +219,9 @@ public class CSVEditor extends JFrame {
 
                                 // then add some columns
                                 ((DefaultTableModel) spreadsheet.getModel()).setRowCount(rows);
+
+                                // notify the user as well
+                                statBar.setText(lang.getProperty("STAT_NEW_FILE"));
                             }
                         }
                     }
@@ -237,6 +271,8 @@ public class CSVEditor extends JFrame {
             }
         });
 
+
+        statBar.setText(lang.getProperty("STAT_INIT"));
     }
 
     public static void main(String[] args) {
@@ -291,7 +327,18 @@ public class CSVEditor extends JFrame {
 
     private boolean discardAgreed() {
         return 0 == JOptionPane.showOptionDialog(null,
-                lang.getProperty("WARNING_YOUR_DATA_WILL_GONE"),
+                lang.getProperty("WARNING_YOUR_DATA_WILL_GONE") + " " + lang.getProperty("WARNING_CONTINUE"),
+                null,
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                new String[]{"OK", "Cancel"},
+                "Cancel"
+        );
+    }
+    private boolean confirmedContinue(String messageKey) {
+        return 0 == JOptionPane.showOptionDialog(null,
+                lang.getProperty(messageKey) + " " + lang.getProperty("WARNING_CONTINUE"),
                 null,
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.WARNING_MESSAGE,
@@ -306,6 +353,17 @@ public class CSVEditor extends JFrame {
                 null,
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.INFORMATION_MESSAGE,
+                null,
+                new String[]{"OK", "Cancel"},
+                "Cancel"
+        );
+    }
+    private void displayError(String messageKey, Throwable cause) {
+        JOptionPane.showOptionDialog(null,
+                lang.getProperty(messageKey) + "\n" + cause.toString(),
+                null,
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.ERROR_MESSAGE,
                 null,
                 new String[]{"OK", "Cancel"},
                 "Cancel"
@@ -358,10 +416,18 @@ public class CSVEditor extends JFrame {
      */
     private String translations =
             "" +
-                    "WARNING_YOUR_DATA_WILL_GONE=Existing edits will be lost, continue?\n" +
+                    "WARNING_CONTINUE=Continue?\n" +
+                    "WARNING_YOUR_DATA_WILL_GONE=Existing edits will be lost.\n" +
                     "OPERATION_CANCELLED=Operation cancelled.\n" +
-                    "NEW_ROWS=Enter the number of rows to initialise the new CSV.¤Remember, you can always add or delete rows.\n" +
-                    "ADD_ROWS=Enter the number of rows to add:\n";
+                    "NO_SUCH_FILE=No such file exists, operation cancelled.\n" +
+                    "NEW_ROWS=Enter the number of rows to initialise the new CSV.¤Remember, you can always add or delete rows later.\n" +
+                    "ADD_ROWS=Enter the number of rows to add:\n" +
+                    "WRITE_FAIL=Writing to file has failed:\n" +
+                    "STAT_INIT=Creating a new CSV. You can still open existing file.\n" +
+                    "STAT_SAVE_SUCCESSFUL=File saved successfully.\n" +
+                    "STAT_NEW_FILE=New CSV created.\n" +
+                    "STAT_LOAD_SUCCESSFUL=File loaded successfully.\n" +
+                    "ERROR_INTERNAL=Something went wrong.\n";
 }
 
 class OptionSize {
