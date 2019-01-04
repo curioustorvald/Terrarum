@@ -3,9 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.bipolarClamp
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameworld.GameWorld
@@ -612,14 +610,15 @@ open class ActorHumanoid(
         sprite?.update(delta)
         spriteGlow?.update(delta)
 
-        //println("$this\tsprite current frame: ${sprite!!.currentFrame}")
+        if (walledBottom && controllerMoveDelta?.x != 0.0) {
+            //switch row
+            sprite?.switchRow(SPRITE_ROW_WALK)
+            spriteGlow?.switchRow(SPRITE_ROW_WALK)
 
-        if (walledBottom) {
-            // set anim row
-            if (controllerMoveDelta?.x != 0.0) {
-                sprite?.switchRow(SPRITE_ROW_WALK)
-                spriteGlow?.switchRow(SPRITE_ROW_WALK)
-            }
+            // set anim frame delay
+            // 4f of the divider is a magic number, empirically decided
+            sprite?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveDelta?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
+            spriteGlow?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveDelta?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
 
             // flipping the sprite
             if (walkHeading == LEFT) {

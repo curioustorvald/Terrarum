@@ -17,7 +17,6 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 
 /**
  * Should be made into its own artifact to build.
@@ -129,7 +128,7 @@ public class CSVEditor extends JFrame {
 
                                     // then work on the file
                                     for (CSVRecord record : records) {
-                                        Vector newRow = new Vector(columns.length);
+                                        String[] newRow = new String[columns.length];
 
                                         // construct newRow
                                         for (String column : columns) {
@@ -138,7 +137,7 @@ public class CSVEditor extends JFrame {
                                                 value = csvFormat.getNullString();
                                             }
 
-                                            newRow.add(spreadsheet.getColumnModel().getColumnIndex(column), value);
+                                            newRow[spreadsheet.getColumnModel().getColumnIndex(column)] = value;
                                         }
 
                                         ((DefaultTableModel) spreadsheet.getModel()).addRow(newRow);
@@ -273,6 +272,9 @@ public class CSVEditor extends JFrame {
 
 
         statBar.setText(lang.getProperty("STAT_INIT"));
+
+        this.revalidate();
+        this.repaint();
     }
 
     public static void main(String[] args) {

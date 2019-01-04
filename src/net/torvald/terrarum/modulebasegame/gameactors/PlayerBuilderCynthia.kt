@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.ai.NullAI
@@ -28,7 +27,6 @@ object PlayerBuilderCynthia {
 
 
         p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/test_player_2.tga"), 26, 42))
-        p.sprite!!.delay = 0.2f
         p.sprite!!.setRowsAndFrames(1, 1)
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 9, 0)

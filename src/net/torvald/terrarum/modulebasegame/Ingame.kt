@@ -274,7 +274,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     /** Load rest of the game with GL context */
     fun postInit() {
-        setTheRealGamerFirstTime(PlayerBuilderSigrid())
+        //setTheRealGamerFirstTime(PlayerBuilderSigrid())
+        setTheRealGamerFirstTime(PlayerBuilderTestSubject1())
 
 
 

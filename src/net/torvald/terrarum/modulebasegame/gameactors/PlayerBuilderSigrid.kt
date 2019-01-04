@@ -20,11 +20,9 @@ object PlayerBuilderSigrid {
 
 
         p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/test_player.tga"), 28, 51))
-        p.sprite!!.delay = 0.2f
         p.sprite!!.setRowsAndFrames(1, 1)
 
         p.makeNewSpriteGlow(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/test_player_glow.tga"), 28, 51))
-        p.spriteGlow!!.delay = 0.2f
         p.spriteGlow!!.setRowsAndFrames(1, 1)
 
         p.actorValue[AVKey.SCALE] = 1.0

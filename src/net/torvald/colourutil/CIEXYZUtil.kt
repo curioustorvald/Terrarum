@@ -1,7 +1,7 @@
 package net.torvald.colourutil
 
-import com.jme3.math.FastMath
 import com.badlogic.gdx.graphics.Color
+import com.jme3.math.FastMath
 
 /**
  * Created by minjaesong on 2017-01-12.
@@ -11,25 +11,27 @@ object CIEXYZUtil {
     /**
      * 0..255 -> 0.0..1.0
      */
-    private val rgbLineariseLUT = Array<Float>(257, {
-        val step = minOf(it, 255) / 255f
+    private val rgbLinLUT = FloatArray(256) {
+        val step = it / 255f
 
         if (step > 0.04045f)
             ((step + 0.055f) / 1.055f).powerOf(2.4f)
         else step / 12.92f
-    })
+    }
 
     /**
      * 0..255 -> 0.0..1.0
      */
-    private val rgbUnLineariseLUT = Array<Float>(257, {
-        val step = minOf(it, 255) / 255f
+    private val rgbUnLinLUT = FloatArray(256) {
+        val step = it / 255f
 
         if (step > 0.0031308f)
             1.055f * step.powerOf(1f / 2.4f) - 0.055f
         else
             step * 12.92f
-    })
+    }
+
+    private val rgbToXyzLut_XR = FloatArray(256) { 0.4124564f * (it / 255f) }
 
 
 
@@ -65,8 +67,35 @@ object CIEXYZUtil {
 
     fun Color.toXYZ(): CIEXYZ = RGB(this).toXYZ()
 
+    /**
+     * "Linearise" the sRGB triads. This use lookup table to speed up calculation.
+     * Integer values (1/255, 2/255, .. , 254/255, 255/255) are accurate but any values in between are
+     * linearly interpolated and thus slightly less accurate. Visually there's little-to-no difference,
+     * but may not optimal for rigorous maths.
+     */
     fun RGB.linearise(): RGB {
-        /*val newR = if (r > 0.04045f)
+        val out = floatArrayOf(0f, 0f, 0f)
+        for (i in 0..2) {
+            val value = when (i) {
+                0 -> this.r
+                1 -> this.g
+                2 -> this.b
+                else -> throw InternalError("Fuck you")
+            }
+            val step = value.clampOne() * 255f // 0.0 .. 255.0
+            val intStep = step.toInt() // 0 .. 255
+            val NeXTSTEP = minOf(intStep + 1, 255) // 1 .. 255
+
+            out[i] = interpolateLinear(step - intStep, rgbLinLUT[intStep], rgbLinLUT[NeXTSTEP])
+        }
+
+
+        return RGB(out[0], out[1], out[2], alpha)
+    }
+
+    /** Suitable for rigorous maths but slower */
+    fun RGB.lineariseSuper(): RGB {
+        val newR = if (r > 0.04045f)
             ((r + 0.055f) / 1.055f).powerOf(2.4f)
         else r / 12.92f
         val newG = if (g > 0.04045f)
@@ -77,28 +106,38 @@ object CIEXYZUtil {
         else b / 12.92f
 
 
-        return RGB(newR, newG, newB, alpha)*/
+        return RGB(newR, newG, newB, alpha)
+    }
 
+    /**
+     * "Un-linearise" the RGB triads. That is, codes the linear RGB into sRGB. This use lookup table to speed up calculation.
+     * Integer values (1/255, 2/255, .. , 254/255, 255/255) are accurate but any values in between are
+     * linearly interpolated and thus slightly less accurate. Visually there's little-to-no difference,
+     * but may not optimal for rigorous maths.
+     */
+    fun RGB.unLinearise(): RGB {
         val out = floatArrayOf(0f, 0f, 0f)
         for (i in 0..2) {
             val value = when (i) {
                 0 -> this.r
                 1 -> this.g
                 2 -> this.b
-                else -> throw Exception("Fuck you")
+                else -> throw InternalError("Fuck you")
             }
-            val step = value.clampOne() * 255f
-            val intStep = step.toInt()
+            val step = value.clampOne() * 255f // 0.0 .. 255.0
+            val intStep = step.toInt() // 0 .. 255
+            val NeXTSTEP = minOf(intStep + 1, 255) // 1 .. 255
 
-            out[i] = interpolateLinear(step - intStep, rgbLineariseLUT[intStep], rgbLineariseLUT[intStep + 1])
+            out[i] = interpolateLinear(step - intStep, rgbUnLinLUT[intStep], rgbUnLinLUT[NeXTSTEP])
         }
 
 
         return RGB(out[0], out[1], out[2], alpha)
     }
 
-    fun RGB.unLinearise(): RGB {
-        /*val newR = if (r > 0.0031308f)
+    /** Suitable for rigorous maths but slower */
+    fun RGB.unLineariseSuper(): RGB {
+        val newR = if (r > 0.0031308f)
             1.055f * r.powerOf(1f / 2.4f) - 0.055f
         else
             r * 12.92f
@@ -112,24 +151,7 @@ object CIEXYZUtil {
             b * 12.92f
 
 
-        return RGB(newR, newG, newB, alpha)*/
-
-        val out = floatArrayOf(0f, 0f, 0f)
-        for (i in 0..2) {
-            val value = when (i) {
-                0 -> this.r
-                1 -> this.g
-                2 -> this.b
-                else -> throw Exception("Fuck you")
-            }
-            val step = value.clampOne() * 255f
-            val intStep = step.toInt()
-
-            out[i] = interpolateLinear(step - intStep, rgbUnLineariseLUT[intStep], rgbUnLineariseLUT[intStep + 1])
-        }
-
-
-        return RGB(out[0], out[1], out[2], alpha)
+        return RGB(newR, newG, newB, alpha)
     }
 
     fun RGB.toXYZ(): CIEXYZ {
