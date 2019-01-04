@@ -1,9 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -23,12 +21,12 @@ object PlayerBuilderTestSubject1 {
 
 
         p.makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/npc_template_anim_prototype.tga"), 48, 52))
-        p.sprite!!.delay = 0.2f
+        p.sprite!!.delays = floatArrayOf(2f, 1f/12f) // second value does nothing -- overridden by ActorHumanoid.updateSprite(float)
         p.sprite!!.setRowsAndFrames(2, 4)
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 21, 0)
 
-        p.setPosition(4096.0 * FeaturesDrawer.TILE_SIZE, 300.0 * FeaturesDrawer.TILE_SIZE)
+        p.setPosition(3.0 * FeaturesDrawer.TILE_SIZE, 3.0 * FeaturesDrawer.TILE_SIZE)
 
 
 

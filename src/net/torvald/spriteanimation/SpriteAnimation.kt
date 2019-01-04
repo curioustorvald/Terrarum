@@ -7,6 +7,7 @@ package net.torvald.spriteanimation
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
+import net.torvald.terrarum.Second
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -16,12 +17,29 @@ class SpriteAnimation(val parentActor: ActorWBMovable) {
 
     var currentFrame = 0
     var currentRow = 0
+
     var nFrames: Int = 1
         private set
     var nRows: Int = 1
         private set
-    var delay = 200f
+
+    private val currentDelay: Second
+        get() = delays[currentRow]
+
+    /**
+     * Sets delays for each rows. Array size must be the same as the rows of the sheet
+     */
+    var delays: FloatArray = floatArrayOf(0.2f)
+        set(value) {
+            if (value.filter { it <= 0f }.isNotEmpty()) {
+                throw IllegalArgumentException("Delay array contains zero or negative value: $delays")
+            }
+
+            field = value
+        }
+
     private var delta = 0f
+
     val looping = true
     private var animationRunning = true
     var flipHorizontal = false
@@ -61,17 +79,23 @@ class SpriteAnimation(val parentActor: ActorWBMovable) {
             //skip this if animation is stopped
             this.delta += delta
 
+            //println("delta accumulation: $delta, currentDelay: $currentDelay")
+
             //check if it's time to advance the frame
-            if (this.delta >= this.delay) {
-                //if set to not loop, keep the frame at the last frame
-                if (this.currentFrame == this.nFrames && !this.looping) {
-                    this.currentFrame = this.nFrames - 1
+            while (this.delta >= currentDelay) {
+                // advance frame
+                if (looping) { // looping, wrap around
+                    currentFrame = (currentFrame + 1) % nFrames
+                }
+                else if (currentFrame < nFrames - 1) { // not looping and haven't reached the end
+                    currentFrame += 1
                 }
 
-                //advance one frame, then reset delta counter
-                this.currentFrame = this.currentFrame % this.nFrames
-                this.delta = 0f
+                // discount counter
+                this.delta -= currentDelay
             }
+
+            //println("row, frame: $currentRow, $currentFrame")
         }
     }
 
@@ -92,7 +116,7 @@ class SpriteAnimation(val parentActor: ActorWBMovable) {
         }
 
         if (visible) {
-            val region = textureRegion.get(currentRow, currentFrame)
+            val region = textureRegion.get(currentFrame, currentRow)
             batch.color = colorFilter
 
             if (flipHorizontal && flipVertical) {
@@ -136,15 +160,6 @@ class SpriteAnimation(val parentActor: ActorWBMovable) {
         //if beyond the frame index then reset
         if (currentFrame > nFrames) {
             reset()
-        }
-    }
-
-    fun setSpriteDelay(newDelay: Float) {
-        if (newDelay > 0) {
-            delay = newDelay
-        }
-        else {
-            throw IllegalArgumentException("Delay equal or less than zero")
         }
     }
 

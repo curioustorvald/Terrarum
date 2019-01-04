@@ -34,7 +34,6 @@ internal class FixtureTikiTorch : FixtureBase(
         lightBoxList.add(Hitbox(3.0, 0.0, 4.0, 3.0))
 
         makeNewSprite(TextureRegionPack(ModMgr.getGdxFile("basegame", "sprites/fixtures/tiki_torch.tga"), 10, 27))
-        sprite!!.delay = 0.2f
         sprite!!.setRowsAndFrames(1, 1)
 
         actorValue[AVKey.BASEMASS] = 1.0
