@@ -17,12 +17,18 @@ class ADLParsingTest {
 
         ! a skeleton also defines what body parts (images) be used.
         ! you can also write multiline text using reverse solidus; this is a feature of .properties
-        SKELETON_STAND=HEAD 0,32;\
+        ! skeleton joints are ordered: foremost-drawn object comes first, which means lowermost object IN THIS LIST
+        !   are painted first, and any object that comes before it will paint over it. In other words, this list is
+        !   first reversed then being iterated.
+        ! Joints' original point is defined in the document sprite_joints.psd. It also has visual representations.
+        # TODO right now accessory points are explicitly defined. Should they be injected in run-time?
+        SKELETON_STAND=HEADGEAR 0,32;HAIR_FORE 0,32;\
+                       ARM_REST_RIGHT -7,23;HAND_REST_RIGHT -6,11;HELD_ITEM -6,11;\
+                       HAIR 0,32;HEAD 0,32;\
                        UPPER_TORSO 0,23;LOWER_TORSO 0,15;\
-                       LEG_LEFT 2,7;FOOT_LEFT 2,2;\
-                       LEG_RIGHT -2,7;FOOT_RIGHT -2,2;\
-                       ARM_REST_LEFT 5,24;HAND_REST_LEFT 6,12;\
-                       ARM_REST_RIGHT -7,23;HAND_REST_RIGHT -6,11
+                       FOOT_RIGHT -2,2;LEG_RIGHT -2,7;\
+                       FOOT_LEFT 2,2;LEG_LEFT 2,7;\
+                       ARM_REST_LEFT 5,24;HAND_REST_LEFT 6,12
 
         # skeleton_stand is used for testing purpose
         ANIM_RUN=DELAY 0.15;ROW 2;SKELETON SKELETON_STAND
