@@ -9,8 +9,8 @@ import java.io.StringReader
 class ADLParsingTest {
 
     val TEST_STR = """
-        SPRITESHEET=sprites/test
-        EXTENSION=.tga.gz
+        SPRITESHEET=mods/basegame/sprites/sprite_assembler_test_assets/test_
+        EXTENSION=.tga
 
         # note to self: don't implement skeleton hierarchy: there's too many exceptions
         # besides, you have "ALL" key.

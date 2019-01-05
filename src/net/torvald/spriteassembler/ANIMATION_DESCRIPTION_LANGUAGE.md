@@ -74,7 +74,7 @@ If a field is recognised as an animation (in this case ANIM_RUN), the assembler 
 
 ### Naming convention of files
 
-If the animation specifies a "body part" (in this example LEG_LEFT and LEG_RIGHT), the assembler will look for a file ```sprites/test_leg_left.tga.gz``` and ```sprites/test_leg_right.tga.gz``` respectively.
+If the animation specifies a "body part" (in this example LEG_LEFT and LEG_RIGHT), the assembler will look for a file ```sprites/test_leg_left.tga.gz``` and ```sprites/test_leg_right.tga.gz``` respectively. Filenames are advised to be kept all lowercase.
 
 #### Reserved keywords
 
