@@ -16,7 +16,13 @@ class ADLParsingTest {
         # besides, you have "ALL" key.
 
         ! a skeleton also defines what body parts (images) be used.
-        SKELETON_STAND=HEAD 0,32;UPPER_TORSO 0,23;LOWER_TORSO 0,15;LEG_LEFT 2,7;LEG_RIGHT -2,7;FOOT_LEFT 2,2;FOOT_RIGHT -2,2;ARM_REST_LEFT 5,24;HAND_REST_LEFT 6,12;ARM_REST_RIGHT -7,23;HAND_REST_RIGHT -6,11
+        ! you can also write multiline text using reverse solidus; this is a feature of .properties
+        SKELETON_STAND=HEAD 0,32;\
+                       UPPER_TORSO 0,23;LOWER_TORSO 0,15;\
+                       LEG_LEFT 2,7;FOOT_LEFT 2,2;\
+                       LEG_RIGHT -2,7;FOOT_RIGHT -2,2;\
+                       ARM_REST_LEFT 5,24;HAND_REST_LEFT 6,12;\
+                       ARM_REST_RIGHT -7,23;HAND_REST_RIGHT -6,11
 
         # skeleton_stand is used for testing purpose
         ANIM_RUN=DELAY 0.15;ROW 2;SKELETON SKELETON_STAND
