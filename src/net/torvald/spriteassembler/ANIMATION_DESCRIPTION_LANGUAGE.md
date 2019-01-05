@@ -76,14 +76,26 @@ If a field is recognised as an animation (in this case ANIM_RUN), the assembler 
 
 If the animation specifies a "body part" (in this example LEG_LEFT and LEG_RIGHT), the assembler will look for a file ```sprites/test_leg_left.tga.gz``` and ```sprites/test_leg_right.tga.gz``` respectively. Filenames are advised to be kept all lowercase.
 
-#### Reserved keywords
+### Reserved keywords
+
+These values must exist so that the file can be parsed successfully.
+
+#### Root
 
 |Name|Type|Meaning|
 |---|---|---|
-|SPRITESHEET|property/string|base file name of the images|
-|EXTENSION|property/string|extension of the base file|
-|DELAY|variable: float|delay between frames, in seconds|
-|ROW|vareable: float|which row the animation goes in the spritesheet|
+|SPRITESHEET|properties: NAME_ONLY|Base file name of the images|
+|EXTENSION|properties: NAME_ONLY|Extension of the base file|
+
+#### Animation
+
+Remember that 'variables' are contained within 'properties'
+
+|Name|Type|Meaning|
+|---|---|---|
+|DELAY|variable: float|Delay between frames, in seconds|
+|ROW|variable: float|which row the animation goes in the spritesheet|
+|SKELETON|variable: string_pair|Which skeleton this animation uses
 
 ### Notes
 

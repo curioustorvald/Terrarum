@@ -3,13 +3,25 @@ package net.torvald.spriteassembler
 import java.io.InputStream
 import java.io.Reader
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 class ADProperties {
     private val javaProp = Properties()
 
     /** Every key is CAPITALISED */
     private val propTable = HashMap<String, List<ADPropertyObject>>()
+
+    /** list of bodyparts used by all the skeletons */
+    lateinit var bodyparts: List<String>; private set
+    /** properties that are being used as skeletons */
+    lateinit var skeletons: List<String>; private set
+    /** properties that are recognised as animations */
+    lateinit var animations: List<String>; private set
+
+    private val reservedProps = listOf("SPRITESHEET", "EXTENSION")
+    private val animMustContain = listOf("DELAY", "ROW", "SKELETON")
 
     constructor(reader: Reader) {
         javaProp.load(reader)
@@ -28,6 +40,38 @@ class ADProperties {
 
             propTable[propName.capitalize()] = propsList
         }
+
+        val bodyparts = HashSet<String>()
+        val skeletons = HashSet<String>()
+        val animations = ArrayList<String>()
+        // populate skeletons and animations
+        forEach { s, list ->
+            // linear search. If variable == "SKELETON", the 's' is likely an animation
+            // and thus, uses whatever the "input" used by the SKELETON is a skeleton
+            list.forEach {
+                if (it.variable == "SKELETON") {
+                    skeletons.add(it.input as String)
+                    animations.add(s)
+                }
+            }
+        }
+
+        // populate the bodyparts using skeletons
+        skeletons.forEach { skeletonName ->
+            val prop = get(skeletonName)
+
+            if (prop == null) throw Error("The skeleton definition for $skeletonName does not exist")
+
+            prop.forEach { bodypart ->
+                bodyparts.add(bodypart.variable)
+            }
+        }
+
+
+
+        this.bodyparts = bodyparts.toList().sorted()
+        this.skeletons = skeletons.toList().sorted()
+        this.animations = animations.sorted()
     }
 
     operator fun get(identifier: String) = propTable[identifier.capitalize()]
@@ -35,6 +79,7 @@ class ADProperties {
         get() = propTable.keys
     fun containsKey(key: String) = propTable.containsKey(key)
     fun forEach(predicate: (String, List<ADPropertyObject>) -> Unit) = propTable.forEach(predicate)
+
 }
 
 /**
@@ -56,6 +101,7 @@ class ADPropertyObject(propertyRaw: String) {
             else -> null
         }
     val type: ADPropertyType
+
 
     init {
         val propPair = propertyRaw.split(variableInputSepRegex)
@@ -115,6 +161,6 @@ class ADPropertyObject(propertyRaw: String) {
     }
 
     override fun toString(): String {
-        return "$variable ${input ?: ""}: $type"
+        return "$variable ${input ?: ""}: ${type.toString().toLowerCase()}"
     }
 }
