@@ -3,6 +3,8 @@ package net.torvald.spriteassembler;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +20,8 @@ public class SpriteAssemblerApp extends JFrame {
     private JTextPane panelCode = new JTextPane();
     private JTextArea statBar = new JTextArea("Null.");
 
+
+    
     public SpriteAssemblerApp() {
         JSplitPane panelDataView = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(panelProperties), new JScrollPane(panelBodypartsList));
 
@@ -26,6 +30,12 @@ public class SpriteAssemblerApp extends JFrame {
 
         JMenuBar menu = new JMenuBar();
         menu.add(new JMenu("File"));
+        menu.add(new JMenu("Parse")).addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                System.out.println("Hello");
+            }
+        });
         menu.add(new JMenu("Run"));
 
         this.setLayout(new BorderLayout());

@@ -101,7 +101,7 @@ class ADPropertyObject(propertyRaw: String) {
 
         /** example valid input: ```LEG_RIGHT 0,1``` */
         fun isADvariable(property: String) = variableInputSepRegex.containsMatchIn(property)
-        /** example valid input: ```sprites/test.tga``` */
+        /** example valid input: ```sprites/test``` */
         fun isADstring(property: String) = !isADvariable(property)
     }
 
