@@ -12,21 +12,25 @@ class ADLParsingTest {
         SPRITESHEET=sprites/test
         EXTENSION=.tga.gz
 
-        ANIM_RUN=DELAY 0.15;ROW 2
-        ANIM_RUN_BODYPARTS=HEAD;UPPER_TORSO;LOWER_TORSO;ARM_FWD_LEFT;ARM_FWD_RIGHT;LEG_LEFT;LEG_RIGHT
+        # note to self: don't implement skeleton hierarchy: there's too many exceptions
+        # besides, you have "ALL" key.
+
+        ! a skeleton also defines what body parts (images) be used.
+        SKELETON_STAND=HEAD 0,32;UPPER_TORSO 0,23;LOWER_TORSO 0,15;LEG_LEFT 2,7;LEG_RIGHT -2,7;FOOT_LEFT 2,2;FOOT_RIGHT -2,2;ARM_REST_LEFT 5,24;HAND_REST_LEFT 6,12;ARM_REST_RIGHT -7,23;HAND_REST_RIGHT -6,11
+
+        # skeleton_stand is used for testing purpose
+        ANIM_RUN=DELAY 0.15;ROW 2;SKELETON SKELETON_STAND
         ANIM_RUN_1=LEG_RIGHT 1,-1;LEG_LEFT -1,0
         ANIM_RUN_2=ALL 0,-1;LEG_RIGHT 0,1;LEG_LEFT 0,-1
         ANIM_RUN_3=LEG_RIGHT -1,0;LEG_LEFT 1,-1
         ANIM_RUN_4=ALL 0,-1;LEG_RIGHT 0,-1;LEG_LEFT 0,1
 
-        ANIM_IDLE=DELAY 2;ROW 1
-        ANIM_IDLE_BODYPARTS=HEAD;UPPER_TORSO;LOWER_TORSO;ARM_REST_LEFT;ARM_REST_RIGHT;LEG_LEFT;LEG_RIGHT
+        ANIM_IDLE=DELAY 2;ROW 1;SKELETON SKELETON_STAND
         ANIM_IDLE_1=
         ! ANIM_IDLE_1 will not make any transformation
         ANIM_IDLE_2=UPPER_TORSO 0,-1
 
-        ANIM_CROUCH=DELAY 1;ROW 3
-        ANIM_CROUCH_BODYPARTS=HEAD;UPPER_TORSO;LOWER_TORSO;ARM_FWD_LEFT;ARM_FWD_RIGHT;LEG_CROUCH_LEFT;LEG_CROUCH_RIGHT
+        ANIM_CROUCH=DELAY 1;ROW 3;SKELETON SKELETON_CROUCH
         ANIM_CROUCH_1=
     """.trimIndent()
 
