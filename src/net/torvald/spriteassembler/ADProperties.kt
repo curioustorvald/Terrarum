@@ -160,7 +160,9 @@ class ADPropertyObject(propertyRaw: String) {
         fun isADstring(property: String) = !isADvariable(property)
     }
 
-    data class Vector2i(var x: Int, var y: Int)
+    data class Vector2i(var x: Int, var y: Int) {
+        override fun toString() = "$x, $y"
+    }
 
     enum class ADPropertyType {
         NAME_ONLY,  // "sprite/test.tga" to nothing

@@ -101,8 +101,6 @@ class SpriteAssemblerApp : JFrame() {
         panelPartsList.add("Skeletons", JScrollPane(panelSkeletonsList))
 
         val panelDataView = JSplitPane(JSplitPane.VERTICAL_SPLIT, JScrollPane(panelProperties), panelPartsList)
-        panelProperties.preferredSize = Dimension(1, 300)
-        panelPartsList.preferredSize = Dimension(1, 200)
 
         val panelTop = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, JScrollPane(panelPreview), panelDataView)
 
