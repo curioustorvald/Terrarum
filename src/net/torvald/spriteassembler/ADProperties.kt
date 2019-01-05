@@ -15,6 +15,7 @@ class ADProperties {
 
     /** list of bodyparts used by all the skeletons */
     lateinit var bodyparts: List<String>; private set
+    lateinit var bodypartFiles: List<String>; private set
     /** properties that are being used as skeletons */
     lateinit var skeletons: List<String>; private set
     /** properties that are recognised as animations */
@@ -22,6 +23,9 @@ class ADProperties {
 
     private val reservedProps = listOf("SPRITESHEET", "EXTENSION")
     private val animMustContain = listOf("DELAY", "ROW", "SKELETON")
+
+    lateinit var baseFilename: String; private set
+    lateinit var extension: String; private set
 
     constructor(reader: Reader) {
         javaProp.load(reader)
@@ -40,6 +44,10 @@ class ADProperties {
 
             propTable[propName.capitalize()] = propsList
         }
+
+        // set reserved values for the animation: filename, extension
+        baseFilename = get("SPRITESHEET")!![0].variable
+        extension = get("EXTENSION")!![0].variable
 
         val bodyparts = HashSet<String>()
         val skeletons = HashSet<String>()
@@ -67,11 +75,10 @@ class ADProperties {
             }
         }
 
-
-
         this.bodyparts = bodyparts.toList().sorted()
         this.skeletons = skeletons.toList().sorted()
         this.animations = animations.sorted()
+        this.bodypartFiles = this.bodyparts.map { getFullFilename(it) }
     }
 
     operator fun get(identifier: String) = propTable[identifier.capitalize()]
@@ -80,6 +87,8 @@ class ADProperties {
     fun containsKey(key: String) = propTable.containsKey(key)
     fun forEach(predicate: (String, List<ADPropertyObject>) -> Unit) = propTable.forEach(predicate)
 
+    fun getFullFilename(partName: String) =
+            "${this.baseFilename}${partName.toLowerCase()}${this.extension}"
 }
 
 /**
