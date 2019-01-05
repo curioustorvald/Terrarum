@@ -1,6 +1,7 @@
 package net.torvald.spriteassembler
 
 import java.awt.BorderLayout
+import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -23,6 +24,7 @@ class SpriteAssemblerApp : JFrame() {
     private val panelProperties = JTree()
     private val panelAnimationsList = JList<String>()
     private val panelBodypartsList = JList<String>()
+    private val panelImageFilesList = JList<String>()
     private val panelSkeletonsList = JList<String>()
     private val panelCode = JTextPane()
     private val statBar = JTextArea("Null.")
@@ -85,20 +87,25 @@ class SpriteAssemblerApp : JFrame() {
 
         }
 
+        panelPreview.preferredSize = Dimension(512,512)
 
         panelAnimationsList.model = DefaultListModel()
         panelBodypartsList.model = DefaultListModel()
+        panelImageFilesList.model = DefaultListModel()
         panelSkeletonsList.model = DefaultListModel()
 
         val panelPartsList = JTabbedPane(JTabbedPane.TOP)
         panelPartsList.add("Animations", JScrollPane(panelAnimationsList))
         panelPartsList.add("Bodyparts", JScrollPane(panelBodypartsList))
+        panelPartsList.add("Images", JScrollPane(panelImageFilesList))
         panelPartsList.add("Skeletons", JScrollPane(panelSkeletonsList))
 
-
         val panelDataView = JSplitPane(JSplitPane.VERTICAL_SPLIT, JScrollPane(panelProperties), panelPartsList)
+        panelProperties.preferredSize = Dimension(1, 300)
+        panelPartsList.preferredSize = Dimension(1, 200)
 
         val panelTop = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, JScrollPane(panelPreview), panelDataView)
+
         val panelMain = JSplitPane(JSplitPane.VERTICAL_SPLIT, panelTop, JScrollPane(panelCode))
 
         val menu = JMenuBar()
@@ -132,8 +139,12 @@ class SpriteAssemblerApp : JFrame() {
                         (panelAnimationsList.model as DefaultListModel).addElement(it)
                     }
                     // populate bodyparts view
-                    adProperties!!.bodyparts.forEach {
-                        (panelBodypartsList.model as DefaultListModel).addElement(it)
+                    adProperties!!.bodyparts.forEach { partName ->
+                        (panelBodypartsList.model as DefaultListModel).addElement(partName)
+                    }
+                    // populate image file list view
+                    adProperties!!.bodypartFiles.forEach { partName ->
+                        (panelImageFilesList.model as DefaultListModel).addElement(partName)
                     }
                     // populate skeletons view
                     adProperties!!.skeletons.forEach {
