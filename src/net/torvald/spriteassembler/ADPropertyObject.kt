@@ -52,6 +52,7 @@ class ADPropertyObject(propertyRaw: String) {
         get() = when (type) {
             ADPropertyType.IVEC2 -> field!! as Vector2i
             ADPropertyType.FLOAT -> field!! as Float
+            ADPropertyType.STRING_PAIR -> field!! as String
             else -> null
         }
     val type: ADPropertyType
@@ -72,13 +73,14 @@ class ADPropertyObject(propertyRaw: String) {
                 input = toADfloat(inputStr)
             }
             else {
-                throw IllegalArgumentException("Malformed input, input property seems not ivec2, float nor string: $propertyRaw")
+                type = ADPropertyType.STRING_PAIR
+                input = inputStr
             }
         }
         else {
             variable = propertyRaw
             input = null
-            type = ADPropertyType.STRING
+            type = ADPropertyType.NAME_ONLY
         }
     }
 
@@ -106,7 +108,10 @@ class ADPropertyObject(propertyRaw: String) {
     data class Vector2i(var x: Int, var y: Int)
 
     enum class ADPropertyType {
-        STRING, IVEC2, FLOAT
+        NAME_ONLY,  // "sprite/test.tga" to nothing
+        IVEC2,      // "LEG_RIGHT" to (1,-1)
+        FLOAT,      // "DELAY" to 0.15
+        STRING_PAIR // "SKELETON" to "SKELETON_DEFAULT"
     }
 
     override fun toString(): String {
