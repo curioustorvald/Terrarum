@@ -134,7 +134,7 @@ class SpriteAssemblerApp : JFrame() {
 
                     // populate animations view
                     adProperties!!.animations.forEach {
-                        (panelAnimationsList.model as DefaultListModel).addElement(it)
+                        (panelAnimationsList.model as DefaultListModel).addElement("${it.value}")
                     }
                     // populate bodyparts view
                     adProperties!!.bodyparts.forEach { partName ->
@@ -146,7 +146,7 @@ class SpriteAssemblerApp : JFrame() {
                     }
                     // populate skeletons view
                     adProperties!!.skeletons.forEach {
-                        (panelSkeletonsList.model as DefaultListModel).addElement(it)
+                        (panelSkeletonsList.model as DefaultListModel).addElement("${it.value}")
                     }
                 }
                 catch (fehler: Throwable) {

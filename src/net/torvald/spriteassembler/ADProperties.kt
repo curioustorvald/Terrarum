@@ -3,9 +3,20 @@ package net.torvald.spriteassembler
 import java.io.InputStream
 import java.io.Reader
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
+
+data class Joint(val name: String, val position: ADPropertyObject.Vector2i) {
+    override fun toString() = "$name $position"
+}
+
+data class Skeleton(val name: String, val joints: List<Joint>) {
+    override fun toString() = "$name=$joints"
+}
+
+data class Animation(val name: String, val delay: Float, val row: Int, val skeleton: Skeleton) {
+    override fun toString() = "$name delay: $delay, row: $row, skeleton: ${skeleton.name}"
+}
 
 class ADProperties {
     private val javaProp = Properties()
@@ -17,9 +28,9 @@ class ADProperties {
     lateinit var bodyparts: List<String>; private set
     lateinit var bodypartFiles: List<String>; private set
     /** properties that are being used as skeletons */
-    lateinit var skeletons: List<String>; private set
+    lateinit var skeletons: HashMap<String, Skeleton>; private set
     /** properties that are recognised as animations */
-    lateinit var animations: List<String>; private set
+    lateinit var animations: HashMap<String, Animation>; private set
 
     private val reservedProps = listOf("SPRITESHEET", "EXTENSION")
     private val animMustContain = listOf("DELAY", "ROW", "SKELETON")
@@ -42,7 +53,7 @@ class ADProperties {
             val propsStr = javaProp.getProperty(propName as String)
             val propsList = propsStr.split(';').map { ADPropertyObject(it) }
 
-            propTable[propName.capitalize()] = propsList
+            propTable[propName.toUpperCase()] = propsList
         }
 
         // set reserved values for the animation: filename, extension
@@ -50,38 +61,46 @@ class ADProperties {
         extension = get("EXTENSION")!![0].variable
 
         val bodyparts = HashSet<String>()
-        val skeletons = HashSet<String>()
-        val animations = ArrayList<String>()
+        val skeletons = HashMap<String, Skeleton>()
+        val animations = HashMap<String, Animation>()
         // populate skeletons and animations
         forEach { s, list ->
-            // linear search. If variable == "SKELETON", the 's' is likely an animation
+            // Map-ify. If it has variable == "SKELETON", the 's' is likely an animation
             // and thus, uses whatever the "input" used by the SKELETON is a skeleton
+            val propsHashMap = HashMap<String, Any?>()
             list.forEach {
-                if (it.variable == "SKELETON") {
-                    skeletons.add(it.input as String)
-                    animations.add(s)
-                }
+                propsHashMap[it.variable.toUpperCase()] = it.input
+            }
+
+            // if it is indeed anim, populate animations list
+            if (propsHashMap.containsKey("SKELETON")) {
+                val skeletonName = propsHashMap["SKELETON"] as String
+                val skeletonDef = get(skeletonName) ?: throw Error("Skeleton definition for $skeletonName not found")
+
+                skeletons.put(skeletonName, Skeleton(skeletonName, skeletonDef.toJoints()))
+                animations.put(s, Animation(
+                        s,
+                        propsHashMap["DELAY"] as Float,
+                        (propsHashMap["ROW"] as Float).toInt(),
+                        Skeleton(skeletonName, skeletonDef.toJoints())
+                ))
             }
         }
 
         // populate the bodyparts using skeletons
-        skeletons.forEach { skeletonName ->
-            val prop = get(skeletonName)
-
-            if (prop == null) throw Error("The skeleton definition for $skeletonName does not exist")
-
-            prop.forEach { bodypart ->
-                bodyparts.add(bodypart.variable)
+        skeletons.forEach { (_, prop: Skeleton) ->
+            prop.joints.forEach {
+                bodyparts.add(it.name)
             }
         }
 
         this.bodyparts = bodyparts.toList().sorted()
-        this.skeletons = skeletons.toList().sorted()
-        this.animations = animations.sorted()
+        this.skeletons = skeletons
+        this.animations = animations
         this.bodypartFiles = this.bodyparts.map { getFullFilename(it) }
     }
 
-    operator fun get(identifier: String) = propTable[identifier.capitalize()]
+    operator fun get(identifier: String) = propTable[identifier.toUpperCase()]
     val keys
         get() = propTable.keys
     fun containsKey(key: String) = propTable.containsKey(key)
@@ -89,6 +108,16 @@ class ADProperties {
 
     fun getFullFilename(partName: String) =
             "${this.baseFilename}${partName.toLowerCase()}${this.extension}"
+
+    fun getAnimByFrameName(frameName: String): Animation {
+        val animName = frameName.substring(0 until frameName.lastIndexOf('_'))
+        return animations[animName]!!
+    }
+
+    private fun List<ADPropertyObject>.toJoints() = List(this.size) {
+        Joint(this[it].variable, this[it].input!! as ADPropertyObject.Vector2i)
+    }
+
 }
 
 /**
