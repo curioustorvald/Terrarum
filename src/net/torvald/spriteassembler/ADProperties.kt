@@ -261,6 +261,7 @@ class ADPropertyObject(propertyRaw: String) {
         override fun toString() = "($x, $y)"
 
         operator fun plus(other: Vector2i) = Vector2i(this.x + other.x, this.y + other.y)
+        operator fun minus(other: Vector2i) = Vector2i(this.x - other.x, this.y - other.y)
 
         fun invertY() = Vector2i(this.x, -this.y)
     }

@@ -1,9 +1,8 @@
 package net.torvald.spriteassembler
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Pixmap
 import net.torvald.terrarum.linearSearch
-import java.awt.Image
-import java.awt.Toolkit
-import java.awt.image.BufferedImage
 import java.io.File
 
 /**
@@ -11,29 +10,28 @@ import java.io.File
  *
  * Created by minjaesong on 2019-01-06.
  */
-object AssembleFrameAWT {
+object AssembleFramePixmap {
 
     // FIXME fuck this I'll use GDX
 
-    operator fun invoke(properties: ADProperties, frameName: String, assembleConfig: AssembleConfig = AssembleConfig()): BufferedImage {
+    operator fun invoke(properties: ADProperties, frameName: String, assembleConfig: AssembleConfig = AssembleConfig()): Pixmap {
         val theAnim = properties.getAnimByFrameName(frameName)
         val skeleton = theAnim.skeleton.joints.reversed()
         val transforms = properties.getTransform(frameName)
-        val bodyparts = Array<Image?>(skeleton.size) {
+        val bodyparts = Array<Pixmap?>(skeleton.size) {
             // if file does not exist, null it
             val file = File("assets/" + properties.toFilename(skeleton[it].name))
 
             //printdbg(this, "Loading file ${file.absolutePath}, exists: ${file.exists()}")
 
-            val toolkit = Toolkit.getDefaultToolkit()
             /*return*/if (file.exists()) {
-                toolkit.getImage(file.absolutePath)
+                Pixmap(Gdx.files.internal(file.path))
             }
             else {
                 null
             }
         }
-        val canvas = BufferedImage(assembleConfig.fw, assembleConfig.fh, BufferedImage.TYPE_4BYTE_ABGR)
+        val canvas = Pixmap(assembleConfig.fw, assembleConfig.fh, Pixmap.Format.RGBA8888)
 
 
         println("Frame name: $frameName")
@@ -47,16 +45,18 @@ object AssembleFrameAWT {
 
 
         // actually draw
-        val g = canvas.graphics
+        canvas.blending = Pixmap.Blending.SourceOver
 
         bodyparts.forEachIndexed { index, image ->
             if (image != null) {
-                val drawPos = transformList[index].second.invertY() + assembleConfig.origin
-                g.drawImage(image, drawPos.x, drawPos.y, null)
+                val imgCentre = AssembleFrameBase.getCentreOf(image)
+                val drawPos = transformList[index].second.invertY() + assembleConfig.origin - imgCentre
+
+                canvas.drawPixmap(image, drawPos.x, drawPos.y)
+
+                image.dispose()
             }
         }
-
-        canvas.flush()
 
         return canvas
     }
@@ -68,7 +68,7 @@ object AssembleFrameAWT {
  * @param fh Frame Height
  * @param origin Int vector of origin point, (0,0) being TOP-LEFT
  */
-data class AssembleConfig(val fw: Int = 48, val fh: Int = 56, val origin: ADPropertyObject.Vector2i = ADPropertyObject.Vector2i(29, 58))
+data class AssembleConfig(val fw: Int = 48, val fh: Int = 56, val origin: ADPropertyObject.Vector2i = ADPropertyObject.Vector2i(29, fh - 1))
 
 object AssembleFrameBase {
     /**
@@ -94,4 +94,6 @@ object AssembleFrameBase {
 
         return transformOutput.toList()
     }
+
+    fun getCentreOf(pixmap: Pixmap) = ADPropertyObject.Vector2i(pixmap.width / 2, pixmap.height / 2)
 }

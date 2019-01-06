@@ -9,17 +9,13 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.inUse
 import java.awt.BorderLayout
 import java.awt.Font
-import java.awt.Graphics
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.awt.image.BufferedImage
-import java.io.File
-import java.io.IOException
 import java.io.StringReader
 import java.util.*
-import javax.imageio.ImageIO
 import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
@@ -84,7 +80,8 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                                "STAT_LOAD_SUCCESSFUL=File loaded successfully.\n" +
                                "ERROR_INTERNAL=Something went wrong.\n" +
                                "ERROR_PARSE_FAIL=Parsing failed\n" +
-                               "SPRITE_DEF_LOAD_SUCCESSFUL=Sprite definition loaded."
+                               "SPRITE_DEF_LOAD_SUCCESSFUL=Sprite definition loaded.\n" +
+                               "SPRITE_ASSEMBLE_SUCCESSFUL=Sprite assembled."
 
     init {
         // setup application properties //
@@ -145,7 +142,9 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                     // clean the data views
                     panelAnimationsList.model = DefaultListModel()
                     panelBodypartsList.model = DefaultListModel()
+                    panelImageFilesList.model = DefaultListModel()
                     panelSkeletonsList.model = DefaultListModel()
+                    panelTransformsList.model = DefaultListModel()
 
                     // populate animations view
                     adProperties.animations.forEach {
@@ -178,8 +177,8 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
         menu.add(JMenu("Run")).addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 try {
-                    val image = AssembleFrameAWT(adProperties, "ANIM_RUN_1")
-
+                    gdxWindow.requestAssemblyTest(adProperties, "ANIM_IDLE_2")
+                    statBar.text = lang.getProperty("SPRITE_ASSEMBLE_SUCCESSFUL")
                 }
                 catch (fehler: Throwable) {
                     displayError("ERROR_PARSE_FAIL", fehler)
@@ -220,36 +219,11 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
     }
 }
 
-internal class ImagePanel : JPanel() {
-
-    private var image: BufferedImage? = null
-
-    init {
-        try {
-            image = ImageIO.read(File("image name and path"))
-        }
-        catch (ex: IOException) {
-            // handle exception...
-        }
-
-    }
-
-    fun setImage(image: BufferedImage) {
-        this.image = image
-    }
-
-    override fun paintComponent(g: Graphics) {
-        super.paintComponent(g)
-        g.drawImage(image, 0, 0, this) // see javadoc for more info on the parameters
-    }
-
-}
-
 class SpriteAssemblerPreview: Game() {
     private lateinit var batch: SpriteBatch
 
     private lateinit var renderTexture: Texture
-    var image: Pixmap? = null
+    private var image: Pixmap? = null
         set(value) {
             renderTexture.dispose()
             field?.dispose()
@@ -264,15 +238,43 @@ class SpriteAssemblerPreview: Game() {
         renderTexture = Texture(1, 1, Pixmap.Format.RGBA8888)
     }
 
-    val bgCol = Color(.62f,.79f,1f,1f)
+    private val bgCol = Color(.62f,.79f,1f,1f)
+
+    private var doAssemble = false
+    private lateinit var assembleProp: ADProperties
+    private lateinit var assembleFrameName: String
 
     override fun render() {
+        if (doAssemble) {
+            // assembly requires GL context
+            doAssemble = false
+            assembleImageTest(assembleProp, assembleFrameName)
+        }
+
+
         Gdx.gl.glClearColor(.62f,.79f,1f,1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+
+
+        batch.inUse {
+            batch.color = Color.WHITE
+            batch.draw(renderTexture, 0f, 0f)
+        }
     }
+
+    private fun assembleImageTest(prop: ADProperties, frameName: String) {
+        image = AssembleFramePixmap(prop, frameName)
+    }
+
+    fun requestAssemblyTest(prop: ADProperties, frameName: String) {
+        doAssemble = true
+        assembleProp = prop
+        assembleFrameName = frameName
+    }
+
 }
 
 fun main(args: Array<String>) {
