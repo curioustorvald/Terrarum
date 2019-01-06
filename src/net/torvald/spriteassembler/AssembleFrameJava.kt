@@ -13,7 +13,9 @@ import java.io.File
  */
 object AssembleFrameAWT {
 
-    operator fun invoke(properties: ADProperties, frameName: String, assembleConfig: AssembleConfig = AssembleConfig()) {
+    // FIXME fuck this I'll use GDX
+
+    operator fun invoke(properties: ADProperties, frameName: String, assembleConfig: AssembleConfig = AssembleConfig()): BufferedImage {
         val theAnim = properties.getAnimByFrameName(frameName)
         val skeleton = theAnim.skeleton.joints.reversed()
         val transforms = properties.getTransform(frameName)
@@ -38,9 +40,25 @@ object AssembleFrameAWT {
         transforms.forEach { println(it) }
         println("==========================")
         println("Transformed skeleton:")
-        AssembleFrameBase.makeTransformList(skeleton, transforms).forEach { (name, transform) ->
+        val transformList = AssembleFrameBase.makeTransformList(skeleton, transforms)
+        transformList.forEach { (name, transform) ->
             println("$name transformedOut: $transform")
         }
+
+
+        // actually draw
+        val g = canvas.graphics
+
+        bodyparts.forEachIndexed { index, image ->
+            if (image != null) {
+                val drawPos = transformList[index].second.invertY() + assembleConfig.origin
+                g.drawImage(image, drawPos.x, drawPos.y, null)
+            }
+        }
+
+        canvas.flush()
+
+        return canvas
     }
 
 }
@@ -48,10 +66,9 @@ object AssembleFrameAWT {
 /**
  * @param fw Frame Width
  * @param fh Frame Height
- * @param ox Origin-X, leftmost point being zero
- * @param oy Origin-Y, bottommost point being zero
+ * @param origin Int vector of origin point, (0,0) being TOP-LEFT
  */
-data class AssembleConfig(val fw: Int = 48, val fh: Int = 56, val ox: Int = 29, val oy: Int = 0)
+data class AssembleConfig(val fw: Int = 48, val fh: Int = 56, val origin: ADPropertyObject.Vector2i = ADPropertyObject.Vector2i(29, 58))
 
 object AssembleFrameBase {
     /**
@@ -69,7 +86,7 @@ object AssembleFrameBase {
 
         // process transform queue
         transforms.forEach { transform ->
-            // TODO when the transform.joint.name == ADProperties.ALL_JOINT_SELECT_KEY
+            // TODO when the transform.joint.name == ADProperties.ALL_JOINT_SELECT_KEY]]
 
             val jointToMoveIndex = transformOutput.linearSearch { it.first == transform.joint.name }!!
             transformOutput[jointToMoveIndex] = transformOutput[jointToMoveIndex].first to transform.getTransformVector()

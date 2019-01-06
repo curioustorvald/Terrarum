@@ -1,7 +1,16 @@
 package net.torvald.spriteassembler
 
+import com.badlogic.gdx.Game
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import java.awt.BorderLayout
-import java.awt.Dimension
+import java.awt.Font
 import java.awt.Graphics
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -18,9 +27,8 @@ import javax.swing.tree.DefaultTreeModel
 /**
  * Created by minjaesong on 2019-01-05.
  */
-class SpriteAssemblerApp : JFrame() {
+class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
 
-    private val panelPreview = ImagePanel()
     private val panelProperties = JTree()
     private val panelAnimationsList = JList<String>()
     private val panelBodypartsList = JList<String>()
@@ -88,7 +96,7 @@ class SpriteAssemblerApp : JFrame() {
 
         }
 
-        panelPreview.preferredSize = Dimension(512,512)
+        panelCode.font = Font(Font.MONOSPACED, Font.PLAIN, 11)
 
         panelAnimationsList.model = DefaultListModel()
         panelBodypartsList.model = DefaultListModel()
@@ -104,10 +112,14 @@ class SpriteAssemblerApp : JFrame() {
         panelPartsList.add("Transforms", JScrollPane(panelTransformsList))
 
         val panelDataView = JSplitPane(JSplitPane.VERTICAL_SPLIT, JScrollPane(panelProperties), panelPartsList)
+        panelDataView.resizeWeight = 0.333
 
-        val panelTop = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, JScrollPane(panelPreview), panelDataView)
+        // to disable text wrap
+        //val panelCodeNoWrap = JPanel(BorderLayout())
+        //panelCodeNoWrap.add(panelCode)
 
-        val panelMain = JSplitPane(JSplitPane.VERTICAL_SPLIT, panelTop, JScrollPane(panelCode))
+        val panelMain = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, JScrollPane(panelCode), panelDataView)
+        panelMain.resizeWeight = 0.666
 
         val menu = JMenuBar()
         menu.add(JMenu("File"))
@@ -163,7 +175,18 @@ class SpriteAssemblerApp : JFrame() {
 
             }
         })
-        menu.add(JMenu("Run"))
+        menu.add(JMenu("Run")).addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent?) {
+                try {
+                    val image = AssembleFrameAWT(adProperties, "ANIM_RUN_1")
+
+                }
+                catch (fehler: Throwable) {
+                    displayError("ERROR_PARSE_FAIL", fehler)
+                    fehler.printStackTrace()
+                }
+            }
+        })
 
         this.layout = BorderLayout()
         this.add(menu, BorderLayout.NORTH)
@@ -195,13 +218,6 @@ class SpriteAssemblerApp : JFrame() {
                 "Cancel"
         )
     }
-
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            SpriteAssemblerApp()
-        }
-    }
 }
 
 internal class ImagePanel : JPanel() {
@@ -218,9 +234,57 @@ internal class ImagePanel : JPanel() {
 
     }
 
+    fun setImage(image: BufferedImage) {
+        this.image = image
+    }
+
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
         g.drawImage(image, 0, 0, this) // see javadoc for more info on the parameters
     }
 
+}
+
+class SpriteAssemblerPreview: Game() {
+    private lateinit var batch: SpriteBatch
+
+    private lateinit var renderTexture: Texture
+    var image: Pixmap? = null
+        set(value) {
+            renderTexture.dispose()
+            field?.dispose()
+
+            field = value
+            renderTexture = Texture(field)
+        }
+
+    override fun create() {
+        Gdx.graphics.setTitle("Sprite Assembler Preview")
+        batch = SpriteBatch()
+        renderTexture = Texture(1, 1, Pixmap.Format.RGBA8888)
+    }
+
+    val bgCol = Color(.62f,.79f,1f,1f)
+
+    override fun render() {
+        Gdx.gl.glClearColor(.62f,.79f,1f,1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    }
+}
+
+fun main(args: Array<String>) {
+    val appConfig = LwjglApplicationConfiguration()
+    appConfig.resizable = true
+    appConfig.width = 512
+    appConfig.height = 512
+    appConfig.foregroundFPS = 5
+    appConfig.backgroundFPS = 5
+
+    val gdxWindow = SpriteAssemblerPreview()
+
+    LwjglApplication(gdxWindow, appConfig)
+    SpriteAssemblerApp(gdxWindow)
 }
