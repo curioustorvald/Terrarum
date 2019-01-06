@@ -41,9 +41,6 @@ class ADLParsingTest {
         ANIM_IDLE_1=
         ! ANIM_IDLE_1 will not make any transformation
         ANIM_IDLE_2=UPPER_TORSO 0,-1
-
-        ANIM_CROUCH=DELAY 1;ROW 3;SKELETON SKELETON_CROUCH
-        ANIM_CROUCH_1=
     """.trimIndent()
 
     operator fun invoke() {

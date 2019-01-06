@@ -9,7 +9,14 @@ object AssembleFrameGdxPixmap {
 
     operator fun invoke(properties: ADProperties, frameName: String) {
         val theAnim = properties.getAnimByFrameName(frameName)
-        val skeleton = theAnim.skeleton
+        val skeleton = theAnim.skeleton.joints
+
+        println("Test")
+
+        // test print required body part filename
+        skeleton.reversed().forEach {
+            println(properties.toFilename(it.name))
+        }
     }
 
 }
