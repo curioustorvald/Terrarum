@@ -2,6 +2,7 @@ package net.torvald.spriteassembler
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Pixmap
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.linearSearch
 import java.io.File
 
@@ -10,11 +11,26 @@ import java.io.File
  *
  * Created by minjaesong on 2019-01-06.
  */
-object AssembleFramePixmap {
+object AssembleSheetPixmap {
 
-    // FIXME fuck this I'll use GDX
+    operator fun invoke(properties: ADProperties, assembleConfig: AssembleConfig = AssembleConfig()): Pixmap {
+        val canvas = Pixmap(properties.cols * assembleConfig.fw, properties.rows * assembleConfig.fh, Pixmap.Format.RGBA8888)
+        canvas.blending = Pixmap.Blending.SourceOver
 
-    operator fun invoke(properties: ADProperties, frameName: String, assembleConfig: AssembleConfig = AssembleConfig()): Pixmap {
+
+        // actually draw
+        properties.transforms.forEach { t, _ ->
+            drawThisFrame(t, canvas, properties, assembleConfig)
+        }
+
+        return canvas
+    }
+
+    private fun drawThisFrame(frameName: String,
+                              canvas: Pixmap,
+                              properties: ADProperties,
+                              assembleConfig: AssembleConfig
+    ) {
         val theAnim = properties.getAnimByFrameName(frameName)
         val skeleton = theAnim.skeleton.joints.reversed()
         val transforms = properties.getTransform(frameName)
@@ -25,40 +41,42 @@ object AssembleFramePixmap {
             //printdbg(this, "Loading file ${file.absolutePath}, exists: ${file.exists()}")
 
             /*return*/if (file.exists()) {
-                Pixmap(Gdx.files.internal(file.path))
+            Pixmap(Gdx.files.internal(file.path))
             }
             else {
                 null
             }
         }
-        val canvas = Pixmap(assembleConfig.fw, assembleConfig.fh, Pixmap.Format.RGBA8888)
-
         val transformList = AssembleFrameBase.makeTransformList(skeleton, transforms)
 
-        /*println("Frame name: $frameName")
-        transforms.forEach { println(it) }
-        println("==========================")
-        println("Transformed skeleton:")
-        transformList.forEach { (name, transform) ->
-            println("$name transformedOut: $transform")
-        }*/
+        val animRow = theAnim.row
+        val animFrame = properties.getFrameNumberFromName(frameName)
 
+        AppLoader.printdbg(this, "Frame to draw: $frameName (R$animRow C$animFrame)")
 
-        // actually draw
-        canvas.blending = Pixmap.Blending.SourceOver
+        drawFrame(animRow, animFrame, canvas, bodyparts, transformList, assembleConfig)
+    }
 
+    private fun drawFrame(row: Int, column: Int,
+                          canvas: Pixmap,
+                          bodyparts: Array<Pixmap?>,
+                          transformList: List<Pair<String, ADPropertyObject.Vector2i>>,
+                          assembleConfig: AssembleConfig
+    ) {
         bodyparts.forEachIndexed { index, image ->
             if (image != null) {
                 val imgCentre = AssembleFrameBase.getCentreOf(image)
                 val drawPos = transformList[index].second.invertY() + assembleConfig.origin - imgCentre
 
-                canvas.drawPixmap(image, drawPos.x, drawPos.y)
+                canvas.drawPixmap(
+                        image,
+                        (column - 1) * assembleConfig.fw + drawPos.x,
+                        (row - 1) * assembleConfig.fh + drawPos.y
+                )
 
                 image.dispose()
             }
         }
-
-        return canvas
     }
 
 }

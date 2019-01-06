@@ -50,6 +50,9 @@ class ADProperties {
 
     private val ALL_JOINT = Joint(ALL_JOINT_SELECT_KEY, ADPropertyObject.Vector2i(0, 0))
 
+    var rows = -1; private set
+    var cols = -1; private set
+
     companion object {
         const val ALL_JOINT_SELECT_KEY = "ALL"
     }
@@ -76,6 +79,8 @@ class ADProperties {
         baseFilename = get("SPRITESHEET")[0].variable
         extension = get("EXTENSION")[0].variable
 
+        var maxColFinder = -1
+        var maxRowFinder = -1
         val bodyparts = HashSet<String>()
         val skeletons = HashMap<String, Skeleton>()
         val animations = HashMap<String, Animation>()
@@ -85,7 +90,7 @@ class ADProperties {
         propTable.keys.forEach {
             if (animFrameSuffixRegex.containsMatchIn(it)) {
                 val animName = getAnimNameFromFrame(it)
-                val frameNumber = it.drop(animName.length + 1).toInt()
+                val frameNumber = getFrameNumberFromName(it)
 
                 // if animFrames does not have our entry, add it.
                 // otherwise, max() against the existing value
@@ -95,6 +100,8 @@ class ADProperties {
                 else {
                     animFrames[animName] = frameNumber
                 }
+
+                maxColFinder = maxOf(maxColFinder, frameNumber)
             }
         }
         // populate skeletons and animations
@@ -119,6 +126,8 @@ class ADProperties {
                         animFrames[s]!!,
                         Skeleton(skeletonName, skeletonDef.toJoints())
                 )
+
+                maxRowFinder = maxOf(maxRowFinder, animations[s]!!.row)
             }
         }
 
@@ -164,6 +173,9 @@ class ADProperties {
         this.animations = animations
         this.bodypartFiles = this.bodyparts.map { toFilename(it) }
         this.transforms = transforms
+
+        cols = maxColFinder
+        rows = maxRowFinder
     }
 
     operator fun get(identifier: String) = propTable[identifier.toUpperCase()]!!
@@ -176,6 +188,8 @@ class ADProperties {
             "${this.baseFilename}${partName.toLowerCase()}${this.extension}"
 
     fun getAnimByFrameName(frameName: String) = animations[getAnimNameFromFrame(frameName)]!!
+    fun getFrameNumberFromName(frameName: String) = frameName.substring(frameName.lastIndexOf('_') + 1 until frameName.length).toInt()
+
     fun getSkeleton(name: String) = skeletons[name]!!
     fun getTransform(name: String) = transforms[name]!!
 

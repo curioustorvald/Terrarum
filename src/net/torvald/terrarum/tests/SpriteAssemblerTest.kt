@@ -1,7 +1,7 @@
 package net.torvald.terrarum.tests
 
 import net.torvald.spriteassembler.ADProperties
-import net.torvald.spriteassembler.AssembleFramePixmap
+import net.torvald.spriteassembler.AssembleSheetPixmap
 import java.io.StringReader
 
 /**
@@ -11,7 +11,7 @@ class SpriteAssemblerTest {
 
     operator fun invoke() {
         val properties = ADProperties(StringReader(ADLParsingTest().TEST_STR))
-        AssembleFramePixmap.invoke(properties, "ANIM_RUN_1")
+        AssembleSheetPixmap.invoke(properties)
     }
 
 }
