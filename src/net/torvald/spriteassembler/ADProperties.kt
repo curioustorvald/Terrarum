@@ -14,8 +14,8 @@ data class Skeleton(val name: String, val joints: List<Joint>) {
     override fun toString() = "$name=$joints"
 }
 
-data class Animation(val name: String, val delay: Float, val row: Int, val skeleton: Skeleton) {
-    override fun toString() = "$name delay: $delay, row: $row, skeleton: ${skeleton.name}"
+data class Animation(val name: String, val delay: Float, val row: Int, val frames: Int, val skeleton: Skeleton) {
+    override fun toString() = "$name delay: $delay, row: $row, frames: $frames, skeleton: ${skeleton.name}"
 }
 
 class ADProperties {
@@ -37,6 +37,8 @@ class ADProperties {
 
     lateinit var baseFilename: String; private set
     lateinit var extension: String; private set
+
+    private val animFrameSuffixRegex = Regex("""_[0-9]+""")
 
     constructor(reader: Reader) {
         javaProp.load(reader)
@@ -63,6 +65,23 @@ class ADProperties {
         val bodyparts = HashSet<String>()
         val skeletons = HashMap<String, Skeleton>()
         val animations = HashMap<String, Animation>()
+        val animFrames = HashMap<String, Int>()
+        // scan every props, write down anim frames for later use
+        propTable.keys.forEach {
+            if (animFrameSuffixRegex.containsMatchIn(it)) {
+                val animName = getAnimNameFromFrame(it)
+                val frameNumber = it.drop(animName.length + 1).toInt()
+
+                // if animFrames does not have our entry, add it.
+                // otherwise, max() against the existing value
+                if (animFrames.containsKey(animName)) {
+                    animFrames[animName] = maxOf(animFrames[animName]!!, frameNumber)
+                }
+                else {
+                    animFrames[animName] = frameNumber
+                }
+            }
+        }
         // populate skeletons and animations
         forEach { s, list ->
             // Map-ify. If it has variable == "SKELETON", the 's' is likely an animation
@@ -82,6 +101,7 @@ class ADProperties {
                         s,
                         propsHashMap["DELAY"] as Float,
                         (propsHashMap["ROW"] as Float).toInt(),
+                        animFrames[s]!!,
                         Skeleton(skeletonName, skeletonDef.toJoints())
                 ))
             }
@@ -97,7 +117,7 @@ class ADProperties {
         this.bodyparts = bodyparts.toList().sorted()
         this.skeletons = skeletons
         this.animations = animations
-        this.bodypartFiles = this.bodyparts.map { getFullFilename(it) }
+        this.bodypartFiles = this.bodyparts.map { toFilename(it) }
     }
 
     operator fun get(identifier: String) = propTable[identifier.toUpperCase()]
@@ -106,13 +126,14 @@ class ADProperties {
     fun containsKey(key: String) = propTable.containsKey(key)
     fun forEach(predicate: (String, List<ADPropertyObject>) -> Unit) = propTable.forEach(predicate)
 
-    fun getFullFilename(partName: String) =
+    fun toFilename(partName: String) =
             "${this.baseFilename}${partName.toLowerCase()}${this.extension}"
 
     fun getAnimByFrameName(frameName: String): Animation {
-        val animName = frameName.substring(0 until frameName.lastIndexOf('_'))
-        return animations[animName]!!
+        return animations[getAnimNameFromFrame(frameName)]!!
     }
+
+    private fun getAnimNameFromFrame(s: String) = s.substring(0 until s.lastIndexOf('_'))
 
     private fun List<ADPropertyObject>.toJoints() = List(this.size) {
         Joint(this[it].variable, this[it].input!! as ADPropertyObject.Vector2i)
