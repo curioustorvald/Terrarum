@@ -31,6 +31,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
     private val panelImageFilesList = JList<String>()
     private val panelSkeletonsList = JList<String>()
     private val panelTransformsList = JList<String>()
+    private val panelStatList = JList<String>()
     private val panelCode = JTextPane()
     private val statBar = JTextArea("Null.")
 
@@ -100,6 +101,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
         panelImageFilesList.model = DefaultListModel()
         panelSkeletonsList.model = DefaultListModel()
         panelTransformsList.model = DefaultListModel()
+        panelStatList.model = DefaultListModel()
 
         val panelPartsList = JTabbedPane(JTabbedPane.TOP)
         panelPartsList.add("Animations", JScrollPane(panelAnimationsList))
@@ -107,6 +109,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
         panelPartsList.add("Images", JScrollPane(panelImageFilesList))
         panelPartsList.add("Skeletons", JScrollPane(panelSkeletonsList))
         panelPartsList.add("Transforms", JScrollPane(panelTransformsList))
+        panelPartsList.add("Stats", JScrollPane(panelStatList))
 
         val panelDataView = JSplitPane(JSplitPane.VERTICAL_SPLIT, JScrollPane(panelProperties), panelPartsList)
         panelDataView.resizeWeight = 0.333
@@ -145,6 +148,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                     panelImageFilesList.model = DefaultListModel()
                     panelSkeletonsList.model = DefaultListModel()
                     panelTransformsList.model = DefaultListModel()
+                    panelStatList.model = DefaultListModel()
 
                     // populate animations view
                     adProperties.animations.forEach {
@@ -166,6 +170,9 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                     adProperties.transforms.forEach {
                         (panelTransformsList.model as DefaultListModel).addElement("$it")
                     }
+                    // populate stats
+                    (panelStatList.model as DefaultListModel).addElement("Spritesheet rows: ${adProperties.rows}")
+                    (panelStatList.model as DefaultListModel).addElement("Spritesheet columns: ${adProperties.cols}")
                 }
                 catch (fehler: Throwable) {
                     displayError("ERROR_PARSE_FAIL", fehler)
@@ -177,7 +184,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
         menu.add(JMenu("Run")).addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 try {
-                    gdxWindow.requestAssemblyTest(adProperties, "ANIM_IDLE_2")
+                    gdxWindow.requestAssemblyTest(adProperties)
                     statBar.text = lang.getProperty("SPRITE_ASSEMBLE_SUCCESSFUL")
                 }
                 catch (fehler: Throwable) {
@@ -242,13 +249,12 @@ class SpriteAssemblerPreview: Game() {
 
     private var doAssemble = false
     private lateinit var assembleProp: ADProperties
-    private lateinit var assembleFrameName: String
 
     override fun render() {
         if (doAssemble) {
             // assembly requires GL context
             doAssemble = false
-            assembleImageTest(assembleProp, assembleFrameName)
+            assembleImage(assembleProp)
         }
 
 
@@ -265,14 +271,13 @@ class SpriteAssemblerPreview: Game() {
         }
     }
 
-    private fun assembleImageTest(prop: ADProperties, frameName: String) {
-        image = AssembleFramePixmap(prop, frameName)
+    private fun assembleImage(prop: ADProperties) {
+        image = AssembleSheetPixmap(prop)
     }
 
-    fun requestAssemblyTest(prop: ADProperties, frameName: String) {
+    fun requestAssemblyTest(prop: ADProperties) {
         doAssemble = true
         assembleProp = prop
-        assembleFrameName = frameName
     }
 
 }
