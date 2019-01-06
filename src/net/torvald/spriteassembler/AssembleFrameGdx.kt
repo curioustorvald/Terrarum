@@ -33,15 +33,15 @@ object AssembleFramePixmap {
         }
         val canvas = Pixmap(assembleConfig.fw, assembleConfig.fh, Pixmap.Format.RGBA8888)
 
+        val transformList = AssembleFrameBase.makeTransformList(skeleton, transforms)
 
-        println("Frame name: $frameName")
+        /*println("Frame name: $frameName")
         transforms.forEach { println(it) }
         println("==========================")
         println("Transformed skeleton:")
-        val transformList = AssembleFrameBase.makeTransformList(skeleton, transforms)
         transformList.forEach { (name, transform) ->
             println("$name transformedOut: $transform")
-        }
+        }*/
 
 
         // actually draw
@@ -79,20 +79,27 @@ object AssembleFrameBase {
      */
     fun makeTransformList(joints: List<Joint>, transforms: List<Transform>): List<Pair<String, ADPropertyObject.Vector2i>> {
         // make our mutable list
-        val transformOutput = ArrayList<Pair<String, ADPropertyObject.Vector2i>>()
+        val out = ArrayList<Pair<String, ADPropertyObject.Vector2i>>()
         joints.forEach {
-            transformOutput.add(it.name to it.position)
+            out.add(it.name to it.position)
         }
 
         // process transform queue
         transforms.forEach { transform ->
-            // TODO when the transform.joint.name == ADProperties.ALL_JOINT_SELECT_KEY]]
-
-            val jointToMoveIndex = transformOutput.linearSearch { it.first == transform.joint.name }!!
-            transformOutput[jointToMoveIndex] = transformOutput[jointToMoveIndex].first to transform.getTransformVector()
+            if (transform.joint.name == ADProperties.ALL_JOINT_SELECT_KEY) {
+                // transform applies to all joints
+                for (c in 0 until out.size) {
+                    out[c] = out[c].first to (out[c].second + transform.translate)
+                }
+            }
+            else {
+                val i = out.linearSearch { it.first == transform.joint.name }!!
+                // transform applies to one specific joint in the list (one specific joint is a search result)
+                out[i] = out[i].first to (out[i].second + transform.translate)
+            }
         }
 
-        return transformOutput.toList()
+        return out.toList()
     }
 
     fun getCentreOf(pixmap: Pixmap) = ADPropertyObject.Vector2i(pixmap.width / 2, pixmap.height / 2)

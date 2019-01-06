@@ -22,7 +22,6 @@ data class Animation(val name: String, val delay: Float, val row: Int, val frame
 /** Later the 'translate' can be changed so that it represents affine transformation (Matrix2d) */
 data class Transform(val joint: Joint, val translate: ADPropertyObject.Vector2i) {
     override fun toString() = "$joint transform: $translate"
-    fun getTransformVector() = joint.position + translate
 }
 
 class ADProperties {
