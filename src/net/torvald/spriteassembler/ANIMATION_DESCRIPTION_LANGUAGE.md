@@ -97,6 +97,14 @@ Remember that 'variables' are contained within 'properties'
 |ROW|variable: float|which row the animation goes in the spritesheet|
 |SKELETON|variable: string_pair|Which skeleton this animation uses
 
+#### Transforms
+
+Things like ```LEG_RIGHT -1,0``` within ```ANIM_RUN_3``` are called 'Transform'
+
+|Name|Type|Meaning|
+|---|---|---|
+|ALL|variable: ivec2|Shifts (translates) everything by set value|
+
 ### Notes
 
 * All indices are one-based
@@ -104,6 +112,7 @@ Remember that 'variables' are contained within 'properties'
 ## Operation
 
 * Each line describes transformation
-* Transformation are applied sequentially from left to right. In other words, their order matters. Be wary of the clipping that may occur!
+* Transformation are applied sequentially from left to right. In other words, their order matters. Be wary of the clipping that may occur! (really?)
 * The Field is an identifier the game code -- sprite assembler -- recognises.
 * The Field of animation's name is the name the game code looks for. Example: ```this.setAnim("ANIM_RUN")```
+* Coord system is Y-Up, meaning Y=0 is the bottommost position.

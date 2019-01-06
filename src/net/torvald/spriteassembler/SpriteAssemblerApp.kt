@@ -26,10 +26,11 @@ class SpriteAssemblerApp : JFrame() {
     private val panelBodypartsList = JList<String>()
     private val panelImageFilesList = JList<String>()
     private val panelSkeletonsList = JList<String>()
+    private val panelTransformsList = JList<String>()
     private val panelCode = JTextPane()
     private val statBar = JTextArea("Null.")
 
-    private var adProperties: ADProperties? = null
+    private lateinit var adProperties: ADProperties
 
     private val props = Properties()
     private val lang = Properties()
@@ -93,12 +94,14 @@ class SpriteAssemblerApp : JFrame() {
         panelBodypartsList.model = DefaultListModel()
         panelImageFilesList.model = DefaultListModel()
         panelSkeletonsList.model = DefaultListModel()
+        panelTransformsList.model = DefaultListModel()
 
         val panelPartsList = JTabbedPane(JTabbedPane.TOP)
         panelPartsList.add("Animations", JScrollPane(panelAnimationsList))
         panelPartsList.add("Bodyparts", JScrollPane(panelBodypartsList))
         panelPartsList.add("Images", JScrollPane(panelImageFilesList))
         panelPartsList.add("Skeletons", JScrollPane(panelSkeletonsList))
+        panelPartsList.add("Transforms", JScrollPane(panelTransformsList))
 
         val panelDataView = JSplitPane(JSplitPane.VERTICAL_SPLIT, JScrollPane(panelProperties), panelPartsList)
 
@@ -116,7 +119,7 @@ class SpriteAssemblerApp : JFrame() {
 
                     val propRoot = DefaultMutableTreeNode("Properties")
 
-                    adProperties?.forEach { s, list ->
+                    adProperties.forEach { s, list ->
                         // build tree node for the properties display
                         val propNode = DefaultMutableTreeNode(s)
                         propRoot.add(propNode)
@@ -133,20 +136,24 @@ class SpriteAssemblerApp : JFrame() {
                     panelSkeletonsList.model = DefaultListModel()
 
                     // populate animations view
-                    adProperties!!.animations.forEach {
+                    adProperties.animations.forEach {
                         (panelAnimationsList.model as DefaultListModel).addElement("${it.value}")
                     }
                     // populate bodyparts view
-                    adProperties!!.bodyparts.forEach { partName ->
+                    adProperties.bodyparts.forEach { partName ->
                         (panelBodypartsList.model as DefaultListModel).addElement(partName)
                     }
                     // populate image file list view
-                    adProperties!!.bodypartFiles.forEach { partName ->
+                    adProperties.bodypartFiles.forEach { partName ->
                         (panelImageFilesList.model as DefaultListModel).addElement(partName)
                     }
                     // populate skeletons view
-                    adProperties!!.skeletons.forEach {
+                    adProperties.skeletons.forEach {
                         (panelSkeletonsList.model as DefaultListModel).addElement("${it.value}")
+                    }
+                    // populate transforms view
+                    adProperties.transforms.forEach {
+                        (panelTransformsList.model as DefaultListModel).addElement("$it")
                     }
                 }
                 catch (fehler: Throwable) {

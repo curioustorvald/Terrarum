@@ -724,3 +724,18 @@ fun interpolateLinear(scale: Double, startValue: Double, endValue: Double): Doub
     }
     return (1.0 - scale) * startValue + scale * endValue
 }
+
+fun <T> List<T>.linearSearch(selector: (T) -> Boolean): Int? {
+    this.forEachIndexed { index, it ->
+        if (selector.invoke(it)) return index
+    }
+
+    return null
+}
+fun <T> List<T>.linearSearchBy(selector: (T) -> Boolean): T? {
+    this.forEach {
+        if (selector.invoke(it)) return it
+    }
+
+    return null
+}
