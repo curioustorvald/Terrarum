@@ -49,7 +49,11 @@ class ADProperties {
 
     private val animFrameSuffixRegex = Regex("""_[0-9]+""")
 
-    private val ALL_JOINT = Joint("ALL", ADPropertyObject.Vector2i(0, 0))
+    private val ALL_JOINT = Joint(ALL_JOINT_SELECT_KEY, ADPropertyObject.Vector2i(0, 0))
+
+    companion object {
+        const val ALL_JOINT_SELECT_KEY = "ALL"
+    }
 
     constructor(reader: Reader) {
         javaProp.load(reader)

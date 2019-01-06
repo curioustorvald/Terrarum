@@ -69,6 +69,8 @@ object AssembleFrameBase {
 
         // process transform queue
         transforms.forEach { transform ->
+            // TODO when the transform.joint.name == ADProperties.ALL_JOINT_SELECT_KEY
+
             val jointToMoveIndex = transformOutput.linearSearch { it.first == transform.joint.name }!!
             transformOutput[jointToMoveIndex] = transformOutput[jointToMoveIndex].first to transform.getTransformVector()
         }
