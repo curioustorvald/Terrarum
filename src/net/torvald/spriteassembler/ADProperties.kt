@@ -1,5 +1,6 @@
 package net.torvald.spriteassembler
 
+import net.torvald.terrarum.linearSearchBy
 import java.io.InputStream
 import java.io.Reader
 import java.util.*
@@ -18,19 +19,27 @@ data class Animation(val name: String, val delay: Float, val row: Int, val frame
     override fun toString() = "$name delay: $delay, row: $row, frames: $frames, skeleton: ${skeleton.name}"
 }
 
+/** Later the 'translate' can be changed so that it represents affine transformation (Matrix2d) */
+data class Transform(val joint: Joint, val translate: ADPropertyObject.Vector2i) {
+    override fun toString() = "$joint transform: $translate"
+    fun getTransformVector() = joint.position + translate
+}
+
 class ADProperties {
     private val javaProp = Properties()
 
     /** Every key is CAPITALISED */
     private val propTable = HashMap<String, List<ADPropertyObject>>()
 
-    /** list of bodyparts used by all the skeletons */
+    /** list of bodyparts used by all the skeletons (HEAD, UPPER_TORSO, LOWER_TORSO) */
     lateinit var bodyparts: List<String>; private set
     lateinit var bodypartFiles: List<String>; private set
-    /** properties that are being used as skeletons */
+    /** properties that are being used as skeletons (SKELETON_STAND) */
     lateinit var skeletons: HashMap<String, Skeleton>; private set
-    /** properties that are recognised as animations */
+    /** properties that are recognised as animations (ANIM_RUN, ANIM)IDLE) */
     lateinit var animations: HashMap<String, Animation>; private set
+    /** an "animation frame" property (ANIM_RUN_1, ANIM_RUN_2) */
+    lateinit var transforms: HashMap<String, List<Transform>>; private set
 
     private val reservedProps = listOf("SPRITESHEET", "EXTENSION")
     private val animMustContain = listOf("DELAY", "ROW", "SKELETON")
@@ -39,6 +48,8 @@ class ADProperties {
     lateinit var extension: String; private set
 
     private val animFrameSuffixRegex = Regex("""_[0-9]+""")
+
+    private val ALL_JOINT = Joint("ALL", ADPropertyObject.Vector2i(0, 0))
 
     constructor(reader: Reader) {
         javaProp.load(reader)
@@ -59,13 +70,14 @@ class ADProperties {
         }
 
         // set reserved values for the animation: filename, extension
-        baseFilename = get("SPRITESHEET")!![0].variable
-        extension = get("EXTENSION")!![0].variable
+        baseFilename = get("SPRITESHEET")[0].variable
+        extension = get("EXTENSION")[0].variable
 
         val bodyparts = HashSet<String>()
         val skeletons = HashMap<String, Skeleton>()
         val animations = HashMap<String, Animation>()
         val animFrames = HashMap<String, Int>()
+        val transforms = HashMap<String, List<Transform>>()
         // scan every props, write down anim frames for later use
         propTable.keys.forEach {
             if (animFrameSuffixRegex.containsMatchIn(it)) {
@@ -94,16 +106,16 @@ class ADProperties {
             // if it is indeed anim, populate animations list
             if (propsHashMap.containsKey("SKELETON")) {
                 val skeletonName = propsHashMap["SKELETON"] as String
-                val skeletonDef = get(skeletonName) ?: throw Error("Skeleton definition for $skeletonName not found")
+                val skeletonDef = get(skeletonName)
 
-                skeletons.put(skeletonName, Skeleton(skeletonName, skeletonDef.toJoints()))
-                animations.put(s, Animation(
+                skeletons[skeletonName] = Skeleton(skeletonName, skeletonDef.toJoints())
+                animations[s] = Animation(
                         s,
                         propsHashMap["DELAY"] as Float,
                         (propsHashMap["ROW"] as Float).toInt(),
                         animFrames[s]!!,
                         Skeleton(skeletonName, skeletonDef.toJoints())
-                ))
+                )
             }
         }
 
@@ -114,13 +126,44 @@ class ADProperties {
             }
         }
 
+        // populate transforms
+        animations.forEach { t, u ->
+            for (fc in 1..u.frames) {
+                val frameName = "${t}_$fc"
+                val prop = get(frameName)
+
+                var emptyList = prop.size == 1 && prop[0].variable.isEmpty()
+
+                val transformList = if (!emptyList) {
+                    List(prop.size) { index ->
+                        val jointNameToSearch = prop[index].variable.toUpperCase()
+                        val joint = if (jointNameToSearch == "ALL")
+                            ALL_JOINT
+                        else
+                            u.skeleton.joints.linearSearchBy { it.name == jointNameToSearch }
+                            ?: throw NullPointerException("No such joint: $jointNameToSearch")
+                        val translate = prop[index].input as ADPropertyObject.Vector2i
+
+                        Transform(joint, translate)
+                    }
+                }
+                else {
+                    // to make real empty list
+                    List(0) { Transform(ALL_JOINT, ADPropertyObject.Vector2i(0, 0)) }
+                }
+
+                transforms[frameName] = transformList
+            }
+        }
+
         this.bodyparts = bodyparts.toList().sorted()
         this.skeletons = skeletons
         this.animations = animations
         this.bodypartFiles = this.bodyparts.map { toFilename(it) }
+        this.transforms = transforms
     }
 
-    operator fun get(identifier: String) = propTable[identifier.toUpperCase()]
+    operator fun get(identifier: String) = propTable[identifier.toUpperCase()]!!
     val keys
         get() = propTable.keys
     fun containsKey(key: String) = propTable.containsKey(key)
@@ -129,14 +172,14 @@ class ADProperties {
     fun toFilename(partName: String) =
             "${this.baseFilename}${partName.toLowerCase()}${this.extension}"
 
-    fun getAnimByFrameName(frameName: String): Animation {
-        return animations[getAnimNameFromFrame(frameName)]!!
-    }
+    fun getAnimByFrameName(frameName: String) = animations[getAnimNameFromFrame(frameName)]!!
+    fun getSkeleton(name: String) = skeletons[name]!!
+    fun getTransform(name: String) = transforms[name]!!
 
     private fun getAnimNameFromFrame(s: String) = s.substring(0 until s.lastIndexOf('_'))
 
     private fun List<ADPropertyObject>.toJoints() = List(this.size) {
-        Joint(this[it].variable, this[it].input!! as ADPropertyObject.Vector2i)
+        Joint(this[it].variable.toUpperCase(), this[it].input!! as ADPropertyObject.Vector2i)
     }
 
 }
@@ -167,7 +210,7 @@ class ADPropertyObject(propertyRaw: String) {
 
         if (isADvariable(propertyRaw)) {
             variable = propPair[0]
-            val inputStr = propPair[1]!!
+            val inputStr = propPair[1]
 
             if (isADivec2(inputStr)) {
                 type = ADPropertyType.IVEC2
@@ -211,7 +254,9 @@ class ADPropertyObject(propertyRaw: String) {
     }
 
     data class Vector2i(var x: Int, var y: Int) {
-        override fun toString() = "$x, $y"
+        override fun toString() = "($x, $y)"
+
+        operator fun plus(other: Vector2i) = Vector2i(this.x + other.x, this.y + other.y)
     }
 
     enum class ADPropertyType {
