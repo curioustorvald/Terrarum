@@ -43,3 +43,19 @@ jar {
     baseName = 'Terrarum'
     version = '0.2'
 }
+
+// should be same as plain old 'gradlew run'
+task game(type: JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    main = 'net.torvald.terrarum.AppLoader'
+}
+
+task spriteassembler(type: JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    main = 'net.torvald.spriteassembler.SpriteAssemblerAppKt'
+}
+
+task csveditor(type: JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    main = 'net.torvald.terrarum.debuggerapp.CSVEditor'
+}

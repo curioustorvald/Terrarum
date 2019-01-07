@@ -100,7 +100,7 @@ public class CSVEditor extends JFrame {
 
         menuBar.add(new JMenu("File") {
             {
-                add("Open…").addMouseListener(new MouseAdapter() {
+                add("Open...").addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
                         // let's show generic warning first
@@ -174,7 +174,7 @@ public class CSVEditor extends JFrame {
                     }
                 });
 
-                add("Save…").addMouseListener(new MouseAdapter() {
+                add("Save...").addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
                         JFileChooser fileChooser = new JFileChooser() {
@@ -229,8 +229,8 @@ public class CSVEditor extends JFrame {
         });
         menuBar.add(new JMenu("Edit") {
             {
-                add("New rows…");
-                add("New column…");
+                add("New rows...");
+                add("New column...");
                 add("Delete current row");
                 add("Delete current column");
             }
