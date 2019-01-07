@@ -4,8 +4,12 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
-import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.PixmapIO2
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.gdxClearAndSetBlend
 import net.torvald.terrarum.inUse
 import java.awt.BorderLayout
 import java.awt.Font
@@ -272,11 +276,7 @@ class SpriteAssemblerPreview: Game() {
         }
 
 
-        Gdx.gl.glClearColor(.62f,.79f,1f,1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
-        Gdx.gl.glEnable(GL20.GL_BLEND)
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        gdxClearAndSetBlend(.62f,.79f,1f,1f)
 
 
         batch.inUse {

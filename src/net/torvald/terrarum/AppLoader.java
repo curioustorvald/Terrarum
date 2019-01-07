@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
+import static net.torvald.terrarum.TerrarumKt.gdxClearAndSetBlend;
+
 /**
  * The framework's Application Loader
  *
@@ -245,12 +247,7 @@ public class AppLoader implements ApplicationListener {
 
 
         FrameBufferManager.begin(renderFBO);
-        Gdx.gl.glClearColor(.094f, .094f, .094f, 0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD);
+        gdxClearAndSetBlend(.094f, .094f, .094f, 0f);
         FrameBufferManager.end();
 
 

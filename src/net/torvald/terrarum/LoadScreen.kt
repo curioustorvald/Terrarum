@@ -2,12 +2,14 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
-import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.jme3.math.FastMath
 import net.torvald.dataclass.HistoryArray
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.Ingame
 
 /**
  * Created by minjaesong on 2017-07-13.
@@ -123,12 +125,10 @@ object LoadScreen : ScreenAdapter() {
 
 
 
-        Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
 
         textFbo.inAction(null, null) {
-            Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            gdxClearAndSetBlend(0f, 0f, 0f, 0f)
         }
 
         // update arrow object
