@@ -3,7 +3,10 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -241,8 +244,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         //camera.setToOrtho(true, Terrarum.WIDTH.toFloat(), Terrarum.HEIGHT.toFloat())
 
         // render world
-        Gdx.gl.glClearColor(.64f, .754f, .84f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        gdxClearAndSetBlend(.64f, .754f, .84f, 1f)
 
 
         IngameRenderer.invoke(world = demoWorld, uisToDraw = uiContainer)

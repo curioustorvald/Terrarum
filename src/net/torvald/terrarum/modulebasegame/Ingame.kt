@@ -251,22 +251,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             historicalFigureIDBucket = ArrayList<Int>()
-
-
-
-            // add new player and put it to actorContainer
-            //playableActorDelegate = PlayableActorDelegate(PlayerBuilderSigrid())
-            //playableActorDelegate = PlayableActorDelegate(PlayerBuilderTestSubject1())
-            //addNewActor(player)
-
-
-            // test actor
-            //addNewActor(PlayerBuilderCynthia())
-
-
-            // it won't work:
-            //setTheRealGamerFirstTime(PlayerBuilderSigrid())
-            // because NO GL CONTEXT IN THIS THREAD, might want 'postInit()'?
         }
     }
 

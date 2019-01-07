@@ -21,7 +21,6 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -396,17 +395,17 @@ object Terrarum : Screen {
 
 
         // jump straight into the ingame
-        val ingame = Ingame(batch)
+        /*val ingame = Ingame(batch)
         ingame.gameLoadInfoPayload = Ingame.NewWorldParameters(2400, 800, HQRNG().nextLong())
         ingame.gameLoadMode = Ingame.GameLoadMode.CREATE_NEW
         LoadScreen.screenToLoad = ingame
         this.ingame = ingame
-        setScreen(LoadScreen)
+        setScreen(LoadScreen)*/
 
 
 
         // title screen
-        //AppLoader.getINSTANCE().setScreen(TitleScreen(batch))
+        AppLoader.getINSTANCE().setScreen(TitleScreen(batch))
     }
 
     fun setScreen(screen: Screen) {
@@ -598,7 +597,10 @@ fun blendMul(batch: SpriteBatch? = null) {
 fun blendNormal(batch: SpriteBatch? = null) {
     (batch ?: Terrarum.batch).enableBlending()
     (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+
+    // alpha must not be premultiplied
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
+    Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE)
 }
 
 fun blendScreen(batch: SpriteBatch? = null) {
@@ -609,6 +611,20 @@ fun blendScreen(batch: SpriteBatch? = null) {
 
 fun blendDisable(batch: SpriteBatch? = null) {
     (batch ?: Terrarum.batch).disableBlending()
+}
+
+fun gdxClearAndSetBlend(r: Float, g: Float, b: Float, a: Float) {
+    Gdx.gl.glClearColor(0f,0f,0f,0f)
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+    Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
+    Gdx.gl.glEnable(GL20.GL_BLEND)
+
+    // this assumens premultiplied alpha?
+    //Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    // alpha must not be premultiplied
+
+    Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+    Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD)
 }
 
 object BlendMode {

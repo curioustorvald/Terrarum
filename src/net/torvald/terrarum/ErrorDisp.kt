@@ -3,7 +3,6 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.langpack.Lang
@@ -39,8 +38,7 @@ object ErrorDisp : Screen {
     }
 
     override fun render(delta: Float) {
-        Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
 
 
 

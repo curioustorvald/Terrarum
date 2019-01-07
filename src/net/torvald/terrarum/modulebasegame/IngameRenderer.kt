@@ -12,8 +12,8 @@ import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameactors.ParticleBase
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
-import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
+import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
@@ -93,11 +93,7 @@ object IngameRenderer {
 
         // clear main or whatever super-FBO being used
         //clearBuffer()
-        Gdx.gl.glClearColor(.64f, .754f, .84f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
-        Gdx.gl.glEnable(GL20.GL_BLEND)
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        gdxClearAndSetBlend(.64f, .754f, .84f, 1f)
 
         ///////////////////////////////////////////////////////////////////////
 
@@ -321,8 +317,7 @@ object IngameRenderer {
         fboA.inAction(null, null) {
             clearBuffer()
             // paint black
-            Gdx.gl.glClearColor(0f,0f,0f,1f) // solid black: so that unused area will be also black
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            gdxClearAndSetBlend(0f,0f,0f,1f) // solid black: so that unused area will be also black
         }
         fboA_lightMixed.inAction(null, null) { clearBuffer() }
 
@@ -433,11 +428,7 @@ object IngameRenderer {
     }
 
     private fun clearBuffer() {
-        Gdx.gl.glClearColor(0f,0f,0f,0f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
-        Gdx.gl.glEnable(GL20.GL_BLEND)
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        gdxClearAndSetBlend(0f,0f,0f,0f)
     }
 
     private fun moveCameraToWorldCoord() {
