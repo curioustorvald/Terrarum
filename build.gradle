@@ -48,14 +48,20 @@ jar {
 task game(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     main = 'net.torvald.terrarum.AppLoader'
+    group = "Application"
+    description = "Launches the game. Should be the same as 'gradlew run'."
 }
 
 task spriteassembler(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     main = 'net.torvald.spriteassembler.SpriteAssemblerAppKt'
+    group = "Application"
+    description = "Launches the Sprite Assembler."
 }
 
 task csveditor(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     main = 'net.torvald.terrarum.debuggerapp.CSVEditor'
+    group = "Application"
+    description = "Launches the CSV Editor. (for Blocks?)"
 }

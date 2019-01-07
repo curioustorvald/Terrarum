@@ -4,10 +4,7 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.inUse
 import java.awt.BorderLayout
@@ -76,8 +73,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                                "ADD_ROWS=Enter the number of rows to add:\n" +
                                "WRITE_FAIL=Writing to file has failed:\n" +
                                "STAT_INIT=Creating a new CSV. You can still open existing file.\n" +
-                               "STAT_SAVE_SUCCESSFUL=File saved successfully.\n" +
-                               "STAT_NEW_FILE=New CSV created.\n" +
+                               "STAT_SAVE_TGA_SUCCESSFUL=Spritesheet exported successfully.\n" +
                                "STAT_LOAD_SUCCESSFUL=File loaded successfully.\n" +
                                "ERROR_INTERNAL=Something went wrong.\n" +
                                "ERROR_PARSE_FAIL=Parsing failed\n" +
@@ -122,7 +118,6 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
         panelMain.resizeWeight = 0.666
 
         val menu = JMenuBar()
-        menu.add(JMenu("File"))
         menu.add(JMenu("Parse")).addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent?) {
                 try {
@@ -193,6 +188,17 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                 }
             }
         })
+        menu.add(JMenu("Export")).addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent?) {
+                val fileChooser = JFileChooser()
+                fileChooser.showSaveDialog(null)
+
+                if (fileChooser.selectedFile != null) {
+                    gdxWindow.requestExport(fileChooser.selectedFile.absolutePath)
+                    statBar.text = lang.getProperty("STAT_SAVE_TGA_SUCCESSFUL")
+                } // else, do nothing
+            }
+        })
 
         this.layout = BorderLayout()
         this.add(menu, BorderLayout.NORTH)
@@ -250,11 +256,19 @@ class SpriteAssemblerPreview: Game() {
     private var doAssemble = false
     private lateinit var assembleProp: ADProperties
 
+    private var doExport = false
+    private lateinit var exportPath: String
+
     override fun render() {
         if (doAssemble) {
             // assembly requires GL context
             doAssemble = false
             assembleImage(assembleProp)
+        }
+
+        if (doExport && image != null) {
+            doExport = false
+            PixmapIO2.writeTGA(Gdx.files.absolute(exportPath), image)
         }
 
 
@@ -280,6 +294,14 @@ class SpriteAssemblerPreview: Game() {
         assembleProp = prop
     }
 
+    fun requestExport(path: String) {
+        doExport = true
+        exportPath = path
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+    }
 }
 
 fun main(args: Array<String>) {
