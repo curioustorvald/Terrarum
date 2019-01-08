@@ -1,4 +1,3 @@
-package net.torvald.terrarum.audio.surroundpanner
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
@@ -7,7 +6,9 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.files.FileHandle
 import java.awt.BorderLayout
-import javax.swing.*
+import javax.swing.JFrame
+import javax.swing.JPanel
+import javax.swing.JSlider
 
 /**
  * Created by minjaesong on 2018-05-18.
