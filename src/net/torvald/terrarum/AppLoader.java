@@ -53,7 +53,7 @@ public class AppLoader implements ApplicationListener {
     /**
      * when FALSE, some assertion and print code will not execute
      */
-    public static final boolean IS_DEVELOPMENT_BUILD = true;
+    public static boolean IS_DEVELOPMENT_BUILD = false;
 
 
     /**
@@ -168,6 +168,10 @@ public class AppLoader implements ApplicationListener {
         appConfig.foregroundFPS = 9999;
         appConfig.title = GAME_NAME;
         appConfig.forceExit = false;
+
+        if (args.length == 1 && args[0].equals("isdev=true")) {
+            IS_DEVELOPMENT_BUILD = true;
+        }
 
         new LwjglApplication(new AppLoader(appConfig), appConfig);
     }

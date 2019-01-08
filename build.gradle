@@ -52,6 +52,14 @@ task game(type: JavaExec) {
     description = "Launches the game. Should be the same as 'gradlew run'."
 }
 
+task gamedebug(type: JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    main = 'net.torvald.terrarum.AppLoader'
+    group = "Application"
+    description = "Launches the game with debuy key."
+    args = ["isdev=true"]
+}
+
 task spriteassembler(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     main = 'net.torvald.spriteassembler.SpriteAssemblerAppKt'

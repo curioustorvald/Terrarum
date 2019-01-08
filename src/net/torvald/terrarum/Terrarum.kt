@@ -621,8 +621,8 @@ fun gdxClearAndSetBlend(r: Float, g: Float, b: Float, a: Float) {
 
     // this assumens premultiplied alpha?
     //Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-    // alpha must not be premultiplied
 
+    // alpha must not be premultiplied
     Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD)
 }
