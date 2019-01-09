@@ -35,6 +35,8 @@ public class CSVEditor extends JFrame {
     private final int ARBITRARY = 240;
     private int[] colWidth = new int[]{FOUR_DIGIT, FOUR_DIGIT, ARBITRARY, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, TWO_DIGIT, FOUR_DIGIT, FOUR_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT};
 
+    private final int UNDO_BUFFER_SIZE = 10;
+
     private CSVFormat csvFormat = CSVFetcher.INSTANCE.getTerrarumCSVFormat();
 
     private final int INITIAL_ROWS = 2;
@@ -49,8 +51,13 @@ public class CSVEditor extends JFrame {
     private JTextPane comment = new JTextPane();
     private JLabel statBar = new JLabel("null.");
 
+    private JMenu undoMenu = new JMenu("Undo");
+    private JMenu redoMenu = new JMenu("Redo");
+
     private Properties props = new Properties();
     private Properties lang = new Properties();
+
+    private TraversingCircularArray<Object[][]> undoBuffer = new TraversingCircularArray(UNDO_BUFFER_SIZE);
 
     public CSVEditor() {
         // setup application properties //
@@ -227,12 +234,88 @@ public class CSVEditor extends JFrame {
                 });
             }
         });
+
+        undoMenu.setEnabled(false);
+        redoMenu.setEnabled(false);
+
         menuBar.add(new JMenu("Edit") {
             {
-                add("New rows...");
+                add("New rows...").addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        Integer rows = askInteger("ADD_ROWS");
+
+                        if (rows != null) {
+                            DefaultTableModel tableModel = (DefaultTableModel) spreadsheet.getModel();
+                            tableModel.setRowCount(tableModel.getRowCount() + rows);
+                        }
+                    }
+                });
                 add("New column...");
                 add("Delete current row");
                 add("Delete current column");
+                addSeparator();
+                add(undoMenu);
+                add(redoMenu);
+                addSeparator();
+                add("Sort by ID").addMouseListener(new MouseAdapter() {
+                    private String[] getRow(int row, DefaultTableModel table) {
+                        String[] v = new String[table.getColumnCount()];
+                        for (int k = 0; k < v.length; k++) {
+                            v[k] = (String) table.getValueAt(row, k);
+                        }
+                        return v;
+                    }
+
+                    private void setRow(int row, String[] data, DefaultTableModel table) {
+                        for (int k = 0; k < data.length; k++) {
+                            table.setValueAt(data[k], row, k);
+                        }
+                    }
+
+                    private int toInt(String s) {
+                        int i;
+                        try {
+                            i = Integer.parseInt(s);
+
+                            if (i == -1) i = 2147483646;
+                        }
+                        catch (NumberFormatException e) {
+                            i = 2147483647;
+                        }
+
+                        return i;
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        DefaultTableModel table = (DefaultTableModel) spreadsheet.getModel();
+                        int tableLen = table.getRowCount();
+
+                        // perkele, had to get dirty
+                        // using insertion sort (should work good enough)
+                        int i = 1;
+                        while (i < tableLen) {
+                            String[] xData = getRow(i, table);
+                            int xComparator = toInt(xData[0]); // x <- A[i]
+
+                            int j = i - 1;
+                            String[] jData = getRow(j, table);
+
+                            while (j >= 0 && toInt(jData[0]) > xComparator) {
+                                // manually set a row
+                                setRow(j + 1, jData, table);
+                                j -= 1;
+
+                                if (j < 0) break;
+                                jData = getRow(j, table);
+                            }
+
+                            setRow(j + 1, xData, table);
+                            i += 1;
+                        }
+                    }
+                });
             }
         });
 
