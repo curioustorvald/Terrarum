@@ -12,6 +12,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
+import net.torvald.terrarum.worlddrawer.WorldCamera
 
 /**
  * Created by minjaesong on 2016-03-14.
@@ -49,10 +50,6 @@ class BasicDebugInfoWindow : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        fun Int.rawR() = this / LightmapRenderer.MUL_2
-        fun Int.rawG() = this % LightmapRenderer.MUL_2 / LightmapRenderer.MUL
-        fun Int.rawB() = this % LightmapRenderer.MUL
-
         val player = ingame.actorNowPlaying
 
         batch.color = Color(0xFFEE88FF.toInt())
@@ -77,6 +74,9 @@ class BasicDebugInfoWindow : UICanvas() {
                                          + " ("
                                          + "${(hitbox?.endX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
                                          + ")")
+            printLineColumn(batch, 3, 1, "camX "
+                                         + ccG
+                                         + "${WorldCamera.x}")
             printLineColumn(batch, 1, 2, "startY "
                                          + ccG
                                          + "${hitbox?.startY}"
@@ -89,6 +89,9 @@ class BasicDebugInfoWindow : UICanvas() {
                                          + " ("
                                          + "${(hitbox?.endY?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
                                          + ")")
+            printLineColumn(batch, 3, 2, "camY "
+                                         + ccG
+                                         + "${WorldCamera.y}")
 
             printLine(batch, 3, "veloX reported $ccG${player.externalForce.x}")
             printLine(batch, 4, "veloY reported $ccG${player.externalForce.y}")

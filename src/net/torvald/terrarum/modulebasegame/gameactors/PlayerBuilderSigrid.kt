@@ -85,7 +85,7 @@ object PlayerBuilderSigrid {
                 Block.ILLUMINATOR_WHITE, Block.ILLUMINATOR_BLACK, Block.ILLUMINATOR_ORANGE,
                 Block.ILLUMINATOR_GREEN, Block.ILLUMINATOR_CYAN, Block.SUNSTONE,
                 Block.ORE_COPPER,
-                Block.PLATFORM_WOODEN
+                Block.PLATFORM_STONE, Block.PLATFORM_WOODEN, Block.PLATFORM_BIRCH, Block.PLATFORM_BLOODROSE, Block.PLATFORM_EBONY
         )
         val walls = arrayOf(
                 Block.AIR, Block.DIRT, Block.GLASS_CRUDE,
