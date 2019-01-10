@@ -392,7 +392,7 @@ public class AppLoader implements ApplicationListener {
 
         TextureRegionPack.Companion.setGlobalFlipY(true);
         fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true,
-                Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 128, false
+                Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 256, false
         );
 
         audioDevice = Gdx.audio.newAudioDevice(48000, false);
