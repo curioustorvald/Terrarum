@@ -29,7 +29,7 @@ object PlayerBuilderTestSubject1 {
         p.setPosition(3.0 * FeaturesDrawer.TILE_SIZE, 3.0 * FeaturesDrawer.TILE_SIZE)
 
 
-
+        PlayerBuilderSigrid.fillTestInventory(p.inventory)
 
 
         return p

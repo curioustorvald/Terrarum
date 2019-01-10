@@ -86,7 +86,7 @@ object Terrarum : Screen {
      */
     val TARGET_INTERNAL_FPS: Double = 60.0
 
-    internal val UPDATE_CATCHUP_MAX_TRIES = 4
+    internal val UPDATE_CATCHUP_MAX_TRIES = 2 // this feature does more harm than good...
 
 
 
@@ -324,7 +324,6 @@ object Terrarum : Screen {
         shapeRender = ShapeRenderer()
 
 
-        //fontGame = GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", flipY = true)
         fontSmallNumbers = TinyAlphNum
 
 

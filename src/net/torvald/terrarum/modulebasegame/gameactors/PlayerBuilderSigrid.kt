@@ -67,6 +67,13 @@ object PlayerBuilderSigrid {
 
 
         // Test fill up inventory
+        fillTestInventory(p.inventory)
+
+
+        return p
+    }
+
+    fun fillTestInventory(inventory: ActorInventory) {
         val blocks = arrayOf(
                 Block.AIR, Block.DIRT, Block.GLASS_CRUDE,
                 Block.GRASS, Block.GRAVEL, Block.ICE_MAGICAL, Block.LANTERN,
@@ -88,14 +95,9 @@ object PlayerBuilderSigrid {
                 Block.SANDSTONE_RED, Block.STONE, Block.STONE_BRICKS,
                 Block.STONE_QUARRIED, Block.STONE_TILE_WHITE
         )
-        blocks.forEach { p.addItem(it, 999) }
-        walls.forEach { p.addItem(it + 4096, 999) }
-        p.inventory.add(ItemCodex.ITEM_STATIC.first)
-        p.inventory.add(9000)
-
-
-
-
-        return p
+        blocks.forEach { inventory.add(it, 9995) }
+        walls.forEach { inventory.add(it + 4096, 9995) }
+        inventory.add(ItemCodex.ITEM_STATIC.first)
+        inventory.add(9000)
     }
 }
