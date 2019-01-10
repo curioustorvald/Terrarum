@@ -23,7 +23,6 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
  * This will be rendered to a postprocessor FBO
  */
 object IngameRenderer {
-
     /** for non-private use, use with care! */
     lateinit var batch: SpriteBatch
     private lateinit var camera: OrthographicCamera
@@ -274,8 +273,7 @@ object IngameRenderer {
         fboRGB_lightMixed.inAction(camera, batch) {
 
             setCameraPosition(0f, 0f)
-            val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF)
-            val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF)
+            val (xrem, yrem) = worldCamToRenderPos()
 
             batch.inUse {
                 // draw world
@@ -357,8 +355,7 @@ object IngameRenderer {
         fboA_lightMixed.inAction(camera, batch) {
 
             setCameraPosition(0f, 0f)
-            val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF)
-            val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF)
+            val (xrem, yrem) = worldCamToRenderPos()
 
             batch.inUse {
                 // draw world
@@ -556,5 +553,13 @@ object IngameRenderer {
         lightmapFboB.dispose()
 
         LightmapRenderer.dispose()
+    }
+
+    private fun worldCamToRenderPos(): Pair<Float, Float> {
+        // for some reason it does not like integer. No, really; it breaks (jitter when you move) when you try to "fix" that.
+        val xrem = -(WorldCamera.x.toFloat() fmod TILE_SIZEF)
+        val yrem = -(WorldCamera.y.toFloat() fmod TILE_SIZEF)
+
+        return xrem to yrem
     }
 }

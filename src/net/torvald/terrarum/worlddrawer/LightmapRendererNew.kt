@@ -37,8 +37,6 @@ import kotlin.system.measureNanoTime
  */
 object LightmapRenderer {
 
-    // FIXME lightmap shifts to left, ONLY AT x=33.5-34.5
-
     private var world: GameWorld = GameWorld.makeNullWorld()
 
     /** do not call this yourself! Let your game renderer handle this! */
@@ -173,7 +171,7 @@ object LightmapRenderer {
             world.getTileFromTerrain(0, 0) // test inquiry
         }
         catch (e: UninitializedPropertyAccessException) {
-            return // quit prematually
+            return // quit prematurely
         }
 
 
@@ -182,6 +180,8 @@ object LightmapRenderer {
 
         if (for_x_start < 0) for_x_start -= 1 // to fix that the light shifts 1 tile to the left when WorldCamera < 0
         //if (for_y_start < 0) for_y_start -= 1 // not needed when we only wrap at x axis
+
+        if (WorldCamera.x in -(TILE_SIZE - 1)..-1) for_x_start -= 1 // another edge-case fix
 
         for_x_end = for_x_start + WorldCamera.width / TILE_SIZE + 3
         for_y_end = for_y_start + WorldCamera.height / TILE_SIZE + 2 // same fix as above
@@ -763,7 +763,7 @@ object LightmapRenderer {
 
 
     val rgbHDRLookupTable = floatArrayOf( // polynomial of 6.0   please refer to work_files/HDRcurveBezierLinIntp.kts
-            0.0000f,0.0000f,0.0020f,0.0060f,0.0100f,0.0139f,0.0179f,0.0219f,0.0259f,0.0299f,0.0338f,0.0378f,0.0418f,0.0458f,0.0497f,0.0537f,
+            0.0000f,0.0004f,0.0020f,0.0060f,0.0100f,0.0139f,0.0179f,0.0219f,0.0259f,0.0299f,0.0338f,0.0378f,0.0418f,0.0458f,0.0497f,0.0537f,
             0.0577f,0.0617f,0.0656f,0.0696f,0.0736f,0.0776f,0.0816f,0.0855f,0.0895f,0.0935f,0.0975f,0.1014f,0.1054f,0.1094f,0.1134f,0.1173f,
             0.1213f,0.1253f,0.1293f,0.1332f,0.1372f,0.1412f,0.1451f,0.1491f,0.1531f,0.1571f,0.1610f,0.1650f,0.1690f,0.1730f,0.1769f,0.1809f,
             0.1849f,0.1888f,0.1928f,0.1968f,0.2007f,0.2047f,0.2087f,0.2127f,0.2166f,0.2206f,0.2246f,0.2285f,0.2325f,0.2365f,0.2404f,0.2444f,
