@@ -480,7 +480,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 updateTries++
 
                 if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
-                    printdbg(this, "Update couldn't catch up -- delta-T buildup was $oldDeltaCtr seconds")
+                    //printdbg(this, "Update couldn't catch up -- delta-T buildup was $oldDeltaCtr seconds")
                     break
                 }
             }

@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.Second
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -17,15 +17,20 @@ class UITooltip : UICanvas() {
     override var openCloseTime: Second = 0f
 
     var message: String = ""
+        set(value) {
+            field = value
+            msgWidth = font.getWidth(value)
+        }
 
     private val textures = TextureRegionPack("assets/graphics/gui/tooltip_black.tga", 8, 36)
 
     private val font = Terrarum.fontGame
+    private var msgWidth = 0
 
     val textMarginX = 4
 
     override var width: Int
-        get() = font.getWidth(message) + (textMarginX + textures.tileW) * 2
+        get() = msgWidth + (textMarginX + textures.tileW) * 2
         set(value) { throw Error("You are not supposed to set the width of the tooltip manually.") }
     override var height: Int
         get() = textures.tileH
@@ -42,7 +47,7 @@ class UITooltip : UICanvas() {
 
         val tooltipY = mouseY - textures.tileH
 
-        val txtW = font.getWidth(message) + 2f * textMarginX
+        val txtW = msgWidth + 2f * textMarginX
 
         batch.color = Color.WHITE
         batch.draw(textures.get(0, 0), mouseX, tooltipY)
@@ -52,6 +57,7 @@ class UITooltip : UICanvas() {
     }
 
     override fun updateUI(delta: Float) {
+        setPosition(Terrarum.mouseScreenX, Terrarum.mouseScreenY)
     }
 
     override fun doOpening(delta: Float) {
