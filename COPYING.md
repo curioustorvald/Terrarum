@@ -1,6 +1,6 @@
 *Terrarum*
 
-Copyright (C) 2013-2018 Minjaesong (Torvald) 
+Copyright (C) 2013-2019 Minjaesong (Torvald)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 *Terrarum Sans Bitmap*
 
-Copyright (c) 2017 Minjae Song (Torvald) and the contributors
+Copyright (c) 2017-2019 Minjae Song (Torvald) and the contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
