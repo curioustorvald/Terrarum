@@ -4,26 +4,27 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
+import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
-import net.torvald.terrarum.modulebasegame.ui.UIQuickBar.Companion.CELL_SIZE
-import net.torvald.terrarum.modulebasegame.ui.UIQuickBar.Companion.SLOT_COUNT
+import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OPEN_CLOSE
+import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.SLOT_COUNT
 import net.torvald.terrarum.ui.UICanvas
 import org.dyn4j.geometry.Vector2
 
 /**
+ * The Sims styled pie representation of the Quickslot.
+ *
  * Created by minjaesong on 2016-07-20.
  */
-class UIPieMenu : UICanvas() {
-    private val cellSize = UIQuickBar.CELL_SIZE
+class uiQuickslotPie : UICanvas() {
+    private val cellSize = ItemSlotImageFactory.slotImage.tileW
 
-    private val slotCount = UIQuickBar.SLOT_COUNT
+    private val slotCount = UIQuickslotBar.SLOT_COUNT
 
     private val slotDistanceFromCentre: Double
-            get() = cellSize * 2.8 * handler.scale
+            get() = cellSize * 2.5 * handler.scale
     override var width: Int = cellSize * 7
     override var height: Int = width
 
@@ -31,7 +32,7 @@ class UIPieMenu : UICanvas() {
     /**
      * In milliseconds
      */
-    override var openCloseTime: Second = 0.16f
+    override var openCloseTime: Second = COMMON_OPEN_CLOSE
 
     private val smallenSize = 0.93f
 
@@ -59,48 +60,24 @@ class UIPieMenu : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // draw radial thingies
         for (i in 0..slotCount - 1) {
+            val item = (Terrarum.ingame!! as Ingame).actorNowPlaying?.inventory?.getQuickslot(i)?.item
+
             // set position
             val angle = Math.PI * 2.0 * (i.toDouble() / slotCount) + Math.PI // 180 deg monitor-wise
             val slotCentrePoint = Vector2(0.0, slotDistanceFromCentre).setDirection(-angle) // NOTE: NOT a center of circle!
 
             // draw cells
             val image = if (i == selection)
-                ItemSlotImageBuilder.produceLarge(false, (i + 1) % SLOT_COUNT)
+                ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, item)
             else
-                ItemSlotImageBuilder.produce(true, (i + 1) % SLOT_COUNT)
+                ItemSlotImageFactory.produce(true, (i + 1) % SLOT_COUNT, item)
 
-            val slotSize = image.regionWidth
+            val slotX = slotCentrePoint.x.toInt()
+            val slotY = slotCentrePoint.y.toInt()
 
-            val slotX = slotCentrePoint.x.toFloat() - (slotSize / 2)
-            val slotY = slotCentrePoint.y.toFloat() - (slotSize / 2)
+            batch.color = Color(1f, 1f, 1f, handler.opacity * UIQuickslotBar.DISPLAY_OPACITY)
+            image.draw(batch, slotX, slotY)
 
-            batch.color = Color(1f, 1f, 1f, handler.opacity * UIQuickBar.finalOpacity)
-            batch.draw(
-                    image,
-                    slotX,
-                    slotY
-            )
-
-
-            // draw item
-            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
-            if (player == null) return // don't draw actual items
-
-
-            val itemPair = player.inventory.getQuickBar(i)
-
-            if (itemPair != null) {
-                val itemImage = ItemCodex.getItemImage(itemPair.item)
-                val itemW = itemImage.regionWidth
-                val itemH = itemImage.regionHeight
-
-                batch.color = Color(1f, 1f, 1f, handler.opacity)
-                batch.draw(
-                        itemImage, // using fixed CELL_SIZE for reasons
-                        slotX + (CELL_SIZE - itemW) / 2f,
-                        slotY + (CELL_SIZE - itemH) / 2f
-                )
-            }
         }
     }
 

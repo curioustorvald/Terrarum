@@ -3,20 +3,16 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.BlendMode
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.UIItemInventoryElem
-import net.torvald.terrarum.UIItemInventoryElemSimple
-import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
-import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
-import net.torvald.terrarum.ceilInt
+import net.torvald.terrarum.*
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Display either extended or compact list
@@ -75,8 +71,7 @@ class UIItemInventoryDynamicList(
     val defaultTextColour = Color(0xeaeaea_ff.toInt())
 
     private val listGap = 8
-    private val itemList = Array<UIItemInventoryCellBase>(
-            7 * 2, {
+    private val itemList = Array<UIItemInventoryCellBase>(7 * 2) {
         UIItemInventoryElem(
                 parentUI = inventoryUI,
                 posX = this.posX + (272 + listGap) * (it % 2),
@@ -91,9 +86,9 @@ class UIItemInventoryDynamicList(
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 inactiveTextCol = defaultTextColour
-        ) })
-    private val itemGrid = Array<UIItemInventoryCellBase>(
-            7 * 10, {
+        )
+    }
+    private val itemGrid = Array<UIItemInventoryCellBase>(7 * 10) {
         UIItemInventoryElemSimple(
                 parentUI = inventoryUI,
                 posX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % 10),
@@ -109,17 +104,13 @@ class UIItemInventoryDynamicList(
                 inactiveTextCol = defaultTextColour
         )
     }
-    )
 
-    private var items: Array<UIItemInventoryCellBase>
-            = if (catArrangement[selection] in compactViewCat) itemGrid else itemList // this is INIT code
+    private var items: Array<UIItemInventoryCellBase> = itemList
 
-    var isCompactMode = (catArrangement[selection] in compactViewCat) // this is INIT code
+    var isCompactMode = false // this is INIT code
         set(value) {
             items = if (value) itemGrid else itemList
-
             rebuild()
-
             field = value
         }
 
@@ -129,7 +120,7 @@ class UIItemInventoryDynamicList(
             posY - 2 + (4 + UIItemInventoryElem.height - (parentUI as UIInventoryFull).catIcons.tileH) * index
 
     /** Long/compact mode buttons */
-    private val gridModeButtons = Array<UIItemImageButton>(2, { index ->
+    private val gridModeButtons = Array<UIItemImageButton>(2) { index ->
         UIItemImageButton(
                 parentUI,
                 parentUI.catIcons.get(index + 14, 0),
@@ -139,7 +130,7 @@ class UIItemInventoryDynamicList(
                 posY = getIconPosY(index),
                 highlightable = true
         )
-    })
+    }
 
     private val scrollUpButton = UIItemImageButton(
             parentUI,
@@ -288,8 +279,8 @@ class UIItemInventoryDynamicList(
                 items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
 
                 // set quickslot number
-                for (qs in 1..UIQuickBar.SLOT_COUNT) {
-                    if (sortListItem.item == inventory.getQuickBar(qs - 1)?.item) {
+                for (qs in 1..UIQuickslotBar.SLOT_COUNT) {
+                    if (sortListItem.item == inventory.getQuickslot(qs - 1)?.item) {
                         items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                         break
                     }

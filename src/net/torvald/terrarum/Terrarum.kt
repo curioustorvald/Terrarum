@@ -588,6 +588,7 @@ infix fun Color.mul(other: Color): Color = this.cpy().mul(other)
 
 
 fun blendMul(batch: SpriteBatch? = null) {
+    // will break if the colour image contains semitransparency
     (batch ?: Terrarum.batch).enableBlending()
     (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
@@ -597,12 +598,18 @@ fun blendNormal(batch: SpriteBatch? = null) {
     (batch ?: Terrarum.batch).enableBlending()
     (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-    // alpha must not be premultiplied
+    // ALPHA MUST NOT BE PREMULTIPLIED //
+    // we're using separate blend func to accomodate not-premultiplied alpha
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
     Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+
+    // helpful links:
+    // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble
+    // - https://www.andersriggelsen.dk/glblendfunc.php
 }
 
 fun blendScreen(batch: SpriteBatch? = null) {
+    // will break if the colour image contains semitransparency
     (batch ?: Terrarum.batch).enableBlending()
     (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
@@ -621,9 +628,15 @@ fun gdxClearAndSetBlend(r: Float, g: Float, b: Float, a: Float) {
     // this assumens premultiplied alpha?
     //Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-    // alpha must not be premultiplied
+    // ALPHA MUST NOT BE PREMULTIPLIED //
+    // we're using separate blend func to accomodate not-premultiplied alpha
     Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE)
     Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD)
+
+
+    // helpful links:
+    // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble
+    // - https://www.andersriggelsen.dk/glblendfunc.php
 }
 
 object BlendMode {

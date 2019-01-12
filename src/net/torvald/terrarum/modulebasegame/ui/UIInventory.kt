@@ -316,8 +316,8 @@ package net.torvald.terrarum.modulebasegame.ui
                     items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
 
                     // set quickslot number
-                    for (qs in 1..UIQuickBar.SLOT_COUNT) {
-                        if (sortListItem.item == actor?.inventory?.getQuickBar(qs - 1)?.item) {
+                    for (qs in 1..UIQuickslotBar.SLOT_COUNT) {
+                        if (sortListItem.item == actor?.inventory?.getQuickslot(qs - 1)?.item) {
                             items[k].quickslot = qs % 10 // 10 -> 0, 1..9 -> 1..9
                             break
                         }

@@ -130,7 +130,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
         quickBar[slot] = dynamicID
     }
 
-    fun getQuickBar(slot: Int): InventoryPair? = getByDynamicID(quickBar[slot])
+    fun getQuickslot(slot: Int): InventoryPair? = getByDynamicID(quickBar[slot])
 
     /**
      * HashMap<GameItem, Amounts>

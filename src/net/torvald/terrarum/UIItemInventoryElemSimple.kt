@@ -129,7 +129,7 @@ class UIItemInventoryElemSimple(
 
             val inventory = player.inventory
             val slot = if (keycode == Input.Keys.NUM_0) 9 else keycode - Input.Keys.NUM_1
-            val currentSlotItem = inventory.getQuickBar(slot)
+            val currentSlotItem = inventory.getQuickslot(slot)
 
 
             inventory.setQuickBar(
@@ -143,7 +143,7 @@ class UIItemInventoryElemSimple(
             // search for duplicates in the quickbar, except mine
             // if there is, unregister the other
             (0..9).minus(slot).forEach {
-                if (inventory.getQuickBar(it)?.item == item) {
+                if (inventory.getQuickslot(it)?.item == item) {
                     inventory.setQuickBar(it, null)
                 }
             }
