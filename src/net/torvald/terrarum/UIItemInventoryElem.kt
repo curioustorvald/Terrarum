@@ -10,7 +10,7 @@ import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
-import net.torvald.terrarum.ui.*
+import net.torvald.terrarum.ui.UIItemTextButton
 
 /***
  * Note that the UI will not render if either item or itemImage is null.
@@ -136,7 +136,7 @@ class UIItemInventoryElem(
     }
 
     override fun keyDown(keycode: Int): Boolean {
-        if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_1..Input.Keys.NUM_0) {
+        if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
             val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
 
             if (player == null) return false
@@ -163,7 +163,7 @@ class UIItemInventoryElem(
             }
         }
 
-        return true
+        return super.keyDown(keycode)
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -189,7 +189,7 @@ class UIItemInventoryElem(
 
         inventoryUI.rebuildList()
 
-        return true
+        return super.touchDown(screenX, screenY, pointer, button)
     }
 
 

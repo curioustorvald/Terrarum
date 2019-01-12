@@ -72,7 +72,7 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
         if (ingame.canPlayerControl) {
             ingame.actorNowPlaying?.keyDown(keycode)
 
-            // quickslot (quickbar)
+            // quickslot by number keys
             val quickslotKeys = AppLoader.getConfigIntArray("keyquickslots")
             if (keycode in quickslotKeys) {
                 ingame.actorNowPlaying?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, quickslotKeys.indexOf(keycode))
@@ -145,6 +145,16 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
     }
 
     override fun scrolled(amount: Int): Boolean {
+        if (ingame.canPlayerControl) {
+            // quickslot by wheel
+            if (ingame.actorNowPlaying != null) {
+                ingame.actorNowPlaying!!.actorValue.set(
+                        AVKey.__PLAYER_QUICKSLOTSEL,
+                        (ingame.actorNowPlaying!!.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)!! - amount) % ingame.actorNowPlaying!!.inventory.quickSlot.size
+                )
+            }
+        }
+
         ingame.uiContainer.forEach { it.scrolled(amount) }
         return true
     }

@@ -9,7 +9,7 @@ import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
-import net.torvald.terrarum.ui.*
+import net.torvald.terrarum.ui.UIItemTextButton
 
 /**
  * Created by minjaesong on 2017-10-20.
@@ -121,8 +121,7 @@ class UIItemInventoryElemSimple(
     }
 
     override fun keyDown(keycode: Int): Boolean {
-        if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_1..Input.Keys.NUM_0) {
-            println("keydown elemgrid")
+        if (item != null && Terrarum.ingame != null && keycode in Input.Keys.NUM_0..Input.Keys.NUM_9) {
 
             val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
             if (player == null) return false
@@ -149,7 +148,7 @@ class UIItemInventoryElemSimple(
             }
         }
 
-        return true
+        return super.keyDown(keycode)
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -172,7 +171,7 @@ class UIItemInventoryElemSimple(
 
         inventoryUI.rebuildList()
 
-        return true
+        return super.touchDown(screenX, screenY, pointer, button)
     }
 
 
