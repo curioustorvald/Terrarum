@@ -81,9 +81,6 @@ object DefaultConfig {
 
         jsonObject.addProperty("maxparticles", 768)
 
-
-        //jsonObject.addProperty("fullframelightupdate", false)
-
         jsonObject.addProperty("temperatureunit", 1) // -1: american, 0: kelvin, 1: celcius
 
 

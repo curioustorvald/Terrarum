@@ -6,7 +6,7 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.ui.ConsoleWindow
-import java.util.ArrayList
+import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import javax.swing.JOptionPane
@@ -23,7 +23,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
 
     open lateinit var consoleHandler: ConsoleWindow
 
-    open lateinit var world: GameWorld
+    open var world: GameWorld = GameWorld.makeNullWorld()
     /** how many different planets/stages/etc. are thenre. Whole stages must be manually managed by YOU. */
     var gameworldCount = 0
     /** The actor the game is currently allowing you to control.
