@@ -11,8 +11,8 @@ import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_WALLS
 import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.lock
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar
 import java.util.*
-import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
 /**
@@ -30,13 +30,13 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     /**
      * List of all equipped items (tools, armours, rings, necklaces, etc.)
      */
-    val itemEquipped = Array<GameItem?>(GameItem.EquipPosition.INDEX_MAX, { null })
+    val itemEquipped = Array<GameItem?>(GameItem.EquipPosition.INDEX_MAX) { null }
 
     /**
      * Sorted by referenceID.
      */
     val itemList = ArrayList<InventoryPair>()
-    val quickBar = Array<ItemID?>(10, { null }) // 0: Slot 1, 9: Slot 10
+    val quickSlot = Array<ItemID?>(UIQuickslotBar.SLOT_COUNT) { null } // 0: Slot 1, 9: Slot 10
 
     var currency = 0 // unified currency for whole civs; Dwarf Fortress approach seems too complicated
 
@@ -127,10 +127,10 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
     }
 
     fun setQuickBar(slot: Int, dynamicID: ItemID?) {
-        quickBar[slot] = dynamicID
+        quickSlot[slot] = dynamicID
     }
 
-    fun getQuickslot(slot: Int): InventoryPair? = getByDynamicID(quickBar[slot])
+    fun getQuickslot(slot: Int): InventoryPair? = getByDynamicID(quickSlot[slot])
 
     /**
      * HashMap<GameItem, Amounts>

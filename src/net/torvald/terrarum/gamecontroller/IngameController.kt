@@ -4,11 +4,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.floorInt
+import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.itemproperties.GameItem
-import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
 /**
@@ -70,12 +71,19 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
 
         if (ingame.canPlayerControl) {
             ingame.actorNowPlaying?.keyDown(keycode)
-        }
 
-        if (AppLoader.getConfigIntArray("keyquickselalt").contains(keycode)
-            || keycode == AppLoader.getConfigInt("keyquicksel")) {
-            ingame.uiPieMenu.setAsOpen()
-            ingame.uiQuickBar.setAsClose()
+            // quickslot (quickbar)
+            val quickslotKeys = AppLoader.getConfigIntArray("keyquickslots")
+            if (keycode in quickslotKeys) {
+                ingame.actorNowPlaying?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, quickslotKeys.indexOf(keycode))
+            }
+
+            // pie menu
+            if (AppLoader.getConfigIntArray("keyquickselalt").contains(keycode)
+                || keycode == AppLoader.getConfigInt("keyquicksel")) {
+                ingame.uiPieMenu.setAsOpen()
+                ingame.uiQuickBar.setAsClose()
+            }
         }
 
         ingame.uiContainer.forEach { it.keyDown(keycode) } // for KeyboardControlled UIcanvases

@@ -358,14 +358,7 @@ open class ActorHumanoid(
     }
 
     override fun keyDown(keycode: Int): Boolean {
-        // quickslot (quickbar)
-        val quickbarKeys = AppLoader.getConfigIntArray("keyquickbars")
-        if (keycode in quickbarKeys) {
-            actorValue[AVKey.__PLAYER_QUICKSLOTSEL] = quickbarKeys.indexOf(keycode)
-        }
-
-
-        return true
+        return false
     }
 
 
