@@ -1,6 +1,5 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -83,24 +82,6 @@ class UIQuickslotBar : UICanvas() {
         // super.scrolled(amount) // no UIItems here
 
         selection = selection.plus(if (amount > 1) 1 else if (amount < -1) -1 else 0).fmod(SLOT_COUNT)
-
-        return true
-    }
-
-    override fun keyDown(keycode: Int): Boolean {
-        selection = when (keycode) {
-            Input.Keys.NUM_1 -> 0
-            Input.Keys.NUM_2 -> 1
-            Input.Keys.NUM_3 -> 2
-            Input.Keys.NUM_4 -> 3
-            Input.Keys.NUM_5 -> 4
-            Input.Keys.NUM_6 -> 5
-            Input.Keys.NUM_7 -> 6
-            Input.Keys.NUM_8 -> 7
-            Input.Keys.NUM_9 -> 8
-            Input.Keys.NUM_0 -> 9
-            else -> return false
-        }
 
         return true
     }

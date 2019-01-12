@@ -1,15 +1,6 @@
 package net.torvald.terrarum.utils
 
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import net.torvald.terrarum.AppLoader.printdbg
-import java.io.File
-
-import java.io.IOException
-import java.nio.file.FileSystems
-import java.nio.file.Files
-import java.util.ArrayList
-import java.util.function.Consumer
 
 /**
  * Created by minjaesong on 2016-02-15.
@@ -18,7 +9,7 @@ object JsonFetcher {
 
     private var jsonString: StringBuffer? = null
 
-    @Throws(java.io.IOException::class)
+    @Throws(java.nio.file.NoSuchFileException::class)
     operator fun invoke(jsonFilePath: String): com.google.gson.JsonObject {
         jsonString = StringBuffer() // reset buffer every time it called
         readJsonFileAsString(jsonFilePath)
@@ -35,7 +26,7 @@ object JsonFetcher {
         return jsonObj
     }
 
-    @Throws(java.io.IOException::class)
+    @Throws(java.nio.file.NoSuchFileException::class)
     operator fun invoke(jsonFile: java.io.File): com.google.gson.JsonObject {
         jsonString = StringBuffer() // reset buffer every time it called
         readJsonFileAsString(jsonFile.canonicalPath)
@@ -52,15 +43,11 @@ object JsonFetcher {
         return jsonObj
     }
 
+    @Throws(java.nio.file.NoSuchFileException::class)
     private fun readJsonFileAsString(path: String) {
-        try {
-            java.nio.file.Files.lines(java.nio.file.FileSystems.getDefault().getPath(path)).forEach(
-                    { jsonString!!.append(it) }
-            ) // JSON does not require line break
-        }
-        catch (e: IOException) {
-            System.err.println("[JsonFetcher] An error occurred while reading $path")
-            e.printStackTrace()
-        }
+        java.nio.file.Files.lines(java.nio.file.FileSystems.getDefault().getPath(path)).forEach(
+                { jsonString!!.append(it) }
+        ) // JSON does not require line break
+
     }
 }

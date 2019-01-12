@@ -12,6 +12,10 @@ class ActorValue(val actor: Actor) : KVHashMap() {
     }
 
     override fun set(key: String, value: Any) {
+        /*if (key == AVKey.__PLAYER_QUICKSLOTSEL) {
+            Thread.currentThread().stackTrace.forEach { println(it) }
+        }*/
+
         super.set(key, value)
         actor.onActorValueChange(key, value) // fire the event handler
     }

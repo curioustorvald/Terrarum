@@ -116,11 +116,11 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     // UI aliases
     lateinit var uiAliases: ArrayList<UICanvas>
         private set
-    lateinit var uiAlasesPausing: ArrayList<UICanvas>
+    lateinit var uiAliasesPausing: ArrayList<UICanvas>
         private set
 
     inline val paused: Boolean
-        get() = uiAlasesPausing.map { if (it.isOpened) return true else 0 }.isEmpty() // isEmply is always false, which we want
+        get() = uiAliasesPausing.map { if (it.isOpened) return true else 0 }.isEmpty() // isEmpty is always false, which we want
     /**
      * Set to false if UI is opened; set to true  if UI is closed.
      */
@@ -355,13 +355,13 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 uiTooltip
                 // drawn last
         )
-        uiAlasesPausing = arrayListOf(
+        uiAliasesPausing = arrayListOf(
                 uiInventoryPlayer,
                 //uiInventoryContainer,
                 consoleHandler,
                 uiCheatMotherfuckerNootNoot
         )
-        uiAlasesPausing.forEach { addUI(it) } // put them all to the UIContainer
+        uiAliasesPausing.forEach { addUI(it) } // put them all to the UIContainer
         uiAliases.forEach { addUI(it) } // put them all to the UIContainer
 
 
@@ -958,7 +958,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         actorsRenderOverlay.forEach { it.dispose() }
 
         uiAliases.forEach { it.dispose() }
-        uiAlasesPausing.forEach { it.dispose() }
+        uiAliasesPausing.forEach { it.dispose() }
 
 
         WatchDotAlph.dispose()

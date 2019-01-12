@@ -67,8 +67,8 @@ object DefaultConfig {
 
         jsonObject.addProperty("keyjump", Input.Keys.SPACE)
 
-        val keyquickbars = JsonArray(); for (i in Input.Keys.NUMPAD_1..Input.Keys.NUMPAD_9) keyquickbars.add(i); keyquickbars.add(Input.Keys.NUMPAD_0) // NUM_1 to NUM_0
-        jsonObject.add("keyquickbars", keyquickbars)
+        val keyquickslots = JsonArray(); for (i in Input.Keys.NUM_1..Input.Keys.NUM_9) keyquickslots.add(i); keyquickslots.add(Input.Keys.NUM_0) // NUM_1 to NUM_0
+        jsonObject.add("keyquickslots", keyquickslots)
 
         jsonObject.addProperty("mouseprimary", Input.Buttons.LEFT) // left mouse
         jsonObject.addProperty("mousesecondary", Input.Buttons.RIGHT) // right mouse
