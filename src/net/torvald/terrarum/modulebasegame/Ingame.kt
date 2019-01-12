@@ -307,12 +307,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // >- lesser UIs -<
         // quick bar
-        uiQuickBar = UIQuickBar()
+        uiQuickBar = UIQuickslotBar()
         uiQuickBar.isVisible = true
-        uiQuickBar.setPosition((Terrarum.WIDTH - uiQuickBar.width) / 2 + 12, -10)
+        uiQuickBar.setPosition((Terrarum.WIDTH - uiQuickBar.width) / 2, 8)
 
         // pie menu
-        uiPieMenu = UIPieMenu()
+        uiPieMenu = uiQuickslotPie()
         uiPieMenu.setPosition(Terrarum.HALFW, Terrarum.HALFH)
 
         // vital metre
@@ -965,7 +965,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         Watch7SegMain.dispose()
         WatchDotAlph.dispose()
 
-        ItemSlotImageBuilder.dispose()
+        ItemSlotImageFactory.dispose()
 
         MessageWindow.SEGMENT_BLACK.dispose()
         MessageWindow.SEGMENT_WHITE.dispose()

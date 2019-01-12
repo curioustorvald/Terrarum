@@ -202,7 +202,7 @@ object IngameRenderer {
             }
         }
 
-        // works but some UI elements have wrong transparency
+        // works but some UI elements have wrong transparency -> should be fixed with Terrarum.gdxCleanAndSetBlend -- Torvald 2019-01-12
         blendNormal(batch)
     }
 

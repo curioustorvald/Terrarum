@@ -230,7 +230,9 @@ object ItemCodex {
         itemCodex[code] = item
     }
 
-    fun getItemImage(item: GameItem): TextureRegion {
+    fun getItemImage(item: GameItem?): TextureRegion? {
+        if (item == null) return null
+
         // terrain
         if (item.originalID in ITEM_TILES) {
             return BlocksDrawer.tilesTerrain.get(

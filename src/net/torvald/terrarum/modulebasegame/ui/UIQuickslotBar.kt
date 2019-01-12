@@ -4,74 +4,61 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
-import net.torvald.terrarum.Second
 import net.torvald.terrarum.gameworld.fmod
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.ui.UICanvas
 
 /**
+ * A bar-shaped representation of the Quickslot.
+ *
  * Created by minjaesong on 2016-07-20.
  */
-class UIQuickBar : UICanvas() {
-    private val gutter = 8
-    override var width: Int = (ItemSlotImageBuilder.slotImage.tileW + gutter) * SLOT_COUNT
-    override var height: Int = ItemSlotImageBuilder.slotImage.tileH + 4 + Terrarum.fontGame.lineHeight.toInt()
+class UIQuickslotBar : UICanvas() {
+    private val cellSize = ItemSlotImageFactory.slotImage.tileW // 38
+
+    private val gutter = 10 - 6 // do -6 to get a gutter size of not-enlarged cells
+    override var width: Int = cellSize * SLOT_COUNT + gutter * (SLOT_COUNT - 1) // 452
+    override var height: Int = ItemSlotImageFactory.slotImage.tileH + 4 + Terrarum.fontGame.lineHeight.toInt()
     /**
      * In milliseconds
      */
-    override var openCloseTime: Second = 0.16f
-
-    private val startPointX = ItemSlotImageBuilder.slotImage.tileW / 2
-    private val startPointY = ItemSlotImageBuilder.slotImage.tileH / 2
+    override var openCloseTime: Second = COMMON_OPEN_CLOSE
 
     private var selection: Int
         get() = (Terrarum.ingame!! as Ingame).actorNowPlaying?.actorValue?.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL) ?: 0
         set(value) { (Terrarum.ingame!! as Ingame).actorNowPlaying?.actorValue?.set(AVKey.__PLAYER_QUICKSLOTSEL, value.fmod(SLOT_COUNT)) }
-    
+
+
+    companion object {
+        const val SLOT_COUNT = 10
+        const val DISPLAY_OPACITY = 0.8f
+        const val COMMON_OPEN_CLOSE = 0.12f
+    }
+
+
     override fun updateUI(delta: Float) {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
         for (i in 0..SLOT_COUNT - 1) {
-            val image = if (i == selection)
-                ItemSlotImageBuilder.produceLarge(false, (i + 1) % SLOT_COUNT)
-            else
-                ItemSlotImageBuilder.produce(true, (i + 1) % SLOT_COUNT)
+            val item = (Terrarum.ingame!! as Ingame).actorNowPlaying?.inventory?.getQuickslot(i)?.item
 
-            val slotX = startPointX + (CELL_SIZE + gutter).times(i).toFloat()
-            val slotY = startPointY.toFloat()
+            val image = if (i == selection)
+                ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, item)
+            else
+                ItemSlotImageFactory.produce(true, (i + 1) % SLOT_COUNT, item)
+
+            val slotX = cellSize / 2 + (cellSize + gutter) * i
+            val slotY = cellSize / 2
 
             // draw slots
-            batch.color = Color(1f, 1f, 1f, handler.opacity * finalOpacity)
-            batch.draw(
-                    image,
-                    slotX,
-                    slotY
-            )
+            batch.color = Color(1f, 1f, 1f, handler.opacity * DISPLAY_OPACITY)
+            image.draw(batch, slotX, slotY)
 
-            // draw item
-            val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
-            if (player == null) return // if player is null, don't draw actual items
-
-
-            val itemPair = player.inventory.getQuickBar(i)
-
-            if (itemPair != null) {
-                val itemImage = ItemCodex.getItemImage(itemPair.item)
-                val itemW = itemImage.regionWidth
-                val itemH = itemImage.regionHeight
-
-                batch.color = Color(1f, 1f, 1f, handler.opacity)
-                batch.draw(
-                        itemImage, // using fixed CELL_SIZE for reasons
-                        slotX + (CELL_SIZE - itemW) / 2f,
-                        slotY + (CELL_SIZE - itemH) / 2f
-                )
-            }
         }
     }
 
@@ -121,11 +108,4 @@ class UIQuickBar : UICanvas() {
     override fun dispose() {
     }
 
-
-    companion object {
-        val finalOpacity = 0.8f
-
-        const val SLOT_COUNT = 10
-        const val CELL_SIZE = 32
-    }
 }
