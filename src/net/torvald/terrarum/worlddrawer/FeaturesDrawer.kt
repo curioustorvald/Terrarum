@@ -1,12 +1,13 @@
 package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockstats.BlockStats
 import com.jme3.math.FastMath
 import net.torvald.colourutil.ColourTemp
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendMul
+import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.gameworld.GameWorld
 
@@ -54,14 +55,15 @@ object FeaturesDrawer {
         colTemp = colTemp_warm + colTemp_cold - ENV_COLTEMP_NOON
         val zoom = Terrarum.ingame?.screenZoom ?: 1f
 
-        blendMul()
+        blendMul(batch)
 
         batch.color = ColourTemp(colTemp)
-        batch.fillRect(WorldCamera.x * zoom,
-                WorldCamera.y * zoom,
+        batch.fillRect(0f, 0f,
                 Terrarum.WIDTH * if (zoom < 1) 1f / zoom else zoom,
                 Terrarum.HEIGHT * if (zoom < 1) 1f / zoom else zoom
         )
+
+        blendNormal(batch)
     }
 
     /**
