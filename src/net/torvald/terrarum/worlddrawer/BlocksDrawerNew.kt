@@ -2,21 +2,18 @@ package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Matrix4
+import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.ceilInt
-import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
-import net.torvald.terrarum.roundInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.BufferedOutputStream
 import java.io.File
@@ -89,7 +86,7 @@ internal object BlocksDrawer {
 
 
     private lateinit var tilesQuad: Mesh
-    private val shader = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/tiling.frag"))
+    private val shader = AppLoader.loadShader("assets/4096.vert", "assets/tiling.frag")
 
     init {
         printdbg(this, "Unpacking textures...")
@@ -350,33 +347,33 @@ internal object BlocksDrawer {
         drawTiles(FLUID)
     }
 
-    internal fun drawWall(projectionMatrix: Matrix4) {
+    internal fun drawWall(projectionMatrix: Matrix4, backbuffer: FrameBuffer) {
         // blend normal
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-        renderUsingBuffer(WALL, projectionMatrix)
+        renderUsingBuffer(WALL, projectionMatrix, backbuffer)
     }
 
-    internal fun drawTerrain(projectionMatrix: Matrix4) {
+    internal fun drawTerrain(projectionMatrix: Matrix4, backbuffer: FrameBuffer) {
         // blend normal
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
-        renderUsingBuffer(TERRAIN, projectionMatrix)
-        renderUsingBuffer(FLUID, projectionMatrix)
+        renderUsingBuffer(TERRAIN, projectionMatrix, backbuffer)
+        renderUsingBuffer(FLUID, projectionMatrix, backbuffer)
     }
 
-    internal fun drawFront(projectionMatrix: Matrix4, drawWires: Boolean) {
+    internal fun drawFront(projectionMatrix: Matrix4, drawWires: Boolean, backbuffer: FrameBuffer) {
         // blend mul
         Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         // let's just not MUL on terrain, make it FLUID only...
-        renderUsingBuffer(FLUID, projectionMatrix)
+        renderUsingBuffer(FLUID, projectionMatrix, backbuffer)
 
 
 
@@ -386,7 +383,7 @@ internal object BlocksDrawer {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         if (drawWires) {
-            renderUsingBuffer(WIRE, projectionMatrix)
+            renderUsingBuffer(WIRE, projectionMatrix, backbuffer)
         }
     }
 
@@ -688,7 +685,7 @@ internal object BlocksDrawer {
 
     private var _tilesBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
 
-    private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4) {
+    private fun renderUsingBuffer(mode: Int, projectionMatrix: Matrix4, backbuffer: FrameBuffer) {
         //Gdx.gl.glClearColor(.094f, .094f, .094f, 0f)
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
@@ -731,6 +728,7 @@ internal object BlocksDrawer {
         _tilesBufferAsTex.dispose()
         _tilesBufferAsTex = Texture(tilesBuffer)
         _tilesBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+        backbuffer.colorBufferTexture.bind(3)
         tilesTerrainBlend.texture.bind(2)
         _tilesBufferAsTex.bind(1) // trying 1 and 0...
         tileAtlas.texture.bind(0) // for some fuck reason, it must be bound as last
@@ -742,6 +740,7 @@ internal object BlocksDrawer {
         shader.setUniformi("tilesAtlas", 0)
         shader.setUniformi("tilesBlendAtlas", 2)
         shader.setUniformi("tilemap", 1)
+        shader.setUniformi("backbuffer", 3)
         shader.setUniformi("tilemapDimension", tilesBuffer.width, tilesBuffer.height)
         shader.setUniformf("tilesInAxes", tilesInHorizontal.toFloat(), tilesInVertical.toFloat())
         shader.setUniformi("cameraTranslation", WorldCamera.x fmod TILE_SIZE, WorldCamera.y fmod TILE_SIZE) // usage of 'fmod' and '%' were depend on the for_x_start, which I can't just do naive int div

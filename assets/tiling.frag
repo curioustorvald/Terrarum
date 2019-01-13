@@ -30,6 +30,7 @@ uniform sampler2D tilemap; // RGBA8888
 
 uniform sampler2D tilesAtlas; // terrain, wire, fluids, etc.
 uniform sampler2D tilesBlendAtlas; // weather mix (e.g. yellowed grass)
+uniform sampler2D backbuffer;
 uniform float tilesBlend = 0.0; // percentage of blending [0f..1f]. 0: draws tilesAtlas, 1: draws tilesBlendAtlas
 
 uniform ivec2 tilesInAtlas = ivec2(256, 256);
@@ -67,6 +68,7 @@ void main() {
     // READ THE FUCKING MANUAL, YOU DONKEY !! //
     // This code purposedly uses flipped fragcoord. //
     // Make sure you don't use gl_FragCoord unknowingly! //
+    // Remember, if there's a compile error, shader SILENTLY won't do anything //
 
 
     // default gl_FragCoord takes half-integer (represeting centre of the pixel) -- could be useful for phys solver?
@@ -109,6 +111,11 @@ void main() {
 
     vec4 finalBreakage = texture2D(tilesAtlas, finalUVCoordForBreakage);
 
-    gl_FragColor = colourFilter * (mix(finalTile, finalBreakage, finalBreakage.a));
+    vec4 finalColor = mix(finalTile, finalBreakage, finalBreakage.a);
+    vec4 backbufferColor = texture2D(backbuffer, gl_FragCoord.xy / screenDimension);
+
+    //gl_FragColor = colourFilter * finalColor;
+    //                                                             v
+    gl_FragColor = colourFilter * mix(backbufferColor, finalColor, 1);
 
 }
