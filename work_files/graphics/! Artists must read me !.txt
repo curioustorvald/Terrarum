@@ -1,0 +1,9 @@
+All the images must be exported as .tga or .tga.gz. All the alpha must be premultiplied.
+
+It is recommended to use ImageMagick command line tool to convert PSD to TGA directly.
+
+    convert terrain.psd -colorspace sRGB -write mpr:temp -background black -alpha Remove mpr:temp -compose Copy_Opacity -composite terrain.tga
+
+'convert' is a ImageMagick's convert.exe, usually located at 'C:\Program Files\ImageMagick-7.0.8-Q16'
+
+If you have ImageMagick installed, please use included batch file.
