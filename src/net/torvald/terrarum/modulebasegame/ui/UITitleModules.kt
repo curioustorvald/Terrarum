@@ -4,12 +4,11 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.Second
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemList
-import net.torvald.terrarum.ui.UIItemTextButtonList
 
 /**
  * Created by minjaesong on 2017-08-01.
@@ -18,13 +17,10 @@ class UITitleModules : UICanvas() {
 
     override var openCloseTime: Second = 0f
 
-
-
     private val moduleAreaHMargin = 48
-
     private val moduleAreaBorder = 8
 
-    override var width = (Terrarum.WIDTH * 0.75).toInt() - moduleAreaHMargin
+    override var width = Terrarum.WIDTH - UIRemoCon.remoConWidth - moduleAreaHMargin
     override var height = Terrarum.HEIGHT - moduleAreaHMargin * 2
 
 
@@ -44,7 +40,7 @@ class UITitleModules : UICanvas() {
     private val mouduleArea = UIItemList<UIItemModuleInfoCell>(
             this,
             moduleInfoCells,
-            (Terrarum.WIDTH * 0.25f).toInt(), moduleAreaHMargin,
+            UIRemoCon.remoConWidth, moduleAreaHMargin,
             width,
             height,
             inactiveCol = Color.WHITE,

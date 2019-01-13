@@ -7,6 +7,7 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -150,7 +151,7 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
             if (ingame.actorNowPlaying != null) {
                 ingame.actorNowPlaying!!.actorValue.set(
                         AVKey.__PLAYER_QUICKSLOTSEL,
-                        (ingame.actorNowPlaying!!.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)!! - amount) % ingame.actorNowPlaying!!.inventory.quickSlot.size
+                        (ingame.actorNowPlaying!!.actorValue.getAsInt(AVKey.__PLAYER_QUICKSLOTSEL)!! - amount) fmod ingame.actorNowPlaying!!.inventory.quickSlot.size
                 )
             }
         }

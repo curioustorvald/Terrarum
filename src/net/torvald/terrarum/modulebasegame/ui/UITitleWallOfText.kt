@@ -3,13 +3,11 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.CreditSingleton
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.Second
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextArea
-import net.torvald.terrarum.ui.UIItemTextButtonList
 
 open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
 
@@ -17,10 +15,10 @@ open class UITitleWallOfText(private val text: List<String>) : UICanvas() {
 
 
     private val textAreaHMargin = 48
-    override var width = (Terrarum.WIDTH * 0.75).toInt()
+    override var width = Terrarum.WIDTH - UIRemoCon.remoConWidth - textAreaHMargin
     override var height = Terrarum.HEIGHT - textAreaHMargin * 2
     private val textArea = UIItemTextArea(this,
-            Terrarum.WIDTH - width, textAreaHMargin,
+            UIRemoCon.remoConWidth, textAreaHMargin,
             width, height
     )
 

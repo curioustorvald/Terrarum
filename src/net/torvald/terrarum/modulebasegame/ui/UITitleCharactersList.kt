@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.serialise.SavegameLedger
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemList
 
@@ -17,13 +16,10 @@ class UITitleCharactersList : UICanvas() {
 
     override var openCloseTime: Second = 0f
 
-
-
     private val moduleAreaHMargin = 48
-
     private val moduleAreaBorder = 8
 
-    override var width = (Terrarum.WIDTH * 0.75).toInt() - moduleAreaHMargin
+    override var width = Terrarum.WIDTH - UIRemoCon.remoConWidth - moduleAreaHMargin
     override var height = Terrarum.HEIGHT - moduleAreaHMargin * 2
 
     private val moduleInfoCells = ArrayList<UIItemSavegameInfoCell>()
@@ -37,7 +33,7 @@ class UITitleCharactersList : UICanvas() {
     private val mouduleArea = UIItemList<UIItemSavegameInfoCell>(
             this,
             moduleInfoCells,
-            (Terrarum.WIDTH * 0.25f).toInt(), moduleAreaHMargin,
+            UIRemoCon.remoConWidth, moduleAreaHMargin,
             width,
             height,
             inactiveCol = Color.WHITE,
