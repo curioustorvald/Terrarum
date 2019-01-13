@@ -222,15 +222,9 @@ public class AppLoader implements ApplicationListener {
         logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
         logo.flip(false, true);
 
-        shaderBayerSkyboxFill = new ShaderProgram(Gdx.files.internal("assets/4096.vert"),
-                Gdx.files.internal("assets/4096_bayer_skyboxfill.frag")
-        );
-        shaderHicolour = new ShaderProgram(Gdx.files.internal("assets/4096.vert"),
-                Gdx.files.internal("assets/hicolour.frag")
-        );
-        shaderColLUT = new ShaderProgram(Gdx.files.internal("assets/4096.vert"),
-                Gdx.files.internal("assets/passthru.frag")
-        );
+        shaderBayerSkyboxFill = loadShader("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag");
+        shaderHicolour = loadShader("assets/4096.vert", "assets/hicolour.frag");
+        shaderColLUT = loadShader("assets/4096.vert", "assets/passthru.frag");
 
         fullscreenQuad = new Mesh(
                 true, 4, 6,
@@ -464,9 +458,9 @@ public class AppLoader implements ApplicationListener {
         defaultSaveDir = defaultDir + "/Saves";
         configDir = defaultDir + "/config.json";
 
-        System.out.println("os.name = $OSName (with identifier $operationSystem)");
-        System.out.println("os.version = $OSVersion");
-        System.out.println("default directory: $defaultDir");
+        System.out.println(String.format("os.name = %s (with identifier %s)", OSName, operationSystem));
+        System.out.println(String.format("os.version = %s", OSVersion));
+        System.out.println(String.format("default directory: %s", defaultDir));
     }
 
     private void createDirs() {
@@ -634,15 +628,25 @@ public class AppLoader implements ApplicationListener {
 
     // //
 
-    public static final void printdbg(Object obj, Object message) {
+    public static void printdbg(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD || getConfigBoolean("forcedevbuild")) {
             System.out.println("[" + obj.getClass().getSimpleName() + "] " + message.toString());
         }
     }
 
-    public static final void printdbgerr(Object obj, Object message) {
+    public static void printdbgerr(Object obj, Object message) {
         if (IS_DEVELOPMENT_BUILD || getConfigBoolean("forcedevbuild")) {
             System.err.println("[" + obj.getClass().getSimpleName() + "] " + message.toString());
         }
+    }
+
+    public static ShaderProgram loadShader(String vert, String frag) {
+        ShaderProgram s = new ShaderProgram(Gdx.files.internal(vert), Gdx.files.internal(frag));
+
+        if (s.getLog().contains("error C")) {
+            throw new Error(String.format("Shader program loaded with %s, %s failed:\n%s", vert, frag, s.getLog()));
+        }
+
+        return s;
     }
 }

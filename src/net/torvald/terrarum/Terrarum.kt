@@ -328,18 +328,18 @@ object Terrarum : Screen {
 
 
         ShaderProgram.pedantic = false
-        shaderBlur = ShaderProgram(Gdx.files.internal("assets/blur.vert"), Gdx.files.internal("assets/blur.frag"))
+        shaderBlur = AppLoader.loadShader("assets/blur.vert", "assets/blur.frag")
 
 
         if (getConfigBoolean("fxdither")) {
-            shaderBayer = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer.frag"))
+            shaderBayer = AppLoader.loadShader("assets/4096.vert", "assets/4096_bayer.frag")
             shaderBayer.begin()
             shaderBayer.setUniformf("rcount", 64f)
             shaderBayer.setUniformf("gcount", 64f)
             shaderBayer.setUniformf("bcount", 64f)
             shaderBayer.end()
 
-            shaderSkyboxFill = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/4096_bayer_skyboxfill.frag"))
+            shaderSkyboxFill = AppLoader.loadShader("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag")
             shaderSkyboxFill.begin()
             shaderSkyboxFill.setUniformf("rcount", 64f)
             shaderSkyboxFill.setUniformf("gcount", 64f)
@@ -347,15 +347,15 @@ object Terrarum : Screen {
             shaderSkyboxFill.end()
         }
         else {
-            shaderBayer = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/passthru.frag"))
-            shaderSkyboxFill = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/skyboxfill.frag"))
+            shaderBayer = AppLoader.loadShader("assets/4096.vert", "assets/passthru.frag")
+            shaderSkyboxFill = AppLoader.loadShader("assets/4096.vert", "assets/skyboxfill.frag")
         }
 
 
-        shaderBlendGlow = ShaderProgram(Gdx.files.internal("assets/blendGlow.vert"), Gdx.files.internal("assets/blendGlow.frag"))
+        shaderBlendGlow = AppLoader.loadShader("assets/blendGlow.vert", "assets/blendGlow.frag")
 
-        shaderRGBOnly = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/rgbonly.frag"))
-        shaderAtoGrey = ShaderProgram(Gdx.files.internal("assets/4096.vert"), Gdx.files.internal("assets/aonly.frag"))
+        shaderRGBOnly = AppLoader.loadShader("assets/4096.vert", "assets/rgbonly.frag")
+        shaderAtoGrey = AppLoader.loadShader("assets/4096.vert", "assets/aonly.frag")
 
 
         if (!shaderBlendGlow.isCompiled) {
@@ -625,19 +625,20 @@ fun blendDisable(batch: SpriteBatch? = null) {
 }
 
 fun gdxClearAndSetBlend(r: Float, g: Float, b: Float, a: Float) {
-    Gdx.gl.glClearColor(0f,0f,0f,0f)
+    Gdx.gl.glClearColor(r,g,b,a)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
     Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
     Gdx.gl.glEnable(GL20.GL_BLEND)
 
-    // this assumens premultiplied alpha?
-    //Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    // ALPHA *MUST BE* PREMULTIPLIED //
 
-    // ALPHA MUST NOT BE PREMULTIPLIED //
-    // we're using separate blend func to accomodate not-premultiplied alpha
-    Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE)
-    Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD)
-
+    // One way to tell:
+    //  1. Check (RGB) and (A) values.
+    //  2. If there exist a pixel such that max(R,G,B) > (A), then the image is NOT premultiplied.
+    // Easy way:
+    //  Base game (mods/basegame/blocks/terrain.tga.gz) has impure window glass. When looking at the RGB channel only:
+    //      premultipied     if the glass looks very dark.
+    //      not premultipied if the glass looks VERY GREEN.
 
     // helpful links:
     // - https://gamedev.stackexchange.com/questions/82741/normal-blend-mode-with-opengl-trouble

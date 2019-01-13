@@ -50,7 +50,6 @@ object PostProcessor {
             fbo.colorBufferTexture.bind(0)
 
             shader?.begin()
-            shader?.setUniformf("resolution", AppLoader.appConfig.width.toFloat(), AppLoader.appConfig.height.toFloat())
             shader?.setUniformMatrix("u_projTrans", projMat)
             shader?.setUniformi("u_texture", 0)
             AppLoader.fullscreenQuad.render(shader, GL20.GL_TRIANGLES)
