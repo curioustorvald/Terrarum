@@ -31,9 +31,6 @@ object PlayerBuilderTestSubject1 {
 
         PlayerBuilderSigrid.fillTestInventory(p.inventory)
 
-        p.isNoClip = true
-
-
         return p
     }
 }
