@@ -209,7 +209,7 @@ class UIItemInventoryDynamicList(
 
             batch.color = colour
             batch.draw(
-                    (parentUI as UIInventoryFull).catIcons.get(20,0),
+                    (parentUI as UIInventoryFull).catIcons.get(if (i == itemPage) 20 else 21,0),
                     scrollUpButton.posX.toFloat(),
                     getScrollDotYHeight(i).toFloat()
             )
