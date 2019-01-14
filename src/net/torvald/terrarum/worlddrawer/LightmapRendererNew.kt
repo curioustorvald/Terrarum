@@ -196,7 +196,8 @@ object LightmapRenderer {
          * |  |    3|   |↗       |   |       ↖|   |3    |  |
          * `--+-----'   `--------'   `--------'   `-----+--'
          * round:   1            2            3            4
-         * for all lightmap[y][x]
+         * for all lightmap[y][x], run in this order: 2-3-4-1
+         * for some reason, this setup removes (or mitigates) directional artefacts.
          */
 
         AppLoader.debugTimers["Renderer.Lanterns"] = measureNanoTime {
@@ -210,37 +211,37 @@ object LightmapRenderer {
         // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
 
         if (!AppLoader.getConfigBoolean("multithreadedlight")) {
-            // Round 1
+            // Round 2
             AppLoader.debugTimers["Renderer.Light1"] = measureNanoTime {
-                for (y in for_y_start - overscan_open..for_y_end) {
+                for (y in for_y_end + overscan_open downTo for_y_start) {
                     for (x in for_x_start - overscan_open..for_x_end) {
                         setLight(x, y, calculate(x, y, 1))
                     }
                 }
             }
 
-            // Round 2
+            // Round 3
             AppLoader.debugTimers["Renderer.Light2"] = measureNanoTime {
                 for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_start - overscan_open..for_x_end) {
+                    for (x in for_x_end + overscan_open downTo for_x_start) {
                         setLight(x, y, calculate(x, y, 2))
                     }
                 }
             }
 
-            // Round 3
+            // Round 4
             AppLoader.debugTimers["Renderer.Light3"] = measureNanoTime {
-                for (y in for_y_end + overscan_open downTo for_y_start) {
+                for (y in for_y_start - overscan_open..for_y_end) {
                     for (x in for_x_end + overscan_open downTo for_x_start) {
                         setLight(x, y, calculate(x, y, 3))
                     }
                 }
             }
 
-            // Round 4
+            // Round 1
             AppLoader.debugTimers["Renderer.Light4"] = measureNanoTime {
                 for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_end + overscan_open downTo for_x_start) {
+                    for (x in for_x_start - overscan_open..for_x_end) {
                         setLight(x, y, calculate(x, y, 4))
                     }
                 }
@@ -471,10 +472,10 @@ object LightmapRenderer {
         // brighten if solid
         if (BlockCodex[world.getTileFromTerrain(x, y)].isSolid) {
             return Color(
-                    (l.r * 1.25f),//.clampOne(),
-                    (l.g * 1.25f),//.clampOne(),
-                    (l.b * 1.25f),//.clampOne()
-                    (l.a * 1.25f)
+                    (l.r * 1.2f),
+                    (l.g * 1.2f),
+                    (l.b * 1.2f),
+                    (l.a * 1.2f)
             )
         }
         else {
