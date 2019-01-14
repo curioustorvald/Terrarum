@@ -577,26 +577,25 @@ fun SpriteBatch.drawStraightLine(x: Float, y: Float, otherEnd: Float, thickness:
 infix fun Color.mul(other: Color): Color = this.cpy().mul(other)
 
 
-
-/*inline fun Color.toRGB10(): RGB10 {
-    val bits = this.toIntBits() // ABGR
-    // 0bxxRRRRRRRRRRGGGGGGGGGGBBBBBBBBBB
-    // 0bAAAAAAAABBBBBBBBGGGGGGGGRRRRRRRR
-    return bits.and(0x0000FF).shl(20) or bits.and(0x00FF00).shl(2) or bits.and(0xFF0000).ushr(16)
-}*/
-
-
-
 fun blendMul(batch: SpriteBatch? = null) {
     // will break if the colour image contains semitransparency
     (batch ?: Terrarum.batch).enableBlending()
     (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
-    Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
+}
+
+fun blendScreen(batch: SpriteBatch? = null) {
+    // will break if the colour image contains semitransparency
+    (batch ?: Terrarum.batch).enableBlending()
+    (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR)
+}
+
+fun blendDisable(batch: SpriteBatch? = null) {
+    (batch ?: Terrarum.batch).disableBlending()
 }
 
 fun blendNormal(batch: SpriteBatch? = null) {
     (batch ?: Terrarum.batch).enableBlending()
-    (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    (batch ?: Terrarum.batch).setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE)
 
     // ALPHA *MUST BE* PREMULTIPLIED //
 
@@ -613,17 +612,6 @@ fun blendNormal(batch: SpriteBatch? = null) {
     // - https://www.andersriggelsen.dk/glblendfunc.php
 }
 
-fun blendScreen(batch: SpriteBatch? = null) {
-    // will break if the colour image contains semitransparency
-    (batch ?: Terrarum.batch).enableBlending()
-    (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR)
-    Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD) // batch.flush does not touch blend equation
-}
-
-fun blendDisable(batch: SpriteBatch? = null) {
-    (batch ?: Terrarum.batch).disableBlending()
-}
-
 fun gdxClearAndSetBlend(r: Float, g: Float, b: Float, a: Float) {
     Gdx.gl.glClearColor(r,g,b,a)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -637,8 +625,8 @@ fun gdxSetBlend() {
 
 fun gdxSetBlendNormal() {
     gdxSetBlend()
-    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-    Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD)
+    Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+    //Gdx.gl.glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL30.GL_MAX) // batch.flush does not touch blend equation
 
     // ALPHA *MUST BE* PREMULTIPLIED //
 

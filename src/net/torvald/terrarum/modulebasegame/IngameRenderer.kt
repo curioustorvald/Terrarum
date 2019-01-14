@@ -94,7 +94,7 @@ object IngameRenderer {
 
         // clear main or whatever super-FBO being used
         //clearBuffer()
-        gdxClearAndSetBlend(.64f, .754f, .84f, 1f)
+        gdxClearAndSetBlend(.64f, .754f, .84f, 0f)
 
         ///////////////////////////////////////////////////////////////////////
 
@@ -544,21 +544,21 @@ object IngameRenderer {
             lightmapFboB.dispose()
         }
 
-        fboRGB = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
-        fboRGB_lightMixed = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
-        fboA = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
-        fboA_lightMixed = FrameBuffer(Pixmap.Format.RGBA8888, width, height, false)
+        fboRGB = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
+        fboRGB_lightMixed = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
+        fboA = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
+        fboA_lightMixed = FrameBuffer(Pixmap.Format.RGBA8888, width, height, true)
         lightmapFboA = FrameBuffer(
                 Pixmap.Format.RGBA8888,
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
-                false
+                true
         )
         lightmapFboB = FrameBuffer(
                 Pixmap.Format.RGBA8888,
                 LightmapRenderer.lightBuffer.width * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
                 LightmapRenderer.lightBuffer.height * LightmapRenderer.DRAW_TILE_SIZE.toInt(),
-                false
+                true
         )
 
         BlocksDrawer.resize(width, height)
