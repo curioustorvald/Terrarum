@@ -627,8 +627,18 @@ fun blendDisable(batch: SpriteBatch? = null) {
 fun gdxClearAndSetBlend(r: Float, g: Float, b: Float, a: Float) {
     Gdx.gl.glClearColor(r,g,b,a)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+    gdxSetBlend()
+}
+
+fun gdxSetBlend() {
     Gdx.gl.glEnable(GL20.GL_TEXTURE_2D)
     Gdx.gl.glEnable(GL20.GL_BLEND)
+}
+
+fun gdxSetBlendNormal() {
+    gdxSetBlend()
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    Gdx.gl.glBlendEquation(GL20.GL_FUNC_ADD)
 
     // ALPHA *MUST BE* PREMULTIPLIED //
 

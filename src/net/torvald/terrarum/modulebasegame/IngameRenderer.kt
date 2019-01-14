@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.utils.ScreenUtils
 import net.torvald.dataclass.CircularArray
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWithBody
@@ -18,6 +19,7 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
+import javax.swing.JFileChooser
 
 /**
  * This will be rendered to a postprocessor FBO
@@ -220,6 +222,8 @@ object IngameRenderer {
         processBlur(lightmapFboA, lightmapFboB)
     }
 
+    internal var fboRGBexportRequested = false
+
     private fun drawToRGB(
             actorsRenderBehind: List<ActorWithBody>?,
             actorsRenderMiddle: List<ActorWithBody>?,
@@ -238,7 +242,7 @@ object IngameRenderer {
             }
 
             setCameraPosition(0f, 0f)
-            BlocksDrawer.drawWall(batch.projectionMatrix, fboRGB)
+            BlocksDrawer.drawWall(batch.projectionMatrix)
 
             batch.inUse {
                 moveCameraToWorldCoord()
@@ -247,7 +251,7 @@ object IngameRenderer {
             }
 
             setCameraPosition(0f, 0f)
-            BlocksDrawer.drawTerrain(batch.projectionMatrix, fboRGB)
+            BlocksDrawer.drawTerrain(batch.projectionMatrix)
 
             batch.inUse {
                 /////////////////
@@ -262,20 +266,42 @@ object IngameRenderer {
             }
 
             setCameraPosition(0f, 0f)
-            BlocksDrawer.drawFront(batch.projectionMatrix, false, fboRGB) // blue coloured filter of water, etc.
+            BlocksDrawer.drawFront(batch.projectionMatrix, false) // blue coloured filter of water, etc.
 
             batch.inUse {
                 FeaturesDrawer.drawEnvOverlay(batch)
             }
         }
 
+        if (fboRGBexportRequested) {
+            fboRGBexportRequested = false
+            val fileChooser = JFileChooser()
+            fileChooser.showSaveDialog(null)
+
+            try {
+                if (fileChooser.selectedFile != null) {
+                    fboRGB.inAction(null, null) {
+                        val p = ScreenUtils.getFrameBufferPixmap(0, 0, fboRGB.width, fboRGB.height)
+                        PixmapIO2.writeTGA(Gdx.files.absolute(fileChooser.selectedFile.absolutePath), p)
+                    }
+                }
+            }
+            catch (e: Throwable) {
+                e.printStackTrace()
+            }
+        }
 
         fboRGB_lightMixed.inAction(camera, batch) {
 
             setCameraPosition(0f, 0f)
             val (xrem, yrem) = worldCamToRenderPos()
 
+            gdxSetBlend()
+
             batch.inUse {
+
+                blendNormal(batch)
+
                 // draw world
                 batch.draw(fboRGB.colorBufferTexture, 0f, 0f)
                 batch.flush()
