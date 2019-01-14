@@ -1,10 +1,8 @@
 package net.torvald.terrarum.serialise
 
-import com.badlogic.gdx.Gdx
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.gameactors.PlayerBuilder
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
@@ -101,11 +99,11 @@ object WriteWorldInfo {
         metaOut.write((world as GameWorldExtension).time.TIME_T.toLittle())
 
         // creation time (real world time)
-        metaOut.write(world.creationTime.toLittle48())
+        metaOut.write(world.creationTime.toULittle48())
 
         // time at save (real world time)
         val timeNow = System.currentTimeMillis() / 1000L
-        metaOut.write(timeNow.toLittle48())
+        metaOut.write(timeNow.toULittle48())
 
         // get playtime and save it
         val timeToAdd = (timeNow - world.loadTime).toInt()

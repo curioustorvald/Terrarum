@@ -88,3 +88,5 @@ internal object WriteLayerData {
 
 
 }
+
+const val WORLD_WRITER_FORMAT_VERSION = 3
