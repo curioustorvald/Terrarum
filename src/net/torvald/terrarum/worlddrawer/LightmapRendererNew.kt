@@ -190,14 +190,15 @@ object LightmapRenderer {
          * Updating order:
          * ,--------.   ,--+-----.   ,-----+--.   ,--------. -
          * |↘       |   |  |    3|   |3    |  |   |       ↙| ↕︎ overscan_open / overscan_opaque
-         * |  +-----+   |  |  2  |   |  2  |  |   +-----+  | - depending on the noop_mask
-         * |  |1    | → |  |1    | → |    1|  | → |    1|  |
-         * |  |  2  |   |  +-----+   +-----+  |   |  2  |  |
+         * |  ,-----+   |  |  2  |   |  2  |  |   +-----.  | - depending on the noop_mask
+         * |  |1    |   |  |1    |   |    1|  |   |    1|  |
+         * |  |  2  |   |  `-----+   +-----'  |   |  2  |  |
          * |  |    3|   |↗       |   |       ↖|   |3    |  |
          * `--+-----'   `--------'   `--------'   `-----+--'
          * round:   1            2            3            4
-         * for all lightmap[y][x], run in this order: 2-3-4-1
-         * for some reason, this setup removes (or mitigates) directional artefacts.
+         * for all lightmap[y][x], run in this order: 2-3-4-1-2
+         *     If you run only 4 sets, orthogonal/diagonal artefacts are bound to occur,
+         * it seems 5-pass is mandatory
          */
 
         AppLoader.debugTimers["Renderer.Lanterns"] = measureNanoTime {
@@ -247,11 +248,21 @@ object LightmapRenderer {
                 }
             }
 
+            // Round 2
+            AppLoader.debugTimers["Renderer.Light5"] = measureNanoTime {
+                for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_start - overscan_open..for_x_end) {
+                        setLight(x, y, calculate(x, y, 5))
+                    }
+                }
+            }
+
             AppLoader.debugTimers["Renderer.LightSequential"] =
                     (AppLoader.debugTimers["Renderer.Light1"]!! as Long) +
                     (AppLoader.debugTimers["Renderer.Light2"]!! as Long) +
                     (AppLoader.debugTimers["Renderer.Light3"]!! as Long) +
-                    (AppLoader.debugTimers["Renderer.Light4"]!! as Long)
+                    (AppLoader.debugTimers["Renderer.Light4"]!! as Long) +
+                    (AppLoader.debugTimers["Renderer.Light5"]!! as Long)
         }
         else {
             AppLoader.debugTimers["Renderer.LightPre"] = measureNanoTime {

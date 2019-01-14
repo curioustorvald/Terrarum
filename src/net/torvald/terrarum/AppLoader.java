@@ -157,7 +157,7 @@ public class AppLoader implements ApplicationListener {
         ShaderProgram.pedantic = false;
 
         LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
-        appConfig.useGL30 = true;
+        //appConfig.useGL30 = true; // used: loads GL 3.2, unused: loads GL 4.6; what the fuck?
         appConfig.vSyncEnabled = false;
         appConfig.resizable = false;//true;
         //appConfig.width = 1072; // IMAX ratio
