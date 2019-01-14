@@ -46,10 +46,10 @@ object PlayerBuilderSigrid {
 
         p.actorValue[AVKey.INTELLIGENT] = true
 
-        //p.actorValue[AVKey.LUMR] = 0.84
-        //p.actorValue[AVKey.LUMG] = 0.93
-        //p.actorValue[AVKey.LUMB] = 1.37
-        //p.actorValue[AVKey.LUMA] = 1.93
+        p.actorValue[AVKey.LUMR] = 0.84
+        p.actorValue[AVKey.LUMG] = 0.93
+        p.actorValue[AVKey.LUMB] = 1.37
+        p.actorValue[AVKey.LUMA] = 1.93
 
         p.actorValue[AVKey.BASEDEFENCE] = 141
 
@@ -75,20 +75,19 @@ object PlayerBuilderSigrid {
 
     fun fillTestInventory(inventory: ActorInventory) {
         val blocks = arrayOf(
-                Block.AIR, Block.DIRT, Block.GLASS_CRUDE,
+                Block.AIR, Block.DIRT, Block.GLASS_CRUDE, Block.GLASS_CLEAN,
                 Block.GRASS, Block.GRAVEL, Block.ICE_MAGICAL, Block.LANTERN,
                 Block.PLANK_BIRCH, Block.PLANK_BLOODROSE, Block.PLANK_EBONY, Block.PLANK_NORMAL,
                 Block.SANDSTONE, Block.SANDSTONE_BLACK, Block.SANDSTONE_GREEN,
                 Block.SANDSTONE_RED, Block.STONE, Block.STONE_BRICKS,
                 Block.STONE_QUARRIED, Block.STONE_TILE_WHITE, Block.TORCH,
                 Block.DAYLIGHT_CAPACITOR, Block.ICE_FRAGILE,
-                Block.ILLUMINATOR_WHITE, Block.ILLUMINATOR_BLACK, Block.ILLUMINATOR_ORANGE,
-                Block.ILLUMINATOR_GREEN, Block.ILLUMINATOR_CYAN, Block.SUNSTONE,
+                Block.SUNSTONE,
                 Block.ORE_COPPER,
                 Block.PLATFORM_STONE, Block.PLATFORM_WOODEN, Block.PLATFORM_BIRCH, Block.PLATFORM_BLOODROSE, Block.PLATFORM_EBONY
-        )
+        ) + (Block.ILLUMINATOR_WHITE .. Block.ILLUMINATOR_BLACK).toList()
         val walls = arrayOf(
-                Block.AIR, Block.DIRT, Block.GLASS_CRUDE,
+                Block.AIR, Block.DIRT, Block.GLASS_CRUDE, Block.GLASS_CLEAN,
                 Block.GRASSWALL, Block.ICE_MAGICAL,
                 Block.PLANK_BIRCH, Block.PLANK_BLOODROSE, Block.PLANK_EBONY, Block.PLANK_NORMAL,
                 Block.SANDSTONE, Block.SANDSTONE_BLACK, Block.SANDSTONE_GREEN,
