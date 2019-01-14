@@ -6,13 +6,12 @@ import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
-import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskSkimmer.Companion.read
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.toHex
 import java.io.*
 import java.nio.charset.Charset
 import java.util.*
-import kotlin.IllegalArgumentException
 import kotlin.collections.HashMap
 
 /**
@@ -45,6 +44,7 @@ internal object ReadLayerDataLzma {
         val layerCount = inputStream.read(1)[0].toUint()
         val payloadCount = inputStream.read(1)[0].toUint()
         val compression = inputStream.read(1)[0].toUint()
+        val generatorVer = inputStream.read(2).toULittleShort()
         val width = inputStream.read(4).toLittleInt()
         val height = inputStream.read(4).toLittleInt()
         val spawnAddress = inputStream.read(6).toLittleInt48()
@@ -55,6 +55,7 @@ internal object ReadLayerDataLzma {
         printdbg(this, "Layers count: $layerCount")
         printdbg(this, "Payloads count: $payloadCount")
         printdbg(this, "Compression: $compression")
+        printdbg(this, "World generator version: $generatorVer")
         printdbg(this, "Dimension: ${width}x$height")
 
         // read payloads

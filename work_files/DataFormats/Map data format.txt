@@ -8,7 +8,7 @@ Ord  Hex  Description
 02   4D   M
 03   7A   z               # 'z' because it's compressed
 
-04   03   Version revision number (unreleased numbers also count)
+04   03   Version revision number of this format (unreleased numbers also count)
 
 05   03   Number of layers, NOT the number of payload
 
@@ -17,22 +17,25 @@ Ord  Hex  Description
 07   01   Compression algorithm, 0 for none, 1 for DEFLATE, 2 for LZMA, otherwise undefined (maybe LZMA2 for the future?)
           Value of 01 (DEFLATE) is recommended for its faster compression
 
-08        World width
-09        World width
+08        World generator version. If the generator adds new feature (e.g. new ores, new buildings)
+09        this number must be incremented by one.
+
 0A        World width
 0B        World width
+0C        World width
+0D        World width
 
-0C        World height
-0D        World height
 0E        World height
 0F        World height
+10        World height
+11        World height
 
-10        Default spawn coord in Absolute Tile Number
-11        Default spawn coord in Absolute Tile Number
 12        Default spawn coord in Absolute Tile Number
 13        Default spawn coord in Absolute Tile Number
 14        Default spawn coord in Absolute Tile Number
 15        Default spawn coord in Absolute Tile Number
+16        Default spawn coord in Absolute Tile Number
+17        Default spawn coord in Absolute Tile Number
 
 # Payload
 #
@@ -61,6 +64,13 @@ Payload "TdMG" -- world terrain damage data, array of: (Int48 tileAddress, Float
 
 Payload "WdMG" -- world walls damage data, array of: (Int48 tileAddress, Float32 damage)
                   Uncompressed size will be arbitrary (multiple of tens)
+
+Payload "FlTP" -- world fluid types, array of: (Int48 tileAddress, Signed Int16 type)
+                  Uncompressed size will be arbitrary (multiple of eights)
+
+Payload "FlFL" -- world fluid fills, array of: (Int48 tileAddress, Float32 amount)
+                  Uncompressed size will be arbitrary (multiple of tens)
+                  If the 'amount' < 0.0001f (WorldSimulator.FLUID_MIN_MASS), the entry must be discarded
 
 EOF  45   E
 EOF  6E   n

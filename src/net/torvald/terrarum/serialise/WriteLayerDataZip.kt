@@ -1,18 +1,14 @@
 package net.torvald.terrarum.serialise
 
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.console.EchoError
 import net.torvald.terrarum.realestate.LandUtil
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.nio.charset.Charset
 import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
-import java.util.zip.GZIPOutputStream
 
 /**
  * This object only writes a file named 'worldinfo1'.
@@ -39,10 +35,11 @@ internal object WriteLayerDataZip {
     val LAYERS_FILENAME = "world"
 
     val MAGIC = byteArrayOf(0x54, 0x45, 0x4D, 0x7A)
-    val VERSION_NUMBER = 3.toByte()
+    val VERSION_NUMBER = WORLD_WRITER_FORMAT_VERSION.toByte()
     val NUMBER_OF_LAYERS = 3.toByte()
     val NUMBER_OF_PAYLOADS = 5.toByte()
     val COMPRESSION_ALGORITHM = 1.toByte()
+    val GENERATOR_VERSION = WORLD_GENERATOR_VERSION.toULittleShort()
     val PAYLOAD_HEADER = byteArrayOf(0, 0x70, 0x4C, 0x64)
     val PAYLOAD_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x50, 0x59, 0x4C, 0x64, -1)
     val FILE_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x54, 0x45, 0x4D, -1, -2)
@@ -83,7 +80,7 @@ internal object WriteLayerDataZip {
         fun wb(byte: Byte) { outputStream.write(byte.toInt()) }
         //fun wb(byte: Int) { outputStream.write(byte) }
         fun wi32(int: Int) { wb(int.toLittle()) }
-        fun wi48(long: Long) { wb(long.toLittle48()) }
+        fun wi48(long: Long) { wb(long.toULittle48()) }
         fun wi64(long: Long) { wb(long.toLittle()) }
         fun wf32(float: Float) { wi32(float.toRawBits()) }
 
@@ -94,7 +91,7 @@ internal object WriteLayerDataZip {
 
 
         // all the necessary headers
-        wb(MAGIC); wb(VERSION_NUMBER); wb(NUMBER_OF_LAYERS); wb(NUMBER_OF_PAYLOADS); wb(COMPRESSION_ALGORITHM)
+        wb(MAGIC); wb(VERSION_NUMBER); wb(NUMBER_OF_LAYERS); wb(NUMBER_OF_PAYLOADS); wb(COMPRESSION_ALGORITHM); wb(GENERATOR_VERSION)
 
         // world width, height, and spawn point
         wi32(world.width); wi32(world.height)
@@ -134,12 +131,12 @@ internal object WriteLayerDataZip {
 
         // TdMG payload
         wb(PAYLOAD_HEADER); wb("TdMG".toByteArray())
-        wi48(world.terrainDamages.size.toLong())
+        wi48(world.terrainDamages.size * 10L)
 
         deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
 
         world.terrainDamages.forEach { t, u ->
-            deflater.write(t.toLittle48())
+            deflater.write(t.toULittle48())
             deflater.write(u.toRawBits().toLittle())
         }
 
@@ -148,17 +145,48 @@ internal object WriteLayerDataZip {
 
         // WdMG payload
         wb(PAYLOAD_HEADER); wb("WdMG".toByteArray())
-        wi48(world.wallDamages.size.toLong())
+        wi48(world.wallDamages.size * 10L)
 
         deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
 
         world.wallDamages.forEach { t, u ->
-            deflater.write(t.toLittle48())
+            deflater.write(t.toULittle48())
             deflater.write(u.toRawBits().toLittle())
         }
 
         deflater.finish()
         wb(PAYLOAD_FOOTER)
+
+        // FlTP payload
+        wb(PAYLOAD_HEADER); wb("FlTP".toByteArray())
+        wi48(world.fluidTypes.size * 8L)
+
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
+
+        world.fluidTypes.forEach { t, u ->
+            deflater.write(t.toULittle48())
+            deflater.write(u.value.toLittleShort())
+        }
+
+        deflater.finish()
+        wb(PAYLOAD_FOOTER)
+
+        // FlFL payload
+        wb(PAYLOAD_HEADER); wb("FlFL".toByteArray())
+        wi48(world.fluidFills.size * 10L)
+
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
+
+        world.fluidFills.forEach { t, u ->
+            deflater.write(t.toULittle48())
+            deflater.write(u.toRawBits().toLittle())
+        }
+
+        deflater.finish()
+        wb(PAYLOAD_FOOTER)
+
+
+
 
         // write footer
         wb(FILE_FOOTER)
