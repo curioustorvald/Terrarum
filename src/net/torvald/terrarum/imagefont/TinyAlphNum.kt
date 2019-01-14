@@ -27,11 +27,13 @@ object TinyAlphNum : BitmapFont() {
         return W * str.length
     }
 
-    lateinit var colourHolder: Color
+    lateinit var colMain: Color
+    lateinit var colShadow: Color
 
     override fun draw(batch: Batch, text: CharSequence, x: Float, y: Float): GlyphLayout? {
-        val originalColour = batch.color
-        colourHolder = batch.color
+        val originalColour = batch.color.cpy()
+        colMain = batch.color.cpy()
+        colShadow = colMain.cpy().mul(0.5f, 0.5f, 0.5f, 1f)
 
         val x = x.round()
         val y = y.round()
@@ -43,16 +45,17 @@ object TinyAlphNum : BitmapFont() {
                 val cclow = text[index + 1]
                 val colour = getColour(cchigh, cclow)
 
-                colourHolder = colour
+                colMain = colour
+                colShadow = colMain.cpy().mul(0.5f, 0.5f, 0.5f, 1f)
             }
             else if (c in 0.toChar()..255.toChar()) {
-                batch.color = colourHolder.cpy().mul(0.5f, 0.5f, 0.5f, 1f)
+                batch.color = colShadow
                 batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W + 1, y)
                 batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W, y + 1)
                 batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W + 1, y + 1)
 
 
-                batch.color = colourHolder.cpy()
+                batch.color = colMain
                 batch.draw(fontSheet.get(c.toInt() % 16, c.toInt() / 16), x + charsPrinted * W, y)
 
                 charsPrinted += 1
