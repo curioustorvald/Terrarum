@@ -1,7 +1,7 @@
 package net.torvald.terrarum.console
 
 import net.torvald.terrarum.modulebasegame.console.*
-import java.util.HashMap
+import java.util.*
 
 /**
  * Created by minjaesong on 2016-01-15.
@@ -59,7 +59,8 @@ object CommandDict {
 
 
             /* !! */"exportlayer" to ExportLayerData,
-            /* !! */"importlayer" to ImportLayerData
+            /* !! */"importlayer" to ImportLayerData,
+            /* !! */"exportfborgb" to ExportRendererFboRGB
     )
 
     operator fun get(commandName: String): ConsoleCommand {

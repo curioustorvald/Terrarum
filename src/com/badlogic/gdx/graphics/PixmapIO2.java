@@ -11,17 +11,27 @@ import java.io.OutputStream;
  */
 public class PixmapIO2 {
 
-    public static void writeTGA(FileHandle file, Pixmap pixmap) throws IOException {
+    public static void writeTGAHappy(FileHandle file, Pixmap pixmap) throws IOException {
         OutputStream output = file.write(false);
 
         try {
-            _writeTGA(output, pixmap);
+            _writeTGA(output, pixmap, false);
         } finally {
             StreamUtils.closeQuietly(output);
         }
     }
 
-    private static void _writeTGA(OutputStream out, Pixmap pixmap) throws IOException {
+    public static void writeTGA(FileHandle file, Pixmap pixmap) throws IOException {
+        OutputStream output = file.write(false);
+
+        try {
+            _writeTGA(output, pixmap, true);
+        } finally {
+            StreamUtils.closeQuietly(output);
+        }
+    }
+
+    private static void _writeTGA(OutputStream out, Pixmap pixmap, Boolean verbatim) throws IOException {
         byte[] width = toShortLittle(pixmap.getWidth());
         byte[] height = toShortLittle(pixmap.getHeight());
         byte[] zero = toShortLittle(0);
@@ -50,7 +60,7 @@ public class PixmapIO2 {
                 int color = pixmap.getPixel(x, y);
 
                 // if alpha == 0, write special value instead
-                if ((color & 0xFF) == 0) {
+                if (verbatim && (color & 0xFF) == 0) {
                     out.write(zeroalpha);
                 }
                 else {
@@ -63,7 +73,10 @@ public class PixmapIO2 {
         // write footer
         // 00 00 00 00 00 00 00 00 TRUEVISION-XFILE 2E 00
         out.write(new byte[]{0,0,0,0,0,0,0,0});
-        out.write("TerrarumHappyTGA".getBytes());
+        if (verbatim)
+            out.write("TRUEVISION-XFILE".getBytes());
+        else
+            out.write("TerrarumHappyTGA".getBytes());
         out.write(new byte[]{0x2E,0});
 
 
