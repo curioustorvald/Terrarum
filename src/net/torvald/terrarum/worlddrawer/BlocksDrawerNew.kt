@@ -188,7 +188,7 @@ internal object BlocksDrawer {
             Block.ILLUMINATOR_RED_OFF,
             Block.ILLUMINATOR_TAN_OFF,
             Block.ILLUMINATOR_WHITE_OFF,
-            Block.ILLUMINATOR_YELLOW,
+            Block.ILLUMINATOR_YELLOW_OFF,
             Block.DAYLIGHT_CAPACITOR,
 
             Block.ORE_COPPER,
