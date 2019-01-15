@@ -272,7 +272,7 @@ class SpriteAssemblerPreview: Game() {
 
         if (doExport && image != null) {
             doExport = false
-            PixmapIO2.writeTGAHappy(Gdx.files.absolute(exportPath), image)
+            PixmapIO2.writeTGAHappy(Gdx.files.absolute(exportPath), image, false)
         }
 
 

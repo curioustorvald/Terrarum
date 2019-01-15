@@ -1,10 +1,11 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.*
+import net.torvald.terrarum.ccG
+import net.torvald.terrarum.ccW
+import net.torvald.terrarum.ccY
 import net.torvald.terrarum.langpack.Lang
 import java.time.ZonedDateTime
-import java.util.ArrayList
-import java.util.Formatter
+import java.util.*
 import java.util.regex.Pattern
 
 /**
@@ -20,7 +21,8 @@ internal object CommandInterpreter {
             "getlocale",
             "help",
             "version",
-            "tips"
+            "tips",
+            "screenshot"
     )
 
     internal fun execute(command: String) {

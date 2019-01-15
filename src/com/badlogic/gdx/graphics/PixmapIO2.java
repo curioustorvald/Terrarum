@@ -11,32 +11,32 @@ import java.io.OutputStream;
  */
 public class PixmapIO2 {
 
-    public static void writeTGAHappy(FileHandle file, Pixmap pixmap) throws IOException {
+    // REMEMBER: to the GL's perspective, this game's FBOs are always Y-flipped. //
+
+    public static void writeTGAHappy(FileHandle file, Pixmap pixmap, boolean flipY) throws IOException {
         OutputStream output = file.write(false);
 
         try {
-            _writeTGA(output, pixmap, false);
+            _writeTGA(output, pixmap, false, flipY);
         } finally {
             StreamUtils.closeQuietly(output);
         }
     }
 
-    public static void writeTGA(FileHandle file, Pixmap pixmap) throws IOException {
+    public static void writeTGA(FileHandle file, Pixmap pixmap, boolean flipY) throws IOException {
         OutputStream output = file.write(false);
 
         try {
-            _writeTGA(output, pixmap, true);
+            _writeTGA(output, pixmap, true, flipY);
         } finally {
             StreamUtils.closeQuietly(output);
         }
     }
 
-    private static void _writeTGA(OutputStream out, Pixmap pixmap, Boolean verbatim) throws IOException {
+    private static void _writeTGA(OutputStream out, Pixmap pixmap, boolean verbatim, boolean flipY) throws IOException {
         byte[] width = toShortLittle(pixmap.getWidth());
         byte[] height = toShortLittle(pixmap.getHeight());
         byte[] zero = toShortLittle(0);
-
-        byte[] zeroalpha = new byte[]{0,0,0,0};
 
         out.write(0); // ID field: empty
         out.write(0); // no colour map, but should be ignored anyway as it being unmapped RGB
@@ -55,16 +55,17 @@ public class PixmapIO2 {
         //     1. BGRA order
         //     2. Y-Flipped but not X-Flipped
 
-        for (int y = pixmap.getHeight() - 1; y >= 0; y--) {
-            for (int x = 0; x < pixmap.getWidth(); x++) {
-                int color = pixmap.getPixel(x, y);
-
-                // if alpha == 0, write special value instead
-                if (verbatim && (color & 0xFF) == 0) {
-                    out.write(zeroalpha);
+        if (!flipY) {
+            for (int y = pixmap.getHeight() - 1; y >= 0; y--) {
+                for (int x = 0; x < pixmap.getWidth(); x++) {
+                    writeTga(x, y, verbatim, pixmap, out);
                 }
-                else {
-                    out.write(RGBAtoBGRA(color));
+            }
+        }
+        else {
+            for (int y = 0; y < pixmap.getHeight(); y++) {
+                for (int x = 0; x < pixmap.getWidth(); x++) {
+                    writeTga(x, y, verbatim, pixmap, out);
                 }
             }
         }
@@ -84,6 +85,19 @@ public class PixmapIO2 {
         out.close();
     }
 
+    private static byte[] zeroalpha = new byte[]{0,0,0,0};
+    private static void writeTga(int x, int y, boolean verbatim, Pixmap pixmap, OutputStream out) throws IOException {
+        int color = pixmap.getPixel(x, y);
+
+        // if alpha == 0, write special value instead
+        if (verbatim && (color & 0xFF) == 0) {
+            out.write(zeroalpha);
+        }
+        else {
+            out.write(RGBAtoBGRA(color));
+        }
+    }
+    
     private static byte[] toShortLittle(int i) {
         return new byte[]{
                 (byte) (i & 0xFF),
