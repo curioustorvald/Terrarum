@@ -44,8 +44,10 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     abstract val width: Int
     abstract val height: Int
 
+    /** Position of mouse relative to this item */
     protected val relativeMouseX: Int
         get() = (Terrarum.mouseScreenX - (parentUI.posX) - this.posX)
+    /** Position of mouse relative to this item */
     protected val relativeMouseY: Int
         get() = (Terrarum.mouseScreenY - (parentUI.posY) - this.posY)
 
