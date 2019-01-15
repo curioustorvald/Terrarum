@@ -43,6 +43,7 @@ object CommandDict {
             "setscale" to SetScale,
             "kill" to KillActor,
             "money" to MoneyDisp,
+            "screenshot" to TakeScreenshot,
 
             // Test codes
             "bulletintest" to SetBulletin,

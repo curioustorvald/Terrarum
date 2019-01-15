@@ -22,7 +22,9 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import javax.swing.JFileChooser
 
 /**
- * This will be rendered to a postprocessor FBO
+ * This will be rendered to a postprocessor FBO.
+ *
+ * For the entire render path, see AppLoader.
  */
 object IngameRenderer {
     /** for non-private use, use with care! */
@@ -282,7 +284,8 @@ object IngameRenderer {
                 if (fileChooser.selectedFile != null) {
                     fboRGB.inAction(null, null) {
                         val p = ScreenUtils.getFrameBufferPixmap(0, 0, fboRGB.width, fboRGB.height)
-                        PixmapIO2.writeTGA(Gdx.files.absolute(fileChooser.selectedFile.absolutePath), p)
+                        PixmapIO2.writeTGA(Gdx.files.absolute(fileChooser.selectedFile.absolutePath), p, false)
+                        p.dispose()
                     }
                 }
             }

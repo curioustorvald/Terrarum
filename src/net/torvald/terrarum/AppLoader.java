@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -140,6 +141,7 @@ public class AppLoader implements ApplicationListener {
 
     private static boolean splashDisplayed = false;
     private static boolean postInitFired = false;
+    private static boolean screenshotRequested = false;
 
     public static LwjglApplicationConfiguration appConfig;
     public static GameFontBase fontGame;
@@ -246,10 +248,6 @@ public class AppLoader implements ApplicationListener {
 
         FrameBufferManager.begin(renderFBO);
         gdxClearAndSetBlend(.094f, .094f, .094f, 0f);
-        FrameBufferManager.end();
-
-
-        FrameBufferManager.begin(renderFBO);
         setCameraPosition(0, 0);
 
         // draw splash screen when predefined screen is null
@@ -293,6 +291,20 @@ public class AppLoader implements ApplicationListener {
 
         PostProcessor.INSTANCE.draw(camera.combined, renderFBO);
 
+
+        // process screenshot request
+        if (screenshotRequested) {
+            screenshotRequested = false;
+
+            try {
+                Pixmap p = ScreenUtils.getFrameBufferPixmap(0, 0, appConfig.width, appConfig.height);
+                PixmapIO2.writeTGA(Gdx.files.absolute(defaultDir + "/Screenshot.tga"), p, true);
+                p.dispose();
+            }
+            catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
 
         splashDisplayed = true;
         GLOBAL_RENDER_TIMER += 1;
@@ -417,13 +429,20 @@ public class AppLoader implements ApplicationListener {
         fullscreenQuad.setIndices(new short[]{0, 1, 2, 2, 3, 0});
     }
 
+    public static void requestScreenshot() {
+        screenshotRequested = true;
+    }
+
     // DEFAULT DIRECTORIES //
 
     public static String OSName = System.getProperty("os.name");
     public static String OSVersion = System.getProperty("os.version");
     public static String operationSystem;
+    /** %appdata%/Terrarum, without trailing slash */
     public static String defaultDir;
+    /** defaultDir + "/Saves", without trailing slash */
     public static String defaultSaveDir;
+    /** defaultDir + "/config.json" */
     public static String configDir;
     public static RunningEnvironment environment;
 
