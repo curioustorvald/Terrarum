@@ -62,6 +62,10 @@ class UIItemInventoryDynamicList(
     private val compactViewCat = setOf(3, 4, 6, 7, 9) // ingredients, potions, blocks, walls, all (spritesheet order)
 
     var itemPage = 0
+        set(value) {
+            field = if (itemPageCount == 0) 0 else (value).fmod(itemPageCount)
+            rebuild()
+        }
     var itemPageCount = 1 // TODO total size of current category / items.size
         private set
 
@@ -152,6 +156,9 @@ class UIItemInventoryDynamicList(
             highlightable = false
     )
 
+    fun scrollItemPage(relativeAmount: Int) {
+        itemPage = if (itemPageCount == 0) 0 else (itemPage + relativeAmount).fmod(itemPageCount)
+    }
 
     init {
         // initially highlight grid mode buttons
@@ -174,14 +181,12 @@ class UIItemInventoryDynamicList(
         }
 
         scrollUpButton.clickOnceListener = { _, _, _ ->
-            itemPage = if (itemPageCount == 0) 0 else (itemPage - 1).fmod(itemPageCount)
             scrollUpButton.highlighted = false
-            rebuild()
+            scrollItemPage(-1)
         }
         scrollDownButton.clickOnceListener = { _, _, _ ->
-            itemPage = if (itemPageCount == 0) 0 else (itemPage + 1).fmod(itemPageCount)
             scrollDownButton.highlighted = false
-            rebuild()
+            scrollItemPage(1)
         }
 
         // if (is.mouseUp) handled by this.touchDown()
@@ -336,6 +341,8 @@ class UIItemInventoryDynamicList(
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        super.touchUp(screenX, screenY, pointer, button)
+
         items.forEach { if (it.mouseUp) it.touchUp(screenX, screenY, pointer, button) }
 
         return true
@@ -355,6 +362,17 @@ class UIItemInventoryDynamicList(
 
         items.forEach { if (it.mouseUp) it.keyUp(keycode) }
         rebuild()
+
+        return true
+    }
+
+    override fun scrolled(amount: Int): Boolean {
+        super.scrolled(amount)
+
+        // scroll the item list (for now)
+        if (mouseUp) {
+            scrollItemPage(amount)
+        }
 
         return true
     }
