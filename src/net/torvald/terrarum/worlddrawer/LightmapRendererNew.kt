@@ -85,7 +85,7 @@ object LightmapRenderer {
      */
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
     //private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
-    private val lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0f,0f,0f,0f) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
+    private var lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0f,0f,0f,0f) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lanternMap = ArrayList<Lantern>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
     private val AIR = Block.AIR
@@ -150,11 +150,26 @@ object LightmapRenderer {
     }
 
     // TODO in regard of "colour math against integers", take Int
+    /**
+     * Simply stores the given colour into the main lightmap.
+     */
     private fun setLight(x: Int, y: Int, colour: Color) {
         setLightOf(lightmap, x, y, colour)
     }
 
-    private fun setLightOf(list: Array<Color>, x: Int, y: Int, colour: Color) {
+    /**
+     * Converts world coord (x,y) into the lightmap index, and stores the input colour into the given list
+     * with given applyFun applied.
+     *
+     * Default 'applyFun' is simply storing given colour into the array.
+     *
+     * @param list The lightmap
+     * @param x World X coordinate
+     * @param y World Y coordinate
+     * @param colour Color to write
+     * @param applyFun A function ```foo(old_colour, given_colour)```
+     */
+    private fun setLightOf(list: Array<Color>, x: Int, y: Int, colour: Color, applyFun: (Color, Color) -> Color = { _, c -> c }) {
         if (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
             x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH) {
 
@@ -162,7 +177,7 @@ object LightmapRenderer {
             val xpos = x - for_x_start + overscan_open
 
             //lightmap[ypos][xpos] = colour
-            list[ypos * LIGHTMAP_WIDTH + xpos] = colour
+            list[ypos * LIGHTMAP_WIDTH + xpos] = applyFun.invoke(list[ypos * LIGHTMAP_WIDTH + xpos], colour)
         }
     }
 
@@ -205,18 +220,20 @@ object LightmapRenderer {
             buildLanternmap()
         } // usually takes 3000 ns
 
-        // O(36n) == O(n) where n is a size of the map.
+        // O((5*9)n) == O(n) where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with ADDITIVE blend (aka maxblend)
 
 
         // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
 
         if (!AppLoader.getConfigBoolean("multithreadedlight")) {
+            //val workMap = lightmap.copyOf()
+
             // Round 2
             AppLoader.debugTimers["Renderer.Light1"] = measureNanoTime {
                 for (y in for_y_end + overscan_open downTo for_y_start) {
                     for (x in for_x_start - overscan_open..for_x_end) {
-                        setLight(x, y, calculate(x, y, 1))
+                        setLightOf(lightmap, x, y, calculate(x, y, 1))
                     }
                 }
             }
@@ -225,7 +242,7 @@ object LightmapRenderer {
             AppLoader.debugTimers["Renderer.Light2"] = measureNanoTime {
                 for (y in for_y_end + overscan_open downTo for_y_start) {
                     for (x in for_x_end + overscan_open downTo for_x_start) {
-                        setLight(x, y, calculate(x, y, 2))
+                        setLightOf(lightmap, x, y, calculate(x, y, 2))
                     }
                 }
             }
@@ -234,7 +251,7 @@ object LightmapRenderer {
             AppLoader.debugTimers["Renderer.Light3"] = measureNanoTime {
                 for (y in for_y_start - overscan_open..for_y_end) {
                     for (x in for_x_end + overscan_open downTo for_x_start) {
-                        setLight(x, y, calculate(x, y, 3))
+                        setLightOf(lightmap, x, y, calculate(x, y, 3))
                     }
                 }
             }
@@ -243,7 +260,7 @@ object LightmapRenderer {
             AppLoader.debugTimers["Renderer.Light4"] = measureNanoTime {
                 for (y in for_y_start - overscan_open..for_y_end) {
                     for (x in for_x_start - overscan_open..for_x_end) {
-                        setLight(x, y, calculate(x, y, 4))
+                        setLightOf(lightmap, x, y, calculate(x, y, 4))
                     }
                 }
             }
@@ -252,10 +269,12 @@ object LightmapRenderer {
             AppLoader.debugTimers["Renderer.Light5"] = measureNanoTime {
                 for (y in for_y_end + overscan_open downTo for_y_start) {
                     for (x in for_x_start - overscan_open..for_x_end) {
-                        setLight(x, y, calculate(x, y, 5))
+                        setLightOf(lightmap, x, y, calculate(x, y, 5))
                     }
                 }
             }
+
+            //lightmap = workMap
 
             AppLoader.debugTimers["Renderer.LightSequential"] =
                     (AppLoader.debugTimers["Renderer.Light1"]!! as Long) +
@@ -313,10 +332,9 @@ object LightmapRenderer {
                     calcTasks.forEachIndexed { index, list ->
                         ThreadParallel.map(index, "LightCalculate") { index -> // this index is that index
                             list.forEach {
-                                val msg = it as ThreadedLightmapUpdateMessage
+                                val it = it as ThreadedLightmapUpdateMessage
 
                                 setLightOf(bufferForPasses[it.pass - 1], it.x, it.y, calculate(it.x, it.y, it.pass))
-                                //setLightOf(bufferForPasses[it.pass - 1], it.x, it.y, calculate(it.x, it.y, 1))
                             }
                         }
                     }
@@ -402,6 +420,8 @@ object LightmapRenderer {
     private fun calculate(x: Int, y: Int, pass: Int): Color = calculate(x, y, pass, false)
 
     /**
+     * Calculates the light simulation, using main lightmap as one of the input.
+     *
      * @param pass one-based
      */
     private fun calculate(x: Int, y: Int, pass: Int, doNotCalculateAmbient: Boolean): Color {
