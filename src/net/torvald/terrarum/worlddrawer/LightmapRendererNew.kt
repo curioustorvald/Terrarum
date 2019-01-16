@@ -103,10 +103,12 @@ object LightmapRenderer {
     const val MUL_FLOAT = MUL / 256f
     const val DIV_FLOAT = 256f / MUL
 
-    internal var for_x_start: Int = 0
-    internal var for_y_start: Int = 0
-    internal var for_x_end: Int = 0
-    internal var for_y_end: Int = 0
+    internal var for_x_start = 0
+    internal var for_y_start = 0
+    internal var for_x_end = 0
+    internal var for_y_end = 0
+    internal var for_x = 0
+    internal var for_y = 0
 
 
     //inline fun getLightRawPos(x: Int, y: Int) = lightmap[y][x]
@@ -199,7 +201,10 @@ object LightmapRenderer {
         if (WorldCamera.x in -(TILE_SIZE - 1)..-1) for_x_start -= 1 // another edge-case fix
 
         for_x_end = for_x_start + WorldCamera.width / TILE_SIZE + 3
-        for_y_end = for_y_start + WorldCamera.height / TILE_SIZE + 2 // same fix as above
+        for_y_end = for_y_start + WorldCamera.height / TILE_SIZE + 3 // same fix as above
+
+        for_x = (for_x_end - for_x_start) / 2
+        for_y = (for_y_end - for_y_start) / 2
 
         /**
          * Updating order:
@@ -229,6 +234,9 @@ object LightmapRenderer {
         if (!AppLoader.getConfigBoolean("multithreadedlight")) {
             //val workMap = lightmap.copyOf()
 
+            // The skipping is dependent on how you get ambient light,
+            // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
+
             // Round 2
             AppLoader.debugTimers["Renderer.Light1"] = measureNanoTime {
                 for (y in for_y_end + overscan_open downTo for_y_start) {
@@ -238,37 +246,97 @@ object LightmapRenderer {
                 }
             }
 
+            /* ..#####
+               ..#####
+               ..#####
+               ..#O###
+               ...####
+               .......
+               ......↖ shaded area: skip update*/
             // Round 3
             AppLoader.debugTimers["Renderer.Light2"] = measureNanoTime {
                 for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_end + overscan_open downTo for_x_start) {
+                    val range = (
+                                if (y > for_y + 1)
+                                    for_x_end + overscan_open
+                                else if (y == for_y + 1)
+                                    for_x - 1
+                                else
+                                    for_x - 2
+                                ) downTo for_x_start
+                    for (x in range) {
                         setLightOf(lightmap, x, y, calculate(x, y, 2))
                     }
                 }
             }
 
+            /* #####.↙
+               #####..
+               #####..
+               ###O#..
+               ####...
+               .......
+               ....... shaded area: skip update*/
             // Round 4
             AppLoader.debugTimers["Renderer.Light3"] = measureNanoTime {
                 for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_end + overscan_open downTo for_x_start) {
+                    val range = for_x_end + overscan_open downTo (
+                            if (y > for_y + 1)
+                                for_x_start
+                            else if (y == for_y + 1)
+                                for_x + 1
+                            else
+                                for_x + 2
+                                )
+                    for (x in range) {
                         setLightOf(lightmap, x, y, calculate(x, y, 3))
                     }
                 }
             }
 
+            /* ↘......
+               .......
+               ####...
+               ###O#..
+               #####..
+               #####..
+               #####.. shaded area: skip update*/
             // Round 1
             AppLoader.debugTimers["Renderer.Light4"] = measureNanoTime {
                 for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_start - overscan_open..for_x_end) {
+                    val range = (
+                            if (y > for_y - 1)
+                                for_x_start - overscan_open
+                            else if (y == for_y - 1)
+                                for_x + 1
+                            else
+                                for_x + 2
+                                ) .. for_x_end
+                    for (x in range) {
                         setLightOf(lightmap, x, y, calculate(x, y, 4))
                     }
                 }
             }
 
+            /* .......
+               .......
+               ...####
+               ..#O###
+               ..#####
+               ..#####
+               ↗.##### shaded area: skip update*/
             // Round 2
             AppLoader.debugTimers["Renderer.Light5"] = measureNanoTime {
                 for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_start - overscan_open..for_x_end) {
+                    val range = for_x_start - overscan_open .. (
+                            if (y > for_y - 1)
+                                for_x_end
+                            else if (y == for_y - 1)
+                                for_x - 1
+                            else
+                                for_x - 2
+                                )
+                    for (x in range) {
                         setLightOf(lightmap, x, y, calculate(x, y, 5))
                     }
                 }
