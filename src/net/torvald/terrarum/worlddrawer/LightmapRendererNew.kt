@@ -7,15 +7,12 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.jme3.math.FastMath
-import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.ceilInt
 import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
 import net.torvald.terrarum.concurrent.ThreadParallel
-import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.GameWorld
@@ -86,7 +83,7 @@ object LightmapRenderer {
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
     //private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private var lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0f,0f,0f,0f) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
-    private val lanternMap = ArrayList<Lantern>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    private val lanternMap = HashMap<Point2i, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
     private val AIR = Block.AIR
 
@@ -402,10 +399,10 @@ object LightmapRenderer {
 
                                 val normalisedColor = it.color.cpy().mul(DIV_FLOAT)
 
-                                lanternMap.add(Lantern(x, y, normalisedColor))
+                                lanternMap[Point2i(x, y)] = normalisedColor
                                 // Q&D fix for Roundworld anomaly
-                                lanternMap.add(Lantern(x + world.width, y, normalisedColor))
-                                lanternMap.add(Lantern(x - world.width, y, normalisedColor))
+                                lanternMap[Point2i(x + world.width, y)] = normalisedColor
+                                lanternMap[Point2i(x - world.width, y)] = normalisedColor
                             }
                         }
                     }
@@ -459,11 +456,8 @@ object LightmapRenderer {
         }
         // END MIX TILE
 
-        for (i in 0 until lanternMap.size) {
-            val lmap = lanternMap[i]
-            if (lmap.posX == x && lmap.posY == y)
-                lightLevelThis.set(lightLevelThis maxBlend lmap.color) // maximise to not exceed 1.0 with normal (<= 1.0) light
-        }
+        // blend lantern
+        lightLevelThis maxBlend (lanternMap[Point2i(x, y)] ?: colourNull)
 
         // calculate ambient
         /*  + * +
@@ -862,11 +856,6 @@ object LightmapRenderer {
             hdr(this.b),
             hdr(this.a)
     )
-
-    /**
-     * color values are normalised -- 0.0 to 1.0 for 0..1023
-     */
-    data class Lantern(val posX: Int, val posY: Int, val color: Color)
 
     private fun Color.nonZero() = this.r != 0f || this.g != 0f || this.b != 0f || this.a != 0f
 

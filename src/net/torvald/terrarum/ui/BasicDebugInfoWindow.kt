@@ -49,6 +49,21 @@ class BasicDebugInfoWindow : UICanvas() {
         }
     }
 
+    private fun formatNanoTime(l: Long?): String {
+        if (l == null) return "null"
+
+        val sb = StringBuilder()
+
+        l.toString().reversed().forEachIndexed { index, c ->
+            if (index > 0 && index % 3 == 0)
+                sb.append(' ')
+
+            sb.append(c)
+        }
+
+        return sb.reverse().toString()
+    }
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         val player = ingame.actorNowPlaying
 
@@ -136,9 +151,10 @@ class BasicDebugInfoWindow : UICanvas() {
         printLine(batch, 10, "fluid@cursor ${ccY}Type $ccM${fluid.type.value} ${ccY}Fill $ccG${fluid.amount}f")
 
 
+        // print time
         var dbgCnt = 12
         AppLoader.debugTimers.forEach { t, u ->
-            printLine(batch, dbgCnt, "$ccM$t $ccG$u$ccY ns")
+            printLine(batch, dbgCnt, "$ccM$t $ccG${formatNanoTime(u as? Long)}$ccY ns")
             dbgCnt++
         }
 
