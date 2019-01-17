@@ -47,12 +47,12 @@ object LightmapRenderer {
 
                 /*for (y in 0 until LIGHTMAP_HEIGHT) {
                     for (x in 0 until LIGHTMAP_WIDTH) {
-                        lightmap[y][x] = Color(0)
+                        lightmap[y][x] = colourNull
                     }
                 }*/
 
                 for (i in 0 until lightmap.size) {
-                    lightmap[i] = Color(0)
+                    lightmap[i] = colourNull
                 }
             }
         }
@@ -203,8 +203,10 @@ object LightmapRenderer {
         for_x_end = for_x_start + WorldCamera.width / TILE_SIZE + 3
         for_y_end = for_y_start + WorldCamera.height / TILE_SIZE + 3 // same fix as above
 
-        for_x = (for_x_end - for_x_start) / 2
-        for_y = (for_y_end - for_y_start) / 2
+        for_x = for_x_start + (for_x_end - for_x_start) / 2
+        for_y = for_y_start + (for_y_end - for_y_start) / 2
+
+        //println("$for_x_start..$for_x_end, $for_x\t$for_y_start..$for_y_end, $for_y")
 
         /**
          * Updating order:
@@ -225,6 +227,12 @@ object LightmapRenderer {
             buildLanternmap()
         } // usually takes 3000 ns
 
+
+        // wipe out lightmap
+        AppLoader.debugTimers["Renderer.Light0"] = measureNanoTime {
+            for (k in 0 until lightmap.size) lightmap[k] = colourNull
+        }
+
         // O((5*9)n) == O(n) where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with ADDITIVE blend (aka maxblend)
 
@@ -232,124 +240,58 @@ object LightmapRenderer {
         // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
 
         if (!AppLoader.getConfigBoolean("multithreadedlight")) {
-            //val workMap = lightmap.copyOf()
+            //val workMap = Array(lightmap.size) { colourNull }
 
             // The skipping is dependent on how you get ambient light,
             // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
+
+            // FIXME theoretically skipping shouldn't work (light can be anywhere on the screen, not just centre
+            //       but how does it actually work ?!?!?!!?!?!?!?
+            //         because things are filled in subsequent frames ?
+            //         because of not wiping out prev map ! (if pass=1 also calculates ambience, was disabled to not have to wipe out)
 
             // Round 2
             AppLoader.debugTimers["Renderer.Light1"] = measureNanoTime {
                 for (y in for_y_end + overscan_open downTo for_y_start) {
                     for (x in for_x_start - overscan_open..for_x_end) {
-                        setLightOf(lightmap, x, y, calculate(x, y, 1))
+                        setLightOf(lightmap, x, y, calculate(x, y))
                     }
                 }
             }
 
-            /* ..#####
-               ..#####
-               ..#####
-               ..#O###
-               ...####
-               .......
-               ......↖ shaded area: skip update*/
             // Round 3
             AppLoader.debugTimers["Renderer.Light2"] = measureNanoTime {
                 for (y in for_y_end + overscan_open downTo for_y_start) {
-                    val range = (
-                                if (y > for_y + 1)
-                                    for_x_end + overscan_open
-                                else if (y == for_y + 1)
-                                    for_x - 1
-                                else
-                                    for_x - 2
-                                ) downTo for_x_start
-                    for (x in range) {
-                        setLightOf(lightmap, x, y, calculate(x, y, 2))
+                    for (x in for_x_end + overscan_open downTo for_x_start) {
+                        setLightOf(lightmap, x, y, calculate(x, y))
                     }
                 }
             }
 
-            /* #####.↙
-               #####..
-               #####..
-               ###O#..
-               ####...
-               .......
-               ....... shaded area: skip update*/
             // Round 4
             AppLoader.debugTimers["Renderer.Light3"] = measureNanoTime {
                 for (y in for_y_start - overscan_open..for_y_end) {
-                    val range = for_x_end + overscan_open downTo (
-                            if (y > for_y + 1)
-                                for_x_start
-                            else if (y == for_y + 1)
-                                for_x + 1
-                            else
-                                for_x + 2
-                                )
-                    for (x in range) {
-                        setLightOf(lightmap, x, y, calculate(x, y, 3))
+                    for (x in for_x_end + overscan_open downTo for_x_start) {
+                        setLightOf(lightmap, x, y, calculate(x, y))
                     }
                 }
             }
 
-            /* ↘......
-               .......
-               ####...
-               ###O#..
-               #####..
-               #####..
-               #####.. shaded area: skip update*/
             // Round 1
             AppLoader.debugTimers["Renderer.Light4"] = measureNanoTime {
                 for (y in for_y_start - overscan_open..for_y_end) {
-                    val range = (
-                            if (y > for_y - 1)
-                                for_x_start - overscan_open
-                            else if (y == for_y - 1)
-                                for_x + 1
-                            else
-                                for_x + 2
-                                ) .. for_x_end
-                    for (x in range) {
-                        setLightOf(lightmap, x, y, calculate(x, y, 4))
+                    for (x in for_x_start - overscan_open..for_x_end) {
+                        setLightOf(lightmap, x, y, calculate(x, y))
                     }
                 }
             }
-
-            /* .......
-               .......
-               ...####
-               ..#O###
-               ..#####
-               ..#####
-               ↗.##### shaded area: skip update*/
-            // Round 2
-            AppLoader.debugTimers["Renderer.Light5"] = measureNanoTime {
-                for (y in for_y_end + overscan_open downTo for_y_start) {
-                    val range = for_x_start - overscan_open .. (
-                            if (y > for_y - 1)
-                                for_x_end
-                            else if (y == for_y - 1)
-                                for_x - 1
-                            else
-                                for_x - 2
-                                )
-                    for (x in range) {
-                        setLightOf(lightmap, x, y, calculate(x, y, 5))
-                    }
-                }
-            }
-
-            //lightmap = workMap
 
             AppLoader.debugTimers["Renderer.LightSequential"] =
                     (AppLoader.debugTimers["Renderer.Light1"]!! as Long) +
                     (AppLoader.debugTimers["Renderer.Light2"]!! as Long) +
                     (AppLoader.debugTimers["Renderer.Light3"]!! as Long) +
                     (AppLoader.debugTimers["Renderer.Light4"]!! as Long) +
-                    (AppLoader.debugTimers["Renderer.Light5"]!! as Long)
+                    (AppLoader.debugTimers["Renderer.Light0"]!! as Long)
         }
         else {
             AppLoader.debugTimers["Renderer.LightPre"] = measureNanoTime {
@@ -357,7 +299,7 @@ object LightmapRenderer {
                 val bufferForPasses = arrayOf(
                         lightmap.copyOf(), lightmap.copyOf(), lightmap.copyOf(), lightmap.copyOf()
                 )
-                //val combiningBuffer = Array(lightmap.size) { Color(0) }
+                //val combiningBuffer = Array(lightmap.size) { colourNull }
 
                 // this is kind of inefficient...
                 val calcTask = ArrayList<ThreadedLightmapUpdateMessage>()
@@ -402,7 +344,7 @@ object LightmapRenderer {
                             list.forEach {
                                 val it = it as ThreadedLightmapUpdateMessage
 
-                                setLightOf(bufferForPasses[it.pass - 1], it.x, it.y, calculate(it.x, it.y, it.pass))
+                                setLightOf(bufferForPasses[it.pass - 1], it.x, it.y, calculate(it.x, it.y))
                             }
                         }
                     }
@@ -482,17 +424,13 @@ object LightmapRenderer {
     private val thisTileOpacity = Color(0f,0f,0f,0f)
     private val sunLight = Color(0f,0f,0f,0f)
 
-    /**
-     * @param pass one-based
-     */
-    private fun calculate(x: Int, y: Int, pass: Int): Color = calculate(x, y, pass, false)
 
     /**
      * Calculates the light simulation, using main lightmap as one of the input.
      *
      * @param pass one-based
      */
-    private fun calculate(x: Int, y: Int, pass: Int, doNotCalculateAmbient: Boolean): Color {
+    private fun calculate(x: Int, y: Int): Color {
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
 
@@ -527,41 +465,30 @@ object LightmapRenderer {
                 lightLevelThis.set(lightLevelThis maxBlend lmap.color) // maximise to not exceed 1.0 with normal (<= 1.0) light
         }
 
-        if (!doNotCalculateAmbient) {
-            // calculate ambient
-            /*  + * +
-             *  * @ *
-             *  + * +
-             *  sample ambient for eight points and apply attenuation for those
-             *  maxblend eight values and use it
-             */
+        // calculate ambient
+        /*  + * +
+         *  * @ *
+         *  + * +
+         *  sample ambient for eight points and apply attenuation for those
+         *  maxblend eight values and use it
+         */
 
-            // will "overwrite" what's there in the lightmap if it's the first pass
-            if (pass > 1) {
-                // TODO colour math against integers
-                /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y - 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
-                /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y - 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
-                /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y + 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
-                /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y + 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
+        // will "overwrite" what's there in the lightmap if it's the first pass
+        // TODO colour math against integers
+        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y - 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
+        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y - 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
+        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y + 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
+        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y + 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
 
-                /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y - 1) ?: Color.CLEAR, thisTileOpacity))
-                /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y + 1) ?: Color.CLEAR, thisTileOpacity))
-                /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y) ?: Color.CLEAR, thisTileOpacity))
-                /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y) ?: Color.CLEAR, thisTileOpacity))
-            }
+        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y - 1) ?: Color.CLEAR, thisTileOpacity))
+        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y + 1) ?: Color.CLEAR, thisTileOpacity))
+        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y) ?: Color.CLEAR, thisTileOpacity))
+        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y) ?: Color.CLEAR, thisTileOpacity))
 
-            val ret = lightLevelThis maxBlend ambientAccumulator
+        val ret = lightLevelThis maxBlend ambientAccumulator
 
 
-
-            return ret
-        }
-        else {
-            val ret = lightLevelThis
-
-            return ret
-        }
-
+        return ret
     }
 
     private fun getLightForOpaque(x: Int, y: Int): Color? { // ...so that they wouldn't appear too dark
@@ -801,7 +728,7 @@ object LightmapRenderer {
     /*private fun purgeLightmap() {
         for (y in 0..LIGHTMAP_HEIGHT - 1) {
             for (x in 0..LIGHTMAP_WIDTH - 1) {
-                lightmap.setColor(0)
+                lightmap.setcolourNull
                 lightmap.fillRectangle(0, 0, lightmap.width, lightmap.height)
             }
         }
