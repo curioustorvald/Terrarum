@@ -148,13 +148,6 @@ object LightmapRenderer {
         return null
     }
 
-    // TODO in regard of "colour math against integers", take Int
-    /**
-     * Simply stores the given colour into the main lightmap.
-     */
-    private fun setLight(x: Int, y: Int, colour: Color) {
-        setLightOf(lightmap, x, y, colour)
-    }
 
     /**
      * Converts world coord (x,y) into the lightmap index, and stores the input colour into the given list
@@ -175,7 +168,7 @@ object LightmapRenderer {
             val ypos = y - for_y_start + overscan_open
             val xpos = x - for_x_start + overscan_open
 
-            //lightmap[ypos][xpos] = colour
+            //lightmap[ypos][xpos] = applyFun.invoke(list[ypos][xpos], colour)
             list[ypos * LIGHTMAP_WIDTH + xpos] = applyFun.invoke(list[ypos * LIGHTMAP_WIDTH + xpos], colour)
         }
     }
@@ -227,11 +220,11 @@ object LightmapRenderer {
 
         // wipe out lightmap
         AppLoader.debugTimers["Renderer.Light0"] = measureNanoTime {
+            //for (ky in 0 until lightmap.size) for (kx in 0 until lightmap[0].size) lightmap[ky][kx] = colourNull
             for (k in 0 until lightmap.size) lightmap[k] = colourNull
             // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
             // but the performance boost is measly 0.1 ms on 6700K
         }
-
         // O((5*9)n) == O(n) where n is a size of the map.
         // Because of inevitable overlaps on the area, it only works with MAX blend
 
