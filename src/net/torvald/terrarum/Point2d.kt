@@ -53,3 +53,5 @@ data class Point2d(var x: Double, var y: Double) : Cloneable {
     fun distSqr(other: Point2d) = ((this.x - other.x).sqr() + (this.y - other.y).sqr())
 
 }
+
+data class Point2i(val x: Int, val y: Int)
