@@ -17,6 +17,7 @@ import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
+import java.util.concurrent.atomic.AtomicReferenceArray
 import kotlin.system.measureNanoTime
 
 /**
@@ -51,6 +52,8 @@ object LightmapRenderer {
                 for (i in 0 until lightmap.size) {
                     lightmap[i] = colourNull
                 }
+
+                makeUpdateTaskList()
             }
         }
         catch (e: UninitializedPropertyAccessException) {
@@ -278,102 +281,96 @@ object LightmapRenderer {
                 }
             }
 
-            AppLoader.debugTimers["Renderer.LightSequential"] =
+            AppLoader.debugTimers["Renderer.LightTotal"] =
                     (AppLoader.debugTimers["Renderer.Light1"]!! as Long) +
                     (AppLoader.debugTimers["Renderer.Light2"]!! as Long) +
                     (AppLoader.debugTimers["Renderer.Light3"]!! as Long) +
                     (AppLoader.debugTimers["Renderer.Light4"]!! as Long) +
                     (AppLoader.debugTimers["Renderer.Light0"]!! as Long)
         }
-        else {
-            AppLoader.debugTimers["Renderer.LightPre"] = measureNanoTime {
+        else if (world.worldIndex != -1) { // to avoid updating on the null world
+            val buf = AtomicReferenceArray<Color>(lightmap.size)
 
-                val bufferForPasses = arrayOf(
-                        lightmap.copyOf(), lightmap.copyOf(), lightmap.copyOf(), lightmap.copyOf()
-                )
-                //val combiningBuffer = Array(lightmap.size) { colourNull }
+            AppLoader.debugTimers["Renderer.LightPrlPre"] = measureNanoTime {
+                // update the content of buf using maxBlend -- it's not meant for overwrite
 
-                // this is kind of inefficient...
-                val calcTask = ArrayList<ThreadedLightmapUpdateMessage>()
+                updateMessages.forEachIndexed { index, msg ->
+                    ThreadParallel.map(index, "Light") {
+                        // for the message slices...
+                        msg.forEach { m ->
+                            // update the content of buf using maxBlend -- it's not meant for overwrite
+                            buf.getAndUpdate(m.y * LIGHTMAP_WIDTH + m.x) { oldCol ->
+                                val ux = m.x + for_x_start - overscan_open
+                                val uy = m.y + for_y_start - overscan_open
 
-                // Round 1 preload
-                for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_start - overscan_open..for_x_end) {
-                        calcTask.add(ThreadedLightmapUpdateMessage(x, y, 1))
-                    }
-                }
-
-                // Round 2 preload
-                for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_start - overscan_open..for_x_end) {
-                        calcTask.add(ThreadedLightmapUpdateMessage(x, y, 2))
-                    }
-                }
-
-                // Round 3 preload
-                for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_end + overscan_open downTo for_x_start) {
-                        calcTask.add(ThreadedLightmapUpdateMessage(x, y, 3))
-                    }
-                }
-
-                // Round 4 preload
-                for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_end + overscan_open downTo for_x_start) {
-                        calcTask.add(ThreadedLightmapUpdateMessage(x, y, 4))
-                    }
-                }
-
-                val calcTasks = calcTask.sliceEvenly(Terrarum.THREADS)
-                val combineTasks = (0 until lightmap.size).sliceEvenly(Terrarum.THREADS)
-
-
-                // couldn't help but do this nested timer
-
-                AppLoader.debugTimers["Renderer.LightParallel${Terrarum.THREADS}x"] = measureNanoTime {
-                    calcTasks.forEachIndexed { index, list ->
-                        ThreadParallel.map(index, "LightCalculate") { index -> // this index is that index
-                            list.forEach {
-                                val it = it as ThreadedLightmapUpdateMessage
-
-                                setLightOf(bufferForPasses[it.pass - 1], it.x, it.y, calculate(it.x, it.y))
+                                (oldCol ?: colourNull) maxBlend calculate(ux, uy)
                             }
                         }
                     }
-
-                    ThreadParallel.startAllWaitForDie()
-                }
-
-                AppLoader.debugTimers["Runderer.LightPost"] = measureNanoTime {
-                    combineTasks.forEachIndexed { index, intRange ->
-                        ThreadParallel.map(index, "LightCombine") { index -> // this index is that index
-                            for (i in intRange) {
-                                val max1 = bufferForPasses[0][i] maxBlend bufferForPasses[1][i]
-                                val max2 = bufferForPasses[2][i] maxBlend bufferForPasses[3][i]
-                                val max = max1 maxBlend max2
-
-                                lightmap[i] = max
-                            }
-                        }
-                    }
-
-                    ThreadParallel.startAllWaitForDie()
                 }
             }
 
+            AppLoader.debugTimers["Renderer.LightPrlRun"] = measureNanoTime {
+                ThreadParallel.startAllWaitForDie()
+            }
 
-            // get correct Renderer.LightPre by subtracting some shits
-            AppLoader.debugTimers["Renderer.LightParaTotal"] = AppLoader.debugTimers["Renderer.LightPre"]!!
-            AppLoader.debugTimers["Renderer.LightPre"] =
-                    (AppLoader.debugTimers["Renderer.LightPre"]!! as Long) -
-                    (AppLoader.debugTimers["Renderer.LightParallel${Terrarum.THREADS}x"]!! as Long) -
-                    (AppLoader.debugTimers["Runderer.LightPost"]!! as Long)
+            AppLoader.debugTimers["Renderer.LightPrlPost"] = measureNanoTime {
+                // copy to lightmap
+                for (k in 0 until lightmap.size) {
+                    lightmap[k] = buf.getPlain(k) ?: colourNull
+                }
+            }
 
-            // accuracy may suffer (overheads maybe?) but it doesn't matter (i think...)
+            AppLoader.debugTimers["Renderer.LightTotal"] =
+                    (AppLoader.debugTimers["Renderer.LightPrlPre"]!! as Long) +
+                    (AppLoader.debugTimers["Renderer.LightPrlRun"]!! as Long) +
+                    (AppLoader.debugTimers["Renderer.LightPrlPost"]!! as Long)
         }
     }
 
-    internal data class ThreadedLightmapUpdateMessage(val x: Int, val y: Int, val pass: Int)
+    // TODO re-init at every resize
+    private lateinit var updateMessages: List<Array<ThreadedLightmapUpdateMessage>>
+
+    private fun makeUpdateTaskList() {
+        val lightTaskArr = ArrayList<ThreadedLightmapUpdateMessage>()
+
+        val for_x_start = overscan_open
+        val for_y_start = overscan_open
+        val for_x_end = for_x_start + WorldCamera.width / TILE_SIZE + 3
+        val for_y_end = for_y_start + WorldCamera.height / TILE_SIZE + 3 // same fix as above
+
+        // Round 2
+        for (y in for_y_end + overscan_open downTo for_y_start) {
+            for (x in for_x_start - overscan_open..for_x_end) {
+                lightTaskArr.add(ThreadedLightmapUpdateMessage(x, y))
+            }
+        }
+
+        // Round 3
+        for (y in for_y_end + overscan_open downTo for_y_start) {
+            for (x in for_x_end + overscan_open downTo for_x_start) {
+                lightTaskArr.add(ThreadedLightmapUpdateMessage(x, y))
+            }
+        }
+
+        // Round 4
+        for (y in for_y_start - overscan_open..for_y_end) {
+            for (x in for_x_end + overscan_open downTo for_x_start) {
+                lightTaskArr.add(ThreadedLightmapUpdateMessage(x, y))
+            }
+        }
+
+        // Round 1
+        for (y in for_y_start - overscan_open..for_y_end) {
+            for (x in for_x_start - overscan_open..for_x_end) {
+                lightTaskArr.add(ThreadedLightmapUpdateMessage(x, y))
+            }
+        }
+
+        updateMessages = lightTaskArr.toTypedArray().sliceEvenly(Terrarum.THREADS)
+    }
+
+    internal data class ThreadedLightmapUpdateMessage(val x: Int, val y: Int)
 
 
     private fun buildLanternmap() {
