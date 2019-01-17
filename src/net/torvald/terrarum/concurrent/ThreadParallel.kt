@@ -1,11 +1,6 @@
 package net.torvald.terrarum.concurrent
 
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.lock
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantLock
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.collections.ArrayList
 
 typealias RunnableFun = () -> Unit
 /** Int: index of the processing core */
@@ -174,9 +169,9 @@ object ParallelUtils {
         return al
     }
 
-    fun Iterable<*>.sliceEvenly(slices: Int): List<List<*>> = this.toList().sliceEvenly(slices)
+    fun <T> Iterable<T>.sliceEvenly(slices: Int): List<List<T>> = this.toList().sliceEvenly(slices)
 
-    fun List<*>.sliceEvenly(slices: Int): List<List<*>> {
+    fun <T> List<T>.sliceEvenly(slices: Int): List<List<T>> {
         return (0 until slices).map {
             this.subList(
                     this.size.toFloat().div(slices).times(it).roundInt(),
@@ -185,7 +180,7 @@ object ParallelUtils {
         }
     }
 
-    fun Array<*>.sliceEvenly(slices: Int): List<Array<*>> {
+    fun <T> Array<T>.sliceEvenly(slices: Int): List<Array<T>> {
         return (0 until slices).map {
             this.sliceArray(
                     this.size.toFloat().div(slices).times(it).roundInt() until
