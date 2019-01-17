@@ -155,9 +155,12 @@ open class GameWorld {
     val damageDataArray: ByteArray
         get() = layerTerrainLowBits.data
 
+    private fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceWorld())
+
     fun getTileFromWall(x: Int, y: Int): Int? {
-        val wall: Int? = layerWall.getTile(x fmod width, y.coerceWorld().coerceWorld())
-        val wallDamage: Int? = getWallLowBits(x fmod width, y.coerceWorld())
+        val (x, y) = coerceXY(x, y)
+        val wall: Int? = layerWall.getTile(x, y)
+        val wallDamage: Int? = getWallLowBits(x, y)
         return if (wall == null || wallDamage == null)
             null
         else
@@ -165,8 +168,9 @@ open class GameWorld {
     }
 
     fun getTileFromTerrain(x: Int, y: Int): Int? {
-        val terrain: Int? = layerTerrain.getTile(x fmod width, y.coerceWorld())
-        val terrainDamage: Int? = getTerrainLowBits(x fmod width, y.coerceWorld())
+        val (x, y) = coerceXY(x, y)
+        val terrain: Int? = layerTerrain.getTile(x, y)
+        val terrainDamage: Int? = getTerrainLowBits(x, y)
         return if (terrain == null || terrainDamage == null)
             null
         else
@@ -174,15 +178,18 @@ open class GameWorld {
     }
 
     fun getTileFromWire(x: Int, y: Int): Int? {
-        return layerWire.getTile(x fmod width, y.coerceWorld())
+        val (x, y) = coerceXY(x, y)
+        return layerWire.getTile(x, y)
     }
 
     fun getWallLowBits(x: Int, y: Int): Int? {
-        return layerWallLowBits.getData(x fmod width, y.coerceWorld())
+        val (x, y) = coerceXY(x, y)
+        return layerWallLowBits.getData(x, y)
     }
 
     fun getTerrainLowBits(x: Int, y: Int): Int? {
-        return layerTerrainLowBits.getData(x fmod width, y.coerceWorld())
+        val (x, y) = coerceXY(x, y)
+        return layerTerrainLowBits.getData(x, y)
     }
 
     /**
@@ -194,7 +201,8 @@ open class GameWorld {
      * @param combinedTilenum (tilenum * 16) + damage
      */
     fun setTileWall(x: Int, y: Int, combinedTilenum: Int) {
-        setTileWall(x fmod width, y.coerceWorld(), (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
+        val (x, y) = coerceXY(x, y)
+        setTileWall(x, y, (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
     }
 
     /**
@@ -206,12 +214,14 @@ open class GameWorld {
      * @param combinedTilenum (tilenum * 16) + damage
      */
     fun setTileTerrain(x: Int, y: Int, combinedTilenum: Int) {
-        setTileTerrain(x fmod width, y.coerceWorld(), (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
+        val (x, y) = coerceXY(x, y)
+        setTileTerrain(x, y, (combinedTilenum / PairedMapLayer.RANGE).toByte(), combinedTilenum % PairedMapLayer.RANGE)
     }
 
     fun setTileWall(x: Int, y: Int, tile: Byte, damage: Int) {
-        layerWall.setTile(x fmod width, y.coerceWorld(), tile)
-        layerWallLowBits.setData(x fmod width, y.coerceWorld(), damage)
+        val (x, y) = coerceXY(x, y)
+        layerWall.setTile(x, y, tile)
+        layerWallLowBits.setData(x, y, damage)
         wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
     }
 
@@ -219,8 +229,9 @@ open class GameWorld {
      * Warning: this function alters fluid lists: be wary of call order!
      */
     fun setTileTerrain(x: Int, y: Int, tile: Byte, damage: Int) {
-        layerTerrain.setTile(x fmod width, y.coerceWorld(), tile)
-        layerTerrainLowBits.setData(x fmod width, y.coerceWorld(), damage)
+        val (x, y) = coerceXY(x, y)
+        layerTerrain.setTile(x, y, tile)
+        layerTerrainLowBits.setData(x, y, damage)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
         terrainDamages.remove(blockAddr)
 
@@ -232,7 +243,8 @@ open class GameWorld {
     }
 
     fun setTileWire(x: Int, y: Int, tile: Byte) {
-        layerWire.setTile(x fmod width, y.coerceWorld(), tile)
+        val (x, y) = coerceXY(x, y)
+        layerWire.setTile(x, y, tile)
     }
 
     fun getTileFrom(mode: Int, x: Int, y: Int): Int? {

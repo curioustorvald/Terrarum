@@ -228,6 +228,8 @@ object LightmapRenderer {
         // wipe out lightmap
         AppLoader.debugTimers["Renderer.Light0"] = measureNanoTime {
             for (k in 0 until lightmap.size) lightmap[k] = colourNull
+            // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
+            // but the performance boost is measly 0.1 ms on 6700K
         }
 
         // O((5*9)n) == O(n) where n is a size of the map.
@@ -428,11 +430,13 @@ object LightmapRenderer {
      * @param pass one-based
      */
     private fun calculate(x: Int, y: Int): Color {
+
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
 
         ambientAccumulator.set(0f,0f,0f,0f)
 
+        // this six fetch tasks take 2 ms ?!
         lightLevelThis.set(0f,0f,0f,0f)
         thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
         thisWall = world.getTileFromWall(x, y) ?: Block.STONE
@@ -446,13 +450,14 @@ object LightmapRenderer {
         if (thisTerrain == AIR && thisWall == AIR) {
             lightLevelThis.set(sunLight)
         }
-        // luminous tile on top of air
-        else if (thisWall == AIR && thisTileLuminosity.nonZero()) {
-            lightLevelThis.set(sunLight maxBlend thisTileLuminosity) // maximise to not exceed 1.0 with normal (<= 1.0) light
-        }
-        // opaque wall and luminous tile
-        else if (thisWall != AIR && thisTileLuminosity.nonZero()) {
-            lightLevelThis.set(thisTileLuminosity)
+        // luminous tile
+        else if (thisTileLuminosity.nonZero()) {
+            // luminous tile on top of air
+            if (thisWall == AIR)
+                lightLevelThis.set(sunLight maxBlend thisTileLuminosity) // maximise to not exceed 1.0 with normal (<= 1.0) light
+            // opaque wall and luminous tile
+            else
+                lightLevelThis.set(thisTileLuminosity)
         }
         // END MIX TILE
 
@@ -468,16 +473,16 @@ object LightmapRenderer {
          */
 
         // will "overwrite" what's there in the lightmap if it's the first pass
-        // TODO colour math against integers
-        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y - 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
-        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y - 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
-        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y + 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
-        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y + 1) ?: Color.CLEAR, scaleSqrt2(thisTileOpacity)))
+        // takes about 2 ms
+        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y - 1) ?: colourNull, scaleSqrt2(thisTileOpacity)))
+        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y - 1) ?: colourNull, scaleSqrt2(thisTileOpacity)))
+        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y + 1) ?: colourNull, scaleSqrt2(thisTileOpacity)))
+        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y + 1) ?: colourNull, scaleSqrt2(thisTileOpacity)))
 
-        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y - 1) ?: Color.CLEAR, thisTileOpacity))
-        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y + 1) ?: Color.CLEAR, thisTileOpacity))
-        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y) ?: Color.CLEAR, thisTileOpacity))
-        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y) ?: Color.CLEAR, thisTileOpacity))
+        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y - 1) ?: colourNull, thisTileOpacity))
+        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y + 1) ?: colourNull, thisTileOpacity))
+        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y) ?: colourNull, thisTileOpacity))
+        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y) ?: colourNull, thisTileOpacity))
 
         val ret = lightLevelThis maxBlend ambientAccumulator
 
