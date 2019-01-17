@@ -233,7 +233,7 @@ object LightmapRenderer {
         }
 
         // O((5*9)n) == O(n) where n is a size of the map.
-        // Because of inevitable overlaps on the area, it only works with ADDITIVE blend (aka maxblend)
+        // Because of inevitable overlaps on the area, it only works with MAX blend
 
 
         // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
@@ -415,33 +415,33 @@ object LightmapRenderer {
 
 
 
-    private val ambientAccumulator = Color(0f,0f,0f,0f)
+    //private val ambientAccumulator = Color(0f,0f,0f,0f)
     private val lightLevelThis = Color(0f,0f,0f,0f)
     private var thisTerrain = 0
     private var thisWall = 0
     private val thisTileLuminosity = Color(0f,0f,0f,0f)
     private val thisTileOpacity = Color(0f,0f,0f,0f)
+    private val thisTileOpacity2 = Color(0f,0f,0f,0f) // thisTileOpacity * sqrt(2)
     private val sunLight = Color(0f,0f,0f,0f)
 
 
     /**
      * Calculates the light simulation, using main lightmap as one of the input.
-     *
-     * @param pass one-based
      */
     private fun calculate(x: Int, y: Int): Color {
 
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
 
-        ambientAccumulator.set(0f,0f,0f,0f)
+        //ambientAccumulator.set(0f,0f,0f,0f)
 
         // this six fetch tasks take 2 ms ?!
-        lightLevelThis.set(0f,0f,0f,0f)
+        lightLevelThis.set(colourNull)
         thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
         thisWall = world.getTileFromWall(x, y) ?: Block.STONE
         thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity) // already been div by four
         thisTileOpacity.set(BlockCodex[thisTerrain].opacity) // already been div by four
+        thisTileOpacity2.set(thisTileOpacity); thisTileOpacity2.mul(1.41421356f)
         sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
 
 
@@ -465,26 +465,31 @@ object LightmapRenderer {
         lightLevelThis maxBlend (lanternMap[Point2i(x, y)] ?: colourNull)
 
         // calculate ambient
-        /*  + * +
-         *  * @ *
-         *  + * +
+        /*  + * +  0 4 1
+         *  * @ *  6 @ 7
+         *  + * +  2 5 3
          *  sample ambient for eight points and apply attenuation for those
          *  maxblend eight values and use it
          */
 
         // will "overwrite" what's there in the lightmap if it's the first pass
-        // takes about 2 ms
-        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y - 1) ?: colourNull, scaleSqrt2(thisTileOpacity)))
-        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y - 1) ?: colourNull, scaleSqrt2(thisTileOpacity)))
-        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y + 1) ?: colourNull, scaleSqrt2(thisTileOpacity)))
-        /* + */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y + 1) ?: colourNull, scaleSqrt2(thisTileOpacity)))
+        // takes about 2 ms on 6700K
+        val amb = Array(8) {
+            when (it) {
+                /* + */0 -> darkenColoured(getLightInternal(x - 1, y - 1) ?: colourNull, thisTileOpacity2)
+                /* + */1 -> darkenColoured(getLightInternal(x + 1, y - 1) ?: colourNull, thisTileOpacity2)
+                /* + */2 -> darkenColoured(getLightInternal(x - 1, y + 1) ?: colourNull, thisTileOpacity2)
+                /* + */3 -> darkenColoured(getLightInternal(x + 1, y + 1) ?: colourNull, thisTileOpacity2)
 
-        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y - 1) ?: colourNull, thisTileOpacity))
-        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x, y + 1) ?: colourNull, thisTileOpacity))
-        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x - 1, y) ?: colourNull, thisTileOpacity))
-        /* * */ambientAccumulator.set(ambientAccumulator maxBlend darkenColoured(getLightInternal(x + 1, y) ?: colourNull, thisTileOpacity))
+                /* * */4 -> darkenColoured(getLightInternal(x, y - 1) ?: colourNull, thisTileOpacity)
+                /* * */5 -> darkenColoured(getLightInternal(x, y + 1) ?: colourNull, thisTileOpacity)
+                /* * */6 -> darkenColoured(getLightInternal(x - 1, y) ?: colourNull, thisTileOpacity)
+                /* * */7 -> darkenColoured(getLightInternal(x + 1, y) ?: colourNull, thisTileOpacity)
+                else -> throw InternalError()
+            }
+        }
 
-        val ret = lightLevelThis maxBlend ambientAccumulator
+        val ret = amb.fold(lightLevelThis) { acc, color -> acc maxBlend color }
 
 
         return ret
@@ -514,6 +519,7 @@ object LightmapRenderer {
     var lightBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
     private val colourNull = Color(0)
+    private val epsilon = 1f/2048f
 
     private var _lightBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
 
@@ -862,7 +868,7 @@ object LightmapRenderer {
             hdr(this.a)
     )
 
-    private fun Color.nonZero() = this.r != 0f || this.g != 0f || this.b != 0f || this.a != 0f
+    private fun Color.nonZero() = this.r >= epsilon || this.g >= epsilon || this.b >= epsilon || this.a >= epsilon
 
     val histogram: Histogram
         get() {

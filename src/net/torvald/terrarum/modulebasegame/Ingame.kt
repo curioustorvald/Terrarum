@@ -491,6 +491,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         /** RENDER CODE GOES HERE */
         //renderGame(batch)
         AppLoader.debugTimers["Ingame.render"] = measureNanoTime { renderGame() }
+        AppLoader.debugTimers["Ingame.render-Light"] =
+                (AppLoader.debugTimers["Ingame.render"] as Long) - ((AppLoader.debugTimers["Renderer.LightSequential"] as? Long) ?: 0)
     }
 
     protected fun updateGame(delta: Float) {
