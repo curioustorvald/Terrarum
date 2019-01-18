@@ -4,10 +4,10 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
-import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.ui.UIItem
 
 /**
@@ -39,8 +39,7 @@ class UIItemInventoryEquippedView(
     
     val spriteViewBackCol: Color; get() = Color(0x404040_88.toInt())//Color(0xd4d4d4_ff.toInt())
 
-    private val itemGrid = Array<UIItemInventoryCellBase>(
-            2 * 5, {
+    private val itemGrid = Array<UIItemInventoryCellBase>(2 * 5) {
         UIItemInventoryElemSimple(
                 parentUI = parentUI,
                 posX = this.posX + (UIItemInventoryElemSimple.height + listGap) * ((it + 4) % 2),
@@ -55,7 +54,6 @@ class UIItemInventoryEquippedView(
                 drawBackOnNull = true
         )
     }
-    )
 
 
     override fun update(delta: Float) {

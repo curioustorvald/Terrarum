@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import com.badlogic.gdx.Gdx
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
@@ -14,7 +15,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 object PlayerBuilderSigrid {
 
     operator fun invoke(): IngamePlayer {
-        val p = IngamePlayer(-9223372036854775807L) // XD
+        val p = IngamePlayer(Gdx.files.internal("lol"),  - 9223372036854775807L) // XD
 
         p.referenceID = 0x51621D // the only constant of this procedural universe
 

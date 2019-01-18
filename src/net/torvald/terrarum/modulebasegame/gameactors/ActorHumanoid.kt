@@ -3,6 +3,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
+import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
@@ -20,6 +21,11 @@ import java.util.*
 /**
  * Humanoid actor class to provide same controlling function (such as work, jump)
  * Also applies unreal air friction for movement control
+ *
+ * For some actors that "HasAssembledSprite", sprite rows must be in this specific order:
+ *  1. Idle
+ *  2. Walk
+ *  ...
  *
  * Created by minjaesong on 2016-10-24.
  */
@@ -610,8 +616,11 @@ open class ActorHumanoid(
 
             // set anim frame delay
             // 4f of the divider is a magic number, empirically decided
-            sprite?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveDelta?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
-            spriteGlow?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveDelta?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
+            if (this is HasAssembledSprite) {
+                sprite?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveDelta?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
+                spriteGlow?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveDelta?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
+
+            }
 
             // flipping the sprite
             if (walkHeading == LEFT) {

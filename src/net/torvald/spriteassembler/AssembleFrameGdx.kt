@@ -15,14 +15,14 @@ import java.io.File
  */
 object AssembleSheetPixmap {
 
-    operator fun invoke(properties: ADProperties, assembleConfig: AssembleConfig = AssembleConfig()): Pixmap {
-        val canvas = Pixmap(properties.cols * assembleConfig.fw, properties.rows * assembleConfig.fh, Pixmap.Format.RGBA8888)
+    operator fun invoke(properties: ADProperties): Pixmap {
+        val canvas = Pixmap(properties.cols * properties.frameWidth, properties.rows * properties.frameHeight, Pixmap.Format.RGBA8888)
         canvas.blending = Pixmap.Blending.SourceOver
 
 
         // actually draw
         properties.transforms.forEach { t, _ ->
-            drawThisFrame(t, canvas, properties, assembleConfig)
+            drawThisFrame(t, canvas, properties)
         }
 
         return canvas
@@ -30,8 +30,7 @@ object AssembleSheetPixmap {
 
     private fun drawThisFrame(frameName: String,
                               canvas: Pixmap,
-                              properties: ADProperties,
-                              assembleConfig: AssembleConfig
+                              properties: ADProperties
     ) {
         val theAnim = properties.getAnimByFrameName(frameName)
         val skeleton = theAnim.skeleton.joints.reversed()
@@ -56,23 +55,23 @@ object AssembleSheetPixmap {
 
         AppLoader.printdbg(this, "Frame to draw: $frameName (R$animRow C$animFrame)")
 
-        drawFrame(animRow, animFrame, canvas, bodyparts, transformList, assembleConfig)
+        drawFrame(animRow, animFrame, canvas, properties, bodyparts, transformList)
 
         bodyparts.forEach { it?.dispose() }
     }
 
     private fun drawFrame(row: Int, column: Int,
                           canvas: Pixmap,
+                          props: ADProperties,
                           bodyparts: Array<Pixmap?>,
-                          transformList: List<Pair<String, ADPropertyObject.Vector2i>>,
-                          assembleConfig: AssembleConfig
+                          transformList: List<Pair<String, ADPropertyObject.Vector2i>>
     ) {
-        val tmpFrame = Pixmap(assembleConfig.fw, assembleConfig.fh, Pixmap.Format.RGBA8888)
+        val tmpFrame = Pixmap(props.frameWidth, props.frameHeight, Pixmap.Format.RGBA8888)
 
         bodyparts.forEachIndexed { index, image ->
             if (image != null) {
                 val imgCentre = AssembleFrameBase.getCentreOf(image)
-                val drawPos = transformList[index].second.invertY() + assembleConfig.origin - imgCentre
+                val drawPos = transformList[index].second.invertY() + props.origin - imgCentre
 
                 tmpFrame.drawPixmap(image, drawPos.x, drawPos.y)
             }
@@ -80,8 +79,8 @@ object AssembleSheetPixmap {
 
         canvas.drawPixmap(
                 tmpFrame,
-                (column - 1) * assembleConfig.fw,
-                (row - 1) * assembleConfig.fh
+                (column - 1) * props.frameWidth,
+                (row - 1) * props.frameHeight
         )
 
         tmpFrame.dispose()
@@ -89,13 +88,6 @@ object AssembleSheetPixmap {
     }
 
 }
-
-/**
- * @param fw Frame Width
- * @param fh Frame Height
- * @param origin Int vector of origin point, (0,0) being TOP-LEFT
- */
-data class AssembleConfig(val fw: Int = 48, val fh: Int = 56, val origin: ADPropertyObject.Vector2i = ADPropertyObject.Vector2i(29, fh - 1))
 
 object AssembleFrameBase {
     /**

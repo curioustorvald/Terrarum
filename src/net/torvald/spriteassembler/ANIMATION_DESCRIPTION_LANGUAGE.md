@@ -86,6 +86,7 @@ These values must exist so that the file can be parsed successfully.
 |---|---|---|
 |SPRITESHEET|properties: NAME_ONLY|Base file name of the images|
 |EXTENSION|properties: NAME_ONLY|Extension of the base file|
+|CONFIG|properties: 2 variables|Frame size and origin-x position, 0 being left|
 
 #### Animation
 
