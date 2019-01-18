@@ -15,6 +15,13 @@ data class Skeleton(val name: String, val joints: List<Joint>) {
     override fun toString() = "$name=$joints"
 }
 
+/**
+ * @param name You know it
+ * @param delay Delay between each frame in seconds
+ * @param row STARTS AT ONE! Row in the final spritesheet, also act as the animation index.
+ * @param frames number of frames this animation has
+ * @param skeleton list of joints to be transformed
+ */
 data class Animation(val name: String, val delay: Float, val row: Int, val frames: Int, val skeleton: Skeleton) {
     override fun toString() = "$name delay: $delay, row: $row, frames: $frames, skeleton: ${skeleton.name}"
 }
@@ -45,6 +52,12 @@ class ADProperties {
 
     lateinit var baseFilename: String; private set
     lateinit var extension: String; private set
+    var frameWidth: Int = -1; private set
+    var frameHeight: Int = -1; private set
+    var originX: Int = -1; private set
+    var originY: Int = -1; private set
+    val origin: ADPropertyObject.Vector2i
+        get() = ADPropertyObject.Vector2i(originX, originY)
 
     private val animFrameSuffixRegex = Regex("""_[0-9]+""")
 
@@ -67,6 +80,10 @@ class ADProperties {
         continueLoad()
     }
 
+    constructor(javaProp: Properties) {
+        this.javaProp.putAll(javaProp.toMap())
+    }
+
     private fun continueLoad() {
         javaProp.keys.forEach { propName ->
             val propsStr = javaProp.getProperty(propName as String)
@@ -76,8 +93,13 @@ class ADProperties {
         }
 
         // set reserved values for the animation: filename, extension
-        baseFilename = get("SPRITESHEET")[0].variable
-        extension = get("EXTENSION")[0].variable
+        baseFilename = get("SPRITESHEET")[0].name
+        extension = get("EXTENSION")[0].name
+        val frameSizeVec = get("CONFIG").linearSearchBy { it.name == "SIZE" }!!.input as ADPropertyObject.Vector2i
+        frameWidth = frameSizeVec.x
+        frameHeight = frameSizeVec.y
+        originX = (get("CONFIG").linearSearchBy { it.name == "ORIGINX" }!!.input as Float).toInt()
+        originY = frameHeight - 1
 
         var maxColFinder = -1
         var maxRowFinder = -1
@@ -110,7 +132,7 @@ class ADProperties {
             // and thus, uses whatever the "input" used by the SKELETON is a skeleton
             val propsHashMap = HashMap<String, Any?>()
             list.forEach {
-                propsHashMap[it.variable.toUpperCase()] = it.input
+                propsHashMap[it.name.toUpperCase()] = it.input
             }
 
             // if it is indeed anim, populate animations list
@@ -144,11 +166,11 @@ class ADProperties {
                 val frameName = "${t}_$fc"
                 val prop = get(frameName)
 
-                var emptyList = prop.size == 1 && prop[0].variable.isEmpty()
+                var emptyList = prop.size == 1 && prop[0].name.isEmpty()
 
                 val transformList = if (!emptyList) {
                     List(prop.size) { index ->
-                        val jointNameToSearch = prop[index].variable.toUpperCase()
+                        val jointNameToSearch = prop[index].name.toUpperCase()
                         val joint = if (jointNameToSearch == "ALL")
                             ALL_JOINT
                         else
@@ -196,7 +218,7 @@ class ADProperties {
     private fun getAnimNameFromFrame(s: String) = s.substring(0 until s.lastIndexOf('_'))
 
     private fun List<ADPropertyObject>.toJoints() = List(this.size) {
-        Joint(this[it].variable.toUpperCase(), this[it].input!! as ADPropertyObject.Vector2i)
+        Joint(this[it].name.toUpperCase(), this[it].input!! as ADPropertyObject.Vector2i)
     }
 
 }
@@ -211,7 +233,7 @@ class ADProperties {
 class ADPropertyObject(propertyRaw: String) {
 
     /** If the input is like ```UPPER_TORSO``` (that is, not a variable-input pair), this holds the string UPPER_TORSO. */
-    val variable: String
+    val name: String
     val input: Any?
         get() = when (type) {
             ADPropertyType.IVEC2 -> field!! as Vector2i
@@ -226,7 +248,7 @@ class ADPropertyObject(propertyRaw: String) {
         val propPair = propertyRaw.split(variableInputSepRegex)
 
         if (isADvariable(propertyRaw)) {
-            variable = propPair[0]
+            name = propPair[0]
             val inputStr = propPair[1]
 
             if (isADivec2(inputStr)) {
@@ -243,7 +265,7 @@ class ADPropertyObject(propertyRaw: String) {
             }
         }
         else {
-            variable = propertyRaw
+            name = propertyRaw
             input = null
             type = ADPropertyType.NAME_ONLY
         }
@@ -287,6 +309,6 @@ class ADPropertyObject(propertyRaw: String) {
     }
 
     override fun toString(): String {
-        return "$variable ${input ?: ""}: ${type.toString().toLowerCase()}"
+        return "$name ${input ?: ""}: ${type.toString().toLowerCase()}"
     }
 }

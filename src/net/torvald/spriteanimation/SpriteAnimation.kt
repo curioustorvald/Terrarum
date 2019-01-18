@@ -18,10 +18,10 @@ class SpriteAnimation(val parentActor: ActorWBMovable) {
     var currentFrame = 0
     var currentRow = 0
 
-    var nFrames: Int = 1
-        private set
+    var nFrames: IntArray = intArrayOf(1)
+        internal set
     var nRows: Int = 1
-        private set
+        internal set
 
     private val currentDelay: Second
         get() = delays[currentRow]
@@ -71,7 +71,15 @@ class SpriteAnimation(val parentActor: ActorWBMovable) {
      */
     fun setRowsAndFrames(nRows: Int, nFrames: Int) {
         this.nRows = nRows
-        this.nFrames = nFrames
+        this.nFrames = IntArray(nRows) { nFrames }
+    }
+
+    fun setFramesOf(row: Int, frameCount: Int) {
+        nFrames[row] = frameCount
+    }
+
+    fun setFramesCount(framesCount: IntArray) {
+        nFrames = framesCount
     }
 
     fun update(delta: Float) {
@@ -85,9 +93,9 @@ class SpriteAnimation(val parentActor: ActorWBMovable) {
             while (this.delta >= currentDelay) {
                 // advance frame
                 if (looping) { // looping, wrap around
-                    currentFrame = (currentFrame + 1) % nFrames
+                    currentFrame = (currentFrame + 1) % nFrames[currentRow]
                 }
-                else if (currentFrame < nFrames - 1) { // not looping and haven't reached the end
+                else if (currentFrame < nFrames[currentRow] - 1) { // not looping and haven't reached the end
                     currentFrame += 1
                 }
 
@@ -110,7 +118,7 @@ class SpriteAnimation(val parentActor: ActorWBMovable) {
      * *
      * @param scale
      */
-    @JvmOverloads fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float = 1f) {
+    fun render(batch: SpriteBatch, posX: Float, posY: Float, scale: Float = 1f) {
         if (cellWidth == 0 || cellHeight == 0) {
             throw Error("Sprite width or height is set to zero! ($cellWidth, $cellHeight); master: $parentActor")
         }
@@ -158,7 +166,7 @@ class SpriteAnimation(val parentActor: ActorWBMovable) {
         currentRow = newRow % nRows
 
         //if beyond the frame index then reset
-        if (currentFrame > nFrames) {
+        if (currentFrame > nFrames[currentRow]) {
             reset()
         }
     }

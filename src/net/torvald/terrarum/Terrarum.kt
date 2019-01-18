@@ -86,7 +86,7 @@ object Terrarum : Screen {
      */
     val TARGET_INTERNAL_FPS: Double = 60.0
 
-    internal val UPDATE_CATCHUP_MAX_TRIES = 2 // this feature does more harm than good...
+    internal val UPDATE_CATCHUP_MAX_TRIES = 1 // this feature does more harm than good...
 
 
 
@@ -98,9 +98,9 @@ object Terrarum : Screen {
 
     var ingame: IngameInstance? = null
 
-    private val javaHeapCircularArray = CircularArray<Int>(128)
-    private val nativeHeapCircularArray = CircularArray<Int>(128)
-    private val updateRateCircularArray = CircularArray<Double>(128)
+    private val javaHeapCircularArray = CircularArray<Int>(64)
+    private val nativeHeapCircularArray = CircularArray<Int>(64)
+    private val updateRateCircularArray = CircularArray<Double>(16)
 
     val memJavaHeap: Int
         get() {

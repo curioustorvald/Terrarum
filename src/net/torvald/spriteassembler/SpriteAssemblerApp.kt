@@ -94,7 +94,7 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
 
         }
 
-        panelCode.font = Font(Font.MONOSPACED, Font.PLAIN, 11)
+        panelCode.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
 
         panelAnimationsList.model = DefaultListModel()
         panelBodypartsList.model = DefaultListModel()
@@ -172,6 +172,8 @@ class SpriteAssemblerApp(val gdxWindow: SpriteAssemblerPreview) : JFrame() {
                     // populate stats
                     (panelStatList.model as DefaultListModel).addElement("Spritesheet rows: ${adProperties.rows}")
                     (panelStatList.model as DefaultListModel).addElement("Spritesheet columns: ${adProperties.cols}")
+                    (panelStatList.model as DefaultListModel).addElement("Frame size: ${adProperties.frameWidth}, ${adProperties.frameHeight}")
+                    (panelStatList.model as DefaultListModel).addElement("Origin position: ${adProperties.originX}, ${adProperties.originY}")
                 }
                 catch (fehler: Throwable) {
                     displayError("ERROR_PARSE_FAIL", fehler)
@@ -289,6 +291,7 @@ class SpriteAssemblerPreview: Game() {
         image = AssembleSheetPixmap(prop)
     }
 
+    // TODO rename to requestAssembly
     fun requestAssemblyTest(prop: ADProperties) {
         doAssemble = true
         assembleProp = prop
