@@ -7,7 +7,9 @@ import net.torvald.terrarum.linearSearch
 import java.io.File
 
 /**
- * Assembles the single frame of the animation, outputs Java AWT image.
+ * Assembles the single frame of the animation, outputs GDX Pixmap.
+ *
+ * The entire rendering is done by using pixmap. That is, no GPU access.
  *
  * Created by minjaesong on 2019-01-06.
  */
@@ -55,6 +57,8 @@ object AssembleSheetPixmap {
         AppLoader.printdbg(this, "Frame to draw: $frameName (R$animRow C$animFrame)")
 
         drawFrame(animRow, animFrame, canvas, bodyparts, transformList, assembleConfig)
+
+        bodyparts.forEach { it?.dispose() }
     }
 
     private fun drawFrame(row: Int, column: Int,
@@ -63,20 +67,25 @@ object AssembleSheetPixmap {
                           transformList: List<Pair<String, ADPropertyObject.Vector2i>>,
                           assembleConfig: AssembleConfig
     ) {
+        val tmpFrame = Pixmap(assembleConfig.fw, assembleConfig.fh, Pixmap.Format.RGBA8888)
+
         bodyparts.forEachIndexed { index, image ->
             if (image != null) {
                 val imgCentre = AssembleFrameBase.getCentreOf(image)
                 val drawPos = transformList[index].second.invertY() + assembleConfig.origin - imgCentre
 
-                canvas.drawPixmap(
-                        image,
-                        (column - 1) * assembleConfig.fw + drawPos.x,
-                        (row - 1) * assembleConfig.fh + drawPos.y
-                )
-
-                image.dispose()
+                tmpFrame.drawPixmap(image, drawPos.x, drawPos.y)
             }
         }
+
+        canvas.drawPixmap(
+                tmpFrame,
+                (column - 1) * assembleConfig.fw,
+                (row - 1) * assembleConfig.fh
+        )
+
+        tmpFrame.dispose()
+
     }
 
 }
