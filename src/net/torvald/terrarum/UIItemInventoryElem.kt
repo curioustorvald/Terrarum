@@ -74,12 +74,12 @@ class UIItemInventoryElem(
         if (item != null || drawBackOnNull) {
             // do not highlight even if drawBackOnNull is true
             if (mouseUp && item != null) {
-                BlendMode.resolve(mouseoverBackBlendMode)
+                BlendMode.resolve(mouseoverBackBlendMode, batch)
                 batch.color = mouseoverBackCol
             }
             // if drawBackOnNull, just draw background
             else {
-                BlendMode.resolve(backBlendMode)
+                BlendMode.resolve(backBlendMode, batch)
                 batch.color = backCol
             }
             batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
@@ -87,7 +87,7 @@ class UIItemInventoryElem(
 
 
         if (item != null && itemImage != null) {
-            blendNormal()
+            blendNormal(batch)
             
             // item image
             batch.color = Color.WHITE

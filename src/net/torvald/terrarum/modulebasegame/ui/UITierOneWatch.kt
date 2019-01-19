@@ -63,7 +63,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // light overlay or EL
         if (ELon) {
-            blendNormal()
+            blendNormal(batch)
             batch.draw(atlas.get(0, 2), 0f, 0f)
         }
         else {
@@ -73,7 +73,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
         }
 
         // LCD back
-        blendNormal()
+        blendNormal(batch)
         batch.draw(atlas.get(0, 3), 0f, 0f)
 
 

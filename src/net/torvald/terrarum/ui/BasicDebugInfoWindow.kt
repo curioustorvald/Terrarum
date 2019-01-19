@@ -272,7 +272,7 @@ class BasicDebugInfoWindow : UICanvas() {
         Terrarum.fontSmallNumbers.draw(batch, "255", x.toFloat() + w + 1 - 8 * 3, y.toFloat() + h + 2)
         Terrarum.fontSmallNumbers.draw(batch, "Histogramme", x + w / 2 - 5.5f * 8, y.toFloat() + h + 2)
 
-        blendScreen()
+        blendScreen(batch)
         for (c in 0..2) {
             for (i in 0..255) {
                 var histogram_value = if (i == 255) 0 else histogram.get(c)[i]
@@ -291,7 +291,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 batch.fillRect(bar_x, bar_y, bar_w, bar_h)
             }
         }
-        blendNormal()
+        blendNormal(batch)
     }
 
     private fun drawGamepadAxis(batch: SpriteBatch, axisX: Float, axisY: Float, uiX: Int, uiY: Int) {
@@ -307,7 +307,7 @@ class BasicDebugInfoWindow : UICanvas() {
         val padName = if (Terrarum.controller!!.name.isEmpty()) "Gamepad"
                       else Terrarum.controller!!.name
 
-        blendNormal()
+        blendNormal(batch)
 
         batch.end()
         Terrarum.inShapeRenderer {

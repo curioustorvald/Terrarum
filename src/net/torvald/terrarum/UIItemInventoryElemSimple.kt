@@ -56,12 +56,12 @@ class UIItemInventoryElemSimple(
         if (item != null || drawBackOnNull) {
             // do not highlight even if drawBackOnNull is true
             if (mouseUp && item != null || equippedSlot != null) { // "equippedSlot != null": also highlight back if equipped
-                BlendMode.resolve(mouseoverBackBlendMode)
+                BlendMode.resolve(mouseoverBackBlendMode, batch)
                 batch.color = mouseoverBackCol
             }
             // if drawBackOnNull, just draw background
             else {
-                BlendMode.resolve(backBlendMode)
+                BlendMode.resolve(backBlendMode, batch)
                 batch.color = backCol
             }
             batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
@@ -72,7 +72,7 @@ class UIItemInventoryElemSimple(
         // and you can clearly see the quickslot UI anyway
 
         if (item != null && itemImage != null) {
-            blendNormal()
+            blendNormal(batch)
 
             // item image
             batch.color = Color.WHITE

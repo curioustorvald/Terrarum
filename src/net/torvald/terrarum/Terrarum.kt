@@ -576,25 +576,25 @@ fun SpriteBatch.drawStraightLine(x: Float, y: Float, otherEnd: Float, thickness:
 infix fun Color.mul(other: Color): Color = this.cpy().mul(other)
 
 
-fun blendMul(batch: SpriteBatch? = null) {
+fun blendMul(batch: SpriteBatch) {
     // will break if the colour image contains semitransparency
-    (batch ?: Terrarum.batch).enableBlending()
-    (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
+    batch.enableBlending()
+    batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA)
 }
 
-fun blendScreen(batch: SpriteBatch? = null) {
+fun blendScreen(batch: SpriteBatch) {
     // will break if the colour image contains semitransparency
-    (batch ?: Terrarum.batch).enableBlending()
-    (batch ?: Terrarum.batch).setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR)
+    batch.enableBlending()
+    batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR)
 }
 
-fun blendDisable(batch: SpriteBatch? = null) {
-    (batch ?: Terrarum.batch).disableBlending()
+fun blendDisable(batch: SpriteBatch) {
+    batch.disableBlending()
 }
 
-fun blendNormal(batch: SpriteBatch? = null) {
-    (batch ?: Terrarum.batch).enableBlending()
-    (batch ?: Terrarum.batch).setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE)
+fun blendNormal(batch: SpriteBatch) {
+    batch.enableBlending()
+    batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE)
 
     // ALPHA *MUST BE* PREMULTIPLIED //
 
@@ -648,7 +648,7 @@ object BlendMode {
     const val NORMAL   = "normal"
     //const val MAX      = "GL_MAX" // not supported by GLES -- use shader
 
-    fun resolve(mode: String, batch: SpriteBatch? = null) {
+    fun resolve(mode: String, batch: SpriteBatch) {
         when (mode) {
             SCREEN   -> blendScreen(batch)
             MULTIPLY -> blendMul(batch)

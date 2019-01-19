@@ -23,7 +23,7 @@ class UIItemModuleInfoCell(
     private val numberAreaWidth = Terrarum.fontSmallNumbers.W * 3 + 4
 
     override fun render(batch: SpriteBatch, camera: Camera) {
-        blendNormal()
+        blendNormal(batch)
 
         if (ModMgr.moduleInfo.containsKey(moduleName)) {
             val modInfo = ModMgr.moduleInfo[moduleName]!!

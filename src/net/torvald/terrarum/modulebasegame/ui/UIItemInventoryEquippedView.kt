@@ -62,7 +62,7 @@ class UIItemInventoryEquippedView(
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         // sprite background
-        blendNormal()
+        blendNormal(batch)
         batch.color = spriteViewBackCol
         batch.fillRect(
                 posX.toFloat(), posY.toFloat(),
