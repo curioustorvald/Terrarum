@@ -4,13 +4,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameactors.ActorWBMovable.Companion.SI_TO_GAME_ACC
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.Hitbox
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -61,7 +60,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
 
             // gravity, winds, etc. (external forces)
             if (!isNoSubjectToGrav) {
-                velocity += (Terrarum.ingame!!.world).gravitation / dragCoefficient * SI_TO_GAME_ACC
+                velocity += (Terrarum.ingame!!.world).gravitation / dragCoefficient
             }
 
 

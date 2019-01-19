@@ -1,13 +1,11 @@
 package net.torvald.terrarum.gameactors
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.Terrarum.PHYS_REF_FPS
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockProp
@@ -47,16 +45,16 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     private val world: GameWorld?
         get() = Terrarum.ingame?.world
 
-    
+
     @Transient internal var sprite: SpriteAnimation? = null
     @Transient internal var spriteGlow: SpriteAnimation? = null
 
     var drawMode = BlendMode.NORMAL
 
     var hitboxTranslateX: Int = 0// relative to spritePosX
-        protected set
+    protected set
     var hitboxTranslateY: Int = 0// relative to spritePosY
-        protected set
+    protected set
     var baseHitboxW: Int = 0
         protected set
     var baseHitboxH: Int = 0
@@ -80,7 +78,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 hitbox.endX.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
                 hitbox.endY.plus(0.00001f).div(TILE_SIZE).floor() + 0.5f,
                 true
-            )
+        )
 
 
     /** May hold width/height of zero; the end point should be inclusive!
@@ -97,6 +95,12 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         )
 
     /**
+     * TODO Pixels per 1/60 seconds.
+     *
+     * When the engine resolves this value, the framerate must be accounted for. E.g.:
+     *  3.0 is resolved as 3.0 if FPS is 60, but the same value should be resolved as 6.0 if FPS is 30.
+     *  v_resolved = v * (60/FPS) or, v * (60 * delta_t)
+     *
      * Elevators/Movingwalks/etc.: edit hitbox manually!
      *
      * Velocity vector for newtonian sim.
@@ -133,16 +137,16 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     /** Apparent mass. Use "avBaseMass" for base mass */
     val mass: Double
         get() = actorValue.getAsDouble(AVKey.BASEMASS) ?: MASS_DEFAULT * Math.pow(scale, 3.0)
-        /*set(value) { // use "var avBaseMass: Double"
-            if (value <= 0)
-                throw IllegalArgumentException("mass cannot be less than or equal to zero.")
-            else if (value < MASS_LOWEST) {
-                printdbg(this, "input too small; using $MASS_LOWEST instead.")
-                actorValue[AVKey.BASEMASS] = MASS_LOWEST
-            }
+    /*set(value) { // use "var avBaseMass: Double"
+        if (value <= 0)
+            throw IllegalArgumentException("mass cannot be less than or equal to zero.")
+        else if (value < MASS_LOWEST) {
+            printdbg(this, "input too small; using $MASS_LOWEST instead.")
+            actorValue[AVKey.BASEMASS] = MASS_LOWEST
+        }
 
-            actorValue[AVKey.BASEMASS] = value / Math.pow(scale, 3.0)
-        }*/
+        actorValue[AVKey.BASEMASS] = value / Math.pow(scale, 3.0)
+    }*/
     @Transient val MASS_DEFAULT: Double = 60.0
     /** Valid range: [0, 1]  */
     var elasticity: Double = 0.0
@@ -185,8 +189,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
     private inline val grounded: Boolean
         get() = if (world == null) true else {
-            isNoClip || 
-            (world!!.gravitation.y > 0 && isWalled(hitbox, COLLIDING_BOTTOM) || 
+            isNoClip ||
+            (world!!.gravitation.y > 0 && isWalled(hitbox, COLLIDING_BOTTOM) ||
              world!!.gravitation.y < 0 && isWalled(hitbox, COLLIDING_TOP))
         }
     /** Default to 'true'  */
@@ -212,7 +216,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * meter to pixel : 24/FPS
      */
     private val gravitation: Vector2
-            get() = world?.gravitation ?: Vector2(0.0, 9.8)
+        get() = world?.gravitation ?: Vector2(0.0, 9.8)
     @Transient val DRAG_COEFF_DEFAULT = 1.2
     /** Drag coefficient. Parachutes have much higher value than bare body (1.2) */
     var dragCoefficient: Double
@@ -266,7 +270,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     internal var walledTop = false    // UNUSED; only for BasicDebugInfoWindow
     internal var walledBottom = false // UNUSED; only for BasicDebugInfoWindow
     internal var colliding = false
-    
+
     protected inline val updateDelta: Float
         get() = Terrarum.deltaTime
 
@@ -354,7 +358,6 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     override fun update(delta: Float) {
         if (isUpdate && !flagDespawn) {
 
-            val ddelta = Gdx.graphics.deltaTime.toDouble()
             if (!assertPrinted) assertInit()
 
             if (sprite != null) sprite!!.update(delta)
@@ -404,7 +407,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                  *     This body is NON-STATIC and the other body is STATIC
                  */
                 if (!isNoCollideWorld) {
-                    displaceHitbox(ddelta)
+                    displaceHitbox()
                 }
                 else {
                     hitbox.translate(externalForce)
@@ -424,7 +427,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 // FIXME asymmetry on friction
                 setHorizontalFriction() // friction SHOULD use and alter externalForce
                 //if (isNoClip) { // TODO also hanging on the rope, etc.
-                    setVerticalFriction()
+                setVerticalFriction()
                 //}
 
 
@@ -562,7 +565,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         }
     }*/
 
-    private fun displaceHitbox(delta: Double) {
+    private fun displaceHitbox() {
         // // HOW IT SHOULD WORK // //
         // ////////////////////////
         // combineVeloToMoveDelta now
@@ -619,7 +622,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                         true
                 )
 
-                       // offset 1 pixel to the down so that friction would work
+                // offset 1 pixel to the down so that friction would work
                 return (y == hitbox.endY.plus(1.0).div(TILE_SIZE).floorInt()) && // copied from forEachFeetTileNum
                        (x in newTilewiseHitbox.startX.toInt()..newTilewiseHitbox.endX.toInt()) // copied from forEachOccupyingTilePos
             }
@@ -628,7 +631,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             fun Double.modTileDelta() = this - this.modTile()
 
 
-            val vectorSum = (externalForce + controllerMoveDelta) * PHYS_REF_FPS * delta //* PHYS_CONST_MULT
+            val vectorSum = externalForce + controllerMoveDelta
             val ccdSteps = minOf(16, (vectorSum.magnitudeSquared / TILE_SIZE.sqr()).floorInt() + 1) // adaptive
 
 
@@ -708,7 +711,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                     15    -> {
                         newHitbox.reassign(sixteenStep[0]); zeroX = true; zeroY = true
                     }
-                // one-side collision
+                    // one-side collision
                     1, 11 -> {
                         newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta()); bounceX = true
                     }
@@ -727,7 +730,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 // fire Collision Event with one/two/three-side collision
                 // for the ease of writing, this jumptable is separated from above.
                 when (selfCollisionStatus) {
-                // TODO compose CollisionInfo and fire collided()
+                    // TODO compose CollisionInfo and fire collided()
                 }
 
 
@@ -962,7 +965,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
     private fun isCollidingInternal(txStart: Int, tyStart: Int, txEnd: Int, tyEnd: Int, feet: Boolean = false): Boolean {
         if (world == null) return false
-        
+
         for (y in tyStart..tyEnd) {
             for (x in txStart..txEnd) {
                 val tile = world!!.getTileFromTerrain(x, y) ?: Block.STONE
@@ -990,7 +993,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * Very straightforward for the actual solid tiles, not so much for the platforms
      */
     private fun shouldICollideWithThis(tile: Int) =
-            // regular solid block
+    // regular solid block
             (BlockCodex[tile].isSolid)
 
     /**
@@ -999,7 +1002,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * Just like "shouldICollideWithThis" but it's intended to work with feet tiles
      */
     private fun shouldICollideWithThisFeet(tile: Int) =
-            // regular solid block
+    // regular solid block
             (BlockCodex[tile].isSolid) ||
             // platforms, moving downward AND not "going down"
             (this is ActorHumanoid && BlockCodex[tile].isPlatform &&
@@ -1008,7 +1011,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             // platforms, moving downward
             (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
              externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0)
-            // TODO: as for the platform, only apply it when it's a feet tile
+    // TODO: as for the platform, only apply it when it's a feet tile
 
 
 
@@ -1022,23 +1025,23 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             val tileY: Int
             if (side == COLLIDING_LEFT) {
                 tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundInt()
-                                                                                                           + i + translateX)
+                                                + i + translateX)
                 tileY = div16TruncateToMapHeight(hitbox.hitboxEnd.y.roundInt() + translateY)
             }
             else if (side == COLLIDING_TOP) {
                 tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundInt()
-                                                                                                           + i + translateX)
+                                                + i + translateX)
                 tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundInt() + translateY)
             }
             else if (side == COLLIDING_RIGHT) {
                 tileX = div16TruncateToMapWidth(hitbox.hitboxEnd.x.roundInt() + translateX)
                 tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundInt()
-                                                                                                            + i + translateY)
+                                                 + i + translateY)
             }
             else if (side == COLLIDING_LEFT) {
                 tileX = div16TruncateToMapWidth(hitbox.hitboxStart.x.roundInt() + translateX)
                 tileY = div16TruncateToMapHeight(hitbox.hitboxStart.y.roundInt()
-                                                                                                            + i + translateY)
+                                                 + i + translateY)
             }
             else {
                 throw IllegalArgumentException(side.toString() + ": Wrong side input")
@@ -1327,7 +1330,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
     override fun drawGlow(batch: SpriteBatch) {
         if (isVisible && spriteGlow != null) {
-            blendNormal()
+            blendNormal(batch)
             drawSpriteInGoodPosition(spriteGlow!!, batch)
         }
     }
@@ -1335,7 +1338,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     override fun drawBody(batch: SpriteBatch) {
         if (isVisible && sprite != null) {
             if (!KeyToggler.isOn(Input.Keys.F12)) {
-                BlendMode.resolve(drawMode)
+                BlendMode.resolve(drawMode, batch)
                 drawSpriteInGoodPosition(sprite!!, batch)
             }
             else {
@@ -1463,8 +1466,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
     private fun forEachOccupyingTileNum(consumer: (Int?) -> Unit) {
         if (world == null) return
-        
-        
+
+
         val tiles = ArrayList<Int?>()
         for (y in hIntTilewiseHitbox.startY.toInt()..hIntTilewiseHitbox.endY.toInt()) {
             for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
@@ -1478,7 +1481,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     private fun forEachOccupyingTile(consumer: (BlockProp?) -> Unit) {
         if (world == null) return
 
-        
+
         val tileProps = ArrayList<BlockProp?>()
         for (y in hIntTilewiseHitbox.startY.toInt()..hIntTilewiseHitbox.endY.toInt()) {
             for (x in hIntTilewiseHitbox.startX.toInt()..hIntTilewiseHitbox.endX.toInt()) {
@@ -1507,7 +1510,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     private fun forEachOccupyingTilePos(hitbox: Hitbox, consumer: (BlockAddress) -> Unit) {
         if (world == null) return
 
-        
+
         val newTilewiseHitbox = Hitbox.fromTwoPoints(
                 hitbox.startX.div(TILE_SIZE).floor(),
                 hitbox.startY.div(TILE_SIZE).floor(),
@@ -1529,7 +1532,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     private fun forEachFeetTileNum(consumer: (Int?) -> Unit) {
         if (world == null) return
 
-        
+
         val tiles = ArrayList<Int?>()
 
         // offset 1 pixel to the down so that friction would work
@@ -1545,7 +1548,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     private fun forEachFeetTile(consumer: (BlockProp?) -> Unit) {
         if (world == null) return
 
-        
+
         val tileProps = ArrayList<BlockProp?>()
 
         // offset 1 pixel to the down so that friction would work
@@ -1649,9 +1652,9 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     internal val avAcceleration: Double
         get() { if (accelMultMovement.isNaN()) println("accelMultMovement: $accelMultMovement")
             return actorValue.getAsDouble(AVKey.ACCEL)!! *
-                (actorValue.getAsDouble(AVKey.ACCELBUFF) ?: 1.0) *
-                accelMultMovement *
-                scale.sqrt()
+                   (actorValue.getAsDouble(AVKey.ACCELBUFF) ?: 1.0) *
+                   accelMultMovement *
+                   scale.sqrt()
         }
     internal val avSpeedCap: Double
         get() = actorValue.getAsDouble(AVKey.SPEED)!! *
