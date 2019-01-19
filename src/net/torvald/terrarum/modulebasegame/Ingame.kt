@@ -418,16 +418,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     ///////////////
     private class ThreadIngameUpdate(val ingame: Ingame): Runnable {
         override fun run() {
-            var updateTries = 0
-            while (ingame.updateDeltaCounter >= ingame.renderRate) {
-                ingame.updateGame(Terrarum.deltaTime)
-                ingame.updateDeltaCounter -= ingame.renderRate
-                updateTries++
-
-                if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
-                    break
-                }
-            }
+            TODO()
         }
     }
 
@@ -469,27 +460,24 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             // else, NOP;
         }
         else {
-            var updateTries = 0
-            val oldDeltaCtr = updateDeltaCounter
-            while (updateDeltaCounter >= renderRate) {
-
-                //updateGame(delta)
-                AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
-
-                updateDeltaCounter -= renderRate
-                updateTries++
-
-                if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
-                    //printdbg(this, "Update couldn't catch up -- delta-T buildup was $oldDeltaCtr seconds")
-                    break
+            updateDeltaCounter += delta
+            /*if (delta < 1f / 10f) { // discard async if measured FPS <= 10
+                var updateTries = 0
+                while (updateDeltaCounter >= renderRate && updateTries < 6) {
+                    AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
+                    updateDeltaCounter -= renderRate
+                    updateTries++
                 }
             }
+            else {
+                AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
+            }*/
+
+            AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
         }
 
 
-
         /** RENDER CODE GOES HERE */
-        //renderGame(batch)
         AppLoader.debugTimers["Ingame.render"] = measureNanoTime { renderGame() }
         AppLoader.debugTimers["Ingame.render-Light"] =
                 (AppLoader.debugTimers["Ingame.render"] as Long) - ((AppLoader.debugTimers["Renderer.LightTotal"] as? Long) ?: 0)
