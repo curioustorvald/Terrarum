@@ -358,7 +358,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     override fun update(delta: Float) {
         if (isUpdate && !flagDespawn) {
 
-            val ddelta = delta.toFloat()
+            val ddelta = delta.toDouble()
 
             if (!assertPrinted) assertInit()
 
@@ -388,7 +388,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 // Actors are subject to the gravity and the buoyancy if they are not levitating
 
                 if (!isNoSubjectToGrav) {
-                    applyGravitation()
+                    applyGravitation(ddelta)
                 }
 
                 //applyBuoyancy()
@@ -409,7 +409,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                  *     This body is NON-STATIC and the other body is STATIC
                  */
                 if (!isNoCollideWorld) {
-                    displaceHitbox()
+                    displaceHitbox(ddelta)
                 }
                 else {
                     val vecSum = externalForce + (controllerMoveDelta ?: Vector2(0.0, 0.0))
@@ -495,7 +495,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         }
     }*/
 
-    fun getDrag(externalForce: Vector2): Vector2 {
+    fun getDrag(delta: Double, externalForce: Vector2): Vector2 {
         /**
          * weight; gravitational force in action
          * W = mass * G (9.8 [m/s^2])
@@ -513,7 +513,10 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
         val V: Vector2 = (W - D) / Terrarum.PHYS_TIME_FRAME * SI_TO_GAME_ACC
 
-        return V
+        return V * (Terrarum.PHYS_REF_FPS * delta).sqrt()
+
+        // FIXME v * const, where const = 1.0 for FPS=60, sqrt(2.0) for FPS=30, etc.
+        //       this is "close enough" solution and not perfect.
     }
 
     /**
@@ -531,11 +534,11 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      *
      * Apply only if not grounded; normal force is precessed separately.
      */
-    private fun applyGravitation() {
+    private fun applyGravitation(delta: Double) {
 
         if (!isNoSubjectToGrav && !(gravitation.y > 0 && walledBottom || gravitation.y < 0 && walledTop)) {
             //if (!isWalled(hitbox, COLLIDING_BOTTOM)) {
-            applyForce(getDrag(externalForce))
+            applyForce(getDrag(delta, externalForce))
             //}
         }
     }
@@ -567,7 +570,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         }
     }*/
 
-    private fun displaceHitbox() {
+    private fun displaceHitbox(delta: Double) {
         // // HOW IT SHOULD WORK // //
         // ////////////////////////
         // combineVeloToMoveDelta now
@@ -633,7 +636,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             fun Double.modTileDelta() = this - this.modTile()
 
 
-            val vectorSum = externalForce + controllerMoveDelta
+            val vectorSum = (externalForce + controllerMoveDelta) * (Terrarum.PHYS_REF_FPS * delta)
             val ccdSteps = minOf(16, (vectorSum.magnitudeSquared / TILE_SIZE.sqr()).floorInt() + 1) // adaptive
 
 

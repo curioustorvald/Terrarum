@@ -519,7 +519,7 @@ open class ActorHumanoid(
 
                     val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, jmpCtr)
                     forceVec.y -= getJumpAcc(jumpPower, timedJumpCharge)
-                    forceVec.y += getDrag(forceVec).y
+                    forceVec.y += getDrag(1.0 / Terrarum.PHYS_REF_FPS, forceVec).y
 
                     simYPos += forceVec.y // ignoring all the fluid drag OTHER THAN THE AIR
 
