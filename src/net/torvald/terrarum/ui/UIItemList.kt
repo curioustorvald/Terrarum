@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.BlendMode
-import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.Second
+import net.torvald.terrarum.fillRect
 
 
 /**
@@ -106,11 +106,11 @@ class UIItemList<Item: UIItem>(
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         batch.color = backgroundCol
-        BlendMode.resolve(backgroundBlendMode)
+        BlendMode.resolve(backgroundBlendMode, batch)
         batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
 
         batch.color = highlightBackCol
-        BlendMode.resolve(highlightBackBlendMode)
+        BlendMode.resolve(highlightBackBlendMode, batch)
         if (highlightY != null) {
             batch.fillRect(posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), UIItemTextButton.height.toFloat())
         }

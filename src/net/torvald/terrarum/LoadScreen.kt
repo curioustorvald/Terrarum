@@ -161,7 +161,7 @@ object LoadScreen : ScreenAdapter() {
                 Terrarum.batch.inUse {
 
 
-                    blendNormal()
+                    blendNormal(Terrarum.batch)
                     Terrarum.fontGame
                     it.color = Color.WHITE
 
@@ -169,7 +169,7 @@ object LoadScreen : ScreenAdapter() {
                     Terrarum.fontGame.draw(it, textToPrint, ((textFbo.width - textWidth) / 2).toInt().toFloat(), 0f)
 
 
-                    blendMul()
+                    blendMul(Terrarum.batch)
                     // draw colour overlay, flipped
                     it.draw(textOverlayTex,
                             (textFbo.width - textWidth) / 2f,
@@ -184,7 +184,7 @@ object LoadScreen : ScreenAdapter() {
             Terrarum.batch.inUse {
                 initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT) // dunno, no render without this
                 it.projectionMatrix = camera.combined
-                blendNormal()
+                blendNormal(Terrarum.batch)
 
 
                 // almost black background
@@ -251,7 +251,7 @@ object LoadScreen : ScreenAdapter() {
 
                 initViewPort(Terrarum.WIDTH, Terrarum.HEIGHT) // dunno, no render without this
                 it.projectionMatrix = camera.combined
-                blendNormal()
+                blendNormal(Terrarum.batch)
 
 
 

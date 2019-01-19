@@ -40,11 +40,11 @@ open class UIItemImageButton(
     override fun render(batch: SpriteBatch, camera: Camera) {
         // draw background
         if (mouseUp) {
-            BlendMode.resolve(activeBackBlendMode)
+            BlendMode.resolve(activeBackBlendMode, batch)
             batch.color = activeBackCol
         }
         else {
-            BlendMode.resolve(buttonBackBlendMode)
+            BlendMode.resolve(buttonBackBlendMode, batch)
             batch.color = buttonBackCol
         }
 
@@ -52,7 +52,7 @@ open class UIItemImageButton(
 
 
         // draw image
-        blendNormal()
+        blendNormal(batch)
 
         batch.color = if (highlighted) highlightCol
         else if (mouseUp) activeCol

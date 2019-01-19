@@ -188,7 +188,7 @@ class UIInventoryFull(
             )
 
             // encumbrance bar background
-            blendMul()
+            blendMul(batch)
             batch.color = Color(0xa0a0a0_ff.toInt())
             batch.fillRect(
                     xEnd - 3 - weightBarWidth,
@@ -197,7 +197,7 @@ class UIInventoryFull(
                     controlHelpHeight - 6f
             )
             // encumbrance bar
-            blendNormal()
+            blendNormal(batch)
             batch.color = if (isEncumbered) Color(0xff0000_cc.toInt()) else Color(0x00ff00_cc.toInt())
             batch.fillRect(
                     xEnd - 3 - weightBarWidth,

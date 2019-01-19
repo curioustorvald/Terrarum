@@ -58,7 +58,7 @@ class UITitleModules : UICanvas() {
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         batch.color = Color.WHITE
-        blendNormal()
+        blendNormal(batch)
         mouduleArea.render(batch, camera)
     }
 

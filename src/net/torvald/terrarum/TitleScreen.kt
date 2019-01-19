@@ -261,7 +261,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
     private fun renderOverlayTexts() {
         setCameraPosition(0f, 0f)
-        blendNormal()
+        blendNormal(batch)
         batch.shader = null
 
         batch.color = Color.LIGHT_GRAY
