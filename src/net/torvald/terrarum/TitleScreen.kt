@@ -204,15 +204,16 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     override fun render(delta: Float) {
         // async update
         updateDeltaCounter += delta
-        var updateTries = 0
-        while (updateDeltaCounter >= renderRate) {
-            updateScreen(delta)
-            updateDeltaCounter -= renderRate
-            updateTries++
-
-            if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
-                break
+        if (delta < 1f / 10f) { // discard async if measured FPS <= 10
+            var updateTries = 0
+            while (updateDeltaCounter >= renderRate && updateTries < 6) {
+                updateScreen(delta)
+                updateDeltaCounter -= renderRate
+                updateTries++
             }
+        }
+        else {
+            updateScreen(delta)
         }
 
         // render? just do it anyway

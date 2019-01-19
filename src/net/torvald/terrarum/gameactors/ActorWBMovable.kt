@@ -1,11 +1,13 @@
 package net.torvald.terrarum.gameactors
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.Terrarum.PHYS_REF_FPS
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockProp
@@ -352,6 +354,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     override fun update(delta: Float) {
         if (isUpdate && !flagDespawn) {
 
+            val ddelta = Gdx.graphics.deltaTime.toDouble()
             if (!assertPrinted) assertInit()
 
             if (sprite != null) sprite!!.update(delta)
@@ -401,7 +404,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                  *     This body is NON-STATIC and the other body is STATIC
                  */
                 if (!isNoCollideWorld) {
-                    displaceHitbox()
+                    displaceHitbox(ddelta)
                 }
                 else {
                     hitbox.translate(externalForce)
@@ -559,7 +562,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         }
     }*/
 
-    private fun displaceHitbox() {
+    private fun displaceHitbox(delta: Double) {
         // // HOW IT SHOULD WORK // //
         // ////////////////////////
         // combineVeloToMoveDelta now
@@ -625,7 +628,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             fun Double.modTileDelta() = this - this.modTile()
 
 
-            val vectorSum = externalForce + controllerMoveDelta
+            val vectorSum = (externalForce + controllerMoveDelta) * PHYS_REF_FPS * delta //* PHYS_CONST_MULT
             val ccdSteps = minOf(16, (vectorSum.magnitudeSquared / TILE_SIZE.sqr()).floorInt() + 1) // adaptive
 
 

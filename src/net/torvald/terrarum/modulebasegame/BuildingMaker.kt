@@ -161,35 +161,22 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         // ASYNCHRONOUS UPDATE AND RENDER //
 
 
-        /** UPDATE CODE GOES HERE */
+        // async update
         updateDeltaCounter += delta
-
-
-
-        if (false && AppLoader.getConfigBoolean("multithread")) { // NO MULTITHREADING: camera don't like concurrent modification (jittery actor movements)
-            // else, NOP;
-        }
-        else {
+        if (delta < 1f / 10f) { // discard async if measured FPS <= 10
             var updateTries = 0
             while (updateDeltaCounter >= updateRate) {
-
-                //updateGame(delta)
-                AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
-
+                updateGame(delta)
                 updateDeltaCounter -= updateRate
                 updateTries++
-
-                if (updateTries >= Terrarum.UPDATE_CATCHUP_MAX_TRIES) {
-                    break
-                }
             }
         }
+        else {
+            updateGame(delta)
+        }
 
-
-
-        /** RENDER CODE GOES HERE */
-        //renderGame(batch)
-        AppLoader.debugTimers["Ingame.render"] = measureNanoTime { renderGame() }
+        // render? just do it anyway
+        renderGame()
     }
 
     private fun updateGame(delta: Float) {

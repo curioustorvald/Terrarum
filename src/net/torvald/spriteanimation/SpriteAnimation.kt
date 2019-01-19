@@ -163,11 +163,9 @@ class SpriteAnimation(val parentActor: ActorWBMovable) {
     }
 
     fun switchRow(newRow: Int) {
-        currentRow = newRow % nRows
-
-        //if beyond the frame index then reset
-        if (currentFrame > nFrames[currentRow]) {
-            reset()
+        if (newRow != currentRow) {
+            currentRow = newRow
+            currentFrame = 1
         }
     }
 
