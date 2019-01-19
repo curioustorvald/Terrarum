@@ -358,6 +358,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     override fun update(delta: Float) {
         if (isUpdate && !flagDespawn) {
 
+            val ddelta = delta.toFloat()
+
             if (!assertPrinted) assertInit()
 
             if (sprite != null) sprite!!.update(delta)
@@ -410,8 +412,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                     displaceHitbox()
                 }
                 else {
-                    hitbox.translate(externalForce)
-                    hitbox.translate(controllerMoveDelta)
+                    val vecSum = externalForce + (controllerMoveDelta ?: Vector2(0.0, 0.0))
+                    hitbox.translate(vecSum * (Terrarum.PHYS_REF_FPS * ddelta))
                 }
 
                 //////////////////////////////////////////////////////////////
