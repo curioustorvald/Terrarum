@@ -41,6 +41,9 @@ class CircularArray<T>(val size: Int) {
         //println("$this $unreliableAddCount")
     }
 
+    fun getHeadElem(): T = buffer[head]
+    fun getTailElem(): T = buffer[tail]
+
     /**
      * Iterates the array with oldest element first.
      */
