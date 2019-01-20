@@ -21,10 +21,11 @@ class CircularArray<T>(val size: Int) {
 
     val lastIndex = size - 1
 
-    /** elemCount == size means it has the exact elements and no more.
-     * If elemCount is greater by 1 against the size, it means it started to circle, elemCount won't increment at this point. */
+    /**
+     * Number of elements that forEach() or fold() would iterate.
+     */
     val elemCount: Int
-        get() = unreliableAddCount
+        get() = minOf(unreliableAddCount, size)
 
     fun add(item: T) {
         if (unreliableAddCount <= size) unreliableAddCount += 1
