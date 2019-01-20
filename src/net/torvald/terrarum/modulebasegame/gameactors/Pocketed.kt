@@ -1,6 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -28,7 +28,7 @@ interface Pocketed {
         }
 
         inventory.itemEquipped[item.equipPosition] = null
-        item.effectOnUnequip(Terrarum.deltaTime)
+        item.effectOnUnequip(AppLoader.getSmoothDelta().toFloat())
     }
 
     // no need for equipSlot(Int)
@@ -50,7 +50,7 @@ interface Pocketed {
 
         if (item.equipPosition >= 0) {
             inventory.itemEquipped[item.equipPosition] = item
-            item.effectWhenEquipped(Terrarum.deltaTime)
+            item.effectWhenEquipped(AppLoader.getSmoothDelta().toFloat())
         }
         // else do nothing
     }
@@ -69,13 +69,13 @@ interface Pocketed {
 
 
     fun consumePrimary(item: GameItem) {
-        if (item.startPrimaryUse(Terrarum.deltaTime)) {
+        if (item.startPrimaryUse(AppLoader.getSmoothDelta().toFloat())) {
             inventory.consumeItem(this as Actor, item) // consume on successful
         }
     }
 
     fun consumeSecondary(item: GameItem) {
-        if (item.startSecondaryUse(Terrarum.deltaTime))
+        if (item.startSecondaryUse(AppLoader.getSmoothDelta().toFloat()))
             inventory.consumeItem(this as Actor, item) // consume on successful
     }
 }

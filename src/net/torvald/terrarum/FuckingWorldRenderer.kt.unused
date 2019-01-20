@@ -464,7 +464,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         override fun run() {
             var updateTries = 0
             while (ingame.updateDeltaCounter >= ingame.updateRate) {
-                ingame.updateGame(Terrarum.deltaTime)
+                ingame.updateGame(AppLoader.getSmoothDelta().toFloat())
                 ingame.updateDeltaCounter -= ingame.updateRate
                 updateTries++
 
@@ -1090,7 +1090,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
         playableActorDelegate = newActor
-        WorldSimulator(player, Terrarum.deltaTime)
+        WorldSimulator(player, AppLoader.getSmoothDelta().toFloat())
     }
 
     private fun changePossession(refid: Int) {
@@ -1107,7 +1107,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         // accept new delegate
         playableActorDelegate = PlayableActorDelegate(getActorByID(refid) as ActorHumanoid)
         playableActorDelegate!!.actor.collisionType = ActorWithPhysics.COLLISION_KINEMATIC
-        WorldSimulator(player, Terrarum.deltaTime)
+        WorldSimulator(player, AppLoader.getSmoothDelta().toFloat())
     }
 
     /** Send message to notifier UI and toggle the UI as opened. */

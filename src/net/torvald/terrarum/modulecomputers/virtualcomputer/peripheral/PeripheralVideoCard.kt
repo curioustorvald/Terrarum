@@ -155,7 +155,7 @@ import org.luaj.vm2.lib.*
     private val spriteBuffer = ImageBuffer(VSprite.width * 2, VSprite.height)
 
     fun render(g: Graphics) {
-        cursorBlinkTimer += Terrarum.deltaTime
+        cursorBlinkTimer += AppLoader.getSmoothDelta().toFloat()
         if (cursorBlinkTimer > cursorBlinkTime) {
             cursorBlinkTimer -= cursorBlinkTime
             cursorBlinkOn = !cursorBlinkOn

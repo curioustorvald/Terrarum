@@ -212,8 +212,6 @@ object Terrarum : Screen {
     val fullscreenQuad = AppLoader.fullscreenQuad
 
 
-    val deltaTime: Float; get() = Gdx.graphics.rawDeltaTime
-
 
     lateinit var assetManager: AssetManager // TODO
 
@@ -413,9 +411,7 @@ object Terrarum : Screen {
     override fun render(delta: Float) {
         AppLoader.debugTimers["GDX.rawDelta"] = Gdx.graphics.rawDeltaTime.times(1000_000_000f).toLong()
         AppLoader.debugTimers["GDX.smtDelta"] = AppLoader.getSmoothDelta().times(1000_000_000f).toLong()
-        AppLoader.getINSTANCE().screen.render(deltaTime)
-        //GLOBAL_RENDER_TIMER += 1
-        // moved to AppLoader; global event must be place at the apploader to prevent ACCIDENTAL forgot-to-update type of bug.
+        AppLoader.getINSTANCE().screen.render(delta)
     }
 
     override fun pause() {
@@ -489,7 +485,7 @@ object Terrarum : Screen {
         get() = Gdx.input.y
     /** Bigger than 1.0 */
     inline val updateRate: Double
-        get() = 1.0 / Gdx.graphics.deltaTime
+        get() = 1.0 / AppLoader.getSmoothDelta()
     /** Smaller than 1.0 */
     val renderRate = 1.0 / TARGET_INTERNAL_FPS
     val renderRateStr = TARGET_INTERNAL_FPS.toString()
