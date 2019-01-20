@@ -411,7 +411,8 @@ object Terrarum : Screen {
     }
 
     override fun render(delta: Float) {
-        AppLoader.debugTimers["GDX.delta"] = delta.times(1000_000_000f).toLong()
+        AppLoader.debugTimers["GDX.rawDelta"] = Gdx.graphics.rawDeltaTime.times(1000_000_000f).toLong()
+        AppLoader.debugTimers["GDX.smtDelta"] = AppLoader.getSmoothDelta().times(1000_000_000f).toLong()
         AppLoader.getINSTANCE().screen.render(deltaTime)
         //GLOBAL_RENDER_TIMER += 1
         // moved to AppLoader; global event must be place at the apploader to prevent ACCIDENTAL forgot-to-update type of bug.

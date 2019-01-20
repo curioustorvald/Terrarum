@@ -1,5 +1,6 @@
 package net.torvald.terrarum.gameactors
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -358,7 +359,10 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     override fun update(delta: Float) {
         if (isUpdate && !flagDespawn) {
 
-            val ddelta = delta.toDouble()
+            val ddelta = Gdx.graphics.rawDeltaTime.toDouble()
+            //val ddelta = AppLoader.getSmoothDelta()
+            //println("${Gdx.graphics.rawDeltaTime.toDouble()}\t${AppLoader.getSmoothDelta()}")
+
 
             if (!assertPrinted) assertInit()
 

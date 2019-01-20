@@ -408,7 +408,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         itemOnGrip?.endSecondaryUse(delta)
     }
 
-    protected var updateDeltaCounter = 0.0
     protected val renderRate = Terrarum.renderRate
 
     private var firstTimeRun = true
@@ -439,6 +438,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             gameFullyLoaded = true
+            AppLoader.resetDeltaSmoothingHistory()
         }
 
 
@@ -446,7 +446,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         /** UPDATE CODE GOES HERE */
-        updateDeltaCounter += delta
 
 
 
@@ -460,19 +459,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             // else, NOP;
         }
         else {
-            updateDeltaCounter += delta
-            /*if (delta < 1f / 10f) { // discard async if measured FPS <= 10
-                var updateTries = 0
-                while (updateDeltaCounter >= renderRate && updateTries < 6) {
-                    AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
-                    updateDeltaCounter -= renderRate
-                    updateTries++
-                }
-            }
-            else {
-                AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
-            }*/
-
             AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
         }
 

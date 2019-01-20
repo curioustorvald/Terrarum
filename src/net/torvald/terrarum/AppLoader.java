@@ -16,6 +16,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.torvald.dataclass.ArrayListMap;
+import net.torvald.dataclass.CircularArray;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
@@ -24,6 +25,7 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -162,8 +164,6 @@ public class AppLoader implements ApplicationListener {
         //appConfig.useGL30 = true; // used: loads GL 3.2, unused: loads GL 4.6; what the fuck?
         appConfig.vSyncEnabled = false;
         appConfig.resizable = false;//true;
-        //appConfig.width = 1072; // IMAX ratio
-        //appConfig.height = 742; // IMAX ratio
         appConfig.width = 1110; // photographic ratio (1.5:1)
         appConfig.height = 740; // photographic ratio (1.5:1)
         appConfig.backgroundFPS = 9999;
@@ -237,6 +237,99 @@ public class AppLoader implements ApplicationListener {
         updateFullscreenQuad(appConfig.width, appConfig.height);
     }
 
+    private static double _kalman_xhat_k = 1.0 / 60.0;
+    private static double _kalman_p_k = 1.0;
+    private static final double _kalman_R = 0.1;
+    private static boolean _kalman_discard_requested = true;
+    private static int _kalman_discard_frame_counter = 0;
+    private final int _KALMAN_FRAMES_TO_DISCARD = 3;
+    private final double _KALMAN_UPDATE_THRE = 0.1;
+
+    private static final int _DELTA_ITER_AVR_SAMPLESIZE = 25;
+    private static CircularArray<Double> deltaHistory = new CircularArray<>(_DELTA_ITER_AVR_SAMPLESIZE);
+    private static double deltaAvr = 0.0;
+
+    /**
+     * Because fuck you GDX. (No, really; take a look at LwjglGraphics.java, getDeltaTime() and rawDeltaTime() are exactly the same)
+     * @return Render delta that is smoothed out.
+     */
+    public static double getSmoothDelta() {
+        // kalman filter is calculated but not actually being used.
+        //return deltaAvr;
+
+
+        // below is the kalman part
+        if (_kalman_discard_requested)
+            return Gdx.graphics.getRawDeltaTime();
+
+        return _kalman_xhat_k;
+    }
+
+    public static void resetDeltaSmoothingHistory() {
+        _kalman_xhat_k = 1.0 / 60.0;
+        _kalman_p_k = 1.0;
+        _kalman_discard_requested = true;
+
+
+        deltaHistory = new CircularArray<>(_DELTA_ITER_AVR_SAMPLESIZE);
+    }
+
+    /**
+     * @link http://bilgin.esme.org/BitsAndBytes/KalmanFilterforDummies
+     */
+    private void updateKalmanRenderDelta() {
+
+        // TODO implement nonlinear kalman filter or n-frames average
+
+        // kalman filter is calculated but not actually being used.
+        // the problem with this kalman filter is that it assumes most simplistic situation:
+        //   1. the actual delta (measured delta - noise) is constant
+        //   2. everything is linear
+        // we may need to implement Extended Kalman Filter but wtf is Jacobian, I suck at maths.
+
+        if (_kalman_discard_requested) {
+            _kalman_discard_frame_counter += 1;
+            if (_kalman_discard_frame_counter >= _KALMAN_FRAMES_TO_DISCARD) {
+                _kalman_discard_requested = false;
+            }
+        }
+        else {
+            // measurement value
+            double _kalman_zed_k = Gdx.graphics.getRawDeltaTime();
+
+            if (_kalman_zed_k <= _KALMAN_UPDATE_THRE) {
+                // time update
+                double _kalman_xhatminus_k = _kalman_xhat_k;
+                double _kalman_pminus_k = _kalman_p_k;
+
+                // measurement update
+                double _kalman_gain = _kalman_pminus_k / (_kalman_pminus_k + _kalman_R);
+                double _kalman_xhat_kNew = _kalman_xhatminus_k + _kalman_gain * (_kalman_zed_k - _kalman_xhatminus_k);
+                double _kalman_p_kNew = (1.0 - _kalman_gain) * _kalman_pminus_k;
+
+                _kalman_xhat_k = _kalman_xhat_kNew;
+                _kalman_p_k = _kalman_p_kNew;
+            }
+        }
+
+
+        // below is the averaging part
+        if (Gdx.graphics.getRawDeltaTime() <= _KALMAN_UPDATE_THRE) {
+            deltaHistory.add(((double) Gdx.graphics.getRawDeltaTime()));
+            ArrayList<Double> middleVals = new ArrayList<>();
+            deltaHistory.forEach((it) -> {
+                middleVals.add(it);
+                return null;
+            });
+            for (int k = deltaHistory.getElemCount() - 2; k >= 0; k--) {
+                for (int l = 0; l <= k; l++) {
+                    middleVals.set(l, (middleVals.get(l) + middleVals.get(l + 1)) / 2.0);
+                }
+            }
+            deltaAvr = middleVals.get(0);
+        }
+    }
+
     @Override
     public void render() {
 
@@ -245,6 +338,8 @@ public class AppLoader implements ApplicationListener {
             postInit();
         }
 
+        // update smooth delta AFTER postInit
+        updateKalmanRenderDelta();
 
         FrameBufferManager.begin(renderFBO);
         gdxClearAndSetBlend(.094f, .094f, .094f, 0f);
@@ -341,6 +436,8 @@ public class AppLoader implements ApplicationListener {
         updateFullscreenQuad(screenW, screenH);
 
         printdbg(this, "Resize event");
+
+        resetDeltaSmoothingHistory();
     }
 
     @Override
@@ -385,6 +482,8 @@ public class AppLoader implements ApplicationListener {
         }
 
         printdbg(this, "Screen transisiton complete: " + this.screen.getClass().getCanonicalName());
+
+        resetDeltaSmoothingHistory();
     }
 
     private void postInit() {
