@@ -421,6 +421,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
     }
 
+    private var countdownToDeltaReset = 15 // number of frames
+
     override fun render(delta: Float) {
         // Q&D solution for LoadScreen and Ingame, where while LoadScreen is working, Ingame now no longer has GL Context
         // there's still things to load which needs GL context to be present
@@ -438,7 +440,14 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             gameFullyLoaded = true
-            AppLoader.resetDeltaSmoothingHistory()
+        }
+
+
+        if (countdownToDeltaReset >= 0) {3
+            if (countdownToDeltaReset == 0) {
+                AppLoader.resetDeltaSmoothingHistory()
+            }
+            countdownToDeltaReset -= 1
         }
 
 

@@ -16,7 +16,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.torvald.dataclass.ArrayListMap;
-import net.torvald.dataclass.CircularArray;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
@@ -237,16 +236,10 @@ public class AppLoader implements ApplicationListener {
     }
 
     private static double _kalman_xhat_k = 1.0 / 60.0;
+    private static double _kalman_return_value = _kalman_xhat_k;
     private static double _kalman_p_k = 1.0;
     private static final double _kalman_R = 0.1;
-    private static boolean _kalman_discard_requested = true;
-    private static int _kalman_discard_frame_counter = 0;
-    private final int _KALMAN_FRAMES_TO_DISCARD = 3;
     private final double _KALMAN_UPDATE_THRE = 0.1;
-
-    private static final int _DELTA_ITER_AVR_SAMPLESIZE = 13;
-    private static CircularArray<Double> deltaHistory = new CircularArray<>(_DELTA_ITER_AVR_SAMPLESIZE);
-    private static double deltaAvr = 0.0;
 
     /**
      * Because fuck you GDX. (No, really; take a look at LwjglGraphics.java, getDeltaTime() and rawDeltaTime() are exactly the same)
@@ -254,23 +247,15 @@ public class AppLoader implements ApplicationListener {
      */
     public static double getSmoothDelta() {
         // kalman filter is calculated but not actually being used.
-        return deltaAvr;
 
 
         // below is the kalman part
-        /*if (_kalman_discard_requested)
-            return Gdx.graphics.getRawDeltaTime();
-
-        return _kalman_xhat_k;*/
+        return _kalman_return_value;
     }
 
     public static void resetDeltaSmoothingHistory() {
         _kalman_xhat_k = 1.0 / 60.0;
         _kalman_p_k = 1.0;
-        _kalman_discard_requested = true;
-
-
-        deltaHistory = new CircularArray<>(_DELTA_ITER_AVR_SAMPLESIZE);
     }
 
     /**
@@ -286,40 +271,45 @@ public class AppLoader implements ApplicationListener {
         //   2. everything is linear
         // we may need to implement Extended Kalman Filter but wtf is Jacobian, I suck at maths.
 
-        //double observation = ((double) Gdx.graphics.getRawDeltaTime());
-        double observation = 1.0 / Gdx.graphics.getFramesPerSecond();
+        double observation = ((double) Gdx.graphics.getRawDeltaTime());
 
-        if (_kalman_discard_requested) {
-            _kalman_discard_frame_counter += 1;
-            if (_kalman_discard_frame_counter >= _KALMAN_FRAMES_TO_DISCARD) {
-                _kalman_discard_requested = false;
-            }
+        if (getMul(observation, _kalman_return_value) >= 2.5) {
+            resetDeltaSmoothingHistory();
+        }
+
+        // measurement value
+        double _kalman_zed_k = observation;
+
+        if (_kalman_zed_k <= _KALMAN_UPDATE_THRE) {
+            // time update
+            double _kalman_xhatminus_k = _kalman_xhat_k;
+            double _kalman_pminus_k = _kalman_p_k;
+
+            // measurement update
+            double _kalman_gain = _kalman_pminus_k / (_kalman_pminus_k + _kalman_R);
+            double _kalman_xhat_kNew = _kalman_xhatminus_k + _kalman_gain * (_kalman_zed_k - _kalman_xhatminus_k);
+            double _kalman_p_kNew = (1.0 - _kalman_gain) * _kalman_pminus_k;
+
+            _kalman_xhat_k = _kalman_xhat_kNew;
+            _kalman_p_k = _kalman_p_kNew;
+
+            _kalman_return_value = _kalman_xhat_kNew;
+        }
+    }
+
+
+    private final double getMul_epsilon = 0.00001;
+    // only for a > 0 && b > 0
+    private double getMul(double a, double b) {
+        if (a < getMul_epsilon || b < getMul_epsilon) {
+            return a + b;
+        }
+
+        if (a > b) {
+            return a / b;
         }
         else {
-            // measurement value
-            double _kalman_zed_k = observation;
-
-            if (_kalman_zed_k <= _KALMAN_UPDATE_THRE) {
-                // time update
-                double _kalman_xhatminus_k = _kalman_xhat_k;
-                double _kalman_pminus_k = _kalman_p_k;
-
-                // measurement update
-                double _kalman_gain = _kalman_pminus_k / (_kalman_pminus_k + _kalman_R);
-                double _kalman_xhat_kNew = _kalman_xhatminus_k + _kalman_gain * (_kalman_zed_k - _kalman_xhatminus_k);
-                double _kalman_p_kNew = (1.0 - _kalman_gain) * _kalman_pminus_k;
-
-                _kalman_xhat_k = _kalman_xhat_kNew;
-                _kalman_p_k = _kalman_p_kNew;
-            }
-        }
-
-
-        // below is the averaging part
-        if (observation <= _KALMAN_UPDATE_THRE) {
-            deltaHistory.add(observation);
-            double deltaSum = deltaHistory.fold(0.0, (acc, val) -> { return acc += val; });
-            deltaAvr = deltaSum / deltaHistory.getElemCount();
+            return b / a;
         }
     }
 
