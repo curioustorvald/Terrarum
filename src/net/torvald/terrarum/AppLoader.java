@@ -25,7 +25,6 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -245,7 +244,7 @@ public class AppLoader implements ApplicationListener {
     private final int _KALMAN_FRAMES_TO_DISCARD = 3;
     private final double _KALMAN_UPDATE_THRE = 0.1;
 
-    private static final int _DELTA_ITER_AVR_SAMPLESIZE = 25;
+    private static final int _DELTA_ITER_AVR_SAMPLESIZE = 13;
     private static CircularArray<Double> deltaHistory = new CircularArray<>(_DELTA_ITER_AVR_SAMPLESIZE);
     private static double deltaAvr = 0.0;
 
@@ -255,14 +254,14 @@ public class AppLoader implements ApplicationListener {
      */
     public static double getSmoothDelta() {
         // kalman filter is calculated but not actually being used.
-        //return deltaAvr;
+        return deltaAvr;
 
 
         // below is the kalman part
-        if (_kalman_discard_requested)
+        /*if (_kalman_discard_requested)
             return Gdx.graphics.getRawDeltaTime();
 
-        return _kalman_xhat_k;
+        return _kalman_xhat_k;*/
     }
 
     public static void resetDeltaSmoothingHistory() {
@@ -287,6 +286,9 @@ public class AppLoader implements ApplicationListener {
         //   2. everything is linear
         // we may need to implement Extended Kalman Filter but wtf is Jacobian, I suck at maths.
 
+        //double observation = ((double) Gdx.graphics.getRawDeltaTime());
+        double observation = 1.0 / Gdx.graphics.getFramesPerSecond();
+
         if (_kalman_discard_requested) {
             _kalman_discard_frame_counter += 1;
             if (_kalman_discard_frame_counter >= _KALMAN_FRAMES_TO_DISCARD) {
@@ -295,7 +297,7 @@ public class AppLoader implements ApplicationListener {
         }
         else {
             // measurement value
-            double _kalman_zed_k = Gdx.graphics.getRawDeltaTime();
+            double _kalman_zed_k = observation;
 
             if (_kalman_zed_k <= _KALMAN_UPDATE_THRE) {
                 // time update
@@ -314,19 +316,10 @@ public class AppLoader implements ApplicationListener {
 
 
         // below is the averaging part
-        if (Gdx.graphics.getRawDeltaTime() <= _KALMAN_UPDATE_THRE) {
-            deltaHistory.add(((double) Gdx.graphics.getRawDeltaTime()));
-            ArrayList<Double> middleVals = new ArrayList<>();
-            deltaHistory.forEach((it) -> {
-                middleVals.add(it);
-                return null;
-            });
-            for (int k = deltaHistory.getElemCount() - 2; k >= 0; k--) {
-                for (int l = 0; l <= k; l++) {
-                    middleVals.set(l, (middleVals.get(l) + middleVals.get(l + 1)) / 2.0);
-                }
-            }
-            deltaAvr = middleVals.get(0);
+        if (observation <= _KALMAN_UPDATE_THRE) {
+            deltaHistory.add(observation);
+            double deltaSum = deltaHistory.fold(0.0, (acc, val) -> { return acc += val; });
+            deltaAvr = deltaSum / deltaHistory.getElemCount();
         }
     }
 

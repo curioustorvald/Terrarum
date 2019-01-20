@@ -359,9 +359,9 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     override fun update(delta: Float) {
         if (isUpdate && !flagDespawn) {
 
-            val ddelta = Gdx.graphics.rawDeltaTime.toDouble()
-            //val ddelta = AppLoader.getSmoothDelta()
-            //println("${Gdx.graphics.rawDeltaTime.toDouble()}\t${AppLoader.getSmoothDelta()}")
+            //val ddelta = Gdx.graphics.rawDeltaTime.toDouble()
+            val ddelta = AppLoader.getSmoothDelta()
+            println("${Gdx.graphics.rawDeltaTime.toDouble()}\t${AppLoader.getSmoothDelta()}")
 
 
             if (!assertPrinted) assertInit()
