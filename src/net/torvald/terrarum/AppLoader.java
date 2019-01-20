@@ -238,7 +238,7 @@ public class AppLoader implements ApplicationListener {
     private static double _kalman_xhat_k = 1.0 / 60.0;
     private static double _kalman_return_value = _kalman_xhat_k;
     private static double _kalman_p_k = 1.0;
-    private static final double _kalman_R = 0.1;
+    private static final double _kalman_R = 0.2; // 0.2: empirical value
     private final double _KALMAN_UPDATE_THRE = 0.1;
 
     /**
@@ -263,13 +263,15 @@ public class AppLoader implements ApplicationListener {
      */
     private void updateKalmanRenderDelta() {
 
-        // TODO implement nonlinear kalman filter or n-frames average
+        // TODO implement nonlinear kalman filter
 
         // kalman filter is calculated but not actually being used.
         // the problem with this kalman filter is that it assumes most simplistic situation:
         //   1. the actual delta (measured delta - noise) is constant
         //   2. everything is linear
         // we may need to implement Extended Kalman Filter but wtf is Jacobian, I suck at maths.
+        // Instead, the kalman filter will reset when new delta is given-value-times greater/lesser
+        //   it's not perfect but it works.
 
         double observation = ((double) Gdx.graphics.getRawDeltaTime());
 
