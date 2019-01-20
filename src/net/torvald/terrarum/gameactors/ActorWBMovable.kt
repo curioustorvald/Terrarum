@@ -100,6 +100,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * When the engine resolves this value, the framerate must be accounted for. E.g.:
      *  3.0 is resolved as 3.0 if FPS is 60, but the same value should be resolved as 6.0 if FPS is 30.
      *  v_resolved = v * (60/FPS) or, v * (60 * delta_t)
+     * (Use this code verbatim: '(Terrarum.PHYS_REF_FPS * delta)')
+     *
      *
      * Elevators/Movingwalks/etc.: edit hitbox manually!
      *
@@ -271,10 +273,6 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     internal var walledBottom = false // UNUSED; only for BasicDebugInfoWindow
     internal var colliding = false
 
-    protected inline val updateDelta: Float
-        get() = Terrarum.deltaTime
-
-
     var isWalkingH = false
     var isWalkingV = false
 
@@ -340,7 +338,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     inline val feetPosTile: IntArray
         get() = intArrayOf(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
 
-    override fun run() = update(updateDelta)
+    override fun run() = update(AppLoader.getSmoothDelta().toFloat())
 
     /**
      * Add vector value to the velocity, in the time unit of single frame.
@@ -355,18 +353,18 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
     private val bounceDampenVelThreshold = 0.5
 
-    override fun update(delta: Float) {
+    override fun update(fdelta: Float) {
         if (isUpdate && !flagDespawn) {
 
-            //val ddelta = Gdx.graphics.rawDeltaTime.toDouble()
-            val ddelta = AppLoader.getSmoothDelta()
+            //val delta = Gdx.graphics.rawDeltaTime.toDouble()
+            val delta = AppLoader.getSmoothDelta()
             //println("${Gdx.graphics.rawDeltaTime.toDouble()}\t${AppLoader.getSmoothDelta()}")
 
 
             if (!assertPrinted) assertInit()
 
-            if (sprite != null) sprite!!.update(delta)
-            if (spriteGlow != null) spriteGlow!!.update(delta)
+            if (sprite != null) sprite!!.update(fdelta)
+            if (spriteGlow != null) spriteGlow!!.update(fdelta)
 
             // make NoClip work for player
             if (true) {//this == Terrarum.ingame!!.actorNowPlaying) {
@@ -391,7 +389,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 // Actors are subject to the gravity and the buoyancy if they are not levitating
 
                 if (!isNoSubjectToGrav) {
-                    applyGravitation(ddelta)
+                    applyGravitation(delta)
                 }
 
                 //applyBuoyancy()
@@ -412,11 +410,11 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                  *     This body is NON-STATIC and the other body is STATIC
                  */
                 if (!isNoCollideWorld) {
-                    displaceHitbox(ddelta)
+                    displaceHitbox(delta)
                 }
                 else {
                     val vecSum = externalForce + (controllerMoveDelta ?: Vector2(0.0, 0.0))
-                    hitbox.translate(vecSum * (Terrarum.PHYS_REF_FPS * ddelta))
+                    hitbox.translate(vecSum * (Terrarum.PHYS_REF_FPS * delta))
                 }
 
                 //////////////////////////////////////////////////////////////
@@ -430,9 +428,9 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 // TODO less friction for non-animating objects (make items glide far more on ice)
 
                 // FIXME asymmetry on friction
-                setHorizontalFriction() // friction SHOULD use and alter externalForce
+                setHorizontalFriction(delta) // friction SHOULD use and alter externalForce
                 //if (isNoClip) { // TODO also hanging on the rope, etc.
-                setVerticalFriction()
+                setVerticalFriction(delta)
                 //}
 
 
@@ -1073,7 +1071,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
     /** about stopping
      * for about get moving, see updateMovementControl */
-    private fun setHorizontalFriction() {
+    private fun setHorizontalFriction(delta: Double) {
         val friction = if (isNoClip)
             BASE_FRICTION * BlockCodex[Block.STONE].friction.frictionToMult()
         else {
@@ -1102,7 +1100,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         }
     }
 
-    private fun setVerticalFriction() {
+    private fun setVerticalFriction(delta: Double) {
         val friction = if (isNoClip)
             BASE_FRICTION * BlockCodex[Block.STONE].friction.frictionToMult()
         else

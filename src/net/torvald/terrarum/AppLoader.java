@@ -358,12 +358,14 @@ public class AppLoader implements ApplicationListener {
             loadTimer += Gdx.graphics.getRawDeltaTime();
 
             if (loadTimer >= showupTime) {
+                // hand over the scene control to this single class; Terrarum must call
+                // 'AppLoader.getINSTANCE().screen.render(delta)', this is not redundant at all!
                 setScreen(Terrarum.INSTANCE);
             }
         }
         // draw the screen
         else {
-            screen.render(Gdx.graphics.getDeltaTime());
+            screen.render(((float) getSmoothDelta()));
         }
 
         // nested FBOs are just not a thing in GL!

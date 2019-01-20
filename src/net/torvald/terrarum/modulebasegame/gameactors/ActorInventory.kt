@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
@@ -210,7 +211,7 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
                 actor.avStrength / 1000.0
             else
                 1.0 // TODO variable: scale, strength
-            val swingDmgToFrameDmg = Terrarum.deltaTime.toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
+            val swingDmgToFrameDmg = AppLoader.getSmoothDelta().toFloat().toDouble() / actor.actorValue.getAsDouble(AVKey.ACTION_INTERVAL)!!
 
             // damage the item
             newItem.durability -= (baseDamagePerSwing * swingDmgToFrameDmg).toFloat()

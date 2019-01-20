@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 
 /**
@@ -9,13 +10,13 @@ class ThreadActorUpdate(val startIndex: Int, val endIndex: Int) : Runnable {
     override fun run() {
         for (i in startIndex..endIndex) {
             val it = Terrarum.ingame!!.actorContainer[i]
-            it.update(Terrarum.deltaTime)
+            it.update(AppLoader.getSmoothDelta().toFloat())
 
             if (it is Pocketed) {
                 it.inventory.forEach { inventoryEntry ->
-                    inventoryEntry.item.effectWhileInPocket(Terrarum.deltaTime)
+                    inventoryEntry.item.effectWhileInPocket(AppLoader.getSmoothDelta().toFloat())
                     if (it.equipped(inventoryEntry.item)) {
-                        inventoryEntry.item.effectWhenEquipped(Terrarum.deltaTime)
+                        inventoryEntry.item.effectWhenEquipped(AppLoader.getSmoothDelta().toFloat())
                     }
                 }
             }

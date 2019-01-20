@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
@@ -22,7 +23,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
     /** Will NOT actually delete from the CircularArray */
     @Volatile var flagDespawn = false
 
-    override fun run() = update(Terrarum.deltaTime)
+    override fun run() = update(AppLoader.getSmoothDelta().toFloat())
 
     var isNoSubjectToGrav = false
     var dragCoefficient = 3.0
