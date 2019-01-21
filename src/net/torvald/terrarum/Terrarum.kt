@@ -74,21 +74,11 @@ object Terrarum : Screen {
         get() = HEIGHT.ushr(1)
 
     /**
-     * To be used with physics simulator
+     * To be used with physics simulator. This is a magic number.
      */
     val PHYS_TIME_FRAME: Double = 26.0 + (2.0 / 3.0)
-    val PHYS_CONST_MULT: Double = 60.0 / (26.0 + (2.0 / 3.0))
-    val PHYS_REF_FPS: Double = 60.0
     // 26.0 + (2.0 / 3.0) // lower value == faster gravity response (IT WON'T HOTSWAP!!)
     // protip: using METER, game unit and SI unit will have same number
-
-    /**
-     * To be used with render, to achieve smooth frame drawing
-     * TARGET_INTERNAL_FPS > PHYS_TIME_FRAME for smooth frame drawing
-     */
-    val TARGET_INTERNAL_FPS: Double = 60.0
-
-
 
 
 
@@ -483,13 +473,9 @@ object Terrarum : Screen {
         get() = Gdx.input.x
     inline val mouseScreenY: Int
         get() = Gdx.input.y
-    /** Bigger than 1.0 */
+    /** Delta converted as it it was a FPS */
     inline val updateRate: Double
         get() = 1.0 / AppLoader.getSmoothDelta()
-    /** Smaller than 1.0 */
-    val renderRate = 1.0 / TARGET_INTERNAL_FPS
-    val renderRateStr = TARGET_INTERNAL_FPS.toString()
-
     /**
      * Usage:
      *

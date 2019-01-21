@@ -82,7 +82,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         fun getCanonicalTitle() = AppLoader.GAME_NAME +
                                   " — F: ${Gdx.graphics.framesPerSecond}" +
                                   if (AppLoader.IS_DEVELOPMENT_BUILD)
-                                      " (Δt${Terrarum.updateRateStr} / RT${Terrarum.renderRateStr})" +
+                                      " (ΔF${Terrarum.updateRateStr})" +
                                       " — M: J${Terrarum.memJavaHeap}M / N${Terrarum.memNativeHeap}M / X${Terrarum.memXmx}M"
                                   else
                                       ""
@@ -379,6 +379,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         LightmapRenderer.fireRecalculateEvent()
 
 
+        AppLoader.debugTimers["Ingame.updateCounter"] = 0
 
 
 
@@ -408,8 +409,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         itemOnGrip?.endSecondaryUse(delta)
     }
 
-    protected val renderRate = Terrarum.renderRate
-
     private var firstTimeRun = true
 
     ///////////////
@@ -422,6 +421,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private var countdownToDeltaReset = 15 // number of frames
+    private var updateAkku = 0.0
 
     override fun render(delta: Float) {
         // Q&D solution for LoadScreen and Ingame, where while LoadScreen is working, Ingame now no longer has GL Context
@@ -443,7 +443,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
 
 
-        if (countdownToDeltaReset >= 0) {3
+        if (countdownToDeltaReset >= 0) {
             if (countdownToDeltaReset == 0) {
                 AppLoader.resetDeltaSmoothingHistory()
             }
@@ -456,20 +456,15 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         /** UPDATE CODE GOES HERE */
 
+        updateAkku += AppLoader.getSmoothDelta()
 
-
-        if (false && AppLoader.getConfigBoolean("multithread")) { // NO MULTITHREADING: camera don't like concurrent modification (jittery actor movements)
-            if (firstTimeRun || updateThreadWrapper.state == Thread.State.TERMINATED) {
-                updateThreadWrapper = Thread(ingameUpdateThread, "Terrarum UpdateThread")
-                updateThreadWrapper.start()
-
-                if (firstTimeRun) firstTimeRun = false
-            }
-            // else, NOP;
-        }
-        else {
+        var i = 0L
+        while (updateAkku >= delta) {
             AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
+            updateAkku -= delta
+            i += 1
         }
+        AppLoader.debugTimers["Ingame.updateCounter"] = i
 
 
         /** RENDER CODE GOES HERE */
@@ -542,6 +537,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private fun renderGame() {
         Gdx.graphics.setTitle(getCanonicalTitle())
+
+        
 
         IngameRenderer.invoke(
                 world as GameWorldExtension,

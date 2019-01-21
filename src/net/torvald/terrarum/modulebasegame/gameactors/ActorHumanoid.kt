@@ -406,9 +406,9 @@ open class ActorHumanoid(
                     avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f) * absAxisVal
 
         if (absAxisVal != AXIS_KEYBOARD)
-            controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal) }
+            controllerV?.x?.let { controllerV!!.x = controllerV!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal) }
         else
-            controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
+            controllerV?.x?.let { controllerV!!.x = controllerV!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
 
         if (walkCounterX < 1000000) {
           walkCounterX += 1
@@ -444,9 +444,9 @@ open class ActorHumanoid(
                     avAcceleration * applyVelo(walkCounterY) * (if (up) -1f else 1f) * absAxisVal
 
         if (absAxisVal != AXIS_KEYBOARD)
-            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap * absAxisVal) }
+            controllerV?.y?.let { controllerV!!.y = controllerV!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap * absAxisVal) }
         else
-            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap) }
+            controllerV?.y?.let { controllerV!!.y = controllerV!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap) }
 
         if (walkCounterY < 1000000) {
             walkCounterY += 1
@@ -489,6 +489,7 @@ open class ActorHumanoid(
     private var oldJUMPPOWERBUFF = -1.0 // init
     private var oldScale = -1.0
     private var oldDragCoefficient = -1.0
+    // used by some AIs
     var jumpAirTime: Double = -1.0
         get() {
             // compare all the affecting variables
@@ -519,7 +520,7 @@ open class ActorHumanoid(
 
                     val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, jmpCtr)
                     forceVec.y -= getJumpAcc(jumpPower, timedJumpCharge)
-                    forceVec.y += getDrag(1.0 / Terrarum.PHYS_REF_FPS, forceVec).y
+                    forceVec.y += getDrag(AppLoader.UPDATE_RATE.toFloat(), forceVec).y
 
                     simYPos += forceVec.y // ignoring all the fluid drag OTHER THAN THE AIR
 
@@ -564,7 +565,7 @@ open class ActorHumanoid(
 
             jumpAcc = getJumpAcc(jumpPower, timedJumpCharge)
 
-            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y -= jumpAcc } // feed negative value to the vector
+            controllerV?.y?.let { controllerV!!.y -= jumpAcc } // feed negative value to the vector
             // do not think of resetting this to zero when counter hit the ceiling; that's HOW NOT
             // newtonian physics work, stupid myself :(
 
@@ -609,7 +610,7 @@ open class ActorHumanoid(
         sprite?.update(delta)
         spriteGlow?.update(delta)
 
-        if (walledBottom && controllerMoveDelta?.x != 0.0) {
+        if (walledBottom && controllerV?.x != 0.0) {
             //switch row
             sprite?.switchRow(SPRITE_ROW_WALK)
             spriteGlow?.switchRow(SPRITE_ROW_WALK)
@@ -617,8 +618,8 @@ open class ActorHumanoid(
             // set anim frame delay
             // 4f of the divider is a magic number, empirically decided
             if (this is HasAssembledSprite) {
-                sprite?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveDelta?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
-                spriteGlow?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveDelta?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
+                sprite?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerV?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
+                spriteGlow?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerV?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
 
             }
 

@@ -9,7 +9,6 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Hitbox
 import net.torvald.terrarum.gameactors.Luminous
-import net.torvald.terrarum.gameworld.GameWorld
 import org.dyn4j.geometry.Vector2
 import java.util.*
 
@@ -54,7 +53,7 @@ open class ProjectileSimple(
         posPre = Point2d(fromPoint.x, fromPoint.y)
         // lightbox sized 8x8 centered to the bullet
         lightBoxList.add(Hitbox(-4.0, -4.0, 8.0, 8.0))
-        //this.externalForce.set(velocity)
+        //this.externalV.set(velocity)
 
         damage = bulletDatabase[type][OFFSET_DAMAGE] as Int
         displayColour = bulletDatabase[type][OFFSET_COL] as Color
@@ -64,7 +63,7 @@ open class ProjectileSimple(
         setHitboxDimension(2, 2, 0, 0) // should be following sprite's properties if there IS one
 
 
-        externalForce.set((fromPoint to toPoint).setMagnitude(speed.toDouble()))
+        externalV.set((fromPoint to toPoint).setMagnitude(speed.toDouble()))
 
 
 

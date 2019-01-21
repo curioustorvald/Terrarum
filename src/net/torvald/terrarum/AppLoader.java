@@ -207,6 +207,8 @@ public class AppLoader implements ApplicationListener {
         Gdx.gl20.glViewport(0, 0, width, height);
     }
 
+    public static final double UPDATE_RATE = 1.0 / 61.0; // TODO set it like 1/100, because apparent framerate is limited by update rate
+
     private float loadTimer = 0f;
     private final float showupTime = 100f / 1000f;
 
@@ -235,7 +237,7 @@ public class AppLoader implements ApplicationListener {
         updateFullscreenQuad(appConfig.width, appConfig.height);
     }
 
-    private static double _kalman_xhat_k = 1.0 / 60.0;
+    private static double _kalman_xhat_k = UPDATE_RATE;
     private static double _kalman_return_value = _kalman_xhat_k;
     private static double _kalman_p_k = 1.0;
     private static final double _kalman_R = 0.2; // 0.2: empirical value
@@ -254,7 +256,7 @@ public class AppLoader implements ApplicationListener {
     }
 
     public static void resetDeltaSmoothingHistory() {
-        _kalman_xhat_k = 1.0 / 60.0;
+        _kalman_xhat_k = UPDATE_RATE;
         _kalman_p_k = 1.0;
     }
 
@@ -365,7 +367,7 @@ public class AppLoader implements ApplicationListener {
         }
         // draw the screen
         else {
-            screen.render(((float) getSmoothDelta()));
+            screen.render((float) UPDATE_RATE);
         }
 
         // nested FBOs are just not a thing in GL!

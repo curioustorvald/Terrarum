@@ -95,7 +95,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         )
 
     /**
-     * TODO Pixels per 1/60 seconds.
+     * Unit: Pixels per 1/60 (or AppLoader.UPDATE_RATE) seconds.
      *
      * When the engine resolves this value, the framerate must be accounted for. E.g.:
      *  3.0 is resolved as 3.0 if FPS is 60, but the same value should be resolved as 6.0 if FPS is 30.
@@ -109,15 +109,21 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * Acceleration: used in code like:
      *     veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
+     *
+     * V for Velocity!
      */
-    internal val externalForce = Vector2(0.0, 0.0)
+    internal val externalV = Vector2(0.0, 0.0)
 
     @Transient private val VELO_HARD_LIMIT = 100.0
 
     /**
+     * Unit: Pixels per 1/60 (or AppLoader.UPDATE_RATE) seconds.
+     *
      * for "Controllable" actors
+     *
+     * V for Velocity!
      */
-    var controllerMoveDelta: Vector2? = if (this is Controllable) Vector2() else null
+    var controllerV: Vector2? = if (this is Controllable) Vector2() else null
 
     // not sure we need this...
     //var jumpable = true // this is kind of like "semaphore"
@@ -348,23 +354,17 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * @param acc : Acceleration in Vector2
      */
     fun applyForce(acc: Vector2) {
-        externalForce += acc * speedMultByTile
+        externalV += acc * speedMultByTile
     }
 
     private val bounceDampenVelThreshold = 0.5
 
-    override fun update(fdelta: Float) {
+    override fun update(delta: Float) {
         if (isUpdate && !flagDespawn) {
-
-            //val delta = Gdx.graphics.rawDeltaTime.toDouble()
-            val delta = AppLoader.getSmoothDelta()
-            //println("${Gdx.graphics.rawDeltaTime.toDouble()}\t${AppLoader.getSmoothDelta()}")
-
-
             if (!assertPrinted) assertInit()
 
-            if (sprite != null) sprite!!.update(fdelta)
-            if (spriteGlow != null) spriteGlow!!.update(fdelta)
+            if (sprite != null) sprite!!.update(delta)
+            if (spriteGlow != null) spriteGlow!!.update(delta)
 
             // make NoClip work for player
             if (true) {//this == Terrarum.ingame!!.actorNowPlaying) {
@@ -381,7 +381,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
 
             ////////////////////////////////////////////////////////////////
-            // Codes that modifies velocity (moveDelta and externalForce) //
+            // Codes that modifies velocity (moveDelta and externalV) //
             ////////////////////////////////////////////////////////////////
 
             // --> Apply more forces <-- //
@@ -396,8 +396,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             }
 
             // hard limit velocity
-            externalForce.x = externalForce.x.bipolarClamp(VELO_HARD_LIMIT) // displaceHitbox SHOULD use moveDelta
-            externalForce.y = externalForce.y.bipolarClamp(VELO_HARD_LIMIT)
+            externalV.x = externalV.x.bipolarClamp(VELO_HARD_LIMIT) // displaceHitbox SHOULD use moveDelta
+            externalV.y = externalV.y.bipolarClamp(VELO_HARD_LIMIT)
 
             if (!isChronostasis) {
                 ///////////////////////////////////////////////////
@@ -410,11 +410,11 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                  *     This body is NON-STATIC and the other body is STATIC
                  */
                 if (!isNoCollideWorld) {
-                    displaceHitbox(delta)
+                    displaceHitbox(delta.toDouble())
                 }
                 else {
-                    val vecSum = externalForce + (controllerMoveDelta ?: Vector2(0.0, 0.0))
-                    hitbox.translate(vecSum * (Terrarum.PHYS_REF_FPS * delta))
+                    val vecSum = externalV + (controllerV ?: Vector2(0.0, 0.0))
+                    hitbox.translate(vecSum)
                 }
 
                 //////////////////////////////////////////////////////////////
@@ -428,7 +428,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 // TODO less friction for non-animating objects (make items glide far more on ice)
 
                 // FIXME asymmetry on friction
-                setHorizontalFriction(delta) // friction SHOULD use and alter externalForce
+                setHorizontalFriction(delta) // friction SHOULD use and alter externalV
                 //if (isNoClip) { // TODO also hanging on the rope, etc.
                 setVerticalFriction(delta)
                 //}
@@ -470,33 +470,33 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             if (!(isWalled(hitbox, COLLIDING_LEFT) && walkX < 0)
                 || !(isWalled(hitbox, COLLIDING_RIGHT) && walkX > 0)
                     ) {
-                moveDelta.x = externalForce.x + walkX
+                moveDelta.x = externalV.x + walkX
             }
 
             // decide whether to ignore walkY
             if (!(isWalled(hitbox, COLLIDING_TOP) && walkY < 0)
                 || !(isWalled(hitbox, COLLIDING_BOTTOM) && walkY > 0)
                     ) {
-                moveDelta.y = externalForce.y + walkY
+                moveDelta.y = externalV.y + walkY
             }
         }
         else {
             if (!isWalled(hitbox, COLLIDING_LEFT)
                 || !isWalled(hitbox, COLLIDING_RIGHT)
                     ) {
-                moveDelta.x = externalForce.x
+                moveDelta.x = externalV.x
             }
 
             // decide whether to ignore walkY
             if (!isWalled(hitbox, COLLIDING_TOP)
                 || !isWalled(hitbox, COLLIDING_BOTTOM)
                     ) {
-                moveDelta.y = externalForce.y
+                moveDelta.y = externalV.y
             }
         }
     }*/
 
-    fun getDrag(delta: Double, externalForce: Vector2): Vector2 {
+    fun getDrag(delta: Float, externalForce: Vector2): Vector2 {
         /**
          * weight; gravitational force in action
          * W = mass * G (9.8 [m/s^2])
@@ -514,7 +514,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
         val V: Vector2 = (W - D) / Terrarum.PHYS_TIME_FRAME * SI_TO_GAME_ACC
 
-        return V * (Terrarum.PHYS_REF_FPS * delta).sqrt()
+        return V
 
         // FIXME v * const, where const = 1.0 for FPS=60, sqrt(2.0) for FPS=30, etc.
         //       this is "close enough" solution and not perfect.
@@ -535,11 +535,11 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      *
      * Apply only if not grounded; normal force is precessed separately.
      */
-    private fun applyGravitation(delta: Double) {
+    private fun applyGravitation(delta: Float) {
 
         if (!isNoSubjectToGrav && !(gravitation.y > 0 && walledBottom || gravitation.y < 0 && walledTop)) {
             //if (!isWalled(hitbox, COLLIDING_BOTTOM)) {
-            applyForce(getDrag(delta, externalForce))
+            applyForce(getDrag(delta, externalV))
             //}
         }
     }
@@ -587,7 +587,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         //          if not touching:
         //              do nothing
         //      [Friction]:
-        //          deform vector "externalForce"
+        //          deform vector "externalV"
         //          if isControllable:
         //              also alter walkX/Y
         // translate ((nextHitbox)) hitbox by moveDelta (forces), this consumes force
@@ -637,7 +637,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             fun Double.modTileDelta() = this - this.modTile()
 
 
-            val vectorSum = (externalForce + controllerMoveDelta) * (Terrarum.PHYS_REF_FPS * delta)
+            val vectorSum = (externalV + controllerV)
             val ccdSteps = minOf(16, (vectorSum.magnitudeSquared / TILE_SIZE.sqr()).floorInt() + 1) // adaptive
 
 
@@ -838,20 +838,20 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
                 // bounce X/Y
                 if (bounceX) {
-                    externalForce.x *= elasticity
-                    controllerMoveDelta?.let { controllerMoveDelta!!.x *= elasticity }
+                    externalV.x *= elasticity
+                    controllerV?.let { controllerV!!.x *= elasticity }
                 }
                 if (bounceY) {
-                    externalForce.y *= elasticity
-                    controllerMoveDelta?.let { controllerMoveDelta!!.y *= elasticity }
+                    externalV.y *= elasticity
+                    controllerV?.let { controllerV!!.y *= elasticity }
                 }
                 if (zeroX) {
-                    externalForce.x = 0.0
-                    controllerMoveDelta?.let { controllerMoveDelta!!.x = 0.0 }
+                    externalV.x = 0.0
+                    controllerV?.let { controllerV!!.x = 0.0 }
                 }
                 if (zeroY) {
-                    externalForce.y = 0.0
-                    controllerMoveDelta?.let { controllerMoveDelta!!.y = 0.0 }
+                    externalV.y = 0.0
+                    controllerV?.let { controllerV!!.y = 0.0 }
                 }
 
 
@@ -1012,11 +1012,11 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             (BlockCodex[tile].isSolid) ||
             // platforms, moving downward AND not "going down"
             (this is ActorHumanoid && BlockCodex[tile].isPlatform &&
-             externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0 &&
+             externalV.y + (controllerV?.y ?: 0.0) >= 0.0 &&
              !this.isDownDown && this.axisY <= 0f) ||
             // platforms, moving downward
             (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
-             externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0)
+             externalV.y + (controllerV?.y ?: 0.0) >= 0.0)
     // TODO: as for the platform, only apply it when it's a feet tile
 
 
@@ -1071,7 +1071,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
     /** about stopping
      * for about get moving, see updateMovementControl */
-    private fun setHorizontalFriction(delta: Double) {
+    private fun setHorizontalFriction(delta: Float) {
         val friction = if (isNoClip)
             BASE_FRICTION * BlockCodex[Block.STONE].friction.frictionToMult()
         else {
@@ -1079,50 +1079,50 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             BASE_FRICTION * if (grounded) feetFriction else bodyFriction
         }
 
-        if (externalForce.x < 0) {
-            externalForce.x += friction
-            if (externalForce.x > 0) externalForce.x = 0.0 // compensate overshoot
+        if (externalV.x < 0) {
+            externalV.x += friction
+            if (externalV.x > 0) externalV.x = 0.0 // compensate overshoot
         }
-        else if (externalForce.x > 0) {
-            externalForce.x -= friction
-            if (externalForce.x < 0) externalForce.x = 0.0 // compensate overshoot
+        else if (externalV.x > 0) {
+            externalV.x -= friction
+            if (externalV.x < 0) externalV.x = 0.0 // compensate overshoot
         }
 
         if (this is Controllable) {
-            if (controllerMoveDelta!!.x < 0) {
-                controllerMoveDelta!!.x += friction
-                if (controllerMoveDelta!!.x > 0) controllerMoveDelta!!.x = 0.0
+            if (controllerV!!.x < 0) {
+                controllerV!!.x += friction
+                if (controllerV!!.x > 0) controllerV!!.x = 0.0
             }
-            else if (controllerMoveDelta!!.x > 0) {
-                controllerMoveDelta!!.x -= friction
-                if (controllerMoveDelta!!.x < 0) controllerMoveDelta!!.x = 0.0
+            else if (controllerV!!.x > 0) {
+                controllerV!!.x -= friction
+                if (controllerV!!.x < 0) controllerV!!.x = 0.0
             }
         }
     }
 
-    private fun setVerticalFriction(delta: Double) {
+    private fun setVerticalFriction(delta: Float) {
         val friction = if (isNoClip)
             BASE_FRICTION * BlockCodex[Block.STONE].friction.frictionToMult()
         else
             BASE_FRICTION * bodyFriction
 
-        if (externalForce.y < 0) {
-            externalForce.y += friction
-            if (externalForce.y > 0) externalForce.y = 0.0 // compensate overshoot
+        if (externalV.y < 0) {
+            externalV.y += friction
+            if (externalV.y > 0) externalV.y = 0.0 // compensate overshoot
         }
-        else if (externalForce.y > 0) {
-            externalForce.y -= friction
-            if (externalForce.y < 0) externalForce.y = 0.0 // compensate overshoot
+        else if (externalV.y > 0) {
+            externalV.y -= friction
+            if (externalV.y < 0) externalV.y = 0.0 // compensate overshoot
         }
 
         if (this is Controllable) {
-            if (controllerMoveDelta!!.y < 0) {
-                controllerMoveDelta!!.y += friction
-                if (controllerMoveDelta!!.y > 0) controllerMoveDelta!!.y = 0.0
+            if (controllerV!!.y < 0) {
+                controllerV!!.y += friction
+                if (controllerV!!.y > 0) controllerV!!.y = 0.0
             }
-            else if (controllerMoveDelta!!.y > 0) {
-                controllerMoveDelta!!.y -= friction
-                if (controllerMoveDelta!!.y < 0) controllerMoveDelta!!.y = 0.0
+            else if (controllerV!!.y > 0) {
+                controllerV!!.y -= friction
+                if (controllerV!!.y < 0) controllerV!!.y = 0.0
             }
         }
     }
@@ -1443,8 +1443,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             field = value
 
             if (value) {
-                externalForce.zero()
-                controllerMoveDelta?.zero()
+                externalV.zero()
+                controllerV?.zero()
             }
         }
 
