@@ -198,12 +198,23 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
     private val introUncoverTime: Second = 0.3f
     private var introUncoverDeltaCounter = 0f
-    private var updateDeltaCounter = 0.0
+    private var updateAkku = 0.0
 
     override fun render(delta: Float) {
-        // TODO async update
+        // async update and render
 
-        updateScreen(delta)
+        val dt = AppLoader.getSmoothDelta()
+        updateAkku += dt
+
+        var i = 0L
+        while (updateAkku >= delta) {
+            updateScreen(delta)
+            updateAkku -= delta
+            i += 1
+        }
+        AppLoader.debugTimers["Ingame.updateCounter"] = i
+
+
         // render? just do it anyway
         renderScreen()
     }
