@@ -106,7 +106,7 @@ public class AppLoader implements ApplicationListener {
     }
 
     public static final String GAME_NAME = "Terrarum";
-    public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2018 Torvald (minjaesong)";
+    public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2019 Torvald (minjaesong)";
     public static String GAME_LOCALE = System.getProperty("user.language") + System.getProperty("user.country");
 
     /**
@@ -277,7 +277,7 @@ public class AppLoader implements ApplicationListener {
 
         double observation = ((double) Gdx.graphics.getRawDeltaTime());
 
-        if (getMul(observation, _kalman_return_value) >= 2.5) {
+        if (getMul(observation, _kalman_return_value) >= 1.2) {
             resetDeltaSmoothingHistory();
         }
 
