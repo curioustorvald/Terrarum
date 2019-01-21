@@ -267,17 +267,19 @@ public class AppLoader implements ApplicationListener {
 
         // TODO implement nonlinear kalman filter
 
-        // kalman filter is calculated but not actually being used.
-        // the problem with this kalman filter is that it assumes most simplistic situation:
-        //   1. the actual delta (measured delta - noise) is constant
+        // The problem with this kalman filter is that it assumes most simplistic situation:
+        //   1. the actual delta (measured delta - noise) is constant (that is, not constantly increasing or something)
         //   2. everything is linear
-        // we may need to implement Extended Kalman Filter but wtf is Jacobian, I suck at maths.
-        // Instead, the kalman filter will reset when new delta is given-value-times greater/lesser
-        //   it's not perfect but it works.
+        // We may need to implement Extended Kalman Filter but what is Jacobian, I suck at maths.
+        //
+        // Instead, this implementation will reset itself when difference in magnitude between
+        // old and new is greater than set value.
+        //
+        // It's not perfect but it works, much better than averaging.
 
         double observation = ((double) Gdx.graphics.getRawDeltaTime());
 
-        if (getMul(observation, _kalman_return_value) >= 1.2) {
+        if (getMul(observation, _kalman_return_value) >= 2.0) {
             resetDeltaSmoothingHistory();
         }
 

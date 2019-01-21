@@ -476,6 +476,11 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         AppLoader.debugTimers["Ingame.render"] = measureNanoTime { renderGame() }
         AppLoader.debugTimers["Ingame.render-Light"] =
                 (AppLoader.debugTimers["Ingame.render"] as Long) - ((AppLoader.debugTimers["Renderer.LightTotal"] as? Long) ?: 0)
+
+
+
+        AppLoader.debugTimers["Gdx.deltaRaw"] = Gdx.graphics.rawDeltaTime.times(1_000_000_000).toLong()
+        AppLoader.debugTimers["Gdx.deltaSmt"] = Gdx.graphics.deltaTime.times(1_000_000_000).toLong()
     }
 
     protected fun updateGame(delta: Float) {
