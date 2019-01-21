@@ -2,9 +2,10 @@ package net.torvald.terrarum.worlddrawer
 
 import com.jme3.math.FastMath
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.floorInt
+import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameworld.GameWorld
+import org.dyn4j.geometry.Vector2
 
 /**
  * Created by minjaesong on 2016-12-30.
@@ -29,6 +30,8 @@ object WorldCamera {
     inline val yCentre: Int
         get() = y + height.ushr(1)
 
+    private val nullVec = Vector2(0.0, 0.0)
+
     fun update(world: GameWorld, player: ActorWBMovable?) {
         if (player == null) return
 
@@ -38,12 +41,14 @@ object WorldCamera {
         // TOP-LEFT position of camera border
 
         // some hacky equation to position player at the dead centre
-        // NOT tested for WorldDrawer sampling negative coord for its drawing (which causes some fucking artefacts)
-        x = ((player.hitbox.centeredX).toFloat() - (width / 2)).floorInt() // X only: ROUNDWORLD implementation
+        // implementing the "lag behind" camera the right way
+        val pVecSum = player.externalV + (player.controllerV ?: nullVec)
+
+        x = ((player.hitbox.centeredX - pVecSum.x).toFloat() - (width / 2)).floorInt() // X only: ROUNDWORLD implementation
 
 
         y = (FastMath.clamp(
-                player.hitbox.centeredY.toFloat() - height / 2,
+                (player.hitbox.centeredY - pVecSum.y).toFloat() - height / 2,
                 TILE_SIZE.toFloat(),
                 world.height * TILE_SIZE - height - TILE_SIZE.toFloat()
         )).floorInt().clampCameraY(world)

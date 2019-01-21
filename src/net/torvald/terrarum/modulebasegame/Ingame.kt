@@ -505,8 +505,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             // camera-related updates //
             ////////////////////////////
             FeaturesDrawer.update(delta)
-            WorldCamera.update(gameworld, actorNowPlaying)
-
 
 
             ///////////////////////////
@@ -529,6 +527,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             visibleActorsRenderMidTop = actorsRenderMidTop.filter { it.inScreen() }
             visibleActorsRenderFront  =  actorsRenderFront.filter { it.inScreen() }
             visibleActorsRenderOverlay=actorsRenderOverlay.filter { it.inScreen() }
+
+
+            WorldCamera.update(gameworld, actorNowPlaying)
         }
 
 
