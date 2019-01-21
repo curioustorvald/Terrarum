@@ -7,11 +7,11 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
-data class Joint(val name: String, val position: ADPropertyObject.Vector2i) {
+internal data class Joint(val name: String, val position: ADPropertyObject.Vector2i) {
     override fun toString() = "$name $position"
 }
 
-data class Skeleton(val name: String, val joints: List<Joint>) {
+internal data class Skeleton(val name: String, val joints: List<Joint>) {
     override fun toString() = "$name=$joints"
 }
 
@@ -22,12 +22,12 @@ data class Skeleton(val name: String, val joints: List<Joint>) {
  * @param frames number of frames this animation has
  * @param skeleton list of joints to be transformed
  */
-data class Animation(val name: String, val delay: Float, val row: Int, val frames: Int, val skeleton: Skeleton) {
+internal data class Animation(val name: String, val delay: Float, val row: Int, val frames: Int, val skeleton: Skeleton) {
     override fun toString() = "$name delay: $delay, row: $row, frames: $frames, skeleton: ${skeleton.name}"
 }
 
 /** Later the 'translate' can be changed so that it represents affine transformation (Matrix2d) */
-data class Transform(val joint: Joint, val translate: ADPropertyObject.Vector2i) {
+internal data class Transform(val joint: Joint, val translate: ADPropertyObject.Vector2i) {
     override fun toString() = "$joint transform: $translate"
 }
 
@@ -41,11 +41,11 @@ class ADProperties {
     lateinit var bodyparts: List<String>; private set
     lateinit var bodypartFiles: List<String>; private set
     /** properties that are being used as skeletons (SKELETON_STAND) */
-    lateinit var skeletons: HashMap<String, Skeleton>; private set
+    internal lateinit var skeletons: HashMap<String, Skeleton>; private set
     /** properties that are recognised as animations (ANIM_RUN, ANIM)IDLE) */
-    lateinit var animations: HashMap<String, Animation>; private set
+    internal lateinit var animations: HashMap<String, Animation>; private set
     /** an "animation frame" property (ANIM_RUN_1, ANIM_RUN_2) */
-    lateinit var transforms: HashMap<String, List<Transform>>; private set
+    internal lateinit var transforms: HashMap<String, List<Transform>>; private set
 
     private val reservedProps = listOf("SPRITESHEET", "EXTENSION")
     private val animMustContain = listOf("DELAY", "ROW", "SKELETON")
@@ -56,7 +56,7 @@ class ADProperties {
     var frameHeight: Int = -1; private set
     var originX: Int = -1; private set
     var originY: Int = -1; private set
-    val origin: ADPropertyObject.Vector2i
+    internal val origin: ADPropertyObject.Vector2i
         get() = ADPropertyObject.Vector2i(originX, originY)
 
     private val animFrameSuffixRegex = Regex("""_[0-9]+""")
@@ -209,11 +209,11 @@ class ADProperties {
     fun toFilename(partName: String) =
             "${this.baseFilename}${partName.toLowerCase()}${this.extension}"
 
-    fun getAnimByFrameName(frameName: String) = animations[getAnimNameFromFrame(frameName)]!!
-    fun getFrameNumberFromName(frameName: String) = frameName.substring(frameName.lastIndexOf('_') + 1 until frameName.length).toInt()
+    internal fun getAnimByFrameName(frameName: String) = animations[getAnimNameFromFrame(frameName)]!!
+    internal fun getFrameNumberFromName(frameName: String) = frameName.substring(frameName.lastIndexOf('_') + 1 until frameName.length).toInt()
 
-    fun getSkeleton(name: String) = skeletons[name]!!
-    fun getTransform(name: String) = transforms[name]!!
+    internal fun getSkeleton(name: String) = skeletons[name]!!
+    internal fun getTransform(name: String) = transforms[name]!!
 
     private fun getAnimNameFromFrame(s: String) = s.substring(0 until s.lastIndexOf('_'))
 
@@ -271,7 +271,7 @@ class ADPropertyObject(propertyRaw: String) {
         }
     }
 
-    companion object {
+    internal companion object {
         private val floatRegex = Regex("""-?[0-9]+(\.[0-9]*)?""")
         private val ivec2Regex = Regex("""-?[0-9]+,-?[0-9]+""")
         private val variableInputSepRegex = Regex(""" +""")
@@ -292,7 +292,7 @@ class ADPropertyObject(propertyRaw: String) {
         fun isADstring(property: String) = !isADvariable(property)
     }
 
-    data class Vector2i(var x: Int, var y: Int) {
+    internal data class Vector2i(var x: Int, var y: Int) {
         override fun toString() = "($x, $y)"
 
         operator fun plus(other: Vector2i) = Vector2i(this.x + other.x, this.y + other.y)
