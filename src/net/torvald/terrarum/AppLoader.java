@@ -160,12 +160,12 @@ public class AppLoader implements ApplicationListener {
 
         LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
         //appConfig.useGL30 = true; // used: loads GL 3.2, unused: loads GL 4.6; what the fuck?
-        appConfig.vSyncEnabled = false;
+        appConfig.vSyncEnabled = true;
         appConfig.resizable = false;//true;
         appConfig.width = 1110; // photographic ratio (1.5:1)
         appConfig.height = 740; // photographic ratio (1.5:1)
-        appConfig.backgroundFPS = 9999;
-        appConfig.foregroundFPS = 9999;
+        appConfig.backgroundFPS = 0;
+        appConfig.foregroundFPS = 0;
         appConfig.title = GAME_NAME;
         appConfig.forceExit = false;
 
@@ -207,7 +207,7 @@ public class AppLoader implements ApplicationListener {
         Gdx.gl20.glViewport(0, 0, width, height);
     }
 
-    public static final double UPDATE_RATE = 1.0 / 61.0; // TODO set it like 1/100, because apparent framerate is limited by update rate
+    public static final double UPDATE_RATE = 1.0 / 60.0; // TODO set it like 1/100, because apparent framerate is limited by update rate
 
     private float loadTimer = 0f;
     private final float showupTime = 100f / 1000f;
@@ -480,6 +480,11 @@ public class AppLoader implements ApplicationListener {
         getDefaultDirectory();
         createDirs();
         readConfigJson();
+
+        // set render configs according to local config
+        appConfig.vSyncEnabled = getConfigBoolean("usevsync");
+        appConfig.foregroundFPS = getConfigInt("displayfps");
+        appConfig.backgroundFPS = getConfigInt("displayfps");
 
         textureWhiteSquare = new Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"));
         textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
