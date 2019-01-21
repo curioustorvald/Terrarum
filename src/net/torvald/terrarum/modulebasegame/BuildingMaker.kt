@@ -120,9 +120,6 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    protected var updateDeltaCounter = 0.0
-    protected val updateRate = 1.0 / Terrarum.TARGET_INTERNAL_FPS
-
     private val actorsRenderOverlay = ArrayList<ActorWithBody>()
 
     init {
@@ -161,19 +158,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         // ASYNCHRONOUS UPDATE AND RENDER //
 
 
-        // async update
-        updateDeltaCounter += delta
-        if (delta < 1f / 10f) { // discard async if measured FPS <= 10
-            var updateTries = 0
-            while (updateDeltaCounter >= updateRate) {
-                updateGame(delta)
-                updateDeltaCounter -= updateRate
-                updateTries++
-            }
-        }
-        else {
-            updateGame(delta)
-        }
+        // TODO async update
+        updateGame(delta)
 
         // render? just do it anyway
         renderGame()

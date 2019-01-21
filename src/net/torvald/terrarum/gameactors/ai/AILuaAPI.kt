@@ -46,7 +46,7 @@ import org.luaj.vm2.*
          */
         fun composeActorObject(actor: ActorWBMovable): LuaTable {
             val t: LuaTable = LuaTable()
-            val moveDelta = actor.externalForce + actor.controllerMoveDelta
+            val moveDelta = actor.externalV + actor.controllerV
 
             t["name"] = actor.actorValue.getAsString(AVKey.NAME).toLua()
             t["startX"] = actor.hitbox.centeredX.toLua()

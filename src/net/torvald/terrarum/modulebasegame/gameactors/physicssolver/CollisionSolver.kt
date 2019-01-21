@@ -150,8 +150,8 @@ object CollisionSolver {
 
             // if they actually makes collision (e.g. player vs ball), solve it
             if (a makesCollisionWith b) {
-                val a_moveDelta = a.externalForce + a.controllerMoveDelta
-                val b_moveDelta = b.externalForce + b.controllerMoveDelta
+                val a_moveDelta = a.externalV + a.controllerV
+                val b_moveDelta = b.externalV + b.controllerV
 
                 val ux_1 = a_moveDelta.x
                 val ux_2 = b_moveDelta.x
