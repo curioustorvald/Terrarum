@@ -53,7 +53,7 @@ open class GameWorld {
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
     /** Some arbitrary and empirical value */
-    var gravitation: Vector2 = Vector2(0.0, 0.36)
+    var gravitation: Vector2 = Vector2(0.0, 0.31)
     /** 0.0..1.0+ */
     var globalLight = Color(0f,0f,0f,0f)
     var averageTemperature = 288f // 15 deg celsius; simulates global warming

@@ -114,6 +114,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      */
     internal val externalV = Vector2(0.0, 0.0)
 
+    internal val externalA = Vector2(0.0, 0.0)
+
     @Transient private val VELO_HARD_LIMIT = 100.0
 
     /**
@@ -223,7 +225,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * meter to pixel : 24/FPS
      */
     private val gravitation: Vector2
-        get() = world?.gravitation ?: Vector2(0.0, 0.36)
+        get() = world?.gravitation ?: Vector2(0.0, 0.31)
     @Transient val DRAG_COEFF_DEFAULT = 1.2
     /** Drag coefficient. Parachutes have much higher value than bare body (1.2) */
     var dragCoefficient: Double
@@ -353,7 +355,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * @param acc : Acceleration in Vector2
      */
     fun applyForce(acc: Vector2) {
-        externalV += acc * speedMultByTile
+        externalA += acc
     }
 
     private val bounceDampenVelThreshold = 0.5
@@ -545,7 +547,10 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
         if (!isNoSubjectToGrav && !(gravitation.y > 0 && walledBottom || gravitation.y < 0 && walledTop)) {
             //applyForce(getDrag(delta, externalV))
-            applyForce(gravitation)
+
+            //applyForce(gravitation)
+
+            applyForce(Vector2(0.0, 0.01))
         }
     }
 
@@ -650,7 +655,10 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         // v(t) = v_0 + at
         // v_0 = myV
         val t = (Terrarum.PHYS_REF_FPS * delta)
-        val displacement = (externalV + (controllerMoveV ?: nullVec)) * t
+        val v0 = externalV + (controllerMoveV ?: nullVec)
+        val vt = v0 + externalA * t
+        val displacement = (v0 + vt) * 0.5 * t
+        externalV += externalA * t
         val ccdSteps = minOf(16, (displacement.magnitudeSquared / TILE_SIZE.sqr()).floorInt() + 1) // adaptive
 
 
@@ -851,18 +859,22 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             // bounce X/Y
             if (bounceX) {
                 externalV.x *= elasticity
+                externalA.x *= elasticity
                 controllerMoveV?.let { controllerMoveV!!.x *= elasticity }
             }
             if (bounceY) {
                 externalV.y *= elasticity
+                externalA.y *= elasticity
                 controllerMoveV?.let { controllerMoveV!!.y *= elasticity }
             }
             if (zeroX) {
                 externalV.x = 0.0
+                externalA.x = 0.0
                 controllerMoveV?.let { controllerMoveV!!.x = 0.0 }
             }
             if (zeroY) {
                 externalV.y = 0.0
+                externalA.y = 0.0
                 controllerMoveV?.let { controllerMoveV!!.y = 0.0 }
             }
 
