@@ -66,6 +66,11 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     private val actorsRenderFront  = ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
     private val actorsRenderOverlay= ArrayList<ActorWithBody>(ACTORCONTAINER_INITIAL_SIZE)
 
+    private var visibleActorsRenderBehind: List<ActorWithBody> = ArrayList(1)
+    private var visibleActorsRenderMiddle: List<ActorWithBody> = ArrayList(1)
+    private var visibleActorsRenderMidTop: List<ActorWithBody> = ArrayList(1)
+    private var visibleActorsRenderFront: List<ActorWithBody> = ArrayList(1)
+    private var visibleActorsRenderOverlay: List<ActorWithBody> = ArrayList(1)
 
     //var screenZoom = 1.0f   // definition moved to IngameInstance
     //val ZOOM_MAXIMUM = 4.0f // definition moved to IngameInstance
@@ -453,10 +458,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // ASYNCHRONOUS UPDATE AND RENDER //
 
-
         /** UPDATE CODE GOES HERE */
-
-        updateAkku += AppLoader.getSmoothDelta()
+        val dt = AppLoader.getSmoothDelta()
+        updateAkku += dt
 
         var i = 0L
         while (updateAkku >= delta) {
@@ -465,6 +469,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             i += 1
         }
         AppLoader.debugTimers["Ingame.updateCounter"] = i
+
 
 
         /** RENDER CODE GOES HERE */
@@ -517,6 +522,13 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             particlesContainer.forEach { if (!it.flagDespawn) particlesActive++; it.update(delta) }
             // TODO thread pool(?)
             CollisionSolver.process()
+
+
+            visibleActorsRenderBehind = actorsRenderBehind.filter { it.inScreen() }
+            visibleActorsRenderMiddle = actorsRenderMiddle.filter { it.inScreen() }
+            visibleActorsRenderMidTop = actorsRenderMidTop.filter { it.inScreen() }
+            visibleActorsRenderFront  =  actorsRenderFront.filter { it.inScreen() }
+            visibleActorsRenderOverlay=actorsRenderOverlay.filter { it.inScreen() }
         }
 
 
@@ -538,15 +550,13 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     private fun renderGame() {
         Gdx.graphics.setTitle(getCanonicalTitle())
 
-        
-
         IngameRenderer.invoke(
                 world as GameWorldExtension,
-                actorsRenderBehind,
-                actorsRenderMiddle,
-                actorsRenderMidTop,
-                actorsRenderFront,
-                actorsRenderOverlay,
+                visibleActorsRenderBehind,
+                visibleActorsRenderMiddle,
+                visibleActorsRenderMidTop,
+                visibleActorsRenderFront,
+                visibleActorsRenderOverlay,
                 particlesContainer,
                 actorNowPlaying,
                 uiContainer
@@ -959,4 +969,5 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             printdbg(this, "->   $it")
         }
     }
+
 }
