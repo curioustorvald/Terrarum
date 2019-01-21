@@ -89,7 +89,7 @@ object AssembleSheetPixmap {
 
 }
 
-object AssembleFrameBase {
+internal object AssembleFrameBase {
     /**
      * Returns joints list with tranform applied.
      * @param skeleton list of joints
