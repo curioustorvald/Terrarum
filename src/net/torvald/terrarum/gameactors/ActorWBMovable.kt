@@ -19,6 +19,7 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 import java.util.*
+import kotlin.math.pow
 
 
 /**
@@ -550,7 +551,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
             //applyForce(gravitation)
 
-            applyForce(Vector2(0.0, 0.01))
+            applyForce(Vector2(0.0, 0.5) / (Terrarum.PHYS_REF_FPS * delta).pow(0.5))
         }
     }
 
@@ -650,15 +651,12 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
 
         // displacement relative to the original position
-        // s(t) = s_0 + v_0 * t + 0.5at^2
-        // s(t) = s_0 + 0.5 * (v_0 + v(t)) * t
-        // v(t) = v_0 + at
-        // v_0 = myV
+        // x = x_0 + v_0 t + 0.5 a t^2 // v_0: old velocity
+        // x = x_0 + v t - 0.5 a t^2   // v: current velocity
         val t = (Terrarum.PHYS_REF_FPS * delta)
         val v0 = externalV + (controllerMoveV ?: nullVec)
-        val vt = v0 + externalA * t
-        val displacement = (v0 + vt) * 0.5 * t
-        externalV += externalA * t
+        v0 += externalA * t
+        val displacement = v0 * t - externalA * (0.5 * t * t)
         val ccdSteps = minOf(16, (displacement.magnitudeSquared / TILE_SIZE.sqr()).floorInt() + 1) // adaptive
 
 

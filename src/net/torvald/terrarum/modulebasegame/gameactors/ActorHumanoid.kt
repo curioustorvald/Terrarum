@@ -559,7 +559,7 @@ open class ActorHumanoid(
     private fun jump(delta: Float) {
         if (jumping) {// && jumpable) {
             // increment jump counter
-            if (jumpCounter < MAX_JUMP_LENGTH) jumpCounter += 1 / (Terrarum.PHYS_REF_FPS * delta).toFloat()
+            if (jumpCounter < MAX_JUMP_LENGTH) jumpCounter += 1
 
             val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, jumpCounter)
 
