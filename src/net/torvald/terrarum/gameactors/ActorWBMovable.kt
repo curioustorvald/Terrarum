@@ -94,13 +94,15 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 true
         )
 
+    private val nullVec = Vector2(0.0, 0.0)
+
     /**
      * TODO Pixels per 1/60 seconds.
      *
      * When the engine resolves this value, the framerate must be accounted for. E.g.:
      *  3.0 is resolved as 3.0 if FPS is 60, but the same value should be resolved as 6.0 if FPS is 30.
      *  v_resolved = v * (60/FPS) or, v * (60 * delta_t)
-     * (Use this code verbatim: '(Terrarum.PHYS_REF_FPS * delta)')
+     * (Use this code verbatim: '(Terrarum.PHYS_REF_FPS * delta)', for easy grep later)
      *
      *
      * Elevators/Movingwalks/etc.: edit hitbox manually!
@@ -110,14 +112,17 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      *     veloY += 3.0
      * +3.0 is acceleration. You __accumulate__ acceleration to the velocity.
      */
-    internal val externalForce = Vector2(0.0, 0.0)
+    internal val externalV = Vector2(0.0, 0.0)
 
     @Transient private val VELO_HARD_LIMIT = 100.0
 
     /**
      * for "Controllable" actors
      */
-    var controllerMoveDelta: Vector2? = if (this is Controllable) Vector2() else null
+    var controllerMoveV: Vector2? = if (this is Controllable) Vector2() else null
+
+
+
 
     // not sure we need this...
     //var jumpable = true // this is kind of like "semaphore"
@@ -218,7 +223,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * meter to pixel : 24/FPS
      */
     private val gravitation: Vector2
-        get() = world?.gravitation ?: Vector2(0.0, 9.8)
+        get() = world?.gravitation ?: Vector2(0.0, 0.36)
     @Transient val DRAG_COEFF_DEFAULT = 1.2
     /** Drag coefficient. Parachutes have much higher value than bare body (1.2) */
     var dragCoefficient: Double
@@ -348,7 +353,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * @param acc : Acceleration in Vector2
      */
     fun applyForce(acc: Vector2) {
-        externalForce += acc * speedMultByTile
+        externalV += acc * speedMultByTile
     }
 
     private val bounceDampenVelThreshold = 0.5
@@ -381,7 +386,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
 
             ////////////////////////////////////////////////////////////////
-            // Codes that modifies velocity (moveDelta and externalForce) //
+            // Codes that modifies velocity (moveDelta and externalV) //
             ////////////////////////////////////////////////////////////////
 
             // --> Apply more forces <-- //
@@ -396,8 +401,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             }
 
             // hard limit velocity
-            externalForce.x = externalForce.x.bipolarClamp(VELO_HARD_LIMIT) // displaceHitbox SHOULD use moveDelta
-            externalForce.y = externalForce.y.bipolarClamp(VELO_HARD_LIMIT)
+            externalV.x = externalV.x.bipolarClamp(VELO_HARD_LIMIT) // displaceHitbox SHOULD use moveDelta
+            externalV.y = externalV.y.bipolarClamp(VELO_HARD_LIMIT)
 
             if (!isChronostasis) {
                 ///////////////////////////////////////////////////
@@ -413,7 +418,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                     displaceHitbox(delta)
                 }
                 else {
-                    val vecSum = externalForce + (controllerMoveDelta ?: Vector2(0.0, 0.0))
+                    val vecSum = externalV + (controllerMoveV ?: Vector2(0.0, 0.0))
                     hitbox.translate(vecSum * (Terrarum.PHYS_REF_FPS * delta))
                 }
 
@@ -428,7 +433,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 // TODO less friction for non-animating objects (make items glide far more on ice)
 
                 // FIXME asymmetry on friction
-                setHorizontalFriction(delta) // friction SHOULD use and alter externalForce
+                setHorizontalFriction(delta) // friction SHOULD use and alter externalV
                 //if (isNoClip) { // TODO also hanging on the rope, etc.
                 setVerticalFriction(delta)
                 //}
@@ -470,28 +475,28 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             if (!(isWalled(hitbox, COLLIDING_LEFT) && walkX < 0)
                 || !(isWalled(hitbox, COLLIDING_RIGHT) && walkX > 0)
                     ) {
-                moveDelta.x = externalForce.x + walkX
+                moveDelta.x = externalV.x + walkX
             }
 
             // decide whether to ignore walkY
             if (!(isWalled(hitbox, COLLIDING_TOP) && walkY < 0)
                 || !(isWalled(hitbox, COLLIDING_BOTTOM) && walkY > 0)
                     ) {
-                moveDelta.y = externalForce.y + walkY
+                moveDelta.y = externalV.y + walkY
             }
         }
         else {
             if (!isWalled(hitbox, COLLIDING_LEFT)
                 || !isWalled(hitbox, COLLIDING_RIGHT)
                     ) {
-                moveDelta.x = externalForce.x
+                moveDelta.x = externalV.x
             }
 
             // decide whether to ignore walkY
             if (!isWalled(hitbox, COLLIDING_TOP)
                 || !isWalled(hitbox, COLLIDING_BOTTOM)
                     ) {
-                moveDelta.y = externalForce.y
+                moveDelta.y = externalV.y
             }
         }
     }*/
@@ -501,7 +506,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
          * weight; gravitational force in action
          * W = mass * G (9.8 [m/s^2])
          */
-        val W: Vector2 = gravitation * Terrarum.PHYS_TIME_FRAME.toDouble()
+        val W: Vector2 = gravitation// * Terrarum.PHYS_TIME_FRAME.toDouble()
         /**
          * Area
          */
@@ -510,11 +515,12 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
          * Drag of atmosphere
          * D = Cd (drag coefficient) * 0.5 * rho (density) * V^2 (velocity sqr) * A (area)
          */
-        val D: Vector2 = Vector2(externalForce.x.magnSqr(), externalForce.y.magnSqr()) * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
+        val V = externalV + controllerMoveV
+        val D: Vector2 = V.magnSqr() * dragCoefficient * 0.5 * A// * tileDensityFluid.toDouble()
 
-        val V: Vector2 = (W - D) / Terrarum.PHYS_TIME_FRAME * SI_TO_GAME_ACC
+        val final: Vector2 = (W - D)
 
-        return V * (Terrarum.PHYS_REF_FPS * delta).sqrt()
+        return final
 
         // FIXME v * const, where const = 1.0 for FPS=60, sqrt(2.0) for FPS=30, etc.
         //       this is "close enough" solution and not perfect.
@@ -538,9 +544,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     private fun applyGravitation(delta: Double) {
 
         if (!isNoSubjectToGrav && !(gravitation.y > 0 && walledBottom || gravitation.y < 0 && walledTop)) {
-            //if (!isWalled(hitbox, COLLIDING_BOTTOM)) {
-            applyForce(getDrag(delta, externalForce))
-            //}
+            //applyForce(getDrag(delta, externalV))
+            applyForce(gravitation)
         }
     }
 
@@ -587,7 +592,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         //          if not touching:
         //              do nothing
         //      [Friction]:
-        //          deform vector "externalForce"
+        //          deform vector "externalV"
         //          if isControllable:
         //              also alter walkX/Y
         // translate ((nextHitbox)) hitbox by moveDelta (forces), this consumes force
@@ -596,287 +601,293 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         //
         // ((comments))  [Label]
 
-        if (world != null) {
+        if (world == null) {
+            return
+        }
 
-            fun debug1(wut: Any?) {
-                //  vvvvv  set it true to make debug print work
-                if (true) printdbg(this, wut)
+        fun debug1(wut: Any?) {
+            //  vvvvv  set it true to make debug print work
+            if (true) printdbg(this, wut)
+        }
+
+        fun debug2(wut: Any?) {
+            //  vvvvv  set it true to make debug print work
+            if (false) printdbg(this, wut)
+        }
+
+        fun debug3(wut: Any?) {
+            //  vvvvv  set it true to make debug print work
+            if (false) printdbg(this, wut)
+        }
+
+        fun debug4(wut: Any?) {
+            //  vvvvv  set it true to make debug print work
+            if (false) printdbg(this, wut)
+        }
+
+        fun BlockAddress.isFeetTile(hitbox: Hitbox): Boolean {
+            val (x, y) = LandUtil.resolveBlockAddr(world!!, this)
+            val newTilewiseHitbox = Hitbox.fromTwoPoints(
+                    hitbox.startX.div(TILE_SIZE).floor(),
+                    hitbox.startY.div(TILE_SIZE).floor(),
+                    hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
+                    hitbox.endY.minus(0.00001).div(TILE_SIZE).floor(),
+                    true
+            )
+
+            // offset 1 pixel to the down so that friction would work
+            return (y == hitbox.endY.plus(1.0).div(TILE_SIZE).floorInt()) && // copied from forEachFeetTileNum
+                   (x in newTilewiseHitbox.startX.toInt()..newTilewiseHitbox.endX.toInt()) // copied from forEachOccupyingTilePos
+        }
+
+        fun Double.modTile() = this.toInt().div(TILE_SIZE).times(TILE_SIZE)
+        fun Double.modTileDelta() = this - this.modTile()
+
+
+        // displacement relative to the original position
+        // s(t) = s_0 + v_0 * t + 0.5at^2
+        // s(t) = s_0 + 0.5 * (v_0 + v(t)) * t
+        // v(t) = v_0 + at
+        // v_0 = myV
+        val t = (Terrarum.PHYS_REF_FPS * delta)
+        val displacement = (externalV + (controllerMoveV ?: nullVec)) * t
+        val ccdSteps = minOf(16, (displacement.magnitudeSquared / TILE_SIZE.sqr()).floorInt() + 1) // adaptive
+
+
+        // * NEW idea: wall pushes the actors (ref. SM64 explained by dutch pancake) *
+        // direction to push is determined by the velocity
+        // proc:
+        // 10 I detect being walled and displace myself
+        // 11 There's 16 possible case so work all 16 (some can be merged obviously)
+        // 12 Amount of displacement can be obtained with modTileDelta()
+        // 13 isWalled() is confirmed to be working
+        // 20 sixteenStep may be optional, I think, but it'd be good to have
+
+        // ignore MOST of the codes below (it might be possible to recycle the structure??)
+        // and the idea above has not yet implemented, and may never will. --Torvald, 2018-12-30
+
+        val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(displacement * (it / ccdSteps.toDouble())) } // zeroth step is for special condition
+
+        var collidingStep: Int? = null
+
+        for (step in 1..ccdSteps) {
+
+            val stepBox = sixteenStep[step]
+
+            forEachOccupyingTilePos(stepBox) {
+                val tileCoord = LandUtil.resolveBlockAddr(world!!, it)
+                val tile = world!!.getTileFromTerrain(tileCoord.first, tileCoord.second) ?: Block.STONE
+
+                if (shouldICollideWithThis(tile) || (it.isFeetTile(stepBox) && shouldICollideWithThisFeet(tile))) {
+                    collidingStep = step
+                }
             }
 
-            fun debug2(wut: Any?) {
-                //  vvvvv  set it true to make debug print work
-                if (false) printdbg(this, wut)
+            if (collidingStep != null) break
+        }
+
+
+        val COLL_LEFTSIDE = 1
+        val COLL_BOTTOMSIDE = 2
+        val COLL_RIGHTSIDE = 4
+        val COLL_TOPSIDE = 8
+
+        var bounceX = false
+        var bounceY = false
+        var zeroX = false
+        var zeroY = false
+        // collision NOT detected
+        if (collidingStep == null) {
+            hitbox.translate(displacement)
+            // grounded = false
+        }
+        // collision detected
+        else {
+            debug1("== Collision step: $collidingStep / $ccdSteps")
+
+
+            val newHitbox = hitbox.reassign(sixteenStep[collidingStep!!])
+
+            var selfCollisionStatus = 0
+            if (isWalled(newHitbox, COLLIDING_LEFT)) selfCollisionStatus += COLL_LEFTSIDE   // 1
+            if (isWalled(newHitbox, COLLIDING_RIGHT)) selfCollisionStatus += COLL_RIGHTSIDE  // 4
+            if (isWalled(newHitbox, COLLIDING_TOP)) selfCollisionStatus += COLL_TOPSIDE    // 8
+            if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE // 2
+
+            // fixme UP and RIGHT && LEFT and DOWN bug
+
+            when (selfCollisionStatus) {
+                0     -> {
+                    debug1("[ActorWBMovable] Contradiction -- collision detected by CCD, but isWalled() says otherwise")
+                }
+                5     -> {
+                    zeroX = true
+                }
+                10    -> {
+                    zeroY = true
+                }
+                15    -> {
+                    newHitbox.reassign(sixteenStep[0]); zeroX = true; zeroY = true
+                }
+                // one-side collision
+                1, 11 -> {
+                    newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta()); bounceX = true
+                }
+                4, 14 -> {
+                    newHitbox.translatePosX(-newHitbox.endX.modTileDelta()); bounceX = true
+                }
+                8, 13 -> {
+                    newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta()); bounceY = true
+                }
+                2, 7  -> {
+                    newHitbox.translatePosY(-newHitbox.endY.modTileDelta()); bounceY = true
+                }
             }
 
-            fun debug3(wut: Any?) {
-                //  vvvvv  set it true to make debug print work
-                if (false) printdbg(this, wut)
+
+            // fire Collision Event with one/two/three-side collision
+            // for the ease of writing, this jumptable is separated from above.
+            when (selfCollisionStatus) {
+                // TODO compose CollisionInfo and fire collided()
             }
 
-            fun debug4(wut: Any?) {
-                //  vvvvv  set it true to make debug print work
-                if (false) printdbg(this, wut)
-            }
 
-            fun BlockAddress.isFeetTile(hitbox: Hitbox): Boolean {
-                val (x, y) = LandUtil.resolveBlockAddr(world!!, this)
-                val newTilewiseHitbox = Hitbox.fromTwoPoints(
-                        hitbox.startX.div(TILE_SIZE).floor(),
-                        hitbox.startY.div(TILE_SIZE).floor(),
-                        hitbox.endX.minus(0.00001).div(TILE_SIZE).floor(),
-                        hitbox.endY.minus(0.00001).div(TILE_SIZE).floor(),
-                        true
+            // two-side collision
+            if (selfCollisionStatus in listOf(3, 6, 9, 12)) {
+                debug1("twoside collision $selfCollisionStatus")
+
+                // !! this code is based on Dyn4j Vector's coord system; V(1,0) -> 0, V(0,1) -> pi, V(0,-1) -> -pi !! //
+
+                // we can use selfCollisionStatus to tell which of those four side we care
+
+                // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
+                val offendingTileWorldX = if (selfCollisionStatus in listOf(6, 12))
+                    newHitbox.endX.div(TILE_SIZE).floor() * TILE_SIZE - 0.00001
+                else
+                    newHitbox.startX.div(TILE_SIZE).ceil() * TILE_SIZE
+
+                // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
+                val offendingTileWorldY = if (selfCollisionStatus in listOf(3, 6))
+                    newHitbox.endY.div(TILE_SIZE).floor() * TILE_SIZE - 0.00001
+                else
+                    newHitbox.startY.div(TILE_SIZE).ceil() * TILE_SIZE
+
+                val offendingHitboxPointX = if (selfCollisionStatus in listOf(6, 12))
+                    newHitbox.endX
+                else
+                    newHitbox.startX
+
+                val offendingHitboxPointY = if (selfCollisionStatus in listOf(3, 6))
+                    newHitbox.endY
+                else
+                    newHitbox.startY
+
+
+
+                val angleOfIncidence =
+                        if (selfCollisionStatus in listOf(3, 9))
+                            displacement.direction.toPositiveRad()
+                        else
+                            displacement.direction
+
+                val angleThreshold =
+                        if (selfCollisionStatus in listOf(3, 9))
+                            (Vector2(offendingHitboxPointX, offendingHitboxPointY) -
+                             Vector2(offendingTileWorldX, offendingTileWorldY)).direction.toPositiveRad()
+                        else
+                            (Vector2(offendingHitboxPointX, offendingHitboxPointY) -
+                             Vector2(offendingTileWorldX, offendingTileWorldY)).direction
+
+
+                debug1("vectorSum: $displacement, vectorDirRaw: ${displacement.direction / Math.PI}pi")
+                debug1("incidentAngle: ${angleOfIncidence / Math.PI}pi, threshold: ${angleThreshold / Math.PI}pi")
+
+
+                val displacementAbs = Vector2(
+                        (offendingTileWorldX - offendingHitboxPointX).abs(),
+                        (offendingTileWorldY - offendingHitboxPointY).abs()
                 )
 
-                // offset 1 pixel to the down so that friction would work
-                return (y == hitbox.endY.plus(1.0).div(TILE_SIZE).floorInt()) && // copied from forEachFeetTileNum
-                       (x in newTilewiseHitbox.startX.toInt()..newTilewiseHitbox.endX.toInt()) // copied from forEachOccupyingTilePos
-            }
 
-            fun Double.modTile() = this.toInt().div(TILE_SIZE).times(TILE_SIZE)
-            fun Double.modTileDelta() = this - this.modTile()
+                // FIXME jump-thru-ceil bug on 1px-wide (the edge), case-9 collision (does not occur on case-12 coll.)
 
 
-            val vectorSum = (externalForce + controllerMoveDelta) * (Terrarum.PHYS_REF_FPS * delta)
-            val ccdSteps = minOf(16, (vectorSum.magnitudeSquared / TILE_SIZE.sqr()).floorInt() + 1) // adaptive
-
-
-
-            // * NEW idea: wall pushes the actors (ref. SM64 explained by dutch pancake) *
-            // direction to push is determined by the velocity
-            // proc:
-            // 10 I detect being walled and displace myself
-            // 11 There's 16 possible case so work all 16 (some can be merged obviously)
-            // 12 Amount of displacement can be obtained with modTileDelta()
-            // 13 isWalled() is confirmed to be working
-            // 20 sixteenStep may be optional, I think, but it'd be good to have
-
-            // ignore MOST of the codes below (it might be possible to recycle the structure??)
-            // and the idea above has not yet implemented, and may never will. --Torvald, 2018-12-30
-
-            val sixteenStep = (0..ccdSteps).map { hitbox.clone().translate(vectorSum * (it / ccdSteps.toDouble())) } // zeroth step is for special condition
-
-            var collidingStep: Int? = null
-
-            for (step in 1..ccdSteps) {
-
-                val stepBox = sixteenStep[step]
-
-                forEachOccupyingTilePos(stepBox) {
-                    val tileCoord = LandUtil.resolveBlockAddr(world!!, it)
-                    val tile = world!!.getTileFromTerrain(tileCoord.first, tileCoord.second) ?: Block.STONE
-
-                    if (shouldICollideWithThis(tile) || (it.isFeetTile(stepBox) && shouldICollideWithThisFeet(tile))) {
-                        collidingStep = step
-                    }
-                }
-
-                if (collidingStep != null) break
-            }
-
-
-            val COLL_LEFTSIDE = 1
-            val COLL_BOTTOMSIDE = 2
-            val COLL_RIGHTSIDE = 4
-            val COLL_TOPSIDE = 8
-
-            var bounceX = false
-            var bounceY = false
-            var zeroX = false
-            var zeroY = false
-            // collision NOT detected
-            if (collidingStep == null) {
-                hitbox.translate(vectorSum)
-                // grounded = false
-            }
-            // collision detected
-            else {
-                debug1("== Collision step: $collidingStep / $ccdSteps")
-
-
-                val newHitbox = hitbox.reassign(sixteenStep[collidingStep!!])
-
-                var selfCollisionStatus = 0
-                if (isWalled(newHitbox, COLLIDING_LEFT)) selfCollisionStatus += COLL_LEFTSIDE   // 1
-                if (isWalled(newHitbox, COLLIDING_RIGHT)) selfCollisionStatus += COLL_RIGHTSIDE  // 4
-                if (isWalled(newHitbox, COLLIDING_TOP)) selfCollisionStatus += COLL_TOPSIDE    // 8
-                if (isWalled(newHitbox, COLLIDING_BOTTOM)) selfCollisionStatus += COLL_BOTTOMSIDE // 2
-
-                // fixme UP and RIGHT && LEFT and DOWN bug
-
-                when (selfCollisionStatus) {
-                    0     -> {
-                        debug1("[ActorWBMovable] Contradiction -- collision detected by CCD, but isWalled() says otherwise")
-                    }
-                    5     -> {
-                        zeroX = true
-                    }
-                    10    -> {
-                        zeroY = true
-                    }
-                    15    -> {
-                        newHitbox.reassign(sixteenStep[0]); zeroX = true; zeroY = true
-                    }
-                    // one-side collision
-                    1, 11 -> {
-                        newHitbox.translatePosX(TILE_SIZE - newHitbox.startX.modTileDelta()); bounceX = true
-                    }
-                    4, 14 -> {
-                        newHitbox.translatePosX(-newHitbox.endX.modTileDelta()); bounceX = true
-                    }
-                    8, 13 -> {
-                        newHitbox.translatePosY(TILE_SIZE - newHitbox.startY.modTileDelta()); bounceY = true
-                    }
-                    2, 7  -> {
-                        newHitbox.translatePosY(-newHitbox.endY.modTileDelta()); bounceY = true
-                    }
-                }
-
-
-                // fire Collision Event with one/two/three-side collision
-                // for the ease of writing, this jumptable is separated from above.
-                when (selfCollisionStatus) {
-                    // TODO compose CollisionInfo and fire collided()
-                }
-
-
-                // two-side collision
-                if (selfCollisionStatus in listOf(3, 6, 9, 12)) {
-                    debug1("twoside collision $selfCollisionStatus")
-
-                    // !! this code is based on Dyn4j Vector's coord system; V(1,0) -> 0, V(0,1) -> pi, V(0,-1) -> -pi !! //
-
-                    // we can use selfCollisionStatus to tell which of those four side we care
-
-                    // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
-                    val offendingTileWorldX = if (selfCollisionStatus in listOf(6, 12))
-                        newHitbox.endX.div(TILE_SIZE).floor() * TILE_SIZE - 0.00001
-                    else
-                        newHitbox.startX.div(TILE_SIZE).ceil() * TILE_SIZE
-
-                    // points to the EDGE of the tile in world dimension (don't use this directly to get tilewise coord!!)
-                    val offendingTileWorldY = if (selfCollisionStatus in listOf(3, 6))
-                        newHitbox.endY.div(TILE_SIZE).floor() * TILE_SIZE - 0.00001
-                    else
-                        newHitbox.startY.div(TILE_SIZE).ceil() * TILE_SIZE
-
-                    val offendingHitboxPointX = if (selfCollisionStatus in listOf(6, 12))
-                        newHitbox.endX
-                    else
-                        newHitbox.startX
-
-                    val offendingHitboxPointY = if (selfCollisionStatus in listOf(3, 6))
-                        newHitbox.endY
-                    else
-                        newHitbox.startY
-
-
-
-                    val angleOfIncidence =
-                            if (selfCollisionStatus in listOf(3, 9))
-                                vectorSum.direction.toPositiveRad()
-                            else
-                                vectorSum.direction
-
-                    val angleThreshold =
-                            if (selfCollisionStatus in listOf(3, 9))
-                                (Vector2(offendingHitboxPointX, offendingHitboxPointY) -
-                                 Vector2(offendingTileWorldX, offendingTileWorldY)).direction.toPositiveRad()
-                            else
-                                (Vector2(offendingHitboxPointX, offendingHitboxPointY) -
-                                 Vector2(offendingTileWorldX, offendingTileWorldY)).direction
-
-
-                    debug1("vectorSum: $vectorSum, vectorDirRaw: ${vectorSum.direction / Math.PI}pi")
-                    debug1("incidentAngle: ${angleOfIncidence / Math.PI}pi, threshold: ${angleThreshold / Math.PI}pi")
-
-
-                    val displacementAbs = Vector2(
-                            (offendingTileWorldX - offendingHitboxPointX).abs(),
-                            (offendingTileWorldY - offendingHitboxPointY).abs()
-                    )
-
-
-                    // FIXME jump-thru-ceil bug on 1px-wide (the edge), case-9 collision (does not occur on case-12 coll.)
-
-
-                    val displacementUnitVector =
-                            if (angleOfIncidence == angleThreshold)
-                                -vectorSum
-                            else {
-                                when (selfCollisionStatus) {
-                                    3    -> if (angleOfIncidence > angleThreshold) Vector2(1.0, 0.0) else Vector2(0.0, -1.0)
-                                    6    -> if (angleOfIncidence > angleThreshold) Vector2(0.0, -1.0) else Vector2(-1.0, 0.0)
-                                    9    -> if (angleOfIncidence > angleThreshold) Vector2(0.0, 1.0) else Vector2(1.0, 0.0)
-                                    12   -> if (angleOfIncidence > angleThreshold) Vector2(-1.0, 0.0) else Vector2(0.0, 1.0)
-                                    else -> throw InternalError("Blame hardware or universe")
-                                }
+                val displacementUnitVector =
+                        if (angleOfIncidence == angleThreshold)
+                            -displacement
+                        else {
+                            when (selfCollisionStatus) {
+                                3    -> if (angleOfIncidence > angleThreshold) Vector2(1.0, 0.0) else Vector2(0.0, -1.0)
+                                6    -> if (angleOfIncidence > angleThreshold) Vector2(0.0, -1.0) else Vector2(-1.0, 0.0)
+                                9    -> if (angleOfIncidence > angleThreshold) Vector2(0.0, 1.0) else Vector2(1.0, 0.0)
+                                12   -> if (angleOfIncidence > angleThreshold) Vector2(-1.0, 0.0) else Vector2(0.0, 1.0)
+                                else -> throw InternalError("Blame hardware or universe")
                             }
+                        }
 
-                    val finalDisplacement =
-                            if (angleOfIncidence == angleThreshold)
-                                displacementUnitVector
-                            else
-                                Vector2(
-                                        displacementAbs.x * displacementUnitVector.x,
-                                        displacementAbs.y * displacementUnitVector.y
-                                )
+                val finalDisplacement =
+                        if (angleOfIncidence == angleThreshold)
+                            displacementUnitVector
+                        else
+                            Vector2(
+                                    displacementAbs.x * displacementUnitVector.x,
+                                    displacementAbs.y * displacementUnitVector.y
+                            )
 
-                    newHitbox.translate(finalDisplacement)
-
-
-                    debug1("displacement: $finalDisplacement")
+                newHitbox.translate(finalDisplacement)
 
 
-                    // TODO: translate other axis proportionally to the incident vector
-
-                    bounceX = angleOfIncidence == angleThreshold || displacementUnitVector.x != 0.0
-                    bounceY = angleOfIncidence == angleThreshold || displacementUnitVector.y != 0.0
-
-                }
+                debug1("displacement: $finalDisplacement")
 
 
-                // bounce X/Y
-                if (bounceX) {
-                    externalForce.x *= elasticity
-                    controllerMoveDelta?.let { controllerMoveDelta!!.x *= elasticity }
-                }
-                if (bounceY) {
-                    externalForce.y *= elasticity
-                    controllerMoveDelta?.let { controllerMoveDelta!!.y *= elasticity }
-                }
-                if (zeroX) {
-                    externalForce.x = 0.0
-                    controllerMoveDelta?.let { controllerMoveDelta!!.x = 0.0 }
-                }
-                if (zeroY) {
-                    externalForce.y = 0.0
-                    controllerMoveDelta?.let { controllerMoveDelta!!.y = 0.0 }
-                }
+                // TODO: translate other axis proportionally to the incident vector
+
+                bounceX = angleOfIncidence == angleThreshold || displacementUnitVector.x != 0.0
+                bounceY = angleOfIncidence == angleThreshold || displacementUnitVector.y != 0.0
+
+            }
 
 
-                hitbox.reassign(newHitbox)
+            // bounce X/Y
+            if (bounceX) {
+                externalV.x *= elasticity
+                controllerMoveV?.let { controllerMoveV!!.x *= elasticity }
+            }
+            if (bounceY) {
+                externalV.y *= elasticity
+                controllerMoveV?.let { controllerMoveV!!.y *= elasticity }
+            }
+            if (zeroX) {
+                externalV.x = 0.0
+                controllerMoveV?.let { controllerMoveV!!.x = 0.0 }
+            }
+            if (zeroY) {
+                externalV.y = 0.0
+                controllerMoveV?.let { controllerMoveV!!.y = 0.0 }
+            }
 
 
-                // slam-into-whatever damage (such dirty; much hack; wow)
-                //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
-                val collisionDamage = mass * (vectorSum.magnitude / (10.0 / Terrarum.PHYS_TIME_FRAME).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
-                // kg * m / s^2 (mass * acceleration), acceleration -> (vectorMagn / (0.01)^2).gameToSI()
-                if (collisionDamage != 0.0) debug1("Collision damage: $collisionDamage N")
-                // FIXME instead of 0.5mv^2, we can model after "change of velocity (aka accel)", just as in real-life; big change of accel on given unit time is what kills
+            hitbox.reassign(newHitbox)
 
 
-                // grounded = true
-            }// end of collision not detected
+            // slam-into-whatever damage (such dirty; much hack; wow)
+            //                                                   vvvv hack (supposed to be 1.0)                           vvv 50% hack
+            val collisionDamage = mass * (displacement.magnitude / (10.0 / Terrarum.PHYS_TIME_FRAME).sqr()) / fallDamageDampening.sqr() * GAME_TO_SI_ACC
+            // kg * m / s^2 (mass * acceleration), acceleration -> (vectorMagn / (0.01)^2).gameToSI()
+            if (collisionDamage != 0.0) debug1("Collision damage: $collisionDamage N")
+            // FIXME instead of 0.5mv^2, we can model after "change of velocity (aka accel)", just as in real-life; big change of accel on given unit time is what kills
 
 
-            return
+            // grounded = true
+        }// end of collision not detected
+
+
+        return
 
 
 
-            // if collision not detected, just don't care; it's not your job to apply moveDelta
+        // if collision not detected, just don't care; it's not your job to apply moveDelta
 
-        }
     }
 
 
@@ -1012,11 +1023,11 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             (BlockCodex[tile].isSolid) ||
             // platforms, moving downward AND not "going down"
             (this is ActorHumanoid && BlockCodex[tile].isPlatform &&
-             externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0 &&
+             externalV.y + (controllerMoveV?.y ?: 0.0) >= 0.0 &&
              !this.isDownDown && this.axisY <= 0f) ||
             // platforms, moving downward
             (this !is ActorHumanoid && BlockCodex[tile].isPlatform &&
-             externalForce.y + (controllerMoveDelta?.y ?: 0.0) >= 0.0)
+             externalV.y + (controllerMoveV?.y ?: 0.0) >= 0.0)
     // TODO: as for the platform, only apply it when it's a feet tile
 
 
@@ -1079,23 +1090,23 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             BASE_FRICTION * if (grounded) feetFriction else bodyFriction
         }
 
-        if (externalForce.x < 0) {
-            externalForce.x += friction
-            if (externalForce.x > 0) externalForce.x = 0.0 // compensate overshoot
+        if (externalV.x < 0) {
+            externalV.x += friction
+            if (externalV.x > 0) externalV.x = 0.0 // compensate overshoot
         }
-        else if (externalForce.x > 0) {
-            externalForce.x -= friction
-            if (externalForce.x < 0) externalForce.x = 0.0 // compensate overshoot
+        else if (externalV.x > 0) {
+            externalV.x -= friction
+            if (externalV.x < 0) externalV.x = 0.0 // compensate overshoot
         }
 
         if (this is Controllable) {
-            if (controllerMoveDelta!!.x < 0) {
-                controllerMoveDelta!!.x += friction
-                if (controllerMoveDelta!!.x > 0) controllerMoveDelta!!.x = 0.0
+            if (controllerMoveV!!.x < 0) {
+                controllerMoveV!!.x += friction
+                if (controllerMoveV!!.x > 0) controllerMoveV!!.x = 0.0
             }
-            else if (controllerMoveDelta!!.x > 0) {
-                controllerMoveDelta!!.x -= friction
-                if (controllerMoveDelta!!.x < 0) controllerMoveDelta!!.x = 0.0
+            else if (controllerMoveV!!.x > 0) {
+                controllerMoveV!!.x -= friction
+                if (controllerMoveV!!.x < 0) controllerMoveV!!.x = 0.0
             }
         }
     }
@@ -1106,23 +1117,23 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         else
             BASE_FRICTION * bodyFriction
 
-        if (externalForce.y < 0) {
-            externalForce.y += friction
-            if (externalForce.y > 0) externalForce.y = 0.0 // compensate overshoot
+        if (externalV.y < 0) {
+            externalV.y += friction
+            if (externalV.y > 0) externalV.y = 0.0 // compensate overshoot
         }
-        else if (externalForce.y > 0) {
-            externalForce.y -= friction
-            if (externalForce.y < 0) externalForce.y = 0.0 // compensate overshoot
+        else if (externalV.y > 0) {
+            externalV.y -= friction
+            if (externalV.y < 0) externalV.y = 0.0 // compensate overshoot
         }
 
         if (this is Controllable) {
-            if (controllerMoveDelta!!.y < 0) {
-                controllerMoveDelta!!.y += friction
-                if (controllerMoveDelta!!.y > 0) controllerMoveDelta!!.y = 0.0
+            if (controllerMoveV!!.y < 0) {
+                controllerMoveV!!.y += friction
+                if (controllerMoveV!!.y > 0) controllerMoveV!!.y = 0.0
             }
-            else if (controllerMoveDelta!!.y > 0) {
-                controllerMoveDelta!!.y -= friction
-                if (controllerMoveDelta!!.y < 0) controllerMoveDelta!!.y = 0.0
+            else if (controllerMoveV!!.y > 0) {
+                controllerMoveV!!.y -= friction
+                if (controllerMoveV!!.y < 0) controllerMoveV!!.y = 0.0
             }
         }
     }
@@ -1443,8 +1454,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
             field = value
 
             if (value) {
-                externalForce.zero()
-                controllerMoveDelta?.zero()
+                externalV.zero()
+                controllerMoveV?.zero()
             }
         }
 

@@ -124,11 +124,11 @@ open class ActorHumanoid(
     @Transient private val KEY_NULL = -1
 
     /** how long the jump button has down, in frames */
-    internal var jumpCounter = 0
+    internal var jumpCounter = 0f
     internal var jumpAcc = 0.0
     /** how long the walk button has down, in frames */
-    internal var walkCounterX = 0
-    internal var walkCounterY = 0
+    internal var walkCounterX = 0f
+    internal var walkCounterY = 0f
     @Transient private val MAX_JUMP_LENGTH = 25 // manages "heaviness" of the jump control. Higher = heavier
 
     private var readonly_totalX = 0.0
@@ -289,24 +289,24 @@ open class ActorHumanoid(
 
         if (hasController) {
             if (axisX != 0f) {
-                walkHorizontal(axisX < 0f, axisX.abs())
+                walkHorizontal(delta, axisX < 0f, axisX.abs())
             }
         }
         // ↑F, ↓S
         if (isRightDown && !isLeftDown) {
-            walkHorizontal(false, AXIS_KEYBOARD)
+            walkHorizontal(delta, false, AXIS_KEYBOARD)
             prevHMoveKey = AppLoader.getConfigInt("keyright")
         } // ↓F, ↑S
         else if (isLeftDown && !isRightDown) {
-            walkHorizontal(true, AXIS_KEYBOARD)
+            walkHorizontal(delta, true, AXIS_KEYBOARD)
             prevHMoveKey = AppLoader.getConfigInt("keyleft")
         } // ↓F, ↓S
         /*else if (isLeftDown && isRightDown) {
                if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)) {
-                   walkHorizontal(false, AXIS_KEYBOARD)
+                   walkHorizontal(delta, false, AXIS_KEYBOARD)
                    prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)
                } else if (prevHMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_RIGHT)) {
-                   walkHorizontal(true, AXIS_KEYBOARD)
+                   walkHorizontal(delta, true, AXIS_KEYBOARD)
                    prevHMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_LEFT)
                }
            }*/
@@ -317,24 +317,24 @@ open class ActorHumanoid(
         if (isNoClip || COLLISION_TEST_MODE) {
             if (hasController) {
                 if (axisY != 0f) {
-                    walkVertical(axisY < 0, axisY.abs())
+                    walkVertical(delta, axisY < 0, axisY.abs())
                 }
             }
             // ↑E, ↓D
             if (isDownDown && !isUpDown) {
-                walkVertical(false, AXIS_KEYBOARD)
+                walkVertical(delta, false, AXIS_KEYBOARD)
                 prevVMoveKey = AppLoader.getConfigInt("keydown")
             } // ↓E, ↑D
             else if (isUpDown && !isDownDown) {
-                walkVertical(true, AXIS_KEYBOARD)
+                walkVertical(delta, true, AXIS_KEYBOARD)
                 prevVMoveKey = AppLoader.getConfigInt("keyup")
             } // ↓E, ↓D
             /*else if (isUpDown && isDownDown) {
                 if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)) {
-                    walkVertical(false, AXIS_KEYBOARD)
+                    walkVertical(delta, false, AXIS_KEYBOARD)
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)
                 } else if (prevVMoveKey == KeyMap.getKeyCode(EnumKeyFunc.MOVE_DOWN)) {
-                    walkVertical(true, AXIS_KEYBOARD)
+                    walkVertical(delta, true, AXIS_KEYBOARD)
                     prevVMoveKey = KeyMap.getKeyCode(EnumKeyFunc.MOVE_UP)
                 }
             }*/
@@ -349,15 +349,15 @@ open class ActorHumanoid(
                     (!airJumpingAllowed && walledBottom)) {
                     jumping = true
                 }
-                jump()
+                jump(delta)
             }
             else {
-                walkVertical(true, AXIS_KEYBOARD)
+                walkVertical(delta, true, AXIS_KEYBOARD)
             }
         }
         else {
             jumping = false
-            jumpCounter = 0
+            jumpCounter = 0f
             jumpAcc = 0.0
         }
 
@@ -388,7 +388,7 @@ open class ActorHumanoid(
      * @param absAxisVal (set AXIS_KEYBOARD if keyboard controlled)
      * @author minjaesong
      */
-    private fun walkHorizontal(left: Boolean, absAxisVal: Float) {
+    private fun walkHorizontal(delta: Float, left: Boolean, absAxisVal: Float) {
 
 
         if (avAcceleration.isNaN()) {
@@ -406,12 +406,12 @@ open class ActorHumanoid(
                     avAcceleration * applyVelo(walkCounterX) * (if (left) -1f else 1f) * absAxisVal
 
         if (absAxisVal != AXIS_KEYBOARD)
-            controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal) }
+            controllerMoveV?.x?.let { controllerMoveV!!.x = controllerMoveV!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap * absAxisVal) }
         else
-            controllerMoveDelta?.x?.let { controllerMoveDelta!!.x = controllerMoveDelta!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
+            controllerMoveV?.x?.let { controllerMoveV!!.x = controllerMoveV!!.x.plus(readonly_totalX).bipolarClamp(avSpeedCap) }
 
         if (walkCounterX < 1000000) {
-          walkCounterX += 1
+          walkCounterX += 1 * (Terrarum.PHYS_REF_FPS * delta).toFloat()
         }
 
         isWalkingH = true
@@ -428,7 +428,7 @@ open class ActorHumanoid(
      * *
      * @param absAxisVal (set AXIS_KEYBOARD if keyboard controlled)
      */
-    private fun walkVertical(up: Boolean, absAxisVal: Float) {
+    private fun walkVertical(delta: Float, up: Boolean, absAxisVal: Float) {
         if (up && walledTop || !up && walledBottom) return
 
 
@@ -444,12 +444,12 @@ open class ActorHumanoid(
                     avAcceleration * applyVelo(walkCounterY) * (if (up) -1f else 1f) * absAxisVal
 
         if (absAxisVal != AXIS_KEYBOARD)
-            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap * absAxisVal) }
+            controllerMoveV?.y?.let { controllerMoveV!!.y = controllerMoveV!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap * absAxisVal) }
         else
-            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y = controllerMoveDelta!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap) }
+            controllerMoveV?.y?.let { controllerMoveV!!.y = controllerMoveV!!.y.plus(readonly_totalY).bipolarClamp(avSpeedCap) }
 
         if (walkCounterY < 1000000) {
-            walkCounterY += 1
+            walkCounterY += 1 * (Terrarum.PHYS_REF_FPS * delta).toFloat()
         }
 
 
@@ -462,7 +462,7 @@ open class ActorHumanoid(
         else 0.0
     }
 
-    private fun applyVelo(x: Int): Double {
+    private fun applyVelo(x: Float): Double {
         return if (x < WALK_FRAMES_TO_MAX_ACCEL)
             0.5 - 0.5 * Math.cos(Math.PI * x / WALK_FRAMES_TO_MAX_ACCEL)
         else 1.0
@@ -470,13 +470,13 @@ open class ActorHumanoid(
 
     // stops; let the friction kick in by doing nothing to the velocity here
     private fun walkHStop() {
-        walkCounterX = 0
+        walkCounterX = 0f
         isWalkingH = false
     }
 
     // stops; let the friction kick in by doing nothing to the velocity here
     private fun walkVStop() {
-        walkCounterY = 0
+        walkCounterY = 0f
         isWalkingV = false
     }
 
@@ -489,6 +489,7 @@ open class ActorHumanoid(
     private var oldJUMPPOWERBUFF = -1.0 // init
     private var oldScale = -1.0
     private var oldDragCoefficient = -1.0
+    // used by some AIs?
     var jumpAirTime: Double = -1.0
         get() {
             // compare all the affecting variables
@@ -512,7 +513,7 @@ open class ActorHumanoid(
 
                 var simYPos = 0.0
                 var forceVec = Vector2(0.0, 0.0)
-                var jmpCtr = 0
+                var jmpCtr = 0f
                 while (true) {
                     if (jmpCtr < MAX_JUMP_LENGTH) jmpCtr++
 
@@ -542,7 +543,7 @@ open class ActorHumanoid(
     private val jumpPower: Double
         get() = actorValue.getAsDouble(AVKey.JUMPPOWER)!! * (actorValue.getAsDouble(AVKey.JUMPPOWERBUFF) ?: 1.0)
 
-    private fun jumpFunc(len: Int, counter: Int): Double {
+    private fun jumpFunc(len: Int, counter: Float): Double {
         // linear time mode
         val init = (len + 1) / 2.0
         var timedJumpCharge = init - init / len * counter
@@ -555,16 +556,16 @@ open class ActorHumanoid(
      *
      * TODO linear function (play Super Mario Bros. and you'll get what I'm talking about) -- SCRATCH THAT!
      */
-    private fun jump() {
+    private fun jump(delta: Float) {
         if (jumping) {// && jumpable) {
             // increment jump counter
-            if (jumpCounter < MAX_JUMP_LENGTH) jumpCounter += 1
+            if (jumpCounter < MAX_JUMP_LENGTH) jumpCounter += 1 / (Terrarum.PHYS_REF_FPS * delta).toFloat()
 
             val timedJumpCharge = jumpFunc(MAX_JUMP_LENGTH, jumpCounter)
 
             jumpAcc = getJumpAcc(jumpPower, timedJumpCharge)
 
-            controllerMoveDelta?.y?.let { controllerMoveDelta!!.y -= jumpAcc } // feed negative value to the vector
+            controllerMoveV?.y?.let { controllerMoveV!!.y -= jumpAcc } // feed negative value to the vector
             // do not think of resetting this to zero when counter hit the ceiling; that's HOW NOT
             // newtonian physics work, stupid myself :(
 
@@ -579,7 +580,7 @@ open class ActorHumanoid(
         if (jumpCounter >= MAX_JUMP_LENGTH && !isGamer) {
             isJumpDown = false
             jumping = false
-            jumpCounter = 0
+            jumpCounter = 0f
             jumpAcc = 0.0
         }
     }
@@ -609,7 +610,7 @@ open class ActorHumanoid(
         sprite?.update(delta)
         spriteGlow?.update(delta)
 
-        if (walledBottom && controllerMoveDelta?.x != 0.0) {
+        if (walledBottom && controllerMoveV?.x != 0.0) {
             //switch row
             sprite?.switchRow(SPRITE_ROW_WALK)
             spriteGlow?.switchRow(SPRITE_ROW_WALK)
@@ -617,8 +618,8 @@ open class ActorHumanoid(
             // set anim frame delay
             // 4f of the divider is a magic number, empirically decided
             if (this is HasAssembledSprite) {
-                sprite?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveDelta?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
-                spriteGlow?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveDelta?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
+                sprite?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveV?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
+                spriteGlow?.delays?.set(SPRITE_ROW_WALK, scale.sqrt().toFloat() / (4f * (controllerMoveV?.x ?: 0.0001).abs().toFloat())) // FIXME empirical value
 
             }
 

@@ -738,7 +738,6 @@ fun absMax(left: Double, right: Double): Double {
     }
 }
 
-fun Double.magnSqr() = if (this >= 0.0) this.sqr() else -this.sqr()
 fun Double.sign() = if (this > 0.0) 1.0 else if (this < 0.0) -1.0 else 0.0
 fun interpolateLinear(scale: Double, startValue: Double, endValue: Double): Double {
     if (startValue == endValue) {

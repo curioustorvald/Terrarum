@@ -10,7 +10,6 @@ import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Controllable
 import net.torvald.terrarum.gameactors.Hitbox
-import net.torvald.terrarum.gameworld.GameWorld
 
 /**
  * Created by minjaesong on 2018-01-17.
@@ -37,7 +36,7 @@ class PhysTestLuarLander : ActorWBMovable(RenderOrder.MIDTOP), Controllable {
         super.update(delta)
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            controllerMoveDelta!!.y = avSpeedCap
+            controllerMoveV!!.y = avSpeedCap
         }
     }
 

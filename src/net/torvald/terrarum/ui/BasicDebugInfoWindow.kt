@@ -108,11 +108,11 @@ class BasicDebugInfoWindow : UICanvas() {
                                          + ccG
                                          + "${WorldCamera.y}")
 
-            printLine(batch, 3, "veloX reported $ccG${player.externalForce.x}")
-            printLine(batch, 4, "veloY reported $ccG${player.externalForce.y}")
+            printLine(batch, 3, "veloX reported $ccG${player.externalV.x}")
+            printLine(batch, 4, "veloY reported $ccG${player.externalV.y}")
 
-            printLine(batch, 5, "p_WalkX $ccG${player.controllerMoveDelta?.x}")
-            printLine(batch, 6, "p_WalkY $ccG${player.controllerMoveDelta?.y}")
+            printLine(batch, 5, "p_WalkX $ccG${player.controllerMoveV?.x}")
+            printLine(batch, 6, "p_WalkY $ccG${player.controllerMoveV?.y}")
 
             printLineColumn(batch, 2, 3, "veloX measured $ccG${xdelta}")
             printLineColumn(batch, 2, 4, "veloY measured $ccG${ydelta}")

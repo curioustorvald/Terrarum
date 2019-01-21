@@ -360,6 +360,13 @@ class Vector2 {
         return Vector2(newX, newY)
     }
 
+    private fun Double.magnSqr() = if (this >= 0.0) this * this else -(this * this)
+
+    /**
+     * Returns new vector whose magnitude is squared, and direction is preserved.
+     */
+    fun magnSqr(): Vector2 = Vector2(x.magnSqr(), y.magnSqr())
+
     /**
      * Adds the given [Vector2] to this [Vector2].
      * @param vector the [Vector2]
