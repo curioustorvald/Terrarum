@@ -87,18 +87,18 @@ void main() {
     ivec2 breakageXY = getTileXY(breakage + 5); // +5 is hard-coded constant that depends on the atlas
 
 
-    mediump vec2 coordInTile = mod(pxCoord, tileSizeInPx) / tileSizeInPx; // 0..1 regardless of tile position in atlas
+    vec2 coordInTile = mod(pxCoord, tileSizeInPx) / tileSizeInPx; // 0..1 regardless of tile position in atlas
 
     // don't really need highp here; read the GLES spec
-    mediump vec2 singleTileSizeInUV = vec2(1) / tilesInAtlas; // constant 0.00390625 for unmodified default uniforms
+    vec2 singleTileSizeInUV = vec2(1) / tilesInAtlas; // constant 0.00390625 for unmodified default uniforms
 
-    mediump vec2 uvCoordForTile = coordInTile * singleTileSizeInUV; // 0..0.00390625 regardless of tile position in atlas
+    vec2 uvCoordForTile = coordInTile * singleTileSizeInUV; // 0..0.00390625 regardless of tile position in atlas
 
-    mediump vec2 uvCoordOffsetTile = tileXY * singleTileSizeInUV; // where the tile starts in the atlas, using uv coord (0..1)
-    mediump vec2 uvCoordOffsetBreakage = breakageXY * singleTileSizeInUV;
+    vec2 uvCoordOffsetTile = tileXY * singleTileSizeInUV; // where the tile starts in the atlas, using uv coord (0..1)
+    vec2 uvCoordOffsetBreakage = breakageXY * singleTileSizeInUV;
 
-    mediump vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffsetTile;// where we should be actually looking for in atlas, using UV coord (0..1)
-    mediump vec2 finalUVCoordForBreakage = uvCoordForTile + uvCoordOffsetBreakage;
+    vec2 finalUVCoordForTile = uvCoordForTile + uvCoordOffsetTile;// where we should be actually looking for in atlas, using UV coord (0..1)
+    vec2 finalUVCoordForBreakage = uvCoordForTile + uvCoordOffsetBreakage;
 
 
     // blending a breakage tex with main tex

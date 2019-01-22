@@ -675,7 +675,7 @@ public class AppLoader implements ApplicationListener {
     public static ShaderProgram loadShader(String vert, String frag) {
         ShaderProgram s = new ShaderProgram(Gdx.files.internal(vert), Gdx.files.internal(frag));
 
-        if (s.getLog().contains("error C")) {
+        if (s.getLog().toLowerCase().contains("error")) {
             throw new Error(String.format("Shader program loaded with %s, %s failed:\n%s", vert, frag, s.getLog()));
         }
 
