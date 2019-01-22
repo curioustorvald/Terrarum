@@ -154,18 +154,28 @@ public class AppLoader implements ApplicationListener {
 
     public static ArrayListMap debugTimers = new ArrayListMap<String, Long>();
 
+    static final int defaultW = 1110;
+    static final int defaultH = 740;
 
     public static void main(String[] args) {
+        // load configs
+        getDefaultDirectory();
+        createDirs();
+        readConfigJson();
+
+
         ShaderProgram.pedantic = false;
 
         LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
         //appConfig.useGL30 = true; // used: loads GL 3.2, unused: loads GL 4.6; what the fuck?
-        appConfig.vSyncEnabled = true;
+        appConfig.vSyncEnabled = getConfigBoolean("usevsync");
         appConfig.resizable = false;//true;
-        appConfig.width = 1110; // photographic ratio (1.5:1)
-        appConfig.height = 740; // photographic ratio (1.5:1)
-        appConfig.backgroundFPS = 0;
-        appConfig.foregroundFPS = 0;
+        //appConfig.width = 1110; // photographic ratio (1.5:1)
+        //appConfig.height = 740; // photographic ratio (1.5:1)
+        appConfig.width = getConfigInt("screenwidth");
+        appConfig.height = getConfigInt("screenheight");
+        appConfig.backgroundFPS = getConfigInt("displayfps");
+        appConfig.foregroundFPS = getConfigInt("displayfps");
         appConfig.title = GAME_NAME;
         appConfig.forceExit = false;
 
@@ -396,16 +406,6 @@ public class AppLoader implements ApplicationListener {
     }
 
     private void postInit() {
-        // load configs
-        getDefaultDirectory();
-        createDirs();
-        readConfigJson();
-
-        // set render configs according to local config
-        appConfig.vSyncEnabled = getConfigBoolean("usevsync");
-        appConfig.foregroundFPS = getConfigInt("displayfps");
-        appConfig.backgroundFPS = getConfigInt("displayfps");
-
         textureWhiteSquare = new Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"));
         textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
@@ -459,7 +459,7 @@ public class AppLoader implements ApplicationListener {
     public static String configDir;
     public static RunningEnvironment environment;
 
-    private void getDefaultDirectory() {
+    private static void getDefaultDirectory() {
         String OS = OSName.toUpperCase();
         if (OS.contains("WIN")) {
             operationSystem = "WINDOWS";
@@ -495,7 +495,7 @@ public class AppLoader implements ApplicationListener {
         System.out.println(String.format("default directory: %s", defaultDir));
     }
 
-    private void createDirs() {
+    private static void createDirs() {
         File[] dirs = {new File(defaultSaveDir)};
 
         for (File it : dirs) {
@@ -641,7 +641,7 @@ public class AppLoader implements ApplicationListener {
 
         if (config == null) {
             if (defaults == null) {
-                throw new NullPointerException("key not found: '$key'");
+                throw new NullPointerException("key not found: '" + key + "'");
             }
             else {
                 return defaults;
@@ -661,13 +661,13 @@ public class AppLoader implements ApplicationListener {
     // //
 
     public static void printdbg(Object obj, Object message) {
-        if (IS_DEVELOPMENT_BUILD || getConfigBoolean("forcedevbuild")) {
+        if (IS_DEVELOPMENT_BUILD) {
             System.out.println("[" + obj.getClass().getSimpleName() + "] " + message.toString());
         }
     }
 
     public static void printdbgerr(Object obj, Object message) {
-        if (IS_DEVELOPMENT_BUILD || getConfigBoolean("forcedevbuild")) {
+        if (IS_DEVELOPMENT_BUILD) {
             System.err.println("[" + obj.getClass().getSimpleName() + "] " + message.toString());
         }
     }

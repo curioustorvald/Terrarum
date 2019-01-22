@@ -15,7 +15,8 @@ object DefaultConfig {
 
         jsonObject.addProperty("displayfps", 0) // 0: no limit, non-zero: limit
         jsonObject.addProperty("usevsync", false)
-        jsonObject.addProperty("forcedevbuild", false)
+        jsonObject.addProperty("screenwidth", AppLoader.defaultW)
+        jsonObject.addProperty("screenheight", AppLoader.defaultH)
 
 
         jsonObject.addProperty("imtooyoungtodie", false) // no perma-death

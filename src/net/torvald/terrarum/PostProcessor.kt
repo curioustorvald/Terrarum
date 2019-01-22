@@ -1,12 +1,13 @@
 package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import kotlin.system.measureNanoTime
 
@@ -16,11 +17,14 @@ import kotlin.system.measureNanoTime
 object PostProcessor {
 
     private lateinit var batch: SpriteBatch // not nulling to save some lines of code
+    private lateinit var shapeRenderer: ShapeRenderer
     //private lateinit var camera: OrthographicCamera
-    private var textureRegion: TextureRegion? = null
+    //private var textureRegion: TextureRegion? = null
 
 
     private lateinit var lutTex: Texture
+
+    private var init = false
 
     fun reloadLUT(filename: String) {
         lutTex = Texture(Gdx.files.internal("assets/clut/$filename"))
@@ -28,9 +32,11 @@ object PostProcessor {
 
     fun draw(projMat: Matrix4, fbo: FrameBuffer) {
 
-        if (textureRegion == null) {
-            textureRegion = TextureRegion(fbo.colorBufferTexture)
+        // init
+        if (!init) {
+            //textureRegion = TextureRegion(fbo.colorBufferTexture)
             batch = SpriteBatch()
+            shapeRenderer = ShapeRenderer()
             Gdx.gl20.glViewport(0, 0, AppLoader.appConfig.width, AppLoader.appConfig.height)
         }
 
@@ -58,7 +64,17 @@ object PostProcessor {
 
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
-
+            if (AppLoader.IS_DEVELOPMENT_BUILD) {
+                shapeRenderer.color = Color.CYAN
+                shapeRenderer.inUse(ShapeRenderer.ShapeType.Line) {
+                    shapeRenderer.rect(
+                            (AppLoader.screenW - AppLoader.defaultW).div(2).toFloat(),
+                            (AppLoader.screenH - AppLoader.defaultH).div(2).toFloat(),
+                            AppLoader.defaultW.toFloat(),
+                            AppLoader.defaultH.toFloat()
+                    )
+                }
+            }
         }
     }
 
