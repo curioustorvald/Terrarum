@@ -3,6 +3,7 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -18,9 +19,7 @@ object PostProcessor {
 
     private lateinit var batch: SpriteBatch // not nulling to save some lines of code
     private lateinit var shapeRenderer: ShapeRenderer
-    //private lateinit var camera: OrthographicCamera
-    //private var textureRegion: TextureRegion? = null
-
+    private lateinit var camera: OrthographicCamera
 
     private lateinit var lutTex: Texture
 
@@ -34,8 +33,12 @@ object PostProcessor {
 
         // init
         if (!init) {
-            //textureRegion = TextureRegion(fbo.colorBufferTexture)
             batch = SpriteBatch()
+            camera = OrthographicCamera(AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
+            camera.setToOrtho(true)
+
+            batch.projectionMatrix = camera.combined
+
             shapeRenderer = ShapeRenderer()
             Gdx.gl20.glViewport(0, 0, AppLoader.appConfig.width, AppLoader.appConfig.height)
         }
@@ -74,9 +77,23 @@ object PostProcessor {
                             AppLoader.defaultH.toFloat()
                     )
                 }
+
+                try {
+                    batch.color = Color.CYAN
+                    batch.inUse {
+                        AppLoader.fontSmallNumbers.draw(
+                                batch, defaultResStr,
+                                (AppLoader.screenW - AppLoader.defaultW).div(2).toFloat(),
+                                (AppLoader.screenH - AppLoader.defaultH).div(2).minus(10).toFloat()
+                        )
+                    }
+                }
+                catch (doNothing: NullPointerException) { }
             }
         }
     }
+
+    private val defaultResStr = "${AppLoader.defaultW}x${AppLoader.defaultH}"
 
     /**
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
