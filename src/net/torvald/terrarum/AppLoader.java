@@ -16,6 +16,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.torvald.dataclass.ArrayListMap;
+import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
@@ -145,6 +146,7 @@ public class AppLoader implements ApplicationListener {
 
     public static LwjglApplicationConfiguration appConfig;
     public static GameFontBase fontGame;
+    public static TinyAlphNum fontSmallNumbers;
 
     /**
      * For the events depends on rendering frame (e.g. flicker on post-hit invincibility)
@@ -413,6 +415,7 @@ public class AppLoader implements ApplicationListener {
         fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true,
                 Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false, 256, false
         );
+        fontSmallNumbers = TinyAlphNum.INSTANCE;
 
         audioDevice = Gdx.audio.newAudioDevice(48000, false);
 

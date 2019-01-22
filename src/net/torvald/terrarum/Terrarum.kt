@@ -122,7 +122,7 @@ object Terrarum : Screen {
 
 
     val fontGame: GameFontBase = AppLoader.fontGame
-    lateinit var fontSmallNumbers: TinyAlphNum
+    val fontSmallNumbers: TinyAlphNum = AppLoader.fontSmallNumbers
 
     var joypadLabelStart: Char = 0xE000.toChar() // lateinit
     var joypadLableSelect: Char = 0xE000.toChar() // lateinit
@@ -311,10 +311,7 @@ object Terrarum : Screen {
         shapeRender = ShapeRenderer()
 
 
-        fontSmallNumbers = TinyAlphNum
 
-
-        ShaderProgram.pedantic = false
         shaderBlur = AppLoader.loadShader("assets/blur.vert", "assets/blur.frag")
 
 
