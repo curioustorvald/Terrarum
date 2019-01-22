@@ -14,7 +14,7 @@ Thumbs.db
 # Resources that should not be tracked
 *.jar
 assets/mods/basegame/demoworld
-assets/mods/basegame/demoworld.gz
+#assets/mods/basegame/demoworld.gz
 external_resource_packs.zip
 
 # IntelliJ
