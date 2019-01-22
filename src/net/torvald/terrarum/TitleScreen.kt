@@ -203,7 +203,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     override fun render(delta: Float) {
         // async update and render
 
-        val dt = AppLoader.getSmoothDelta()
+        val dt = Gdx.graphics.deltaTime
         updateAkku += dt
 
         var i = 0L

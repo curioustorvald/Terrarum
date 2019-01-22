@@ -28,7 +28,7 @@ interface Pocketed {
         }
 
         inventory.itemEquipped[item.equipPosition] = null
-        item.effectOnUnequip(AppLoader.getSmoothDelta().toFloat())
+        item.effectOnUnequip(AppLoader.UPDATE_RATE.toFloat())
     }
 
     // no need for equipSlot(Int)
@@ -50,7 +50,7 @@ interface Pocketed {
 
         if (item.equipPosition >= 0) {
             inventory.itemEquipped[item.equipPosition] = item
-            item.effectWhenEquipped(AppLoader.getSmoothDelta().toFloat())
+            item.effectWhenEquipped(AppLoader.UPDATE_RATE.toFloat())
         }
         // else do nothing
     }
@@ -69,13 +69,13 @@ interface Pocketed {
 
 
     fun consumePrimary(item: GameItem) {
-        if (item.startPrimaryUse(AppLoader.getSmoothDelta().toFloat())) {
+        if (item.startPrimaryUse(AppLoader.UPDATE_RATE.toFloat())) {
             inventory.consumeItem(this as Actor, item) // consume on successful
         }
     }
 
     fun consumeSecondary(item: GameItem) {
-        if (item.startSecondaryUse(AppLoader.getSmoothDelta().toFloat()))
+        if (item.startSecondaryUse(AppLoader.UPDATE_RATE.toFloat()))
             inventory.consumeItem(this as Actor, item) // consume on successful
     }
 }

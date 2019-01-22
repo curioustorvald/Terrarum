@@ -10,13 +10,13 @@ class ThreadActorUpdate(val startIndex: Int, val endIndex: Int) : Runnable {
     override fun run() {
         for (i in startIndex..endIndex) {
             val it = Terrarum.ingame!!.actorContainer[i]
-            it.update(AppLoader.getSmoothDelta().toFloat())
+            it.update(AppLoader.UPDATE_RATE.toFloat())
 
             if (it is Pocketed) {
                 it.inventory.forEach { inventoryEntry ->
-                    inventoryEntry.item.effectWhileInPocket(AppLoader.getSmoothDelta().toFloat())
+                    inventoryEntry.item.effectWhileInPocket(AppLoader.UPDATE_RATE.toFloat())
                     if (it.equipped(inventoryEntry.item)) {
-                        inventoryEntry.item.effectWhenEquipped(AppLoader.getSmoothDelta().toFloat())
+                        inventoryEntry.item.effectWhenEquipped(AppLoader.UPDATE_RATE.toFloat())
                     }
                 }
             }

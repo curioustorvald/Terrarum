@@ -66,7 +66,6 @@ public class LwjglGraphics implements Graphics {
 
     // deltaTime kalman filter related variables
     private float kalmanEstimate = 1.0f/60.0f;
-    private float kalmanReturnValue = kalmanEstimate;
     private float kalmanErrorCovariance = 1.0f;
     private final float kalmanErrorRate = 0.2f; // 0.2: empirical value
     private final float kalmanUpdateThreshold = 0.1f;
@@ -119,7 +118,7 @@ public class LwjglGraphics implements Graphics {
     }
 
     public float getDeltaTime () {
-        return kalmanReturnValue;
+        return kalmanEstimate;
     }
 
     private void resetDeltaSmoothingHistory() {
@@ -152,7 +151,7 @@ public class LwjglGraphics implements Graphics {
         //
         // It's not perfect but it works, much better than averaging.
 
-        if (getMagnitudeDifference(deltaTime, kalmanReturnValue) >= 2.0) {
+        if (getMagnitudeDifference(deltaTime, kalmanEstimate) >= 2.0) {
             resetDeltaSmoothingHistory();
         }
 
@@ -171,8 +170,6 @@ public class LwjglGraphics implements Graphics {
 
             kalmanEstimate = newEstimate;
             kalmanErrorCovariance = newError;
-
-            kalmanReturnValue = newEstimate;
         }
     }
 

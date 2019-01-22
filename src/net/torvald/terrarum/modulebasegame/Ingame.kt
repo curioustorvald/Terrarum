@@ -425,7 +425,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    private var countdownToDeltaReset = 15 // number of frames
     private var updateAkku = 0.0
 
     override fun render(delta: Float) {
@@ -447,19 +446,10 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             gameFullyLoaded = true
         }
 
-
-        if (countdownToDeltaReset >= 0) {
-            if (countdownToDeltaReset == 0) {
-                AppLoader.resetDeltaSmoothingHistory()
-            }
-            countdownToDeltaReset -= 1
-        }
-
-
         // ASYNCHRONOUS UPDATE AND RENDER //
 
         /** UPDATE CODE GOES HERE */
-        val dt = AppLoader.getSmoothDelta()
+        val dt = Gdx.graphics.deltaTime
         updateAkku += dt
 
         var i = 0L
@@ -477,10 +467,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         AppLoader.debugTimers["Ingame.render-Light"] =
                 (AppLoader.debugTimers["Ingame.render"] as Long) - ((AppLoader.debugTimers["Renderer.LightTotal"] as? Long) ?: 0)
 
-
-
-        AppLoader.debugTimers["Gdx.deltaRaw"] = Gdx.graphics.rawDeltaTime.times(1_000_000_000).toLong()
-        AppLoader.debugTimers["Gdx.deltaSmt"] = Gdx.graphics.deltaTime.times(1_000_000_000).toLong()
     }
 
     protected fun updateGame(delta: Float) {

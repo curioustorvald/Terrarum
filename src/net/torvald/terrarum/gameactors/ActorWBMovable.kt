@@ -344,7 +344,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
     inline val feetPosTile: IntArray
         get() = intArrayOf(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
 
-    override fun run() = update(AppLoader.getSmoothDelta().toFloat())
+    override fun run() = update(AppLoader.UPDATE_RATE.toFloat())
 
     /**
      * Add vector value to the velocity, in the time unit of single frame.

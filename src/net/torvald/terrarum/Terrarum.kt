@@ -400,7 +400,7 @@ object Terrarum : Screen {
 
     override fun render(delta: Float) {
         AppLoader.debugTimers["GDX.rawDelta"] = Gdx.graphics.rawDeltaTime.times(1000_000_000f).toLong()
-        AppLoader.debugTimers["GDX.smtDelta"] = AppLoader.getSmoothDelta().times(1000_000_000f).toLong()
+        AppLoader.debugTimers["GDX.smtDelta"] = Gdx.graphics.deltaTime.times(1000_000_000f).toLong()
         AppLoader.getINSTANCE().screen.render(delta)
     }
 
@@ -475,7 +475,7 @@ object Terrarum : Screen {
         get() = Gdx.input.y
     /** Delta converted as it it was a FPS */
     inline val updateRate: Double
-        get() = 1.0 / AppLoader.getSmoothDelta()
+        get() = 1.0 / Gdx.graphics.deltaTime
     /**
      * Usage:
      *
