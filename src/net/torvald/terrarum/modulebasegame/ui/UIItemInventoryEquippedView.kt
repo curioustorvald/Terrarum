@@ -60,6 +60,8 @@ class UIItemInventoryEquippedView(
         itemGrid.forEach { it.update(delta) }
     }
 
+    private val spriteDrawCol = Color(0xddddddff.toInt())
+
     override fun render(batch: SpriteBatch, camera: Camera) {
         // sprite background
         blendNormal(batch)
@@ -74,51 +76,46 @@ class UIItemInventoryEquippedView(
         sprite?.let {
             blendNormal(batch)
 
-            it.render(
-                    batch,
+            batch.color = spriteDrawCol
+            batch.draw(
+                    it.textureRegion.get(0, 0),
                     posX + (width - it.cellWidth).div(2).toFloat(),
                     posY + (width - it.cellHeight).div(2).toFloat()
-        ) }
+            )
 
+        }
+
+        // TODO inscribe slot image on each cells HERE
 
         itemGrid.forEach { it.render(batch, camera) }
     }
 
-
     internal fun rebuild() {
-        inventorySortList = inventory.itemEquipped.clone()
-
-
-        
         rebuildList = false
 
         // sort by equip position
 
         // fill the grid from fastest index, make no gap in-between of slots
-        var listPushCnt = 0
         for (k in 0 until itemGrid.size) {
-            val it = inventorySortList[k]
+            val item = inventory.itemEquipped[k]
 
-            if (it != null) {
-                val itemRecord = inventory.getByDynamicID(it.dynamicID)!!
+            if (item == null) {
 
-                itemGrid[listPushCnt].item = it
-                itemGrid[listPushCnt].amount = itemRecord.amount
-                itemGrid[listPushCnt].itemImage = ItemCodex.getItemImage(it)
-                itemGrid[listPushCnt].quickslot = null // don't need to be displayed
-                itemGrid[listPushCnt].equippedSlot = null // don't need to be displayed
-
-                listPushCnt++
+                itemGrid[k].item = null
+                itemGrid[k].amount = 0
+                itemGrid[k].itemImage = null
+                itemGrid[k].quickslot = null
+                itemGrid[k].equippedSlot = null
             }
-        }
+            else {
+                val itemRecord = inventory.getByDynamicID(item.dynamicID)!!
 
-        // empty out un-filled grids from previous garbage
-        for (m in listPushCnt until itemGrid.size) {
-            itemGrid[m].item = null
-            itemGrid[m].amount = 0
-            itemGrid[m].itemImage = null
-            itemGrid[m].quickslot = null
-            itemGrid[m].equippedSlot = null
+                itemGrid[k].item = item
+                itemGrid[k].amount = itemRecord.amount
+                itemGrid[k].itemImage = ItemCodex.getItemImage(item)
+                itemGrid[k].quickslot = null // don't need to be displayed
+                itemGrid[k].equippedSlot = null // don't need to be displayed
+            }
         }
     }
     

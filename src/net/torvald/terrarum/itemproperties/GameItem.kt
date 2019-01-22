@@ -3,10 +3,10 @@ package net.torvald.terrarum.itemproperties
 import com.badlogic.gdx.graphics.Color
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.ItemValue
-import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
-import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
 import net.torvald.terrarum.langpack.Lang
+import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 
 typealias ItemID = Int
 
@@ -207,28 +207,39 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
     object EquipPosition {
         @JvmStatic val NULL = -1
 
-        @JvmStatic val ARMOUR = 0
         // you can add alias to address something like LEGGINGS, BREASTPLATE, RINGS, NECKLACES, etc.
-        @JvmStatic val BODY_BACK = 1 // wings, jetpacks, etc.
-        @JvmStatic val BODY_BUFF2 = 2
-        @JvmStatic val BODY_BUFF3 = 3
-        @JvmStatic val BODY_BUFF4 = 4
-        @JvmStatic val BODY_BUFF5 = 5
-        @JvmStatic val BODY_BUFF6 = 6
-        @JvmStatic val BODY_BUFF7 = 7
-        @JvmStatic val BODY_BUFF8 = 8
 
-        @JvmStatic val HAND_GRIP = 9
-        @JvmStatic val HAND_GAUNTLET = 10
-        @JvmStatic val HAND_BUFF2 = 11
-        @JvmStatic val HAND_BUFF3 = 12
-        @JvmStatic val HAND_BUFF4 = 13
+        @JvmStatic val BODY_ARMOUR = 0
+        @JvmStatic val BODY_BACKPACK = 1 // wings, jetpacks, etc.
 
-        @JvmStatic val FOOTWEAR = 14
+        @JvmStatic val FOOTWEAR = 2
+        @JvmStatic val HEADGEAR = 3
 
-        @JvmStatic val HEADGEAR = 15
+        @JvmStatic val HAND_GRIP = 4
+        @JvmStatic val HAND_GAUNTLET = 5
 
-        @JvmStatic val INDEX_MAX = 15
+        @JvmStatic val BODY_BUFF1 = 6
+        @JvmStatic val BODY_BUFF2 = 8
+        @JvmStatic val BODY_BUFF3 = 10
+
+        @JvmStatic val HAND_BUFF1 = 7
+        @JvmStatic val HAND_BUFF2 = 9
+        @JvmStatic val HAND_BUFF3 = 11
+
+        // invisible from the inventory UI
+        // intended for semi-permanant (de)buff (e.g. lifetime achivement, curse)
+        // can be done with actorvalue and some more code, but it's easier to just make
+        // such (de)buffs as an item.
+        @JvmStatic val STIGMA_1 = 12
+        @JvmStatic val STIGMA_2 = 13
+        @JvmStatic val STIGMA_3 = 14
+        @JvmStatic val STIGMA_4 = 15
+        @JvmStatic val STIGMA_5 = 16
+        @JvmStatic val STIGMA_6 = 17
+        @JvmStatic val STIGMA_7 = 18
+        @JvmStatic val STIGMA_8 = 19
+
+        @JvmStatic val INDEX_MAX = 19
     }
 
     object Category {
