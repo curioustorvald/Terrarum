@@ -3,7 +3,7 @@ package net.torvald.terrarum.gamecontroller
 /**
  * Created by minjaesong on 2016-01-15.
  */
-@Deprecated("Use Gdx.Input.Keys")
+/*@Deprecated("Use Gdx.Input.Keys")
 object DeprecatedAsFuckKey {
 
     val RETURN = 28
@@ -90,4 +90,4 @@ object DeprecatedAsFuckKey {
     val PGDN = 209
     val HOME = 199
     val END = 207
-}
+}*/

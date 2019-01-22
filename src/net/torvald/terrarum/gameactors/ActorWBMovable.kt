@@ -1,7 +1,5 @@
 package net.torvald.terrarum.gameactors
 
-import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.spriteanimation.SpriteAnimation
 import net.torvald.terrarum.*
@@ -9,7 +7,6 @@ import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.BlockProp
-import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
@@ -1343,10 +1340,11 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
     override fun drawBody(batch: SpriteBatch) {
         if (isVisible && sprite != null) {
-            if (!KeyToggler.isOn(Input.Keys.F12)) {
+            //if (!KeyToggler.isOn(Input.Keys.F12)) {
                 BlendMode.resolve(drawMode, batch)
                 drawSpriteInGoodPosition(sprite!!, batch)
-            }
+            /*}
+            // ye olde tilewiseposition debugger, we don't use it anymore.
             else {
                 batch.color = Color.NAVY
                 val hb = intTilewiseHitbox
@@ -1360,7 +1358,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
                 batch.color = Color.VIOLET
                 batch.fillRect(hitbox.startX.toFloat(), hitbox.startY.toFloat(), hitbox.width.toFloat(), hitbox.height.toFloat())
-            }
+            }*/
         }
     }
 
