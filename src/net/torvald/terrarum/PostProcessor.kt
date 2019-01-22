@@ -29,9 +29,9 @@ object PostProcessor {
         lutTex = Texture(Gdx.files.internal("assets/clut/$filename"))
     }
 
-    private val defaultResCol = Color(0x00ffffdd)
-    private val safeAreaCol = Color(0xffffffaa.toInt())
-    private val safeAreaCol2 = Color(0xffffff66.toInt())
+    private val defaultResCol = Color(0x66ffff66)
+    private val safeAreaCol = Color(0xffffff66.toInt())
+    private val safeAreaCol2 = Color(0xffffff44.toInt())
 
     fun draw(projMat: Matrix4, fbo: FrameBuffer) {
 
