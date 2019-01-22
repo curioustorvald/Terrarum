@@ -131,10 +131,10 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
             if (ingame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
                 if (button == AppLoader.getConfigInt("mouseprimary")) {
-                    ingame.worldPrimaryClickEnd(AppLoader.getSmoothDelta().toFloat())
+                    ingame.worldPrimaryClickEnd(AppLoader.UPDATE_RATE.toFloat())
                 }
                 if (button == AppLoader.getConfigInt("mousesecondary")) {
-                    ingame.worldSecondaryClickEnd(AppLoader.getSmoothDelta().toFloat())
+                    ingame.worldSecondaryClickEnd(AppLoader.UPDATE_RATE.toFloat())
                 }
             }
         }
@@ -172,10 +172,10 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
             if (ingame.uiContainer.map { if ((it.isOpening || it.isOpened) && it.mouseUp) 1 else 0 }.sum() == 0) { // no UI on the mouse, right?
 
                 if (button == AppLoader.getConfigInt("mouseprimary")) {
-                    ingame.worldPrimaryClickStart(AppLoader.getSmoothDelta().toFloat())
+                    ingame.worldPrimaryClickStart(AppLoader.UPDATE_RATE.toFloat())
                 }
                 if (button == AppLoader.getConfigInt("mousesecondary")) {
-                    ingame.worldSecondaryClickStart(AppLoader.getSmoothDelta().toFloat())
+                    ingame.worldSecondaryClickStart(AppLoader.UPDATE_RATE.toFloat())
                 }
             }
         }

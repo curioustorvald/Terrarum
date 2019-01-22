@@ -237,86 +237,11 @@ public class AppLoader implements ApplicationListener {
         updateFullscreenQuad(appConfig.width, appConfig.height);
     }
 
-    private static double _kalman_xhat_k = UPDATE_RATE;
-    private static double _kalman_return_value = _kalman_xhat_k;
-    private static double _kalman_p_k = 1.0;
-    private static final double _kalman_R = 0.2; // 0.2: empirical value
-    private final double _KALMAN_UPDATE_THRE = 0.1;
-
-    /**
-     * Because fuck you GDX. (No, really; take a look at LwjglGraphics.java, getDeltaTime() and rawDeltaTime() are exactly the same)
-     * @return Render delta that is smoothed out.
-     */
-    public static double getSmoothDelta() {
-        // kalman filter is calculated but not actually being used.
-
-
-        // below is the kalman part
-        return _kalman_return_value;
-    }
-
-    public static void resetDeltaSmoothingHistory() {
-        _kalman_xhat_k = UPDATE_RATE;
-        _kalman_p_k = 1.0;
-    }
-
     /**
      * @link http://bilgin.esme.org/BitsAndBytes/KalmanFilterforDummies
      */
     private void updateKalmanRenderDelta() {
-
-        // TODO implement nonlinear kalman filter
-
-        // The problem with this kalman filter is that it assumes most simplistic situation:
-        //   1. the actual delta (measured delta - noise) is constant (that is, not constantly increasing or something)
-        //   2. everything is linear
-        // We may need to implement Extended Kalman Filter but what is Jacobian, I suck at maths.
-        //
-        // Instead, this implementation will reset itself when difference in magnitude between
-        // old and new is greater than set value.
-        //
-        // It's not perfect but it works, much better than averaging.
-
-        double observation = ((double) Gdx.graphics.getRawDeltaTime());
-
-        if (getMul(observation, _kalman_return_value) >= 2.0) {
-            resetDeltaSmoothingHistory();
-        }
-
-        // measurement value
-        double _kalman_zed_k = observation;
-
-        if (_kalman_zed_k <= _KALMAN_UPDATE_THRE) {
-            // time update
-            double _kalman_xhatminus_k = _kalman_xhat_k;
-            double _kalman_pminus_k = _kalman_p_k;
-
-            // measurement update
-            double _kalman_gain = _kalman_pminus_k / (_kalman_pminus_k + _kalman_R);
-            double _kalman_xhat_kNew = _kalman_xhatminus_k + _kalman_gain * (_kalman_zed_k - _kalman_xhatminus_k);
-            double _kalman_p_kNew = (1.0 - _kalman_gain) * _kalman_pminus_k;
-
-            _kalman_xhat_k = _kalman_xhat_kNew;
-            _kalman_p_k = _kalman_p_kNew;
-
-            _kalman_return_value = _kalman_xhat_kNew;
-        }
-    }
-
-
-    private final double getMul_epsilon = 0.00001;
-    // only for a > 0 && b > 0
-    private double getMul(double a, double b) {
-        if (a < getMul_epsilon || b < getMul_epsilon) {
-            return a + b;
-        }
-
-        if (a > b) {
-            return a / b;
-        }
-        else {
-            return b / a;
-        }
+        // moved to LwjglGraphics
     }
 
     @Override
@@ -326,9 +251,6 @@ public class AppLoader implements ApplicationListener {
             postInitFired = true;
             postInit();
         }
-
-        // update smooth delta AFTER postInit
-        updateKalmanRenderDelta();
 
         FrameBufferManager.begin(renderFBO);
         gdxClearAndSetBlend(.094f, .094f, .094f, 0f);
@@ -427,8 +349,6 @@ public class AppLoader implements ApplicationListener {
         updateFullscreenQuad(screenW, screenH);
 
         printdbg(this, "Resize event");
-
-        resetDeltaSmoothingHistory();
     }
 
     @Override
@@ -473,8 +393,6 @@ public class AppLoader implements ApplicationListener {
         }
 
         printdbg(this, "Screen transisiton complete: " + this.screen.getClass().getCanonicalName());
-
-        resetDeltaSmoothingHistory();
     }
 
     private void postInit() {

@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
@@ -64,9 +63,9 @@ object BlockPropUtil {
     internal fun dynamicLumFuncTickClock() {
         // FPS-time compensation
         if (Gdx.graphics.framesPerSecond > 0) {
-            flickerFuncX += AppLoader.getSmoothDelta().toFloat() * 1000f
-            breathFuncX  += AppLoader.getSmoothDelta().toFloat() * 1000f
-            pulsateFuncX += AppLoader.getSmoothDelta().toFloat() * 1000f
+            flickerFuncX += Gdx.graphics.deltaTime * 1000f
+            breathFuncX  += Gdx.graphics.deltaTime * 1000f
+            pulsateFuncX += Gdx.graphics.deltaTime * 1000f
         }
 
         // flicker-related vars
