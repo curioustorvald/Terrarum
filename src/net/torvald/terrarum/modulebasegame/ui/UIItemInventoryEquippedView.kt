@@ -21,12 +21,12 @@ class UIItemInventoryEquippedView(
         override var posY: Int
 ) : UIItem(parentUI) {
 
-    override val width  = 104
-    override val height = 384
+    override val width  = WIDTH
+    override val height = HEIGHT
 
     companion object {
-        val width  = 104
-        val height = 384
+        val WIDTH  = 2 * UIItemInventoryElemSimple.height + UIItemInventoryDynamicList.listGap
+        val HEIGHT = UIItemInventoryDynamicList.HEIGHT
     }
 
     private val listGap = 8
@@ -39,7 +39,7 @@ class UIItemInventoryEquippedView(
     
     val spriteViewBackCol: Color; get() = Color(0x404040_88.toInt())//Color(0xd4d4d4_ff.toInt())
 
-    private val itemGrid = Array<UIItemInventoryCellBase>(2 * 5) {
+    private val itemGrid = Array<UIItemInventoryCellBase>(2 * 6) {
         UIItemInventoryElemSimple(
                 parentUI = parentUI,
                 posX = this.posX + (UIItemInventoryElemSimple.height + listGap) * ((it + 4) % 2),
