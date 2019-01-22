@@ -74,13 +74,21 @@ class UIItemInventoryDynamicList(
 
     val defaultTextColour = Color(0xeaeaea_ff.toInt())
 
-    private val listGap = 8
-    private val itemList = Array<UIItemInventoryCellBase>(7 * 2) {
-        UIItemInventoryElem(
+    companion object {
+        const val listGap = 8
+        const val horizontalCells = 12
+        const val verticalCells = 8
+        val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / 2
+
+        val WIDTH = horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 1) * listGap
+        val HEIGHT = verticalCells * UIItemInventoryElemSimple.height + (verticalCells - 1) * listGap
+    }
+
+    private val itemGrid = Array<UIItemInventoryCellBase>(horizontalCells * verticalCells) {
+        UIItemInventoryElemSimple(
                 parentUI = inventoryUI,
-                posX = this.posX + (272 + listGap) * (it % 2),
-                posY = this.posY + (UIItemInventoryElem.height + listGap) * (it / 2),
-                width = 272,
+                posX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % horizontalCells),
+                posY = this.posY + (UIItemInventoryElemSimple.height + listGap) * (it / horizontalCells),
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
@@ -92,11 +100,12 @@ class UIItemInventoryDynamicList(
                 inactiveTextCol = defaultTextColour
         )
     }
-    private val itemGrid = Array<UIItemInventoryCellBase>(7 * 10) {
-        UIItemInventoryElemSimple(
+    private val itemList = Array<UIItemInventoryCellBase>(verticalCells * 2) {
+        UIItemInventoryElem(
                 parentUI = inventoryUI,
-                posX = this.posX + (UIItemInventoryElemSimple.height + listGap) * (it % 10),
-                posY = this.posY + (UIItemInventoryElemSimple.height + listGap) * (it / 10),
+                posX = this.posX + (largeListWidth + listGap) * (it % 2),
+                posY = this.posY + (UIItemInventoryElem.height + listGap) * (it / 2),
+                width = largeListWidth,
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,

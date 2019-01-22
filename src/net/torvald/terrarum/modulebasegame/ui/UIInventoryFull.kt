@@ -30,8 +30,10 @@ class UIInventoryFull(
     override var width: Int = Terrarum.WIDTH
     override var height: Int = Terrarum.HEIGHT
 
-    val internalWidth: Int = 686
-    val internalHeight: Int = 558 // grad_begin..grad_end..contents..grad_begin..grad_end
+    private val itemListToEquipViewGap = 24
+
+    val internalWidth: Int = UIItemInventoryDynamicList.WIDTH + UIItemInventoryEquippedView.WIDTH + itemListToEquipViewGap
+    val internalHeight: Int = 166 + UIItemInventoryDynamicList.HEIGHT // grad_begin..grad_end..contents..grad_begin..grad_end
 
 
 
@@ -62,7 +64,7 @@ class UIInventoryFull(
     val categoryBar = UIItemInventoryCatBar(
             this,
             (Terrarum.WIDTH - catBarWidth) / 2,
-            66 + (Terrarum.HEIGHT - internalHeight) / 2,
+            42 + (Terrarum.HEIGHT - internalHeight) / 2,
             catBarWidth
     )
     val catSelection: Int
@@ -91,7 +93,7 @@ class UIInventoryFull(
                         this,
                         actor!!.inventory,
                         actor as ActorWBMovable,
-                        internalWidth - UIItemInventoryEquippedView.width + (Terrarum.WIDTH - internalWidth) / 2,
+                        internalWidth - UIItemInventoryEquippedView.WIDTH + (Terrarum.WIDTH - internalWidth) / 2,
                         109 + (Terrarum.HEIGHT - internalHeight) / 2
                 )
             }
@@ -174,7 +176,7 @@ class UIInventoryFull(
         // control hints
         blendNormal(batch)
         batch.color = Color.WHITE
-        Terrarum.fontGame.draw(batch, listControlHelp, offsetX, offsetY + internalHeight)
+        Terrarum.fontGame.draw(batch, listControlHelp, offsetX, yEnd-20)
 
 
         // encumbrance meter
@@ -184,7 +186,7 @@ class UIInventoryFull(
             Terrarum.fontGame.draw(batch,
                     encumbranceText,
                     xEnd - 9 - Terrarum.fontGame.getWidth(encumbranceText) - weightBarWidth,
-                    yEnd
+                    yEnd-20
             )
 
             // encumbrance bar background
@@ -192,7 +194,7 @@ class UIInventoryFull(
             batch.color = Color(0xa0a0a0_ff.toInt())
             batch.fillRect(
                     xEnd - 3 - weightBarWidth,
-                    yEnd + 3f,
+                    yEnd-20 + 3f,
                     weightBarWidth,
                     controlHelpHeight - 6f
             )
@@ -201,7 +203,7 @@ class UIInventoryFull(
             batch.color = if (isEncumbered) Color(0xff0000_cc.toInt()) else Color(0x00ff00_cc.toInt())
             batch.fillRect(
                     xEnd - 3 - weightBarWidth,
-                    yEnd + 3f,
+                    yEnd-20 + 3f,
                     if (actor?.inventory?.capacityMode == CAPACITY_MODE_NO_ENCUMBER)
                         1f
                     else // make sure 1px is always be seen
