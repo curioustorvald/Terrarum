@@ -314,7 +314,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         // quick bar
         uiQuickBar = UIQuickslotBar()
         uiQuickBar.isVisible = true
-        uiQuickBar.setPosition((Terrarum.WIDTH - uiQuickBar.width) / 2, 8)
+        uiQuickBar.setPosition((Terrarum.WIDTH - uiQuickBar.width) / 2, AppLoader.getTvSafeGraphicsHeight())
 
         // pie menu
         uiPieMenu = uiQuickslotPie()

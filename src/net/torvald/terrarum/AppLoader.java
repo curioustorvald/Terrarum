@@ -110,6 +110,14 @@ public class AppLoader implements ApplicationListener {
     public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2019 Torvald (minjaesong)";
     public static String GAME_LOCALE = System.getProperty("user.language") + System.getProperty("user.country");
 
+    public static final float TV_SAFE_GRAPHICS = 0.05f; // as per EBU recommendation (https://tech.ebu.ch/docs/r/r095.pdf)
+    public static final float TV_SAFE_ACTION = 0.035f; // as per EBU recommendation (https://tech.ebu.ch/docs/r/r095.pdf)
+
+    public static int getTvSafeGraphicsWidth() { return Math.round(screenW * TV_SAFE_GRAPHICS); }
+    public static int getTvSafeGraphicsHeight() { return Math.round(screenH * TV_SAFE_GRAPHICS); }
+    public static int getTvSafeActionWidth() { return Math.round(screenW * TV_SAFE_ACTION); }
+    public static int getTvSafeActionHeight() { return Math.round(screenH * TV_SAFE_ACTION); }
+
     /**
      * These languages won't distinguish regional differences (e.g. enUS and enUK, frFR and frCA)
      */

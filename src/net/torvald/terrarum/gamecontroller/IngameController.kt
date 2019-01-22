@@ -68,6 +68,8 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
         /////////////////////
     }
 
+    private var f12Down = false
+
     override fun keyDown(keycode: Int): Boolean {
 
         if (ingame.canPlayerControl) {
@@ -98,6 +100,15 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
         }
 
 
+        // screenshot key
+        if (keycode == Input.Keys.F12 && !f12Down) {
+            AppLoader.requestScreenshot()
+            // FIXME
+            //ingame.sendNotification(arrayOf("Screenshot taken", ""))
+            f12Down = true
+            println("Screenshot taken.")
+        }
+
         return true
     }
 
@@ -109,6 +120,10 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
         }
 
         ingame.uiContainer.forEach { it.keyUp(keycode) } // for KeyboardControlled UIcanvases
+
+
+        // screenshot key
+        if (keycode == Input.Keys.F12) f12Down = false
 
 
         return true

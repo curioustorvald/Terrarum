@@ -29,6 +29,10 @@ object PostProcessor {
         lutTex = Texture(Gdx.files.internal("assets/clut/$filename"))
     }
 
+    private val defaultResCol = Color(0x00ffffdd)
+    private val safeAreaCol = Color(0xffffffaa.toInt())
+    private val safeAreaCol2 = Color(0xffffff66.toInt())
+
     fun draw(projMat: Matrix4, fbo: FrameBuffer) {
 
         // init
@@ -68,8 +72,23 @@ object PostProcessor {
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
             if (AppLoader.IS_DEVELOPMENT_BUILD) {
-                shapeRenderer.color = Color.CYAN
+                val tvSafeAreaW = AppLoader.getTvSafeGraphicsWidth().toFloat()
+                val tvSafeAreaH = AppLoader.getTvSafeGraphicsHeight().toFloat()
+                val tvSafeArea2W = AppLoader.getTvSafeActionWidth().toFloat()
+                val tvSafeArea2H = AppLoader.getTvSafeActionHeight().toFloat()
+
                 shapeRenderer.inUse(ShapeRenderer.ShapeType.Line) {
+                    shapeRenderer.color = safeAreaCol2
+                    shapeRenderer.rect(
+                            tvSafeArea2W, tvSafeArea2H, AppLoader.screenW - 2 * tvSafeArea2W, AppLoader.screenH - 2 * tvSafeArea2H
+                    )
+
+                    shapeRenderer.color = safeAreaCol
+                    shapeRenderer.rect(
+                        tvSafeAreaW, tvSafeAreaH, AppLoader.screenW - 2 * tvSafeAreaW, AppLoader.screenH - 2 * tvSafeAreaH
+                    )
+
+                    shapeRenderer.color = defaultResCol
                     shapeRenderer.rect(
                             (AppLoader.screenW - AppLoader.defaultW).div(2).toFloat(),
                             (AppLoader.screenH - AppLoader.defaultH).div(2).toFloat(),
@@ -79,8 +98,14 @@ object PostProcessor {
                 }
 
                 try {
-                    batch.color = Color.CYAN
                     batch.inUse {
+                        batch.color = safeAreaCol
+                        AppLoader.fontSmallNumbers.draw(
+                                batch, safeAreaStr,
+                                tvSafeAreaW, tvSafeAreaH - 10
+                        )
+
+                        batch.color = defaultResCol
                         AppLoader.fontSmallNumbers.draw(
                                 batch, defaultResStr,
                                 (AppLoader.screenW - AppLoader.defaultW).div(2).toFloat(),
@@ -94,6 +119,7 @@ object PostProcessor {
     }
 
     private val defaultResStr = "${AppLoader.defaultW}x${AppLoader.defaultH}"
+    private val safeAreaStr = "TV Safe Area"
 
     /**
      * Camera will be moved so that (newX, newY) would be sit on the top-left edge.
