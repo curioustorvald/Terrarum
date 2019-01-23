@@ -22,7 +22,8 @@ internal object CommandInterpreter {
             "help",
             "version",
             "tips",
-            "screenshot"
+            "screenshot",
+            "resize"
     )
 
     internal fun execute(command: String) {

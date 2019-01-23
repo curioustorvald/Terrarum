@@ -1,6 +1,7 @@
 package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -10,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import kotlin.system.measureNanoTime
 
 /**
@@ -71,7 +73,7 @@ object PostProcessor {
 
             Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
 
-            if (AppLoader.IS_DEVELOPMENT_BUILD) {
+            if (AppLoader.IS_DEVELOPMENT_BUILD && KeyToggler.isOn(Input.Keys.F11)) {
                 val tvSafeAreaW = AppLoader.getTvSafeGraphicsWidth().toFloat()
                 val tvSafeAreaH = AppLoader.getTvSafeGraphicsHeight().toFloat()
                 val tvSafeArea2W = AppLoader.getTvSafeActionWidth().toFloat()
@@ -90,10 +92,10 @@ object PostProcessor {
 
                     shapeRenderer.color = defaultResCol
                     shapeRenderer.rect(
-                            (AppLoader.screenW - AppLoader.defaultW).div(2).toFloat(),
-                            (AppLoader.screenH - AppLoader.defaultH).div(2).toFloat(),
-                            AppLoader.defaultW.toFloat(),
-                            AppLoader.defaultH.toFloat()
+                            (AppLoader.screenW - AppLoader.minimumW).div(2).toFloat(),
+                            (AppLoader.screenH - AppLoader.minimumH).div(2).toFloat(),
+                            AppLoader.minimumW.toFloat(),
+                            AppLoader.minimumH.toFloat()
                     )
                 }
 
@@ -108,8 +110,8 @@ object PostProcessor {
                         batch.color = defaultResCol
                         AppLoader.fontSmallNumbers.draw(
                                 batch, defaultResStr,
-                                (AppLoader.screenW - AppLoader.defaultW).div(2).toFloat(),
-                                (AppLoader.screenH - AppLoader.defaultH).div(2).minus(10).toFloat()
+                                (AppLoader.screenW - AppLoader.minimumW).div(2).toFloat(),
+                                (AppLoader.screenH - AppLoader.minimumH).div(2).minus(10).toFloat()
                         )
                     }
                 }
@@ -118,7 +120,7 @@ object PostProcessor {
         }
     }
 
-    private val defaultResStr = "${AppLoader.defaultW}x${AppLoader.defaultH}"
+    private val defaultResStr = "${AppLoader.minimumW}x${AppLoader.minimumH}"
     private val safeAreaStr = "TV Safe Area"
 
     /**

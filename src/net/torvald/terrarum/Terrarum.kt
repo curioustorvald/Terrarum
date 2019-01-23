@@ -433,11 +433,9 @@ object Terrarum : Screen {
         AppLoader.getINSTANCE().screen.hide()
     }
 
+    /** For the actual resize, call AppLoader.resize() */
     override fun resize(width: Int, height: Int) {
-        /*try {
-            AppLoader.getINSTANCE().screen.resize(width, height)
-        }
-        catch (e: NullPointerException) { }*/ // I sense circular recursion...
+        ingame?.resize(width, height)
 
         printdbg(this, "newsize: ${Gdx.graphics.width}x${Gdx.graphics.height} | internal: ${width}x$height")
     }

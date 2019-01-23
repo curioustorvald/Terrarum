@@ -76,7 +76,7 @@ class UIItemInventoryDynamicList(
 
     companion object {
         const val listGap = 8
-        const val horizontalCells = 12
+        const val horizontalCells = 11
         const val verticalCells = 8
         val largeListWidth = (horizontalCells * UIItemInventoryElemSimple.height + (horizontalCells - 2) * listGap) / 2
 
