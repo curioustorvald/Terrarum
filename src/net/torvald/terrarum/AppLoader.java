@@ -2,6 +2,7 @@ package net.torvald.terrarum;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
@@ -16,6 +17,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.torvald.dataclass.ArrayListMap;
+import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.utils.JsonFetcher;
@@ -151,6 +153,8 @@ public class AppLoader implements ApplicationListener {
     private static boolean splashDisplayed = false;
     private static boolean postInitFired = false;
     private static boolean screenshotRequested = false;
+    private static boolean resizeRequested = false;
+    private static Point2i resizeReqSize;
 
     public static LwjglApplicationConfiguration appConfig;
     public static GameFontBase fontGame;
@@ -164,8 +168,10 @@ public class AppLoader implements ApplicationListener {
 
     public static ArrayListMap debugTimers = new ArrayListMap<String, Long>();
 
-    static final int defaultW = 1110;
-    static final int defaultH = 740;
+    public static final int defaultW = 1110;
+    public static final int defaultH = 740;
+    public static final int minimumW = 1080;
+    public static final int minimumH = 720;
 
     public static void main(String[] args) {
         // load configs
@@ -191,6 +197,8 @@ public class AppLoader implements ApplicationListener {
 
         if (args.length == 1 && args[0].equals("isdev=true")) {
             IS_DEVELOPMENT_BUILD = true;
+            // safe area box
+            KeyToggler.INSTANCE.forceSet(Input.Keys.F11, true);
         }
 
         new LwjglApplication(new AppLoader(appConfig), appConfig);
@@ -320,6 +328,13 @@ public class AppLoader implements ApplicationListener {
         PostProcessor.INSTANCE.draw(camera.combined, renderFBO);
 
 
+        // process resize request
+        if (resizeRequested) {
+            resizeRequested = false;
+            resize(resizeReqSize.getX(), resizeReqSize.getY());
+        }
+
+
         // process screenshot request
         if (screenshotRequested) {
             screenshotRequested = false;
@@ -340,6 +355,11 @@ public class AppLoader implements ApplicationListener {
 
     @Override
     public void resize(int width, int height) {
+        printdbg(this, "Resize called");
+        for (StackTraceElement stackTraceElement : Thread.currentThread().getStackTrace()) {
+            printdbg(this, stackTraceElement);
+        }
+
         //initViewPort(width, height);
 
         screenW = width;
@@ -368,7 +388,12 @@ public class AppLoader implements ApplicationListener {
 
         updateFullscreenQuad(screenW, screenH);
 
-        printdbg(this, "Resize event");
+        printdbg(this, "Resize end");
+    }
+
+    public static void resizeScreen(int width, int height) {
+        resizeRequested = true;
+        resizeReqSize = new Point2i(Math.max(width, minimumW), Math.max(height, minimumH));
     }
 
     @Override
