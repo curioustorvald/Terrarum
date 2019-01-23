@@ -18,15 +18,15 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  * Created by minjaesong on 2017-06-11.
  */
 class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
-    override var width = 77
-    override var height = 53
+    override var width = 160
+    override var height = 25
     override var openCloseTime: Second = 0f
 
     private var ELuptimer = 10f // init value higher than uptime: to make the light turned off by default
     private val ELuptime = 4f
     private var ELon = false
 
-    private var atlas = TextureRegionPack(ModMgr.getPath("basegame", "gui/watchface2_atlas.tga"), width, height)
+    private var atlas = TextureRegionPack(ModMgr.getPath("basegame", "gui/watchface_atlas.tga"), width, height)
 
     private var littleFont = Watch7SegSmall
     private var timeFont = Watch7SegMain
@@ -68,7 +68,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
         }
         else {
             // backplate
-            batch.color = drawCol
+            batch.color = Color.WHITE
             batch.draw(atlas.get(0, 0), 0f, 0f)
         }
 
@@ -80,15 +80,15 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
         
         // day name
         batch.color = lcdLitCol
-        textFont.draw(batch, worldTime.getDayNameShort().toUpperCase(), 9f, 5f)
+        textFont.draw(batch, worldTime.getDayNameShort().toUpperCase(), 71f, 7f)
 
         // day
-        littleFont.draw(batch, worldTime.days.toString().padStart(2, ' '), 54f, 4f)
+        littleFont.draw(batch, worldTime.days.toString().padStart(2, ' '), 110f, 6f)
 
         // hour
-        timeFont.draw(batch, worldTime.hours.toString().padStart(2, '/'), 25f, 31f)
+        littleFont.draw(batch, worldTime.hours.toString().padStart(2, '/'), 26f, 6f)
         // minute
-        timeFont.draw(batch, worldTime.minutes.toString().padStart(2, '0'), 53f, 31f)
+        littleFont.draw(batch, worldTime.minutes.toString().padStart(2, '0'), 48f, 6f)
 
         // season marker
         batch.draw(atlas.get(1, worldTime.months - 1), 0f, 0f)
@@ -97,7 +97,7 @@ class UITierOneWatch(private val player: ActorHumanoid?) : UICanvas() {
         // moon dial
         val moonPhase = (worldTime.moonPhase * moonDialCount).roundInt() % moonDialCount
         batch.color = lcdLitCol
-        batch.draw(moonDial.get(moonPhase, 0), 4f, 19f)
+        batch.draw(moonDial.get(moonPhase, 0), 6f, 4f)
     }
 
     override fun doOpening(delta: Float) {
