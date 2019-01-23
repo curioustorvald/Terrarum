@@ -337,7 +337,10 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         uiWatchTierOne = UITierOneWatch(actorNowPlaying)
         uiWatchTierOne.setAsAlwaysVisible()
-        uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.width, uiWatchBasic.height - 2)
+        uiWatchTierOne.setPosition(
+                ((Terrarum.WIDTH - AppLoader.getTvSafeActionWidth()) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
+                AppLoader.getTvSafeGraphicsHeight() + 7
+        )
 
 
         uiTooltip = UITooltip()
@@ -512,14 +515,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             // TODO thread pool(?)
             CollisionSolver.process()
 
-
-            visibleActorsRenderBehind = actorsRenderBehind.filter { it.inScreen() }
-            visibleActorsRenderMiddle = actorsRenderMiddle.filter { it.inScreen() }
-            visibleActorsRenderMidTop = actorsRenderMidTop.filter { it.inScreen() }
-            visibleActorsRenderFront  =  actorsRenderFront.filter { it.inScreen() }
-            visibleActorsRenderOverlay=actorsRenderOverlay.filter { it.inScreen() }
-
-
             WorldCamera.update(gameworld, actorNowPlaying)
         }
 
@@ -542,6 +537,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     private fun renderGame() {
         Gdx.graphics.setTitle(getCanonicalTitle())
 
+        filterVisibleActors()
+
         IngameRenderer.invoke(
                 world as GameWorldExtension,
                 visibleActorsRenderBehind,
@@ -555,6 +552,14 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         )
     }
 
+
+    private fun filterVisibleActors() {
+        visibleActorsRenderBehind = actorsRenderBehind.filter { it.inScreen() }
+        visibleActorsRenderMiddle = actorsRenderMiddle.filter { it.inScreen() }
+        visibleActorsRenderMidTop = actorsRenderMidTop.filter { it.inScreen() }
+        visibleActorsRenderFront  =  actorsRenderFront.filter { it.inScreen() }
+        visibleActorsRenderOverlay=actorsRenderOverlay.filter { it.inScreen() }
+    }
 
     private fun repossessActor() {
         // check if currently pocessed actor is removed from game
@@ -913,6 +918,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
             notifier.setPosition(
                     (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
+            uiQuickBar.setPosition((Terrarum.WIDTH - uiQuickBar.width) / 2, AppLoader.getTvSafeGraphicsHeight())
 
             // inventory
             /*uiInventoryPlayer =
@@ -925,7 +931,11 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
             // basic watch-style notification bar (temperature, new mail)
             uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.width, 0)
-            uiWatchTierOne.setPosition(Terrarum.WIDTH - uiWatchTierOne.width, uiWatchBasic.height - 2)
+            uiWatchTierOne.setPosition(
+                    ((Terrarum.WIDTH - AppLoader.getTvSafeGraphicsWidth()) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
+                    AppLoader.getTvSafeGraphicsHeight() + 7
+            )
+
         }
 
 
