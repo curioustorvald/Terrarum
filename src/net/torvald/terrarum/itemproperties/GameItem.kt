@@ -212,8 +212,8 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
         @JvmStatic val BODY_ARMOUR = 0
         @JvmStatic val BODY_BACKPACK = 1 // wings, jetpacks, etc.
 
-        @JvmStatic val FOOTWEAR = 2
-        @JvmStatic val HEADGEAR = 3
+        @JvmStatic val HEADGEAR = 2
+        @JvmStatic val FOOTWEAR = 3
 
         @JvmStatic val HAND_GRIP = 4
         @JvmStatic val HAND_GAUNTLET = 5

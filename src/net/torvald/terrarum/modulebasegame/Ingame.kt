@@ -339,7 +339,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         uiWatchTierOne.setAsAlwaysVisible()
         uiWatchTierOne.setPosition(
                 ((Terrarum.WIDTH - AppLoader.getTvSafeActionWidth()) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
-                AppLoader.getTvSafeGraphicsHeight() + 7
+                AppLoader.getTvSafeGraphicsHeight() + 8
         )
 
 
@@ -933,7 +933,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.width, 0)
             uiWatchTierOne.setPosition(
                     ((Terrarum.WIDTH - AppLoader.getTvSafeGraphicsWidth()) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
-                    AppLoader.getTvSafeGraphicsHeight() + 7
+                    AppLoader.getTvSafeGraphicsHeight() + 8
             )
 
         }
