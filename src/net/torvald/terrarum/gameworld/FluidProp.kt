@@ -1,14 +1,9 @@
 package net.torvald.terrarum.gameworld
 
-import com.badlogic.gdx.graphics.Color
-import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.blockproperties.BlockCodex
-import net.torvald.terrarum.blockproperties.BlockPropUtil
-
 /**
  * Created by minjaesong on 2018-12-29.
  */
-class FluidProp {
+/*class FluidProp {
 
     var density: Int = 0
 
@@ -45,4 +40,4 @@ class FluidProp {
             return p
         }
     }
-}
+}*/
