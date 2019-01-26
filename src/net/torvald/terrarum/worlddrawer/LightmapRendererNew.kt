@@ -422,6 +422,9 @@ object LightmapRenderer {
      */
     private fun calculate(x: Int, y: Int): Color {
 
+        // TODO if we only use limited set of operations (max, mul, sub) then int-ify should be possible.
+        // 0xiiii_ffff, 65536 for 1.0
+
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
 
@@ -432,33 +435,30 @@ object LightmapRenderer {
         thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
         thisFluid = world.getFluid(x, y).type
         thisWall = world.getTileFromWall(x, y) ?: Block.STONE
-        thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity maxBlend BlockCodex[thisFluid].luminosity) // already been div by four
 
+        if (thisFluid != Fluid.NULL) {
+            thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity)
+            thisTileLuminosity.maxAndAssign(BlockCodex[thisFluid].luminosity) // already been div by four
+            thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
+            thisTileOpacity.maxAndAssign(BlockCodex[thisFluid].opacity) // already been div by four
+        }
+        else {
+            thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity)
+            thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
+        }
         // TODO thisTileOpacity: take fluid amount into account
 
-        thisTileOpacity.set(BlockCodex[thisTerrain].opacity maxBlend BlockCodex[thisFluid].opacity) // already been div by four
         thisTileOpacity2.set(thisTileOpacity); thisTileOpacity2.mul(1.41421356f)
         sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
 
 
-        // MIX TILE
-        // open air
-        if (thisTerrain == AIR && thisWall == AIR) {
+        // open air || luminous tile backed by sunlight
+        if ((thisTerrain == AIR && thisWall == AIR) || (thisTileLuminosity.nonZero() && thisWall == AIR)) {
             lightLevelThis.set(sunLight)
         }
-        // luminous tile
-        else if (thisTileLuminosity.nonZero()) {
-            // luminous tile on top of air
-            if (thisWall == AIR)
-                lightLevelThis.set(sunLight maxBlend thisTileLuminosity) // maximise to not exceed 1.0 with normal (<= 1.0) light
-            // opaque wall and luminous tile
-            else
-                lightLevelThis.set(thisTileLuminosity)
-        }
-        // END MIX TILE
 
         // blend lantern
-        lightLevelThis maxBlend (lanternMap[Point2i(x, y)] ?: colourNull)
+        lightLevelThis.maxAndAssign(thisTileLuminosity).maxAndAssign(lanternMap[Point2i(x, y)] ?: colourNull)
 
         // calculate ambient
         /*  + * +  0 4 1
@@ -470,25 +470,17 @@ object LightmapRenderer {
 
         // will "overwrite" what's there in the lightmap if it's the first pass
         // takes about 2 ms on 6700K
-        val amb = Array(8) {
-            when (it) {
-                /* + */0 -> darkenColoured(getLightInternal(x - 1, y - 1) ?: colourNull, thisTileOpacity2)
-                /* + */1 -> darkenColoured(getLightInternal(x + 1, y - 1) ?: colourNull, thisTileOpacity2)
-                /* + */2 -> darkenColoured(getLightInternal(x - 1, y + 1) ?: colourNull, thisTileOpacity2)
-                /* + */3 -> darkenColoured(getLightInternal(x + 1, y + 1) ?: colourNull, thisTileOpacity2)
-
-                /* * */4 -> darkenColoured(getLightInternal(x, y - 1) ?: colourNull, thisTileOpacity)
-                /* * */5 -> darkenColoured(getLightInternal(x, y + 1) ?: colourNull, thisTileOpacity)
-                /* * */6 -> darkenColoured(getLightInternal(x - 1, y) ?: colourNull, thisTileOpacity)
-                /* * */7 -> darkenColoured(getLightInternal(x + 1, y) ?: colourNull, thisTileOpacity)
-                else -> throw InternalError()
-            }
-        }
-
-        val ret = amb.fold(lightLevelThis) { acc, color -> acc maxBlend color }
+        /* + */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x - 1, y - 1) ?: colourNull, thisTileOpacity2))
+        /* + */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x + 1, y - 1) ?: colourNull, thisTileOpacity2))
+        /* + */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x - 1, y + 1) ?: colourNull, thisTileOpacity2))
+        /* + */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x + 1, y + 1) ?: colourNull, thisTileOpacity2))
+        /* * */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x, y - 1) ?: colourNull, thisTileOpacity))
+        /* * */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x, y + 1) ?: colourNull, thisTileOpacity))
+        /* * */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x - 1, y) ?: colourNull, thisTileOpacity))
+        /* * */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x + 1, y) ?: colourNull, thisTileOpacity))
 
 
-        return ret
+        return lightLevelThis.cpy() // it HAS to be a cpy()
     }
 
     private fun getLightForOpaque(x: Int, y: Int): Color? { // ...so that they wouldn't appear too dark
@@ -515,7 +507,7 @@ object LightmapRenderer {
     var lightBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
     private val colourNull = Color(0)
-    private val epsilon = 1f/2048f
+    private val epsilon = 1f/1024f
 
     private var _lightBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
 
@@ -671,6 +663,18 @@ object LightmapRenderer {
                 if (this.b > other.b) this.b else other.b,
                 if (this.a > other.a) this.a else other.a
         )
+    }
+
+    /** infix is removed to clarify the association direction */
+    fun Color.maxAndAssign(other: Color): Color {
+        this.set(
+                if (this.r > other.r) this.r else other.r,
+                if (this.g > other.g) this.g else other.g,
+                if (this.b > other.b) this.b else other.b,
+                if (this.a > other.a) this.a else other.a
+        )
+
+        return this
     }
 
 
@@ -864,7 +868,7 @@ object LightmapRenderer {
             hdr(this.a)
     )
 
-    private fun Color.nonZero() = this.r >= epsilon || this.g >= epsilon || this.b >= epsilon || this.a >= epsilon
+    private fun Color.nonZero() = this.r + this.g + this.b + this.a > epsilon
 
     val histogram: Histogram
         get() {
