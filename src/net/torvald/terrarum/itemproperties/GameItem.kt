@@ -210,13 +210,13 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
         // you can add alias to address something like LEGGINGS, BREASTPLATE, RINGS, NECKLACES, etc.
 
         @JvmStatic val BODY_ARMOUR = 0
-        @JvmStatic val BODY_BACKPACK = 1 // wings, jetpacks, etc.
+        @JvmStatic val BODY_FOOTWEAR = 1 // wings, jetpacks, etc.
 
         @JvmStatic val HEADGEAR = 2
-        @JvmStatic val FOOTWEAR = 3
+        @JvmStatic val HAND_GAUNTLET = 3
 
         @JvmStatic val HAND_GRIP = 4
-        @JvmStatic val HAND_GAUNTLET = 5
+        @JvmStatic val TOOL_HOOKSHOT = 5
 
         @JvmStatic val BODY_BUFF1 = 6
         @JvmStatic val BODY_BUFF2 = 8

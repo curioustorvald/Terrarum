@@ -1,9 +1,7 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.QNDTreeNode
 import net.torvald.terrarum.Yaml
-import java.util.*
 
 
 
@@ -24,6 +22,9 @@ object UITitleRemoConYaml {
         - MENU_OPTIONS
          - MENU_OPTIONS_GRAPHICS
          - MENU_OPTIONS_CONTROLS
+          - MENU_CONTROLS_KEYBOARD
+          - MENU_CONTROLS_GAMEPAD
+          - MENU_LABEL_RETURN
          - MENU_OPTIONS_SOUND
          - MENU_LABEL_RETURN
         - MENU_MODULES : net.torvald.terrarum.modulebasegame.ui.UITitleModules

@@ -182,10 +182,10 @@ class BasicDebugInfoWindow : UICanvas() {
 
         batch.color = Color.WHITE
 
-        if (Terrarum.controller != null) {
+        if (AppLoader.gamepad != null) {
             drawGamepadAxis(batch,
-                    Terrarum.controller!!.getAxisValue(3),
-                    Terrarum.controller!!.getAxisValue(2),
+                    AppLoader.gamepad!!.getAxisValue(3),
+                    AppLoader.gamepad!!.getAxisValue(2),
                     Terrarum.WIDTH - 135,
                     40
             )
@@ -304,8 +304,8 @@ class BasicDebugInfoWindow : UICanvas() {
         val pointDX = axisX * halfW
         val pointDY = axisY * halfH
 
-        val padName = if (Terrarum.controller!!.name.isEmpty()) "Gamepad"
-                      else Terrarum.controller!!.name
+        val padName = if (AppLoader.gamepad!!.name.isEmpty()) "Gamepad"
+                      else AppLoader.gamepad!!.name
 
         blendNormal(batch)
 

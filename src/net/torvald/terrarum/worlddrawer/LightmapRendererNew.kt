@@ -11,6 +11,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.ActorWBMovable
@@ -408,6 +409,7 @@ object LightmapRenderer {
     //private val ambientAccumulator = Color(0f,0f,0f,0f)
     private val lightLevelThis = Color(0f,0f,0f,0f)
     private var thisTerrain = 0
+    private var thisFluid = Fluid.NULL
     private var thisWall = 0
     private val thisTileLuminosity = Color(0f,0f,0f,0f)
     private val thisTileOpacity = Color(0f,0f,0f,0f)
@@ -428,9 +430,13 @@ object LightmapRenderer {
         // this six fetch tasks take 2 ms ?!
         lightLevelThis.set(colourNull)
         thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
+        thisFluid = world.getFluid(x, y).type
         thisWall = world.getTileFromWall(x, y) ?: Block.STONE
-        thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity) // already been div by four
-        thisTileOpacity.set(BlockCodex[thisTerrain].opacity) // already been div by four
+        thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity maxBlend BlockCodex[thisFluid].luminosity) // already been div by four
+
+        // TODO thisTileOpacity: take fluid amount into account
+
+        thisTileOpacity.set(BlockCodex[thisTerrain].opacity maxBlend BlockCodex[thisFluid].opacity) // already been div by four
         thisTileOpacity2.set(thisTileOpacity); thisTileOpacity2.mul(1.41421356f)
         sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
 

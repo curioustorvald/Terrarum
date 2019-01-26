@@ -124,20 +124,20 @@ object Terrarum : Screen {
     val fontGame: GameFontBase = AppLoader.fontGame
     val fontSmallNumbers: TinyAlphNum = AppLoader.fontSmallNumbers
 
-    var joypadLabelStart: Char = 0xE000.toChar() // lateinit
-    var joypadLableSelect: Char = 0xE000.toChar() // lateinit
-    var joypadLabelNinA: Char = 0xE000.toChar() // lateinit TODO
-    var joypadLabelNinB: Char = 0xE000.toChar() // lateinit TODO
-    var joypadLabelNinX: Char = 0xE000.toChar() // lateinit TODO
-    var joypadLabelNinY: Char = 0xE000.toChar() // lateinit TODO
-    var joypadLabelNinL: Char = 0xE000.toChar() // lateinit TODO
-    var joypadLabelNinR: Char = 0xE000.toChar() // lateinit TODO
-    var joypadLabelNinZL: Char = 0xE000.toChar() // lateinit TODO
-    var joypadLabelNinZR: Char = 0xE000.toChar() // lateinit TODO
-    val joypadLabelLEFT = 0xE068.toChar()
-    val joypadLabelDOWN = 0xE069.toChar()
-    val joypadLabelUP = 0xE06A.toChar()
-    val joypadLabelRIGHT = 0xE06B.toChar()
+    var gamepadLabelStart: Char = 0xE000.toChar() // lateinit
+    var gamepadLableSelect: Char = 0xE000.toChar() // lateinit
+    var gamepadLabelNinA: Char = 0xE000.toChar() // lateinit TODO
+    var gamepadLabelNinB: Char = 0xE000.toChar() // lateinit TODO
+    var gamepadLabelNinX: Char = 0xE000.toChar() // lateinit TODO
+    var gamepadLabelNinY: Char = 0xE000.toChar() // lateinit TODO
+    var gamepadLabelNinL: Char = 0xE000.toChar() // lateinit TODO
+    var gamepadLabelNinR: Char = 0xE000.toChar() // lateinit TODO
+    var gamepadLabelNinZL: Char = 0xE000.toChar() // lateinit TODO
+    var gamepadLabelNinZR: Char = 0xE000.toChar() // lateinit TODO
+    val gamepadLabelLEFT = 0xE068.toChar()
+    val gamepadLabelDOWN = 0xE069.toChar()
+    val gamepadLabelUP = 0xE06A.toChar()
+    val gamepadLabelRIGHT = 0xE06B.toChar()
 
     // 0x0 - 0xF: Game-related
     // 0x10 - 0x1F: Config
@@ -159,10 +159,6 @@ object Terrarum : Screen {
 
     val STATE_ID_TOOL_NOISEGEN = 0x200
     val STATE_ID_TOOL_RUMBLE_DIAGNOSIS = 0x201
-
-    var controller: org.lwjgl.input.Controller? = null
-        private set
-    val CONTROLLER_DEADZONE = 0.1f
 
     /** Available CPU threads */
     val THREADS = Runtime.getRuntime().availableProcessors() + 1
@@ -223,12 +219,12 @@ object Terrarum : Screen {
         println("vendor = $processorVendor")
 
 
-        joypadLabelStart = when (getConfigString("joypadlabelstyle")) {
+        gamepadLabelStart = when (getConfigString("gamepadlabelstyle")) {
             "nwii"     -> 0xE04B.toChar() // + mark
             "logitech" -> 0xE05A.toChar() // number 10
             else       -> 0xE042.toChar() // |> mark (sonyps, msxb360, generic)
         }
-        joypadLableSelect = when (getConfigString("joypadlabelstyle")) {
+        gamepadLableSelect = when (getConfigString("gamepadlabelstyle")) {
             "nwii"     -> 0xE04D.toChar() // - mark
             "logitech" -> 0xE059.toChar() // number 9
             "sonyps"   -> 0xE043.toChar() // solid rectangle

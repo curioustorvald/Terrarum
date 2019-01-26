@@ -8,22 +8,22 @@
   "multithread": true,
 
 
-  "joypadkeyn": 4,
-  "joypadkeyw": 1,
-  "joypadkeys": 2,
-  "joypadkeye": 3,
+  "gamepadkeyn": 4,
+  "gamepadkeyw": 1,
+  "gamepadkeys": 2,
+  "gamepadkeye": 3,
 
-  "joypadlup": 4,
-  "joypadrup": 5,
-  "joypadldown": 6,
-  "joypadrdown": 7,
+  "gamepadlup": 4,
+  "gamepadrup": 5,
+  "gamepadldown": 6,
+  "gamepadrdown": 7,
 
-  "joypadlstickx": 0,
-  "joypadlsticky": 1,
-  "joypadrstickx": 2,
-  "joypadrsticky": 3,
+  "gamepadlstickx": 0,
+  "gamepadlsticky": 1,
+  "gamepadrstickx": 2,
+  "gamepadrsticky": 3,
 
-  "joypadlabelstyle": "msxb360",
+  "gamepadlabelstyle": "msxb360",
 
 
   "keyup": 33,
