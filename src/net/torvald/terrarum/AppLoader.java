@@ -24,6 +24,8 @@ import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
+import org.lwjgl.input.Controller;
+import org.lwjgl.input.Controllers;
 
 import java.io.File;
 import java.io.IOException;
@@ -160,6 +162,10 @@ public class AppLoader implements ApplicationListener {
     public static GameFontBase fontGame;
     public static TinyAlphNum fontSmallNumbers;
 
+    /** A gamepad. Multiple gamepads may controll this single virtualised gamepad. */
+    public static org.lwjgl.input.Controller gamepad = null;
+    public static float gamepadDeadzone = 0.1f;
+
     /**
      * For the events depends on rendering frame (e.g. flicker on post-hit invincibility)
      */
@@ -244,14 +250,17 @@ public class AppLoader implements ApplicationListener {
 
     @Override
     public void create() {
+        // set basis of draw
         logoBatch = new SpriteBatch();
         camera = new OrthographicCamera(((float) appConfig.width), ((float) appConfig.height));
 
         initViewPort(appConfig.width, appConfig.height);
 
+        // logo here :p
         logo = new TextureRegion(new Texture(Gdx.files.internal("assets/graphics/logo_placeholder.tga")));
         logo.flip(false, true);
 
+        // set GL graphics constants
         shaderBayerSkyboxFill = loadShader("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag");
         shaderHicolour = loadShader("assets/4096.vert", "assets/hicolour.frag");
         shaderColLUT = loadShader("assets/4096.vert", "assets/passthru.frag");
@@ -263,6 +272,22 @@ public class AppLoader implements ApplicationListener {
                 VertexAttribute.TexCoords(0)
         );
         updateFullscreenQuad(appConfig.width, appConfig.height);
+
+        // enlist suitable gamepads
+        try {
+            Controllers.create();
+
+            printdbg(this, "Available gamepads: " + Controllers.getControllerCount());
+            for (int x = 0; x < Controllers.getControllerCount(); x++) {
+                Controller gamepad = Controllers.getController(x);
+                printdbg(this, String.format("Gamepad #%d: %s", x + 1, gamepad.getName()));
+            }
+        }
+        catch (Throwable e) {
+            printdbg(this, "Exception occured while creating controllers -- there will be no gamepads available.");
+            printdbg(this, e);
+        }
+
     }
 
     /**
@@ -407,7 +432,7 @@ public class AppLoader implements ApplicationListener {
         }
 
         IngameRenderer.INSTANCE.dispose();
-
+        if (Controllers.isCreated()) Controllers.destroy();
 
         // delete temp files
         new File("./tmp_wenquanyi.tga").delete(); // FIXME this is pretty much ad-hoc
@@ -440,6 +465,9 @@ public class AppLoader implements ApplicationListener {
         printdbg(this, "Screen transisiton complete: " + this.screen.getClass().getCanonicalName());
     }
 
+    /**
+     * Init stuffs which needs GL context
+     */
     private void postInit() {
         textureWhiteSquare = new Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"));
         textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);

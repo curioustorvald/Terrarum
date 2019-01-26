@@ -51,9 +51,9 @@ class UIInventoryFull(
             "${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
         else
             "${0xe069.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
-            "${Terrarum.joypadLabelNinY} ${Lang["GAME_INVENTORY_USE"]}$SP" +
+            "${Terrarum.gamepadLabelNinY} ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "${0xe011.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
-            "${Terrarum.joypadLabelNinA} ${Lang["GAME_INVENTORY_DROP"]}"
+            "${Terrarum.gamepadLabelNinA} ${Lang["GAME_INVENTORY_DROP"]}"
     val controlHelpHeight = Terrarum.fontGame.lineHeight
 
     private var encumbrancePerc = 0f

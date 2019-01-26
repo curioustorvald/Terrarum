@@ -118,7 +118,7 @@ object Lang {
 
         // special treatment
         if (key.startsWith("MENU_LABEL_PRESS_START_SYMBOL"))
-            return ret2.replace('>', Terrarum.joypadLabelStart).capitalize()
+            return ret2.replace('>', Terrarum.gamepadLabelStart).capitalize()
 
         return if (key.getEndTag().contains("bg"))
             "${AppLoader.fontGame.charsetOverrideBulgarian}${ret2.capitalize()}${AppLoader.fontGame.charsetOverrideDefault}"

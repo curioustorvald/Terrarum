@@ -28,22 +28,22 @@ object DefaultConfig {
 
 
         // control-gamepad
-        jsonObject.addProperty("joypadkeyn", 4)
-        jsonObject.addProperty("joypadkeyw", 1)
-        jsonObject.addProperty("joypadkeys", 2)
-        jsonObject.addProperty("joypadkeye", 3) // logitech indices
+        jsonObject.addProperty("gamepadkeyn", 4)
+        jsonObject.addProperty("gamepadkeyw", 1)
+        jsonObject.addProperty("gamepadkeys", 2)
+        jsonObject.addProperty("gamepadkeye", 3) // logitech indices
 
-        jsonObject.addProperty("joypadlup", 4)
-        jsonObject.addProperty("joypadrup", 5)
-        jsonObject.addProperty("joypadldown", 6)
-        jsonObject.addProperty("joypadrdown", 7) // logitech indices
+        jsonObject.addProperty("gamepadlup", 4)
+        jsonObject.addProperty("gamepadrup", 5)
+        jsonObject.addProperty("gamepadldown", 6)
+        jsonObject.addProperty("gamepadrdown", 7) // logitech indices
 
-        jsonObject.addProperty("joypadlstickx", 0)
-        jsonObject.addProperty("joypadlsticky", 1)
-        jsonObject.addProperty("joypadrstickx", 2)
-        jsonObject.addProperty("joypadrsticky", 3) // 0-1-2-3 but sometimes 3-2-1-0 ?! what the actual fuck?
+        jsonObject.addProperty("gamepadlstickx", 0)
+        jsonObject.addProperty("gamepadlsticky", 1)
+        jsonObject.addProperty("gamepadrstickx", 2)
+        jsonObject.addProperty("gamepadrsticky", 3) // 0-1-2-3 but sometimes 3-2-1-0 ?! what the actual fuck?
 
-        jsonObject.addProperty("joypadlabelstyle", "msxb360") // "nwii", "logitech", "sonyps", "msxb360", "generic"
+        jsonObject.addProperty("gamepadlabelstyle", "msxb360") // "nwii", "logitech", "sonyps", "msxb360", "generic"
 
 
 

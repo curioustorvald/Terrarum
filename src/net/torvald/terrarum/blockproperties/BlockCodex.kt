@@ -1,6 +1,8 @@
 package net.torvald.terrarum.blockproperties
 
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.gameworld.FluidType
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.utils.CSVFetcher
@@ -69,6 +71,19 @@ object BlockCodex {
         }
         catch (e: NullPointerException) {
             throw NullPointerException("Blockprop with raw id $rawIndex does not exist.")
+        }
+    }
+
+    operator fun get(fluidType: FluidType?): BlockProp {
+        if (fluidType == null || fluidType.value == 0) {
+            return blockProps[Block.AIR]
+        }
+
+        try {
+            return blockProps[fluidType.abs() + GameWorld.TILES_SUPPORTED - 1]
+        }
+        catch (e: NullPointerException) {
+            throw NullPointerException("Blockprop with raw id $fluidType does not exist.")
         }
     }
 

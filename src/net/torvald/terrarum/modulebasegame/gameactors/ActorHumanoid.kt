@@ -225,20 +225,20 @@ open class ActorHumanoid(
             isRightDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyright"))
             isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump"))
 
-            if (Terrarum.controller != null) {
-                axisX =  Terrarum.controller!!.getAxisValue(AppLoader.getConfigInt("joypadlstickx"))
-                axisY =  Terrarum.controller!!.getAxisValue(AppLoader.getConfigInt("joypadlsticky"))
-                axisRX = Terrarum.controller!!.getAxisValue(AppLoader.getConfigInt("joypadrstickx"))
-                axisRY = Terrarum.controller!!.getAxisValue(AppLoader.getConfigInt("joypadrsticky"))
+            if (AppLoader.gamepad != null) {
+                axisX =  AppLoader.gamepad!!.getAxisValue(AppLoader.getConfigInt("gamepadlstickx"))
+                axisY =  AppLoader.gamepad!!.getAxisValue(AppLoader.getConfigInt("gamepadlsticky"))
+                axisRX = AppLoader.gamepad!!.getAxisValue(AppLoader.getConfigInt("gamepadrstickx"))
+                axisRY = AppLoader.gamepad!!.getAxisValue(AppLoader.getConfigInt("gamepadrsticky"))
 
                 // deadzonning
-                if (Math.abs(axisX) < Terrarum.CONTROLLER_DEADZONE) axisX = 0f
-                if (Math.abs(axisY) < Terrarum.CONTROLLER_DEADZONE) axisY = 0f
-                if (Math.abs(axisRX) < Terrarum.CONTROLLER_DEADZONE) axisRX = 0f
-                if (Math.abs(axisRY) < Terrarum.CONTROLLER_DEADZONE) axisRY = 0f
+                if (Math.abs(axisX) < AppLoader.gamepadDeadzone) axisX = 0f
+                if (Math.abs(axisY) < AppLoader.gamepadDeadzone) axisY = 0f
+                if (Math.abs(axisRX) < AppLoader.gamepadDeadzone) axisRX = 0f
+                if (Math.abs(axisRY) < AppLoader.gamepadDeadzone) axisRY = 0f
 
                 isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump")) ||
-                             Terrarum.controller!!.isButtonPressed(GAMEPAD_JUMP)
+                             AppLoader.gamepad!!.isButtonPressed(GAMEPAD_JUMP)
             }
         }
         else {
@@ -250,7 +250,7 @@ open class ActorHumanoid(
     }
 
     private inline val hasController: Boolean
-        get() = if (isGamer) Terrarum.controller != null
+        get() = if (isGamer) AppLoader.gamepad != null
                 else true
     
     private fun processInput(delta: Float) {
@@ -384,7 +384,7 @@ open class ActorHumanoid(
      *
      * Be warned.
      *
-     * @param left (even if the game is joypad controlled, you must give valid value)
+     * @param left (even if the game is gamepad controlled, you must give valid value)
      * @param absAxisVal (set AXIS_KEYBOARD if keyboard controlled)
      * @author minjaesong
      */
@@ -424,7 +424,7 @@ open class ActorHumanoid(
 
     /**
 
-     * @param up (even if the game is joypad controlled, you must give valid value)
+     * @param up (even if the game is gamepad controlled, you must give valid value)
      * *
      * @param absAxisVal (set AXIS_KEYBOARD if keyboard controlled)
      */
