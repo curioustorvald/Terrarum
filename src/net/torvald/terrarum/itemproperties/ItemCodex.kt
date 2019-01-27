@@ -192,11 +192,37 @@ object ItemCodex {
 
             override fun startSecondaryUse(delta: Float): Boolean {
                 val ingame = Terrarum.ingame!! as Ingame // must be in here
-                ingame.world.setFluid(Terrarum.mouseTileX, Terrarum.mouseTileY, Fluid.WATER, 1f)
+                ingame.world.setFluid(Terrarum.mouseTileX, Terrarum.mouseTileY, Fluid.WATER, 4f)
                 return true
             }
         }
 
+
+        // test lava bucket
+        itemCodex[9001] = object : GameItem() {
+            override var dynamicID: ItemID = 9001
+            override val originalID: ItemID = 9001
+
+            override val isUnique: Boolean = true
+            override val originalName: String = "Infinite Lava Bucket"
+
+            override var baseMass: Double = 1000.0
+            override var baseToolSize: Double? = null
+
+            override var inventoryCategory: String = "tool"
+            override var stackable: Boolean = false
+
+            override val isDynamic: Boolean = false
+            override val material: Material = Material(1,1,1,1,1,1,1,1,1,1.0)
+
+            override val equipPosition: Int = EquipPosition.HAND_GRIP
+
+            override fun startSecondaryUse(delta: Float): Boolean {
+                val ingame = Terrarum.ingame!! as Ingame // must be in here
+                ingame.world.setFluid(Terrarum.mouseTileX, Terrarum.mouseTileY, Fluid.LAVA, 4f)
+                return true
+            }
+        }
 
 
         // read from save (if applicable) and fill dynamicItemDescription

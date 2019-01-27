@@ -23,7 +23,7 @@ class PickaxeGeneric(override val originalID: ItemID) : GameItem() {
     override var stackable = true
     override var maxDurability = 147
     override var durability = maxDurability.toFloat()
-    override val equipPosition = 9
+    override val equipPosition = GameItem.EquipPosition.HAND_GRIP
     override var inventoryCategory = Category.TOOL
     override val isUnique = false
     override val isDynamic = true
@@ -47,10 +47,10 @@ class PickaxeGeneric(override val originalID: ItemID) : GameItem() {
 
         // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
         // return false if hitting actors
-        Terrarum.ingame!!.actorContainer.forEach({
+        Terrarum.ingame!!.actorContainer.forEach {
             if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
                 return false
-        })
+        }
 
         // return false if here's no tile
         if (Block.AIR == (Terrarum.ingame!!.world).getTileFromTerrain(mouseTileX, mouseTileY))
