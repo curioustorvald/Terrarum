@@ -407,14 +407,15 @@ object LightmapRenderer {
 
 
     //private val ambientAccumulator = Color(0f,0f,0f,0f)
-    private val lightLevelThis = Color(0f,0f,0f,0f)
+    private val lightLevelThis = Color(0)
     private var thisTerrain = 0
-    private var thisFluid = Fluid.NULL
+    private var thisFluid = GameWorld.FluidInfo(Fluid.NULL, 0f)
+    private val fluidAmountToCol = Color(0)
     private var thisWall = 0
-    private val thisTileLuminosity = Color(0f,0f,0f,0f)
-    private val thisTileOpacity = Color(0f,0f,0f,0f)
-    private val thisTileOpacity2 = Color(0f,0f,0f,0f) // thisTileOpacity * sqrt(2)
-    private val sunLight = Color(0f,0f,0f,0f)
+    private val thisTileLuminosity = Color(0)
+    private val thisTileOpacity = Color(0)
+    private val thisTileOpacity2 = Color(0) // thisTileOpacity * sqrt(2)
+    private val sunLight = Color(0)
 
 
     /**
@@ -422,8 +423,12 @@ object LightmapRenderer {
      */
     private fun calculate(x: Int, y: Int): Color {
 
+        // TODO is JEP 338 released yet?
+
+
         // TODO if we only use limited set of operations (max, mul, sub) then int-ify should be possible.
         // 0xiiii_ffff, 65536 for 1.0
+        // Tested it, no perf gain :(
 
         // O(9n) == O(n) where n is a size of the map
         // TODO devise multithreading on this
@@ -433,20 +438,21 @@ object LightmapRenderer {
         // this six fetch tasks take 2 ms ?!
         lightLevelThis.set(colourNull)
         thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
-        thisFluid = world.getFluid(x, y).type
+        thisFluid = world.getFluid(x, y)
         thisWall = world.getTileFromWall(x, y) ?: Block.STONE
 
-        if (thisFluid != Fluid.NULL) {
+        if (thisFluid.type != Fluid.NULL) {
+            fluidAmountToCol.set(thisFluid.amount, thisFluid.amount, thisFluid.amount, thisFluid.amount)
+
             thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity)
-            thisTileLuminosity.maxAndAssign(BlockCodex[thisFluid].luminosity) // already been div by four
+            thisTileLuminosity.maxAndAssign(BlockCodex[thisFluid.type].luminosity mul fluidAmountToCol) // already been div by four
             thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
-            thisTileOpacity.maxAndAssign(BlockCodex[thisFluid].opacity) // already been div by four
+            thisTileOpacity.maxAndAssign(BlockCodex[thisFluid.type].opacity mul fluidAmountToCol) // already been div by four
         }
         else {
             thisTileLuminosity.set(BlockCodex[thisTerrain].luminosity)
             thisTileOpacity.set(BlockCodex[thisTerrain].opacity)
         }
-        // TODO thisTileOpacity: take fluid amount into account
 
         thisTileOpacity2.set(thisTileOpacity); thisTileOpacity2.mul(1.41421356f)
         sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
@@ -480,7 +486,7 @@ object LightmapRenderer {
         /* * */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x + 1, y) ?: colourNull, thisTileOpacity))
 
 
-        return lightLevelThis.cpy() // it HAS to be a cpy()
+        return lightLevelThis.cpy() // it HAS to be a cpy(), otherwise all cells gets the same instance
     }
 
     private fun getLightForOpaque(x: Int, y: Int): Color? { // ...so that they wouldn't appear too dark
@@ -542,20 +548,6 @@ object LightmapRenderer {
                 lightBuffer.drawPixel(x - this_x_start, lightBuffer.height - 1 - y + this_y_start) // flip Y
             }
         }
-        //println()
-
-        // FIXME FUCKS SAKE: this_y_start is sometimes fixed at zero, which fucked old light sys with black screen
-        //  -> recalculate event not being fired
-
-
-        // so this code actually works now...
-        /*for (y in 0 until lightBuffer.height) {
-            for (x in 0 until lightBuffer.width) {
-                val rnd = Math.random().toFloat()
-                lightBuffer.setColor(Color(rnd, rnd, rnd, 1f))
-                lightBuffer.drawPixel(x, y)
-            }
-        }*/
 
 
         // draw to the batch

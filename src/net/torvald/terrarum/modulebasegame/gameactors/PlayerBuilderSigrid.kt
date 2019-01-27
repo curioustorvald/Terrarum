@@ -99,5 +99,6 @@ object PlayerBuilderSigrid {
         walls.forEach { inventory.add(it + 4096, 9995) }
         inventory.add(ItemCodex.ITEM_STATIC.first)
         inventory.add(9000)
+        inventory.add(9001)
     }
 }
