@@ -36,7 +36,6 @@ import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.system.measureNanoTime
 
 
 /**
@@ -387,7 +386,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         LightmapRenderer.fireRecalculateEvent()
 
 
-        AppLoader.debugTimers["Ingame.updateCounter"] = 0
+        AppLoader.setDebugTime("Ingame.updateCounter", 0)
 
 
 
@@ -457,18 +456,19 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         var i = 0L
         while (updateAkku >= delta) {
-            AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
+            AppLoader.measureDebugTime("Ingame.update") { updateGame(delta) }
             updateAkku -= delta
             i += 1
         }
-        AppLoader.debugTimers["Ingame.updateCounter"] = i
+        AppLoader.setDebugTime("Ingame.updateCounter", i)
 
 
 
         /** RENDER CODE GOES HERE */
-        AppLoader.debugTimers["Ingame.render"] = measureNanoTime { renderGame() }
-        AppLoader.debugTimers["Ingame.render-Light"] =
+        AppLoader.measureDebugTime("Ingame.render") { renderGame() }
+        AppLoader.setDebugTime("Ingame.render-Light",
                 (AppLoader.debugTimers["Ingame.render"] as Long) - ((AppLoader.debugTimers["Renderer.LightTotal"] as? Long) ?: 0)
+        )
 
     }
 

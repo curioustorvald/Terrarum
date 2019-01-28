@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Matrix4
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import kotlin.system.measureNanoTime
 
 /**
  * Must be called by the App Loader
@@ -52,7 +51,7 @@ object PostProcessor {
 
 
 
-        AppLoader.debugTimers["Renderer.PostProcessor"] = measureNanoTime {
+        AppLoader.measureDebugTime("Renderer.PostProcessor") {
 
             gdxClearAndSetBlend(.094f, .094f, .094f, 0f)
 

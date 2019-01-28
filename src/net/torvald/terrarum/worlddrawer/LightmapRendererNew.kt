@@ -1,11 +1,10 @@
 package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
@@ -16,10 +15,11 @@ import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Luminous
+import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
+import net.torvald.terrarum.realestate.LandUtil
 import java.util.concurrent.atomic.AtomicReferenceArray
-import kotlin.system.measureNanoTime
 
 /**
  * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
@@ -37,6 +37,8 @@ import kotlin.system.measureNanoTime
 object LightmapRenderer {
 
     private var world: GameWorld = GameWorld.makeNullWorld()
+    private lateinit var lightCalcShader: ShaderProgram
+    private val SHADER_LIGHTING = AppLoader.getConfigBoolean("gpulightcalc")
 
     /** do not call this yourself! Let your game renderer handle this! */
     fun setWorld(world: GameWorld) {
@@ -70,10 +72,6 @@ object LightmapRenderer {
     val overscan_open: Int = 32
     val overscan_opaque: Int = 8
 
-    init {
-        printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
-    }
-
     // TODO resize(int, int) -aware
 
     val LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.WIDTH)
@@ -86,8 +84,70 @@ object LightmapRenderer {
      */
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
     //private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
-    private var lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0f,0f,0f,0f) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
-    private val lanternMap = HashMap<Point2i, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+    private val lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0f,0f,0f,0f) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
+    private val lanternMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
+
+    private lateinit var texturedLightMap: FrameBuffer
+    private lateinit var texturedLightMapOutput: Pixmap
+    private lateinit var texturedLightSources: Texture
+    private lateinit var texturedShadeSources: Texture
+    private lateinit var texturedLightSourcePixmap: Pixmap // used to turn tiles into texture
+    private lateinit var texturedShadeSourcePixmap: Pixmap // used to turn tiles into texture
+    private lateinit var texturedLightQuad: Mesh
+    private lateinit var texturedLightCamera: OrthographicCamera
+    private lateinit var texturedLightBatch: SpriteBatch
+
+    private const val LIGHTMAP_UNIT = 1
+    private const val SHADEMAP_UNIT = 0
+
+    init {
+        printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
+
+        if (SHADER_LIGHTING) {
+            lightCalcShader = AppLoader.loadShader("assets/4096.vert", "assets/raytracelight.frag")
+            lightCalcShader.setUniformf("outSize", LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat())
+            lightCalcShader.setUniformi("shades", SHADEMAP_UNIT)
+            lightCalcShader.setUniformi("lights", LIGHTMAP_UNIT)
+            lightCalcShader.setUniformi("u_texture", 0)
+
+            texturedLightMap = FrameBuffer(Pixmap.Format.RGBA8888, LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, false)
+            //texturedLightMap = Texture(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
+            //texturedLightMap.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
+            texturedLightMapOutput = Pixmap(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
+
+            texturedLightSources = Texture(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
+            texturedLightSources.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
+            texturedShadeSources = Texture(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
+            texturedShadeSources.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
+            texturedLightSourcePixmap = Pixmap(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
+            texturedLightSourcePixmap.blending = Pixmap.Blending.None
+            texturedShadeSourcePixmap = Pixmap(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
+            texturedShadeSourcePixmap.blending = Pixmap.Blending.None
+
+            texturedLightQuad = Mesh(
+                    true, 4, 6,
+                    VertexAttribute.Position(),
+                    VertexAttribute.ColorUnpacked(),
+                    VertexAttribute.TexCoords(0)
+            )
+            texturedLightQuad.setVertices(floatArrayOf(
+                    0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
+                    LIGHTMAP_WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
+                    LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
+                    0f, LIGHTMAP_HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f))
+            texturedLightQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+
+            texturedLightCamera = OrthographicCamera(LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat())
+            texturedLightCamera.setToOrtho(true)
+            texturedLightCamera.update()
+
+            texturedLightBatch = SpriteBatch(8, lightCalcShader)
+
+        }
+    }
 
     private val AIR = Block.AIR
 
@@ -202,132 +262,189 @@ object LightmapRenderer {
 
         //println("$for_x_start..$for_x_end, $for_x\t$for_y_start..$for_y_end, $for_y")
 
-        /**
-         * Updating order:
-         * ,--------.   ,--+-----.   ,-----+--.   ,--------. -
-         * |↘       |   |  |    3|   |3    |  |   |       ↙| ↕︎ overscan_open / overscan_opaque
-         * |  ,-----+   |  |  2  |   |  2  |  |   +-----.  | - depending on the noop_mask
-         * |  |1    |   |  |1    |   |    1|  |   |    1|  |
-         * |  |  2  |   |  `-----+   +-----'  |   |  2  |  |
-         * |  |    3|   |↗       |   |       ↖|   |3    |  |
-         * `--+-----'   `--------'   `--------'   `-----+--'
-         * round:   1            2            3            4
-         * for all lightmap[y][x], run in this order: 2-3-4-1-2
-         *     If you run only 4 sets, orthogonal/diagonal artefacts are bound to occur,
-         * it seems 5-pass is mandatory
-         */
-
-        AppLoader.debugTimers["Renderer.Lanterns"] = measureNanoTime {
+        AppLoader.measureDebugTime("Renderer.Lanterns") {
             buildLanternmap()
         } // usually takes 3000 ns
 
+        if (!SHADER_LIGHTING) {
+            /**
+             * Updating order:
+             * ,--------.   ,--+-----.   ,-----+--.   ,--------. -
+             * |↘       |   |  |    3|   |3    |  |   |       ↙| ↕︎ overscan_open / overscan_opaque
+             * |  ,-----+   |  |  2  |   |  2  |  |   +-----.  | - depending on the noop_mask
+             * |  |1    |   |  |1    |   |    1|  |   |    1|  |
+             * |  |  2  |   |  `-----+   +-----'  |   |  2  |  |
+             * |  |    3|   |↗       |   |       ↖|   |3    |  |
+             * `--+-----'   `--------'   `--------'   `-----+--'
+             * round:   1            2            3            4
+             * for all lightmap[y][x], run in this order: 2-3-4-1-2
+             *     If you run only 4 sets, orthogonal/diagonal artefacts are bound to occur,
+             * it seems 5-pass is mandatory
+             */
 
-        // wipe out lightmap
-        AppLoader.debugTimers["Renderer.Light0"] = measureNanoTime {
-            //for (ky in 0 until lightmap.size) for (kx in 0 until lightmap[0].size) lightmap[ky][kx] = colourNull
-            for (k in 0 until lightmap.size) lightmap[k] = colourNull
-            // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
-            // but the performance boost is measly 0.1 ms on 6700K
-        }
-        // O((5*9)n) == O(n) where n is a size of the map.
-        // Because of inevitable overlaps on the area, it only works with MAX blend
+
+            // wipe out lightmap
+            AppLoader.measureDebugTime("Renderer.Light0") {
+                //for (ky in 0 until lightmap.size) for (kx in 0 until lightmap[0].size) lightmap[ky][kx] = colourNull
+                for (k in 0 until lightmap.size) lightmap[k] = colourNull
+                // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
+                // but the performance boost is measly 0.1 ms on 6700K
+            }
+            // O((5*9)n) == O(n) where n is a size of the map.
+            // Because of inevitable overlaps on the area, it only works with MAX blend
 
 
-        // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
+            // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
 
-        if (!AppLoader.getConfigBoolean("multithreadedlight")) {
-            //val workMap = Array(lightmap.size) { colourNull }
+            if (!AppLoader.getConfigBoolean("multithreadedlight")) {
+                //val workMap = Array(lightmap.size) { colourNull }
 
-            // The skipping is dependent on how you get ambient light,
-            // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
+                // The skipping is dependent on how you get ambient light,
+                // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
 
-            // FIXME theoretically skipping shouldn't work (light can be anywhere on the screen, not just centre
-            //       but how does it actually work ?!?!?!!?!?!?!?
-            //         because things are filled in subsequent frames ?
-            //         because of not wiping out prev map ! (if pass=1 also calculates ambience, was disabled to not have to wipe out)
+                // FIXME theoretically skipping shouldn't work (light can be anywhere on the screen, not just centre
+                //       but how does it actually work ?!?!?!!?!?!?!?
+                //         because things are filled in subsequent frames ?
+                //         because of not wiping out prev map ! (if pass=1 also calculates ambience, was disabled to not have to wipe out)
 
-            // Round 2
-            AppLoader.debugTimers["Renderer.Light1"] = measureNanoTime {
-                for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_start - overscan_open..for_x_end) {
-                        setLightOf(lightmap, x, y, calculate(x, y))
+                // Round 2
+                AppLoader.measureDebugTime("Renderer.Light1") {
+                    for (y in for_y_end + overscan_open downTo for_y_start) {
+                        for (x in for_x_start - overscan_open..for_x_end) {
+                            setLightOf(lightmap, x, y, calculate(x, y))
+                        }
                     }
                 }
-            }
 
-            // Round 3
-            AppLoader.debugTimers["Renderer.Light2"] = measureNanoTime {
-                for (y in for_y_end + overscan_open downTo for_y_start) {
-                    for (x in for_x_end + overscan_open downTo for_x_start) {
-                        setLightOf(lightmap, x, y, calculate(x, y))
+                // Round 3
+                AppLoader.measureDebugTime("Renderer.Light2") {
+                    for (y in for_y_end + overscan_open downTo for_y_start) {
+                        for (x in for_x_end + overscan_open downTo for_x_start) {
+                            setLightOf(lightmap, x, y, calculate(x, y))
+                        }
                     }
                 }
-            }
 
-            // Round 4
-            AppLoader.debugTimers["Renderer.Light3"] = measureNanoTime {
-                for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_end + overscan_open downTo for_x_start) {
-                        setLightOf(lightmap, x, y, calculate(x, y))
+                // Round 4
+                AppLoader.measureDebugTime("Renderer.Light3") {
+                    for (y in for_y_start - overscan_open..for_y_end) {
+                        for (x in for_x_end + overscan_open downTo for_x_start) {
+                            setLightOf(lightmap, x, y, calculate(x, y))
+                        }
                     }
                 }
-            }
 
-            // Round 1
-            AppLoader.debugTimers["Renderer.Light4"] = measureNanoTime {
-                for (y in for_y_start - overscan_open..for_y_end) {
-                    for (x in for_x_start - overscan_open..for_x_end) {
-                        setLightOf(lightmap, x, y, calculate(x, y))
+                // Round 1
+                AppLoader.measureDebugTime("Renderer.Light4") {
+                    for (y in for_y_start - overscan_open..for_y_end) {
+                        for (x in for_x_start - overscan_open..for_x_end) {
+                            setLightOf(lightmap, x, y, calculate(x, y))
+                        }
                     }
                 }
+
+                AppLoader.addDebugTime("Renderer.LightTotal",
+                        "Renderer.Light1",
+                        "Renderer.Light2",
+                        "Renderer.Light3",
+                        "Renderer.Light4",
+                        "Renderer.Light0"
+                )
             }
+            else if (world.worldIndex != -1) { // to avoid updating on the null world
+                val buf = AtomicReferenceArray<Color>(lightmap.size)
 
-            AppLoader.debugTimers["Renderer.LightTotal"] =
-                    (AppLoader.debugTimers["Renderer.Light1"]!! as Long) +
-                    (AppLoader.debugTimers["Renderer.Light2"]!! as Long) +
-                    (AppLoader.debugTimers["Renderer.Light3"]!! as Long) +
-                    (AppLoader.debugTimers["Renderer.Light4"]!! as Long) +
-                    (AppLoader.debugTimers["Renderer.Light0"]!! as Long)
-        }
-        else if (world.worldIndex != -1) { // to avoid updating on the null world
-            val buf = AtomicReferenceArray<Color>(lightmap.size)
+                AppLoader.measureDebugTime("Renderer.LightPrlPre") {
+                    // update the content of buf using maxBlend -- it's not meant for overwrite
 
-            AppLoader.debugTimers["Renderer.LightPrlPre"] = measureNanoTime {
-                // update the content of buf using maxBlend -- it's not meant for overwrite
+                    updateMessages.forEachIndexed { index, msg ->
+                        ThreadParallel.map(index, "Light") {
+                            // for the message slices...
+                            msg.forEach { m ->
+                                // update the content of buf using maxBlend -- it's not meant for overwrite
+                                buf.getAndUpdate(m.y * LIGHTMAP_WIDTH + m.x) { oldCol ->
+                                    val ux = m.x + for_x_start - overscan_open
+                                    val uy = m.y + for_y_start - overscan_open
 
-                updateMessages.forEachIndexed { index, msg ->
-                    ThreadParallel.map(index, "Light") {
-                        // for the message slices...
-                        msg.forEach { m ->
-                            // update the content of buf using maxBlend -- it's not meant for overwrite
-                            buf.getAndUpdate(m.y * LIGHTMAP_WIDTH + m.x) { oldCol ->
-                                val ux = m.x + for_x_start - overscan_open
-                                val uy = m.y + for_y_start - overscan_open
-
-                                (oldCol ?: colourNull) maxBlend calculate(ux, uy)
+                                    (oldCol ?: colourNull) maxBlend calculate(ux, uy)
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            AppLoader.debugTimers["Renderer.LightPrlRun"] = measureNanoTime {
-                ThreadParallel.startAllWaitForDie()
-            }
-
-            AppLoader.debugTimers["Renderer.LightPrlPost"] = measureNanoTime {
-                // copy to lightmap
-                for (k in 0 until lightmap.size) {
-                    lightmap[k] = buf.getPlain(k) ?: colourNull
+                AppLoader.measureDebugTime("Renderer.LightPrlRun") {
+                    ThreadParallel.startAllWaitForDie()
                 }
-            }
 
-            AppLoader.debugTimers["Renderer.LightTotal"] =
-                    (AppLoader.debugTimers["Renderer.LightPrlPre"]!! as Long) +
-                    (AppLoader.debugTimers["Renderer.LightPrlRun"]!! as Long) +
-                    (AppLoader.debugTimers["Renderer.LightPrlPost"]!! as Long)
+                AppLoader.measureDebugTime("Renderer.LightPrlPost") {
+                    // copy to lightmap
+                    for (k in 0 until lightmap.size) {
+                        lightmap[k] = buf.getPlain(k) ?: colourNull
+                    }
+                }
+
+                AppLoader.addDebugTime("Renderer.LightTotal",
+                        "Renderer.LightPrlPre",
+                        "Renderer.LightPrlRun",
+                        "Renderer.LightPrlPost"
+                )
+            }
+        }
+        else {
+            AppLoader.measureDebugTime("Renderer.LightGPU") {
+
+                // prepare necessary textures (lightmap, shademap) for the input.
+                for (ty in 0 until LIGHTMAP_HEIGHT) {
+                    for (tx in 0 until LIGHTMAP_WIDTH) {
+                        val wx = tx + for_x_start - overscan_open
+                        val wy = ty + for_y_start - overscan_open
+
+                        // Several variables will be altered by this. See its documentation.
+                        getLightsAndShades(wx, wy)
+
+                        texturedLightSourcePixmap.drawPixel(tx, ty, lightLevelThis.toIntBits())
+                        texturedShadeSourcePixmap.drawPixel(tx, ty, thisTileOpacity.toIntBits())
+
+
+
+                        if (wy in for_y_start..for_y_end && wx in for_x_start..for_x_end) {
+                            texturedLightSourcePixmap.drawPixel(tx, ty, 0x00FFFFFF)
+                        }
+                        else {
+                            texturedLightSourcePixmap.drawPixel(tx, ty, 0xFF000000.toInt())
+                        }
+                    }
+                }
+
+                texturedLightSources.dispose()
+                texturedLightSources = Texture(texturedLightSourcePixmap)
+
+                texturedShadeSources.dispose()
+                texturedShadeSources = Texture(texturedShadeSourcePixmap)
+
+
+                texturedLightMap.inAction(texturedLightCamera, null) {
+                    gdxClearAndSetBlend(0f,0f,0f,0f)
+
+                    texturedLightSources.bind(LIGHTMAP_UNIT)
+                    texturedShadeSources.bind(SHADEMAP_UNIT)
+
+                    lightCalcShader.begin()
+                    lightCalcShader.setUniformMatrix("u_projTrans", texturedLightCamera.combined)
+                    texturedLightQuad.render(lightCalcShader, GL20.GL_TRIANGLES)
+                    lightCalcShader.end()
+                }
+
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+
+
+            }
         }
     }
+
+
+
 
     // TODO re-init at every resize
     private lateinit var updateMessages: List<Array<ThreadedLightmapUpdateMessage>>
@@ -392,10 +509,11 @@ object LightmapRenderer {
 
                                 val normalisedColor = it.color.cpy().mul(DIV_FLOAT)
 
-                                lanternMap[Point2i(x, y)] = normalisedColor
+                                lanternMap[LandUtil.getBlockAddr(world, x, y)] = normalisedColor
+                                //lanternMap[Point2i(x, y)] = normalisedColor
                                 // Q&D fix for Roundworld anomaly
-                                lanternMap[Point2i(x + world.width, y)] = normalisedColor
-                                lanternMap[Point2i(x - world.width, y)] = normalisedColor
+                                //lanternMap[Point2i(x + world.width, y)] = normalisedColor
+                                //lanternMap[Point2i(x - world.width, y)] = normalisedColor
                             }
                         }
                     }
@@ -417,25 +535,18 @@ object LightmapRenderer {
     private val thisTileOpacity2 = Color(0) // thisTileOpacity * sqrt(2)
     private val sunLight = Color(0)
 
-
     /**
-     * Calculates the light simulation, using main lightmap as one of the input.
+     * This function will alter following variables:
+     * - lightLevelThis
+     * - thisTerrain
+     * - thisFluid
+     * - thisWall
+     * - thisTileLuminosity
+     * - thisTileOpacity
+     * - thisTileOpacity2
+     * - sunlight
      */
-    private fun calculate(x: Int, y: Int): Color {
-
-        // TODO is JEP 338 released yet?
-
-
-        // TODO if we only use limited set of operations (max, mul, sub) then int-ify should be possible.
-        // 0xiiii_ffff, 65536 for 1.0
-        // Tested it, no perf gain :(
-
-        // O(9n) == O(n) where n is a size of the map
-        // TODO devise multithreading on this
-
-        //ambientAccumulator.set(0f,0f,0f,0f)
-
-        // this six fetch tasks take 2 ms ?!
+    private fun getLightsAndShades(x: Int, y: Int) {
         lightLevelThis.set(colourNull)
         thisTerrain = world.getTileFromTerrain(x, y) ?: Block.STONE
         thisFluid = world.getFluid(x, y)
@@ -464,7 +575,26 @@ object LightmapRenderer {
         }
 
         // blend lantern
-        lightLevelThis.maxAndAssign(thisTileLuminosity).maxAndAssign(lanternMap[Point2i(x, y)] ?: colourNull)
+        lightLevelThis.maxAndAssign(thisTileLuminosity).maxAndAssign(lanternMap[LandUtil.getBlockAddr(world, x, y)] ?: colourNull)
+
+    }
+
+    /**
+     * Calculates the light simulation, using main lightmap as one of the input.
+     */
+    private fun calculate(x: Int, y: Int): Color {
+
+        // TODO is JEP 338 released yet?
+
+
+        // TODO if we only use limited set of operations (max, mul, sub) then int-ify should be possible.
+        // 0xiiii_ffff, 65536 for 1.0
+        // Tested it, no perf gain :(
+
+        // O(9n) == O(n) where n is a size of the map
+        // TODO devise multithreading on this
+
+        getLightsAndShades(x, y)
 
         // calculate ambient
         /*  + * +  0 4 1
@@ -519,49 +649,57 @@ object LightmapRenderer {
 
     internal fun draw(batch: SpriteBatch) {
 
-        val this_x_start = for_x_start// + overscan_open
-        val this_x_end = for_x_end// + overscan_open
-        val this_y_start = for_y_start// + overscan_open
-        val this_y_end = for_y_end// + overscan_open
+        // when shader is not used: 0.5 ms on 6700K
+        AppLoader.measureDebugTime("Renderer.LightToScreen") {
 
-        // wipe out beforehand. You DO need this
-        lightBuffer.blending = Pixmap.Blending.None // gonna overwrite (remove this line causes the world to go bit darker)
-        lightBuffer.setColor(colourNull)
-        lightBuffer.fill()
+            val this_x_start = for_x_start// + overscan_open
+            val this_x_end = for_x_end// + overscan_open
+            val this_y_start = for_y_start// + overscan_open
+            val this_y_end = for_y_end// + overscan_open
+
+            // wipe out beforehand. You DO need this
+            if (!SHADER_LIGHTING) {
+                lightBuffer.blending = Pixmap.Blending.None // gonna overwrite (remove this line causes the world to go bit darker)
+                lightBuffer.setColor(colourNull)
+                lightBuffer.fill()
 
 
-        // write to colour buffer
-        for (y in this_y_start..this_y_end) {
-            //println("y: $y, this_y_start: $this_y_start")
-            if (y == this_y_start && this_y_start == 0) {
-                //throw Error("Fuck hits again...")
+                // write to colour buffer
+                for (y in this_y_start..this_y_end) {
+                    //println("y: $y, this_y_start: $this_y_start")
+                    if (y == this_y_start && this_y_start == 0) {
+                        //throw Error("Fuck hits again...")
+                    }
+
+                    for (x in this_x_start..this_x_end) {
+
+                        val color = (getLightForOpaque(x, y) ?: Color(0f, 0f, 0f, 0f)).normaliseToHDR()
+
+                        lightBuffer.setColor(color)
+
+                        //lightBuffer.drawPixel(x - this_x_start, y - this_y_start)
+
+                        lightBuffer.drawPixel(x - this_x_start, lightBuffer.height - 1 - y + this_y_start) // flip Y
+                    }
+                }
+
+
+                // draw to the batch
+                _lightBufferAsTex.dispose()
+                _lightBufferAsTex = Texture(lightBuffer)
+                _lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
+
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+                //      we might not need shader here...
+                //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
+                batch.draw(_lightBufferAsTex, 0f, 0f, _lightBufferAsTex.width * DRAW_TILE_SIZE, _lightBufferAsTex.height * DRAW_TILE_SIZE)
             }
-
-            for (x in this_x_start..this_x_end) {
-
-                val color = (getLightForOpaque(x, y) ?: Color(0f,0f,0f,0f)).normaliseToHDR()
-
-                lightBuffer.setColor(color)
-
-                //lightBuffer.drawPixel(x - this_x_start, y - this_y_start)
-
-                lightBuffer.drawPixel(x - this_x_start, lightBuffer.height - 1 - y + this_y_start) // flip Y
+            else {
+                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+                batch.draw(texturedLightMap.colorBufferTexture, -overscan_open * DRAW_TILE_SIZE, -overscan_open * DRAW_TILE_SIZE, texturedLightMap.width * DRAW_TILE_SIZE, texturedLightMap.height * DRAW_TILE_SIZE)
             }
         }
-
-
-        // draw to the batch
-        _lightBufferAsTex.dispose()
-        _lightBufferAsTex = Texture(lightBuffer)
-        _lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-
-
-        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
-        //      we might not need shader here...
-        //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
-        batch.draw(_lightBufferAsTex, 0f, 0f, _lightBufferAsTex.width * DRAW_TILE_SIZE, _lightBufferAsTex.height * DRAW_TILE_SIZE)
-
-
     }
 
     fun dispose() {
@@ -769,6 +907,7 @@ object LightmapRenderer {
         // make sure the BlocksDrawer is resized first!
 
         // copied from BlocksDrawer, duh!
+        // FIXME 'lightBuffer' is not zoomable in this way
         val tilesInHorizontal = (screenW.toFloat() / TILE_SIZE).ceilInt() + 1
         val tilesInVertical = (screenH.toFloat() / TILE_SIZE).ceilInt() + 1
 
@@ -779,7 +918,6 @@ object LightmapRenderer {
             _init = true
         }
         lightBuffer = Pixmap(tilesInHorizontal, tilesInVertical, Pixmap.Format.RGBA8888)
-
 
 
         printdbg(this, "Resize event")

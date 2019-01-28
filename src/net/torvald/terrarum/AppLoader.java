@@ -745,4 +745,30 @@ public class AppLoader implements ApplicationListener {
 
         return s;
     }
+
+    public static void measureDebugTime(String name, kotlin.jvm.functions.Function0<kotlin.Unit> block) {
+        if (IS_DEVELOPMENT_BUILD) {
+            //debugTimers.put(name, kotlin.system.TimingKt.measureNanoTime(block));
+
+            long start = System.nanoTime();
+            block.invoke();
+            debugTimers.put(name, System.nanoTime() - start);
+        }
+    }
+
+    public static void setDebugTime(String name, long value) {
+        if (IS_DEVELOPMENT_BUILD) {
+            debugTimers.put(name, value);
+        }
+    }
+
+    public static void addDebugTime(String target, String... targets) {
+        if (IS_DEVELOPMENT_BUILD) {
+            long l = 0L;
+            for (String s : targets) {
+                l += ((long) debugTimers.get(s));
+            }
+            debugTimers.put(target, l);
+        }
+    }
 }
