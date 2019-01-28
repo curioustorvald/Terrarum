@@ -97,8 +97,8 @@ object LightmapRenderer {
     private lateinit var texturedLightCamera: OrthographicCamera
     private lateinit var texturedLightBatch: SpriteBatch
 
-    private const val LIGHTMAP_UNIT = 1
-    private const val SHADEMAP_UNIT = 0
+    private const val LIGHTMAP_UNIT = 0
+    private const val SHADEMAP_UNIT = 1
 
     init {
         printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
@@ -403,17 +403,18 @@ object LightmapRenderer {
                         // Several variables will be altered by this. See its documentation.
                         getLightsAndShades(wx, wy)
 
-                        texturedLightSourcePixmap.drawPixel(tx, ty, lightLevelThis.toIntBits())
-                        texturedShadeSourcePixmap.drawPixel(tx, ty, thisTileOpacity.toIntBits())
+                        texturedLightSourcePixmap.drawPixel(tx, ty, lightLevelThis.toRGBA())
+                        texturedShadeSourcePixmap.drawPixel(tx, ty, thisTileOpacity.toRGBA())
 
 
 
-                        if (wy in for_y_start..for_y_end && wx in for_x_start..for_x_end) {
+                        /*if (wy in for_y_start..for_y_end && wx in for_x_start..for_x_end) {
                             texturedLightSourcePixmap.drawPixel(tx, ty, 0x00FFFFFF)
                         }
                         else {
                             texturedLightSourcePixmap.drawPixel(tx, ty, 0xFF000000.toInt())
-                        }
+                        }*/
+
                     }
                 }
 
@@ -426,9 +427,10 @@ object LightmapRenderer {
 
                 texturedLightMap.inAction(texturedLightCamera, null) {
                     gdxClearAndSetBlend(0f,0f,0f,0f)
+                    Gdx.gl.glDisable(GL20.GL_BLEND)
 
-                    texturedLightSources.bind(LIGHTMAP_UNIT)
                     texturedShadeSources.bind(SHADEMAP_UNIT)
+                    texturedLightSources.bind(LIGHTMAP_UNIT)
 
                     lightCalcShader.begin()
                     lightCalcShader.setUniformMatrix("u_projTrans", texturedLightCamera.combined)
@@ -1079,3 +1081,6 @@ object LightmapRenderer {
         return (1f - scale) * startValue + scale * endValue
     }
 }
+
+fun Color.toRGBA() = (255 * r).toInt() shl 24 or ((255 * g).toInt() shl 16) or ((255 * b).toInt() shl 8) or (255 * a).toInt()
+
