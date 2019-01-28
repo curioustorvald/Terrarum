@@ -10,6 +10,7 @@ varying vec2 v_texCoords;
 // the divisor of 2 input and an output must be the same. I.e. either divide all by 4, or not.
 uniform sampler2D shades;
 uniform sampler2D lights;
+// WARNING -- Gdx.Color.toIntBits returns ABGR, but GLSL expects RGBA. Use the function Color.toRGBA() in LightmapRenderNew
 uniform sampler2D u_texture;
 uniform vec2 outSize;
 uniform float multiplier = 4.0; // if divided by four, put 4.0 in there
@@ -95,6 +96,8 @@ void main() {
     gl_FragColor = outColor * multiplier;
     gl_FragColor = vec4(0,1,0,1);
 
-    gl_FragColor = vec4(texture2D(lights, v_texCoords)) * multiplier;
+    gl_FragColor = vec4(texture2D(lights, gl_FragCoord.xy / outSize)) * multiplier;
+
+    // FIXME (gl_FragCoord / outSize) != v_texCoords
 
 }
