@@ -24,6 +24,7 @@ object DefaultConfig {
         jsonObject.addProperty("notificationshowuptime", 6500)
         jsonObject.addProperty("multithread", true) // experimental!
         jsonObject.addProperty("multithreadedlight", false) // experimental!
+        jsonObject.addProperty("gpulightcalc", true) // experimental!
 
 
 

@@ -392,8 +392,8 @@ object Terrarum : Screen {
     }
 
     override fun render(delta: Float) {
-        AppLoader.debugTimers["GDX.rawDelta"] = Gdx.graphics.rawDeltaTime.times(1000_000_000f).toLong()
-        AppLoader.debugTimers["GDX.smtDelta"] = Gdx.graphics.deltaTime.times(1000_000_000f).toLong()
+        AppLoader.setDebugTime("GDX.rawDelta", Gdx.graphics.rawDeltaTime.times(1000_000_000f).toLong())
+        AppLoader.setDebugTime("GDX.smtDelta", Gdx.graphics.deltaTime.times(1000_000_000f).toLong())
         AppLoader.getINSTANCE().screen.render(delta)
     }
 

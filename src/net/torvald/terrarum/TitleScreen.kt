@@ -212,7 +212,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             updateAkku -= delta
             i += 1
         }
-        AppLoader.debugTimers["Ingame.updateCounter"] = i
+        AppLoader.setDebugTime("Ingame.updateCounter", i)
 
 
         // render? just do it anyway

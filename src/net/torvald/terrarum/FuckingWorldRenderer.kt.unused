@@ -529,7 +529,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             while (updateDeltaCounter >= updateRate) {
 
                 //updateGame(delta)
-                AppLoader.debugTimers["Ingame.update"] = measureNanoTime { updateGame(delta) }
+                AppLoader.measureDebugTime("Ingame.update") { updateGame(delta) }
 
                 updateDeltaCounter -= updateRate
                 updateTries++
@@ -544,7 +544,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         /** RENDER CODE GOES HERE */
         //renderGame(batch)
-        AppLoader.debugTimers["Ingame.render"] = measureNanoTime { renderGame(batch) }
+        AppLoader.measureDebugTime("Ingame.render") { renderGame(batch) }
     }
 
     protected fun updateGame(delta: Float) {
