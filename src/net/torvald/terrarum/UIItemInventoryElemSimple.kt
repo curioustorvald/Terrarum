@@ -96,8 +96,8 @@ class UIItemInventoryElemSimple(
                     batch.drawStraightLine(barOffset, posY + height - thickness, barOffset + barFullLen * (item!!.durability / item!!.maxDurability), thickness, false)
                 }
             }
-            else {
-                // draw item count
+            // draw item count when applicable
+            else if (item!!.stackable) {
                 val amountString = amount.toString()
 
                 // highlight item count (blocks/walls) if the item is equipped
