@@ -18,6 +18,10 @@ class UIItemModuleInfoCell(
         override var posY: Int
 ) : UIItem(parent) {
 
+    // deal with the moving position
+    override var oldPosX = posX
+    override var oldPosY = posY
+
     override val height: Int = Terrarum.fontGame.lineHeight.toInt() * 2
 
     private val numberAreaWidth = Terrarum.fontSmallNumbers.W * 3 + 4

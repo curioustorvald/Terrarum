@@ -20,6 +20,10 @@ class UIItemImageGallery(
         val column: Int = 1
 ) : UIItem(parentUI) {
 
+    // deal with the moving position
+    override var oldPosX = posX
+    override var oldPosY = posY
+
     override fun update(delta: Float) {
     }
 

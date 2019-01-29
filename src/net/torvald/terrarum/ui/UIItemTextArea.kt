@@ -17,6 +17,10 @@ class UIItemTextArea(
         val align: Alignment = Alignment.LEFT
 ) : UIItem(parentUI) {
 
+    // deal with the moving position
+    override var oldPosX = posX
+    override var oldPosY = posY
+
     private var entireText: List<String> = listOf("") // placeholder
 
     var scrollPos = 0

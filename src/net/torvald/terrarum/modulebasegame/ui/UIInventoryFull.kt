@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.langpack.Lang
@@ -15,6 +14,8 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory.Companion.C
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
+import net.torvald.terrarum.ui.UIItemTextButtonList
+import net.torvald.terrarum.ui.UIUtils
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -29,6 +30,8 @@ class UIInventoryFull(
         doNotWarnConstant: Boolean = false
 ) : UICanvas(toggleKeyLiteral, toggleButtonLiteral, customPositioning, doNotWarnConstant) {
 
+    private val debugvals = false
+    
     override var width: Int = Terrarum.WIDTH
     override var height: Int = Terrarum.HEIGHT
 
@@ -60,12 +63,12 @@ class UIInventoryFull(
         get() = if (AppLoader.environment == RunningEnvironment.PC)
             "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
         else
-            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe06b.toChar()} ${Lang["GAME_INVENTORY"]}"
+            "${0xe069.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe06b.toChar()} ${Lang["GAME_INVENTORY"]}"
     val gameMenuControlHelp: String
         get() = if (AppLoader.environment == RunningEnvironment.PC)
             "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
         else
-            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe068.toChar()} ${Lang["GAME_INVENTORY"]}"
+            "${0xe069.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe068.toChar()} ${Lang["GAME_INVENTORY"]}"
     val controlHelpHeight = Terrarum.fontGame.lineHeight
 
     private var encumbrancePerc = 0f
@@ -104,22 +107,41 @@ class UIInventoryFull(
                     internalWidth - UIItemInventoryEquippedView.WIDTH + (Terrarum.WIDTH - internalWidth) / 2,
                     109 + (Terrarum.HEIGHT - internalHeight) / 2
             )
+    private val gameMenuListWidth = 400
+    private val gameMenuListHeight = 40 * 5
+    private val gameMenuCharInfoHeight = 64 + 40 // no top margin, 40 bottom margin
+    private val gameMenuListTotalHeight = gameMenuListHeight + gameMenuCharInfoHeight
+    private val gameMenuButtons = UIItemTextButtonList(
+            this, arrayOf("MENU_LABEL_MAINMENU", "MENU_LABEL_DESKTOP", "MENU_OPTIONS_CONTROLS", "MENU_OPTIONS_SOUND", "MENU_LABEL_GRAPHICS"),
+            Terrarum.WIDTH + (Terrarum.WIDTH - gameMenuListWidth) / 2,
+            (itemList.height - gameMenuListTotalHeight) / 2 + itemList.posY + gameMenuCharInfoHeight,
+            gameMenuListWidth, gameMenuListHeight,
+            readFromLang = true,
+            textAreaWidth = gameMenuListWidth,
+            activeBackCol = Color(0),
+            highlightBackCol = Color(0),
+            backgroundCol = Color(0),
+            inactiveCol = Color.WHITE,
+            defaultSelection = null
+    )
 
+    private val SCREEN_MINIMAP = 2f
+    private val SCREEN_INVENTORY = 1f
+    private val SCREEN_MENU = 0f
 
-    private var currentScreen = 1f //
+    private var currentScreen = SCREEN_INVENTORY
     private var transitionRequested = false
+    private var transitionOngoing = false
+    private var transitionReqSource = SCREEN_INVENTORY
+    private var transitionReqTarget = SCREEN_INVENTORY
     private var transitionTimer = 0f
-    private val transitionLength = 0.5f
-
-    private val SCREEN_MINIMAP = 0
-    private val SCREEN_INVENTORY = 1
-    private val SCREEN_MENU = 2
+    private val transitionLength = 0.333f
 
 
     private val transitionalUpdateUIs = ArrayList<UIItem>()
     private val transitionalUpdateUIoriginalPosX = ArrayList<Int>()
-
-
+    
+    
     private fun addToTransitionalGroup(item: UIItem) {
         transitionalUpdateUIs.add(item)
         transitionalUpdateUIoriginalPosX.add(item.posX)
@@ -151,6 +173,7 @@ class UIInventoryFull(
 
         addToTransitionalGroup(itemList)
         addToTransitionalGroup(equipped)
+        addToTransitionalGroup(gameMenuButtons)
     }
 
     private var offsetX = ((Terrarum.WIDTH - internalWidth)   / 2).toFloat()
@@ -165,8 +188,9 @@ class UIInventoryFull(
 
 
         categoryBar.update(delta)
-        itemList.update(delta)
-        equipped.update(delta)
+
+        transitionalUpdateUIs.forEach { it.update(delta) }
+
     }
 
     private val gradStartCol = Color(0x404040_60)
@@ -179,13 +203,41 @@ class UIInventoryFull(
     private var xEnd = (Terrarum.WIDTH + internalWidth).div(2).toFloat()
     private var yEnd = (Terrarum.HEIGHT + internalHeight).div(2).toFloat()
 
+    fun requestTransition(target: Int) {
+        if (!transitionOngoing) {
+            transitionRequested = true
+            transitionReqSource = currentScreen.round()
+            transitionReqTarget = target.toFloat()
+        }
+    }
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
-        currentScreen = 1f + 0.1f * FastMath.sin(transitionTimer)
-        transitionTimer += Gdx.graphics.deltaTime
+        if (transitionRequested && !transitionOngoing) {
+            transitionRequested = false
+            transitionOngoing = true
+            transitionTimer = 0f
+        }
+
+        if (transitionOngoing) {
+            transitionTimer += Gdx.graphics.deltaTime
+
+            currentScreen = UIUtils.moveQuick(transitionReqSource, transitionReqTarget, transitionTimer, transitionLength)
+
+            if (transitionTimer > transitionLength) {
+                transitionOngoing = false
+                currentScreen = transitionReqTarget
+            }
+        }
+
+
 
         // update at render time
         updateTransitionalItems()
+        if (debugvals) {
+            batch.color = Color.WHITE
+            AppLoader.fontSmallNumbers.draw(batch, "screen:$currentScreen", 500f, 20f)
+        }
 
 
 
@@ -213,15 +265,82 @@ class UIInventoryFull(
         categoryBar.render(batch, camera)
 
 
-        renderScreenInventory(batch, camera)
+        if (currentScreen > 1f + epsilon) {
+            renderScreenMinimap(batch, camera)
+
+            if (debugvals) {
+                batch.color = Color.CORAL
+                AppLoader.fontSmallNumbers.draw(batch, "Map", 300f, 10f)
+            }
+        }
+
+        if (currentScreen in epsilon..2f - epsilon) {
+            renderScreenInventory(batch, camera)
+
+            if (debugvals) {
+                batch.color = Color.CHARTREUSE
+                AppLoader.fontSmallNumbers.draw(batch, "Inv", 350f, 10f)
+            }
+        }
+
+        if (currentScreen < 1f - epsilon) {
+            renderScreenGamemenu(batch, camera)
+
+            if (debugvals) {
+                batch.color = Color.SKY
+                AppLoader.fontSmallNumbers.draw(batch, "Men", 400f, 10f)
+            }
+        }
+
+        if (debugvals) {
+            batch.color = Color.WHITE
+            AppLoader.fontSmallNumbers.draw(batch, "inventoryScrOffX:$inventoryScrOffX", 500f, 10f)
+        }
+
+
     }
 
+    private val epsilon = 0.001f
+
     private val minimapScrOffX: Float
-        get() = (currentScreen + 1f) * Terrarum.WIDTH
+        get() = (currentScreen - 2f) * Terrarum.WIDTH
+    /**
+     * - 0 on inventory screen
+     * - +WIDTH on minimap screen
+     * - -WIDTH on gamemenu screen
+     */
     private val inventoryScrOffX: Float
         get() = (currentScreen - 1f) * Terrarum.WIDTH
     private val menuScrOffX: Float
         get() = (currentScreen) * Terrarum.WIDTH
+
+    private fun renderScreenMinimap(batch: SpriteBatch, camera: Camera) {
+        // control hints
+        blendNormal(batch)
+        batch.color = Color.WHITE
+        Terrarum.fontGame.draw(batch, minimapControlHelp, offsetX + minimapScrOffX, yEnd - 20)
+    }
+
+    private fun renderScreenGamemenu(batch: SpriteBatch, camera: Camera) {
+        // control hints
+        blendNormal(batch)
+        batch.color = Color.WHITE
+        Terrarum.fontGame.draw(batch, gameMenuControlHelp, offsetX + menuScrOffX, yEnd - 20)
+
+        // text buttons
+        gameMenuButtons.render(batch, camera)
+
+        // character info window
+
+        // !! DUMMY !!
+        batch.color = itemList.backColour
+        batch.fillRect(
+                ((Terrarum.WIDTH - 400) / 2) + menuScrOffX,
+                (itemList.height - gameMenuListTotalHeight) / 2 + itemList.posY.toFloat(),
+                gameMenuListWidth.toFloat(),
+                64f
+        )
+    }
 
     private fun renderScreenInventory(batch: SpriteBatch, camera: Camera) {
         itemList.render(batch, camera)

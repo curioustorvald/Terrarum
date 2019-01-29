@@ -36,6 +36,10 @@ class UIItemList<Item: UIItem>(
         val border: Int = 0
 ) : UIItem(parentUI) {
 
+    // deal with the moving position
+    override var oldPosX = posX
+    override var oldPosY = posY
+
     init {
         itemList.forEachIndexed { index, item ->
             item.posX = this.posX + border
@@ -47,7 +51,7 @@ class UIItemList<Item: UIItem>(
     var selectedIndex: Int? = defaultSelection
     val selectedButton: UIItem?
         get() = if (selectedIndex != null) itemList[selectedIndex!!] else null
-    private var highlightY: Double? = if (selectedIndex != null) itemList[selectedIndex!!].posY.toDouble() else null
+    private var highlightY: Float? = if (selectedIndex != null) itemList[selectedIndex!!].posY.toFloat() else null
     private val highlighterMoveDuration: Second = 0.1f
     private var highlighterMoveTimer: Second = 0f
     private var highlighterMoving = false
@@ -66,8 +70,8 @@ class UIItemList<Item: UIItem>(
                 highlightY = UIUtils.moveQuick(
                         highlighterYStart!!,
                         highlighterYEnd!!,
-                        highlighterMoveTimer.toDouble(),
-                        highlighterMoveDuration.toDouble()
+                        highlighterMoveTimer,
+                        highlighterMoveDuration
                 )
             }
 
@@ -87,14 +91,14 @@ class UIItemList<Item: UIItem>(
                 val oldIndex = selectedIndex
 
                 if (kinematic) {
-                    highlighterYStart = itemList[selectedIndex!!].posY.toDouble()
+                    highlighterYStart = itemList[selectedIndex!!].posY.toFloat()
                     selectedIndex = index
                     highlighterMoving = true
-                    highlighterYEnd = itemList[selectedIndex!!].posY.toDouble()
+                    highlighterYEnd = itemList[selectedIndex!!].posY.toFloat()
                 }
                 else {
                     selectedIndex = index
-                    highlightY = itemList[selectedIndex!!].posY.toDouble()
+                    highlightY = itemList[selectedIndex!!].posY.toFloat()
                 }
 
                 selectionChangeListener?.invoke(oldIndex, index)

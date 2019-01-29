@@ -1,11 +1,14 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
-import net.torvald.terrarum.*
-import net.torvald.terrarum.langpack.Lang
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.BlendMode
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.fillRect
+import net.torvald.terrarum.langpack.Lang
 
 /**
  * Text button. Height of hitbox is extended (double lineHeight, or 40 px) for better clicking
@@ -33,6 +36,10 @@ open class UIItemTextButton(
         val alignment: Alignment = Alignment.CENTRE,
         val hitboxSize: Int = UIItemTextButton.height
 ) : UIItem(parentUI) {
+
+    // deal with the moving position
+    override var oldPosX = posX
+    override var oldPosY = posY
 
     companion object {
         val font = Terrarum.fontGame

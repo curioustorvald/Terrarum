@@ -63,7 +63,8 @@ class UIItemInventoryEquippedView(
     private val spriteDrawCol = Color(0xddddddff.toInt())
 
     // deal with the moving position
-    private var oldPosX = posX
+    override var oldPosX = posX
+    override var oldPosY = posY
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         val posXDelta = posX - oldPosX

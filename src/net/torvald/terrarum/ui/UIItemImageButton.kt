@@ -35,6 +35,10 @@ open class UIItemImageButton(
         var highlightable: Boolean
 ) : UIItem(parent) {
 
+    // deal with the moving position
+    override var oldPosX = posX
+    override var oldPosY = posY
+
     var highlighted = false
 
     override fun render(batch: SpriteBatch, camera: Camera) {
