@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.BlendMode
-import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.Second
+import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.gameactors.ai.toInt
 import net.torvald.terrarum.roundInt
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -44,6 +44,10 @@ class UIItemTextButtonList(
         val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.CENTRE,
         val itemHitboxSize: Int = UIItemTextButton.height
 ) : UIItem(parentUI) {
+
+    // deal with the moving position
+    override var oldPosX = posX
+    override var oldPosY = posY
 
     val iconToTextGap = 20
     val iconCellWidth = (iconSpriteSheet?.tileW ?: -iconToTextGap) / (iconSpriteSheet?.horizontalCount ?: 1)
@@ -130,7 +134,7 @@ class UIItemTextButtonList(
     var selectedIndex: Int? = defaultSelection
     val selectedButton: UIItemTextButton?
         get() = if (selectedIndex != null) buttons[selectedIndex!!] else null
-    private var highlightY: Double? = if (selectedIndex != null) buttons[selectedIndex!!].posY.toDouble() else null
+    private var highlightY: Float? = if (selectedIndex != null) buttons[selectedIndex!!].posY.toFloat() else null
     private val highlighterMoveDuration: Second = 0.1f
     private var highlighterMoveTimer: Second = 0f
     private var highlighterMoving = false
@@ -141,6 +145,10 @@ class UIItemTextButtonList(
     var selectionChangeListener: ((Int?, Int) -> Unit)? = null
 
     override fun update(delta: Float) {
+        val posXDelta = posX - oldPosX
+        buttons.forEach { it.posX += posXDelta }
+
+
         if (highlighterMoving) {
             highlighterMoveTimer += delta
 
@@ -148,8 +156,8 @@ class UIItemTextButtonList(
                 highlightY = UIUtils.moveQuick(
                         highlighterYStart!!,
                         highlighterYEnd!!,
-                        highlighterMoveTimer.toDouble(),
-                        highlighterMoveDuration.toDouble()
+                        highlighterMoveTimer.toFloat(),
+                        highlighterMoveDuration.toFloat()
                 )
             }
 
@@ -170,13 +178,13 @@ class UIItemTextButtonList(
 
                 if (kinematic) {
                     selectedIndex = index
-                    highlighterYStart = buttons[selectedIndex!!].posY.toDouble()
+                    highlighterYStart = buttons[selectedIndex!!].posY.toFloat()
                     highlighterMoving = true
-                    highlighterYEnd = buttons[selectedIndex!!].posY.toDouble()
+                    highlighterYEnd = buttons[selectedIndex!!].posY.toFloat()
                 }
                 else {
                     selectedIndex = index
-                    highlightY = buttons[selectedIndex!!].posY.toDouble()
+                    highlightY = buttons[selectedIndex!!].posY.toFloat()
                 }
 
                 selectionChangeListener?.invoke(oldIndex, index)
@@ -184,6 +192,8 @@ class UIItemTextButtonList(
             btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
 
         }
+
+        oldPosX = posX
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {

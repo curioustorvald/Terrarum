@@ -246,6 +246,7 @@ object Terrarum : Screen {
                 RunningEnvironment.PC
             }
         //}
+
     }
 
 
@@ -689,6 +690,7 @@ fun Double.roundInt(): Int = Math.round(this).toInt()
 fun Float.roundInt(): Int = Math.round(this)
 fun Double.abs() = Math.abs(this)
 fun Double.sqr() = this * this
+fun Float.sqr() = this * this
 fun Double.sqrt() = Math.sqrt(this)
 fun Float.sqrt() = FastMath.sqrt(this)
 fun Int.abs() = this.absoluteValue

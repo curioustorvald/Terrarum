@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
-import net.torvald.terrarum.ui.*
+import net.torvald.terrarum.ui.UIItem
+import net.torvald.terrarum.ui.UIItemImageButton
+import net.torvald.terrarum.ui.UIUtils
 
 /**
  * Created by minjaesong on 2017-10-20.
@@ -17,6 +19,12 @@ class UIItemInventoryCatBar(
         override var posY: Int,
         override val width: Int
 ) : UIItem(parentUI) {
+
+    // deal with the moving position
+    override var oldPosX = posX
+    override var oldPosY = posY
+
+    private val parentInventory = parentUI
 
     private val catIcons = parentUI.catIcons
     private val catArrangement = parentUI.catArrangement
@@ -91,7 +99,7 @@ class UIItemInventoryCatBar(
     private val underlineColour = Color(0xeaeaea_40.toInt())
     private val underlineHighlightColour = mainButtons[0].highlightCol
 
-    private var highlighterXPos = mainButtons[selectedIndex].posX.toDouble()
+    private var highlighterXPos = mainButtons[selectedIndex].posX.toFloat()
     private var highlighterXStart = highlighterXPos
     private var highlighterXEnd = highlighterXPos
 
@@ -99,6 +107,14 @@ class UIItemInventoryCatBar(
     private var highlighterMoving = false
     private val highlighterMoveDuration: Second = 0.1f
     private var highlighterMoveTimer: Second = 0f
+
+    private var transitionFired = false
+
+    /**
+     * 0: map, 1: inventory caticons, 2: menu
+     */
+    var selectedPanel = 1
+        private set
 
     // set up underlined indicator
     init {
@@ -134,8 +150,8 @@ class UIItemInventoryCatBar(
             highlighterXPos = UIUtils.moveQuick(
                     highlighterXStart,
                     highlighterXEnd,
-                    highlighterMoveTimer.toDouble(),
-                    highlighterMoveDuration.toDouble()
+                    highlighterMoveTimer,
+                    highlighterMoveDuration
             )
 
             if (highlighterMoveTimer > highlighterMoveDuration) {
@@ -150,23 +166,61 @@ class UIItemInventoryCatBar(
         mainButtons.forEachIndexed { index, btn ->
             btn.update(delta)
 
+            if (btn.mousePushed && selectedPanel != 1) {
+                transitionFired = true
+                selectedPanel = 1
+            }
 
             if (btn.mousePushed && index != selectedIndex) {
+                // normal stuffs
                 val oldIndex = selectedIndex
 
-                highlighterXStart = mainButtons[selectedIndex].posX.toDouble() // using old selectedIndex
+                highlighterXStart = mainButtons[selectedIndex].posX.toFloat() // using old selectedIndex
                 selectedIndex = index
                 highlighterMoving = true
-                highlighterXEnd = mainButtons[selectedIndex].posX.toDouble() // using new selectedIndex
+                highlighterXEnd = mainButtons[selectedIndex].posX.toFloat() // using new selectedIndex
 
                 selectionChangeListener?.invoke(oldIndex, index)
             }
-            btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
 
+            if (selectedPanel == 1) {
+                btn.highlighted = (index == selectedIndex) // forcibly highlight if this.highlighted != null
+
+                sideButtons[0].highlighted = false
+                sideButtons[3].highlighted = false
+            }
         }
 
         sideButtons[0].update(delta)
         sideButtons[3].update(delta)
+
+
+        // more transition stuffs
+        if (sideButtons[0].mousePushed) {
+            if (selectedPanel != 0) transitionFired = true
+            mainButtons.forEach { it.highlighted = false }
+            selectedPanel = 0
+            parentInventory.requestTransition(0)
+
+            sideButtons[0].highlighted = true
+            sideButtons[3].highlighted = false
+        }
+        else if (sideButtons[3].mousePushed) {
+            if (selectedPanel != 2) transitionFired = true
+            mainButtons.forEach { it.highlighted = false }
+            selectedPanel = 2
+            parentInventory.requestTransition(2)
+            transitionFired = true
+
+            sideButtons[0].highlighted = false
+            sideButtons[3].highlighted = true
+        }
+
+
+        if (transitionFired) {
+            transitionFired = false
+            parentInventory.requestTransition(2 - selectedPanel)
+        }
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -186,8 +240,12 @@ class UIItemInventoryCatBar(
         batch.drawStraightLine(posX.toFloat(), posY + height - 1f, posX + width.toFloat(), 1f, false)
 
         // indicator
-        batch.color = underlineHighlightColour
-        batch.draw(underlineIndTex, (highlighterXPos - buttonGapSize / 2).toFloat().round(), posY + highlighterYPos)
+        if (selectedPanel == 1) {
+            batch.color = underlineHighlightColour
+            batch.draw(underlineIndTex, (highlighterXPos - buttonGapSize / 2).toFloat().round(), posY + highlighterYPos)
+        }
+
+
     }
 
 

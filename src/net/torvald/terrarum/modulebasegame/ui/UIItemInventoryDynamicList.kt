@@ -32,8 +32,14 @@ class UIItemInventoryDynamicList(
         override var posY: Int
 ) : UIItem(parentUI) {
 
-    override val width  = 496
-    override val height = 384
+    // deal with the moving position
+    override var oldPosX = posX
+    override var oldPosY = posY
+
+    override val width  = WIDTH
+    override val height = HEIGHT
+
+    val backColour = Color(0x404040_88)
 
     private val catArrangement = parentUI.catArrangement
 
@@ -94,7 +100,7 @@ class UIItemInventoryDynamicList(
                 itemImage = null,
                 mouseoverBackCol = Color(0x282828_ff),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = Color(0x404040_88),
+                backCol = backColour,
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 inactiveTextCol = defaultTextColour
@@ -111,7 +117,7 @@ class UIItemInventoryDynamicList(
                 itemImage = null,
                 mouseoverBackCol = Color(0x282828_ff),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = Color(0x404040_88),
+                backCol = backColour,
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true,
                 inactiveTextCol = defaultTextColour
@@ -164,9 +170,6 @@ class UIItemInventoryDynamicList(
             posY = getIconPosY(3),
             highlightable = false
     )
-
-    // deal with the moving position
-    private var oldPosX = posX
 
     fun scrollItemPage(relativeAmount: Int) {
         itemPage = if (itemPageCount == 0) 0 else (itemPage + relativeAmount).fmod(itemPageCount)

@@ -67,6 +67,10 @@ class UIItemIntSlider(
     )
 
 
+    // deal with the moving position
+    override var oldPosX = posX
+    override var oldPosY = posY
+
     var value = initValue
 
 

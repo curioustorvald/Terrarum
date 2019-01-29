@@ -44,6 +44,25 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
     abstract val width: Int
     abstract val height: Int
 
+    /** This variable is NOT updated on its own.
+     * ```
+     * val posXDelta = posX - oldPosX
+     * itemGrid.forEach { it.posX += posXDelta }
+     * ...
+     * oldPosX = posX
+     * ```
+     */
+    protected abstract var oldPosX: Int
+    /** This variable is NOT updated on its own.
+     * ```
+     * val posYDelta = posY - oldPosY
+     * itemGrid.forEach { it.posY += posYDelta }
+     * ...
+     * oldPosY = posY
+     * ```
+     */
+    protected abstract var oldPosY: Int
+
     /** Position of mouse relative to this item */
     protected val relativeMouseX: Int
         get() = (Terrarum.mouseScreenX - (parentUI.posX) - this.posX)

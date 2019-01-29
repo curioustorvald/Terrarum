@@ -20,6 +20,10 @@ class UIItemSavegameInfoCell(
         override var posY: Int
 ) : UIItem(parent) {
 
+    // deal with the moving position
+    override var oldPosX = posX
+    override var oldPosY = posY
+
     override val height: Int = Terrarum.fontGame.lineHeight.toInt() * 2
 
     override fun render(batch: SpriteBatch, camera: Camera) {
