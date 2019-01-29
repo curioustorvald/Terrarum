@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.langpack.Lang
@@ -13,13 +14,14 @@ import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2017-10-21.
  */
 class UIInventoryFull(
-        var actor: Pocketed?,
+        var actor: Pocketed,
 
         toggleKeyLiteral: Int? = null, toggleButtonLiteral: Int? = null,
         // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
@@ -54,6 +56,16 @@ class UIInventoryFull(
             "${Terrarum.gamepadLabelNinY} ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "${0xe011.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "${Terrarum.gamepadLabelNinA} ${Lang["GAME_INVENTORY_DROP"]}"
+    val minimapControlHelp: String
+        get() = if (AppLoader.environment == RunningEnvironment.PC)
+            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
+        else
+            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe06b.toChar()} ${Lang["GAME_INVENTORY"]}"
+    val gameMenuControlHelp: String
+        get() = if (AppLoader.environment == RunningEnvironment.PC)
+            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
+        else
+            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe068.toChar()} ${Lang["GAME_INVENTORY"]}"
     val controlHelpHeight = Terrarum.fontGame.lineHeight
 
     private var encumbrancePerc = 0f
@@ -75,48 +87,70 @@ class UIInventoryFull(
     override var openCloseTime: Second = 0.0f
 
 
-    private val itemList: UIItemInventoryDynamicList? =
-            if (actor != null) {
-                UIItemInventoryDynamicList(
-                        this,
-                        actor!!.inventory,
-                        0 + (Terrarum.WIDTH - internalWidth) / 2,
-                        109 + (Terrarum.HEIGHT - internalHeight) / 2
-                )
-            }
-    else null
+    private val itemList: UIItemInventoryDynamicList =
+            UIItemInventoryDynamicList(
+                    this,
+                    actor.inventory,
+                    0 + (Terrarum.WIDTH - internalWidth) / 2,
+                    109 + (Terrarum.HEIGHT - internalHeight) / 2
+            )
 
 
-    private val equipped: UIItemInventoryEquippedView? =
-            if (actor != null) {
-                UIItemInventoryEquippedView(
-                        this,
-                        actor!!.inventory,
-                        actor as ActorWBMovable,
-                        internalWidth - UIItemInventoryEquippedView.WIDTH + (Terrarum.WIDTH - internalWidth) / 2,
-                        109 + (Terrarum.HEIGHT - internalHeight) / 2
-                )
-            }
-    else null
+    private val equipped: UIItemInventoryEquippedView =
+            UIItemInventoryEquippedView(
+                    this,
+                    actor.inventory,
+                    actor as ActorWBMovable,
+                    internalWidth - UIItemInventoryEquippedView.WIDTH + (Terrarum.WIDTH - internalWidth) / 2,
+                    109 + (Terrarum.HEIGHT - internalHeight) / 2
+            )
 
 
+    private var currentScreen = 1f //
+    private var transitionRequested = false
+    private var transitionTimer = 0f
+    private val transitionLength = 0.5f
+
+    private val SCREEN_MINIMAP = 0
+    private val SCREEN_INVENTORY = 1
+    private val SCREEN_MENU = 2
+
+
+    private val transitionalUpdateUIs = ArrayList<UIItem>()
+    private val transitionalUpdateUIoriginalPosX = ArrayList<Int>()
+
+
+    private fun addToTransitionalGroup(item: UIItem) {
+        transitionalUpdateUIs.add(item)
+        transitionalUpdateUIoriginalPosX.add(item.posX)
+    }
+
+    private fun updateTransitionalItems() {
+        for (k in 0..transitionalUpdateUIs.lastIndex) {
+            val intOff = inventoryScrOffX.roundInt()
+            transitionalUpdateUIs[k].posX = transitionalUpdateUIoriginalPosX[k] + intOff
+        }
+    }
 
     init {
         addItem(categoryBar)
-        itemList?.let { addItem(it) }
-        equipped?.let { addItem(it) }
+        itemList.let { addItem(it) }
+        equipped.let { addItem(it) }
 
 
         categoryBar.selectionChangeListener = { old, new  ->
             rebuildList()
-            itemList?.itemPage = 0 // set scroll to zero
-            itemList?.rebuild() // have to manually rebuild, too!
+            itemList.itemPage = 0 // set scroll to zero
+            itemList.rebuild() // have to manually rebuild, too!
         }
 
 
 
         rebuildList()
 
+
+        addToTransitionalGroup(itemList)
+        addToTransitionalGroup(equipped)
     }
 
     private var offsetX = ((Terrarum.WIDTH - internalWidth)   / 2).toFloat()
@@ -131,8 +165,8 @@ class UIInventoryFull(
 
 
         categoryBar.update(delta)
-        itemList?.update(delta)
-        equipped?.update(delta)
+        itemList.update(delta)
+        equipped.update(delta)
     }
 
     private val gradStartCol = Color(0x404040_60)
@@ -142,9 +176,17 @@ class UIInventoryFull(
 
     private val weightBarWidth = 60f
 
+    private var xEnd = (Terrarum.WIDTH + internalWidth).div(2).toFloat()
+    private var yEnd = (Terrarum.HEIGHT + internalHeight).div(2).toFloat()
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        val xEnd = (Terrarum.WIDTH + internalWidth).div(2).toFloat()
-        val yEnd = (Terrarum.HEIGHT + internalHeight).div(2).toFloat()
+
+        currentScreen = 1f + 0.1f * FastMath.sin(transitionTimer)
+        transitionTimer += Gdx.graphics.deltaTime
+
+        // update at render time
+        updateTransitionalItems()
+
 
 
         // background fill
@@ -169,66 +211,74 @@ class UIInventoryFull(
 
         // UI items
         categoryBar.render(batch, camera)
-        itemList?.render(batch, camera)
-        equipped?.render(batch, camera)
+
+
+        renderScreenInventory(batch, camera)
+    }
+
+    private val minimapScrOffX: Float
+        get() = (currentScreen + 1f) * Terrarum.WIDTH
+    private val inventoryScrOffX: Float
+        get() = (currentScreen - 1f) * Terrarum.WIDTH
+    private val menuScrOffX: Float
+        get() = (currentScreen) * Terrarum.WIDTH
+
+    private fun renderScreenInventory(batch: SpriteBatch, camera: Camera) {
+        itemList.render(batch, camera)
+        equipped.render(batch, camera)
 
 
         // control hints
         blendNormal(batch)
         batch.color = Color.WHITE
-        Terrarum.fontGame.draw(batch, listControlHelp, offsetX, yEnd-20)
+        Terrarum.fontGame.draw(batch, listControlHelp, offsetX + inventoryScrOffX, yEnd - 20)
 
 
         // encumbrance meter
-        if (actor != null) {
-            val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
+        val encumbranceText = Lang["GAME_INVENTORY_ENCUMBRANCE"]
 
-            Terrarum.fontGame.draw(batch,
-                    encumbranceText,
-                    xEnd - 9 - Terrarum.fontGame.getWidth(encumbranceText) - weightBarWidth,
-                    yEnd-20
-            )
+        Terrarum.fontGame.draw(batch,
+                encumbranceText,
+                xEnd - 9 - Terrarum.fontGame.getWidth(encumbranceText) - weightBarWidth + inventoryScrOffX,
+                yEnd-20
+        )
 
-            // encumbrance bar background
-            blendMul(batch)
-            batch.color = Color(0xa0a0a0_ff.toInt())
-            batch.fillRect(
-                    xEnd - 3 - weightBarWidth,
-                    yEnd-20 + 3f,
-                    weightBarWidth,
-                    controlHelpHeight - 6f
-            )
-            // encumbrance bar
-            blendNormal(batch)
-            batch.color = if (isEncumbered) Color(0xff0000_cc.toInt()) else Color(0x00ff00_cc.toInt())
-            batch.fillRect(
-                    xEnd - 3 - weightBarWidth,
-                    yEnd-20 + 3f,
-                    if (actor?.inventory?.capacityMode == CAPACITY_MODE_NO_ENCUMBER)
-                        1f
-                    else // make sure 1px is always be seen
-                        minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
-                    controlHelpHeight - 5f
-            )
-        }
+        // encumbrance bar background
+        blendMul(batch)
+        batch.color = Color(0xa0a0a0_ff.toInt())
+        batch.fillRect(
+                xEnd - 3 - weightBarWidth + inventoryScrOffX,
+                yEnd-20 + 3f,
+                weightBarWidth,
+                controlHelpHeight - 6f
+        )
+        // encumbrance bar
+        blendNormal(batch)
+        batch.color = if (isEncumbered) Color(0xff0000_cc.toInt()) else Color(0x00ff00_cc.toInt())
+        batch.fillRect(
+                xEnd - 3 - weightBarWidth + inventoryScrOffX,
+                yEnd-20 + 3f,
+                if (actor.inventory.capacityMode == CAPACITY_MODE_NO_ENCUMBER)
+                    1f
+                else // make sure 1px is always be seen
+                    minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
+                controlHelpHeight - 5f
+        )
     }
 
 
-
     fun rebuildList() {
-        itemList?.rebuild()
-        equipped?.rebuild()
+        itemList.rebuild()
+        equipped.rebuild()
 
-        actor?.let {
-            encumbrancePerc = actor!!.inventory.capacity.toFloat() / actor!!.inventory.maxCapacity
-            isEncumbered = actor!!.inventory.isEncumbered
-        }
+        encumbrancePerc = actor.inventory.capacity.toFloat() / actor.inventory.maxCapacity
+        isEncumbered = actor.inventory.isEncumbered
     }
 
     override fun dispose() {
         categoryBar.dispose()
-        itemList?.dispose()
-        equipped?.dispose()
+        itemList.dispose()
+        equipped.dispose()
     }
 
 
@@ -245,7 +295,7 @@ class UIInventoryFull(
     }
 
     override fun endClosing(delta: Float) {
-        (Terrarum.ingame as? Ingame)?.setTooltipMessage(null) // required!!
+        (Terrarum.ingame as? Ingame)?.setTooltipMessage(null) // required!
     }
 
 
@@ -255,6 +305,9 @@ class UIInventoryFull(
 
         offsetX = ((Terrarum.WIDTH - internalWidth)   / 2).toFloat()
         offsetY = ((Terrarum.HEIGHT - internalHeight) / 2).toFloat()
+
+        xEnd = (Terrarum.WIDTH + internalWidth).div(2).toFloat()
+        yEnd = (Terrarum.HEIGHT + internalHeight).div(2).toFloat()
     }
 
 

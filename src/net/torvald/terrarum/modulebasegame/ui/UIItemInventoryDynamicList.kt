@@ -165,6 +165,9 @@ class UIItemInventoryDynamicList(
             highlightable = false
     )
 
+    // deal with the moving position
+    private var oldPosX = posX
+
     fun scrollItemPage(relativeAmount: Int) {
         itemPage = if (itemPageCount == 0) 0 else (itemPage + relativeAmount).fmod(itemPageCount)
     }
@@ -205,6 +208,15 @@ class UIItemInventoryDynamicList(
     private val upDownButtonGapToDots = 7 // apparent gap may vary depend on the texture itself
 
     override fun render(batch: SpriteBatch, camera: Camera) {
+        val posXDelta = posX - oldPosX
+        itemGrid.forEach { it.posX += posXDelta }
+        itemList.forEach { it.posX += posXDelta }
+        gridModeButtons.forEach { it.posX += posXDelta }
+        scrollUpButton.posX += posXDelta
+        scrollDownButton.posX += posXDelta
+
+
+
         fun getScrollDotYHeight(i: Int) = scrollUpButton.posY + 10 + upDownButtonGapToDots + 10 * i
 
         scrollDownButton.posY = getScrollDotYHeight(itemPageCount) + upDownButtonGapToDots
@@ -230,6 +242,8 @@ class UIItemInventoryDynamicList(
         }
 
         super.render(batch, camera)
+
+        oldPosX = posX
     }
 
 

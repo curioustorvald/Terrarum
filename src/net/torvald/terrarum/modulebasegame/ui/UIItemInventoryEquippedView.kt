@@ -62,7 +62,15 @@ class UIItemInventoryEquippedView(
 
     private val spriteDrawCol = Color(0xddddddff.toInt())
 
+    // deal with the moving position
+    private var oldPosX = posX
+
     override fun render(batch: SpriteBatch, camera: Camera) {
+        val posXDelta = posX - oldPosX
+        itemGrid.forEach { it.posX += posXDelta }
+
+
+
         // sprite background
         blendNormal(batch)
         batch.color = spriteViewBackCol
@@ -88,6 +96,9 @@ class UIItemInventoryEquippedView(
         // TODO inscribe slot image on each cells HERE
 
         itemGrid.forEach { it.render(batch, camera) }
+
+
+        oldPosX = posX
     }
 
     internal fun rebuild() {

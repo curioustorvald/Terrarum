@@ -17,9 +17,9 @@ class GdxColorMap {
         height = pixmap.height
         is2D = pixmap.height > 1
 
-        data = kotlin.IntArray(pixmap.width * pixmap.height, {
+        data = kotlin.IntArray(pixmap.width * pixmap.height) {
             pixmap.getPixel(it % pixmap.width, it / pixmap.width)
-        })
+        }
 
 
         AppLoader.printdbg(this, "Loading colormap from ${imageFile.name()}; PixmapFormat: ${pixmap.format}; Dimension: $width x $height")
