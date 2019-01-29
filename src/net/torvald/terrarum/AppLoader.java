@@ -299,6 +299,7 @@ public class AppLoader implements ApplicationListener {
 
     @Override
     public void render() {
+        Gdx.gl.glDisable(GL20.GL_DITHER);
 
         if (splashDisplayed && !postInitFired) {
             postInitFired = true;
@@ -541,11 +542,11 @@ public class AppLoader implements ApplicationListener {
             operationSystem = "SOLARIS";
             defaultDir = System.getProperty("user.home") + "/.Terrarum";
         }
-        else if (System.getProperty("java.runtime.name").toUpperCase().contains("ANDROID")) {
+        /*else if (System.getProperty("java.runtime.name").toUpperCase().contains("ANDROID")) {
             operationSystem = "ANDROID";
             defaultDir = System.getProperty("user.home") + "/.Terrarum";
             environment = RunningEnvironment.MOBILE;
-        }
+        }*/
         else {
             operationSystem = "UNKNOWN";
             defaultDir = System.getProperty("user.home") + "/.Terrarum";

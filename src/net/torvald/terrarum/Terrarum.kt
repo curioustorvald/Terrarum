@@ -234,7 +234,7 @@ object Terrarum : Screen {
 
 
         // setting environment as MOBILE precedes this code
-        if (environment != RunningEnvironment.MOBILE) {
+        //if (environment != RunningEnvironment.MOBILE) {
             environment = try {
                 Controllers.getController(0) // test if controller exists
                 if (getConfigString("pcgamepadenv") == "console")
@@ -245,7 +245,7 @@ object Terrarum : Screen {
             catch (e: IndexOutOfBoundsException) {
                 RunningEnvironment.PC
             }
-        }
+        //}
     }
 
 
@@ -270,11 +270,6 @@ object Terrarum : Screen {
     val MINIMAL_GL_MAX_TEXTURE_SIZE = 4096
 
     override fun show() {
-        if (environment != RunningEnvironment.MOBILE) {
-            Gdx.gl.glDisable(GL20.GL_DITHER)
-        }
-
-
         assetManager = AssetManager()
 
 
@@ -634,7 +629,7 @@ object BlendMode {
 }
 
 enum class RunningEnvironment {
-    PC, CONSOLE, MOBILE
+    PC, CONSOLE//, MOBILE
 }
 
 infix fun Color.screen(other: Color) = Color(

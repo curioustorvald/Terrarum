@@ -304,7 +304,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 -uiInventoryPlayer.width,
                 70
         )*/
-        uiInventoryPlayer = UIInventoryFull(actorNowPlaying,
+        uiInventoryPlayer = UIInventoryFull(actorNowPlaying!!,
                 toggleKeyLiteral = AppLoader.getConfigInt("keyinventory")
         )
         uiInventoryPlayer.setPosition(0, 0)
