@@ -105,10 +105,6 @@ object LightmapRenderer {
 
         if (SHADER_LIGHTING) {
             lightCalcShader = AppLoader.loadShader("assets/4096.vert", "assets/raytracelight.frag")
-            lightCalcShader.setUniformf("outSize", LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat())
-            lightCalcShader.setUniformi("shades", SHADEMAP_UNIT)
-            lightCalcShader.setUniformi("lights", LIGHTMAP_UNIT)
-            lightCalcShader.setUniformi("u_texture", 0)
 
             texturedLightMap = FrameBuffer(Pixmap.Format.RGBA8888, LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, false)
             //texturedLightMap = Texture(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
@@ -133,11 +129,11 @@ object LightmapRenderer {
                     VertexAttribute.ColorUnpacked(),
                     VertexAttribute.TexCoords(0)
             )
-            texturedLightQuad.setVertices(floatArrayOf(
-                    0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
-                    LIGHTMAP_WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                    LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                    0f, LIGHTMAP_HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 0f))
+            texturedLightQuad.setVertices(floatArrayOf( // y-flipped quads!
+                    0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 0f,
+                    LIGHTMAP_WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 0f,
+                    LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 1f,
+                    0f, LIGHTMAP_HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 1f))
             texturedLightQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
 
             texturedLightCamera = OrthographicCamera(LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat())
@@ -433,7 +429,11 @@ object LightmapRenderer {
                     texturedLightSources.bind(LIGHTMAP_UNIT)
 
                     lightCalcShader.begin()
+                    // it seems that every time shader ends, uniforms reset themselves.
                     lightCalcShader.setUniformMatrix("u_projTrans", texturedLightCamera.combined)
+                    lightCalcShader.setUniformf("outSize", LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat())
+                    lightCalcShader.setUniformi("shades", SHADEMAP_UNIT)
+                    lightCalcShader.setUniformi("lights", LIGHTMAP_UNIT)
                     texturedLightQuad.render(lightCalcShader, GL20.GL_TRIANGLES)
                     lightCalcShader.end()
                 }

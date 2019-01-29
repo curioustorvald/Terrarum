@@ -61,12 +61,18 @@ vec2[TRAVERSE_SIZE] traceRay(int arraySize, vec2 from, vec2 to) {
 
 void main() {
 
+    // this code will produce y-flipped image. It's your job to flip it again (e.g. using y-flipped fullscreen quad)
+
+    // Nice try, but it kills GPU :(
+    // reason: looks like traceRayCount() returns value greater than TRAVERSE_SIZE.
+    //         even if I make traceRayCount() to return constant 3, I get less than 1 fps on GTX 970.
+
     vec4 outColor = vec4(0.0,0.0,0.0,0.0);
 
     // 1. pick a light source
     for (int y = 0; y < int(outSize.y); y++) {
         for (int x = 0; x < int(outSize.x); x++) {
-            vec2 from = vec2(x, y);
+            vec2 from = vec2(x + 0.5, y + 0.5); // +0.5 is used because gl_FragCoord does
             vec2 to = gl_FragCoord.xy;
             vec2 delta = to - from;
             int traceCount = traceRayCount(delta);
@@ -94,10 +100,9 @@ void main() {
     }
 
     gl_FragColor = outColor * multiplier;
-    gl_FragColor = vec4(0,1,0,1);
+    //gl_FragColor = vec4(0,1,0,1);
 
-    gl_FragColor = vec4(texture2D(lights, gl_FragCoord.xy / outSize)) * multiplier;
+    //gl_FragColor = sampleFrom(lights, gl_FragCoord.xy) * multiplier;
 
-    // FIXME (gl_FragCoord / outSize) != v_texCoords
 
 }

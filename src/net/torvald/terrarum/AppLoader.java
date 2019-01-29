@@ -496,7 +496,7 @@ public class AppLoader implements ApplicationListener {
         logoBatch.setProjectionMatrix(camera.combined);
     }
 
-    private void updateFullscreenQuad(int WIDTH, int HEIGHT) {
+    private void updateFullscreenQuad(int WIDTH, int HEIGHT) { // NOT y-flipped quads!
         fullscreenQuad.setVertices(new float[]{
                 0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f,
                 WIDTH, 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f,
@@ -650,16 +650,19 @@ public class AppLoader implements ApplicationListener {
      * Return config from config set. If the config does not exist, default value will be returned.
      * @param key
      * *
-     * @return Config from config set or default config if it does not exist.
-     * *
-     * @throws NullPointerException if the specified config simply does not exist.
+     * @return Config from config set or default config if it does not exist. If the default value is undefined, will return false.
      */
     public static boolean getConfigBoolean(String key) {
-        Object cfg = getConfigMaster(key);
-        if (cfg instanceof JsonPrimitive)
-        return ((JsonPrimitive) cfg).getAsBoolean();
-        else
-        return ((boolean) cfg);
+        try {
+            Object cfg = getConfigMaster(key);
+            if (cfg instanceof JsonPrimitive)
+                return ((JsonPrimitive) cfg).getAsBoolean();
+            else
+                return ((boolean) cfg);
+        }
+        catch (NullPointerException keyNotFound) {
+            return false;
+        }
     }
 
     public static int[] getConfigIntArray(String key) {
