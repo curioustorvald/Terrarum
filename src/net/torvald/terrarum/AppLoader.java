@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
@@ -22,6 +23,8 @@ import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
+import net.torvald.terrarum.worlddrawer.BlocksDrawer;
+import net.torvald.terrarum.worlddrawer.LightmapRenderer;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
 import org.lwjgl.input.Controller;
@@ -248,8 +251,12 @@ public class AppLoader implements ApplicationListener {
 
     private FrameBuffer renderFBO;
 
+    public static AssetManager assetManager;
+
     @Override
     public void create() {
+        assetManager = new AssetManager();
+
         // set basis of draw
         logoBatch = new SpriteBatch();
         camera = new OrthographicCamera(((float) appConfig.width), ((float) appConfig.height));
@@ -287,6 +294,9 @@ public class AppLoader implements ApplicationListener {
             printdbg(this, "Exception occured while creating controllers -- there will be no gamepads available.");
             printdbg(this, e);
         }
+
+
+        // make loading list
 
     }
 
@@ -437,6 +447,13 @@ public class AppLoader implements ApplicationListener {
 
         Terrarum.INSTANCE.dispose();
 
+        shaderBayerSkyboxFill.dispose();
+        shaderHicolour.dispose();
+        shaderColLUT.dispose();
+
+        assetManager.dispose();
+        fullscreenQuad.dispose();
+
         fontGame.dispose();
         fontSmallNumbers.dispose();
 
@@ -490,6 +507,10 @@ public class AppLoader implements ApplicationListener {
         if (injectScreen != null) {
             setScreen(injectScreen);
         }
+
+
+        BlocksDrawer.INSTANCE.getWorld(); // will initialize the BlocksDrawer by calling dummy method
+        LightmapRenderer.INSTANCE.hdr(0f);
 
 
         printdbg(this, "PostInit done");
