@@ -38,6 +38,8 @@ object PostProcessor {
 
         // init
         if (!init) {
+            init = true
+
             batch = SpriteBatch()
             camera = OrthographicCamera(AppLoader.screenW.toFloat(), AppLoader.screenH.toFloat())
             camera.setToOrtho(true)
@@ -115,6 +117,12 @@ object PostProcessor {
                     }
                 }
                 catch (doNothing: NullPointerException) { }
+                finally {
+                    // one-time call, caused by catching NPE before batch ends
+                    if (batch.isDrawing) {
+                        batch.end()
+                    }
+                }
             }
         }
     }
