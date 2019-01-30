@@ -105,7 +105,7 @@ class UIItemInventoryCatBar(
 
     private val highlighterYPos = catIcons.tileH + 4f
     private var highlighterMoving = false
-    private val highlighterMoveDuration: Second = 0.1f
+    private val highlighterMoveDuration: Second = 0.15f
     private var highlighterMoveTimer: Second = 0f
 
     private var transitionFired = false

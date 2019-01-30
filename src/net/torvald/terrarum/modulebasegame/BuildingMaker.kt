@@ -4,10 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.IngameInstance
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.Yaml
+import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gamecontroller.KeyToggler
@@ -20,7 +17,6 @@ import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import kotlin.system.measureNanoTime
 
 /**
  * Created by minjaesong on 2018-07-06.
@@ -35,6 +31,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
  - Import…
  - Save world…
  - Load world…
+ - Exit to Title : net.torvald.terrarum.modulebasegame.YamlCommandExit
 - Tool
  - Pencil
  - Eyedropper
@@ -135,6 +132,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         uiToolbox.setPosition(0, 0)
         uiToolbox.isVisible = true
+
         notifier.setPosition(
                 (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
 
@@ -259,4 +257,10 @@ class MovableWorldCamera : ActorHumanoid(0, usePhysics = false) {
     override fun onActorValueChange(key: String, value: Any?) {
     }
 
+}
+
+class YamlCommandExit : YamlInvokable {
+    override fun invoke(vararg args: Any?) {
+        Terrarum.setScreen(TitleScreen(Terrarum.batch))
+    }
 }

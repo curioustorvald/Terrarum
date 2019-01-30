@@ -401,24 +401,15 @@ object Terrarum : Screen {
         AppLoader.getINSTANCE().screen.resume()
     }
 
+    /** Don't call this! Call AppLoader.dispose() */
     override fun dispose() {
-        AppLoader.getINSTANCE().screen.dispose()
-
-        fontGame.dispose()
-        fontSmallNumbers.dispose()
-
-
         //dispose any other resources used in this level
-
-
         shaderBayer.dispose()
         shaderSkyboxFill.dispose()
         shaderBlur.dispose()
         shaderBlendGlow.dispose()
 
-
-        shapeRender.dispose()
-        batch.dispose()
+        ingame?.dispose()
     }
 
     override fun hide() {

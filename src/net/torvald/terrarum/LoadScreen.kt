@@ -313,7 +313,6 @@ object LoadScreen : ScreenAdapter() {
     }
 
     override fun hide() {
-        dispose()
     }
 
     override fun resize(width: Int, height: Int) {

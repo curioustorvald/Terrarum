@@ -22,8 +22,6 @@ import net.torvald.terrarum.modulebasegame.gameactors.*
 import net.torvald.terrarum.modulebasegame.gameactors.physicssolver.CollisionSolver
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
-import net.torvald.terrarum.modulebasegame.imagefont.Watch7SegMain
-import net.torvald.terrarum.modulebasegame.imagefont.WatchDotAlph
 import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
@@ -890,7 +888,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun hide() {
-        dispose()
+        uiContainer.forEach { it.handler.dispose() }
     }
 
 
@@ -943,26 +941,16 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun dispose() {
-        IngameRenderer.dispose()
-
         actorsRenderBehind.forEach { it.dispose() }
         actorsRenderMiddle.forEach { it.dispose() }
         actorsRenderMidTop.forEach { it.dispose() }
         actorsRenderFront.forEach { it.dispose() }
         actorsRenderOverlay.forEach { it.dispose() }
 
-        uiAliases.forEach { it.dispose() }
-        uiAliasesPausing.forEach { it.dispose() }
-
-
-        WatchDotAlph.dispose()
-        Watch7SegMain.dispose()
-        WatchDotAlph.dispose()
-
-        ItemSlotImageFactory.dispose()
-
-        MessageWindow.SEGMENT_BLACK.dispose()
-        MessageWindow.SEGMENT_WHITE.dispose()
+        uiContainer.forEach {
+            it.handler.dispose()
+            it.dispose()
+        }
     }
 
 

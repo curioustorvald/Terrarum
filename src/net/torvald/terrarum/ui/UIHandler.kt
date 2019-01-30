@@ -3,8 +3,9 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.modulebasegame.Ingame
+import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.gamecontroller.KeyToggler
+import net.torvald.terrarum.modulebasegame.Ingame
 
 /**
  * UIHandler is a handler for UICanvas. It opens/closes the attached UI, moves the "window" (or "canvas")
@@ -20,7 +21,7 @@ class UIHandler(//var UI: UICanvas,
                 // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
                 var customPositioning: Boolean = false, // mainly used by vital meter
                 var doNotWarnConstant: Boolean = false
-) {
+): Disposable {
 
     // X/Y Position relative to the game window.
     var posX: Int = 0
@@ -340,5 +341,11 @@ class UIHandler(//var UI: UICanvas,
         else {
             return false
         }
+    }
+
+    /** Don't dispose common assets, this function is called when the ingame does hide() */
+    override fun dispose() {
+        toggleKey?.let { KeyToggler.forceSet(it, false) }
+        toggleButton?.let { /* ButtonToggler.forceSet(it, false) */ }
     }
 }

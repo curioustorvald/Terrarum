@@ -135,7 +135,7 @@ class UIInventoryFull(
     private var transitionReqSource = SCREEN_INVENTORY
     private var transitionReqTarget = SCREEN_INVENTORY
     private var transitionTimer = 0f
-    private val transitionLength = 0.333f
+    private val transitionLength = 0.212f
 
 
     private val transitionalUpdateUIs = ArrayList<UIItem>()
@@ -174,6 +174,16 @@ class UIInventoryFull(
         addToTransitionalGroup(itemList)
         addToTransitionalGroup(equipped)
         addToTransitionalGroup(gameMenuButtons)
+
+        // make gameMenuButtons work
+        gameMenuButtons.selectionChangeListener = { old, new ->
+            if (new == 0) {
+                Terrarum.setScreen(TitleScreen(Terrarum.batch))
+            }
+            else if (new == 1) {
+                Gdx.app.exit()
+            }
+        }
     }
 
     private var offsetX = ((Terrarum.WIDTH - internalWidth)   / 2).toFloat()
