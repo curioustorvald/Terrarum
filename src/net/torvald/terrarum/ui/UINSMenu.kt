@@ -13,6 +13,7 @@ import net.torvald.terrarum.*
 class UINSMenu(
         var title: String = "",
         val minimumWidth: Int,
+        /** Optional instance of YamlInvokable can be used */
         treeRepresentation: Yaml,
 
         val titleBackCol: Color = Color(0f,0f,0f,.77f),
@@ -29,7 +30,7 @@ class UINSMenu(
     val CHILD_ARROW = "${0x2023.toChar()}"
 
 
-    val tree = treeRepresentation.parse()
+    val tree = treeRepresentation.parseAsYamlInvokable()
     override var width = 0
     override var height = 0
     //override var width = maxOf(minimumWidth, tree.getLevelData(1).map { Terrarum.fontGame.getWidth(it ?: "") }.max() ?: 0)
@@ -53,10 +54,10 @@ class UINSMenu(
         addSubMenu(tree)
     }
 
-    private fun addSubMenu(tree: QNDTreeNode<String>) {
-        val menuTitle = tree.data ?: title
+    private fun addSubMenu(tree: QNDTreeNode<Pair<String, YamlInvokable?>>) {
+        val menuTitle = tree.data?.first ?: title
         val stringsFromTree = Array<String>(tree.children.size) {
-            tree.children[it].toString() + if (tree.children[it].children.isNotEmpty()) "  $CHILD_ARROW" else ""
+            tree.children[it].data?.first + if (tree.children[it].children.isNotEmpty()) "  $CHILD_ARROW" else ""
         }
 
         val listWidth = maxOf(
@@ -98,6 +99,10 @@ class UINSMenu(
             if (tree.children[new].children.isNotEmpty()) {
                 addSubMenu(tree.children[new])
             }
+
+            // invoke whatever command there is
+            //printdbg(this, "Selected: ${tree.children[new].data?.second}")
+            tree.children[new].data?.second?.invoke()
         }
         // END List selection change listener
 

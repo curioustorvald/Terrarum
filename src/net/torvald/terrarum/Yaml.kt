@@ -123,7 +123,10 @@ inline class Yaml(val text: String) {
                     val nodeString = it.drop(2)
                     val nodeNameAndInvocation = nodeString.split(SEPARATOR)
                     val nodeName = nodeNameAndInvocation[0]
-                    val nodeInvocation = loadClass(nodeNameAndInvocation[1])
+                    val nodeInvocation = if (nodeNameAndInvocation.size == 2)
+                        loadClass(nodeNameAndInvocation[1])
+                    else
+                        null
 
                     val nameInvokePair = nodeName to nodeInvocation
 
@@ -193,5 +196,5 @@ inline class Yaml(val text: String) {
  *
  */
 interface YamlInvokable {
-    operator fun invoke()
+    operator fun invoke(vararg args: Any?)
 }

@@ -1,6 +1,6 @@
 package net.torvald.terrarum.console
 
-import net.torvald.terrarum.console.ConsoleCommand
+import com.badlogic.gdx.Gdx
 
 /**
  * Created by minjaesong on 2016-01-15.
@@ -8,7 +8,7 @@ import net.torvald.terrarum.console.ConsoleCommand
 internal object QuitApp : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
-        System.exit(1)
+        Gdx.app.exit()
     }
 
     override fun printUsage() {

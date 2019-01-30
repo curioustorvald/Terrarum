@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
@@ -21,7 +22,7 @@ abstract class UICanvas(
         // UI positions itself? (you must g.flush() yourself after the g.translate(Int, Int))
         customPositioning: Boolean = false, // mainly used by vital meter
         doNotWarnConstant: Boolean = false
-) {
+): Disposable {
 
     abstract var width: Int
     abstract var height: Int
@@ -36,7 +37,7 @@ abstract class UICanvas(
     /**
      * Usage: (in StateInGame:) uiHandlerField.ui.handler = uiHandlerField
      */
-    protected val handler = UIHandler(toggleKeyLiteral, toggleButtonLiteral, customPositioning, doNotWarnConstant)
+    val handler = UIHandler(toggleKeyLiteral, toggleButtonLiteral, customPositioning, doNotWarnConstant)
 
     init {
 
@@ -111,7 +112,7 @@ abstract class UICanvas(
      */
     abstract fun endClosing(delta: Float)
 
-    abstract fun dispose()
+    abstract override fun dispose()
 
     fun addItem(uiItem: UIItem) {
         uiItems.add(uiItem)

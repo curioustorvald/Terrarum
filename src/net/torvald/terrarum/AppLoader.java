@@ -435,6 +435,11 @@ public class AppLoader implements ApplicationListener {
         IngameRenderer.INSTANCE.dispose();
         if (Controllers.isCreated()) Controllers.destroy();
 
+        Terrarum.INSTANCE.dispose();
+
+        fontGame.dispose();
+        fontSmallNumbers.dispose();
+
         // delete temp files
         new File("./tmp_wenquanyi.tga").delete(); // FIXME this is pretty much ad-hoc
     }
