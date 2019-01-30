@@ -26,10 +26,9 @@ object UITitleRemoConYaml {
           - MENU_CONTROLS_GAMEPAD
           - MENU_LABEL_RETURN
          - MENU_OPTIONS_SOUND
+         - MENU_LABEL_LANGUAGE : net.torvald.terrarum.modulebasegame.ui.UITitleLanguage
          - MENU_LABEL_RETURN
         - MENU_MODULES : net.torvald.terrarum.modulebasegame.ui.UITitleModules
-         - MENU_LABEL_RETURN
-        - MENU_LABEL_LANGUAGE : net.torvald.terrarum.modulebasegame.ui.UITitleLanguage
          - MENU_LABEL_RETURN
         - MENU_LABEL_CREDITS : net.torvald.terrarum.modulebasegame.ui.UITitleCredits
          - MENU_LABEL_CREDITS : net.torvald.terrarum.modulebasegame.ui.UITitleCredits
