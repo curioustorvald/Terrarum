@@ -12,6 +12,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.Notification
+import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
@@ -40,10 +41,10 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
  - Undo
  - Redo
 - Time
- - Morning
- - Noon
- - Dusk
- - Night
+ - Morning : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeMorning
+ - Noon : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeNoon
+ - Dusk : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeDusk
+ - Night : net.torvald.terrarum.modulebasegame.YamlCommandSetTimeNight
  - Set…
 - Weather
  - Sunny
@@ -132,6 +133,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         uiToolbox.setPosition(0, 0)
         uiToolbox.isVisible = true
+        uiToolbox.invocationArgument = arrayOf(this)
 
         notifier.setPosition(
                 (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
@@ -166,6 +168,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     private fun updateGame(delta: Float) {
         KeyToggler.update(false)
 
+        WeatherMixer.update(delta, actorNowPlaying, gameWorld)
         blockPointingCursor.update(delta)
         actorNowPlaying?.update(delta)
         uiContainer.forEach { it.update(delta) }
@@ -174,7 +177,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun renderGame() {
-        IngameRenderer(world as GameWorldExtension, actorsRenderOverlay = actorsRenderOverlay, uisToDraw = uiContainer)
+        IngameRenderer.invoke(world as GameWorldExtension, actorsRenderOverlay = actorsRenderOverlay, uisToDraw = uiContainer)
     }
 
     override fun resize(width: Int, height: Int) {
@@ -260,7 +263,31 @@ class MovableWorldCamera : ActorHumanoid(0, usePhysics = false) {
 }
 
 class YamlCommandExit : YamlInvokable {
-    override fun invoke(vararg args: Any?) {
+    override fun invoke(args: Array<Any>) {
         Terrarum.setScreen(TitleScreen(Terrarum.batch))
+    }
+}
+
+class YamlCommandSetTimeMorning : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).gameWorld.time.setTimeOfToday(WorldTime.parseTime("7h00"))
+    }
+}
+
+class YamlCommandSetTimeNoon : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).gameWorld.time.setTimeOfToday(WorldTime.parseTime("12h30"))
+    }
+}
+
+class YamlCommandSetTimeDusk : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).gameWorld.time.setTimeOfToday(WorldTime.parseTime("18h40"))
+    }
+}
+
+class YamlCommandSetTimeNight : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).gameWorld.time.setTimeOfToday(WorldTime.parseTime("0h30"))
     }
 }

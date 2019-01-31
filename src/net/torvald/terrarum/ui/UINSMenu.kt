@@ -50,6 +50,8 @@ class UINSMenu(
     val selectedIndex: Int?
         get() = listStack.peek().ui.selectedIndex
 
+    var invocationArgument: Array<Any> = arrayOf(this)
+
     init {
         addSubMenu(tree)
     }
@@ -102,7 +104,7 @@ class UINSMenu(
 
             // invoke whatever command there is
             //printdbg(this, "Selected: ${tree.children[new].data?.second}")
-            tree.children[new].data?.second?.invoke()
+            tree.children[new].data?.second?.invoke(invocationArgument)
         }
         // END List selection change listener
 

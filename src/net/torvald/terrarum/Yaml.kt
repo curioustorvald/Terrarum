@@ -196,5 +196,5 @@ inline class Yaml(val text: String) {
  *
  */
 interface YamlInvokable {
-    operator fun invoke(vararg args: Any?)
+    operator fun invoke(args: Array<Any>)
 }
