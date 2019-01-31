@@ -478,6 +478,7 @@ public class AppLoader implements ApplicationListener {
 
         if (this.screen != null) {
             this.screen.hide();
+            this.screen.dispose();
         }
         this.screen = screen;
         if (this.screen != null) {

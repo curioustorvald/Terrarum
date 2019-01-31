@@ -239,7 +239,7 @@ object LoadScreen : ScreenAdapter() {
                 for (i in 0 until messages.elemCount) {
                     Terrarum.fontGame.draw(it,
                             messages[i] ?: "",
-                            40f,
+                            AppLoader.getTvSafeGraphicsWidth() + 16f,
                             80f + (messages.size - i - 1) * Terrarum.fontGame.lineHeight
                     )
                 }
@@ -264,7 +264,7 @@ object LoadScreen : ScreenAdapter() {
                 for (i in 0 until messages.elemCount) {
                     Terrarum.fontGame.draw(it,
                             messages[i] ?: "",
-                            40f,
+                            AppLoader.getTvSafeGraphicsWidth() + 16f,
                             80f + (messages.size - i - 1) * Terrarum.fontGame.lineHeight
                     )
                 }

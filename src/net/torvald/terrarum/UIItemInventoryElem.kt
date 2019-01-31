@@ -198,7 +198,6 @@ class UIItemInventoryElem(
 
 
     override fun dispose() {
-        itemImage?.texture?.dispose()
     }
 
     override fun keyUp(keycode: Int): Boolean {
