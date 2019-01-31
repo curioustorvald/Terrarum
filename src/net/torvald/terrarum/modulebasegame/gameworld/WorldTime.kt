@@ -153,6 +153,9 @@ class WorldTime(initTime: Long = 0L) {
 
         val EPOCH_YEAR = 125
 
+        /**
+         * Parse a time in the format of "8h30" (hour and minute) or "39882" (second) and return a time of day, in seconds
+         */
         fun parseTime(s: String): Int =
                 if (s.length >= 4 && s.contains('h')) {
                     s.toLowerCase().substringBefore('h').toInt() * HOUR_SEC +
