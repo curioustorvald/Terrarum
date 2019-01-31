@@ -89,6 +89,9 @@ abstract class UICanvas(
      *
      * Under normal circumstances, draws are automatically translated as per the handler's X/Y position.
      * This means, don't write like: ```draw(posX + 4, posY + 32)```, do instead: ```draw(4, 32)``` unless you have a good reason to do so.
+     *
+     * The transparency of the handler is independent of the draw, you must specified the color yourself
+     * using handler.opacity or handler.opacityColour
      */
     abstract fun renderUI(batch: SpriteBatch, camera: Camera)
 
@@ -201,7 +204,7 @@ abstract class UICanvas(
 
     // handler func aliases //
 
-    fun setPosition(x: Int, y: Int) {
+    open fun setPosition(x: Int, y: Int) {
         handler.setPosition(x, y)
     }
 
@@ -209,15 +212,15 @@ abstract class UICanvas(
         handler.setAsAlwaysVisible()
     }
 
-    fun setAsOpen() {
+    open fun setAsOpen() {
         handler.setAsOpen()
     }
 
-    fun setAsClose() {
+    open fun setAsClose() {
         handler.setAsClose()
     }
 
-    fun toggleOpening() {
+    open fun toggleOpening() {
         handler.toggleOpening()
     }
 
@@ -255,7 +258,7 @@ abstract class UICanvas(
         const val OPENCLOSE_GENERIC = 0.2f
 
         fun doOpeningFade(ui: UICanvas, openCloseTime: Second) {
-            ui.handler.opacity = ui.handler.openCloseCounter / openCloseTime
+            ui.handler.opacity = maxOf(0f, ui.handler.openCloseCounter - 0.02f) / openCloseTime // fade start 1/50 sec late, it's intended
         }
         fun doClosingFade(ui: UICanvas, openCloseTime: Second) {
             ui.handler.opacity = (openCloseTime - ui.handler.openCloseCounter) / openCloseTime

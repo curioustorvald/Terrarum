@@ -55,7 +55,13 @@ class UIHandler(//var UI: UICanvas,
     var closeFired = false
 
     var opacity = 1f
+        set(value) {
+            field = value
+            opacityColour.set(1f,1f,1f,opacity)
+        }
     var scale = 1f
+
+    val opacityColour = Color(1f,1f,1f,opacity)
 
     var openCloseCounter = 0f
 
@@ -175,13 +181,18 @@ class UIHandler(//var UI: UICanvas,
 
             ui.renderUI(batch, camera)
             //ingameGraphics.flush()
+            batch.color = Color.WHITE
 
 
             setCameraPosition(batch, camera, 0f, 0f)
         }
 
 
-        subUIs.forEach { it.render(batch, camera) }
+        subUIs.forEach {
+            it.render(batch, camera)
+            batch.color = Color.WHITE
+        }
+
     }
 
     fun setPosition(x: Int, y: Int) {
