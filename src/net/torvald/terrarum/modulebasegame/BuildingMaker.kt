@@ -186,7 +186,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun dispose() {
-        IngameRenderer.dispose()
+        blockPointingCursor.dispose()
     }
 }
 
