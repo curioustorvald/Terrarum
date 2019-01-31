@@ -103,8 +103,7 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
         // screenshot key
         if (keycode == Input.Keys.F12 && !f12Down) {
             AppLoader.requestScreenshot()
-            // FIXME
-            //ingame.sendNotification(arrayOf("Screenshot taken", ""))
+            ingame.sendNotification(arrayOf("Screenshot taken", ""))
             f12Down = true
             println("Screenshot taken.")
         }

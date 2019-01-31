@@ -41,6 +41,8 @@ class UIQuickslotBar : UICanvas() {
     override fun updateUI(delta: Float) {
     }
 
+    private val drawColor = Color(1f,1f,1f,1f)
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
         for (i in 0..SLOT_COUNT - 1) {
@@ -55,7 +57,8 @@ class UIQuickslotBar : UICanvas() {
             val slotY = cellSize / 2
 
             // draw slots
-            batch.color = Color(1f, 1f, 1f, handler.opacity * DISPLAY_OPACITY)
+            drawColor.a = handler.opacity * DISPLAY_OPACITY
+            batch.color = drawColor
             image.draw(batch, slotX, slotY)
 
         }

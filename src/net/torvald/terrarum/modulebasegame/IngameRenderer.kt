@@ -79,6 +79,9 @@ object IngameRenderer {
 
         init()
 
+        batch.color = Color.WHITE
+
+
         BlocksDrawer.world = world
         LightmapRenderer.setWorld(world)
         FeaturesDrawer.world = world
@@ -208,6 +211,7 @@ object IngameRenderer {
 
         // works but some UI elements have wrong transparency -> should be fixed with Terrarum.gdxCleanAndSetBlend -- Torvald 2019-01-12
         blendNormal(batch)
+        batch.color = Color.WHITE
     }
 
 

@@ -285,23 +285,14 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         // init notifier
         notifier = Notification()
         notifier.setPosition(
-                (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
+                (Terrarum.WIDTH - notifier.width) / 2,
+                Terrarum.HEIGHT - notifier.height - AppLoader.getTvSafeGraphicsHeight()
+        )
 
 
 
 
         // >- queue up game UIs that should pause the world -<
-        // inventory
-        /*uiInventoryPlayer = UIInventory(player,
-                width = 900,
-                height = Terrarum.HEIGHT - 160,
-                categoryWidth = 210,
-                toggleKeyLiteral = AppLoader.getConfigInt("keyinventory")
-        )*/
-        /*uiInventoryPlayer.setPosition(
-                -uiInventoryPlayer.width,
-                70
-        )*/
         uiInventoryPlayer = UIInventoryFull(actorNowPlaying!!,
                 toggleKeyLiteral = AppLoader.getConfigInt("keyinventory")
         )

@@ -57,6 +57,8 @@ class uiQuickslotPie : UICanvas() {
         }
     }
 
+    private val drawColor = Color(1f,1f,1f,1f)
+
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // draw radial thingies
         for (i in 0..slotCount - 1) {
@@ -75,7 +77,8 @@ class uiQuickslotPie : UICanvas() {
             val slotX = slotCentrePoint.x.toInt()
             val slotY = slotCentrePoint.y.toInt()
 
-            batch.color = Color(1f, 1f, 1f, handler.opacity * UIQuickslotBar.DISPLAY_OPACITY)
+            drawColor.a = handler.opacity * UIQuickslotBar.DISPLAY_OPACITY
+            batch.color = drawColor
             image.draw(batch, slotX, slotY)
 
         }

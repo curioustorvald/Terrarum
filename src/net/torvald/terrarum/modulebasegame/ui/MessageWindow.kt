@@ -1,19 +1,10 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-
 
 /**
  * Created by minjaesong on 2016-01-27.
  */
-class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas() {
+/*class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas() {
 
     private val segment = if (isBlackVariant) SEGMENT_BLACK else SEGMENT_WHITE
 
@@ -49,6 +40,9 @@ class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas
         messagesList.forEachIndexed { index, s ->
             Terrarum.fontGame.draw(batch, s, segment.tileW + LRmargin, (segment.tileH - Terrarum.fontGame.lineHeight) / 2f)
         }
+
+        AppLoader.printdbg(this, "render")
+
     }
 
     override fun doOpening(delta: Float) {
@@ -76,4 +70,4 @@ class MessageWindow(override var width: Int, isBlackVariant: Boolean) : UICanvas
         val SEGMENT_BLACK = TextureRegionPack("assets/graphics/gui/message_black.tga", 8, 56)
         val SEGMENT_WHITE = TextureRegionPack("assets/graphics/gui/message_white.tga", 8, 56)
     }
-}
+}*/
