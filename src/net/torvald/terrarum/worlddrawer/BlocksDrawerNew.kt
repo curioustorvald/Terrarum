@@ -143,13 +143,32 @@ internal object BlocksDrawer {
         printdbg(this, "Making wall item textures...")
 
         // create item_wall images
-        // will just use the terrain texture :p
-        tileItemWall = weatherTerrains[1]
+        // because some limitation, we'll use summer image
+        // CPU render shits (lots of magic numbers xD)
+        val itemWallPixmap = Pixmap(_terrainPixMap[1].width / 16, _terrainPixMap[1].height, Pixmap.Format.RGBA8888)
+        for (blocksCol in 0 until itemWallPixmap.width / TILE_SIZE) { // 0..15
+            val pxColStart = blocksCol * 256 // 0, 256, 512, 768, ...
+            for (pxCol in pxColStart until pxColStart + TILE_SIZE) {
+                val x = blocksCol * TILE_SIZE + (pxCol fmod TILE_SIZE)
+
+                for (y in 0 until itemWallPixmap.height) {
+                    val colour = Color(_terrainPixMap[1].getPixel(pxCol, y)) mulAndAssign wallOverlayColour
+                    itemWallPixmap.drawPixel(x, y, colour.toRGBA())
+                }
+            }
+        }
+
+        // test print
+        //PixmapIO2.writeTGA(Gdx.files.local("wallitem.tga"), itemWallPixmap, false)
+
+        val itemWallTexture = Texture(itemWallPixmap)
+        itemWallPixmap.dispose()
+        tileItemWall = TextureRegionPack(itemWallTexture, TILE_SIZE, TILE_SIZE)
 
 
-        _terrainPixMap.forEach { it.dispose() } // finally
 
-
+        // finally
+        _terrainPixMap.forEach { it.dispose() }
         tilesTerrain = weatherTerrains[1]
 
 

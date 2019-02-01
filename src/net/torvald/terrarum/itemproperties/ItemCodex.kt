@@ -269,7 +269,7 @@ object ItemCodex {
         // wall
         else if (item.originalID in ITEM_WALLS) {
             return BlocksDrawer.tileItemWall.get(
-                    (item.originalID.minus(ITEM_WALLS.first) % 16) * 16,
+                    (item.originalID.minus(ITEM_WALLS.first) % 16),
                     (item.originalID.minus(ITEM_WALLS.first) / 16)
             )
         }
