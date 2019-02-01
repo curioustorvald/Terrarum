@@ -70,6 +70,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
             }
         }
 
+        // set time to summer
+        gameWorld.time.addTime(WorldTime.DAY_LENGTH * 32)
 
         world = gameWorld
     }
