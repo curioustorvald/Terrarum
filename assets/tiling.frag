@@ -110,7 +110,7 @@ void main() {
 
     vec4 finalBreakage = texture2D(tilesAtlas, finalUVCoordForBreakage);
 
-    vec4 finalColor = mix(finalTile, finalBreakage, finalBreakage.a);
+    vec4 finalColor = vec4(mix(finalTile.rgb, finalBreakage.rgb, finalBreakage.a), finalTile.a);
 
     gl_FragColor = colourFilter * finalColor;
 
