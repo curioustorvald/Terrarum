@@ -1,5 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
+import net.torvald.terrarum.gameworld.fmod
+
 
 typealias time_t = Long
 
@@ -96,11 +98,11 @@ class WorldTime(initTime: Long = 0L) {
 
     // these functions won't need inlining for performance
     val yearlyDays: Int // 0 - 119
-        get() = (TIME_T.toPositiveInt().div(DAY_LENGTH) % YEAR_DAYS)
+        get() = (TIME_T.div(DAY_LENGTH) fmod YEAR_DAYS.toLong()).toInt()
     val days: Int // 1 - 30 fixed
-        get() = (yearlyDays % 30) + 1
+        get() = (yearlyDays % MONTH_LENGTH) + 1
     val months: Int // 1 - 4
-        get() = (yearlyDays / 30) + 1
+        get() = (yearlyDays / MONTH_LENGTH) + 1
     val years: Int
         get() = TIME_T.div(YEAR_DAYS * DAY_LENGTH).abs().toInt() + EPOCH_YEAR
 
