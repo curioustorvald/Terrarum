@@ -42,10 +42,12 @@ internal object BlocksDrawer {
      * If not, the engine will choose wrong tile for a number you provided.
      */
 
-    val tilesTerrain: TextureRegionPack
+    /** Index zero: spring */
+    val weatherTerrains: Array<TextureRegionPack>
+    lateinit var tilesTerrain: TextureRegionPack; private set
+    lateinit var tilesTerrainBlend: TextureRegionPack; private set
     val tilesWire: TextureRegionPack
     val tileItemWall: TextureRegionPack
-    val tilesTerrainBlend: TextureRegionPack
     val tilesFluid: TextureRegionPack
 
     //val tileItemWall = Image(TILE_SIZE * 16, TILE_SIZE * GameWorld.TILES_SUPPORTED / 16) // 4 MB
@@ -97,8 +99,8 @@ internal object BlocksDrawer {
         // -- Torvald, 2018-12-19
 
         // hard-coded as tga.gz
-        val gzFileList = listOf("blocks/terrain.tga.gz", "blocks/wire.tga.gz", "blocks/terrain_autumn.tga.gz", "blocks/fluids.tga.gz")
-        val gzTmpFName = listOf("tmp_terrain.tga", "tmp_wire.tga", "tmp_terrain_autumn.tga", "tmp_fluids.tga")
+        val gzFileList = listOf("blocks/wire.tga.gz", "blocks/fluids.tga.gz", "blocks/terrain_spring.tga.gz", "blocks/terrain.tga.gz", "blocks/terrain_autumn.tga.gz", "blocks/terrain_winter.tga.gz")
+        val gzTmpFName = listOf("tmp_wire.tga", "tmp_fluids.tga", "tmp_vor.tga", "tmp_sumar.tga", "tmp_haust.tga", "tmp_vetter.tga")
         // unzip GZIP temporarily
         gzFileList.forEachIndexed { index, filename ->
             val terrainTexFile = ModMgr.getGdxFile("basegame", filename)
@@ -111,27 +113,29 @@ internal object BlocksDrawer {
             fos.close()
         }
 
-        val _terrainPixMap = Pixmap(Gdx.files.internal(gzTmpFName[0]))
-        val _wirePixMap = Pixmap(Gdx.files.internal(gzTmpFName[1]))
-        val _terrainBlendPixMap = Pixmap(Gdx.files.internal(gzTmpFName[2]))
-        val _fluidPixMap = Pixmap(Gdx.files.internal(gzTmpFName[3]))
+        val _wirePixMap = Pixmap(Gdx.files.internal(gzTmpFName[0]))
+        val _fluidPixMap = Pixmap(Gdx.files.internal(gzTmpFName[1]))
+
+        val _terrainPixMap = Array(4) { Pixmap(Gdx.files.internal(gzTmpFName[it + 2])) }
 
         // delete temp files
         gzTmpFName.forEach { File(it).delete() }
 
-        tilesTerrain = TextureRegionPack(Texture(_terrainPixMap), TILE_SIZE, TILE_SIZE)
-        tilesTerrain.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
+        weatherTerrains = Array(4) {
+            val t = TextureRegionPack(Texture(_terrainPixMap[it]), TILE_SIZE, TILE_SIZE)
+            t.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+            t
+        }
+
         tilesWire = TextureRegionPack(Texture(_wirePixMap), TILE_SIZE, TILE_SIZE)
         tilesWire.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-        tilesTerrainBlend = TextureRegionPack(Texture(_terrainBlendPixMap), TILE_SIZE, TILE_SIZE)
-        tilesTerrainBlend.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
         tilesFluid = TextureRegionPack(Texture(_fluidPixMap), TILE_SIZE, TILE_SIZE)
         tilesFluid.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
         // also dispose unused temp files
         //terrainPixMap.dispose() // commented: tileItemWall needs it
         _wirePixMap.dispose()
-        _terrainBlendPixMap.dispose()
         _fluidPixMap.dispose()
 
 
@@ -140,10 +144,13 @@ internal object BlocksDrawer {
 
         // create item_wall images
         // will just use the terrain texture :p
-        tileItemWall = tilesTerrain
+        tileItemWall = weatherTerrains[1]
 
 
-        _terrainPixMap.dispose() // finally
+        _terrainPixMap.forEach { it.dispose() } // finally
+
+
+        tilesTerrain = weatherTerrains[1]
 
 
         printdbg(this, "init() exit")
@@ -340,6 +347,12 @@ internal object BlocksDrawer {
     ///////////////////////////////////////////
 
     internal fun renderData() {
+        try {
+            tilesTerrain = weatherTerrains[(world as GameWorldExtension).time.months - 1]
+            tilesTerrainBlend = weatherTerrains[(world as GameWorldExtension).time.months fmod 4]
+        }
+        catch (e: ClassCastException) { }
+
         drawTiles(WALL)
         drawTiles(TERRAIN) // regular tiles
         drawTiles(WIRE)
@@ -735,7 +748,7 @@ internal object BlocksDrawer {
         /*shader hard-code*/shader.setUniformi("tilesInAtlas", tileAtlas.horizontalCount, tileAtlas.verticalCount) //depends on the tile atlas
         /*shader hard-code*/shader.setUniformi("atlasTexSize", tileAtlas.texture.width, tileAtlas.texture.height) //depends on the tile atlas
         // set the blend value as world's time progresses, in linear fashion
-        shader.setUniformf("tilesBlend", if (world is GameWorldExtension && mode != FLUID)
+        shader.setUniformf("tilesBlend", if (world is GameWorldExtension && (mode == TERRAIN || mode == WALL))
             (world as GameWorldExtension).time.days.minus(1f) / WorldTime.MONTH_LENGTH
         else
             0f

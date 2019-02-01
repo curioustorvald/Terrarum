@@ -23,6 +23,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.modulebasegame.gameactors.HumanoidNPC
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
+import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.UIRemoCon
 import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
@@ -129,7 +130,8 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
         demoWorld = ReadLayerData(FileInputStream(ModMgr.getFile("basegame", "demoworld")))
-
+        // set time to summer
+        demoWorld.time.addTime(WorldTime.DAY_LENGTH * 32)
 
         // construct camera nodes
         val nodeCount = 100
