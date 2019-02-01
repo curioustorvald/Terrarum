@@ -565,7 +565,7 @@ internal object BlocksDrawer {
 
         }
 
-        return ret
+        return 15 - ret
     }
 
     /**
