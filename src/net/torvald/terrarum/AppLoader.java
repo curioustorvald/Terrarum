@@ -1,9 +1,6 @@
 package net.torvald.terrarum;
 
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
@@ -203,6 +200,15 @@ public class AppLoader implements ApplicationListener {
         appConfig.foregroundFPS = getConfigInt("displayfps");
         appConfig.title = GAME_NAME;
         appConfig.forceExit = false;
+
+        // load app icon
+        int[] appIconSizes = new int[]{256,128,64,32,16};
+        for (int size : appIconSizes) {
+            String name = "assets/appicon" + size + ".png";
+            if (new File("./" + name).exists()) {
+                appConfig.addIcon(name, Files.FileType.Internal);
+            }
+        }
 
         if (args.length == 1 && args[0].equals("isdev=true")) {
             IS_DEVELOPMENT_BUILD = true;
