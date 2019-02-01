@@ -2,9 +2,11 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.realestate.LandUtil
 import net.torvald.terrarum.ui.ConsoleWindow
 import java.util.*
 import java.util.concurrent.locks.Lock
@@ -44,6 +46,10 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     val ACTORCONTAINER_INITIAL_SIZE = 64
     val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
+
+    protected val terrainChangeQueue = Queue<BlockChangeQueueItem>()
+    protected val wallChangeQueue = Queue<BlockChangeQueueItem>()
+    protected val wireChangeQueue = Queue<BlockChangeQueueItem>()
 
     override fun hide() {
     }
@@ -94,6 +100,33 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      * Event for triggering held item's `endSecondaryUse(Float)`
      */
     open fun worldSecondaryClickEnd(delta: Float) {
+    }
+
+    /**
+     * Event for triggering fixture update when something is placed/removed on the world.
+     * Normally only called by GameWorld.setTileTerrain
+     *
+     * Queueing schema is used to make sure things are synchronised.
+     */
+    open fun queueTerrainChangedEvent(old: Int, new: Int, position: Long) {
+        val (x, y) = LandUtil.resolveBlockAddr(world, position)
+        terrainChangeQueue.addFirst(BlockChangeQueueItem(old, new, x, y))
+    }
+
+    /**
+     * Wall version of terrainChanged() event
+     */
+    open fun queueWallChangedEvent(old: Int, new: Int, position: Long) {
+        val (x, y) = LandUtil.resolveBlockAddr(world, position)
+        wallChangeQueue.addFirst(BlockChangeQueueItem(old, new, x, y))
+    }
+
+    /**
+     * Wire version of terrainChanged() event
+     */
+    open fun queueWireChangedEvent(old: Int, new: Int, position: Long) {
+        val (x, y) = LandUtil.resolveBlockAddr(world, position)
+        wireChangeQueue.addFirst(BlockChangeQueueItem(old, new, x, y))
     }
 
 
@@ -215,6 +248,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         }
     }
 
+
+    data class BlockChangeQueueItem(val old: Int, val new: Int, val posX: Int, val posY: Int)
 }
 
 inline fun Lock.lock(body: () -> Unit) {

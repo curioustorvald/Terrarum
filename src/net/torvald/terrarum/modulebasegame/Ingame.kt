@@ -405,6 +405,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         itemOnGrip?.endSecondaryUse(delta)
     }
 
+
+
     private var firstTimeRun = true
 
     ///////////////
@@ -505,6 +507,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             CollisionSolver.process()
 
             WorldCamera.update(gameworld, actorNowPlaying)
+
+
+            // completely consume block change queues because why not
+            terrainChangeQueue.clear()
+            wallChangeQueue.clear()
+            wireChangeQueue.clear()
         }
 
 
@@ -663,6 +671,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                             if (it.equipped(inventoryEntry.item)) {
                                 inventoryEntry.item.effectWhenEquipped(delta)
                             }
+                        }
+                    }
+
+                    if (it is CuedByTerrainChange) {
+                        terrainChangeQueue.forEach { cue ->
+                            it.updateForWorldChange(cue)
                         }
                     }
                 }
