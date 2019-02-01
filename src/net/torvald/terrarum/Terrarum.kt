@@ -535,6 +535,14 @@ fun SpriteBatch.drawStraightLine(x: Float, y: Float, otherEnd: Float, thickness:
 
 
 infix fun Color.mul(other: Color): Color = this.cpy().mul(other)
+infix fun Color.mulAndAssign(other: Color): Color {
+    this.r *= other.r
+    this.g *= other.g
+    this.b *= other.b
+    this.a *= other.a
+
+    return this
+}
 
 
 fun blendMul(batch: SpriteBatch) {
