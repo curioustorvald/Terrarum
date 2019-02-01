@@ -1,5 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
+import net.torvald.terrarum.IngameInstance
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.ActorWBMovable
@@ -7,9 +8,9 @@ import net.torvald.terrarum.gameactors.ActorWBMovable
 /**
  * Created by minjaesong on 2016-06-17.
  */
-open class FixtureBase(val blockBox: BlockBox) :
+open class FixtureBase(val blockBox: BlockBox, val blockBoxProps: BlockBoxProps = BlockBoxProps(0)) :
 // disabling physics (not allowing the fixture to move) WILL make things easier
-        ActorWBMovable(RenderOrder.BEHIND, immobileBody = true, usePhysics = false) {
+        ActorWBMovable(RenderOrder.BEHIND, immobileBody = true, usePhysics = false), CuedByTerrainChange {
 
     /**
      * Block-wise position of this fixture when it's placed on the world. Null if it's not on the world
@@ -34,12 +35,43 @@ open class FixtureBase(val blockBox: BlockBox) :
 
     }
 
+    open fun updateSelf() {
+
+    }
+
     /**
      * Removes this instance of the fixture from the world
      */
     open fun despawn() {
         // remove filler block
     }
+}
+
+interface CuedByTerrainChange {
+    /**
+     * Fired by world's BlockChanged event (fired when blocks are placed/removed).
+     * The flooding check must run on every frame. use updateSelf() for that.
+     *
+     * E.g. if a fixture block that is inside of BlockBox is missing, destroy and drop self.
+     */
+    fun updateForWorldChange(cue: IngameInstance.BlockChangeQueueItem) {
+
+    }
+}
+
+/**
+ * Standard 32-bit binary flags.
+ *
+ * (LSB)
+ * - 0: fluid resist - when FALSE, the fixture will break itself to item/nothing. For example, crops has this flag FALSE.
+ * - 1: don't drop item when broken - when TRUE, the fixture will simply disappear instead of dropping itself. For example, crop has this flag TRUE.
+ *
+ * (MSB)
+ *
+ * In the savegame's JSON, this flag set should be stored as signed integer.
+ */
+inline class BlockBoxProps(val flags: Int) {
+
 }
 
 data class BlockBox(var collisionType: Int, var width: Int, var height: Int) {

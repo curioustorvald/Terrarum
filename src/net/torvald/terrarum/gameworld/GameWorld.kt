@@ -2,6 +2,7 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.graphics.Color
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
@@ -220,9 +221,13 @@ open class GameWorld {
 
     fun setTileWall(x: Int, y: Int, tile: Byte, damage: Int) {
         val (x, y) = coerceXY(x, y)
+        val oldWall = getTileFromWall(x, y)
         layerWall.setTile(x, y, tile)
         layerWallLowBits.setData(x, y, damage)
         wallDamages.remove(LandUtil.getBlockAddr(this, x, y))
+
+        if (oldWall != null)
+            Terrarum.ingame?.queueWallChangedEvent(oldWall, tile.toUint() * PairedMapLayer.RANGE + damage, LandUtil.getBlockAddr(this, x, y))
     }
 
     /**
@@ -230,6 +235,7 @@ open class GameWorld {
      */
     fun setTileTerrain(x: Int, y: Int, tile: Byte, damage: Int) {
         val (x, y) = coerceXY(x, y)
+        val oldTerrain = getTileFromTerrain(x, y)
         layerTerrain.setTile(x, y, tile)
         layerTerrainLowBits.setData(x, y, damage)
         val blockAddr = LandUtil.getBlockAddr(this, x, y)
@@ -240,11 +246,18 @@ open class GameWorld {
             fluidTypes.remove(blockAddr)
         }
         // fluid tiles-item should be modified so that they will also place fluid onto their respective map
+
+        if (oldTerrain != null)
+            Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, tile.toUint() * PairedMapLayer.RANGE + damage, LandUtil.getBlockAddr(this, x, y))
     }
 
     fun setTileWire(x: Int, y: Int, tile: Byte) {
         val (x, y) = coerceXY(x, y)
+        val oldWire = getTileFromWire(x, y)
         layerWire.setTile(x, y, tile)
+
+        if (oldWire != null)
+            Terrarum.ingame?.queueWireChangedEvent(oldWire, tile.toUint(), LandUtil.getBlockAddr(this, x, y))
     }
 
     fun getTileFrom(mode: Int, x: Int, y: Int): Int? {
