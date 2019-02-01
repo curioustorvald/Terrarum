@@ -360,15 +360,21 @@ internal object BlocksDrawer {
         return TILES_BLEND_MUL.add(blockID)
     }
 
+    private var drawTIME_T = 0L
+    private val SECONDS_IN_MONTH = WorldTime.MONTH_LENGTH * WorldTime.DAY_LENGTH.toLong()
 
     ///////////////////////////////////////////
     // NO draw lightmap using colour filter, actors must also be hidden behind the darkness
     ///////////////////////////////////////////
 
     internal fun renderData() {
+
         try {
-            tilesTerrain = weatherTerrains[(world as GameWorldExtension).time.months - 1]
-            tilesTerrainBlend = weatherTerrains[(world as GameWorldExtension).time.months fmod 4]
+            drawTIME_T = (world as GameWorldExtension).time.TIME_T - (WorldTime.DAY_LENGTH * 15) // offset by -15 days
+            val seasonalMonth = (drawTIME_T.div(WorldTime.DAY_LENGTH) fmod WorldTime.YEAR_DAYS.toLong()).toInt() / WorldTime.MONTH_LENGTH + 1
+
+            tilesTerrain = weatherTerrains[seasonalMonth - 1]
+            tilesTerrainBlend = weatherTerrains[seasonalMonth fmod 4]
         }
         catch (e: ClassCastException) { }
 
@@ -768,7 +774,7 @@ internal object BlocksDrawer {
         /*shader hard-code*/shader.setUniformi("atlasTexSize", tileAtlas.texture.width, tileAtlas.texture.height) //depends on the tile atlas
         // set the blend value as world's time progresses, in linear fashion
         shader.setUniformf("tilesBlend", if (world is GameWorldExtension && (mode == TERRAIN || mode == WALL))
-            (world as GameWorldExtension).time.days.minus(1f) / WorldTime.MONTH_LENGTH
+            drawTIME_T.fmod(SECONDS_IN_MONTH) / SECONDS_IN_MONTH.toFloat()
         else
             0f
         )
