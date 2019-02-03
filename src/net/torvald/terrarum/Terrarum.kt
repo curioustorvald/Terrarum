@@ -422,17 +422,29 @@ object Terrarum : Screen {
         }
 
     /** Position of the cursor in the world */
-    inline val mouseX: Double
+    val mouseX: Double
         get() = WorldCamera.x + Gdx.input.x / (ingame?.screenZoom ?: 1f).toDouble()
     /** Position of the cursor in the world */
-    inline val mouseY: Double
+    val mouseY: Double
         get() = WorldCamera.y + Gdx.input.y / (ingame?.screenZoom ?: 1f).toDouble()
     /** Position of the cursor in the world */
-    @JvmStatic inline val mouseTileX: Int
+    val oldMouseX: Double
+        get() = WorldCamera.x + (Gdx.input.x - Gdx.input.deltaX) / (ingame?.screenZoom ?: 1f).toDouble()
+    /** Position of the cursor in the world */
+    val oldMouseY: Double
+        get() = WorldCamera.y + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).toDouble()
+    /** Position of the cursor in the world */
+    @JvmStatic val mouseTileX: Int
         get() = (mouseX / FeaturesDrawer.TILE_SIZE).floorInt()
     /** Position of the cursor in the world */
-    @JvmStatic inline val mouseTileY: Int
+    @JvmStatic val mouseTileY: Int
         get() = (mouseY / FeaturesDrawer.TILE_SIZE).floorInt()
+    /** Position of the cursor in the world */
+    @JvmStatic val oldMouseTileX: Int
+        get() = (oldMouseX / FeaturesDrawer.TILE_SIZE).floorInt()
+    /** Position of the cursor in the world */
+    @JvmStatic val oldMouseTileY: Int
+        get() = (oldMouseY / FeaturesDrawer.TILE_SIZE).floorInt()
     inline val mouseScreenX: Int
         get() = Gdx.input.x
     inline val mouseScreenY: Int

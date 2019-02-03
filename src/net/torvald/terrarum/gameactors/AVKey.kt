@@ -29,6 +29,9 @@ object AVKey {
     const val JUMPPOWER = "jumppower"
     const val JUMPPOWERBUFF = "$JUMPPOWER$BUFF"
 
+    /** NOT meant for living creatures. Also, only effective when noclip=true. E.g. camera actor */
+    const val FRICTIONMULT = "frictionmult"
+
     /** Int
      * "Default" value of 1 000
      */
