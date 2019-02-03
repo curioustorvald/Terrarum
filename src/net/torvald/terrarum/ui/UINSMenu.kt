@@ -16,12 +16,17 @@ class UINSMenu(
         /** Optional instance of YamlInvokable can be used */
         treeRepresentation: Yaml,
 
-        val titleBackCol: Color = Color(0f,0f,0f,.77f),
-        val titleTextCol: Color = Color.WHITE,
+        val titleBackCol: Color = DEFAULT_TITLEBACKCOL,
+        val titleTextCol: Color = DEFAULT_TITLETEXTCOL,
         val titleBlendMode: String = BlendMode.NORMAL,
 
         val allowDrag: Boolean = true
 ) : UICanvas() {
+
+    companion object {
+        val DEFAULT_TITLEBACKCOL = Color(0f,0f,0f,.77f)
+        val DEFAULT_TITLETEXTCOL = Color.WHITE
+    }
 
     override var openCloseTime: Second = 0f
     val LINE_HEIGHT = 24
@@ -76,7 +81,7 @@ class UINSMenu(
                 uiWidth, listHeight,
                 textAreaWidth = listWidth,
                 alignment = UIItemTextButton.Companion.Alignment.LEFT,
-                activeBackCol = Color(0x242424_80),//Color(1f,0f,.75f,1f),
+                activeBackCol = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,//Color(1f,0f,.75f,1f),
                 inactiveCol = Color(.94f,.94f,.94f,1f),
                 itemHitboxSize = LINE_HEIGHT
 

@@ -10,6 +10,7 @@ import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
+import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
 import java.util.*
@@ -39,7 +40,7 @@ class UIItemInventoryDynamicList(
     override val width  = WIDTH
     override val height = HEIGHT
 
-    val backColour = Color(0x404040_88)
+    val backColour = CELLCOLOUR_BLACK
 
     private val catArrangement = parentUI.catArrangement
 

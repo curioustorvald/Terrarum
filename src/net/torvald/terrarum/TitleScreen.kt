@@ -210,7 +210,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
         var i = 0L
         while (updateAkku >= delta) {
-            updateScreen(delta)
+            AppLoader.measureDebugTime("Ingame.update") { updateScreen(delta) }
             updateAkku -= delta
             i += 1
         }
@@ -218,7 +218,10 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
         // render? just do it anyway
-        renderScreen()
+        AppLoader.measureDebugTime("Ingame.render") { renderScreen() }
+        AppLoader.setDebugTime("Ingame.render-Light",
+                (AppLoader.debugTimers["Ingame.render"] as Long) - ((AppLoader.debugTimers["Renderer.LightTotal"] as? Long) ?: 0)
+        )
     }
 
     fun updateScreen(delta: Float) {

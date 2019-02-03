@@ -15,8 +15,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.torvald.dataclass.ArrayListMap;
+import net.torvald.getcpuname.GetCpuName;
 import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
+import net.torvald.terrarum.modulebasegame.Ingame;
 import net.torvald.terrarum.modulebasegame.IngameRenderer;
 import net.torvald.terrarum.utils.JsonFetcher;
 import net.torvald.terrarum.utils.JsonWriter;
@@ -114,6 +116,15 @@ public class AppLoader implements ApplicationListener {
     public static final String COPYRIGHT_DATE_NAME = "Copyright 2013-2019 Torvald (minjaesong)";
     public static String GAME_LOCALE = System.getProperty("user.language") + System.getProperty("user.country");
 
+    public static final String systemArch = System.getProperty("os.arch");
+    public static String processor;
+    public static String processorVendor;
+    public static String renderer;
+    public static String rendererVendor;
+
+    public static final boolean is32BitJVM = !System.getProperty("sun.arch.data.model").contains("64");
+
+
     public static final float TV_SAFE_GRAPHICS = 0.05f; // as per EBU recommendation (https://tech.ebu.ch/docs/r/r095.pdf)
     public static final float TV_SAFE_ACTION = 0.035f; // as per EBU recommendation (https://tech.ebu.ch/docs/r/r095.pdf)
 
@@ -186,6 +197,12 @@ public class AppLoader implements ApplicationListener {
         readConfigJson();
 
 
+        try { processor = GetCpuName.getModelName(); }
+        catch (IOException e1) { processor = "Unknown"; }
+        try { processorVendor = GetCpuName.getCPUID(); }
+        catch (IOException e2) { processorVendor = "Unknown"; }
+
+
         ShaderProgram.pedantic = false;
 
         LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
@@ -213,7 +230,7 @@ public class AppLoader implements ApplicationListener {
         if (args.length == 1 && args[0].equals("isdev=true")) {
             IS_DEVELOPMENT_BUILD = true;
             // safe area box
-            KeyToggler.INSTANCE.forceSet(Input.Keys.F11, true);
+            //KeyToggler.INSTANCE.forceSet(Input.Keys.F11, true);
         }
 
         new LwjglApplication(new AppLoader(appConfig), appConfig);
@@ -302,7 +319,14 @@ public class AppLoader implements ApplicationListener {
         }
 
 
+        // set up renderer info variables
+        renderer = Gdx.graphics.getGLVersion().getRendererString();
+        rendererVendor = Gdx.graphics.getGLVersion().getVendorString();
+
+
+
         // make loading list
+
 
     }
 
@@ -363,6 +387,8 @@ public class AppLoader implements ApplicationListener {
         else {
             screen.render((float) UPDATE_RATE);
         }
+
+        KeyToggler.INSTANCE.update(screen instanceof Ingame);
 
         // nested FBOs are just not a thing in GL!
         net.torvald.terrarum.FrameBufferManager.end();
@@ -491,6 +517,8 @@ public class AppLoader implements ApplicationListener {
             this.screen.show();
             this.screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         }
+
+        System.gc();
 
         printdbg(this, "Screen transisiton complete: " + this.screen.getClass().getCanonicalName());
     }

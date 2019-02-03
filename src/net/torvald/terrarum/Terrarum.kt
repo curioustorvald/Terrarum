@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.jme3.math.FastMath
 import net.torvald.dataclass.CircularArray
-import net.torvald.getcpuname.GetCpuName
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.gameactors.Actor
@@ -175,15 +174,6 @@ object Terrarum : Screen {
     const val NAME = AppLoader.GAME_NAME
 
 
-    val systemArch = System.getProperty("os.arch")
-    val processor = GetCpuName.getModelName()
-    val processorVendor = GetCpuName.getCPUID()
-    lateinit var renderer: String
-    lateinit var rendererVendor: String
-
-    val is32BitJVM = !System.getProperty("sun.arch.data.model").contains("64")
-
-
     lateinit var shaderBlur: ShaderProgram
     lateinit var shaderBayer: ShaderProgram
     lateinit var shaderSkyboxFill: ShaderProgram
@@ -282,10 +272,6 @@ object Terrarum : Screen {
         println("GL_VERSION = $GL_VERSION")
         println("GL_MAX_TEXTURE_SIZE = $GL_MAX_TEXTURE_SIZE")
         println("GL info:\n$glInfo") // debug info
-
-        // set up renderer info variables
-        renderer = Gdx.graphics.glVersion.rendererString
-        rendererVendor = Gdx.graphics.glVersion.vendorString
 
 
         if (GL_VERSION < MINIMAL_GL_VERSION || GL_MAX_TEXTURE_SIZE < MINIMAL_GL_MAX_TEXTURE_SIZE) {

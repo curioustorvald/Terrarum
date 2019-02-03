@@ -259,23 +259,27 @@ object ItemCodex {
     fun getItemImage(item: GameItem?): TextureRegion? {
         if (item == null) return null
 
+        return getItemImage(item.originalID)
+    }
+
+    fun getItemImage(itemOriginalID: Int): TextureRegion {
         // terrain
-        if (item.originalID in ITEM_TILES) {
+        if (itemOriginalID in ITEM_TILES) {
             return BlocksDrawer.tilesTerrain.get(
-                    (item.originalID % 16) * 16,
-                    item.originalID / 16
+                    (itemOriginalID % 16) * 16,
+                     itemOriginalID / 16
             )
         }
         // wall
-        else if (item.originalID in ITEM_WALLS) {
+        else if (itemOriginalID in ITEM_WALLS) {
             return BlocksDrawer.tileItemWall.get(
-                    (item.originalID.minus(ITEM_WALLS.first) % 16),
-                    (item.originalID.minus(ITEM_WALLS.first) / 16)
+                    (itemOriginalID.minus(ITEM_WALLS.first) % 16),
+                    (itemOriginalID.minus(ITEM_WALLS.first) / 16)
             )
         }
         // wire
-        else if (item.originalID in ITEM_WIRES) {
-            return BlocksDrawer.tilesWire.get((item.originalID % 16) * 16, item.originalID / 16)
+        else if (itemOriginalID in ITEM_WIRES) {
+            return BlocksDrawer.tilesWire.get((itemOriginalID % 16) * 16, itemOriginalID / 16)
         }
         // TODO get it real, using originalID...?
         else
