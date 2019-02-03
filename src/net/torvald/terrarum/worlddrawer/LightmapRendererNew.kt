@@ -12,14 +12,12 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
-import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.realestate.LandUtil
-import java.util.concurrent.atomic.AtomicReferenceArray
 
 /**
  * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
@@ -53,7 +51,7 @@ object LightmapRenderer {
                 }*/
 
                 for (i in 0 until lightmap.size) {
-                    lightmap[i] = colourNull
+                    lightmap[i] = 0f
                 }
 
                 makeUpdateTaskList()
@@ -84,7 +82,7 @@ object LightmapRenderer {
      */
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
     //private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
-    private val lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0f,0f,0f,0f) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
+    private val lightmap: Array<Float> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT * 4) { 0f } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lanternMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
     private lateinit var texturedLightMap: FrameBuffer
@@ -202,7 +200,12 @@ object LightmapRenderer {
             val xpos = x - for_x_start + overscan_open
 
             //return lightmap[ypos][xpos]
-            return lightmap[ypos * LIGHTMAP_WIDTH + xpos]
+            return Color(
+                    lightmap[4 * (ypos * LIGHTMAP_WIDTH + xpos)],
+                    lightmap[4 * (ypos * LIGHTMAP_WIDTH + xpos) + 1],
+                    lightmap[4 * (ypos * LIGHTMAP_WIDTH + xpos) + 2],
+                    lightmap[4 * (ypos * LIGHTMAP_WIDTH + xpos) + 3]
+            )
         }
 
         return null
@@ -221,7 +224,7 @@ object LightmapRenderer {
      * @param colour Color to write
      * @param applyFun A function ```foo(old_colour, given_colour)```
      */
-    private fun setLightOf(list: Array<Color>, x: Int, y: Int, colour: Color, applyFun: (Color, Color) -> Color = { _, c -> c }) {
+    private fun setLightOf(list: Array<Float>, x: Int, y: Int, colour: Color) {
         if (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
             x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH) {
 
@@ -229,7 +232,12 @@ object LightmapRenderer {
             val xpos = x - for_x_start + overscan_open
 
             //lightmap[ypos][xpos] = applyFun.invoke(list[ypos][xpos], colour)
-            list[ypos * LIGHTMAP_WIDTH + xpos] = applyFun.invoke(list[ypos * LIGHTMAP_WIDTH + xpos], colour)
+            //list[ypos * LIGHTMAP_WIDTH + xpos] = applyFun.invoke(list[ypos * LIGHTMAP_WIDTH + xpos], colour)
+
+            list[4 * (ypos * LIGHTMAP_WIDTH + xpos)] = colour.r
+            list[4 * (ypos * LIGHTMAP_WIDTH + xpos) + 1] = colour.g
+            list[4 * (ypos * LIGHTMAP_WIDTH + xpos) + 2] = colour.b
+            list[4 * (ypos * LIGHTMAP_WIDTH + xpos) + 3] = colour.a
         }
     }
 
@@ -262,189 +270,98 @@ object LightmapRenderer {
             buildLanternmap()
         } // usually takes 3000 ns
 
-        if (!SHADER_LIGHTING) {
-            /**
-             * Updating order:
-             * ,--------.   ,--+-----.   ,-----+--.   ,--------. -
-             * |↘       |   |  |    3|   |3    |  |   |       ↙| ↕︎ overscan_open / overscan_opaque
-             * |  ,-----+   |  |  2  |   |  2  |  |   +-----.  | - depending on the noop_mask
-             * |  |1    |   |  |1    |   |    1|  |   |    1|  |
-             * |  |  2  |   |  `-----+   +-----'  |   |  2  |  |
-             * |  |    3|   |↗       |   |       ↖|   |3    |  |
-             * `--+-----'   `--------'   `--------'   `-----+--'
-             * round:   1            2            3            4
-             * for all lightmap[y][x], run in this order: 2-3-4-1-2
-             *     If you run only 4 sets, orthogonal/diagonal artefacts are bound to occur,
-             * it seems 5-pass is mandatory
-             */
 
 
-            // wipe out lightmap
-            AppLoader.measureDebugTime("Renderer.Light0") {
-                //for (ky in 0 until lightmap.size) for (kx in 0 until lightmap[0].size) lightmap[ky][kx] = colourNull
-                for (k in 0 until lightmap.size) lightmap[k] = colourNull
-                // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
-                // but the performance boost is measly 0.1 ms on 6700K
-            }
-            // O((5*9)n) == O(n) where n is a size of the map.
-            // Because of inevitable overlaps on the area, it only works with MAX blend
-
-
-            // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
-
-            if (!AppLoader.getConfigBoolean("multithreadedlight")) {
-                //val workMap = Array(lightmap.size) { colourNull }
-
-                // The skipping is dependent on how you get ambient light,
-                // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
-
-                // FIXME theoretically skipping shouldn't work (light can be anywhere on the screen, not just centre
-                //       but how does it actually work ?!?!?!!?!?!?!?
-                //         because things are filled in subsequent frames ?
-                //         because of not wiping out prev map ! (if pass=1 also calculates ambience, was disabled to not have to wipe out)
-
-                // Round 2
-                AppLoader.measureDebugTime("Renderer.Light1") {
-                    for (y in for_y_end + overscan_open downTo for_y_start) {
-                        for (x in for_x_start - overscan_open..for_x_end) {
-                            setLightOf(lightmap, x, y, calculate(x, y))
-                        }
-                    }
-                }
-
-                // Round 3
-                AppLoader.measureDebugTime("Renderer.Light2") {
-                    for (y in for_y_end + overscan_open downTo for_y_start) {
-                        for (x in for_x_end + overscan_open downTo for_x_start) {
-                            setLightOf(lightmap, x, y, calculate(x, y))
-                        }
-                    }
-                }
-
-                // Round 4
-                AppLoader.measureDebugTime("Renderer.Light3") {
-                    for (y in for_y_start - overscan_open..for_y_end) {
-                        for (x in for_x_end + overscan_open downTo for_x_start) {
-                            setLightOf(lightmap, x, y, calculate(x, y))
-                        }
-                    }
-                }
-
-                // Round 1
-                AppLoader.measureDebugTime("Renderer.Light4") {
-                    for (y in for_y_start - overscan_open..for_y_end) {
-                        for (x in for_x_start - overscan_open..for_x_end) {
-                            setLightOf(lightmap, x, y, calculate(x, y))
-                        }
-                    }
-                }
-
-                AppLoader.addDebugTime("Renderer.LightTotal",
-                        "Renderer.Light1",
-                        "Renderer.Light2",
-                        "Renderer.Light3",
-                        "Renderer.Light4",
-                        "Renderer.Light0"
-                )
-            }
-            else if (world.worldIndex != -1) { // to avoid updating on the null world
-                val buf = AtomicReferenceArray<Color>(lightmap.size)
-
-                AppLoader.measureDebugTime("Renderer.LightPrlPre") {
-                    // update the content of buf using maxBlend -- it's not meant for overwrite
-
-                    updateMessages.forEachIndexed { index, msg ->
-                        ThreadParallel.map(index, "Light") {
-                            // for the message slices...
-                            msg.forEach { m ->
-                                // update the content of buf using maxBlend -- it's not meant for overwrite
-                                buf.getAndUpdate(m.y * LIGHTMAP_WIDTH + m.x) { oldCol ->
-                                    val ux = m.x + for_x_start - overscan_open
-                                    val uy = m.y + for_y_start - overscan_open
-
-                                    (oldCol ?: colourNull) maxBlend calculate(ux, uy)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                AppLoader.measureDebugTime("Renderer.LightPrlRun") {
-                    ThreadParallel.startAllWaitForDie()
-                }
-
-                AppLoader.measureDebugTime("Renderer.LightPrlPost") {
-                    // copy to lightmap
-                    for (k in 0 until lightmap.size) {
-                        lightmap[k] = buf.getPlain(k) ?: colourNull
-                    }
-                }
-
-                AppLoader.addDebugTime("Renderer.LightTotal",
-                        "Renderer.LightPrlPre",
-                        "Renderer.LightPrlRun",
-                        "Renderer.LightPrlPost"
-                )
-            }
-        }
-        else {
-            AppLoader.measureDebugTime("Renderer.LightGPU") {
-
-                // prepare necessary textures (lightmap, shademap) for the input.
-                for (ty in 0 until LIGHTMAP_HEIGHT) {
-                    for (tx in 0 until LIGHTMAP_WIDTH) {
-                        val wx = tx + for_x_start - overscan_open
-                        val wy = ty + for_y_start - overscan_open
-
-                        // Several variables will be altered by this. See its documentation.
-                        getLightsAndShades(wx, wy)
-
-                        texturedLightSourcePixmap.drawPixel(tx, ty, lightLevelThis.toRGBA())
-                        texturedShadeSourcePixmap.drawPixel(tx, ty, thisTileOpacity.toRGBA())
-
-
-
-                        /*if (wy in for_y_start..for_y_end && wx in for_x_start..for_x_end) {
-                            texturedLightSourcePixmap.drawPixel(tx, ty, 0x00FFFFFF)
-                        }
-                        else {
-                            texturedLightSourcePixmap.drawPixel(tx, ty, 0xFF000000.toInt())
-                        }*/
-
-                    }
-                }
-
-                texturedLightSources.dispose()
-                texturedLightSources = Texture(texturedLightSourcePixmap)
-
-                texturedShadeSources.dispose()
-                texturedShadeSources = Texture(texturedShadeSourcePixmap)
-
-
-                texturedLightMap.inAction(texturedLightCamera, null) {
-                    gdxClearAndSetBlend(0f,0f,0f,0f)
-                    Gdx.gl.glDisable(GL20.GL_BLEND)
-
-                    texturedShadeSources.bind(SHADEMAP_UNIT)
-                    texturedLightSources.bind(LIGHTMAP_UNIT)
-
-                    lightCalcShader.begin()
-                    // it seems that every time shader ends, uniforms reset themselves.
-                    lightCalcShader.setUniformMatrix("u_projTrans", texturedLightCamera.combined)
-                    lightCalcShader.setUniformf("outSize", LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat())
-                    lightCalcShader.setUniformi("shades", SHADEMAP_UNIT)
-                    lightCalcShader.setUniformi("lights", LIGHTMAP_UNIT)
-                    texturedLightQuad.render(lightCalcShader, GL20.GL_TRIANGLES)
-                    lightCalcShader.end()
-                }
-
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
-
-
-            }
-        }
+        fireRecalculateEventJava()
     }
 
+    private fun fireRecalculateEventJava() {
+        /**
+         * Updating order:
+         * ,--------.   ,--+-----.   ,-----+--.   ,--------. -
+         * |↘       |   |  |    3|   |3    |  |   |       ↙| ↕︎ overscan_open / overscan_opaque
+         * |  ,-----+   |  |  2  |   |  2  |  |   +-----.  | - depending on the noop_mask
+         * |  |1    |   |  |1    |   |    1|  |   |    1|  |
+         * |  |  2  |   |  `-----+   +-----'  |   |  2  |  |
+         * |  |    3|   |↗       |   |       ↖|   |3    |  |
+         * `--+-----'   `--------'   `--------'   `-----+--'
+         * round:   1            2            3            4
+         * Run in this order: 0-2-3-4-1
+         * zero means we wipe out lightmap.
+         * But why start from 2? No special reason.
+         */
+
+
+        // wipe out lightmap
+        AppLoader.measureDebugTime("Renderer.Light0") {
+            //for (ky in 0 until lightmap.size) for (kx in 0 until lightmap[0].size) lightmap[ky][kx] = colourNull
+            for (k in 0 until lightmap.size) lightmap[k] = 0f
+            // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
+            // but the performance boost is measly 0.1 ms on 6700K
+        }
+        // O((5*9)n) == O(n) where n is a size of the map.
+        // Because of inevitable overlaps on the area, it only works with MAX blend
+
+
+        // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
+
+        //val workMap = Array(lightmap.size) { colourNull }
+
+        // The skipping is dependent on how you get ambient light,
+        // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
+
+        // FIXME theoretically skipping shouldn't work (light can be anywhere on the screen, not just centre
+        //       but how does it actually work ?!?!?!!?!?!?!?
+        //         because things are filled in subsequent frames ?
+        //         because of not wiping out prev map ! (if pass=1 also calculates ambience, was disabled to not have to wipe out)
+
+        // Round 2
+        AppLoader.measureDebugTime("Renderer.Light1") {
+            for (y in for_y_end + overscan_open downTo for_y_start) {
+                for (x in for_x_start - overscan_open..for_x_end) {
+                    setLightOf(lightmap, x, y, calculate(x, y))
+                }
+            }
+        }
+
+        // Round 3
+        AppLoader.measureDebugTime("Renderer.Light2") {
+            for (y in for_y_end + overscan_open downTo for_y_start) {
+                for (x in for_x_end + overscan_open downTo for_x_start) {
+                    setLightOf(lightmap, x, y, calculate(x, y))
+                }
+            }
+        }
+
+        // Round 4
+        AppLoader.measureDebugTime("Renderer.Light3") {
+            for (y in for_y_start - overscan_open..for_y_end) {
+                for (x in for_x_end + overscan_open downTo for_x_start) {
+                    setLightOf(lightmap, x, y, calculate(x, y))
+                }
+            }
+        }
+
+        // Round 1
+        AppLoader.measureDebugTime("Renderer.Light4") {
+            for (y in for_y_start - overscan_open..for_y_end) {
+                for (x in for_x_start - overscan_open..for_x_end) {
+                    setLightOf(lightmap, x, y, calculate(x, y))
+                }
+            }
+        }
+
+        AppLoader.addDebugTime("Renderer.LightTotal",
+                "Renderer.Light1",
+                "Renderer.Light2",
+                "Renderer.Light3",
+                "Renderer.Light4",
+                "Renderer.Light0"
+        )
+
+    }
+
+    private external fun fireRecalculateEventJNI()
 
 
 
@@ -660,47 +577,41 @@ object LightmapRenderer {
             val this_y_end = for_y_end// + overscan_open
 
             // wipe out beforehand. You DO need this
-            if (!SHADER_LIGHTING) {
-                lightBuffer.blending = Pixmap.Blending.None // gonna overwrite (remove this line causes the world to go bit darker)
-                lightBuffer.setColor(colourNull)
-                lightBuffer.fill()
+            lightBuffer.blending = Pixmap.Blending.None // gonna overwrite (remove this line causes the world to go bit darker)
+            lightBuffer.setColor(colourNull)
+            lightBuffer.fill()
 
 
-                // write to colour buffer
-                for (y in this_y_start..this_y_end) {
-                    //println("y: $y, this_y_start: $this_y_start")
-                    if (y == this_y_start && this_y_start == 0) {
-                        //throw Error("Fuck hits again...")
-                    }
-
-                    for (x in this_x_start..this_x_end) {
-
-                        val color = (getLightForOpaque(x, y) ?: Color(0f, 0f, 0f, 0f)).normaliseToHDR()
-
-                        lightBuffer.setColor(color)
-
-                        //lightBuffer.drawPixel(x - this_x_start, y - this_y_start)
-
-                        lightBuffer.drawPixel(x - this_x_start, lightBuffer.height - 1 - y + this_y_start) // flip Y
-                    }
+            // write to colour buffer
+            for (y in this_y_start..this_y_end) {
+                //println("y: $y, this_y_start: $this_y_start")
+                if (y == this_y_start && this_y_start == 0) {
+                    //throw Error("Fuck hits again...")
                 }
 
+                for (x in this_x_start..this_x_end) {
 
-                // draw to the batch
-                _lightBufferAsTex.dispose()
-                _lightBufferAsTex = Texture(lightBuffer)
-                _lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+                    val color = (getLightForOpaque(x, y) ?: Color(0f, 0f, 0f, 0f)).normaliseToHDR()
 
+                    lightBuffer.setColor(color)
 
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
-                //      we might not need shader here...
-                //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
-                batch.draw(_lightBufferAsTex, 0f, 0f, _lightBufferAsTex.width * DRAW_TILE_SIZE, _lightBufferAsTex.height * DRAW_TILE_SIZE)
+                    //lightBuffer.drawPixel(x - this_x_start, y - this_y_start)
+
+                    lightBuffer.drawPixel(x - this_x_start, lightBuffer.height - 1 - y + this_y_start) // flip Y
+                }
             }
-            else {
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
-                batch.draw(texturedLightMap.colorBufferTexture, -overscan_open * DRAW_TILE_SIZE, -overscan_open * DRAW_TILE_SIZE, texturedLightMap.width * DRAW_TILE_SIZE, texturedLightMap.height * DRAW_TILE_SIZE)
-            }
+
+
+            // draw to the batch
+            _lightBufferAsTex.dispose()
+            _lightBufferAsTex = Texture(lightBuffer)
+            _lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
+
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+            //      we might not need shader here...
+            //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
+            batch.draw(_lightBufferAsTex, 0f, 0f, _lightBufferAsTex.width * DRAW_TILE_SIZE, _lightBufferAsTex.height * DRAW_TILE_SIZE)
         }
     }
 
@@ -1014,10 +925,12 @@ object LightmapRenderer {
                 for (x in overscan_open..render_width + overscan_open + 1) {
                     try {
                         //val colour = lightmap[y][x]
-                        val colour = lightmap[y * LIGHTMAP_WIDTH + x]
-                        reds[minOf(CHANNEL_MAX, colour.r.times(MUL).floorInt())] += 1
-                        greens[minOf(CHANNEL_MAX, colour.g.times(MUL).floorInt())] += 1
-                        blues[minOf(CHANNEL_MAX, colour.b.times(MUL).floorInt())] += 1
+                        val colourR = lightmap[4 * (y * LIGHTMAP_WIDTH + x)]
+                        val colourG = lightmap[4 * (y * LIGHTMAP_WIDTH + x) + 1]
+                        val colourB = lightmap[4 * (y * LIGHTMAP_WIDTH + x) + 2]
+                        reds[minOf(CHANNEL_MAX, colourR.times(MUL).floorInt())] += 1
+                        greens[minOf(CHANNEL_MAX, colourG.times(MUL).floorInt())] += 1
+                        blues[minOf(CHANNEL_MAX, colourB.times(MUL).floorInt())] += 1
                     }
                     catch (e: ArrayIndexOutOfBoundsException) { }
                 }
