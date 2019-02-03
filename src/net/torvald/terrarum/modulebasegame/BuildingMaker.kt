@@ -223,6 +223,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
             makePenWork(Terrarum.mouseTileX, Terrarum.mouseTileY)
             // TODO drag support using bresenham's algo
+            //      for some reason it just doesn't work...
 
         }
     }
@@ -312,9 +313,11 @@ class MovableWorldCamera : ActorHumanoid(0, usePhysics = false) {
         actorValue[AVKey.SPEED] = 8.0
         actorValue[AVKey.SPEEDBUFF] = 1.0
         actorValue[AVKey.ACCEL] = ActorHumanoid.WALK_ACCEL_BASE
-        actorValue[AVKey.ACCELBUFF] = 1.0
+        actorValue[AVKey.ACCELBUFF] = 4.0
         actorValue[AVKey.JUMPPOWER] = 0.0
+        actorValue[AVKey.FRICTIONMULT] = 4.0
     }
+
 
     override fun drawBody(batch: SpriteBatch) {
     }

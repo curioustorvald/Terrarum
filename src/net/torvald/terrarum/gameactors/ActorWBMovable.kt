@@ -1070,7 +1070,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
      * for about get moving, see updateMovementControl */
     private fun setHorizontalFriction(delta: Float) {
         val friction = if (isNoClip)
-            BASE_FRICTION * BlockCodex[Block.STONE].friction.frictionToMult()
+            BASE_FRICTION * (actorValue.getAsDouble(AVKey.FRICTIONMULT) ?: 1.0) * BlockCodex[Block.STONE].friction.frictionToMult()
         else {
             // TODO status quo if !submerged else linearBlend(feetFriction, bodyFriction, submergedRatio)
             BASE_FRICTION * if (grounded) feetFriction else bodyFriction
@@ -1099,9 +1099,11 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
 
     private fun setVerticalFriction(delta: Float) {
         val friction = if (isNoClip)
-            BASE_FRICTION * BlockCodex[Block.STONE].friction.frictionToMult()
+            BASE_FRICTION * (actorValue.getAsDouble(AVKey.FRICTIONMULT) ?: 1.0) * BlockCodex[Block.STONE].friction.frictionToMult()
         else
             BASE_FRICTION * bodyFriction
+        // TODO wall friction (wall skid) similar to setHorizintalFriction ?
+
 
         if (externalV.y < 0) {
             externalV.y += friction
