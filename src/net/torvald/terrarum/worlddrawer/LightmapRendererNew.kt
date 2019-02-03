@@ -639,9 +639,6 @@ object LightmapRenderer {
         }
     }
 
-    const val DRAW_FOR_RGB = 0xFFF0
-    const val DRAW_FOR_ALPHA = 0x000F
-
     var lightBuffer: Pixmap = Pixmap(1, 1, Pixmap.Format.RGBA8888)
 
     private val colourNull = Color(0)
@@ -728,14 +725,6 @@ object LightmapRenderer {
                 data.a * (1f - darken.a * lightScalingMagic))
     }
 
-    private fun scaleSqrt2(data: Color): Color {
-        return Color(
-                data.r * 1.41421356f,
-                data.g * 1.41421356f,
-                data.b * 1.41421356f,
-                data.a * 1.41421356f)
-    }
-
     /**
      * Add each channel's RGB value.
      *
@@ -809,71 +798,6 @@ object LightmapRenderer {
         return this
     }
 
-
-    /*inline fun RGB10.rawR() = this.ushr(20) and 1023
-    inline fun RGB10.rawG() = this.ushr(10) and 1023
-    inline fun RGB10.rawB() = this and 1023
-
-    /** 0.0 - 1.0 for 0-1023 (0.0 - 0.25 for 0-255) */
-    inline fun RGB10.r(): Float = this.rawR() / CHANNEL_MAX_FLOAT
-    inline fun RGB10.g(): Float = this.rawG() / CHANNEL_MAX_FLOAT
-    inline fun RGB10.b(): Float = this.rawB() / CHANNEL_MAX_FLOAT*/
-
-
-    /*inline fun constructRGBFromInt(r: Int, g: Int, b: Int): RGB10 {
-        //if (r !in 0..CHANNEL_MAX) throw IllegalArgumentException("Red: out of range ($r)")
-        //if (g !in 0..CHANNEL_MAX) throw IllegalArgumentException("Green: out of range ($g)")
-        //if (b !in 0..CHANNEL_MAX) throw IllegalArgumentException("Blue: out of range ($b)")
-
-        return r.shl(20) or
-               g.shl(10) or
-               b
-    }*/
-
-    /*inline fun constructRGBFromFloat(r: Float, g: Float, b: Float): RGB10 {
-        //if (r < 0 || r > CHANNEL_MAX_DECIMAL) throw IllegalArgumentException("Red: out of range ($r)")
-        //if (g < 0 || g > CHANNEL_MAX_DECIMAL) throw IllegalArgumentException("Green: out of range ($g)")
-        //if (b < 0 || b > CHANNEL_MAX_DECIMAL) throw IllegalArgumentException("Blue: out of range ($b)")
-
-        return (r * CHANNEL_MAX).round().shl(20) or
-               (g * CHANNEL_MAX).round().shl(10) or
-               (b * CHANNEL_MAX).round()
-    }*/
-
-    fun Int.clampZero() = if (this < 0) 0 else this
-    fun Float.clampZero() = if (this < 0) 0f else this
-    fun Int.clampChannel() = if (this < 0) 0 else if (this > CHANNEL_MAX) CHANNEL_MAX else this
-    fun Float.clampOne() = if (this < 0) 0f else if (this > 1) 1f else this
-    fun Float.clampChannel() = if (this > CHANNEL_MAX_DECIMAL) CHANNEL_MAX_DECIMAL else this
-
-    fun getHighestRGB(x: Int, y: Int): Float? {
-        val value = getLightInternal(x, y)
-        if (value == null)
-            return null
-        else
-            return FastMath.max(value.r, value.g, value.b)
-    }
-
-    fun getHighestRGBA(x: Int, y: Int): Float? {
-        val value = getLightInternal(x, y)
-        if (value == null)
-            return null
-        else
-            return FastMath.max(value.r, value.g, value.b, value.a)
-    }
-
-    /*private fun purgeLightmap() {
-        for (y in 0..LIGHTMAP_HEIGHT - 1) {
-            for (x in 0..LIGHTMAP_WIDTH - 1) {
-                lightmap.setcolourNull
-                lightmap.fillRectangle(0, 0, lightmap.width, lightmap.height)
-            }
-        }
-    */
-
-    infix fun Float.powerOf(f: Float) = FastMath.pow(this, f)
-    private fun Float.sqr() = this * this
-    private fun Float.sqrt() = FastMath.sqrt(this)
     private fun Float.inv() = 1f / this
     fun Float.floor() = FastMath.floor(this)
     fun Double.floorInt() = Math.floor(this).toInt()
@@ -1007,6 +931,7 @@ object LightmapRenderer {
             val reds = IntArray(MUL) // reds[intensity] ← counts
             val greens = IntArray(MUL) // do.
             val blues = IntArray(MUL) // do.
+            val uvs = IntArray(MUL)
             val render_width = for_x_end - for_x_start
             val render_height = for_y_end - for_y_start
             // excluiding overscans; only reckon echo lights
@@ -1018,18 +943,20 @@ object LightmapRenderer {
                         reds[minOf(CHANNEL_MAX, colour.r.times(MUL).floorInt())] += 1
                         greens[minOf(CHANNEL_MAX, colour.g.times(MUL).floorInt())] += 1
                         blues[minOf(CHANNEL_MAX, colour.b.times(MUL).floorInt())] += 1
+                        uvs[minOf(CHANNEL_MAX, colour.a.times(MUL).floorInt())] += 1
                     }
                     catch (e: ArrayIndexOutOfBoundsException) { }
                 }
             }
-            return Histogram(reds, greens, blues)
+            return Histogram(reds, greens, blues, uvs)
         }
 
-    class Histogram(val reds: IntArray, val greens: IntArray, val blues: IntArray) {
+    class Histogram(val reds: IntArray, val greens: IntArray, val blues: IntArray, val uvs: IntArray) {
 
         val RED = 0
         val GREEN = 1
         val BLUE = 2
+        val UV = 3
 
         val screen_tiles: Int = (for_x_end - for_x_start + 2) * (for_y_end - for_y_start + 2)
 
@@ -1063,6 +990,7 @@ object LightmapRenderer {
                 RED   -> reds
                 GREEN -> greens
                 BLUE  -> blues
+                UV    -> uvs
                 else  -> throw IllegalArgumentException()
             }
         }
