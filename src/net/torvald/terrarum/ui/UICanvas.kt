@@ -60,12 +60,14 @@ abstract class UICanvas(
         get() = Terrarum.mouseScreenY - handler.posY
 
     /** If mouse is hovering over it regardless of its visibility */
-    val mouseUp: Boolean
-        get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
+    open val mouseUp: Boolean
+        get() = _mouseUpThis || handler.mouseUp
     /** If mouse is hovering over it and mouse is down */
     val mousePushed: Boolean
         get() = mouseUp && Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))
 
+    private val _mouseUpThis: Boolean
+        get() = relativeMouseX in 0..width - 1 && relativeMouseY in 0..height - 1
 
     /** Called by the screen */
     fun update(delta: Float) {

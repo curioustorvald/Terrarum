@@ -76,6 +76,15 @@ class UIHandler(//var UI: UICanvas,
 
     val subUIs = ArrayList<UICanvas>()
 
+    val mouseUp: Boolean
+        get() {
+            for (k in 0 until subUIs.size) {
+                val ret2 = subUIs[k].mouseUp
+                if (ret2) return true
+            }
+            return false
+        }
+
     fun addSubUI(ui: UICanvas) {
         if (subUIs.contains(ui))
             throw IllegalArgumentException(
