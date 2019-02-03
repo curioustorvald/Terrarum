@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
@@ -264,16 +263,18 @@ class BasicDebugInfoWindow : UICanvas() {
     }
 
     val histogramW = 256
-    val histogramH = 200
+    val histogramH = 256
 
     private fun drawHistogram(batch: SpriteBatch, histogram: LightmapRenderer.Histogram, x: Int, y: Int) {
         val uiColour = Color(0x000000_80.toInt())
         val barR = Color(0xFF0000_FF.toInt())
         val barG = Color(0x00FF00_FF.toInt())
         val barB = Color(0x0000FF_FF.toInt())
-        val barColour = arrayOf(barR, barG, barB)
+        val barA = Color.WHITE
+        val barColour = arrayOf(barR, barG, barB, barA)
         val w = histogramW.toFloat()
         val h = histogramH.toFloat()
+        val halfh = h / 2f
         val range = histogram.range
         val histogramMax = histogram.screen_tiles.toFloat()
 
@@ -285,7 +286,7 @@ class BasicDebugInfoWindow : UICanvas() {
         Terrarum.fontSmallNumbers.draw(batch, "Histogramme", x + w / 2 - 5.5f * 8, y.toFloat() + h + 2)
 
         blendScreen(batch)
-        for (c in 0..2) {
+        for (c in 0..3) {
             for (i in 0..255) {
                 var histogram_value = if (i == 255) 0 else histogram.get(c)[i]
                 if (i == 255) {
@@ -295,12 +296,12 @@ class BasicDebugInfoWindow : UICanvas() {
                 }
 
                 val bar_x = x + (w / w.minus(1f)) * i.toFloat()
-                val bar_h = FastMath.ceil(h / histogramMax * histogram_value.toFloat()).toFloat()
-                val bar_y = y + (h / histogramMax) - bar_h + h
+                val bar_h = halfh * (histogram_value.toFloat() / histogramMax).sqrt()
+                val bar_y = if (c == 3) y + halfh else y + h
                 val bar_w = 1f
 
                 batch.color = barColour[c]
-                batch.fillRect(bar_x, bar_y, bar_w, bar_h)
+                batch.fillRect(bar_x, bar_y, bar_w, -bar_h)
             }
         }
         blendNormal(batch)
