@@ -37,13 +37,17 @@ class UIItemTextButtonList(
         val highlightBackCol: Color = Color(0xb0b0b0_ff.toInt()),
         val highlightBackBlendMode: String = BlendMode.MULTIPLY,
         val inactiveCol: Color = Color(0xc0c0c0_ff.toInt()),
-        val backgroundCol: Color = Color(0x242424_80),
+        val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
         val backgroundBlendMode: String = BlendMode.NORMAL,
         val kinematic: Boolean = false,
 
         val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.CENTRE,
         val itemHitboxSize: Int = UIItemTextButton.height
 ) : UIItem(parentUI) {
+
+    companion object {
+        val DEFAULT_BACKGROUNDCOL = Color(0x242424_80)
+    }
 
     // deal with the moving position
     override var oldPosX = posX

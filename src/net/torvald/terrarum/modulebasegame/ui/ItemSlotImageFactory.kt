@@ -17,8 +17,11 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 object ItemSlotImageFactory {
 
-    val colourBlack = Color(0x404040_FF)
-    val colourWhite = Color(0xC0C0C0_FF.toInt())
+    val CELLCOLOUR_BLACK_OPAQUE = Color(0x404040_FF)
+    val CELLCOLOUR_WHITE_OPAQUE = Color(0xC0C0C0_FF.toInt())
+
+    val CELLCOLOUR_BLACK = Color(0x404040_88)
+    val CELLCOLOUR_WHITE = Color(0xC0C0C0_88.toInt())
 
     val slotImage = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slots_atlas.tga"), 38, 38) // must have same w/h as slotLarge
 

@@ -8,6 +8,7 @@ import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
+import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.ui.UIItem
 
 /**
@@ -37,7 +38,7 @@ class UIItemInventoryEquippedView(
     lateinit var inventorySortList: Array<GameItem?>
     private var rebuildList = true
     
-    val spriteViewBackCol: Color; get() = Color(0x404040_88.toInt())//Color(0xd4d4d4_ff.toInt())
+    val spriteViewBackCol: Color = CELLCOLOUR_BLACK
 
     private val itemGrid = Array<UIItemInventoryCellBase>(2 * 6) {
         UIItemInventoryElemSimple(
@@ -49,7 +50,7 @@ class UIItemInventoryEquippedView(
                 itemImage = null,
                 mouseoverBackCol = Color(0x282828_ff),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
-                backCol = Color(0x404040_88),
+                backCol = CELLCOLOUR_BLACK,
                 backBlendMode = BlendMode.NORMAL,
                 drawBackOnNull = true
         )

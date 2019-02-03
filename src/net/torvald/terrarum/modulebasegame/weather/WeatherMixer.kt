@@ -2,25 +2,26 @@ package net.torvald.terrarum.modulebasegame.weather
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.utils.GdxRuntimeException
-import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.colourutil.*
+import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Texture
+import net.torvald.colourutil.CIELuvUtil
 import net.torvald.random.HQRNG
-import net.torvald.terrarum.*
-import net.torvald.terrarum.console.CommandDict
-import net.torvald.terrarum.console.SetGlobalLightOverride
+import net.torvald.terrarum.GdxColorMap
+import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.ActorWithBody
-import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.RNGConsumer
+import net.torvald.terrarum.modulebasegame.gameactors.ParticleMegaRain
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
+import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
+import net.torvald.terrarum.utils.JsonFetcher
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
-import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
 import java.io.File
 import java.util.*
 
@@ -96,7 +97,7 @@ internal object WeatherMixer : RNGConsumer {
 
 
         // test rain toggled by F2
-        if (KeyToggler.isOn(Input.Keys.F2)) {
+        if (KeyToggler.isOn(Input.Keys.F2) && Terrarum.ingame is Ingame) {
             val playerPosX = player.hitbox.centeredX
             val playerPosY = player.hitbox.centeredY
             kotlin.repeat(7) {

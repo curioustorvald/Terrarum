@@ -8,6 +8,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -19,8 +20,8 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
  */
 class BasicDebugInfoWindow : UICanvas() {
 
-    override var width: Int = Terrarum.WIDTH
-    override var height: Int = Terrarum.HEIGHT
+    override var width: Int = AppLoader.screenW
+    override var height: Int = AppLoader.screenH
 
     override var openCloseTime: Float = 0f
 
@@ -30,14 +31,17 @@ class BasicDebugInfoWindow : UICanvas() {
     private var xdelta = 0.0
     private var ydelta = 0.0
 
-    private val ingame = Terrarum.ingame!! as Ingame
+    private val ingame: IngameInstance?
+        get() = Terrarum.ingame
 
-    private val world: GameWorldExtension
-        get() = Terrarum.ingame!!.world as GameWorldExtension
+    private val world: GameWorld?
+        get() = Terrarum.ingame?.world
+    private val world2: GameWorldExtension?
+        get() = Terrarum.ingame?.world as GameWorldExtension?
 
 
     override fun updateUI(delta: Float) {
-        val player = ingame.actorNowPlaying
+        val player = ingame?.actorNowPlaying
         val hitbox = player?.hitbox
 
         if (hitbox != null) {
@@ -65,7 +69,7 @@ class BasicDebugInfoWindow : UICanvas() {
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
-        val player = ingame.actorNowPlaying
+        val player = ingame?.actorNowPlaying
 
         batch.color = Color(0xFFEE88FF.toInt())
 
@@ -144,11 +148,14 @@ class BasicDebugInfoWindow : UICanvas() {
                    else "$rawR $rawG $rawB $rawA"
         printLine(batch, 8, "light@cursor $ccG$lightVal")
 
-        val tileNum = ingame.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
-        val fluid = ingame.world.getFluid(mouseTileX, mouseTileY)
+        if (ingame != null) {
+            val tileNum = ingame!!.world.getTileFromTerrain(mouseTileX, mouseTileY) ?: -1
+            val fluid = ingame!!.world.getFluid(mouseTileX, mouseTileY)
 
-        printLine(batch, 9, "tile@cursor $ccG$tileNum ($mtX, $mtY)")
-        printLine(batch, 10, "fluid@cursor ${ccY}Type $ccM${fluid.type.value} ${ccY}Fill $ccG${fluid.amount}f")
+            printLine(batch, 9, "tile@cursor $ccG$tileNum ($mtX, $mtY)")
+            printLine(batch, 10, "fluid@cursor ${ccY}Type $ccM${fluid.type.value} ${ccY}Fill $ccG${fluid.amount}f")
+
+        }
 
 
         // print time
@@ -166,8 +173,10 @@ class BasicDebugInfoWindow : UICanvas() {
         //printLineColumn(batch, 2, 1, "VSync $ccG" + Terrarum.appgc.isVSyncRequested)
         //printLineColumn(batch, 2, 2, "Env colour temp $ccG" + FeaturesDrawer.colTemp)
 
-        printLineColumn(batch, 2, 5, "Time $ccG${world.time.todaySeconds.toString().padStart(5, '0')}" +
-                                     " (${world.time.getFormattedTime()})")
+        if (world != null) {
+            printLineColumn(batch, 2, 5, "Time $ccG${world2!!.time.todaySeconds.toString().padStart(5, '0')}" +
+                                         " (${world2!!.time.getFormattedTime()})")
+        }
 
         if (player != null) {
             printLineColumn(batch, 2, 6, "Mass $ccG${player.mass}")
@@ -216,15 +225,18 @@ class BasicDebugInfoWindow : UICanvas() {
          * Bottom left
          */
 
-        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${ingame.actorContainer.size + ingame.actorContainerInactive.size}",
-                2f, Terrarum.HEIGHT - 10f)
-        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${ingame.actorContainer.size}",
-                (2 + 17*8).toFloat(), Terrarum.HEIGHT - 10f)
-        Terrarum.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${ingame.actorContainerInactive.size}",
-                (2 + 28*8).toFloat(), Terrarum.HEIGHT - 10f)
-        Terrarum.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${ingame.particlesActive}",
-                (2 + 41*8).toFloat(), Terrarum.HEIGHT - 10f)
-
+        if (ingame != null) {
+            Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${ingame!!.actorContainer.size + ingame!!.actorContainerInactive.size}",
+                    2f, Terrarum.HEIGHT - 10f)
+            Terrarum.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${ingame!!.actorContainer.size}",
+                    (2 + 17 * 8).toFloat(), Terrarum.HEIGHT - 10f)
+            Terrarum.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${ingame!!.actorContainerInactive.size}",
+                    (2 + 28 * 8).toFloat(), Terrarum.HEIGHT - 10f)
+            if (ingame is Ingame) {
+                Terrarum.fontSmallNumbers.draw(batch, "${ccM}Particles $ccG${(ingame as Ingame).particlesActive}",
+                        (2 + 41 * 8).toFloat(), Terrarum.HEIGHT - 10f)
+            }
+        }
 
         /**
          * Bottom right
@@ -235,8 +247,8 @@ class BasicDebugInfoWindow : UICanvas() {
                 (Terrarum.WIDTH - 2 - totalHardwareName.length * 8).toFloat(), Terrarum.HEIGHT - 10f)
     }
 
-    private val processorName = Terrarum.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "")
-    private val rendererName = Terrarum.renderer
+    private val processorName = AppLoader.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "")
+    private val rendererName = AppLoader.renderer
     private val totalHardwareName = "$processorName  $rendererName"
 
     private fun printLine(batch: SpriteBatch, l: Int, s: String) {

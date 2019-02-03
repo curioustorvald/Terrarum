@@ -7,11 +7,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.*
-import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.Notification
+import net.torvald.terrarum.modulebasegame.ui.UIEditorPalette
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
@@ -26,17 +26,18 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     private val menuYaml = Yaml("""
 - File
- - New
+ - New flat ter.
+ - New rand. ter.
  - Export…
  - Export sel…
  - Import…
- - Save world…
- - Load world…
+ - Save terrain…
+ - Load terrain…
  - Exit to Title : net.torvald.terrarum.modulebasegame.YamlCommandExit
 - Tool
- - Pencil
+ - Pencil : net.torvald.terrarum.modulebasegame.YamlCommandToolPencil
  - Eyedropper
- - Select mrq.
+ - Select mrq. : net.torvald.terrarum.modulebasegame.YamlCommandToolMarquee
  - Move
  - Undo
  - Redo
@@ -81,8 +82,13 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     val uiToolbox = UINSMenu("Menu", 100, menuYaml)
     val notifier = Notification()
+    val uiPalette = UIEditorPalette()
+
 
     val uiContainer = ArrayList<UICanvas>()
+
+    var currentPenMode = PENMODE_PENCIL
+
 
     val blockPointingCursor = object : ActorWithBody(Actor.RenderOrder.OVERLAY) {
 
@@ -90,14 +96,15 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         val body = TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16)
         override val hitbox = Hitbox(0.0, 0.0, 16.0, 16.0)
 
+
         init {
             this.actorValue[AVKey.LUMR] = 1.0
             this.actorValue[AVKey.LUMG] = 1.0
         }
 
         override fun drawBody(batch: SpriteBatch) {
-            batch.color = Color.YELLOW
-            batch.draw(body.get(0, 0), hitbox.startX.toFloat(), hitbox.startY.toFloat())
+            batch.color = toolCursorColour[currentPenMode]
+            batch.draw(body.get(currentPenMode, 0), hitbox.startX.toFloat(), hitbox.startY.toFloat())
         }
 
         override fun drawGlow(batch: SpriteBatch) { }
@@ -120,6 +127,16 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         }
     }
 
+    companion object {
+        const val PENMODE_PENCIL = 0
+        const val PENMODE_MARQUEE = 1
+
+        val toolCursorColour = arrayOf(
+                Color.YELLOW,
+                Color.MAGENTA
+        )
+    }
+
     private val actorsRenderOverlay = ArrayList<ActorWithBody>()
 
     init {
@@ -129,6 +146,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         actorsRenderOverlay.add(blockPointingCursor)
 
         uiContainer.add(uiToolbox)
+        uiContainer.add(uiPalette)
         uiContainer.add(notifier)
 
 
@@ -136,6 +154,9 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         uiToolbox.setPosition(0, 0)
         uiToolbox.isVisible = true
         uiToolbox.invocationArgument = arrayOf(this)
+
+        uiPalette.setPosition(Terrarum.WIDTH - uiPalette.width, 0)
+        uiPalette.isVisible = true
 
         notifier.setPosition(
                 (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
@@ -153,23 +174,34 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         super.show()
     }
 
+    private var updateAkku = 0.0
+
     override fun render(delta: Float) {
         Gdx.graphics.setTitle(Ingame.getCanonicalTitle())
 
 
         // ASYNCHRONOUS UPDATE AND RENDER //
 
+        val dt = Gdx.graphics.deltaTime
+        updateAkku += dt
 
-        // TODO async update
-        updateGame(delta)
+        var i = 0L
+        while (updateAkku >= delta) {
+            AppLoader.measureDebugTime("Ingame.update") { updateGame(delta) }
+            updateAkku -= delta
+            i += 1
+        }
+        AppLoader.setDebugTime("Ingame.updateCounter", i)
 
         // render? just do it anyway
-        renderGame()
+        AppLoader.measureDebugTime("Ingame.render") { renderGame() }
+        AppLoader.setDebugTime("Ingame.render-Light",
+                (AppLoader.debugTimers["Ingame.render"] as Long) - ((AppLoader.debugTimers["Renderer.LightTotal"] as? Long) ?: 0)
+        )
+
     }
 
     private fun updateGame(delta: Float) {
-        KeyToggler.update(false)
-
         WeatherMixer.update(delta, actorNowPlaying, gameWorld)
         blockPointingCursor.update(delta)
         actorNowPlaying?.update(delta)
@@ -187,6 +219,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         uiToolbox.setPosition(0, 0)
         notifier.setPosition(
                 (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
+
         println("[BuildingMaker] Resize event")
     }
 
@@ -291,5 +324,17 @@ class YamlCommandSetTimeDusk : YamlInvokable {
 class YamlCommandSetTimeNight : YamlInvokable {
     override fun invoke(args: Array<Any>) {
         (args[0] as BuildingMaker).gameWorld.time.setTimeOfToday(WorldTime.parseTime("0h30"))
+    }
+}
+
+class YamlCommandToolPencil : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).currentPenMode = BuildingMaker.PENMODE_PENCIL
+    }
+}
+
+class YamlCommandToolMarquee : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).currentPenMode = BuildingMaker.PENMODE_MARQUEE
     }
 }

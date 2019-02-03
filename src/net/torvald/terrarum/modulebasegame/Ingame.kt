@@ -13,7 +13,6 @@ import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.IngameController
-import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.modulebasegame.console.AVTracker
@@ -26,7 +25,6 @@ import net.torvald.terrarum.modulebasegame.ui.*
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
-import net.torvald.terrarum.ui.BasicDebugInfoWindow
 import net.torvald.terrarum.ui.ConsoleWindow
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
@@ -97,7 +95,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
 
-    lateinit var debugWindow: UICanvas
     lateinit var notifier: UICanvas
 
     lateinit var uiPieMenu: UICanvas
@@ -278,10 +275,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         consoleHandler.setPosition(0, 0)
 
 
-        // init debug window
-        debugWindow = BasicDebugInfoWindow()
-        debugWindow.setPosition(0, 0)
-
         // init notifier
         notifier = Notification()
         notifier.setPosition(
@@ -369,7 +362,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // these need to appear on top of any others
         uiContainer.add(notifier)
-        uiContainer.add(debugWindow)
 
 
         LightmapRenderer.fireRecalculateEvent()
@@ -469,7 +461,6 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         particlesActive = 0
 
 
-        KeyToggler.update()
         ingameController.update(delta)
 
 

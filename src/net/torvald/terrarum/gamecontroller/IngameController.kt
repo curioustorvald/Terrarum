@@ -92,9 +92,6 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
         ingame.uiContainer.forEach { it.keyDown(keycode) } // for KeyboardControlled UIcanvases
 
         // Debug UIs
-        if (keycode == Input.Keys.F3) {
-            ingame.debugWindow.toggleOpening()
-        }
         if (keycode == Input.Keys.GRAVE) {
             ingame.consoleHandler.toggleOpening()
         }
