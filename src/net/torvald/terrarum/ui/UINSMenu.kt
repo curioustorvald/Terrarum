@@ -43,12 +43,19 @@ class UINSMenu(
 
 
     private val listStack = ArrayList<MenuPack>()
+    /** cached version of listStack.size */
     private var currentDepth = 0
 
     private data class MenuPack(val title: String, val ui: UIItemTextButtonList)
 
-    private fun ArrayList<MenuPack>.push(item: MenuPack) { this.add(item) }
-    private fun ArrayList<MenuPack>.pop() = this.removeAt(this.lastIndex)
+    private fun ArrayList<MenuPack>.push(item: MenuPack) {
+        currentDepth += 1
+        this.add(item)
+    }
+    private fun ArrayList<MenuPack>.pop(): MenuPack {
+        currentDepth -= 1
+        return this.removeAt(this.lastIndex)
+    }
     private fun ArrayList<MenuPack>.peek() = this.last()
 
 
@@ -60,6 +67,22 @@ class UINSMenu(
     init {
         addSubMenu(tree)
     }
+
+    override val mouseUp: Boolean
+        get() {
+            for (sp in 0 until currentDepth) {
+                val subList = listStack[sp].ui
+
+                val _mouseUp = relativeMouseX in subList.posX..subList.posX + subList.width &&
+                                relativeMouseY in subList.posY - LINE_HEIGHT..subList.posY + subList.height
+
+                if (_mouseUp) return true
+            }
+
+            return false
+        }
+
+    // FIXME mouseUp doesn't work here
 
     private fun addSubMenu(tree: QNDTreeNode<Pair<String, YamlInvokable?>>) {
         val menuTitle = tree.data?.first ?: title
@@ -118,7 +141,6 @@ class UINSMenu(
         listStack.push(MenuPack(menuTitle, list))
         // increment the memoized width
         width += uiWidth
-        currentDepth += 1
     }
 
     private fun popSubMenu() {

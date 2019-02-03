@@ -202,12 +202,29 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun updateGame(delta: Float) {
+        var mouseOnUI = false
+
+
         WeatherMixer.update(delta, actorNowPlaying, gameWorld)
         blockPointingCursor.update(delta)
         actorNowPlaying?.update(delta)
-        uiContainer.forEach { it.update(delta) }
+        uiContainer.forEach {
+            it.update(delta)
+            if (it.isVisible && it.mouseUp) {
+                mouseOnUI = true
+            }
+        }
 
         WorldCamera.update(world, actorNowPlaying)
+
+
+        // make pen work HERE
+        if (Gdx.input.isTouched && !mouseOnUI) {
+
+            makePenWork(Terrarum.mouseTileX, Terrarum.mouseTileY)
+            // TODO drag support using bresenham's algo
+
+        }
     }
 
     private fun renderGame() {
@@ -225,6 +242,18 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     override fun dispose() {
         blockPointingCursor.dispose()
+    }
+
+    private fun makePenWork(worldTileX: Int, worldTileY: Int) {
+        val world = gameWorld
+        val palSelection = uiPalette.fore
+
+        when (currentPenMode) {
+            // test paint terrain layer
+            PENMODE_PENCIL -> {
+                world.setTileTerrain(worldTileX, worldTileY, palSelection)
+            }
+        }
     }
 }
 
@@ -254,6 +283,7 @@ class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {
         return true
     }
 
+    // let left mouse button to paint, because that's how graphic tablets work
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         screen.uiContainer.forEach { it.touchDragged(screenX, screenY, pointer) }
         return true

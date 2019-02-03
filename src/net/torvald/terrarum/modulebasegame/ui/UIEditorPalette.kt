@@ -11,7 +11,6 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
-import net.torvald.terrarum.serialise.toLittle
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
 
@@ -32,7 +31,7 @@ class UIEditorPalette : UICanvas() {
             relativeMouseX in 0 until width && relativeMouseY in 0 until LINE_HEIGHT
 
     var fore = Block.STONE_BRICKS
-    var back = Block.DIRT
+    var back = Block.GLASS_CRUDE
 
     private val titleText = "Pal."
 
@@ -40,29 +39,30 @@ class UIEditorPalette : UICanvas() {
 
     init {
         // make swap icon, because I can't be bothered to make yet another tga
-        val swapIconPixmap = Pixmap(12, 12, Pixmap.Format.RGBA8888)
-        swapIconPixmap.pixels.rewind()
-        arrayOf(
-                0b001000000000,
-                0b011000000000,
-                0b111111111100,
-                0b011000000100,
-                0b001000000100,
-                0b000000000100,
-                0b000000000100,
-                0b000000000100,
-                0b000000000100,
-                0b000000011111,
-                0b000000001110,
-                0b000000000100
-        ).reversed().forEachIndexed { index, bits ->
-            for (shiftmask in 11 downTo 0) {
-                val bit = bits.ushr(shiftmask).and(1) == 1
+        val clut = intArrayOf(0, 0xaaaaaaff.toInt(), -1, -1)
 
-                swapIconPixmap.pixels.put((if (bit) -1 else 0).toLittle())
+        val swapIconPixmap = Pixmap(13, 13, Pixmap.Format.RGBA8888)
+        arrayOf(
+                0b00_00_11_01_00_00_00_00_00_00_00_00_00,
+                0b00_11_11_01_00_00_00_00_00_00_00_00_00,
+                0b11_11_11_11_11_11_11_11_11_11_01_00_00,
+                0b01_11_11_01_01_01_01_01_01_11_01_00_00,
+                0b00_01_11_01_00_00_00_00_00_11_01_00_00,
+                0b00_00_01_01_00_00_00_00_00_11_01_00_00,
+                0b00_00_00_00_00_00_00_00_00_11_01_00_00,
+                0b00_00_00_00_00_00_00_00_00_11_01_00_00,
+                0b00_00_00_00_00_00_00_00_00_11_01_00_00,
+                0b00_00_00_00_00_00_00_11_11_11_11_11_01,
+                0b00_00_00_00_00_00_00_01_11_11_11_01_01,
+                0b00_00_00_00_00_00_00_00_01_11_01_01_00,
+                0b00_00_00_00_00_00_00_00_00_01_01_00_00
+        ).reversed().forEachIndexed { index, bits ->
+            for (shiftmask in 12 downTo 0) {
+                val bit = bits.ushr(shiftmask * 2).and(3)
+
+                swapIconPixmap.drawPixel(12 - shiftmask, index, clut[bit])
             }
         }
-        swapIconPixmap.pixels.rewind()
 
         swapIcon = Texture(swapIconPixmap)
         swapIconPixmap.dispose()
@@ -92,7 +92,7 @@ class UIEditorPalette : UICanvas() {
 
         // draw swap icon
         batch.color = Color.WHITE
-        batch.draw(swapIcon, 18f, 26f)
+        batch.draw(swapIcon, 22f, 26f)
 
     }
 
