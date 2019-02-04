@@ -16,13 +16,8 @@ class BlockProp {
     var shadeColG = 0f
     var shadeColB = 0f
     var shadeColA = 0f
-    lateinit var shadeColor: Color
 
-    /**
-     * @param opacity Raw RGB value, without alpha
-     */
-    inline val opacity: Color
-        get() = Color(shadeColR, shadeColG, shadeColB, shadeColA)
+    lateinit var opacity: Color
 
     var strength: Int = 0
     var density: Int = 0
