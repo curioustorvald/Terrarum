@@ -362,7 +362,7 @@ object LightmapRenderer {
                                     val ux = m.x + for_x_start - overscan_open
                                     val uy = m.y + for_y_start - overscan_open
 
-                                    (oldCol ?: colourNull) maxBlend calculate(ux, uy)
+                                    (oldCol ?: colourNull).cpy().maxAndAssign(calculate(ux, uy))
                                 }
                             }
                         }
@@ -769,20 +769,6 @@ object LightmapRenderer {
                 data.g + brighten,
                 data.b + brighten,
                 data.a + brighten
-        )
-    }
-
-    /** Get each channel from two RGB values, return new RGB that has max value of each channel
-     * @param rgb
-     * @param rgb2
-     * @return
-     */
-    infix fun Color.maxBlend(other: Color): Color {
-        return Color(
-                if (this.r > other.r) this.r else other.r,
-                if (this.g > other.g) this.g else other.g,
-                if (this.b > other.b) this.b else other.b,
-                if (this.a > other.a) this.a else other.a
         )
     }
 
