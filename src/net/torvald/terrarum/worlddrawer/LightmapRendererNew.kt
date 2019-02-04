@@ -12,14 +12,12 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
-import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarum.realestate.LandUtil
-import java.util.concurrent.atomic.AtomicReferenceArray
 
 /**
  * Sub-portion of IngameRenderer. You are not supposed to directly deal with this.
@@ -303,88 +301,41 @@ object LightmapRenderer {
                 //         because things are filled in subsequent frames ?
                 //         because of not wiping out prev map ! (if pass=1 also calculates ambience, was disabled to not have to wipe out)
 
-                // Round 2
-                AppLoader.measureDebugTime("Renderer.Light1") {
+                AppLoader.measureDebugTime("Renderer.LightTotal") {
+                    // Round 2
                     for (y in for_y_end + overscan_open downTo for_y_start) {
                         for (x in for_x_start - overscan_open..for_x_end) {
-                            setLightOf(lightmap, x, y, calculate(x, y))
+                            calculateAndAssign(lightmap, x, y)
                         }
                     }
-                }
-
-                // Round 3
-                AppLoader.measureDebugTime("Renderer.Light2") {
-                    for (y in for_y_end + overscan_open downTo for_y_start) {
+                    // Round 3
+                    /*for (y in for_y_end + overscan_open downTo for_y_start) {
                         for (x in for_x_end + overscan_open downTo for_x_start) {
-                            setLightOf(lightmap, x, y, calculate(x, y))
+                            calculateAndAssign(lightmap, x, y)
                         }
-                    }
-                }
-
-                // Round 4
-                AppLoader.measureDebugTime("Renderer.Light3") {
+                    }*/
+                    // Round 4
                     for (y in for_y_start - overscan_open..for_y_end) {
                         for (x in for_x_end + overscan_open downTo for_x_start) {
-                            setLightOf(lightmap, x, y, calculate(x, y))
+                            calculateAndAssign(lightmap, x, y)
                         }
                     }
-                }
-
-                // Round 1
-                AppLoader.measureDebugTime("Renderer.Light4") {
-                    for (y in for_y_start - overscan_open..for_y_end) {
+                    // Round 1
+                    /*for (y in for_y_start - overscan_open..for_y_end) {
                         for (x in for_x_start - overscan_open..for_x_end) {
-                            setLightOf(lightmap, x, y, calculate(x, y))
+                            calculateAndAssign(lightmap, x, y)
+                        }
+                    }*/
+                    // Round 2 again
+                    for (y in for_y_end + overscan_open downTo for_y_start) {
+                        for (x in for_x_start - overscan_open..for_x_end) {
+                            calculateAndAssign(lightmap, x, y)
                         }
                     }
                 }
-
-                AppLoader.addDebugTime("Renderer.LightTotal",
-                        "Renderer.Light1",
-                        "Renderer.Light2",
-                        "Renderer.Light3",
-                        "Renderer.Light4",
-                        "Renderer.Light0"
-                )
             }
             else if (world.worldIndex != -1) { // to avoid updating on the null world
-                val buf = AtomicReferenceArray<Color>(lightmap.size)
-
-                AppLoader.measureDebugTime("Renderer.LightPrlPre") {
-                    // update the content of buf using maxBlend -- it's not meant for overwrite
-
-                    updateMessages.forEachIndexed { index, msg ->
-                        ThreadParallel.map(index, "Light") {
-                            // for the message slices...
-                            msg.forEach { m ->
-                                // update the content of buf using maxBlend -- it's not meant for overwrite
-                                buf.getAndUpdate(m.y * LIGHTMAP_WIDTH + m.x) { oldCol ->
-                                    val ux = m.x + for_x_start - overscan_open
-                                    val uy = m.y + for_y_start - overscan_open
-
-                                    (oldCol ?: colourNull).cpy().maxAndAssign(calculate(ux, uy))
-                                }
-                            }
-                        }
-                    }
-                }
-
-                AppLoader.measureDebugTime("Renderer.LightPrlRun") {
-                    ThreadParallel.startAllWaitForDie()
-                }
-
-                AppLoader.measureDebugTime("Renderer.LightPrlPost") {
-                    // copy to lightmap
-                    for (k in 0 until lightmap.size) {
-                        lightmap[k] = buf.getPlain(k) ?: colourNull
-                    }
-                }
-
-                AppLoader.addDebugTime("Renderer.LightTotal",
-                        "Renderer.LightPrlPre",
-                        "Renderer.LightPrlRun",
-                        "Renderer.LightPrlPost"
-                )
+                TODO()
             }
         }
         else {
@@ -584,7 +535,7 @@ object LightmapRenderer {
     /**
      * Calculates the light simulation, using main lightmap as one of the input.
      */
-    private fun calculate(x: Int, y: Int): Color {
+    private fun calculateAndAssign(lightmap: Array<Color>, x: Int, y: Int) {
 
         // TODO is JEP 338 released yet?
 
@@ -618,7 +569,8 @@ object LightmapRenderer {
         /* * */lightLevelThis.maxAndAssign(darkenColoured(getLightInternal(x + 1, y) ?: colourNull, thisTileOpacity))
 
 
-        return lightLevelThis.cpy() // it HAS to be a cpy(), otherwise all cells gets the same instance
+        //return lightLevelThis.cpy() // it HAS to be a cpy(), otherwise all cells gets the same instance
+        setLightOf(lightmap, x, y, lightLevelThis.cpy())
     }
 
     private fun getLightForOpaque(x: Int, y: Int): Color? { // ...so that they wouldn't appear too dark
@@ -723,22 +675,6 @@ object LightmapRenderer {
                 data.g * (1f - darken.g * lightScalingMagic),//.clampZero(),
                 data.b * (1f - darken.b * lightScalingMagic),//.clampZero(),
                 data.a * (1f - darken.a * lightScalingMagic))
-    }
-
-    /**
-     * Add each channel's RGB value.
-     *
-     * @param data Raw channel value (0-255) per channel
-     * @param brighten (0-255) per channel
-     * @return brightened data (0-255) per channel
-     */
-    fun brightenColoured(data: Color, brighten: Color): Color {
-        return Color(
-                data.r * (1f + brighten.r * lightScalingMagic),
-                data.g * (1f + brighten.g * lightScalingMagic),
-                data.b * (1f + brighten.b * lightScalingMagic),
-                data.a * (1f + brighten.a * lightScalingMagic)
-        )
     }
 
     /**
@@ -904,10 +840,10 @@ object LightmapRenderer {
     )
     /** To eliminated visible edge on the gradient when 255/1023 is exceeded */
     internal fun Color.normaliseToHDR() = Color(
-            hdr(this.r),
-            hdr(this.g),
-            hdr(this.b),
-            hdr(this.a)
+            hdr(this.r.coerceIn(0f,1f)),
+            hdr(this.g.coerceIn(0f,1f)),
+            hdr(this.b.coerceIn(0f,1f)),
+            hdr(this.a.coerceIn(0f,1f))
     )
 
     private fun Color.nonZero() = this.r + this.g + this.b + this.a > epsilon
