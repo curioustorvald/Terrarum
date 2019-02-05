@@ -33,5 +33,6 @@ Ord  Hex  Description
 ...       SHA-256 hash of worldinfo2 (32 bytes)
 ...       SHA-256 hash of worldinfo3 (32 bytes)
 
-
+...       Gzipped thumbnail image in TGA format
+          (it's gzipped so that it saves faster, so no Lzma)
 

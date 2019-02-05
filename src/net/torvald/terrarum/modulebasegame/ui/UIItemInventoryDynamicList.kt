@@ -11,6 +11,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.gameactors.InventoryPair
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
+import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
 import java.util.*
@@ -99,7 +100,7 @@ class UIItemInventoryDynamicList(
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
-                mouseoverBackCol = Color(0x282828_ff),
+                mouseoverBackCol = Color(CELLCOLOUR_BLACK_ACTIVE),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
                 backCol = backColour,
                 backBlendMode = BlendMode.NORMAL,
@@ -116,7 +117,7 @@ class UIItemInventoryDynamicList(
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
-                mouseoverBackCol = Color(0x282828_ff),
+                mouseoverBackCol = Color(CELLCOLOUR_BLACK_ACTIVE),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
                 backCol = backColour,
                 backBlendMode = BlendMode.NORMAL,

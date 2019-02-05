@@ -9,6 +9,7 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemList
+import net.torvald.terrarum.ui.UIItemModuleInfoCell
 
 /**
  * Created by minjaesong on 2017-08-01.

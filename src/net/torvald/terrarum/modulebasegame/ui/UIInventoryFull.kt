@@ -7,11 +7,15 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
+import net.torvald.terrarum.Terrarum.PLAYER_REF_ID
+import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
+import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
+import net.torvald.terrarum.serialise.ReadWorldInfo
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemTextButtonList
@@ -29,6 +33,8 @@ class UIInventoryFull(
         customPositioning: Boolean = false, // mainly used by vital meter
         doNotWarnConstant: Boolean = false
 ) : UICanvas(toggleKeyLiteral, toggleButtonLiteral, customPositioning, doNotWarnConstant) {
+
+    // FIXME something's causing memory leak
 
     private val debugvals = false
     
@@ -108,7 +114,7 @@ class UIInventoryFull(
                     109 + (Terrarum.HEIGHT - internalHeight) / 2
             )
     private val gameMenuListWidth = 400
-    private val gameMenuListHeight = 40 * 5
+    private val gameMenuListHeight = UIItemPlayerInfoCell.HEIGHT
     private val gameMenuCharInfoHeight = 64 + 40 // no top margin, 40 bottom margin
     private val gameMenuListTotalHeight = gameMenuListHeight + gameMenuCharInfoHeight
     private val gameMenuButtons = UIItemTextButtonList(
@@ -154,6 +160,8 @@ class UIInventoryFull(
         }
     }
 
+    private val testPlayerInfoCell: UIItemPlayerInfoCell
+
     init {
         addItem(categoryBar)
         itemList.let { addItem(it) }
@@ -166,6 +174,15 @@ class UIInventoryFull(
             itemList.rebuild() // have to manually rebuild, too!
         }
 
+        testPlayerInfoCell = UIItemPlayerInfoCell(
+                this,
+                ReadWorldInfo.SaveMetaData("The Yucky Panopticon", 0L,0L,0L,0L,0L, (actor as Actor).referenceID!!, 84873L, 1500000000L, 2000000000L, 2, byteArrayOf(0), byteArrayOf(0), byteArrayOf(0), playerWallet = 13372),
+                gameMenuListWidth,
+                Terrarum.WIDTH + ((Terrarum.WIDTH - 400) / 2) + menuScrOffX.toInt(),
+                (itemList.height - gameMenuListTotalHeight) / 2 + itemList.posY,
+                false,
+                Terrarum.ingame!!.getActorByID(PLAYER_REF_ID) as IngamePlayer
+        )
 
 
         rebuildList()
@@ -174,6 +191,7 @@ class UIInventoryFull(
         addToTransitionalGroup(itemList)
         addToTransitionalGroup(equipped)
         addToTransitionalGroup(gameMenuButtons)
+        addToTransitionalGroup(testPlayerInfoCell)
 
         // make gameMenuButtons work
         gameMenuButtons.selectionChangeListener = { old, new ->
@@ -184,6 +202,7 @@ class UIInventoryFull(
                 Gdx.app.exit()
             }
         }
+
     }
 
     private var offsetX = ((Terrarum.WIDTH - internalWidth)   / 2).toFloat()
@@ -341,15 +360,7 @@ class UIInventoryFull(
         gameMenuButtons.render(batch, camera)
 
         // character info window
-
-        // !! DUMMY !!
-        batch.color = itemList.backColour
-        batch.fillRect(
-                ((Terrarum.WIDTH - 400) / 2) + menuScrOffX,
-                (itemList.height - gameMenuListTotalHeight) / 2 + itemList.posY.toFloat(),
-                gameMenuListWidth.toFloat(),
-                64f
-        )
+        testPlayerInfoCell.render(batch, camera)
     }
 
     private fun renderScreenInventory(batch: SpriteBatch, camera: Camera) {

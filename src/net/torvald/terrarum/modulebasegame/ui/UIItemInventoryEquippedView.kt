@@ -9,6 +9,7 @@ import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
+import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
 import net.torvald.terrarum.ui.UIItem
 
 /**
@@ -28,6 +29,7 @@ class UIItemInventoryEquippedView(
     companion object {
         val WIDTH  = 2 * UIItemInventoryElemSimple.height + UIItemInventoryDynamicList.listGap
         val HEIGHT = UIItemInventoryDynamicList.HEIGHT
+        val SPRITE_DRAW_COL = Color(0xddddddff.toInt())
     }
 
     private val listGap = 8
@@ -48,7 +50,7 @@ class UIItemInventoryEquippedView(
                 item = null,
                 amount = UIItemInventoryElem.UNIQUE_ITEM_HAS_NO_AMOUNT,
                 itemImage = null,
-                mouseoverBackCol = Color(0x282828_ff),
+                mouseoverBackCol = Color(CELLCOLOUR_BLACK_ACTIVE),
                 mouseoverBackBlendMode = BlendMode.SCREEN,
                 backCol = CELLCOLOUR_BLACK,
                 backBlendMode = BlendMode.NORMAL,
@@ -60,8 +62,6 @@ class UIItemInventoryEquippedView(
     override fun update(delta: Float) {
         itemGrid.forEach { it.update(delta) }
     }
-
-    private val spriteDrawCol = Color(0xddddddff.toInt())
 
     // deal with the moving position
     override var oldPosX = posX
@@ -86,7 +86,7 @@ class UIItemInventoryEquippedView(
         sprite?.let {
             blendNormal(batch)
 
-            batch.color = spriteDrawCol
+            batch.color = SPRITE_DRAW_COL
             batch.draw(
                     it.textureRegion.get(0, 0),
                     posX + (width - it.cellWidth).div(2).toFloat(),
