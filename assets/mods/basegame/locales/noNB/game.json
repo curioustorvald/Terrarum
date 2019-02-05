@@ -1,5 +1,7 @@
 {
   "MENU_LABEL_NEW_WORLD": "Ny Verden",
+  "MENU_LABEL_DELETE_WORLD": "Slett Verden",
+  "CONTEXT_WORLD_COUNT": "Verdener: ",
 
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Alle rettigheter reservert",
   "COPYRIGHT_GNU_GPL_3": "Distribuert under GNU GPL 3",

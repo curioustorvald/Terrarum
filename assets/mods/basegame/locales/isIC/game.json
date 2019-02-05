@@ -1,5 +1,8 @@
 {
   "MENU_LABEL_NEW_WORLD": "Nýr Heimur",
+  "MENU_LABEL_DELETE_WORLD": "Eyða Heimur",
+  "CONTEXT_WORLD_COUNT": "Heimar: ",
+
   "MENU_MONITOR_CALI_TITLE": "Skjár athuga",
 
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Öll réttindi áskilinn",

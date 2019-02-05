@@ -1,5 +1,8 @@
 {
   "MENU_LABEL_NEW_WORLD": "あたらしい せかい",
+  "MENU_LABEL_DELETE_WORLD": "せかいを さくじょ",
+  "CONTEXT_WORLD_COUNT": "せかい: ",
+
   "MENU_MONITOR_CALI_TITLE": "モニターチェック",
 
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "ぜんちょさくけん しょゆう",

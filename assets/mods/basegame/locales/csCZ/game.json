@@ -1,5 +1,7 @@
 {
   "MENU_LABEL_NEW_WORLD": "Nový Svět",
+  "MENU_LABEL_DELETE_WORLD": "Smazat Svět",
+  "CONTEXT_WORLD_COUNT": "Světy: ",
 
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Všechna práva vyhrazena",
   "COPYRIGHT_GNU_GPL_3": "Šířen pod licencí GNU GPL 3",

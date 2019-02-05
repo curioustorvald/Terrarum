@@ -1,5 +1,7 @@
 {
   "MENU_LABEL_NEW_WORLD": "Ny Värld",
+  "MENU_LABEL_DELETE_WORLD": "Radera Värld",
+  "CONTEXT_WORLD_COUNT": "Världar: ",
 
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Alla rättigheter förbehållna",
   "COPYRIGHT_GNU_GPL_3": "Distribueras under GNU GPL 3",

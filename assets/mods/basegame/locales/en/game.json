@@ -1,6 +1,7 @@
 {
   "MENU_LABEL_NEW_WORLD": "New World",
-  "MENU_LABEL_DELETE_WORLD" : "Delete World",
+  "MENU_LABEL_DELETE_WORLD": "Delete World",
+  "CONTEXT_WORLD_COUNT": "Worlds: ",
 
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "All rights reserved",
   "COPYRIGHT_GNU_GPL_3": "Distributed under GNU GPL 3",
