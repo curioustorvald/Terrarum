@@ -1,5 +1,8 @@
 {
   "MENU_LABEL_NEW_WORLD": "Nouveau Monde",
+  "MENU_LABEL_DELETE_WORLD": "Supprimer Monde",
+  "CONTEXT_WORLD_COUNT": "Mondes: ",
+
   "MENU_MONITOR_CALI_TITLE": "Vérification d'écran",
 
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Tous les droits sont réservés",

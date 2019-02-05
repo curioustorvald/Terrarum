@@ -1,5 +1,7 @@
 {
-  "MENU_LABEL_NEW_WORLD": "新世界",
+  "MENU_LABEL_NEW_WORLD": "創新世界",
+  "MENU_LABEL_DELETE_WORLD": "刪除世界",
+  "CONTEXT_WORLD_COUNT": "世界: ",
 
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "版權所有",
   "COPYRIGHT_GNU_GPL_3": "分佈在GNU GPL 3下",

@@ -1,5 +1,7 @@
 {
   "MENU_LABEL_NEW_WORLD": "Нов Свят",
+  "MENU_LABEL_DELETE_WORLD": "Изтриване на Света",
+  "CONTEXT_WORLD_COUNT": "Светове: ",
 
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Всички права запазени",
   "COPYRIGHT_GNU_GPL_3": "Разпределени под GNU GPL 3",

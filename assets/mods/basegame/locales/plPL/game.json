@@ -1,5 +1,7 @@
 {
   "MENU_LABEL_NEW_WORLD": "Nowy Świat",
+  "MENU_LABEL_DELETE_WORLD": "Usuń Świat",
+  "CONTEXT_WORLD_COUNT": "Światy: ",
 
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Wszelkie prawa zastrzeżone",
   "COPYRIGHT_GNU_GPL_3": "Rozpowszechniana w GNU GPL 3",
