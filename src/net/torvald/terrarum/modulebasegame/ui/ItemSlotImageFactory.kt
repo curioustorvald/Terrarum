@@ -20,8 +20,12 @@ object ItemSlotImageFactory {
     val CELLCOLOUR_BLACK_OPAQUE = Color(0x404040_FF)
     val CELLCOLOUR_WHITE_OPAQUE = Color(0xC0C0C0_FF.toInt())
 
+    /** Blend mode: normal */
     val CELLCOLOUR_BLACK = Color(0x404040_88)
     val CELLCOLOUR_WHITE = Color(0xC0C0C0_88.toInt())
+
+    /** Blend mode: screen */
+    val CELLCOLOUR_BLACK_ACTIVE = Color(0x282828ff)
 
     val slotImage = TextureRegionPack(Gdx.files.internal("./assets/graphics/gui/quickbar/item_slots_atlas.tga"), 38, 38) // must have same w/h as slotLarge
 

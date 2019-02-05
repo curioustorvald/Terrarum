@@ -1,9 +1,11 @@
 package net.torvald.terrarum.serialise
 
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskSkimmer.Companion.read
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskSkimmer.Companion.read
 
 
 object ReadWorldInfo {
@@ -55,7 +57,7 @@ object ReadWorldInfo {
     }
 
 
-    internal data class SaveMetaData(
+    data class SaveMetaData(
             val worldName: String,
             val terrainSeed: Long,
             val rngS0: Long,
@@ -69,6 +71,14 @@ object ReadWorldInfo {
             val totalPlayTime: Int,
             val worldinfo1Hash: ByteArray,
             val worldInfo2Hash: ByteArray,
-            val worldInfo3Hash: ByteArray
+            val worldInfo3Hash: ByteArray,
+
+            // gzipped TGA in meta
+            val thumbnail: Texture = Texture(2, 2, Pixmap.Format.RGBA8888),
+            // skim through the virtualdisk entries
+            val worldCount: Int = 1,
+            // read from the entry file
+            val playerName: String = "Savegame",
+            val playerWallet: Int = 0
     )
 }
