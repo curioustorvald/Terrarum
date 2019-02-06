@@ -54,4 +54,14 @@ data class Point2d(var x: Double, var y: Double) : Cloneable {
 
 }
 
-data class Point2i(val x: Int, val y: Int)
+data class Point2i(var x: Int, var y: Int) {
+    fun set(x: Int, y: Int) {
+        this.x = x
+        this.y = y
+    }
+
+    fun set(other: Point2i) {
+        this.x = other.x
+        this.y = other.y
+    }
+}
