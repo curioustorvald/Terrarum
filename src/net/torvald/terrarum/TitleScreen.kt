@@ -319,9 +319,6 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
     override fun dispose() {
         logo.texture.dispose()
-
-        IngameRenderer.dispose()
-
         uiMenu.dispose()
     }
 

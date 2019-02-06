@@ -863,6 +863,18 @@ internal object BlocksDrawer {
         }
     }
 
+    fun dispose() {
+        printdbg(this, "dispose called by")
+        Thread.currentThread().stackTrace.forEach {
+            printdbg(this, it)
+        }
+
+        weatherTerrains.forEach { it.dispose() }
+        tilesWire.dispose()
+        tileItemWall.dispose()
+        tilesFluid.dispose()
+    }
+
     fun getRenderStartX(): Int = WorldCamera.x / TILE_SIZE
     fun getRenderStartY(): Int = WorldCamera.y / TILE_SIZE
 

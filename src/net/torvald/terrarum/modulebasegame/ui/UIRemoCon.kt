@@ -12,7 +12,7 @@ import net.torvald.terrarum.Yaml
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemTextButton
 import net.torvald.terrarum.ui.UIItemTextButtonList
-import kotlin.collections.ArrayList
+import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGHT
 
 /**
  * Created by minjaesong on 2018-08-29.
@@ -297,8 +297,8 @@ open class UIRemoCon(treeRepresentation: QNDTreeNode<String>) : UICanvas() {
 
     companion object {
         val remoConWidth = 304
-        fun getRemoConHeight(menu: ArrayList<String>) = 36 * menu.size.plus(1)
-        fun getRemoConHeight(menu: Array<String>) = 36 * menu.size.plus(1)
+        fun getRemoConHeight(menu: ArrayList<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
+        fun getRemoConHeight(menu: Array<String>) = DEFAULT_LINE_HEIGHT * menu.size.plus(1)
         val menubarOffY: Int; get() = Terrarum.HEIGHT / 2 - (Terrarum.fontGame.lineHeight * 1.5).toInt()
     }
 }

@@ -19,7 +19,7 @@ class UIItemTextButtonList(
         override var posX: Int,
         override var posY: Int,
         override var width: Int,
-        override var height: Int,
+        override var height: Int = DEFAULT_LINE_HEIGHT * labelsList.size,
         val readFromLang: Boolean = false,
         val defaultSelection: Int? = null, // negative: INVALID, positive: valid, null: no select
 
@@ -47,6 +47,7 @@ class UIItemTextButtonList(
 
     companion object {
         val DEFAULT_BACKGROUNDCOL = Color(0x242424_80)
+        val DEFAULT_LINE_HEIGHT = 36
     }
 
     // deal with the moving position

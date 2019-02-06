@@ -586,6 +586,8 @@ object IngameRenderer {
         lightmapFboB.dispose()
 
         LightmapRenderer.dispose()
+        BlocksDrawer.dispose()
+        WeatherMixer.dispose()
     }
 
     private fun worldCamToRenderPos(): Pair<Float, Float> {
