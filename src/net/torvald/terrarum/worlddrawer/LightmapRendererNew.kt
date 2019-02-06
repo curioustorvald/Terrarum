@@ -33,6 +33,7 @@ import net.torvald.terrarum.realestate.LandUtil
  * own ingame renderer
  */
 object LightmapRenderer {
+    private const val TILE_SIZE = FeaturesDrawer.TILE_SIZE
 
     private var world: GameWorld = GameWorld.makeNullWorld()
     private lateinit var lightCalcShader: ShaderProgram
@@ -65,17 +66,16 @@ object LightmapRenderer {
         }
     }
 
-    // TODO if (VBO works on BlocksDrawer) THEN overscan of 256, utilise same technique in here
+    val overscan_open: Int = 40
+    val overscan_opaque: Int = 10
 
-    val overscan_open: Int = 32
-    val overscan_opaque: Int = 8
 
     // TODO resize(int, int) -aware
 
-    val LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.WIDTH)
-                                 .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
-    val LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.HEIGHT)
-                                  .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
+    val LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.WIDTH).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+    val LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.HEIGHT).div(TILE_SIZE).ceil() + overscan_open * 2 + 3
+
+    val noopMask = HashSet<Point2i>((LIGHTMAP_WIDTH + LIGHTMAP_HEIGHT) * 2)
 
     /**
      * Float value, 1.0 for 1023
@@ -145,7 +145,6 @@ object LightmapRenderer {
 
     private val AIR = Block.AIR
 
-    private const val TILE_SIZE = FeaturesDrawer.TILE_SIZE
     val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / IngameRenderer.lightmapDownsample
 
     // color model related constants
@@ -261,7 +260,7 @@ object LightmapRenderer {
         } // usually takes 3000 ns
 
         if (!SHADER_LIGHTING) {
-            /**
+            /*
              * Updating order:
              * ,--------.   ,--+-----.   ,-----+--.   ,--------. -
              * |↘       |   |  |    3|   |3    |  |   |       ↙| ↕︎ overscan_open / overscan_opaque
@@ -276,10 +275,17 @@ object LightmapRenderer {
              * it seems 5-pass is mandatory
              */
 
+            // set sunlight
+            sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
+
+            // set no-op mask from solidity of the block
+            AppLoader.measureDebugTime("Renderer.LightNoOpMask") {
+                noopMask.clear()
+                buildNoopMask()
+            }
 
             // wipe out lightmap
             AppLoader.measureDebugTime("Renderer.Light0") {
-                //for (ky in 0 until lightmap.size) for (kx in 0 until lightmap[0].size) lightmap[ky][kx] = colourNull
                 for (k in 0 until lightmap.size) lightmap[k] = colourNull
                 // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
                 // but the performance boost is measly 0.1 ms on 6700K
@@ -291,7 +297,6 @@ object LightmapRenderer {
             // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
 
             if (!AppLoader.getConfigBoolean("multithreadedlight")) {
-                //val workMap = Array(lightmap.size) { colourNull }
 
                 // The skipping is dependent on how you get ambient light,
                 // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
@@ -475,6 +480,35 @@ object LightmapRenderer {
         }
     }
 
+    private fun buildNoopMask() {
+        fun isShaded(x: Int, y: Int) = BlockCodex[world.getTileFromTerrain(x, y) ?: Block.STONE].isSolid
+
+        /*
+        update ordering: clockwise snake
+
+         for_x_start
+         |
+         02468>..............|--for_y_start
+         :                   :
+         :                   :
+         :                   :
+         V                   V
+         13579>............../--for_y_end
+                             |
+                     for_x_end
+
+         */
+
+        for (x in for_x_start..for_x_end) {
+            if (isShaded(x, for_y_start)) noopMask.add(Point2i(x, for_y_start))
+            if (isShaded(x, for_y_end)) noopMask.add(Point2i(x, for_y_end))
+        }
+        for (y in for_y_start + 1..for_y_end - 1) {
+            if (isShaded(for_x_start, y)) noopMask.add(Point2i(for_x_start, y))
+            if (isShaded(for_x_end, y)) noopMask.add(Point2i(for_x_end, y))
+        }
+
+    }
 
 
     //private val ambientAccumulator = Color(0f,0f,0f,0f)
@@ -519,7 +553,7 @@ object LightmapRenderer {
         }
 
         thisTileOpacity2.set(thisTileOpacity); thisTileOpacity2.mul(1.41421356f)
-        sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
+        //sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT) // moved to fireRecalculateEvent()
 
 
         // open air || luminous tile backed by sunlight
@@ -532,20 +566,61 @@ object LightmapRenderer {
 
     }
 
+    private val inNoopMaskp = Point2i(0,0)
+
+    private fun inNoopMask(x: Int, y: Int): Boolean {
+        // TODO: digitise your note of the idea of No-op Mask (date unknown)
+        if (x in for_x_start..for_x_end) {
+            // if it's in the top flange
+            inNoopMaskp.set(x, for_y_start)
+            if (y < for_y_start - overscan_opaque && noopMask.contains(inNoopMaskp)) return true
+            // if it's in the bottom flange
+            inNoopMaskp.y = for_y_end
+            return (y > for_y_end + overscan_opaque && noopMask.contains(inNoopMaskp))
+        }
+        else if (y in for_y_start..for_y_end) {
+            // if it's in the left flange
+            inNoopMaskp.set(for_x_start, y)
+            if (x < for_x_start - overscan_opaque && noopMask.contains(inNoopMaskp)) return true
+            // if it's in the right flange
+            inNoopMaskp.set(for_x_end, y)
+            return (x > for_x_end + overscan_opaque && noopMask.contains(inNoopMaskp))
+        }
+        // top-left corner
+        else if (x < for_x_start && y < for_y_start) {
+            inNoopMaskp.set(for_x_start, for_y_start)
+            return (x < for_x_start - overscan_opaque && y < for_y_start - overscan_opaque && noopMask.contains(inNoopMaskp))
+        }
+        // top-right corner
+        else if (x > for_x_end && y < for_y_start) {
+            inNoopMaskp.set(for_x_end, for_y_start)
+            return (x > for_x_end + overscan_opaque && y < for_y_start - overscan_opaque && noopMask.contains(inNoopMaskp))
+        }
+        // bottom-left corner
+        else if (x < for_x_start && y > for_y_end) {
+            inNoopMaskp.set(for_x_start, for_y_end)
+            return (x < for_x_start - overscan_opaque && y > for_y_end + overscan_opaque && noopMask.contains(inNoopMaskp))
+        }
+        // bottom-right corner
+        else if (x > for_x_end && y > for_y_end) {
+            inNoopMaskp.set(for_x_end, for_y_end)
+            return (x > for_x_end + overscan_opaque && y > for_y_end + overscan_opaque && noopMask.contains(inNoopMaskp))
+        }
+        else
+            return false
+
+        // if your IDE error out that you need return statement, AND it's "fixed" by removing 'else' before 'return false',
+        // you're doing it wrong, the IF and return statements must be inclusive.
+    }
+
     /**
      * Calculates the light simulation, using main lightmap as one of the input.
      */
     private fun calculateAndAssign(lightmap: Array<Color>, x: Int, y: Int) {
 
-        // TODO is JEP 338 released yet?
-
-
-        // TODO if we only use limited set of operations (max, mul, sub) then int-ify should be possible.
-        // 0xiiii_ffff, 65536 for 1.0
-        // Tested it, no perf gain :(
+        if (inNoopMask(x, y)) return
 
         // O(9n) == O(n) where n is a size of the map
-        // TODO devise multithreading on this
 
         getLightsAndShades(x, y)
 
