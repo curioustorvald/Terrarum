@@ -267,4 +267,8 @@ internal object WeatherMixer : RNGConsumer {
                 extraImages = extraImages
         )
     }
+
+    fun dispose() {
+
+    }
 }

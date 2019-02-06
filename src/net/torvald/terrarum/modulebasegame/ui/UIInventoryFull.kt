@@ -7,18 +7,16 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
-import net.torvald.terrarum.Terrarum.PLAYER_REF_ID
-import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory.Companion.CAPACITY_MODE_NO_ENCUMBER
-import net.torvald.terrarum.modulebasegame.gameactors.IngamePlayer
 import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
-import net.torvald.terrarum.serialise.ReadWorldInfo
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemTextButtonList
+import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_LINE_HEIGHT
 import net.torvald.terrarum.ui.UIUtils
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -113,14 +111,13 @@ class UIInventoryFull(
                     internalWidth - UIItemInventoryEquippedView.WIDTH + (Terrarum.WIDTH - internalWidth) / 2,
                     109 + (Terrarum.HEIGHT - internalHeight) / 2
             )
+    private val gameMenu = arrayOf("MENU_LABEL_MAINMENU", "MENU_LABEL_DESKTOP", "MENU_OPTIONS_CONTROLS", "MENU_OPTIONS_SOUND", "MENU_LABEL_GRAPHICS")
+    private val gameMenuListHeight = DEFAULT_LINE_HEIGHT * gameMenu.size
     private val gameMenuListWidth = 400
-    private val gameMenuListHeight = UIItemPlayerInfoCell.HEIGHT
-    private val gameMenuCharInfoHeight = 64 + 40 // no top margin, 40 bottom margin
-    private val gameMenuListTotalHeight = gameMenuListHeight + gameMenuCharInfoHeight
     private val gameMenuButtons = UIItemTextButtonList(
-            this, arrayOf("MENU_LABEL_MAINMENU", "MENU_LABEL_DESKTOP", "MENU_OPTIONS_CONTROLS", "MENU_OPTIONS_SOUND", "MENU_LABEL_GRAPHICS"),
+            this, gameMenu,
             Terrarum.WIDTH + (Terrarum.WIDTH - gameMenuListWidth) / 2,
-            (itemList.height - gameMenuListTotalHeight) / 2 + itemList.posY + gameMenuCharInfoHeight,
+            (itemList.height - gameMenuListHeight) / 2 + itemList.posY,
             gameMenuListWidth, gameMenuListHeight,
             readFromLang = true,
             textAreaWidth = gameMenuListWidth,
@@ -160,8 +157,6 @@ class UIInventoryFull(
         }
     }
 
-    private val testPlayerInfoCell: UIItemPlayerInfoCell
-
     init {
         addItem(categoryBar)
         itemList.let { addItem(it) }
@@ -174,16 +169,6 @@ class UIInventoryFull(
             itemList.rebuild() // have to manually rebuild, too!
         }
 
-        testPlayerInfoCell = UIItemPlayerInfoCell(
-                this,
-                ReadWorldInfo.SaveMetaData("The Yucky Panopticon", 0L,0L,0L,0L,0L, (actor as Actor).referenceID!!, 84873L, 1500000000L, 2000000000L, 2, byteArrayOf(0), byteArrayOf(0), byteArrayOf(0), playerWallet = 13372),
-                gameMenuListWidth,
-                Terrarum.WIDTH + ((Terrarum.WIDTH - 400) / 2) + menuScrOffX.toInt(),
-                (itemList.height - gameMenuListTotalHeight) / 2 + itemList.posY,
-                false,
-                Terrarum.ingame!!.getActorByID(PLAYER_REF_ID) as IngamePlayer
-        )
-
 
         rebuildList()
 
@@ -191,7 +176,6 @@ class UIInventoryFull(
         addToTransitionalGroup(itemList)
         addToTransitionalGroup(equipped)
         addToTransitionalGroup(gameMenuButtons)
-        addToTransitionalGroup(testPlayerInfoCell)
 
         // make gameMenuButtons work
         gameMenuButtons.selectionChangeListener = { old, new ->
@@ -358,9 +342,6 @@ class UIInventoryFull(
 
         // text buttons
         gameMenuButtons.render(batch, camera)
-
-        // character info window
-        testPlayerInfoCell.render(batch, camera)
     }
 
     private fun renderScreenInventory(batch: SpriteBatch, camera: Camera) {
@@ -408,6 +389,8 @@ class UIInventoryFull(
 
 
     fun rebuildList() {
+        printdbg(this, "rebuilding list")
+
         itemList.rebuild()
         equipped.rebuild()
 
