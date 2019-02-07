@@ -569,7 +569,7 @@ object LightmapRenderer {
     private val inNoopMaskp = Point2i(0,0)
 
     private fun inNoopMask(x: Int, y: Int): Boolean {
-        // TODO: digitise your note of the idea of No-op Mask (date unknown)
+        // TODO: digitise your note of the idea of No-op Mask (date unknown, prob before 2017-03-17)
         if (x in for_x_start..for_x_end) {
             // if it's in the top flange
             inNoopMaskp.set(x, for_y_start)
