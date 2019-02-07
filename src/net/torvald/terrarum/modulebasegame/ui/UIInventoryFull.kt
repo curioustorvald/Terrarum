@@ -3,7 +3,6 @@ package net.torvald.terrarum.modulebasegame.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
@@ -256,7 +255,8 @@ class UIInventoryFull(
 
         // background fill
         batch.end()
-        Gdx.gl.glEnable(GL20.GL_BLEND) // ending the batch disables blend
+        gdxSetBlendNormal()
+
 
         val gradTopStart = (Terrarum.HEIGHT - internalHeight).div(2).toFloat()
         val gradBottomEnd = Terrarum.HEIGHT - gradTopStart
