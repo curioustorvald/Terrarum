@@ -270,9 +270,8 @@ object LightmapRenderer {
              * |  |    3|   |↗       |   |       ↖|   |3    |  |
              * `--+-----'   `--------'   `--------'   `-----+--'
              * round:   1            2            3            4
-             * for all lightmap[y][x], run in this order: 2-3-4-1-2
+             * for all lightmap[y][x], run in this order: 2-3-4-1
              *     If you run only 4 sets, orthogonal/diagonal artefacts are bound to occur,
-             * it seems 5-pass is mandatory
              */
 
             // set sunlight
@@ -301,11 +300,6 @@ object LightmapRenderer {
                 // The skipping is dependent on how you get ambient light,
                 // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
 
-                // FIXME theoretically skipping shouldn't work (light can be anywhere on the screen, not just centre
-                //       but how does it actually work ?!?!?!!?!?!?!?
-                //         because things are filled in subsequent frames ?
-                //         because of not wiping out prev map ! (if pass=1 also calculates ambience, was disabled to not have to wipe out)
-
                 AppLoader.measureDebugTime("Renderer.LightTotal") {
                     // Round 2
                     for (y in for_y_end + overscan_open downTo for_y_start) {
@@ -314,11 +308,11 @@ object LightmapRenderer {
                         }
                     }
                     // Round 3
-                    /*for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (y in for_y_end + overscan_open downTo for_y_start) {
                         for (x in for_x_end + overscan_open downTo for_x_start) {
                             calculateAndAssign(lightmap, x, y)
                         }
-                    }*/
+                    }
                     // Round 4
                     for (y in for_y_start - overscan_open..for_y_end) {
                         for (x in for_x_end + overscan_open downTo for_x_start) {
@@ -326,17 +320,17 @@ object LightmapRenderer {
                         }
                     }
                     // Round 1
-                    /*for (y in for_y_start - overscan_open..for_y_end) {
-                        for (x in for_x_start - overscan_open..for_x_end) {
-                            calculateAndAssign(lightmap, x, y)
-                        }
-                    }*/
-                    // Round 2 again
-                    for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (y in for_y_start - overscan_open..for_y_end) {
                         for (x in for_x_start - overscan_open..for_x_end) {
                             calculateAndAssign(lightmap, x, y)
                         }
                     }
+                    // Round 2 again
+                    /*for (y in for_y_end + overscan_open downTo for_y_start) {
+                        for (x in for_x_start - overscan_open..for_x_end) {
+                            calculateAndAssign(lightmap, x, y)
+                        }
+                    }*/
                 }
             }
             else if (world.worldIndex != -1) { // to avoid updating on the null world
@@ -569,6 +563,7 @@ object LightmapRenderer {
     private val inNoopMaskp = Point2i(0,0)
 
     private fun inNoopMask(x: Int, y: Int): Boolean {
+
         // TODO: digitise your note of the idea of No-op Mask (date unknown, prob before 2017-03-17)
         if (x in for_x_start..for_x_end) {
             // if it's in the top flange

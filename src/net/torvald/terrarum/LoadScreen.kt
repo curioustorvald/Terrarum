@@ -31,7 +31,7 @@ object LoadScreen : ScreenAdapter() {
     private var arrowObjPos = 0f // 0 means at starting position, regardless of screen position
     private var arrowObjGlideOffsetX = 0f
     private var arrowObjGlideSize = 0f
-    private val arrowGlideSpeed: Float; get() = Terrarum.WIDTH * 1.5f // pixels per sec
+    private val arrowGlideSpeed: Float; get() = Terrarum.WIDTH / 2f // pixels per sec
     private lateinit var arrowObjTex: Texture
     private var glideTimer = 0f
     private var glideDispY = 0f
@@ -120,6 +120,8 @@ object LoadScreen : ScreenAdapter() {
     private var messageForegroundColour = Color.WHITE
 
     override fun render(delta: Float) {
+        val delta = Gdx.graphics.deltaTime
+
         glideDispY = Terrarum.HEIGHT - 100f - Terrarum.fontGame.lineHeight
         arrowObjGlideSize = arrowObjTex.width + 2f * Terrarum.WIDTH
 
