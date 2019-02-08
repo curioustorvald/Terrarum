@@ -1,10 +1,12 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.gamepadDeadzone
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameworld.GameWorld
@@ -143,7 +145,6 @@ open class ActorHumanoid(
     @Transient private var prevVMoveKey = KEY_NULL
 
     @Transient private val AXIS_KEYBOARD = -13372f // leetz
-    @Transient private val GAMEPAD_JUMP = 7
 
     var isUpDown = false; protected set
     var isDownDown = false; protected set
@@ -225,11 +226,13 @@ open class ActorHumanoid(
             isRightDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyright"))
             isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump"))
 
-            if (AppLoader.gamepad != null) {
-                axisX =  AppLoader.gamepad!!.getAxisValue(AppLoader.getConfigInt("gamepadlstickx"))
-                axisY =  AppLoader.gamepad!!.getAxisValue(AppLoader.getConfigInt("gamepadlsticky"))
-                axisRX = AppLoader.gamepad!!.getAxisValue(AppLoader.getConfigInt("gamepadrstickx"))
-                axisRY = AppLoader.gamepad!!.getAxisValue(AppLoader.getConfigInt("gamepadrsticky"))
+            if ((Terrarum.ingame as Ingame).ingameController.hasController) {
+                val gamepad = Controllers.getControllers()[0]
+
+                axisX =  gamepad.getAxis(AppLoader.getConfigInt("gamepadlstickx"))
+                axisY =  gamepad.getAxis(AppLoader.getConfigInt("gamepadlsticky"))
+                axisRX = gamepad.getAxis(AppLoader.getConfigInt("gamepadrstickx"))
+                axisRY = gamepad.getAxis(AppLoader.getConfigInt("gamepadrsticky"))
 
                 // deadzonning
                 if (Math.abs(axisX) < AppLoader.gamepadDeadzone) axisX = 0f
@@ -238,7 +241,7 @@ open class ActorHumanoid(
                 if (Math.abs(axisRY) < AppLoader.gamepadDeadzone) axisRY = 0f
 
                 isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump")) ||
-                             AppLoader.gamepad!!.isButtonPressed(GAMEPAD_JUMP)
+                             gamepad.getAxis(AppLoader.getConfigInt("gamepadtriggeraxis")) < -AppLoader.gamepadDeadzone
             }
         }
         else {
@@ -250,7 +253,7 @@ open class ActorHumanoid(
     }
 
     private inline val hasController: Boolean
-        get() = if (isGamer) AppLoader.gamepad != null
+        get() = if (isGamer) (Terrarum.ingame as Ingame).ingameController.hasController
                 else true
     
     private fun processInput(delta: Float) {
@@ -264,7 +267,7 @@ open class ActorHumanoid(
             }
         }
         // ↑F, ↑S
-        if (isWalkingH && !isLeftDown && !isRightDown) {
+        if (isWalkingH && !isLeftDown && !isRightDown && axisX.abs() < gamepadDeadzone) {
             walkHStop()
             prevHMoveKey = KEY_NULL
         }
@@ -278,7 +281,7 @@ open class ActorHumanoid(
         }
         // ↑E
         // ↑D
-        if (isNoClip && !isUpDown && !isDownDown) {
+        if (isNoClip && !isUpDown && !isDownDown && axisY.abs() < gamepadDeadzone) {
             walkVStop()
             prevVMoveKey = KEY_NULL
         }

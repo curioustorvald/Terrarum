@@ -1,6 +1,9 @@
 package net.torvald.terrarum;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Files;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
@@ -26,8 +29,6 @@ import net.torvald.terrarum.worlddrawer.BlocksDrawer;
 import net.torvald.terrarum.worlddrawer.LightmapRenderer;
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase;
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack;
-import org.lwjgl.input.Controller;
-import org.lwjgl.input.Controllers;
 
 import java.io.File;
 import java.io.IOException;
@@ -174,7 +175,6 @@ public class AppLoader implements ApplicationListener {
     public static TinyAlphNum fontSmallNumbers;
 
     /** A gamepad. Multiple gamepads may controll this single virtualised gamepad. */
-    public static org.lwjgl.input.Controller gamepad = null;
     public static float gamepadDeadzone = 0.1f;
 
     /**
@@ -304,21 +304,6 @@ public class AppLoader implements ApplicationListener {
                 VertexAttribute.TexCoords(0)
         );
         updateFullscreenQuad(appConfig.width, appConfig.height);
-
-        // enlist suitable gamepads
-        try {
-            Controllers.create();
-
-            printdbg(this, "Available gamepads: " + Controllers.getControllerCount());
-            for (int x = 0; x < Controllers.getControllerCount(); x++) {
-                Controller gamepad = Controllers.getController(x);
-                printdbg(this, String.format("Gamepad #%d: %s", x + 1, gamepad.getName()));
-            }
-        }
-        catch (Throwable e) {
-            printdbg(this, "Exception occured while creating controllers -- there will be no gamepads available.");
-            printdbg(this, e);
-        }
 
 
         // set up renderer info variables
@@ -477,7 +462,6 @@ public class AppLoader implements ApplicationListener {
         }
 
         IngameRenderer.INSTANCE.dispose();
-        if (Controllers.isCreated()) Controllers.destroy();
 
         Terrarum.INSTANCE.dispose();
 

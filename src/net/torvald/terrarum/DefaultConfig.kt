@@ -28,20 +28,22 @@ object DefaultConfig {
 
 
         // control-gamepad
-        jsonObject.addProperty("gamepadkeyn", 4)
-        jsonObject.addProperty("gamepadkeyw", 1)
-        jsonObject.addProperty("gamepadkeys", 2)
-        jsonObject.addProperty("gamepadkeye", 3) // logitech indices
+        jsonObject.addProperty("gamepadkeyn", 3)
+        jsonObject.addProperty("gamepadkeyw", 2)
+        jsonObject.addProperty("gamepadkeys", 0)
+        jsonObject.addProperty("gamepadkeye", 1) // xbox indices
 
         jsonObject.addProperty("gamepadlup", 4)
         jsonObject.addProperty("gamepadrup", 5)
-        jsonObject.addProperty("gamepadldown", 6)
-        jsonObject.addProperty("gamepadrdown", 7) // logitech indices
+        jsonObject.addProperty("gamepadselect", 6)
+        jsonObject.addProperty("gamepadstart", 7)
 
-        jsonObject.addProperty("gamepadlstickx", 0)
-        jsonObject.addProperty("gamepadlsticky", 1)
-        jsonObject.addProperty("gamepadrstickx", 2)
-        jsonObject.addProperty("gamepadrsticky", 3) // 0-1-2-3 but sometimes 3-2-1-0 ?! what the actual fuck?
+        jsonObject.addProperty("gamepadlstickx", 1)
+        jsonObject.addProperty("gamepadlsticky", 0)
+        jsonObject.addProperty("gamepadrstickx", 3)
+        jsonObject.addProperty("gamepadrsticky", 2) // 0-1-2-3 but sometimes 3-2-1-0 ?! what the actual fuck?
+        jsonObject.addProperty("gamepadtriggeraxis", 4) // positive: LT, negative: RT (xbox pad)
+
 
         jsonObject.addProperty("gamepadlabelstyle", "msxb360") // "nwii", "logitech", "sonyps", "msxb360", "generic"
 

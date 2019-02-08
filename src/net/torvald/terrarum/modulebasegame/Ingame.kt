@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.dataclass.CircularArray
@@ -253,7 +254,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
     }
 
-    private val ingameController = IngameController(this)
+    val ingameController = IngameController(this)
 
     /** Load rest of the game with GL context */
     fun postInit() {
@@ -266,7 +267,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
 
+        // make controls work
         Gdx.input.inputProcessor = ingameController
+        Controllers.addListener(ingameController)
 
 
 

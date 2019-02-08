@@ -1,6 +1,7 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -10,6 +11,7 @@ import net.torvald.terrarum.Terrarum.mouseTileY
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
+import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -190,10 +192,12 @@ class BasicDebugInfoWindow : UICanvas() {
 
         batch.color = Color.WHITE
 
-        if (AppLoader.gamepad != null) {
+        if ((Terrarum.ingame as? Ingame)?.ingameController?.hasController == true) {
+            val gamepad = Controllers.getControllers()[0]
+
             drawGamepadAxis(batch,
-                    AppLoader.gamepad!!.getAxisValue(3),
-                    AppLoader.gamepad!!.getAxisValue(2),
+                    gamepad.getAxis(AppLoader.getConfigInt("gamepadlstickx")),
+                    gamepad.getAxis(AppLoader.getConfigInt("gamepadlsticky")),
                     Terrarum.WIDTH - 135,
                     40
             )
@@ -308,7 +312,7 @@ class BasicDebugInfoWindow : UICanvas() {
     }
 
     private fun drawGamepadAxis(batch: SpriteBatch, axisX: Float, axisY: Float, uiX: Int, uiY: Int) {
-        val uiColour = Color(0xAA000000.toInt())
+        val uiColour = ItemSlotImageFactory.CELLCOLOUR_BLACK
         val w = 128f
         val h = 128f
         val halfW = w / 2f
@@ -317,22 +321,24 @@ class BasicDebugInfoWindow : UICanvas() {
         val pointDX = axisX * halfW
         val pointDY = axisY * halfH
 
-        val padName = if (AppLoader.gamepad!!.name.isEmpty()) "Gamepad"
-                      else AppLoader.gamepad!!.name
+        val gamepad = Controllers.getControllers()[0]
+        val padName = if (gamepad.name.isEmpty()) "Gamepad"
+                      else gamepad.name
 
         blendNormal(batch)
 
         batch.end()
+        gdxSetBlendNormal()
         Terrarum.inShapeRenderer {
             it.color = uiColour
-            it.rect(uiX.toFloat(), uiY.toFloat(), w, h)
+            it.rect(uiX.toFloat(), Terrarum.HEIGHT - uiY.toFloat(), w, -h)
             it.color = Color.WHITE
-            it.line(uiX + halfW, uiY + halfH, uiX + halfW + pointDX, uiY + halfH + pointDY)
+            it.line(uiX + halfW, Terrarum.HEIGHT - (uiY + halfH), uiX + halfW + pointDX, Terrarum.HEIGHT - (uiY + halfH + pointDY))
             it.color = Color.GRAY
         }
         batch.begin()
 
-        Terrarum.fontSmallNumbers.draw(batch, padName, uiX + w / 2 - (padName.length) * 4, uiY.toFloat() + h + 2)
+        Terrarum.fontSmallNumbers.draw(batch, padName, Terrarum.WIDTH - (padName.length) * 8f, uiY.toFloat() + h + 2)
 
     }
 
