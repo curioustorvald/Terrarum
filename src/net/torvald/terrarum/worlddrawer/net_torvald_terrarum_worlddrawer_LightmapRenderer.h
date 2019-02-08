@@ -48,10 +48,10 @@ extern "C" {
 /*
  * Class:     net_torvald_terrarum_worlddrawer_LightmapRenderer
  * Method:    fireRecalculateEventJNI
- * Signature: ()V
+ * Signature: (IIIIII[F[I[F[F[B[F[F)V
  */
 JNIEXPORT void JNICALL Java_net_torvald_terrarum_worlddrawer_LightmapRenderer_fireRecalculateEventJNI
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jint, jint, jint, jint, jint, jint, jfloatArray, jintArray, jfloatArray, jfloatArray, jbyteArray, jfloatArray, jfloatArray);
 
 #ifdef __cplusplus
 }

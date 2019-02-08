@@ -82,7 +82,7 @@ object LightmapRenderer {
      */
     // it utilises alpha channel to determine brightness of "glow" sprites (so that alpha channel works like UV light)
     //private val lightmap: Array<Array<Color>> = Array(LIGHTMAP_HEIGHT) { Array(LIGHTMAP_WIDTH, { Color(0f,0f,0f,0f) }) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
-    private val lightmap: Array<Float> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT * 4) { 0f } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
+    private val lightmap: FloatArray = FloatArray(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT * 4) { 0f } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lanternMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
     private lateinit var texturedLightMap: FrameBuffer
@@ -224,7 +224,7 @@ object LightmapRenderer {
      * @param colour Color to write
      * @param applyFun A function ```foo(old_colour, given_colour)```
      */
-    private fun setLightOf(list: Array<Float>, x: Int, y: Int, colour: Color) {
+    private fun setLightOf(list: FloatArray, x: Int, y: Int, colour: Color) {
         if (y - for_y_start + overscan_open in 0 until LIGHTMAP_HEIGHT &&
             x - for_x_start + overscan_open in 0 until LIGHTMAP_WIDTH) {
 
@@ -361,7 +361,16 @@ object LightmapRenderer {
 
     }
 
-    private external fun fireRecalculateEventJNI()
+    private external fun fireRecalculateEventJNI(
+            for_x_start: Int, for_x_end: Int, for_y_start: Int, for_y_end: Int,
+            lightmapwidth: Int, lightmapheight: Int, lightmap: FloatArray,
+            groundmap: IntArray, // high 16 bits: ground, low 16 bits: terrain
+            lummap: FloatArray, // interleaved RGBA
+            shademap: FloatArray, // interleaved RGBA
+            fluidtypemap: ByteArray, // 127 different fluids
+            fluidfillmap: FloatArray,
+            sun: FloatArray
+    )
 
 
 
