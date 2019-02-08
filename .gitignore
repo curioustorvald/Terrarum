@@ -12,7 +12,6 @@ Thumbs.db
 .DS_Store
 
 # Resources that should not be tracked
-*.jar
 assets/mods/basegame/demoworld
 #assets/mods/basegame/demoworld.gz
 external_resource_packs.zip

@@ -3,7 +3,13 @@ package net.torvald.terrarum.gamecontroller
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.controllers.Controller
+import com.badlogic.gdx.controllers.ControllerListener
+import com.badlogic.gdx.controllers.Controllers
+import com.badlogic.gdx.controllers.PovDirection
+import com.badlogic.gdx.math.Vector3
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.AVKey
@@ -16,8 +22,10 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 /**
  * Created by minjaesong on 2015-12-31.
  */
-class IngameController(val ingame: Ingame) : InputAdapter() {
+class IngameController(val ingame: Ingame) : InputAdapter(), ControllerListener {
 
+
+    var hasController = true
 
     // these four values can also be accessed with GameContainer.<varname>
     // e.g.  gc.mouseTileX
@@ -34,6 +42,13 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
     /** currently pointing tile coordinate */
     val mouseTileY: Int
         get() = (mouseY / FeaturesDrawer.TILE_SIZE).floorInt()
+
+    init {
+        if (Controllers.getControllers().size == 0) {
+            hasController = false
+            printdbg(this, "Controller not found")
+        }
+    }
 
     fun update(delta: Float) {
 
@@ -196,4 +211,39 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
         return true
     }
 
+    override fun connected(p0: Controller?) {
+        hasController = true
+    }
+
+    override fun buttonUp(p0: Controller?, p1: Int): Boolean {
+        return false
+    }
+
+    override fun ySliderMoved(p0: Controller?, p1: Int, p2: Boolean): Boolean {
+        return false
+    }
+
+    override fun accelerometerMoved(p0: Controller?, p1: Int, p2: Vector3?): Boolean {
+        return false
+    }
+
+    override fun axisMoved(p0: Controller?, p1: Int, p2: Float): Boolean {
+        return false
+    }
+
+    override fun disconnected(p0: Controller?) {
+        hasController = false
+    }
+
+    override fun xSliderMoved(p0: Controller?, p1: Int, p2: Boolean): Boolean {
+        return false
+    }
+
+    override fun povMoved(p0: Controller?, p1: Int, p2: PovDirection?): Boolean {
+        return false
+    }
+
+    override fun buttonDown(p0: Controller?, p1: Int): Boolean {
+        return false
+    }
 }
