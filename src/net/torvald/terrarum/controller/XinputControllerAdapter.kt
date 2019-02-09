@@ -6,6 +6,9 @@ import net.torvald.terrarum.AppLoader
 import kotlin.math.roundToInt
 
 /**
+ * Note: XInput is a basically a XBOX 360 pad. XBOX One pad and any other compatible pads can be used,
+ * but any additional features (e.g. Impulse Trigger on XBOne) cannot be supported.
+ *
  * Created by minjaesong on 2019-02-09.
  */
 class XinputControllerAdapter(val c: XInputDevice): TerrarumController {
@@ -25,6 +28,8 @@ class XinputControllerAdapter(val c: XInputDevice): TerrarumController {
                 7 -> button.start
                 8 -> getAxis(4) >= AppLoader.gamepadDeadzone
                 9 -> getAxis(5) >= AppLoader.gamepadDeadzone
+                10 -> button.lThumb
+                11 -> button.rThumb
                 else -> throw UnsupportedOperationException("Unknown button: $index")
             }
         }
@@ -62,14 +67,14 @@ class XinputControllerAdapter(val c: XInputDevice): TerrarumController {
                 XInputAxes.DPAD_DOWN -> TerrarumController.POV_S
                 XInputAxes.DPAD_DOWN_LEFT -> TerrarumController.POV_SW
                 XInputAxes.DPAD_LEFT -> TerrarumController.POV_W
-                else -> throw UnsupportedOperationException("Unknown pov: ${axes.dpad}")
+                else -> 0//throw UnsupportedOperationException("Unknown pov: ${axes.dpad}")
             }
         }
         return -1
     }
 
     override fun getName(): String {
-        return "(XInput Compatible)"
+        return "(XB360 Compatible)"
     }
 
     override fun setRumble(left: Float, right: Float) {

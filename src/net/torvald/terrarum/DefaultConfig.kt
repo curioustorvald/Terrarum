@@ -42,13 +42,16 @@ object DefaultConfig {
 
         jsonObject.addProperty("gamepadltrigger", 8)
         jsonObject.addProperty("gamepadrtrigger", 9)
+        jsonObject.addProperty("gamepadlthumb", 10)
+        jsonObject.addProperty("gamepadrthumb", 11)
 
-        jsonObject.addProperty("gamepadlstickx", 1)
-        jsonObject.addProperty("gamepadlsticky", 0)
-        jsonObject.addProperty("gamepadrstickx", 3)
-        jsonObject.addProperty("gamepadrsticky", 2) // 0-1-2-3 but sometimes 3-2-1-0 ?! what the actual fuck?
+
+        jsonObject.addProperty("gamepadaxislx", 1)
+        jsonObject.addProperty("gamepadaxisly", 0)
+        jsonObject.addProperty("gamepadaxisrx", 3)
+        jsonObject.addProperty("gamepadaxisry", 2) // 0-1-2-3 but sometimes 3-2-1-0 ?! what the actual fuck?
         jsonObject.addProperty("gamepadtriggeraxis", 4) // positive: LT, negative: RT (xbox pad)
-
+        jsonObject.addProperty("gamepadtriggeraxis2", 5) // just in case... (RT)
 
         jsonObject.addProperty("gamepadlabelstyle", "msxb360") // "nwii", "logitech", "sonyps", "msxb360", "generic"
 
