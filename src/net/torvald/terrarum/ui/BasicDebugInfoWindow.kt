@@ -1,13 +1,13 @@
 package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.Terrarum.mouseTileX
 import net.torvald.terrarum.Terrarum.mouseTileY
+import net.torvald.terrarum.controller.TerrarumController
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
@@ -192,10 +192,9 @@ class BasicDebugInfoWindow : UICanvas() {
 
         batch.color = Color.WHITE
 
-        if ((Terrarum.ingame as? Ingame)?.ingameController?.hasController == true) {
-            val gamepad = Controllers.getControllers()[0]
-
-            drawGamepadAxis(batch,
+        val gamepad = (Terrarum.ingame as? Ingame)?.ingameController?.gamepad
+        if (gamepad != null) {
+            drawGamepadAxis(gamepad, batch,
                     gamepad.getAxis(AppLoader.getConfigInt("gamepadlstickx")),
                     gamepad.getAxis(AppLoader.getConfigInt("gamepadlsticky")),
                     Terrarum.WIDTH - 135,
@@ -311,7 +310,7 @@ class BasicDebugInfoWindow : UICanvas() {
         blendNormal(batch)
     }
 
-    private fun drawGamepadAxis(batch: SpriteBatch, axisX: Float, axisY: Float, uiX: Int, uiY: Int) {
+    private fun drawGamepadAxis(gamepad: TerrarumController, batch: SpriteBatch, axisX: Float, axisY: Float, uiX: Int, uiY: Int) {
         val uiColour = ItemSlotImageFactory.CELLCOLOUR_BLACK
         val w = 128f
         val h = 128f
@@ -319,11 +318,7 @@ class BasicDebugInfoWindow : UICanvas() {
         val halfH = h / 2f
 
         val pointDX = axisX * halfW
-        val pointDY = axisY * halfH
-
-        val gamepad = Controllers.getControllers()[0]
-        val padName = if (gamepad.name.isEmpty()) "Gamepad"
-                      else gamepad.name
+        val pointDY = -axisY * halfH
 
         blendNormal(batch)
 
@@ -338,7 +333,7 @@ class BasicDebugInfoWindow : UICanvas() {
         }
         batch.begin()
 
-        Terrarum.fontSmallNumbers.draw(batch, padName, Terrarum.WIDTH - (padName.length) * 8f, uiY.toFloat() + h + 2)
+        Terrarum.fontSmallNumbers.draw(batch, gamepad.getName(), Terrarum.WIDTH - (gamepad.getName().length) * 8f, uiY.toFloat() + h + 2)
 
     }
 
