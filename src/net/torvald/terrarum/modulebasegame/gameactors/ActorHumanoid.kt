@@ -228,10 +228,10 @@ open class ActorHumanoid(
             val gamepad = (Terrarum.ingame as Ingame).ingameController.gamepad
 
             if (gamepad != null) {
-                axisX =  gamepad.getAxis(AppLoader.getConfigInt("gamepadlstickx"))
-                axisY =  gamepad.getAxis(AppLoader.getConfigInt("gamepadlsticky"))
-                axisRX = gamepad.getAxis(AppLoader.getConfigInt("gamepadrstickx"))
-                axisRY = gamepad.getAxis(AppLoader.getConfigInt("gamepadrsticky"))
+                axisX =  gamepad.getAxis(AppLoader.getConfigInt("gamepadaxislx"))
+                axisY =  gamepad.getAxis(AppLoader.getConfigInt("gamepadaxisly"))
+                axisRX = gamepad.getAxis(AppLoader.getConfigInt("gamepadaxisrx"))
+                axisRY = gamepad.getAxis(AppLoader.getConfigInt("gamepadaxisry"))
 
                 // deadzonning
                 if (Math.abs(axisX) < AppLoader.gamepadDeadzone) axisX = 0f

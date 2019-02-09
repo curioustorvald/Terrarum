@@ -14,6 +14,8 @@ interface TerrarumController {
      *
      * 8, 9 : L/R Trigger
      *
+     * 10, 11 : L/R Stick
+     *
      * DirectInput devices may need external Index-to-button mapping (just a config file)
      *
      */
@@ -50,6 +52,10 @@ interface TerrarumController {
     fun getPov(): Int
     fun getName(): String
 
+    /**
+     * @param left left rumble motor, 0f..1f
+     * @param right right rumble moter, 0f..1f
+     */
     fun setRumble(left: Float, right: Float)
 
     companion object {
