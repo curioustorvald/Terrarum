@@ -28,6 +28,8 @@ object DefaultConfig {
 
 
         // control-gamepad
+        jsonObject.addProperty("usexinput", true) // when FALSE, LT+RT input on xbox controller is impossible
+
         jsonObject.addProperty("gamepadkeyn", 3)
         jsonObject.addProperty("gamepadkeyw", 2)
         jsonObject.addProperty("gamepadkeys", 0)
@@ -37,6 +39,9 @@ object DefaultConfig {
         jsonObject.addProperty("gamepadrup", 5)
         jsonObject.addProperty("gamepadselect", 6)
         jsonObject.addProperty("gamepadstart", 7)
+
+        jsonObject.addProperty("gamepadltrigger", 8)
+        jsonObject.addProperty("gamepadrtrigger", 9)
 
         jsonObject.addProperty("gamepadlstickx", 1)
         jsonObject.addProperty("gamepadlsticky", 0)

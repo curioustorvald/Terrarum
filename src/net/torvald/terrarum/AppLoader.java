@@ -175,7 +175,7 @@ public class AppLoader implements ApplicationListener {
     public static TinyAlphNum fontSmallNumbers;
 
     /** A gamepad. Multiple gamepads may controll this single virtualised gamepad. */
-    public static float gamepadDeadzone = 0.1f;
+    public static float gamepadDeadzone = 0.2f;
 
     /**
      * For the events depends on rendering frame (e.g. flicker on post-hit invincibility)

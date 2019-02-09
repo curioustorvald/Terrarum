@@ -1,7 +1,6 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
 import net.torvald.spriteanimation.HasAssembledSprite
@@ -226,9 +225,9 @@ open class ActorHumanoid(
             isRightDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyright"))
             isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump"))
 
-            if ((Terrarum.ingame as Ingame).ingameController.hasController) {
-                val gamepad = Controllers.getControllers()[0]
+            val gamepad = (Terrarum.ingame as Ingame).ingameController.gamepad
 
+            if (gamepad != null) {
                 axisX =  gamepad.getAxis(AppLoader.getConfigInt("gamepadlstickx"))
                 axisY =  gamepad.getAxis(AppLoader.getConfigInt("gamepadlsticky"))
                 axisRX = gamepad.getAxis(AppLoader.getConfigInt("gamepadrstickx"))
@@ -241,7 +240,7 @@ open class ActorHumanoid(
                 if (Math.abs(axisRY) < AppLoader.gamepadDeadzone) axisRY = 0f
 
                 isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump")) ||
-                             gamepad.getAxis(AppLoader.getConfigInt("gamepadtriggeraxis")) < -AppLoader.gamepadDeadzone
+                             gamepad.getButton(AppLoader.getConfigInt("gamepadltrigger"))
             }
         }
         else {
@@ -253,7 +252,7 @@ open class ActorHumanoid(
     }
 
     private inline val hasController: Boolean
-        get() = if (isGamer) (Terrarum.ingame as Ingame).ingameController.hasController
+        get() = if (isGamer) (Terrarum.ingame as Ingame).ingameController.hasGamepad
                 else true
     
     private fun processInput(delta: Float) {
