@@ -183,6 +183,13 @@ public class AppLoader implements ApplicationListener {
     public static TerrarumController gamepad = null;
     public static float gamepadDeadzone = 0.2f;
 
+    public static boolean inDeadzone(TerrarumController controller, int axis) {
+        float ax = controller.getAxis(axis);
+        float zero = (axis < 4) ? getConfigFloatArray("gamepadaxiszeropoints")[axis] : 0f;
+
+        return Math.abs(ax - zero) < gamepadDeadzone;
+    }
+
     /**
      * For the events depends on rendering frame (e.g. flicker on post-hit invincibility)
      */
@@ -750,6 +757,21 @@ public class AppLoader implements ApplicationListener {
         }
         else
             return ((int[]) cfg);
+    }
+
+    public static float[] getConfigFloatArray(String key) {
+        Object cfg = getConfigMaster(key);
+        if (cfg instanceof JsonArray) {
+            JsonArray jsonArray = ((JsonArray) cfg).getAsJsonArray();
+            //return IntArray(jsonArray.size(), { i -> jsonArray[i].asInt })
+            float[] floatArray = new float[jsonArray.size()];
+            for (int i = 0; i < jsonArray.size(); i++) {
+                floatArray[i] = jsonArray.get(i).getAsInt();
+            }
+            return floatArray;
+        }
+        else
+            return ((float[]) cfg);
     }
 
     /**
