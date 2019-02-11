@@ -133,8 +133,13 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
     open fun effectWhenPickedUp(delta: Float) { }
 
     /**
-     * Apply effects (continuously or not) while primary button (usually left mouse button) is down.
+     * Apply effects (continuously or not) while primary button is down.
      * The item will NOT be consumed, so you will want to consume it yourself by inventory.consumeItem(item)
+     *
+     * Primary button refers to all of these:
+     * - Left mouse button (configurable)
+     * - Screen tap
+     * - XBox controller RT (fixed; LT is for jumping)
      *
      * @return true when used successfully, false otherwise
      *
@@ -146,8 +151,10 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
     open fun startPrimaryUse(delta: Float): Boolean = false
 
     /**
-     * Apply effects (continuously or not) while secondary button (usually right mouse button) is down
+     * Apply effects (continuously or not) while secondary button is down
      * The item will NOT be consumed, so you will want to consume it yourself by inventory.consumeItem(item)
+     *
+     * NOTE: please refrain from using this; secondary button is currently undefined in the gamepad and touch input.
      *
      * @return true when used successfully, false otherwise
      *
