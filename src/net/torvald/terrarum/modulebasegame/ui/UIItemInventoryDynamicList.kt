@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BL
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
 /**
@@ -81,6 +82,9 @@ class UIItemInventoryDynamicList(
     private var rebuildList = true
 
     val defaultTextColour = Color(0xeaeaea_ff.toInt())
+
+    private val walletFont = TextureRegionPack("./assets/graphics/fonts/inventory_wallet_numbers.tga", 20, 9)
+    private var walletText = ""
 
     companion object {
         const val listGap = 8
@@ -246,6 +250,16 @@ class UIItemInventoryDynamicList(
             )
         }
 
+        // draw wallet text
+        batch.color = Color.WHITE
+        walletText.forEachIndexed { index, it ->
+            batch.draw(
+                    walletFont.get(0, it - '0'),
+                    gridModeButtons[0].posX.toFloat(), // scroll button size: 20px, font width: 20 px
+                    gridModeButtons[0].posY + height - index * walletFont.tileH.toFloat()
+            )
+        }
+
         super.render(batch, camera)
 
         oldPosX = posX
@@ -347,6 +361,13 @@ class UIItemInventoryDynamicList(
         itemPageCount = (inventorySortList.size.toFloat() / items.size.toFloat()).ceilInt()
 
 
+        // ¤   42g
+        // ¤ 6969g
+        // ¤ 2147483647g
+        // g is read as "grave" /ɡraːv/ or /ɡɹeɪv/, because it isn't gram.
+        walletText = "<;?" + inventory.wallet.toString().padStart(4, '?') + ":"
+
+
         rebuildList = false
     }
 
@@ -356,6 +377,7 @@ class UIItemInventoryDynamicList(
         gridModeButtons.forEach { it.dispose() }
         scrollUpButton.dispose()
         scrollDownButton.dispose()
+        walletFont.dispose()
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

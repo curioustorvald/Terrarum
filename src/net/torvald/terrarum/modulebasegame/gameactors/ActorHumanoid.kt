@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color
 import com.jme3.math.FastMath
 import net.torvald.spriteanimation.HasAssembledSprite
 import net.torvald.terrarum.*
-import net.torvald.terrarum.AppLoader.gamepadDeadzone
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameworld.GameWorld
@@ -225,7 +224,7 @@ open class ActorHumanoid(
             isRightDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyright"))
             isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump"))
 
-            val gamepad = (Terrarum.ingame as Ingame).ingameController.gamepad
+            val gamepad = AppLoader.gamepad
 
             if (gamepad != null) {
                 axisX =  gamepad.getAxis(AppLoader.getConfigInt("gamepadaxislx"))
@@ -234,10 +233,10 @@ open class ActorHumanoid(
                 axisRY = gamepad.getAxis(AppLoader.getConfigInt("gamepadaxisry"))
 
                 // deadzonning
-                if (Math.abs(axisX) < AppLoader.gamepadDeadzone) axisX = 0f
-                if (Math.abs(axisY) < AppLoader.gamepadDeadzone) axisY = 0f
-                if (Math.abs(axisRX) < AppLoader.gamepadDeadzone) axisRX = 0f
-                if (Math.abs(axisRY) < AppLoader.gamepadDeadzone) axisRY = 0f
+                if (AppLoader.inDeadzone(gamepad, AppLoader.getConfigInt("gamepadaxislx"))) axisX = 0f
+                if (AppLoader.inDeadzone(gamepad, AppLoader.getConfigInt("gamepadaxisly"))) axisY = 0f
+                if (AppLoader.inDeadzone(gamepad, AppLoader.getConfigInt("gamepadaxisrx"))) axisRX = 0f
+                if (AppLoader.inDeadzone(gamepad, AppLoader.getConfigInt("gamepadaxisry"))) axisRY = 0f
 
                 isJumpDown = Gdx.input.isKeyPressed(AppLoader.getConfigInt("keyjump")) ||
                              gamepad.getButton(AppLoader.getConfigInt("gamepadltrigger"))
@@ -252,7 +251,7 @@ open class ActorHumanoid(
     }
 
     private inline val hasController: Boolean
-        get() = if (isGamer) (Terrarum.ingame as Ingame).ingameController.hasGamepad
+        get() = if (isGamer) AppLoader.gamepad != null
                 else true
     
     private fun processInput(delta: Float) {
@@ -266,7 +265,7 @@ open class ActorHumanoid(
             }
         }
         // ↑F, ↑S
-        if (isWalkingH && !isLeftDown && !isRightDown && axisX.abs() < gamepadDeadzone) {
+        if (isWalkingH && !isLeftDown && !isRightDown && axisX == 0f) {
             walkHStop()
             prevHMoveKey = KEY_NULL
         }
@@ -280,7 +279,7 @@ open class ActorHumanoid(
         }
         // ↑E
         // ↑D
-        if (isNoClip && !isUpDown && !isDownDown && axisY.abs() < gamepadDeadzone) {
+        if (isNoClip && !isUpDown && !isDownDown && axisY == 0f) {
             walkVStop()
             prevVMoveKey = KEY_NULL
         }

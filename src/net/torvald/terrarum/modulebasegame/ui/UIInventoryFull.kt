@@ -49,7 +49,6 @@ class UIInventoryFull(
     internal val catArrangement: IntArray = intArrayOf(9,6,7,1,0,2,3,4,5,8)
 
 
-
     private val SP = "${0x3000.toChar()}${0x3000.toChar()}"
     val listControlHelp: String
         get() = if (AppLoader.environment == RunningEnvironment.PC)
@@ -396,6 +395,20 @@ class UIInventoryFull(
 
         encumbrancePerc = actor.inventory.capacity.toFloat() / actor.inventory.maxCapacity
         isEncumbered = actor.inventory.isEncumbered
+    }
+
+    private fun Int.fastLen(): Int {
+        return if (this < 0) 1 + this.unaryMinus().fastLen()
+        else if (this < 10) 1
+        else if (this < 100) 2
+        else if (this < 1000) 3
+        else if (this < 10000) 4
+        else if (this < 100000) 5
+        else if (this < 1000000) 6
+        else if (this < 10000000) 7
+        else if (this < 100000000) 8
+        else if (this < 1000000000) 9
+        else 10
     }
 
     override fun dispose() {
