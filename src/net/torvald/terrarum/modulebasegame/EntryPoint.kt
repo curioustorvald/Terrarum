@@ -2,17 +2,19 @@ package net.torvald.terrarum.modulebasegame
 
 import net.torvald.terrarum.AppLoader.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.ModuleEntryPoint
+import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
-import net.torvald.terrarum.gameactors.ActorWBMovable
 
 /**
+ * The entry point for the module "Basegame"
+ *
  * Created by minjaesong on 2018-06-21.
  */
 class EntryPoint : ModuleEntryPoint() {
@@ -52,11 +54,6 @@ class EntryPoint : ModuleEntryPoint() {
                 }
 
                 override fun startPrimaryUse(delta: Float): Boolean {
-                    return false
-                    // TODO base punch attack
-                }
-
-                override fun startSecondaryUse(delta: Float): Boolean {
                     val ingame = Terrarum.ingame!! as Ingame
 
                     val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())

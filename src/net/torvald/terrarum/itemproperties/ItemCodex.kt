@@ -190,7 +190,7 @@ object ItemCodex {
 
             override val equipPosition: Int = EquipPosition.HAND_GRIP
 
-            override fun startSecondaryUse(delta: Float): Boolean {
+            override fun startPrimaryUse(delta: Float): Boolean {
                 val ingame = Terrarum.ingame!! as Ingame // must be in here
                 ingame.world.setFluid(Terrarum.mouseTileX, Terrarum.mouseTileY, Fluid.WATER, 4f)
                 return true
@@ -217,7 +217,7 @@ object ItemCodex {
 
             override val equipPosition: Int = EquipPosition.HAND_GRIP
 
-            override fun startSecondaryUse(delta: Float): Boolean {
+            override fun startPrimaryUse(delta: Float): Boolean {
                 val ingame = Terrarum.ingame!! as Ingame // must be in here
                 ingame.world.setFluid(Terrarum.mouseTileX, Terrarum.mouseTileY, Fluid.LAVA, 4f)
                 return true
