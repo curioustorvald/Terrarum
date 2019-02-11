@@ -8,17 +8,22 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.github.strikerx3.jxinput.XInputDevice;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.torvald.dataclass.ArrayListMap;
 import net.torvald.getcpuname.GetCpuName;
+import net.torvald.terrarum.controller.GdxControllerAdapter;
+import net.torvald.terrarum.controller.TerrarumController;
+import net.torvald.terrarum.controller.XinputControllerAdapter;
 import net.torvald.terrarum.gamecontroller.KeyToggler;
 import net.torvald.terrarum.imagefont.TinyAlphNum;
 import net.torvald.terrarum.modulebasegame.Ingame;
@@ -175,6 +180,7 @@ public class AppLoader implements ApplicationListener {
     public static TinyAlphNum fontSmallNumbers;
 
     /** A gamepad. Multiple gamepads may controll this single virtualised gamepad. */
+    public static TerrarumController gamepad = null;
     public static float gamepadDeadzone = 0.2f;
 
     /**
@@ -311,6 +317,24 @@ public class AppLoader implements ApplicationListener {
         rendererVendor = Gdx.graphics.getGLVersion().getVendorString();
 
 
+        // make gamepad(s)
+        if (AppLoader.getConfigBoolean("usexinput")) {
+            try {
+                gamepad = new XinputControllerAdapter(XInputDevice.getDeviceFor(0));
+            }
+            catch (Throwable e) { }
+        }
+
+        if (gamepad == null) {
+            try {
+                gamepad = new GdxControllerAdapter(Controllers.getControllers().get(0));
+            }
+            catch (Throwable e) { }
+        }
+
+        if (gamepad != null) {
+            environment = RunningEnvironment.CONSOLE;
+        }
 
         // make loading list
 

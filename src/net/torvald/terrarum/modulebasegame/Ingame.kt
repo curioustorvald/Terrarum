@@ -1,10 +1,8 @@
 package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.github.strikerx3.jxinput.XInputDevice
 import net.torvald.dataclass.CircularArray
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
@@ -12,8 +10,6 @@ import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.console.Authenticator
-import net.torvald.terrarum.controller.GdxControllerAdapter
-import net.torvald.terrarum.controller.XinputControllerAdapter
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.IngameController
@@ -272,13 +268,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // make controls work
         Gdx.input.inputProcessor = ingameController
-        ingameController.gamepad =
-                if (AppLoader.getConfigBoolean("usexinput"))
-                    XinputControllerAdapter(XInputDevice.getDeviceFor(0))
-                else
-                    GdxControllerAdapter(Controllers.getControllers()[0])
-
-
+        if (AppLoader.gamepad != null) {
+            ingameController.gamepad = AppLoader.gamepad
+        }
 
         // init console window
         consoleHandler = ConsoleWindow()
@@ -297,7 +289,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         // >- queue up game UIs that should pause the world -<
         uiInventoryPlayer = UIInventoryFull(actorNowPlaying!!,
-                toggleKeyLiteral = AppLoader.getConfigInt("keyinventory")
+                toggleKeyLiteral = AppLoader.getConfigInt("keyinventory"),
+                toggleButtonLiteral = AppLoader.getConfigInt("gamepadstart")
         )
         uiInventoryPlayer.setPosition(0, 0)
 

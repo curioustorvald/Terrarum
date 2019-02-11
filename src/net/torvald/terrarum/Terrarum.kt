@@ -25,7 +25,6 @@ import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.lwjgl.BufferUtils
-import org.lwjgl.input.Controllers
 import java.io.File
 import kotlin.math.absoluteValue
 
@@ -223,19 +222,6 @@ object Terrarum : Screen {
         }
 
 
-        // setting environment as MOBILE precedes this code
-        //if (environment != RunningEnvironment.MOBILE) {
-            environment = try {
-                Controllers.getController(0) // test if controller exists
-                if (getConfigString("pcgamepadenv") == "console")
-                    RunningEnvironment.CONSOLE
-                else
-                    RunningEnvironment.PC
-            }
-            catch (e: IndexOutOfBoundsException) {
-                RunningEnvironment.PC
-            }
-        //}
 
     }
 

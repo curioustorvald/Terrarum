@@ -249,7 +249,7 @@ class BasicDebugInfoWindow : UICanvas() {
                 (Terrarum.WIDTH - 2 - totalHardwareName.length * 8).toFloat(), Terrarum.HEIGHT - 10f)
     }
 
-    private val processorName = AppLoader.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "")
+    private val processorName = AppLoader.processor.replace(Regex(""" Processor|( CPU)? @ [0-9.]+GHz"""), "") + if (AppLoader.is32BitJVM) " (32-bit)" else ""
     private val rendererName = AppLoader.renderer
     private val totalHardwareName = "$processorName  $rendererName"
 
