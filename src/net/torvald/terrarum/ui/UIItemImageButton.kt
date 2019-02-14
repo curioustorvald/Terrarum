@@ -15,17 +15,15 @@ open class UIItemImageButton(
         parent: UICanvas,
         val image: TextureRegion,
 
-        val buttonCol: Color = Color.WHITE,
-        val buttonBackCol: Color = Color(0),
-        val buttonBackBlendMode: String = BlendMode.NORMAL,
-
-        val activeCol: Color = Color(0xfff066_ff.toInt()),
-        val activeBackCol: Color = Color(0xb0b0b0_ff.toInt()),
-        val activeBackBlendMode: String = BlendMode.MULTIPLY,
-
-        val highlightCol: Color = Color(0x00f8ff_ff),
-        val highlightBackCol: Color = Color(0xb0b0b0_ff.toInt()),
-        val highlightBackBlendMode: String = BlendMode.MULTIPLY,
+        val activeCol: Color = UIItemTextButton.defaultActiveCol,
+        val activeBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_ACTIVECOL,
+        val activeBackBlendMode: String = BlendMode.NORMAL,
+        val highlightCol: Color = UIItemTextButton.defaultHighlightCol,
+        val highlightBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_HIGHLIGHTCOL,
+        val highlightBackBlendMode: String = BlendMode.NORMAL,
+        val inactiveCol: Color = UIItemTextButton.defaultInactiveCol,
+        val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
+        val backgroundBlendMode: String = BlendMode.NORMAL,
 
         override var posX: Int,
         override var posY: Int,
@@ -43,16 +41,21 @@ open class UIItemImageButton(
 
     override fun render(batch: SpriteBatch, camera: Camera) {
         // draw background
-        if (mouseUp) {
+        if (highlighted) {
+            BlendMode.resolve(highlightBackBlendMode, batch)
+            batch.color = highlightBackCol
+            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+        }
+        else if (mouseUp) {
             BlendMode.resolve(activeBackBlendMode, batch)
             batch.color = activeBackCol
+            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
         else {
-            BlendMode.resolve(buttonBackBlendMode, batch)
-            batch.color = buttonBackCol
+            batch.color = backgroundCol
+            BlendMode.resolve(backgroundBlendMode, batch)
+            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
-
-        batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
 
 
         // draw image
@@ -60,7 +63,7 @@ open class UIItemImageButton(
 
         batch.color = if (highlighted) highlightCol
         else if (mouseUp) activeCol
-        else buttonCol
+        else inactiveCol
 
         batch.draw(image, (posX + (width - image.regionWidth) / 2).toFloat(), (posY + (height - image.regionHeight) / 2).toFloat())
     }

@@ -104,7 +104,6 @@ class UINSMenu(
                 uiWidth, listHeight,
                 textAreaWidth = listWidth,
                 alignment = UIItemTextButton.Companion.Alignment.LEFT,
-                activeBackCol = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,//Color(1f,0f,.75f,1f),
                 inactiveCol = Color(.94f,.94f,.94f,1f),
                 itemHitboxSize = LINE_HEIGHT
 

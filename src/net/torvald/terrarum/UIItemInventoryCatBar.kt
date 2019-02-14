@@ -54,6 +54,8 @@ class UIItemInventoryCatBar(
                     inventoryUI,
                     catIcons.get(catArrangement[index], 0),
                     activeBackCol = Color(0),
+                    backgroundCol = Color(0),
+                    highlightBackCol = Color(0),
                     activeBackBlendMode = BlendMode.NORMAL,
                     posX = posX + iconPosX,
                     posY = posY + iconPosY,
@@ -84,10 +86,12 @@ class UIItemInventoryCatBar(
                     inventoryUI,
                     catIcons.get(iconIndex[index], 0),
                     activeBackCol = Color(0),
+                    backgroundCol = Color(0),
+                    highlightBackCol = Color(0),
                     activeBackBlendMode = BlendMode.NORMAL,
                     posX = iconPosX,
                     posY = posY + iconPosY,
-                    buttonCol = if (index == 0 || index == 3) Color.WHITE else Color(0xffffff7f.toInt()),
+                    inactiveCol = if (index == 0 || index == 3) Color.WHITE else Color(0xffffff7f.toInt()),
                     activeCol = if (index == 0 || index == 3) Color(0xfff066_ff.toInt()) else Color(0xffffff7f.toInt()),
                     highlightable = (index == 0 || index == 3)
             )

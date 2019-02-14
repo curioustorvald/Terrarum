@@ -13,6 +13,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.concurrent.ParallelUtils.sliceEvenly
 import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gameactors.Luminous
 import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
@@ -230,7 +231,7 @@ object LightmapRenderer {
         }
     }
 
-    internal fun fireRecalculateEvent() {
+    internal fun fireRecalculateEvent(vararg actorContainers: List<ActorWithBody>?) {
         try {
             world.getTileFromTerrain(0, 0) // test inquiry
         }
@@ -256,7 +257,7 @@ object LightmapRenderer {
         //println("$for_x_start..$for_x_end, $for_x\t$for_y_start..$for_y_end, $for_y")
 
         AppLoader.measureDebugTime("Renderer.Lanterns") {
-            buildLanternmap()
+            buildLanternmap(actorContainers)
         } // usually takes 3000 ns
 
         if (!SHADER_LIGHTING) {
@@ -443,10 +444,10 @@ object LightmapRenderer {
     internal data class ThreadedLightmapUpdateMessage(val x: Int, val y: Int)
 
 
-    private fun buildLanternmap() {
+    private fun buildLanternmap(actorContainers: Array<out List<ActorWithBody>?>) {
         lanternMap.clear()
-        Terrarum.ingame?.let {
-            it.actorContainer.forEach { it ->
+        actorContainers.forEach { actorContainer ->
+            actorContainer?.forEach {
                 if (it is Luminous && it is ActorWBMovable) {
                     // put lanterns to the area the luminantBox is occupying
                     for (lightBox in it.lightBoxList) {

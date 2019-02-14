@@ -11,7 +11,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.Notification
-import net.torvald.terrarum.modulebasegame.ui.UIEditorPalette
+import net.torvald.terrarum.modulebasegame.ui.UIPaletteSelector
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
@@ -82,7 +82,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     val uiToolbox = UINSMenu("Menu", 100, menuYaml)
     val notifier = Notification()
-    val uiPalette = UIEditorPalette()
+    val uiPaletteSelector = UIPaletteSelector()
+    val uiPalette = UIBuildingMakerBlockChooser(this)
 
 
     val uiContainer = ArrayList<UICanvas>()
@@ -146,8 +147,9 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         actorsRenderOverlay.add(blockPointingCursor)
 
         uiContainer.add(uiToolbox)
-        uiContainer.add(uiPalette)
+        uiContainer.add(uiPaletteSelector)
         uiContainer.add(notifier)
+        uiContainer.add(uiPalette)
 
 
 
@@ -155,8 +157,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         uiToolbox.isVisible = true
         uiToolbox.invocationArgument = arrayOf(this)
 
-        uiPalette.setPosition(Terrarum.WIDTH - uiPalette.width, 0)
-        uiPalette.isVisible = true
+        uiPaletteSelector.setPosition(Terrarum.WIDTH - uiPaletteSelector.width, 0)
+        uiPaletteSelector.isVisible = true
 
         notifier.setPosition(
                 (Terrarum.WIDTH - notifier.width) / 2, Terrarum.HEIGHT - notifier.height)
@@ -164,6 +166,9 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         actorNowPlaying?.setPosition(512 * 16.0, 149 * 16.0)
 
+
+        uiPalette.setPosition(200, 100)
+        uiPalette.isVisible = true // TEST CODE should not be visible
 
 
         LightmapRenderer.fireRecalculateEvent()
@@ -247,7 +252,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     private fun makePenWork(worldTileX: Int, worldTileY: Int) {
         val world = gameWorld
-        val palSelection = uiPalette.fore
+        val palSelection = uiPaletteSelector.fore
 
         when (currentPenMode) {
             // test paint terrain layer

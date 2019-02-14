@@ -17,7 +17,7 @@ import net.torvald.terrarum.ui.UINSMenu
 /**
  * Created by minjaesong on 2019-02-03.
  */
-class UIEditorPalette : UICanvas() {
+class UIPaletteSelector : UICanvas() {
 
     override var width = 36
     override var height = 72
