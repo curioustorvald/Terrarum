@@ -241,7 +241,7 @@ class UIItemTextButtonList(
         selectedIndex = index
     }
 
-    fun unselect() {
+    fun deselect() {
         selectedIndex = null
     }
 

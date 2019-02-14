@@ -82,7 +82,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     val uiToolbox = UINSMenu("Menu", 100, menuYaml)
     val notifier = Notification()
-    val uiPaletteSelector = UIPaletteSelector()
+    val uiPaletteSelector = UIPaletteSelector(this)
     val uiPalette = UIBuildingMakerBlockChooser(this)
 
 
