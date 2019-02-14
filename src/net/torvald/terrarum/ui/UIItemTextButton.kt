@@ -2,7 +2,6 @@ package net.torvald.terrarum.ui
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.BlendMode
 import net.torvald.terrarum.Terrarum
@@ -23,13 +22,17 @@ open class UIItemTextButton(
         override var posY: Int,
         override val width: Int,
         val readFromLang: Boolean = false,
-        val activeCol: Color = Color.WHITE,
-        val activeBackCol: Color = Color(0),
+
+        val activeCol: Color = defaultActiveCol,
+        val activeBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_ACTIVECOL,
         val activeBackBlendMode: String = BlendMode.NORMAL,
-        val highlightCol: Color = defaultHighlightCol,
-        val highlightBackCol: Color = Color(0xb0b0b0_ff.toInt()),
-        val highlightBackBlendMode: String = BlendMode.MULTIPLY,
-        val inactiveCol: Color = defaultInactiveCol,
+        val highlightCol: Color = UIItemTextButton.defaultHighlightCol,
+        val highlightBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_HIGHLIGHTCOL,
+        val highlightBackBlendMode: String = BlendMode.NORMAL,
+        val inactiveCol: Color = UIItemTextButton.defaultInactiveCol,
+        val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
+        val backgroundBlendMode: String = BlendMode.NORMAL,
+
         val preGapX:  Int = 0,
         val postGapX: Int = 0,
 
@@ -44,8 +47,9 @@ open class UIItemTextButton(
     companion object {
         val font = Terrarum.fontGame
         val height = font.lineHeight.toInt()
-        val defaultInactiveCol: Color = Color(0xc8c8c8_ff.toInt())
-        val defaultHighlightCol: Color = Color(0x00f8ff_ff)
+        val defaultInactiveCol = Color.WHITE
+        val defaultHighlightCol = Color(0x00f8ff_ff)
+        val defaultActiveCol = Color(0xfff066_ff.toInt())
 
         enum class Alignment {
             CENTRE, LEFT, RIGHT
@@ -61,13 +65,11 @@ open class UIItemTextButton(
 
     var highlighted: Boolean = false
 
-
-    private val glyphLayout = GlyphLayout()
-
     override fun render(batch: SpriteBatch, camera: Camera) {
         val textW = font.getWidth(label)
 
 
+        // draw background
         if (highlighted) {
             BlendMode.resolve(highlightBackBlendMode, batch)
             batch.color = highlightBackCol
@@ -78,6 +80,12 @@ open class UIItemTextButton(
             batch.color = activeBackCol
             batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
         }
+        else {
+            batch.color = backgroundCol
+            BlendMode.resolve(backgroundBlendMode, batch)
+            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+        }
+
 
         blendNormal(batch)
 

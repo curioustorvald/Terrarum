@@ -89,7 +89,7 @@ object IngameRenderer {
         this.player = player
 
 
-        LightmapRenderer.fireRecalculateEvent()
+        LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
 
         prepLightmapRGBA()
         BlocksDrawer.renderData()

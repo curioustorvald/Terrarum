@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BL
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
 import net.torvald.terrarum.ui.UIItem
 import net.torvald.terrarum.ui.UIItemImageButton
+import net.torvald.terrarum.ui.UIItemTextButton.Companion.defaultActiveCol
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
@@ -149,8 +150,11 @@ class UIItemInventoryDynamicList(
         UIItemImageButton(
                 parentUI,
                 parentUI.catIcons.get(index + 14, 0),
+                backgroundCol = Color(0),
                 activeBackCol = Color(0),
+                highlightBackCol = Color(0),
                 activeBackBlendMode = BlendMode.NORMAL,
+                activeCol = defaultActiveCol,
                 posX = iconPosX,
                 posY = getIconPosY(index),
                 highlightable = true
@@ -160,8 +164,10 @@ class UIItemInventoryDynamicList(
     private val scrollUpButton = UIItemImageButton(
             parentUI,
             parentUI.catIcons.get(18, 0),
+            backgroundCol = Color(0),
             activeBackCol = Color(0),
             activeBackBlendMode = BlendMode.NORMAL,
+            activeCol = defaultActiveCol,
             posX = iconPosX,
             posY = getIconPosY(2),
             highlightable = false
@@ -170,8 +176,10 @@ class UIItemInventoryDynamicList(
     private val scrollDownButton = UIItemImageButton(
             parentUI,
             parentUI.catIcons.get(19, 0),
+            backgroundCol = Color(0),
             activeBackCol = Color(0),
             activeBackBlendMode = BlendMode.NORMAL,
+            activeCol = defaultActiveCol,
             posX = iconPosX,
             posY = getIconPosY(3),
             highlightable = false

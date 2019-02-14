@@ -329,18 +329,31 @@ public class AppLoader implements ApplicationListener {
             try {
                 gamepad = new XinputControllerAdapter(XInputDevice.getDeviceFor(0));
             }
-            catch (Throwable e) { }
+            catch (Throwable e) {
+                gamepad = null;
+            }
+
+            // nullify if not actually connected
+            if (!((XinputControllerAdapter) gamepad).getC().isConnected()) {
+                gamepad = null;
+            }
         }
 
         if (gamepad == null) {
             try {
                 gamepad = new GdxControllerAdapter(Controllers.getControllers().get(0));
             }
-            catch (Throwable e) { }
+            catch (Throwable e) {
+                gamepad = null;
+            }
+
         }
 
         if (gamepad != null) {
             environment = RunningEnvironment.CONSOLE;
+        }
+        else {
+            environment = RunningEnvironment.PC;
         }
 
         // make loading list

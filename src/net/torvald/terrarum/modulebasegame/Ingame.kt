@@ -774,7 +774,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     override fun addNewActor(actor: Actor?) {
         if (actor == null) return
 
-        if (theGameHasActor(actor.referenceID!!)) {
+        if (AppLoader.IS_DEVELOPMENT_BUILD && theGameHasActor(actor.referenceID!!)) {
             throw Error("The actor $actor already exists in the game")
         }
         else {
@@ -807,7 +807,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     fun activateDormantActor(actor: Actor) {
-        if (!isInactive(actor.referenceID!!)) {
+        if (AppLoader.IS_DEVELOPMENT_BUILD && !isInactive(actor.referenceID!!)) {
             if (isActive(actor.referenceID!!))
                 throw Error("The actor $actor is already activated")
             else

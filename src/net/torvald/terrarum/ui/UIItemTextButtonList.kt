@@ -8,6 +8,7 @@ import net.torvald.terrarum.Second
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.gameactors.ai.toInt
 import net.torvald.terrarum.roundInt
+import net.torvald.terrarum.ui.UIItemTextButton.Companion.defaultActiveCol
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -30,23 +31,26 @@ class UIItemTextButtonList(
         val iconCol: Color = UIItemTextButton.defaultInactiveCol,
 
         // copied directly from UIItemTextButton
-        val activeCol: Color = Color(0xfff066_ff.toInt()),
-        val activeBackCol: Color = Color(0),
+        val activeCol: Color = defaultActiveCol,
+        val activeBackCol: Color = DEFAULT_BACKGROUND_ACTIVECOL,
         val activeBackBlendMode: String = BlendMode.NORMAL,
-        val highlightCol: Color = Color(0x00f8ff_ff),
-        val highlightBackCol: Color = Color(0xb0b0b0_ff.toInt()),
-        val highlightBackBlendMode: String = BlendMode.MULTIPLY,
-        val inactiveCol: Color = Color(0xc0c0c0_ff.toInt()),
+        val highlightCol: Color = UIItemTextButton.defaultHighlightCol,
+        val highlightBackCol: Color = DEFAULT_BACKGROUND_HIGHLIGHTCOL,
+        val highlightBackBlendMode: String = BlendMode.NORMAL,
+        val inactiveCol: Color = UIItemTextButton.defaultInactiveCol,
         val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
         val backgroundBlendMode: String = BlendMode.NORMAL,
+
         val kinematic: Boolean = false,
 
         val alignment: UIItemTextButton.Companion.Alignment = UIItemTextButton.Companion.Alignment.CENTRE,
-        val itemHitboxSize: Int = UIItemTextButton.height
+        val itemHitboxSize: Int = DEFAULT_LINE_HEIGHT
 ) : UIItem(parentUI) {
 
     companion object {
         val DEFAULT_BACKGROUNDCOL = Color(0x242424_80)
+        val DEFAULT_BACKGROUND_HIGHLIGHTCOL = Color(0x121212BF)
+        val DEFAULT_BACKGROUND_ACTIVECOL = Color(0x1b1b1b9F)
         val DEFAULT_LINE_HEIGHT = 36
     }
 
@@ -87,6 +91,8 @@ class UIItemTextButtonList(
                     highlightBackCol = highlightBackCol,
                     highlightBackBlendMode = highlightBackBlendMode,
                     inactiveCol = inactiveCol,
+                    backgroundCol = backgroundCol,
+                    backgroundBlendMode = backgroundBlendMode,
                     preGapX = pregap,
                     postGapX = postgap,
                     alignment = alignment,
@@ -106,6 +112,7 @@ class UIItemTextButtonList(
                     highlightCol = highlightCol,
                     highlightBackCol = activeBackCol, // we are using custom highlighter
                     highlightBackBlendMode = activeBackBlendMode, // we are using custom highlighter
+                    backgroundCol = Color(0),
                     inactiveCol = inactiveCol,
                     preGapX = pregap,
                     postGapX = postgap,
@@ -203,14 +210,16 @@ class UIItemTextButtonList(
 
     override fun render(batch: SpriteBatch, camera: Camera) {
 
-        batch.color = backgroundCol
-        BlendMode.resolve(backgroundBlendMode, batch)
-        batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
+        if (kinematic) {
+            batch.color = backgroundCol
+            BlendMode.resolve(backgroundBlendMode, batch)
+            batch.fillRect(posX.toFloat(), posY.toFloat(), width.toFloat(), height.toFloat())
 
-        batch.color = highlightBackCol
-        BlendMode.resolve(highlightBackBlendMode, batch)
-        if (highlightY != null) {
-            batch.fillRect(posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), itemHitboxSize.toFloat())
+            batch.color = highlightBackCol
+            BlendMode.resolve(highlightBackBlendMode, batch)
+            if (highlightY != null) {
+                batch.fillRect(posX.toFloat(), highlightY!!.toFloat(), width.toFloat(), itemHitboxSize.toFloat())
+            }
         }
 
         buttons.forEach { it.render(batch, camera) }
