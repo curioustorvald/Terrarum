@@ -10,6 +10,7 @@ import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.modulebasegame.BuildingMaker
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
@@ -17,7 +18,7 @@ import net.torvald.terrarum.ui.UINSMenu
 /**
  * Created by minjaesong on 2019-02-03.
  */
-class UIPaletteSelector : UICanvas() {
+class UIPaletteSelector(val parent: BuildingMaker) : UICanvas() {
 
     override var width = 36
     override var height = 72
@@ -152,6 +153,11 @@ class UIPaletteSelector : UICanvas() {
         if (!swapDown && (relativeMouseX in 14..35 && relativeMouseY in 24..32 || relativeMouseX in 22..35 && relativeMouseY in 33..40)) {
             swapDown = true
             swapForeAndBack()
+        }
+
+        // if either of the block is down, open palette window of the parent
+        if ((relativeMouseX in 14..30 && relativeMouseY in 41..57) || (relativeMouseX in 6..22 && relativeMouseY in 33..49)) {
+            parent.uiPalette.isVisible = true
         }
 
         return true

@@ -3,9 +3,7 @@ package net.torvald.terrarum.modulebasegame
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.BlendMode
+import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
@@ -57,44 +55,64 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
             0, this.height - UIItemTextButtonList.DEFAULT_LINE_HEIGHT,
             width = MENUBAR_SIZE, textAreaWidth = MENUBAR_SIZE
     )
-    private val buttonGapClickDummy = UIItemImageButton(
-            this, TextureRegion(AppLoader.textureWhiteSquare),
-            width = MENUBAR_SIZE, height = height - (tabs.height + closeButton.height),
-            highlightable = false,
-            posX = 0, posY = tabs.height,
-            activeCol = Color(0),
-            inactiveCol = Color(0),
-            activeBackCol = DEFAULT_BACKGROUNDCOL,
-            activeBackBlendMode = BlendMode.NORMAL,
-            backgroundCol = DEFAULT_BACKGROUNDCOL,
-            backgroundBlendMode = BlendMode.NORMAL
-    )
 
     override fun updateUI(delta: Float) {
         palette.forEach { it.update(delta) }
         tabs.update(delta)
         closeButton.update(delta)
-        buttonGapClickDummy.update(delta)
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         palette.forEach { it.render(batch, camera) }
 
-        buttonGapClickDummy.render(batch, camera)
+        // gaps between tabs and close button
+        batch.color = DEFAULT_BACKGROUNDCOL
+        batch.fillRect(0f, tabs.height.toFloat(), MENUBAR_SIZE.toFloat(), height.toFloat() - (tabs.height + closeButton.height))
+
+        // the actual buttons
         tabs.render(batch, camera)
         closeButton.render(batch, camera)
     }
 
+    private var dragOriginX = 0 // relative mousepos
+    private var dragOriginY = 0 // relative mousepos
+    private var dragForReal = false
+    private var closeReady = false // so that it'll close when the mouse is DOWN then UP
+
+    private fun mouseOnDragHandle() = relativeMouseX in 0 until MENUBAR_SIZE && relativeMouseY in tabs.height until height - closeButton.height
+
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        return super.touchDragged(screenX, screenY, pointer)
+        if (mouseOnDragHandle()) {
+            if (dragForReal) {
+                handler.setPosition(screenX - dragOriginX, screenY - dragOriginY)
+            }
+        }
+
+        return true
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchDown(screenX, screenY, pointer, button)
+        if (mouseOnDragHandle()) {
+            dragOriginX = relativeMouseX
+            dragOriginY = relativeMouseY
+            dragForReal = true
+        }
+        else {
+            dragForReal = false
+        }
+
+        closeReady = closeButton.mouseUp
+
+        return true
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchUp(screenX, screenY, pointer, button)
+        if (closeReady && closeButton.mouseUp) {
+            closeButton.deselect()
+            this.isVisible = false
+        }
+
+        return true
     }
 
     override fun doOpening(delta: Float) {
