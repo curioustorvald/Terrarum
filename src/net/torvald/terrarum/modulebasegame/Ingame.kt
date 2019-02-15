@@ -105,7 +105,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     lateinit var uiVitalSecondary: UICanvas
     lateinit var uiVitalItem: UICanvas // itemcount/durability of held block or active ammo of held gun. As for the block, max value is 500.
 
-    private lateinit var uiWatchBasic: UICanvas
+    private lateinit var uiBasicInfo: UICanvas
     private lateinit var uiWatchTierOne: UICanvas
 
     private lateinit var uiTooltip: UITooltip
@@ -314,17 +314,17 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         //uiVitalItem = UIVitalMetre(player, { null }, { null }, Color(0xffcc00), 0, customPositioning = true)
         //uiVitalItem.setAsAlwaysVisible()
 
-        // basic watch-style notification bar (temperature, new mail)
-        uiWatchBasic = UIBasicNotifier(actorNowPlaying)
-        uiWatchBasic.setAsAlwaysVisible()
-        uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.width, 0)
-
         uiWatchTierOne = UITierOneWatch(actorNowPlaying)
         uiWatchTierOne.setAsAlwaysVisible()
         uiWatchTierOne.setPosition(
                 ((Terrarum.WIDTH - AppLoader.getTvSafeActionWidth()) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
                 AppLoader.getTvSafeGraphicsHeight() + 8
         )
+
+        // basic watch-style notification bar (temperature, new mail)
+        uiBasicInfo = UIBasicInfo(actorNowPlaying)
+        uiBasicInfo.setAsAlwaysVisible()
+        uiBasicInfo.setPosition((uiQuickBar.posX - uiBasicInfo.width - AppLoader.getTvSafeActionWidth()) / 2 + AppLoader.getTvSafeActionWidth(), uiWatchTierOne.posY)
 
 
         uiTooltip = UITooltip()
@@ -342,7 +342,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
                 uiPieMenu,
                 uiQuickBar,
-                uiWatchBasic,
+                uiBasicInfo,
                 uiWatchTierOne,
                 uiTooltip
                 // drawn last
@@ -927,7 +927,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
             // basic watch-style notification bar (temperature, new mail)
-            uiWatchBasic.setPosition(Terrarum.WIDTH - uiWatchBasic.width, 0)
+            uiBasicInfo.setPosition(Terrarum.WIDTH - uiBasicInfo.width, 0)
             uiWatchTierOne.setPosition(
                     ((Terrarum.WIDTH - AppLoader.getTvSafeGraphicsWidth()) - (uiQuickBar.posX + uiQuickBar.width) - uiWatchTierOne.width) / 2 + (uiQuickBar.posX + uiQuickBar.width),
                     AppLoader.getTvSafeGraphicsHeight() + 8

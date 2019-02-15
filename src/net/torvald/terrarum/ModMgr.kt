@@ -4,24 +4,20 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.AppLoader.printdbgerr
-import net.torvald.terrarum.utils.CSVFetcher
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.langpack.Lang
-import net.torvald.terrarum.modulebasegame.EntryPoint
+import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.io.FileReader
 import java.nio.file.FileSystems
 import java.util.*
-import javax.script.ScriptEngineManager
-import javax.script.Invocable
 
 
 
@@ -63,6 +59,7 @@ object ModMgr {
 
     /** Module name (directory name), ModuleMetadata */
     val moduleInfo = HashMap<String, ModuleMetadata>()
+    val entryPointClasses = ArrayList<ModuleEntryPoint>()
 
     init {
         // load modules
@@ -112,8 +109,8 @@ object ModMgr {
                     val newClassConstructor = newClass.getConstructor(/* no args defined */)
                     val newClassInstance = newClassConstructor.newInstance(/* no args defined */)
 
+                    entryPointClasses.add(newClassInstance as ModuleEntryPoint)
                     (newClassInstance as ModuleEntryPoint).invoke()
-
                 }
 
 
@@ -210,6 +207,9 @@ object ModMgr {
         return filesList.toList()
     }
 
+    fun disposeMods() {
+        entryPointClasses.forEach { it.dispose() }
+    }
 
 
     object GameBlockLoader {
