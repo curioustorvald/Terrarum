@@ -5,4 +5,5 @@ package net.torvald.terrarum
  */
 abstract class ModuleEntryPoint {
     abstract fun invoke()
+    abstract fun dispose()
 }

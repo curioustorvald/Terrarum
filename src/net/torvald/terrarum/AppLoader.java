@@ -519,6 +519,8 @@ public class AppLoader implements ApplicationListener {
         fontGame.dispose();
         fontSmallNumbers.dispose();
 
+        ModMgr.INSTANCE.disposeMods();
+
         // delete temp files
         new File("./tmp_wenquanyi.tga").delete(); // FIXME this is pretty much ad-hoc
     }
