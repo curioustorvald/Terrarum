@@ -13,7 +13,7 @@ import net.torvald.terrarum.fillRect
  */
 open class UIItemImageButton(
         parent: UICanvas,
-        val image: TextureRegion,
+        var image: TextureRegion,
 
         /** Colour when mouse is over */
         val activeCol: Color = UIItemTextButton.defaultActiveCol,

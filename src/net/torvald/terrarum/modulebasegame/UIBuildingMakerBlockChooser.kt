@@ -1,8 +1,10 @@
 package net.torvald.terrarum.modulebasegame
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.blendNormal
 import net.torvald.terrarum.blendScreen
 import net.torvald.terrarum.fillRect
@@ -11,6 +13,7 @@ import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIItemTextButtonList
 import net.torvald.terrarum.ui.UIItemTextButtonList.Companion.DEFAULT_BACKGROUNDCOL
+import kotlin.math.roundToInt
 
 /**
  * Created by minjaesong on 2019-02-14.
@@ -39,12 +42,11 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
                 this, ItemCodex.getItemImage(it),
                 posX = MENUBAR_SIZE + (it % 16) * TILESREGION_SIZE,
                 posY = (it / 16) * TILESREGION_SIZE,
-                highlightable = true,
+                highlightable = false,
                 width = TILESREGION_SIZE,
                 height = TILESREGION_SIZE,
                 highlightCol = Color.WHITE,
                 activeCol = Color.WHITE
-
         )
     }
     private val tabs = UIItemTextButtonList(
@@ -58,20 +60,68 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
             width = MENUBAR_SIZE, textAreaWidth = MENUBAR_SIZE
     )
 
+    init {
+        palette.forEachIndexed { index, it ->
+            uiItems.add(it)
+
+            it.clickOnceListener = { _, _, _ ->
+                parent.setPencilColour(paletteScroll * 16 + index)
+            }
+        }
+    }
+
     override fun updateUI(delta: Float) {
-        palette.forEach { it.update(delta) }
+        parent.tappedOnUI = true
+        if (!mouseOnScroll) palette.forEach { it.update(delta) }
         tabs.update(delta)
         closeButton.update(delta)
         if (closeButton.mousePushed) {
-            parent.tappedOnUI = true
-            isVisible = false
+            closeButton.deselect()
+            closeGracefully()
+        }
+
+        // respond to click
+        if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
+            // scroll bar
+            if (relativeMouseX in width - SCROLLBAR_SIZE until width && relativeMouseY in 0 until height) {
+                mouseOnScroll = true
+            }
+
+            if (mouseOnScroll) {
+                scrollBarPos = relativeMouseY - (scrollBarHeight / 2).roundToInt()
+                scrollBarPos = scrollBarPos.coerceIn(0, scrollableArea - 1)
+            }
+        }
+        else {
+            mouseOnScroll = false
+        }
+
+        // rebuild if necessary
+        val newPaletteScroll = ((scrollBarPos.toFloat() / scrollableArea) * paletteScrollMax).roundToInt()
+        if (paletteScroll != newPaletteScroll) {
+            paletteScroll = newPaletteScroll
+            rebuildPalette()
         }
     }
 
     private val addCol = Color(0x242424ff)
     private var scrollBarPos = 0
-    private val scrollBarHeight = (HEIGHT - 16*14).toFloat()
-    private val scrollableArea = HEIGHT - scrollBarHeight
+    private var paletteScroll = 0
+    private val paletteScrollMax = 256f - 14f
+    private val scrollBarHeight = (HEIGHT - 16 * 14).toFloat()
+    private val scrollableArea = HEIGHT - scrollBarHeight.roundToInt()
+    private var mouseOnScroll = false
+
+    private fun closeGracefully() {
+        this.isVisible = false
+        parent.tappedOnUI = true
+    }
+
+    private fun rebuildPalette() {
+        palette.forEachIndexed { index, it ->
+            it.image = ItemCodex.getItemImage(paletteScroll * 16 + index)
+        }
+    }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         palette.forEach { it.render(batch, camera) }
@@ -106,7 +156,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
             }
         }
 
-        return true
+        return super.touchDragged(screenX, screenY, pointer)
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -120,11 +170,11 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
             dragForReal = false
         }
 
-        return true
+        return super.touchDown(screenX, screenY, pointer, button)
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return true
+        return super.touchUp(screenX, screenY, pointer, button)
     }
 
     override fun doOpening(delta: Float) {
