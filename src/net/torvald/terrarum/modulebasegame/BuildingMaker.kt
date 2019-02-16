@@ -288,6 +288,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     override fun dispose() {
         blockPointingCursor.dispose()
+        uiPenMenu.dispose()
     }
 
     private fun makePenWork(x: Int, y: Int) {
