@@ -18,12 +18,12 @@ object BlockCodex {
 
     private var blockProps: Array<BlockProp>
 
-    const val TILE_UNIQUE_MAX = MapLayer.RANGE * PairedMapLayer.RANGE
+    const val MAX_TERRAIN_TILES = MapLayer.RANGE * PairedMapLayer.RANGE
 
     private val nullProp = BlockProp()
 
     init {
-        blockProps = Array<BlockProp>(TILE_UNIQUE_MAX * 2, { BlockProp() })
+        blockProps = Array<BlockProp>(MAX_TERRAIN_TILES * 2, { BlockProp() })
     }
 
     /**

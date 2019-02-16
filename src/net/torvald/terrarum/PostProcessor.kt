@@ -37,6 +37,15 @@ object PostProcessor {
 
     private val debugUI = BasicDebugInfoWindow()
 
+    fun dispose() {
+        batch.dispose()
+        shapeRenderer.dispose()
+        try {
+            lutTex.dispose()
+        }
+        catch (e: UninitializedPropertyAccessException) { }
+    }
+
     fun draw(projMat: Matrix4, fbo: FrameBuffer) {
 
         // init

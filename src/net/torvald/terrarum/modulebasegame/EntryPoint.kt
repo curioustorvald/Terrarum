@@ -11,6 +11,7 @@ import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
+import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
 
 /**
  * The entry point for the module "Basegame"
@@ -103,4 +104,7 @@ class EntryPoint : ModuleEntryPoint() {
         println("Welcome back!")
     }
 
+    override fun dispose() {
+        WatchFont.dispose()
+    }
 }

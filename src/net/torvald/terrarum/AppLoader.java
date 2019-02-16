@@ -269,6 +269,7 @@ public class AppLoader implements ApplicationListener {
     public static int screenH = 0;
 
     public static Texture textureWhiteSquare;
+    public static Texture textureWhiteCircle;
 
     private void initViewPort(int width, int height) {
         // Set Y to point downwards
@@ -506,18 +507,25 @@ public class AppLoader implements ApplicationListener {
         }
 
         IngameRenderer.INSTANCE.dispose();
+        PostProcessor.INSTANCE.dispose();
 
         Terrarum.INSTANCE.dispose();
 
         shaderBayerSkyboxFill.dispose();
         shaderHicolour.dispose();
+        shaderPassthru.dispose();
         shaderColLUT.dispose();
 
         assetManager.dispose();
         fullscreenQuad.dispose();
+        logoBatch.dispose();
 
         fontGame.dispose();
         fontSmallNumbers.dispose();
+
+        textureWhiteSquare.dispose();
+        textureWhiteCircle.dispose();
+        logo.getTexture().dispose();
 
         ModMgr.INSTANCE.disposeMods();
 
@@ -561,6 +569,8 @@ public class AppLoader implements ApplicationListener {
     private void postInit() {
         textureWhiteSquare = new Texture(Gdx.files.internal("assets/graphics/ortho_line_tex_2px.tga"));
         textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
+        textureWhiteCircle = new Texture(Gdx.files.internal("assets/graphics/circle_512.tga"));
 
         TextureRegionPack.Companion.setGlobalFlipY(true);
         fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true,

@@ -3,6 +3,8 @@ package net.torvald.terrarum.modulebasegame
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.torvald.terrarum.blendNormal
+import net.torvald.terrarum.blendScreen
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.ui.UICanvas
@@ -21,7 +23,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
 
         const val TILESREGION_SIZE = 24
         const val MENUBAR_SIZE = 80
-        const val SCROLLBAR_SIZE = 16
+        const val SCROLLBAR_SIZE = 24
 
         const val WIDTH = TILES_X*TILESREGION_SIZE + SCROLLBAR_SIZE + MENUBAR_SIZE
         const val HEIGHT = TILES_Y*TILESREGION_SIZE
@@ -60,7 +62,16 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         palette.forEach { it.update(delta) }
         tabs.update(delta)
         closeButton.update(delta)
+        if (closeButton.mousePushed) {
+            parent.tappedOnUI = true
+            isVisible = false
+        }
     }
+
+    private val addCol = Color(0x242424ff)
+    private var scrollBarPos = 0
+    private val scrollBarHeight = (HEIGHT - 16*14).toFloat()
+    private val scrollableArea = HEIGHT - scrollBarHeight
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         palette.forEach { it.render(batch, camera) }
@@ -68,6 +79,14 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         // gaps between tabs and close button
         batch.color = DEFAULT_BACKGROUNDCOL
         batch.fillRect(0f, tabs.height.toFloat(), MENUBAR_SIZE.toFloat(), height.toFloat() - (tabs.height + closeButton.height))
+        // scrollbar back
+        batch.fillRect(width - SCROLLBAR_SIZE.toFloat(), 0f, SCROLLBAR_SIZE.toFloat(), height.toFloat())
+        blendScreen(batch)
+        batch.color = addCol
+        batch.fillRect(width - SCROLLBAR_SIZE.toFloat(), 0f, SCROLLBAR_SIZE.toFloat(), height.toFloat())
+        // scrollbar
+        batch.fillRect(width - SCROLLBAR_SIZE.toFloat(), scrollBarPos.toFloat(), SCROLLBAR_SIZE.toFloat(), scrollBarHeight)
+        blendNormal(batch)
 
         // the actual buttons
         tabs.render(batch, camera)
@@ -77,7 +96,6 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
     private var dragOriginX = 0 // relative mousepos
     private var dragOriginY = 0 // relative mousepos
     private var dragForReal = false
-    private var closeReady = false // so that it'll close when the mouse is DOWN then UP
 
     private fun mouseOnDragHandle() = relativeMouseX in 0 until MENUBAR_SIZE && relativeMouseY in tabs.height until height - closeButton.height
 
@@ -96,22 +114,16 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
             dragOriginX = relativeMouseX
             dragOriginY = relativeMouseY
             dragForReal = true
+            parent.tappedOnUI = true
         }
         else {
             dragForReal = false
         }
 
-        closeReady = closeButton.mouseUp
-
         return true
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (closeReady && closeButton.mouseUp) {
-            closeButton.deselect()
-            this.isVisible = false
-        }
-
         return true
     }
 

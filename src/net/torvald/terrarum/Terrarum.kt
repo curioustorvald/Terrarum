@@ -509,6 +509,9 @@ fun Float.round(): Float {
 fun SpriteBatch.fillRect(x: Float, y: Float, w: Float, h: Float) {
     this.draw(AppLoader.textureWhiteSquare, x, y, w, h)
 }
+fun SpriteBatch.fillCircle(x: Float, y: Float, w: Float, h: Float) {
+    this.draw(AppLoader.textureWhiteCircle, x, y, w, h)
+}
 fun SpriteBatch.drawStraightLine(x: Float, y: Float, otherEnd: Float, thickness: Float, isVertical: Boolean) {
     if (!isVertical)
         this.fillRect(x, y, otherEnd - x, thickness)
