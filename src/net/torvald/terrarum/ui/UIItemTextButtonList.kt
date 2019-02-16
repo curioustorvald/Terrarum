@@ -3,12 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.BlendMode
-import net.torvald.terrarum.Second
-import net.torvald.terrarum.fillRect
-import net.torvald.terrarum.gameactors.ai.toInt
-import net.torvald.terrarum.roundInt
-import net.torvald.terrarum.ui.UIItemTextButton.Companion.defaultActiveCol
+import net.torvald.terrarum.*
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -31,15 +26,23 @@ class UIItemTextButtonList(
         val iconCol: Color = UIItemTextButton.defaultInactiveCol,
 
         // copied directly from UIItemTextButton
-        val activeCol: Color = defaultActiveCol,
-        val activeBackCol: Color = DEFAULT_BACKGROUND_ACTIVECOL,
+        /** Colour when mouse is over */
+        val activeCol: Color = UIItemTextButton.defaultActiveCol,
+        /** Colour when mouse is over */
+        val activeBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_ACTIVECOL,
+        /** Colour when mouse is over */
         val activeBackBlendMode: String = BlendMode.NORMAL,
+        /** Colour when clicked/selected */
         val highlightCol: Color = UIItemTextButton.defaultHighlightCol,
-        val highlightBackCol: Color = DEFAULT_BACKGROUND_HIGHLIGHTCOL,
+        /** Colour when clicked/selected */
+        val highlightBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_HIGHLIGHTCOL,
+        /** Colour when clicked/selected */
         val highlightBackBlendMode: String = BlendMode.NORMAL,
+        /** Colour on normal status */
         val inactiveCol: Color = UIItemTextButton.defaultInactiveCol,
         val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
         val backgroundBlendMode: String = BlendMode.NORMAL,
+
 
         val kinematic: Boolean = false,
 

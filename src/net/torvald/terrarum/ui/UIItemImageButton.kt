@@ -15,12 +15,19 @@ open class UIItemImageButton(
         parent: UICanvas,
         val image: TextureRegion,
 
+        /** Colour when mouse is over */
         val activeCol: Color = UIItemTextButton.defaultActiveCol,
+        /** Colour when mouse is over */
         val activeBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_ACTIVECOL,
+        /** Colour when mouse is over */
         val activeBackBlendMode: String = BlendMode.NORMAL,
+        /** Colour when clicked/selected */
         val highlightCol: Color = UIItemTextButton.defaultHighlightCol,
+        /** Colour when clicked/selected */
         val highlightBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_HIGHLIGHTCOL,
+        /** Colour when clicked/selected */
         val highlightBackBlendMode: String = BlendMode.NORMAL,
+        /** Colour on normal status */
         val inactiveCol: Color = UIItemTextButton.defaultInactiveCol,
         val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
         val backgroundBlendMode: String = BlendMode.NORMAL,
@@ -30,6 +37,7 @@ open class UIItemImageButton(
         override val width: Int = image.regionWidth,
         override val height: Int = image.regionHeight,
 
+        /** When clicked, toggle its "lit" status */
         var highlightable: Boolean
 ) : UIItem(parent) {
 
@@ -89,7 +97,7 @@ open class UIItemImageButton(
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (mouseUp) {
+        if (mouseUp && highlightable) {
             highlighted = !highlighted
         }
 

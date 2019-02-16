@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
@@ -267,6 +268,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
             // actually open
             uiPenMenu.setAsOpen()
         }
+
+        BlockPropUtil.dynamicLumFuncTickClock()
     }
 
     private fun renderGame() {
@@ -284,6 +287,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     fun setPencilColour(itemID: ItemID) {
         uiPaletteSelector.fore = itemID
+        currentPenMode = PENMODE_PENCIL
+        currentPenTarget = PENTARGET_TERRAIN // TERRAIN is arbitrary chosen to prevent possible conflict; for the pencil itself this property does nothing
     }
 
     override fun dispose() {

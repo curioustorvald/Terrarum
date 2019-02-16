@@ -682,6 +682,8 @@ fun Float.sqrt() = FastMath.sqrt(this)
 fun Int.abs() = this.absoluteValue
 fun Double.bipolarClamp(limit: Double) =
         this.coerceIn(-limit, limit)
+fun Boolean.toInt() = if (this) 1 else 0
+
 
 fun absMax(left: Double, right: Double): Double {
     if (left > 0 && right > 0)

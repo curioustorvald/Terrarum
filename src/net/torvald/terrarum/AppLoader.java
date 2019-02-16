@@ -571,6 +571,7 @@ public class AppLoader implements ApplicationListener {
         textureWhiteSquare.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         textureWhiteCircle = new Texture(Gdx.files.internal("assets/graphics/circle_512.tga"));
+        textureWhiteCircle.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         TextureRegionPack.Companion.setGlobalFlipY(true);
         fontGame = new GameFontBase("assets/graphics/fonts/terrarum-sans-bitmap", false, true,

@@ -23,15 +23,23 @@ open class UIItemTextButton(
         override val width: Int,
         val readFromLang: Boolean = false,
 
-        val activeCol: Color = defaultActiveCol,
+        /** Colour when mouse is over */
+        val activeCol: Color = UIItemTextButton.defaultActiveCol,
+        /** Colour when mouse is over */
         val activeBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_ACTIVECOL,
+        /** Colour when mouse is over */
         val activeBackBlendMode: String = BlendMode.NORMAL,
+        /** Colour when clicked/selected */
         val highlightCol: Color = UIItemTextButton.defaultHighlightCol,
+        /** Colour when clicked/selected */
         val highlightBackCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUND_HIGHLIGHTCOL,
+        /** Colour when clicked/selected */
         val highlightBackBlendMode: String = BlendMode.NORMAL,
+        /** Colour on normal status */
         val inactiveCol: Color = UIItemTextButton.defaultInactiveCol,
         val backgroundCol: Color = UIItemTextButtonList.DEFAULT_BACKGROUNDCOL,
         val backgroundBlendMode: String = BlendMode.NORMAL,
+
 
         val preGapX:  Int = 0,
         val postGapX: Int = 0,
