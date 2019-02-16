@@ -873,6 +873,10 @@ internal object BlocksDrawer {
         tilesWire.dispose()
         tileItemWall.dispose()
         tilesFluid.dispose()
+        tilesBuffer.dispose()
+        _tilesBufferAsTex.dispose()
+        tilesQuad.dispose()
+        shader.dispose()
     }
 
     fun getRenderStartX(): Int = WorldCamera.x / TILE_SIZE

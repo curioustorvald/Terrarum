@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.*
+import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
@@ -33,12 +35,17 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
  - Import…
  - Save terrain…
  - Load terrain…
+ -
  - Exit to Title : net.torvald.terrarum.modulebasegame.YamlCommandExit
 - Tool
  - Pencil : net.torvald.terrarum.modulebasegame.YamlCommandToolPencil
- - Eyedropper
- - Select mrq. : net.torvald.terrarum.modulebasegame.YamlCommandToolMarquee
- - Move
+ - Eraser : net.torvald.terrarum.modulebasegame.YamlCommandToolPencilErase
+ - Wall Hammer : net.torvald.terrarum.modulebasegame.YamlCommandToolPencilEraseWall
+ - Eyedropper : net.torvald.terrarum.modulebasegame.YamlCommandToolEyedropper
+ - Add Selection : net.torvald.terrarum.modulebasegame.YamlCommandToolMarquee
+ - Remove Sel. : net.torvald.terrarum.modulebasegame.YamlCommandToolMarqueeErase
+ - Clear Sel.
+ - Move Selected
  - Undo
  - Redo
 - Time
@@ -84,12 +91,15 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     val notifier = Notification()
     val uiPaletteSelector = UIPaletteSelector(this)
     val uiPalette = UIBuildingMakerBlockChooser(this)
+    val uiPenMenu = UIBuildingMakerPenMenu(this)
 
 
     val uiContainer = ArrayList<UICanvas>()
 
     var currentPenMode = PENMODE_PENCIL
+    var currentPenTarget = PENTARGET_TERRAIN
 
+    val selection = ArrayList<Point2i>()
 
     val blockPointingCursor = object : ActorWithBody(Actor.RenderOrder.OVERLAY) {
 
@@ -130,11 +140,20 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     companion object {
         const val PENMODE_PENCIL = 0
-        const val PENMODE_MARQUEE = 1
+        const val PENMODE_PENCIL_ERASE = 1
+        const val PENMODE_MARQUEE = 2
+        const val PENMODE_MARQUEE_ERASE = 3
+        const val PENMODE_EYEDROPPER = 4
+
+        const val PENTARGET_TERRAIN = 1
+        const val PENTARGET_WALL = 2
 
         val toolCursorColour = arrayOf(
                 Color.YELLOW,
-                Color.MAGENTA
+                Color.YELLOW,
+                Color.MAGENTA,
+                Color.MAGENTA,
+                Color.WHITE
         )
     }
 
@@ -150,6 +169,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         uiContainer.add(uiPaletteSelector)
         uiContainer.add(notifier)
         uiContainer.add(uiPalette)
+        uiContainer.add(uiPenMenu)
 
 
 
@@ -168,7 +188,6 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         uiPalette.setPosition(200, 100)
-        uiPalette.isVisible = true // TEST CODE should not be visible
 
 
         LightmapRenderer.fireRecalculateEvent()
@@ -206,30 +225,47 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     }
 
-    private fun updateGame(delta: Float) {
-        var mouseOnUI = false
+    private var mouseOnUI = false
+    internal var tappedOnUI = false // when true, even if the UI is closed, pen won't work unless your pen is lifted
+    // must be set to TRUE by UIs
 
+    private fun updateGame(delta: Float) {
 
         WeatherMixer.update(delta, actorNowPlaying, gameWorld)
         blockPointingCursor.update(delta)
         actorNowPlaying?.update(delta)
+        var overwriteMouseOnUI = false
         uiContainer.forEach {
             it.update(delta)
             if (it.isVisible && it.mouseUp) {
-                mouseOnUI = true
+                overwriteMouseOnUI = true
             }
         }
+
+        mouseOnUI = (overwriteMouseOnUI || uiPenMenu.isVisible)
+
 
         WorldCamera.update(world, actorNowPlaying)
 
 
         // make pen work HERE
-        if (Gdx.input.isTouched && !mouseOnUI) {
+        // when LEFT mouse is down
+        if (!tappedOnUI && Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary")) && !mouseOnUI) {
 
             makePenWork(Terrarum.mouseTileX, Terrarum.mouseTileY)
             // TODO drag support using bresenham's algo
             //      for some reason it just doesn't work...
+        }
+        else if (!uiPenMenu.isVisible && Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
+            // open pen menu
+            // position the menu to where the cursor is
+            uiPenMenu.posX = Terrarum.mouseScreenX - uiPenMenu.width / 2
+            uiPenMenu.posY = Terrarum.mouseScreenY - uiPenMenu.height / 2
+            uiPenMenu.posX = uiPenMenu.posX.coerceIn(0, Terrarum.WIDTH - uiPenMenu.width)
+            uiPenMenu.posY = uiPenMenu.posY.coerceIn(0, Terrarum.HEIGHT - uiPenMenu.height)
 
+            // actually open
+            uiPenMenu.setAsOpen()
         }
     }
 
@@ -246,18 +282,37 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         println("[BuildingMaker] Resize event")
     }
 
+    fun setPencilColour(itemID: ItemID) {
+        uiPaletteSelector.fore = itemID
+    }
+
     override fun dispose() {
         blockPointingCursor.dispose()
     }
 
-    private fun makePenWork(worldTileX: Int, worldTileY: Int) {
+    private fun makePenWork(x: Int, y: Int) {
         val world = gameWorld
         val palSelection = uiPaletteSelector.fore
 
         when (currentPenMode) {
             // test paint terrain layer
             PENMODE_PENCIL -> {
-                world.setTileTerrain(worldTileX, worldTileY, palSelection)
+                if (palSelection < BlockCodex.MAX_TERRAIN_TILES)
+                    world.setTileTerrain(x, y, palSelection)
+                else if (palSelection < 2 * BlockCodex.MAX_TERRAIN_TILES)
+                    world.setTileWall(x, y, palSelection - BlockCodex.MAX_TERRAIN_TILES)
+            }
+            PENMODE_PENCIL_ERASE -> {
+                if (currentPenTarget and PENTARGET_WALL != 0)
+                    world.setTileWall(x, y, Block.AIR)
+                else
+                    world.setTileTerrain(x, y, Block.AIR)
+            }
+            PENMODE_EYEDROPPER -> {
+                uiPaletteSelector.fore = if (world.getTileFromTerrain(x, y) == Block.AIR)
+                    world.getTileFromWall(x, y)!! + BlockCodex.MAX_TERRAIN_TILES
+                else
+                    world.getTileFromTerrain(x, y)!!
             }
         }
     }
@@ -266,6 +321,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         screen.uiContainer.forEach { it.touchUp(screenX, screenY, pointer, button) }
+        screen.tappedOnUI = false
         return true
     }
 
@@ -289,7 +345,6 @@ class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {
         return true
     }
 
-    // let left mouse button to paint, because that's how graphic tablets work
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
         screen.uiContainer.forEach { it.touchDragged(screenX, screenY, pointer) }
         return true
@@ -368,11 +423,39 @@ class YamlCommandSetTimeNight : YamlInvokable {
 class YamlCommandToolPencil : YamlInvokable {
     override fun invoke(args: Array<Any>) {
         (args[0] as BuildingMaker).currentPenMode = BuildingMaker.PENMODE_PENCIL
+        (args[0] as BuildingMaker).currentPenTarget = BuildingMaker.PENTARGET_TERRAIN
+    }
+}
+
+class YamlCommandToolPencilErase : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).currentPenMode = BuildingMaker.PENMODE_PENCIL_ERASE
+        (args[0] as BuildingMaker).currentPenTarget = BuildingMaker.PENTARGET_TERRAIN
+    }
+}
+
+class YamlCommandToolPencilEraseWall : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).currentPenMode = BuildingMaker.PENMODE_PENCIL_ERASE
+        (args[0] as BuildingMaker).currentPenTarget = BuildingMaker.PENTARGET_WALL
+    }
+}
+
+class YamlCommandToolEyedropper : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).currentPenMode = BuildingMaker.PENMODE_EYEDROPPER
+        (args[0] as BuildingMaker).currentPenTarget = BuildingMaker.PENTARGET_TERRAIN
     }
 }
 
 class YamlCommandToolMarquee : YamlInvokable {
     override fun invoke(args: Array<Any>) {
         (args[0] as BuildingMaker).currentPenMode = BuildingMaker.PENMODE_MARQUEE
+    }
+}
+
+class YamlCommandToolMarqueeErase : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).currentPenMode = BuildingMaker.PENMODE_MARQUEE_ERASE
     }
 }

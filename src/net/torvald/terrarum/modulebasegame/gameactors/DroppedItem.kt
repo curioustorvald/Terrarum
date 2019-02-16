@@ -5,7 +5,6 @@ import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWBMovable
-import net.torvald.terrarum.gameworld.GameWorld
 
 /**
  * Created by minjaesong on 2016-03-15.
@@ -18,7 +17,7 @@ open class DroppedItem(private val item: GameItem) : ActorWBMovable(RenderOrder.
 
         isVisible = true
 
-        avBaseMass = if (item.dynamicID < BlockCodex.TILE_UNIQUE_MAX)
+        avBaseMass = if (item.dynamicID < BlockCodex.MAX_TERRAIN_TILES)
             BlockCodex[item.dynamicID].density / 1000.0
         else
             ItemCodex[item.dynamicID].mass

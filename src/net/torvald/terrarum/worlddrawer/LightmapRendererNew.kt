@@ -1,9 +1,11 @@
 package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
@@ -38,7 +40,7 @@ object LightmapRenderer {
 
     private var world: GameWorld = GameWorld.makeNullWorld()
     private lateinit var lightCalcShader: ShaderProgram
-    private val SHADER_LIGHTING = AppLoader.getConfigBoolean("gpulightcalc")
+    //private val SHADER_LIGHTING = AppLoader.getConfigBoolean("gpulightcalc")
 
     /** do not call this yourself! Let your game renderer handle this! */
     fun setWorld(world: GameWorld) {
@@ -86,62 +88,8 @@ object LightmapRenderer {
     private val lightmap: Array<Color> = Array(LIGHTMAP_WIDTH * LIGHTMAP_HEIGHT) { Color(0f,0f,0f,0f) } // Can't use framebuffer/pixmap -- this is a fvec4 array, whereas they are ivec4.
     private val lanternMap = HashMap<BlockAddress, Color>((Terrarum.ingame?.ACTORCONTAINER_INITIAL_SIZE ?: 2) * 4)
 
-    private lateinit var texturedLightMap: FrameBuffer
-    private lateinit var texturedLightMapOutput: Pixmap
-    private lateinit var texturedLightSources: Texture
-    private lateinit var texturedShadeSources: Texture
-    private lateinit var texturedLightSourcePixmap: Pixmap // used to turn tiles into texture
-    private lateinit var texturedShadeSourcePixmap: Pixmap // used to turn tiles into texture
-    private lateinit var texturedLightQuad: Mesh
-    private lateinit var texturedLightCamera: OrthographicCamera
-    private lateinit var texturedLightBatch: SpriteBatch
-
-    private const val LIGHTMAP_UNIT = 0
-    private const val SHADEMAP_UNIT = 1
-
     init {
         printdbg(this, "Overscan open: $overscan_open; opaque: $overscan_opaque")
-
-        if (SHADER_LIGHTING) {
-            lightCalcShader = AppLoader.loadShader("assets/4096.vert", "assets/raytracelight.frag")
-
-            texturedLightMap = FrameBuffer(Pixmap.Format.RGBA8888, LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, false)
-            //texturedLightMap = Texture(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
-            //texturedLightMap.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-
-            texturedLightMapOutput = Pixmap(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
-
-            texturedLightSources = Texture(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
-            texturedLightSources.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-
-            texturedShadeSources = Texture(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
-            texturedShadeSources.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-
-            texturedLightSourcePixmap = Pixmap(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
-            texturedLightSourcePixmap.blending = Pixmap.Blending.None
-            texturedShadeSourcePixmap = Pixmap(LIGHTMAP_WIDTH, LIGHTMAP_HEIGHT, Pixmap.Format.RGBA8888)
-            texturedShadeSourcePixmap.blending = Pixmap.Blending.None
-
-            texturedLightQuad = Mesh(
-                    true, 4, 6,
-                    VertexAttribute.Position(),
-                    VertexAttribute.ColorUnpacked(),
-                    VertexAttribute.TexCoords(0)
-            )
-            texturedLightQuad.setVertices(floatArrayOf( // y-flipped quads!
-                    0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 0f,
-                    LIGHTMAP_WIDTH.toFloat(), 0f, 0f, 1f, 1f, 1f, 1f, 1f, 0f,
-                    LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 1f, 1f,
-                    0f, LIGHTMAP_HEIGHT.toFloat(), 0f, 1f, 1f, 1f, 1f, 0f, 1f))
-            texturedLightQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
-
-            texturedLightCamera = OrthographicCamera(LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat())
-            texturedLightCamera.setToOrtho(true)
-            texturedLightCamera.update()
-
-            texturedLightBatch = SpriteBatch(8, lightCalcShader)
-
-        }
     }
 
     private val AIR = Block.AIR
@@ -260,139 +208,81 @@ object LightmapRenderer {
             buildLanternmap(actorContainers)
         } // usually takes 3000 ns
 
-        if (!SHADER_LIGHTING) {
-            /*
-             * Updating order:
-             * ,--------.   ,--+-----.   ,-----+--.   ,--------. -
-             * |↘       |   |  |    3|   |3    |  |   |       ↙| ↕︎ overscan_open / overscan_opaque
-             * |  ,-----+   |  |  2  |   |  2  |  |   +-----.  | - depending on the noop_mask
-             * |  |1    |   |  |1    |   |    1|  |   |    1|  |
-             * |  |  2  |   |  `-----+   +-----'  |   |  2  |  |
-             * |  |    3|   |↗       |   |       ↖|   |3    |  |
-             * `--+-----'   `--------'   `--------'   `-----+--'
-             * round:   1            2            3            4
-             * for all lightmap[y][x], run in this order: 2-3-4-1
-             *     If you run only 4 sets, orthogonal/diagonal artefacts are bound to occur,
-             */
+        /*
+         * Updating order:
+         * ,--------.   ,--+-----.   ,-----+--.   ,--------. -
+         * |↘       |   |  |    3|   |3    |  |   |       ↙| ↕︎ overscan_open / overscan_opaque
+         * |  ,-----+   |  |  2  |   |  2  |  |   +-----.  | - depending on the noop_mask
+         * |  |1    |   |  |1    |   |    1|  |   |    1|  |
+         * |  |  2  |   |  `-----+   +-----'  |   |  2  |  |
+         * |  |    3|   |↗       |   |       ↖|   |3    |  |
+         * `--+-----'   `--------'   `--------'   `-----+--'
+         * round:   1            2            3            4
+         * for all lightmap[y][x], run in this order: 2-3-4-1
+         *     If you run only 4 sets, orthogonal/diagonal artefacts are bound to occur,
+         */
 
-            // set sunlight
-            sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
+        // set sunlight
+        sunLight.set(world.globalLight); sunLight.mul(DIV_FLOAT)
 
-            // set no-op mask from solidity of the block
-            AppLoader.measureDebugTime("Renderer.LightNoOpMask") {
-                noopMask.clear()
-                buildNoopMask()
-            }
+        // set no-op mask from solidity of the block
+        AppLoader.measureDebugTime("Renderer.LightNoOpMask") {
+            noopMask.clear()
+            buildNoopMask()
+        }
 
-            // wipe out lightmap
-            AppLoader.measureDebugTime("Renderer.Light0") {
-                for (k in 0 until lightmap.size) lightmap[k] = colourNull
-                // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
-                // but the performance boost is measly 0.1 ms on 6700K
-            }
-            // O((5*9)n) == O(n) where n is a size of the map.
-            // Because of inevitable overlaps on the area, it only works with MAX blend
+        // wipe out lightmap
+        AppLoader.measureDebugTime("Renderer.Light0") {
+            for (k in 0 until lightmap.size) lightmap[k] = colourNull
+            // when disabled, light will "decay out" instead of "instantly out", which can have a cool effect
+            // but the performance boost is measly 0.1 ms on 6700K
+        }
+        // O((5*9)n) == O(n) where n is a size of the map.
+        // Because of inevitable overlaps on the area, it only works with MAX blend
 
 
-            // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
+        // each usually takes 8 000 000..12 000 000 miliseconds total when not threaded
 
-            if (!AppLoader.getConfigBoolean("multithreadedlight")) {
+        if (!AppLoader.getConfigBoolean("multithreadedlight")) {
 
-                // The skipping is dependent on how you get ambient light,
-                // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
+            // The skipping is dependent on how you get ambient light,
+            // in this case we have 'spillage' due to the fact calculate() samples 3x3 area.
 
-                AppLoader.measureDebugTime("Renderer.LightTotal") {
-                    // Round 2
-                    for (y in for_y_end + overscan_open downTo for_y_start) {
-                        for (x in for_x_start - overscan_open..for_x_end) {
-                            calculateAndAssign(lightmap, x, y)
-                        }
+            AppLoader.measureDebugTime("Renderer.LightTotal") {
+                // Round 2
+                for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_start - overscan_open..for_x_end) {
+                        calculateAndAssign(lightmap, x, y)
                     }
-                    // Round 3
-                    for (y in for_y_end + overscan_open downTo for_y_start) {
-                        for (x in for_x_end + overscan_open downTo for_x_start) {
-                            calculateAndAssign(lightmap, x, y)
-                        }
-                    }
-                    // Round 4
-                    for (y in for_y_start - overscan_open..for_y_end) {
-                        for (x in for_x_end + overscan_open downTo for_x_start) {
-                            calculateAndAssign(lightmap, x, y)
-                        }
-                    }
-                    // Round 1
-                    for (y in for_y_start - overscan_open..for_y_end) {
-                        for (x in for_x_start - overscan_open..for_x_end) {
-                            calculateAndAssign(lightmap, x, y)
-                        }
-                    }
-                    // Round 2 again
-                    /*for (y in for_y_end + overscan_open downTo for_y_start) {
-                        for (x in for_x_start - overscan_open..for_x_end) {
-                            calculateAndAssign(lightmap, x, y)
-                        }
-                    }*/
                 }
-            }
-            else if (world.worldIndex != -1) { // to avoid updating on the null world
-                TODO()
+                // Round 3
+                for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_end + overscan_open downTo for_x_start) {
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }
+                // Round 4
+                for (y in for_y_start - overscan_open..for_y_end) {
+                    for (x in for_x_end + overscan_open downTo for_x_start) {
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }
+                // Round 1
+                for (y in for_y_start - overscan_open..for_y_end) {
+                    for (x in for_x_start - overscan_open..for_x_end) {
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }
+                // Round 2 again
+                /*for (y in for_y_end + overscan_open downTo for_y_start) {
+                    for (x in for_x_start - overscan_open..for_x_end) {
+                        calculateAndAssign(lightmap, x, y)
+                    }
+                }*/
             }
         }
-        else {
-            AppLoader.measureDebugTime("Renderer.LightGPU") {
-
-                // prepare necessary textures (lightmap, shademap) for the input.
-                for (ty in 0 until LIGHTMAP_HEIGHT) {
-                    for (tx in 0 until LIGHTMAP_WIDTH) {
-                        val wx = tx + for_x_start - overscan_open
-                        val wy = ty + for_y_start - overscan_open
-
-                        // Several variables will be altered by this. See its documentation.
-                        getLightsAndShades(wx, wy)
-
-                        texturedLightSourcePixmap.drawPixel(tx, ty, lightLevelThis.toRGBA())
-                        texturedShadeSourcePixmap.drawPixel(tx, ty, thisTileOpacity.toRGBA())
-
-
-
-                        /*if (wy in for_y_start..for_y_end && wx in for_x_start..for_x_end) {
-                            texturedLightSourcePixmap.drawPixel(tx, ty, 0x00FFFFFF)
-                        }
-                        else {
-                            texturedLightSourcePixmap.drawPixel(tx, ty, 0xFF000000.toInt())
-                        }*/
-
-                    }
-                }
-
-                texturedLightSources.dispose()
-                texturedLightSources = Texture(texturedLightSourcePixmap)
-
-                texturedShadeSources.dispose()
-                texturedShadeSources = Texture(texturedShadeSourcePixmap)
-
-
-                texturedLightMap.inAction(texturedLightCamera, null) {
-                    gdxClearAndSetBlend(0f,0f,0f,0f)
-                    Gdx.gl.glDisable(GL20.GL_BLEND)
-
-                    texturedShadeSources.bind(SHADEMAP_UNIT)
-                    texturedLightSources.bind(LIGHTMAP_UNIT)
-
-                    lightCalcShader.begin()
-                    // it seems that every time shader ends, uniforms reset themselves.
-                    lightCalcShader.setUniformMatrix("u_projTrans", texturedLightCamera.combined)
-                    lightCalcShader.setUniformf("outSize", LIGHTMAP_WIDTH.toFloat(), LIGHTMAP_HEIGHT.toFloat())
-                    lightCalcShader.setUniformi("shades", SHADEMAP_UNIT)
-                    lightCalcShader.setUniformi("lights", LIGHTMAP_UNIT)
-                    texturedLightQuad.render(lightCalcShader, GL20.GL_TRIANGLES)
-                    lightCalcShader.end()
-                }
-
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
-
-
-            }
+        else if (world.worldIndex != -1) { // to avoid updating on the null world
+            TODO()
         }
     }
 
@@ -680,47 +570,41 @@ object LightmapRenderer {
             val this_y_end = for_y_end// + overscan_open
 
             // wipe out beforehand. You DO need this
-            if (!SHADER_LIGHTING) {
-                lightBuffer.blending = Pixmap.Blending.None // gonna overwrite (remove this line causes the world to go bit darker)
-                lightBuffer.setColor(colourNull)
-                lightBuffer.fill()
+            lightBuffer.blending = Pixmap.Blending.None // gonna overwrite (remove this line causes the world to go bit darker)
+            lightBuffer.setColor(colourNull)
+            lightBuffer.fill()
 
 
-                // write to colour buffer
-                for (y in this_y_start..this_y_end) {
-                    //println("y: $y, this_y_start: $this_y_start")
-                    if (y == this_y_start && this_y_start == 0) {
-                        //throw Error("Fuck hits again...")
-                    }
-
-                    for (x in this_x_start..this_x_end) {
-
-                        val color = (getLightForOpaque(x, y) ?: Color(0f, 0f, 0f, 0f)).normaliseToHDR()
-
-                        lightBuffer.setColor(color)
-
-                        //lightBuffer.drawPixel(x - this_x_start, y - this_y_start)
-
-                        lightBuffer.drawPixel(x - this_x_start, lightBuffer.height - 1 - y + this_y_start) // flip Y
-                    }
+            // write to colour buffer
+            for (y in this_y_start..this_y_end) {
+                //println("y: $y, this_y_start: $this_y_start")
+                if (y == this_y_start && this_y_start == 0) {
+                    //throw Error("Fuck hits again...")
                 }
 
+                for (x in this_x_start..this_x_end) {
 
-                // draw to the batch
-                _lightBufferAsTex.dispose()
-                _lightBufferAsTex = Texture(lightBuffer)
-                _lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+                    val color = (getLightForOpaque(x, y) ?: Color(0f, 0f, 0f, 0f)).normaliseToHDR()
 
+                    lightBuffer.setColor(color)
 
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
-                //      we might not need shader here...
-                //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
-                batch.draw(_lightBufferAsTex, 0f, 0f, _lightBufferAsTex.width * DRAW_TILE_SIZE, _lightBufferAsTex.height * DRAW_TILE_SIZE)
+                    //lightBuffer.drawPixel(x - this_x_start, y - this_y_start)
+
+                    lightBuffer.drawPixel(x - this_x_start, lightBuffer.height - 1 - y + this_y_start) // flip Y
+                }
             }
-            else {
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
-                batch.draw(texturedLightMap.colorBufferTexture, -overscan_open * DRAW_TILE_SIZE, -overscan_open * DRAW_TILE_SIZE, texturedLightMap.width * DRAW_TILE_SIZE, texturedLightMap.height * DRAW_TILE_SIZE)
-            }
+
+
+            // draw to the batch
+            _lightBufferAsTex.dispose()
+            _lightBufferAsTex = Texture(lightBuffer)
+            _lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
+
+
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+            //      we might not need shader here...
+            //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
+            batch.draw(_lightBufferAsTex, 0f, 0f, _lightBufferAsTex.width * DRAW_TILE_SIZE, _lightBufferAsTex.height * DRAW_TILE_SIZE)
         }
     }
 
