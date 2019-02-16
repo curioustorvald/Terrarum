@@ -3,6 +3,8 @@ package net.torvald.terrarum
 import com.badlogic.gdx.Input
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockCodex
 
 /**
  * Keys must be all lowercase
@@ -101,6 +103,25 @@ object DefaultConfig {
         // "fancy" graphics settings
         jsonObject.addProperty("fxdither", true)
         //jsonObject.addProperty("fx3dlut", false)
+
+
+        // settings regarding debugger
+        val buildingMakerFavs = JsonArray()
+        intArrayOf(
+                Block.GLASS_CRUDE,
+                Block.PLANK_NORMAL,
+                Block.PLANK_BIRCH,
+                Block.STONE_QUARRIED,
+                Block.STONE_BRICKS,
+
+                Block.STONE_TILE_WHITE,
+                Block.TORCH,
+                Block.PLANK_NORMAL + BlockCodex.MAX_TERRAIN_TILES,
+                Block.PLANK_BIRCH + BlockCodex.MAX_TERRAIN_TILES,
+                Block.GLASS_CRUDE + BlockCodex.MAX_TERRAIN_TILES).forEach {
+            buildingMakerFavs.add(it)
+        }
+        jsonObject.add("buildingmakerfavs", buildingMakerFavs)
 
 
         return jsonObject

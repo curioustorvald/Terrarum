@@ -1,6 +1,6 @@
 package net.torvald.terrarum.gameactors.ai
 
-import org.luaj.vm2.*
+import org.luaj.vm2.LuaValue
 
 /**
  * Created by minjaesong on 2016-10-24.
@@ -388,4 +388,3 @@ fun String.toLua() = LuaValue.valueOf(this)
 fun Double?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
 fun Int?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
 fun String?.toLua() = if (this == null) LuaValue.NIL else this.toLua()
-fun Boolean.toInt() = if (this) 1 else 0

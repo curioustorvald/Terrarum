@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.*
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
 import net.torvald.terrarum.ui.UICanvas
+import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import org.dyn4j.geometry.Vector2
 
@@ -17,20 +19,20 @@ import org.dyn4j.geometry.Vector2
 class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
 
     companion object {
-        const val SIZE = 400
+        const val SIZE = 330
         const val RADIUS = SIZE / 2.0
         const val RADIUSF = RADIUS.toFloat()
 
-        const val BLOCKS_ROW_RADIUS = 150.0
-        const val TOOLS_ROW_RADIUS = 72.0
+        const val BLOCKS_ROW_RADIUS = 120.0
+        const val TOOLS_ROW_RADIUS = 56.0
 
         const val BLOCK_BACK_SIZE = 72
         const val BLOCK_BACK_RADIUS = BLOCK_BACK_SIZE / 2f
 
         const val ICON_SIZE = 38
         const val ICON_SIZEH = ICON_SIZE / 2f
-        const val ICON_HITBOX_SIZE = 52
-        const val ICON_HITBOX_RADIUS = ICON_HITBOX_SIZE / 2f
+        const val CLOSE_BUTTON_SIZE = 48
+        const val CLOSE_BUTTON_RADIUS = CLOSE_BUTTON_SIZE / 2f
 
         const val PALETTE_SIZE = 10
         const val TOOLS_SIZE = 5
@@ -40,16 +42,46 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
     private val blockCellCol = ItemSlotImageFactory.CELLCOLOUR_WHITE
     /** Centre pos. */
     private val blockCellPos = Array<Vector2>(PALETTE_SIZE) {
-        val newvec = Vector2(0.0, 0.0 - BLOCKS_ROW_RADIUS)
-        newvec.rotate(Math.PI / 5.0 * it).plus(Vector2(RADIUS, RADIUS))
+        Vector2(0.0, 0.0 - BLOCKS_ROW_RADIUS)
+                .rotate(Math.PI / 5.0 * it)
+                .plus(Vector2(RADIUS, RADIUS))
     }
-    /** Centre pos. */
-    private val toolsPos = Array<Vector2>(TOOLS_SIZE) {
+    private val toolIcons = TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/buildingmaker/penmenu_icons.tga"), 38, 38)
+    private val toolButtons = Array<UIItemImageButton>(TOOLS_SIZE) {
         val newvec = Vector2(TOOLS_ROW_RADIUS, 0.0)
-        newvec.rotate(Math.PI / 2.5 * it).plus(Vector2(RADIUS, RADIUS))
-    }
+                .rotate(Math.PI / 2.5 * it)
+                .plus(Vector2(RADIUS - ICON_SIZEH, RADIUS - ICON_SIZEH))
 
-    private val menuIcons = TextureRegionPack(ModMgr.getGdxFile("basegame", "gui/buildingmaker/penmenu_icons.tga"), 38, 38)
+        UIItemImageButton(
+                this, toolIcons.get(it, 0),
+                backgroundCol = Color(0),
+                highlightBackCol = Color(0),
+                activeBackCol = Color(0),
+                posX = newvec.x.roundInt(),
+                posY = newvec.y.roundInt(),
+                width = ICON_SIZE, height = ICON_SIZE,
+                highlightable = false
+        )
+    }
+    private val toolButtonsJob = arrayOf(
+            { parent.currentPenMode = BuildingMaker.PENMODE_MARQUEE },
+            { parent.currentPenMode = BuildingMaker.PENMODE_MARQUEE_ERASE },
+            {
+                parent.uiPalette.isVisible = true
+                parent.uiPalette.setPosition(Gdx.input.x - parent.uiPalette.width / 2, Gdx.input.y - parent.uiPalette.height / 2)
+                parent.uiPalette.posX = parent.uiPalette.posX.coerceIn(0, Terrarum.WIDTH - parent.uiPalette.width)
+                parent.uiPalette.posY = parent.uiPalette.posY.coerceIn(0, Terrarum.HEIGHT - parent.uiPalette.height)
+            },
+            {
+                parent.currentPenMode = BuildingMaker.PENMODE_PENCIL_ERASE
+                parent.currentPenTarget = BuildingMaker.PENTARGET_TERRAIN
+            },
+            {
+                parent.currentPenMode = BuildingMaker.PENMODE_PENCIL_ERASE
+                parent.currentPenTarget = BuildingMaker.PENTARGET_WALL
+            }
+
+    )
 
     override var width = SIZE
     override var height = SIZE
@@ -57,9 +89,42 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
 
     private var mouseVec = Vector2(0.0, 0.0)
 
+    private var mouseOnCloseButton = false
+    private var mouseOnBlocksSlot: Int? = null
+
+    init {
+        // make toolbox work
+        toolButtons.forEachIndexed { index, button ->
+            uiItems.add(button)
+
+            button.clickOnceListener = { _, _, b ->
+                if (b == AppLoader.getConfigInt("mouseprimary")) {
+                    toolButtonsJob[index].invoke()
+                    closeGracefully()
+                }
+            }
+        }
+    }
+
     override fun updateUI(delta: Float) {
         mouseVec.x = relativeMouseX.toDouble()
         mouseVec.y = relativeMouseY.toDouble()
+
+        toolButtons.forEach { it.update(delta) }
+
+        // determine if cursor is above shits
+        mouseOnCloseButton = (mouseVec.distanceSquared(RADIUS, RADIUS) <= CLOSE_BUTTON_RADIUS.sqr())
+        // --> blocks slot
+        for (i in 0 until PALETTE_SIZE) {
+            val posVec = blockCellPos[i]
+            if (mouseVec.distanceSquared(posVec) <= BLOCK_BACK_RADIUS.sqr()) {
+                mouseOnBlocksSlot = i
+                break
+            }
+            mouseOnBlocksSlot = null
+            // actually selecting the slot is handled by renderUI()
+        }
+
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             this.isVisible = false
@@ -69,11 +134,15 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
         // primary click
         if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
             // close by clicking close button or out-of-boud
-            if (mouseVec.distanceSquared(RADIUS, RADIUS) !in ICON_HITBOX_RADIUS.sqr()..RADIUSF.sqr()) {
-                this.isVisible = false
-                parent.tappedOnUI = true
+            if (mouseVec.distanceSquared(RADIUS, RADIUS) !in CLOSE_BUTTON_RADIUS.sqr()..RADIUSF.sqr()) {
+                closeGracefully()
             }
         }
+    }
+
+    private fun closeGracefully() {
+        this.isVisible = false
+        parent.tappedOnUI = true
     }
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
@@ -81,24 +150,34 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
         batch.color = backCol
         batch.fillCircle(0f, 0f, SIZE.toFloat(), SIZE.toFloat())
 
-        // draw fore
+        // draw blocks slot
         batch.color = blockCellCol
+        val slotConfig = AppLoader.getConfigIntArray("buildingmakerfavs")
         for (i in 0 until PALETTE_SIZE) {
-            val x = blockCellPos[i].x.roundInt().toFloat() - BLOCK_BACK_RADIUS
-            val y = blockCellPos[i].y.roundInt().toFloat() - BLOCK_BACK_RADIUS
-            batch.fillCircle(x, y, BLOCK_BACK_SIZE.toFloat(), BLOCK_BACK_SIZE.toFloat())
+            val x = blockCellPos[i].x.roundInt().toFloat()
+            val y = blockCellPos[i].y.roundInt().toFloat()
+            batch.color = blockCellCol
+            repeat((i == mouseOnBlocksSlot).toInt() + 1) { batch.fillCircle(x - BLOCK_BACK_RADIUS, y - BLOCK_BACK_RADIUS, BLOCK_BACK_SIZE.toFloat(), BLOCK_BACK_SIZE.toFloat()) }
+            batch.color = Color.WHITE
+            batch.draw(ItemCodex.getItemImage(slotConfig[i]), x - 16, y - 16, 32f, 32f)
+
+            // update as well while looping
+            if (i == mouseOnBlocksSlot && Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
+                parent.setPencilColour(slotConfig[i])
+                closeGracefully()
+            }
         }
 
         // draw close button
-        batch.fillCircle(RADIUSF - ICON_HITBOX_RADIUS, RADIUSF - ICON_HITBOX_RADIUS, ICON_HITBOX_SIZE.toFloat(), ICON_HITBOX_SIZE.toFloat())
+        batch.color = blockCellCol
+        repeat(mouseOnCloseButton.toInt() + 1) { batch.fillCircle(RADIUSF - CLOSE_BUTTON_RADIUS, RADIUSF - CLOSE_BUTTON_RADIUS, CLOSE_BUTTON_SIZE.toFloat(), CLOSE_BUTTON_SIZE.toFloat()) }
+
+        batch.color = if (mouseOnCloseButton) toolButtons[0].activeCol else toolButtons[0].inactiveCol
+        batch.draw(toolIcons.get(5, 0), RADIUSF - ICON_SIZEH, RADIUSF - ICON_SIZEH)
 
         // draw icons
-        batch.color = Color.WHITE
-        batch.draw(menuIcons.get(5, 0), RADIUSF - ICON_SIZEH, RADIUSF - ICON_SIZEH)
-        for (i in 0 until TOOLS_SIZE) {
-            val x = toolsPos[i].x.roundInt().toFloat() - ICON_SIZEH
-            val y = toolsPos[i].y.roundInt().toFloat() - ICON_SIZEH
-            batch.draw(menuIcons.get(i, 0), x, y)
+        toolButtons.forEach {
+            it.render(batch, camera)
         }
     }
 
@@ -115,6 +194,7 @@ class UIBuildingMakerPenMenu(val parent: BuildingMaker): UICanvas() {
     }
 
     override fun dispose() {
-        menuIcons.dispose()
+        toolIcons.dispose()
     }
+
 }
