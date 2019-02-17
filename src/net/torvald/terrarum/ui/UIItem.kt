@@ -3,6 +3,7 @@ package net.torvald.terrarum.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.Disposable
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 
@@ -27,16 +28,26 @@ import net.torvald.terrarum.Terrarum
  * For example:
  *
  * ```
- * <<some_name>>.clickOnceListener = { mouseX, mouseY, button ->
+ * Kotlin:
+ * <<identifier>>.clickOnceListener = { mouseX, mouseY, button ->
  *     println("Bo-ing!")
  * }
+ *
+ * Java:
+ * <<identifier>>.setClickOnceListener((mouseX, mouseY, button) -> {
+ *     System.out.println("Bo-ing!");
+ *     return null;
+ * });
  * ```
  *
  * This listener will print out 'Bo-ing!' whenever it's clicked.
  *
+ * As mentioned in [UICanvas], UIItems must be added to the Canvas to make listeners work without implementing
+ * everything by yourself.
+ *
  * Created by minjaesong on 2015-12-31.
  */
-abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UIHandler!
+abstract class UIItem(var parentUI: UICanvas): Disposable { // do not replace parentUI to UIHandler!
 
     // X/Y Position relative to the containing canvas
     abstract var posX: Int
@@ -214,6 +225,6 @@ abstract class UIItem(var parentUI: UICanvas) { // do not replace parentUI to UI
         return false
     }
 
-    abstract fun dispose()
+    abstract override fun dispose()
 
 }

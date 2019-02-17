@@ -11,9 +11,28 @@ import net.torvald.terrarum.roundInt
 
 
 /**
- * UIItems must be added manually at the init!
+ * ## UI Items
  *
- * FIXME: Bad design!!
+ * UI can contain one or more UI elements (called UIItem). Each UIItem can have one or more events programmed to it.
+ * Events have their own listener are governed by their GDX event handlers (e.g. mouseMoved).
+ * These GDX handlers are what makes the our own handler to work.
+ *
+ * UIItems have following event handlers: updateLister, keyDownListener, mouseMovedListener, touchDraggedListener, touchDownListener, touchUpListener, scrolledListener, and clickOnceListener.
+ * (perhaps clickOnceListener is the one most useful)
+ *
+ * To make them work without any hassle on your part,
+ * all the UIItems must be added to this UICanvas's ```uiItems``` list.
+ *
+ * See also: [net.torvald.terrarum.ui.UIItem]
+ *
+ * ## Sub UIs
+ *
+ * Sub UIs are UICanvases that is child of this UICanvas. They are also managed internally to lessen your burden.
+ * Just add all the Sub UIs using ```addSubUI()``` method.
+ *
+ * ## Position variables
+ *
+ * PosX/Y and relativeMouseX/Y are explained in ```work_files/terrarum_ui_elements_coord_explained.png```
  *
  * Created by minjaesong on 2015-12-31.
  */
