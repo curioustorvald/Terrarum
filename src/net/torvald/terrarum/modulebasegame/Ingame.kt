@@ -1,6 +1,7 @@
 package net.torvald.terrarum.modulebasegame
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.dataclass.CircularArray
@@ -13,6 +14,7 @@ import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.IngameController
+import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.modulebasegame.console.AVTracker
@@ -251,6 +253,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
             historicalFigureIDBucket = ArrayList<Int>()
         }
+
+        KeyToggler.forceSet(Input.Keys.Q, false)
     }
 
     val ingameController = IngameController(this)

@@ -47,6 +47,9 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
  - Remove Sel. : net.torvald.terrarum.modulebasegame.YamlCommandToolMarqueeErase
  - Clear Sel. : net.torvald.terrarum.modulebasegame.YamlCommandToolMarqueeClear
  - Move Selected
+ -
+ - Hide/Show Sel. : net.torvald.terrarum.modulebasegame.YamlCommandToolToggleMarqueeOverlay
+ -
  - Undo
  - Redo
 - Time
@@ -97,13 +100,23 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     val uiContainer = ArrayList<UICanvas>()
 
+    private val pensMustShowSelection = arrayOf(
+            PENMODE_MARQUEE, PENMODE_MARQUEE_ERASE
+    )
+
     var currentPenMode = PENMODE_PENCIL
+        set(value) {
+            field = value
+            if (value in pensMustShowSelection) {
+                showSelection = true
+            }
+        }
     var currentPenTarget = PENTARGET_TERRAIN
 
     val selection = ArrayList<Point2i>()
 
     val blockMarkings = TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16)
-
+    internal var showSelection = true
     val blockPointingCursor = object : ActorWithBody(Actor.RenderOrder.OVERLAY) {
 
         override var referenceID: ActorID? = 1048575 // custom refID
@@ -326,7 +339,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun renderGame() {
-        IngameRenderer.invoke(world as GameWorldExtension, actorsRenderOverlay = actorsRenderOverlay + essentialOverlays, uisToDraw = uiContainer)
+        IngameRenderer.invoke(world as GameWorldExtension, actorsRenderOverlay = if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays, uisToDraw = uiContainer)
     }
 
     override fun resize(width: Int, height: Int) {
@@ -530,5 +543,11 @@ class YamlCommandToolMarqueeClear : YamlInvokable {
         (args[0] as BuildingMaker).selection.toList().forEach {
             (args[0] as BuildingMaker).removeBlockMarker(it.x, it.y)
         }
+    }
+}
+
+class YamlCommandToolToggleMarqueeOverlay : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).showSelection = !(args[0] as BuildingMaker).showSelection
     }
 }
