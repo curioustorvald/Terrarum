@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
  * Created by minjaesong on 2017-01-21.
  */
 abstract class ActorWithBody(renderOrder: RenderOrder) : Actor(renderOrder) {
-    open val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
+    abstract val hitbox: Hitbox
     abstract fun drawBody(batch: SpriteBatch)
     abstract fun drawGlow(batch: SpriteBatch)
     open var tooltipText: String? = null // null: display nothing

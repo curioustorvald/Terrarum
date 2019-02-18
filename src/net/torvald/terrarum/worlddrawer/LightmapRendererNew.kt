@@ -350,7 +350,7 @@ object LightmapRenderer {
                             for (x in lightBoxX.div(TILE_SIZE).floorInt()
                                     ..lightBoxX.plus(lightBoxW).div(TILE_SIZE).floorInt()) {
 
-                                val normalisedColor = it.color.cpy().mul(DIV_FLOAT)
+                                val normalisedColor = it.color//.cpy().mul(DIV_FLOAT)
 
                                 lanternMap[LandUtil.getBlockAddr(world, x, y)] = normalisedColor
                                 //lanternMap[Point2i(x, y)] = normalisedColor
