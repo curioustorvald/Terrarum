@@ -11,7 +11,6 @@ import net.torvald.terrarum.ui.ConsoleWindow
 import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
-import javax.swing.JOptionPane
 
 /**
  * Although the game (as product) can have infinitely many stages/planets/etc., those stages must be manually managed by YOU;
@@ -144,11 +143,11 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
             index = actorContainerInactive.binarySearch(ID)
 
             if (index < 0) {
-                JOptionPane.showMessageDialog(
+                /*JOptionPane.showMessageDialog(
                         null,
                         "Actor with ID $ID does not exist.",
                         null, JOptionPane.ERROR_MESSAGE
-                )
+                )*/
                 throw IllegalArgumentException("Actor with ID $ID does not exist.")
             }
             else

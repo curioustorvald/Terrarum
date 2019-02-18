@@ -45,7 +45,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
  - Eyedropper : net.torvald.terrarum.modulebasegame.YamlCommandToolEyedropper
  - Add Selection : net.torvald.terrarum.modulebasegame.YamlCommandToolMarquee
  - Remove Sel. : net.torvald.terrarum.modulebasegame.YamlCommandToolMarqueeErase
- - Clear Sel.
+ - Clear Sel. : net.torvald.terrarum.modulebasegame.YamlCommandToolMarqueeClear
  - Move Selected
  - Undo
  - Redo
@@ -102,10 +102,11 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     val selection = ArrayList<Point2i>()
 
+    val blockMarkings = TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16)
+
     val blockPointingCursor = object : ActorWithBody(Actor.RenderOrder.OVERLAY) {
 
-        override var referenceID: ActorID? = Terrarum.generateUniqueReferenceID(renderOrder)
-        val body = TextureRegionPack(Gdx.files.internal("assets/graphics/blocks/block_markings_common.tga"), 16, 16)
+        override var referenceID: ActorID? = 1048575 // custom refID
         override val hitbox = Hitbox(0.0, 0.0, 16.0, 16.0)
 
 
@@ -116,13 +117,12 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         override fun drawBody(batch: SpriteBatch) {
             batch.color = toolCursorColour[currentPenMode]
-            batch.draw(body.get(currentPenMode, 0), hitbox.startX.toFloat(), hitbox.startY.toFloat())
+            batch.draw(blockMarkings.get(currentPenMode, 0), hitbox.startX.toFloat(), hitbox.startY.toFloat())
         }
 
         override fun drawGlow(batch: SpriteBatch) { }
 
         override fun dispose() {
-            body.dispose()
         }
 
         override fun update(delta: Float) {
@@ -136,6 +136,56 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         override fun run() {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+    }
+
+    private val blockMarkerColour = Color(0xe0e0e0ff.toInt())
+
+    internal fun blockPosToRefID(x: Int, y: Int) = 1048576 + (y * gameWorld.width + x)
+
+    private fun generateNewBlockMarkerVisible(x: Int, y: Int) = object : ActorWithBody(Actor.RenderOrder.OVERLAY) {
+        override var referenceID: ActorID? = blockPosToRefID(x, y) // custom refID
+        override val hitbox = Hitbox(x * 16.0, y * 16.0, 16.0, 16.0)
+
+        override fun drawBody(batch: SpriteBatch) {
+            batch.color = blockMarkerColour
+            batch.draw(blockMarkings.get(2,0), hitbox.startX.toFloat(), hitbox.startY.toFloat())
+        }
+
+        override fun drawGlow(batch: SpriteBatch) { }
+
+        override fun update(delta: Float) { }
+
+        override fun onActorValueChange(key: String, value: Any?) { }
+
+        override fun run() {
+            TODO("not implemented")
+        }
+
+        override fun dispose() {
+
+        }
+    }
+
+    internal fun addBlockMarker(x: Int, y: Int) {
+        try {
+            val a = generateNewBlockMarkerVisible(x, y)
+            addNewActor(a)
+            actorsRenderOverlay.add(a)
+            selection.add(Point2i(x, y))
+        }
+        catch (e: Error) { }
+    }
+
+    internal fun removeBlockMarker(x: Int, y: Int) {
+        try {
+            val a = getActorByID(blockPosToRefID(x, y))
+            removeActor(a)
+            actorsRenderOverlay.remove(a)
+            selection.remove(Point2i(x, y))
+        }
+        catch (e: IllegalArgumentException) {
+            // no actor to erase, do nothing
         }
     }
 
@@ -156,15 +206,18 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
                 Color.MAGENTA,
                 Color.WHITE
         )
+
+        const val DEFAULT_POI_NAME = "The Yucky Panopticon"
     }
 
-    private val actorsRenderOverlay = ArrayList<ActorWithBody>()
+    private val actorsRenderOverlay = ArrayList<ActorWithBody>() // can be hidden (e.g. hide sel.)
+    private val essentialOverlays = ArrayList<ActorWithBody>()
 
     init {
         gameWorld.time.setTimeOfToday(WorldTime.HOUR_SEC * 10)
         gameWorld.globalLight = Color(.8f,.8f,.8f,.8f)
 
-        actorsRenderOverlay.add(blockPointingCursor)
+        essentialOverlays.add(blockPointingCursor)
 
         uiContainer.add(uiToolbox)
         uiContainer.add(uiPaletteSelector)
@@ -273,7 +326,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun renderGame() {
-        IngameRenderer.invoke(world as GameWorldExtension, actorsRenderOverlay = actorsRenderOverlay, uisToDraw = uiContainer)
+        IngameRenderer.invoke(world as GameWorldExtension, actorsRenderOverlay = actorsRenderOverlay + essentialOverlays, uisToDraw = uiContainer)
     }
 
     override fun resize(width: Int, height: Int) {
@@ -292,7 +345,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     override fun dispose() {
-        blockPointingCursor.dispose()
+        blockMarkings.dispose()
         uiPenMenu.dispose()
     }
 
@@ -319,6 +372,12 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
                     world.getTileFromWall(x, y)!! + BlockCodex.MAX_TERRAIN_TILES
                 else
                     world.getTileFromTerrain(x, y)!!
+            }
+            PENMODE_MARQUEE -> {
+                addBlockMarker(x, y)
+            }
+            PENMODE_MARQUEE_ERASE -> {
+                removeBlockMarker(x, y)
             }
         }
     }
@@ -450,7 +509,7 @@ class YamlCommandToolPencilEraseWall : YamlInvokable {
 class YamlCommandToolEyedropper : YamlInvokable {
     override fun invoke(args: Array<Any>) {
         (args[0] as BuildingMaker).currentPenMode = BuildingMaker.PENMODE_EYEDROPPER
-        (args[0] as BuildingMaker).currentPenTarget = BuildingMaker.PENTARGET_TERRAIN
+        (args[0] as BuildingMaker).currentPenTarget = BuildingMaker.PENTARGET_TERRAIN + BuildingMaker.PENTARGET_WALL
     }
 }
 
@@ -463,5 +522,13 @@ class YamlCommandToolMarquee : YamlInvokable {
 class YamlCommandToolMarqueeErase : YamlInvokable {
     override fun invoke(args: Array<Any>) {
         (args[0] as BuildingMaker).currentPenMode = BuildingMaker.PENMODE_MARQUEE_ERASE
+    }
+}
+
+class YamlCommandToolMarqueeClear : YamlInvokable {
+    override fun invoke(args: Array<Any>) {
+        (args[0] as BuildingMaker).selection.toList().forEach {
+            (args[0] as BuildingMaker).removeBlockMarker(it.x, it.y)
+        }
     }
 }
