@@ -18,6 +18,7 @@ import net.torvald.terrarum.modulebasegame.ui.UIPaletteSelector
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
+import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -163,6 +164,8 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         override fun drawBody(batch: SpriteBatch) {
             batch.color = blockMarkerColour
             batch.draw(blockMarkings.get(2,0), hitbox.startX.toFloat(), hitbox.startY.toFloat())
+            batch.draw(blockMarkings.get(2,0), hitbox.startX.toFloat() + world.width * TILE_SIZE, hitbox.startY.toFloat())
+            batch.draw(blockMarkings.get(2,0), hitbox.startX.toFloat() - world.width * TILE_SIZE, hitbox.startY.toFloat())
         }
 
         override fun drawGlow(batch: SpriteBatch) { }
@@ -393,6 +396,31 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
                 removeBlockMarker(x, y)
             }
         }
+    }
+
+    private fun getSelectionTotalDimension(): Point2i {
+        selection.sortBy { it.y * world.width + it.x }
+        return selection.last() - selection.first()
+    }
+
+    private fun serialiseSelection() {
+        // save format: sparse list encoded in following binary format:
+        /*
+        Header: TEaT0bLD -- magic: Terrarum Attachment
+                Int8 version number -- always 1
+                Int8 number of layers -- always 2 or 3
+                Int8 number of payloads -- always 2 or 3
+                int8 compression algorithm -- always 1 (DEFLATE)
+                Int16 width
+
+        The rest: payloads defined in the map data format
+                  Payloads: array of (Int48 tileAddress, UInt16 blockID)
+
+        Footer: EndAtC \xFF\xFE -- magic: end of attachment with BOM
+         */
+        // proc:
+        //   translate boxes so that leftmost point is (0,0)
+        //   write to the list using translated coords
     }
 }
 

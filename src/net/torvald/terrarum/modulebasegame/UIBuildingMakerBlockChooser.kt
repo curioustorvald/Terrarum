@@ -25,7 +25,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         const val TILES_Y = 14
 
         const val TILESREGION_SIZE = 24
-        const val MENUBAR_SIZE = 80
+        const val MENUBAR_SIZE = 72
         const val SCROLLBAR_SIZE = 24
 
         const val WIDTH = TILES_X*TILESREGION_SIZE + SCROLLBAR_SIZE + MENUBAR_SIZE
@@ -50,7 +50,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         )
     }
     private val tabs = UIItemTextButtonList(
-            this, arrayOf("Terrain", "Wall", "Wire", "Fixtures"),
+            this, arrayOf("Terrain", "Wall", "Wire"),
             0, 0, textAreaWidth = MENUBAR_SIZE, width = MENUBAR_SIZE,
             defaultSelection = 0
     )
