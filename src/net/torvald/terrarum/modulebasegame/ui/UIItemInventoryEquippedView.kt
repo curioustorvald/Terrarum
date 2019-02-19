@@ -11,6 +11,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ActorInventory
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_BLACK_ACTIVE
 import net.torvald.terrarum.ui.UIItem
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2017-10-28.
@@ -41,6 +42,10 @@ class UIItemInventoryEquippedView(
     private var rebuildList = true
     
     val spriteViewBackCol: Color = CELLCOLOUR_BLACK
+
+    private val equipPosIcon = TextureRegionPack("./assets/graphics/gui/inventory/equip_position.tga", 18, 18)
+    private val cellToIcon = intArrayOf(0,1,2,3,4,5,6,7,6,7,6,7)
+    private val equipPosIconCol = Color(0xdddddd7f.toInt())
 
     private val itemGrid = Array<UIItemInventoryCellBase>(2 * 6) {
         UIItemInventoryElemSimple(
@@ -97,7 +102,13 @@ class UIItemInventoryEquippedView(
 
         // TODO inscribe slot image on each cells HERE
 
-        itemGrid.forEach { it.render(batch, camera) }
+        itemGrid.forEachIndexed { index, cell ->
+            cell.render(batch, camera)
+            if (cell.item == null) {
+                batch.color = equipPosIconCol
+                batch.draw(equipPosIcon.get(cellToIcon[index], 0), 15f + cell.posX, 15f + cell.posY)
+            }
+        }
 
 
         oldPosX = posX

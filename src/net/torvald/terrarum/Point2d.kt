@@ -64,4 +64,12 @@ data class Point2i(var x: Int, var y: Int) {
         this.x = other.x
         this.y = other.y
     }
+
+    operator fun plus(other: Point2i): Point2i {
+        return Point2i(this.x + other.x, this.y + other.y)
+    }
+
+    operator fun minus(other: Point2i): Point2i {
+        return Point2i(other.x - this.x, other.y - this.y)
+    }
 }
