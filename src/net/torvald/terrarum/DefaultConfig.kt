@@ -55,10 +55,10 @@ object DefaultConfig {
         jsonObject.addProperty("gamepadtriggeraxis", 4) // positive: LT, negative: RT (xbox pad)
         jsonObject.addProperty("gamepadtriggeraxis2", 5) // just in case... (RT)
 
-        val axesZeroPoints = JsonArray(); axesZeroPoints.add(0f); axesZeroPoints.add(0f); axesZeroPoints.add(0f); axesZeroPoints.add(0f)
+        val axesZeroPoints = JsonArray(); axesZeroPoints.add(-0.011f); axesZeroPoints.add(-0.022f); axesZeroPoints.add(-0.033f); axesZeroPoints.add(-0.044f)
         jsonObject.add("gamepadaxiszeropoints", axesZeroPoints) // to accomodate shifted zero point of analog stick
 
-        jsonObject.addProperty("gamepadlabelstyle", "msxb360") // "nwii", "logitech", "sonyps", "msxb360", "generic"
+        jsonObject.addProperty("gamepadlabelstyle", "msxbone") // "nwii", "logitech", "sonyps", "msxb360", "msxbone"
 
 
 

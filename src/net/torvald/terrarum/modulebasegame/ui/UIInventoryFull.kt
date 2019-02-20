@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.Terrarum.gamepadLabelStart
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
@@ -57,20 +58,21 @@ class UIInventoryFull(
             "${0xe011.toChar()}..${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
         else
-            "${0xe069.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
-            "${Terrarum.gamepadLabelNinY} ${Lang["GAME_INVENTORY_USE"]}$SP" +
-            "${0xe011.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
-            "${Terrarum.gamepadLabelNinA} ${Lang["GAME_INVENTORY_DROP"]}"
+            "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "${Terrarum.gamepadLabelLEFTRIGHT} ${"$ Section"}$SP" +
+            "${Terrarum.gamepadLabelWest} ${Lang["GAME_INVENTORY_USE"]}$SP" +
+            "${Terrarum.gamepadLabelNorth}${Terrarum.gamepadLabelLStick} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
+            "${Terrarum.gamepadLabelEast} ${Lang["GAME_INVENTORY_DROP"]}"
     val minimapControlHelp: String
         get() = if (AppLoader.environment == RunningEnvironment.PC)
             "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
         else
-            "${0xe069.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe06b.toChar()} ${Lang["GAME_INVENTORY"]}"
+            "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe06b.toChar()} ${Lang["GAME_INVENTORY"]}"
     val gameMenuControlHelp: String
         get() = if (AppLoader.environment == RunningEnvironment.PC)
             "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
         else
-            "${0xe069.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe068.toChar()} ${Lang["GAME_INVENTORY"]}"
+            "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe068.toChar()} ${Lang["GAME_INVENTORY"]}"
     val controlHelpHeight = Terrarum.fontGame.lineHeight
 
     private var encumbrancePerc = 0f
