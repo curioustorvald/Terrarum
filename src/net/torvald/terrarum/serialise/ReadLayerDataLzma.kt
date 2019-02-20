@@ -8,9 +8,7 @@ import net.torvald.terrarum.gameworld.MapLayer
 import net.torvald.terrarum.gameworld.PairedMapLayer
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskSkimmer.Companion.read
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.toHex
 import java.io.*
-import java.nio.charset.Charset
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -60,7 +58,8 @@ internal object ReadLayerDataLzma {
 
         // read payloads
 
-        val pldBuffer4 = ByteArray(4)
+        val payloads = PayloadUtil.readAll(inputStream)
+        /*val pldBuffer4 = ByteArray(4)
         val pldBuffer6 = ByteArray(6)
         val pldBuffer8 = ByteArray(8)
 
@@ -121,7 +120,7 @@ internal object ReadLayerDataLzma {
         // test for EOF
         inputStream.read(pldBuffer8)
         if (!pldBuffer8.contentEquals(WriteLayerDataZip.FILE_FOOTER))
-            throw InternalError("Expected end-of-file, got not-so-end-of-file")
+            throw InternalError("Expected end-of-file, got not-so-end-of-file")*/
 
 
         //////////////////////
@@ -199,8 +198,6 @@ internal object ReadLayerDataLzma {
         )
     }
 
-    private data class TEMzPayload(val uncompressedSize: Long, val bytes: ByteArray) // FIXME deflated stream cannot be larger than 2 GB
-
     /**
      * Immediately deployable, a part of the gameworld
      */
@@ -220,27 +217,6 @@ internal object ReadLayerDataLzma {
             val fluidTypes: HashMap<BlockAddress, FluidType>,
             val fluidFills: HashMap<BlockAddress, Float>
     )
-
-    private fun ByteArray.shiftLeftBy(size: Int, fill: Byte = 0.toByte()) {
-        if (size == 0) {
-            return
-        }
-        else if (size < 0) {
-            throw IllegalArgumentException("This won't shift to right (size = $size)")
-        }
-        else if (size >= this.size) {
-            Arrays.fill(this, 0.toByte())
-        }
-        else {
-            for (c in size..this.lastIndex) {
-                this[c - size] = this[c]
-            }
-            for (c in (this.size - size)..this.lastIndex) {
-                this[c] = fill
-            }
-        }
-    }
-
 
 	internal fun InputStream.readRelative(b: ByteArray, off: Int, len: Int): Int {
         if (b == null) {
@@ -271,15 +247,5 @@ internal object ReadLayerDataLzma {
         }
 
         return i
-    }
-
-    fun ByteArray.toByteString(): String {
-        val sb = StringBuilder()
-        this.forEach {
-            sb.append(it.toUint().toHex().takeLast(2))
-            sb.append(' ')
-        }
-        sb.deleteCharAt(sb.lastIndex)
-        return sb.toString()
     }
 }
