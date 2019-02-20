@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.*
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -157,15 +158,46 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
     internal fun blockPosToRefID(x: Int, y: Int) = 1048576 + (y * gameWorld.width + x)
 
+    private var _testMarkerDrawCalls = 0L
+
     private fun generateNewBlockMarkerVisible(x: Int, y: Int) = object : ActorWithBody(Actor.RenderOrder.OVERLAY) {
         override var referenceID: ActorID? = blockPosToRefID(x, y) // custom refID
         override val hitbox = Hitbox(x * 16.0, y * 16.0, 16.0, 16.0)
 
         override fun drawBody(batch: SpriteBatch) {
             batch.color = blockMarkerColour
-            batch.draw(blockMarkings.get(2,0), hitbox.startX.toFloat(), hitbox.startY.toFloat())
-            batch.draw(blockMarkings.get(2,0), hitbox.startX.toFloat() + world.width * TILE_SIZE, hitbox.startY.toFloat())
-            batch.draw(blockMarkings.get(2,0), hitbox.startX.toFloat() - world.width * TILE_SIZE, hitbox.startY.toFloat())
+            drawSpriteInGoodPosition(blockMarkings.get(2,0), batch)
+        }
+
+        private fun drawSpriteInGoodPosition(sprite: TextureRegion, batch: SpriteBatch) {
+            val leftsidePadding = world.width.times(TILE_SIZE) - WorldCamera.width.ushr(1)
+            val rightsidePadding = WorldCamera.width.ushr(1)
+
+            if (hitbox.startX in WorldCamera.x - hitbox.width..WorldCamera.x + WorldCamera.width.toDouble() &&
+                hitbox.startY in WorldCamera.y - hitbox.height..WorldCamera.y + WorldCamera.height.toDouble()) {
+                if (WorldCamera.xCentre > leftsidePadding && hitbox.centeredX <= rightsidePadding) {
+                    // camera center neg, actor center pos
+                    batch.draw(sprite,
+                            hitbox.startX.toFloat() + world.width * TILE_SIZE,
+                            hitbox.startY.toFloat()
+                    )
+                }
+                else if (WorldCamera.xCentre < rightsidePadding && hitbox.centeredY >= leftsidePadding) {
+                    // camera center pos, actor center neg
+                    batch.draw(sprite,
+                            hitbox.startX.toFloat() - world.width * TILE_SIZE,
+                            hitbox.startY.toFloat()
+                    )
+                }
+                else {
+                    batch.draw(sprite,
+                            hitbox.startX.toFloat(),
+                            hitbox.startY.toFloat()
+                    )
+                }
+
+                _testMarkerDrawCalls += 1
+            }
         }
 
         override fun drawGlow(batch: SpriteBatch) { }
@@ -342,7 +374,11 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     private fun renderGame() {
+        _testMarkerDrawCalls = 0L
+
         IngameRenderer.invoke(world as GameWorldExtension, actorsRenderOverlay = if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays, uisToDraw = uiContainer)
+
+        AppLoader.setDebugTime("Test.MarkerDrawCalls", _testMarkerDrawCalls)
     }
 
     override fun resize(width: Int, height: Int) {

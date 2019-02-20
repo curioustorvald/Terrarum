@@ -330,16 +330,17 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         hitbox.translate(dx, dy)
     }
 
-    inline val centrePosVector: Vector2
-        get() = Vector2(hitbox.centeredX, hitbox.centeredY)
-    inline val centrePosPoint: Point2d
-        get() = Point2d(hitbox.centeredX, hitbox.centeredY)
-    inline val feetPosVector: Vector2
-        get() = Vector2(hitbox.centeredX, hitbox.endY)
-    inline val feetPosPoint: Point2d
-        get() = Point2d(hitbox.centeredX, hitbox.endY)
-    inline val feetPosTile: IntArray
-        get() = intArrayOf(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
+    // get() methods are moved to update(), too much stray object being created is definitely not good
+    val centrePosVector: Vector2 = Vector2(0.0,0.0)
+        //get() = Vector2(hitbox.centeredX, hitbox.centeredY)
+    val centrePosPoint: Point2d = Point2d(0.0, 0.0)
+        //get() = Point2d(hitbox.centeredX, hitbox.centeredY)
+    val feetPosVector: Vector2 = Vector2(0.0,0.0)
+        //get() = Vector2(hitbox.centeredX, hitbox.endY)
+    val feetPosPoint: Point2d = Point2d(0.0,0.0)
+        //get() = Point2d(hitbox.centeredX, hitbox.endY)
+    val feetPosTile: Point2i = Point2i(0,0)
+        //get() = Point2i(hIntTilewiseHitbox.centeredX.floorInt(), hIntTilewiseHitbox.endY.floorInt())
 
     override fun run() = update(AppLoader.UPDATE_RATE.toFloat())
 
@@ -435,6 +436,9 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 clampHitbox()
             }
 
+
+            // update all the other variables //
+
             // cheap solution for sticking into the wall while Left or Right is held
             walledLeft = isWalled(hitbox, COLLIDING_LEFT)
             walledRight = isWalled(hitbox, COLLIDING_RIGHT)
@@ -448,6 +452,14 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
                 walledBottom = false
                 colliding = false
             }
+
+            centrePosVector.set(hitbox.centeredX, hitbox.centeredY)
+            centrePosPoint.set(hitbox.centeredX, hitbox.centeredY)
+            feetPosVector.set(hitbox.centeredX, hitbox.endY)
+            feetPosPoint.set(hitbox.centeredX, hitbox.endY)
+            feetPosTile.x = hIntTilewiseHitbox.centeredX.floorInt()
+            feetPosTile.y = hIntTilewiseHitbox.endY.floorInt()
+
         }
     }
 
@@ -1375,28 +1387,33 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         val offsetY = sprite.cellHeight * scale - hitbox.height - hitboxTranslateY * scale - 1
 
 
-        if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
-            // camera center neg, actor center pos
-            sprite.render(batch,
-                    (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZE,
-                    (hitbox.startY - offsetY).toFloat(),
-                    (scale).toFloat()
-            )
-        }
-        else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
-            // camera center pos, actor center neg
-            sprite.render(batch,
-                    (hitbox.startX - offsetX).toFloat() - world!!.width * TILE_SIZE,
-                    (hitbox.startY - offsetY).toFloat(),
-                    (scale).toFloat()
-            )
-        }
-        else {
-            sprite.render(batch,
-                    (hitbox.startX - offsetX).toFloat(),
-                    (hitbox.startY - offsetY).toFloat(),
-                    (scale).toFloat()
-            )
+        // FIXME test me: this extra IF statement is supposed to not draw actors that's outside of the camera.
+        //                basic code without offsetX/Y DOES work, but obviously offsets are not tested.
+        if (hitbox.startX - offsetX in WorldCamera.x - hitbox.width - offsetX..WorldCamera.x + WorldCamera.width + offsetX &&
+                hitbox.endY + offsetY in WorldCamera.y - hitbox.height - offsetY..WorldCamera.y + WorldCamera.height + offsetY) {
+            if (WorldCamera.xCentre > leftsidePadding && centrePosPoint.x <= rightsidePadding) {
+                // camera center neg, actor center pos
+                sprite.render(batch,
+                        (hitbox.startX - offsetX).toFloat() + world!!.width * TILE_SIZE,
+                        (hitbox.startY - offsetY).toFloat(),
+                        (scale).toFloat()
+                )
+            }
+            else if (WorldCamera.xCentre < rightsidePadding && centrePosPoint.x >= leftsidePadding) {
+                // camera center pos, actor center neg
+                sprite.render(batch,
+                        (hitbox.startX - offsetX).toFloat() - world!!.width * TILE_SIZE,
+                        (hitbox.startY - offsetY).toFloat(),
+                        (scale).toFloat()
+                )
+            }
+            else {
+                sprite.render(batch,
+                        (hitbox.startX - offsetX).toFloat(),
+                        (hitbox.startY - offsetY).toFloat(),
+                        (scale).toFloat()
+                )
+            }
         }
     }
 
