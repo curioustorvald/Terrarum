@@ -75,7 +75,7 @@ open class ProjectileSimple(
         lifetimeCounter += delta
         if (walledTop || walledBottom || walledRight || walledLeft || lifetimeCounter >= lifetimeMax ||
             // stuck check
-            BlockCodex[(Terrarum.ingame!!.world).getTileFromTerrain(feetPosTile[0], feetPosTile[1]) ?: Block.STONE].isSolid
+            BlockCodex[(Terrarum.ingame!!.world).getTileFromTerrain(feetPosTile.x, feetPosTile.y) ?: Block.STONE].isSolid
                 ) {
             flagDespawn()
         }
