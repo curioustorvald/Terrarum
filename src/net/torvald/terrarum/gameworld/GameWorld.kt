@@ -8,7 +8,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.realestate.LandUtil
-import net.torvald.terrarum.serialise.ReadLayerDataLzma
+import net.torvald.terrarum.serialise.ReadLayerDataZip
 import org.dyn4j.geometry.Vector2
 import kotlin.math.absoluteValue
 
@@ -97,7 +97,7 @@ open class GameWorld {
         this.totalPlayTime = totalPlayTime
     }
 
-    internal constructor(worldIndex: Int, layerData: ReadLayerDataLzma.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
+    internal constructor(worldIndex: Int, layerData: ReadLayerDataZip.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) {
         this.worldIndex = worldIndex
 
         layerTerrain = layerData.layerTerrain
