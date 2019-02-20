@@ -4,6 +4,9 @@ import com.badlogic.gdx.utils.compression.Lzma
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.serialise.WriteLayerDataZip.FILE_FOOTER
+import net.torvald.terrarum.serialise.WriteLayerDataZip.PAYLOAD_FOOTER
+import net.torvald.terrarum.serialise.WriteLayerDataZip.PAYLOAD_HEADER
 import java.io.*
 import java.util.zip.DeflaterOutputStream
 
@@ -35,9 +38,6 @@ internal object WriteLayerDataLzma {
     val NUMBER_OF_PAYLOADS = 5.toByte()
     val COMPRESSION_ALGORITHM = 2.toByte()
     val GENERATOR_VERSION = WORLD_GENERATOR_VERSION.toULittleShort()
-    val PAYLOAD_HEADER = byteArrayOf(0, 0x70, 0x4C, 0x64)
-    val PAYLOAD_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x50, 0x59, 0x4C, 0x64, -1)
-    val FILE_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x54, 0x45, 0x4D, -1, -2)
 
     //val NULL: Byte = 0
 

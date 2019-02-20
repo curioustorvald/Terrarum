@@ -21,6 +21,11 @@ data class Point2d(var x: Double, var y: Double) : Cloneable {
         this.y = other.y
     }
 
+    fun setCoerceIn(start: Point2d, endInclusive: Point2d) {
+        x = x.coerceIn(start.x, endInclusive.x)
+        y = y.coerceIn(start.y, endInclusive.y)
+    }
+
     /**
      * Rotate transform this point, with pivot (0, 0)
      * @return new Point2d that is rotated

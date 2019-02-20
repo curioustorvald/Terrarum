@@ -40,9 +40,9 @@ internal object WriteLayerDataZip {
     val NUMBER_OF_PAYLOADS = 5.toByte()
     val COMPRESSION_ALGORITHM = 1.toByte()
     val GENERATOR_VERSION = WORLD_GENERATOR_VERSION.toULittleShort()
-    val PAYLOAD_HEADER = byteArrayOf(0, 0x70, 0x4C, 0x64)
-    val PAYLOAD_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x50, 0x59, 0x4C, 0x64, -1)
-    val FILE_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x54, 0x45, 0x4D, -1, -2)
+    val PAYLOAD_HEADER = byteArrayOf(0, 0x70, 0x4C, 0x64) // \0pLd
+    val PAYLOAD_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x50, 0x59, 0x4C, 0x64, -1) // EndPYLd\xFF
+    val FILE_FOOTER = byteArrayOf(0x45, 0x6E, 0x64, 0x54, 0x45, 0x4D, -1, -2) // EndTEM with BOM
 
     //val NULL: Byte = 0
 

@@ -17,12 +17,21 @@ import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.ui.Notification
 import net.torvald.terrarum.modulebasegame.ui.UIPaletteSelector
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
+import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.serialise.WriteLayerDataZip.FILE_FOOTER
+import net.torvald.terrarum.serialise.WriteLayerDataZip.PAYLOAD_FOOTER
+import net.torvald.terrarum.serialise.WriteLayerDataZip.PAYLOAD_HEADER
+import net.torvald.terrarum.serialise.toLittle
+import net.torvald.terrarum.serialise.toLittleShort
+import net.torvald.terrarum.serialise.toULittle48
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UINSMenu
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
+import java.io.File
+import java.io.FileOutputStream
 
 /**
  * Created by minjaesong on 2018-07-06.
@@ -74,8 +83,15 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         println("[BuildingMaker] Generating builder world...")
 
+        for (y in 0 until gameWorld.height) {
+            gameWorld.setTileWall(0, y, Block.ILLUMINATOR_RED)
+            gameWorld.setTileWall(gameWorld.width - 1, y, Block.ILLUMINATOR_RED)
+            gameWorld.setTileTerrain(0, y, Block.ILLUMINATOR_RED_OFF)
+            gameWorld.setTileTerrain(gameWorld.width - 1, y, Block.ILLUMINATOR_RED_OFF)
+        }
+
         for (y in 150 until gameWorld.height) {
-            for (x in 0 until gameWorld.width) {
+            for (x in 1 until gameWorld.width - 1) {
                 // wall layer
                 gameWorld.setTileWall(x, y, Block.DIRT)
 
@@ -91,7 +107,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
 
-    override var actorNowPlaying: ActorHumanoid? = MovableWorldCamera()
+    override var actorNowPlaying: ActorHumanoid? = MovableWorldCamera(this)
 
     val uiToolbox = UINSMenu("Menu", 100, menuYaml)
     val notifier = Notification()
@@ -439,7 +455,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
         return selection.last() - selection.first()
     }
 
-    private fun serialiseSelection() {
+    private fun serialiseSelection(outfile: File) {
         // save format: sparse list encoded in following binary format:
         /*
         Header: TEaT0bLD -- magic: Terrarum Attachment
@@ -451,12 +467,37 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         The rest: payloads defined in the map data format
                   Payloads: array of (Int48 tileAddress, UInt16 blockID)
+                  Payload names: TerL, WalL, WirL for Terrain, Wall and Wire respectively
 
-        Footer: EndAtC \xFF\xFE -- magic: end of attachment with BOM
+        Footer: EndTEM \xFF\xFE -- magic: end of attachment with BOM
+
+        Endian: LITTLE
          */
         // proc:
         //   translate boxes so that leftmost point is (0,0)
         //   write to the list using translated coords
+
+        val payloads = arrayOf("WalL", "TerL", "WirL")
+
+        val selectionDim = getSelectionTotalDimension()
+        val fos = FileOutputStream(outfile)
+        // write header
+        fos.write("TEaT0bLD".toByteArray())
+        fos.write(byteArrayOf(1,3,3,1))
+        fos.write(selectionDim.x.toLittleShort())
+        // write wall -> terrain -> wire (order defined in GameWorld.TERRAIN/WALL/WIRE)
+        payloads.forEachIndexed { index, it ->
+            fos.write(PAYLOAD_HEADER); fos.write(it.toByteArray())
+            selection.forEach {
+                val tile = world.getTileFrom(index, it.x, it.y)!!
+                val addr = LandUtil.getBlockAddr(world, it.x - selectionDim.x, it.y - selectionDim.y)
+                fos.write(addr.toULittle48())
+                fos.write(tile.toLittle())
+            }
+            fos.write(PAYLOAD_FOOTER)
+        }
+        fos.write(FILE_FOOTER)
+        fos.close()
     }
 }
 
@@ -503,7 +544,7 @@ class BuildingMakerController(val screen: BuildingMaker) : InputAdapter() {
     }
 }
 
-class MovableWorldCamera : ActorHumanoid(0, usePhysics = false) {
+class MovableWorldCamera(val parent: BuildingMaker) : ActorHumanoid(0, usePhysics = false) {
 
     init {
         referenceID = Terrarum.PLAYER_REF_ID
@@ -520,6 +561,22 @@ class MovableWorldCamera : ActorHumanoid(0, usePhysics = false) {
         actorValue[AVKey.FRICTIONMULT] = 4.0
     }
 
+    // TODO resize-aware
+    private var coerceInStart = Point2d(
+            (Terrarum.WIDTH - hitbox.width) / 2.0,
+            (Terrarum.HEIGHT - hitbox.height) / 2.0
+    )
+    private var coerceInEnd = Point2d(
+            parent.world.width * TILE_SIZE - (Terrarum.WIDTH - hitbox.width) / 2.0,
+            parent.world.height * TILE_SIZE - (Terrarum.HEIGHT - hitbox.height) / 2.0
+    )
+
+    override fun update(delta: Float) {
+        super.update(delta)
+
+        // confine the camera so it won't wrap
+        this.hitbox.hitboxStart.setCoerceIn(coerceInStart, coerceInEnd)
+    }
 
     override fun drawBody(batch: SpriteBatch) {
     }

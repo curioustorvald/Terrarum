@@ -45,13 +45,13 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double, var suppress
     /**
      * @return bottom-centered point of hitbox.
      */
-    val canonicalY: Double
-        get() = hitboxEnd.y
+    inline val canonicalY: Double
+        get() = endY
 
     val endX: Double
-        get() = hitboxEnd.x
+        get() = hitboxStart.x + width
     val endY: Double
-        get() = hitboxEnd.y
+        get() = hitboxStart.y + height
 
     /**
      * Set to the point top left
@@ -131,10 +131,10 @@ class Hitbox(x1: Double, y1: Double, width: Double, height: Double, var suppress
         get() = hitboxStart.y
 
     val centeredX: Double
-        get() = (hitboxStart.x + hitboxEnd.x) * 0.5
+        get() = hitboxStart.x + width * 0.5
 
     val centeredY: Double
-        get() = (hitboxStart.y + hitboxEnd.y) * 0.5
+        get() = hitboxStart.y + height * 0.5
 
     infix fun intersects(position: Point2d) =
             (position.x >= startX && position.x <= startX + width) &&
