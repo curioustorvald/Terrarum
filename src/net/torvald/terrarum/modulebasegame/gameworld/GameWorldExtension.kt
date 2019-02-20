@@ -1,7 +1,7 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
-import net.torvald.terrarum.gameworld.*
-import net.torvald.terrarum.serialise.ReadLayerDataLzma
+import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.serialise.ReadLayerDataZip
 
 /**
  * Created by minjaesong on 2018-07-03.
@@ -9,7 +9,7 @@ import net.torvald.terrarum.serialise.ReadLayerDataLzma
 class GameWorldExtension: GameWorld {
 
     constructor(worldIndex: Int, width: Int, height: Int, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) : super(worldIndex, width, height, creationTIME_T, lastPlayTIME_T, totalPlayTime)
-    internal constructor(worldIndex: Int, layerData: ReadLayerDataLzma.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) : super(worldIndex, layerData, creationTIME_T, lastPlayTIME_T, totalPlayTime)
+    internal constructor(worldIndex: Int, layerData: ReadLayerDataZip.LayerData, creationTIME_T: Long, lastPlayTIME_T: Long, totalPlayTime: Int) : super(worldIndex, layerData, creationTIME_T, lastPlayTIME_T, totalPlayTime)
 
 
     val time: WorldTime

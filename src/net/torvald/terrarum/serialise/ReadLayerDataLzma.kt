@@ -20,7 +20,7 @@ internal object ReadLayerDataLzma {
 
     // FIXME TERRAIN DAMAGE UNTESTED
 
-    internal operator fun invoke(file: File): LayerData {
+    internal operator fun invoke(file: File): ReadLayerDataZip.LayerData {
         val inputStream = MarkableFileInputStream(FileInputStream(file))
 
 
@@ -185,7 +185,7 @@ internal object ReadLayerDataLzma {
         // TODO parse fluid(Types|Fills)
 
         
-        return LayerData(
+        return ReadLayerDataZip.LayerData(
                 MapLayer(width, height, payloadBytes["WALL_MSB"]!!),
                 MapLayer(width, height, payloadBytes["TERR_MSB"]!!),
                 MapLayer(width, height, payloadBytes["WIRE"]!!),
@@ -197,26 +197,6 @@ internal object ReadLayerDataLzma {
                 wallDamages, terrainDamages, fluidTypes, fluidFills
         )
     }
-
-    /**
-     * Immediately deployable, a part of the gameworld
-     */
-    internal data class LayerData(
-            val layerWall: MapLayer,
-            val layerTerrain: MapLayer,
-            val layerWire: MapLayer,
-            val layerWallLowBits: PairedMapLayer,
-            val layerTerrainLowBits: PairedMapLayer,
-            //val layerThermal: MapLayerHalfFloat, // in Kelvins
-            //val layerAirPressure: MapLayerHalfFloat, // (milibar - 1000)
-
-            val spawnX: Int,
-            val spawnY: Int,
-            val wallDamages: HashMap<BlockAddress, Float>,
-            val terrainDamages: HashMap<BlockAddress, Float>,
-            val fluidTypes: HashMap<BlockAddress, FluidType>,
-            val fluidFills: HashMap<BlockAddress, Float>
-    )
 
 	internal fun InputStream.readRelative(b: ByteArray, off: Int, len: Int): Int {
         if (b == null) {
