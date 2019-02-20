@@ -7,7 +7,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.Terrarum.gamepadLabelEast
+import net.torvald.terrarum.Terrarum.gamepadLabelLEFTRIGHT
+import net.torvald.terrarum.Terrarum.gamepadLabelLStick
+import net.torvald.terrarum.Terrarum.gamepadLabelNorth
+import net.torvald.terrarum.Terrarum.gamepadLabelRIGHT
+import net.torvald.terrarum.Terrarum.gamepadLabelRStick
 import net.torvald.terrarum.Terrarum.gamepadLabelStart
+import net.torvald.terrarum.Terrarum.gamepadLabelWest
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
@@ -59,20 +66,24 @@ class UIInventoryFull(
             "${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
         else
             "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
-            "${Terrarum.gamepadLabelLEFTRIGHT} ${"$ Section"}$SP" +
-            "${Terrarum.gamepadLabelWest} ${Lang["GAME_INVENTORY_USE"]}$SP" +
-            "${Terrarum.gamepadLabelNorth}${Terrarum.gamepadLabelLStick} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
-            "${Terrarum.gamepadLabelEast} ${Lang["GAME_INVENTORY_DROP"]}"
+            "$gamepadLabelLEFTRIGHT ${"$ Section"}$SP" +
+            "$gamepadLabelWest ${Lang["GAME_INVENTORY_USE"]}$SP" +
+            "$gamepadLabelNorth$gamepadLabelLStick ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
+            "$gamepadLabelEast ${Lang["GAME_INVENTORY_DROP"]}"
     val minimapControlHelp: String
         get() = if (AppLoader.environment == RunningEnvironment.PC)
-            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
+            "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "${0xe006.toChar()} ${Lang["GAME_ACTION_MOVE_VERB"]}"
         else
-            "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe06b.toChar()} ${Lang["GAME_INVENTORY"]}"
+            "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "$gamepadLabelRStick ${Lang["GAME_ACTION_MOVE_VERB"]}$SP" +
+            "$gamepadLabelRIGHT ${Lang["GAME_INVENTORY"]}"
     val gameMenuControlHelp: String
         get() = if (AppLoader.environment == RunningEnvironment.PC)
             "${0xe031.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"
         else
-            "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP${0xe068.toChar()} ${Lang["GAME_INVENTORY"]}"
+            "$gamepadLabelStart ${Lang["GAME_ACTION_CLOSE"]}$SP" +
+            "${0xe068.toChar()} ${Lang["GAME_INVENTORY"]}"
     val controlHelpHeight = Terrarum.fontGame.lineHeight
 
     private var encumbrancePerc = 0f
@@ -328,9 +339,21 @@ class UIInventoryFull(
     private val menuScrOffX: Float
         get() = (currentScreen) * Terrarum.WIDTH
 
+    private val MINIMAP_WIDTH = 800f
+    private val MINIMAP_HEIGHT = UIItemInventoryDynamicList.HEIGHT.toFloat()
+    private val MINIMAP_SKYCOL = Color(0x88bbddff.toInt())
+
     private fun renderScreenMinimap(batch: SpriteBatch, camera: Camera) {
-        // control hints
         blendNormal(batch)
+
+        // 1px stroke
+        batch.color = Color.WHITE
+        batch.fillRect(-1 + minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, -1 + itemList.posY.toFloat(), 2 + MINIMAP_WIDTH, 2 + MINIMAP_HEIGHT)
+        // sky background
+        batch.color = MINIMAP_SKYCOL
+        batch.fillRect(minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, itemList.posY.toFloat(), MINIMAP_WIDTH, MINIMAP_HEIGHT)
+
+        // control hints
         batch.color = Color.WHITE
         Terrarum.fontGame.draw(batch, minimapControlHelp, offsetX + minimapScrOffX, yEnd - 20)
     }
