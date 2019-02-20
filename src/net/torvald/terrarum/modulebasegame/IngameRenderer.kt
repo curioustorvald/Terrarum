@@ -31,6 +31,8 @@ object IngameRenderer {
     lateinit var batch: SpriteBatch
     private lateinit var camera: OrthographicCamera
 
+    private lateinit var blurWriteQuad: Mesh
+
     private lateinit var lightmapFboA: FrameBuffer
     private lateinit var lightmapFboB: FrameBuffer
     private lateinit var fboRGB: FrameBuffer
@@ -45,6 +47,7 @@ object IngameRenderer {
     private val shaderBlendGlow = Terrarum.shaderBlendGlow
     private val shaderRGBOnly = Terrarum.shaderRGBOnly
     private val shaderAtoGrey = Terrarum.shaderAtoGrey
+    private val shaderPassthru = SpriteBatch.createDefaultShader()
 
     private val width = Terrarum.WIDTH
     private val height = Terrarum.HEIGHT
@@ -490,44 +493,42 @@ object IngameRenderer {
 
         // initialise readBuffer with untreated lightmap
         blurReadBuffer.inAction(camera, batch) {
-            batch.inUse {
-                blendDisable(batch)
-                batch.color = Color.WHITE
-                LightmapRenderer.draw(batch)
-            }
+            val texture = LightmapRenderer.draw()
+            texture.bind(0)
+
+            shaderPassthru.begin()
+            shaderPassthru.setUniformMatrix("u_projTrans", camera.combined)
+            shaderPassthru.setUniformi("u_texture", 0)
+            blurWriteQuad.render(shaderPassthru, GL20.GL_TRIANGLES)
+            shaderPassthru.end()
         }
 
-
-
-
+        // do blurring
         for (i in 0 until blurIterations) {
             blurWriteBuffer.inAction(camera, batch) {
 
-                batch.inUse {
-                    val texture = blurReadBuffer.colorBufferTexture
+                val texture = blurReadBuffer.colorBufferTexture
+                texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+                texture.bind(0)
 
-                    texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-
-
-                    batch.shader = shaderBlur
-                    batch.shader.setUniformf("iResolution",
-                            blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())
-                    batch.shader.setUniformf("flip", 1f)
-                    if (i % 2 == 0)
-                        batch.shader.setUniformf("direction", blurRadius, 0f)
-                    else
-                        batch.shader.setUniformf("direction", 0f, blurRadius)
-
-
-                    batch.color = Color.WHITE
-                    batch.draw(texture, 0f, 0f)
+                shaderBlur.begin()
+                shaderBlur.setUniformMatrix("u_projTrans", camera.combined)
+                shaderBlur.setUniformi("u_texture", 0)
+                shaderBlur.setUniformf("iResolution",
+                        blurWriteBuffer.width.toFloat(), blurWriteBuffer.height.toFloat())
+                shaderBlur.setUniformf("flip", 1f)
+                if (i % 2 == 0)
+                    shaderBlur.setUniformf("direction", blurRadius, 0f)
+                else
+                    shaderBlur.setUniformf("direction", 0f, blurRadius)
+                blurWriteQuad.render(shaderBlur, GL20.GL_TRIANGLES)
+                shaderBlur.end()
 
 
-                    // swap
-                    val t = blurWriteBuffer
-                    blurWriteBuffer = blurReadBuffer
-                    blurReadBuffer = t
-                }
+                // swap
+                val t = blurWriteBuffer
+                blurWriteBuffer = blurReadBuffer
+                blurReadBuffer = t
             }
         }
 
@@ -540,6 +541,13 @@ object IngameRenderer {
 
     fun resize(width: Int, height: Int) {
         if (!init) {
+            blurWriteQuad = Mesh(
+                    true, 4, 6,
+                    VertexAttribute.Position(),
+                    VertexAttribute.ColorUnpacked(),
+                    VertexAttribute.TexCoords(0)
+            )
+
             init = true
         }
         else {
@@ -572,7 +580,13 @@ object IngameRenderer {
         LightmapRenderer.resize(width, height)
 
 
-        //LightmapRenderer.fireRecalculateEvent()
+        blurWriteQuad.setVertices(floatArrayOf(
+                0f,0f,0f, 1f,1f,1f,1f, 0f,1f,
+                lightmapFboA.width.toFloat(),0f,0f, 1f,1f,1f,1f, 1f,1f,
+                lightmapFboA.width.toFloat(),lightmapFboA.height.toFloat(),0f, 1f,1f,1f,1f, 1f,0f,
+                0f,lightmapFboA.height.toFloat(),0f, 1f,1f,1f,1f, 0f,0f))
+        blurWriteQuad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
+
     }
 
     private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()

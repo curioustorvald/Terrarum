@@ -252,7 +252,7 @@ public class AppLoader implements ApplicationListener {
 
     private static ShaderProgram shaderBayerSkyboxFill;
     public static ShaderProgram shaderHicolour;
-    public static ShaderProgram shaderPassthru;
+    public static ShaderProgram shaderPassthruRGB;
     public static ShaderProgram shaderColLUT;
 
     public static Mesh fullscreenQuad;
@@ -308,8 +308,8 @@ public class AppLoader implements ApplicationListener {
         // set GL graphics constants
         shaderBayerSkyboxFill = loadShader("assets/4096.vert", "assets/4096_bayer_skyboxfill.frag");
         shaderHicolour = loadShader("assets/4096.vert", "assets/hicolour.frag");
-        shaderPassthru = loadShader("assets/4096.vert", "assets/passthru.frag");
-        shaderColLUT = loadShader("assets/4096.vert", "assets/passthru.frag");
+        shaderPassthruRGB = loadShader("assets/4096.vert", "assets/passthrurgb.frag");
+        shaderColLUT = loadShader("assets/4096.vert", "assets/passthrurgb.frag");
 
         fullscreenQuad = new Mesh(
                 true, 4, 6,
@@ -513,7 +513,7 @@ public class AppLoader implements ApplicationListener {
 
         shaderBayerSkyboxFill.dispose();
         shaderHicolour.dispose();
-        shaderPassthru.dispose();
+        shaderPassthruRGB.dispose();
         shaderColLUT.dispose();
 
         assetManager.dispose();

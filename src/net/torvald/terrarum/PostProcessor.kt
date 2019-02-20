@@ -93,7 +93,7 @@ object PostProcessor {
                 if (AppLoader.getConfigBoolean("fxdither"))
                     AppLoader.shaderHicolour
                 else
-                    AppLoader.shaderPassthru
+                    AppLoader.shaderPassthruRGB
 
         fbo.colorBufferTexture.bind(0)
 
