@@ -122,20 +122,27 @@ object Terrarum : Screen {
     val fontGame: GameFontBase = AppLoader.fontGame
     val fontSmallNumbers: TinyAlphNum = AppLoader.fontSmallNumbers
 
-    var gamepadLabelStart: Char = 0xE000.toChar() // lateinit
-    var gamepadLableSelect: Char = 0xE000.toChar() // lateinit
-    var gamepadLabelNinA: Char = 0xE000.toChar() // lateinit TODO
-    var gamepadLabelNinB: Char = 0xE000.toChar() // lateinit TODO
-    var gamepadLabelNinX: Char = 0xE000.toChar() // lateinit TODO
-    var gamepadLabelNinY: Char = 0xE000.toChar() // lateinit TODO
-    var gamepadLabelNinL: Char = 0xE000.toChar() // lateinit TODO
-    var gamepadLabelNinR: Char = 0xE000.toChar() // lateinit TODO
-    var gamepadLabelNinZL: Char = 0xE000.toChar() // lateinit TODO
-    var gamepadLabelNinZR: Char = 0xE000.toChar() // lateinit TODO
+    var gamepadLabelStart = 0xE000.toChar() // lateinit
+    var gamepadLabelSelect = 0xE000.toChar() // lateinit
+    var gamepadLabelEast = 0xE000.toChar() // lateinit
+    var gamepadLabelSouth = 0xE000.toChar() // lateinit
+    var gamepadLabelNorth = 0xE000.toChar() // lateinit
+    var gamepadLabelWest = 0xE000.toChar() // lateinit
+    var gamepadLabelLB = 0xE000.toChar() // lateinit
+    var gamepadLabelRB = 0xE000.toChar() // lateinit
+    var gamepadLabelLT = 0xE000.toChar() // lateinit
+    var gamepadLabelRT = 0xE000.toChar() // lateinit
     val gamepadLabelLEFT = 0xE068.toChar()
     val gamepadLabelDOWN = 0xE069.toChar()
     val gamepadLabelUP = 0xE06A.toChar()
     val gamepadLabelRIGHT = 0xE06B.toChar()
+    val gamepadLabelUPDOWN = 0xE072.toChar()
+    val gamepadLabelLEFTRIGHT = 0xE071.toChar()
+    val gamepadLabelDPAD = 0xE070.toChar()
+    val gamepadLabelLStick = 0xE044.toChar()
+    val gamepadLabelRStick = 0xE045.toChar()
+    val gamepadLabelLStickPush = 0xE046.toChar()
+    val gamepadLabelRStickPush = 0xE047.toChar()
 
     // 0x0 - 0xF: Game-related
     // 0x10 - 0x1F: Config
@@ -208,21 +215,69 @@ object Terrarum : Screen {
         println("vendor = $processorVendor")
 
 
+        setGamepadButtonLabels()
+
+    }
+
+    private fun setGamepadButtonLabels() {
         gamepadLabelStart = when (getConfigString("gamepadlabelstyle")) {
             "nwii"     -> 0xE04B.toChar() // + mark
             "logitech" -> 0xE05A.toChar() // number 10
+            "msxbone"  -> 0xE049.toChar() // trifold equal sign?
             else       -> 0xE042.toChar() // |> mark (sonyps, msxb360, generic)
         }
-        gamepadLableSelect = when (getConfigString("gamepadlabelstyle")) {
+        gamepadLabelSelect = when (getConfigString("gamepadlabelstyle")) {
             "nwii"     -> 0xE04D.toChar() // - mark
             "logitech" -> 0xE059.toChar() // number 9
             "sonyps"   -> 0xE043.toChar() // solid rectangle
             "msxb360"  -> 0xE041.toChar() // <| mark
+            "msxbone"  -> 0xE048.toChar() // multitask button?
             else       -> 0xE043.toChar() // solid rectangle
         }
 
 
-
+        when (getConfigString("gamepadlabelstyle")) {
+            "msxb360", "msxbone" -> {
+                gamepadLabelSouth = 0xE061.toChar()
+                gamepadLabelEast = 0xE062.toChar()
+                gamepadLabelWest = 0xE078.toChar()
+                gamepadLabelNorth = 0xE079.toChar()
+                gamepadLabelLB = 0xE06D.toChar()
+                gamepadLabelRB = 0xE06E.toChar()
+                gamepadLabelLT = 0xE06C.toChar()
+                gamepadLabelRT = 0xE06F.toChar()
+            }
+            "nwii" -> {
+                gamepadLabelSouth = 0xE062.toChar()
+                gamepadLabelEast = 0xE061.toChar()
+                gamepadLabelWest = 0xE079.toChar()
+                gamepadLabelNorth = 0xE078.toChar()
+                gamepadLabelLB = 0xE065.toChar()
+                gamepadLabelRB = 0xE066.toChar()
+                gamepadLabelLT = 0xE064.toChar()
+                gamepadLabelRT = 0xE067.toChar()
+            }
+            "sonyps" -> {
+                gamepadLabelSouth = 0xE063.toChar()
+                gamepadLabelEast = 0xE050.toChar()
+                gamepadLabelWest = 0xE073.toChar()
+                gamepadLabelNorth = 0xE074.toChar()
+                gamepadLabelLB = 0xE07B.toChar()
+                gamepadLabelRB = 0xE07C.toChar()
+                gamepadLabelLT = 0xE07A.toChar()
+                gamepadLabelRT = 0xE07D.toChar()
+            }
+            "logitech" -> {
+                gamepadLabelSouth = 0xE052.toChar()
+                gamepadLabelEast = 0xE053.toChar()
+                gamepadLabelWest = 0xE051.toChar()
+                gamepadLabelNorth = 0xE054.toChar()
+                gamepadLabelLB = 0xE055.toChar()
+                gamepadLabelRB = 0xE056.toChar()
+                gamepadLabelLT = 0xE057.toChar()
+                gamepadLabelRT = 0xE058.toChar()
+            }
+        }
     }
 
 

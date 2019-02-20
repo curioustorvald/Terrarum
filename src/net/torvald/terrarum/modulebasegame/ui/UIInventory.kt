@@ -142,9 +142,9 @@ package net.torvald.terrarum.modulebasegame.ui
             "${0xe011.toChar()}..${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
             "${0xe034.toChar()} ${Lang["GAME_INVENTORY_DROP"]}"
     else
-            "$gamepadLabelNinY ${Lang["GAME_INVENTORY_USE"]}$SP" +
+            "$gamepadLabelWest ${Lang["GAME_INVENTORY_USE"]}$SP" +
             "${0xe011.toChar()}${0xe010.toChar()} ${Lang["GAME_INVENTORY_REGISTER"]}$SP" +
-            "$gamepadLabelNinA ${Lang["GAME_INVENTORY_DROP"]}"
+            "$gamepadLabelEast ${Lang["GAME_INVENTORY_DROP"]}"
     val listControlClose: String
         get() = if (Terrarum.environment == RunningEnvironment.PC)
             "${0xe037.toChar()} ${Lang["GAME_ACTION_CLOSE"]}"

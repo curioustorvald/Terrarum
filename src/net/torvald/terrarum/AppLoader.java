@@ -352,6 +352,16 @@ public class AppLoader implements ApplicationListener {
 
         if (gamepad != null) {
             environment = RunningEnvironment.CONSOLE;
+
+            // calibrate the sticks
+            /*float[] axesZeroPoints = new float[]{
+                    gamepad.getAxis(0),
+                    gamepad.getAxis(1),
+                    gamepad.getAxis(2),
+                    gamepad.getAxis(3)
+            };
+            setConfig("gamepadaxiszeropoints", axesZeroPoints);*/
+
         }
         else {
             environment = RunningEnvironment.PC;
@@ -840,7 +850,7 @@ public class AppLoader implements ApplicationListener {
     }
 
     public static void setConfig(String key, Object value) {
-        gameConfig.set(key, value);
+        gameConfig.set(key.toLowerCase(), value);
     }
 
 
