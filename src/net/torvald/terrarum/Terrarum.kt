@@ -295,7 +295,7 @@ object Terrarum : Screen {
             shaderSkyboxFill.end()
         }
         else {
-            shaderBayer = AppLoader.loadShader("assets/4096.vert", "assets/passthru.frag")
+            shaderBayer = AppLoader.loadShader("assets/4096.vert", "assets/passthrurgb.frag")
             shaderSkyboxFill = AppLoader.loadShader("assets/4096.vert", "assets/skyboxfill.frag")
         }
 

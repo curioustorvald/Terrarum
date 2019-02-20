@@ -1,11 +1,8 @@
 package net.torvald.terrarum.worlddrawer
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.jme3.math.FastMath
 import net.torvald.terrarum.*
@@ -559,7 +556,7 @@ object LightmapRenderer {
 
     private var _lightBufferAsTex: Texture = Texture(1, 1, Pixmap.Format.RGBA8888)
 
-    internal fun draw(batch: SpriteBatch) {
+    internal fun draw(): Texture {
 
         // when shader is not used: 0.5 ms on 6700K
         AppLoader.measureDebugTime("Renderer.LightToScreen") {
@@ -600,12 +597,14 @@ object LightmapRenderer {
             _lightBufferAsTex = Texture(lightBuffer)
             _lightBufferAsTex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
 
-
-            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
+            /*Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0) // so that batch that comes next will bind any tex to it
             //      we might not need shader here...
             //batch.draw(lightBufferAsTex, 0f, 0f, lightBufferAsTex.width.toFloat(), lightBufferAsTex.height.toFloat())
             batch.draw(_lightBufferAsTex, 0f, 0f, _lightBufferAsTex.width * DRAW_TILE_SIZE, _lightBufferAsTex.height * DRAW_TILE_SIZE)
+            */
         }
+
+        return _lightBufferAsTex
     }
 
     fun dispose() {
