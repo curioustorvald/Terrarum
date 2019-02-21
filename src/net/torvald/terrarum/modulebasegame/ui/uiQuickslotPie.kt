@@ -7,6 +7,7 @@ import com.jme3.math.FastMath
 import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.COMMON_OPEN_CLOSE
 import net.torvald.terrarum.modulebasegame.ui.UIQuickslotBar.Companion.SLOT_COUNT
@@ -62,7 +63,7 @@ class uiQuickslotPie : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         // draw radial thingies
         for (i in 0..slotCount - 1) {
-            val item = (Terrarum.ingame!! as Ingame).actorNowPlaying?.inventory?.getQuickslot(i)?.item
+            val item = ItemCodex[(Terrarum.ingame!! as Ingame).actorNowPlaying?.inventory?.getQuickslot(i)?.item]
 
             // set position
             val angle = Math.PI * 2.0 * (i.toDouble() / slotCount) + Math.PI // 180 deg monitor-wise

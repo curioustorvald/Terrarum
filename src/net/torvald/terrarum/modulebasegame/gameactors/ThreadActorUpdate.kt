@@ -2,6 +2,7 @@ package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.itemproperties.ItemCodex
 
 /**
  * Created by minjaesong on 2016-05-25.
@@ -14,9 +15,9 @@ class ThreadActorUpdate(val startIndex: Int, val endIndex: Int) : Runnable {
 
             if (it is Pocketed) {
                 it.inventory.forEach { inventoryEntry ->
-                    inventoryEntry.item.effectWhileInPocket(AppLoader.UPDATE_RATE.toFloat())
+                    ItemCodex[inventoryEntry.item]?.effectWhileInPocket(AppLoader.UPDATE_RATE.toFloat())
                     if (it.equipped(inventoryEntry.item)) {
-                        inventoryEntry.item.effectWhenEquipped(AppLoader.UPDATE_RATE.toFloat())
+                        ItemCodex[inventoryEntry.item]?.effectWhenEquipped(AppLoader.UPDATE_RATE.toFloat())
                     }
                 }
             }

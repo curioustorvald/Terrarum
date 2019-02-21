@@ -12,6 +12,7 @@ import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
@@ -66,10 +67,10 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
 
                 itemOnGrip?.let {
                     if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary"))) {
-                        player.consumePrimary(it)
+                        player.consumePrimary(ItemCodex[it]!!)
                     }
                     if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mousesecondary"))) {
-                        player.consumeSecondary(it)
+                        player.consumeSecondary(ItemCodex[it]!!)
                     }
                 }
             }

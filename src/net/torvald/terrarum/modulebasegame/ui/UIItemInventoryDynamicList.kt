@@ -316,20 +316,20 @@ class UIItemInventoryDynamicList(
 
         // filter items
         inventory.forEach {
-            if (it.item.inventoryCategory == filter || filter == "__all__")
+            if (ItemCodex[it.item]!!.inventoryCategory == filter || filter == "__all__")
                 inventorySortList.add(it)
         }
 
         // sort if needed
         // test sort by name
-        inventorySortList.sortBy { it.item.name }
+        inventorySortList.sortBy { ItemCodex[it.item]!!.name }
 
         // map sortList to item list
         for (k in 0 until items.size) {
             // we have an item
             try {
                 val sortListItem = inventorySortList[k + itemPage * items.size]
-                items[k].item = sortListItem.item
+                items[k].item = ItemCodex[sortListItem.item]
                 items[k].amount = sortListItem.amount
                 items[k].itemImage = ItemCodex.getItemImage(sortListItem.item)
 
@@ -346,7 +346,7 @@ class UIItemInventoryDynamicList(
                 // set equippedslot number
                 for (eq in 0 until inventory.itemEquipped.size) {
                     if (eq < inventory.itemEquipped.size) {
-                        if (inventory.itemEquipped[eq] == items[k].item) {
+                        if (inventory.itemEquipped[eq] == items[k].item?.dynamicID) {
                             items[k].equippedSlot = eq
                             break
                         }

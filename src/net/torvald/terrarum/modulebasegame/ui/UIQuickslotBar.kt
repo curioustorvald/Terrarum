@@ -7,6 +7,7 @@ import net.torvald.terrarum.Second
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameworld.fmod
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.ui.UICanvas
 
@@ -46,7 +47,7 @@ class UIQuickslotBar : UICanvas() {
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
 
         for (i in 0..SLOT_COUNT - 1) {
-            val item = (Terrarum.ingame!! as Ingame).actorNowPlaying?.inventory?.getQuickslot(i)?.item
+            val item = ItemCodex[(Terrarum.ingame!! as Ingame).actorNowPlaying?.inventory?.getQuickslot(i)?.item]
 
             val image = if (i == selection)
                 ItemSlotImageFactory.produceLarge(false, (i + 1) % SLOT_COUNT, item)

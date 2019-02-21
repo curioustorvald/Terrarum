@@ -4,6 +4,7 @@ import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.itemproperties.ItemID
 
 /**
  * Created by minjaesong on 2016-01-15.
@@ -31,6 +32,12 @@ interface Pocketed {
         item.effectOnUnequip(AppLoader.UPDATE_RATE.toFloat())
     }
 
+    fun unequipItem(itemID: ItemID?) {
+        itemID?.let {
+            unequipItem(ItemCodex[itemID])
+        } ?: return
+    }
+
     // no need for equipSlot(Int)
     fun unequipSlot(slot: Int) {
         if (slot < 0 || slot > GameItem.EquipPosition.INDEX_MAX)
@@ -49,19 +56,24 @@ interface Pocketed {
         }
 
         if (item.equipPosition >= 0) {
-            inventory.itemEquipped[item.equipPosition] = item
+            inventory.itemEquipped[item.equipPosition] = item.dynamicID
             item.effectWhenEquipped(AppLoader.UPDATE_RATE.toFloat())
         }
         // else do nothing
     }
 
-    fun equipped(item: GameItem): Boolean {
-        return inventory.itemEquipped[item.equipPosition] == item
+    fun equipItem(itemID: ItemID) {
+        equipItem(ItemCodex[itemID]!!)
     }
 
-    fun addItem(itemID: Int, count: Int = 1) = inventory.add(ItemCodex[itemID], count)
+    fun equipped(item: GameItem): Boolean {
+        return inventory.itemEquipped[item.equipPosition] == item.dynamicID
+    }
+    fun equipped(itemID: ItemID) = equipped(ItemCodex[itemID]!!)
+
+    fun addItem(itemID: Int, count: Int = 1) = inventory.add(ItemCodex[itemID]!!, count)
     fun addItem(item: GameItem, count: Int = 1) = inventory.add(item, count)
-    fun removeItem(itemID: Int, count: Int = 1) = inventory.remove(ItemCodex[itemID], count)
+    fun removeItem(itemID: Int, count: Int = 1) = inventory.remove(ItemCodex[itemID]!!, count)
     fun removeItem(item: GameItem, count: Int = 1) = inventory.remove(item, count)
 
     fun hasItem(item: GameItem) = inventory.contains(item.dynamicID)

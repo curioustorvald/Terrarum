@@ -9,6 +9,7 @@ import net.torvald.terrarum.gameactors.*
 import net.torvald.terrarum.gameactors.faction.Faction
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameworld.time_t
@@ -208,10 +209,10 @@ open class ActorHumanoid(
         // update inventory items
         inventory.forEach {
             if (!inventory.itemEquipped.contains(it.item)) { // unequipped
-                it.item.effectWhileInPocket(delta)
+                ItemCodex[it.item]!!.effectWhileInPocket(delta)
             }
             else { // equipped
-                it.item.effectWhenEquipped(delta)
+                ItemCodex[it.item]!!.effectWhenEquipped(delta)
             }
         }
     }
@@ -590,7 +591,7 @@ open class ActorHumanoid(
         // quickslot implementation
         if (key == AVKey.__PLAYER_QUICKSLOTSEL && value != null) {
             // ONLY FOR HAND_GRIPs!!
-            val quickBarItem = inventory.getQuickslot(actorValue.getAsInt(key)!!)?.item
+            val quickBarItem = ItemCodex[inventory.getQuickslot(actorValue.getAsInt(key)!!)?.item]
 
             if (quickBarItem != null && quickBarItem.equipPosition == GameItem.EquipPosition.HAND_GRIP) {
                 equipItem(quickBarItem)

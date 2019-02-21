@@ -1,7 +1,8 @@
 package net.torvald.terrarum.modulebasegame.ui
 
-import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 
 /**
  * Created by minjaesong on 2017-04-21.
@@ -9,7 +10,7 @@ import net.torvald.terrarum.itemproperties.GameItem
 object AmmoMeterProxy {
 
     operator fun invoke(actor: ActorHumanoid, meter: UIVitalMetre) {
-        val currentItem = actor.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]
+        val currentItem = ItemCodex[actor.inventory.itemEquipped[GameItem.EquipPosition.HAND_GRIP]]
 
         if (currentItem == null) {
             meter.vitalGetterMax = { null }
