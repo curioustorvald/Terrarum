@@ -1,11 +1,9 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.realestate.LandUtil
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
@@ -48,14 +46,16 @@ internal object WriteLayerDataZip {
 
 
     /**
-     * TODO currently it'll dump the temporary file (tmp_worldinfo1) onto the disk and will return the temp file.
+     * @param world The world to serialise
+     * @param path The directory where the temporary file goes, in relative to the AppLoader.defaultSaveDir. Should NOT start with slashed
      *
      * @return File on success; `null` on failure
      */
-    internal operator fun invoke(): File? {
-        val world = (Terrarum.ingame!!.world)
+    internal operator fun invoke(world: GameWorld): ByteArray64? {
+        //val sanitisedPath = path.replace('\\', '/').removePrefix("/").replace("../", "")
 
-        val path = "${AppLoader.defaultSaveDir}/tmp_$LAYERS_FILENAME${world.worldIndex}"
+        //val path = "${AppLoader.defaultSaveDir}/$sanitisedPath/tmp_$LAYERS_FILENAME${world.worldIndex}"
+        //val path = "${AppLoader.defaultSaveDir}/tmp_$LAYERS_FILENAME${world.worldIndex}"
 
         // TODO let's try dump-on-the-disk-then-pack method...
 
@@ -69,11 +69,12 @@ internal object WriteLayerDataZip {
         }*/
 
 
-        val outFile = File(path)
-        if (outFile.exists()) outFile.delete()
-        outFile.createNewFile()
+        //val outFile = File(path)
+        //if (outFile.exists()) outFile.delete()
+        //outFile.createNewFile()
 
-        val outputStream = BufferedOutputStream(FileOutputStream(outFile), 8192)
+        //val outputStream = BufferedOutputStream(FileOutputStream(outFile), 8192)
+        val outputStream = ByteArray64GrowableOutputStream()
         var deflater: DeflaterOutputStream // couldn't really use one outputstream for all the files.
 
         fun wb(byteArray: ByteArray) { outputStream.write(byteArray) }
@@ -196,15 +197,12 @@ internal object WriteLayerDataZip {
         // END OF WRITE //
         //////////////////
 
-
-
-        // replace savemeta with tempfile
         try {
             outputStream.flush()
             outputStream.close()
 
 
-            return outFile
+            return outputStream.toByteArray64()
         }
         catch (e: IOException) {
             e.printStackTrace()

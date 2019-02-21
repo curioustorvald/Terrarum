@@ -42,7 +42,6 @@ class EntryPoint : ModuleEntryPoint() {
                 override val isUnique: Boolean = false
                 override var baseMass: Double = BlockCodex[i].density / 1000.0
                 override var baseToolSize: Double? = null
-                override var equipPosition = EquipPosition.HAND_GRIP
                 override val originalName = BlockCodex[i % ItemCodex.ITEM_WALLS.first].nameKey
                 override var stackable = true
                 override var inventoryCategory = if (i in ItemCodex.ITEM_TILES) Category.BLOCK else Category.WALL
@@ -50,6 +49,8 @@ class EntryPoint : ModuleEntryPoint() {
                 override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
 
                 init {
+                    equipPosition = EquipPosition.HAND_GRIP
+
                     if (IS_DEVELOPMENT_BUILD)
                         print("$originalID ")
                 }
@@ -61,7 +62,7 @@ class EntryPoint : ModuleEntryPoint() {
 
                     // check for collision with actors (BLOCK only)
                     if (this.inventoryCategory == Category.BLOCK) {
-                        ingame.actorContainer.forEach {
+                        ingame.actorContainerActive.forEach {
                             if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
                                 return false
                         }

@@ -153,7 +153,7 @@ open class ActorHumanoid(
         get() = if (Terrarum.ingame == null) false else this == Terrarum.ingame!!.actorNowPlaying
 
 
-    private val nullItem = object : GameItem() {
+    @Transient private val nullItem = object : GameItem() {
         override var dynamicID: Int = 0
         override val originalID = dynamicID
         override val isUnique: Boolean = false

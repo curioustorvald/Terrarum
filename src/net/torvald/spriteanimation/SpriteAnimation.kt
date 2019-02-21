@@ -11,7 +11,10 @@ import net.torvald.terrarum.Second
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
-class SpriteAnimation(val parentActor: ActorWBMovable) {
+/**
+ * This class should not be serialised; save its Animation Description Language instead.
+ */
+class SpriteAnimation(@Transient val parentActor: ActorWBMovable) {
 
     lateinit var textureRegion: TextureRegionPack; private set
 

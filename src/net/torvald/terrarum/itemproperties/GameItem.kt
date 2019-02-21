@@ -74,9 +74,11 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
     abstract val isDynamic: Boolean
 
     /**
-     * Where to equip the item
+     * Where to equip the item.
+     *
+     * Can't use 'open val' as GSON don't like that
      */
-    open val equipPosition: Int = EquipPosition.NULL
+    var equipPosition: Int = EquipPosition.NULL
 
     abstract val material: Material
 
@@ -273,6 +275,7 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
 
     fun generateUniqueDynamicID(inventory: ActorInventory): GameItem {
         dynamicID = GameItem.generateUniqueDynamicID(inventory)
+        ItemCodex.registerNewDynamicItem(dynamicID, this)
         return this
     }
 
@@ -285,6 +288,7 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
             do {
                 ret = ITEM_DYNAMIC.pickRandom()
             } while (inventory.contains(ret))
+
             return ret
         }
     }

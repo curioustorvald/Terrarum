@@ -2,7 +2,8 @@ package net.torvald.terrarum.itemproperties
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import net.torvald.terrarum.KVHashMap
+import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameworld.GameWorld
@@ -21,7 +22,7 @@ object ItemCodex {
      * Will return corresponding Actor if ID >= ACTORID_MIN
      */
     val itemCodex = HashMap<ItemID, GameItem>()
-    private val dynamicItemDescription = HashMap<ItemID, KVHashMap>()
+    val dynamicItemDescription = HashMap<ItemID, GameItem>()
 
     val ITEM_TILES = 0..GameWorld.TILES_SUPPORTED - 1
     val ITEM_WALLS = GameWorld.TILES_SUPPORTED..GameWorld.TILES_SUPPORTED * 2 - 1
@@ -73,7 +74,7 @@ object ItemCodex {
 
                     // check for collision with actors (BLOCK only)
                     if (this.inventoryCategory == Category.BLOCK) {
-                        ingame.actorContainer.forEach {
+                        ingame.actorContainerActive.forEach {
                             if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
                                 return false
                         }
@@ -141,7 +142,7 @@ object ItemCodex {
 
                 // linear search filter (check for intersection with tilewise mouse point and tilewise hitbox)
                 // return false if hitting actors
-                ingame.actorContainer.forEach {
+                ingame.actorContainerActive.forEach {
                     if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
                         return false
                 }
@@ -188,7 +189,9 @@ object ItemCodex {
             override val isDynamic: Boolean = false
             override val material: Material = Material(1,1,1,1,1,1,1,1,1,1.0)
 
-            override val equipPosition: Int = EquipPosition.HAND_GRIP
+            init {
+                equipPosition = EquipPosition.HAND_GRIP
+            }
 
             override fun startPrimaryUse(delta: Float): Boolean {
                 val ingame = Terrarum.ingame!! as Ingame // must be in here
@@ -215,7 +218,9 @@ object ItemCodex {
             override val isDynamic: Boolean = false
             override val material: Material = Material(1,1,1,1,1,1,1,1,1,1.0)
 
-            override val equipPosition: Int = EquipPosition.HAND_GRIP
+            init {
+                equipPosition = EquipPosition.HAND_GRIP
+            }
 
             override fun startPrimaryUse(delta: Float): Boolean {
                 val ingame = Terrarum.ingame!! as Ingame // must be in here
@@ -232,14 +237,22 @@ object ItemCodex {
         println()
     }
 
+    fun registerNewDynamicItem(dynamicID: Int, item: GameItem) {
+        if (AppLoader.IS_DEVELOPMENT_BUILD) {
+            printdbg(this, "Registering new dynamic item $dynamicID (from ${item.originalID})")
+        }
+        dynamicItemDescription[dynamicID] = item
+    }
+
     /**
-     * Returns clone of the item in the Codex
+     * Returns the item in the Codex. If the item is static, its clone will be returned (you are free to modify the returned item).
+     * However, if the item is dynamic, the item itself will be returned. Modifying the item will affect the game.
      */
     operator fun get(code: ItemID): GameItem {
         if (code <= ITEM_STATIC.endInclusive) // generic item
             return itemCodex[code]!!.clone() // from CSV
         else if (code <= ITEM_DYNAMIC.endInclusive) {
-            TODO("read from dynamicitem description (JSON)")
+            return itemCodex[code]!!
         }
         else {
             val a = (Terrarum.ingame!! as Ingame).getActorByID(code) // actor item

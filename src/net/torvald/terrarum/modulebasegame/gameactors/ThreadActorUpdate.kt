@@ -9,7 +9,7 @@ import net.torvald.terrarum.Terrarum
 class ThreadActorUpdate(val startIndex: Int, val endIndex: Int) : Runnable {
     override fun run() {
         for (i in startIndex..endIndex) {
-            val it = Terrarum.ingame!!.actorContainer[i]
+            val it = Terrarum.ingame!!.actorContainerActive[i]
             it.update(AppLoader.UPDATE_RATE.toFloat())
 
             if (it is Pocketed) {

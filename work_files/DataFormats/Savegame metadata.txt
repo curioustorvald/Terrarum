@@ -14,25 +14,28 @@ Ord  Hex  Description
 05   03   Number of hashes
 
 06        Name of the world in UTF-8 (arbitrary length, must not contain NULL)
-...  00   String terminator
+n-1  00   String terminator
 
-...       Terrain seed (8 bytes)
-...       Randomiser s0 (8 bytes)
-...       Randomiser s1 (8 bytes)
-...       Weather s0 (8 bytes)
-...       Weather s1 (8 bytes)
+(Ord is now offset from n)
 
-...       ReferenceID of the player (4 bytes, a fixed value of 91A7E2)
-...       Current world's time_t (the ingame time, 8 bytes)
+00        Terrain seed (8 bytes)
+08        Randomiser s0 (8 bytes)
+10        Randomiser s1 (8 bytes)
+18        Weather s0 (8 bytes)
+20        Weather s1 (8 bytes)
 
-...       Creation time in time_t (6 bytes)
-...       Last play time in time_t (6 bytes)
-...       Total playtime in time_t (4 bytes)    // will record 136.1 years of playtime
+28        ReferenceID of the player (4 bytes, a fixed value of 91A7E2)
+2C        Current world's time_t (the ingame time, 8 bytes)
 
-...       SHA-256 hash of worldinfo1 (32 bytes)
-...       SHA-256 hash of worldinfo2 (32 bytes)
-...       SHA-256 hash of worldinfo3 (32 bytes)
+34        Creation time in time_t (6 bytes)
+3A        Last play time in time_t (6 bytes)
+40        Total playtime in time_t (4 bytes)    // will record 136.1 years of playtime
 
-...       Gzipped thumbnail image in TGA format
+44        SHA-256 hash of worldinfo1 (32 bytes)
+72        SHA-256 hash of worldinfo2 (32 bytes)
+A4        SHA-256 hash of worldinfo3 (32 bytes)
+
+D6        Compressed size (2 bytes)
+D8        Gzipped thumbnail image in TGA format
           (it's gzipped so that it saves faster, so no Lzma)
 

@@ -39,7 +39,7 @@ object CollisionSolver {
         collCandidateY.clear()
 
         // mark list x
-        (Terrarum.ingame!! as Ingame).actorContainer.forEach { it ->
+        (Terrarum.ingame!! as Ingame).actorContainerActive.forEach { it ->
             if (it is ActorWBMovable) {
                 collListX.add(CollisionMarkings(it.hitbox.hitboxStart.x, STARTPOINT, it))
                 collListX.add(CollisionMarkings(it.hitbox.hitboxEnd.x, ENDPOINT, it))
@@ -72,7 +72,7 @@ object CollisionSolver {
         collCandidateStack.clear()
 
         // mark list y
-        (Terrarum.ingame!! as Ingame).actorContainer.forEach { it ->
+        (Terrarum.ingame!! as Ingame).actorContainerActive.forEach { it ->
             if (it is ActorWBMovable) {
                 collListY.add(CollisionMarkings(it.hitbox.hitboxStart.y, STARTPOINT, it))
                 collListY.add(CollisionMarkings(it.hitbox.hitboxEnd.y, ENDPOINT, it))

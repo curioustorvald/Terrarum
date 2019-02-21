@@ -1,12 +1,8 @@
 package net.torvald.terrarum
 
-import com.badlogic.gdx.utils.Json
-import com.badlogic.gdx.utils.JsonValue
 import com.google.gson.Gson
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import kotlin.collections.HashMap
 
 typealias ItemValue = KVHashMap
 
@@ -116,6 +112,7 @@ open class KVHashMap : GsonSerialisable {
     }
 
     override fun read(gson: JsonObject) {
+        TODO()
     }
 
     override fun write(targetGson: JsonObject) {

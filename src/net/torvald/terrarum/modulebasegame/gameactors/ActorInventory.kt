@@ -20,13 +20,15 @@ import java.util.concurrent.locks.ReentrantLock
  * Created by minjaesong on 2016-03-15.
  */
 
-class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode: Int) {
+class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var capacityMode: Int) {
 
     companion object {
-        @Transient val CAPACITY_MODE_NO_ENCUMBER = 0
-        @Transient val CAPACITY_MODE_COUNT = 1
-        @Transient val CAPACITY_MODE_WEIGHT = 2
+        val CAPACITY_MODE_NO_ENCUMBER = 0
+        val CAPACITY_MODE_COUNT = 1
+        val CAPACITY_MODE_WEIGHT = 2
     }
+
+    // FIXME unless absolutely necessary, don't store full item object; only store its dynamicID
 
     /**
      * List of all equipped items (tools, armours, rings, necklaces, etc.)
@@ -265,8 +267,8 @@ class ActorInventory(val actor: Pocketed, var maxCapacity: Int, var capacityMode
             arr[j + 1] = x
         }
     }
-    private val STATIC_ID = 41324534
-    private val DYNAMIC_ID = 181643953
+    @Transient private val STATIC_ID = 41324534
+    @Transient private val DYNAMIC_ID = 181643953
     private fun ArrayList<InventoryPair>.binarySearch(ID: ItemID, searchBy: Int): Int {
         // code from collections/Collections.kt
         var low = 0
