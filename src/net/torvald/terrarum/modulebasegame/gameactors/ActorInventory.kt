@@ -33,7 +33,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
     /**
      * List of all equipped items (tools, armours, rings, necklaces, etc.)
      */
-    val itemEquipped = Array<GameItem?>(GameItem.EquipPosition.INDEX_MAX) { null }
+    val itemEquipped = Array<ItemID?>(GameItem.EquipPosition.INDEX_MAX) { null }
 
     /**
      * Sorted by referenceID.
@@ -46,7 +46,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
     init {
     }
 
-    fun add(itemID: ItemID, count: Int = 1) = add(ItemCodex[itemID], count)
+    fun add(itemID: ItemID, count: Int = 1) = add(ItemCodex[itemID]!!, count)
     fun add(item: GameItem, count: Int = 1) {
 
         println("[ActorInventory] add $item, $count")
@@ -86,12 +86,12 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
         }
         // new item
         else {
-            itemList.add(InventoryPair(item, count))
+            itemList.add(InventoryPair(item.dynamicID, count))
         }
         insertionSortLastElem(itemList)
     }
 
-    fun remove(itemID: ItemID, count: Int) = remove(ItemCodex[itemID], count)
+    fun remove(itemID: ItemID, count: Int) = remove(ItemCodex[itemID]!!, count)
     /** Will check existence of the item using its Dynamic ID; careful with command order!
      *      e.g. re-assign after this operation */
     fun remove(item: GameItem, count: Int = 1) {
@@ -152,7 +152,7 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
         else
             getTotalCount().toDouble()
 
-    fun getTotalWeight(): Double = itemList.map { it.item.mass * it.amount }.sum()
+    fun getTotalWeight(): Double = itemList.map { ItemCodex[it.item]!!.mass * it.amount }.sum()
 
     /**
      * Real amount
@@ -277,7 +277,10 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
         while (low <= high) {
             val mid = (low + high).ushr(1) // safe from overflows
 
-            val midVal = if (searchBy == STATIC_ID) this.get(mid).item.originalID else this.get(mid).item.dynamicID
+            val midVal = if (searchBy == STATIC_ID)
+                ItemCodex[this[mid].item]!!.originalID
+            else
+                ItemCodex[this[mid].item]!!.dynamicID
 
             if (ID > midVal)
                 low = mid + 1
@@ -290,4 +293,4 @@ class ActorInventory(@Transient val actor: Pocketed, var maxCapacity: Int, var c
     }
 }
 
-data class InventoryPair(val item: GameItem, var amount: Int)
+data class InventoryPair(val item: ItemID, var amount: Int)

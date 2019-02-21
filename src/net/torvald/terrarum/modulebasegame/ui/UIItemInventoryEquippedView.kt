@@ -132,9 +132,9 @@ class UIItemInventoryEquippedView(
                 itemGrid[k].equippedSlot = null
             }
             else {
-                val itemRecord = inventory.getByDynamicID(item.dynamicID)!!
+                val itemRecord = inventory.getByDynamicID(item)!!
 
-                itemGrid[k].item = item
+                itemGrid[k].item = ItemCodex[item]
                 itemGrid[k].amount = itemRecord.amount
                 itemGrid[k].itemImage = ItemCodex.getItemImage(item)
                 itemGrid[k].quickslot = null // don't need to be displayed

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
@@ -137,7 +138,7 @@ class UIItemInventoryElemSimple(
 
             inventory.setQuickBar(
                     slot,
-                    if (currentSlotItem?.item != item)
+                    if (currentSlotItem?.item != item?.dynamicID)
                         item?.dynamicID // register
                     else
                         null // drop registration
@@ -146,7 +147,7 @@ class UIItemInventoryElemSimple(
             // search for duplicates in the quickbar, except mine
             // if there is, unregister the other
             (0..9).minus(slot).forEach {
-                if (inventory.getQuickslot(it)?.item == item) {
+                if (inventory.getQuickslot(it)?.item == item?.dynamicID) {
                     inventory.setQuickBar(it, null)
                 }
             }
@@ -165,7 +166,7 @@ class UIItemInventoryElemSimple(
             val player = (Terrarum.ingame!! as Ingame).actorNowPlaying
             if (player == null) return false
 
-            if (item != player.inventory.itemEquipped.get(itemEquipSlot)) { // if this item is unequipped, equip it
+            if (item != ItemCodex[player.inventory.itemEquipped.get(itemEquipSlot)]) { // if this item is unequipped, equip it
                 player.equipItem(item!!)
             }
             else { // if not, unequip it

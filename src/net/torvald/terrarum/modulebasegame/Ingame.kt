@@ -17,6 +17,7 @@ import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.console.AVTracker
 import net.torvald.terrarum.modulebasegame.console.ActorsList
 import net.torvald.terrarum.modulebasegame.gameactors.*
@@ -392,22 +393,22 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     override fun worldPrimaryClickStart(delta: Float) {
         val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
-        itemOnGrip?.startPrimaryUse(delta)
+        ItemCodex[itemOnGrip]?.startPrimaryUse(delta)
     }
 
     override fun worldPrimaryClickEnd(delta: Float) {
         val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
-        itemOnGrip?.endPrimaryUse(delta)
+        ItemCodex[itemOnGrip]?.endPrimaryUse(delta)
     }
 
     override fun worldSecondaryClickStart(delta: Float) {
         val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
-        itemOnGrip?.startSecondaryUse(delta)
+        ItemCodex[itemOnGrip]?.startSecondaryUse(delta)
     }
 
     override fun worldSecondaryClickEnd(delta: Float) {
         val itemOnGrip = actorNowPlaying?.inventory?.itemEquipped?.get(GameItem.EquipPosition.HAND_GRIP)
-        itemOnGrip?.endSecondaryUse(delta)
+        ItemCodex[itemOnGrip]?.endSecondaryUse(delta)
     }
 
 
@@ -671,9 +672,9 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
                     if (it is Pocketed) {
                         it.inventory.forEach { inventoryEntry ->
-                            inventoryEntry.item.effectWhileInPocket(delta)
+                            ItemCodex[inventoryEntry.item]!!.effectWhileInPocket(delta)
                             if (it.equipped(inventoryEntry.item)) {
-                                inventoryEntry.item.effectWhenEquipped(delta)
+                                ItemCodex[inventoryEntry.item]!!.effectWhenEquipped(delta)
                             }
                         }
                     }

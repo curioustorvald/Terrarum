@@ -248,17 +248,20 @@ object ItemCodex {
      * Returns the item in the Codex. If the item is static, its clone will be returned (you are free to modify the returned item).
      * However, if the item is dynamic, the item itself will be returned. Modifying the item will affect the game.
      */
-    operator fun get(code: ItemID): GameItem {
+    operator fun get(code: ItemID?): GameItem? {
+        if (code == null) return null
+
         if (code <= ITEM_STATIC.endInclusive) // generic item
             return itemCodex[code]!!.clone() // from CSV
         else if (code <= ITEM_DYNAMIC.endInclusive) {
-            return itemCodex[code]!!
+            return dynamicItemDescription[code]!!
         }
         else {
             val a = (Terrarum.ingame!! as Ingame).getActorByID(code) // actor item
             if (a is CanBeAnItem) return a.itemData
 
-            throw IllegalArgumentException("Attempted to get item data of actor that cannot be an item. ($a)")
+            return null
+            //throw IllegalArgumentException("Attempted to get item data of actor that cannot be an item. ($a)")
         }
     }
 

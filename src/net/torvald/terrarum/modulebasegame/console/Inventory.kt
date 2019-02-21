@@ -4,9 +4,9 @@ import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.modulebasegame.gameactors.Pocketed
 
 /**
  * Created by minjaesong on 2016-12-12.
@@ -39,7 +39,7 @@ internal object Inventory : ConsoleCommand {
             else {
                 target!!.inventory.forEach { val (item, amount) = it
                     if (amount == 0) {
-                        EchoError("Unexpected zero-amounted item: ID ${item.dynamicID}")
+                        EchoError("Unexpected zero-amounted item: ID $item")
                     }
                     Echo("ID $item${if (amount > 1) " ($amount)" else ""}")
                 }
@@ -59,13 +59,13 @@ internal object Inventory : ConsoleCommand {
 
     private fun addItem(refId: Int, amount: Int = 1) {
         if (target != null) {
-            target!!.addItem(ItemCodex[refId], amount)
+            target!!.addItem(ItemCodex[refId]!!, amount)
         }
     }
 
     private fun equipItem(refId: Int) {
         if (target != null) {
-            val item = ItemCodex[refId]
+            val item = ItemCodex[refId]!!
             target!!.equipItem(item)
         }
     }

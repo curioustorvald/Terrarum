@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.colourutil.CIELabUtil.darkerLab
 import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.ui.UIInventoryFull
 import net.torvald.terrarum.modulebasegame.ui.UIItemInventoryCellBase
@@ -147,12 +148,12 @@ class UIItemInventoryElem(
 
             val inventory = player.inventory
             val slot = if (keycode == Input.Keys.NUM_0) 9 else keycode - Input.Keys.NUM_1
-            val currentSlotItem = inventory?.getQuickslot(slot)
+            val currentSlotItem = inventory.getQuickslot(slot)
 
 
             inventory.setQuickBar(
                     slot,
-                    if (currentSlotItem?.item != item)
+                    if (currentSlotItem?.item != item?.dynamicID)
                         item?.dynamicID // register
                     else
                         null // drop registration
@@ -161,7 +162,7 @@ class UIItemInventoryElem(
             // search for duplicates in the quickbar, except mine
             // if there is, unregister the other
             (0..9).minus(slot).forEach {
-                if (inventory.getQuickslot(it)?.item == item) {
+                if (inventory.getQuickslot(it)?.item == item?.dynamicID) {
                     inventory.setQuickBar(it, null)
                 }
             }
@@ -183,7 +184,7 @@ class UIItemInventoryElem(
 
             if (player == null) return false
 
-            if (item != player.inventory.itemEquipped.get(itemEquipSlot)) { // if this item is unequipped, equip it
+            if (item != ItemCodex[player.inventory.itemEquipped.get(itemEquipSlot)]) { // if this item is unequipped, equip it
                 player.equipItem(item!!)
             }
             else { // if not, unequip it

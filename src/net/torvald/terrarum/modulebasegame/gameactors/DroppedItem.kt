@@ -1,10 +1,10 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import net.torvald.terrarum.itemproperties.GameItem
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.itemproperties.ItemCodex
 
 /**
  * Created by minjaesong on 2016-03-15.
@@ -20,9 +20,9 @@ open class DroppedItem(private val item: GameItem) : ActorWBMovable(RenderOrder.
         avBaseMass = if (item.dynamicID < BlockCodex.MAX_TERRAIN_TILES)
             BlockCodex[item.dynamicID].density / 1000.0
         else
-            ItemCodex[item.dynamicID].mass
+            ItemCodex[item.dynamicID]!!.mass
 
-        scale = ItemCodex[item.dynamicID].scale
+        scale = ItemCodex[item.dynamicID]!!.scale
     }
 
     override fun update(delta: Float) {
