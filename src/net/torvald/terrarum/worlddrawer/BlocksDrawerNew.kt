@@ -866,7 +866,7 @@ internal object BlocksDrawer {
     fun dispose() {
         printdbg(this, "dispose called by")
         Thread.currentThread().stackTrace.forEach {
-            printdbg(this, it)
+            printdbg(this, "--> $it")
         }
 
         weatherTerrains.forEach { it.dispose() }

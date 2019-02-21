@@ -1,7 +1,5 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
-import net.torvald.terrarum.gameactors.Controllable
-
 /**
  * A wrapper to support instant player changing (or possessing other NPCs maybe)
  *
@@ -9,7 +7,7 @@ import net.torvald.terrarum.gameactors.Controllable
  * Created by minjaesong on 2016-10-23.
  */
 @Deprecated("The ingame should discriminate 'theRealGamer' and 'actorNowPlaying'")
-class PlayableActorDelegate(val actor: ActorHumanoid) {
+class PlayableActorDelegate(@Transient val actor: ActorHumanoid) {
 
     /*init {
         if (actor !is Controllable)

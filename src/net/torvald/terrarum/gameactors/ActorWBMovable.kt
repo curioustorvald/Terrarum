@@ -32,7 +32,7 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         ActorWithBody(renderOrder) {
 
 
-    val COLLISION_TEST_MODE = false
+    @Transient val COLLISION_TEST_MODE = false
 
     /* !! ActorValue macros are on the very bottom of the source !! */
 
@@ -1155,15 +1155,15 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         }
     }*/
 
-    private inline val submergedRatio: Double
+    private val submergedRatio: Double
         get() {
             if (hitbox.height == 0.0) throw RuntimeException("Hitbox.height is zero")
             return submergedHeight / hitbox.height
         }
-    private inline val submergedVolume: Double
+    private val submergedVolume: Double
         get() = submergedHeight * hitbox.width * hitbox.width
 
-    private inline val submergedHeight: Double
+    private val submergedHeight: Double
         get() = Math.max(
                 getContactingAreaFluid(COLLIDING_LEFT),
                 getContactingAreaFluid(COLLIDING_RIGHT)

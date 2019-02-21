@@ -228,9 +228,9 @@ class BasicDebugInfoWindow : UICanvas() {
          */
 
         if (ingame != null) {
-            Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${ingame!!.actorContainer.size + ingame!!.actorContainerInactive.size}",
+            Terrarum.fontSmallNumbers.draw(batch, "${ccY}Actors total $ccG${ingame!!.actorContainerActive.size + ingame!!.actorContainerInactive.size}",
                     2f, Terrarum.HEIGHT - 10f)
-            Terrarum.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${ingame!!.actorContainer.size}",
+            Terrarum.fontSmallNumbers.draw(batch, "${ccY}Active $ccG${ingame!!.actorContainerActive.size}",
                     (2 + 17 * 8).toFloat(), Terrarum.HEIGHT - 10f)
             Terrarum.fontSmallNumbers.draw(batch, "${ccY}Dormant $ccG${ingame!!.actorContainerInactive.size}",
                     (2 + 28 * 8).toFloat(), Terrarum.HEIGHT - 10f)

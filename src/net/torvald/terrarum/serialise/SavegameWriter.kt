@@ -1,11 +1,15 @@
 package net.torvald.terrarum.serialise
 
+import com.badlogic.gdx.Gdx
+import com.google.gson.Gson
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskEntry
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.DiskSkimmer
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VirtualDisk
+import net.torvald.terrarum.gameactors.AVKey
+import net.torvald.terrarum.gameactors.Actor
+import net.torvald.terrarum.itemproperties.GameItem
+import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
+import net.torvald.terrarum.roundInt
 import java.io.File
 import java.nio.charset.Charset
 
@@ -18,43 +22,116 @@ object SavegameWriter {
 
     private val charset = Charset.forName("UTF-8")
 
+    private lateinit var playerName: String
+
     operator fun invoke(): Boolean {
-        val diskImage = generateDiskImage(null)
+        playerName = "${Terrarum.ingame!!.actorGamer!!.actorValue[AVKey.NAME]}"
+        if (playerName.isEmpty()) playerName = "Test subject ${Math.random().times(0x7FFFFFFF).roundInt()}"
+
+        try {
+            val diskImage = generateNewDiskImage()
+            val outFile = File("${AppLoader.defaultSaveDir}/$playerName")
+            VDUtil.dumpToRealMachine(diskImage, outFile)
+
+            return true
+        }
+        catch (e: Throwable) {
+            e.printStackTrace()
+        }
 
         return false
     }
 
 
-    private fun generateDiskImage(oldDiskFile: File?): VirtualDisk {
-        val disk = VDUtil.createNewDisk(0x7FFFFFFFFFFFFFFFL, "TerrarumSave", charset)
-        val oldDiskSkimmer = oldDiskFile?.let { DiskSkimmer(oldDiskFile) }
-
-        val ROOT = disk.root.entryID
+    fun generateNewDiskImage(): VirtualDisk {
+        val creationDate = System.currentTimeMillis() / 1000L
         val ingame = Terrarum.ingame!!
         val gameworld = ingame.world
+        val player = ingame.actorGamer!!
+        val disk = VDUtil.createNewDisk(0x7FFFFFFFFFFFFFFFL, "Tesv-$playerName", charset)
+        val ROOT = disk.root.entryID
 
         // serialise current world (stage)
-        val world = WriteLayerDataZip() // filename can be anything that is "tmp_world[n]" where [n] is any number
-        val worldFile = VDUtil.importFile(world!!, gameworld.worldIndex, charset)
+
+        val worldBytes = WriteLayerDataZip(gameworld) // filename can be anything that is "world[n]" where [n] is any number
+        if (worldBytes == null) {
+            throw Error("Serialising world failed")
+        }
 
         // add current world (stage) to the disk
-        VDUtil.addFile(disk, ROOT, worldFile)
+        VDUtil.registerFile(disk, DiskEntry(
+                gameworld.worldIndex, ROOT,
+                "world${gameworld.worldIndex}".toByteArray(charset),
+                creationDate, creationDate,
+                EntryFile(worldBytes)
+        ))
 
-        // put other worlds (stages) to the disk (without loading whole oldDiskFile onto the disk)
-        oldDiskSkimmer?.let {
-            // skim-and-write other worlds
-            for (c in 1..ingame.gameworldCount) {
-                if (c != gameworld.worldIndex) {
-                    val oldWorldFile = oldDiskSkimmer.requestFile(c)
-                    VDUtil.addFile(disk, ROOT, oldWorldFile!!)
-                }
-            }
-        }
+
 
         // TODO world[n] is done, needs whole other things
 
 
+        // worldinfo0..3
+        val worldinfoBytes = WriteWorldInfo(gameworld)
+        worldinfoBytes?.forEachIndexed { index, bytes ->
+            VDUtil.registerFile(disk, DiskEntry(
+                    32766 - index, ROOT, "worldinfo$index".toByteArray(charset),
+                    creationDate, creationDate,
+                    EntryFile(bytes)
+            ))
+        } ?: throw Error("Serialising worldinfo failed")
+
+        // loadorder.txt
+        VDUtil.registerFile(disk, DiskEntry(
+                32767, ROOT, "load_order.txt".toByteArray(charset),
+                creationDate, creationDate,
+                EntryFile(ByteArray64.fromByteArray(Gdx.files.internal("./assets/mods/LoadOrder.csv").readBytes()))
+        ))
+
+        // actors
+        ingame.actorContainerActive.forEach {
+            VDUtil.registerFile(disk, DiskEntry(
+                    gameworld.worldIndex, ROOT,
+                    it.referenceID!!.toString(16).toUpperCase().toByteArray(charset),
+                    creationDate, creationDate,
+                    EntryFile(serialiseActor(it))
+            ))
+        }
+        ingame.actorContainerInactive.forEach {
+            VDUtil.registerFile(disk, DiskEntry(
+                    gameworld.worldIndex, ROOT,
+                    it.referenceID!!.toString(16).toUpperCase().toByteArray(charset),
+                    creationDate, creationDate,
+                    EntryFile(serialiseActor(it))
+            ))
+        }
+
+        // items
+        ItemCodex.dynamicItemDescription.forEach { dynamicID, item ->
+            VDUtil.registerFile(disk, DiskEntry(
+                    gameworld.worldIndex, ROOT,
+                    dynamicID.toString(16).toUpperCase().toByteArray(charset),
+                    creationDate, creationDate,
+                    EntryFile(serialiseItem(item))
+            ))
+        }
+
+        System.gc()
 
         return disk
+    }
+
+    fun modifyExistingSave(savefile: File): VirtualDisk {
+        TODO()
+    }
+
+    private fun serialiseActor(a: Actor): ByteArray64 {
+        val gson = Gson().toJsonTree(a).toString().toByteArray(charset)
+        return ByteArray64.fromByteArray(gson)
+    }
+
+    private fun serialiseItem(i: GameItem): ByteArray64 {
+        val gson = Gson().toJsonTree(i).toString().toByteArray(charset)
+        return ByteArray64.fromByteArray(gson)
     }
 }

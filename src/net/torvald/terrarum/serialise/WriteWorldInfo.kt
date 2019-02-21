@@ -1,16 +1,15 @@
 package net.torvald.terrarum.serialise
 
-import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
+import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64InputStream
 import org.apache.commons.codec.digest.DigestUtils
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 
 object WriteWorldInfo {
 
@@ -23,12 +22,11 @@ object WriteWorldInfo {
     /**
      * TODO currently it'll dump the temporary file (tmp_worldinfo1) onto the disk and will return the temp file.
      *
-     * @return File on success; `null` on failure
+     * @return List of ByteArray64, worldinfo0..worldinfo3; `null` on failure
      */
-    internal operator fun invoke(): List<File>? {
-        val world = (Terrarum.ingame!!.world)
+    internal operator fun invoke(world: GameWorld): List<ByteArray64>? {
 
-        val path = "${AppLoader.defaultSaveDir}/tmp_worldinfo"
+        //val path = "${AppLoader.defaultSaveDir}/tmp_worldinfo"
 
         val infileList = arrayOf(
                 ModMgr.getGdxFilesFromEveryMod("blocks/blocks.csv"),
@@ -36,40 +34,34 @@ object WriteWorldInfo {
                 ModMgr.getGdxFilesFromEveryMod("materials/materials.csv")
         )
 
-        val metaFile = File(path + "0")
-
-        val outFiles = ArrayList<File>()
-        outFiles.add(metaFile)
-
+        val outFiles = ArrayList<ByteArray64>() // for worldinfo1-3 only
         val worldInfoHash = ArrayList<ByteArray>() // hash of worldinfo1-3
         // try to write worldinfo1-3
 
         for (filenum in 1..HASHED_FILES_COUNT) {
-            val outFile = File(path + filenum.toString())
-            if (outFile.exists()) outFile.delete()
-            outFile.createNewFile()
-
-            val outputStream = BufferedOutputStream(FileOutputStream(outFile), 256)
+            val outputStream = ByteArray64GrowableOutputStream()
             val infile = infileList[filenum - 1]
 
             infile.forEach {
+                outputStream.write("## from file: ${it.nameWithoutExtension()} ##############################\n".toByteArray())
                 val readBytes = it.readBytes()
                 outputStream.write(readBytes)
+                outputStream.write("\n".toByteArray())
             }
 
             outputStream.flush()
             outputStream.close()
 
 
-            outFiles.add(outFile)
+            outFiles.add(outputStream.toByteArray64())
 
 
-            worldInfoHash.add(DigestUtils.sha256(FileInputStream(outFile)))
+            worldInfoHash.add(DigestUtils.sha256(ByteArray64InputStream(outputStream.toByteArray64())))
         }
 
 
         // compose save meta (actual writing part)
-        val metaOut = BufferedOutputStream(FileOutputStream(metaFile), 256)
+        val metaOut = ByteArray64GrowableOutputStream()
 
 
         metaOut.write(META_MAGIC)
@@ -78,8 +70,11 @@ object WriteWorldInfo {
 
         // world name
         val worldNameBytes = world.worldName.toByteArray(Charsets.UTF_8)
-        metaOut.write(worldNameBytes)
-        if (worldNameBytes.last() != NULL) metaOut.write(NULL.toInt())
+        //metaOut.write(worldNameBytes)
+        worldNameBytes.forEach {
+            if (it != 0.toByte()) metaOut.write(it.toInt())
+        }
+        metaOut.write(NULL.toInt())
 
         // terrain seed
         metaOut.write(world.generatorSeed.toLittle())
@@ -125,7 +120,7 @@ object WriteWorldInfo {
 
 
 
-        return outFiles.toList()
+        return listOf(metaOut.toByteArray64()) + outFiles.toList()
     }
 
 }

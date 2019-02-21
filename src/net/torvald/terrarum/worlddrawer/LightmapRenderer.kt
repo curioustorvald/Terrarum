@@ -241,7 +241,7 @@ object LightmapRendererOld {
     private fun buildLanternmap() {
         lanternMap.clear()
         Terrarum.ingame?.let {
-            it.actorContainer.forEach { it ->
+            it.actorContainerActive.forEach { it ->
                 if (it is Luminous && it is ActorWBMovable) {
                     // put lanterns to the area the luminantBox is occupying
                     for (lightBox in it.lightBoxList) {

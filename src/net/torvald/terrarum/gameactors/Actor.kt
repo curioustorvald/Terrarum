@@ -35,7 +35,7 @@ abstract class Actor(val renderOrder: RenderOrder) : Comparable<Actor>, Runnable
      * @return Reference ID. (16777216-0x7FFF_FFFF)
      */
     open var referenceID: ActorID? = null
-    var actorValue = ActorValue(this)
+    var actorValue = ActorValue(this) // FIXME cyclic reference on GSON
     @Volatile var flagDespawn = false
 
     override fun equals(other: Any?): Boolean {

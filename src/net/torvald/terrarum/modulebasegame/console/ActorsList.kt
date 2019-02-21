@@ -15,7 +15,7 @@ internal object ActorsList : ConsoleCommand {
 
     override fun execute(args: Array<String>) {
         jPanelInstances.add(ActorsLister(
-                (Terrarum.ingame!! as Ingame).actorContainer,
+                (Terrarum.ingame!! as Ingame).actorContainerActive,
                 (Terrarum.ingame!! as Ingame).actorContainerInactive)
         )
     }

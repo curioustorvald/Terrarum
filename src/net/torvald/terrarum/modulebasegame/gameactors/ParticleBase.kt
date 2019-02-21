@@ -31,8 +31,8 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
     private val lifetimeMax = maxLifeTime ?: 5f
     private var lifetimeCounter = 0f
 
-    open val velocity = Vector2(0.0, 0.0)
-    open val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
+    val velocity = Vector2(0.0, 0.0)
+    val hitbox = Hitbox(0.0, 0.0, 0.0, 0.0)
 
     open lateinit var body: TextureRegion // you might want to use SpriteAnimation
     open var glow: TextureRegion? = null
@@ -61,7 +61,7 @@ open class ParticleBase(renderOrder: Actor.RenderOrder, val despawnUponCollision
 
             // gravity, winds, etc. (external forces)
             if (!isNoSubjectToGrav) {
-                velocity += (Terrarum.ingame!!.world).gravitation / dragCoefficient
+                velocity.plusAssign((Terrarum.ingame!!.world).gravitation / dragCoefficient)
             }
 
 

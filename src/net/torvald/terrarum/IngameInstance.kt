@@ -31,11 +31,15 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
      *
      *  Most of the time it'd be the "player", but think about the case where you have possessed
      *  some random actor of the game. Now that actor is now actorNowPlaying, the actual gamer's avatar
-     *  (reference ID of 0x91A7E2) (must) stay in the actorContainer, but it's not a actorNowPlaying.
+     *  (reference ID of 0x91A7E2) (must) stay in the actorContainerActive, but it's not a actorNowPlaying.
      *
      *  Nullability of this property is believed to be unavoidable (trust me!). I'm sorry for the inconvenience.
      */
     open var actorNowPlaying: ActorHumanoid? = null
+    /**
+     * The actual gamer
+     */
+    open var actorGamer: ActorHumanoid? = null
 
     open var gameInitialised = false
         internal set
@@ -43,7 +47,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
         internal set
 
     val ACTORCONTAINER_INITIAL_SIZE = 64
-    val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
+    val actorContainerActive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
 
     protected val terrainChangeQueue = Queue<BlockChangeQueueItem>()
@@ -135,10 +139,10 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     ///////////////////////
 
     fun getActorByID(ID: Int): Actor {
-        if (actorContainer.size == 0 && actorContainerInactive.size == 0)
+        if (actorContainerActive.size == 0 && actorContainerInactive.size == 0)
             throw IllegalArgumentException("Actor with ID $ID does not exist.")
 
-        var index = actorContainer.binarySearch(ID)
+        var index = actorContainerActive.binarySearch(ID)
         if (index < 0) {
             index = actorContainerInactive.binarySearch(ID)
 
@@ -154,7 +158,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
                 return actorContainerInactive[index]
         }
         else
-            return actorContainer[index]
+            return actorContainerActive[index]
     }
 
     fun ArrayList<*>.binarySearch(actor: Actor) = this.binarySearch(actor.referenceID!!)
@@ -191,9 +195,9 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     open fun removeActor(actor: Actor?) {
         if (actor == null) return
 
-        val indexToDelete = actorContainer.binarySearch(actor.referenceID!!)
+        val indexToDelete = actorContainerActive.binarySearch(actor.referenceID!!)
         if (indexToDelete >= 0) {
-            actorContainer.removeAt(indexToDelete)
+            actorContainerActive.removeAt(indexToDelete)
         }
     }
 
@@ -207,16 +211,16 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
             throw Error("The actor $actor already exists in the game")
         }
         else {
-            actorContainer.add(actor)
-            insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
+            actorContainerActive.add(actor)
+            insertionSortLastElem(actorContainerActive) // we can do this as we are only adding single actor
         }
     }
 
     fun isActive(ID: Int): Boolean =
-            if (actorContainer.size == 0)
+            if (actorContainerActive.size == 0)
                 false
             else
-                actorContainer.binarySearch(ID) >= 0
+                actorContainerActive.binarySearch(ID) >= 0
 
     fun isInactive(ID: Int): Boolean =
             if (actorContainerInactive.size == 0)
@@ -225,7 +229,7 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
                 actorContainerInactive.binarySearch(ID) >= 0
 
     /**
-     * actorContainer extensions
+     * actorContainerActive extensions
      */
     fun theGameHasActor(actor: Actor?) = if (actor == null) false else theGameHasActor(actor.referenceID!!)
 

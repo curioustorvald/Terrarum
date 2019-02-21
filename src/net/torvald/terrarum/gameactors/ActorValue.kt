@@ -5,7 +5,7 @@ import net.torvald.terrarum.KVHashMap
 /**
  * Created by minjaesong on 2017-04-28.
  */
-class ActorValue(val actor: Actor) : KVHashMap() {
+class ActorValue(@Transient val actor: Actor) : KVHashMap() {
 
     private constructor(actor: Actor, newMap: HashMap<String, Any>): this(actor) {
         hashMap = newMap

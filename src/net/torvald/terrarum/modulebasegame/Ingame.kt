@@ -52,7 +52,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      */
     //val ACTORCONTAINER_INITIAL_SIZE = 64
     val PARTICLES_MAX = AppLoader.getConfigInt("maxparticles")
-    //val actorContainer = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
+    //val actorContainerActive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     //val actorContainerInactive = ArrayList<Actor>(ACTORCONTAINER_INITIAL_SIZE)
     val particlesContainer = CircularArray<ParticleBase>(PARTICLES_MAX)
     val uiContainer = ArrayList<UICanvas>()
@@ -155,6 +155,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     lateinit var gameLoadInfoPayload: Any
     lateinit var gameworld: GameWorldExtension
     lateinit var theRealGamer: IngamePlayer
+
+    override var actorGamer: ActorHumanoid?
+        get() = theRealGamer
+        set(value) {
+            throw UnsupportedOperationException()
+        }
 
     enum class GameLoadMode {
         CREATE_NEW, LOAD_FROM
@@ -611,10 +617,10 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      * if the actor is not to be dormant, it will be just ignored.
      */
     fun KillOrKnockdownActors() {
-        var actorContainerSize = actorContainer.size
+        var actorContainerSize = actorContainerActive.size
         var i = 0
-        while (i < actorContainerSize) { // loop through actorContainer
-            val actor = actorContainer[i]
+        while (i < actorContainerSize) { // loop through actorContainerActive
+            val actor = actorContainerActive[i]
             val actorIndex = i
             // kill actors flagged to despawn
             if (actor.flagDespawn) {
@@ -627,7 +633,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
                 if (actor !is Projectile) { // if it's a projectile, don't inactivate it; just kill it.
                     actorContainerInactive.add(actor) // naïve add; duplicates are checked when the actor is re-activated
                 }
-                actorContainer.removeAt(actorIndex)
+                actorContainerActive.removeAt(actorIndex)
                 actorContainerSize -= 1
                 i-- // array removed 1 elem, so we also decrement counter by 1
             }
@@ -641,8 +647,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
      * NOTE: concurrency for actor updating is currently disabled because of it's poor performance
      */
     fun updateActors(delta: Float) {
-        if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD && actorContainer.size > Terrarum.THREADS) {
-            val actors = actorContainer.size.toFloat()
+        if (false) { // don't multithread this for now, it's SLOWER //if (Terrarum.MULTITHREAD && actorContainerActive.size > Terrarum.THREADS) {
+            val actors = actorContainerActive.size.toFloat()
             // set up indices
             for (i in 0..Terrarum.THREADS - 1) {
                 ThreadParallel.map(
@@ -659,7 +665,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             actorNowPlaying?.update(delta)
         }
         else {
-            actorContainer.forEach {
+            actorContainerActive.forEach {
                 if (it != actorNowPlaying) {
                     it.update(delta)
 
@@ -736,12 +742,12 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
         if (actor.referenceID == theRealGamer.referenceID || actor.referenceID == 0x51621D) // do not delete this magic
             throw RuntimeException("Attempted to remove player.")
-        val indexToDelete = actorContainer.binarySearch(actor.referenceID!!)
+        val indexToDelete = actorContainerActive.binarySearch(actor.referenceID!!)
         if (indexToDelete >= 0) {
             printdbg(this, "Removing actor $actor")
             printStackTrace()
 
-            actorContainer.removeAt(indexToDelete)
+            actorContainerActive.removeAt(indexToDelete)
 
             // indexToDelete >= 0 means that the actor certainly exists in the game
             // which means we don't need to check if i >= 0 again
@@ -785,8 +791,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             printdbg(this, "Adding actor $actor")
             printStackTrace()
 
-            actorContainer.add(actor)
-            insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
+            actorContainerActive.add(actor)
+            insertionSortLastElem(actorContainerActive) // we can do this as we are only adding single actor
 
             if (actor is ActorWithBody) {
                 when (actor.renderOrder) {
@@ -819,8 +825,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         }
         else {
             actorContainerInactive.remove(actor)
-            actorContainer.add(actor)
-            insertionSortLastElem(actorContainer) // we can do this as we are only adding single actor
+            actorContainerActive.add(actor)
+            insertionSortLastElem(actorContainerActive) // we can do this as we are only adding single actor
 
             if (actor is ActorWithBody) {
                 when (actor.renderOrder) {
@@ -959,7 +965,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
     private fun printStackTrace() {
         Thread.currentThread().getStackTrace().forEach {
-            printdbg(this, "->   $it")
+            printdbg(this, "--> $it")
         }
     }
 

@@ -2,6 +2,7 @@
 package net.torvald.terrarum.gameworld
 
 import com.badlogic.gdx.graphics.Color
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockproperties.BlockCodex
@@ -17,7 +18,19 @@ typealias BlockAddress = Long
 open class GameWorld {
 
     var worldName: String = "New World"
+    /** Index start at 1 */
     var worldIndex: Int
+        set(value) {
+            if (value <= 0)
+                throw Error("World index start at 1; you entered $value")
+
+            printdbg(this, "Creation of new world with index $value, called by:")
+            Thread.currentThread().stackTrace.forEach {
+                printdbg(this, "--> $it")
+            }
+
+            field = value
+        }
     val width: Int
     val height: Int
 
@@ -451,7 +464,7 @@ open class GameWorld {
         @Transient val SIZEOF: Byte = MapLayer.SIZEOF
         @Transient val LAYERS: Byte = 4 // terrain, wall (layerTerrainLowBits + layerWallLowBits), wire
 
-        fun makeNullWorld() = GameWorld(-1, 1, 1, 0, 0, 0)
+        fun makeNullWorld() = GameWorld(1, 1, 1, 0, 0, 0)
     }
 }
 

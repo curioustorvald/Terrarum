@@ -1,15 +1,12 @@
 package net.torvald.terrarum.modulecomputers.virtualcomputer.luaapi
 
-import org.luaj.vm2.*
-import org.luaj.vm2.lib.OneArgFunction
-import org.luaj.vm2.lib.TwoArgFunction
-import org.luaj.vm2.lib.ZeroArgFunction
 import net.torvald.terrarum.modulecomputers.virtualcomputer.luaapi.Term.Companion.checkIBM437
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
-import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.VDUtil.VDPath
-
-import java.io.*
+import org.luaj.vm2.Globals
+import org.luaj.vm2.LuaError
+import org.luaj.vm2.LuaValue
+import java.io.IOException
 import java.nio.charset.Charset
 import java.util.*
 
@@ -27,7 +24,7 @@ import java.util.*
  */
 internal class Filesystem(globals: Globals, computer: net.torvald.terrarum.modulecomputers.virtualcomputer.computer.TerrarumComputer) {
 
-    init {
+    /*init {
         // load things. WARNING: THIS IS MANUAL!
         globals["fs"] = LuaValue.tableOf()
         globals["fs"]["list"] = ListFiles(computer) // CC compliant
@@ -45,7 +42,7 @@ internal class Filesystem(globals: Globals, computer: net.torvald.terrarum.modul
         globals["fs"]["parent"] = GetParentDir(computer)
         // fs.dofile defined in BOOT
         // fs.fetchText defined in ROMLIB
-    }
+    }*/
 
     companion object {
         val sysCharset = Charset.forName("CP437")
@@ -135,6 +132,8 @@ internal class Filesystem(globals: Globals, computer: net.torvald.terrarum.modul
             }
         }
     } // end of Companion Object
+
+    /*
 
     /**
      * @param cname == UUID of the drive
@@ -509,5 +508,5 @@ internal class Filesystem(globals: Globals, computer: net.torvald.terrarum.modul
             return if (scanner.hasNextLine()) LuaValue.valueOf(scanner.nextLine())
                    else LuaValue.NIL
         }
-    }
+    }*/
 }
