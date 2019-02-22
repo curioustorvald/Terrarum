@@ -1,11 +1,11 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import com.google.gson.GsonBuilder
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.serialise.SavegameWriter
 import java.io.BufferedWriter
 import java.io.FileWriter
 import java.io.IOException
@@ -17,18 +17,7 @@ internal object GsonTest : ConsoleCommand {
     override fun execute(args: Array<String>) {
         if (args.size == 2) {
 
-            val jsonBuilder = if (AppLoader.IS_DEVELOPMENT_BUILD) {
-                GsonBuilder()
-                        .setPrettyPrinting()
-
-                        .serializeNulls()
-                        .create()
-            }
-            else {
-                GsonBuilder()
-                        .serializeNulls()
-                        .create()
-            }
+            val jsonBuilder = SavegameWriter.getJsonBuilder()
 
 
             val jsonString = jsonBuilder.toJson((Terrarum.ingame!! as Ingame).actorNowPlaying)
