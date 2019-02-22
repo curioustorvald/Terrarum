@@ -4,7 +4,6 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.realestate.LandUtil
-import java.io.IOException
 import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
 
@@ -99,11 +98,12 @@ internal object WriteLayerDataZip {
         wi48(LandUtil.getBlockAddr(world, world.spawnX, world.spawnY))
 
         // write payloads //
-        outputStream.flush()
 
         // TERR payload
         // PRO Debug tip: every deflated bytes must begin with 0x789C or 0x78DA
         // Thus, \0pLd + [10] must be either of these.
+
+        // TODO serialised payloads have bit too much zeros, should I be worried?
 
         wb(PAYLOAD_HEADER); wb("TERR".toByteArray())
         wi48(world.width * world.height * 3L / 2)
@@ -187,8 +187,6 @@ internal object WriteLayerDataZip {
         wb(PAYLOAD_FOOTER)
 
 
-
-
         // write footer
         wb(FILE_FOOTER)
 
@@ -197,21 +195,10 @@ internal object WriteLayerDataZip {
         // END OF WRITE //
         //////////////////
 
-        try {
-            outputStream.flush()
-            outputStream.close()
+        outputStream.flush()
+        outputStream.close()
 
-
-            return outputStream.toByteArray64()
-        }
-        catch (e: IOException) {
-            e.printStackTrace()
-        }
-        finally {
-            outputStream.close()
-        }
-
-        return null
+        return outputStream.toByteArray64()
     }
 
 

@@ -1,7 +1,7 @@
 package net.torvald.terrarum.serialise
 
 import com.badlogic.gdx.Gdx
-import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
@@ -24,8 +24,8 @@ object SavegameWriter {
 
     private lateinit var playerName: String
 
-    operator fun invoke(): Boolean {
-        playerName = "${Terrarum.ingame!!.actorGamer!!.actorValue[AVKey.NAME]}"
+    operator fun invoke(pnameOverride: String? = null): Boolean {
+        playerName = pnameOverride ?: "${Terrarum.ingame!!.actorGamer!!.actorValue[AVKey.NAME]}"
         if (playerName.isEmpty()) playerName = "Test subject ${Math.random().times(0x7FFFFFFF).roundInt()}"
 
         try {
@@ -56,6 +56,14 @@ object SavegameWriter {
         val worldBytes = WriteLayerDataZip(gameworld) // filename can be anything that is "world[n]" where [n] is any number
         if (worldBytes == null) {
             throw Error("Serialising world failed")
+        }
+
+        if (!worldBytes.sliceArray(0..3).contentEquals(WriteLayerDataZip.MAGIC)) {
+            worldBytes.forEach {
+                print(it.toUInt().and(255u).toString(16).toUpperCase().padStart(2, '0'))
+                print(' ')
+            }; println()
+            throw Error()
         }
 
         // add current world (stage) to the disk
@@ -91,7 +99,7 @@ object SavegameWriter {
         // actors
         ingame.actorContainerActive.forEach {
             VDUtil.registerFile(disk, DiskEntry(
-                    gameworld.worldIndex, ROOT,
+                    it.referenceID!!, ROOT,
                     it.referenceID!!.toString(16).toUpperCase().toByteArray(charset),
                     creationDate, creationDate,
                     EntryFile(serialiseActor(it))
@@ -99,7 +107,7 @@ object SavegameWriter {
         }
         ingame.actorContainerInactive.forEach {
             VDUtil.registerFile(disk, DiskEntry(
-                    gameworld.worldIndex, ROOT,
+                    it.referenceID!!, ROOT,
                     it.referenceID!!.toString(16).toUpperCase().toByteArray(charset),
                     creationDate, creationDate,
                     EntryFile(serialiseActor(it))
@@ -109,7 +117,7 @@ object SavegameWriter {
         // items
         ItemCodex.dynamicItemDescription.forEach { dynamicID, item ->
             VDUtil.registerFile(disk, DiskEntry(
-                    gameworld.worldIndex, ROOT,
+                    item.dynamicID, ROOT,
                     dynamicID.toString(16).toUpperCase().toByteArray(charset),
                     creationDate, creationDate,
                     EntryFile(serialiseItem(item))
@@ -125,13 +133,26 @@ object SavegameWriter {
         TODO()
     }
 
+    fun getJsonBuilder() = if (AppLoader.IS_DEVELOPMENT_BUILD) {
+        GsonBuilder()
+                .setPrettyPrinting()
+
+                .serializeNulls()
+                .create()
+    }
+    else {
+        GsonBuilder()
+                .serializeNulls()
+                .create()
+    }
+
     private fun serialiseActor(a: Actor): ByteArray64 {
-        val gson = Gson().toJsonTree(a).toString().toByteArray(charset)
+        val gson = getJsonBuilder().toJson(a).toByteArray(charset)
         return ByteArray64.fromByteArray(gson)
     }
 
     private fun serialiseItem(i: GameItem): ByteArray64 {
-        val gson = Gson().toJsonTree(i).toString().toByteArray(charset)
+        val gson = getJsonBuilder().toJson(i).toByteArray(charset)
         return ByteArray64.fromByteArray(gson)
     }
 }

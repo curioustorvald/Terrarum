@@ -58,7 +58,7 @@ object CommandDict {
             "imtest" to JavaIMTest,
             "cheatmotherfuckernootnoot" to CheatWarnTest,
             "spawnlunarlander" to SpawnPhysTestLunarLander,
-
+            "savetest" to SavegameWriterTest,
 
             /* !! */"exportlayer" to ExportLayerData,
             /* !! */"importlayer" to ImportLayerData,
