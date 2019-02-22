@@ -10,7 +10,7 @@ import net.torvald.terrarum.worlddrawer.FeaturesDrawer
  */
 object PlayerBuilderTestSubject1 {
     operator fun invoke(): IngamePlayer {
-        val p: IngamePlayer = IngamePlayer(ModMgr.getGdxFile("basegame", "sprites/test_sprite.properties"), -589141658L) // random value thrown
+        val p: IngamePlayer = IngamePlayer(ModMgr.getPath("basegame", "sprites/test_sprite.properties"), -589141658L) // random value thrown
         InjectCreatureRaw(p.actorValue, "basegame", "CreatureHuman.json")
 
 
