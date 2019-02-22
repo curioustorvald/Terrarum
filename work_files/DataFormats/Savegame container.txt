@@ -6,21 +6,22 @@ Files contained the TerranVirtualDisk is as follows:
 (root)
     worldinfo0      -- Savegame Metadata (TESV)
                        Has fixed Entry ID of 32766
-    worldinfo1      -- Copy of blocks.csv     -- will use this from the next load
+    worldinfo1      -- (TODO Copy of blocks.csv OR BlockCodex in JSON)     -- will use this from the next load
                        Has fixed Entry ID of 32765
-    worldinfo2      -- Copy of items.csv      -- will use this from the next load
+    worldinfo2      -- (TODO Copy of items.csv OR ItemCodex in JSON, static only)      -- will use this from the next load
                        Has fixed Entry ID of 32764
-    worldinfo3      -- Copy of materials.csv  -- will use this from the next load
+    worldinfo3      -- (TODO Copy of materials.csv OR MaterialCodex in JSON)  -- will use this from the next load
                        Has fixed Entry ID of 32763
     world[n]        -- Layer Data (TEMD); [n] is a serial number of the world (starts at 1)
                        Has fixed Entry ID of [n]
-    (any random number in Hex 32768..ACTORID_MIN - 1)   -- Serialised Dynamic Item?
     (any random number in Hex ACTORID_MIN..FFFFFFFF)    -- Serialised Entity Information (including Player)
     (PLAYER_REF_ID in Hex -- 91A7E2)    -- Player Character Information (Serialised--JSON'd--Entity Information)
     (51621D)        -- The Debug Player (Serialised Entity Information)
     load_order.txt  -- LoadOrder.csv (NOT zipped)
                        Has fixed Entry ID of 32767
 
-
+    // TODO select one of following:
+    (any random number in Hex 32768..ACTORID_MIN - 1)   -- Serialised Dynamic Item?
+    worldinfo4      -- dynamic item codex in JSON, has fixed Entry ID of 32762
 
 Remarks: world history is created at the load time by scanning all the actors' corresponding ActorValue
