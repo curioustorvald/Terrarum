@@ -1,6 +1,6 @@
 package net.torvald.spriteanimation
 
-import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import net.torvald.spriteassembler.ADProperties
 import net.torvald.spriteassembler.AssembleSheetPixmap
@@ -11,16 +11,16 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 interface HasAssembledSprite {
 
-    var animDesc: FileHandle
+    var animDescPath: String
 
     // FIXME sometimes the animmation is invisible (row and nFrames mismatch -- row is changed to 1 but it's drawing 3rd frame?)
 
     fun reassembleSprite(sprite: SpriteAnimation) {
-        _rebuild(ADProperties(animDesc.read()), sprite)
+        _rebuild(ADProperties(Gdx.files.internal(animDescPath).read()), sprite)
     }
 
-    /*fun rebuild(animDesc: String, spriteAnimation: SpriteAnimation) {
-        _rebuild(ADProperties(StringReader(animDesc)), spriteAnimation)
+    /*fun rebuild(animDescPath: String, spriteAnimation: SpriteAnimation) {
+        _rebuild(ADProperties(StringReader(animDescPath)), spriteAnimation)
     }
 
     fun rebuild(animDesc: FileHandle, spriteAnimation: SpriteAnimation) {
