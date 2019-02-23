@@ -2,20 +2,19 @@
   "MENU_LABEL_NEW_WORLD": "Uusi Maailma",
   "MENU_LABEL_DELETE_WORLD": "Poista Maailma",
   "CONTEXT_WORLD_COUNT": "Maailmoja: ",
-
   "MENU_MONITOR_CALI_TITLE": "Tarkista näytön",
-
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Kaikki oikeudet pidätetään",
   "COPYRIGHT_GNU_GPL_3": "Jaetaan GNU GPL 3:n mukaisesti",
   "APP_ADJUST_YOUR_MONITOR": "Paras pelikokemus saavutetaan on oikealla säädetty näytöllä. Jos et ole ollut, säädä ennen pelaamista.",
-
   "APP_WARNING_HEALTH_AND_SAFETY": "VAROITUS-TERVEYS JA TURVALLISUUS",
   "MENU_LABEL_PRESS_START_SYMBOL": "Paina >",
-
-  "GAME_INVENTORY_INGREDIENTS" : "Ainekset",
-  "GAME_INVENTORY_POTIONS" : "Juomat",
-  "GAME_INVENTORY_BLOCKS" : "Lohkareet",
-  "GAME_INVENTORY_WALLS" : "Seinät",
-  "CONTEXT_ITEM_TOOL_PLURAL" : "Työkalut",
-  "GAME_INVENTORY_FAVORITES" : "Suosikit"
+  "GAME_INVENTORY_INGREDIENTS": "Ainekset",
+  "GAME_INVENTORY_POTIONS": "Juomat",
+  "GAME_INVENTORY_BLOCKS": "Lohkareet",
+  "GAME_INVENTORY_WALLS": "Seinät",
+  "CONTEXT_ITEM_TOOL_PLURAL": "Työkalut",
+  "GAME_INVENTORY_FAVORITES": "Suosikit",
+  "CONTEXT_ITEM_MAP": "Kartta",
+  "MENU_LABEL_MENU": "Valikko",
+  "GAME_INVENTORY_REGISTER": "Rekisteröidä"
 }

@@ -2,12 +2,11 @@
   "MENU_LABEL_NEW_WORLD": "Lume Nouă",
   "MENU_LABEL_DELETE_WORLD": "Șterge Lume",
   "CONTEXT_WORLD_COUNT": "Lumi: ",
-
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Toate drepturile rezervate",
   "COPYRIGHT_GNU_GPL_3": "Distribuit sub GNU GPL 3",
   "APP_ADJUST_YOUR_MONITOR": "",
-
   "APP_WARNING_HEALTH_AND_SAFETY": "ATENȚIONARE-SĂNĂTATE ȘI SIGURANȚĂ",
-  "MENU_LABEL_PRESS_START_SYMBOL": "Apasă >"
-
+  "MENU_LABEL_PRESS_START_SYMBOL": "Apasă >",
+  "CONTEXT_ITEM_MAP": "Hartă",
+  "MENU_LABEL_MENU": "Meniu"
 }

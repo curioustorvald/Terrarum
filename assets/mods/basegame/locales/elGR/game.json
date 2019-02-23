@@ -2,12 +2,12 @@
   "MENU_LABEL_NEW_WORLD": "Νέο Κόσμο",
   "MENU_LABEL_DELETE_WORLD": "Διαγραφή Κόσμο",
   "CONTEXT_WORLD_COUNT": "Κόσμοι: ",
-
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Όλα τα δικαιώματα διατηρούνται",
   "COPYRIGHT_GNU_GPL_3": "Διανέμεται υπό την GNU GPL 3",
   "APP_ADJUST_YOUR_MONITOR": "",
-
   "APP_WARNING_HEALTH_AND_SAFETY": "ΠΡΟΣΟΧΗ-ΥΓΕΙΑ ΚΑΙ ΑΣΦΑΛΕΙΑ",
-  "MENU_LABEL_PRESS_START_SYMBOL": "Πάτα >"
-
+  "MENU_LABEL_PRESS_START_SYMBOL": "Πάτα >",
+  "CONTEXT_ITEM_MAP": "Χαρτης",
+  "MENU_LABEL_MENU": "Μενού",
+  "GAME_INVENTORY_REGISTER": "Εγγραφή"
 }

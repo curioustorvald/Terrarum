@@ -2,12 +2,12 @@
   "MENU_LABEL_NEW_WORLD": "Novo Mundo",
   "MENU_LABEL_DELETE_WORLD": "Excluir Mundo",
   "CONTEXT_WORLD_COUNT": "Mundos: ",
-
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Todos os direitos reservados",
   "COPYRIGHT_GNU_GPL_3": "Distribuído sob GNU GPL 3",
   "APP_ADJUST_YOUR_MONITOR": "",
-
   "APP_WARNING_HEALTH_AND_SAFETY": "ATENÇÃO-SAÚDE E SEGURANÇA",
-  "MENU_LABEL_PRESS_START_SYMBOL": "Pressione >"
-
+  "MENU_LABEL_PRESS_START_SYMBOL": "Pressione >",
+  "CONTEXT_ITEM_MAP": "Mapa",
+  "MENU_LABEL_MENU": "Menu",
+  "GAME_INVENTORY_REGISTER": "Registrar"
 }

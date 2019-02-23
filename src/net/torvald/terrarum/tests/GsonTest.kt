@@ -1,5 +1,5 @@
 
-import net.torvald.terrarum.serialise.SavegameWriter
+import net.torvald.terrarum.utils.JsonWriter
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -21,7 +21,7 @@ object GsonTest {
 
     operator fun invoke() {
 
-        val gson = SavegameWriter.getJsonBuilder()
+        val gson = JsonWriter.getJsonBuilder()
         val jsonString = gson.toJson(testClass)
 
         println(jsonString)

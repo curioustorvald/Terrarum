@@ -2,12 +2,11 @@
   "MENU_LABEL_NEW_WORLD": "โลกใหม่",
   "MENU_LABEL_DELETE_WORLD": "ลบโลก",
   "CONTEXT_WORLD_COUNT": "โลก: ",
-
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "สงวนลิขสิทธิ์",
   "COPYRIGHT_GNU_GPL_3": "เผยแพร่ภายใต้ GNU GPL 3",
   "APP_ADJUST_YOUR_MONITOR": "",
-
   "APP_WARNING_HEALTH_AND_SAFETY": "คำเตือน-อนามัยและความปลอดภัย",
-  "MENU_LABEL_PRESS_START_SYMBOL": "กดปุ่ม >"
-
+  "MENU_LABEL_PRESS_START_SYMBOL": "กดปุ่ม >",
+  "CONTEXT_ITEM_MAP": "แผนที่",
+  "MENU_LABEL_MENU": "เมนู"
 }

@@ -2,11 +2,12 @@
   "MENU_LABEL_NEW_WORLD": "Nový Svět",
   "MENU_LABEL_DELETE_WORLD": "Smazat Svět",
   "CONTEXT_WORLD_COUNT": "Světy: ",
-
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Všechna práva vyhrazena",
   "COPYRIGHT_GNU_GPL_3": "Šířen pod licencí GNU GPL 3",
   "APP_ADJUST_YOUR_MONITOR": "",
-
   "APP_WARNING_HEALTH_AND_SAFETY": "POZOR-ZDRAVÍ A BEZPEČNOST",
-  "MENU_LABEL_PRESS_START_SYMBOL": "Stiskněte >"
+  "MENU_LABEL_PRESS_START_SYMBOL": "Stiskněte >",
+  "CONTEXT_ITEM_MAP": "Mapa",
+  "MENU_LABEL_MENU": "Nabídka",
+  "GAME_INVENTORY_REGISTER": "Zaregistrovat"
 }
