@@ -2,18 +2,18 @@
   "MENU_LABEL_NEW_WORLD": "Новый Мир",
   "MENU_LABEL_DELETE_WORLD": "Удалить Мир",
   "CONTEXT_WORLD_COUNT": "Миры: ",
-
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Все права защищены",
   "COPYRIGHT_GNU_GPL_3": "Распространяется в соответствии с GNU GPL 3",
   "APP_ADJUST_YOUR_MONITOR": "",
-
   "APP_WARNING_HEALTH_AND_SAFETY": "ПРЕДУПРЕЖДЕНИЕ-ЗДОРОВЬЕ И БЕЗОПАСНОСТЬ",
   "MENU_LABEL_PRESS_START_SYMBOL": "Нажмите >",
-
-  "GAME_INVENTORY_INGREDIENTS" : "Ингредиенты",
-  "GAME_INVENTORY_POTIONS" : "Зелья",
-  "GAME_INVENTORY_BLOCKS" : "Блоки",
-  "GAME_INVENTORY_WALLS" : "Стены",
-  "CONTEXT_ITEM_TOOL_PLURAL" : "Инструменты",
-  "GAME_INVENTORY_FAVORITES" : "Избранное"
+  "GAME_INVENTORY_INGREDIENTS": "Ингредиенты",
+  "GAME_INVENTORY_POTIONS": "Зелья",
+  "GAME_INVENTORY_BLOCKS": "Блоки",
+  "GAME_INVENTORY_WALLS": "Стены",
+  "CONTEXT_ITEM_TOOL_PLURAL": "Инструменты",
+  "GAME_INVENTORY_FAVORITES": "Избранное",
+  "CONTEXT_ITEM_MAP": "Карта",
+  "MENU_LABEL_MENU": "Меню",
+  "GAME_INVENTORY_REGISTER": "Зарегистрировать"
 }

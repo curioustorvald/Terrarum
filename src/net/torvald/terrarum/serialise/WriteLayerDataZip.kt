@@ -107,83 +107,83 @@ internal object WriteLayerDataZip {
 
         wb(PAYLOAD_HEADER); wb("TERR".toByteArray())
         wi48(world.width * world.height * 3L / 2)
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION, true), false)
         deflater.write(world.terrainArray)
         deflater.write(world.layerTerrainLowBits.data)
-        deflater.finish()
+        deflater.flush(); deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // WALL payload
         wb(PAYLOAD_HEADER); wb("WALL".toByteArray())
         wi48(world.width * world.height * 3L / 2)
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION, true), false)
         deflater.write(world.wallArray)
         deflater.write(world.layerWallLowBits.data)
-        deflater.finish()
+        deflater.flush(); deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // WIRE payload
         wb(PAYLOAD_HEADER); wb("WIRE".toByteArray())
         wi48(world.width * world.height.toLong())
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION, true), false)
         deflater.write(world.wireArray)
-        deflater.finish()
+        deflater.flush(); deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // TdMG payload
         wb(PAYLOAD_HEADER); wb("TdMG".toByteArray())
         wi48(world.terrainDamages.size * 10L)
 
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION, true), false)
 
         world.terrainDamages.forEach { t, u ->
             deflater.write(t.toULittle48())
             deflater.write(u.toRawBits().toLittle())
         }
 
-        deflater.finish()
+        deflater.flush(); deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // WdMG payload
         wb(PAYLOAD_HEADER); wb("WdMG".toByteArray())
         wi48(world.wallDamages.size * 10L)
 
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION, true), false)
 
         world.wallDamages.forEach { t, u ->
             deflater.write(t.toULittle48())
             deflater.write(u.toRawBits().toLittle())
         }
 
-        deflater.finish()
+        deflater.flush(); deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // FlTP payload
         wb(PAYLOAD_HEADER); wb("FlTP".toByteArray())
         wi48(world.fluidTypes.size * 8L)
 
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION, true), false)
 
         world.fluidTypes.forEach { t, u ->
             deflater.write(t.toULittle48())
             deflater.write(u.value.toLittleShort())
         }
 
-        deflater.finish()
+        deflater.flush(); deflater.finish()
         wb(PAYLOAD_FOOTER)
 
         // FlFL payload
         wb(PAYLOAD_HEADER); wb("FlFL".toByteArray())
         wi48(world.fluidFills.size * 10L)
 
-        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION), true)
+        deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION, true), false)
 
         world.fluidFills.forEach { t, u ->
             deflater.write(t.toULittle48())
             deflater.write(u.toRawBits().toLittle())
         }
 
-        deflater.finish()
+        deflater.flush(); deflater.finish()
         wb(PAYLOAD_FOOTER)
 
 

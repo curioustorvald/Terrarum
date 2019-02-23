@@ -2,22 +2,19 @@
   "MENU_LABEL_NEW_WORLD": "新しい世界",
   "MENU_LABEL_DELETE_WORLD": "世界を削除",
   "CONTEXT_WORLD_COUNT": "世界: ",
-
   "MENU_MONITOR_CALI_TITLE": "モニターチェック",
-
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "全著作権所有",
   "COPYRIGHT_GNU_GPL_3": "GNU GPL 3で配布",
   "APP_ADJUST_YOUR_MONITOR": "このゲームは、適切に調整したモニターから最高のプレイができます。調整していなかったら、プレイする前に調整してください。",
-
   "APP_WARNING_HEALTH_AND_SAFETY": "警告ー健康と安全のために",
   "MENU_LABEL_PRESS_START_SYMBOL": "> ボタンを押す",
-
-  "GAME_INVENTORY_INGREDIENTS" : "材料",
-  "GAME_INVENTORY_POTIONS" : "水薬",
-  "GAME_INVENTORY_BLOCKS" : "ブロック",
-  "GAME_INVENTORY_WALLS" : "壁",
-  "CONTEXT_ITEM_TOOL_PLURAL" : "道具",
-  "GAME_INVENTORY_FAVORITES" : "お気に入り",
-
-  "GAME_INVENTORY_REGISTER" : "登録する"
+  "GAME_INVENTORY_INGREDIENTS": "材料",
+  "GAME_INVENTORY_POTIONS": "水薬",
+  "GAME_INVENTORY_BLOCKS": "ブロック",
+  "GAME_INVENTORY_WALLS": "壁",
+  "CONTEXT_ITEM_TOOL_PLURAL": "道具",
+  "GAME_INVENTORY_FAVORITES": "お気に入り",
+  "GAME_INVENTORY_REGISTER": "登録する",
+  "CONTEXT_ITEM_MAP": "地図",
+  "MENU_LABEL_MENU": "メニュー"
 }

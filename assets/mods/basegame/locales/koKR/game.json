@@ -2,22 +2,19 @@
   "MENU_LABEL_NEW_WORLD": "새 세계",
   "MENU_LABEL_DELETE_WORLD": "새계 삭제",
   "CONTEXT_WORLD_COUNT": "새계: ",
-
   "MENU_MONITOR_CALI_TITLE": "모니터 확인",
-
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "모든 권리 보유",
   "COPYRIGHT_GNU_GPL_3": "GNU GPL 3에 따라 배포됨",
   "APP_ADJUST_YOUR_MONITOR": "본 게임은 적절히 조정된 모니터에서 최상으로 즐길 수 있습니다. 조정하지 않았다면 플레이하기 전에 조정해 주십시오.",
-
   "APP_WARNING_HEALTH_AND_SAFETY": "경고—건강과 안전을 위하여",
   "MENU_LABEL_PRESS_START_SYMBOL": ">을 누르세요",
-
-  "GAME_INVENTORY_INGREDIENTS" : "재료",
-  "GAME_INVENTORY_POTIONS" : "물약",
-  "GAME_INVENTORY_BLOCKS" : "블록",
-  "GAME_INVENTORY_WALLS" : "벽지",
-  "CONTEXT_ITEM_TOOL_PLURAL" : "도구",
-  "GAME_INVENTORY_FAVORITES" : "즐겨찾기",
-
-  "GAME_INVENTORY_REGISTER" : "등록하기"
+  "GAME_INVENTORY_INGREDIENTS": "재료",
+  "GAME_INVENTORY_POTIONS": "물약",
+  "GAME_INVENTORY_BLOCKS": "블록",
+  "GAME_INVENTORY_WALLS": "벽지",
+  "CONTEXT_ITEM_TOOL_PLURAL": "도구",
+  "GAME_INVENTORY_FAVORITES": "즐겨찾기",
+  "GAME_INVENTORY_REGISTER": "등록하기",
+  "MENU_LABEL_MENU": "메뉴",
+  "CONTEXT_ITEM_MAP": "지도"
 }

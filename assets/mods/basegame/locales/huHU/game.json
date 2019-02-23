@@ -1,12 +1,11 @@
 {
   "MENU_LABEL_NEW_WORLD": "Új Világ",
   "MENU_LABEL_DELETE_WORLD": "Világ Törlése",
-
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Minden jog fenntartva",
   "COPYRIGHT_GNU_GPL_3": "Elosztott GNU GPL 3",
   "APP_ADJUST_YOUR_MONITOR": "",
-
   "APP_WARNING_HEALTH_AND_SAFETY": "VIGYÁZAT-EGÉSZSÉGÜGYI ÉS BIZTONSÁGI",
-  "MENU_LABEL_PRESS_START_SYMBOL": "Nyomd meg a >ot"
-
+  "MENU_LABEL_PRESS_START_SYMBOL": "Nyomd meg a >ot",
+  "CONTEXT_ITEM_MAP": "Térkép",
+  "MENU_LABEL_MENU": "Menü"
 }

@@ -2,18 +2,17 @@
   "MENU_LABEL_NEW_WORLD": "Нов Свят",
   "MENU_LABEL_DELETE_WORLD": "Изтриване на Света",
   "CONTEXT_WORLD_COUNT": "Светове: ",
-
   "COPYRIGHT_ALL_RIGHTS_RESERVED": "Всички права запазени",
   "COPYRIGHT_GNU_GPL_3": "Разпределени под GNU GPL 3",
   "APP_ADJUST_YOUR_MONITOR": "",
-
   "APP_WARNING_HEALTH_AND_SAFETY": "ВНИМАНИЕ-ЗДРАВЕ И БЕЗОПАСНОСТ",
   "MENU_LABEL_PRESS_START_SYMBOL": "атисни >",
-
-  "GAME_INVENTORY_INGREDIENTS" : "Съставки",
-  "GAME_INVENTORY_POTIONS" : "Отвари",
-  "GAME_INVENTORY_BLOCKS" : "Блокове",
-  "GAME_INVENTORY_WALLS" : "Стени",
-  "CONTEXT_ITEM_TOOL_PLURAL" : "Инструменти",
-  "GAME_INVENTORY_FAVORITES" : "Любими"
+  "GAME_INVENTORY_INGREDIENTS": "Съставки",
+  "GAME_INVENTORY_POTIONS": "Отвари",
+  "GAME_INVENTORY_BLOCKS": "Блокове",
+  "GAME_INVENTORY_WALLS": "Стени",
+  "CONTEXT_ITEM_TOOL_PLURAL": "Инструменти",
+  "GAME_INVENTORY_FAVORITES": "Любими",
+  "CONTEXT_ITEM_MAP": "Карта",
+  "MENU_LABEL_MENU": "Меню"
 }

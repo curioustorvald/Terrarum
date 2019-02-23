@@ -1,7 +1,6 @@
 package net.torvald.terrarum.serialise
 
 import com.badlogic.gdx.Gdx
-import com.google.gson.GsonBuilder
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameactors.AVKey
@@ -10,6 +9,7 @@ import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.*
 import net.torvald.terrarum.roundInt
+import net.torvald.terrarum.utils.JsonWriter.getJsonBuilder
 import java.io.File
 import java.nio.charset.Charset
 
@@ -131,23 +131,6 @@ object SavegameWriter {
 
     fun modifyExistingSave(savefile: File): VirtualDisk {
         TODO()
-    }
-
-    fun getJsonBuilder() = if (AppLoader.IS_DEVELOPMENT_BUILD) {
-        GsonBuilder()
-                .setPrettyPrinting()
-
-                .serializeNulls()
-                .disableHtmlEscaping()
-                .enableComplexMapKeySerialization()
-                .create()
-    }
-    else {
-        GsonBuilder()
-                .serializeNulls()
-                .disableHtmlEscaping()
-                .enableComplexMapKeySerialization()
-                .create()
     }
 
     private fun serialiseActor(a: Actor): ByteArray64 {
