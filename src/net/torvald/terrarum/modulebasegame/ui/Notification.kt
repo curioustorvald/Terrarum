@@ -61,18 +61,30 @@ class Notification : UICanvas() {
         drawColor.a = handler.opacity
         fontCol.a = handler.opacity
 
-        val textWidth = width//maxOf(width, messagesList.map { Terrarum.fontGame.getWidth(it) }.sorted()[1])
+        val realTextWidth = 12 + if (message.size == 1)
+            Terrarum.fontGame.getWidth(message[0])
+        else
+            maxOf(Terrarum.fontGame.getWidth(message[0]), Terrarum.fontGame.getWidth(message[1]))
+        val displayedTextWidth = maxOf(240, realTextWidth)
+
+        // force the UI to the centre of the screen
+        this.posX = (Terrarum.WIDTH - displayedTextWidth) / 2
+
 
         batch.color = drawColor
 
         batch.draw(segment.get(0, 0), -segment.tileW.toFloat(), 0f)
-        batch.draw(segment.get(1, 0), 0f, 0f, textWidth.toFloat(), segment.tileH.toFloat())
-        batch.draw(segment.get(2, 0), textWidth.toFloat(), 0f)
+        batch.draw(segment.get(1, 0), 0f, 0f, displayedTextWidth.toFloat(), segment.tileH.toFloat())
+        batch.draw(segment.get(2, 0), displayedTextWidth.toFloat(), 0f)
 
         batch.color = fontCol
         message.forEachIndexed { index, s ->
-            val y = imageToTextAreaDelta + index * (textAreaHeight / 2) + (textAreaHeight / 2 - Terrarum.fontGame.lineHeight) / 2
-            Terrarum.fontGame.draw(batch, s, LRmargin, y)
+            val xoff = 6 + (displayedTextWidth - realTextWidth) / 2
+            val y = if (message.size == 1)
+                -2 + imageToTextAreaDelta + 0.5f * (textAreaHeight / 2) + (textAreaHeight / 2 - Terrarum.fontGame.lineHeight) / 2
+            else
+                -1 + imageToTextAreaDelta + index * (textAreaHeight / 2) + (textAreaHeight / 2 - Terrarum.fontGame.lineHeight) / 2
+            Terrarum.fontGame.draw(batch, s, LRmargin + xoff, y)
         }
 
 

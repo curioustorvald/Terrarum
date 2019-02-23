@@ -6,9 +6,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.blendNormal
-import net.torvald.terrarum.blendScreen
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory.CELLCOLOUR_WHITE
 import net.torvald.terrarum.ui.UICanvas
 import net.torvald.terrarum.ui.UIItemImageButton
 import net.torvald.terrarum.ui.UIItemTextButtonList
@@ -104,7 +104,7 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
         }
     }
 
-    private val addCol = Color(0x242424ff)
+    private val scrollbarBackCol = Color(0x000000_70)
     private var scrollBarPos = 0
     private var paletteScroll = 0
     private val paletteScrollMax = 256f - 14f
@@ -125,18 +125,19 @@ class UIBuildingMakerBlockChooser(val parent: BuildingMaker): UICanvas() {
 
     override fun renderUI(batch: SpriteBatch, camera: Camera) {
         palette.forEach { it.render(batch, camera) }
+        blendNormal(batch)
 
         // gaps between tabs and close button
         batch.color = DEFAULT_BACKGROUNDCOL
         batch.fillRect(0f, tabs.height.toFloat(), MENUBAR_SIZE.toFloat(), height.toFloat() - (tabs.height + closeButton.height))
         // scrollbar back
+        batch.color = DEFAULT_BACKGROUNDCOL
         batch.fillRect(width - SCROLLBAR_SIZE.toFloat(), 0f, SCROLLBAR_SIZE.toFloat(), height.toFloat())
-        blendScreen(batch)
-        batch.color = addCol
+        batch.color = scrollbarBackCol
         batch.fillRect(width - SCROLLBAR_SIZE.toFloat(), 0f, SCROLLBAR_SIZE.toFloat(), height.toFloat())
         // scrollbar
+        batch.color = CELLCOLOUR_WHITE
         batch.fillRect(width - SCROLLBAR_SIZE.toFloat(), scrollBarPos.toFloat(), SCROLLBAR_SIZE.toFloat(), scrollBarHeight)
-        blendNormal(batch)
 
         // the actual buttons
         tabs.render(batch, camera)

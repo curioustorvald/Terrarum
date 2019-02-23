@@ -15,7 +15,6 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorWithBody
 import net.torvald.terrarum.gamecontroller.IngameController
 import net.torvald.terrarum.gamecontroller.KeyToggler
-import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.console.AVTracker
@@ -250,7 +249,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             val timeNow = System.currentTimeMillis() / 1000
             gameworld = GameWorldExtension(1, worldParams.width, worldParams.height, timeNow, timeNow, 0) // new game, so the creation time is right now
             gameworldCount++
-            world = gameworld as GameWorld
+            world = gameworld
 
             // generate terrain for the map
             WorldGenerator.attachMap(world)
@@ -594,8 +593,8 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     }
 
     /** Send message to notifier UI and toggle the UI as opened. */
-    fun sendNotification(msg: Array<String>) {
-        (notifier as Notification).sendNotification(msg)
+    fun sendNotification(msg1: String, msg2: String? = null) {
+        (notifier as Notification).sendNotification(if (msg2 != null) arrayOf(msg1, msg2) else arrayOf(msg1))
     }
 
     fun wakeDormantActors() {
