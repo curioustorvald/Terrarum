@@ -1,8 +1,8 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
+import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
 
 /**
@@ -10,11 +10,7 @@ import net.torvald.terrarum.modulebasegame.Ingame
  */
 internal object SetBulletin : ConsoleCommand {
     override fun execute(args: Array<String>) {
-        val testMsg = arrayOf(
-                Lang["ERROR_SAVE_CORRUPTED"],
-                Lang["MENU_LABEL_CONTINUE_QUESTION"]
-        )
-        send(testMsg)
+        send(Lang["ERROR_SAVE_CORRUPTED"], Lang["MENU_LABEL_CONTINUE_QUESTION"])
     }
 
     override fun printUsage() {
@@ -25,8 +21,8 @@ internal object SetBulletin : ConsoleCommand {
      * Actually send notifinator
      * @param message real message
      */
-    fun send(message: Array<String>) {
-        (Terrarum.ingame!! as Ingame).sendNotification(message)
+    fun send(msg1: String, msg2: String? = null) {
+        (Terrarum.ingame!! as Ingame).sendNotification(msg1, msg2)
         println("sent notifinator")
     }
 }
