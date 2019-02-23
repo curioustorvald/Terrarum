@@ -1,6 +1,5 @@
 package net.torvald.terrarum
 
-import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
@@ -115,12 +114,4 @@ open class KVHashMap : GsonSerialisable {
         TODO()
     }
 
-    override fun write(targetGson: JsonObject) {
-        hashMap.forEach { t, u ->
-            if (u is JsonPrimitive)
-                targetGson.add(t, u)
-            else
-                targetGson.add(t, Gson().toJsonTree(u))
-        }
-    }
 }

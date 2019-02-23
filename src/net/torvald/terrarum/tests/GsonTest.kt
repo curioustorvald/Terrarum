@@ -1,6 +1,5 @@
-import com.badlogic.gdx.graphics.Color
-import com.google.gson.GsonBuilder
-import net.torvald.terrarum.gameactors.Actor
+
+import net.torvald.terrarum.serialise.SavegameWriter
 import org.dyn4j.geometry.Vector2
 
 /**
@@ -10,54 +9,42 @@ import org.dyn4j.geometry.Vector2
  */
 object GsonTest {
 
-    operator fun invoke() {
-        val jsonString = GsonBuilder()
-                .setPrettyPrinting()
-                .serializeNulls()
-                .create()
-                .toJson(GsonTestActor())
-
-
-        println(jsonString)
-    }
-
-}
-
-class GsonTestActor : Actor(Actor.RenderOrder.MIDDLE) {
-    override fun update(delta: Float) {
-        TODO("not implemented")
-    }
-
-    override fun onActorValueChange(key: String, value: Any?) {
-        TODO("not implemented")
-    }
-
-    override fun dispose() {
-        TODO("not implemented")
-    }
-
-    override fun run() {
-        TODO("not implemented")
-    }
+    private val testClass = GsonTestClass()
 
     init {
-        referenceID = 42
+        testClass.foo = 42
+        testClass.bar = 1f/42f
+        testClass.baz = "According to all known laws of aviation, there is no way a bee should be able to fly."
+        testClass.fov = Vector2(1.23432, -0.4)
     }
 
-    private val mysecretnote = "note"
+
+    operator fun invoke() {
+
+        val gson = SavegameWriter.getJsonBuilder()
+        val jsonString = gson.toJson(testClass)
+
+        println(jsonString)
+
+
+        val deserialised = gson.fromJson(jsonString, GsonTestSuper::class.java)
+        println(deserialised)
+        println(deserialised as GsonTestClass) // ClassCastException
+    }
+
 }
 
-class GsonTestClass : GsonTestInterface {
-    var foo = 1.567f
-    val bar = "stingy"
-    val baz = Color(0f, 0.2f, 0.4f, 1f)
-    val fov = Vector2(1.324324, -0.4321)
+open class GsonTestSuper(var foo: Int) {
+    override fun toString() = "GsonTestSuper"
+}
 
-    val bazget: Color
-        get() = Color.CHARTREUSE
-
-    @Transient override var superfoo = 42
-    @Transient val tbar = "i'm invisible"
+class GsonTestClass(
+    foo: Int = 0,
+    var bar: Float = 0f,
+    var baz: String = "",
+    var fov: Vector2 = Vector2(0.0,0.0)
+) : GsonTestSuper(foo) {
+    override fun toString() = "GsonTestClass(foo=$foo, bar=$bar, baz=$baz, fov=$fov)"
 }
 
 interface GsonTestInterface {
