@@ -7,7 +7,9 @@ import com.google.gson.JsonObject
  */
 interface GsonSerialisable {
 
+    /**
+     * Will modify itself according to the input gson. Not sure it's even necessary so please test.
+     */
     fun read(gson: JsonObject)
-    fun write(targetGson: JsonObject)
 
 }

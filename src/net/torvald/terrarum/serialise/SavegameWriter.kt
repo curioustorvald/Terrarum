@@ -138,11 +138,15 @@ object SavegameWriter {
                 .setPrettyPrinting()
 
                 .serializeNulls()
+                .disableHtmlEscaping()
+                .enableComplexMapKeySerialization()
                 .create()
     }
     else {
         GsonBuilder()
                 .serializeNulls()
+                .disableHtmlEscaping()
+                .enableComplexMapKeySerialization()
                 .create()
     }
 
