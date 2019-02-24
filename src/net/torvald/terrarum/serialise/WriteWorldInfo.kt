@@ -1,8 +1,18 @@
 package net.torvald.terrarum.serialise
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL30
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.PixmapIO2
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
+import com.badlogic.gdx.utils.ScreenUtils
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.inAction
+import net.torvald.terrarum.inUse
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
@@ -10,6 +20,9 @@ import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64InputStream
 import org.apache.commons.codec.digest.DigestUtils
+import java.io.ByteArrayOutputStream
+import java.util.zip.Deflater
+import java.util.zip.DeflaterOutputStream
 
 object WriteWorldInfo {
 
@@ -111,6 +124,55 @@ object WriteWorldInfo {
             metaOut.write(it)
         }
 
+        // thumbnail
+        val texreg = Terrarum.ingame!!.actorGamer.sprite?.textureRegion
+        if (texreg != null) {
+            val batch = SpriteBatch()
+            val camera = OrthographicCamera(texreg.tileW.toFloat(), texreg.tileH.toFloat())
+            val fbo = FrameBuffer(Pixmap.Format.RGBA8888, texreg.tileW, texreg.tileH, false)
+
+            fbo.inAction(camera, batch) {
+                batch.inUse {
+                    batch.draw(texreg.get(0, 0), 0f, 0f)
+                }
+            }
+
+            // bind and unbind the fbo so that I can get the damned Pixmap using ScreenUtils
+            // NullPointerException if not appconfig.useGL30
+            Gdx.gl30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, fbo.framebufferHandle)
+            Gdx.gl30.glReadBuffer(GL30.GL_COLOR_ATTACHMENT0)
+
+            val outpixmap = ScreenUtils.getFrameBufferPixmap(0, 0, fbo.width, fbo.height)
+
+            Gdx.gl30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, 0)
+            Gdx.gl30.glReadBuffer(GL30.GL_BACK)
+
+
+            val tgaSize = PixmapIO2.HEADER_FOOTER_SIZE + outpixmap.width * outpixmap.height * 4
+            val byteArrayOS = ByteArrayOutputStream(tgaSize)
+            PixmapIO2._writeTGA(byteArrayOS, outpixmap, true, true)
+            byteArrayOS.flush()
+            byteArrayOS.close()
+
+
+            //PixmapIO2.writeTGA(Gdx.files.absolute(AppLoader.defaultDir+"/tmp_writeworldinfo+outpixmap.tga"), outpixmap, true)
+
+
+            outpixmap.dispose()
+            batch.dispose()
+            fbo.dispose()
+
+
+
+            // write uncompressed size
+            metaOut.write(tgaSize.toULittleShort())
+            // write compressed tga
+            val deflater = DeflaterOutputStream(metaOut, Deflater(Deflater.BEST_COMPRESSION, true), false)
+            deflater.write(byteArrayOS.toByteArray())
+            deflater.flush(); deflater.finish()
+            // write footer
+            metaOut.write(-1); metaOut.write(-2)
+        }
 
         // more data goes here //
 

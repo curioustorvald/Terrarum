@@ -39,7 +39,8 @@ open class IngameInstance(val batch: SpriteBatch) : Screen {
     /**
      * The actual gamer
      */
-    open var actorGamer: ActorHumanoid? = null
+    val actorGamer: ActorHumanoid
+        get() = getActorByID(Terrarum.PLAYER_REF_ID) as ActorHumanoid
 
     open var gameInitialised = false
         internal set

@@ -35,7 +35,8 @@ n-1  00   String terminator
 72        SHA-256 hash of worldinfo2 (32 bytes)
 A4        SHA-256 hash of worldinfo3 (32 bytes)
 
-D6        Compressed size (2 bytes)
-D8        Gzipped thumbnail image in TGA format
-          (it's gzipped so that it saves faster, so no Lzma)
-
+D6        Uncompressed size (2 bytes)
+D8        Deflated thumbnail image in TGA format
+p-2       (it's deflated so that it saves faster, so no Lzma)
+p-2       0xFF
+p-1       0xFE
