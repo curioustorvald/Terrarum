@@ -155,12 +155,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     lateinit var gameLoadInfoPayload: Any
     lateinit var gameworld: GameWorldExtension
     lateinit var theRealGamer: IngamePlayer
-
-    override var actorGamer: ActorHumanoid?
-        get() = theRealGamer
-        set(value) {
-            throw UnsupportedOperationException()
-        }
+        // get() = actorGamer as IngamePlayer
 
     enum class GameLoadMode {
         CREATE_NEW, LOAD_FROM
@@ -202,6 +197,10 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
     )
 
     private fun setTheRealGamerFirstTime(actor: IngamePlayer) {
+        if (actor.referenceID != Terrarum.PLAYER_REF_ID) {
+            throw Error()
+        }
+
         actorNowPlaying = actor
         theRealGamer = actor
         addNewActor(actorNowPlaying)

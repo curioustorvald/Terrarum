@@ -13,6 +13,8 @@ public class PixmapIO2 {
 
     // REMEMBER: to the GL's perspective, this game's FBOs are always Y-flipped. //
 
+    public static int HEADER_FOOTER_SIZE = 18 + 26;
+
     public static void writeTGAHappy(FileHandle file, Pixmap pixmap, boolean flipY) throws IOException {
         OutputStream output = file.write(false);
 
@@ -33,7 +35,7 @@ public class PixmapIO2 {
         }
     }
 
-    private static void _writeTGA(OutputStream out, Pixmap pixmap, boolean verbatim, boolean flipY) throws IOException {
+    public static void _writeTGA(OutputStream out, Pixmap pixmap, boolean verbatim, boolean flipY) throws IOException {
         byte[] width = toShortLittle(pixmap.getWidth());
         byte[] height = toShortLittle(pixmap.getHeight());
         byte[] zero = toShortLittle(0);
