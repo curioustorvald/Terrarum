@@ -480,7 +480,7 @@ internal object BlocksDrawer {
                 }
 
 
-                // draw a tile, but only when illuminated
+                // draw a tile
                 try {
                     val nearbyTilesInfo = if (mode == FLUID) {
                         getNearbyTilesInfoFluids(x, y)

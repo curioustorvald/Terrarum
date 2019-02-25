@@ -40,3 +40,6 @@ D8        Deflated thumbnail image in TGA format
 p-2       (it's deflated so that it saves faster, so no Lzma)
 p-2       0xFF
 p-1       0xFE
+
+Note: if you're going to add more footer beyond this point, DON'T;
+      instead pack the thumbnail.tga and other footers in TEVD container.

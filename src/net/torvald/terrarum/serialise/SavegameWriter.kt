@@ -80,7 +80,7 @@ object SavegameWriter {
 
 
         // worldinfo0..3
-        val worldinfoBytes = WriteWorldInfo(gameworld)
+        val worldinfoBytes = WriteWorldInfo(ingame)
         worldinfoBytes?.forEachIndexed { index, bytes ->
             VDUtil.registerFile(disk, DiskEntry(
                     32766 - index, ROOT, "worldinfo$index".toByteArray(charset),

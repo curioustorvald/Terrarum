@@ -8,11 +8,7 @@ import com.badlogic.gdx.graphics.PixmapIO2
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.utils.ScreenUtils
-import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.inAction
-import net.torvald.terrarum.inUse
+import net.torvald.terrarum.*
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.modulebasegame.worldgenerator.RoguelikeRandomiser
@@ -37,7 +33,7 @@ object WriteWorldInfo {
      *
      * @return List of ByteArray64, worldinfo0..worldinfo3; `null` on failure
      */
-    internal operator fun invoke(world: GameWorld): List<ByteArray64>? {
+    internal operator fun invoke(ingame: IngameInstance): List<ByteArray64>? {
 
         //val path = "${AppLoader.defaultSaveDir}/tmp_worldinfo"
 
@@ -82,6 +78,7 @@ object WriteWorldInfo {
         metaOut.write(HASHED_FILES_COUNT)
 
         // world name
+        val world = ingame.world
         val worldNameBytes = world.worldName.toByteArray(Charsets.UTF_8)
         //metaOut.write(worldNameBytes)
         worldNameBytes.forEach {
@@ -125,7 +122,7 @@ object WriteWorldInfo {
         }
 
         // thumbnail
-        val texreg = Terrarum.ingame!!.actorGamer.sprite?.textureRegion
+        val texreg = ingame.actorGamer.sprite?.textureRegion
         if (texreg != null) {
             val batch = SpriteBatch()
             val camera = OrthographicCamera(texreg.tileW.toFloat(), texreg.tileH.toFloat())

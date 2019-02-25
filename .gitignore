@@ -30,3 +30,4 @@ tmp_*
 *.index
 *.threads
 *_Leak_Suspects.zip
+desktop.ini
