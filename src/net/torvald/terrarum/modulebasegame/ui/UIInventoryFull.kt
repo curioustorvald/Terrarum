@@ -369,6 +369,8 @@ class UIInventoryFull(
         gameMenuButtons.render(batch, camera)
     }
 
+    private val encumbranceBarBackCol = Color(0xa0a0a0_ff.toInt())
+
     private fun renderScreenInventory(batch: SpriteBatch, camera: Camera) {
         itemList.render(batch, camera)
         equipped.render(batch, camera)
@@ -391,7 +393,7 @@ class UIInventoryFull(
 
         // encumbrance bar background
         blendMul(batch)
-        batch.color = Color(0xa0a0a0_ff.toInt())
+        batch.color = encumbranceBarBackCol
         batch.fillRect(
                 xEnd - 3 - weightBarWidth + inventoryScrOffX,
                 yEnd-20 + 3f,
