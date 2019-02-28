@@ -20,7 +20,9 @@ object CreateTileAtlas {
     lateinit var atlasAutumn: Pixmap
     lateinit var atlasWinter: Pixmap
     lateinit var atlasSpring: Pixmap
-    lateinit var tags: HashMap<Int, RenderTag>
+    internal lateinit var tags: HashMap<Int, RenderTag>
+        private set
+    private val defaultRenderTag = RenderTag(3, RenderTag.CONNECT_SELF, RenderTag.MASK_NA) // 'update' block
     var initialised = false
         private set
 
@@ -39,6 +41,7 @@ object CreateTileAtlas {
     operator fun invoke(updateExisting: Boolean = false) { if (updateExisting || !initialised) {
 
         tags = HashMap<Int, RenderTag>()
+        tags[0] = RenderTag(0, RenderTag.CONNECT_SELF, RenderTag.MASK_NA)
 
         atlas = Pixmap(256 * TILE_SIZE, 256 * TILE_SIZE, Pixmap.Format.RGBA8888)
         atlasAutumn = Pixmap(256 * TILE_SIZE, 256 * TILE_SIZE, Pixmap.Format.RGBA8888)
@@ -88,6 +91,10 @@ object CreateTileAtlas {
 
         initialised = true
     } }
+
+    fun getRenderTag(blockID: Int): RenderTag {
+        return tags.getOrDefault(blockID, defaultRenderTag)
+    }
 
     private fun fileToAtlantes(it: FileHandle) {
         val tilesPixmap = Pixmap(it)
