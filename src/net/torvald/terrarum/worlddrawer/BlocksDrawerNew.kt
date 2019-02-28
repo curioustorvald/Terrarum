@@ -13,6 +13,7 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
+import net.torvald.terrarum.utils.JsonWriter
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.io.BufferedOutputStream
 import java.io.File
@@ -91,6 +92,21 @@ internal object BlocksDrawer {
 
     init {
         printdbg(this, "Unpacking textures...")
+
+
+        CreateTileAtlas()
+        JsonWriter.writeToFile(CreateTileAtlas.tags, "${AppLoader.defaultDir}/test_rendertags.json")
+        /* // each takes about 60 seconds
+        printdbg(this, "Writing pixmap as tga: atlas.tga")
+        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlas.tga"), CreateTileAtlas.atlas, false)
+        printdbg(this, "Writing pixmap as tga: atlasAutumn.tga")
+        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasAutumn.tga"), CreateTileAtlas.atlasAutumn, false)
+        printdbg(this, "Writing pixmap as tga: atlasWinter.tga")
+        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasWinter.tga"), CreateTileAtlas.atlasWinter, false)
+        printdbg(this, "Writing pixmap as tga: atlasSpring.tga")
+        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasSpring.tga"), CreateTileAtlas.atlasSpring, false)
+        */
+
 
         // PNG still doesn't work right.
         // The thing is, pixel with alpha 0 must have RGB of also 0, which PNG does not guarantee it.
