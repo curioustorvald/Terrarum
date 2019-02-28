@@ -173,7 +173,7 @@ object ModMgr {
         }
     }
 
-    /** Get a common file from all the installed mods. Files are guaranteed to exist. If a mod does not
+    /** Get a common file (literal file or directory) from all the installed mods. Files are guaranteed to exist. If a mod does not
      * contain the file, the mod will be skipped. */
     fun getFilesFromEveryMod(path: String): List<File> {
         val path = path.sanitisePath()
@@ -189,7 +189,7 @@ object ModMgr {
         return filesList.toList()
     }
 
-    /** Get a common file from all the installed mods. Files are guaranteed to exist. If a mod does not
+    /** Get a common file (literal file or directory) from all the installed mods. Files are guaranteed to exist. If a mod does not
      * contain the file, the mod will be skipped.
      *
      * Returning files are read-only. */
