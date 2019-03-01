@@ -15,10 +15,6 @@ import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.utils.JsonWriter
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.util.zip.GZIPInputStream
 import kotlin.math.roundToInt
 
 
@@ -48,6 +44,7 @@ internal object BlocksDrawer {
     lateinit var tilesTerrain: TextureRegionPack; private set
     lateinit var tilesTerrainBlend: TextureRegionPack; private set
     val tilesWire: TextureRegionPack
+    val tileItemTerrain: TextureRegionPack
     val tileItemWall: TextureRegionPack
     val tilesFluid: TextureRegionPack
 
@@ -91,22 +88,6 @@ internal object BlocksDrawer {
     private val shader = AppLoader.loadShader("assets/4096.vert", "assets/tiling.frag")
 
     init {
-        printdbg(this, "Unpacking textures...")
-
-
-        CreateTileAtlas()
-        JsonWriter.writeToFile(CreateTileAtlas.tags, "${AppLoader.defaultDir}/test_rendertags.json")
-        /* // each takes about 60 seconds
-        printdbg(this, "Writing pixmap as tga: atlas.tga")
-        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlas.tga"), CreateTileAtlas.atlas, false)
-        printdbg(this, "Writing pixmap as tga: atlasAutumn.tga")
-        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasAutumn.tga"), CreateTileAtlas.atlasAutumn, false)
-        printdbg(this, "Writing pixmap as tga: atlasWinter.tga")
-        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasWinter.tga"), CreateTileAtlas.atlasWinter, false)
-        printdbg(this, "Writing pixmap as tga: atlasSpring.tga")
-        PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasSpring.tga"), CreateTileAtlas.atlasSpring, false)
-        */
-
 
         // PNG still doesn't work right.
         // The thing is, pixel with alpha 0 must have RGB of also 0, which PNG does not guarantee it.
@@ -114,77 +95,80 @@ internal object BlocksDrawer {
         // with TGA, you have a complete control over this, with the expense of added hassle on your side.
         // -- Torvald, 2018-12-19
 
-        // hard-coded as tga.gz
-        val gzFileList = listOf("blocks/wire.tga.gz", "blocks/fluids.tga.gz", "blocks/terrain_spring.tga.gz", "blocks/terrain.tga.gz", "blocks/terrain_autumn.tga.gz", "blocks/terrain_winter.tga.gz")
-        val gzTmpFName = listOf("tmp_wire.tga", "tmp_fluids.tga", "tmp_vor.tga", "tmp_sumar.tga", "tmp_haust.tga", "tmp_vetter.tga")
-        // unzip GZIP temporarily
-        gzFileList.forEachIndexed { index, filename ->
-            val terrainTexFile = ModMgr.getGdxFile("basegame", filename)
-            val gzi = GZIPInputStream(terrainTexFile.read(GZIP_READBUF_SIZE))
-            val wholeFile = gzi.readBytes()
-            gzi.close()
-            val fos = BufferedOutputStream(FileOutputStream(gzTmpFName[index]))
-            fos.write(wholeFile)
-            fos.flush()
-            fos.close()
-        }
+        printdbg(this, "Making terrain textures...")
 
-        val _wirePixMap = Pixmap(Gdx.files.internal(gzTmpFName[0]))
-        val _fluidPixMap = Pixmap(Gdx.files.internal(gzTmpFName[1]))
-
-        val _terrainPixMap = Array(4) { Pixmap(Gdx.files.internal(gzTmpFName[it + 2])) }
-
-        // delete temp files
-        gzTmpFName.forEach { File(it).delete() }
-
-
-        weatherTerrains = Array(4) {
-            val t = TextureRegionPack(Texture(_terrainPixMap[it]), TILE_SIZE, TILE_SIZE)
-            t.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-            t
-        }
-
-        tilesWire = TextureRegionPack(Texture(_wirePixMap), TILE_SIZE, TILE_SIZE)
-        tilesWire.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-        tilesFluid = TextureRegionPack(Texture(_fluidPixMap), TILE_SIZE, TILE_SIZE)
-        tilesFluid.texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest)
-
-        // also dispose unused temp files
-        //terrainPixMap.dispose() // commented: tileItemWall needs it
-        _wirePixMap.dispose()
-        _fluidPixMap.dispose()
+        CreateTileAtlas()
+        JsonWriter.writeToFile(CreateTileAtlas.tags, "${AppLoader.defaultDir}/test_rendertags.json")
+        // each takes about 60 seconds
+        //printdbg(this, "Writing pixmap as tga: atlas.tga")
+        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlas.tga"), CreateTileAtlas.atlas, false)
+        //printdbg(this, "Writing pixmap as tga: atlasAutumn.tga")
+        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasAutumn.tga"), CreateTileAtlas.atlasAutumn, false)
+        //printdbg(this, "Writing pixmap as tga: atlasWinter.tga")
+        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasWinter.tga"), CreateTileAtlas.atlasWinter, false)
+        //printdbg(this, "Writing pixmap as tga: atlasSpring.tga")
+        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasSpring.tga"), CreateTileAtlas.atlasSpring, false)
 
 
 
-        printdbg(this, "Making wall item textures...")
+        // create terrain texture from pixmaps
+        weatherTerrains = arrayOf(
+                TextureRegionPack(Texture(CreateTileAtlas.atlasSpring), TILE_SIZE, TILE_SIZE),
+                TextureRegionPack(Texture(CreateTileAtlas.atlas), TILE_SIZE, TILE_SIZE),
+                TextureRegionPack(Texture(CreateTileAtlas.atlasAutumn), TILE_SIZE, TILE_SIZE),
+                TextureRegionPack(Texture(CreateTileAtlas.atlasWinter), TILE_SIZE, TILE_SIZE)
+        )
+
+        // unzip tga.gz for tilesWire and tilesFluid
+
+        //TODO
+        tilesWire = TextureRegionPack(Texture(8, 8, Pixmap.Format.RGBA8888), 1, 1)
+        tilesFluid = TextureRegionPack(Texture(8, 8, Pixmap.Format.RGBA8888), 1, 1)
+
+
+        printdbg(this, "Making terrain and wall item textures...")
 
         // create item_wall images
-        // because some limitation, we'll use summer image
-        // CPU render shits (lots of magic numbers xD)
-        val itemWallPixmap = Pixmap(_terrainPixMap[1].width / 16, _terrainPixMap[1].height, Pixmap.Format.RGBA8888)
-        for (blocksCol in 0 until itemWallPixmap.width / TILE_SIZE) { // 0..15
-            val pxColStart = blocksCol * 256 // 0, 256, 512, 768, ...
-            for (pxCol in pxColStart until pxColStart + TILE_SIZE) {
-                val x = blocksCol * TILE_SIZE + (pxCol fmod TILE_SIZE)
 
-                for (y in 0 until itemWallPixmap.height) {
-                    val colour = Color(_terrainPixMap[1].getPixel(pxCol, y)) mulAndAssign wallOverlayColour
-                    itemWallPixmap.drawPixel(x, y, colour.toRGBA())
-                }
+        fun maskTypetoTileIDForItemImage(maskType: Int) = when(maskType) {
+            CreateTileAtlas.RenderTag.MASK_47 -> 17
+            CreateTileAtlas.RenderTag.MASK_PLATFORM -> 7
+            else -> 0
+        }
+
+        val itemTerrainPixmap = Pixmap(16 * TILE_SIZE, 256 * TILE_SIZE, Pixmap.Format.RGBA8888)
+        val itemWallPixmap = Pixmap(16 * TILE_SIZE, 256 * TILE_SIZE, Pixmap.Format.RGBA8888)
+
+        CreateTileAtlas.tags.toMap().forEach { t, u ->
+            val tilePosFromAtlas = u.atlasStartingPosition + maskTypetoTileIDForItemImage(u.maskType)
+            val srcX = (tilePosFromAtlas % 256) * TILE_SIZE
+            val srcY = (tilePosFromAtlas / 256) * TILE_SIZE
+            val destX = (t % 16) * TILE_SIZE
+            val destY = (t / 16) * TILE_SIZE
+            itemTerrainPixmap.drawPixmap(CreateTileAtlas.atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+            itemWallPixmap.drawPixmap(CreateTileAtlas.atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+        }
+        // darken things for the wall
+        for (y in 0 until itemWallPixmap.height) {
+            for (x in 0 until itemWallPixmap.width) {
+                val c = Color(itemWallPixmap.getPixel(x, y)).mulAndAssign(wallOverlayColour).toRGBA()
+                itemWallPixmap.drawPixel(x, y, c)
             }
         }
 
         // test print
-        //PixmapIO2.writeTGA(Gdx.files.local("wallitem.tga"), itemWallPixmap, false)
+        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/terrainitem.tga"), itemTerrainPixmap, false)
 
+        val itemTerrainTexture = Texture(itemTerrainPixmap)
         val itemWallTexture = Texture(itemWallPixmap)
+        itemTerrainPixmap.dispose()
         itemWallPixmap.dispose()
+        tileItemTerrain = TextureRegionPack(itemTerrainTexture, TILE_SIZE, TILE_SIZE)
         tileItemWall = TextureRegionPack(itemWallTexture, TILE_SIZE, TILE_SIZE)
 
 
 
         // finally
-        _terrainPixMap.forEach { it.dispose() }
         tilesTerrain = weatherTerrains[1]
 
 
@@ -906,6 +890,8 @@ internal object BlocksDrawer {
         _tilesBufferAsTex.dispose()
         tilesQuad.dispose()
         shader.dispose()
+
+        CreateTileAtlas.dispose()
     }
 
     fun getRenderStartX(): Int = WorldCamera.x / TILE_SIZE

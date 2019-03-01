@@ -281,8 +281,8 @@ object ItemCodex {
     fun getItemImage(itemOriginalID: Int): TextureRegion {
         // terrain
         if (itemOriginalID in ITEM_TILES) {
-            return BlocksDrawer.tilesTerrain.get(
-                    (itemOriginalID % 16) * 16,
+            return BlocksDrawer.tileItemTerrain.get(
+                    itemOriginalID % 16,
                      itemOriginalID / 16
             )
         }
