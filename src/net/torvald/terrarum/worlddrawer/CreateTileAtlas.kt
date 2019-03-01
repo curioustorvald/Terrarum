@@ -226,4 +226,11 @@ object CreateTileAtlas {
         }
     }
 
+    fun dispose() {
+        atlas.dispose()
+        atlasAutumn.dispose()
+        atlasWinter.dispose()
+        atlasSpring.dispose()
+    }
+
 }
