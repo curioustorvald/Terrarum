@@ -16,6 +16,8 @@ import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
  */
 object CreateTileAtlas {
 
+    const val TILES_IN_X = 256
+    
     lateinit var atlas: Pixmap
     lateinit var atlasAutumn: Pixmap
     lateinit var atlasWinter: Pixmap
@@ -43,10 +45,10 @@ object CreateTileAtlas {
         tags = HashMap<Int, RenderTag>()
         tags[0] = RenderTag(0, RenderTag.CONNECT_SELF, RenderTag.MASK_NA)
 
-        atlas = Pixmap(256 * TILE_SIZE, 256 * TILE_SIZE, Pixmap.Format.RGBA8888)
-        atlasAutumn = Pixmap(256 * TILE_SIZE, 256 * TILE_SIZE, Pixmap.Format.RGBA8888)
-        atlasWinter = Pixmap(256 * TILE_SIZE, 256 * TILE_SIZE, Pixmap.Format.RGBA8888)
-        atlasSpring = Pixmap(256 * TILE_SIZE, 256 * TILE_SIZE, Pixmap.Format.RGBA8888)
+        atlas = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        atlasAutumn = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        atlasWinter = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        atlasSpring = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
 
         val initMap = Pixmap(Gdx.files.internal(atlasInit))
@@ -188,8 +190,8 @@ object CreateTileAtlas {
             _drawToAtlantes(pixmap, destTileNum, srcTileX, srcTileY, 4)
         }
         else {
-            val atlasX = (destTileNum % 256) * TILE_SIZE
-            val atlasY = (destTileNum / 256) * TILE_SIZE
+            val atlasX = (destTileNum % TILES_IN_X) * TILE_SIZE
+            val atlasY = (destTileNum / TILES_IN_X) * TILE_SIZE
             val sourceX = srcTileX * TILE_SIZE
             val sourceY = srcTileY * TILE_SIZE
 

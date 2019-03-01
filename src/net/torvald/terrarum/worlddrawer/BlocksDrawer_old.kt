@@ -467,10 +467,10 @@ object BlocksDrawerOLD {
                                 nearbyTilesInfo = getNearbyTilesInfoWallSticker(x, y)
                             }
                             else if (isConnectMutual(thisTile)) {
-                                nearbyTilesInfo = getNearbyTilesInfoNonSolid(x, y, mode)
+                                nearbyTilesInfo = getNearbyTilesInfoConMutual(x, y, mode)
                             }
                             else if (isConnectSelf(thisTile)) {
-                                nearbyTilesInfo = getNearbyTilesInfo(x, y, mode, thisTile)
+                                nearbyTilesInfo = getNearbyTilesInfoConSelf(x, y, mode, thisTile)
                             }
                             else {
                                 nearbyTilesInfo = 0
@@ -543,7 +543,7 @@ object BlocksDrawerOLD {
      * *
      * @return binary [0-15] 1: up, 2: right, 4: down, 8: left
      */
-    fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
+    fun getNearbyTilesInfoConSelf(x: Int, y: Int, mode: Int, mark: Int?): Int {
         val nearbyTiles = IntArray(4)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: Block.NULL
@@ -561,7 +561,7 @@ object BlocksDrawerOLD {
         return ret
     }
 
-    fun getNearbyTilesInfoNonSolid(x: Int, y: Int, mode: Int): Int {
+    fun getNearbyTilesInfoConMutual(x: Int, y: Int, mode: Int): Int {
         val nearbyTiles = IntArray(4)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: Block.NULL
