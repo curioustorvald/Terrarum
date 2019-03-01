@@ -14,6 +14,7 @@ import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldSimulator
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.utils.JsonWriter
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILES_IN_X
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import kotlin.math.roundToInt
 
@@ -55,8 +56,6 @@ internal object BlocksDrawer {
 
     const val BREAKAGE_STEPS = 10
     const val TILES_PER_BLOCK = PairedMapLayer.RANGE
-    const val BLOCKS_IN_ATLAS_X = 16  // assuming atlas size of 4096x4096 px
-    const val BLOCKS_IN_ATLAS_Y = 256 // assuming atlas size of 4096x4096 px
 
     val WALL = GameWorld.WALL
     val TERRAIN = GameWorld.TERRAIN
@@ -136,13 +135,13 @@ internal object BlocksDrawer {
             else -> 0
         }
 
-        val itemTerrainPixmap = Pixmap(16 * TILE_SIZE, 256 * TILE_SIZE, Pixmap.Format.RGBA8888)
-        val itemWallPixmap = Pixmap(16 * TILE_SIZE, 256 * TILE_SIZE, Pixmap.Format.RGBA8888)
+        val itemTerrainPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        val itemWallPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
         CreateTileAtlas.tags.toMap().forEach { t, u ->
             val tilePosFromAtlas = u.atlasStartingPosition + maskTypetoTileIDForItemImage(u.maskType)
-            val srcX = (tilePosFromAtlas % 256) * TILE_SIZE
-            val srcY = (tilePosFromAtlas / 256) * TILE_SIZE
+            val srcX = (tilePosFromAtlas % TILES_IN_X) * TILE_SIZE
+            val srcY = (tilePosFromAtlas / TILES_IN_X) * TILE_SIZE
             val destX = (t % 16) * TILE_SIZE
             val destY = (t / 16) * TILE_SIZE
             itemTerrainPixmap.drawPixmap(CreateTileAtlas.atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
@@ -186,175 +185,8 @@ internal object BlocksDrawer {
      *
      * size of this LUT must be equal to 256.
      */
-    private val connectLut = intArrayOf(17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,8,10,8,10,0,12,0,43,8,10,8,10,0,12,0,43,11,13,11,13,6,20,6,34,11,13,11,13,36,33,36,46,8,10,8,10,0,12,0,43,8,10,8,10,0,12,0,43,30,42,30,42,38,26,38,18,30,42,30,42,23,40,23,31,17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,8,28,8,28,0,41,0,21,8,28,8,28,0,41,0,21,11,44,11,44,6,27,6,45,11,44,11,44,36,19,36,32,8,28,8,28,0,41,0,21,8,28,8,28,0,41,0,21,30,29,30,29,38,39,38,25,30,29,30,29,23,24,23,22)
-
-    /**
-     * Connectivity group 01 : artificial tiles
-     * It holds different shading rule to discriminate with group 02, index 0 is single tile.
-     * These are the tiles that only connects to itself, will not connect to colour variants
-     */
-    private val TILES_CONNECT_SELF = hashSetOf(
-            Block.GLASS_CRUDE,
-            Block.GLASS_CLEAN,
-            Block.ILLUMINATOR_BLACK,
-            Block.ILLUMINATOR_BLUE,
-            Block.ILLUMINATOR_BROWN,
-            Block.ILLUMINATOR_CYAN,
-            Block.ILLUMINATOR_FUCHSIA,
-            Block.ILLUMINATOR_GREEN,
-            Block.ILLUMINATOR_GREEN_DARK,
-            Block.ILLUMINATOR_GREY_DARK,
-            Block.ILLUMINATOR_GREY_LIGHT,
-            Block.ILLUMINATOR_GREY_MED,
-            Block.ILLUMINATOR_ORANGE,
-            Block.ILLUMINATOR_PURPLE,
-            Block.ILLUMINATOR_RED,
-            Block.ILLUMINATOR_TAN,
-            Block.ILLUMINATOR_WHITE,
-            Block.ILLUMINATOR_YELLOW,
-            Block.ILLUMINATOR_BLACK_OFF,
-            Block.ILLUMINATOR_BLUE_OFF,
-            Block.ILLUMINATOR_BROWN_OFF,
-            Block.ILLUMINATOR_CYAN_OFF,
-            Block.ILLUMINATOR_FUCHSIA_OFF,
-            Block.ILLUMINATOR_GREEN_OFF,
-            Block.ILLUMINATOR_GREEN_DARK_OFF,
-            Block.ILLUMINATOR_GREY_DARK_OFF,
-            Block.ILLUMINATOR_GREY_LIGHT_OFF,
-            Block.ILLUMINATOR_GREY_MED_OFF,
-            Block.ILLUMINATOR_ORANGE_OFF,
-            Block.ILLUMINATOR_PURPLE_OFF,
-            Block.ILLUMINATOR_RED_OFF,
-            Block.ILLUMINATOR_TAN_OFF,
-            Block.ILLUMINATOR_WHITE_OFF,
-            Block.ILLUMINATOR_YELLOW_OFF,
-            Block.DAYLIGHT_CAPACITOR,
-
-            Block.ORE_COPPER,
-            Block.ORE_IRON,
-            Block.ORE_GOLD,
-            Block.ORE_SILVER,
-            Block.ORE_ILMENITE,
-            Block.ORE_AURICHALCUM
-    )
-
-    /**
-     * To interact with external modules
-     */
-    @JvmStatic fun addConnectSelf(blockID: Int): Boolean {
-        return TILES_CONNECT_SELF.add(blockID)
-    }
-
-    /**
-     * Connectivity group 02 : natural tiles
-     * It holds different shading rule to discriminate with group 01, index 0 is middle tile.
-     */
-    private val TILES_CONNECT_MUTUAL = hashSetOf(
-            Block.STONE,
-            Block.STONE_QUARRIED,
-            Block.STONE_TILE_WHITE,
-            Block.STONE_BRICKS,
-            Block.DIRT,
-            Block.GRASS,
-            Block.GRASSWALL,
-            Block.PLANK_BIRCH,
-            Block.PLANK_BLOODROSE,
-            Block.PLANK_EBONY,
-            Block.PLANK_NORMAL,
-            Block.SAND,
-            Block.SAND_WHITE,
-            Block.SAND_RED,
-            Block.SAND_DESERT,
-            Block.SAND_BLACK,
-            Block.SAND_GREEN,
-            Block.GRAVEL,
-            Block.GRAVEL_GREY,
-            Block.SNOW,
-            Block.ICE_NATURAL,
-            Block.ICE_MAGICAL,
-
-            Block.SANDSTONE,
-            Block.SANDSTONE_BLACK,
-            Block.SANDSTONE_DESERT,
-            Block.SANDSTONE_RED,
-            Block.SANDSTONE_WHITE,
-            Block.SANDSTONE_GREEN
-
-            /*lock.WATER,
-            Block.WATER_1,
-            Block.WATER_2,
-            Block.WATER_3,
-            Block.WATER_4,
-            Block.WATER_5,
-            Block.WATER_6,
-            Block.WATER_7,
-            Block.WATER_8,
-            Block.WATER_9,
-            Block.WATER_10,
-            Block.WATER_11,
-            Block.WATER_12,
-            Block.WATER_13,
-            Block.WATER_14,
-            Block.WATER_15,
-            Block.LAVA,
-            Block.LAVA_1,
-            Block.LAVA_2,
-            Block.LAVA_3,
-            Block.LAVA_4,
-            Block.LAVA_5,
-            Block.LAVA_6,
-            Block.LAVA_7,
-            Block.LAVA_8,
-            Block.LAVA_9,
-            Block.LAVA_10,
-            Block.LAVA_11,
-            Block.LAVA_12,
-            Block.LAVA_13,
-            Block.LAVA_14,
-            Block.LAVA_15*/
-    )
-
-    /**
-     * To interact with external modules
-     */
-    @JvmStatic fun addConnectMutual(blockID: Int): Boolean {
-        return TILES_CONNECT_MUTUAL.add(blockID)
-    }
-
-    /**
-     * Torches, levers, switches, ...
-     */
-    private val TILES_WALL_STICKER = hashSetOf(
-            Block.TORCH,
-            Block.TORCH_FROST,
-            Block.TORCH_OFF,
-            Block.TORCH_FROST_OFF
-    )
-
-    /**
-     * To interact with external modules
-     */
-    @JvmStatic fun addWallSticker(blockID: Int): Boolean {
-        return TILES_WALL_STICKER.add(blockID)
-    }
-
-    /**
-     * platforms, ...
-     */
-    private val TILES_WALL_STICKER_CONNECT_SELF = hashSetOf(
-            Block.PLATFORM_BIRCH,
-            Block.PLATFORM_BLOODROSE,
-            Block.PLATFORM_EBONY,
-            Block.PLATFORM_STONE,
-            Block.PLATFORM_WOODEN
-    )
-
-    /**
-     * To interact with external modules
-     */
-    @JvmStatic fun addWallStickerConnectSelf(blockID: Int): Boolean {
-        return TILES_WALL_STICKER_CONNECT_SELF.add(blockID)
-    }
+    private val connectLut47 = intArrayOf(17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,8,10,8,10,0,12,0,43,8,10,8,10,0,12,0,43,11,13,11,13,6,20,6,34,11,13,11,13,36,33,36,46,8,10,8,10,0,12,0,43,8,10,8,10,0,12,0,43,30,42,30,42,38,26,38,18,30,42,30,42,23,45,23,31,17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,17,1,17,1,2,3,2,14,17,1,17,1,2,3,2,14,9,7,9,7,4,5,4,35,9,7,9,7,16,37,16,15,8,28,8,28,0,41,0,21,8,28,8,28,0,41,0,21,11,44,11,44,6,27,6,40,11,44,11,44,36,19,36,32,8,28,8,28,0,41,0,21,8,28,8,28,0,41,0,21,30,29,30,29,38,39,38,25,30,29,30,29,23,24,23,22)
+    private val connectLut16 = intArrayOf(0,2,0,2,4,6,4,6,0,2,0,2,4,6,4,6,8,10,8,10,12,14,12,14,8,10,8,10,12,14,12,14,0,2,0,2,4,6,4,6,0,2,0,2,4,6,4,6,8,10,8,10,12,14,12,14,8,10,8,10,12,14,12,14,1,3,1,3,5,7,5,7,1,3,1,3,5,7,5,7,9,11,9,11,13,15,13,15,9,11,9,11,13,15,13,15,1,3,1,3,5,7,5,7,1,3,1,3,5,7,5,7,9,11,9,11,13,15,13,15,9,11,9,11,13,15,13,15,0,2,0,2,4,6,4,6,0,2,0,2,4,6,4,6,8,10,8,10,12,14,12,14,8,10,8,10,12,14,12,14,0,2,0,2,4,6,4,6,0,2,0,2,4,6,4,6,8,10,8,10,12,14,12,14,8,10,8,10,12,14,12,14,1,3,1,3,5,7,5,7,1,3,1,3,5,7,5,7,9,11,9,11,13,15,13,15,9,11,9,11,13,15,13,15,1,3,1,3,5,7,5,7,1,3,1,3,5,7,5,7,9,11,9,11,13,15,13,15,9,11,9,11,13,15,13,15)
 
     /**
      * Tiles that half-transparent and has hue
@@ -444,7 +276,7 @@ internal object BlocksDrawer {
         if (this.amount >= WorldSimulator.FLUID_MIN_MASS) {
             val fluidLevel = this.amount.coerceIn(0f,1f).times(PairedMapLayer.RANGE - 1).roundToInt()
 
-            return fluidLevel * BLOCKS_IN_ATLAS_X + fluidNum
+            return fluidLevel * 16 + fluidNum
         }
         else {
             return 0
@@ -494,7 +326,7 @@ internal object BlocksDrawer {
 
 
                 // draw a tile
-                try {
+                if (thisTile != null) try {
                     val nearbyTilesInfo = if (mode == FLUID) {
                         getNearbyTilesInfoFluids(x, y)
                     }
@@ -505,18 +337,27 @@ internal object BlocksDrawer {
                         getNearbyTilesInfoWallSticker(x, y)
                     }
                     else if (isConnectMutual(thisTile)) {
-                        getNearbyTilesInfoNonSolid(x, y, mode)
+                        getNearbyTilesInfoConMutual(x, y, mode)
                     }
                     else if (isConnectSelf(thisTile)) {
-                        getNearbyTilesInfo(x, y, mode, thisTile)
+                        getNearbyTilesInfoConSelf(x, y, mode, thisTile)
                     }
                     else {
                         0
                     }
 
+                    val renderTag = CreateTileAtlas.getRenderTag(thisTile)
+                    val tileNumberBase = renderTag.atlasStartingPosition
+                    val tileNumber = tileNumberBase + when (renderTag.maskType) {
+                        CreateTileAtlas.RenderTag.MASK_NA -> 0
+                        CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
+                        CreateTileAtlas.RenderTag.MASK_47 -> connectLut47[nearbyTilesInfo]
+                        CreateTileAtlas.RenderTag.MASK_TORCH, CreateTileAtlas.RenderTag.MASK_PLATFORM -> nearbyTilesInfo
+                        else -> throw IllegalArgumentException("Unknown mask type: ${renderTag.maskType}")
+                    }
 
-                    val thisTileX = TILES_PER_BLOCK * ((thisTile ?: 0) % BLOCKS_IN_ATLAS_X) + nearbyTilesInfo
-                    val thisTileY = (thisTile ?: 0) / BLOCKS_IN_ATLAS_X
+                    val thisTileX = tileNumber % TILES_IN_X
+                    val thisTileY = tileNumber / TILES_IN_X
 
                     val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
                     val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
@@ -539,91 +380,63 @@ internal object BlocksDrawer {
         }
     }
 
-    /**
+    private fun getNearbyTilesPos(x: Int, y: Int): Array<Point2i> {
+        return arrayOf(
+                Point2i(x + 1, y),
+                Point2i(x + 1, y + 1),
+                Point2i(x, y + 1),
+                Point2i(x - 1, y + 1),
+                Point2i(x - 1, y),
+                Point2i(x - 1, y - 1),
+                Point2i(x, y - 1),
+                Point2i(x + 1, y - 1)
+        )
+    }
 
-     * @param x
-     * *
-     * @param y
-     * *
-     * @return binary [0-15] 1: up, 2: right, 4: down, 8: left
-     */
-    internal fun getNearbyTilesInfo(x: Int, y: Int, mode: Int, mark: Int?): Int {
-        val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFrom(mode, x    , y - 1) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(mode, x    , y + 1) ?: Block.NULL
+    private fun getNearbyTilesInfoConSelf(x: Int, y: Int, mode: Int, mark: Int?): Int {
+        val nearbyTiles = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) ?: Block.NULL }
 
-        // try for
         var ret = 0
-        for (i in 0..3) {
+        for (i in 0 until nearbyTiles.size) {
             if (nearbyTiles[i] == mark) {
-                ret += 1 shl i // add 1, 2, 4, 8 for i = 0, 1, 2, 3
+                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
 
         return ret
     }
 
-    internal fun getNearbyTilesInfoNonSolid(x: Int, y: Int, mode: Int): Int {
-        val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(mode, x - 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(mode, x + 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_UP] = world.getTileFrom(mode, x    , y - 1) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] = world.getTileFrom(mode, x    , y + 1) ?: Block.NULL
+    private fun getNearbyTilesInfoConMutual(x: Int, y: Int, mode: Int): Int {
+        val nearbyTiles = getNearbyTilesPos(x, y).map { world.getTileFrom(mode, it.x, it.y) ?: Block.NULL }
 
-        // try for
         var ret = 0
-        for (i in 0..3) {
-            try {
-                if (!BlockCodex[nearbyTiles[i]].isSolid) {
-                    ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
-                }
-            } catch (e: ArrayIndexOutOfBoundsException) {
+        for (i in 0 until nearbyTiles.size) {
+            if (BlockCodex[nearbyTiles[i]].isSolid) {
+                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
-
         }
 
-        return 15 - ret
+        return ret
     }
 
     /**
-     * Basically getNearbyTilesInfoNonSolid() but connects mutually with all the fluids
+     * Basically getNearbyTilesInfoConMutual() but connects mutually with all the fluids
      */
-    internal fun getNearbyTilesInfoFluids(x: Int, y: Int): Int {
-        val nearbyTiles = IntArray(4)
-        nearbyTiles[NEARBY_TILE_KEY_UP] =    world.getTileFromTerrain(x    , y - 1) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFromTerrain(x + 1, y) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_DOWN] =  world.getTileFromTerrain(x    , y + 1) ?: Block.NULL
-        nearbyTiles[NEARBY_TILE_KEY_LEFT] =  world.getTileFromTerrain(x - 1, y) ?: Block.NULL
+    private fun getNearbyTilesInfoFluids(x: Int, y: Int): Int {
+        val nearbyPos = getNearbyTilesPos(x, y)
+        val nearbyTiles = nearbyPos.map { world.getTileFromTerrain(it.x, it.y) ?: Block.NULL }
 
-        val nearX = intArrayOf(x, x+1, x, x-1)
-        val nearY = intArrayOf(y-1, y, y+1, y)
-
-        // try for
         var ret = 0
-        for (i in 0..3) {
-            try {
-                if (!world.getFluid(nearX[i], nearY[i]).isFluid() && // is not a fluid and...
-                    !BlockCodex[nearbyTiles[i]].isSolid) {
-                    ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
-                }
-            } catch (e: ArrayIndexOutOfBoundsException) {
+        for (i in 0 until nearbyTiles.size) {
+            if (BlockCodex[nearbyTiles[i]].isSolid || world.getFluid(nearbyPos[i].x, nearbyPos[i].y).isFluid()) {
+                ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
-
         }
 
-        //return ret
-        
-        return if (ret == 15 || ret == 10)
-            ret
-        else if (world.getFluid(x, y-1).isFluid()) // if tile above is a fluid
-            0
-        else
-            1
+        return ret
     }
 
-    internal fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
+    private fun getNearbyTilesInfoWallSticker(x: Int, y: Int): Int {
         val nearbyTiles = IntArray(4)
         val NEARBY_TILE_KEY_BACK = NEARBY_TILE_KEY_UP
         nearbyTiles[NEARBY_TILE_KEY_LEFT] =  world.getTileFrom(TERRAIN, x - 1, y) ?: Block.NULL
@@ -657,7 +470,7 @@ internal object BlocksDrawer {
         }
     }
 
-    internal fun getNearbyTilesInfoPlatform(x: Int, y: Int): Int {
+    private fun getNearbyTilesInfoPlatform(x: Int, y: Int): Int {
         val nearbyTiles = IntArray(4)
         nearbyTiles[NEARBY_TILE_KEY_LEFT] = world.getTileFrom(TERRAIN, x - 1, y) ?: Block.NULL
         nearbyTiles[NEARBY_TILE_KEY_RIGHT] = world.getTileFrom(TERRAIN, x + 1, y) ?: Block.NULL
@@ -884,6 +697,7 @@ internal object BlocksDrawer {
 
         weatherTerrains.forEach { it.dispose() }
         tilesWire.dispose()
+        tileItemTerrain.dispose()
         tileItemWall.dispose()
         tilesFluid.dispose()
         tilesBuffer.dispose()
@@ -900,11 +714,11 @@ internal object BlocksDrawer {
     fun getRenderEndX(): Int = clampWTile(getRenderStartX() + (WorldCamera.width / TILE_SIZE) + 2)
     fun getRenderEndY(): Int = clampHTile(getRenderStartY() + (WorldCamera.height / TILE_SIZE) + 2)
 
-    fun isConnectSelf(b: Int?): Boolean = TILES_CONNECT_SELF.contains(b)
-    fun isConnectMutual(b: Int?): Boolean = TILES_CONNECT_MUTUAL.contains(b)
-    fun isWallSticker(b: Int?): Boolean = TILES_WALL_STICKER.contains(b)
-    fun isPlatform(b: Int?): Boolean = TILES_WALL_STICKER_CONNECT_SELF.contains(b)
-    fun isBlendMul(b: Int?): Boolean = TILES_BLEND_MUL.contains(b)
+    fun isConnectSelf(b: Int): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_SELF
+    fun isConnectMutual(b: Int): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_MUTUAL
+    fun isWallSticker(b: Int): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER
+    fun isPlatform(b: Int): Boolean = CreateTileAtlas.getRenderTag(b).connectionType == CreateTileAtlas.RenderTag.CONNECT_WALL_STICKER_CONNECT_SELF
+    //fun isBlendMul(b: Int): Boolean = TILES_BLEND_MUL.contains(b)
 
     fun tileInCamera(x: Int, y: Int) =
             x >= WorldCamera.x.div(TILE_SIZE) && y >= WorldCamera.y.div(TILE_SIZE) &&
