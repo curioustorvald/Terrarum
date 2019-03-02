@@ -2,12 +2,16 @@ package net.torvald.terrarum.worlddrawer
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.utils.GdxRuntimeException
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.ModMgr
+import net.torvald.terrarum.blockproperties.BlockCodex
+import net.torvald.terrarum.blockproperties.Fluid
+import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.toInt
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
+import kotlin.math.roundToInt
 
 /**
  * This class implements work_files/dynamic_shape_2_0.psd
@@ -22,6 +26,7 @@ object CreateTileAtlas {
     lateinit var atlasAutumn: Pixmap
     lateinit var atlasWinter: Pixmap
     lateinit var atlasSpring: Pixmap
+    lateinit var atlasFluid: Pixmap
     internal lateinit var tags: HashMap<Int, RenderTag>
         private set
     private val defaultRenderTag = RenderTag(3, RenderTag.CONNECT_SELF, RenderTag.MASK_NA) // 'update' block
@@ -31,6 +36,7 @@ object CreateTileAtlas {
     /** 0000.tga, 1.tga.gz, 3242423.tga, 000033.tga.gz */
     // for right now, TGA file only, no gzip
     private val validTerrainTilesFilename = Regex("""[0-9]+\.tga""")//Regex("""[0-9]+\.tga(.gz)?""")
+    private val validFluidTilesFilename = Regex("""fluid_[0-9]+\.tga""")
 
     // 16 tiles are reserved for internal use: solid black, solid white, breakage stages.
     // 0th tile is complete transparent tile and is also a BlockID of zero: air.
@@ -38,7 +44,7 @@ object CreateTileAtlas {
     private val atlasInit = "./assets/graphics/blocks/init.tga"
 
     /**
-     * Must be called AFTER mods' loading
+     * Must be called AFTER mods' loading so that all the block props are loaded
      */
     operator fun invoke(updateExisting: Boolean = false) { if (updateExisting || !initialised) {
 
@@ -49,6 +55,7 @@ object CreateTileAtlas {
         atlasAutumn = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
         atlasWinter = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
         atlasSpring = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        atlasFluid = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
 
         val initMap = Pixmap(Gdx.files.internal(atlasInit))
@@ -57,21 +64,20 @@ object CreateTileAtlas {
 
 
         // get all the files applicable
-        // first, get all the '/blocks' directory
+        // first, get all the '/blocks' directory, and add all the files, regardless of their extension, to the list
         val tgaList = ArrayList<FileHandle>()
         ModMgr.getGdxFilesFromEveryMod("blocks").forEach {
             if (!it.isDirectory) {
                 throw Error("Path '${it.path()}' is not a directory")
             }
 
-            // then, filter the file such that its name matches the regex
-            it.list { _, name -> name.matches(validTerrainTilesFilename) }.forEach { tgaFile ->
-                tgaList.add(tgaFile)
+            it.list().forEach { tgaFile ->
+                if (!tgaFile.isDirectory) tgaList.add(tgaFile)
             }
         }
 
-        // Sift through the file list, but TGA format first
-        tgaList.filter { it.extension().toUpperCase() == "TGA" }.forEach {
+        // Sift through the file list for blocks, but TGA format first
+        tgaList.filter { it.name().matches(validTerrainTilesFilename) && it.extension().toUpperCase() == "TGA" }.forEach {
             try {
                 fileToAtlantes(it)
             }
@@ -91,11 +97,83 @@ object CreateTileAtlas {
         }*/
 
 
+        // Sift through the file list for fluids, but TGA format first
+        val fluidMasterPixmap = Pixmap(TILE_SIZE * 47, TILE_SIZE * 8, Pixmap.Format.RGBA8888)
+        tgaList.filter { it.name().matches(validFluidTilesFilename) && it.extension().toUpperCase() == "TGA" }.forEachIndexed { fluidLevel, it ->
+            val pixmap = Pixmap(it)
+            // dirty manual copy
+            repeat(5) {
+                fluidMasterPixmap.drawPixmap(pixmap,
+                        it * TILE_SIZE * 7, fluidLevel * TILE_SIZE,
+                        0, TILE_SIZE * it,
+                        TILE_SIZE * 7, TILE_SIZE
+                )
+            }
+            repeat(2) {
+                fluidMasterPixmap.drawPixmap(pixmap,
+                        (35 + it * 6) * TILE_SIZE, fluidLevel * TILE_SIZE,
+                        0, TILE_SIZE * (5 + it),
+                        TILE_SIZE * 6, TILE_SIZE
+                )
+            }
+
+            pixmap.dispose()
+        }
+        // test print
+        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/fluidpixmapmaster.tga"), fluidMasterPixmap, false)
+
+        // occupy the fluid pixmap with software rendering
+        for (i in BlockCodex.MAX_TERRAIN_TILES..BlockCodex.highestNumber) {
+            val fluid = Color(BlockCodex[i].colour)
+
+            // pixmap <- (color SCREEN fluidMasterPixmap)
+            // then occupy the atlasFluid
+            val pixmap = Pixmap(fluidMasterPixmap.width, fluidMasterPixmap.height, Pixmap.Format.RGBA8888)
+
+            for (y in 0 until pixmap.height) {
+                for (x in 0 until pixmap.width) {
+                    val inColour = Color(fluidMasterPixmap.getPixel(x, y))
+                    // SCREEN for RGB, MUL for A.
+                    inColour.r = 1f - (1f - fluid.r) * (1f - inColour.r)
+                    inColour.g = 1f - (1f - fluid.g) * (1f - inColour.g)
+                    inColour.b = 1f - (1f - fluid.b) * (1f - inColour.b)
+                    inColour.a = fluid.a * inColour.a
+
+                    pixmap.drawPixel(x, y, inColour.toRGBA())
+                }
+            }
+
+            // test print
+            //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/$i.tga"), pixmap, false)
+            // using the test print, I figured out that the output is alpha premultiplied.
+
+            // to the atlas
+            val atlasTargetPos = 1 + 47 * 8 * (i - BlockCodex.MAX_TERRAIN_TILES)
+            for (k in 0 until 47 * 8) {
+                val srcX = (k % 47) * TILE_SIZE
+                val srcY = (k / 47) * TILE_SIZE
+                val destX = ((atlasTargetPos + k) % TILES_IN_X) * TILE_SIZE
+                val destY = ((atlasTargetPos + k) / TILES_IN_X) * TILE_SIZE
+                atlasFluid.drawPixmap(pixmap, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+            }
+
+            pixmap.dispose()
+        }
+
+
+        fluidMasterPixmap.dispose()
+
         initialised = true
     } }
 
     fun getRenderTag(blockID: Int): RenderTag {
         return tags.getOrDefault(blockID, defaultRenderTag)
+    }
+
+    fun fluidToTileNumber(fluid: GameWorld.FluidInfo): Int {
+        val fluidLevel = fluid.amount.coerceIn(0f, 1f).times(9).roundToInt()
+        return if (fluid.type == Fluid.NULL || fluidLevel == 0) 0 else
+            47 * 8 * (fluid.type.abs() - 1) + 47 * (fluidLevel - 1)
     }
 
     private fun fileToAtlantes(it: FileHandle) {
@@ -160,7 +238,7 @@ object CreateTileAtlas {
         val txOfPixmap = pixmap.width / TILE_SIZE
         val tyOfPixmap = pixmap.height / TILE_SIZE
         for (i in 0 until tilesCount) {
-            printdbg(this, "Rendering to atlas, tile# $atlasCursor")
+            //printdbg(this, "Rendering to atlas, tile# $atlasCursor")
 
             // different texture for different seasons (224x224)
             if (seasonal) {
@@ -200,11 +278,12 @@ object CreateTileAtlas {
                 2 -> atlasAutumn.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 3 -> atlasWinter.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
                 4 -> atlasSpring.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
+                5 -> atlasFluid.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)
             }
         }
     }
 
-    data class RenderTag(val atlasStartingPosition: Int, val connectionType: Int, val maskType: Int) {
+    data class RenderTag(val tileNumber: Int, val connectionType: Int, val maskType: Int) {
         companion object {
             const val CONNECT_MUTUAL = 0
             const val CONNECT_SELF = 1
@@ -233,6 +312,6 @@ object CreateTileAtlas {
         atlasAutumn.dispose()
         atlasWinter.dispose()
         atlasSpring.dispose()
+        atlasFluid.dispose()
     }
-
 }

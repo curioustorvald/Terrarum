@@ -107,6 +107,8 @@ internal object BlocksDrawer {
         //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasWinter.tga"), CreateTileAtlas.atlasWinter, false)
         //printdbg(this, "Writing pixmap as tga: atlasSpring.tga")
         //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasSpring.tga"), CreateTileAtlas.atlasSpring, false)
+        //printdbg(this, "Writing pixmap as tga: atlasFluid.tga")
+        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/atlasFluid.tga"), CreateTileAtlas.atlasFluid, false)
 
 
 
@@ -139,7 +141,7 @@ internal object BlocksDrawer {
         val itemWallPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
         CreateTileAtlas.tags.toMap().forEach { t, u ->
-            val tilePosFromAtlas = u.atlasStartingPosition + maskTypetoTileIDForItemImage(u.maskType)
+            val tilePosFromAtlas = u.tileNumber + maskTypetoTileIDForItemImage(u.maskType)
             val srcX = (tilePosFromAtlas % TILES_IN_X) * TILE_SIZE
             val srcY = (tilePosFromAtlas / TILES_IN_X) * TILE_SIZE
             val destX = (t % 16) * TILE_SIZE
@@ -347,7 +349,7 @@ internal object BlocksDrawer {
                     }
 
                     val renderTag = CreateTileAtlas.getRenderTag(thisTile)
-                    val tileNumberBase = renderTag.atlasStartingPosition
+                    val tileNumberBase = renderTag.tileNumber
                     val tileNumber = tileNumberBase + when (renderTag.maskType) {
                         CreateTileAtlas.RenderTag.MASK_NA -> 0
                         CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
