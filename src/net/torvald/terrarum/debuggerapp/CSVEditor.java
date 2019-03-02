@@ -28,12 +28,12 @@ import java.util.Properties;
 public class CSVEditor extends JFrame {
 
     /** Default columns. When you open existing csv, it should overwrite this. */
-    private String[] columns = new String[]{"id", "drop", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "plat", "wall", "fall", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour"};
+    private String[] columns = new String[]{"id", "drop", "name", "shdr", "shdg", "shdb", "shduv", "str", "dsty", "mate", "solid", "plat", "wall", "fall", "dlfn", "fv", "fr", "lumr", "lumg", "lumb", "lumuv", "colour", "vscs"};
     private final int FOUR_DIGIT = 42;
     private final int SIX_DIGIT = 50;
     private final int TWO_DIGIT = 30;
     private final int ARBITRARY = 240;
-    private int[] colWidth = new int[]{FOUR_DIGIT, FOUR_DIGIT, ARBITRARY, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, TWO_DIGIT, FOUR_DIGIT, FOUR_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, FOUR_DIGIT * 2};
+    private int[] colWidth = new int[]{FOUR_DIGIT, FOUR_DIGIT, ARBITRARY, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, TWO_DIGIT, FOUR_DIGIT, FOUR_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, TWO_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, SIX_DIGIT, FOUR_DIGIT * 2, TWO_DIGIT};
 
     private final int UNDO_BUFFER_SIZE = 10;
 
@@ -500,7 +500,8 @@ public class CSVEditor extends JFrame {
                     "dlfn=Dynamic Light Function. 0=Static. Please see <strong>notes</strong>\n" +
                     "fv=Vertical friction when player slide on the cliff. 0 means not slide-able\n" +
                     "fr=Horizontal friction. &lt;16:slippery 16:regular &gt;16:sticky\n" +
-                    "colour=Colour of the block in hexadecimal RGBA. Only makes sense for fluids (id >= 4096)\n";
+                    "colour=[Fluids] Colour of the block in hexadecimal RGBA.\n" +
+                    "vscs=[Fluids] Viscocity of the block. 16 for water.\n";
 
     /**
      * ¤ is used as a \n marker

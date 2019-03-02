@@ -22,6 +22,7 @@ class BlockProp {
     var strength: Int = 0
     var density: Int = 0
     var viscosity: Int = 0
+    var colour: Int = 0
 
     var isSolid: Boolean = false
     //var isClear: Boolean = false

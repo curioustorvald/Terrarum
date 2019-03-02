@@ -16,15 +16,15 @@ import java.io.IOException
  */
 object BlockCodex {
 
-    private var blockProps: Array<BlockProp>
+    private var blockProps = HashMap<Int, BlockProp>()
 
+    /** 4096 */
     const val MAX_TERRAIN_TILES = MapLayer.RANGE * PairedMapLayer.RANGE
 
     private val nullProp = BlockProp()
 
-    init {
-        blockProps = Array<BlockProp>(MAX_TERRAIN_TILES * 2, { BlockProp() })
-    }
+    var highestNumber = -1
+        private set
 
     /**
      * Later entry (possible from other modules) will replace older ones
@@ -36,12 +36,18 @@ object BlockCodex {
             AppLoader.printdbg(this, "Building block properties table")
 
             records.forEach {
-                if (intVal(it, "id") == -1) {
+                /*if (intVal(it, "id") == -1) {
                     setProp(nullProp, it)
                 }
                 else {
                     setProp(blockProps[intVal(it, "id")], it)
-                }
+                }*/
+
+                val id = intVal(it, "id")
+                setProp(id, it)
+
+                if (id > highestNumber)
+                    highestNumber = id
             }
         }
         catch (e: IOException) {
@@ -68,7 +74,7 @@ object BlockCodex {
         }
 
         try {
-            return blockProps[rawIndex]
+            return blockProps[rawIndex]!!
         }
         catch (e: NullPointerException) {
             throw NullPointerException("Blockprop with raw id $rawIndex does not exist.")
@@ -77,11 +83,11 @@ object BlockCodex {
 
     operator fun get(fluidType: FluidType?): BlockProp {
         if (fluidType == null || fluidType.value == 0) {
-            return blockProps[Block.AIR]
+            return blockProps[Block.AIR]!!
         }
 
         try {
-            return blockProps[fluidType.abs() + GameWorld.TILES_SUPPORTED - 1]
+            return blockProps[fluidType.abs() + GameWorld.TILES_SUPPORTED - 1]!!
         }
         catch (e: NullPointerException) {
             throw NullPointerException("Blockprop with raw id $fluidType does not exist.")
@@ -89,22 +95,14 @@ object BlockCodex {
     }
 
     fun getOrNull(rawIndex: Int?): BlockProp? {
-        if (rawIndex == null || rawIndex == Block.NULL) {
-            return null
-        }
-
-        try {
-            return blockProps[rawIndex]
-        }
-        catch (e: NullPointerException) {
-            throw NullPointerException("Blockprop with raw id $rawIndex does not exist.")
-        }
+        return blockProps[rawIndex]
     }
 
-    private fun setProp(prop: BlockProp, record: CSVRecord) {
+    private fun setProp(key: Int, record: CSVRecord) {
+        val prop = BlockProp()
         prop.nameKey = record.get("name")
 
-        prop.id = intVal(record, "id")
+        prop.id = if (key == -1) 0 else intVal(record, "id")
         prop.drop = intVal(record, "drop")
 
         prop.shadeColR = floatVal(record, "shdr") / LightmapRenderer.MUL_FLOAT
@@ -124,6 +122,7 @@ object BlockCodex {
 
         prop.friction = intVal(record, "fr")
         prop.viscosity = intVal(record, "vscs")
+        prop.colour = str16ToInt(record, "colour")
 
         //prop.isFluid = boolVal(record, "fluid")
         prop.isSolid = boolVal(record, "solid")
@@ -135,8 +134,23 @@ object BlockCodex {
 
         prop.dynamicLuminosityFunction = intVal(record, "dlfn")
 
+        blockProps[key] = prop
+
         print("${intVal(record, "id")}")
         println("\t" + prop.nameKey)
+    }
+
+    private fun str16ToInt(rec: CSVRecord, s: String): Int {
+        var ret = 0
+        try {
+            ret = rec.get(s).toLong(16).toInt()
+        }
+        catch (e: NumberFormatException) {
+        }
+        catch (e1: IllegalStateException) {
+        }
+
+        return ret
     }
 
     private fun intVal(rec: CSVRecord, s: String): Int {

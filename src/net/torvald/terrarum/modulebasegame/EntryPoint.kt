@@ -36,66 +36,70 @@ class EntryPoint : ModuleEntryPoint() {
         // blocks.csvs are loaded by ModMgr beforehand
         // block items (blocks and walls are the same thing basically)
         for (i in ItemCodex.ITEM_TILES + ItemCodex.ITEM_WALLS) {
-            ItemCodex.itemCodex[i] = object : GameItem() {
-                override val originalID = i
-                override var dynamicID = i
-                override val isUnique: Boolean = false
-                override var baseMass: Double = BlockCodex[i].density / 1000.0
-                override var baseToolSize: Double? = null
-                override val originalName = BlockCodex[i % ItemCodex.ITEM_WALLS.first].nameKey
-                override var stackable = true
-                override var inventoryCategory = if (i in ItemCodex.ITEM_TILES) Category.BLOCK else Category.WALL
-                override var isDynamic = false
-                override val material = Material(0,0,0,0,0,0,0,0,0,0.0)
+            val blockProp = BlockCodex.getOrNull(i % ItemCodex.ITEM_WALLS.first)
 
-                init {
-                    equipPosition = EquipPosition.HAND_GRIP
+            if (blockProp != null) {
+                ItemCodex.itemCodex[i] = object : GameItem() {
+                    override val originalID = i
+                    override var dynamicID = i
+                    override val isUnique: Boolean = false
+                    override var baseMass: Double = blockProp.density / 1000.0
+                    override var baseToolSize: Double? = null
+                    override val originalName = blockProp.nameKey
+                    override var stackable = true
+                    override var inventoryCategory = if (i in ItemCodex.ITEM_TILES) Category.BLOCK else Category.WALL
+                    override var isDynamic = false
+                    override val material = Material(0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0)
 
-                    if (IS_DEVELOPMENT_BUILD)
-                        print("$originalID ")
-                }
+                    init {
+                        equipPosition = EquipPosition.HAND_GRIP
 
-                override fun startPrimaryUse(delta: Float): Boolean {
-                    val ingame = Terrarum.ingame!! as Ingame
+                        if (IS_DEVELOPMENT_BUILD)
+                            print("$originalID ")
+                    }
 
-                    val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
+                    override fun startPrimaryUse(delta: Float): Boolean {
+                        val ingame = Terrarum.ingame!! as Ingame
 
-                    // check for collision with actors (BLOCK only)
-                    if (this.inventoryCategory == Category.BLOCK) {
-                        ingame.actorContainerActive.forEach {
-                            if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
-                                return false
+                        val mousePoint = Point2d(Terrarum.mouseTileX.toDouble(), Terrarum.mouseTileY.toDouble())
+
+                        // check for collision with actors (BLOCK only)
+                        if (this.inventoryCategory == Category.BLOCK) {
+                            ingame.actorContainerActive.forEach {
+                                if (it is ActorWBMovable && it.hIntTilewiseHitbox.intersects(mousePoint))
+                                    return false
+                            }
                         }
-                    }
 
-                    // return false if the tile is already there
-                    if (this.inventoryCategory == Category.BLOCK &&
-                        this.dynamicID == ingame.world.getTileFromTerrain(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
-                        this.inventoryCategory == Category.WALL &&
-                        this.dynamicID - ItemCodex.ITEM_WALLS.start == ingame.world.getTileFromWall(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
-                        this.inventoryCategory == Category.WIRE &&
-                        this.dynamicID - ItemCodex.ITEM_WIRES.start == ingame.world.getTileFromWire(Terrarum.mouseTileX, Terrarum.mouseTileY)
-                    )
-                        return false
-
-                    // filter passed, do the job
-                    // FIXME this is only useful for Player
-                    if (i in ItemCodex.ITEM_TILES) {
-                        ingame.world.setTileTerrain(
-                                Terrarum.mouseTileX,
-                                Terrarum.mouseTileY,
-                                i
+                        // return false if the tile is already there
+                        if (this.inventoryCategory == Category.BLOCK &&
+                            this.dynamicID == ingame.world.getTileFromTerrain(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
+                            this.inventoryCategory == Category.WALL &&
+                            this.dynamicID - ItemCodex.ITEM_WALLS.start == ingame.world.getTileFromWall(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
+                            this.inventoryCategory == Category.WIRE &&
+                            this.dynamicID - ItemCodex.ITEM_WIRES.start == ingame.world.getTileFromWire(Terrarum.mouseTileX, Terrarum.mouseTileY)
                         )
-                    }
-                    else {
-                        ingame.world.setTileWall(
-                                Terrarum.mouseTileX,
-                                Terrarum.mouseTileY,
-                                i
-                        )
-                    }
+                            return false
 
-                    return true
+                        // filter passed, do the job
+                        // FIXME this is only useful for Player
+                        if (i in ItemCodex.ITEM_TILES) {
+                            ingame.world.setTileTerrain(
+                                    Terrarum.mouseTileX,
+                                    Terrarum.mouseTileY,
+                                    i
+                            )
+                        }
+                        else {
+                            ingame.world.setTileWall(
+                                    Terrarum.mouseTileX,
+                                    Terrarum.mouseTileY,
+                                    i
+                            )
+                        }
+
+                        return true
+                    }
                 }
             }
         }
