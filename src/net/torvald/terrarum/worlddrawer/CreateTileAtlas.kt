@@ -16,6 +16,11 @@ import kotlin.math.roundToInt
 /**
  * This class implements work_files/dynamic_shape_2_0.psd
  *
+ * Tile at (0,0) AND (5,0) must be transparent. Former is because block 0 is considered as an air, and the latter
+ * is because it's breakage of 0, and 0 means no breakage. Breakage part is hard-coded in the tiling shader.
+ *
+ * Any real tiles must begin from (0,16), the first 256x16 section is reserved for special purpose (terrain: breakage, fluid: empty)
+ *
  * Created by minjaesong on 2019-02-28.
  */
 object CreateTileAtlas {
@@ -57,6 +62,11 @@ object CreateTileAtlas {
         atlasSpring = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
         atlasFluid = Pixmap(TILES_IN_X * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
 
+        atlas.blending = Pixmap.Blending.None
+        atlasAutumn.blending = Pixmap.Blending.None
+        atlasWinter.blending = Pixmap.Blending.None
+        atlasSpring.blending = Pixmap.Blending.None
+        atlasFluid.blending = Pixmap.Blending.None
 
         val initMap = Pixmap(Gdx.files.internal(atlasInit))
         drawToAtlantes(initMap, 16)
@@ -129,6 +139,7 @@ object CreateTileAtlas {
             // pixmap <- (color SCREEN fluidMasterPixmap)
             // then occupy the atlasFluid
             val pixmap = Pixmap(fluidMasterPixmap.width, fluidMasterPixmap.height, Pixmap.Format.RGBA8888)
+            pixmap.blending = Pixmap.Blending.None
 
             for (y in 0 until pixmap.height) {
                 for (x in 0 until pixmap.width) {
@@ -145,10 +156,9 @@ object CreateTileAtlas {
 
             // test print
             //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/$i.tga"), pixmap, false)
-            // using the test print, I figured out that the output is alpha premultiplied.
 
             // to the atlas
-            val atlasTargetPos = 1 + 47 * 8 * (i - BlockCodex.MAX_TERRAIN_TILES)
+            val atlasTargetPos = 16 + 47 * 8 * (i - BlockCodex.MAX_TERRAIN_TILES)
             for (k in 0 until 47 * 8) {
                 val srcX = (k % 47) * TILE_SIZE
                 val srcY = (k / 47) * TILE_SIZE
@@ -170,10 +180,12 @@ object CreateTileAtlas {
         return tags.getOrDefault(blockID, defaultRenderTag)
     }
 
+    fun fluidFillToTileLevel(fill: Float) = fill.times(8).roundToInt().coerceIn(0, 8)
+
     fun fluidToTileNumber(fluid: GameWorld.FluidInfo): Int {
-        val fluidLevel = fluid.amount.coerceIn(0f, 1f).times(9).roundToInt()
+        val fluidLevel = fluidFillToTileLevel(fluid.amount)
         return if (fluid.type == Fluid.NULL || fluidLevel == 0) 0 else
-            47 * 8 * (fluid.type.abs() - 1) + 47 * (fluidLevel - 1)
+            16 + (376 * (fluid.type.abs() - 1)) + (47 * (fluidLevel - 1))
     }
 
     private fun fileToAtlantes(it: FileHandle) {

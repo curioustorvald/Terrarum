@@ -124,7 +124,7 @@ internal object BlocksDrawer {
 
         //TODO
         tilesWire = TextureRegionPack(Texture(8, 8, Pixmap.Format.RGBA8888), 1, 1)
-        tilesFluid = TextureRegionPack(Texture(8, 8, Pixmap.Format.RGBA8888), 1, 1)
+        tilesFluid = TextureRegionPack(Texture(CreateTileAtlas.atlasFluid), TILE_SIZE, TILE_SIZE)
 
 
         printdbg(this, "Making terrain and wall item textures...")
@@ -322,7 +322,7 @@ internal object BlocksDrawer {
                     WALL -> world.getTileFromWall(x, y)
                     TERRAIN -> world.getTileFromTerrain(x, y)
                     WIRE -> world.getTileFromWire(x, y)
-                    FLUID -> world.getFluid(x, y).toTileInFluidAtlas()
+                    FLUID -> world.getFluid(x, y).type.abs()
                     else -> throw IllegalArgumentException()
                 }
 
@@ -349,17 +349,27 @@ internal object BlocksDrawer {
                     }
 
                     val renderTag = CreateTileAtlas.getRenderTag(thisTile)
-                    val tileNumberBase = renderTag.tileNumber
-                    val tileNumber = tileNumberBase + when (renderTag.maskType) {
-                        CreateTileAtlas.RenderTag.MASK_NA -> 0
-                        CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
-                        CreateTileAtlas.RenderTag.MASK_47 -> connectLut47[nearbyTilesInfo]
-                        CreateTileAtlas.RenderTag.MASK_TORCH, CreateTileAtlas.RenderTag.MASK_PLATFORM -> nearbyTilesInfo
-                        else -> throw IllegalArgumentException("Unknown mask type: ${renderTag.maskType}")
-                    }
+                    val tileNumberBase =
+                            if (mode == FLUID)
+                                CreateTileAtlas.fluidToTileNumber(world.getFluid(x, y))
+                            else
+                                renderTag.tileNumber
+                    val tileNumber = if (thisTile == 0) 0
+                    else if (mode == FLUID) tileNumberBase + connectLut47[nearbyTilesInfo]
+                    else tileNumberBase + when (renderTag.maskType) {
+                            CreateTileAtlas.RenderTag.MASK_NA -> 0
+                            CreateTileAtlas.RenderTag.MASK_16 -> connectLut16[nearbyTilesInfo]
+                            CreateTileAtlas.RenderTag.MASK_47 -> connectLut47[nearbyTilesInfo]
+                            CreateTileAtlas.RenderTag.MASK_TORCH, CreateTileAtlas.RenderTag.MASK_PLATFORM -> nearbyTilesInfo
+                            else -> throw IllegalArgumentException("Unknown mask type: ${renderTag.maskType}")
+                        }
 
-                    val thisTileX = tileNumber % TILES_IN_X
-                    val thisTileY = tileNumber / TILES_IN_X
+                    var thisTileX = tileNumber % TILES_IN_X
+                    var thisTileY = tileNumber / TILES_IN_X
+
+                    if (mode == FLUID && thisTileX == 22 && thisTileY == 3) {
+                        //println("tileNumberBase = $tileNumberBase, tileNumber = $tileNumber, fluid = ${world.getFluid(x, y)}")
+                    }
 
                     val breakage = if (mode == TERRAIN) world.getTerrainDamage(x, y) else world.getWallDamage(x, y)
                     val maxHealth = BlockCodex[world.getTileFromTerrain(x, y)].strength
@@ -430,7 +440,8 @@ internal object BlocksDrawer {
 
         var ret = 0
         for (i in 0 until nearbyTiles.size) {
-            if (BlockCodex[nearbyTiles[i]].isSolid || world.getFluid(nearbyPos[i].x, nearbyPos[i].y).isFluid()) {
+            val fluid = world.getFluid(nearbyPos[i].x, nearbyPos[i].y)
+            if (BlockCodex[nearbyTiles[i]].isSolid || (fluid.isFluid() && 0 < CreateTileAtlas.fluidFillToTileLevel(fluid.amount))) {
                 ret += (1 shl i) // add 1, 2, 4, 8 for i = 0, 1, 2, 3
             }
         }
