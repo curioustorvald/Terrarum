@@ -10,7 +10,6 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.toInt
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
 import kotlin.math.roundToInt
 
 /**
@@ -25,8 +24,12 @@ import kotlin.math.roundToInt
  */
 object CreateTileAtlas {
 
-    const val TILES_IN_X = 256
-    
+    const val MAX_TEX_SIZE = 4096
+    const val TILE_SIZE = 16
+    const val TILES_IN_X = MAX_TEX_SIZE / TILE_SIZE
+
+    private val TOTAL_TILES = TILES_IN_X * TILES_IN_X
+
     lateinit var atlas: Pixmap
     lateinit var atlasAutumn: Pixmap
     lateinit var atlasWinter: Pixmap
@@ -246,11 +249,14 @@ object CreateTileAtlas {
     }
 
     private fun drawToAtlantes(pixmap: Pixmap, tilesCount: Int) {
+        if (atlasCursor >= TOTAL_TILES) {
+            throw Error("Too much tiles for $MAX_TEX_SIZE texture size: $atlasCursor")
+        }
+
         val seasonal = pixmap.width == pixmap.height && pixmap.width == 14 * TILE_SIZE
         val txOfPixmap = pixmap.width / TILE_SIZE
-        val tyOfPixmap = pixmap.height / TILE_SIZE
         for (i in 0 until tilesCount) {
-            //printdbg(this, "Rendering to atlas, tile# $atlasCursor")
+            //printdbg(this, "Rendering to atlas, tile# $atlasCursor, tilesCount = $tilesCount, seasonal = $seasonal")
 
             // different texture for different seasons (224x224)
             if (seasonal) {
@@ -263,7 +269,7 @@ object CreateTileAtlas {
             }
             else {
                 val i = if (i < 41) i else i + 1 // to compensate the discontinuity between 40th and 41st tile
-                _drawToAtlantes(pixmap, atlasCursor, i % txOfPixmap, i / tyOfPixmap, 0)
+                _drawToAtlantes(pixmap, atlasCursor, i % txOfPixmap, i / txOfPixmap, 0)
                 atlasCursor += 1
             }
         }
@@ -284,6 +290,8 @@ object CreateTileAtlas {
             val atlasY = (destTileNum / TILES_IN_X) * TILE_SIZE
             val sourceX = srcTileX * TILE_SIZE
             val sourceY = srcTileY * TILE_SIZE
+
+            //if (mode == 1) printdbg(this, "atlaspos: ($atlasX, $atlasY), srcpos: ($sourceX, $sourceY), srcpixmap = $pixmap")
 
             when (mode) {
                 1 -> atlas.drawPixmap(pixmap, sourceX, sourceY, TILE_SIZE, TILE_SIZE, atlasX, atlasY, TILE_SIZE, TILE_SIZE)

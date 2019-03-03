@@ -15,10 +15,7 @@ import net.torvald.terrarum.modulebasegame.gameactors.ParticleBase
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.worlddrawer.LightmapRenderer
-import net.torvald.terrarum.worlddrawer.WorldCamera
+import net.torvald.terrarum.worlddrawer.*
 import javax.swing.JFileChooser
 
 /**
@@ -589,7 +586,7 @@ object IngameRenderer {
 
     }
 
-    private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
+    private val TILE_SIZEF = CreateTileAtlas.TILE_SIZE.toFloat()
 
     fun dispose() {
         fboRGB.dispose()

@@ -40,9 +40,9 @@ object LightmapRendererOld {
     // TODO resize(int, int) -aware
 
     val LIGHTMAP_WIDTH = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.WIDTH)
-            .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
+            .div(CreateTileAtlas.TILE_SIZE).ceil() + overscan_open * 2 + 3
     val LIGHTMAP_HEIGHT = (Terrarum.ingame?.ZOOM_MINIMUM ?: 1f).inv().times(Terrarum.HEIGHT)
-            .div(FeaturesDrawer.TILE_SIZE).ceil() + overscan_open * 2 + 3
+            .div(CreateTileAtlas.TILE_SIZE).ceil() + overscan_open * 2 + 3
 
     /**
      * Float value, 1.0 for 1023
@@ -53,8 +53,8 @@ object LightmapRendererOld {
 
     private val AIR = Block.AIR
 
-    private const val TILE_SIZE = FeaturesDrawer.TILE_SIZE
-    private val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / IngameRenderer.lightmapDownsample
+    private const val TILE_SIZE = CreateTileAtlas.TILE_SIZE
+    private val DRAW_TILE_SIZE: Float = CreateTileAtlas.TILE_SIZE / IngameRenderer.lightmapDownsample
 
     // color model related constants
     const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB

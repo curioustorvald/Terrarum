@@ -4,7 +4,7 @@ import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.gameactors.ai.NullAI
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -31,7 +31,7 @@ object PlayerBuilderCynthia {
 
         p.setHitboxDimension(15, p.actorValue.getAsInt(AVKey.BASEHEIGHT) ?: ActorHumanoid.BASE_HEIGHT, 9, 0)
 
-        p.setPosition(4096.0 * FeaturesDrawer.TILE_SIZE, 300.0 * FeaturesDrawer.TILE_SIZE)
+        p.setPosition(4096.0 * CreateTileAtlas.TILE_SIZE, 300.0 * CreateTileAtlas.TILE_SIZE)
 
 
 

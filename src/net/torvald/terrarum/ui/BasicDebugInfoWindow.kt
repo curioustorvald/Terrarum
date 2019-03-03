@@ -12,7 +12,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.ui.ItemSlotImageFactory
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
@@ -86,13 +86,13 @@ class BasicDebugInfoWindow : UICanvas() {
                                          + ccG
                                          + "${hitbox?.startX}"
                                          + " ("
-                                         + "${(hitbox?.startX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                         + "${(hitbox?.startX?.div(CreateTileAtlas.TILE_SIZE))?.toInt()}"
                                          + ")")
             printLineColumn(batch, 2, 1, "endX "
                                          + ccG
                                          + "${hitbox?.endX}"
                                          + " ("
-                                         + "${(hitbox?.endX?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                         + "${(hitbox?.endX?.div(CreateTileAtlas.TILE_SIZE))?.toInt()}"
                                          + ")")
             printLineColumn(batch, 3, 1, "camX "
                                          + ccG
@@ -101,13 +101,13 @@ class BasicDebugInfoWindow : UICanvas() {
                                          + ccG
                                          + "${hitbox?.startY}"
                                          + " ("
-                                         + "${(hitbox?.startY?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                         + "${(hitbox?.startY?.div(CreateTileAtlas.TILE_SIZE))?.toInt()}"
                                          + ")")
             printLineColumn(batch, 2, 2, "endY "
                                          + ccG
                                          + "${hitbox?.endY}"
                                          + " ("
-                                         + "${(hitbox?.endY?.div(FeaturesDrawer.TILE_SIZE))?.toInt()}"
+                                         + "${(hitbox?.endY?.div(CreateTileAtlas.TILE_SIZE))?.toInt()}"
                                          + ")")
             printLineColumn(batch, 3, 2, "camY "
                                          + ccG

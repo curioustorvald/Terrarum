@@ -11,6 +11,7 @@ import net.torvald.terrarum.gameworld.BlockAddress
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
 import net.torvald.terrarum.realestate.LandUtil
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -1621,8 +1622,8 @@ open class ActorWBMovable(renderOrder: RenderOrder, val immobileBody: Boolean = 
         @Transient const val COLLISION_KNOCKBACK_GIVER = 4 // mobs
         @Transient const val COLLISION_KNOCKBACK_TAKER = 5 // benevolent NPCs
 
-        @Transient val TILE_SIZE = FeaturesDrawer.TILE_SIZE
-        @Transient val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
+        @Transient val TILE_SIZE = CreateTileAtlas.TILE_SIZE
+        @Transient val TILE_SIZEF = CreateTileAtlas.TILE_SIZE.toFloat()
 
         private fun div16TruncateToMapWidth(x: Int): Int {
             if (x < 0)
