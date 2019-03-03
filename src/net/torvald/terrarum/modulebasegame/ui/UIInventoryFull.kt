@@ -1,10 +1,12 @@
 package net.torvald.terrarum.modulebasegame.ui
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.jme3.math.Vector2f
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum.gamepadLabelEast
@@ -15,6 +17,7 @@ import net.torvald.terrarum.Terrarum.gamepadLabelRStick
 import net.torvald.terrarum.Terrarum.gamepadLabelRT
 import net.torvald.terrarum.Terrarum.gamepadLabelStart
 import net.torvald.terrarum.Terrarum.gamepadLabelWest
+import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.modulebasegame.Ingame
@@ -38,8 +41,6 @@ class UIInventoryFull(
         customPositioning: Boolean = false, // mainly used by vital meter
         doNotWarnConstant: Boolean = false
 ) : UICanvas(toggleKeyLiteral, toggleButtonLiteral, customPositioning, doNotWarnConstant) {
-
-    // FIXME something's causing memory leak
 
     private val debugvals = false
     
@@ -155,7 +156,7 @@ class UIInventoryFull(
 
     private val transitionalUpdateUIs = ArrayList<UIItem>()
     private val transitionalUpdateUIoriginalPosX = ArrayList<Int>()
-    
+
     
     private fun addToTransitionalGroup(item: UIItem) {
         transitionalUpdateUIs.add(item)
@@ -343,20 +344,105 @@ class UIInventoryFull(
     private val MINIMAP_WIDTH = 800f
     private val MINIMAP_HEIGHT = UIItemInventoryDynamicList.HEIGHT.toFloat()
     private val MINIMAP_SKYCOL = Color(0x88bbddff.toInt())
+    private var minimapZoom = 1f
+    private var minimapPanX = -MinimapComposer.totalWidth / 2f
+    private var minimapPanY = -MinimapComposer.totalHeight / 2f
+    private val MINIMAP_ZOOM_MIN = 0.25f
+    private val MINIMAP_ZOOM_MAX = 8f
+    private val minimapFBO = FrameBuffer(Pixmap.Format.RGBA8888, MINIMAP_WIDTH.toInt(), MINIMAP_HEIGHT.toInt(), false)
+    private val minimapCamera = OrthographicCamera(MINIMAP_WIDTH, MINIMAP_HEIGHT)
 
     private fun renderScreenMinimap(batch: SpriteBatch, camera: Camera) {
         blendNormal(batch)
 
+        // update map panning
+        if (currentScreen >= 2f - epsilon) {
+            // if left click is down and cursor is in the map area
+            if (Gdx.input.isButtonPressed(AppLoader.getConfigInt("mouseprimary")) &&
+                Terrarum.mouseScreenY in itemList.posY..itemList.posY + itemList.height) {
+                minimapPanX += Terrarum.mouseDeltaX / minimapZoom
+                minimapPanY += Terrarum.mouseDeltaY / minimapZoom
+            }
+
+
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)) {
+                minimapZoom *= (1f / 1.02f)
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)) {
+                minimapZoom *= 1.02f
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_3)) {
+                minimapZoom = 1f
+                minimapPanX = -MinimapComposer.totalWidth / 2f
+                minimapPanY = -MinimapComposer.totalHeight / 2f
+            }
+
+
+            try {
+                //minimapPanX = minimapPanX.coerceIn(-(MinimapComposer.totalWidth * minimapZoom) + MINIMAP_WIDTH, 0f) // un-comment this line to constain the panning over x-axis
+            } catch (e: IllegalArgumentException) { }
+            try {
+                //minimapPanY = minimapPanY.coerceIn(-(MinimapComposer.totalHeight * minimapZoom) + MINIMAP_HEIGHT, 0f)
+            } catch (e: IllegalArgumentException) { }
+            minimapZoom = minimapZoom.coerceIn(MINIMAP_ZOOM_MIN, MINIMAP_ZOOM_MAX)
+
+
+            // make image to roll over for x-axis. This is for the ROUNDWORLD implementation, feel free to remove below.
+
+        }
+
+
+        // render minimap
+        batch.end()
+        minimapFBO.inAction(minimapCamera, batch) {
+            // whatever.
+            val t = MinimapComposer.tempTex
+            t.forEach { it.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat) }
+
+
+            batch.inUse {
+
+                // [  1  0 0 ]   [  s   0  0 ]   [  s  0 0 ]
+                // [  0  1 0 ] x [  0   s  0 ] = [  0  s 0 ]
+                // [ px py 1 ]   [ w/2 h/2 1 ]   [ tx ty 1 ]
+                //
+                // https://www.wolframalpha.com/input/?i=%7B%7B1,0,0%7D,%7B0,1,0%7D,%7Bp_x,p_y,1%7D%7D+*+%7B%7Bs,0,0%7D,%7B0,s,0%7D,%7Bw%2F2,h%2F2,1%7D%7D
+
+                val halfWindow = Vector2f(0.5f * MINIMAP_WIDTH, 0.5f * MINIMAP_HEIGHT)
+                val p = arrayOf(
+                        Vector2f(minimapPanX, minimapPanY).mult(minimapZoom).add(halfWindow),
+                        Vector2f(minimapPanX + t[0].width, minimapPanY).mult(minimapZoom).add(halfWindow),
+                        Vector2f(minimapPanX, minimapPanY + t[0].height).mult(minimapZoom).add(halfWindow),
+                        Vector2f(minimapPanX + t[0].width, minimapPanY + t[0].height).mult(minimapZoom).add(halfWindow)
+                )
+
+                // sky background
+                batch.color = MINIMAP_SKYCOL
+                batch.fillRect(0f, 0f, MINIMAP_WIDTH, MINIMAP_HEIGHT)
+                // the actual image
+                batch.color = Color.WHITE
+                repeat(4) {
+                    batch.draw(t[it], p[it].x, p[it].y + t[it].height * minimapZoom, t[it].width * minimapZoom, -t[it].height * minimapZoom)
+                }
+            }
+        }
+        batch.begin()
+
+
+        //Terrarum.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", 10f, 10f)
+
+
+        batch.projectionMatrix = camera.combined
         // 1px stroke
         batch.color = Color.WHITE
         batch.fillRect(-1 + minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, -1 + itemList.posY.toFloat(), 2 + MINIMAP_WIDTH, 2 + MINIMAP_HEIGHT)
-        // sky background
-        batch.color = MINIMAP_SKYCOL
-        batch.fillRect(minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, itemList.posY.toFloat(), MINIMAP_WIDTH, MINIMAP_HEIGHT)
 
         // control hints
         batch.color = Color.WHITE
         Terrarum.fontGame.draw(batch, minimapControlHelp, offsetX + minimapScrOffX, yEnd - 20)
+
+        // the minimap
+        batch.draw(minimapFBO.colorBufferTexture, minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, itemList.posY.toFloat())
     }
 
     private fun renderScreenGamemenu(batch: SpriteBatch, camera: Camera) {
@@ -507,6 +593,6 @@ class UIInventoryFull(
     override fun scrolled(amount: Int): Boolean {
         return super.scrolled(amount)
     }
-
-
+    
 }
+

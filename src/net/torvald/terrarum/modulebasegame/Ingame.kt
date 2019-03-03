@@ -9,6 +9,7 @@ import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.blockproperties.BlockPropUtil
 import net.torvald.terrarum.blockstats.BlockStats
+import net.torvald.terrarum.blockstats.MinimapComposer
 import net.torvald.terrarum.concurrent.ThreadParallel
 import net.torvald.terrarum.console.Authenticator
 import net.torvald.terrarum.gameactors.Actor
@@ -273,6 +274,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
 
         MegaRainGovernor // invoke MegaRain Governor
+        MinimapComposer // invoke MinimapComposer
 
 
 

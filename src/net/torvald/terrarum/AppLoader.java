@@ -21,6 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.torvald.dataclass.ArrayListMap;
 import net.torvald.getcpuname.GetCpuName;
+import net.torvald.terrarum.blockstats.MinimapComposer;
 import net.torvald.terrarum.controller.GdxControllerAdapter;
 import net.torvald.terrarum.controller.TerrarumController;
 import net.torvald.terrarum.controller.XinputControllerAdapter;
@@ -523,6 +524,7 @@ public class AppLoader implements ApplicationListener {
 
         IngameRenderer.INSTANCE.dispose();
         PostProcessor.INSTANCE.dispose();
+        MinimapComposer.INSTANCE.dispose();
 
         Terrarum.INSTANCE.dispose();
 

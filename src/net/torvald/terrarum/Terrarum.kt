@@ -21,7 +21,6 @@ import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.worlddrawer.CreateTileAtlas
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
@@ -491,6 +490,10 @@ object Terrarum : Screen {
         get() = Gdx.input.x
     inline val mouseScreenY: Int
         get() = Gdx.input.y
+    inline val mouseDeltaX: Int
+        get() = Gdx.input.deltaX
+    inline val mouseDeltaY: Int
+        get() = Gdx.input.deltaY
     /** Delta converted as it it was a FPS */
     inline val updateRate: Double
         get() = 1.0 / Gdx.graphics.deltaTime
