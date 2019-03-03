@@ -10,6 +10,7 @@ import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.blockstats.BlockStats
 import net.torvald.terrarum.fillRect
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 
 /**
  * Created by minjaesong on 2015-12-31.
@@ -17,7 +18,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 object FeaturesDrawer {
     lateinit var world: GameWorld
 
-    const val TILE_SIZE = 16
+    //const val TILE_SIZE = CreateTileAtlas.TILE_SIZE
 
     private val ENV_COLTEMP_LOWEST = 5500
     private val ENV_COLTEMP_HIGHEST = 7500

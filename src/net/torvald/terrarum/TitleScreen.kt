@@ -29,7 +29,7 @@ import net.torvald.terrarum.modulebasegame.ui.UITitleRemoConYaml
 import net.torvald.terrarum.modulebasegame.weather.WeatherMixer
 import net.torvald.terrarum.serialise.ReadLayerData
 import net.torvald.terrarum.ui.UICanvas
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.LightmapRenderer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.FileInputStream
@@ -75,7 +75,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
 
 
-            val tileSize = FeaturesDrawer.TILE_SIZE.toFloat()
+            val tileSize = CreateTileAtlas.TILE_SIZE.toFloat()
             val catmullRomTension = 0f
 
             // pan camera
@@ -122,7 +122,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
 
     private lateinit var worldFBO: FrameBuffer
 
-    private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
+    private val TILE_SIZE = CreateTileAtlas.TILE_SIZE
     private val TILE_SIZEF = TILE_SIZE.toFloat()
 
     private fun loadThingsWhileIntroIsVisible() {
@@ -141,7 +141,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             while (!BlockCodex[demoWorld.getTileFromTerrain(tileXPos, travelDownCounter)].isSolid) {
                 travelDownCounter += 4
             }
-            travelDownCounter * FeaturesDrawer.TILE_SIZE.toFloat()
+            travelDownCounter * CreateTileAtlas.TILE_SIZE.toFloat()
         }
 
 
@@ -149,7 +149,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
             init {
                 setHitboxDimension(2, 2, 0, 0)
                 hitbox.setPosition(
-                        HQRNG().nextInt(demoWorld.width) * FeaturesDrawer.TILE_SIZE.toDouble(),
+                        HQRNG().nextInt(demoWorld.width) * CreateTileAtlas.TILE_SIZE.toDouble(),
                         0.0 // Y pos: placeholder; camera AI will take it over
                 )
                 isNoClip = true

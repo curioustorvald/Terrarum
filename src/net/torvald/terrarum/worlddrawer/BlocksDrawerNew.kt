@@ -32,8 +32,8 @@ internal object BlocksDrawer {
 
     var world: GameWorld = GameWorld.makeNullWorld()
 
-    private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
-    private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
+    private val TILE_SIZE = CreateTileAtlas.TILE_SIZE
+    private val TILE_SIZEF = CreateTileAtlas.TILE_SIZE.toFloat()
 
     /**
      * Widths of the tile atlases must have exactly the same width (height doesn't matter)

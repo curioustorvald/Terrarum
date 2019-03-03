@@ -20,7 +20,7 @@ import net.torvald.terrarum.modulebasegame.gameworld.GameWorldExtension
 import net.torvald.terrarum.modulebasegame.gameworld.WorldTime
 import net.torvald.terrarum.modulebasegame.worldgenerator.WorldGenerator
 import net.torvald.terrarum.utils.JsonFetcher
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import java.io.File
 import java.util.*
@@ -146,7 +146,7 @@ internal object WeatherMixer : RNGConsumer {
          .|         = // parallax of -1
          -+ <- 0.0  =
          */
-        val parallax: Float = (parallaxZeroPos - WorldCamera.gdxCamY.div(FeaturesDrawer.TILE_SIZE.toFloat())) / parallaxDomainSize
+        val parallax: Float = (parallaxZeroPos - WorldCamera.gdxCamY.div(CreateTileAtlas.TILE_SIZE.toFloat())) / parallaxDomainSize
 
 
         // draw skybox to provided graphics instance

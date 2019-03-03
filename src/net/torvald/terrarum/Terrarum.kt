@@ -20,6 +20,7 @@ import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.ActorID
 import net.torvald.terrarum.imagefont.TinyAlphNum
 import net.torvald.terrarum.itemproperties.ItemCodex
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 import net.torvald.terrarumsansbitmap.gdx.GameFontBase
@@ -476,16 +477,16 @@ object Terrarum : Screen {
         get() = WorldCamera.y + (Gdx.input.y - Gdx.input.deltaY) / (ingame?.screenZoom ?: 1f).toDouble()
     /** Position of the cursor in the world */
     @JvmStatic val mouseTileX: Int
-        get() = (mouseX / FeaturesDrawer.TILE_SIZE).floorInt()
+        get() = (mouseX / CreateTileAtlas.TILE_SIZE).floorInt()
     /** Position of the cursor in the world */
     @JvmStatic val mouseTileY: Int
-        get() = (mouseY / FeaturesDrawer.TILE_SIZE).floorInt()
+        get() = (mouseY / CreateTileAtlas.TILE_SIZE).floorInt()
     /** Position of the cursor in the world */
     @JvmStatic val oldMouseTileX: Int
-        get() = (oldMouseX / FeaturesDrawer.TILE_SIZE).floorInt()
+        get() = (oldMouseX / CreateTileAtlas.TILE_SIZE).floorInt()
     /** Position of the cursor in the world */
     @JvmStatic val oldMouseTileY: Int
-        get() = (oldMouseY / FeaturesDrawer.TILE_SIZE).floorInt()
+        get() = (oldMouseY / CreateTileAtlas.TILE_SIZE).floorInt()
     inline val mouseScreenX: Int
         get() = Gdx.input.x
     inline val mouseScreenY: Int

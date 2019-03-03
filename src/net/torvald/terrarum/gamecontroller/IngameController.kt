@@ -14,6 +14,7 @@ import net.torvald.terrarum.gameworld.fmod
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.worlddrawer.WorldCamera
 
@@ -38,10 +39,10 @@ class IngameController(val ingame: Ingame) : InputAdapter() {
         get() = WorldCamera.y + Gdx.input.y / (ingame.screenZoom)
     /** currently pointing tile coordinate */
     val mouseTileX: Int
-        get() = (mouseX / FeaturesDrawer.TILE_SIZE).floorInt()
+        get() = (mouseX / CreateTileAtlas.TILE_SIZE).floorInt()
     /** currently pointing tile coordinate */
     val mouseTileY: Int
-        get() = (mouseY / FeaturesDrawer.TILE_SIZE).floorInt()
+        get() = (mouseY / CreateTileAtlas.TILE_SIZE).floorInt()
 
     init {
         if (Controllers.getControllers().size == 0) {

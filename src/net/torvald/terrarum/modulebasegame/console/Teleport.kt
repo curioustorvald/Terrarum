@@ -1,12 +1,12 @@
 package net.torvald.terrarum.modulebasegame.console
 
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.console.ConsoleCommand
 import net.torvald.terrarum.console.Echo
 import net.torvald.terrarum.console.EchoError
-import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.gameactors.ActorWBMovable
+import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 
 /**
  * Created by minjaesong on 2016-01-24.
@@ -19,8 +19,8 @@ internal object Teleport : ConsoleCommand {
             val x: Int
             val y: Int
             try {
-                x = args[1].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
-                y = args[2].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
+                x = args[1].toInt() * CreateTileAtlas.TILE_SIZE + CreateTileAtlas.TILE_SIZE / 2
+                y = args[2].toInt() * CreateTileAtlas.TILE_SIZE + CreateTileAtlas.TILE_SIZE / 2
             }
             catch (e: NumberFormatException) {
                 EchoError("Teleport: wrong number input.")
@@ -86,8 +86,8 @@ internal object Teleport : ConsoleCommand {
             val x: Int
             val y: Int
             try {
-                x = args[3].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
-                y = args[4].toInt() * FeaturesDrawer.TILE_SIZE + FeaturesDrawer.TILE_SIZE / 2
+                x = args[3].toInt() * CreateTileAtlas.TILE_SIZE + CreateTileAtlas.TILE_SIZE / 2
+                y = args[4].toInt() * CreateTileAtlas.TILE_SIZE + CreateTileAtlas.TILE_SIZE / 2
                 val actorID = args[1].toInt()
 
                 if (Terrarum.ingame!!.getActorByID(actorID) !is ActorWBMovable) {

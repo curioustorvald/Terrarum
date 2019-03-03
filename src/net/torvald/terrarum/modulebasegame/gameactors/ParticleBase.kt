@@ -10,7 +10,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.floorInt
 import net.torvald.terrarum.gameactors.Actor
 import net.torvald.terrarum.gameactors.Hitbox
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer.TILE_SIZE
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas.TILE_SIZE
 import org.dyn4j.geometry.Vector2
 
 /**

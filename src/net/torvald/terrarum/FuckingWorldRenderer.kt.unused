@@ -199,7 +199,7 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         private set
 
 
-    private val TILE_SIZEF = FeaturesDrawer.TILE_SIZE.toFloat()
+    private val TILE_SIZEF = CreateTileAtlas.TILE_SIZE.toFloat()
 
     //////////////
     // GDX code //
@@ -485,8 +485,8 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
 
                 // go to spawn position
                 player.setPosition(
-                        world.spawnX * FeaturesDrawer.TILE_SIZE.toDouble(),
-                        world.spawnY * FeaturesDrawer.TILE_SIZE.toDouble()
+                        world.spawnX * CreateTileAtlas.TILE_SIZE.toDouble(),
+                        world.spawnY * CreateTileAtlas.TILE_SIZE.toDouble()
                 )
 
                 addNewActor(player)
@@ -1214,18 +1214,18 @@ class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
             min(// take min of normal position and wrapped (x < 0) position
                     (a.hitbox.centeredX - p.hitbox.centeredX).sqr() +
                     (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
-                    (a.hitbox.centeredX - p.hitbox.centeredX + world.width * FeaturesDrawer.TILE_SIZE).sqr() +
+                    (a.hitbox.centeredX - p.hitbox.centeredX + world.width * CreateTileAtlas.TILE_SIZE).sqr() +
                     (a.hitbox.centeredY - p.hitbox.centeredY).sqr(),
-                    (a.hitbox.centeredX - p.hitbox.centeredX - world.width * FeaturesDrawer.TILE_SIZE).sqr() +
+                    (a.hitbox.centeredX - p.hitbox.centeredX - world.width * CreateTileAtlas.TILE_SIZE).sqr() +
                     (a.hitbox.centeredY - p.hitbox.centeredY).sqr()
             )
     private fun distToCameraSqr(a: ActorWithBody) =
             min(
                     (a.hitbox.startX - WorldCamera.x).sqr() +
                     (a.hitbox.startY - WorldCamera.y).sqr(),
-                    (a.hitbox.startX - WorldCamera.x + world.width * FeaturesDrawer.TILE_SIZE).sqr() +
+                    (a.hitbox.startX - WorldCamera.x + world.width * CreateTileAtlas.TILE_SIZE).sqr() +
                     (a.hitbox.startY - WorldCamera.y).sqr(),
-                    (a.hitbox.startX - WorldCamera.x - world.width * FeaturesDrawer.TILE_SIZE).sqr() +
+                    (a.hitbox.startX - WorldCamera.x - world.width * CreateTileAtlas.TILE_SIZE).sqr() +
                     (a.hitbox.startY - WorldCamera.y).sqr()
             )
 

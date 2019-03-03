@@ -11,7 +11,7 @@ import org.dyn4j.geometry.Vector2
  * Created by minjaesong on 2016-12-30.
  */
 object WorldCamera {
-    private val TILE_SIZE = FeaturesDrawer.TILE_SIZE
+    private val TILE_SIZE = CreateTileAtlas.TILE_SIZE
 
     var x: Int = 0 // left position
         private set

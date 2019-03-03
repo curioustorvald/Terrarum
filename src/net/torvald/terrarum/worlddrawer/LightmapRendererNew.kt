@@ -33,7 +33,7 @@ import net.torvald.terrarum.realestate.LandUtil
  * own ingame renderer
  */
 object LightmapRenderer {
-    private const val TILE_SIZE = FeaturesDrawer.TILE_SIZE
+    private const val TILE_SIZE = CreateTileAtlas.TILE_SIZE
 
     private var world: GameWorld = GameWorld.makeNullWorld()
     private lateinit var lightCalcShader: ShaderProgram
@@ -91,7 +91,7 @@ object LightmapRenderer {
 
     private val AIR = Block.AIR
 
-    val DRAW_TILE_SIZE: Float = FeaturesDrawer.TILE_SIZE / IngameRenderer.lightmapDownsample
+    val DRAW_TILE_SIZE: Float = CreateTileAtlas.TILE_SIZE / IngameRenderer.lightmapDownsample
 
     // color model related constants
     const val MUL = 1024 // modify this to 1024 to implement 30-bit RGB

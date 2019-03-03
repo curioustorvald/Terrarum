@@ -1,18 +1,14 @@
 package net.torvald.terrarum.modulebasegame.gameworld
 
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.AppLoader
-import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum
-import net.torvald.terrarum.blockproperties.Block
-import net.torvald.terrarum.roundInt
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
-import net.torvald.terrarum.gamecontroller.KeyToggler
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.modulebasegame.gameactors.ActorHumanoid
+import net.torvald.terrarum.roundInt
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 
 /**
  * Created by minjaesong on 2016-08-03.
@@ -59,8 +55,8 @@ object WorldSimulator {
         //printdbg(this, "============================")
 
         if (p != null) {
-            updateXFrom = p.hitbox.centeredX.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
-            updateYFrom = p.hitbox.centeredY.div(FeaturesDrawer.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
+            updateXFrom = p.hitbox.centeredX.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
+            updateYFrom = p.hitbox.centeredY.div(CreateTileAtlas.TILE_SIZE).minus(FLUID_UPDATING_SQUARE_RADIUS).roundInt()
             updateXTo = updateXFrom + DOUBLE_RADIUS
             updateYTo = updateYFrom + DOUBLE_RADIUS
         }

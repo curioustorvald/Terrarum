@@ -1,14 +1,13 @@
 package net.torvald.terrarum.blockstats
 
+import com.jme3.math.FastMath
+import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.MapLayer
-import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import net.torvald.terrarum.worlddrawer.FeaturesDrawer
-import net.torvald.terrarum.Terrarum
-import com.jme3.math.FastMath
 import net.torvald.terrarum.modulebasegame.Ingame
-
-import java.util.Arrays
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
+import java.util.*
 
 /**
  * Created by minjaesong on 2016-02-01.
@@ -17,7 +16,7 @@ object BlockStats {
 
     private val tilestat = ShortArray(GameWorld.TILES_SUPPORTED)
 
-    private val TSIZE = FeaturesDrawer.TILE_SIZE
+    private val TSIZE = CreateTileAtlas.TILE_SIZE
 
     /**
      * Update tile stats from tiles on screen
