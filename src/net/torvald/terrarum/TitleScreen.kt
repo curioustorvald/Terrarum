@@ -220,7 +220,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         // render? just do it anyway
         AppLoader.measureDebugTime("Ingame.render") { renderScreen() }
         AppLoader.setDebugTime("Ingame.render-Light",
-                (AppLoader.debugTimers["Ingame.render"] as Long) - ((AppLoader.debugTimers["Renderer.LightTotal"] as? Long) ?: 0)
+                ((AppLoader.debugTimers["Ingame.render"] as? Long) ?: 0) - ((AppLoader.debugTimers["Renderer.LightTotal"] as? Long) ?: 0)
         )
     }
 

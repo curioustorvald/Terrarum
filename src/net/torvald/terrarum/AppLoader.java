@@ -335,7 +335,12 @@ public class AppLoader implements ApplicationListener {
             }
 
             // nullify if not actually connected
-            if (!((XinputControllerAdapter) gamepad).getC().isConnected()) {
+            try {
+                if (!((XinputControllerAdapter) gamepad).getC().isConnected()) {
+                    gamepad = null;
+                }
+            }
+            catch (NullPointerException notQuiteWindows) {
                 gamepad = null;
             }
         }
