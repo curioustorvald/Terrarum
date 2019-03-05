@@ -205,7 +205,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
     override fun render(delta: Float) {
         // async update and render
 
-        val dt = Gdx.graphics.deltaTime
+        val dt = Gdx.graphics.rawDeltaTime
         updateAkku += dt
 
         var i = 0L
@@ -252,7 +252,7 @@ class TitleScreen(val batch: SpriteBatch) : Screen {
         gdxClearAndSetBlend(.64f, .754f, .84f, 1f)
 
 
-        IngameRenderer.invoke(world = demoWorld, uisToDraw = uiContainer)
+        IngameRenderer.invoke(gamePaused = false, world = demoWorld, uisToDraw = uiContainer)
 
 
         batch.inUse {

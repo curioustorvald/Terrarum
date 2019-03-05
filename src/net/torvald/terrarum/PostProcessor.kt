@@ -65,7 +65,7 @@ object PostProcessor {
         }
 
 
-        debugUI.update(Gdx.graphics.deltaTime)
+        debugUI.update(Gdx.graphics.rawDeltaTime)
 
 
         AppLoader.measureDebugTime("Renderer.PostProcessor") {

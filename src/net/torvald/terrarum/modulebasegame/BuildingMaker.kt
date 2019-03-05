@@ -324,7 +324,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
 
         // ASYNCHRONOUS UPDATE AND RENDER //
 
-        val dt = Gdx.graphics.deltaTime
+        val dt = Gdx.graphics.rawDeltaTime
         updateAkku += dt
 
         var i = 0L
@@ -392,7 +392,7 @@ class BuildingMaker(batch: SpriteBatch) : IngameInstance(batch) {
     private fun renderGame() {
         _testMarkerDrawCalls = 0L
 
-        IngameRenderer.invoke(world as GameWorldExtension, actorsRenderOverlay = if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays, uisToDraw = uiContainer)
+        IngameRenderer.invoke(false, world as GameWorldExtension, actorsRenderOverlay = if (showSelection) actorsRenderOverlay + essentialOverlays else essentialOverlays, uisToDraw = uiContainer)
 
         AppLoader.setDebugTime("Test.MarkerDrawCalls", _testMarkerDrawCalls)
     }

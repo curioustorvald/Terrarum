@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.jme3.math.Vector2f
 import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum.gamepadLabelEast
@@ -246,7 +245,7 @@ class UIInventoryFull(
         }
 
         if (transitionOngoing) {
-            transitionTimer += Gdx.graphics.deltaTime
+            transitionTimer += Gdx.graphics.rawDeltaTime
 
             currentScreen = UIUtils.moveQuick(transitionReqSource, transitionReqTarget, transitionTimer, transitionLength)
 
@@ -347,7 +346,7 @@ class UIInventoryFull(
     private var minimapZoom = 1f
     private var minimapPanX = -MinimapComposer.totalWidth / 2f
     private var minimapPanY = -MinimapComposer.totalHeight / 2f
-    private val MINIMAP_ZOOM_MIN = 0.25f
+    private val MINIMAP_ZOOM_MIN = 0.5f
     private val MINIMAP_ZOOM_MAX = 8f
     private val minimapFBO = FrameBuffer(Pixmap.Format.RGBA8888, MINIMAP_WIDTH.toInt(), MINIMAP_HEIGHT.toInt(), false)
     private val minimapCamera = OrthographicCamera(MINIMAP_WIDTH, MINIMAP_HEIGHT)
@@ -396,9 +395,8 @@ class UIInventoryFull(
         batch.end()
         minimapFBO.inAction(minimapCamera, batch) {
             // whatever.
-            val t = MinimapComposer.tempTex
-            t.forEach { it.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat) }
-
+            MinimapComposer.tempTex.dispose()
+            MinimapComposer.tempTex = Texture(MinimapComposer.minimap)
 
             batch.inUse {
 
@@ -408,22 +406,16 @@ class UIInventoryFull(
                 //
                 // https://www.wolframalpha.com/input/?i=%7B%7B1,0,0%7D,%7B0,1,0%7D,%7Bp_x,p_y,1%7D%7D+*+%7B%7Bs,0,0%7D,%7B0,s,0%7D,%7Bw%2F2,h%2F2,1%7D%7D
 
-                val halfWindow = Vector2f(0.5f * MINIMAP_WIDTH, 0.5f * MINIMAP_HEIGHT)
-                val p = arrayOf(
-                        Vector2f(minimapPanX, minimapPanY).mult(minimapZoom).add(halfWindow),
-                        Vector2f(minimapPanX + t[0].width, minimapPanY).mult(minimapZoom).add(halfWindow),
-                        Vector2f(minimapPanX, minimapPanY + t[0].height).mult(minimapZoom).add(halfWindow),
-                        Vector2f(minimapPanX + t[0].width, minimapPanY + t[0].height).mult(minimapZoom).add(halfWindow)
-                )
+                val tx = minimapPanX * minimapZoom + 0.5f * MINIMAP_WIDTH
+                val ty = minimapPanY * minimapZoom + 0.5f * MINIMAP_HEIGHT
 
                 // sky background
                 batch.color = MINIMAP_SKYCOL
                 batch.fillRect(0f, 0f, MINIMAP_WIDTH, MINIMAP_HEIGHT)
                 // the actual image
                 batch.color = Color.WHITE
-                repeat(4) {
-                    batch.draw(t[it], p[it].x, p[it].y + t[it].height * minimapZoom, t[it].width * minimapZoom, -t[it].height * minimapZoom)
-                }
+                batch.draw(MinimapComposer.tempTex, tx, ty + MinimapComposer.totalHeight * minimapZoom, MinimapComposer.totalWidth * minimapZoom, -MinimapComposer.totalHeight * minimapZoom)
+
             }
         }
         batch.begin()

@@ -62,6 +62,7 @@ object IngameRenderer {
     private var debugMode = 0
 
     operator fun invoke(
+            gamePaused: Boolean,
             world: GameWorldExtension,
             actorsRenderBehind : List<ActorWithBody>? = null,
             actorsRenderMiddle : List<ActorWithBody>? = null,
@@ -89,14 +90,15 @@ object IngameRenderer {
         this.player = player
 
 
-        LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
+        if (!gamePaused) {
+            LightmapRenderer.fireRecalculateEvent(actorsRenderBehind, actorsRenderFront, actorsRenderMidTop, actorsRenderMiddle, actorsRenderOverlay)
 
-        prepLightmapRGBA()
-        BlocksDrawer.renderData()
-        drawToRGB(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
-        drawToA(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
-        drawOverlayActors(actorsRenderOverlay)
-
+            prepLightmapRGBA()
+            BlocksDrawer.renderData()
+            drawToRGB(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
+            drawToA(actorsRenderBehind, actorsRenderMiddle, actorsRenderMidTop, actorsRenderFront, particlesContainer)
+            drawOverlayActors(actorsRenderOverlay)
+        }
         // clear main or whatever super-FBO being used
         //clearBuffer()
         gdxClearAndSetBlend(.64f, .754f, .84f, 0f)
