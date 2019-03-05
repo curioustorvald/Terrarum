@@ -622,7 +622,7 @@ object LightmapRenderer {
      */
     fun darkenColoured(data: Color, darken: Color): Color {
         // use equation with magic number 8.0
-        // should draw somewhat exponential curve when you plot the propagation of light in-game
+        // this function, when done recursively (A_x = darken(A_x-1, C)), draws exponential curve. (R^2 = 1)
 
         return Color(
                 data.r * (1f - darken.r * lightScalingMagic),//.clampZero(),
