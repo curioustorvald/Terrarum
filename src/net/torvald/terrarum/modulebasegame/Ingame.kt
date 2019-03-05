@@ -449,7 +449,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         // ASYNCHRONOUS UPDATE AND RENDER //
 
         /** UPDATE CODE GOES HERE */
-        val dt = Gdx.graphics.deltaTime
+        val dt = Gdx.graphics.rawDeltaTime
         updateAkku += dt
 
         var i = 0L
@@ -543,6 +543,7 @@ open class Ingame(batch: SpriteBatch) : IngameInstance(batch) {
         filterVisibleActors()
 
         IngameRenderer.invoke(
+                paused,
                 world as GameWorldExtension,
                 visibleActorsRenderBehind,
                 visibleActorsRenderMiddle,

@@ -120,7 +120,7 @@ object LoadScreen : ScreenAdapter() {
     private var messageForegroundColour = Color.WHITE
 
     override fun render(delta: Float) {
-        val delta = Gdx.graphics.deltaTime
+        val delta = Gdx.graphics.rawDeltaTime
 
         glideDispY = Terrarum.HEIGHT - 100f - Terrarum.fontGame.lineHeight
         arrowObjGlideSize = arrowObjTex.width + 2f * Terrarum.WIDTH
