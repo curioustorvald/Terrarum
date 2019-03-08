@@ -12,6 +12,8 @@ import javax.naming.OperationNotSupportedException
 class GdxColorMap {
 
     constructor(imageFile: FileHandle) {
+        AppLoader.printdbg(this, "Loading colormap from ${imageFile.name()}")
+
         val pixmap = Pixmap(imageFile)
         width = pixmap.width
         height = pixmap.height
@@ -21,11 +23,19 @@ class GdxColorMap {
             pixmap.getPixel(it % pixmap.width, it / pixmap.width)
         }
 
-
-        AppLoader.printdbg(this, "Loading colormap from ${imageFile.name()}; PixmapFormat: ${pixmap.format}; Dimension: $width x $height")
-
-
         pixmap.dispose()
+    }
+
+    constructor(pixmap: Pixmap, disposePixmap: Boolean = true) {
+        width = pixmap.width
+        height = pixmap.height
+        is2D = pixmap.height > 1
+
+        data = kotlin.IntArray(pixmap.width * pixmap.height) {
+            pixmap.getPixel(it % pixmap.width, it / pixmap.width)
+        }
+
+        if (disposePixmap) pixmap.dispose()
     }
 
     constructor(color: Color) {

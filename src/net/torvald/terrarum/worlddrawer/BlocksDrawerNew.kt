@@ -129,43 +129,13 @@ internal object BlocksDrawer {
 
         printdbg(this, "Making terrain and wall item textures...")
 
-        // create item_wall images
 
-        fun maskTypetoTileIDForItemImage(maskType: Int) = when(maskType) {
-            CreateTileAtlas.RenderTag.MASK_47 -> 17
-            CreateTileAtlas.RenderTag.MASK_PLATFORM -> 7
-            else -> 0
-        }
-
-        val itemTerrainPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-        val itemWallPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
-
-        CreateTileAtlas.tags.toMap().forEach { t, u ->
-            val tilePosFromAtlas = u.tileNumber + maskTypetoTileIDForItemImage(u.maskType)
-            val srcX = (tilePosFromAtlas % TILES_IN_X) * TILE_SIZE
-            val srcY = (tilePosFromAtlas / TILES_IN_X) * TILE_SIZE
-            val destX = (t % 16) * TILE_SIZE
-            val destY = (t / 16) * TILE_SIZE
-            itemTerrainPixmap.drawPixmap(CreateTileAtlas.atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
-            itemWallPixmap.drawPixmap(CreateTileAtlas.atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
-        }
-        // darken things for the wall
-        for (y in 0 until itemWallPixmap.height) {
-            for (x in 0 until itemWallPixmap.width) {
-                val c = Color(itemWallPixmap.getPixel(x, y)).mulAndAssign(wallOverlayColour).toRGBA()
-                itemWallPixmap.drawPixel(x, y, c)
-            }
-        }
 
         // test print
         //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/terrainitem.tga"), itemTerrainPixmap, false)
 
-        val itemTerrainTexture = Texture(itemTerrainPixmap)
-        val itemWallTexture = Texture(itemWallPixmap)
-        itemTerrainPixmap.dispose()
-        itemWallPixmap.dispose()
-        tileItemTerrain = TextureRegionPack(itemTerrainTexture, TILE_SIZE, TILE_SIZE)
-        tileItemWall = TextureRegionPack(itemWallTexture, TILE_SIZE, TILE_SIZE)
+        tileItemTerrain = TextureRegionPack(CreateTileAtlas.itemTerrainTexture, TILE_SIZE, TILE_SIZE)
+        tileItemWall = TextureRegionPack(CreateTileAtlas.itemWallTexture, TILE_SIZE, TILE_SIZE)
 
 
 

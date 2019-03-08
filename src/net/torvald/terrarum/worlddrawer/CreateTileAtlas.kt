@@ -4,11 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.GdxRuntimeException
+import net.torvald.terrarum.GdxColorMap
 import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.blockproperties.Fluid
 import net.torvald.terrarum.gameworld.GameWorld
+import net.torvald.terrarum.mulAndAssign
 import net.torvald.terrarum.toInt
 import kotlin.math.roundToInt
 
@@ -35,6 +38,9 @@ object CreateTileAtlas {
     lateinit var atlasWinter: Pixmap
     lateinit var atlasSpring: Pixmap
     lateinit var atlasFluid: Pixmap
+    lateinit var itemTerrainTexture: Texture
+    lateinit var itemWallTexture: Texture
+    lateinit var terrainTileColourMap: GdxColorMap
     internal lateinit var tags: HashMap<Int, RenderTag>
         private set
     private val defaultRenderTag = RenderTag(3, RenderTag.CONNECT_SELF, RenderTag.MASK_NA) // 'update' block
@@ -175,6 +181,68 @@ object CreateTileAtlas {
 
 
         fluidMasterPixmap.dispose()
+
+        // create item_wall images
+
+        fun maskTypetoTileIDForItemImage(maskType: Int) = when(maskType) {
+            CreateTileAtlas.RenderTag.MASK_47 -> 17
+            CreateTileAtlas.RenderTag.MASK_PLATFORM -> 7
+            else -> 0
+        }
+
+        val itemTerrainPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        val itemWallPixmap = Pixmap(16 * TILE_SIZE, TILES_IN_X * TILE_SIZE, Pixmap.Format.RGBA8888)
+        val terrainColormapPixmap = Pixmap(16, TILES_IN_X, Pixmap.Format.RGBA8888)
+
+        CreateTileAtlas.tags.toMap().forEach { t, u ->
+            val tilePosFromAtlas = u.tileNumber + maskTypetoTileIDForItemImage(u.maskType)
+            val srcX = (tilePosFromAtlas % TILES_IN_X) * TILE_SIZE
+            val srcY = (tilePosFromAtlas / TILES_IN_X) * TILE_SIZE
+            val destX = (t % 16) * TILE_SIZE
+            val destY = (t / 16) * TILE_SIZE
+            itemTerrainPixmap.drawPixmap(CreateTileAtlas.atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+            itemWallPixmap.drawPixmap(CreateTileAtlas.atlas, srcX, srcY, TILE_SIZE, TILE_SIZE, destX, destY, TILE_SIZE, TILE_SIZE)
+        }
+        // darken things for the wall
+        for (y in 0 until itemWallPixmap.height) {
+            for (x in 0 until itemWallPixmap.width) {
+                val c = Color(itemWallPixmap.getPixel(x, y)).mulAndAssign(BlocksDrawer.wallOverlayColour).toRGBA()
+                itemWallPixmap.drawPixel(x, y, c)
+            }
+        }
+        // create terrain colourmap
+        val pxCount = TILE_SIZE * TILE_SIZE
+        for (id in 0 until BlockCodex.MAX_TERRAIN_TILES) {
+            val tx = (id % 16) * TILE_SIZE
+            val ty = (id / 16) * TILE_SIZE
+            var r = 0; var g = 0; var b = 0; var a = 0
+            // average out the whole block
+            for (y in ty until ty + TILE_SIZE) {
+                for (x in tx until tx + TILE_SIZE) {
+                    val data = itemTerrainPixmap.getPixel(x, y)
+                    r += (data ushr 24) and 255
+                    g += (data ushr 16) and 255
+                    b += (data ushr  8) and 255
+                    a += data and 255
+                }
+            }
+
+            terrainColormapPixmap.drawPixel(tx / TILE_SIZE, ty / TILE_SIZE,
+                    (r / pxCount).shl(24) or
+                            (g / pxCount).shl(16) or
+                            (b / pxCount).shl(8) or
+                            (a / pxCount)
+            )
+        }
+
+        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/terrain_colormap.tga"), terrainColormapPixmap, false)
+        //PixmapIO2.writeTGA(Gdx.files.absolute("${AppLoader.defaultDir}/terrainitem.tga"), itemTerrainPixmap, false)
+
+        terrainTileColourMap = GdxColorMap(terrainColormapPixmap)
+        itemTerrainTexture = Texture(itemTerrainPixmap)
+        itemWallTexture = Texture(itemWallPixmap)
+        itemTerrainPixmap.dispose()
+        itemWallPixmap.dispose()
 
         initialised = true
     } }

@@ -216,6 +216,10 @@ class UIInventoryFull(
 
         transitionalUpdateUIs.forEach { it.update(delta) }
 
+        if (currentScreen > 1f + epsilon) {
+            MinimapComposer.setWorld(Terrarum.ingame!!.world)
+            MinimapComposer.update()
+        }
     }
 
     private val gradStartCol = Color(0x404040_60)
@@ -393,6 +397,9 @@ class UIInventoryFull(
 
         // render minimap
         batch.end()
+
+        MinimapComposer.renderToBackground()
+
         minimapFBO.inAction(minimapCamera, batch) {
             // whatever.
             MinimapComposer.tempTex.dispose()
@@ -421,7 +428,7 @@ class UIInventoryFull(
         batch.begin()
 
 
-        //Terrarum.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", 10f, 10f)
+        Terrarum.fontSmallNumbers.draw(batch, "$minimapPanX, $minimapPanY; x$minimapZoom", minimapScrOffX + (Terrarum.WIDTH - MINIMAP_WIDTH) / 2, -10f + itemList.posY)
 
 
         batch.projectionMatrix = camera.combined
