@@ -1,12 +1,16 @@
 package net.torvald.terrarum.blockstats
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.utils.GdxRuntimeException
+import com.badlogic.gdx.utils.Queue
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.Terrarum
+import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameworld.GameWorld
-import net.torvald.terrarum.worlddrawer.toRGBA
+import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 
 object MinimapComposer {
 
@@ -32,7 +36,6 @@ object MinimapComposer {
     }
 
     var tempTex = Texture(1,1,Pixmap.Format.RGBA8888)
-    val minimap = Pixmap(Gdx.files.internal("./assets/testimage.png"))
     // total size of the minimap. Remember: textures can be mosaic-ed to display full map.
     var totalWidth = 0
     var totalHeight = 0
@@ -45,14 +48,20 @@ object MinimapComposer {
     const val LIVETILE_SIZE = 64
     const val DISPLAY_CANVAS_WIDTH = 2048
     const val DISPLAY_CANVAS_HEIGHT = 1024
+    val minimap = Pixmap(DISPLAY_CANVAS_WIDTH, DISPLAY_CANVAS_HEIGHT, Pixmap.Format.RGBA8888)
     const val TILES_IN_X = DISPLAY_CANVAS_WIDTH / LIVETILE_SIZE
     const val TILES_IN_Y = DISPLAY_CANVAS_HEIGHT / LIVETILE_SIZE
-    private val displayPixmap = Pixmap(DISPLAY_CANVAS_WIDTH, DISPLAY_CANVAS_HEIGHT, Pixmap.Format.RGBA8888)
     // numbers inside of it will change a lot
-    private val tileSlot = Array(TILES_IN_Y) { IntArray(TILES_IN_X) }
+    private val tilemap = Array(TILES_IN_Y) { y -> IntArray(TILES_IN_X) { x -> y * TILES_IN_X + x } }
     // pixmaps inside of this will never be redefined
     private val liveTiles = Array(TILES_IN_X * TILES_IN_Y) { Pixmap(LIVETILE_SIZE, LIVETILE_SIZE, Pixmap.Format.RGBA8888) }
+    // indices are exacly the same as liveTiles
+    private val liveTilesMeta = Array(TILES_IN_X * TILES_IN_Y) { LiveTileMeta(revalidate = true) }
 
+    private val updaterQueue = Queue<Runnable>(TILES_IN_X * TILES_IN_Y * 2)
+    private var currentThreads = Array(maxOf(1, Terrarum.THREADS.times(2).div(3))) {
+        Thread()
+    }
 
     init {
         totalWidth = minimap.width
@@ -60,24 +69,74 @@ object MinimapComposer {
     }
 
     fun update() {
+        // make the queueing work
+        // enqueue first
+        for (y in 0 until tilemap.size) {
+            for (x in 0 until tilemap[0].size) {
+                if (liveTilesMeta[tilemap[y][x]].revalidate) {
+                    liveTilesMeta[tilemap[y][x]].revalidate = false
+                    updaterQueue.addLast(createUpdater(x, y))
+                    printdbg(this, "Queueing tilemap update ($x,$y); queue size now: ${updaterQueue.size}")
+                }
+            }
+        }
+        // consume the queue
+        for (k in 0 until currentThreads.size) {
+            if (currentThreads[k].state == Thread.State.TERMINATED && !updaterQueue.isEmpty) {
+                currentThreads[k] = Thread(updaterQueue.removeFirst(), "MinimapLivetilePainter")
+                printdbg(this, "Consuming from queue; queue size now: ${updaterQueue.size}")
+            }
+            if (currentThreads[k].state == Thread.State.NEW) {
+                currentThreads[k].start()
+            }
+        }
+
+
+        // assign tiles to the tilemap
+        // TODO
 
     }
 
+    fun renderToBackground() {
+        for (y in 0 until TILES_IN_Y) {
+            for (x in 0 until TILES_IN_X) {
+                minimap.drawPixmap(liveTiles[tilemap[y][x]], x * LIVETILE_SIZE, y * LIVETILE_SIZE)
+            }
+        }
+    }
+
+    private val HQRNG = net.torvald.random.HQRNG()
+
     private fun createUpdater(tileSlotIndexX: Int, tileSlotIndexY: Int) = Runnable {
-        val pixmap = liveTiles[tileSlot[tileSlotIndexY][tileSlotIndexX]]
+        val pixmap = liveTiles[tilemap[tileSlotIndexY][tileSlotIndexX]]
         val topLeftX = topLeftCoordX + LIVETILE_SIZE * tileSlotIndexX
         val topLeftY = topLeftCoordY + LIVETILE_SIZE * tileSlotIndexY
 
         for (y in topLeftY until topLeftY + LIVETILE_SIZE) {
             for (x in if (tileSlotIndexY >= TILES_IN_X / 2) (topLeftX + LIVETILE_SIZE - 1) downTo topLeftX else topLeftX until topLeftX + LIVETILE_SIZE) {
-                val color = Color.WHITE // TODO
-                pixmap.drawPixel(x - topLeftX, y - topLeftY, color.toRGBA())
+                val tileTerr = world.getTileFromTerrain(x, y) ?: throw Error("OoB: $x, $y")
+                val wallTerr = world.getTileFromWall(x, y) ?: Block.AIR
+                val colTerr = CreateTileAtlas.terrainTileColourMap.get(tileTerr % 16, tileTerr / 16)
+                val colWall = CreateTileAtlas.terrainTileColourMap.get(wallTerr % 16, wallTerr / 16).mul(BlocksDrawer.wallOverlayColour)
+
+                if (colTerr.a < 1f) {
+                    pixmap.setColor(colWall)
+                    pixmap.drawPixel(x - topLeftX, y - topLeftY)
+                }
+                pixmap.setColor(colTerr)
+                pixmap.drawPixel(x - topLeftX, y - topLeftY)
             }
         }
     }
 
     fun dispose() {
         liveTiles.forEach { it.dispose() }
+        minimap.dispose()
+        try {
+            tempTex.dispose()
+        }
+        catch (e: GdxRuntimeException) {}
     }
 
+    private data class LiveTileMeta(var revalidate: Boolean)
 }
