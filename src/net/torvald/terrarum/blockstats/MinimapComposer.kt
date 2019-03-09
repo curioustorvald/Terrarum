@@ -46,8 +46,8 @@ object MinimapComposer {
     var topLeftCoordY = 0
 
     const val LIVETILE_SIZE = 64
-    const val DISPLAY_CANVAS_WIDTH = 2048
-    const val DISPLAY_CANVAS_HEIGHT = 1024
+    const val DISPLAY_CANVAS_WIDTH = 2048 // must be divisible by LIVETILE_SIZE
+    const val DISPLAY_CANVAS_HEIGHT = 1024 // must be divisible by LIVETILE_SIZE
     val minimap = Pixmap(DISPLAY_CANVAS_WIDTH, DISPLAY_CANVAS_HEIGHT, Pixmap.Format.RGBA8888)
     const val TILES_IN_X = DISPLAY_CANVAS_WIDTH / LIVETILE_SIZE
     const val TILES_IN_Y = DISPLAY_CANVAS_HEIGHT / LIVETILE_SIZE
@@ -96,12 +96,30 @@ object MinimapComposer {
         // TODO
 
     }
+    fun revalidateAll() {
+        liveTilesMeta.forEach { it.revalidate = true }
+    }
+
+    private var rerender = true
+
+    /**
+     * When to call:
+     * - every 5 seconds or so
+     * - every .5 seconds for 10 seconds after the tilemap changed
+     */
+    fun requestRender() {
+        printdbg(this, "Rerender requested")
+        rerender = true
+    }
 
     fun renderToBackground() {
-        for (y in 0 until TILES_IN_Y) {
-            for (x in 0 until TILES_IN_X) {
-                minimap.drawPixmap(liveTiles[tilemap[y][x]], x * LIVETILE_SIZE, y * LIVETILE_SIZE)
+        if (rerender) {
+            for (y in 0 until TILES_IN_Y) {
+                for (x in 0 until TILES_IN_X) {
+                    minimap.drawPixmap(liveTiles[tilemap[y][x]], x * LIVETILE_SIZE, y * LIVETILE_SIZE)
+                }
             }
+            rerender = false
         }
     }
 
