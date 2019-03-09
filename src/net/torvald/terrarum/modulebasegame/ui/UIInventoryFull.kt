@@ -220,6 +220,8 @@ class UIInventoryFull(
             MinimapComposer.setWorld(Terrarum.ingame!!.world)
             MinimapComposer.update()
         }
+
+        minimapRerenderTimer += Gdx.graphics.rawDeltaTime
     }
 
     private val gradStartCol = Color(0x404040_60)
@@ -231,6 +233,9 @@ class UIInventoryFull(
 
     private var xEnd = (Terrarum.WIDTH + internalWidth).div(2).toFloat()
     private var yEnd = (Terrarum.HEIGHT + internalHeight).div(2).toFloat()
+
+    private var minimapRerenderTimer = 0f
+    private val minimapRerenderInterval = .5f
 
     fun requestTransition(target: Int) {
         if (!transitionOngoing) {
@@ -398,12 +403,18 @@ class UIInventoryFull(
         // render minimap
         batch.end()
 
+        if (minimapRerenderTimer >= minimapRerenderInterval) {
+            minimapRerenderTimer = 0f
+            MinimapComposer.requestRender()
+        }
+
         MinimapComposer.renderToBackground()
 
         minimapFBO.inAction(minimapCamera, batch) {
             // whatever.
             MinimapComposer.tempTex.dispose()
             MinimapComposer.tempTex = Texture(MinimapComposer.minimap)
+            MinimapComposer.tempTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Nearest)
 
             batch.inUse {
 
@@ -545,6 +556,8 @@ class UIInventoryFull(
 
     override fun endClosing(delta: Float) {
         (Terrarum.ingame as? Ingame)?.setTooltipMessage(null) // required!
+
+        MinimapComposer.revalidateAll()
     }
 
 
