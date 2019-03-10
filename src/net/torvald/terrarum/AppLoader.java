@@ -4,7 +4,6 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
@@ -290,11 +289,12 @@ public class AppLoader implements ApplicationListener {
 
     private FrameBuffer renderFBO;
 
-    public static AssetManager assetManager;
+    public static CommonResourcePool resourcePool;
 
     @Override
     public void create() {
-        assetManager = new AssetManager();
+        resourcePool = CommonResourcePool.INSTANCE;
+
 
         // set basis of draw
         logoBatch = new SpriteBatch();
@@ -533,7 +533,7 @@ public class AppLoader implements ApplicationListener {
         shaderPassthruRGB.dispose();
         shaderColLUT.dispose();
 
-        assetManager.dispose();
+        resourcePool.dispose();
         fullscreenQuad.dispose();
         logoBatch.dispose();
 
@@ -602,6 +602,11 @@ public class AppLoader implements ApplicationListener {
         if (injectScreen != null) {
             setScreen(injectScreen);
         }
+
+
+        ModMgr.INSTANCE.invoke(); // invoke Module Manager
+        AppLoader.resourcePool.loadAll();
+        printdbg(this, "all modules loaded successfully");
 
 
         BlocksDrawer.INSTANCE.getWorld(); // will initialize the BlocksDrawer by calling dummy method

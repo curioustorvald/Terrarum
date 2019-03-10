@@ -214,6 +214,9 @@ object IngameRenderer {
         // works but some UI elements have wrong transparency -> should be fixed with Terrarum.gdxCleanAndSetBlend -- Torvald 2019-01-12
         blendNormal(batch)
         batch.color = Color.WHITE
+
+
+        drawWires = false
     }
 
 
@@ -231,6 +234,8 @@ object IngameRenderer {
     }
 
     internal var fboRGBexportRequested = false
+
+    var drawWires = false
 
     private fun drawToRGB(
             actorsRenderBehind: List<ActorWithBody>?,
@@ -274,7 +279,7 @@ object IngameRenderer {
             }
 
             setCameraPosition(0f, 0f)
-            BlocksDrawer.drawFront(batch.projectionMatrix, false) // blue coloured filter of water, etc.
+            BlocksDrawer.drawFront(batch.projectionMatrix, drawWires) // blue coloured filter of water, etc.
 
             batch.inUse {
                 FeaturesDrawer.drawEnvOverlay(batch)

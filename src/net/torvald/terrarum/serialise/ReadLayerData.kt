@@ -71,9 +71,6 @@ internal object ReadLayerData {
         retWorld.layerTerrainLowBits.data = terrainLayerLSB
         retWorld.layerWallLowBits.data = wallLayerLSB
 
-        if (wireLayer != null) {
-            retWorld.layerWire.data = wireLayer
-        }
 
         retWorld.spawnX = spawnCoordXBytes.toLittleInt()
         retWorld.spawnY = spawnCoordYBytes.toLittleInt()

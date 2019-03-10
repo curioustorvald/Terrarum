@@ -176,9 +176,6 @@ object WorldGenerator {
         //post-process
         generateFloatingIslands()
 
-        //wire layer
-        Arrays.fill(world.wireArray, 0.toByte())
-
 
         // determine spawn position
         world.spawnY = getSpawnHeight(world.spawnX)

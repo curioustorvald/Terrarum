@@ -1,6 +1,5 @@
 package net.torvald.terrarum.itemproperties
 
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.AppLoader.printdbg
@@ -10,6 +9,7 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
 /**
@@ -31,7 +31,8 @@ object ItemCodex {
     val ITEM_DYNAMIC = 0x10_0000..0x0FFF_FFFF
     val ACTORID_MIN = ITEM_DYNAMIC.endInclusive + 1
 
-    private val itemImagePlaceholder = TextureRegion(Texture("./assets/item_kari_24.tga"))
+    private val itemImagePlaceholder: TextureRegion
+        get() = (AppLoader.resourcePool["basegame.items24"] as TextureRegionPack).get(0,0) // copper pickaxe
 
     //private val ingame = Terrarum.ingame!! as Ingame // WARNING you can't put this here, ExceptionInInitializerError
 
@@ -294,12 +295,11 @@ object ItemCodex {
             )
         }
         // wire
-        else if (itemOriginalID in ITEM_WIRES) {
+        /*else if (itemOriginalID in ITEM_WIRES) {
             return BlocksDrawer.tilesWire.get((itemOriginalID % 16) * 16, itemOriginalID / 16)
-        }
-        // TODO get it real, using originalID...?
+        }*/
         else
-            return itemImagePlaceholder
+            return itemCodex[itemOriginalID]?.itemImage ?: itemImagePlaceholder
     }
 
     fun hasItem(itemID: Int): Boolean = dynamicItemDescription.containsKey(itemID)

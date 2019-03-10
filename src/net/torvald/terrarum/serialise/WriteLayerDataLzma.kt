@@ -113,10 +113,10 @@ internal object WriteLayerDataLzma {
         wb(PAYLOAD_FOOTER)
 
         // WIRE payload
-        wb(PAYLOAD_HEADER); wb("WIRE".toByteArray())
+        /*wb(PAYLOAD_HEADER); wb("WIRE".toByteArray())
         wi48(world.width * world.height.toLong())
         Lzma.compress(ByteArrayInputStream(world.wireArray), outputStream)
-        wb(PAYLOAD_FOOTER)
+        wb(PAYLOAD_FOOTER)*/
 
         // TdMG payload
         wb(PAYLOAD_HEADER); wb("TdMG".toByteArray())

@@ -140,6 +140,8 @@ object ModMgr {
         }*/
     }
 
+    operator fun invoke() { }
+
     private fun checkExistence(module: String) {
         if (!moduleInfo.containsKey(module))
             throw FileNotFoundException("No such module: $module")

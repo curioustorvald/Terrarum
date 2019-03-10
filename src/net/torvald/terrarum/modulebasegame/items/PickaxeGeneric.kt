@@ -1,5 +1,7 @@
 package net.torvald.terrarum.modulebasegame.items
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion
+import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.Point2d
 import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.Block
@@ -10,6 +12,7 @@ import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemID
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.Ingame
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * Created by minjaesong on 2017-07-17.
@@ -22,9 +25,11 @@ class PickaxeGeneric(override val originalID: ItemID) : GameItem() {
     override var baseToolSize: Double? = 10.0
     override var stackable = true
     override var inventoryCategory = Category.TOOL
-    override var isUnique = false
-    override var isDynamic = true
+    override val isUnique = false
+    override val isDynamic = true
     override var material = Material(0,0,0,0,0,0,0,0,1,0.0)
+    override val itemImage: TextureRegion?
+        get() = (AppLoader.resourcePool["basegame.items24"] as TextureRegionPack).get(2,0)
 
     init {
         super.equipPosition = GameItem.EquipPosition.HAND_GRIP

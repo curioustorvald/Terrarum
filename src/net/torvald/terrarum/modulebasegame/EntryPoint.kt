@@ -1,17 +1,15 @@
 package net.torvald.terrarum.modulebasegame
 
+import net.torvald.terrarum.*
 import net.torvald.terrarum.AppLoader.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.ModuleEntryPoint
-import net.torvald.terrarum.Point2d
-import net.torvald.terrarum.Terrarum
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
+import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
  * The entry point for the module "Basegame"
@@ -25,6 +23,18 @@ class EntryPoint : ModuleEntryPoint() {
         ModMgr.GameBlockLoader.invoke("basegame")
         ModMgr.GameItemLoader.invoke("basegame")
         ModMgr.GameLanguageLoader.invoke("basegame")
+
+
+        // load common resources to the AssetsManager
+        AppLoader.resourcePool.addToLoadingList("basegame.items16", TextureRegionPack.javaClass) {
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "items/items.tga"), 16, 16)
+        }
+        AppLoader.resourcePool.addToLoadingList("basegame.items24", TextureRegionPack.javaClass) {
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "items/items24.tga"), 24, 24)
+        }
+        AppLoader.resourcePool.addToLoadingList("basegame.items48", TextureRegionPack.javaClass) {
+            TextureRegionPack(ModMgr.getGdxFile("basegame", "items/items48.tga"), 48, 48)
+        }
 
 
         /////////////////////////////////
@@ -77,7 +87,7 @@ class EntryPoint : ModuleEntryPoint() {
                             this.inventoryCategory == Category.WALL &&
                             this.dynamicID - ItemCodex.ITEM_WALLS.start == ingame.world.getTileFromWall(Terrarum.mouseTileX, Terrarum.mouseTileY) ||
                             this.inventoryCategory == Category.WIRE &&
-                            this.dynamicID - ItemCodex.ITEM_WIRES.start == ingame.world.getTileFromWire(Terrarum.mouseTileX, Terrarum.mouseTileY)
+                            1.shl(this.dynamicID - ItemCodex.ITEM_WIRES.start) and (ingame.world.getWires(Terrarum.mouseTileX, Terrarum.mouseTileY) ?: 0) != 0
                         )
                             return false
 

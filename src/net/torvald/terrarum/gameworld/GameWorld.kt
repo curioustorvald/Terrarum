@@ -46,7 +46,7 @@ open class GameWorld {
     //layers
     val layerWall: MapLayer
     val layerTerrain: MapLayer
-    val layerWire: MapLayer
+    //val layerWire: MapLayer
 
     val layerWallLowBits: PairedMapLayer
     val layerTerrainLowBits: PairedMapLayer
@@ -63,6 +63,12 @@ open class GameWorld {
     val terrainDamages: HashMap<BlockAddress, Float>
     val fluidTypes: HashMap<BlockAddress, FluidType>
     val fluidFills: HashMap<BlockAddress, Float>
+    val conduitTypes: HashMap<BlockAddress, Int> // 1 bit = 1 conduit (pipe/wire) type
+    val conduitFills: Array<HashMap<BlockAddress, Float>>
+    val conduitFills0: HashMap<BlockAddress, Float> // size of liquid packet on the block
+        get() = conduitFills[0]
+    val conduitFills1: HashMap<BlockAddress, Float> // size of gas packet on the block
+        get() = conduitFills[1]
 
     //public World physWorld = new World( new Vec2(0, -Terrarum.game.gravitationalAccel) );
     //physics
@@ -89,7 +95,7 @@ open class GameWorld {
 
         layerTerrain = MapLayer(width, height)
         layerWall = MapLayer(width, height)
-        layerWire = MapLayer(width, height)
+        //layerWire = MapLayer(width, height)
         layerTerrainLowBits = PairedMapLayer(width, height)
         layerWallLowBits = PairedMapLayer(width, height)
 
@@ -97,6 +103,9 @@ open class GameWorld {
         terrainDamages = HashMap<BlockAddress, Float>()
         fluidTypes = HashMap<BlockAddress, FluidType>()
         fluidFills = HashMap<BlockAddress, Float>()
+
+        conduitTypes = HashMap<BlockAddress, Int>()
+        conduitFills = Array(16) { HashMap<BlockAddress, Float>() }
 
         // temperature layer: 2x2 is one cell
         //layerThermal = MapLayerHalfFloat(width, height, averageTemperature)
@@ -115,7 +124,7 @@ open class GameWorld {
 
         layerTerrain = layerData.layerTerrain
         layerWall = layerData.layerWall
-        layerWire = layerData.layerWire
+        //layerWire = layerData.layerWire
         layerTerrainLowBits = layerData.layerTerrainLowBits
         layerWallLowBits = layerData.layerWallLowBits
 
@@ -123,6 +132,9 @@ open class GameWorld {
         terrainDamages = layerData.terrainDamages
         fluidTypes = layerData.fluidTypes
         fluidFills = layerData.fluidFills
+
+        conduitTypes = HashMap<BlockAddress, Int>()
+        conduitFills = Array(16) { HashMap<BlockAddress, Float>() }
 
         spawnX = layerData.spawnX
         spawnY = layerData.spawnY
@@ -158,16 +170,8 @@ open class GameWorld {
 
      * @return byte[][] wire layer
      */
-    val wireArray: ByteArray
-        get() = layerWire.data
-
-    /**
-     * Get paired array data of damage codes.
-     * Format: 0baaaabbbb, aaaa for x = 0, 2, 4, ..., bbbb for x = 1, 3, 5, ...
-     * @return byte[][] damage code pair
-     */
-    val damageDataArray: ByteArray
-        get() = layerTerrainLowBits.data
+    //val wireArray: ByteArray
+    //    get() = layerWire.data
 
     private fun coerceXY(x: Int, y: Int) = (x fmod width) to (y.coerceWorld())
 
@@ -191,9 +195,13 @@ open class GameWorld {
             terrain * PairedMapLayer.RANGE + terrainDamage
     }
 
-    fun getTileFromWire(x: Int, y: Int): Int? {
+    /*fun getTileFromWire(x: Int, y: Int): Int? {
         val (x, y) = coerceXY(x, y)
         return layerWire.getTile(x, y)
+    }*/
+
+    fun getWires(x: Int, y: Int): Int? {
+        return conduitTypes.getOrDefault(LandUtil.getBlockAddr(this, x, y), 0)
     }
 
     fun getWallLowBits(x: Int, y: Int): Int? {
@@ -264,14 +272,14 @@ open class GameWorld {
             Terrarum.ingame?.queueTerrainChangedEvent(oldTerrain, tile.toUint() * PairedMapLayer.RANGE + damage, LandUtil.getBlockAddr(this, x, y))
     }
 
-    fun setTileWire(x: Int, y: Int, tile: Byte) {
+    /*fun setTileWire(x: Int, y: Int, tile: Byte) {
         val (x, y) = coerceXY(x, y)
         val oldWire = getTileFromWire(x, y)
         layerWire.setTile(x, y, tile)
 
         if (oldWire != null)
             Terrarum.ingame?.queueWireChangedEvent(oldWire, tile.toUint(), LandUtil.getBlockAddr(this, x, y))
-    }
+    }*/
 
     fun getTileFrom(mode: Int, x: Int, y: Int): Int? {
         if (mode == TERRAIN) {
@@ -281,7 +289,7 @@ open class GameWorld {
             return getTileFromWall(x, y)
         }
         else if (mode == WIRE) {
-            return getTileFromWire(x, y)
+            return getWires(x, y)
         }
         else
             throw IllegalArgumentException("illegal mode input: " + mode.toString())
