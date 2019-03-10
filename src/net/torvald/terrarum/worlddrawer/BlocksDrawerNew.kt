@@ -291,7 +291,7 @@ internal object BlocksDrawer {
                 val thisTile = when (mode) {
                     WALL -> world.getTileFromWall(x, y)
                     TERRAIN -> world.getTileFromTerrain(x, y)
-                    WIRE -> world.getTileFromWire(x, y)
+                    WIRE -> world.getWires(x, y)
                     FLUID -> world.getFluid(x, y).type.abs()
                     else -> throw IllegalArgumentException()
                 }

@@ -2,7 +2,6 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -195,9 +194,6 @@ object Terrarum : Screen {
 
 
 
-    lateinit var assetManager: AssetManager // TODO
-
-
     init {
         println("$NAME version ${AppLoader.getVERSION_STRING()}")
         println("Java Runtime version ${System.getProperty("java.version")}")
@@ -302,8 +298,6 @@ object Terrarum : Screen {
     val MINIMAL_GL_MAX_TEXTURE_SIZE = 4096
 
     override fun show() {
-        assetManager = AssetManager()
-
 
         testTexture = Texture(Gdx.files.internal("./assets/test_texture.tga"))
 
@@ -386,13 +380,6 @@ object Terrarum : Screen {
         AppLoader.GAME_LOCALE = getConfigString("language")
         printdbg(this, "locale = ${AppLoader.GAME_LOCALE}")
 
-
-
-        ModMgr // invoke Module Manager
-
-
-
-        printdbg(this, "all modules loaded successfully")
 
 
 

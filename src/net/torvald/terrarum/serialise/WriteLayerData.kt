@@ -62,7 +62,6 @@ internal object WriteLayerData {
         outputStream.write(map.layerWall.data)          
         outputStream.write(map.layerTerrainLowBits.data)
         outputStream.write(map.layerWallLowBits.data)   
-        outputStream.write(map.layerWire.data)          
 
         // replace savemeta with tempfile
         try {

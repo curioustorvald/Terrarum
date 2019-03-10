@@ -1,6 +1,7 @@
 package net.torvald.terrarum.itemproperties
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.random.HQRNG
 import net.torvald.terrarum.ItemValue
 import net.torvald.terrarum.itemproperties.ItemCodex.ITEM_DYNAMIC
@@ -81,6 +82,12 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
     var equipPosition: Int = EquipPosition.NULL
 
     abstract val material: Material
+
+    /**
+     * Don't assign! Create getter -- there's inevitable execution order fuckup on ModMgr,
+     * where it simultaneously wanted to be called before and after the Mod's EntryPoint if you assign value to it on init block.
+     */
+    @Transient open val itemImage: TextureRegion? = null
 
     /**
      * Apparent mass of the item. (basemass * scale^3)
@@ -168,12 +175,12 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
     open fun endSecondaryUse(delta: Float): Boolean = false
 
     /**
-     * Effects applied immediately only once if thrown from pocket
+     * Effects applied immediately only once if thrown (discarded) from pocket
      */
     open fun effectWhenThrown(delta: Float) { }
 
     /**
-     * Effects applied (continuously or not) when equipped (drawn)
+     * Effects applied (continuously or not) when equipped (drawn/pulled out)
      */
     open fun effectWhenEquipped(delta: Float) { }
 
@@ -291,6 +298,8 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
 
             return ret
         }
+
+        val NULL_MATERIAL = Material(0,0,0,0,0,0,0,0,1,0.0)
     }
 }
 

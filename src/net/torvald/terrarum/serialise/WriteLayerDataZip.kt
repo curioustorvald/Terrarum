@@ -123,12 +123,12 @@ internal object WriteLayerDataZip {
         wb(PAYLOAD_FOOTER)
 
         // WIRE payload
-        wb(PAYLOAD_HEADER); wb("WIRE".toByteArray())
+        /*wb(PAYLOAD_HEADER); wb("WIRE".toByteArray())
         wi48(world.width * world.height.toLong())
         deflater = DeflaterOutputStream(outputStream, Deflater(Deflater.BEST_COMPRESSION, true), false)
         deflater.write(world.wireArray)
         deflater.flush(); deflater.finish()
-        wb(PAYLOAD_FOOTER)
+        wb(PAYLOAD_FOOTER)*/
 
         // TdMG payload
         wb(PAYLOAD_HEADER); wb("TdMG".toByteArray())

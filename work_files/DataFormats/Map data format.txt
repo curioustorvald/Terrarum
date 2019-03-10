@@ -71,6 +71,10 @@ Payload "FlTP" -- world fluid types, array of: (Int48 tileAddress, Signed Int16 
 Payload "FlFL" -- world fluid fills, array of: (Int48 tileAddress, Float32 amount)
                   Uncompressed size will be arbitrary (multiple of tens)
                   If the 'amount' < 0.0001f (WorldSimulator.FLUID_MIN_MASS), the entry must be discarded
+Payload "CtYP" -- conduit types, array of: (Int48 tileAddress, Uint32 bitarray)
+                  can hold 32 different wires simultaneously
+Payload "CfL0" -- conduit fills, aka size of liquid/gas packet, array of: (Int48 tileAddress, Float32 fill)
+                  CfL0..CfL9, CfLa..CfLf are available to store values for 16 different things.
 
 EOF  45   E
 EOF  6E   n
