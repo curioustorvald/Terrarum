@@ -7,7 +7,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.ActorWBMovable
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
-import net.torvald.terrarum.itemproperties.Material
+import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.modulebasegame.imagefont.WatchFont
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -18,22 +18,27 @@ import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
  */
 class EntryPoint : ModuleEntryPoint() {
 
+    private val moduleName = "basegame"
+
     override fun invoke() {
 
-        ModMgr.GameBlockLoader.invoke("basegame")
-        ModMgr.GameItemLoader.invoke("basegame")
-        ModMgr.GameLanguageLoader.invoke("basegame")
+        // the order of invocation is important! Material should be the first as blocks and items are depend on it.
+        ModMgr.GameMaterialLoader.invoke(moduleName)
+        ModMgr.GameBlockLoader.invoke(moduleName)
+        ModMgr.GameItemLoader.invoke(moduleName)
+        ModMgr.GameLanguageLoader.invoke(moduleName)
+
 
 
         // load common resources to the AssetsManager
-        AppLoader.resourcePool.addToLoadingList("basegame.items16", TextureRegionPack.javaClass) {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "items/items.tga"), 16, 16)
+        AppLoader.resourcePool.addToLoadingList("$moduleName.items16", TextureRegionPack.javaClass) {
+            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items.tga"), 16, 16)
         }
-        AppLoader.resourcePool.addToLoadingList("basegame.items24", TextureRegionPack.javaClass) {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "items/items24.tga"), 24, 24)
+        AppLoader.resourcePool.addToLoadingList("$moduleName.items24", TextureRegionPack.javaClass) {
+            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items24.tga"), 24, 24)
         }
-        AppLoader.resourcePool.addToLoadingList("basegame.items48", TextureRegionPack.javaClass) {
-            TextureRegionPack(ModMgr.getGdxFile("basegame", "items/items48.tga"), 48, 48)
+        AppLoader.resourcePool.addToLoadingList("$moduleName.items48", TextureRegionPack.javaClass) {
+            TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items48.tga"), 48, 48)
         }
 
 
@@ -59,7 +64,7 @@ class EntryPoint : ModuleEntryPoint() {
                     override var stackable = true
                     override var inventoryCategory = if (i in ItemCodex.ITEM_TILES) Category.BLOCK else Category.WALL
                     override var isDynamic = false
-                    override val material = Material(0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0)
+                    override val material = MaterialCodex[blockProp.material]
 
                     init {
                         equipPosition = EquipPosition.HAND_GRIP

@@ -1,3 +1,5 @@
    "id";"classname"
- "8448";"net.torvald.terrarum.modulebasegame.items.PickaxeGeneric"
- "8449";"net.torvald.terrarum.modulebasegame.items.WirePieceSignalWire"
+ "8448";"net.torvald.terrarum.modulebasegame.items.PickaxeCopper"
+ "8449";"net.torvald.terrarum.modulebasegame.items.PickaxeIron"
+ "8450";"net.torvald.terrarum.modulebasegame.items.PickaxeSteel"
+ "8466";"net.torvald.terrarum.modulebasegame.items.WirePieceSignalWire"

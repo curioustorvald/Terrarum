@@ -298,8 +298,6 @@ abstract class GameItem : Comparable<GameItem>, Cloneable {
 
             return ret
         }
-
-        val NULL_MATERIAL = Material(0,0,0,0,0,0,0,0,1,0.0)
     }
 }
 

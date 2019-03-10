@@ -8,6 +8,7 @@ import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarum.itemproperties.ItemID
+import net.torvald.terrarum.itemproperties.MaterialCodex
 import net.torvald.terrarum.langpack.Lang
 import net.torvald.terrarum.utils.CSVFetcher
 import net.torvald.terrarum.utils.JsonFetcher
@@ -247,6 +248,14 @@ object ModMgr {
 
         @JvmStatic operator fun invoke(module: String) {
             Lang.load(getPath(module, langPath))
+        }
+    }
+
+    object GameMaterialLoader {
+        val matePath = "materials/"
+
+        @JvmStatic operator fun invoke(module: String) {
+            MaterialCodex(module, matePath + "materials.csv")
         }
     }
 }

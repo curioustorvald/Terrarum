@@ -4,7 +4,6 @@ import net.torvald.terrarum.ModMgr
 import net.torvald.terrarum.blockproperties.Block
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.faction.FactionFactory
-import net.torvald.terrarum.itemproperties.ItemCodex
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -96,8 +95,11 @@ object PlayerBuilderSigrid {
         )
         blocks.forEach { inventory.add(it, 9995) }
         walls.forEach { inventory.add(it + 4096, 9995) }
-        inventory.add(ItemCodex.ITEM_STATIC.first)
-        inventory.add(9000)
-        inventory.add(9001)
+        inventory.add(8448) // copper pick
+        inventory.add(8449) // iron pick
+        inventory.add(8450) // steel pick
+        inventory.add(8466) // wire piece
+        inventory.add(9000) // TEST water bucket
+        inventory.add(9001) // TEST lava bucket
     }
 }
