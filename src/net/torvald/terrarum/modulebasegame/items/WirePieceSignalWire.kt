@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import net.torvald.terrarum.AppLoader
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemID
+import net.torvald.terrarum.itemproperties.Material
 import net.torvald.terrarum.modulebasegame.IngameRenderer
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
@@ -20,7 +21,7 @@ class WirePieceSignalWire(override val originalID: ItemID) : GameItem() {
     override var inventoryCategory = Category.WIRE
     override val isUnique = false
     override val isDynamic = false
-    override val material = GameItem.NULL_MATERIAL
+    override val material = Material()
     override val itemImage: TextureRegion?
         get() = (AppLoader.resourcePool["basegame.items16"] as TextureRegionPack).get(1,9)
 

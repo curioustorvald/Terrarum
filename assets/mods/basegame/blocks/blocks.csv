@@ -119,7 +119,7 @@
 #
 # vscs: viscosity, (velocity) / (1 + (n/16)), 16 halves movement speed, can be used to non-fluid tiles (sticky hazard, tarmac road in Terraria)
 #
-# str: strength
+# str: strength. Only useful for pickaxes
 #
 # dsty: density. As we are putting water an 1000, it is identical to specific gravity. [g/l]
 #

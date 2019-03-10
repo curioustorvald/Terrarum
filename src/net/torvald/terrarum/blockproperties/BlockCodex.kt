@@ -139,45 +139,45 @@ object BlockCodex {
         print("${intVal(record, "id")}")
         println("\t" + prop.nameKey)
     }
-
-    private fun str16ToInt(rec: CSVRecord, s: String): Int {
-        var ret = 0
-        try {
-            ret = rec.get(s).toLong(16).toInt()
-        }
-        catch (e: NumberFormatException) {
-        }
-        catch (e1: IllegalStateException) {
-        }
-
-        return ret
-    }
-
-    private fun intVal(rec: CSVRecord, s: String): Int {
-        var ret = -1
-        try {
-            ret = rec.get(s).toInt()
-        }
-        catch (e: NumberFormatException) {
-        }
-        catch (e1: IllegalStateException) {
-        }
-
-        return ret
-    }
-
-    private fun floatVal(rec: CSVRecord, s: String): Float {
-        var ret = -1f
-        try {
-            ret = rec.get(s).toFloat()
-        }
-        catch (e: NumberFormatException) {
-        }
-        catch (e1: IllegalStateException) {
-        }
-
-        return ret
-    }
-
-    private fun boolVal(rec: CSVRecord, s: String) = intVal(rec, s) != 0
 }
+
+fun str16ToInt(rec: CSVRecord, s: String): Int {
+    var ret = 0
+    try {
+        ret = rec.get(s).toLong(16).toInt()
+    }
+    catch (e: NumberFormatException) {
+    }
+    catch (e1: IllegalStateException) {
+    }
+
+    return ret
+}
+
+fun intVal(rec: CSVRecord, s: String): Int {
+    var ret = -1
+    try {
+        ret = rec.get(s).toInt()
+    }
+    catch (e: NumberFormatException) {
+    }
+    catch (e1: IllegalStateException) {
+    }
+
+    return ret
+}
+
+fun floatVal(rec: CSVRecord, s: String): Float {
+    var ret = -1f
+    try {
+        ret = rec.get(s).toFloat()
+    }
+    catch (e: NumberFormatException) {
+    }
+    catch (e1: IllegalStateException) {
+    }
+
+    return ret
+}
+
+fun boolVal(rec: CSVRecord, s: String) = intVal(rec, s) != 0

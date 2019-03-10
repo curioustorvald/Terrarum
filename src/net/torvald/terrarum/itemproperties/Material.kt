@@ -1,36 +1,56 @@
 package net.torvald.terrarum.itemproperties
 
+import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.blockproperties.floatVal
+import net.torvald.terrarum.blockproperties.intVal
+import net.torvald.terrarum.utils.CSVFetcher
+import java.io.IOException
+
 /**
  * To be used with items AND TILES (electricity resistance, thermal conductivity)
  *
  * Created by minjaesong on 2016-03-18.
  */
-data class Material (
-    //var maxEdge: Int, // i think weapSharpnessMod would cut it // arbitrary unit
-    var hardness: Int, // arbitrary unit
-    var density: Int, // grams per litre
+class Material {
+    var strength: Int = 1 // actually tensile strength
+    var density: Int = 1000 // grams per litre
 
-    // impact force: force applied by sudden strike, e.g. hammer/axe/sword strike
-    var impactRigidness: Int, // arbitrary unit  (rigid <-> soft)  a weapon made of soft material will inflict less damage
-    var impactFractureForce: Int, // pascal (N/m^2); if the item (e.g. sword) receives a force that exceeds this value, the item will be destroyed
+    var thermalConductivity: Float = 10f // watts per metre-kelven
 
-    // compressive force: force applied by exerting pressure on an object, e.g. sword/spear stab
-    var compressiveRigidness: Int,  // arbitrary unit  (rigid <-> soft)  a weapon made of soft material will inflict less damage
-    var compressiveFractureForce: Int, // pascal (N/m^2); if the item (e.g. sword) receives a force that exceeds this value, the item will be destroyed
+    var forceMod: Int = 1 // arbitrary unit. See Pickaxe_Power.xlsx
+    var enduranceMod: Float = 1f // multiplier. Copper as 1.0
+    //var armourMod: Float // multiplier. Copper as 1.0
 
-    // remarks:
-    //      we won't need elasticity, even if we have glass
-    // some examples:
-    //      - glass sword works as the material has high compressive fracture, but prone to shatter
-    //        (hit mobs 5-6 times and it's gone) as it shatters easily as it has low impact fracture
+    var durability: Int = 0 // tools only
+}
 
+object MaterialCodex {
 
+    private var materialProps = HashMap<String, Material>()
+    private val nullMaterial = Material()
 
-    var electricityResistance: Int, // ohm
-    var thermalConductivity: Int, // pascal (N/m^2); if the item (e.g. sword) receives a force that exceeds this value, the item will be destroyed
+    operator fun invoke(module: String, path: String) {
+        try {
+            val records = CSVFetcher.readFromModule(module, path)
 
+            printdbg(this, "Building materials table")
 
+            records.forEach {
+                val prop = Material()
+                prop.strength = intVal(it, "tens")
+                prop.density = intVal(it, "dsty")
+                prop.forceMod = intVal(it, "forcemod")
+                prop.enduranceMod = floatVal(it, "endurance")
+                prop.thermalConductivity = floatVal(it, "tcond")
 
-    var forceMod: Int, // arbitrary unit. See Pickaxe_Power.xlsx
-    var armourMod: Double // multiplier
-)
+                materialProps[it.get("idst").toUpperCase()] = prop
+            }
+        }
+        catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    operator fun get(identifier: String) = materialProps[identifier.toUpperCase()] ?: nullMaterial
+
+}

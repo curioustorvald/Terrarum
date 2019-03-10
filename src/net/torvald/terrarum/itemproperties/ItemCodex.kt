@@ -188,7 +188,7 @@ object ItemCodex {
             override var stackable: Boolean = false
 
             override val isDynamic: Boolean = false
-            override val material: Material = Material(1,1,1,1,1,1,1,1,1,1.0)
+            override val material: Material = Material()
 
             init {
                 equipPosition = EquipPosition.HAND_GRIP
@@ -217,7 +217,7 @@ object ItemCodex {
             override var stackable: Boolean = false
 
             override val isDynamic: Boolean = false
-            override val material: Material = Material(1,1,1,1,1,1,1,1,1,1.0)
+            override val material: Material = Material()
 
             init {
                 equipPosition = EquipPosition.HAND_GRIP
