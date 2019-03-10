@@ -50,16 +50,16 @@ class UIItemInventoryDynamicList(
 
 
     val catIconsMeaning = listOf( // sortedBy: catArrangement
-            GameItem.Category.WEAPON,
-            GameItem.Category.TOOL,
-            GameItem.Category.ARMOUR,
-            GameItem.Category.GENERIC,
-            GameItem.Category.POTION,
-            GameItem.Category.MAGIC,
-            GameItem.Category.BLOCK,
-            GameItem.Category.WALL,
-            GameItem.Category.MISC,
-            "__all__"
+            arrayOf(GameItem.Category.WEAPON),
+            arrayOf(GameItem.Category.TOOL, GameItem.Category.WIRE),
+            arrayOf(GameItem.Category.ARMOUR),
+            arrayOf(GameItem.Category.GENERIC),
+            arrayOf(GameItem.Category.POTION),
+            arrayOf(GameItem.Category.MAGIC),
+            arrayOf(GameItem.Category.BLOCK),
+            arrayOf(GameItem.Category.WALL),
+            arrayOf(GameItem.Category.MISC),
+            arrayOf("__all__")
     )
 
     private val inventoryUI = parentUI
@@ -316,7 +316,7 @@ class UIItemInventoryDynamicList(
 
         // filter items
         inventory.forEach {
-            if (ItemCodex[it.item]!!.inventoryCategory == filter || filter == "__all__")
+            if ((filter.contains(ItemCodex[it.item]!!.inventoryCategory) || filter[0] == "__all__"))
                 inventorySortList.add(it)
         }
 
