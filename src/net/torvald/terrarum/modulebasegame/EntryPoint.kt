@@ -31,13 +31,13 @@ class EntryPoint : ModuleEntryPoint() {
 
 
         // load common resources to the AssetsManager
-        AppLoader.resourcePool.addToLoadingList("$moduleName.items16", TextureRegionPack.javaClass) {
+        AppLoader.resourcePool.addToLoadingList("$moduleName.items16") {
             TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items.tga"), 16, 16)
         }
-        AppLoader.resourcePool.addToLoadingList("$moduleName.items24", TextureRegionPack.javaClass) {
+        AppLoader.resourcePool.addToLoadingList("$moduleName.items24") {
             TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items24.tga"), 24, 24)
         }
-        AppLoader.resourcePool.addToLoadingList("$moduleName.items48", TextureRegionPack.javaClass) {
+        AppLoader.resourcePool.addToLoadingList("$moduleName.items48") {
             TextureRegionPack(ModMgr.getGdxFile(moduleName, "items/items48.tga"), 48, 48)
         }
 

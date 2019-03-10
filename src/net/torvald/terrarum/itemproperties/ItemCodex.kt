@@ -9,7 +9,6 @@ import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulebasegame.Ingame
 import net.torvald.terrarum.modulebasegame.gameactors.CanBeAnItem
 import net.torvald.terrarum.worlddrawer.BlocksDrawer
-import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 import java.util.*
 
 /**
@@ -32,7 +31,7 @@ object ItemCodex {
     val ACTORID_MIN = ITEM_DYNAMIC.endInclusive + 1
 
     private val itemImagePlaceholder: TextureRegion
-        get() = (AppLoader.resourcePool["basegame.items24"] as TextureRegionPack).get(0,0) // copper pickaxe
+        get() = AppLoader.resourcePool.getAsTextureRegion("itemplaceholder_24") // copper pickaxe
 
     //private val ingame = Terrarum.ingame!! as Ingame // WARNING you can't put this here, ExceptionInInitializerError
 
