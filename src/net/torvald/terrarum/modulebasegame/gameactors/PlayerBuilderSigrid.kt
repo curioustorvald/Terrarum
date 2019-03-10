@@ -1,9 +1,10 @@
 package net.torvald.terrarum.modulebasegame.gameactors
 
 import net.torvald.terrarum.ModMgr
-import net.torvald.terrarum.blockproperties.Block
+import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.gameactors.AVKey
 import net.torvald.terrarum.gameactors.faction.FactionFactory
+import net.torvald.terrarum.worlddrawer.CreateTileAtlas
 import net.torvald.terrarumsansbitmap.gdx.TextureRegionPack
 
 /**
@@ -73,28 +74,14 @@ object PlayerBuilderSigrid {
     }
 
     fun fillTestInventory(inventory: ActorInventory) {
-        val blocks = arrayOf(
-                Block.AIR, Block.DIRT, Block.GLASS_CRUDE, Block.GLASS_CLEAN,
-                Block.GRASS, Block.GRAVEL, Block.ICE_MAGICAL, Block.LANTERN,
-                Block.PLANK_BIRCH, Block.PLANK_BLOODROSE, Block.PLANK_EBONY, Block.PLANK_NORMAL,
-                Block.SANDSTONE, Block.SANDSTONE_BLACK, Block.SANDSTONE_GREEN,
-                Block.SANDSTONE_RED, Block.STONE, Block.STONE_BRICKS,
-                Block.STONE_QUARRIED, Block.STONE_TILE_WHITE, Block.TORCH,
-                Block.DAYLIGHT_CAPACITOR, Block.ICE_FRAGILE,
-                Block.SUNSTONE,
-                Block.ORE_COPPER,
-                Block.PLATFORM_STONE, Block.PLATFORM_WOODEN, Block.PLATFORM_BIRCH, Block.PLATFORM_BLOODROSE, Block.PLATFORM_EBONY
-        ) + (Block.ILLUMINATOR_WHITE .. Block.ILLUMINATOR_BLACK).toList()
-        val walls = arrayOf(
-                Block.AIR, Block.DIRT, Block.GLASS_CRUDE, Block.GLASS_CLEAN,
-                Block.GRASSWALL, Block.ICE_MAGICAL,
-                Block.PLANK_BIRCH, Block.PLANK_BLOODROSE, Block.PLANK_EBONY, Block.PLANK_NORMAL,
-                Block.SANDSTONE, Block.SANDSTONE_BLACK, Block.SANDSTONE_GREEN,
-                Block.SANDSTONE_RED, Block.STONE, Block.STONE_BRICKS,
-                Block.STONE_QUARRIED, Block.STONE_TILE_WHITE
-        )
-        blocks.forEach { inventory.add(it, 9995) }
-        walls.forEach { inventory.add(it + 4096, 9995) }
+
+        CreateTileAtlas.tags.forEach { t, _ ->
+            inventory.add(t, 9995)
+            if (BlockCodex[t].isWallable) {
+                inventory.add(t + 4096, 9995)
+            }
+        }
+
         inventory.add(8448) // copper pick
         inventory.add(8449) // iron pick
         inventory.add(8450) // steel pick
