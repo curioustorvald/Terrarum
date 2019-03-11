@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import net.torvald.terrarum.*
+import net.torvald.terrarum.AppLoader.IS_DEVELOPMENT_BUILD
 import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.Terrarum.gamepadLabelEast
 import net.torvald.terrarum.Terrarum.gamepadLabelLStick
@@ -229,7 +230,7 @@ class UIInventoryFull(
     private val shapeRenderer = ShapeRenderer()
     private val gradHeight = 48f
 
-    private val weightBarWidth = 60f
+    private val weightBarWidth = 64f
 
     private var xEnd = (Terrarum.WIDTH + internalWidth).div(2).toFloat()
     private var yEnd = (Terrarum.HEIGHT + internalHeight).div(2).toFloat()
@@ -465,8 +466,6 @@ class UIInventoryFull(
         gameMenuButtons.render(batch, camera)
     }
 
-    private val encumbranceBarBackCol = Color(0xa0a0a0_ff.toInt())
-
     private fun renderScreenInventory(batch: SpriteBatch, camera: Camera) {
         itemList.render(batch, camera)
         equipped.render(batch, camera)
@@ -483,31 +482,41 @@ class UIInventoryFull(
 
         Terrarum.fontGame.draw(batch,
                 encumbranceText,
-                xEnd - 9 - Terrarum.fontGame.getWidth(encumbranceText) - weightBarWidth + inventoryScrOffX,
+                xEnd - 6 - Terrarum.fontGame.getWidth(encumbranceText) - weightBarWidth + inventoryScrOffX,
                 yEnd-20
         )
 
         // encumbrance bar background
-        blendMul(batch)
-        batch.color = encumbranceBarBackCol
+        blendNormal(batch)
+        val encumbCol = UIItemInventoryCellCommonRes.getHealthMeterColour(1f - encumbrancePerc, 0f, 1f)
+        val encumbBack = encumbCol mul UIItemInventoryCellCommonRes.meterBackDarkening
+        batch.color = encumbBack
         batch.fillRect(
-                xEnd - 3 - weightBarWidth + inventoryScrOffX,
+                xEnd - weightBarWidth + inventoryScrOffX,
                 yEnd-20 + 3f,
                 weightBarWidth,
                 controlHelpHeight - 6f
         )
         // encumbrance bar
-        blendNormal(batch)
-        batch.color = if (isEncumbered) Color(0xff0000_cc.toInt()) else Color(0x00ff00_cc.toInt())
+        batch.color = encumbCol
         batch.fillRect(
-                xEnd - 3 - weightBarWidth + inventoryScrOffX,
+                xEnd - weightBarWidth + inventoryScrOffX,
                 yEnd-20 + 3f,
                 if (actor.inventory.capacityMode == CAPACITY_MODE_NO_ENCUMBER)
                     1f
                 else // make sure 1px is always be seen
                     minOf(weightBarWidth, maxOf(1f, weightBarWidth * encumbrancePerc)),
-                controlHelpHeight - 5f
+                controlHelpHeight - 6f
         )
+        // debug text
+        batch.color = Color.LIGHT_GRAY
+        if (IS_DEVELOPMENT_BUILD) {
+            AppLoader.fontSmallNumbers.draw(batch,
+                    "${actor.inventory.capacity}/${actor.inventory.maxCapacity}",
+                    xEnd - 6 - Terrarum.fontGame.getWidth(encumbranceText) - weightBarWidth + inventoryScrOffX,
+                    yEnd-20 + 3f + controlHelpHeight - 4f
+            )
+        }
     }
 
 
