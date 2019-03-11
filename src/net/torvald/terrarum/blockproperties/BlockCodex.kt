@@ -2,6 +2,7 @@ package net.torvald.terrarum.blockproperties
 
 import com.badlogic.gdx.graphics.Color
 import net.torvald.terrarum.AppLoader
+import net.torvald.terrarum.AppLoader.printmsg
 import net.torvald.terrarum.gameworld.FluidType
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.gameworld.MapLayer
@@ -33,7 +34,7 @@ object BlockCodex {
         try {
             val records = CSVFetcher.readFromModule(module, path)
 
-            AppLoader.printdbg(this, "Building block properties table")
+            AppLoader.printmsg(this, "Building block properties table")
 
             records.forEach {
                 /*if (intVal(it, "id") == -1) {
@@ -136,8 +137,7 @@ object BlockCodex {
 
         blockProps[key] = prop
 
-        print("${intVal(record, "id")}")
-        println("\t" + prop.nameKey)
+        printmsg(this, "${intVal(record, "id")}\t" + prop.nameKey)
     }
 }
 

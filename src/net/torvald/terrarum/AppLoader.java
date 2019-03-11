@@ -881,6 +881,10 @@ public class AppLoader implements ApplicationListener {
         }
     }
 
+    public static void printmsg(Object obj, Object message) {
+        System.out.println("[" + obj.getClass().getSimpleName() + "] " + message.toString());
+    }
+
     public static ShaderProgram loadShader(String vert, String frag) {
         ShaderProgram s = new ShaderProgram(Gdx.files.internal(vert), Gdx.files.internal(frag));
 

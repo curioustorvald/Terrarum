@@ -2,8 +2,7 @@ package net.torvald.terrarum
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
-import net.torvald.terrarum.AppLoader.printdbg
-import net.torvald.terrarum.AppLoader.printdbgerr
+import net.torvald.terrarum.AppLoader.*
 import net.torvald.terrarum.blockproperties.BlockCodex
 import net.torvald.terrarum.itemproperties.GameItem
 import net.torvald.terrarum.itemproperties.ItemCodex
@@ -75,7 +74,7 @@ object ModMgr {
 
         loadOrder.forEachIndexed { index, it ->
             val moduleName = it[0]
-            printdbg(this, "Loading module $moduleName")
+            printmsg(this, "Loading module $moduleName")
 
             try {
                 val modMetadata = Properties()

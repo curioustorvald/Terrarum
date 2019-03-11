@@ -1,6 +1,6 @@
 package net.torvald.terrarum.itemproperties
 
-import net.torvald.terrarum.AppLoader.printdbg
+import net.torvald.terrarum.AppLoader.printmsg
 import net.torvald.terrarum.blockproperties.floatVal
 import net.torvald.terrarum.blockproperties.intVal
 import net.torvald.terrarum.utils.CSVFetcher
@@ -22,6 +22,8 @@ class Material {
     //var armourMod: Float // multiplier. Copper as 1.0
 
     var durability: Int = 0 // tools only
+
+    var identifier: String = "Name not set"
 }
 
 object MaterialCodex {
@@ -33,17 +35,20 @@ object MaterialCodex {
         try {
             val records = CSVFetcher.readFromModule(module, path)
 
-            printdbg(this, "Building materials table")
+            printmsg(this, "Building materials table")
 
             records.forEach {
                 val prop = Material()
                 prop.strength = intVal(it, "tens")
                 prop.density = intVal(it, "dsty")
-                prop.forceMod = intVal(it, "forcemod")
+                prop.forceMod = intVal(it, "fmod")
                 prop.enduranceMod = floatVal(it, "endurance")
                 prop.thermalConductivity = floatVal(it, "tcond")
+                prop.identifier = it.get("idst").toUpperCase()
 
-                materialProps[it.get("idst").toUpperCase()] = prop
+                materialProps[prop.identifier] = prop
+
+                printmsg(this, "${prop.identifier}\t${prop.strength}\t${prop.density}\t${prop.forceMod}\t${prop.enduranceMod}")
             }
         }
         catch (e: IOException) {
@@ -51,6 +56,13 @@ object MaterialCodex {
         }
     }
 
-    operator fun get(identifier: String) = materialProps[identifier.toUpperCase()] ?: nullMaterial
+    operator fun get(identifier: String) = try {
+        materialProps[identifier.toUpperCase()]!!
+    }
+    catch (e: NullPointerException) {
+        throw NullPointerException("Material with id $identifier does not exist.")
+    }
+
+    fun getOrDefault(identifier: String) = materialProps[identifier.toUpperCase()] ?: nullMaterial
 
 }

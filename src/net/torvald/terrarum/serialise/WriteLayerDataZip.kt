@@ -1,5 +1,6 @@
 package net.torvald.terrarum.serialise
 
+import net.torvald.terrarum.AppLoader.printdbg
 import net.torvald.terrarum.gameworld.GameWorld
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64
 import net.torvald.terrarum.modulecomputers.virtualcomputer.tvd.ByteArray64GrowableOutputStream
@@ -104,6 +105,10 @@ internal object WriteLayerDataZip {
         // Thus, \0pLd + [10] must be either of these.
 
         // TODO serialised payloads have bit too much zeros, should I be worried?
+
+        val savePayloads = world.javaClass.superclass.declaredFields//.filter { it.isAnnotationPresent(TEMzPayload::class.java) }
+        printdbg(this, "")
+        savePayloads.forEach { printdbg(this, "${it.name}: ${it.type} @${it.declaredAnnotations.size}") }
 
         wb(PAYLOAD_HEADER); wb("TERR".toByteArray())
         wi48(world.width * world.height * 3L / 2)
